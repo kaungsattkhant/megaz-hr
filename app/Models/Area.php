@@ -12,4 +12,9 @@ class Area extends Model
     protected $fillable=[
         'name','area_type_id'
     ];
+
+    public function areaType()
+    {
+        return $this->belongsTo(AreaType::class);
+    }
 }

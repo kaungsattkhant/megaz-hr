@@ -13,14 +13,14 @@ return new class extends Migration
     {
         Schema::create('staff', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('gender_id')->constrained()->onDelete('cascade');
+            $table->foreignId('department_id')->constrained()->onDelete('cascade');
             $table->string('name',45);
-            $table->string('phone_number',45);
+            $table->string('phone_number',45)->unique();
             $table->string('password',225);
-            $table->string('nrc_no',45);
-            $table->string('address',45);
-            $table->unsignedBigInteger('gender_id');
-            $table->unsignedBigInteger('department_id');
-            $table->tinyInteger('is_verified');
+            $table->string('nrc_no',45)->nullable();
+            $table->string('address')->nullable();
+            $table->boolean('is_verified');
             $table->timestamps();
         });
     }

@@ -13,8 +13,8 @@ return new class extends Migration
     {
         Schema::create('areas', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('area_type_id')->constrained()->onDelete('cascade');
             $table->string('name',45);
-            $table->unsignedBigInteger('area_type_id');
             $table->timestamps();
         });
     }

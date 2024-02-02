@@ -11,9 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('staff_roles', function (Blueprint $table) {
-            $table->unsignedBigInteger('staff_id');
-            $table->unsignedBigInteger('role_id');
+        Schema::create('role_staff', function (Blueprint $table) {
+            $table->foreignId('staff_id')->constrained()->onDelete('cascade');
+            $table->foreignId('role_id')->constrained()->onDelete('cascade');
         });
     }
 
@@ -22,6 +22,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('staff_roles');
+        Schema::dropIfExists('role_staff');
     }
 };
