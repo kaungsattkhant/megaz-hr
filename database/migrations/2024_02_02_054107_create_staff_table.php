@@ -18,9 +18,9 @@ return new class extends Migration
             $table->string('name',45);
             $table->string('phone_number',45)->unique();
             $table->string('password',225);
-            $table->string('nrc_no',45)->nullable();
+            $table->string('nrc_number',45)->nullable();
             $table->string('address')->nullable();
-            $table->boolean('is_verified');
+            $table->boolean('is_active')->default(1);
             $table->timestamps();
         });
     }

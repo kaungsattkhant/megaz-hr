@@ -22,6 +22,7 @@ return new class extends Migration
             $table->boolean('is_double_checked')->default(0);
             $table->unsignedBigInteger('double_checked_by')->nullable();
             $table->tinyInteger('status');
+            $table->boolean('is_active')->default(1);
             $table->timestamps();
         });
     }

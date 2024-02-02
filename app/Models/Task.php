@@ -13,7 +13,7 @@ class Task extends Model
     protected $fillable=[
         'name','task','assigned_at','completed_at','completed_by',
         'is_double_checked','double_checked_by',
-        'status','role_id'
+        'status','role_id','is_active'
     ];
 
     public function role()
