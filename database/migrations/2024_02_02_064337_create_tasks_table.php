@@ -1,0 +1,36 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    /**
+     * Run the migrations.
+     */
+    public function up(): void
+    {
+        Schema::create('tasks', function (Blueprint $table) {
+            $table->id();
+            $table->string('name',45);
+            $table->longText('text');
+            $table->dateTime('assigned_at');
+            $table->dateTime('completed_at');
+            $table->unsignedBigInteger('completed_by');
+            $table->tinyInteger('is_double_checked');
+            $table->unsignedBigInteger('double_checked_by');
+            $table->tinyInteger('status');
+            $table->unsignedBigInteger('role_id');
+            $table->timestamps();
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     */
+    public function down(): void
+    {
+        Schema::dropIfExists('tasks');
+    }
+};
