@@ -6,15 +6,24 @@ use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
+use App\Models\Area;
+use App\Models\Role;
+
 class Task extends Model
 {
     use HasFactory;
 
     protected $fillable=[
-        'name','task','assigned_at','completed_at','completed_by',
+        'role_id', 'area_id',
+        'name','description','assigned_at','completed_at','completed_by',
         'is_double_checked','double_checked_by',
-        'status','role_id','is_active'
+        'status','is_active'
     ];
+
+    public function area()
+    {
+        return $this->belongsTo(Area::class);
+    }
 
     public function role()
     {
