@@ -5,6 +5,11 @@ namespace Database\Seeders;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
+use Database\Seeders\DepartmentSeeder;
+use Database\Seeders\GenderSeeder;
+use Database\Seeders\RoleSeeder;
+use Database\Seeders\StaffSeeder;
+
 class DatabaseSeeder extends Seeder
 {
     /**
@@ -12,11 +17,9 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // \App\Models\User::factory(10)->create();
-
-        // \App\Models\User::factory()->create([
-        //     'name' => 'Test User',
-        //     'email' => 'test@example.com',
-        // ]);
+        (new DepartmentSeeder())->run();
+        (new GenderSeeder())->run();
+        (new RoleSeeder())->run();
+        (new StaffSeeder())->run();
     }
 }
