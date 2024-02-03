@@ -2,12 +2,12 @@
 
 namespace App\Repositories;
 
-use App\Models\Staff;
+use App\Models\Area;
 
 class AreaRepository implements AreaRepositoryInterface
 {
-    public function getAreasByStaff(Staff $staff)
+    public function getAreas()
     {
-
+        return Area::with('areaType')->where('is_active', 1)->get();
     }
 }
