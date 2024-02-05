@@ -6,7 +6,7 @@ use Illuminate\Http\Request;
 
 use App\Http\Controllers\Controller;
 
-use App\Repositories\AreaRepositoryInterface;
+use App\Repositories\Area\AreaRepositoryInterface;
 
 class AreaController extends Controller
 {

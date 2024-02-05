@@ -4,8 +4,8 @@ namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
 
-use App\Repositories\AreaRepositoryInterface;
-use App\Repositories\AreaRepository;
+use App\Repositories\Area\AreaRepositoryInterface;
+use App\Repositories\Area\AreaRepository;
 
 class RepositoryServiceProvider extends ServiceProvider
 {
