@@ -17,7 +17,7 @@ class Staff extends Authenticatable
     use HasFactory, HasApiTokens;
 
     protected $fillable=[
-        'name','phone_number','nrc_number','address','gender_id','department_id','is_active'
+        'name','phone_number','nrc_number','address','gender_id','department_id','is_active','password'
     ];
 
     protected $hidden=[
