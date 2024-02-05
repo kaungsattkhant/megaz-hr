@@ -26,7 +26,7 @@ Route::middleware('auth:api')->group(function(){
     Route::post('/logout', [AuthController::class, 'logout']);
 
     Route::get('/areas', [AreaController::class, 'getAreas']);
-    Route::get('/areas/{areaId}/tasks', [TaskController::class, 'getTasks']);
+    Route::get('/areas/{areaId}/tasks', [TaskController::class, 'getTasksOfRolesFromArea']);
 });
 
 Route::get('/departments',[DepartmentAPIController::class,'getDepartmentData']);
