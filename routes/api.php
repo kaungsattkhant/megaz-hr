@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Route;
 
 use App\Http\Controllers\API\AuthController;
 use App\Http\Controllers\API\AreaController;
+use App\Http\Controllers\API\TaskController;
 
 /*
 |--------------------------------------------------------------------------
@@ -22,6 +23,7 @@ Route::middleware('auth:api')->group(function(){
     Route::post('/logout', [AuthController::class, 'logout']);
 
     Route::get('/areas', [AreaController::class, 'getAreas']);
+    Route::get('/areas/{areaId}/tasks', [TaskController::class, 'getTasks']);
 });
 
 // Route::group(['prefix' => 'management'], function () {});
