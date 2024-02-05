@@ -3,10 +3,11 @@
 namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\RoleCreateRequest;
-use App\Http\Requests\RoleUpdateRequest;
+
+use App\Http\Requests\Role\RoleCreateRequest;
+use App\Http\Requests\Role\RoleUpdateRequest;
+
 use App\Repositories\Role\RoleRepositoryInterface;
-use Illuminate\Http\Request;
 
 class RoleAPIController extends Controller
 {

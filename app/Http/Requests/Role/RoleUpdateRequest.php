@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Http\Requests;
+namespace App\Http\Requests\Role;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class DepartmentCreateRequest extends FormRequest
+class RoleUpdateRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -23,7 +23,8 @@ class DepartmentCreateRequest extends FormRequest
     {
         return [
             //
-            'name' => 'required',
+            "department_id" => "sometimes",
+            "name" => "sometimes"
         ];
     }
 }

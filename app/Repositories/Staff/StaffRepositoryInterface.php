@@ -12,7 +12,5 @@ interface StaffRepositoryInterface
 
     public function updateData(array $data,$id);
 
-    public function deleteData(Staff $staff);
-
-
+    public function deleteData($id);
 }

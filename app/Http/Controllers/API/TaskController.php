@@ -15,7 +15,6 @@ class TaskController extends Controller
     {
         $staff = $request->user();
         $roles = $staff->roles;
-        // $area = Area::find($areaId);
         $tasks = collect();
         foreach($roles as $role){
             $task = Task::where('area_id', $areaId)->where('role_id', $role->id)->first();

@@ -37,10 +37,16 @@ class StaffRepository implements StaffRepositoryInterface
         return $staff;
     }
 
-    public function deleteData(Staff $staff)
+    public function deleteData($id)
     {
-        $staff->is_active = 0;
-        $staff->update();
-        return true;
+        $staff = Staff::find($id);
+        if($staff){
+            $staff->is_active = 0;
+            $staff->save();
+
+            return true;
+        }
+
+        return false;
     }
 }

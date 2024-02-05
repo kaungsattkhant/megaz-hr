@@ -7,7 +7,8 @@ use Illuminate\Http\Request;
 use App\Actions\Auth\APILoginAction;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\StaffLoginRequest;
+
+use App\Http\Requests\Staff\StaffLoginRequest;
 
 use App\Models\Staff;
 

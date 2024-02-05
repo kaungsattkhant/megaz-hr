@@ -3,11 +3,11 @@
 namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\StaffCreateRequest;
-use App\Http\Requests\StaffUpdateRequest;
-use App\Models\Staff;
+
+use App\Http\Requests\Staff\StaffCreateRequest;
+use App\Http\Requests\Staff\StaffUpdateRequest;
+
 use App\Repositories\Staff\StaffRepositoryInterface;
-use Illuminate\Http\Request;
 
 class StaffAPIController extends Controller
 {
@@ -37,10 +37,10 @@ class StaffAPIController extends Controller
         ResponseData($staff);
     }
 
-    public function deleteStaff(Staff $staff)
+    public function deleteStaff($id)
     {
-        $staff = $this->staffRepo->deleteData($staff);
-        if ($staff == 'true') {
+        $staffDeleted = $this->staffRepo->deleteData($id);
+        if ($staffDeleted) {
             ResponseMessage("Staff deleted");
         } else {
             ResponseMessage('staff not found or some error occur');
