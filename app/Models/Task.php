@@ -15,7 +15,7 @@ class Task extends Model
 
     protected $fillable=[
         'role_id', 'area_id',
-        'name','description','assigned_at','completed_at','completed_by',
+        'name','description','assigned_days','completed_at','completed_by',
         'is_double_checked','double_checked_by',
         'status','is_active'
     ];
