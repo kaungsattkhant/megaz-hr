@@ -43,4 +43,9 @@ Route::post('/staff',[StaffAPIController::class,'createStaff']);
 Route::put('/staff/{id}',[StaffAPIController::class,'updateStaff']);
 Route::delete('/staff/{id}',[StaffAPIController::class,'deleteStaff']);
 
+Route::get('/tasks',[TaskController::class,'getTaskdata']);
+Route::post('/tasks',[TaskController::class,'createTask']);
+Route::put('/tasks/{id}',[TaskController::class,'updateTask']);
+Route::delete('/tasks/{id}',[TaskController::class,'deleteTask']);
+
 // Route::group(['prefix' => 'management'], function () {});

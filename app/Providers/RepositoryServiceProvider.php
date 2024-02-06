@@ -15,6 +15,8 @@ use App\Repositories\Role\RoleRepositoryInterface;
 
 use App\Repositories\Staff\StaffRepository;
 use App\Repositories\Staff\StaffRepositoryInterface;
+use App\Repositories\Task\TaskRepository;
+use App\Repositories\Task\TaskRepositoryInterface;
 
 class RepositoryServiceProvider extends ServiceProvider
 {
@@ -36,5 +38,6 @@ class RepositoryServiceProvider extends ServiceProvider
         $this->app->bind(DepartmentRepositoryInterface::class, DepartmentRepository::class);
         $this->app->bind(RoleRepositoryInterface::class,RoleRepository::class);
         $this->app->bind(StaffRepositoryInterface::class,StaffRepository::class);
+        $this->app->bind(TaskRepositoryInterface::class,TaskRepository::class);
     }
 }
