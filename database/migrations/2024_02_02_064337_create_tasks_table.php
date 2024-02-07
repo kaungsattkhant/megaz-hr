@@ -17,7 +17,7 @@ return new class extends Migration
             $table->foreignId('role_id')->constrained()->onDelete('cascade');
             $table->string('name',45);
             $table->longText('description');
-            $table->text('assigned_days')->nullable();
+            $table->set('assigned_days', ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'])->nullable();
             $table->dateTime('completed_at')->nullable();
             $table->unsignedBigInteger('completed_by')->nullable();
             $table->boolean('is_double_checked')->default(0);

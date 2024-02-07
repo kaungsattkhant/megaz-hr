@@ -27,11 +27,14 @@ class TaskRepository implements TaskRepositoryInterface
 
     public function createData(array $data)
     {
-        $stringDays = '';
-        foreach ($data['assigned_days'] as $day) {
-            $stringDays .= $day . ' ';
-        }
-        $data['assigned_days'] = $stringDays;
+        // if(count($data['assigned_days'])>0){
+
+        // }
+        // $stringDays = '';
+        // foreach ($data['assigned_days'] as $day) {
+        //     $stringDays .= $day . ' ';
+        // }
+        // $data['assigned_days'] = $stringDays;
         $task = Task::create($data);
         return $task;
     }
