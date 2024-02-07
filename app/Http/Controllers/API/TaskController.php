@@ -35,6 +35,9 @@ class TaskController extends Controller
         }
 
         $tasks = $this->taskRepo->getTasksOfRolesFromArea($areaId, $roleIds);
+        if(count($tasks) < 1){
+            ResponseMessage('No tasks found', 404);
+        }
 
         ResponseData($tasks);
     }
