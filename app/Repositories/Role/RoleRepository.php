@@ -20,7 +20,7 @@ class RoleRepository implements RoleRepositoryInterface
 
     public function updateData(array $data, string $id)
     {
-        if ($id) {
+        if (isset($id)) {
             $role = Role::find($id);
             $role->update($data);
         } else {

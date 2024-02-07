@@ -25,7 +25,7 @@ class StaffRepository implements StaffRepositoryInterface
 
     public function updateData(array $data, $id)
     {
-        if ($id) {
+        if (isset($id)) {
             $staff = Staff::find($id);
             $staff->update($data);
             if (isset($data['roles'])) {

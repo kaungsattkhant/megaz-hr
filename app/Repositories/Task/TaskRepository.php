@@ -42,7 +42,7 @@ class TaskRepository implements TaskRepositoryInterface
     public function updateData(array $data, string $id)
     {
 
-        if ($id) {
+        if (isset($id)) {
             $stringDays = '';
             $task = Task::find($id);
             $task->assigned_days = '';

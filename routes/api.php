@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Route;
 
 use App\Http\Controllers\API\AuthController;
 use App\Http\Controllers\API\AreaController;
+use App\Http\Controllers\API\ComplainAPIController;
 use App\Http\Controllers\API\DepartmentAPIController;
 use App\Http\Controllers\API\RoleAPIController;
 use App\Http\Controllers\API\StaffAPIController;
@@ -43,9 +44,14 @@ Route::post('/staff',[StaffAPIController::class,'createStaff']);
 Route::put('/staff/{id}',[StaffAPIController::class,'updateStaff']);
 Route::delete('/staff/{id}',[StaffAPIController::class,'deleteStaff']);
 
-Route::get('/tasks',[TaskController::class,'getTaskdata']);
+Route::get('/tasks',[TaskController::class,'getTaskData']);
 Route::post('/tasks',[TaskController::class,'createTask']);
 Route::put('/tasks/{id}',[TaskController::class,'updateTask']);
 Route::delete('/tasks/{id}',[TaskController::class,'deleteTask']);
+
+Route::get('/complains',[ComplainAPIController::class,'getComplainData']);
+Route::post('/complains',[ComplainAPIController::class,'createComplain']);
+Route::put('/complains/{id}',[ComplainAPIController::class,'updateComplain']);
+Route::delete('/complains/{id}',[ComplainAPIController::class,'deleteComplain']);
 
 // Route::group(['prefix' => 'management'], function () {});
