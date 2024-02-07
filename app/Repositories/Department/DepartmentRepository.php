@@ -3,12 +3,14 @@
 namespace App\Repositories\Department;
 
 use App\Models\Department;
+use Illuminate\Http\Request;
 
 class DepartmentRepository implements DepartmentRepositoryInterface
 {
-    public function listAllData()
+    public function listAllData(Request $request)
     {
-        $departments = Department::all();
+        $allDepartments = Department::all();
+        $departments = Pagination($allDepartments,$request,'departments');
         return $departments;
     }
 
@@ -20,11 +22,11 @@ class DepartmentRepository implements DepartmentRepositoryInterface
 
     public function updateData(array $data, string $id)
     {
-        if (isset($id)) {
-            $department = Department::find($id);
+        $department = Department::find($id);
+        if($department)
+        {
+            $data = RemoveNullValues($data);
             $department->update($data);
-        } else {
-            $department = Department::create($data);
         }
         return $department;
     }

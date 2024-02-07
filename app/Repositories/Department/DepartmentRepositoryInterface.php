@@ -2,9 +2,11 @@
 
 namespace App\Repositories\Department;
 
+use Illuminate\Http\Request;
+
 interface DepartmentRepositoryInterface
 {
-    public function listAllData();
+    public function listAllData(Request $request);
 
     public function createData(array $data);
 

@@ -3,12 +3,14 @@
 namespace App\Repositories\Staff;
 
 use App\Models\Staff;
+use Illuminate\Http\Request;
 
 class StaffRepository implements StaffRepositoryInterface
 {
-    public function listAllData()
+    public function listAllData(Request $request)
     {
-        $staffs = Staff::all();
+        $allStaffs = Staff::all();
+        $staffs = Pagination($allStaffs, $request, 'staffs');
         return $staffs;
     }
 
@@ -25,22 +27,25 @@ class StaffRepository implements StaffRepositoryInterface
 
     public function updateData(array $data, $id)
     {
-        if (isset($id)) {
-            $staff = Staff::find($id);
+
+        $staff = Staff::find($id);
+        if ($staff) {
+
+            $data = RemoveNullValues($data);
+
             $staff->update($data);
             if (isset($data['roles'])) {
                 $staff->roles()->sync($data['roles']);
             }
-        } else {
-            $staff = Staff::create($data);
         }
+
         return $staff;
     }
 
     public function deleteData($id)
     {
         $staff = Staff::find($id);
-        if($staff){
+        if ($staff) {
             $staff->is_active = 0;
             $staff->save();
 

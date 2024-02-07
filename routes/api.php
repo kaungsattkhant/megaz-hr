@@ -5,7 +5,7 @@ use Illuminate\Support\Facades\Route;
 
 use App\Http\Controllers\API\AuthController;
 use App\Http\Controllers\API\AreaController;
-use App\Http\Controllers\API\ComplainAPIController;
+use App\Http\Controllers\API\ComplaintAPIController;
 use App\Http\Controllers\API\DepartmentAPIController;
 use App\Http\Controllers\API\RoleAPIController;
 use App\Http\Controllers\API\StaffAPIController;
@@ -39,19 +39,19 @@ Route::get('/roles',[RoleAPIController::class,'getRoleData']);
 Route::post('/roles',[RoleAPIController::class,'createRole']);
 Route::put('/roles/{id}',[RoleAPIController::class,'updateRole']);
 
-Route::get('/staff',[StaffAPIController::class,'getStaffData']);
-Route::post('/staff',[StaffAPIController::class,'createStaff']);
-Route::put('/staff/{id}',[StaffAPIController::class,'updateStaff']);
-Route::delete('/staff/{id}',[StaffAPIController::class,'deleteStaff']);
+Route::get('/staffs',[StaffAPIController::class,'getStaffData']);
+Route::post('/staffs',[StaffAPIController::class,'createStaff']);
+Route::put('/staffs/{id}',[StaffAPIController::class,'updateStaff']);
+Route::delete('/staffs/{id}',[StaffAPIController::class,'deleteStaff']);
 
 Route::get('/tasks',[TaskController::class,'getTaskData']);
 Route::post('/tasks',[TaskController::class,'createTask']);
 Route::put('/tasks/{id}',[TaskController::class,'updateTask']);
 Route::delete('/tasks/{id}',[TaskController::class,'deleteTask']);
 
-Route::get('/complains',[ComplainAPIController::class,'getComplainData']);
-Route::post('/complains',[ComplainAPIController::class,'createComplain']);
-Route::put('/complains/{id}',[ComplainAPIController::class,'updateComplain']);
-Route::delete('/complains/{id}',[ComplainAPIController::class,'deleteComplain']);
+Route::get('/complains',[ComplaintAPIController::class,'getComplainData']);
+Route::post('/complains',[ComplaintAPIController::class,'createComplain']);
+Route::put('/complains/{id}',[ComplaintAPIController::class,'updateComplain']);
+Route::delete('/complains/{id}',[ComplaintAPIController::class,'deleteComplain']);
 
 // Route::group(['prefix' => 'management'], function () {});

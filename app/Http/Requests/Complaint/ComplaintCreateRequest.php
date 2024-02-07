@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Http\Requests\Complain;
+namespace App\Http\Requests\Complaint;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class ComplainUpdateRequest extends FormRequest
+class ComplaintCreateRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -23,10 +23,10 @@ class ComplainUpdateRequest extends FormRequest
     {
         return [
             //
-            "title" => "sometimes",
-            "description" => "sometimes",
-            "category" => "sometimes",
-            "posted_by" => "sometimes",
+            "title" => "required",
+            "description" => "required",
+            "category" => "required",
+            "posted_by" => "required",
         ];
     }
 }

@@ -6,8 +6,8 @@ use Illuminate\Support\ServiceProvider;
 
 use App\Repositories\Area\AreaRepositoryInterface;
 use App\Repositories\Area\AreaRepository;
-use App\Repositories\Complain\ComplainRepository;
-use App\Repositories\Complain\ComplainRepositoryInterface;
+use App\Repositories\Complaint\ComplaintRepository;
+use App\Repositories\Complaint\ComplaintRepositoryInterface;
 use App\Repositories\Department\DepartmentRepository;
 use App\Repositories\Department\DepartmentRepositoryInterface;
 
@@ -40,6 +40,6 @@ class RepositoryServiceProvider extends ServiceProvider
         $this->app->bind(RoleRepositoryInterface::class,RoleRepository::class);
         $this->app->bind(StaffRepositoryInterface::class,StaffRepository::class);
         $this->app->bind(TaskRepositoryInterface::class,TaskRepository::class);
-        $this->app->bind(ComplainRepositoryInterface::class,ComplainRepository::class);
+        $this->app->bind(ComplaintRepositoryInterface::class,ComplaintRepository::class);
     }
 }

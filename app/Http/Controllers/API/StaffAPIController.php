@@ -8,6 +8,7 @@ use App\Http\Requests\Staff\StaffCreateRequest;
 use App\Http\Requests\Staff\StaffUpdateRequest;
 
 use App\Repositories\Staff\StaffRepositoryInterface;
+use Illuminate\Http\Request;
 
 class StaffAPIController extends Controller
 {
@@ -19,9 +20,9 @@ class StaffAPIController extends Controller
         $this->staffRepo = $staffRepo;
     }
 
-    public function getStaffData()
+    public function getStaffData(Request $request)
     {
-        $staffs = $this->staffRepo->listAllData();
+        $staffs = $this->staffRepo->listAllData($request);
         ResponseData($staffs);
     }
 
@@ -34,7 +35,11 @@ class StaffAPIController extends Controller
     public function updateStaff(StaffUpdateRequest $request, $id)
     {
         $staff = $this->staffRepo->updateData($request->all(), $id);
-        ResponseData($staff);
+       if(!$staff)
+       {
+        ResponseMessage('Staff not found with given ID',404);
+       }
+       ResponseData($staff);
     }
 
     public function deleteStaff($id)

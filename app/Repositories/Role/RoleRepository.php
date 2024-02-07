@@ -3,12 +3,14 @@
 namespace App\Repositories\Role;
 
 use App\Models\Role;
+use Illuminate\Http\Request;
 
 class RoleRepository implements RoleRepositoryInterface
 {
-    public function listAllData()
+    public function listAllData(Request $request)
     {
-        $roles = Role::all();
+        $allRoles = Role::all();
+        $roles = Pagination($allRoles,$request,'roles');
         return $roles;
     }
 
@@ -20,11 +22,11 @@ class RoleRepository implements RoleRepositoryInterface
 
     public function updateData(array $data, string $id)
     {
-        if (isset($id)) {
-            $role = Role::find($id);
+        $role = Role::find($id);
+        if($role)
+        {
+            $data = RemoveNullValues($data);
             $role->update($data);
-        } else {
-            $role = Role::create($data);
         }
         return $role;
     }

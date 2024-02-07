@@ -8,6 +8,7 @@ use App\Http\Requests\Department\DepartmentCreateRequest;
 use App\Http\Requests\Department\DepartmentUpdateRequest;
 
 use App\Repositories\Department\DepartmentRepositoryInterface;
+use Illuminate\Http\Request;
 
 class DepartmentAPIController extends Controller
 {
@@ -18,9 +19,9 @@ class DepartmentAPIController extends Controller
         $this->repoDepartment = $repoDepartment;
     }
 
-    public function getDepartmentData()
+    public function getDepartmentData(Request $request)
     {
-        $departments = $this->repoDepartment->listAllData();
+        $departments = $this->repoDepartment->listAllData($request);
         ResponseData($departments);
     }
 

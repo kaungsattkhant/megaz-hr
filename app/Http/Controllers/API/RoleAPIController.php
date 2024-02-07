@@ -8,6 +8,7 @@ use App\Http\Requests\Role\RoleCreateRequest;
 use App\Http\Requests\Role\RoleUpdateRequest;
 
 use App\Repositories\Role\RoleRepositoryInterface;
+use Illuminate\Http\Request;
 
 class RoleAPIController extends Controller
 {
@@ -18,9 +19,9 @@ class RoleAPIController extends Controller
         $this->roleRepo = $roleRepo;
     }
 
-    public function getRoleData()
+    public function getRoleData(Request $request)
     {
-        $roles = $this->roleRepo->listAllData();
+        $roles = $this->roleRepo->listAllData($request);
         ResponseData($roles);
     }
 

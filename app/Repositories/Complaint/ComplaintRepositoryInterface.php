@@ -1,11 +1,10 @@
 <?php
 
-namespace App\Repositories\Staff;
+namespace App\Repositories\Complaint;
 
-use App\Models\Staff;
 use Illuminate\Http\Request;
 
-interface StaffRepositoryInterface
+interface ComplaintRepositoryInterface
 {
     public function listAllData(Request $request);
 
@@ -14,4 +13,6 @@ interface StaffRepositoryInterface
     public function updateData(array $data,$id);
 
     public function deleteData($id);
+
+
 }
