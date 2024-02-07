@@ -24,27 +24,45 @@ class TaskController extends Controller
     public function getTasksOfRolesFromArea(Request $request, int $areaId)
     {
         $staff = $request->user();
-        $roles = $staff->roles;
-        $tasks = $this->taskRepo->getTasksOfRolesFromArea($areaId, $roles);
+        $roles = $staff->roles()->select('id')->get();
+        $roleIds = [];
+        foreach($roles as $role){
+            array_push($roleIds, $role->id);
+        }
+
+        if(count($roleIds) < 1){
+            ResponseMessage('Unauthorized, no role found', 401);
+        }
+
+        $tasks = $this->taskRepo->getTasksOfRolesFromArea($areaId, $roleIds);
+        if(count($tasks) < 1){
+            ResponseMessage('No tasks found', 404);
+        }
 
         ResponseData($tasks);
     }
 
-    public function getTaskData()
+    public function getTaskData(Request $request)
     {
-        $tasks = $this->taskRepo->listAllData();
+        $tasks = $this->taskRepo->listAllData($request);
+
         ResponseData($tasks);
     }
 
     public function createTask(TaskCreateRequest $request)
     {
         $task = $this->taskRepo->createData($request->all());
+
         ResponseData($task);
     }
 
-    public function updateTask(TaskUpdateRequest $request,$id)
+    public function updateTask(TaskUpdateRequest $request, $id)
     {
-        $task = $this->taskRepo->updateData($request->all(),$id);
+        $task = $this->taskRepo->updateData($request->all(), $id);
+        if(!$task){
+            ResponseMessage('No task found with given id', 404);
+        }
+
         ResponseData($task);
     }
 

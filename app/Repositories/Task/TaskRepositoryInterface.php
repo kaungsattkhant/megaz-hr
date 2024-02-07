@@ -2,15 +2,17 @@
 
 namespace App\Repositories\Task;
 
+use Illuminate\Http\Request;
+
 interface TaskRepositoryInterface
 {
-    public function getTasksOfRolesFromArea($areaId, $roles);
+    public function getTasksOfRolesFromArea(int $areaId, array $roleIds);
 
-    public function listAllData();
+    public function listAllData(Request $request);
 
     public function createData(array $data);
 
-    public function updateData(array $data, string $id);
+    public function updateData(array $data, int $id);
 
-    public function deleteData($id);
+    public function deleteData(int $id);
 }

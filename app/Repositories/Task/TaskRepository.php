@@ -2,78 +2,59 @@
 
 namespace App\Repositories\Task;
 
+use Illuminate\Http\Request;
+
 use App\Models\Task;
 
 class TaskRepository implements TaskRepositoryInterface
 {
-    public function getTasksOfRolesFromArea($areaId, $roles)
+    public function getTasksOfRolesFromArea(int $areaId, array $roleIds)
     {
-        $tasks = collect();
-        foreach ($roles as $role) {
-            $task = Task::where('area_id', $areaId)->where('role_id', $role->id)->first();
-            if ($task) {
-                $tasks->push($task);
-            }
-        }
+        $dayName = now()->format('D');
+        $tasks = Task::where('area_id', $areaId)->whereIn('role_id', $roleIds)
+        ->where('assigned_days', 'like', "%{$dayName}%")
+        ->where('is_active', 1)
+        ->get();
 
         return $tasks;
     }
 
-    public function listAllData()
+    public function listAllData(Request $request)
     {
         $tasks = Task::all();
-        return $tasks;
+        $tasksData = Pagination($tasks, $request, 'tasks');
+
+        return $tasksData;
     }
 
     public function createData(array $data)
     {
-        // if(count($data['assigned_days'])>0){
-
-        // }
-        // $stringDays = '';
-        // foreach ($data['assigned_days'] as $day) {
-        //     $stringDays .= $day . ' ';
-        // }
-        // $data['assigned_days'] = $stringDays;
         $task = Task::create($data);
+
         return $task;
     }
 
-    public function updateData(array $data, string $id)
-    {
-
-        if (isset($id)) {
-            $stringDays = '';
-            $task = Task::find($id);
-            $task->assigned_days = '';
-            $task->save();
-
-            foreach ($data['assigned_days'] as $day) {
-                $stringDays .= $day . ' ';
-            }
-            $data['assigned_days'] = $stringDays;
-            $task->update($data);
-            return $task;
-        } else {
-            $stringDays = '';
-            foreach ($data['assigned_days'] as $day) {
-                $stringDays .= $day . ' ';
-            }
-            $data['assigned_days'] = $stringDays;
-            $task = Task::create($data);
-            return $task;
-        }
-    }
-
-    public function deleteData($id)
+    public function updateData(array $data, int $id)
     {
         $task = Task::find($id);
-        if(!$task || $task == null)
+        if($task){
+            $data = RemoveNullValues($data);
+            $task->update($data);
+        }
+
+        return $task;
+    }
+
+    public function deleteData(int $id)
+    {
+        $task = Task::find($id);
+        if(!$task)
         {
             return false;
         }
         $task->is_active=0;
         $task->save();
+
         return true;
     }
 }
