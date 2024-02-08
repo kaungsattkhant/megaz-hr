@@ -4,10 +4,10 @@
     <div id="app" class="main-container">
         @include('layouts.sidebar')
 
-        <div class="content-container">
+        <div class="main-content">
             @include('layouts.navbar')
 
-            <main class="inner-container">
+            <main class="inner-container bg-gray-100">
                 @yield('content')
             </main>
         </div>

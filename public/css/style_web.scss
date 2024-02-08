@@ -1,0 +1,149 @@
+@charset "UTF-8";
+@import url("https://fonts.googleapis.com/css2?family=Lato&display=swap");
+@font-face {
+  font-family: 'Poppins';
+  src: url("../fonts/Poppins-Regular.ttf") format("truetype"); }
+/* width */
+.small-scrollbar::-webkit-scrollbar {
+  width: 4px; }
+
+/* Track */
+.small-scrollbar::-webkit-scrollbar-track {
+  background: #f1f1f1; }
+
+/* Handle */
+.small-scrollbar::-webkit-scrollbar-thumb {
+  background: #ccc; }
+
+/* Handle on hover */
+.small-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: #888; }
+
+
+.side-bar {
+  position: fixed;
+  width: 16%;
+  background-color: #E94B18;
+  color: white;
+  min-height: 100vh;
+  padding-top: 1.5rem;
+  border-right: 1px solid #e5e5e5; }
+
+.side-bar ul {
+  padding-top: 0.5rem; }
+
+.side-bar ul li a {
+  padding: 0.75rem 2rem;
+  margin: 0.25rem 0rem;
+  display: flex;
+  position: relative;
+  font-size: 14px;
+  color: white;
+  font-family: 'Lato'; }
+
+.side-bar ul li a.active-link {
+  color: white;
+  background-color: #fff3;
+  border-radius: 8px;
+  border-radius: 0!important; }
+
+.side-bar ul li a i {
+  width: 2rem;
+  text-align: center; }
+
+.main-container {
+  background-color: rgb(243,244,246);
+  min-height: 100vh;
+  display: flex; }
+
+.main-content {
+  margin-left: auto;
+  width: 84%;
+  display: inline-block; }
+
+.inner-container {
+  padding: 2.5rem 1.5rem; }
+
+.top-bar {
+  display: flex;
+  justify-content: space-between;
+  padding: 1.5rem 1.5rem;
+  background-color: white;
+  border-bottom: 1px solid #e5e7eb; }
+
+.primary-btn {
+  padding: 0.5rem 2rem;
+  border-radius: 4px;
+  font-size: 16px;
+  color: white;
+  background-color: #0BA348; }
+
+.add-btn {
+  font-size: 14px;
+  padding: 6px 16px;
+  border-radius: 3px;
+  background-color: #EB6E47!important;
+  color: white;}
+
+.input-ui{
+    padding: 8px 10px;
+  }
+.input-ui:focus{
+  outline: none;
+  box-shadow: none;
+}
+.primary-input {
+  padding: 0.5rem;
+  color: black; }
+
+.primary-table tbody tr td:first-child{
+    border-top-left-radius: 12px;
+    border-bottom-left-radius: 12px;
+  }
+.primary-table tbody tr td:last-child{
+   border-top-right-radius: 12px;
+   border-bottom-right-radius: 12px; 
+  }
+  
+
+/* Hide scrollbar for Chrome, Safari and Opera */
+.no-scrollbar::-webkit-scrollbar {
+  display: none; }
+
+/* Hide scrollbar for IE, Edge and Firefox */
+.no-scrollbar {
+  -ms-overflow-style: none;
+  /* IE and Edge */
+  scrollbar-width: none;
+  /* Firefox */ }
+
+
+  .search-input {
+    position: relative;
+    border: 1px solid #c7c9cd;
+    border-radius: 8px;
+    background-color: white; }
+  
+  .search-input input {
+    border: none;
+    font-size: 14px;
+    font-family: 'Lato';
+    padding-left: 32px;
+    background: none;
+    padding-top: 6px;
+    text-align: left;
+    padding-bottom: 6px; }
+  
+  .search-input input:focus {
+    outline: none;
+    box-shadow: none; }
+  
+  .search-input i {
+    position: absolute;
+    left: 0.5rem;
+    top: calc(50% - 8px);
+    color: #95979b; }
+  
+.active-link{
+      background-color: #fff2;
+}
