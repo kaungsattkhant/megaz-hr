@@ -12,7 +12,7 @@
 	<title> test</title>
     @vite('resources/js/app.js')
 
-    <!-- <link rel="stylesheet" href="{{asset('css/style_web.css')}}"> -->
+    <link rel="stylesheet" href="{{asset('css/style_web.css')}}">
     <link rel="stylesheet" href="{{asset('fontawesome/css/all.css')}}">
     <link rel="stylesheet" href="{{asset('css/normalize.css')}}">
 
