@@ -10,6 +10,7 @@ use App\Http\Controllers\API\DepartmentAPIController;
 use App\Http\Controllers\API\RoleAPIController;
 use App\Http\Controllers\API\StaffAPIController;
 use App\Http\Controllers\API\TaskController;
+use App\Models\Gender;
 
 /*
 |--------------------------------------------------------------------------
@@ -43,6 +44,10 @@ Route::get('/staffs',[StaffAPIController::class,'getStaffData']);
 Route::post('/staffs',[StaffAPIController::class,'createStaff']);
 Route::put('/staffs/{id}',[StaffAPIController::class,'updateStaff']);
 Route::delete('/staffs/{id}',[StaffAPIController::class,'deleteStaff']);
+
+Route::get('genders', function(){
+    ResponseData(Gender::all());
+});
 
 Route::get('/tasks',[TaskController::class,'getTaskData']);
 Route::post('/tasks',[TaskController::class,'createTask']);

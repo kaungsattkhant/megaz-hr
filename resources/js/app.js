@@ -6,3 +6,14 @@ import { Collapse, Select, Carousel, initTE, Modal, Ripple, Dropdown, Datepicker
 initTE({ Collapse, Select, Carousel, Modal, Ripple, Dropdown, Datepicker});
 
 //////////////................/////////////////
+
+import {createApp} from 'vue/dist/vue.esm-bundler';
+
+import StaffListComponent from './Components/Staff/StaffListComponent.vue';
+import StaffCreateComponent from './Components/Staff/StaffCreateComponent.vue';
+
+const app = createApp({});
+app.component('StaffListComponent', StaffListComponent);
+app.component('StaffCreateComponent', StaffCreateComponent);
+
+app.mount('#app');

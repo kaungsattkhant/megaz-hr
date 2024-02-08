@@ -19,6 +19,7 @@ Route::get('/', function () {
 
 
 // test
-Route::view('/teststaff', 'staff.index');
-Route::view('/teststaffcreate', 'staff.create');
-Route::view('/testtask', 'tasks.index');
+Route::view('/staff', 'staff.index');
+Route::view('/staff/create', 'staff.create');
+
+Route::view('/tasks', 'tasks.index');
