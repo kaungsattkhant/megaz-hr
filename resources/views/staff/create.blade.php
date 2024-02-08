@@ -5,7 +5,7 @@
 @section('content')
 
 <div id="app">
-    <staff-list-component/>
+    <staff-create-component/>
 </div>
 
 @endsection

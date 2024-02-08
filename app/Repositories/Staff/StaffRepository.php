@@ -9,7 +9,7 @@ class StaffRepository implements StaffRepositoryInterface
 {
     public function listAllData(Request $request)
     {
-        $allStaffs = Staff::all();
+        $allStaffs = Staff::with('department')->get();
         $staffs = Pagination($allStaffs, $request, 'staffs');
         return $staffs;
     }

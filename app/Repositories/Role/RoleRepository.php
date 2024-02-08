@@ -10,6 +10,9 @@ class RoleRepository implements RoleRepositoryInterface
     public function listAllData(Request $request)
     {
         $allRoles = Role::all();
+        if($request->all_minified){
+            return $allRoles;
+        }
         $roles = Pagination($allRoles,$request,'roles');
         return $roles;
     }

@@ -9,6 +9,9 @@ class DepartmentRepository implements DepartmentRepositoryInterface
 {
     public function listAllData(Request $request)
     {
+        if($request->all_minified){
+            return Department::all();
+        }
         $allDepartments = Department::all();
         $departments = Pagination($allDepartments,$request,'departments');
         return $departments;
