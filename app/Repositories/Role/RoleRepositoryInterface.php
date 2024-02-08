@@ -10,5 +10,5 @@ interface RoleRepositoryInterface
 
     public function createData(array $data);
 
-    public function updateData(array $data,string $id);
+    public function updateData(array $data,int $id);
 }

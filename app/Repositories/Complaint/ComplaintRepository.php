@@ -18,12 +18,12 @@ class ComplaintRepository implements ComplaintRepositoryInterface
 
     public function createData(array $data)
     {
-        $data['status'] = 'Not yet';
+
         $complaint = Complaint::create($data);
         return $complaint;
     }
 
-    public function updateData(array $data,$id)
+    public function updateData(array $data,int $id)
     {
        $complaint = Complaint::find($id);
        if($complaint)

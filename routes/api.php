@@ -8,6 +8,7 @@ use App\Http\Controllers\API\AreaController;
 use App\Http\Controllers\API\ComplaintAPIController;
 use App\Http\Controllers\API\DepartmentAPIController;
 use App\Http\Controllers\API\RoleAPIController;
+use App\Http\Controllers\API\ServiceAPIController;
 use App\Http\Controllers\API\StaffAPIController;
 use App\Http\Controllers\API\TaskController;
 
@@ -49,9 +50,13 @@ Route::post('/tasks',[TaskController::class,'createTask']);
 Route::put('/tasks/{id}',[TaskController::class,'updateTask']);
 Route::delete('/tasks/{id}',[TaskController::class,'deleteTask']);
 
-Route::get('/complains',[ComplaintAPIController::class,'getComplainData']);
-Route::post('/complains',[ComplaintAPIController::class,'createComplain']);
-Route::put('/complains/{id}',[ComplaintAPIController::class,'updateComplain']);
-Route::delete('/complains/{id}',[ComplaintAPIController::class,'deleteComplain']);
+Route::get('/complaints',[ComplaintAPIController::class,'getComplainData']);
+Route::post('/complaints',[ComplaintAPIController::class,'createComplain']);
+Route::put('/complaints/{id}',[ComplaintAPIController::class,'updateComplain']);
+Route::delete('/complaints/{id}',[ComplaintAPIController::class,'deleteComplain']);
 
+Route::get('/services',[ServiceAPIController::class,'getServiceData']);
+Route::post('/services',[ServiceAPIController::class,'createService']);
+Route::put('/services/{id}',[ServiceAPIController::class,'updateService']);
+Route::delete('/services/{id}',[ServiceAPIController::class,'deleteService']);
 // Route::group(['prefix' => 'management'], function () {});

@@ -20,7 +20,7 @@ class DepartmentRepository implements DepartmentRepositoryInterface
         return $department;
     }
 
-    public function updateData(array $data, string $id)
+    public function updateData(array $data, int $id)
     {
         $department = Department::find($id);
         if($department)

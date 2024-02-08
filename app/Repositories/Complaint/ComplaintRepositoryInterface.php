@@ -10,7 +10,7 @@ interface ComplaintRepositoryInterface
 
     public function createData(array $data);
 
-    public function updateData(array $data,$id);
+    public function updateData(array $data,int $id);
 
     public function deleteData($id);
 

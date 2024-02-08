@@ -25,7 +25,7 @@ class StaffRepository implements StaffRepositoryInterface
         return $staff;
     }
 
-    public function updateData(array $data, $id)
+    public function updateData(array $data,int $id)
     {
 
         $staff = Staff::find($id);
