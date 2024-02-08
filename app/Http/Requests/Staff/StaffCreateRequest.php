@@ -29,8 +29,8 @@ class StaffCreateRequest extends FormRequest
             "address" => "required",
             "gender_id" => "required",
             "department_id" => "required",
-            "password" => "required"
-
+            "password" => "required",
+            "roles" => "required"
         ];
     }
 }

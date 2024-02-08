@@ -2,13 +2,14 @@
 
 namespace App\Http\Controllers\API;
 
+use Illuminate\Http\Request;
+
 use App\Http\Controllers\Controller;
 
 use App\Http\Requests\Staff\StaffCreateRequest;
 use App\Http\Requests\Staff\StaffUpdateRequest;
 
 use App\Repositories\Staff\StaffRepositoryInterface;
-use Illuminate\Http\Request;
 
 class StaffAPIController extends Controller
 {
@@ -28,7 +29,10 @@ class StaffAPIController extends Controller
 
     public function createStaff(StaffCreateRequest $request)
     {
-        $staff = $this->staffRepo->createData($request->all());
+        $data = $request->all();
+        $data['roles'] = explode(',', $request->roles);
+        $staff = $this->staffRepo->createData($data);
+
         ResponseData($staff);
     }
 
