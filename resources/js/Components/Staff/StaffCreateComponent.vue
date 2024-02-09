@@ -57,7 +57,7 @@
             </div>
             <div class="col-span-4 rounded-md">
                 <label for="" class="block text-sm text-black mb-3">
-                    Role
+                    Roles
                 </label>
             </div>
             <div class="col-span-1">
@@ -82,12 +82,16 @@
                 </button>
             </div>
             <div class="mb-4 col-span-3 pb-6 rounded-md">
-                <select name="" id="" v-model="selectedRole"
-                    class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
-                    <option :value="role" v-for="(role, roleIndex) in roleList" :key="roleIndex"> {{ role.name }} </option>
-                    <!-- <option value="2">Manager</option>
-                    <option value="3">Waiter</option> -->
-                </select>
+                <div class="bg-white mb-0 w-[90%] text-sm inline-block" data-te-select-wrapper-ref>
+                    <select data-te-select-init data-te-select-placeholder="Select Roles"
+                        data-te-select-filter="true" name="" id="" multiple v-model="selectedRoles"
+                        class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
+                        <option :value="role" v-for="(role, roleIndex) in roleList" :key="roleIndex"> {{ role.name }} </option>
+                        <!-- <option value="2">Manager</option>
+                        <option value="3">Waiter</option> -->
+                    </select>
+                </div>
+
             </div>
             <div class=" col-span-2">
                 <button class="pl-1 py-2" data-te-toggle="modal" data-te-target="#add_role_modal">
@@ -205,7 +209,7 @@
 </template>
 
 <script>
-    import { Modal, Ripple, initTE, Input } from "tw-elements";
+    import { Modal, Ripple, initTE, Input, Select } from "tw-elements";
     import { getApiData, postApiData, deleteApiData } from '../../utilities/ajax-helpers';
 
     export default {
@@ -222,7 +226,8 @@
                 selectedGender: null,
                 nrcNumber: null,
                 selectedDepartment: null,
-                selectedRole: null,
+                selectedRoles: [],
+                roleIds: [],
                 address: null
             };
         },
@@ -250,6 +255,11 @@
             },
 
             createStaffBtnClicked(){
+                this.roleIds = [];
+                this.selectedRoles.forEach((role)=>{
+                    this.roleIds.push(role.id);
+                });
+                // console.log(this.roleIds);
                 // alert(`name = ${this.name}`);
                 // alert(`phone num = ${this.phoneNumber}`);
                 // alert(`password = ${this.password}`);
@@ -261,7 +271,7 @@
                 this.createStaff();
             },
 
-            createStaff()
+            async createStaff()
             {
                 let formData = new FormData();
                 formData.append('name', this.name);
@@ -271,24 +281,24 @@
                 formData.append('gender_id', this.selectedGender.id);
                 formData.append('department_id', this.selectedDepartment.id);
                 formData.append('password', this.password);
-                // formData.append();
-                let response = postApiData({url: '/api/staffs', form_data: formData});
-                if(response.data.success){
+                formData.append('roles', this.roleIds);
+
+                let response = await postApiData({url: '/api/staffs', form_data: formData});
+                if(response.success){
                     window.location.replace('/staff');
                 }
                 else{
                     alert('some errors occur');
                 }
-                // window.location.href='/staffs/create';
             },
 
         },
         mounted()
         {
+            initTE({ Select });
             this.getGenderList();
             this.getDepartmentList();
             this.getRoleList();
-            // this.getStaffsList();
         }
     }
 </script>

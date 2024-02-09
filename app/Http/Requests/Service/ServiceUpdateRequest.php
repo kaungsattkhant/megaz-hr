@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Http\Requests\Staff;
+namespace App\Http\Requests\Service;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class StaffCreateRequest extends FormRequest
+class ServiceUpdateRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -23,14 +23,10 @@ class StaffCreateRequest extends FormRequest
     {
         return [
             //
-            "name" => "required",
-            "phone_number" => "required",
-            "nrc_number" => "required",
-            "address" => "required",
-            "gender_id" => "required",
-            "department_id" => "required",
-            "password" => "required",
-            "roles" => "required"
+            "area_id" => "sometimes",
+            "name" => "sometimes",
+            "service_category" => "sometimes",
+            "price" => "sometimes"
         ];
     }
 }

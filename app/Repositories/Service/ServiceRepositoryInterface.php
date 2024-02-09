@@ -1,11 +1,10 @@
 <?php
 
-namespace App\Repositories\Staff;
+namespace App\Repositories\Service;
 
-use App\Models\Staff;
 use Illuminate\Http\Request;
 
-interface StaffRepositoryInterface
+interface ServiceRepositoryInterface
 {
     public function listAllData(Request $request);
 
@@ -13,5 +12,5 @@ interface StaffRepositoryInterface
 
     public function updateData(array $data,int $id);
 
-    public function deleteData($id);
+    public function deleteData(int $id);
 }

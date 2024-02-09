@@ -21,5 +21,6 @@ class DatabaseSeeder extends Seeder
         (new GenderSeeder())->run();
         (new RoleSeeder())->run();
         (new StaffSeeder())->run();
+        (new ServiceCategorySeeder())->run();
     }
 }
