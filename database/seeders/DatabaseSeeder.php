@@ -18,8 +18,8 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         (new DepartmentSeeder())->run();
-        (new GenderSeeder())->run();
         (new RoleSeeder())->run();
+        (new GenderSeeder())->run();
         (new StaffSeeder())->run();
         (new ServiceCategorySeeder())->run();
     }

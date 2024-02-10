@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Http\Requests\Service;
+namespace App\Http\Requests\Entity;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class ServiceCreateRequest extends FormRequest
+class EntityUpdateRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -23,10 +23,10 @@ class ServiceCreateRequest extends FormRequest
     {
         return [
             //
-            "area_id" => "required",
-            "name" => "required",
-            "service_category_id" => "required",
-            "price" => "required"
+            "area_id" => "sometimes",
+            "name" => "sometimes",
+            "service_category" => "sometimes",
+            "price" => "sometimes"
         ];
     }
 }
