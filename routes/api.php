@@ -28,9 +28,11 @@ Route::post('/login', [AuthController::class,'login']);
 Route::middleware('auth:api')->group(function(){
     Route::post('/logout', [AuthController::class, 'logout']);
 
-    Route::get('/areas', [AreaController::class, 'getAreas']);
+
     Route::get('/areas/{areaId}/tasks', [TaskController::class, 'getTasksOfRolesFromArea']);
 });
+
+Route::get('/areas', [AreaController::class, 'getAreas']);
 
 Route::get('/departments',[DepartmentAPIController::class,'getDepartmentData']);
 Route::post('/departments',[DepartmentAPIController::class,'createDepartment']);

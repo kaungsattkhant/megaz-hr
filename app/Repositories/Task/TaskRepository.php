@@ -21,7 +21,7 @@ class TaskRepository implements TaskRepositoryInterface
 
     public function listAllData(Request $request)
     {
-        $tasks = Task::all();
+        $tasks = Task::with('role.department')->get();
         $tasksData = Pagination($tasks, $request, 'tasks');
 
         return $tasksData;
