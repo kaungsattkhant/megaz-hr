@@ -131,27 +131,31 @@
                             <label for="" class="block text-sm text-black mb-3">
                                 Role
                             </label>
-                            <select name="" id=""  v-model="selectedRole"
+                            <select data-te-select-init data-te-select-placeholder="Select Roles"
+                                data-te-select-filter="true" name="" id="" multiple v-model="selectedRoles"
                                 class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
-                                <option :value="role" v-for="(role, roleIndex) in roleList" :key="roleIndex">{{ role.name }}</option>
+                                <option :value="role" v-for="(role, roleIndex) in roleList" :key="roleIndex"> {{ role.name }} </option>
+                                
                             </select>
                         </div>
                         <div class="mb-4">
                             <label for="" class="block text-sm text-black mb-3">
                                 Date Assign
                             </label>
-                            <select name="" id=""
+                            <select name="" id="" v-model="selectedDate"
                                 class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
-                                <option value="1">1/12/1999</option>
+                                <option value="monday">1/12/1999</option>
                                 <option value="2">Manager</option>
                                 <option value="3">Waiter</option>
                             </select>
+                            <input type="date">
                         </div>
                     </div>
 
                     <!--Modal footer-->
                     <div class="flex justify-center px-12 mb-6">
-                        <button type="button" class="add-btn focus:outline-none focus:ring-0 ">
+                        <button type="button" @click="createTasksBtnClicked"
+                            class="add-btn focus:outline-none focus:ring-0 ">
                             Create
                         </button>
                     </div>
@@ -165,8 +169,8 @@
 </template>
 
 <script>
-    import { Modal, Ripple, initTE, Input } from "tw-elements";
-    import { getApiData, deleteApiData } from '../../utilities/ajax-helpers';
+    import { Modal, Ripple, Select, initTE, Input } from "tw-elements";
+    import { getApiData, postApiData, deleteApiData } from '../../utilities/ajax-helpers';
 
     export default {
         data() {
@@ -176,9 +180,11 @@
 
                 name: null,
                 selectedDepartment: null,
-                selectedRole: null,
+                selectedRoles: [],
+                roleIds: [],
                 selectedDate: null,
                 tasks: null,
+                testId:22,
 
             };
         },
@@ -200,30 +206,34 @@
                 }
             },
 
-            createTaskaBtnClicked(){
+            createTasksBtnClicked(){
                 // alert(`name = ${this.name}`);
-                // alert(`phone num = ${this.phoneNumber}`);
-                // alert(`password = ${this.password}`);
-                // alert(`nrc = ${this.nrcNumber}`);
+                // alert(`tasks = ${this.tasks}`);
                 // alert(`department = ${this.selectedDepartment.name}`);
                 // alert(`role = ${this.selectedRole.name}`);
-                // alert(`gender = ${this.selectedGender.name}`);
-                // alert(`address = ${this.address}`);
-                this.createStaff();
+                // alert(`date = ${this.selectedDate}`);
+                this.roleIds = [];
+                this.selectedRoles.forEach((role)=>{
+                    this.roleIds.push(role.id);
+                });
+                this.createTasks();
             },
 
-            createStaff()
+            createTasks()
             {
+                
                 let formData = new FormData();
                 formData.append('name', this.name);
+                formData.append('description', this.tasks);
                 formData.append('department_id', this.selectedDepartment.id);
                 // formData.append('role', this.role);
-                formData.append('description', this.tasks);
-                formData.append('assigned_days', this.date);
-                // formData.append();
-                let response = postApiData({url: '/api/staffs', form_data: formData});
-                if(response.data.success){
-                    window.location.replace('/staff');
+                formData.append('assigned_days', this.selectedDate);
+                formData.append('area_id', this.testId);
+                formData.append('role_id', this.roleIds);
+                let response = postApiData({url: '/api/tasks', form_data: formData});
+                if(response.success){
+                    window.location.replace('/tasks');
+                    alert('test');
                 }
                 else{
                     alert('some errors occur');
@@ -236,7 +246,7 @@
             this.getDepartmentList();
             this.getRoleList();
 
-            initTE({ Modal, Ripple });
+            initTE({ Modal,Select, Ripple });
         }
     }
 </script>
