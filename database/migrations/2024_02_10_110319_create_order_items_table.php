@@ -11,13 +11,16 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('services', function (Blueprint $table) {
+        Schema::create('order_items', function (Blueprint $table) {
             $table->id();
-            $table->string('name',45);
+            $table->unsignedBigInteger('menu_id');
+            $table->double('quantity');
+            $table->double('original_price');
+            $table->double('discount_value');
             $table->double('price');
-            $table->foreignId('area_id');
-            $table->foreignId('service_category_id');
-            $table->boolean('is_available')->default(1);
+            $table->unsignedBigInteger('order_id');
+            $table->string('status',45);
+            $table->tinyInteger('is_complete');
             $table->timestamps();
         });
     }
@@ -27,6 +30,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('services');
+        Schema::dropIfExists('order_items');
     }
 };

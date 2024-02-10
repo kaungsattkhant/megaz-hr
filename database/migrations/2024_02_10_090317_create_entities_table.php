@@ -11,13 +11,14 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('complaints', function (Blueprint $table) {
+        Schema::create('entities', function (Blueprint $table) {
             $table->id();
-            $table->string('title');
-            $table->string('description');
-            $table->string('category');
-            $table->string('posted_by');
-            $table->string('status')->default('not yet');
+            $table->string('name',45);
+            $table->double('price_per_hour');
+            $table->string('entity_type',45);
+            $table->foreignId('area_id');
+            $table->foreignId('service_category_id');
+            $table->boolean('is_available')->default(1);
             $table->timestamps();
         });
     }
@@ -27,6 +28,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('complaints');
+        Schema::dropIfExists('entities');
     }
 };

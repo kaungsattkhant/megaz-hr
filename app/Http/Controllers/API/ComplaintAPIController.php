@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Complaint\ComplainStatusRequest;
 use App\Http\Requests\Complaint\ComplaintCreateRequest;
 use App\Http\Requests\Complaint\ComplaintUpdateRequest;
 use App\Repositories\Complaint\ComplaintRepositoryInterface;
@@ -47,6 +48,17 @@ class ComplaintAPIController extends Controller
             ResponseMessage("Complain deleted");
         }else{
             ResponseMessage('Complain not found or some error occur');
+        }
+    }
+
+    public function complainStatusChange(ComplainStatusRequest $request,$id)
+    {
+        $complaint = $this->complaintRepo->statusChange($request->status,$id);
+        if($complaint!==null)
+        {
+            ResponseMessage('Complaint status changed');
+        }else{
+            ResponseMessage('Complaint not found or some error occur');
         }
     }
 }

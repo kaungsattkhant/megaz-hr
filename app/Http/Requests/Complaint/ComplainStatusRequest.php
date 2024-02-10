@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Http\Requests\Service;
+namespace App\Http\Requests\Complaint;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class ServiceUpdateRequest extends FormRequest
+class ComplainStatusRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -23,10 +23,7 @@ class ServiceUpdateRequest extends FormRequest
     {
         return [
             //
-            "area_id" => "sometimes",
-            "name" => "sometimes",
-            "service_category" => "sometimes",
-            "price" => "sometimes"
+            'status'=>'required'
         ];
     }
 }

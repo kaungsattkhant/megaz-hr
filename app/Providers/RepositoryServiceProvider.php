@@ -10,11 +10,10 @@ use App\Repositories\Complaint\ComplaintRepository;
 use App\Repositories\Complaint\ComplaintRepositoryInterface;
 use App\Repositories\Department\DepartmentRepository;
 use App\Repositories\Department\DepartmentRepositoryInterface;
-
+use App\Repositories\Entity\EntityRepository;
+use App\Repositories\Entity\EntityRepositoryInterface;
 use App\Repositories\Role\RoleRepository;
 use App\Repositories\Role\RoleRepositoryInterface;
-use App\Repositories\Service\ServiceRepository;
-use App\Repositories\Service\ServiceRepositoryInterface;
 use App\Repositories\Staff\StaffRepository;
 use App\Repositories\Staff\StaffRepositoryInterface;
 use App\Repositories\Task\TaskRepository;
@@ -42,6 +41,6 @@ class RepositoryServiceProvider extends ServiceProvider
         $this->app->bind(StaffRepositoryInterface::class,StaffRepository::class);
         $this->app->bind(TaskRepositoryInterface::class,TaskRepository::class);
         $this->app->bind(ComplaintRepositoryInterface::class,ComplaintRepository::class);
-        $this->app->bind(ServiceRepositoryInterface::class,ServiceRepository::class);
+        $this->app->bind(EntityRepositoryInterface::class,EntityRepository::class);
     }
 }
