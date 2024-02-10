@@ -1,0 +1,14 @@
+{
+  "resources/css/app.css": {
+    "file": "assets/app-07XHsSCB.css",
+    "src": "resources/js/app.js"
+  },
+  "resources/js/app.js": {
+    "css": [
+      "assets/app-07XHsSCB.css"
+    ],
+    "file": "assets/app-Irm92_SW.js",
+    "isEntry": true,
+    "src": "resources/js/app.js"
+  }
+}

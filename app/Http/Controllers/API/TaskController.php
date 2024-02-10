@@ -8,7 +8,7 @@ use App\Http\Controllers\Controller;
 
 use App\Http\Requests\Task\TaskCreateRequest;
 use App\Http\Requests\Task\TaskUpdateRequest;
-
+use App\Models\Staff;
 use App\Repositories\Task\TaskRepositoryInterface;
 
 class TaskController extends Controller
@@ -40,6 +40,19 @@ class TaskController extends Controller
         }
 
         ResponseData($tasks);
+    }
+
+    public function updateTaskStatus(Request $request, int $taskId)
+    {
+        $data['completed_at'] = CurrentTime();
+        $data['completed_by'] = $request->user()->id;
+        $data['status'] = $request->status;
+        $task = $this->taskRepo->updateTaskStatus($data, $taskId);
+        if(!$task){
+            ResponseMessage('No task found with the given id', 404);
+        }
+        ResponseMessage('Task status updated');
+        ResponseData($task);
     }
 
     public function getTaskData(Request $request)

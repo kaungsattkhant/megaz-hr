@@ -31,6 +31,7 @@ Route::middleware('auth:api')->group(function(){
 
 
     Route::get('/areas/{areaId}/tasks', [TaskController::class, 'getTasksOfRolesFromArea']);
+    Route::post('/tasks/{taskId}/update_status', [TaskController::class, 'updateTaskStatus']);
 });
 
 Route::get('/areas', [AreaController::class, 'getAreas']);

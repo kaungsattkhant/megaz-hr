@@ -19,6 +19,19 @@ class TaskRepository implements TaskRepositoryInterface
         return $tasks;
     }
 
+    public function updateTaskStatus(array $data, int $id)
+    {
+        $task = Task::find($id);
+        if($task){
+            $task->update($data);
+
+            return $task;
+        }
+        else{
+            return null;
+        }
+    }
+
     public function listAllData(Request $request)
     {
         $tasks = Task::with('role.department')->get();

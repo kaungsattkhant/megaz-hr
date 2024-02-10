@@ -8,6 +8,8 @@ interface TaskRepositoryInterface
 {
     public function getTasksOfRolesFromArea(int $areaId, array $roleIds);
 
+    public function updateTaskStatus(array $data, int $id);
+
     public function listAllData(Request $request);
 
     public function createData(array $data);
