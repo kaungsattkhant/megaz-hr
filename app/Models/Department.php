@@ -16,6 +16,20 @@ class Department extends Model
         'name'
     ];
 
+    protected $hidden=[
+        'created_at','updated_at'
+    ];
+
+    public function getCreatedAt()
+    {
+        return $this->created_at;
+    }
+
+    public function getUpdatedAt()
+    {
+        return $this->updated_at;
+    }
+
     public function staffs()
     {
         return $this->hasMany(Staff::class);

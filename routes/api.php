@@ -12,6 +12,7 @@ use App\Http\Controllers\API\RoleAPIController;
 use App\Http\Controllers\API\ServiceAPIController;
 use App\Http\Controllers\API\StaffAPIController;
 use App\Http\Controllers\API\TaskController;
+use App\Http\Controllers\API\ProfileAPIController;
 use App\Models\Gender;
 
 /*
@@ -32,6 +33,7 @@ Route::middleware('auth:api')->group(function(){
 
     Route::get('/areas/{areaId}/tasks', [TaskController::class, 'getTasksOfRolesFromArea']);
     Route::post('/tasks/{taskId}/update_status', [TaskController::class, 'updateTaskStatus']);
+    Route::get('/profile', [ProfileAPIController::class, 'getProfile']);
 });
 
 Route::get('/areas', [AreaController::class, 'getAreas']);

@@ -21,12 +21,22 @@ class Staff extends Authenticatable
     ];
 
     protected $hidden=[
-        'password'
+        'password','created_at','updated_at'
     ];
 
     public function getAuthPassword()
     {
         return $this->password;
+    }
+
+    public function getCreatedAt()
+    {
+        return $this->created_at;
+    }
+
+    public function getUpdatedAt()
+    {
+        return $this->updated_at;
     }
 
     // A mutator to encrypt the password field
