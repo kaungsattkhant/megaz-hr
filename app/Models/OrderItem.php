@@ -5,18 +5,11 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-use App\Models\Staff;
-
-class Gender extends BaseModel
+class OrderItem extends Model
 {
     use HasFactory;
 
     protected $fillable=[
-        'name'
+        'date','menu_id','quantity','original_price','discount_value','price','order_id','status','is_complete'
     ];
-
-    public function staffs()
-    {
-        return $this->hasMany(Staff::class);
-    }
 }

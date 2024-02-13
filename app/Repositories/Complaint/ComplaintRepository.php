@@ -46,4 +46,16 @@ class ComplaintRepository implements ComplaintRepositoryInterface
             return false;
         }
     }
+
+    public function statusChange(string $status,int $id)
+    {
+        $complaint = Complaint::find($id);
+        if($complaint!==null)
+        {
+            $complaint->status = $status;
+            $complaint->save();
+
+        }
+        return $complaint;
+    }
 }

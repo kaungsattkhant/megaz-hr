@@ -7,10 +7,13 @@ use App\Http\Controllers\API\AuthController;
 use App\Http\Controllers\API\AreaController;
 use App\Http\Controllers\API\ComplaintAPIController;
 use App\Http\Controllers\API\DepartmentAPIController;
+use App\Http\Controllers\API\EntityAPIController;
+use App\Http\Controllers\API\InventoryAPIController;
 use App\Http\Controllers\API\RoleAPIController;
 use App\Http\Controllers\API\ServiceAPIController;
 use App\Http\Controllers\API\StaffAPIController;
 use App\Http\Controllers\API\TaskController;
+use App\Http\Controllers\API\ProfileAPIController;
 use App\Models\Gender;
 
 /*
@@ -28,9 +31,13 @@ Route::post('/login', [AuthController::class,'login']);
 Route::middleware('auth:api')->group(function(){
     Route::post('/logout', [AuthController::class, 'logout']);
 
-    Route::get('/areas', [AreaController::class, 'getAreas']);
+
     Route::get('/areas/{areaId}/tasks', [TaskController::class, 'getTasksOfRolesFromArea']);
+    Route::post('/tasks/{taskId}/update_status', [TaskController::class, 'updateTaskStatus']);
+    Route::get('/profile', [ProfileAPIController::class, 'getProfile']);
 });
+
+Route::get('/areas', [AreaController::class, 'getAreas']);
 
 Route::get('/departments',[DepartmentAPIController::class,'getDepartmentData']);
 Route::post('/departments',[DepartmentAPIController::class,'createDepartment']);
@@ -59,9 +66,17 @@ Route::get('/complaints',[ComplaintAPIController::class,'getComplainData']);
 Route::post('/complaints',[ComplaintAPIController::class,'createComplain']);
 Route::put('/complaints/{id}',[ComplaintAPIController::class,'updateComplain']);
 Route::delete('/complaints/{id}',[ComplaintAPIController::class,'deleteComplain']);
+Route::post('/complaints/{id}/update_status',[ComplaintAPIController::class,'complainStatusChange']);
 
-Route::get('/services',[ServiceAPIController::class,'getServiceData']);
-Route::post('/services',[ServiceAPIController::class,'createService']);
-Route::put('/services/{id}',[ServiceAPIController::class,'updateService']);
-Route::delete('/services/{id}',[ServiceAPIController::class,'deleteService']);
+Route::get('/entities',[EntityAPIController::class,'getEntityData']);
+Route::post('/entities',[EntityAPIController::class,'createEntity']);
+Route::put('/entities/{id}',[EntityAPIController::class,'updateEntity']);
+Route::delete('/entities/{id}',[EntityAPIController::class,'deleteEntity']);
+
+Route::get('/inventories',[InventoryAPIController::class,'getInventoryData']);
+Route::post('/inventories',[InventoryAPIController::class,'createInventory']);
+Route::put('/inventories/{id}',[InventoryAPIController::class,'updateInventory']);
+Route::delete('/inventories/{id}',[InventoryAPIController::class,'deleteInventory']);
 // Route::group(['prefix' => 'management'], function () {});
+
+

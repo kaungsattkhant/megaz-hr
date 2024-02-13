@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Repositories\Service;
+namespace App\Repositories\Entity;
 
 use Illuminate\Http\Request;
 
-interface ServiceRepositoryInterface
+interface EntityRepositoryInterface
 {
     public function listAllData(Request $request);
 

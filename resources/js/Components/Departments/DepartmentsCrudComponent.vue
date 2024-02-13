@@ -27,13 +27,6 @@
                             <th scope="col" class=" px-6 py-4 ">
                                 Name
                             </th>
-                            <th scope="col" class=" px-6 py-4 ">
-                                Department
-                            </th>
-
-                            <th scope="col" class=" px-6 py-4 ">
-                                Role
-                            </th>
                             <th scope="col" class="px-6 py-4">
 
                             </th>
@@ -42,19 +35,13 @@
                     <tbody>
 
                         <!-- looping start -->
-                        <div class="contents" v-for="(task, index) in tasksList" :key="index">
+                        <div class="contents" v-for="(department, index) in departmentList" :key="index">
                             <tr class="bg-white rounded-lg overflow-hidden shadow-lg">
                                 <td class=" px-6 py-4 font-medium ">
                                     {{ ++index }}
                                 </td>
                                 <td class="whitespace-nowrap px-6 py-4 ">
-                                    {{ task.name }}
-                                </td>
-                                <td class="whitespace-nowrap px-6 py-4 ">
-                                    {{ task.role.department.name }}
-                                </td>
-                                <td class=" px-6 py-4 ">
-                                    {{ task.role.name }}
+                                    {{ department.name }}
                                 </td>
                                 <td class="whitespace-nowrap px-6 py-4">
                                     <button id="edit-btn" class="pr-1">
@@ -86,7 +73,7 @@
                     <div class="relative  p-4">
                         <!--Modal title-->
                         <h5 class="text-xl text-center mt-2 font-medium leading-normal text-black" id="create_modalLabel">
-                            Create Task
+                            Create Department
                         </h5>
                         <!--Close button-->
                         <button type="button" class="absolute top-4 right-4 focus:shadow-none focus:outline-none"
@@ -102,56 +89,16 @@
                     <div class="relative px-12 py-4" data-te-modal-body-ref>
                         <div class="mb-4">
                             <label for="" class="block text-sm text-black mb-3">
-                                Task Name
+                                Department Name
                             </label>
                             <input type="text" placeholder="Task Name" v-model="name"
                                 class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
-                        </div>
-                        <div class="mb-4">
-                            <label for="" class="block text-sm text-black mb-3">
-                                Tasks
-                            </label>
-                            <textarea name="" placeholder="Tasks" v-model="tasks"
-                                class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg" id=""
-                                cols="30" rows="4"></textarea>
-                        </div>
-                        <div class="mb-4">
-                            <label for="" class="block text-sm text-black mb-3">
-                                Area
-                            </label>
-                            <select name="" id="" v-model="selectedArea"
-                                class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
-                                <option :value="area" v-for="(area, areaIndex) in areaList" :key="areaIndex">
-                                    {{ area.name }}
-                                 </option>
-
-                            </select>
-                        </div>
-                        <div class="mb-4">
-                            <label for="" class="block text-sm text-black mb-3">
-                                Role
-                            </label>
-                            <select data-te-select-init data-te-select-placeholder="Select Roles"
-                                data-te-select-filter="true" name="" id="" v-model="selectedRole"
-                                class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
-                                <option :value="role" v-for="(role, roleIndex) in roleList" :key="roleIndex"> {{ role.name }} </option>
-                            </select>
-                        </div>
-                        <div class="mb-4">
-                            <label for="" class="block text-sm text-black mb-3">
-                                Assigned Days
-                            </label>
-                            <select data-te-select-init data-te-select-placeholder="Select Days"
-                                data-te-select-filter="true" name="" id="" multiple v-model="selectedDays"
-                                class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
-                                <option :value="day" v-for="(day, dayIndex) in dayList" :key="dayIndex"> {{ day }} </option>
-                            </select>
                         </div>
                     </div>
 
                     <!--Modal footer-->
                     <div class="flex justify-center px-12 mb-6">
-                        <button type="button" @click="createTasksBtnClicked"
+                        <button type="button" @click="createDepartmentsBtnClicked"
                         class="add-btn focus:outline-none focus:ring-0 ">
                             Create
                         </button>
@@ -172,17 +119,11 @@
     export default {
         data() {
             return {
-                tasksList: [],
+                
 
-                areaList: [],
-                roleList: [],
-
+                departmentList: [],
                 name: null,
-                tasks: null,
-                selectedArea: null,
-                selectedRole: null,
-                dayList: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'],
-                selectedDays: [],
+                
 
                 per_page: 10,
                 pageNumbers: [],
@@ -195,53 +136,30 @@
         },
 
         methods: {
-            async getTasksList(pageNumber){
-                let url = `/api/tasks?per_page=${this.per_page}`;
-                if(pageNumber){
-                    url = `${url}&page=${pageNumber}`
-                }
-                let response = await getApiData({ url: url });
-
+            async getDepartmentList(){
+                const response = await getApiData({ url: '/api/departments' });
                 if(response.data){
-                    this.tasksList = response.data.tasks;
+                    this.departmentList = response.data.departments;
                 }
             },
 
-            async getAreaList(){
-                const response = await getApiData({ url: '/api/areas?all_minified=true' });
-                if(response.data){
-                    this.areaList = response.data;
-                }
-            },
-
-            async getRoleList(){
-                const response = await getApiData({ url: '/api/roles?all_minified=true' });
-                if(response.data){
-                    this.roleList = response.data;
-                }
-            },
-
-            createTasksBtnClicked(){
+            createDepartmentsBtnClicked(){
                 // alert(`name = ${this.name}`);
                 // alert(`tasks = ${this.tasks}`);
                 // alert(`department = ${this.selectedDepartment.name}`);
                 // alert(`role = ${this.selectedRole.name}`);
                 // alert(`date = ${this.selectedDate}`);
-                this.createTasks();
+                this.createDepartment();
             },
 
-            async createTasks()
+            async createDepartment()
             {
                 let formData = new FormData();
                 formData.append('name', this.name);
-                formData.append('description', this.tasks);
-                formData.append('area_id', this.selectedArea.id);
-                formData.append('role_id', this.selectedRole.id);
-                formData.append('assigned_days', this.selectedDays);
-                let response = await postApiData({url: '/api/tasks', form_data: formData});
+                let response = await postApiData({url: '/api/departments', form_data: formData});
                 if(response.success){
                     // window.location.replace('/tasks');
-                    this.getTasksList(null);
+                    this.getDepartmentList(null);
                     // alert('test');
                 }
                 else{
@@ -252,10 +170,8 @@
         },
         mounted()
         {
-            this.getTasksList(null);
-            this.getAreaList();
-            this.getRoleList();
 
+            this.getDepartmentList();
             initTE({ Modal,Select, Ripple });
         }
     }

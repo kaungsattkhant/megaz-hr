@@ -1,10 +1,10 @@
 @extends('layouts.main')
 
 @section('page_title', 'Tasks')
-@section('tasks', 'active-link')
+@section('roles', 'active-link')
 @section('content')
     <div id="app">
-        <tasks-crud-component/>
+        <roles-crud-component/>
 
     </div>
 

@@ -23,3 +23,6 @@ Route::view('/staff', 'staff.index');
 Route::view('/staff/create', 'staff.create');
 
 Route::view('/tasks', 'tasks.index');
+
+Route::view('/departments', 'departments.index');
+Route::view('/roles', 'roles.index');

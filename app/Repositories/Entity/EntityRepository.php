@@ -1,28 +1,28 @@
 <?php
 
-namespace App\Repositories\Service;
+namespace App\Repositories\Entity;
 
-use App\Models\Service;
+use App\Models\Entity;
 use Illuminate\Http\Request;
 
-class ServiceRepository implements ServiceRepositoryInterface
+class EntityRepository implements EntityRepositoryInterface
 {
     public function listAllData(Request $request)
     {
-        $allServices = Service::all();
-        $services = Pagination($allServices,$request,'services');
-        return $services;
+        $allEntity = Entity::all();
+        $entities = Pagination($allEntity,$request,'entities');
+        return $entities;
     }
 
     public function createData(array $data)
     {
-        $service = Service::create($data);
+        $service = Entity::create($data);
         return $service;
     }
 
     public function updateData(array $data,int $id)
     {
-        $service = Service::find($id);
+        $service = Entity::find($id);
         if($service)
         {
             $data = RemoveNullValues($data);
@@ -35,7 +35,7 @@ class ServiceRepository implements ServiceRepositoryInterface
     public function deleteData(int $id)
     {
 
-        $service= Service::find($id);
+        $service= Entity::find($id);
         if($service)
         {
             $service->is_available =0;

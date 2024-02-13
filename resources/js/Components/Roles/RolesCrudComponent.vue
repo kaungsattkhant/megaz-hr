@@ -30,10 +30,6 @@
                             <th scope="col" class=" px-6 py-4 ">
                                 Department
                             </th>
-
-                            <th scope="col" class=" px-6 py-4 ">
-                                Role
-                            </th>
                             <th scope="col" class="px-6 py-4">
 
                             </th>
@@ -42,19 +38,17 @@
                     <tbody>
 
                         <!-- looping start -->
-                        <div class="contents" v-for="(task, index) in tasksList" :key="index">
+                        <div class="contents" v-for="(role, index) in roleList" :key="index">
                             <tr class="bg-white rounded-lg overflow-hidden shadow-lg">
                                 <td class=" px-6 py-4 font-medium ">
                                     {{ ++index }}
                                 </td>
                                 <td class="whitespace-nowrap px-6 py-4 ">
-                                    {{ task.name }}
+                                    {{ role.name }}
                                 </td>
+
                                 <td class="whitespace-nowrap px-6 py-4 ">
-                                    {{ task.role.department.name }}
-                                </td>
-                                <td class=" px-6 py-4 ">
-                                    {{ task.role.name }}
+                                    {{ role.department.name }}
                                 </td>
                                 <td class="whitespace-nowrap px-6 py-4">
                                     <button id="edit-btn" class="pr-1">
@@ -84,11 +78,9 @@
                     class="min-[576px]:shadow-[0_0.5rem_1rem_rgba(#000, 0.15)] pointer-events-auto relative flex w-full flex-col rounded-md border-none bg-white bg-clip-padding text-current shadow-lg outline-none">
 
                     <div class="relative  p-4">
-                        <!--Modal title-->
                         <h5 class="text-xl text-center mt-2 font-medium leading-normal text-black" id="create_modalLabel">
-                            Create Task
+                            Create Role
                         </h5>
-                        <!--Close button-->
                         <button type="button" class="absolute top-4 right-4 focus:shadow-none focus:outline-none"
                             data-te-modal-dismiss aria-label="Close">
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
@@ -97,61 +89,27 @@
                             </svg>
                         </button>
                     </div>
-
-                    <!--Modal body-->
                     <div class="relative px-12 py-4" data-te-modal-body-ref>
                         <div class="mb-4">
                             <label for="" class="block text-sm text-black mb-3">
-                                Task Name
+                                Role Name
                             </label>
-                            <input type="text" placeholder="Task Name" v-model="name"
+                            <input type="text" placeholder="Role Name" v-model="name"
                                 class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
                         </div>
                         <div class="mb-4">
                             <label for="" class="block text-sm text-black mb-3">
-                                Tasks
+                                Department
                             </label>
-                            <textarea name="" placeholder="Tasks" v-model="tasks"
-                                class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg" id=""
-                                cols="30" rows="4"></textarea>
-                        </div>
-                        <div class="mb-4">
-                            <label for="" class="block text-sm text-black mb-3">
-                                Area
-                            </label>
-                            <select name="" id="" v-model="selectedArea"
+                            <select name="" id="" v-model="selectedDepartment"
                                 class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
-                                <option :value="area" v-for="(area, areaIndex) in areaList" :key="areaIndex">
-                                    {{ area.name }}
-                                 </option>
+                                <option :value="department.id" v-for="(department, departmentIndex) in departmentList" :key="departmentIndex" > {{ department.name }} </option>
+                            </select>
+                        </div>
 
-                            </select>
-                        </div>
-                        <div class="mb-4">
-                            <label for="" class="block text-sm text-black mb-3">
-                                Role
-                            </label>
-                            <select data-te-select-init data-te-select-placeholder="Select Roles"
-                                data-te-select-filter="true" name="" id="" v-model="selectedRole"
-                                class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
-                                <option :value="role" v-for="(role, roleIndex) in roleList" :key="roleIndex"> {{ role.name }} </option>
-                            </select>
-                        </div>
-                        <div class="mb-4">
-                            <label for="" class="block text-sm text-black mb-3">
-                                Assigned Days
-                            </label>
-                            <select data-te-select-init data-te-select-placeholder="Select Days"
-                                data-te-select-filter="true" name="" id="" multiple v-model="selectedDays"
-                                class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
-                                <option :value="day" v-for="(day, dayIndex) in dayList" :key="dayIndex"> {{ day }} </option>
-                            </select>
-                        </div>
                     </div>
-
-                    <!--Modal footer-->
                     <div class="flex justify-center px-12 mb-6">
-                        <button type="button" @click="createTasksBtnClicked"
+                        <button type="button" @click="createRolesBtnClicked"
                         class="add-btn focus:outline-none focus:ring-0 ">
                             Create
                         </button>
@@ -172,17 +130,13 @@
     export default {
         data() {
             return {
-                tasksList: [],
+                
 
-                areaList: [],
+                departmentList: [],
                 roleList: [],
-
                 name: null,
-                tasks: null,
-                selectedArea: null,
-                selectedRole: null,
-                dayList: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'],
-                selectedDays: [],
+                selectedDepartment:null,
+                
 
                 per_page: 10,
                 pageNumbers: [],
@@ -195,54 +149,34 @@
         },
 
         methods: {
-            async getTasksList(pageNumber){
-                let url = `/api/tasks?per_page=${this.per_page}`;
-                if(pageNumber){
-                    url = `${url}&page=${pageNumber}`
-                }
-                let response = await getApiData({ url: url });
-
+            async getDepartmentList(){
+                const response = await getApiData({ url: '/api/departments?all_minified=true' });
                 if(response.data){
-                    this.tasksList = response.data.tasks;
+                    this.departmentList = response.data;
                 }
             },
 
-            async getAreaList(){
-                const response = await getApiData({ url: '/api/areas?all_minified=true' });
+            async getRolesList(){
+                const response = await getApiData({ url: '/api/roles' });
                 if(response.data){
-                    this.areaList = response.data;
+                    this.roleList = response.data.roles;
                 }
             },
 
-            async getRoleList(){
-                const response = await getApiData({ url: '/api/roles?all_minified=true' });
-                if(response.data){
-                    this.roleList = response.data;
-                }
+            createRolesBtnClicked(){
+                
+                this.createRole();
             },
 
-            createTasksBtnClicked(){
-                // alert(`name = ${this.name}`);
-                // alert(`tasks = ${this.tasks}`);
-                // alert(`department = ${this.selectedDepartment.name}`);
-                // alert(`role = ${this.selectedRole.name}`);
-                // alert(`date = ${this.selectedDate}`);
-                this.createTasks();
-            },
-
-            async createTasks()
+            async createRole()
             {
                 let formData = new FormData();
                 formData.append('name', this.name);
-                formData.append('description', this.tasks);
-                formData.append('area_id', this.selectedArea.id);
-                formData.append('role_id', this.selectedRole.id);
-                formData.append('assigned_days', this.selectedDays);
-                let response = await postApiData({url: '/api/tasks', form_data: formData});
+                formData.append('department_id', this.selectedDepartment);
+                let response = await postApiData({url: '/api/roles', form_data: formData});
                 if(response.success){
-                    // window.location.replace('/tasks');
-                    this.getTasksList(null);
-                    // alert('test');
+                    this.getRolesList(null);
+                    console.log("success")
                 }
                 else{
                     alert('some errors occur');
@@ -252,10 +186,10 @@
         },
         mounted()
         {
-            this.getTasksList(null);
-            this.getAreaList();
-            this.getRoleList();
 
+            this.getRolesList();
+
+            this.getDepartmentList();
             initTE({ Modal,Select, Ripple });
         }
     }

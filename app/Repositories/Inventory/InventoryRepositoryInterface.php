@@ -1,15 +1,13 @@
 <?php
 
-namespace App\Repositories\Task;
+namespace App\Repositories\Inventory;
 
 use Illuminate\Http\Request;
 
-interface TaskRepositoryInterface
+use App\Models\Inventory;
+
+interface InventoryRepositoryInterface
 {
-    public function getTasksOfRolesFromArea(int $areaId, array $roleIds);
-
-    public function updateTaskStatus(array $data, int $id);
-
     public function listAllData(Request $request);
 
     public function createData(array $data);

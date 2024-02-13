@@ -1,0 +1,48 @@
+<?php
+
+namespace App\Http\Controllers\API;
+
+use App\Http\Controllers\Controller;
+use App\Http\Requests\Inventory\InventoryCreateRequest;
+use App\Http\Requests\Inventory\InventoryUpdateRequest;
+use App\Repositories\Inventory\InventoryRepositoryInterface;
+use Illuminate\Http\Request;
+
+class InventoryAPIController extends Controller
+{
+    //
+    protected $inventoryRepo;
+    public function __construct(InventoryRepositoryInterface $inventoryRepo)
+    {
+        $this->inventoryRepo = $inventoryRepo;
+    }
+
+    public function getInventoryData(Request $request)
+    {
+        $inventories = $this->inventoryRepo->listAllData($request);
+        ResponseData($inventories);
+    }
+
+    public function createInventory(InventoryCreateRequest $request)
+    {
+        $inventory = $this->inventoryRepo->createData($request->all());
+        ResponseData($inventory);
+    }
+
+    public function updateInventory(InventoryUpdateRequest $request,$id)
+    {
+        $inventory = $this->inventoryRepo->updateData($request->all(),$id);
+        ResponseData($inventory);
+    }
+
+    public function deleteInventory($id)
+    {
+        $inventory = $this->inventoryRepo->deleteData($id);
+        if($inventory==true)
+        {
+            ResponseMessage('Inventory deleted');
+        }else{
+            ResponseMessage('Inventory not found or some error occur');
+        }
+    }
+}

@@ -9,7 +9,7 @@ class RoleRepository implements RoleRepositoryInterface
 {
     public function listAllData(Request $request)
     {
-        $allRoles = Role::all();
+        $allRoles = Role::with("department")->get();
         if($request->all_minified){
             return $allRoles;
         }
