@@ -8,6 +8,7 @@ use App\Http\Controllers\API\AreaController;
 use App\Http\Controllers\API\ComplaintAPIController;
 use App\Http\Controllers\API\DepartmentAPIController;
 use App\Http\Controllers\API\EntityAPIController;
+use App\Http\Controllers\API\InventoryAPIController;
 use App\Http\Controllers\API\RoleAPIController;
 use App\Http\Controllers\API\ServiceAPIController;
 use App\Http\Controllers\API\StaffAPIController;
@@ -71,4 +72,11 @@ Route::get('/entities',[EntityAPIController::class,'getEntityData']);
 Route::post('/entities',[EntityAPIController::class,'createEntity']);
 Route::put('/entities/{id}',[EntityAPIController::class,'updateEntity']);
 Route::delete('/entities/{id}',[EntityAPIController::class,'deleteEntity']);
+
+Route::get('/inventories',[InventoryAPIController::class,'getInventoryData']);
+Route::post('/inventories',[InventoryAPIController::class,'createInventory']);
+Route::put('/inventories/{id}',[InventoryAPIController::class,'updateInventory']);
+Route::delete('/inventories/{id}',[InventoryAPIController::class,'deleteInventory']);
 // Route::group(['prefix' => 'management'], function () {});
+
+

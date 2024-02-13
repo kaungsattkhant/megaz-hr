@@ -6,7 +6,7 @@ use Illuminate\Http\Request;
 
 use App\Models\Inventory;
 
-class InventoryRepository
+class InventoryRepository implements InventoryRepositoryInterface
 {
     public function listAllData(Request $request)
     {
@@ -26,6 +26,7 @@ class InventoryRepository
 
     public function updateData(array $data, int $id)
     {
+
         $inventory = Inventory::find($id);
         if($inventory)
         {
