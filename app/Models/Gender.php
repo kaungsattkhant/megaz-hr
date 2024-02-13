@@ -7,27 +7,13 @@ use Illuminate\Database\Eloquent\Model;
 
 use App\Models\Staff;
 
-class Gender extends Model
+class Gender extends BaseModel
 {
     use HasFactory;
 
     protected $fillable=[
         'name'
     ];
-
-    protected $hidden=[
-        'created_at','updated_at'
-    ];
-
-    public function getCreatedAt()
-    {
-        return $this->created_at;
-    }
-
-    public function getUpdatedAt()
-    {
-        return $this->updated_at;
-    }
 
     public function staffs()
     {
