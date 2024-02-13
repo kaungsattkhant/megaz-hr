@@ -12,6 +12,8 @@ interface ComplaintRepositoryInterface
 
     public function updateData(array $data,int $id);
 
+    public function statusChange(string $data,int $id);
+
     public function deleteData($id);
 
 
