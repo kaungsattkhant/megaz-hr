@@ -15,6 +15,16 @@ class Gender extends BaseModel
         'name'
     ];
 
+    public function getCreatedAt()
+    {
+        return parent::getCreatedAt();
+    }
+
+    public function getUpdatedAt()
+    {
+        return parent::getUpdatedAt();
+    }
+
     public function staffs()
     {
         return $this->hasMany(Staff::class);
