@@ -14,6 +14,7 @@ use App\Http\Controllers\API\ServiceAPIController;
 use App\Http\Controllers\API\StaffAPIController;
 use App\Http\Controllers\API\TaskController;
 use App\Http\Controllers\API\ProfileAPIController;
+use App\Models\AreaType;
 use App\Models\Gender;
 
 /*
@@ -37,7 +38,13 @@ Route::middleware('auth:api')->group(function(){
     Route::get('/profile', [ProfileAPIController::class, 'getProfile']);
 });
 
+Route::get('/area_types', function(){
+    ResponseData(AreaType::all());
+});
 Route::get('/areas', [AreaController::class, 'getAreas']);
+Route::post('/areas', [AreaController::class, 'createArea']);
+Route::put('/areas/{id}', [AreaController::class, 'updateArea']);
+Route::delete('/areas/{id}', [AreaController::class, 'deleteArea']);
 
 Route::get('/departments',[DepartmentAPIController::class,'getDepartmentData']);
 Route::post('/departments',[DepartmentAPIController::class,'createDepartment']);
