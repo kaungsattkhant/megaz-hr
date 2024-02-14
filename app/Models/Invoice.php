@@ -12,4 +12,14 @@ class Invoice extends Model
     protected $fillable=[
         'invoice_date','start_date','end_date','head_count','created_by','total','tax','sub_total','paid_amount','change','area_id','entity_id','service_id','payment_status','payment_type'
     ];
+
+    public function getCreatedAt()
+    {
+        return parent::getCreatedAt();
+    }
+
+    public function getUpdatedAt()
+    {
+        return parent::getUpdatedAt();
+    }
 }

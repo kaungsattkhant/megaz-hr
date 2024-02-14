@@ -17,4 +17,14 @@ class Item extends Model
     {
         return $this->belongsToMany(Uom::class,'items_uoms', 'item_id', 'uom_id');
     }
+
+    public function getCreatedAt()
+    {
+        return parent::getCreatedAt();
+    }
+
+    public function getUpdatedAt()
+    {
+        return parent::getUpdatedAt();
+    }
 }

@@ -13,4 +13,14 @@ class PurchaseOrderItem extends Model
         'quantity','purchase_order_id','item_id'
     ];
 
+    public function getCreatedAt()
+    {
+        return parent::getCreatedAt();
+    }
+
+    public function getUpdatedAt()
+    {
+        return parent::getUpdatedAt();
+    }
+
 }

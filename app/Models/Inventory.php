@@ -17,4 +17,14 @@ class Inventory extends BaseModel
     {
         return $this->morphTo();
     }
+
+    public function getCreatedAt()
+    {
+        return parent::getCreatedAt();
+    }
+
+    public function getUpdatedAt()
+    {
+        return parent::getUpdatedAt();
+    }
 }

@@ -5,11 +5,21 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class OrderItem extends Model
+class OrderItem extends BaseModel
 {
     use HasFactory;
 
     protected $fillable=[
         'date','menu_id','quantity','original_price','discount_value','price','order_id','status','is_complete'
     ];
+
+    public function getCreatedAt()
+    {
+        return parent::getCreatedAt();
+    }
+
+    public function getUpdatedAt()
+    {
+        return parent::getUpdatedAt();
+    }
 }

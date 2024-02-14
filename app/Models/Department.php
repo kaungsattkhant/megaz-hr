@@ -9,7 +9,7 @@ use App\Models\Inventory;
 use App\Models\Role;
 use App\Models\Staff;
 
-class Department extends Model
+class Department extends BaseModel
 {
     use HasFactory;
 
@@ -20,6 +20,8 @@ class Department extends Model
     protected $hidden=[
         'created_at','updated_at'
     ];
+
+
 
     public function getCreatedAt()
     {

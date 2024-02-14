@@ -7,13 +7,23 @@ use Illuminate\Database\Eloquent\Model;
 
 use App\Models\Area;
 
-class AreaType extends Model
+class AreaType extends BaseModel
 {
     use HasFactory;
 
     protected $fillable=[
         'name'
     ];
+
+    public function getCreatedAt()
+    {
+        return parent::getCreatedAt();
+    }
+
+    public function getUpdatedAt()
+    {
+        return parent::getUpdatedAt();
+    }
 
     public function areas()
     {
