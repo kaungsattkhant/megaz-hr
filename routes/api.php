@@ -9,11 +9,15 @@ use App\Http\Controllers\API\ComplaintAPIController;
 use App\Http\Controllers\API\DepartmentAPIController;
 use App\Http\Controllers\API\EntityAPIController;
 use App\Http\Controllers\API\InventoryAPIController;
+use App\Http\Controllers\API\ItemAPIController;
 use App\Http\Controllers\API\RoleAPIController;
 use App\Http\Controllers\API\ServiceAPIController;
 use App\Http\Controllers\API\StaffAPIController;
 use App\Http\Controllers\API\TaskController;
 use App\Http\Controllers\API\ProfileAPIController;
+use App\Http\Controllers\API\PurchaseOrderAPIController;
+use App\Http\Controllers\API\PurchaseOrderItemAPIController;
+use App\Http\Controllers\API\UomAPIController;
 use App\Models\Gender;
 
 /*
@@ -77,6 +81,29 @@ Route::get('/inventories',[InventoryAPIController::class,'getInventoryData']);
 Route::post('/inventories',[InventoryAPIController::class,'createInventory']);
 Route::put('/inventories/{id}',[InventoryAPIController::class,'updateInventory']);
 Route::delete('/inventories/{id}',[InventoryAPIController::class,'deleteInventory']);
+
+Route::get('/uoms',[UomAPIController::class,'getUomData']);
+Route::post('/uoms',[UomAPIController::class,'createUom']);
+Route::put('/uoms/{id}',[UomAPIController::class,'updateUom']);
+Route::delete('/uoms/{id}',[UomAPIController::class,'deleteUom']);
+
+Route::get('/items',[ItemAPIController::class,'getItemData']);
+Route::post('/items',[ItemAPIController::class,'createItem']);
+Route::put('/items/{id}',[ItemAPIController::class,'updateItem']);
+Route::delete('/items/{id}',[ItemAPIController::class,'deleteItem']);
+
+Route::get('/purchase_orders',[PurchaseOrderAPIController::class,'getPurchaseOrder']);
+Route::post('/purchase_orders',[PurchaseOrderAPIController::class,'createPurchaseOrder']);
+// below the route perform update, and kitchen data update and financial update and it depends on condition,
+Route::put('/purchase_orders/{id}',[PurchaseOrderAPIController::class,'updatePurchaseOrder']);
+Route::delete('/purchase_orders/{id}',[PurchaseOrderAPIController::class,'deletePurchaseOrder']);
+
+Route::get('/purchase_orders_items',[PurchaseOrderItemAPIController::class,'getPurchaseOrderItem']);
+Route::post('/purchase_orders_items',[PurchaseOrderItemAPIController::class,'createPurchaseOrderItem']);
+Route::put('/purchase_orders_items/{id}',[PurchaseOrderItemAPIController::class,'updatePurchaseOrderItem']);
+Route::delete('/purchase_orders_items/{id}',[PurchaseOrderItemAPIController::class,'deletePurchaseOrderItem']);
+
 // Route::group(['prefix' => 'management'], function () {});
+
 
 
