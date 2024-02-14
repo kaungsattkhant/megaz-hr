@@ -18,6 +18,8 @@ use App\Http\Controllers\API\ProfileAPIController;
 use App\Http\Controllers\API\PurchaseOrderAPIController;
 use App\Http\Controllers\API\PurchaseOrderItemAPIController;
 use App\Http\Controllers\API\UomAPIController;
+
+use App\Models\AreaType;
 use App\Models\Gender;
 
 /*
@@ -41,7 +43,13 @@ Route::middleware('auth:api')->group(function(){
     Route::get('/profile', [ProfileAPIController::class, 'getProfile']);
 });
 
+Route::get('/area_types', function(){
+    ResponseData(AreaType::all());
+});
 Route::get('/areas', [AreaController::class, 'getAreas']);
+Route::post('/areas', [AreaController::class, 'createArea']);
+Route::put('/areas/{id}', [AreaController::class, 'updateArea']);
+Route::delete('/areas/{id}', [AreaController::class, 'deleteArea']);
 
 Route::get('/departments',[DepartmentAPIController::class,'getDepartmentData']);
 Route::post('/departments',[DepartmentAPIController::class,'createDepartment']);
