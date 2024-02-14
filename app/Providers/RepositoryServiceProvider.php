@@ -18,7 +18,12 @@ use App\Repositories\Entity\EntityRepositoryInterface;
 
 use App\Repositories\Inventory\InventoryRepository;
 use App\Repositories\Inventory\InventoryRepositoryInterface;
-
+use App\Repositories\Item\ItemRepository;
+use App\Repositories\Item\ItemRepositoryInterface;
+use App\Repositories\PurchaseOrder\PurchaseOrderRepository;
+use App\Repositories\PurchaseOrder\PurchaseOrderRepositoryInterface;
+use App\Repositories\PurchaseOrderItem\PurchaseOrderItemRepository;
+use App\Repositories\PurchaseOrderItem\PurchaseOrderItemRepositoryInterface;
 use App\Repositories\Role\RoleRepository;
 use App\Repositories\Role\RoleRepositoryInterface;
 
@@ -27,6 +32,8 @@ use App\Repositories\Staff\StaffRepositoryInterface;
 
 use App\Repositories\Task\TaskRepository;
 use App\Repositories\Task\TaskRepositoryInterface;
+use App\Repositories\Uom\UomRepository;
+use App\Repositories\Uom\UomRepositoryInterface;
 
 class RepositoryServiceProvider extends ServiceProvider
 {
@@ -52,5 +59,9 @@ class RepositoryServiceProvider extends ServiceProvider
         $this->app->bind(ComplaintRepositoryInterface::class,ComplaintRepository::class);
         $this->app->bind(EntityRepositoryInterface::class,EntityRepository::class);
         $this->app->bind(InventoryRepositoryInterface::class,InventoryRepository::class);
+        $this->app->bind(UomRepositoryInterface::class,UomRepository::class);
+        $this->app->bind(ItemRepositoryInterface::class,ItemRepository::class);
+        $this->app->bind(PurchaseOrderRepositoryInterface::class,PurchaseOrderRepository::class);
+        $this->app->bind(PurchaseOrderItemRepositoryInterface::class,PurchaseOrderItemRepository::class);
     }
 }
