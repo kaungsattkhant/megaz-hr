@@ -5,9 +5,6 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-use App\Models\Area;
-use App\Models\Department;
-
 class Inventory extends BaseModel
 {
     use HasFactory;
@@ -16,13 +13,8 @@ class Inventory extends BaseModel
         'area_id', 'department_id', 'name', 'inventoryable_type', 'inventoryable_id', 'is_active'
     ];
 
-    public function area()
+    public function inventoryable()
     {
-        return $this->belongsTo(Area::class);
-    }
-
-    public function departement()
-    {
-        return $this->belongsTo(Department::class);
+        return $this->morphTo();
     }
 }

@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
+use App\Models\Inventory;
 use App\Models\Role;
 use App\Models\Staff;
 
@@ -38,5 +39,10 @@ class Department extends Model
     public function roles()
     {
         return $this->hasMany(Role::class);
+    }
+
+    public function inventories()
+    {
+        return $this->morphMany(Inventory::class, 'inventoryable');
     }
 }

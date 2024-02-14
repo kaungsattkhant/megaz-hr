@@ -22,8 +22,6 @@ class InventoryUpdateRequest extends FormRequest
     public function rules(): array
     {
         return [
-            "area_id" => "sometimes",
-            "department_id" => "sometimes",
             "name" => "sometimes",
             "inventoryable_type" => "sometimes",
             "inventoryable_id" => "sometimes",

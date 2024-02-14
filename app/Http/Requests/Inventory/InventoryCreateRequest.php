@@ -23,8 +23,6 @@ class InventoryCreateRequest extends FormRequest
     {
         return [
             //
-            "area_id" => "required",
-            "department_id" => "required",
             "name" => "required",
             "inventoryable_type" => "required",
             "inventoryable_id" => "required",

@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 use App\Models\AreaType;
+use App\Models\Inventory;
 
 class Area extends Model
 {
@@ -18,5 +19,10 @@ class Area extends Model
     public function areaType()
     {
         return $this->belongsTo(AreaType::class);
+    }
+
+    public function inventories()
+    {
+        return $this->morphMany(Inventory::class, 'inventoryable');
     }
 }

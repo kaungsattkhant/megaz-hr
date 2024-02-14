@@ -13,7 +13,7 @@ class InventoryRepository implements InventoryRepositoryInterface
         if($request->all_minified){
             return Inventory::all();
         }
-        $allInventories = Inventory::all();
+        $allInventories = Inventory::with('inventoryable')->get();
         $inventories = Pagination($allInventories,$request,'inventories');
         return $inventories;
     }
