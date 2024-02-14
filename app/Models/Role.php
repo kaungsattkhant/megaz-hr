@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 use App\Models\Department;
 use App\Models\Staff;
 
-class Role extends Model
+class Role extends BaseModel
 {
     use HasFactory;
 

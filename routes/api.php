@@ -20,7 +20,9 @@ use App\Http\Controllers\API\PurchaseOrderItemAPIController;
 use App\Http\Controllers\API\UomAPIController;
 
 use App\Models\AreaType;
+use App\Models\Category;
 use App\Models\Gender;
+use App\Models\ServiceCategory;
 
 /*
 |--------------------------------------------------------------------------
@@ -33,6 +35,24 @@ use App\Models\Gender;
 |
 */
 
+Route::get('genders', function(){
+    ResponseData(Gender::all());
+});
+
+Route::get('/categories',function(){
+    ResponseData(Category::all());
+});
+
+Route::get('/service_categories',function(){
+    ResponseData(ServiceCategory::all());
+});
+
+
+Route::get('/area_types', function(){
+    ResponseData(AreaType::all());
+});
+
+
 Route::post('/login', [AuthController::class,'login']);
 Route::middleware('auth:api')->group(function(){
     Route::post('/logout', [AuthController::class, 'logout']);
@@ -43,9 +63,6 @@ Route::middleware('auth:api')->group(function(){
     Route::get('/profile', [ProfileAPIController::class, 'getProfile']);
 });
 
-Route::get('/area_types', function(){
-    ResponseData(AreaType::all());
-});
 Route::get('/areas', [AreaController::class, 'getAreas']);
 Route::post('/areas', [AreaController::class, 'createArea']);
 Route::put('/areas/{id}', [AreaController::class, 'updateArea']);
@@ -55,7 +72,6 @@ Route::get('/departments',[DepartmentAPIController::class,'getDepartmentData']);
 Route::post('/departments',[DepartmentAPIController::class,'createDepartment']);
 Route::put('/departments/{id}',[DepartmentAPIController::class,'updateDepartment']);
 
-
 Route::get('/roles',[RoleAPIController::class,'getRoleData']);
 Route::post('/roles',[RoleAPIController::class,'createRole']);
 Route::put('/roles/{id}',[RoleAPIController::class,'updateRole']);
@@ -64,10 +80,6 @@ Route::get('/staffs',[StaffAPIController::class,'getStaffData']);
 Route::post('/staffs',[StaffAPIController::class,'createStaff']);
 Route::put('/staffs/{id}',[StaffAPIController::class,'updateStaff']);
 Route::delete('/staffs/{id}',[StaffAPIController::class,'deleteStaff']);
-
-Route::get('genders', function(){
-    ResponseData(Gender::all());
-});
 
 Route::get('/tasks',[TaskController::class,'getTaskData']);
 Route::post('/tasks',[TaskController::class,'createTask']);
