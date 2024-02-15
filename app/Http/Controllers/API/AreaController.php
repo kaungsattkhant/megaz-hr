@@ -9,6 +9,8 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Area\AreaCreateRequest;
 use App\Http\Requests\Area\AreaUpdateRequest;
 
+use App\Models\Area;
+
 use App\Repositories\Area\AreaRepositoryInterface;
 
 class AreaController extends Controller
@@ -23,7 +25,8 @@ class AreaController extends Controller
 
     public function getAreas(Request $request)
     {
-        $areas = $this->areaRepo->getAreas($request);
+        // $areas = $this->areaRepo->getAreas($request);
+        $areas = Area::all();
 
         ResponseData($areas);
     }
