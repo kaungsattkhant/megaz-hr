@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
+use Illuminate\Database\Query\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;
@@ -163,6 +164,64 @@ if(!function_exists('Pagination')){
             'last_page' => $paginatedItems->lastPage(),
             'per_page'=>$paginatedItems->perPage(),
             $data_shell_name => $paginatedItems->items(),
+        ];
+    }
+}
+
+if(!function_exists('MakePaginationData')){
+    function MakePaginationData(Request $request, int $totalCount, string $data_shell_name=null)
+    {
+        $pageNumber = 1;
+        $perPage = 20;
+        if($request->page){
+            $pageNumber = $request->page;
+        }
+        if($request->per_page){
+            $perPage = $request->per_page;
+        }
+
+        $fullUrl = $request->fullUrl();
+        $parsedUrl = parse_url($fullUrl);
+        if(array_key_exists('query', $parsedUrl)){
+            parse_str($parsedUrl['query'], $query);
+            unset($query['page']);
+            $newQueryString = http_build_query($query);
+            $newFullUrl = url($parsedUrl['path']) . ($newQueryString ? '?' . $newQueryString : '');
+        }
+        else{
+            $newFullUrl = $fullUrl;
+        }
+
+        $totalPages = ceil($totalCount/$perPage);
+        $previousPage = $pageNumber - 1;
+        $currentPage = $pageNumber;
+        $nextPage = $pageNumber + 1;
+        $firstPage = 1;
+        $lastPage = $totalPages;
+
+        $nextPageUrl = "{$newFullUrl}&page={$nextPage}";
+        if($currentPage == $lastPage){
+            $nextPageUrl = null;
+        }
+        $previousPageUrl = null;
+        if($previousPage >= 1){
+            $previousPageUrl = "{$newFullUrl}&page={$previousPage}";
+        }
+        $firstPageUrl = "{$newFullUrl}&page={$firstPage}";
+        $lastPageUrl = "{$newFullUrl}&page={$lastPage}";
+
+        $data_shell_name = ($data_shell_name)? $data_shell_name : 'data';
+
+        return [
+            "next_page_url" => $nextPageUrl,
+            "previous_page_url" => $previousPageUrl,
+            "first_page_url" => $firstPageUrl,
+            "last_page_url" => $lastPageUrl,
+            "total_pages" => (int) $totalPages,
+            "current_page" => (int) $currentPage,
+            "last_page" => (int) $lastPage,
+            "per_page" => (int) $perPage,
+            $data_shell_name => [],
         ];
     }
 }

@@ -10,13 +10,29 @@ class AreaRepository implements AreaRepositoryInterface
 {
     public function getAreas(Request $request)
     {
-        $areas = Area::with('areaType')->where('is_active', 1)->get();
-        if($request->all_minified){
+        if($request->per_page || $request->page){
+            $totalCount = Area::where('is_active', 1)->count();
+            $pageNumber = 1;
+            $perPage = 20;
+            if($request->page){
+                $pageNumber = $request->page;
+            }
+            if($request->per_page){
+                $perPage = $request->per_page;
+            }
+            $skip = ($pageNumber - 1) * $perPage;
+            $areas = Area::where('is_active', 1)->skip($skip)->take($perPage)->get();
+            $paginationData = MakePaginationData($request, $totalCount, 'areas');
+            $paginationData['areas'] = $areas;
+
+            return $paginationData;
+        }
+
+        else{
+            $areas = Area::with('areaType')->where('is_active', 1)->get();
+
             return $areas;
         }
-        $areasData = Pagination($areas, $request, 'areas');
-
-        return $areasData;
     }
 
     public function createData(array $data)
