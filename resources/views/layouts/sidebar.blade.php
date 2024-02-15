@@ -6,38 +6,44 @@
                 <div class="relative w-[16vw] pt-12">
                     <ul class=" mb-4">
                         <li>
-                            <a href="#" class="flex items-center @yield('staffs')">
+                            <a href="/staff" class="flex items-center @yield('staffs')">
                                 <i class="fal fa-user  pr-3"></i>
                                 Staffs
                             </a>
                         </li>
                         <li>
-                            <a href="#" class="flex items-center @yield('tasks')">
-                                <i class="fal fa-user  pr-3"></i>
+                            <a href="/tasks" class="flex items-center @yield('tasks')">
+                                <i class="fal fa-tasks  pr-3"></i>
                                 Tasks
                             </a>
                         </li>
                         <li>
-                            <a href="#" class="flex items-center @yield('departments')">
-                                <i class="fal fa-user  pr-3"></i>
+                            <a href="/departments" class="flex items-center @yield('departments')">
+                                <i class="fal fa-network-wired  pr-3"></i>
                                 Department
                             </a>
                         </li>
                         <li>
+                            <a href="/roles" class="flex items-center @yield('roles')">
+                                <i class="fal fa-tasks  pr-3"></i>
+                                Role
+                            </a>
+                        </li>
+                        <li>
                             <a href="#" class="flex items-center @yield('inventory')">
-                                <i class="fal fa-user  pr-3"></i>
+                                <i class="fal fa-inventory  pr-3"></i>
                                 Inventory
                             </a>
                         </li>
                         <li>
                             <a href="#" class="flex items-center @yield('menu')">
-                                <i class="fal fa-user  pr-3"></i>
+                                <i class="fal fa-clipboard-list  pr-3"></i>
                                 Menu
                             </a>
                         </li>
                         <li>
                             <a href="#" class="flex items-center @yield('items')">
-                                <i class="fal fa-user  pr-3"></i>
+                                <i class="fal fa-hand-receiving  pr-3"></i>
                                 Items
                             </a>
                         </li>
@@ -47,7 +53,20 @@
                                 Services
                             </a>
                         </li>
+
+
+
+                       
+                        
+                        
                     </ul>
+                    
                 </div>
+                
+            </div>
+            <div class="absolute bottom-0 left-0 w-[16vw] h-14 bg-[#df3b06] border-t border-[#0002] flex items-center justify-start">
+                <button class="w-full text-left pl-12">
+                <i class="fal fa-sign-out pr-3"></i>Logout
+                </button>
             </div>
         </nav>
