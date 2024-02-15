@@ -3,6 +3,7 @@
 namespace App\Repositories\PurchaseOrder;
 
 use App\Models\PurchaseOrder;
+use App\Models\PurchaseOrderItem;
 use Illuminate\Http\Request;
 
 class PurchaseOrderRepository implements PurchaseOrderRepositoryInterface
@@ -32,12 +33,18 @@ class PurchaseOrderRepository implements PurchaseOrderRepositoryInterface
             return $purchaseOrders;
         }
     }
-
-    public function createData(array $data)
+    public function createData(array $purchaseOrder, array $purchaseOrderItems)
     {
-        $purchaseOrders = PurchaseOrder::create($data);
-        return $purchaseOrders;
+        $purchaseOrder = PurchaseOrder::create($purchaseOrder);
+
+        foreach ($purchaseOrderItems as $poItem) {
+            $poItem['purchase_order_id'] = $purchaseOrder->id; // Assign purchase_order_id to each purchase order item
+            $purchaseOrderItem = PurchaseOrderItem::create($poItem);
+        }
+
+        return $purchaseOrder;
     }
+
 
     public function updateData(array $data, int $id)
     {

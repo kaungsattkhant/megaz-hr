@@ -24,7 +24,6 @@ class PurchaseOrderItemCreateRequest extends FormRequest
         return [
             //
             "quantity" => "required",
-            "purchase_order_id" => "required",
             "item_id" => "required"
         ];
     }

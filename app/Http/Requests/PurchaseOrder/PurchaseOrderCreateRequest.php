@@ -23,9 +23,13 @@ class PurchaseOrderCreateRequest extends FormRequest
     {
         return [
             //
-            "po_id" => "required",
-            "total_price" => "required",
-            "created_by" => "required",
+            'purchase_order.po_id' => 'required',
+            'purchase_order.total_price' => 'required',
+            'purchase_order.created_by' => 'required',
+            'purchase_order_items' => 'required',
+            'purchase_order_items.*.quantity' => 'required', // Validate quantity for each item
+            'purchase_order_items.*.item_id' => 'required',
+
         ];
     }
 }
