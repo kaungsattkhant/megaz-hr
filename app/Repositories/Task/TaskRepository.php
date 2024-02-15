@@ -34,10 +34,28 @@ class TaskRepository implements TaskRepositoryInterface
 
     public function listAllData(Request $request)
     {
-        $tasks = Task::with('role.department')->get();
-        $tasksData = Pagination($tasks, $request, 'tasks');
+        if($request->per_page || $request->page){
+            $totalCount = Task::where('is_active', 1)->count();
+            $pageNumber = 1;
+            $perPage = 20;
+            if($request->page){
+                $pageNumber = $request->page;
+            }
+            if($request->per_page){
+                $perPage = $request->per_page;
+            }
+            $skip = ($pageNumber - 1) * $perPage;
+            $tasks = Task::where('is_active', 1)->skip($skip)->take($perPage)->get();
+            $paginationData = MakePaginationData($request, $totalCount, 'tasks');
+            $paginationData['tasks'] = $tasks;
 
-        return $tasksData;
+            return $paginationData;
+        }
+        else{
+            $tasks = Task::where('is_active', 1)->get();
+
+            return $tasks;
+        }
     }
 
     public function createData(array $data)

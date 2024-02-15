@@ -9,12 +9,28 @@ class RoleRepository implements RoleRepositoryInterface
 {
     public function listAllData(Request $request)
     {
-        $allRoles = Role::with("department")->get();
-        if($request->all_minified){
-            return $allRoles;
+        if($request->per_page || $request->page){
+            $totalCount = Role::count();
+            $pageNumber = 1;
+            $perPage = 20;
+            if($request->page){
+                $pageNumber = $request->page;
+            }
+            if($request->per_page){
+                $perPage = $request->per_page;
+            }
+            $skip = ($pageNumber - 1) * $perPage;
+            $roles = Role::skip($skip)->take($perPage)->get();
+            $paginationData = MakePaginationData($request, $totalCount, 'roles');
+            $paginationData['roles'] = $roles;
+
+            return $paginationData;
         }
-        $roles = Pagination($allRoles,$request,'roles');
-        return $roles;
+        else{
+            $roles = Role::all();
+
+            return $roles;
+        }
     }
 
     public function createData(array $data)

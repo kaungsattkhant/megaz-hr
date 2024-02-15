@@ -9,12 +9,28 @@ class DepartmentRepository implements DepartmentRepositoryInterface
 {
     public function listAllData(Request $request)
     {
-        if($request->all_minified){
-            return Department::all();
+        if($request->per_page || $request->page){
+            $totalCount = Department::count();
+            $pageNumber = 1;
+            $perPage = 20;
+            if($request->page){
+                $pageNumber = $request->page;
+            }
+            if($request->per_page){
+                $perPage = $request->per_page;
+            }
+            $skip = ($pageNumber - 1) * $perPage;
+            $departments = Department::skip($skip)->take($perPage)->get();
+            $paginationData = MakePaginationData($request, $totalCount, 'departments');
+            $paginationData['departments'] = $departments;
+
+            return $paginationData;
         }
-        $allDepartments = Department::all();
-        $departments = Pagination($allDepartments,$request,'departments');
-        return $departments;
+        else{
+            $departments = Department::all();
+
+            return $departments;
+        }
     }
 
     public function createData(array $data)

@@ -10,12 +10,28 @@ class InventoryRepository implements InventoryRepositoryInterface
 {
     public function listAllData(Request $request)
     {
-        if($request->all_minified){
-            return Inventory::all();
+        if($request->per_page || $request->page){
+            $totalCount = Inventory::where('is_active', 1)->count();
+            $pageNumber = 1;
+            $perPage = 20;
+            if($request->page){
+                $pageNumber = $request->page;
+            }
+            if($request->per_page){
+                $perPage = $request->per_page;
+            }
+            $skip = ($pageNumber - 1) * $perPage;
+            $inventories = Inventory::where('is_active', 1)->skip($skip)->take($perPage)->get();
+            $paginationData = MakePaginationData($request, $totalCount, 'inventories');
+            $paginationData['inventories'] = $inventories;
+
+            return $paginationData;
         }
-        $allInventories = Inventory::with('inventoryable')->get();
-        $inventories = Pagination($allInventories,$request,'inventories');
-        return $inventories;
+        else{
+            $inventories = Inventory::where('is_active', 1)->get();
+
+            return $inventories;
+        }
     }
 
     public function createData(array $data)

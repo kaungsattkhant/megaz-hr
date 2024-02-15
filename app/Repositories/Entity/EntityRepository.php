@@ -9,9 +9,28 @@ class EntityRepository implements EntityRepositoryInterface
 {
     public function listAllData(Request $request)
     {
-        $allEntity = Entity::all();
-        $entities = Pagination($allEntity,$request,'entities');
-        return $entities;
+        if($request->per_page || $request->page){
+            $totalCount = Entity::where('is_available', 1)->count();
+            $pageNumber = 1;
+            $perPage = 20;
+            if($request->page){
+                $pageNumber = $request->page;
+            }
+            if($request->per_page){
+                $perPage = $request->per_page;
+            }
+            $skip = ($pageNumber - 1) * $perPage;
+            $entities = Entity::where('is_available', 1)->skip($skip)->take($perPage)->get();
+            $paginationData = MakePaginationData($request, $totalCount, 'entities');
+            $paginationData['entities'] = $entities;
+
+            return $paginationData;
+        }
+        else{
+            $entities = Entity::where('is_available', 1)->get();
+
+            return $entities;
+        }
     }
 
     public function createData(array $data)

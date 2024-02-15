@@ -9,9 +9,28 @@ class PurchaseOrderRepository implements PurchaseOrderRepositoryInterface
 {
     public function listAllData(Request $request)
     {
-        $allPurchaseOrders = PurchaseOrder::all();
-        $purchaseOrders = Pagination($allPurchaseOrders, $request, 'purchase orders');
-        return $purchaseOrders;
+        if($request->per_page || $request->page){
+            $totalCount = PurchaseOrder::count();
+            $pageNumber = 1;
+            $perPage = 20;
+            if($request->page){
+                $pageNumber = $request->page;
+            }
+            if($request->per_page){
+                $perPage = $request->per_page;
+            }
+            $skip = ($pageNumber - 1) * $perPage;
+            $purchaseOrders = PurchaseOrder::skip($skip)->take($perPage)->get();
+            $paginationData = MakePaginationData($request, $totalCount, 'purchase_orders');
+            $paginationData['purchaseOrders'] = $purchaseOrders;
+
+            return $paginationData;
+        }
+        else{
+            $purchaseOrders = PurchaseOrder::all();
+
+            return $purchaseOrders;
+        }
     }
 
     public function createData(array $data)
