@@ -14,6 +14,8 @@ import StaffCreateComponent from './Components/Staff/StaffCreateComponent.vue';
 import TasksCrudComponent from './Components/Tasks/TasksCrudComponent.vue';
 import DepartmentsCrudComponent from './Components/Departments/DepartmentsCrudComponent.vue';
 import RolesCrudComponent from './Components/Roles/RolesCrudComponent.vue';
+import AreasCrudComponent from './Components/Areas/AreasCrudComponent.vue';
+import InventoriesCrudComponent from './Components/Inventories/InventoriesCrudComponent.vue';
 
 const app = createApp({});
 app.component('StaffListComponent', StaffListComponent);
@@ -21,5 +23,7 @@ app.component('StaffCreateComponent', StaffCreateComponent);
 app.component('TasksCrudComponent', TasksCrudComponent);
 app.component('DepartmentsCrudComponent', DepartmentsCrudComponent);
 app.component('RolesCrudComponent', RolesCrudComponent);
+app.component('AreasCrudComponent', AreasCrudComponent);
+app.component('InventoriesCrudComponent', InventoriesCrudComponent);
 
 app.mount('#app');

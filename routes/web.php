@@ -19,10 +19,13 @@ Route::get('/', function () {
 
 
 // test
+
+Route::view('/test', 'staff.index');
+
 Route::view('/staff', 'staff.index');
 Route::view('/staff/create', 'staff.create');
-
 Route::view('/tasks', 'tasks.index');
-
 Route::view('/departments', 'departments.index');
 Route::view('/roles', 'roles.index');
+Route::view('/testareas', 'areas.index');
+Route::view('/inventory', 'inventories.index');
