@@ -3,7 +3,7 @@
         <div class=" flex">
             <label for="search" class="search-input">
                 <input type="text" class="input-search" placeholder="Search">
-                
+
                 <i class="fal fa-search"></i>
             </label>
         </div>
@@ -131,13 +131,13 @@
     export default {
         data() {
             return {
-                
+
 
                 areaList:[],
                 typeList:[],
                 name: null,
                 selectedType:null,
-                
+
 
                 per_page: 10,
                 pageNumbers: [],
@@ -153,7 +153,7 @@
             async getAreasList(){
                 const response = await getApiData({ url: '/api/areas' });
                 if(response.data){
-                    this.areaList = response.data.areas;
+                    this.areaList = response.data;
                 }
             },
 
@@ -165,7 +165,7 @@
             },
 
             createAreasBtnClicked(){
-                
+
                 this.createArea();
             },
 

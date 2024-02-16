@@ -20,7 +20,7 @@ class StaffRepository implements StaffRepositoryInterface
                 $perPage = $request->per_page;
             }
             $skip = ($pageNumber - 1) * $perPage;
-            $staffs = Staff::where('is_active', 1)->skip($skip)->take($perPage)->get();
+            $staffs = Staff::where('is_active', 1)->skip($skip)->take($perPage)->with('department')->get();
             $paginationData = MakePaginationData($request, $totalCount, 'staffs');
             $paginationData['staffs'] = $staffs;
 

@@ -22,10 +22,10 @@ Route::get('/', function () {
 
 Route::view('/test', 'staff.index');
 
-Route::view('/staff', 'staff.index');
-Route::view('/staff/create', 'staff.create');
-Route::view('/tasks', 'tasks.index');
-Route::view('/departments', 'departments.index');
-Route::view('/roles', 'roles.index');
-Route::view('/testareas', 'areas.index');
-Route::view('/inventory', 'inventories.index');
+Route::view('/staff', 'staff.index')->name('staff');
+Route::view('/staff/create', 'staff.create')->name('staff.crate');
+Route::view('/tasks', 'tasks.index')->name('tasks');
+Route::view('/departments', 'departments.index')->name('departments');
+Route::view('/areas', 'areas.index')->name('areas');
+Route::view('/roles', 'roles.index')->name('roles');
+Route::view('/inventories', 'inventories.index')->name('inventories');

@@ -3,7 +3,7 @@
         <div class=" flex">
             <label for="search" class="search-input">
                 <input type="text" class="input-search" placeholder="Search">
-                
+
                 <i class="fal fa-search"></i>
             </label>
         </div>
@@ -88,7 +88,7 @@
                             <label for="" class="block text-sm text-black mb-3">
                                 Inventory Name
                             </label>
-                            <input type="text" placeholder="Area Name" v-model="name"
+                            <input type="text" placeholder="Inventory Name" v-model="name"
                                 class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
                         </div>
                         <div class="mb-4">
@@ -130,7 +130,7 @@
     </div>
 
 
- 
+
 
 </template>
 
@@ -141,7 +141,7 @@
     export default {
         data() {
             return {
-                
+
 
                 inventoryList:[],
                 typeList:[],
@@ -150,7 +150,7 @@
                 name: null,
                 selectedInventoryType:null,
                 inventoryable_id:null,
-                
+
 
                 per_page: 10,
                 pageNumbers: [],
@@ -166,18 +166,18 @@
             async getInventoryList(){
                 const response = await getApiData({ url: '/api/inventories' });
                 if(response.data){
-                    this.inventoryList = response.data.inventories;
+                    this.inventoryList = response.data;
                 }
             },
 
             async getAreaList(){
-                const response = await getApiData({ url: '/api/areas?all_minified=true' });
+                const response = await getApiData({ url: '/api/areas' });
                 if(response.data){
                     this.typeList = response.data;
                 }
             },
             async getDepartmentList(){
-                const response = await getApiData({ url: '/api/departments?all_minified=true' });
+                const response = await getApiData({ url: '/api/departments' });
                 if(response.data){
                     this.typeList = response.data;
                 }

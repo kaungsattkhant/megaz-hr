@@ -130,13 +130,13 @@
     export default {
         data() {
             return {
-                
+
 
                 departmentList: [],
                 roleList: [],
                 name: null,
                 selectedDepartment:null,
-                
+
 
                 per_page: 10,
                 pageNumbers: [],
@@ -150,7 +150,7 @@
 
         methods: {
             async getDepartmentList(){
-                const response = await getApiData({ url: '/api/departments?all_minified=true' });
+                const response = await getApiData({ url: '/api/departments' });
                 if(response.data){
                     this.departmentList = response.data;
                 }
@@ -159,12 +159,12 @@
             async getRolesList(){
                 const response = await getApiData({ url: '/api/roles' });
                 if(response.data){
-                    this.roleList = response.data.roles;
+                    this.roleList = response.data;
                 }
             },
 
             createRolesBtnClicked(){
-                
+
                 this.createRole();
             },
 

@@ -20,14 +20,14 @@ class RoleRepository implements RoleRepositoryInterface
                 $perPage = $request->per_page;
             }
             $skip = ($pageNumber - 1) * $perPage;
-            $roles = Role::skip($skip)->take($perPage)->get();
+            $roles = Role::skip($skip)->take($perPage)->with('department')->get();
             $paginationData = MakePaginationData($request, $totalCount, 'roles');
             $paginationData['roles'] = $roles;
 
             return $paginationData;
         }
         else{
-            $roles = Role::all();
+            $roles = Role::with('department')->get();
 
             return $roles;
         }

@@ -152,7 +152,8 @@
                     <!--Modal footer-->
                     <div class="flex justify-center px-12 mb-6">
                         <button type="button" @click="createTasksBtnClicked"
-                        class="add-btn focus:outline-none focus:ring-0 ">
+                        class="add-btn focus:outline-none focus:ring-0 "
+                        data-te-toggle="modal" data-te-target="#create_modal">
                             Create
                         </button>
                     </div>
@@ -208,14 +209,14 @@
             },
 
             async getAreaList(){
-                const response = await getApiData({ url: '/api/areas?all_minified=true' });
+                const response = await getApiData({ url: '/api/areas' });
                 if(response.data){
                     this.areaList = response.data;
                 }
             },
 
             async getRoleList(){
-                const response = await getApiData({ url: '/api/roles?all_minified=true' });
+                const response = await getApiData({ url: '/api/roles' });
                 if(response.data){
                     this.roleList = response.data;
                 }

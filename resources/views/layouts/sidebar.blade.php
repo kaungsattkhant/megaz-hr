@@ -2,35 +2,41 @@
             <div class="relative pb-12 overflow-y-hidden small-scrollbar h-[100vh]"
             onmouseover="this.style.overflowY='scroll'"
             onmouseout="this.style.overflowY='hidden'">
-                
+
                 <div class="relative w-[16vw] pt-12">
                     <ul class=" mb-4">
                         <li>
-                            <a href="/staff" class="flex items-center @yield('staffs')">
+                            <a href="{{ route("staff") }}" class="flex items-center @yield('staffs')">
                                 <i class="fal fa-user  pr-3"></i>
-                                Staffs
+                                Staff
                             </a>
                         </li>
                         <li>
-                            <a href="/tasks" class="flex items-center @yield('tasks')">
+                            <a href="{{ route("tasks") }}" class="flex items-center @yield('tasks')">
                                 <i class="fal fa-tasks  pr-3"></i>
                                 Tasks
                             </a>
                         </li>
                         <li>
-                            <a href="/departments" class="flex items-center @yield('departments')">
+                            <a href="{{ route("departments") }}" class="flex items-center @yield('departments')">
                                 <i class="fal fa-network-wired  pr-3"></i>
                                 Department
                             </a>
                         </li>
                         <li>
-                            <a href="/roles" class="flex items-center @yield('roles')">
+                            <a href="{{ route("areas") }}" class="flex items-center @yield('areas')">
+                                <i class="fal fa-network-wired  pr-3"></i>
+                                Areas
+                            </a>
+                        </li>
+                        <li>
+                            <a href="{{ route("roles") }}" class="flex items-center @yield('roles')">
                                 <i class="fal fa-tasks  pr-3"></i>
                                 Role
                             </a>
                         </li>
                         <li>
-                            <a href="#" class="flex items-center @yield('inventory')">
+                            <a href="{{ route("inventories") }}" class="flex items-center @yield('inventories')">
                                 <i class="fal fa-inventory  pr-3"></i>
                                 Inventory
                             </a>
@@ -56,13 +62,13 @@
 
 
 
-                       
-                        
-                        
+
+
+
                     </ul>
-                    
+
                 </div>
-                
+
             </div>
             <div class="absolute bottom-0 left-0 w-[16vw] h-14 bg-[#df3b06] border-t border-[#0002] flex items-center justify-start">
                 <button class="w-full text-left pl-12">

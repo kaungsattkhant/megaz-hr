@@ -150,7 +150,7 @@
                                 class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
                         </div>
                     </div>
-                    
+
                     <div class="flex justify-center px-12 mb-6">
                         <button type="button" class="add-btn focus:outline-none focus:ring-0 ">
                             Add
@@ -241,14 +241,14 @@
             },
 
             async getDepartmentList(){
-                const response = await getApiData({ url: '/api/departments?all_minified=true' });
+                const response = await getApiData({ url: '/api/departments' });
                 if(response.data){
                     this.departmentList = response.data;
                 }
             },
 
             async getRoleList(){
-                const response = await getApiData({ url: '/api/roles?all_minified=true' });
+                const response = await getApiData({ url: '/api/roles' });
                 if(response.data){
                     this.roleList = response.data;
                 }

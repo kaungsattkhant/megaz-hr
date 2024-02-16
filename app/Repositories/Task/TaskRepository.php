@@ -45,7 +45,7 @@ class TaskRepository implements TaskRepositoryInterface
                 $perPage = $request->per_page;
             }
             $skip = ($pageNumber - 1) * $perPage;
-            $tasks = Task::where('is_active', 1)->skip($skip)->take($perPage)->get();
+            $tasks = Task::where('is_active', 1)->skip($skip)->take($perPage)->with('role.department')->get();
             $paginationData = MakePaginationData($request, $totalCount, 'tasks');
             $paginationData['tasks'] = $tasks;
 

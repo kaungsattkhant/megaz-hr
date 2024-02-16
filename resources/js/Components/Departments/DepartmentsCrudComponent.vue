@@ -119,11 +119,11 @@
     export default {
         data() {
             return {
-                
+
 
                 departmentList: [],
                 name: null,
-                
+
 
                 per_page: 10,
                 pageNumbers: [],
@@ -139,7 +139,7 @@
             async getDepartmentList(){
                 const response = await getApiData({ url: '/api/departments' });
                 if(response.data){
-                    this.departmentList = response.data.departments;
+                    this.departmentList = response.data;
                 }
             },
 
