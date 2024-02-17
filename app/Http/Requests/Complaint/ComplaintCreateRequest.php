@@ -25,8 +25,7 @@ class ComplaintCreateRequest extends FormRequest
             //
             "title" => "required",
             "description" => "required",
-            "category" => "required",
-            "posted_by" => "required",
+            "complaint_category_id" => "required"
         ];
     }
 }

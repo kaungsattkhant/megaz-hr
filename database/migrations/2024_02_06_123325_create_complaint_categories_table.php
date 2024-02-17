@@ -11,13 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('complaints', function (Blueprint $table) {
+        Schema::create('complaint_categories', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('complaint_category_id')->constrained()->onDelete('cascade');
-            $table->string('title');
-            $table->string('description');
-            $table->string('posted_by');
-            $table->string('status')->default('Not Yet'); // Not Yet/Done
+            $table->string('name');
             $table->timestamps();
         });
     }
@@ -27,6 +23,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('complaints');
+        Schema::dropIfExists('complaint_categories');
     }
 };

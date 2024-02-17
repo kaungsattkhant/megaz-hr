@@ -20,6 +20,7 @@ use App\Http\Controllers\API\PurchaseOrderItemAPIController;
 use App\Http\Controllers\API\TestController;
 use App\Http\Controllers\API\UomAPIController;
 
+use App\Models\ComplaintCategory;
 use App\Models\AreaType;
 use App\Models\Category;
 use App\Models\Gender;
@@ -36,18 +37,21 @@ use App\Models\ServiceCategory;
 |
 */
 
-Route::get('genders', function(){
-    ResponseData(Gender::all());
-});
-
 Route::get('/categories',function(){
     ResponseData(Category::all());
+});
+
+Route::get('/complaint_categories',function(){
+    ResponseData(ComplaintCategory::all());
+});
+
+Route::get('genders', function(){
+    ResponseData(Gender::all());
 });
 
 Route::get('/service_categories',function(){
     ResponseData(ServiceCategory::all());
 });
-
 
 Route::get('/area_types', function(){
     ResponseData(AreaType::all());
@@ -63,6 +67,12 @@ Route::middleware('auth:api')->group(function(){
     Route::post('/tasks/{taskId}/update_status', [TaskController::class, 'updateTaskStatus']);
     Route::get('/profile', [ProfileAPIController::class, 'getProfile']);
     Route::post('/profile/change_password', [ProfileAPIController::class, 'updatePassword']);
+
+    Route::get('/complaints',[ComplaintAPIController::class,'getComplainData']);
+    Route::post('/complaints',[ComplaintAPIController::class,'createComplain']);
+    Route::put('/complaints/{id}',[ComplaintAPIController::class,'updateComplain']);
+    Route::delete('/complaints/{id}',[ComplaintAPIController::class,'deleteComplain']);
+    Route::post('/complaints/{id}/update_status',[ComplaintAPIController::class,'complainStatusChange']);
 });
 
 Route::get('/areas', [AreaController::class, 'getAreas']);
@@ -87,12 +97,6 @@ Route::get('/tasks',[TaskController::class,'getTaskData']);
 Route::post('/tasks',[TaskController::class,'createTask']);
 Route::put('/tasks/{id}',[TaskController::class,'updateTask']);
 Route::delete('/tasks/{id}',[TaskController::class,'deleteTask']);
-
-Route::get('/complaints',[ComplaintAPIController::class,'getComplainData']);
-Route::post('/complaints',[ComplaintAPIController::class,'createComplain']);
-Route::put('/complaints/{id}',[ComplaintAPIController::class,'updateComplain']);
-Route::delete('/complaints/{id}',[ComplaintAPIController::class,'deleteComplain']);
-Route::post('/complaints/{id}/update_status',[ComplaintAPIController::class,'complainStatusChange']);
 
 Route::get('/entities',[EntityAPIController::class,'getEntityData']);
 Route::post('/entities',[EntityAPIController::class,'createEntity']);
