@@ -25,6 +25,7 @@ class AppServiceProvider extends ServiceProvider
             'department' => 'App\Models\Department',
             'area' => 'App\Models\Area',
             'purchase_order' => 'App\Models\PurchaseOrder',
+            'staff' => 'App\Models\Staff',
         ]);
     }
 }
