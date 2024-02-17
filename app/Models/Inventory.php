@@ -27,4 +27,9 @@ class Inventory extends BaseModel
     {
         return parent::getUpdatedAt();
     }
+
+    public function inventory_ledgers()
+    {
+        return $this->hasMany(InventoryLedger::class);
+    }
 }

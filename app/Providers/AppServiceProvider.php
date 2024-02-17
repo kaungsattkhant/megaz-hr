@@ -24,6 +24,7 @@ class AppServiceProvider extends ServiceProvider
         Relation::enforceMorphMap([
             'department' => 'App\Models\Department',
             'area' => 'App\Models\Area',
+            'purchase_order' => 'App\Models\PurchaseOrder',
         ]);
     }
 }

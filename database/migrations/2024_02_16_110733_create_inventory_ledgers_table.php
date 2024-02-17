@@ -11,13 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('orders', function (Blueprint $table) {
+        Schema::create('inventory_ledgers', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('order_id');
-            $table->double('total_quantity');
-            $table->date('date');
-            $table->unsignedBigInteger('invoice_id');
-            $table->tinyInteger('is_complete');
+            $table->foreignId('inventory_id')->constrained()->onDelete('cascade');
+            $table->dateTime('date');
+            $table->unsignedBigInteger('ledgerable_id');
+            $table->string('ledgerable_type');
             $table->timestamps();
         });
     }
@@ -27,6 +26,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('orders');
+        Schema::dropIfExists('inventory_ledgers');
     }
 };
