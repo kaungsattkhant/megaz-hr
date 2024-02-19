@@ -54,17 +54,17 @@
                             </a>
                         </li>
                         <li>
+                            <a href="roomandtable" class="flex items-center @yield('table')">
+                                <i class="fal fa-user  pr-3"></i>
+                                Room / Table
+                            </a>
+                        </li>
+                        <li>
                             <a href="#" class="flex items-center @yield('services')">
                                 <i class="fal fa-user  pr-3"></i>
                                 Services
                             </a>
                         </li>
-
-
-
-
-
-
                     </ul>
 
                 </div>
