@@ -45,4 +45,11 @@ class InventoryAPIController extends Controller
             ResponseMessage('Inventory not found or some error occur');
         }
     }
+
+    public function getInventoryLedgers(Request $request, int $inventoryId)
+    {
+        $ledgers = $this->inventoryRepo->getInventoryLedgers($inventoryId);
+
+        ResponseData($ledgers);
+    }
 }

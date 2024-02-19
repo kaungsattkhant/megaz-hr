@@ -16,4 +16,9 @@ class InventoryLedgerItem extends BaseModel
     {
         $this->belongsTo(InventoryLedger::class);
     }
+
+    public function item()
+    {
+        return $this->belongsTo(Item::class);
+    }
 }

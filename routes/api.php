@@ -107,6 +107,7 @@ Route::get('/inventories',[InventoryAPIController::class,'getInventoryData']);
 Route::post('/inventories',[InventoryAPIController::class,'createInventory']);
 Route::put('/inventories/{id}',[InventoryAPIController::class,'updateInventory']);
 Route::delete('/inventories/{id}',[InventoryAPIController::class,'deleteInventory']);
+Route::get('/inventories/{inventoryId}/ledgers',[InventoryAPIController::class,'getInventoryLedgers']);
 
 Route::get('/uoms',[UomAPIController::class,'getUomData']);
 Route::post('/uoms',[UomAPIController::class,'createUom']);

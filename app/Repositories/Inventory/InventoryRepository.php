@@ -4,6 +4,8 @@ namespace App\Repositories\Inventory;
 
 use Illuminate\Http\Request;
 
+use App\Actions\Inventory\GetInventoryStockAction;
+
 use App\Models\Inventory;
 
 class InventoryRepository implements InventoryRepositoryInterface
@@ -61,5 +63,12 @@ class InventoryRepository implements InventoryRepositoryInterface
         }
 
         return $inventory;
+    }
+
+    public function getInventoryLedgers(int $inventoryId)
+    {
+        $ledgers = (new GetInventoryStockAction($inventoryId))->run();
+
+        return $ledgers;
     }
 }
