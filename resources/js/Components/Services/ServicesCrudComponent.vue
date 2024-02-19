@@ -28,7 +28,7 @@
                             <th scope="col" class=" px-6 py-4 ">
                                 Services
                             </th>
-                            <th scope="col" class="px-6 py-4"> 
+                            <th scope="col" class="px-6 py-4">
                                 Category
                             </th>
                             <th scope="col" class="px-6 py-4">
@@ -51,7 +51,7 @@
                                     {{ room.name }}
                                 </td>
                                 <td class="whitespace-nowrap px-6 py-4 ">
-                                    {{ room.entity_type }}
+                                    {{ room.service_category.name }}
                                 </td>
                                 <td class="whitespace-nowrap px-6 py-4 ">
                                     {{ room.price_per_hour }}
@@ -130,7 +130,7 @@
                             </select>
                         </div>
 
-                        
+
 
                     </div>
                     <div class="flex justify-center px-12 mb-6">
@@ -251,7 +251,7 @@
 
         methods: {
             async getRoomAndTableList(){
-                const response = await getApiData({ url: '/api/entities' });
+                const response = await getApiData({ url: '/api/entities?type=service' });
                 if(response.data){
                     this.roomAndTableList = response.data;
                     console.log(this.roomAndTableList)
@@ -330,7 +330,7 @@
                     alert('some errors occur');
                 }
             }
-            
+
 
         },
         mounted()

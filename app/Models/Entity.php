@@ -5,6 +5,8 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
+use App\Models\ServiceCategory;
+
 class Entity extends BaseModel
 {
     use HasFactory;
@@ -21,5 +23,10 @@ class Entity extends BaseModel
     public function getUpdatedAt()
     {
         return parent::getUpdatedAt();
+    }
+
+    public function service_category()
+    {
+        return $this->belongsTo(ServiceCategory::class);
     }
 }

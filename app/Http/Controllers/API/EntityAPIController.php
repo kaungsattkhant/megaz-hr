@@ -2,11 +2,14 @@
 
 namespace App\Http\Controllers\API;
 
+use Illuminate\Http\Request;
+
 use App\Http\Controllers\Controller;
+
 use App\Http\Requests\Entity\EntityCreateRequest;
 use App\Http\Requests\Entity\EntityUpdateRequest;
+
 use App\Repositories\Entity\EntityRepositoryInterface;
-use Illuminate\Http\Request;
 
 class EntityAPIController extends Controller
 {
@@ -18,7 +21,12 @@ class EntityAPIController extends Controller
     }
     public function getEntityData(Request $request)
     {
-        $entities = $this->entityRepo->listAllData($request);
+        $entityType = 'all';
+        if($request->type){
+            $entityType = $request->type;
+        }
+        $entities = $this->entityRepo->listAllData($request, $entityType);
+
         ResponseData($entities);
     }
 
