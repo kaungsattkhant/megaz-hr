@@ -11,16 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('order_items', function (Blueprint $table) {
+        Schema::create('inventory_ledger_items', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('menu_id');
+            $table->foreignId('inventory_ledger_id')->constrained()->onDelete('cascade');
+            $table->foreignId('item_id')->constrained()->onDelete('cascade');
             $table->double('quantity');
-            $table->double('original_price');
-            $table->double('discount_value');
-            $table->double('price');
-            $table->unsignedBigInteger('order_id');
-            $table->string('status',45);
-            $table->tinyInteger('is_complete');
             $table->timestamps();
         });
     }
@@ -30,6 +25,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('order_items');
+        Schema::dropIfExists('inventory_ledger_items');
     }
 };

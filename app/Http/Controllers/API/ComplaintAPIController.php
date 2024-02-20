@@ -2,12 +2,15 @@
 
 namespace App\Http\Controllers\API;
 
+use Illuminate\Http\Request;
+
 use App\Http\Controllers\Controller;
+
 use App\Http\Requests\Complaint\ComplainStatusRequest;
 use App\Http\Requests\Complaint\ComplaintCreateRequest;
 use App\Http\Requests\Complaint\ComplaintUpdateRequest;
+
 use App\Repositories\Complaint\ComplaintRepositoryInterface;
-use Illuminate\Http\Request;
 
 class ComplaintAPIController extends Controller
 {
@@ -26,7 +29,10 @@ class ComplaintAPIController extends Controller
 
     public function createComplain(ComplaintCreateRequest $request)
     {
-        $complaint = $this->complaintRepo->createData($request->all());
+        $data = $request->all();
+        $data['posted_by'] = $request->user()->id;
+        $complaint = $this->complaintRepo->createData($data);
+
         ResponseData($complaint);
     }
 

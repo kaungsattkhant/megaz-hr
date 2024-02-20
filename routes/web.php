@@ -29,7 +29,7 @@ Route::view('/departments', 'departments.index')->name('departments');
 Route::view('/areas', 'areas.index')->name('areas');
 Route::view('/roles', 'roles.index')->name('roles');
 Route::view('/inventories', 'inventories.index')->name('inventories');
-Route::view('/roomandtable', 'tables&rooms.index')->name('roomandtable');
+Route::view('/room_and_table', 'tables&rooms.index')->name('roomandtable');
 Route::view('/services', 'services.index')->name('services');
 Route::view('/menus', 'menus.index')->name('menus');
 Route::view('/menus/create', 'menus.create')->name('menus.create');

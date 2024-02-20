@@ -6,7 +6,7 @@ use Illuminate\Http\Request;
 
 interface EntityRepositoryInterface
 {
-    public function listAllData(Request $request);
+    public function listAllData(Request $request, string $entityType);
 
     public function createData(array $data);
 

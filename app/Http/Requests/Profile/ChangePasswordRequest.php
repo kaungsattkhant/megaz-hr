@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Http\Requests\Complaint;
+namespace App\Http\Requests\Profile;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class ComplaintCreateRequest extends FormRequest
+class ChangePasswordRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -23,9 +23,8 @@ class ComplaintCreateRequest extends FormRequest
     {
         return [
             //
-            "title" => "required",
-            "description" => "required",
-            "complaint_category_id" => "required"
+            'old_password' => 'required',
+            'password' => 'required|confirmed|min:6',
         ];
     }
 }

@@ -37,7 +37,6 @@ class ComplaintRepository implements ComplaintRepositoryInterface
 
     public function createData(array $data)
     {
-
         $complaint = Complaint::create($data);
         return $complaint;
     }
@@ -45,10 +44,9 @@ class ComplaintRepository implements ComplaintRepositoryInterface
     public function updateData(array $data,int $id)
     {
        $complaint = Complaint::find($id);
-       if($complaint)
-       {
-        $data = RemoveNullValues($data);
-        $complaint->update($data);
+       if($complaint){
+            $data = RemoveNullValues($data);
+            $complaint->update($data);
        }
 
        return $complaint;

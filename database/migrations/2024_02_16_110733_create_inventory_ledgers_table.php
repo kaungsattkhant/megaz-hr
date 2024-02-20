@@ -11,13 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('complaints', function (Blueprint $table) {
+        Schema::create('inventory_ledgers', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('complaint_category_id')->constrained()->onDelete('cascade');
-            $table->string('title');
-            $table->string('description');
-            $table->string('posted_by');
-            $table->string('status')->default('Not Yet'); // Not Yet/Done
+            $table->foreignId('inventory_id')->constrained()->onDelete('cascade');
+            $table->dateTime('date');
+            $table->unsignedBigInteger('ledgerable_id');
+            $table->string('ledgerable_type');
             $table->timestamps();
         });
     }
@@ -27,6 +26,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('complaints');
+        Schema::dropIfExists('inventory_ledgers');
     }
 };

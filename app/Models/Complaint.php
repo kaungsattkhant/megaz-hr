@@ -5,12 +5,14 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
+use App\Models\ComplaintCategory;
+
 class Complaint extends BaseModel
 {
     use HasFactory;
 
     protected $fillable = [
-        'title','description','category','posted_by','status'
+        'complaint_category_id','title','description','posted_by','status'
     ];
 
     public function getCreatedAt()
@@ -22,4 +24,15 @@ class Complaint extends BaseModel
     {
         return parent::getUpdatedAt();
     }
+
+    public function complaint_category()
+    {
+        return $this->belongsTo(ComplaintCategory::class);
+    }
+
+    public function postedBy()
+    {
+        return $this->belongsTo(Staff::class, 'posted_by');
+    }
+
 }

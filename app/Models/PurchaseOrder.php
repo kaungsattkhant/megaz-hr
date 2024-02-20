@@ -5,6 +5,9 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
+use App\Models\InventoryLedger;
+use App\Models\PurchaseOrderItem;
+
 class PurchaseOrder extends BaseModel
 {
     use HasFactory;
@@ -20,5 +23,15 @@ class PurchaseOrder extends BaseModel
     public function getUpdatedAt()
     {
         return parent::getUpdatedAt();
+    }
+
+    public function inventory_ledgers()
+    {
+        return $this->morphMany(InventoryLedger::class, 'ledgerable');
+    }
+
+    public function items()
+    {
+        return $this->hasMany(PurchaseOrderItem::class);
     }
 }

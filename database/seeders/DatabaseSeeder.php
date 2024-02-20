@@ -5,6 +5,7 @@ namespace Database\Seeders;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
+use Database\Seeders\ComplaintCategorySeeder;
 use Database\Seeders\DepartmentSeeder;
 use Database\Seeders\GenderSeeder;
 use Database\Seeders\RoleSeeder;
@@ -17,6 +18,7 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
+        (new ComplaintCategorySeeder())->run();
         (new DepartmentSeeder())->run();
         (new RoleSeeder())->run();
         (new GenderSeeder())->run();
