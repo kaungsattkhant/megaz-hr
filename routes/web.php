@@ -31,3 +31,6 @@ Route::view('/roles', 'roles.index')->name('roles');
 Route::view('/inventories', 'inventories.index')->name('inventories');
 Route::view('/room_and_table', 'tables&rooms.index')->name('roomandtable');
 Route::view('/services', 'services.index')->name('services');
+Route::view('/menus', 'menus.index')->name('menus');
+Route::view('/menus/create', 'menus.create')->name('menus.create');
+Route::view('/inventory_ledger', 'inventories.inventory_ledger')->name('inventory.ledger');

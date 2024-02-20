@@ -2,8 +2,8 @@ import './bootstrap';
 import '../css/app.css';
 
 ///////////// Tailwind section //////////////
-import { Collapse, Select, Carousel, initTE, Modal, Ripple, Dropdown, Datepicker } from 'tw-elements';
-initTE({ Collapse, Select, Carousel, Modal, Ripple, Dropdown, Datepicker});
+import { Collapse, Select, Carousel, initTE, Modal, Ripple, Dropdown, Datepicker, Tab } from 'tw-elements';
+initTE({ Collapse, Select, Carousel, Modal, Ripple, Dropdown, Datepicker, Tab});
 
 //////////////................/////////////////
 
@@ -19,6 +19,8 @@ import InventoriesCrudComponent from './Components/Inventories/InventoriesCrudCo
 import TablesCrudComponent from './Components/TablesAndRooms/TablesCrudComponent.vue';
 import ServicesCrudComponent from './Components/Services/ServicesCrudComponent.vue';
 import InventoryLedgersComponent from './Components/Inventories/InventoryLedgersComponent.vue';
+import MenuListComponent from './Components/Menus/MenuListComponent.vue';
+import MenuCreateComponent from './Components/Menus/MenuCreateComponent.vue';
 
 const app = createApp({});
 app.component('StaffListComponent', StaffListComponent);
@@ -31,5 +33,7 @@ app.component('InventoriesCrudComponent', InventoriesCrudComponent);
 app.component('TablesCrudComponent', TablesCrudComponent);
 app.component('ServicesCrudComponent', ServicesCrudComponent);
 app.component('InventoryLedgersComponent', InventoryLedgersComponent);
+app.component('MenuListComponent', MenuListComponent);
+app.component('MenuCreateComponent', MenuCreateComponent);
 
 app.mount('#app');
