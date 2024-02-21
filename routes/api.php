@@ -73,6 +73,8 @@ Route::middleware('auth:api')->group(function(){
     Route::put('/complaints/{id}',[ComplaintAPIController::class,'updateComplain']);
     Route::delete('/complaints/{id}',[ComplaintAPIController::class,'deleteComplain']);
     Route::post('/complaints/{id}/update_status',[ComplaintAPIController::class,'complainStatusChange']);
+
+    Route::get('/supervisor/staff',[StaffAPIController::class,'getStaffListBySupervisor']);
 });
 
 Route::get('/areas', [AreaController::class, 'getAreas']);

@@ -2,8 +2,9 @@
 
 namespace App\Repositories\Staff;
 
-use App\Models\Staff;
 use Illuminate\Http\Request;
+
+use App\Models\Staff;
 
 interface StaffRepositoryInterface
 {
@@ -14,4 +15,6 @@ interface StaffRepositoryInterface
     public function updateData(array $data,int $id);
 
     public function deleteData($id);
+
+    public function getStaffByDepartment(Request $request, int $departmentId);
 }
