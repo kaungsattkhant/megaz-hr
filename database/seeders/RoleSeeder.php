@@ -21,22 +21,22 @@ class RoleSeeder extends Seeder
 
         Role::create([
             'department_id' => $kitchenDept->id,
-            'name' => 'Kitchen Supervisor'
+            'name' => 'Supervisor'
         ]);
 
         Role::create([
             'department_id' => $barDept->id,
-            'name' => 'Bar Supervisor'
+            'name' => 'Supervisor'
         ]);
 
         Role::create([
             'department_id' => $kitchenDept->id,
-            'name' => 'Kitchen Staff'
+            'name' => 'Staff'
         ]);
 
         Role::create([
             'department_id' => $barDept->id,
-            'name' => 'Bar Staff'
+            'name' => 'Staff'
         ]);
     }
 }
