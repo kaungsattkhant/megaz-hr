@@ -74,6 +74,7 @@
                                 </td>
                                 <td class="whitespace-nowrap px-6 py-4">
                                     <button id="edit-btn" class="pr-1"
+                                        @click="transferBtnClicked(ledger[0].item.id)"
                                         data-te-toggle="modal" data-te-target="#transfer_modal">
                                         <i class="fas fa-exchange-alt"></i>
                                     </button>
@@ -137,7 +138,7 @@
 
                     </div>
                     <div class="flex justify-center px-12 mb-6">
-                        <button type="button" @click="transferBtnClicked"
+                        <button type="button" @click="confirmTransferBtnClicked"
                         class="add-btn focus:outline-none focus:ring-0 ">
                             Transfer
                         </button>
@@ -164,9 +165,10 @@
             return {
                 inventoryLegderList:[],
                 inventoryList:[],
+                testopening:10,
                 selectedInventory:null,
                 amount:null,
-                testopening:10,
+                itemId:null,
 
 
                 deleteId: null,
@@ -186,6 +188,44 @@
                 if(response.data){
                     this.inventoryList = response.data;
                 }
+            },
+
+            transferBtnClicked(id){
+                this.itemId = id;
+            },
+            confirmTransferBtnClicked(){
+                this.transferInventory();
+            },
+
+            async transferInventory()
+            {
+                let formData = new FormData();
+                formData.append('source_inventory_id', this.inventory_id);
+                formData.append('destination_inventory_id', this.selectedInventory);
+                formData.append('quantity', this.amount);
+                formData.append('item_id', this.itemId);
+                let response = await postApiData({url: '/api/transfers', form_data: formData});
+                if(response.success){
+                    this.getInventoryLegderList(null);
+                    console.log(this.inventory_id)
+                    console.log(this.selectedInventory)
+                    console.log(this.amount)
+                    console.log(this.itemId)
+                    this.closeModal();
+                    this.clearForm();
+                }
+                else{
+                    alert('some errors occur');
+                }
+            },
+
+            closeModal() {
+                document.getElementById("close").click();
+            },
+
+            clearForm() {
+                this.selectedInventory = null,
+                this.amount = null
             },
 
                      
