@@ -23,13 +23,10 @@ class CreateTransferRequest extends FormRequest
     {
         return [
             //
-            "transfer_id"=>"required",
             "source_inventory_id"=>"required",
             "destination_inventory_id" => "required",
             "quantity" => "required",
             "item_id" => "required",
-            "created_by" => "required",
-
 
         ];
     }

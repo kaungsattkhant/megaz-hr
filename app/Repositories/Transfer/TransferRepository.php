@@ -37,6 +37,7 @@ class TransferRepository implements TransferRepositoryInterface
     {
         $data['status'] = "pending";
         $data['date'] = CurrentTime();
+        $data['created_by'] = 1;
         $transfer = Transfer::create($data);
         return $transfer;
     }
