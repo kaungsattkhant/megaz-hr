@@ -70,7 +70,8 @@
             </div>
             <div class="mb-4 col-span-3 pb-6 rounded-md">
                 <select name="" id="" v-model="selectedDepartment"
-                    class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
+                    class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0"
+                    @change="departmentSelectChanged">
                     <option :value="department" v-for="(department, departmentIndex) in departmentList" :key="departmentIndex" > {{ department.name }} </option>
                     <!-- <option value="2">Table</option>
                     <option value="3">Security</option> -->
@@ -93,11 +94,11 @@
                 </div>
 
             </div>
-            <div class=" col-span-2">
+            <!-- <div class=" col-span-2">
                 <button class="pl-1 py-2" data-te-toggle="modal" data-te-target="#add_role_modal">
                     <i class="far fa-plus"></i>
                 </button>
-            </div>
+            </div> -->
 
 
             <div class="mb-4 col-span-6 pb-6 rounded-md">
@@ -247,6 +248,13 @@
                 }
             },
 
+            async departmentSelectChanged(){
+                const response = await getApiData({ url: `/api/roles?department_id=${this.selectedDepartment.id}` });
+                if(response.data){
+                    this.roleList = response.data;
+                }
+            },
+
             async getRoleList(){
                 const response = await getApiData({ url: '/api/roles' });
                 if(response.data){
@@ -276,8 +284,12 @@
                 let formData = new FormData();
                 formData.append('name', this.name);
                 formData.append('phone_number', this.phoneNumber);
-                formData.append('nrc_number', this.nrcNumber);
-                formData.append('address', this.address);
+                if(this.nrcNumber){
+                    formData.append('nrc_number', this.nrcNumber);
+                }
+                if(this.address){
+                    formData.append('address', this.address);
+                }
                 formData.append('gender_id', this.selectedGender.id);
                 formData.append('department_id', this.selectedDepartment.id);
                 formData.append('password', this.password);
@@ -291,14 +303,14 @@
                     alert('some errors occur');
                 }
             },
-
         },
+
         mounted()
         {
             initTE({ Modal,Select, Ripple });
             this.getGenderList();
             this.getDepartmentList();
-            this.getRoleList();
+            // this.getRoleList();
         }
     }
 </script>

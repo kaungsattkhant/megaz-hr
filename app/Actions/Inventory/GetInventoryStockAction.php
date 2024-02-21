@@ -110,8 +110,8 @@ class GetInventoryStockAction
         })->values();
 
         $mergedPreviousItems = $previousIncomingItems->concat($previousOutgoingItems);
-        $mergedItems = $mergedItems->concat($mergedPreviousItems);
-        $items = $mergedItems->groupBy("item_id")->values();
+        $mergedAllItems = $mergedPreviousItems->concat($mergedItems);
+        $items = $mergedAllItems->groupBy("item_id")->values();
 
         return $items;
     }

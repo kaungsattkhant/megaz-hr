@@ -112,7 +112,7 @@
                     </div>
                     <div class="flex justify-center px-12 mb-6">
                         <button type="button" @click="createRolesBtnClicked"
-                        class="add-btn focus:outline-none focus:ring-0 ">
+                        class="add-btn focus:outline-none focus:ring-0 " data-te-modal-dismiss>
                             Create
                         </button>
                     </div>
