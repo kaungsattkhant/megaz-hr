@@ -10,7 +10,6 @@ class RoleRepository implements RoleRepositoryInterface
     public function listAllData(Request $request)
     {
         if($request->per_page || $request->page){
-            $totalCount = Role::count();
             $pageNumber = 1;
             $perPage = 20;
             if($request->page){
@@ -20,14 +19,30 @@ class RoleRepository implements RoleRepositoryInterface
                 $perPage = $request->per_page;
             }
             $skip = ($pageNumber - 1) * $perPage;
-            $roles = Role::skip($skip)->take($perPage)->with('department')->get();
+
+            if($request->department_id){
+                $totalCount = Role::where('department_id', $request->department_id)->count();
+                $roles = Role::where('department_id', $request->department_id)->skip($skip)->take($perPage)->with('department')->get();
+            }
+            else{
+                $totalCount = Role::count();
+                $roles = Role::skip($skip)->take($perPage)->with('department')->get();
+            }
+
+            // $roles = Role::skip($skip)->take($perPage)->with('department')->get();
             $paginationData = MakePaginationData($request, $totalCount, 'roles');
             $paginationData['roles'] = $roles;
 
             return $paginationData;
         }
         else{
-            $roles = Role::with('department')->get();
+            if($request->department_id){
+                $roles = Role::where('department_id', $request->department_id)->with('department')->get();
+            }
+            else{
+                $roles = Role::with('department')->get();
+            }
+            // $roles = Role::with('department')->get();
 
             return $roles;
         }

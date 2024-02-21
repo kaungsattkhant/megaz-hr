@@ -25,8 +25,8 @@ class StaffCreateRequest extends FormRequest
             //
             "name" => "required",
             "phone_number" => "required",
-            "nrc_number" => "required",
-            "address" => "required",
+            "nrc_number" => "sometimes",
+            "address" => "sometimes",
             "gender_id" => "required",
             "department_id" => "required",
             "password" => "required",

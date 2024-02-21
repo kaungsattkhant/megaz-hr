@@ -93,7 +93,7 @@
                             <label for="" class="block text-sm text-black mb-3">
                                 Department Name
                             </label>
-                            <input type="text" placeholder="Task Name" v-model="name"
+                            <input type="text" placeholder="Department Name" v-model="name"
                                 class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
                         </div>
                     </div>
@@ -101,7 +101,7 @@
                     <!--Modal footer-->
                     <div class="flex justify-center px-12 mb-6">
                         <button type="button" @click="createDepartmentsBtnClicked"
-                        class="add-btn focus:outline-none focus:ring-0 ">
+                        class="add-btn focus:outline-none focus:ring-0 " data-te-modal-dismiss>
                             Create
                         </button>
                     </div>

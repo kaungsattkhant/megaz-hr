@@ -36,6 +36,7 @@ class StaffRepository implements StaffRepositoryInterface
     public function createData(array $data)
     {
         $data['is_active'] = 1;
+        $data = RemoveNullValues($data);
         $staff = Staff::create($data);
 
         if (isset($data['roles']) && is_array($data['roles'])) {
