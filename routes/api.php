@@ -18,6 +18,7 @@ use App\Http\Controllers\API\ProfileAPIController;
 use App\Http\Controllers\API\PurchaseOrderAPIController;
 use App\Http\Controllers\API\PurchaseOrderItemAPIController;
 use App\Http\Controllers\API\TestController;
+use App\Http\Controllers\API\TransferAPIController;
 use App\Http\Controllers\API\UomAPIController;
 
 use App\Models\ComplaintCategory;
@@ -129,6 +130,12 @@ Route::get('/purchase_orders_items',[PurchaseOrderItemAPIController::class,'getP
 Route::post('/purchase_orders_items',[PurchaseOrderItemAPIController::class,'createPurchaseOrderItem']);
 Route::put('/purchase_orders_items/{id}',[PurchaseOrderItemAPIController::class,'updatePurchaseOrderItem']);
 Route::delete('/purchase_orders_items/{id}',[PurchaseOrderItemAPIController::class,'deletePurchaseOrderItem']);
+
+Route::get('/transfers',[TransferAPIController::class,'getTransferData']);
+Route::post('/transfers',[TransferAPIController::class,'createTransfer']);
+Route::put('/transfers/{id}',[TransferAPIController::class,'updateTransfer']);
+Route::delete('/transfers/{id}',[TransferAPIController::class,'deleteTransfer']);
+Route::post('/transfers/{id}/confirms',[TransferAPIController::class,'confirmTransfer']);
 
 // Route::group(['prefix' => 'management'], function () {});
 Route::get("/test", [TestController::class, "index"]);
