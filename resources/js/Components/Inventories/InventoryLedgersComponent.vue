@@ -16,7 +16,135 @@
         </div>
     </div>
     <div class="block rounded-xl">
-        
+
+        <div class="overflow-x-auto">
+            <!-- <div class="inline-block min-w-full py-2 sm:px-6 lg:px-8"> -->
+            <div class="overflow-hidden ">
+                <table class="min-w-full primary-table rounded-xl text-center text-sm font-light ">
+                    <thead class="border-b font-medium ">
+                        <tr>
+                            <th scope="col" class=" px-6 py-4 ">
+                                #
+                            </th>
+                            <th scope="col" class=" px-6 py-4 ">
+                                Item
+                            </th>
+                            <th scope="col" class=" px-6 py-4 ">
+                                Opening
+                            </th>
+                            <th scope="col" class=" px-6 py-4 ">
+                                In
+                            </th>
+                            <th scope="col" class=" px-6 py-4 ">
+                                Out
+                            </th>
+                            <th scope="col" class=" px-6 py-4 ">
+                                Balance
+                            </th>
+                            <th scope="col" class=" px-6 py-4 ">
+                                Amount
+                            </th>
+                            <th scope="col" class="px-6 py-4">
+
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+
+                        <!-- looping start -->
+                        <div class="contents" v-for="(ledger, index) in inventoryLegderList" :key="index">
+                            <tr class="bg-white rounded-lg overflow-hidden shadow-lg">
+                                <td class=" px-6 py-4 font-medium ">
+                                    {{ ++index }}
+                                </td>
+                                <td class="whitespace-nowrap px-6 py-4 ">
+                                    {{ ledger[0].item.name }}
+                                </td>
+                                <td class="whitespace-nowrap px-6 py-4 ">
+                                    opening 100
+                                </td>
+                                <td v-for="(ledg,index) in ledger" :key="index" class="whitespace-nowrap px-6 py-4 ">
+                                    {{ ledg.quantity }}
+                                </td>
+                                <td class="whitespace-nowrap px-6 py-4 ">
+                                    {{ testopening }}
+                                </td>
+                                <td class="whitespace-nowrap px-6 py-4 ">
+                                    {{ index*9000 }}
+                                </td>
+                                <td class="whitespace-nowrap px-6 py-4">
+                                    <button id="edit-btn" class="pr-1"
+                                        data-te-toggle="modal" data-te-target="#transfer_modal">
+                                        <i class="fas fa-exchange-alt"></i>
+                                    </button>
+                                    <button class="pl-2"
+                                        data-te-toggle="modal" data-te-target="#defect_modal">
+                                        <i class="fas fa-exclamation-triangle"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                            <tr class="">
+                                <td class=" col-span-full py-2 "></td>
+                            </tr>
+                        </div>
+
+                            <!-- looping end -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+
+        <!-- Transfer Modal -->
+        <div data-te-modal-init
+            class="fixed left-0 top-0 z-[1055] hidden h-full w-full overflow-y-auto overflow-x-hidden outline-none"
+            id="transfer_modal" tabindex="-1" aria-labelledby="transfer_modalLabel" aria-hidden="true">
+            <div data-te-modal-dialog-ref
+                class="pointer-events-none relative w-auto mb-12 translate-y-[-50px] opacity-0 transition-all duration-300 ease-in-out min-[576px]:mx-auto min-[576px]:mt-7 min-[576px]:max-w-[500px]">
+                <div
+                    class="min-[576px]:shadow-[0_0.5rem_1rem_rgba(#000, 0.15)] pointer-events-auto relative flex w-full flex-col rounded-md border-none bg-white bg-clip-padding text-current shadow-lg outline-none">
+
+                    <div class="relative  p-4">
+                        <h5 class="text-xl text-center mt-2 font-medium leading-normal text-black" id="create_modalLabel">
+                            Transfer
+                        </h5>
+                        <button type="button" id="close" class="absolute top-4 right-4 focus:shadow-none focus:outline-none"
+                            data-te-modal-dismiss aria-label="Close">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                                stroke="currentColor" class="h-5 w-5">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                        </button>
+                    </div>
+                    <div class="relative px-12 py-4" data-te-modal-body-ref>
+                        
+                        <div class="mb-4">
+                            <label for="" class="block text-sm text-black mb-3">
+                                Store
+                            </label>
+                            <select name="" id="" v-model="selectedInventory"
+                                class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
+                                <option :value="store.id" v-for="(store,index) in inventoryList">{{ store.name }}</option>
+                            </select>
+                        </div>
+                        <div class="mb-4">
+                            <label for="" class="block text-sm text-black mb-3">
+                                Amount
+                            </label>
+                            <input type="text" placeholder="Amount" v-model="amount"
+                                class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
+                        </div>
+
+                    </div>
+                    <div class="flex justify-center px-12 mb-6">
+                        <button type="button" @click="transferBtnClicked"
+                        class="add-btn focus:outline-none focus:ring-0 ">
+                            Transfer
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
 
 
         
@@ -31,5 +159,43 @@
     import { Modal, Ripple, Select, initTE, Input } from "tw-elements";
     import { getApiData, postApiData, deleteApiData } from '../../utilities/ajax-helpers';
 
-   
+    export default {
+        data() {
+            return {
+                inventoryLegderList:[],
+                inventoryList:[],
+                selectedInventory:null,
+                amount:null,
+                testopening:10,
+
+
+                deleteId: null,
+            };
+        },
+        props:['inventory_id'],
+
+        methods: {
+            async getInventoryLegderList(){
+                const response = await getApiData({ url: '/api/inventories/'+this.inventory_id+'/ledgers' });
+                if(response.data){
+                    this.inventoryLegderList = response.data;
+                }
+            },
+            async getInventoryList(){
+                const response = await getApiData({ url: '/api/inventories'});
+                if(response.data){
+                    this.inventoryList = response.data;
+                }
+            },
+
+                     
+
+        },
+        mounted()
+        {
+            this.getInventoryLegderList();
+            this.getInventoryList();
+            initTE({ Modal, Select, Ripple });
+        }
+    }
 </script>
