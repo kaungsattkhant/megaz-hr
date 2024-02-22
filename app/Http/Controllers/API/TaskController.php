@@ -8,7 +8,9 @@ use App\Http\Controllers\Controller;
 
 use App\Http\Requests\Task\TaskCreateRequest;
 use App\Http\Requests\Task\TaskUpdateRequest;
+
 use App\Models\Staff;
+
 use App\Repositories\Task\TaskRepositoryInterface;
 
 class TaskController extends Controller
@@ -88,5 +90,25 @@ class TaskController extends Controller
         }else{
             ResponseMessage('Task not found or some error occur');
         }
+    }
+
+    public function getStaffTasksBySupervisor(Request $request, int $staffId)
+    {
+        $staff = Staff::find($request->user()->id);
+        $roles = $staff->roles;
+        $isASupervisor = false;
+        foreach($roles as $role){
+            if($role->name == 'Supervisor'){
+                $isASupervisor = true;
+                break;
+            }
+        }
+        if(!$isASupervisor){
+            ResponseMessage('Not a supervisor', 403);
+        }
+
+        $tasks = $this->taskRepo->getTasksByStaff($staffId);
+
+        ResponseData($tasks);
     }
 }

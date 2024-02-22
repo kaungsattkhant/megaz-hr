@@ -76,6 +76,7 @@ Route::middleware('auth:api')->group(function(){
     Route::post('/complaints/{id}/update_status',[ComplaintAPIController::class,'complainStatusChange']);
 
     Route::get('/supervisor/staff',[StaffAPIController::class,'getStaffListBySupervisor']);
+    Route::get('/supervisor/staff/{staffId}/tasks',[TaskController::class,'getStaffTasksBySupervisor']);
 });
 
 Route::get('/areas', [AreaController::class, 'getAreas']);
