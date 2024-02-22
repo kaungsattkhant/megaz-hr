@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Http\Requests\Transfer;
+namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class CreateTransferRequest extends FormRequest
+class TransferUpdateRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -23,10 +23,12 @@ class CreateTransferRequest extends FormRequest
     {
         return [
             //
-            "source_inventory_id"=>"required",
-            "destination_inventory_id" => "required",
-            "quantity" => "required",
-            "item_id" => "required",
+            "transfer_id"=>"sometimes",
+            "source_inventory_id"=>"sometimes",
+            "destination_inventory_id" => "sometimes",
+            "quantity" => "sometimes",
+            "item_id" => "sometimes",
+            "created_by" => "sometimes",
 
         ];
     }
