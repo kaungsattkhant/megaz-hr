@@ -42,7 +42,9 @@
                                     {{ ++index }}
                                 </td>
                                 <td class="whitespace-nowrap px-6 py-4 ">
+                                    <a :href="'inventories/'+inventory.id+'/ledger'">
                                     {{ inventory.name }}
+                                    </a>
                                 </td>
                                 <td class="whitespace-nowrap px-6 py-4">
                                     <button id="edit-btn" class="pr-1" @click="deleteBtnClicked(inventory.id)"
