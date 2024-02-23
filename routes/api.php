@@ -6,11 +6,11 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\API\AuthController;
 use App\Http\Controllers\API\AreaController;
 use App\Http\Controllers\API\ComplaintAPIController;
+use App\Http\Controllers\API\CustomerAPIController;
 use App\Http\Controllers\API\DepartmentAPIController;
 use App\Http\Controllers\API\EntityAPIController;
 use App\Http\Controllers\API\InventoryAPIController;
 use App\Http\Controllers\API\ItemAPIController;
-use App\Http\Controllers\API\MenuAPIController;
 use App\Http\Controllers\API\RoleAPIController;
 use App\Http\Controllers\API\ServiceAPIController;
 use App\Http\Controllers\API\StaffAPIController;
@@ -26,7 +26,6 @@ use App\Models\ComplaintCategory;
 use App\Models\AreaType;
 use App\Models\Category;
 use App\Models\Gender;
-use App\Models\MenuCategory;
 use App\Models\ServiceCategory;
 
 /*
@@ -60,9 +59,6 @@ Route::get('/area_types', function(){
     ResponseData(AreaType::all());
 });
 
-Route::get('/menu_categories', function(){
-    ResponseData(MenuCategory::where('is_active',1)->get());
-});
 
 Route::post('/login', [AuthController::class,'login']);
 Route::middleware('auth:api')->group(function(){
@@ -145,9 +141,10 @@ Route::put('/transfers/{id}',[TransferAPIController::class,'updateTransfer']);
 Route::delete('/transfers/{id}',[TransferAPIController::class,'deleteTransfer']);
 Route::post('/transfers/{id}/confirms',[TransferAPIController::class,'confirmTransfer']);
 
-Route::get('/menus', [MenuAPIController::class, 'getMenus']);
-Route::post('/menus', [MenuAPIController::class, 'createMenu']);
-Route::post('/menus/{id}/add_price', [MenuAPIController::class, 'addPriceToMenu']);
+Route::get('/customers',[CustomerAPIController::class,'getCustomerData']);
+Route::post('/customers',[CustomerAPIController::class,'createCustomer']);
+Route::put('/customers/{id}',[CustomerAPIController::class,'updateCustomer']);
+Route::delete('/customers/{id}',[CustomerAPIController::class,'deleteCustomer']);
 
 // Route::group(['prefix' => 'management'], function () {});
 Route::get("/test", [TestController::class, "index"]);
