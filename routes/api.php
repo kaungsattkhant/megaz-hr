@@ -21,11 +21,13 @@ use App\Http\Controllers\API\PurchaseOrderItemAPIController;
 use App\Http\Controllers\API\TestController;
 use App\Http\Controllers\API\TransferAPIController;
 use App\Http\Controllers\API\UomAPIController;
+use App\Http\Controllers\API\MenuAPIController;
 
 use App\Models\ComplaintCategory;
 use App\Models\AreaType;
 use App\Models\Category;
 use App\Models\Gender;
+use App\Models\MenuCategory;
 use App\Models\ServiceCategory;
 
 /*
@@ -57,6 +59,10 @@ Route::get('/service_categories',function(){
 
 Route::get('/area_types', function(){
     ResponseData(AreaType::all());
+});
+
+Route::get('/menu_categories', function(){
+    ResponseData(MenuCategory::where('is_active',1)->get());
 });
 
 
@@ -145,6 +151,10 @@ Route::get('/customers',[CustomerAPIController::class,'getCustomerData']);
 Route::post('/customers',[CustomerAPIController::class,'createCustomer']);
 Route::put('/customers/{id}',[CustomerAPIController::class,'updateCustomer']);
 Route::delete('/customers/{id}',[CustomerAPIController::class,'deleteCustomer']);
+
+Route::get('/menus', [MenuAPIController::class, 'getMenus']);
+Route::post('/menus', [MenuAPIController::class, 'createMenu']);
+Route::post('/menus/{id}/add_price', [MenuAPIController::class, 'addPriceToMenu']);
 
 // Route::group(['prefix' => 'management'], function () {});
 Route::get("/test", [TestController::class, "index"]);
