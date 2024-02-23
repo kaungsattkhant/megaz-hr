@@ -9,7 +9,8 @@ use App\Repositories\Area\AreaRepository;
 
 use App\Repositories\Complaint\ComplaintRepository;
 use App\Repositories\Complaint\ComplaintRepositoryInterface;
-
+use App\Repositories\Customer\CustomerRepository;
+use App\Repositories\Customer\CustomerRepositoryInterface;
 use App\Repositories\Department\DepartmentRepository;
 use App\Repositories\Department\DepartmentRepositoryInterface;
 
@@ -72,5 +73,6 @@ class RepositoryServiceProvider extends ServiceProvider
         $this->app->bind(PurchaseOrderRepositoryInterface::class,PurchaseOrderRepository::class);
         $this->app->bind(PurchaseOrderItemRepositoryInterface::class,PurchaseOrderItemRepository::class);
         $this->app->bind(TransferRepositoryInterface::class,TransferRepository::class);
+        $this->app->bind(CustomerRepositoryInterface::class,CustomerRepository::class);
     }
 }

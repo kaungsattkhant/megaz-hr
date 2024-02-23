@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\API\AuthController;
 use App\Http\Controllers\API\AreaController;
 use App\Http\Controllers\API\ComplaintAPIController;
+use App\Http\Controllers\API\CustomerAPIController;
 use App\Http\Controllers\API\DepartmentAPIController;
 use App\Http\Controllers\API\EntityAPIController;
 use App\Http\Controllers\API\InventoryAPIController;
@@ -139,6 +140,11 @@ Route::post('/transfers',[TransferAPIController::class,'createTransfer']);
 Route::put('/transfers/{id}',[TransferAPIController::class,'updateTransfer']);
 Route::delete('/transfers/{id}',[TransferAPIController::class,'deleteTransfer']);
 Route::post('/transfers/{id}/confirms',[TransferAPIController::class,'confirmTransfer']);
+
+Route::get('/customers',[CustomerAPIController::class,'getCustomerData']);
+Route::post('/customers',[CustomerAPIController::class,'createCustomer']);
+Route::put('/customers/{id}',[CustomerAPIController::class,'updateCustomer']);
+Route::delete('/customers/{id}',[CustomerAPIController::class,'deleteCustomer']);
 
 // Route::group(['prefix' => 'management'], function () {});
 Route::get("/test", [TestController::class, "index"]);
