@@ -14,23 +14,28 @@ return new class extends Migration
         Schema::create('invoices', function (Blueprint $table) {
             $table->id();
             $table->string('invoice_id');
+
+            $table->foreignId('area_id')->constrained()->onDelete('cascade');
+            $table->foreignId('entity_id')->constrained()->onDelete('cascade');
+            $table->foreignId('customer_id')->constrained()->onDelete('cascade');
+            $table->foreignId('head_count_id')->constrained()->onDelete('cascade');
+
+            $table->unsignedBigInteger('service_id');
+            $table->unsignedBigInteger('created_by');
             $table->dateTime('invoice_date');
             $table->dateTime('complete_date');
-            $table->unsignedBigInteger('created_by');
-            $table->integer('total');
-            $table->integer('tax');
-            $table->integer('sub_total');
-            $table->integer('paid_amount');
-            $table->integer('total_session_price');
-            $table->integer('change');
-            $table->unsignedBigInteger('area_id');
-            $table->unsignedBigInteger('entity_id');
-            $table->unsignedBigInteger('service_id');
-            $table->integer('area_id');
+
+            $table->double('total');
+            $table->double('tax');
+            $table->double('sub_total');
+            $table->double('paid_amount');
+            $table->double('total_session_price');
+            $table->double('change');
+            $table->double('discount_value');
+
             $table->string('payment_status');
             $table->string('payment_type');
-            $table->integer('discount_value');
-            $table->unsignedBigInteger('customer_id');
+
             $table->timestamps();
         });
     }
