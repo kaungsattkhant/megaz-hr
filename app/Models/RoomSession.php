@@ -5,11 +5,11 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Customer extends Model
+class RoomSession extends Model
 {
     use HasFactory;
 
     protected $fillable=[
-        'name','email','phone_number','address','is_active','gender'
-    ];
+        'start_date','end_date','session_duration','invoice_id'
+    ]
 }

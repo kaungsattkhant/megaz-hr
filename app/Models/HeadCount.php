@@ -5,11 +5,14 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Customer extends Model
+class HeadCount extends Model
 {
     use HasFactory;
 
-    protected $fillable=[
-        'name','email','phone_number','address','is_active','gender'
+    protected $fillable= [
+        'total_head_count',
+        'male',
+        'child',
+        'female'
     ];
 }

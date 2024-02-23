@@ -11,14 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('customers', function (Blueprint $table) {
+        Schema::create('head_counts', function (Blueprint $table) {
             $table->id();
-            $table->string('name',45);
-            $table->string('email')->nullable();
-            $table->string('phone_number');
-            $table->string('address');
-            $table->unsignedBigInteger('gender');
-            $table->boolean('is_active')->default(1);
+            $table->integer('total_head_count');
+            $table->integer('male');
+            $table->integer('child');
+            $table->integer('female');
             $table->timestamps();
         });
     }
@@ -28,6 +26,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('customers');
+        Schema::dropIfExists('head_counts');
     }
 };
