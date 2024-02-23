@@ -43,6 +43,9 @@ use App\Repositories\Uom\UomRepositoryInterface;
 use App\Repositories\Transfer\TransferRepository;
 use App\Repositories\Transfer\TransferRepositoryInterface;
 
+use App\Repositories\Menu\MenuRepository;
+use App\Repositories\Menu\MenuRepositoryInterface;
+
 class RepositoryServiceProvider extends ServiceProvider
 {
     /**
@@ -72,5 +75,6 @@ class RepositoryServiceProvider extends ServiceProvider
         $this->app->bind(PurchaseOrderRepositoryInterface::class,PurchaseOrderRepository::class);
         $this->app->bind(PurchaseOrderItemRepositoryInterface::class,PurchaseOrderItemRepository::class);
         $this->app->bind(TransferRepositoryInterface::class,TransferRepository::class);
+        $this->app->bind(MenuRepositoryInterface::class,MenuRepository::class);
     }
 }
