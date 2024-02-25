@@ -34,3 +34,10 @@ Route::view('/room_and_table', 'tables&rooms.index')->name('roomandtable');
 Route::view('/services', 'services.index')->name('services');
 Route::view('/menus', 'menus.index')->name('menus');
 Route::view('/menus/create', 'menus.create')->name('menus.create');
+Route::view('/complains', 'complains.index')->name('complains');
+Route::view('/items', 'items.index')->name('items');
+
+
+
+//pos
+Route::view('/pos_home', 'pos.home.index')->name('pos');

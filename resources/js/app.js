@@ -21,6 +21,7 @@ import ServicesCrudComponent from './Components/Services/ServicesCrudComponent.v
 import InventoryLedgersComponent from './Components/Inventories/InventoryLedgersComponent.vue';
 import MenuListComponent from './Components/Menus/MenuListComponent.vue';
 import MenuCreateComponent from './Components/Menus/MenuCreateComponent.vue';
+import ComplainsCrudComponent from './Components/Complains/ComplainsCrudComponent.vue';
 
 const app = createApp({});
 app.component('StaffListComponent', StaffListComponent);
@@ -35,5 +36,6 @@ app.component('ServicesCrudComponent', ServicesCrudComponent);
 app.component('InventoryLedgersComponent', InventoryLedgersComponent);
 app.component('MenuListComponent', MenuListComponent);
 app.component('MenuCreateComponent', MenuCreateComponent);
+app.component('ComplainsCrudComponent', ComplainsCrudComponent);
 
 app.mount('#app');
