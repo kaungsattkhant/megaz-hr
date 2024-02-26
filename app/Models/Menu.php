@@ -30,8 +30,8 @@ class Menu extends BaseModel
         return $this->belongsToMany(Item::class)->withPivot(['weight', 'is_make_pack']);
     }
 
-    public function orderItems()
+    public function orderItem()
     {
-        return $this->hasMany(OrderItem::class);
+        return $this->hasOne(OrderItem::class);
     }
 }

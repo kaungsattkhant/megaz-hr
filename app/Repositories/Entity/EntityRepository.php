@@ -58,11 +58,21 @@ class EntityRepository implements EntityRepositoryInterface
     {
         $currentDate = $data['current_date'];
 
-        $entities = Entity::where("entity_type", "room&table")->with(["invoices"=>function($query) use ($currentDate) {
-            $query->whereBetween("invoice_date", [$currentDate . " 00:00:00", $currentDate . " 23:59:59"])
-            ->with('orders.orderItems.menu');
-        }])->get();
-        return $entities;
+        $entities = Entity::where("entity_type", "room&table")
+        ->with([
+            "invoices" => function($query) use ($currentDate) {
+                $query->whereBetween("invoice_date", [$currentDate . " 00:00:00", $currentDate . " 23:59:59"])
+                    ->with('orders.orderItems.menu','service');
+            },
+
+        ])
+        ->get();
+
+    return $entities;
+
+
+return $entities;
+
 
     }
 

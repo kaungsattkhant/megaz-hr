@@ -23,5 +23,12 @@ class Invoice extends Model
         return $this->hasMany(RoomSession::class);
     }
 
+    public function service()
+    {
+        return $this->belongsTo(Entity::class, 'service_id')->where('entity_type', 'service');
+    }
+
+    // public function service
+
 
 }
