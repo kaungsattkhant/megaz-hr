@@ -169,7 +169,7 @@ if(!function_exists('Pagination')){
 }
 
 if(!function_exists('MakePaginationData')){
-    function MakePaginationData(Request $request, int $totalCount, string $data_shell_name=null)
+    function MakePaginationData(Request $request, int $totalCount, string $data_shell_name=null, $data=null)
     {
         $pageNumber = 1;
         $perPage = 20;
@@ -221,7 +221,7 @@ if(!function_exists('MakePaginationData')){
             "current_page" => (int) $currentPage,
             "last_page" => (int) $lastPage,
             "per_page" => (int) $perPage,
-            $data_shell_name => [],
+            $data_shell_name => ($data)? $data: [],
         ];
     }
 }

@@ -2,12 +2,14 @@
 
 namespace App\Http\Controllers\API;
 
+use Illuminate\Http\Request;
+
 use App\Http\Controllers\Controller;
+
 use App\Http\Requests\PurchaseOrderItem\PurchaseOrderItemCreateRequest;
 use App\Http\Requests\PurchaseOrderItem\PurchaseOrderItemUpdateRequest;
-use App\Models\PurchaseOrderItem;
+
 use App\Repositories\PurchaseOrderItem\PurchaseOrderItemRepositoryInterface;
-use Illuminate\Http\Request;
 
 class PurchaseOrderItemAPIController extends Controller
 {

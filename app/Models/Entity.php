@@ -29,4 +29,9 @@ class Entity extends BaseModel
     {
         return $this->belongsTo(ServiceCategory::class);
     }
+
+    public function invoices()
+    {
+        return $this->hasMany(Invoice::class);
+    }
 }
