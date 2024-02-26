@@ -41,4 +41,6 @@ Route::view('/items', 'items.index')->name('items');
 
 
 //pos
-Route::view('/pos_home', 'pos.home.index')->name('pos');
+Route::view('/pos/home', 'pos.home.index')->name('pos');
+Route::view('/pos/customer', 'pos.customers.index')->name('customer');
+Route::view('/pos/customer/create', 'pos.customers.create')->name('customer_create');

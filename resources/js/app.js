@@ -23,6 +23,10 @@ import MenuListComponent from './Components/Menus/MenuListComponent.vue';
 import MenuCreateComponent from './Components/Menus/MenuCreateComponent.vue';
 import ComplainsCrudComponent from './Components/Complains/ComplainsCrudComponent.vue';
 
+
+import CustomersListComponent from './Components/Pos/Customers/CustomersListComponent.vue';
+import CustomersCreateComponent from './Components/Pos/Customers/CustomersCreateComponent.vue';
+
 const app = createApp({});
 app.component('StaffListComponent', StaffListComponent);
 app.component('StaffCreateComponent', StaffCreateComponent);
@@ -37,5 +41,8 @@ app.component('InventoryLedgersComponent', InventoryLedgersComponent);
 app.component('MenuListComponent', MenuListComponent);
 app.component('MenuCreateComponent', MenuCreateComponent);
 app.component('ComplainsCrudComponent', ComplainsCrudComponent);
+
+app.component('CustomersListComponent', CustomersListComponent);
+app.component('CustomersCreateComponent', CustomersCreateComponent);
 
 app.mount('#app');

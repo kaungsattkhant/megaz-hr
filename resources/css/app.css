@@ -26,4 +26,8 @@
             checked:focus:after:border-l-0 checked:focus:after:border-t-0 checked:focus:after:border-solid checked:focus:after:border-white
             checked:focus:after:bg-transparent 
         }
+
+    .a-clear{
+        @apply focus:outline-none focus:ring-0 focus:shadow-none active:ring-0 active:outline-none active:shadow-none
+    }
     }
