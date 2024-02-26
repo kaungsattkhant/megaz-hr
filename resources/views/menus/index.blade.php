@@ -1,7 +1,7 @@
 @extends('layouts.main')
 
 @section('page_title', 'Menu')
-@section('menu', 'active-link')
+@section('menus', 'active-link')
 @section('content')
 
 <div id="app">
