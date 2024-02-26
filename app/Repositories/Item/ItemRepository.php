@@ -27,7 +27,12 @@ class ItemRepository implements ItemRepositoryInterface
             return $paginationData;
         }
         else{
-            $items = Item::all();
+            if($request->category_id){
+                $items = Item::where('category_id', $request->category_id)->get();
+            }
+            else{
+                $items = Item::all();
+            }
 
             return $items;
         }

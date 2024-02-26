@@ -7,7 +7,7 @@
             </label>
         </div>
         <div class="flex justify-end flex-col">
-            <a href="/menu/create" class="add-btn ">
+            <a href="/menus/create" class="add-btn ">
                 Add New
             </a>
 
@@ -40,19 +40,19 @@
                     </thead>
                     <tbody>
 
-                        <div class="contents">
+                        <div class="contents" v-for="(menu, index) in menuList" :key="index">
                             <tr class="bg-white rounded-lg overflow-hidden shadow-lg">
                                 <td class=" px-6 py-4 font-medium ">
-                                    1
+                                    {{ ++index }}
                                 </td>
                                 <td class="whitespace-nowrap px-6 py-4 ">
-                                    Fried Rice
+                                    {{ menu.name }}
                                 </td>
                                 <td class="whitespace-nowrap px-6 py-4 ">
-                                    Kitchen
+                                    <p v-for="(ingredient, ingredientIndex) in menu.items"> {{ ingredient.name }} </p>
                                 </td>
                                 <td class=" px-6 py-4 ">
-                                    Kitchen Staff
+                                    {{ menu.prices[0].price }}
                                 </td>
                                 <td class="whitespace-nowrap px-6 py-4">
                                     <button
@@ -71,10 +71,6 @@
                 </table>
             </div>
         </div>
-
-        
-
-
 
         <!--Delete Modal -->
         <!-- <div
@@ -147,11 +143,18 @@
     export default {
         data() {
             return {
+                menuList: [],
                 deleteId: null,
             };
         },
 
         methods: {
+            async getMenuList(){
+                let response = await getApiData({url: `/api/menus`});
+                if(response.data){
+                    this.menuList = response.data;
+                }
+            },
 
             deleteBtnClicked(id){
                 this.deleteId = id;
@@ -163,11 +166,18 @@
                 if(response.success){
                     alert(`deleted`);
                 }
-            },           
+            },
 
         },
+
+        created()
+        {
+            this.getMenuList();
+        },
+
         mounted()
         {
+
         }
     }
 </script>
