@@ -23,9 +23,10 @@ class CustomerCreateRequest extends FormRequest
     {
         return [
             'name' => 'required',
-            'email' => "required",
+            'email' => "sometimes",
             'phone_number' => "required",
-            'address' => 'required'
+            'address' => 'required',
+            'birthday' => 'required'
         ];
     }
 }
