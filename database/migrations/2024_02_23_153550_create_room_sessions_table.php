@@ -14,8 +14,8 @@ return new class extends Migration
         Schema::create('room_sessions', function (Blueprint $table) {
             $table->id();
             $table->dateTime('start_date');
-            $table->dateTime('end_date');
-            $table->integer('session_duration');
+            $table->dateTime('end_date')->nullable();
+            $table->integer('session_duration')->nullable();
             $table->unsignedBigInteger('invoice_id');
             $table->timestamps();
         });
