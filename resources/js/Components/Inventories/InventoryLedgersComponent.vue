@@ -51,7 +51,6 @@
                     </thead>
                     <tbody>
 
-                        <!-- looping start -->
                         <div class="contents" v-for="(ledger, index) in inventoryLegderList" :key="index">
                             <tr class="bg-white rounded-lg overflow-hidden shadow-lg">
                                 <td class=" px-6 py-4 font-medium ">
@@ -61,16 +60,19 @@
                                     {{ ledger[0].item.name }}
                                 </td>
                                 <td class="whitespace-nowrap px-6 py-4 ">
-                                    opening 100
-                                </td>
-                                <td v-for="(ledg,index) in ledger" :key="index" class="whitespace-nowrap px-6 py-4 ">
-                                    {{ ledg.quantity }}
+                                    {{ ledger.opening }}
                                 </td>
                                 <td class="whitespace-nowrap px-6 py-4 ">
-                                    {{ testopening }}
+                                    {{ ledger.in }}
                                 </td>
                                 <td class="whitespace-nowrap px-6 py-4 ">
-                                    {{ index*9000 }}
+                                    {{ ledger.out }}
+                                </td>
+                                <td class="whitespace-nowrap px-6 py-4 ">
+                                    {{ ledger.closing }}
+                                </td>
+                                <td class="whitespace-nowrap px-6 py-4 ">
+                                    {{ ledger.closing * 1000}}
                                 </td>
                                 <td class="whitespace-nowrap px-6 py-4">
                                     <button id="edit-btn" class="pr-1"
@@ -118,7 +120,7 @@
                         </button>
                     </div>
                     <div class="relative px-12 py-4" data-te-modal-body-ref>
-                        
+
                         <div class="mb-4">
                             <label for="" class="block text-sm text-black mb-3">
                                 Store
@@ -148,7 +150,7 @@
         </div>
 
 
-        
+
     </div>
 
 
@@ -181,6 +183,29 @@
                 const response = await getApiData({ url: '/api/inventories/'+this.inventory_id+'/ledgers' });
                 if(response.data){
                     this.inventoryLegderList = response.data;
+                    // calculate opening, incoming, outgoing and balance
+                    for(let i=0; i<this.inventoryLegderList.length; i++){
+                        this.inventoryLegderList[i]['opening'] = 0;
+                        this.inventoryLegderList[i]['in'] = 0;
+                        this.inventoryLegderList[i]['out'] = 0;
+                        this.inventoryLegderList[i]['closing'] = 0;
+                        for(let j=0; j<this.inventoryLegderList[i].length; j++){
+                            if(this.inventoryLegderList[i][j].type == 'previous incoming'){
+                                this.inventoryLegderList[i]['opening'] += this.inventoryLegderList[i][j].quantity;
+                            }
+                            if(this.inventoryLegderList[i][j].type == 'previous outgoing'){
+                                this.inventoryLegderList[i]['opening'] -= this.inventoryLegderList[i][j].quantity;
+                            }
+                            if(this.inventoryLegderList[i][j].type == 'incoming'){
+                                this.inventoryLegderList[i]['in'] += this.inventoryLegderList[i][j].quantity;
+                            }
+                            if(this.inventoryLegderList[i][j].type == 'outgoing'){
+                                this.inventoryLegderList[i]['out'] += this.inventoryLegderList[i][j].quantity;
+                            }
+                        }
+                        this.inventoryLegderList[i]['closing'] = (this.inventoryLegderList[i]['opening'] + this.inventoryLegderList[i]['in']) - this.inventoryLegderList[i]['out'];
+                        console.log(this.inventoryLegderList[i]);
+                    }
                 }
             },
             async getInventoryList(){
@@ -228,7 +253,7 @@
                 this.amount = null
             },
 
-                     
+
 
         },
         mounted()

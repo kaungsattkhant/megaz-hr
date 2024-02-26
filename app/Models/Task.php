@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\Model;
 use App\Models\Area;
 use App\Models\Role;
 
-class Task extends Model
+class Task extends BaseModel
 {
     use HasFactory;
 

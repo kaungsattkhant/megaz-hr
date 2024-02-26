@@ -74,4 +74,30 @@ class StaffRepository implements StaffRepositoryInterface
 
         return false;
     }
+
+    public function getStaffByDepartment(Request $request, int $departmentId)
+    {
+        if($request->per_page || $request->page){
+            $totalCount = Staff::where('department_id', $departmentId)->where('is_active',1)->count();
+            $pageNumber = 1;
+            $perPage = 20;
+            if($request->page){
+                $pageNumber = $request->page;
+            }
+            if($request->per_page){
+                $perPage = $request->per_page;
+            }
+            $skip = ($pageNumber - 1) * $perPage;
+            $staffs = Staff::where('department_id', $departmentId)->where('is_active', 1)->skip($skip)->take($perPage)->with('department')->get();
+            $paginationData = MakePaginationData($request, $totalCount, 'staffs');
+            $paginationData['staffs'] = $staffs;
+
+            return $paginationData;
+        }
+        else{
+            $staffs = Staff::where('department_id', $departmentId)->where('is_active',1)->get();
+
+            return $staffs;
+        }
+    }
 }

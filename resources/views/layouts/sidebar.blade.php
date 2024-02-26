@@ -42,7 +42,7 @@
                             </a>
                         </li>
                         <li>
-                            <a href="{{ route('menus') }}" class="flex items-center @yield('menu')">
+                            <a href="{{ route('menus') }}" class="flex items-center @yield('menus')">
                                 <i class="fal fa-clipboard-list  pr-3"></i>
                                 Menu
                             </a>

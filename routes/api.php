@@ -6,9 +6,11 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\API\AuthController;
 use App\Http\Controllers\API\AreaController;
 use App\Http\Controllers\API\ComplaintAPIController;
+use App\Http\Controllers\API\CustomerAPIController;
 use App\Http\Controllers\API\DepartmentAPIController;
 use App\Http\Controllers\API\EntityAPIController;
 use App\Http\Controllers\API\InventoryAPIController;
+use App\Http\Controllers\API\InvoiceAPIController;
 use App\Http\Controllers\API\ItemAPIController;
 use App\Http\Controllers\API\RoleAPIController;
 use App\Http\Controllers\API\ServiceAPIController;
@@ -20,11 +22,13 @@ use App\Http\Controllers\API\PurchaseOrderItemAPIController;
 use App\Http\Controllers\API\TestController;
 use App\Http\Controllers\API\TransferAPIController;
 use App\Http\Controllers\API\UomAPIController;
+use App\Http\Controllers\API\MenuAPIController;
 
 use App\Models\ComplaintCategory;
 use App\Models\AreaType;
 use App\Models\Category;
 use App\Models\Gender;
+use App\Models\MenuCategory;
 use App\Models\ServiceCategory;
 
 /*
@@ -58,6 +62,10 @@ Route::get('/area_types', function(){
     ResponseData(AreaType::all());
 });
 
+Route::get('/menu_categories', function(){
+    ResponseData(MenuCategory::where('is_active',1)->get());
+});
+
 
 Route::post('/login', [AuthController::class,'login']);
 Route::middleware('auth:api')->group(function(){
@@ -69,11 +77,14 @@ Route::middleware('auth:api')->group(function(){
     Route::get('/profile', [ProfileAPIController::class, 'getProfile']);
     Route::post('/profile/change_password', [ProfileAPIController::class, 'updatePassword']);
 
-    Route::get('/complaints',[ComplaintAPIController::class,'getComplainData']);
+    Route::get('/staff/complaints',[ComplaintAPIController::class,'getStaffComplaints']);
     Route::post('/complaints',[ComplaintAPIController::class,'createComplain']);
     Route::put('/complaints/{id}',[ComplaintAPIController::class,'updateComplain']);
     Route::delete('/complaints/{id}',[ComplaintAPIController::class,'deleteComplain']);
     Route::post('/complaints/{id}/update_status',[ComplaintAPIController::class,'complainStatusChange']);
+
+    Route::get('/supervisor/staff',[StaffAPIController::class,'getStaffListBySupervisor']);
+    Route::get('/supervisor/staff/{staffId}/tasks',[TaskController::class,'getStaffTasksBySupervisor']);
 });
 
 Route::get('/areas', [AreaController::class, 'getAreas']);
@@ -98,6 +109,8 @@ Route::get('/tasks',[TaskController::class,'getTaskData']);
 Route::post('/tasks',[TaskController::class,'createTask']);
 Route::put('/tasks/{id}',[TaskController::class,'updateTask']);
 Route::delete('/tasks/{id}',[TaskController::class,'deleteTask']);
+
+Route::get('/complaints',[ComplaintAPIController::class,'getComplainData']);
 
 Route::get('/entities',[EntityAPIController::class,'getEntityData']);
 Route::post('/entities',[EntityAPIController::class,'createEntity']);
@@ -136,6 +149,18 @@ Route::post('/transfers',[TransferAPIController::class,'createTransfer']);
 Route::put('/transfers/{id}',[TransferAPIController::class,'updateTransfer']);
 Route::delete('/transfers/{id}',[TransferAPIController::class,'deleteTransfer']);
 Route::post('/transfers/{id}/confirms',[TransferAPIController::class,'confirmTransfer']);
+
+Route::get('/customers',[CustomerAPIController::class,'getCustomerData']);
+Route::post('/customers',[CustomerAPIController::class,'createCustomer']);
+Route::put('/customers/{id}',[CustomerAPIController::class,'updateCustomer']);
+Route::delete('/customers/{id}',[CustomerAPIController::class,'deleteCustomer']);
+
+Route::get('/menus', [MenuAPIController::class, 'getMenus']);
+Route::post('/menus', [MenuAPIController::class, 'createMenu']);
+Route::post('/menus/{id}/add_price', [MenuAPIController::class, 'addPriceToMenu']);
+
+Route::get('/rooms',[EntityAPIController::class,'invoiceWithRooms']);
+Route::post('/rooms/start',[InvoiceAPIController::class,'createInvoiceRoomSession']);
 
 // Route::group(['prefix' => 'management'], function () {});
 Route::get("/test", [TestController::class, "index"]);
