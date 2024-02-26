@@ -13,28 +13,28 @@ return new class extends Migration
     {
         Schema::create('invoices', function (Blueprint $table) {
             $table->id();
-            $table->string('invoice_id');
+            $table->string('invoice_id')->unique()->nullable();
 
             $table->foreignId('area_id')->constrained()->onDelete('cascade');
             $table->foreignId('entity_id')->constrained()->onDelete('cascade');
             $table->foreignId('customer_id')->constrained()->onDelete('cascade');
-            $table->foreignId('head_count_id')->constrained()->onDelete('cascade');
+            $table->unsignedBigInteger('head_count_id')->nullable();
 
-            $table->unsignedBigInteger('service_id');
+            $table->unsignedBigInteger('service_id')->nullable();
             $table->unsignedBigInteger('created_by');
             $table->dateTime('invoice_date');
-            $table->dateTime('complete_date');
+            $table->dateTime('complete_date')->nullable();
 
-            $table->double('total');
-            $table->double('tax');
-            $table->double('sub_total');
-            $table->double('paid_amount');
-            $table->double('total_session_price');
-            $table->double('change');
-            $table->double('discount_value');
+            $table->double('total')->nullable();
+            $table->double('tax')->nullable();
+            $table->double('sub_total')->default(0);
+            $table->double('paid_amount')->default(0);
+            $table->double('total_session_price')->default(0);
+            $table->double('change')->nullable();
+            $table->double('discount_value')->default(0);
 
-            $table->string('payment_status');
-            $table->string('payment_type');
+            $table->string('payment_status')->nullable();
+            $table->string('payment_type')->nullable();
 
             $table->timestamps();
         });
