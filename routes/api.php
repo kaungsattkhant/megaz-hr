@@ -10,6 +10,7 @@ use App\Http\Controllers\API\CustomerAPIController;
 use App\Http\Controllers\API\DepartmentAPIController;
 use App\Http\Controllers\API\EntityAPIController;
 use App\Http\Controllers\API\InventoryAPIController;
+use App\Http\Controllers\API\InvoiceAPIController;
 use App\Http\Controllers\API\ItemAPIController;
 use App\Http\Controllers\API\RoleAPIController;
 use App\Http\Controllers\API\ServiceAPIController;
@@ -157,6 +158,7 @@ Route::post('/menus', [MenuAPIController::class, 'createMenu']);
 Route::post('/menus/{id}/add_price', [MenuAPIController::class, 'addPriceToMenu']);
 
 Route::get('/rooms',[EntityAPIController::class,'invoiceWithRooms']);
+Route::post('/rooms/start',[InvoiceAPIController::class,'createInvoiceRoomSession']);
 
 // Route::group(['prefix' => 'management'], function () {});
 Route::get("/test", [TestController::class, "index"]);
