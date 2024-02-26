@@ -23,7 +23,16 @@ class ComplaintAPIController extends Controller
 
     public function getComplainData(Request $request)
     {
-        $complaints =$this->complaintRepo->listAllData($request);
+        $complaints = $this->complaintRepo->listAllData($request);
+
+        ResponseData($complaints);
+    }
+
+    public function getStaffComplaints(Request $request)
+    {
+        $staffId = $request->user()->id;
+        $complaints = $this->complaintRepo->listComplaintsByStaff($request, $staffId);
+
         ResponseData($complaints);
     }
 

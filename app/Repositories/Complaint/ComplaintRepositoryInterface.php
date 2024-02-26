@@ -8,6 +8,8 @@ interface ComplaintRepositoryInterface
 {
     public function listAllData(Request $request);
 
+    public function listComplaintsByStaff(Request $request, int $staffId);
+
     public function createData(array $data);
 
     public function updateData(array $data,int $id);
@@ -15,6 +17,4 @@ interface ComplaintRepositoryInterface
     public function statusChange(string $data,int $id);
 
     public function deleteData($id);
-
-
 }

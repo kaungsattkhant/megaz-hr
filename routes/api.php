@@ -76,7 +76,7 @@ Route::middleware('auth:api')->group(function(){
     Route::get('/profile', [ProfileAPIController::class, 'getProfile']);
     Route::post('/profile/change_password', [ProfileAPIController::class, 'updatePassword']);
 
-    Route::get('/complaints',[ComplaintAPIController::class,'getComplainData']);
+    Route::get('/staff/complaints',[ComplaintAPIController::class,'getStaffComplaints']);
     Route::post('/complaints',[ComplaintAPIController::class,'createComplain']);
     Route::put('/complaints/{id}',[ComplaintAPIController::class,'updateComplain']);
     Route::delete('/complaints/{id}',[ComplaintAPIController::class,'deleteComplain']);
@@ -108,6 +108,8 @@ Route::get('/tasks',[TaskController::class,'getTaskData']);
 Route::post('/tasks',[TaskController::class,'createTask']);
 Route::put('/tasks/{id}',[TaskController::class,'updateTask']);
 Route::delete('/tasks/{id}',[TaskController::class,'deleteTask']);
+
+Route::get('/complaints',[ComplaintAPIController::class,'getComplainData']);
 
 Route::get('/entities',[EntityAPIController::class,'getEntityData']);
 Route::post('/entities',[EntityAPIController::class,'createEntity']);
