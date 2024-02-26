@@ -14,8 +14,11 @@ class CategorySeeder extends Seeder
     public function run(): void
     {
         //
-        Category::create([
-            'name' => 'item category'
-        ]);
+        $name=['Food','Drink','Appetizer'];
+        foreach($name as $n){
+            Category::create([
+            'name'=>$n,
+            ]);
+        }
     }
 }

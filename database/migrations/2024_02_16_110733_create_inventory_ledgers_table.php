@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('inventory_ledgers', function (Blueprint $table) {
-            $table->id();
+            $table->bigIncrements('id');
             $table->foreignId('inventory_id')->constrained()->onDelete('cascade');
             $table->dateTime('date');
             $table->unsignedBigInteger('ledgerable_id');

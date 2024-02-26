@@ -24,5 +24,10 @@ class DatabaseSeeder extends Seeder
         (new GenderSeeder())->run();
         (new StaffSeeder())->run();
         (new ServiceCategorySeeder())->run();
+        $this->call([
+            CategorySeeder::class,
+            UomSeeder::class,
+            ItemSeeder::class,
+        ]);
     }
 }
