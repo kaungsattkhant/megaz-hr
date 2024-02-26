@@ -5,11 +5,18 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
+use App\Models\Gender;
+
 class Customer extends Model
 {
     use HasFactory;
 
     protected $fillable=[
-       'birthday', 'name','email','phone_number','address','is_active','gender'
+        'gender_id','name','phone_number','birthdate','email','address','is_active',
     ];
+
+    public function gender()
+    {
+        return $this->belongsTo(Gender::class);
+    }
 }
