@@ -12,4 +12,14 @@ class OrderItem extends Model
     protected $fillable = [
         'date','menu_id','quantity','original_price','discount_value','price','order_id','status','is_complete'
     ];
+
+    public function order()
+    {
+        return $this->belongsTo(Order::class);
+    }
+
+    public function menu()
+    {
+        return $this->belongsTo(Menu::class);
+    }
 }
