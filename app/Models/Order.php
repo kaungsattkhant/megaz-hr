@@ -11,4 +11,14 @@ class Order extends Model
     protected $fillable =[
         'order_id','total_quantity','date','total','invoice_id','is_complete'
     ];
+
+    public function invoice()
+    {
+        return $this->hasMany(Invoice::class);
+    }
+
+    public function orderItems()
+    {
+        return $this->hasMany(OrderItem::class);
+    }
 }

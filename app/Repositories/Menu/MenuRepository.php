@@ -40,6 +40,7 @@ class MenuRepository implements MenuRepositoryInterface
     public function createData(array $data, array $items)
     {
         $menu = Menu::create($data);
+        $this->createMenuPrice($menu->id, $data['price']);
         foreach($items as $item){
             $menu->items()->attach($item['id'], [
                 'weight' => $item['weight'],

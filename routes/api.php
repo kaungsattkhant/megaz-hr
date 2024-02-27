@@ -10,6 +10,7 @@ use App\Http\Controllers\API\CustomerAPIController;
 use App\Http\Controllers\API\DepartmentAPIController;
 use App\Http\Controllers\API\EntityAPIController;
 use App\Http\Controllers\API\InventoryAPIController;
+use App\Http\Controllers\API\InvoiceAPIController;
 use App\Http\Controllers\API\ItemAPIController;
 use App\Http\Controllers\API\RoleAPIController;
 use App\Http\Controllers\API\ServiceAPIController;
@@ -74,7 +75,7 @@ Route::middleware('auth:api')->group(function(){
     Route::get('/profile', [ProfileAPIController::class, 'getProfile']);
     Route::post('/profile/change_password', [ProfileAPIController::class, 'updatePassword']);
 
-    Route::get('/complaints',[ComplaintAPIController::class,'getComplainData']);
+    Route::get('/staff/complaints',[ComplaintAPIController::class,'getStaffComplaints']);
     Route::post('/complaints',[ComplaintAPIController::class,'createComplain']);
     Route::put('/complaints/{id}',[ComplaintAPIController::class,'updateComplain']);
     Route::delete('/complaints/{id}',[ComplaintAPIController::class,'deleteComplain']);
@@ -106,6 +107,8 @@ Route::get('/tasks',[TaskController::class,'getTaskData']);
 Route::post('/tasks',[TaskController::class,'createTask']);
 Route::put('/tasks/{id}',[TaskController::class,'updateTask']);
 Route::delete('/tasks/{id}',[TaskController::class,'deleteTask']);
+
+Route::get('/complaints',[ComplaintAPIController::class,'getComplainData']);
 
 Route::get('/entities',[EntityAPIController::class,'getEntityData']);
 Route::post('/entities',[EntityAPIController::class,'createEntity']);
@@ -154,6 +157,9 @@ Route::delete('/customers/{id}',[CustomerAPIController::class,'deleteCustomer'])
 Route::get('/menus', [MenuAPIController::class, 'getMenus']);
 Route::post('/menus', [MenuAPIController::class, 'createMenu']);
 Route::post('/menus/{id}/add_price', [MenuAPIController::class, 'addPriceToMenu']);
+
+Route::get('/rooms',[EntityAPIController::class,'invoiceWithRooms']);
+Route::post('/rooms/start',[InvoiceAPIController::class,'createInvoiceRoomSession']);
 
 // Route::group(['prefix' => 'management'], function () {});
 Route::get("/test", [TestController::class, "index"]);

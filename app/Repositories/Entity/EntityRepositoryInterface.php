@@ -13,4 +13,6 @@ interface EntityRepositoryInterface
     public function updateData(array $data,int $id);
 
     public function deleteData(int $id);
+
+    public function roomWithInvoice(array $data);
 }

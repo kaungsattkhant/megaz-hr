@@ -1,0 +1,137 @@
+<template>
+    <div>
+        
+        <div class="">
+            <div class="w-full pt-9 px-6">
+                
+                <div class="bg-white rounded w-2/4 mx-auto">
+                    <div class="relative  p-4">
+                        <p class="text-xl w-full text-center">
+                            Create Customer
+                        </p>
+                    </div>
+
+                    <div class="relative px-16 py-4" data-te-modal-body-ref>
+                        <div class="mb-4">
+                            <label for="" class="block text-sm text-black mb-3">
+                                Customer Name
+                            </label>
+                            <input type="text" placeholder="Customer Name" v-model="name"
+                                class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
+                        </div>
+                        <div class="mb-4">
+                            <label for="" class="block text-sm text-black mb-3">
+                                Phone Number
+                            </label>
+                            <input type="text" placeholder="Phone Number" v-model="ph_number"
+                                class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
+                        </div>
+                        <div class="mb-4">
+                            <label for="" class="block text-sm text-black mb-3">
+                                Email
+                            </label>
+                            <input type="text" placeholder="Email" v-model="email"
+                                class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
+                        </div>
+                        <div class="mb-4">
+                            <label for="" class="block text-sm text-black mb-3">
+                                Gender
+                            </label>
+                            <select name="" id="" v-model="selectedGender"
+                                class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
+                                <option :value="gender.id" v-for="(gender, departmentIndex) in genderList" :key="departmentIndex" > {{ gender.name }} </option>
+                            </select>
+                        </div>
+                        <div class="mb-4">
+                            <label for="" class="block text-sm text-black mb-3">
+                                Birthdate
+                            </label>
+                            <input type="text" placeholder="2000-02-02" v-model="date"
+                                class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
+                        </div>
+                        <div class="mb-4">
+                            <label for="" class="block text-sm text-black mb-3">
+                                Address
+                            </label>
+                            <textarea v-model="address" class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0"
+                                 name="" id="" cols="30" rows="10"></textarea>
+                        </div>
+                        
+                    </div>
+
+                    <div class="flex justify-center px-12 pb-8">
+                        <button @click="createCustomerBtnClicked()" class="pos-add-btn focus:outline-none focus:ring-0 ">
+                            Create
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+        </div>
+
+
+        
+        
+
+        
+
+    </div>
+</template>
+<script>
+import { Modal, Ripple, Select, Datepicker, initTE, Input } from "tw-elements";
+    import { getApiData, postApiData, deleteApiData } from '../../../utilities/ajax-helpers';
+
+    export default {
+        data() {
+            return {
+                name: null,
+                ph_number:null,
+                email:null,
+                genderList: [],
+                date:null,
+                address:null,
+                selectedGender:null,
+                deleteId: null,
+
+            };
+        },
+
+        methods: {
+            async getGendersList(){
+                const response = await getApiData({ url: '/api/genders' });
+                if(response.data){
+                    this.genderList = response.data;
+                }
+            },
+
+            createCustomerBtnClicked(){
+                this.createCustomer();
+            },
+
+            async createCustomer()
+            {
+                let formData = new FormData();
+                formData.append('gender_id', this.selectedGender);
+                formData.append('name', this.name);
+                formData.append('email', this.email);
+                formData.append('phone_number', this.ph_number);
+                formData.append('address', this.address);
+                formData.append('birthdate', this.date);
+                let response = await postApiData({url: '/api/customers', form_data: formData});
+                console.log(this.selectedGender+','+this.name+','+this.email+','+this.ph_number+','+this.address+','+this.date)
+                if(response.success){
+                    window.location.replace('/pos/customer');
+                    console.log("success")
+                }
+                else{
+                    alert('some errors occur');
+                }
+            },
+        },
+        mounted()
+        {
+            this.getGendersList();
+            initTE({ Modal, Select, Ripple, Datepicker });
+        }
+    }
+</script>

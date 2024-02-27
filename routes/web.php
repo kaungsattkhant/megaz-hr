@@ -35,3 +35,12 @@ Route::view('/room_and_table', 'tables&rooms.index')->name('roomandtable');
 Route::view('/services', 'services.index')->name('services');
 Route::view('/menus', 'menus.index')->name('menus');
 Route::view('/menus/create', 'menus.create')->name('menus.create');
+Route::view('/complains', 'complains.index')->name('complains');
+Route::view('/items', 'items.index')->name('items');
+Route::view('/purchase_orders', 'purchase_orders.index')->name('purchase_orders');
+Route::view('/purchase_orders/create', 'purchase_orders.create')->name('purchase_orders.create');
+
+//pos
+Route::view('/pos/home', 'pos.home.index')->name('pos');
+Route::view('/pos/customer', 'pos.customers.index')->name('customer');
+Route::view('/pos/customer/create', 'pos.customers.create')->name('customer_create');

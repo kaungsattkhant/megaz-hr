@@ -6,63 +6,75 @@
                 <div class="relative w-[16vw] pt-12">
                     <ul class=" mb-4">
                         <li>
-                            <a href="{{ route("staff") }}" class="flex items-center @yield('staffs')">
+                            <a href="{{ route('staff') }}" class="flex items-center @yield('staffs')">
                                 <i class="fal fa-user  pr-3"></i>
                                 Staff
                             </a>
                         </li>
                         <li>
-                            <a href="{{ route("tasks") }}" class="flex items-center @yield('tasks')">
+                            <a href="{{ route('tasks') }}" class="flex items-center @yield('tasks')">
                                 <i class="fal fa-tasks  pr-3"></i>
                                 Tasks
                             </a>
                         </li>
                         <li>
-                            <a href="{{ route("departments") }}" class="flex items-center @yield('departments')">
+                            <a href="{{ route('departments') }}" class="flex items-center @yield('departments')">
                                 <i class="fal fa-network-wired  pr-3"></i>
                                 Department
                             </a>
                         </li>
                         <li>
-                            <a href="{{ route("areas") }}" class="flex items-center @yield('areas')">
+                            <a href="{{ route('areas') }}" class="flex items-center @yield('areas')">
                                 <i class="fal fa-network-wired  pr-3"></i>
                                 Areas
                             </a>
                         </li>
                         <li>
-                            <a href="{{ route("roles") }}" class="flex items-center @yield('roles')">
+                            <a href="{{ route('roles') }}" class="flex items-center @yield('roles')">
                                 <i class="fal fa-tasks  pr-3"></i>
                                 Role
                             </a>
                         </li>
                         <li>
-                            <a href="{{ route("inventories") }}" class="flex items-center @yield('inventories')">
+                            <a href="{{ route('inventories') }}" class="flex items-center @yield('inventories')">
                                 <i class="fal fa-inventory  pr-3"></i>
                                 Inventory
                             </a>
                         </li>
                         <li>
-                            <a href="#" class="flex items-center @yield('menu')">
+                            <a href="{{ route('menus') }}" class="flex items-center @yield('menus')">
                                 <i class="fal fa-clipboard-list  pr-3"></i>
                                 Menu
                             </a>
                         </li>
                         <li>
-                            <a href="#" class="flex items-center @yield('items')">
+                            <a href="{{ route('items') }}" class="flex items-center @yield('items')">
                                 <i class="fal fa-hand-receiving  pr-3"></i>
                                 Items
                             </a>
                         </li>
                         <li>
-                            <a href="{{ route("roomandtable") }}" class="flex items-center @yield('table')">
+                            <a href="{{ route('purchase_orders') }}" class="flex items-center @yield('purchase_orders')">
+                                <i class="fal fa-truck-loading  pr-3"></i>
+                                Purchase Orders
+                            </a>
+                        </li>
+                        <li>
+                            <a href="{{ route('roomandtable') }}" class="flex items-center @yield('table')">
                                 <i class="fal fa-user  pr-3"></i>
                                 Room / Table
                             </a>
                         </li>
                         <li>
-                            <a href="{{ route("services") }}" class="flex items-center @yield('services')">
+                            <a href="{{ route('services') }}" class="flex items-center @yield('services')">
                                 <i class="fal fa-user  pr-3"></i>
                                 Services
+                            </a>
+                        </li>
+                        <li>
+                            <a href="{{ route('complains') }}" class="flex items-center @yield('services')">
+                                <i class="fal fa-user  pr-3"></i>
+                                Complains
                             </a>
                         </li>
                     </ul>

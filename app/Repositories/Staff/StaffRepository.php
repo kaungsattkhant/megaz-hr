@@ -88,14 +88,18 @@ class StaffRepository implements StaffRepositoryInterface
                 $perPage = $request->per_page;
             }
             $skip = ($pageNumber - 1) * $perPage;
-            $staffs = Staff::where('department_id', $departmentId)->where('is_active', 1)->skip($skip)->take($perPage)->with('department')->get();
-            $paginationData = MakePaginationData($request, $totalCount, 'staffs');
-            $paginationData['staffs'] = $staffs;
+            $staffs = Staff::with('department')->where('department_id', $departmentId)
+            ->where('is_active', 1)
+            ->skip($skip)->take($perPage)
+            ->get();
+            $staffData = MakePaginationData($request, $totalCount, 'staffs', $staffs);
 
-            return $paginationData;
+            return $staffData;
         }
         else{
-            $staffs = Staff::where('department_id', $departmentId)->where('is_active',1)->get();
+            $staffs = Staff::with('department')->where('department_id', $departmentId)
+            ->where('is_active',1)
+            ->get();
 
             return $staffs;
         }

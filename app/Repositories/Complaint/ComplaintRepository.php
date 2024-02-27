@@ -22,14 +22,39 @@ class ComplaintRepository implements ComplaintRepositoryInterface
                 $perPage = $request->per_page;
             }
             $skip = ($pageNumber - 1) * $perPage;
-            $complaints = Complaint::skip($skip)->take($perPage)->get();
-            $paginationData = MakePaginationData($request, $totalCount, 'complaints');
-            $paginationData['complaints'] = $complaints;
+            $complaints = Complaint::orderBy('id', 'desc')->skip($skip)->take($perPage)->get();
+            $complaints = MakePaginationData($request, $totalCount, 'complaints', $complaints);
 
-            return $paginationData;
+            return $complaints;
         }
         else{
-            $complaints = Complaint::all();
+            $complaints = Complaint::orderBy('id', 'desc')->get();
+
+            return $complaints;
+        }
+    }
+
+    public function listComplaintsByStaff(Request $request, int $staffId)
+    {
+        if($request->per_page || $request->page){
+            $totalCount = Complaint::where('posted_by', $staffId)->count();
+            $pageNumber = 1;
+            $perPage = 20;
+            if($request->page){
+                $pageNumber = $request->page;
+            }
+            if($request->per_page){
+                $perPage = $request->per_page;
+            }
+            $skip = ($pageNumber - 1) * $perPage;
+            $complaints = Complaint::where('posted_by', $staffId)->orderBy('id', 'desc')
+            ->skip($skip)->take($perPage)->get();
+            $complaints = MakePaginationData($request, $totalCount, 'complaints', $complaints);
+
+            return $complaints;
+        }
+        else{
+            $complaints = Complaint::where('posted_by', $staffId)->orderBy('id', 'desc')->get();
 
             return $complaints;
         }

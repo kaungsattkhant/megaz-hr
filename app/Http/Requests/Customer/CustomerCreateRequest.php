@@ -22,10 +22,12 @@ class CustomerCreateRequest extends FormRequest
     public function rules(): array
     {
         return [
+            'gender_id' => 'required',
             'name' => 'required',
-            'email' => "required",
+            'email' => "sometimes",
             'phone_number' => "required",
-            'address' => 'required'
+            'address' => 'required',
+            'birthdate' => 'required'
         ];
     }
 }

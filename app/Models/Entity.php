@@ -34,4 +34,5 @@ class Entity extends BaseModel
     {
         return $this->hasMany(Invoice::class);
     }
+
 }

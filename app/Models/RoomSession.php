@@ -11,5 +11,10 @@ class RoomSession extends Model
 
     protected $fillable=[
         'start_date','end_date','session_duration','invoice_id'
-    ]
+    ];
+
+    public function invoices()
+    {
+        return $this->hasMany(Invoice::class);
+    }
 }
