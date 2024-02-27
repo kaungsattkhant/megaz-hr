@@ -24,16 +24,15 @@ class MenuRepository implements MenuRepositoryInterface
             $skip = ($pageNumber - 1) * $perPage;
             $menus = Menu::with(['category', 'prices', 'items'])
             ->where('is_active', 1)
-            ->skip($skip)->take($perPage)
+            ->skip($skip)
+            ->take($perPage)
             ->get();
 
             $menus = MakePaginationData($request, $totalCount, 'menus', $menus);
-
             return $menus;
         }
         else{
             $menus = Menu::with(['category', 'prices', 'items'])->where('is_active', 1)->get();
-
             return $menus;
         }
     }

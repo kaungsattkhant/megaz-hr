@@ -8,7 +8,7 @@ interface PurchaseOrderRepositoryInterface
 {
     public function listAllData(Request $request);
 
-    public function createData(array $purchaseOrder,array $purchaseOrderItems);
+    public function createOrUpdate($request);
 
     public function updateData(array $data,int $id);
 

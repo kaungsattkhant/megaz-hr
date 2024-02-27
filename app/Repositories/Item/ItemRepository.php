@@ -23,17 +23,10 @@ class ItemRepository implements ItemRepositoryInterface
             $items = Item::skip($skip)->take($perPage)->get();
             $paginationData = MakePaginationData($request, $totalCount, 'items');
             $paginationData['items'] = $items;
-
             return $paginationData;
         }
         else{
-            if($request->category_id){
-                $items = Item::where('category_id', $request->category_id)->get();
-            }
-            else{
-                $items = Item::all();
-            }
-
+            $items = Item::all();
             return $items;
         }
     }
