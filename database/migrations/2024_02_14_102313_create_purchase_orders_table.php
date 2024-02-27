@@ -12,14 +12,16 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('purchase_orders', function (Blueprint $table) {
-            $table->id();
+            $table->bigIncrements('id');
             $table->string('po_id',45);
             $table->double('total_price');
             $table->unsignedBigInteger('created_by');
-            $table->unsignedBigInteger('kitchen_check_id')->nullable();
+            $table->unsignedBigInteger('manager_check__id')->nullable();
             $table->unsignedBigInteger('financial_check_id')->nullable();
             $table->dateTime('kitchen_check_time')->nullable();
             $table->dateTime('financial_check_time')->nullable();
+            $table->boolean('is_md_checked')->default(0);
+            $table->enum('status', ['created', 'manager_checked', 'financial_checked', 'md_checked'])->default('created');
             $table->timestamps();
         });
     }

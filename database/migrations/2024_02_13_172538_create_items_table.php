@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('items', function (Blueprint $table) {
-            $table->id();
+            $table->bigIncrements('id');
             $table->string('name',45);
             $table->foreignId('category_id')->constrained();
             $table->boolean('is_active')->default(1);

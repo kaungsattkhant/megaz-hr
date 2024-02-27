@@ -21,10 +21,9 @@ class ItemRepository implements ItemRepositoryInterface
             }
             $skip = ($pageNumber - 1) * $perPage;
             $items = Item::skip($skip)->take($perPage)->get();
-            $paginationData = MakePaginationData($request, $totalCount, 'items');
-            $paginationData['items'] = $items;
+            $itemsData = MakePaginationData($request, $totalCount, 'items', $items);
 
-            return $paginationData;
+            return $itemsData;
         }
         else{
             if($request->category_id){
@@ -33,7 +32,6 @@ class ItemRepository implements ItemRepositoryInterface
             else{
                 $items = Item::all();
             }
-
             return $items;
         }
     }
@@ -49,7 +47,6 @@ class ItemRepository implements ItemRepositoryInterface
 
     public function updateData(array $data, int $id)
     {
-
         $item = Item::find($id);
         if ($item) {
             $item->update($data);

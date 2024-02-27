@@ -2,9 +2,10 @@
 
 namespace App\Repositories\PurchaseOrder;
 
+use Illuminate\Http\Request;
 use App\Models\PurchaseOrder;
 use App\Models\PurchaseOrderItem;
-use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class PurchaseOrderRepository implements PurchaseOrderRepositoryInterface
 {
@@ -33,16 +34,30 @@ class PurchaseOrderRepository implements PurchaseOrderRepositoryInterface
             return $purchaseOrders;
         }
     }
-    public function createData(array $purchaseOrder, array $purchaseOrderItems)
+    public function createOrUpdate($request)
     {
-        $purchaseOrder = PurchaseOrder::create($purchaseOrder);
+        // $purchaseOrder = PurchaseOrder::create($purchaseOrder);
+        // foreach ($purchaseOrderItems as $poItem) {
+        //     $poItem['purchase_order_id'] = $purchaseOrder->id; // Assign purchase_order_id to each purchase order item
+        //     $purchaseOrderItem = PurchaseOrderItem::create($poItem);
+        // }
+        // return $purchaseOrder;
 
-        foreach ($purchaseOrderItems as $poItem) {
-            $poItem['purchase_order_id'] = $purchaseOrder->id; // Assign purchase_order_id to each purchase order item
-            $purchaseOrderItem = PurchaseOrderItem::create($poItem);
+        $data = $request->all();
+        dd($data);
+        DB::beginTransaction();
+        try {
+            if (!isset($request->id)) {
+                $data['id'] = null;
+            }
+            DB::commit();
+        } catch(\Exception $e){
+            DB::rollback();
+            ResponseMessage($e->getMessage(),402);
+            throw $e;
         }
 
-        return $purchaseOrder;
+
     }
 
 

@@ -12,10 +12,13 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('purchase_order_items', function (Blueprint $table) {
-            $table->id();
+            $table->bigIncrements('id');
             $table->double('quantity');
-            $table->foreignId('purchase_order_id')->constraind();
-            $table->foreignId('item_id')->constraind();
+            $table->foreignId('purchase_order_id')->constrained();
+            $table->foreignId('item_id')->constrained();
+            $table->boolean('is_manager_checked')->default(0);
+            $table->boolean('is_financial_checked')->default(0);
+            $table->boolean('is_md_checked')->default(0);
             $table->timestamps();
         });
     }

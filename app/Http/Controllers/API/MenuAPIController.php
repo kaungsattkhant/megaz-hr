@@ -23,7 +23,6 @@ class MenuAPIController extends Controller
     public function getMenus(Request $request)
     {
         $menus = $this->menuRepo->listAllData($request);
-
         ResponseData($menus);
     }
 
@@ -32,7 +31,6 @@ class MenuAPIController extends Controller
         $data = $request->except('items');
         $items = json_decode($request->items, true)['items'];
         $menu = $this->menuRepo->createData($data, $items);
-
         ResponseData($menu);
     }
 
