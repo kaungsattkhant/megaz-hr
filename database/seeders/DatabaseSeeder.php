@@ -18,14 +18,20 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        (new ComplaintCategorySeeder())->run();
-        (new DepartmentSeeder())->run();
-        (new RoleSeeder())->run();
-        (new GenderSeeder())->run();
-        (new StaffSeeder())->run();
-        (new ServiceCategorySeeder())->run();
+        // (new ComplaintCategorySeeder())->run();
+        // (new DepartmentSeeder())->run();
+        // (new RoleSeeder())->run();
+        // (new GenderSeeder())->run();
+        // (new StaffSeeder())->run();
+        // (new ServiceCategorySeeder())->run();
         $this->call([
+            ComplaintCategorySeeder::class,
+            DepartmentSeeder::class,
+            RoleSeeder::class,
+            GenderSeeder::class,
             CategorySeeder::class,
+            StaffSeeder::class,
+            ServiceCategorySeeder::class,
             UomSeeder::class,
             ItemSeeder::class,
         ]);

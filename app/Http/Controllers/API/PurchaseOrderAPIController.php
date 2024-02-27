@@ -28,10 +28,9 @@ class PurchaseOrderAPIController extends Controller
         ResponseData($purchaseOrders);
     }
 
-    public function createPurchaseOrder(PurchaseOrderCreateRequest $request)
+    public function createPurchaseOrder(Request $request)
     {
-
-        $purchaseOrder= $this->purchaseOrderRepo->createData($request->purchase_order,$request->purchase_order_items);
+        $purchaseOrder= $this->purchaseOrderRepo->createOrUpdate($request);
         ResponseData($purchaseOrder);
     }
 

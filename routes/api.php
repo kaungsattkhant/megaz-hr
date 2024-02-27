@@ -69,8 +69,6 @@ Route::get('/menu_categories', function(){
 Route::post('/login', [AuthController::class,'login']);
 Route::middleware('auth:api')->group(function(){
     Route::post('/logout', [AuthController::class, 'logout']);
-
-
     Route::get('/areas/{areaId}/tasks', [TaskController::class, 'getTasksOfRolesFromArea']);
     Route::post('/tasks/{taskId}/update_status', [TaskController::class, 'updateTaskStatus']);
     Route::get('/profile', [ProfileAPIController::class, 'getProfile']);
@@ -138,6 +136,7 @@ Route::delete('/purchase_orders/{id}',[PurchaseOrderAPIController::class,'delete
 
 Route::get('/purchase_orders_items',[PurchaseOrderItemAPIController::class,'getPurchaseOrderItem']);
 Route::post('/purchase_orders_items',[PurchaseOrderItemAPIController::class,'createPurchaseOrderItem']);
+
 Route::put('/purchase_orders_items/{id}',[PurchaseOrderItemAPIController::class,'updatePurchaseOrderItem']);
 Route::delete('/purchase_orders_items/{id}',[PurchaseOrderItemAPIController::class,'deletePurchaseOrderItem']);
 
