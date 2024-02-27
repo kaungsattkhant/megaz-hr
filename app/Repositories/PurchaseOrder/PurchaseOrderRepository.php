@@ -22,10 +22,11 @@ class PurchaseOrderRepository implements PurchaseOrderRepositoryInterface
                 $perPage = $request->per_page;
             }
             $skip = ($pageNumber - 1) * $perPage;
-            $purchaseOrders = PurchaseOrder::skip($skip)->take($perPage)->get();
+            $purchaseOrders = PurchaseOrder::with(['items'])
+            ->skip($skip)
+            ->take($perPage)->get();
             $paginationData = MakePaginationData($request, $totalCount, 'purchase_orders');
             $paginationData['purchaseOrders'] = $purchaseOrders;
-
             return $paginationData;
         }
         else{
@@ -44,13 +45,42 @@ class PurchaseOrderRepository implements PurchaseOrderRepositoryInterface
         // return $purchaseOrder;
 
         $data = $request->all();
-        dd($data);
+        $items=json_decode($request->items);
         DB::beginTransaction();
         try {
             if (!isset($request->id)) {
                 $data['id'] = null;
             }
+            $latest = PurchaseOrder::orderBy('created_at', 'desc')->first();
+            $count = 4;
+            if ($latest) {
+                $po_id_array = explode('-', $latest->po_id);
+                $latest_po_id = (int) $po_id_array[1];
+                if (strlen($latest_po_id + 1) > 4 && strlen($latest_po_id) == 4) {
+                    $count = strlen($latest_po_id) + 1;
+                } elseif (strlen($latest_po_id + 1) > 4 && strlen($latest_po_id + 1) >= 5) {
+                    $count = strlen($latest_po_id + 1);
+                }
+                $no = $po_id_array[1] + 1;
+            } else {
+                $no = 1;
+            }
+            $po_id = "PO" . '-' . str_pad($no, $count, "0", STR_PAD_LEFT).'-'.now()->timestamp;
+            $data['po_id']=$po_id;
+            $data['created_by']=1;
+            $po = PurchaseOrder::updateOrCreate(
+                ['id' => $data['id']],
+                $data
+            );
+            foreach($items as $item){
+                $poItem=PurchaseOrderItem::create([
+                    'quantity'=>$item->quantity,
+                    'purchase_order_id'=>$po->id,
+                    'item_id'=>$item->item_id,
+                ]);
+            }
             DB::commit();
+            return $po;
         } catch(\Exception $e){
             DB::rollback();
             ResponseMessage($e->getMessage(),402);

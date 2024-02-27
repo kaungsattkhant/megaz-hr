@@ -12,6 +12,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 class PurchaseOrder extends BaseModel
 {
     use HasFactory;
+    // protected $with=['items'];
     protected $fillable =[
         'po_id',
         'total_price',
