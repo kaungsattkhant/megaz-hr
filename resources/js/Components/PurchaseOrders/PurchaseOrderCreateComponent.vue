@@ -7,78 +7,179 @@
         </div>
 
         <div class="grid grid-rows-3 grid-cols-12 grid-flow-col gap-x-8 bg-white p-8 rounded-md shadow-md mb-8">
-            <div class="mb-4 row-span-2 col-span-1 w-48 pb-6 rounded-md">
+            <div class="mb-4 row-span-2 col-span-12 w-48 pb-6 rounded-md">
                 <label for="" class="block text-sm text-black mb-3">
-                    Date 1
+                    Date
                 </label>
-                <input type="date" class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
+                <input type="date" v-model="date" class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
             </div>
 
-            <div class="mb-0 row-span-1 grid-cols-12 grid-rows-3 rounded-md flex w-60" style="background-color: aquamarine;">
-                <div id="div-1" class="col-span-4 mr-10 w-full">
-                    <label for="" class="block text-sm text-black mb-1">
-                        Item Name
-                    </label>
-                    <div class="text-sm input-ui w-full bg-transparent rounded-lg focus:ring-0" data-te-select-wrapper-ref>
-                        <select data-te-select-init data-te-select-placeholder="Select Category"
-                            data-te-select-filter="true" name="" id="" v-model="selectedItem"
-                            class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0"
-                            >
-                            <option :value="item" v-for="(item, itemIndex) in itemList" :key="itemIndex"> {{ item.name }} </option>
-                        </select>
-                    </div>
-                </div>
-                <div id="div-2" class="col-span-4 mr-20">
-                    <label for="" class="block text-sm text-black mb-3">
-                        Qty
-                    </label>
-                    <input type="number" class="text-sm border border-gray-300 input-ui bg-transparent rounded-lg focus:ring-0" placeholder="Qty">
-                </div>
+            <div class="col-span-3">
+                <label for="" class="block text-sm text-black mb-3">
+                    Item Name
+                </label>
+                <select name="" id="" v-model="selectedItem"
+                class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
+                    <option :value="item" v-for="(item, itemIndex) in itemList" :key="itemIndex" > {{ item.name }} </option>
+                </select>
 
-                <div id="div-3" class="col-span-4">
-                    <!-- <label for="" class="block text-sm text-black mb-1">
-                        Ingredients
-                    </label>
-                    <div class="text-sm input-ui w-full bg-transparent rounded-lg focus:ring-0" data-te-select-wrapper-ref>
-                        <select data-te-select-init data-te-select-placeholder="Select Category"
-                            data-te-select-filter="true" name="" id="" v-model="selectedItem"
-                            class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0"
-                            >
-                            <option :value="item" v-for="(item, itemIndex) in itemList" :key="itemIndex"> {{ item.name }} </option>
-                        </select>
-                    </div> -->
-                    <button> Add </button>
-                </div>
             </div>
+
+            <div class="col-span-3">
+                <label for="" class="block text-sm text-black mb-3">
+                    Qty
+                </label>
+                <input type="number" v-model="quantity" class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0" placeholder="Qty">
+            </div>
+
+            <div class="col-span-3">
+                <label for="" class="block text-sm text-black mb-3">
+                    Amount
+                </label>
+                <input type="number" v-model="amount" class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0" placeholder="Amount">
+            </div>
+
+            <div class="col-span-3">
+                <label for="" class="block text-sm text-black mb-3">
+                    &nbsp;
+                </label>
+                <button class="add-btn" @click="addItemBtnClicked"> Add </button>
+            </div>
+
         </div>
 
+        <div class="grid grid-rows-3 grid-cols-12 grid-flow-col gap-x-8 bg-white p-8 rounded-md shadow-md mb-8">
+            <table class="min-w-full primary-table rounded-xl text-center text-sm font-light ">
+                <thead class="border-b font-medium ">
+                    <tr>
+                        <th scope="col" class=" px-6 py-4 ">
+                            Item
+                        </th>
+                        <th scope="col" class=" px-6 py-4 ">
+                            Qty
+                        </th>
+                        <th scope="col" class=" px-6 py-4 ">
+                            Amount
+                        </th>
+                        <th scope="col" class=" px-6 py-4 ">
+
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr class="bg-white rounded-lg overflow-hidden shadow-lg" v-for="(purchaseOrderItem, purchaseOrderItemsIndex) in purchaseOrderItems" :key="purchaseOrderItemsIndex">
+                        <td class=" px-6 py-4 font-medium ">
+                            {{ purchaseOrderItem.name }}
+                        </td>
+                        <td class=" px-6 py-4 font-medium ">
+                            {{ purchaseOrderItem.quantity }}
+                        </td>
+                        <td class=" px-6 py-4 font-medium ">
+                            {{ purchaseOrderItem.amount.toLocaleString() }}
+                        </td>
+                        <td class=" px-6 py-4 font-medium ">
+                            <button @click="removePurchaseOrderItemBtnClicked(purchaseOrderItemsIndex)">
+                                <i class="fal fa-trash  pr-3"></i>
+                            </button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <div>
+            <button class="add-btn" @click="createPurchaseOrderBtnClicked">
+                Create Purchase Order
+            </button>
+        </div>
     </div>
 </template>
 
 <script>
-    import { getApiData, deleteApiData } from '../../utilities/ajax-helpers';
+    import { getApiData, postApiData } from '../../utilities/ajax-helpers';
+    import { getCurretDateTime, getCurrentDate } from '../../utilities/datetime-helpers';
 
     export default {
         data() {
             return {
+                date: getCurrentDate(),
                 itemList: [],
                 selectedItem: null,
-                deleteId: null,
+                quantity: null,
+                amount: null,
+                purchaseOrderItems: [],
             };
         },
 
         methods: {
+            async getItemList(){
+                let response = await getApiData({url: `/api/items`});
+                if(response.data){
+                    this.itemList = response.data;
+                }
+            },
 
+            addItemBtnClicked(){
+                if(!this.selectedItem){
+                    alert('Choose an item first');
+                    return 1;
+                }
+                if(this.quantity < 1){
+                    alert('Input quantity');
+                    return 1;
+                }
+                if(this.amount < 1){
+                    alert('Input amount');
+                    return 1;
+                }
+                this.purchaseOrderItems.push({
+                    item_id: this.selectedItem.id,
+                    name: this.selectedItem.name,
+                    quantity: this.quantity,
+                    amount: this.amount,
+                });
+
+                this.selectedItem = null;
+                this.quantity = null;
+                this.amount = null;
+            },
+
+            removePurchaseOrderItemBtnClicked(purchaseOrderItemsIndex){
+                this.purchaseOrderItems.splice(purchaseOrderItemsIndex, 1);
+            },
+
+            async createPurchaseOrderBtnClicked(){
+                if(!this.date){
+                    alert('Input date');
+                    return 1;
+                }
+                if(this.purchaseOrderItems.length<1){
+                    alert('Select items');
+                    return 1;
+                }
+                let priceTotal = 0;
+                this.purchaseOrderItems.forEach((purchaseOrderItem)=>{
+                    priceTotal += purchaseOrderItem.amount;
+                });
+                // alert(priceTotal);
+                let payload = {
+                    id: null,
+                    date: this.date,
+                    total_price: priceTotal,
+                    items: this.purchaseOrderItems
+                };
+                let formData = new FormData();
+                formData.append('payload', JSON.stringify(payload));
+                let response = await postApiData({url: `/api/purchase_orders`, form_data:  formData});
+                alert(`Operation success ${response.success}`);
+            },
 
         },
 
-        created()
-        {
-
+        created(){
+            this.getItemList();
         },
 
-        mounted()
-        {
+        mounted(){
 
         }
     }
