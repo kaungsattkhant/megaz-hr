@@ -22,7 +22,8 @@ import InventoryLedgersComponent from './Components/Inventories/InventoryLedgers
 import MenuListComponent from './Components/Menus/MenuListComponent.vue';
 import MenuCreateComponent from './Components/Menus/MenuCreateComponent.vue';
 import ComplainsCrudComponent from './Components/Complains/ComplainsCrudComponent.vue';
-
+import PurchaseOrderListComponent from './Components/PurchaseOrders/PurchaseOrderListComponent.vue';
+import PurchaseOrderCreateComponent from './Components/PurchaseOrders/PurchaseOrderCreateComponent.vue';
 
 import CustomersListComponent from './Components/Pos/Customers/CustomersListComponent.vue';
 import CustomersCreateComponent from './Components/Pos/Customers/CustomersCreateComponent.vue';
@@ -44,5 +45,7 @@ app.component('ComplainsCrudComponent', ComplainsCrudComponent);
 
 app.component('CustomersListComponent', CustomersListComponent);
 app.component('CustomersCreateComponent', CustomersCreateComponent);
+app.component('PurchaseOrderListComponent', PurchaseOrderListComponent);
+app.component('PurchaseOrderCreateComponent', PurchaseOrderCreateComponent);
 
 app.mount('#app');
