@@ -13,11 +13,12 @@ return new class extends Migration
     {
         Schema::create('customers', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('gender_id')->constrained()->onDelete('cascade');
             $table->string('name',45);
-            $table->string('email')->nullable();
-            $table->string('phone_number');
+            $table->string('phone_number')->unique();
+            $table->date('birthdate');
+            $table->string('email')->unique()->nullable();
             $table->string('address');
-            $table->unsignedBigInteger('gender');
             $table->boolean('is_active')->default(1);
             $table->timestamps();
         });
