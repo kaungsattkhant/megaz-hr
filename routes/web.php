@@ -49,6 +49,7 @@ Route::view('/complains', 'complains.index')->name('complains');
 Route::view('/items', 'items.index')->name('items');
 Route::view('/purchase_orders', 'purchase_orders.index')->name('purchase_orders');
 Route::view('/purchase_orders/create', 'purchase_orders.create')->name('purchase_orders.create');
+Route::view('/purchase_orders/{poId}/confirm', 'purchase_orders.confirm')->name('purchase_orders.confirm');
 
 //pos
 Route::view('/pos/home', 'pos.home.index')->name('pos');

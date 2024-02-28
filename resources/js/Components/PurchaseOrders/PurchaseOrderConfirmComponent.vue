@@ -2,7 +2,7 @@
     <div class="px-8">
         <div class="mb-6">
             <p class="text-xl  text-black font-normal">
-                Add Purchase Order
+                Confirm Purchase Order
             </p>
         </div>
 
@@ -42,7 +42,7 @@
         </div>
 
         <div class="grid grid-rows-3 grid-flow-col gap-x-8 bg-white p-8 rounded-md shadow-md mb-8">
-            <table class="min-w-full primary-table rounded-xl text-center text-sm font-light ">
+            <table class="w-full primary-table rounded-xl text-center text-sm font-light ">
                 <thead class="border-b font-medium ">
                     <tr>
                         <th scope="col" class=" px-6 py-4 ">
@@ -66,7 +66,7 @@
                     <div class="contents" v-for="(purchaseOrderItem, purchaseOrderItemsIndex) in purchaseOrderItems" :key="purchaseOrderItemsIndex">
                         <tr class="bg-white rounded-lg overflow-hidden shadow-lg">
                             <td class=" px-6 py-4 font-medium ">
-                                {{ purchaseOrderItem.name }}
+                                {{ purchaseOrderItem.item.name }}
                             </td>
                             <td class=" px-6 py-4 font-medium ">
                                 {{ purchaseOrderItem.quantity }}
@@ -79,7 +79,13 @@
                             </td>
                             <td class=" px-6 py-4 font-medium ">
                                 <button @click="removePurchaseOrderItemBtnClicked(purchaseOrderItemsIndex)">
-                                    <i class="fal fa-trash  pr-3"></i>
+                                    <i class="fal fa-pencil  pr-3"></i>
+                                </button>
+                                <button @click="removePurchaseOrderItemBtnClicked(purchaseOrderItemsIndex)">
+                                    <i class="fal fa-check  pr-3"></i>
+                                </button>
+                                <button @click="removePurchaseOrderItemBtnClicked(purchaseOrderItemsIndex)">
+                                    <i class="fal fa-times  pr-3"></i>
                                 </button>
                             </td>
                         </tr>
@@ -100,13 +106,14 @@
 </template>
 
 <script>
-    import { getApiData, postApiData } from '../../utilities/ajax-helpers';
-    import { getCurrentDate } from '../../utilities/datetime-helpers';
+    import { getApiData, postApiData, deleteApiData } from '../../utilities/ajax-helpers';
 
     export default {
+        props: ['purchaseOrderId'],
         data() {
             return {
-                date: getCurrentDate(),
+                purchaseOrder: null,
+                date: null,
                 itemList: [],
                 selectedItem: null,
                 quantity: null,
@@ -122,6 +129,15 @@
                 }
             },
 
+            async getPurchaseOrder(){
+                let response = await getApiData({url: `/api/purchase_orders/${this.purchaseOrderId}`});
+                if(response.data){
+                    this.purchaseOrder = response.data;
+                    this.date = this.purchaseOrder.date;
+                    this.purchaseOrderItems = this.purchaseOrder.items;
+                }
+            },
+
             addItemBtnClicked(){
                 if(!this.selectedItem){
                     alert('Choose an item first');
@@ -131,20 +147,35 @@
                     alert('Input quantity');
                     return 1;
                 }
-                let amount = (this.selectedItem.item_prices)? this.selectedItem.item_prices.price: 0;
-                this.purchaseOrderItems.push({
-                    item_id: this.selectedItem.id,
-                    name: this.selectedItem.name,
-                    quantity: this.quantity,
-                    amount: amount,
-                });
-
+                let existingItemIndex = this.purchaseOrderItems.findIndex(poItem => poItem.item_id == this.selectedItem.id);
+                if(existingItemIndex != -1){
+                    this.purchaseOrderItems[existingItemIndex].quantity = +this.quantity;
+                }
+                else{
+                    let amount = (this.selectedItem.item_prices)? this.selectedItem.item_prices.price: 0;
+                    this.purchaseOrderItems.push({
+                        item_id: this.selectedItem.id,
+                        item: this.selectedItem,
+                        quantity: this.quantity,
+                        amount: amount,
+                    });
+                }
                 this.selectedItem = null;
                 this.quantity = null;
             },
 
-            removePurchaseOrderItemBtnClicked(purchaseOrderItemsIndex){
-                this.purchaseOrderItems.splice(purchaseOrderItemsIndex, 1);
+            async removePurchaseOrderItemBtnClicked(purchaseOrderItemsIndex){
+                console.log(this.purchaseOrderItems[purchaseOrderItemsIndex]);
+                if(this.purchaseOrderItems[purchaseOrderItemsIndex].id){
+                    let url = `/api/purchase_orders_items/${this.purchaseOrderItems[purchaseOrderItemsIndex].id}`;
+                    let response = await deleteApiData({url: url});
+                    if(response.success){
+                        this.purchaseOrderItems.splice(purchaseOrderItemsIndex, 1);
+                    }
+                }
+                else{
+                    this.purchaseOrderItems.splice(purchaseOrderItemsIndex, 1);
+                }
             },
 
             async createPurchaseOrderBtnClicked(){
@@ -160,10 +191,20 @@
                 this.purchaseOrderItems.forEach((purchaseOrderItem)=>{
                     priceTotal += purchaseOrderItem.amount;
                 });
+                let updatedPurchaseOrderItems = JSON.parse(JSON.stringify(this.purchaseOrderItems));
+                updatedPurchaseOrderItems.forEach((orderItem)=>{
+                    delete orderItem.item;
+                    if(typeof orderItem.id === 'undefined'){
+                        orderItem.id = null;
+                    }
+                });
+
                 let formData = new FormData();
+                formData.append('id', this.purchaseOrderId);
+                formData.append('po_id', this.purchaseOrder.po_id);
                 formData.append('date', this.date);
                 formData.append('total_price', priceTotal);
-                formData.append('items', JSON.stringify(this.purchaseOrderItems));
+                formData.append('items', JSON.stringify(updatedPurchaseOrderItems));
                 let response = await postApiData({url: `/api/purchase_orders`, form_data:  formData});
                 alert(`Operation success ${response.success}`);
             },
@@ -171,6 +212,7 @@
         },
 
         created(){
+            this.getPurchaseOrder();
             this.getItemList();
         },
 

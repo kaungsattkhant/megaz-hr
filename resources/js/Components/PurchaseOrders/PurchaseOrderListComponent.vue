@@ -26,7 +26,7 @@
                                 Date
                             </th>
                             <th scope="col" class=" px-6 py-4 ">
-                                Name
+                                Purchase Order Id
                             </th>
                             <th scope="col" class=" px-6 py-4 ">
                                 Status
@@ -37,25 +37,29 @@
                         </tr>
                     </thead>
                     <tbody>
-
-                        <!-- <div class="contents" v-for="(menu, index) in menuList" :key="index">
+                        <div class="contents" v-for="(purchaseOrder, index) in purchaseOrderList" :key="index">
                             <tr class="bg-white rounded-lg overflow-hidden shadow-lg">
                                 <td class=" px-6 py-4 font-medium ">
                                     {{ ++index }}
                                 </td>
                                 <td class="whitespace-nowrap px-6 py-4 ">
-                                    {{ menu.name }}
+                                    {{ purchaseOrder.date }}
                                 </td>
                                 <td class="whitespace-nowrap px-6 py-4 ">
-                                    <p v-for="(ingredient, ingredientIndex) in menu.items"> {{ ingredient.name }} </p>
+                                    {{ purchaseOrder.po_id }}
                                 </td>
                                 <td class=" px-6 py-4 ">
-                                    {{ menu.prices[0].price }}
+                                    {{ purchaseOrder.status }}
                                 </td>
-                                <td class="whitespace-nowrap px-6 py-4">
-                                    <button
-                                    data-te-toggle="modal" data-te-target="#deleteModal"
-                                        id="edit-btn" class="pr-1">
+                                <td class="whitespace-nowrap px-6 py-4 space-x-4">
+                                    <a :href="'/purchase_orders/'+purchaseOrder.id+'/confirm'" id="" class="pr-1">
+                                        <i class="far fa-check"></i>
+                                    </a>
+                                    <a :href="'/purchase_orders/'+purchaseOrder.id+'/confirm'" id="" class="pr-1">
+                                        <i class="far fa-bars"></i>
+                                    </a>
+                                    <button data-te-toggle="modal" id="edit-btn" class="pr-1"
+                                    data-te-target="#deleteModal">
                                         <i class="fas fa-trash-alt"></i>
                                     </button>
                                 </td>
@@ -64,7 +68,7 @@
                             <tr class="">
                                 <td class=" py-2 "></td>
                             </tr>
-                        </div> -->
+                        </div>
                     </tbody>
                 </table>
             </div>
@@ -73,7 +77,9 @@
 </template>
 
 <script>
-    import { getApiData, deleteApiData } from '../../utilities/ajax-helpers';
+    import { mapGetters } from 'vuex';
+    import { getApiData } from '../../utilities/ajax-helpers';
+    import { convertToFriendlyDate } from '../../utilities/datetime-helpers';
 
     export default {
         data() {
@@ -83,17 +89,26 @@
         },
 
         methods: {
-            async getPurhaseOrderList(){
-                // let response = await getApiData({url: `/api/menus`});
-                // if(response.data){
-                //     this.purchaseOrderList = response.data;
-                // }
+            ...mapGetters(['getToken']),
+
+            async getPurhaseOrderList(pageNumber){
+                let url = `/api/purchase_orders`;
+                if(pageNumber){
+                    url = `${url}?page=${pageNumber}`;
+                }
+                let response = await getApiData({url: url, token: this.getToken()});
+                if(response.data){
+                    this.purchaseOrderList = response.data.data;
+                    this.purchaseOrderList.forEach((po)=>{
+                        po.date = convertToFriendlyDate(po.date);
+                    });
+                }
             },
         },
 
         created()
         {
-            this.getPurhaseOrderList();
+            this.getPurhaseOrderList(null);
         },
 
         mounted()
