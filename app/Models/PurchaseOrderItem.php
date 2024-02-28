@@ -2,8 +2,9 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
+use App\Models\Item;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class PurchaseOrderItem extends BaseModel
 {
@@ -21,6 +22,10 @@ class PurchaseOrderItem extends BaseModel
     public function getUpdatedAt()
     {
         return parent::getUpdatedAt();
+    }
+
+    public function item(){
+        return $this->belongsTo(Item::class);
     }
 
 }

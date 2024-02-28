@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\DB;
 
 class PurchaseOrderRepository implements PurchaseOrderRepositoryInterface
 {
+    private $select=['po_id','total_price','created_by','manager_check_id','manager_check_time','financial_check_id','financial_check_time','is_md_check','status','created_at','updated_at'];
     public function listAllData(Request $request)
     {
         // if($request->per_page || $request->page){
@@ -36,7 +37,7 @@ class PurchaseOrderRepository implements PurchaseOrderRepositoryInterface
         //     return $purchaseOrders;
         // }
 
-        $purchaseOrders = PurchaseOrder::with(['items'])
+        $purchaseOrders = PurchaseOrder::with(['items.item'])
             ->orderBy('id', 'desc')
             ->paginate(20);
             return $purchaseOrders;
