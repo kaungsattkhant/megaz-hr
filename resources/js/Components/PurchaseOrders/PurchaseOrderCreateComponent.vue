@@ -160,15 +160,10 @@
                 this.purchaseOrderItems.forEach((purchaseOrderItem)=>{
                     priceTotal += purchaseOrderItem.amount;
                 });
-                // alert(priceTotal);
-                let payload = {
-                    id: null,
-                    date: this.date,
-                    total_price: priceTotal,
-                    items: this.purchaseOrderItems
-                };
                 let formData = new FormData();
-                formData.append('payload', JSON.stringify(payload));
+                formData.append('date', this.date);
+                formData.append('total_price', priceTotal);
+                formData.append('items', JSON.stringify(this.purchaseOrderItems));
                 let response = await postApiData({url: `/api/purchase_orders`, form_data:  formData});
                 alert(`Operation success ${response.success}`);
             },
