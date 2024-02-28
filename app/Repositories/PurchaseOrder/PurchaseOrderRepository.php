@@ -60,18 +60,6 @@ class PurchaseOrderRepository implements PurchaseOrderRepositoryInterface
             $latest = PurchaseOrder::orderBy('created_at', 'desc')->first();
             $count = 4;
             $no = (new CommonPurchaseOrder())->getUniqueId($latest, $count);
-            // if ($latest) {
-            //     $po_id_array = explode('-', $latest->po_id);
-            //     $latest_po_id = (int) $po_id_array[1];
-            //     if (strlen($latest_po_id + 1) > 4 && strlen($latest_po_id) == 4) {
-            //         $count = strlen($latest_po_id) + 1;
-            //     } elseif (strlen($latest_po_id + 1) > 4 && strlen($latest_po_id + 1) >= 5) {
-            //         $count = strlen($latest_po_id + 1);
-            //     }
-            //     $no = $po_id_array[1] + 1;
-            // } else {
-            //     $no = 1;
-            // }
             $po_id = "PO" . '-' . str_pad($no, $count, "0", STR_PAD_LEFT) . '-' . now()->timestamp;
             $data['po_id'] = $po_id;
             $data['created_by'] = 1;
@@ -80,7 +68,7 @@ class PurchaseOrderRepository implements PurchaseOrderRepositoryInterface
                 $data
             );
             foreach ($items as $item) {
-                $poItem = PurchaseOrderItem::create([
+                $poItem =  $po->items()->create([
                     'quantity' => $item->quantity,
                     'purchase_order_id' => $po->id,
                     'item_id' => $item->item_id,
