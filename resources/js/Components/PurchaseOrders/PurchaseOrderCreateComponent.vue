@@ -34,13 +34,6 @@
 
             <div class="col-span-3">
                 <label for="" class="block text-sm text-black mb-3">
-                    Amount
-                </label>
-                <input type="number" v-model="amount" class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0" placeholder="Amount">
-            </div>
-
-            <div class="col-span-3">
-                <label for="" class="block text-sm text-black mb-3">
                     &nbsp;
                 </label>
                 <button class="add-btn" @click="addItemBtnClicked"> Add </button>
@@ -62,6 +55,9 @@
                             Amount
                         </th>
                         <th scope="col" class=" px-6 py-4 ">
+                            Total
+                        </th>
+                        <th scope="col" class=" px-6 py-4 ">
 
                         </th>
                     </tr>
@@ -76,6 +72,9 @@
                         </td>
                         <td class=" px-6 py-4 font-medium ">
                             {{ purchaseOrderItem.amount.toLocaleString() }}
+                        </td>
+                        <td class=" px-6 py-4 font-medium ">
+                            {{ (purchaseOrderItem.amount * purchaseOrderItem.quantity).toLocaleString() }}
                         </td>
                         <td class=" px-6 py-4 font-medium ">
                             <button @click="removePurchaseOrderItemBtnClicked(purchaseOrderItemsIndex)">
@@ -96,7 +95,7 @@
 
 <script>
     import { getApiData, postApiData } from '../../utilities/ajax-helpers';
-    import { getCurretDateTime, getCurrentDate } from '../../utilities/datetime-helpers';
+    import { getCurrentDate } from '../../utilities/datetime-helpers';
 
     export default {
         data() {
@@ -105,7 +104,6 @@
                 itemList: [],
                 selectedItem: null,
                 quantity: null,
-                amount: null,
                 purchaseOrderItems: [],
             };
         },
@@ -127,20 +125,16 @@
                     alert('Input quantity');
                     return 1;
                 }
-                if(this.amount < 1){
-                    alert('Input amount');
-                    return 1;
-                }
+                let amount = (this.selectedItem.item_prices)? this.selectedItem.item_prices.price: 0;
                 this.purchaseOrderItems.push({
                     item_id: this.selectedItem.id,
                     name: this.selectedItem.name,
                     quantity: this.quantity,
-                    amount: this.amount,
+                    amount: amount,
                 });
 
                 this.selectedItem = null;
                 this.quantity = null;
-                this.amount = null;
             },
 
             removePurchaseOrderItemBtnClicked(purchaseOrderItemsIndex){
