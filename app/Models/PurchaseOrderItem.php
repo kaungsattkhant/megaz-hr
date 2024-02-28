@@ -10,6 +10,7 @@ class PurchaseOrderItem extends BaseModel
 {
     use HasFactory;
 
+    protected $with=['item'];
     protected $fillable=[
         'quantity','purchase_order_id','item_id','amount',
     ];
