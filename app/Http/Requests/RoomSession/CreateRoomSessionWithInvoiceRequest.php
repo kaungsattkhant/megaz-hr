@@ -23,7 +23,6 @@ class CreateRoomSessionWithInvoiceRequest extends FormRequest
     {
         return [
             //
-            "invoice_id" => "required",// must be unique
             "entity_id" => "required",
             "customer_id" => 'required',
             'invoice_date' => "required",//date + time
