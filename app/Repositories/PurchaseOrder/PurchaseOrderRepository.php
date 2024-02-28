@@ -49,7 +49,6 @@ class PurchaseOrderRepository implements PurchaseOrderRepositoryInterface
         //     $purchaseOrderItem = PurchaseOrderItem::create($poItem);
         // }
         // return $purchaseOrder;
-
         $data = $request->all();
         $items = json_decode($request->items);
         DB::beginTransaction();
