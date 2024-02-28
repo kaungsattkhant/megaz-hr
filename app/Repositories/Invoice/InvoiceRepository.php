@@ -38,8 +38,11 @@ class InvoiceRepository implements InvoiceRepositoryInterface
     public function createData(array $data)
     {
         $data['area_id'] = Entity::find($data['entity_id'])->area_id;
-        $data['head_count_id'] =$this->headCountCreate($data);
+        $headCount =$this->headCountCreate($data);
+        $data['head_count_id']=$headCount->id;
         $invoice = Invoice::create($data);
+        $invoice->invoice_id = $invoice->id;
+        $invoice->save();
         return $invoice;
     }
 
