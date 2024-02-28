@@ -82,9 +82,7 @@
                 </div>
 
             </div>
-            <div class="absolute bottom-0 left-0 w-[16vw] h-14 bg-[#df3b06] border-t border-[#0002] flex items-center justify-start">
-                <button class="w-full text-left pl-12">
-                <i class="fal fa-sign-out pr-3"></i>Logout
-                </button>
+            <div id="app" class="absolute bottom-0 left-0 w-[16vw] h-14 bg-[#df3b06] border-t border-[#0002] flex items-center justify-start">
+                <logout-component/>
             </div>
         </nav>

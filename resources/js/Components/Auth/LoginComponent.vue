@@ -104,7 +104,6 @@
 
         created(){
             this.csrfToken = $('meta[name="csrf-token"]').attr('content');
-            // console.log(this.csrfToken);
             this.setCsrfToken(this.csrfToken);
         },
 

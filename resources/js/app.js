@@ -26,6 +26,7 @@ import ComplainsCrudComponent from './Components/Complains/ComplainsCrudComponen
 import PurchaseOrderListComponent from './Components/PurchaseOrders/PurchaseOrderListComponent.vue';
 import PurchaseOrderCreateComponent from './Components/PurchaseOrders/PurchaseOrderCreateComponent.vue';
 import LoginComponent from './Components/Auth/LoginComponent.vue';
+import LogoutComponent from './Components/Auth/LogoutComponent.vue';
 
 import CustomersListComponent from './Components/Pos/Customers/CustomersListComponent.vue';
 import CustomersCreateComponent from './Components/Pos/Customers/CustomersCreateComponent.vue';
@@ -50,6 +51,7 @@ app.component('CustomersCreateComponent', CustomersCreateComponent);
 app.component('PurchaseOrderListComponent', PurchaseOrderListComponent);
 app.component('PurchaseOrderCreateComponent', PurchaseOrderCreateComponent);
 app.component('LoginComponent', LoginComponent);
+app.component('LogoutComponent', LogoutComponent);
 
 app.use(store);
 app.mount('#app');
