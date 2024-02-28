@@ -54,6 +54,12 @@
                             </a>
                         </li>
                         <li>
+                            <a href="{{ route('purchase_orders') }}" class="flex items-center @yield('purchase_orders')">
+                                <i class="fal fa-truck-loading  pr-3"></i>
+                                Purchase Orders
+                            </a>
+                        </li>
+                        <li>
                             <a href="{{ route('roomandtable') }}" class="flex items-center @yield('table')">
                                 <i class="fal fa-user  pr-3"></i>
                                 Room / Table

@@ -37,8 +37,8 @@ Route::view('/menus', 'menus.index')->name('menus');
 Route::view('/menus/create', 'menus.create')->name('menus.create');
 Route::view('/complains', 'complains.index')->name('complains');
 Route::view('/items', 'items.index')->name('items');
-
-
+Route::view('/purchase_orders', 'purchase_orders.index')->name('purchase_orders');
+Route::view('/purchase_orders/create', 'purchase_orders.create')->name('purchase_orders.create');
 
 //pos
 Route::view('/pos/home', 'pos.home.index')->name('pos');

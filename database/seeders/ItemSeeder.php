@@ -5,6 +5,7 @@ namespace Database\Seeders;
 use App\Models\Uom;
 use App\Models\Item;
 use App\Models\Category;
+use App\Models\ItemPrice;
 use Faker\Factory as Faker;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
@@ -22,13 +23,21 @@ class ItemSeeder extends Seeder
         try {
         $faker = Faker::create();
         $uoms=Uom::pluck('id')->toArray();
-        $category=Category::pluck('id')->toArray();
+        $amounts=[1000,2000,3000,4000,5000,6000,7000];
+        $categories=Category::pluck('id')->toArray();
+        $numCategories = count($categories);
+        $numUoms = count($uoms);
         foreach (range(1, 100) as $index) {
+            $randomIndex = $faker->numberBetween(0, count($amounts) - 1);
             $item=Item::create([
                 'name'=>$faker->word,
-                'category_id' => $faker->numberBetween(1, count($category)),
+                'category_id' => $faker->numberBetween(1, $numCategories),
             ]);
-            $randomUoms = $faker->randomElements($uoms, $faker->numberBetween(1, count($uoms)));
+            ItemPrice::create([
+                'price'=>$amounts[$randomIndex],
+                'item_id'=>$item->id,
+            ]);
+            $randomUoms = $faker->randomElements($uoms, $faker->numberBetween(1, $numUoms));
             $item->uoms()->sync($randomUoms);
         }
         DB::commit();

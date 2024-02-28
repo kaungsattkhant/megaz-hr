@@ -10,7 +10,7 @@ class PurchaseOrderItem extends BaseModel
     use HasFactory;
 
     protected $fillable=[
-        'quantity','purchase_order_id','item_id'
+        'quantity','purchase_order_id','item_id','amount',
     ];
 
     public function getCreatedAt()
