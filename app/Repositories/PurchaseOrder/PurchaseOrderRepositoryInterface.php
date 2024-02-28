@@ -16,5 +16,6 @@ interface PurchaseOrderRepositoryInterface
 
     public function updateKitchenAndFinancePO(string $condition, array $data ,int $id);
 
+    public function detail($model);
 
 }
