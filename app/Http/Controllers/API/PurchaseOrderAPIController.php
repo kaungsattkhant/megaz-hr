@@ -69,4 +69,9 @@ class PurchaseOrderAPIController extends Controller
         $purchase_order_item= $this->purchaseOrderRepo->deletePurchaseOrderItem($id);
         // ResponseMessage('Item delete successfully',200);
     }
+
+    public function updateIsCheck(Request $request){
+        
+        $purchase_order_item= $this->purchaseOrderRepo->updateIsCheck($request);
+    }
 }

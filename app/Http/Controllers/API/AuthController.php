@@ -18,7 +18,6 @@ class AuthController extends Controller
     public function login(StaffLoginRequest $request)
     {
         $loginResponse = (new APILoginAction("phone_number", $request->phone_number, $request->password, "App\Models\Staff"))->run("staff_token");
-
         if($loginResponse["code"] != 200){
             ResponseMessage($loginResponse["message"], 401);
         }

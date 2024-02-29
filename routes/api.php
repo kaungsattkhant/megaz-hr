@@ -83,7 +83,37 @@ Route::middleware('auth:api')->group(function(){
 
     Route::get('/supervisor/staff',[StaffAPIController::class,'getStaffListBySupervisor']);
     Route::get('/supervisor/staff/{staffId}/tasks',[TaskController::class,'getStaffTasksBySupervisor']);
+    Route::controller(PurchaseOrderAPIController::class)->group(function(){
+    
+        Route::get('/purchase_orders','getPurchaseOrder');
+        Route::post('/purchase_orders','createPurchaseOrder');
+        // below the route perform update, and kitchen data update and financial update and it depends on condition,
+        Route::put('/purchase_orders/{id}','updatePurchaseOrder');
+        Route::get('/purchase_orders/{purchase_order}','detail');
+        Route::delete('/purchase_orders/{id}','deletePurchaseOrder');
+
+        Route::get('/purchase_orders_items','getPurchaseOrderItem');
+        Route::post('/purchase_orders_items','createPurchaseOrderItem');
+
+        Route::delete('/purchase_orders_items/{id}','deletePurchaseOrderItem');
+        Route::post('updateIsCheck','updateIsCheck');
+    });
 });
+// Route::controller(PurchaseOrderAPIController::class)->group(function(){
+    
+//     Route::get('/purchase_orders','getPurchaseOrder');
+//     Route::post('/purchase_orders','createPurchaseOrder');
+//     // below the route perform update, and kitchen data update and financial update and it depends on condition,
+//     Route::put('/purchase_orders/{id}','updatePurchaseOrder');
+//     Route::get('/purchase_orders/{purchase_order}','detail');
+//     Route::delete('/purchase_orders/{id}','deletePurchaseOrder');
+
+//     Route::get('/purchase_orders_items','getPurchaseOrderItem');
+//     Route::post('/purchase_orders_items','createPurchaseOrderItem');
+
+//     Route::delete('/purchase_orders_items/{id}','deletePurchaseOrderItem');
+//     Route::post('updateIsCheck','updateIsCheck');
+// });
 
 
 
@@ -133,20 +163,7 @@ Route::post('/items',[ItemAPIController::class,'createItem']);
 Route::put('/items/{id}',[ItemAPIController::class,'updateItem']);
 Route::delete('/items/{id}',[ItemAPIController::class,'deleteItem']);
 
-Route::controller(PurchaseOrderAPIController::class)->group(function(){
-    
-    Route::get('/purchase_orders','getPurchaseOrder');
-    Route::post('/purchase_orders','createPurchaseOrder');
-    // below the route perform update, and kitchen data update and financial update and it depends on condition,
-    Route::put('/purchase_orders/{id}','updatePurchaseOrder');
-    Route::get('/purchase_orders/{purchase_order}','detail');
-    Route::delete('/purchase_orders/{id}','deletePurchaseOrder');
 
-    Route::get('/purchase_orders_items','getPurchaseOrderItem');
-    Route::post('/purchase_orders_items','createPurchaseOrderItem');
-
-    Route::delete('/purchase_orders_items/{id}','deletePurchaseOrderItem');
-});
 
 
 

@@ -64,4 +64,11 @@ class Staff extends Authenticatable
     {
         return $this->hasMany(Task::class, 'completed_by');
     }
+
+    public function hasRoles($name){
+        if($this->roles->contains('name',$name)){
+            return true;
+        }
+        return false;
+    }
 }
