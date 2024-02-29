@@ -29,7 +29,6 @@ class RoleRepository implements RoleRepositoryInterface
                 $roles = Role::skip($skip)->take($perPage)->with('department')->get();
             }
 
-            // $roles = Role::skip($skip)->take($perPage)->with('department')->get();
             $paginationData = MakePaginationData($request, $totalCount, 'roles');
             $paginationData['roles'] = $roles;
 
@@ -42,8 +41,6 @@ class RoleRepository implements RoleRepositoryInterface
             else{
                 $roles = Role::with('department')->get();
             }
-            // $roles = Role::with('department')->get();
-
             return $roles;
         }
     }

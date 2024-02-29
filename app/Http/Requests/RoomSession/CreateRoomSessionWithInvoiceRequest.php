@@ -29,7 +29,6 @@ class CreateRoomSessionWithInvoiceRequest extends FormRequest
             "female" => 'sometimes',
             "male" =>"sometimes",
             "child"=>'sometimes'
-
         ];
     }
 }
