@@ -733,13 +733,13 @@
             btnClickedIsOpenRoom(id,index){
                 this.selectedRoom = id;
                 if(this.roomList[index].invoices.length>0){
-                    alert(this.roomList[index].invoices.length)
+                    // alert(this.roomList[index].invoices.length)
                     this.isOpenRoom.step_1 = false;
                     this.isOpenRoom.step_2 = false;
                     this.isOpenRoom.step_detail = true;
                 }
                 if(this.roomList[index].invoices.length<1){
-                    alert(this.roomList[index].invoices.length)
+                    // alert(this.roomList[index].invoices.length)
                     this.isOpenRoom.step_1=true;
                     this.isOpenRoom.step_2 = false;
                     this.isOpenRoom.step_detail = false;
