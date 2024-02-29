@@ -92,7 +92,7 @@ class ComplaintRepository implements ComplaintRepositoryInterface
     public function statusChange(string $status,int $id)
     {
         $complaint = Complaint::find($id);
-        if($complaint!==null)
+        if($complaint !== null)
         {
             $complaint->status = $status;
             $complaint->save();

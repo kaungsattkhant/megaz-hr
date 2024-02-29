@@ -2,15 +2,17 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
+use App\Models\Item;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class PurchaseOrderItem extends BaseModel
 {
     use HasFactory;
 
+    protected $with=['item'];
     protected $fillable=[
-        'quantity','purchase_order_id','item_id'
+        'quantity','purchase_order_id','item_id','amount',
     ];
 
     public function getCreatedAt()
@@ -21,6 +23,10 @@ class PurchaseOrderItem extends BaseModel
     public function getUpdatedAt()
     {
         return parent::getUpdatedAt();
+    }
+
+    public function item(){
+        return $this->belongsTo(Item::class);
     }
 
 }

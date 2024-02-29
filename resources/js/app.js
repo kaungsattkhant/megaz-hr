@@ -2,12 +2,13 @@ import './bootstrap';
 import '../css/app.css';
 
 ///////////// Tailwind section //////////////
-import { Collapse, Select, Carousel, initTE, Modal, Ripple, Dropdown, Datepicker, Tab } from 'tw-elements';
-initTE({ Collapse, Select, Carousel, Modal, Ripple, Dropdown, Datepicker, Tab});
+import { Collapse, Select, Carousel, initTE, Modal, Ripple, Dropdown, Datepicker, Input, Tab } from 'tw-elements';
+initTE({ Collapse, Select, Carousel, Modal, Ripple, Dropdown, Datepicker, Input, Tab});
 
 //////////////................/////////////////
 
 import {createApp} from 'vue/dist/vue.esm-bundler';
+import { store } from './Store';
 
 import StaffListComponent from './Components/Staff/StaffListComponent.vue';
 import StaffCreateComponent from './Components/Staff/StaffCreateComponent.vue';
@@ -22,7 +23,12 @@ import InventoryLedgersComponent from './Components/Inventories/InventoryLedgers
 import MenuListComponent from './Components/Menus/MenuListComponent.vue';
 import MenuCreateComponent from './Components/Menus/MenuCreateComponent.vue';
 import ComplainsCrudComponent from './Components/Complains/ComplainsCrudComponent.vue';
+import PurchaseOrderListComponent from './Components/PurchaseOrders/PurchaseOrderListComponent.vue';
+import PurchaseOrderCreateComponent from './Components/PurchaseOrders/PurchaseOrderCreateComponent.vue';
+import PurchaseOrderConfirmComponent from './Components/PurchaseOrders/PurchaseOrderConfirmComponent.vue';
 
+import LoginComponent from './Components/Auth/LoginComponent.vue';
+import LogoutComponent from './Components/Auth/LogoutComponent.vue';
 
 import CustomersListComponent from './Components/Pos/Customers/CustomersListComponent.vue';
 import CustomersCreateComponent from './Components/Pos/Customers/CustomersCreateComponent.vue';
@@ -43,8 +49,16 @@ app.component('MenuListComponent', MenuListComponent);
 app.component('MenuCreateComponent', MenuCreateComponent);
 app.component('ComplainsCrudComponent', ComplainsCrudComponent);
 
+app.component('PurchaseOrderListComponent', PurchaseOrderListComponent);
+app.component('PurchaseOrderCreateComponent', PurchaseOrderCreateComponent);
+app.component('PurchaseOrderConfirmComponent', PurchaseOrderConfirmComponent);
+
+app.component('LoginComponent', LoginComponent);
+app.component('LogoutComponent', LogoutComponent);
+
 app.component('CustomersListComponent', CustomersListComponent);
 app.component('CustomersCreateComponent', CustomersCreateComponent);
 app.component('HomePageComponent', HomePageComponent);
 
+app.use(store);
 app.mount('#app');

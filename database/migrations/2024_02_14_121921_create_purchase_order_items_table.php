@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('purchase_order_items', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->double('quantity');
+            $table->double('amount');
             $table->foreignId('purchase_order_id')->constrained();
             $table->foreignId('item_id')->constrained();
             $table->boolean('is_manager_checked')->default(0);

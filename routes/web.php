@@ -1,6 +1,9 @@
 <?php
 
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
+
+use App\Http\Controllers\WEB\AuthController;
 
 /*
 |--------------------------------------------------------------------------
@@ -15,9 +18,16 @@ use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
     // return view('welcome');
-    return redirect()->route('staff');
+    if(Auth::check()){
+        return redirect()->route('staff');
+    }
+    else{
+        return redirect()->route('login');
+    }
+    // return redirect()->route('staff');
 });
-
+Route::view('/login', 'auth.login')->name('login_form');
+Route::post('/login',[AuthController::class,'login'])->name('login');
 
 // test
 
@@ -37,8 +47,9 @@ Route::view('/menus', 'menus.index')->name('menus');
 Route::view('/menus/create', 'menus.create')->name('menus.create');
 Route::view('/complains', 'complains.index')->name('complains');
 Route::view('/items', 'items.index')->name('items');
-
-
+Route::view('/purchase_orders', 'purchase_orders.index')->name('purchase_orders');
+Route::view('/purchase_orders/create', 'purchase_orders.create')->name('purchase_orders.create');
+Route::view('/purchase_orders/{poId}/confirm', 'purchase_orders.confirm')->name('purchase_orders.confirm');
 
 //pos
 Route::view('/pos/home', 'pos.home.index')->name('pos');

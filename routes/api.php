@@ -85,6 +85,8 @@ Route::middleware('auth:api')->group(function(){
     Route::get('/supervisor/staff/{staffId}/tasks',[TaskController::class,'getStaffTasksBySupervisor']);
 });
 
+
+
 Route::get('/areas', [AreaController::class, 'getAreas']);
 Route::post('/areas', [AreaController::class, 'createArea']);
 Route::put('/areas/{id}', [AreaController::class, 'updateArea']);
@@ -131,17 +133,23 @@ Route::post('/items',[ItemAPIController::class,'createItem']);
 Route::put('/items/{id}',[ItemAPIController::class,'updateItem']);
 Route::delete('/items/{id}',[ItemAPIController::class,'deleteItem']);
 
-Route::get('/purchase_orders',[PurchaseOrderAPIController::class,'getPurchaseOrder']);
-Route::post('/purchase_orders',[PurchaseOrderAPIController::class,'createPurchaseOrder']);
-// below the route perform update, and kitchen data update and financial update and it depends on condition,
-Route::put('/purchase_orders/{id}',[PurchaseOrderAPIController::class,'updatePurchaseOrder']);
-Route::delete('/purchase_orders/{id}',[PurchaseOrderAPIController::class,'deletePurchaseOrder']);
+Route::controller(PurchaseOrderAPIController::class)->group(function(){
+    
+    Route::get('/purchase_orders','getPurchaseOrder');
+    Route::post('/purchase_orders','createPurchaseOrder');
+    // below the route perform update, and kitchen data update and financial update and it depends on condition,
+    Route::put('/purchase_orders/{id}','updatePurchaseOrder');
+    Route::get('/purchase_orders/{purchase_order}','detail');
+    Route::delete('/purchase_orders/{id}','deletePurchaseOrder');
 
-Route::get('/purchase_orders_items',[PurchaseOrderItemAPIController::class,'getPurchaseOrderItem']);
-Route::post('/purchase_orders_items',[PurchaseOrderItemAPIController::class,'createPurchaseOrderItem']);
+    Route::get('/purchase_orders_items','getPurchaseOrderItem');
+    Route::post('/purchase_orders_items','createPurchaseOrderItem');
 
-Route::put('/purchase_orders_items/{id}',[PurchaseOrderItemAPIController::class,'updatePurchaseOrderItem']);
-Route::delete('/purchase_orders_items/{id}',[PurchaseOrderItemAPIController::class,'deletePurchaseOrderItem']);
+    Route::put('/purchase_orders_items/{id}','updatePurchaseOrderItem');
+    Route::delete('/purchase_orders_items/{id}','deletePurchaseOrderItem');
+});
+
+
 
 Route::get('/transfers',[TransferAPIController::class,'getTransferData']);
 Route::post('/transfers',[TransferAPIController::class,'createTransfer']);

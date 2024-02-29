@@ -1,8 +1,18 @@
 <template>
     <div>
-        
+
         <div class="">
             <div class="w-[67%] pt-9 px-6">
+                <div class="relative">
+                                    <select name="" id="" v-model="selectedCustomer"
+                                        class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
+                                        <option :value="customer.id" v-for="(customer, customerIndex) in customerList" :key="customerIndex" > {{ customer.name }} </option>
+                                    </select>
+                                    <button class="absolute -right-6 transition duration-150 ease-in-out focus:outline-none focus:ring-0"
+                                        data-te-toggle="modal" data-te-target="#create_customer_modal">
+                                        +
+                                    </button>
+                                </div>
                 <ul
                     class="mb-5 flex list-none flex-row flex-wrap border-b-0 pl-0"
                     role="tablist"
@@ -36,7 +46,7 @@
                         >Roof Top</a
                         >
                     </li>
-  
+
                 </ul>
 
                 <div class="mb-6">
@@ -76,7 +86,7 @@
                                         </p>
                                     </div>
                                     <div class="absolute bottom-0 w-full flex justify-end">
-                                        
+
                                         <p class="text-2xl text-white">
                                             {{  index+1 }}
                                         </p>
@@ -100,12 +110,12 @@
                         role="tabpanel"
                         aria-labelledby="tabs-profile-tab">
                         Tab 2 content
-                    </div>                    
+                    </div>
                 </div>
             </div>
             <div class="right-sidebar shadow-lg border-l border-gray-200">
                     <!-- secssion right sidebar -->
-                <div v-if="isOpenRoom.step_detail == true" class="relative h-full"> 
+                <div v-if="isOpenRoom.step_detail == true" class="relative h-full">
                     <div class="flex justify-between padding-section border-b">
                         <div>
                                 <p class="text-black text-xl">
@@ -229,7 +239,7 @@
                             </p>
                         </div>
                         <div class="">
-                            <button @click="btnClickedDoneSession()" class="bg-[#55EFC4] text-black text-center text-sm font-semibold w-full py-3"> 
+                            <button @click="btnClickedDoneSession()" class="bg-[#55EFC4] text-black text-center text-sm font-semibold w-full py-3">
                                 Done Session
                             </button>
                         </div>
@@ -238,7 +248,7 @@
                     <!-- invoice right sidebar -->
                 <div v-if="isOpenRoom.step_invoice == true" class="relative h-full">
                     <div class="flex justify-between padding-section border-b">
-                        <button>   
+                        <button>
                             <i class="far fa-chevron-left"></i>
                          </button>
                         <div>
@@ -256,10 +266,6 @@
                                 <div class="relative">
                                     <input type="text" placeholder="Customer Name"
                                         class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
-                                    <button class="absolute -right-6 transition duration-150 ease-in-out focus:outline-none focus:ring-0"
-                                        data-te-toggle="modal" data-te-target="#create_customer_modal">
-                                        +
-                                    </button>
                                 </div>
                             </div>
                             <div class="mb-4">
@@ -356,7 +362,7 @@
                             </p>
                         </div>
                         <div class="">
-                            <button class="bg-[#55EFC4] text-black text-center text-sm font-semibold w-full py-3"> 
+                            <button class="bg-[#55EFC4] text-black text-center text-sm font-semibold w-full py-3">
                                 Print Invoice
                             </button>
                         </div>
@@ -376,13 +382,13 @@
                                 </p>
                             </div>
                             <img class="w-[60%] mx-auto mb-6" src="../../../../../public/img/Video_light.png" alt="">
-                            <button  @click="btnClickedOpenRoom" class="bg-[#55EFC4] text-black text-center text-sm font-semibold w-full py-3"> 
+                            <button  @click="btnClickedOpenRoom" class="bg-[#55EFC4] text-black text-center text-sm font-semibold w-full py-3">
                                 Open Room
                             </button>
                         </div>
                     </div>
                 </div>
-                <div class=""  v-if="isOpenRoom.step_2 == true" id="open_room_2">
+                <div class=""  v-show="isOpenRoom.step_2 == true" id="open_room_2">
                     <div class="small-scrollbar overflow-y-auto h-[100vh] pt-8">
                         <div class="padding-section w-2/3 mx-auto ">
                             <div class="mb-4">
@@ -435,7 +441,7 @@
                                 <input type="text" placeholder="Child" v-model="child"
                                     class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
                             </div>
-                            <button @click="confirmRoomBtnClicked()" class="bg-[#55EFC4] text-black text-center text-sm font-semibold w-full py-3"> 
+                            <button @click="confirmRoomBtnClicked()" class="bg-[#55EFC4] text-black text-center text-sm font-semibold w-full py-3">
                                 Open Room
                             </button>
                         </div>
@@ -573,7 +579,7 @@
                                 <option value="1"> Room</option>
                             </select>
                         </div>
-                        
+
                     </div>
 
                     <div class="flex justify-center px-12 mb-6">
@@ -597,7 +603,7 @@
                         <p class="text-xl w-full text-center">
                             Create Customer
                         </p>
-                        <button type="button" class="absolute top-4 right-4 focus:shadow-none focus:outline-none 
+                        <button type="button" class="absolute top-4 right-4 focus:shadow-none focus:outline-none
                         " id="closeMegaZ"
                             data-te-modal-dismiss aria-label="Close">
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
@@ -652,7 +658,7 @@
                             <textarea v-model="address" class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0"
                                  name="" id="" cols="30" rows="10"></textarea>
                         </div>
-                        
+
                     </div>
 
                     <div class="flex justify-center px-12 mb-6">
@@ -668,7 +674,7 @@
 
 </template>
 <script>
-    import { Modal, Ripple, Select, Datepicker, initTE, Input } from "tw-elements";
+    import { Modal, Ripple, Select, initTE, Tab } from "tw-elements";
     import { getApiData, postApiData, deleteApiData } from '../../../utilities/ajax-helpers';
 
     export default {
@@ -750,7 +756,7 @@
                 this.isOpenRoom.step_1=false;
                 this.isOpenRoom.step_2=true;
             },
-            
+
             createCustomerBtnClicked(){
                 this.createCustomer();
             },
@@ -825,14 +831,15 @@
             //     }
             // }
         },
-       
+
         mounted()
         {
             this.getGendersList();
             this.getRoomList();
             this.getCustomerList();
             // this.initialSidebarShow();
-            initTE({ Modal, Select, Ripple, Datepicker });
+            initTE({ Modal, Select, Ripple, Tab });
+
         }
     }
 </script>

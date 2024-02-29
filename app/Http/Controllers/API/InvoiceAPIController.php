@@ -22,10 +22,9 @@ class InvoiceAPIController extends Controller
     public function createInvoiceRoomSession(Request $request)
     {
         $data = $request->all();
-        // just a sample created by
         $data['created_by'] = 1;
         $invoice = $this->invoiceRepo->createData($data);
-        $data['start_date']= currentTime();
+        $data['start_date'] = currentTime();
         $data['invoice_id'] = $invoice->id;
         $roomSession = $this->roomSessionRepo->creaetRoomSession($data);
         ResponseData($roomSession);

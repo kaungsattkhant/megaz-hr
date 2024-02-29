@@ -2,8 +2,9 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
+use App\Models\ItemPrice;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Item extends BaseModel
 {
@@ -12,6 +13,8 @@ class Item extends BaseModel
     protected $fillable=[
         'name','category_id'
     ];
+
+    protected $with=['item_prices'];
 
     public function uoms()
     {
@@ -26,5 +29,9 @@ class Item extends BaseModel
     public function getUpdatedAt()
     {
         return parent::getUpdatedAt();
+    }
+
+    public function item_prices(){
+        return $this->hasOne(ItemPrice::class)->latest('created_at');
     }
 }

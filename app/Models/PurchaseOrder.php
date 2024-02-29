@@ -12,9 +12,11 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 class PurchaseOrder extends BaseModel
 {
     use HasFactory;
+    // protected $with=['items'];
     protected $fillable =[
         'po_id',
         'total_price',
+        'date',
         'created_by',
         'manager_check_id',
         'financial_check_id',
@@ -22,7 +24,9 @@ class PurchaseOrder extends BaseModel
         'financial_check_time',
         'is_md_checked',
         'md_check_time',
-        'status'
+        'status',
+        'created_at',
+        'updated_at',
     ];
 
     public function getCreatedAt()

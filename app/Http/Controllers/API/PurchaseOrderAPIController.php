@@ -7,6 +7,7 @@ use App\Models\Item;
 use App\Models\Category;
 use Faker\Factory as Faker;
 use Illuminate\Http\Request;
+use App\Models\PurchaseOrder;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\PurchaseOrder\PurchaseOrderCreateRequest;
@@ -45,6 +46,11 @@ class PurchaseOrderAPIController extends Controller
             ResponseData($purchaseOrder);
         }
 
+    }
+
+    public function detail(PurchaseOrder $purchase_order){
+        $purchaseOrder= $this->purchaseOrderRepo->detail($purchase_order);
+        ResponseData($purchaseOrder);
     }
 
     public function deletePurchaseOrder(int $id)

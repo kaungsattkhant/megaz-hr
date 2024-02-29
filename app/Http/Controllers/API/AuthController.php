@@ -24,7 +24,7 @@ class AuthController extends Controller
         }
 
         else{
-            $staff = Staff::with(["department","roles"])->find($loginResponse["user"]["id"]);
+            $staff = Staff::with(["gender","department","roles"])->find($loginResponse["user"]["id"]);
             $loginResponse["user"] = $staff;
             ResponseData($loginResponse);
         }

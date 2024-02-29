@@ -20,11 +20,11 @@
 </head>
 
 <body class="small-scrollbar">
-    
+
     @yield('pos-body-content')
-    
+
 </body>
-<script src="https://cdn.jsdelivr.net/npm/@tailwindcss/forms@0.5.7/src/index.min.js"></script>
+{{-- <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/forms@0.5.7/src/index.min.js"></script> --}}
 @yield('script_index')
 
 </html>

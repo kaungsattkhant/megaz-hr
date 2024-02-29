@@ -38,8 +38,11 @@ class InvoiceRepository implements InvoiceRepositoryInterface
     public function createData(array $data)
     {
         $data['area_id'] = Entity::find($data['entity_id'])->area_id;
-        $data['head_count_id'] =$this->headCountCreate($data);
+        $headCount = $this->headCountCreate($data);
+        $data['head_count_id'] = $headCount->id;
         $invoice = Invoice::create($data);
+        $invoice->invoice_id = $invoice->id;
+        $invoice->save();
         return $invoice;
     }
 
@@ -57,7 +60,7 @@ class InvoiceRepository implements InvoiceRepositoryInterface
 
     public function deleteData(int $id)
     {
-        $invoice= Invoice::find($id);
+        $invoice = Invoice::find($id);
         if($invoice)
         {
             $invoice->delete();
@@ -68,7 +71,7 @@ class InvoiceRepository implements InvoiceRepositoryInterface
 
     public function headCountCreate(array $data)
     {
-        $data['total_head_count']=$data['female'] + $data['male'] + $data['child'];
+        $data['total_head_count'] = $data['female'] + $data['male'] + $data['child'];
         $headCount = HeadCount::create($data);
         return $headCount;
     }
