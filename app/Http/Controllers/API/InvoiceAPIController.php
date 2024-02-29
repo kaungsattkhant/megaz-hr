@@ -22,6 +22,25 @@ class InvoiceAPIController extends Controller
     public function createInvoiceRoomSession(Request $request)
     {
         $data = $request->all();
+        if(isset($data['male'])){
+            $data['male'] = (int) $data['male'];
+        }
+        else{
+            $data['male'] = 0;
+        }
+        if(isset($data['female'])){
+            $data['female'] = (int) $data['female'];
+        }
+        else{
+            $data['female'] = 0;
+        }
+        if(isset($data['child'])){
+            $data['child'] = (int) $data['child'];
+        }
+        else{
+            $data['child'] = 0;
+        }
+
         $data['created_by'] = 1;
         $invoice = $this->invoiceRepo->createData($data);
         $data['start_date'] = currentTime();

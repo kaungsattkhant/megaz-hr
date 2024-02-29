@@ -36,6 +36,7 @@ class CustomerRepository implements CustomerRepositoryInterface
     public function createData(array $data)
     {
         $customer = Customer::create($data);
+
         return $customer;
     }
 

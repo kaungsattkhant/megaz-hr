@@ -3,16 +3,6 @@
 
         <div class="">
             <div class="w-[67%] pt-9 px-6">
-                <div class="relative">
-                                    <select name="" id="" v-model="selectedCustomer"
-                                        class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
-                                        <option :value="customer.id" v-for="(customer, customerIndex) in customerList" :key="customerIndex" > {{ customer.name }} </option>
-                                    </select>
-                                    <button class="absolute -right-6 transition duration-150 ease-in-out focus:outline-none focus:ring-0"
-                                        data-te-toggle="modal" data-te-target="#create_customer_modal">
-                                        +
-                                    </button>
-                                </div>
                 <ul
                     class="mb-5 flex list-none flex-row flex-wrap border-b-0 pl-0"
                     role="tablist"
@@ -144,7 +134,8 @@
                                     Order Id 1001
                                 </p>
                                 <p class="text-sm text-black font-semibold">
-                                    35,000 MMks
+                                    <!-- 35,000 MMks -->
+                                    {{ value.toLocaleString() }} MMKs
                                 </p>
                             </div>
                             <div class="mb-2">
@@ -157,7 +148,7 @@
                                     Start Time : 9:00 AM Feb 5 2024
                                 </p>
                                 <p class="text-sm text-black">
-                                    Start Time : 9:00 AM Feb 5 2024
+                                    End Time : {{ currentTime }}
                                 </p>
                             </div>
                         </div>
@@ -378,7 +369,7 @@
                                     Open Room {{ selectedRoom }}
                                 </p>
                                 <p class="mb-4 text-black font-semibold">
-                                    Price : 35,000 MMKs
+                                    Price : {{ value.toLocaleString() }} MMKs
                                 </p>
                             </div>
                             <img class="w-[60%] mx-auto mb-6" src="../../../../../public/img/Video_light.png" alt="">
@@ -398,7 +389,7 @@
                                 <div class="relative">
                                     <select name="" id="" v-model="selectedCustomer"
                                         class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
-                                        <option :value="customer.id" v-for="(customer, customerIndex) in customerList" :key="customerIndex" > {{ customer.name }} </option>
+                                        <option :value="customer" v-for="(customer, customerIndex) in customerList" :key="customerIndex" > {{ customer.name }} </option>
                                     </select>
                                     <button class="absolute -right-6 transition duration-150 ease-in-out focus:outline-none focus:ring-0"
                                         data-te-toggle="modal" data-te-target="#create_customer_modal">
@@ -410,7 +401,7 @@
                                 <label for="" class="block text-sm text-black mb-3">
                                     Deposit
                                 </label>
-                                <input type="text" placeholder="Diposit"
+                                <input type="text" placeholder="Deposit"
                                     class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
                             </div>
                             <div class="mb-4">
@@ -424,21 +415,21 @@
                                 <label for="" class="block text-sm text-black mb-3">
                                     Male
                                 </label>
-                                <input type="text" placeholder="Male" v-model="male"
+                                <input type="number" placeholder="Male" v-model="male"
                                     class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
                             </div>
                             <div class="mb-4">
                                 <label for="" class="block text-sm text-black mb-3">
                                     Female
                                 </label>
-                                <input type="text" placeholder="Female" v-model="female"
+                                <input type="number" placeholder="Female" v-model="female"
                                     class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
                             </div>
                             <div class="mb-8">
                                 <label for="" class="block text-sm text-black mb-3">
                                     Child
                                 </label>
-                                <input type="text" placeholder="Child" v-model="child"
+                                <input type="number" placeholder="Child" v-model="child"
                                     class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
                             </div>
                             <button @click="confirmRoomBtnClicked()" class="bg-[#55EFC4] text-black text-center text-sm font-semibold w-full py-3">
@@ -676,6 +667,7 @@
 <script>
     import { Modal, Ripple, Select, initTE, Tab } from "tw-elements";
     import { getApiData, postApiData, deleteApiData } from '../../../utilities/ajax-helpers';
+    import { getCurrentTime, getCurretDateTime } from '../../../utilities/datetime-helpers';
 
     export default {
         data() {
@@ -688,6 +680,7 @@
                     step_detail : false,
                     step_invoice : false
                 },
+                value: 49650,
                 name: null,
                 ph_number:null,
                 email:null,
@@ -702,8 +695,9 @@
                 invoice_id:2,
                 male:null,
                 female:null,
-                child:null
+                child:null,
 
+                currentTime: getCurretDateTime(),
             };
         },
 
@@ -762,23 +756,29 @@
             },
             async createCustomer()
             {
+                console.log(this.email);
+                // return 1;
                 let formData = new FormData();
                 formData.append('gender_id', this.selectedGender);
                 formData.append('name', this.name);
-                formData.append('email', this.email);
+                if(this.email != null){
+                    formData.append('email', this.email);
+                }
                 formData.append('phone_number', this.ph_number);
                 formData.append('address', this.address);
                 formData.append('birthdate', this.date);
                 let response = await postApiData({url: '/api/customers', form_data: formData});
                 console.log(this.selectedGender+','+this.name+','+this.email+','+this.ph_number+','+this.address+','+this.date)
                 if(response.success){
-                    this.getRoomList(null);
+                    this.customerList.push(response.data);
+                    this.selectedCustomer = response.data;
+                    // this.getRoomList(null);
                     console.log("success")
                     this.closeModal();
                     this.clearCustomerForm();
                 }
                 else{
-                    alert('some errors occur');
+                    console.log('some errors occur');
                 }
             },
 
@@ -790,18 +790,24 @@
                 let formData = new FormData();
                 // formData.append('invoice_id', this.invoice_id);
                 formData.append('entity_id', this.selectedRoom);
-                formData.append('customer_id', this.selectedCustomer);
+                formData.append('customer_id', this.selectedCustomer.id);
                 formData.append('invoice_date', this.invoice_date);
-                formData.append('female', this.female);
-                formData.append('male', this.male);
-                formData.append('child', this.child);
+                if(this.female > 0){
+                    formData.append('female', +this.female);
+                }
+                if(this.male > 0){
+                    formData.append('male', +this.male);
+                }
+                if(this.child > 0){
+                    formData.append('child', +this.child);
+                }
                 let response = await postApiData({url: '/api/rooms/start', form_data: formData});
                 if(response.success){
                     this.getRoomList();
                     console.log("success")
                 }
                 else{
-                    alert('some errors occur');
+                    console.log('some errors occur');
                 }
             },
             btnClickedDoneSession(){
