@@ -44,7 +44,6 @@ class InventoryRepository implements InventoryRepositoryInterface
 
     public function updateData(array $data, int $id)
     {
-
         $inventory = Inventory::find($id);
         if($inventory)
         {

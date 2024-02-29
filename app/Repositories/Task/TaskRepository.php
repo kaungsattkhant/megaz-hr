@@ -91,7 +91,6 @@ class TaskRepository implements TaskRepositoryInterface
     public function getTasksByStaff(int $id)
     {
         $tasks = Task::where('completed_by', $id)->where('is_active', 1)->get();
-
         return $tasks;
     }
 }

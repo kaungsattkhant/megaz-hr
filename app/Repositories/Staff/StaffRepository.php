@@ -47,7 +47,6 @@ class StaffRepository implements StaffRepositoryInterface
 
     public function updateData(array $data,int $id)
     {
-
         $staff = Staff::find($id);
         if ($staff) {
 
