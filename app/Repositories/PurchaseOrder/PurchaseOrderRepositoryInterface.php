@@ -18,4 +18,5 @@ interface PurchaseOrderRepositoryInterface
 
     public function detail($model);
 
+    public function deletePurchaseOrderItem($id);
 }

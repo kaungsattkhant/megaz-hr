@@ -145,7 +145,6 @@ Route::controller(PurchaseOrderAPIController::class)->group(function(){
     Route::get('/purchase_orders_items','getPurchaseOrderItem');
     Route::post('/purchase_orders_items','createPurchaseOrderItem');
 
-    Route::put('/purchase_orders_items/{id}','updatePurchaseOrderItem');
     Route::delete('/purchase_orders_items/{id}','deletePurchaseOrderItem');
 });
 

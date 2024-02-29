@@ -10,9 +10,10 @@ use Illuminate\Support\Facades\DB;
 
 class PurchaseOrderRepository implements PurchaseOrderRepositoryInterface
 {
-    private $select=['po_id','total_price','created_by','manager_check_id','manager_check_time','financial_check_id','financial_check_time','is_md_check','status','created_at','updated_at'];
+    private $select = ['po_id', 'total_price', 'created_by', 'manager_check_id', 'manager_check_time', 'financial_check_id', 'financial_check_time', 'is_md_check', 'status', 'created_at', 'updated_at'];
     public function listAllData(Request $request)
     {
+        // dd(auth('sanctum')->user());
         // if($request->per_page || $request->page){
         //     $totalCount = PurchaseOrder::count();
         //     $pageNumber = 1;
@@ -40,10 +41,11 @@ class PurchaseOrderRepository implements PurchaseOrderRepositoryInterface
         $purchaseOrders = PurchaseOrder::with(['items.item'])
             ->orderBy('id', 'desc')
             ->paginate(20);
-            return $purchaseOrders;
+        return $purchaseOrders;
     }
     public function createOrUpdate($request)
     {
+
         // $purchaseOrder = PurchaseOrder::create($purchaseOrder);
         // foreach ($purchaseOrderItems as $poItem) {
         //     $poItem['purchase_order_id'] = $purchaseOrder->id; // Assign purchase_order_id to each purchase order item
@@ -68,12 +70,17 @@ class PurchaseOrderRepository implements PurchaseOrderRepositoryInterface
                 $data
             );
             foreach ($items as $item) {
-                $poItem =  $po->items()->create([
-                    'quantity' => $item->quantity,
-                    'purchase_order_id' => $po->id,
-                    'item_id' => $item->item_id,
-                    'amount' => $item->amount,
-                ]);
+                // if (!isset($item->id) || $item->id==null) {
+                if (isset($item->id) && $item->id !== null) {
+                    $item_data['id'] = $item->id;
+                } else {
+                    $item_data['id'] = null;
+                }
+                $item_data['quantity'] = $item->quantity;
+                $item_data['purchase_order_id'] = $po->id;
+                $item_data['item_id'] = $item->item_id;
+                $item_data['amount'] = $item->amount;
+                $po->items()->updateOrCreate(['id' => $item_data['id']], $item_data);
             }
             DB::commit();
             return $po;
@@ -105,8 +112,9 @@ class PurchaseOrderRepository implements PurchaseOrderRepositoryInterface
         }
     }
 
-    public function detail($purchaseOrder){
-        $purchaseOrder->items=$purchaseOrder->items;
+    public function detail($purchaseOrder)
+    {
+        $purchaseOrder->items = $purchaseOrder->items;
         return $purchaseOrder;
     }
 
@@ -126,5 +134,16 @@ class PurchaseOrderRepository implements PurchaseOrderRepositoryInterface
             }
         }
         return $purchaseOrder;
+    }
+
+    public function deletePurchaseOrderItem($id)
+    {
+        $po_item = PurchaseOrderItem::find($id);
+        if ($po_item) {
+            $po_item->delete();
+            ResponseMessage("Delete successfully",200);
+        } else {
+            ResponseMessage("Data isn't found ", 404);
+        }
     }
 }

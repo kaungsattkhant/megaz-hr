@@ -234,3 +234,11 @@ if(!function_exists('RemoveNullValues')){
         return $cleanedArray;
     }
 }
+
+if (!function_exists('UserData')) {
+    function UserData()
+    {
+        //return  auth('api')->user();
+        return  auth('sanctum')->user();
+    }
+}
