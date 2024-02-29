@@ -39,7 +39,7 @@
                             </label>
                             <select name="" id="" v-model="selectedGender"
                                 class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
-                                <option :value="gender.id" v-for="(gender, departmentIndex) in genderList" :key="departmentIndex" > {{ gender.name }} </option>
+                                <option :value="gender.id" v-for="(gender, genderIndex) in genderList" :key="genderIndex" > {{ gender.name }} </option>
                             </select>
                         </div>
                         <div class="mb-4">

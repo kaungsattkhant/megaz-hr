@@ -26,6 +26,7 @@ import ComplainsCrudComponent from './Components/Complains/ComplainsCrudComponen
 
 import CustomersListComponent from './Components/Pos/Customers/CustomersListComponent.vue';
 import CustomersCreateComponent from './Components/Pos/Customers/CustomersCreateComponent.vue';
+import HomePageComponent from './Components/Pos/Home/HomePageComponent.vue';
 
 const app = createApp({});
 app.component('StaffListComponent', StaffListComponent);
@@ -44,5 +45,6 @@ app.component('ComplainsCrudComponent', ComplainsCrudComponent);
 
 app.component('CustomersListComponent', CustomersListComponent);
 app.component('CustomersCreateComponent', CustomersCreateComponent);
+app.component('HomePageComponent', HomePageComponent);
 
 app.mount('#app');
