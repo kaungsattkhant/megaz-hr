@@ -788,7 +788,7 @@
             async createRoom()
             {
                 let formData = new FormData();
-                formData.append('invoice_id', this.invoice_id);
+                // formData.append('invoice_id', this.invoice_id);
                 formData.append('entity_id', this.selectedRoom);
                 formData.append('customer_id', this.selectedCustomer);
                 formData.append('invoice_date', this.invoice_date);
