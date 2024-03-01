@@ -134,7 +134,7 @@ Route::put('/items/{id}',[ItemAPIController::class,'updateItem']);
 Route::delete('/items/{id}',[ItemAPIController::class,'deleteItem']);
 
 Route::controller(PurchaseOrderAPIController::class)->group(function(){
-    
+
     Route::get('/purchase_orders','getPurchaseOrder');
     Route::post('/purchase_orders','createPurchaseOrder');
     // below the route perform update, and kitchen data update and financial update and it depends on condition,
