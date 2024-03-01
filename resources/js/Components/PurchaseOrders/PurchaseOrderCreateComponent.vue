@@ -102,6 +102,7 @@
 <script>
     import { getApiData, postApiData } from '../../utilities/ajax-helpers';
     import { getCurrentDate } from '../../utilities/datetime-helpers';
+    import { mapGetters } from "vuex";
 
     export default {
         data() {
@@ -115,8 +116,10 @@
         },
 
         methods: {
+            ...mapGetters(['getToken']),
+
             async getItemList(){
-                let response = await getApiData({url: `/api/items`});
+                let response = await getApiData({url: `/api/items`, token: this.getToken()});
                 if(response.data){
                     this.itemList = response.data;
                 }

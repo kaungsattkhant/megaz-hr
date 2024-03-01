@@ -668,6 +668,7 @@
     import { Modal, Ripple, Select, initTE, Tab } from "tw-elements";
     import { getApiData, postApiData, deleteApiData } from '../../../utilities/ajax-helpers';
     import { getCurrentTime, getCurretDateTime } from '../../../utilities/datetime-helpers';
+    import { mapGetters } from "vuex";
 
     export default {
         data() {
@@ -702,14 +703,16 @@
         },
 
         methods: {
+            ...mapGetters(['getToken']),
+
             async getGendersList(){
-                const response = await getApiData({ url: '/api/genders' });
+                const response = await getApiData({ url: '/api/genders', token: this.getToken() });
                 if(response.data){
                     this.genderList = response.data;
                 }
             },
             async getRoomList(){
-                const response = await getApiData({ url: '/api/rooms' });
+                const response = await getApiData({ url: '/api/rooms', token: this.getToken() });
                 if(response.data){
                     this.roomList = response.data;
                     if(this.roomList[0].invoices.length>0){
@@ -725,7 +728,7 @@
                 }
             },
             async getCustomerList(){
-                const response = await getApiData({ url: '/api/customers' });
+                const response = await getApiData({ url: '/api/customers', token: this.getToken() });
                 if(response.data){
                     this.customerList = response.data;
                 }

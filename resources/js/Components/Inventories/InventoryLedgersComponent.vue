@@ -161,6 +161,7 @@
 <script>
     import { Modal, Ripple, Select, initTE, Input } from "tw-elements";
     import { getApiData, postApiData, deleteApiData } from '../../utilities/ajax-helpers';
+    import { mapGetters } from "vuex";
 
     export default {
         data() {
@@ -179,8 +180,10 @@
         props:['inventory_id'],
 
         methods: {
+            ...mapGetters(['getToken']),
+
             async getInventoryLegderList(){
-                const response = await getApiData({ url: '/api/inventories/'+this.inventory_id+'/ledgers' });
+                const response = await getApiData({ url: '/api/inventories/'+this.inventory_id+'/ledgers', token: this.getToken() });
                 if(response.data){
                     this.inventoryLegderList = response.data;
                     // calculate opening, incoming, outgoing and balance
@@ -209,7 +212,7 @@
                 }
             },
             async getInventoryList(){
-                const response = await getApiData({ url: '/api/inventories'});
+                const response = await getApiData({ url: '/api/inventories', token: this.getToken()});
                 if(response.data){
                     this.inventoryList = response.data;
                 }

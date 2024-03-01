@@ -207,6 +207,7 @@
 <script>
     import { Modal, Ripple, Select, initTE, Input } from "tw-elements";
     import { getApiData, postApiData, deleteApiData } from '../../utilities/ajax-helpers';
+    import { mapGetters } from "vuex";
 
     export default {
         data() {
@@ -231,15 +232,17 @@
         },
 
         methods: {
+            ...mapGetters(['getToken']),
+
             async getAreasList(){
-                const response = await getApiData({ url: '/api/areas' });
+                const response = await getApiData({ url: '/api/areas', token: this.getToken() });
                 if(response.data){
                     this.areaList = response.data;
                 }
             },
 
             async getTypeList(){
-                const response = await getApiData({ url: '/api/area_types' });
+                const response = await getApiData({ url: '/api/area_types' , token: this.getToken()});
                 if(response.data){
                     this.typeList = response.data;
                 }

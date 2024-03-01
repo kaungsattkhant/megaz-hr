@@ -240,8 +240,10 @@
 </template>
 
 <script>
+    import { mapGetters } from "vuex";
     import { Modal, Ripple, Select, initTE, Input } from "tw-elements";
     import { getApiData, postApiData, deleteApiData } from '../../utilities/ajax-helpers';
+
 
     export default {
         data() {
@@ -256,7 +258,7 @@
                 selectedRole: null,
                 dayList: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'],
                 selectedDays: [],
-                
+
 
                 per_page: 10,
                 pageNumbers: [],
@@ -269,26 +271,28 @@
         },
 
         methods: {
+            ...mapGetters(['getToken']),
+
             async getTasksList(pageNumber){
                 let url = `/api/tasks?per_page=${this.per_page}`;
                 if(pageNumber){
                     url = `${url}&page=${pageNumber}`
                 }
-                let response = await getApiData({ url: url });
+                let response = await getApiData({ url: url, token: this.getToken() });
                 if(response.data){
                     this.tasksList = response.data.tasks;
                 }
             },
 
             async getAreaList(){
-                const response = await getApiData({ url: '/api/areas' });
+                const response = await getApiData({ url: '/api/areas' , token: this.getToken()});
                 if(response.data){
                     this.areaList = response.data;
                 }
             },
 
             async getRoleList(){
-                const response = await getApiData({ url: '/api/roles' });
+                const response = await getApiData({ url: '/api/roles', token: this.getToken() });
                 if(response.data){
                     this.roleList = response.data;
                 }

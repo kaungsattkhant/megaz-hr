@@ -223,6 +223,7 @@
 <script>
     import { Modal, Ripple, Select, initTE, Input } from "tw-elements";
     import { getApiData, postApiData, deleteApiData } from '../../utilities/ajax-helpers';
+    import { mapGetters } from "vuex";
 
     export default {
         data() {
@@ -250,8 +251,10 @@
         },
 
         methods: {
+            ...mapGetters(['getToken']),
+
             async getRoomAndTableList(){
-                const response = await getApiData({ url: '/api/entities?type=room_and_table' });
+                const response = await getApiData({ url: '/api/entities?type=room_and_table', token: this.getToken() });
                 if(response.data){
                     this.roomAndTableList = response.data;
                     console.log(this.roomAndTableList)
@@ -259,14 +262,14 @@
             },
 
             async getAreaList(){
-                const response = await getApiData({ url: '/api/areas' });
+                const response = await getApiData({ url: '/api/areas', token: this.getToken() });
                 if(response.data){
                     this.areaList = response.data;
                     console.log(this.areaList)
                 }
             },
             async getServiceCategoryList(){
-                const response = await getApiData({ url: '/api/service_categories' });
+                const response = await getApiData({ url: '/api/service_categories', token: this.getToken() });
                 if(response.data){
                     this.serviceCategoryList = response.data;
                 }

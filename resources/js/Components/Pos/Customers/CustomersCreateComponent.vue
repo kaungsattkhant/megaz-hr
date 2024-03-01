@@ -1,9 +1,9 @@
 <template>
     <div>
-        
+
         <div class="">
             <div class="w-full pt-9 px-6">
-                
+
                 <div class="bg-white rounded w-2/4 mx-auto">
                     <div class="relative  p-4">
                         <p class="text-xl w-full text-center">
@@ -56,7 +56,7 @@
                             <textarea v-model="address" class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0"
                                  name="" id="" cols="30" rows="10"></textarea>
                         </div>
-                        
+
                     </div>
 
                     <div class="flex justify-center px-12 pb-8">
@@ -66,20 +66,21 @@
                     </div>
                 </div>
             </div>
-            
+
         </div>
 
 
-        
-        
 
-        
+
+
+
 
     </div>
 </template>
 <script>
 import { Modal, Ripple, Select, Datepicker, initTE, Input } from "tw-elements";
     import { getApiData, postApiData, deleteApiData } from '../../../utilities/ajax-helpers';
+    import { mapGetters } from "vuex";
 
     export default {
         data() {
@@ -97,8 +98,10 @@ import { Modal, Ripple, Select, Datepicker, initTE, Input } from "tw-elements";
         },
 
         methods: {
+            ...mapGetters(['getToken']),
+
             async getGendersList(){
-                const response = await getApiData({ url: '/api/genders' });
+                const response = await getApiData({ url: '/api/genders', token: this.getToken() });
                 if(response.data){
                     this.genderList = response.data;
                 }

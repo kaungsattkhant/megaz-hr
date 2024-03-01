@@ -194,6 +194,7 @@
 <script>
     import { Modal, Ripple, Select, initTE, Input } from "tw-elements";
     import { getApiData, postApiData, deleteApiData } from '../../utilities/ajax-helpers';
+    import { mapGetters } from "vuex";
 
     export default {
         data() {
@@ -216,8 +217,10 @@
         },
 
         methods: {
+            ...mapGetters(['getToken']),
+
             async getDepartmentList(){
-                const response = await getApiData({ url: '/api/departments' });
+                const response = await getApiData({ url: '/api/departments', token: this.getToken() });
                 if(response.data){
                     this.departmentList = response.data;
                 }

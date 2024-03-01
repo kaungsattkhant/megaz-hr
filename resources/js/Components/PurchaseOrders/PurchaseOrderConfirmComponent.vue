@@ -206,6 +206,7 @@
 <script>
     import { Modal, initTE } from "tw-elements";
     import { getApiData, postApiData, deleteApiData } from '../../utilities/ajax-helpers';
+    import { mapGetters } from "vuex";
 
     export default {
         props: ['purchaseOrderId'],
@@ -226,15 +227,17 @@
         },
 
         methods: {
+            ...mapGetters(['getToken']),
+
             async getItemList(){
-                let response = await getApiData({url: `/api/items`});
+                let response = await getApiData({url: `/api/items`, token: this.getToken()});
                 if(response.data){
                     this.itemList = response.data;
                 }
             },
 
             async getPurchaseOrder(){
-                let response = await getApiData({url: `/api/purchase_orders/${this.purchaseOrderId}`});
+                let response = await getApiData({url: `/api/purchase_orders/${this.purchaseOrderId}`, token: this.getToken()});
                 if(response.data){
                     this.purchaseOrder = response.data;
                     this.date = this.purchaseOrder.date;

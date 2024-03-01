@@ -147,6 +147,7 @@
 <script>
 import { Modal, Ripple, Select, Datepicker, initTE, Input } from "tw-elements";
     import { getApiData, postApiData, deleteApiData } from '../../../utilities/ajax-helpers';
+    import { mapGetters } from "vuex";
 
     export default {
         data() {
@@ -157,8 +158,10 @@ import { Modal, Ripple, Select, Datepicker, initTE, Input } from "tw-elements";
         },
 
         methods: {
+            ...mapGetters(['getToken']),
+
             async getCustomersList(){
-                const response = await getApiData({ url: '/api/customers' });
+                const response = await getApiData({ url: '/api/customers' , token: this.getToken()});
                 if(response.data){
                     this.customerList = response.data;
                 }

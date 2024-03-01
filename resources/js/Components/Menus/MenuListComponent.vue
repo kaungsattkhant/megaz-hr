@@ -139,6 +139,7 @@
 <script>
     import { Modal, Ripple, initTE, Input } from "tw-elements";
     import { getApiData, deleteApiData } from '../../utilities/ajax-helpers';
+    import { mapGetters } from "vuex";
 
     export default {
         data() {
@@ -149,8 +150,10 @@
         },
 
         methods: {
+            ...mapGetters(['getToken']),
+
             async getMenuList(){
-                let response = await getApiData({url: `/api/menus`});
+                let response = await getApiData({url: `/api/menus`, token: this.getToken()});
                 if(response.data){
                     this.menuList = response.data;
                 }
