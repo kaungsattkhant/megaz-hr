@@ -82,3 +82,10 @@ if(!function_exists('ResponseEmpty')){
         return response()->noContent($status_code, $common_headers);
     }
 }
+
+
+// if(!function_exists('ResponseStatus')){
+//     function Respons($message,$status){
+//         return responseData('message',$message,$status);
+//     }
+// }

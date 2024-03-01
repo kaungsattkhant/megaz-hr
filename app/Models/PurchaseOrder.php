@@ -8,6 +8,7 @@ use App\Models\InventoryLedger;
 use App\Models\PurchaseOrderItem;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Laravel\Sanctum\HasApiTokens;
 
 class PurchaseOrder extends BaseModel
 {

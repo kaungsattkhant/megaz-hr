@@ -8,6 +8,7 @@ use App\Models\Category;
 use Faker\Factory as Faker;
 use Illuminate\Http\Request;
 use App\Models\PurchaseOrder;
+use App\Models\PurchaseOrderItem;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\PurchaseOrder\PurchaseOrderCreateRequest;
@@ -62,5 +63,15 @@ class PurchaseOrderAPIController extends Controller
         }else{
             ResponseMessage('Purchase Order not found or some error occur');
         }
+    }
+
+    public function deletePurchaseOrderItem($id){
+        $purchase_order_item= $this->purchaseOrderRepo->deletePurchaseOrderItem($id);
+        // ResponseMessage('Item delete successfully',200);
+    }
+
+    public function updateIsCheck(Request $request){
+        
+        $purchase_order_item= $this->purchaseOrderRepo->updateIsCheck($request);
     }
 }

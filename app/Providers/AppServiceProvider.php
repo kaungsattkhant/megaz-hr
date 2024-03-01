@@ -26,6 +26,7 @@ class AppServiceProvider extends ServiceProvider
             'area' => 'App\Models\Area',
             'purchase_order' => 'App\Models\PurchaseOrder',
             'staff' => 'App\Models\Staff',
+            'purchase_order_item'=>'App\Models\PurchaseOrderItem',
         ]);
     }
 }

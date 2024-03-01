@@ -1,16 +1,17 @@
 <?php
 
-use Illuminate\Database\Eloquent\Collection as EloquentCollection;
-use Illuminate\Database\Query\Builder;
+use GuzzleHttp\Client;
 use Illuminate\Http\Request;
-use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;
+use Illuminate\Database\Query\Builder;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Storage;
-
 use Psr\Http\Message\ResponseInterface;
 
-use GuzzleHttp\Client;
+use Illuminate\Pagination\LengthAwarePaginator;
+
+use Illuminate\Database\Eloquent\Relations\Relation;
+use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 
 if(!function_exists('CurrentTime')){
     function CurrentTime(): string {
@@ -232,5 +233,20 @@ if(!function_exists('RemoveNullValues')){
         $cleanedArray = array_filter($arrayWithNullValues, fn($value) => !is_null($value) && $value !== '');
 
         return $cleanedArray;
+    }
+}
+
+if (!function_exists('UserData')) {
+    function UserData()
+    {
+        //return  auth('api')->user();
+        return  auth('sanctum')->user();
+    }
+}
+
+if (!function_exists('Model')) {
+    function Model($model)
+    {
+        return Relation::getMorphedModel($model);
     }
 }

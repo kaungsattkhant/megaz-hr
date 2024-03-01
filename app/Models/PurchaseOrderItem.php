@@ -3,12 +3,13 @@
 namespace App\Models;
 
 use App\Models\Item;
+use Laravel\Sanctum\HasApiTokens;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class PurchaseOrderItem extends BaseModel
 {
-    use HasFactory;
+    use HasApiTokens,HasFactory;
 
     protected $with=['item'];
     protected $fillable=[
