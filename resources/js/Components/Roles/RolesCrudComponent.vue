@@ -201,6 +201,7 @@
 <script>
     import { Modal, Ripple, Select, initTE, Input } from "tw-elements";
     import { getApiData, postApiData, deleteApiData } from '../../utilities/ajax-helpers';
+    import { mapGetters } from "vuex";
 
     export default {
         data() {
@@ -225,15 +226,17 @@
         },
 
         methods: {
+            ...mapGetters(['getToken']),
+
             async getDepartmentList(){
-                const response = await getApiData({ url: '/api/departments' });
+                const response = await getApiData({ url: '/api/departments', token: this.getToken() });
                 if(response.data){
                     this.departmentList = response.data;
                 }
             },
 
             async getRolesList(){
-                const response = await getApiData({ url: '/api/roles' });
+                const response = await getApiData({ url: '/api/roles', token: this.getToken() });
                 if(response.data){
                     this.roleList = response.data;
                 }
@@ -249,7 +252,7 @@
                 let formData = new FormData();
                 formData.append('name', this.name);
                 formData.append('department_id', this.selectedDepartment);
-                let response = await postApiData({url: '/api/roles', form_data: formData});
+                let response = await postApiData({url: '/api/roles', form_data: formData, token: this.getToken()});
                 if(response.success){
                     this.getRolesList(null);
                     console.log("success")
@@ -265,7 +268,7 @@
 
             async confirmDeleteBtnClicked(){
                 let url = `/api/roles/${this.deleteId}`;
-                let response = await deleteApiData({url: url});
+                let response = await deleteApiData({url: url, token: this.getToken()});
                 if(response.success){
                     alert(`deleted`);
                 }

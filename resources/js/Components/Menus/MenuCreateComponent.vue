@@ -321,6 +321,7 @@
 <script>
     import { Modal, Ripple, initTE, Input, Tab, Select } from "tw-elements";
     import { getApiData, postApiData, deleteApiData } from '../../utilities/ajax-helpers';
+    import { mapGetters } from "vuex";
 
     export default {
         data() {
@@ -344,22 +345,24 @@
         },
 
         methods: {
+            ...mapGetters(['getToken']),
+
             async getMenuCategoryList(){
-                let response = await getApiData({url: `/api/menu_categories`});
+                let response = await getApiData({url: `/api/menu_categories`, token: this.getToken()});
                 if(response.data){
                     this.menuCategoryList = response.data;
                 }
             },
 
             async getItemCategoryList(){
-                let response = await getApiData({url: `/api/categories`});
+                let response = await getApiData({url: `/api/categories`, token: this.getToken()});
                 if(response.data){
                     this.itemCategoryList = response.data;
                 }
             },
 
             async itemCategorySelectChanged(){
-                let response = await getApiData({url: `/api/items?category_id=${this.selectedItemCategory.id}`});
+                let response = await getApiData({url: `/api/items?category_id=${this.selectedItemCategory.id}`, token: this.getToken()});
                 if(response.data){
                     this.itemList = response.data;
                 }
@@ -403,7 +406,7 @@
                     formData.append('price', this.price);
                     formData.append('items', menuItems);
 
-                    let response = await postApiData({url: `/api/menus`, form_data: formData});
+                    let response = await postApiData({url: `/api/menus`, form_data: formData, token: this.getToken()});
 
                     if(response.success){
                         window.location.replace(`/menus`);

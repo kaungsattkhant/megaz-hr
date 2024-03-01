@@ -111,7 +111,7 @@
 
                     </div>
                     <div class="flex justify-center px-12 mb-6">
-                        <button type="button" @click="createAreasBtnClicked"
+                        <button data-te-modal-dismiss type="button" @click="createAreasBtnClicked"
                         class="add-btn focus:outline-none focus:ring-0 ">
                             Create
                         </button>
@@ -207,6 +207,7 @@
 <script>
     import { Modal, Ripple, Select, initTE, Input } from "tw-elements";
     import { getApiData, postApiData, deleteApiData } from '../../utilities/ajax-helpers';
+    import { mapGetters } from "vuex";
 
     export default {
         data() {
@@ -231,15 +232,17 @@
         },
 
         methods: {
+            ...mapGetters(['getToken']),
+
             async getAreasList(){
-                const response = await getApiData({ url: '/api/areas' });
+                const response = await getApiData({ url: '/api/areas', token: this.getToken() });
                 if(response.data){
                     this.areaList = response.data;
                 }
             },
 
             async getTypeList(){
-                const response = await getApiData({ url: '/api/area_types' });
+                const response = await getApiData({ url: '/api/area_types' , token: this.getToken()});
                 if(response.data){
                     this.typeList = response.data;
                 }
@@ -255,7 +258,7 @@
                 let formData = new FormData();
                 formData.append('name', this.name);
                 formData.append('area_type_id', this.selectedType);
-                let response = await postApiData({url: '/api/areas', form_data: formData});
+                let response = await postApiData({url: '/api/areas', form_data: formData, token: this.getToken()});
                 if(response.success){
                     this.getAreasList(null);
                     console.log("success")
@@ -271,7 +274,7 @@
 
             async confirmDeleteBtnClicked(){
                 let url = `/api/areas/${this.deleteId}`;
-                let response = await deleteApiData({url: url});
+                let response = await deleteApiData({url: url, token: this.getToken()});
                 if(response.success){
                     this.getAreasList(null);
                     console.log(`deleted`);

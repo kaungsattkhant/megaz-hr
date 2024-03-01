@@ -206,6 +206,7 @@
 <script>
     import { Modal, initTE } from "tw-elements";
     import { getApiData, postApiData, deleteApiData } from '../../utilities/ajax-helpers';
+    import { mapGetters } from "vuex";
 
     export default {
         props: ['purchaseOrderId'],
@@ -226,15 +227,17 @@
         },
 
         methods: {
+            ...mapGetters(['getToken']),
+
             async getItemList(){
-                let response = await getApiData({url: `/api/items`});
+                let response = await getApiData({url: `/api/items`, token: this.getToken()});
                 if(response.data){
                     this.itemList = response.data;
                 }
             },
 
             async getPurchaseOrder(){
-                let response = await getApiData({url: `/api/purchase_orders/${this.purchaseOrderId}`});
+                let response = await getApiData({url: `/api/purchase_orders/${this.purchaseOrderId}`, token: this.getToken()});
                 if(response.data){
                     this.purchaseOrder = response.data;
                     this.date = this.purchaseOrder.date;
@@ -278,7 +281,7 @@
             async confirmRemovePurchaseOrderItemBtnClicked(){
                 if(this.deleteId){
                     let url = `/api/purchase_orders_items/${this.deleteId}`;
-                    let response = await deleteApiData({url: url});
+                    let response = await deleteApiData({url: url, token: this.getToken()});
                     if(response.success){
                         this.purchaseOrderItems.splice(this.deleteIndex, 1);
                     }
@@ -332,7 +335,7 @@
                 formData.append('date', this.date);
                 formData.append('total_price', priceTotal);
                 formData.append('items', JSON.stringify(updatedPurchaseOrderItems));
-                let response = await postApiData({url: `/api/purchase_orders`, form_data:  formData});
+                let response = await postApiData({url: `/api/purchase_orders`, form_data:  formData, token: this.getToken()});
                 alert(`Operation success ${response.success}`);
             },
 

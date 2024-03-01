@@ -212,6 +212,7 @@
 <script>
     import { Modal, Ripple, initTE, Input, Select } from "tw-elements";
     import { getApiData, postApiData, deleteApiData } from '../../utilities/ajax-helpers';
+    import { mapGetters } from "vuex";
 
     export default {
         data() {
@@ -234,29 +235,31 @@
         },
 
         methods: {
+            ...mapGetters(['getToken']),
+
             async getGenderList(){
-                const response = await getApiData({ url: '/api/genders' });
+                const response = await getApiData({ url: '/api/genders', token: this.getToken() });
                 if(response.data){
                     this.genderList = response.data;
                 }
             },
 
             async getDepartmentList(){
-                const response = await getApiData({ url: '/api/departments' });
+                const response = await getApiData({ url: '/api/departments' , token: this.getToken()});
                 if(response.data){
                     this.departmentList = response.data;
                 }
             },
 
             async departmentSelectChanged(){
-                const response = await getApiData({ url: `/api/roles?department_id=${this.selectedDepartment.id}` });
+                const response = await getApiData({ url: `/api/roles?department_id=${this.selectedDepartment.id}`, token: this.getToken() });
                 if(response.data){
                     this.roleList = response.data;
                 }
             },
 
             async getRoleList(){
-                const response = await getApiData({ url: '/api/roles' });
+                const response = await getApiData({ url: '/api/roles', token: this.getToken() });
                 if(response.data){
                     this.roleList = response.data;
                 }
@@ -295,7 +298,7 @@
                 formData.append('password', this.password);
                 formData.append('roles', this.roleIds);
 
-                let response = await postApiData({url: '/api/staffs', form_data: formData});
+                let response = await postApiData({url: '/api/staffs', form_data: formData, token: this.getToken()});
                 if(response.success){
                     window.location.replace('/staff');
                 }

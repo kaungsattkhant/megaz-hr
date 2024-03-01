@@ -194,6 +194,7 @@
 <script>
     import { Modal, Ripple, Select, initTE, Input } from "tw-elements";
     import { getApiData, postApiData, deleteApiData } from '../../utilities/ajax-helpers';
+    import { mapGetters } from "vuex";
 
     export default {
         data() {
@@ -216,8 +217,10 @@
         },
 
         methods: {
+            ...mapGetters(['getToken']),
+
             async getDepartmentList(){
-                const response = await getApiData({ url: '/api/departments' });
+                const response = await getApiData({ url: '/api/departments', token: this.getToken() });
                 if(response.data){
                     this.departmentList = response.data;
                 }
@@ -236,7 +239,7 @@
             {
                 let formData = new FormData();
                 formData.append('name', this.name);
-                let response = await postApiData({url: '/api/departments', form_data: formData});
+                let response = await postApiData({url: '/api/departments', form_data: formData, token: this.getToken()});
                 if(response.success){
                     // window.location.replace('/tasks');
                     this.getDepartmentList(null);
@@ -254,7 +257,7 @@
             async confirmDeleteBtnClicked(){
                 let url = `/api/departments/${this.deleteId}`;
                 alert(url)
-                let response = await deleteApiData({url: url});
+                let response = await deleteApiData({url: url, token: this.getToken()});
                 if(response.success){
                     alert(`deleted`);
                 }

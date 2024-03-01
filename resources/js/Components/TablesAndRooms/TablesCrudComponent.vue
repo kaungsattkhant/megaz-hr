@@ -223,6 +223,7 @@
 <script>
     import { Modal, Ripple, Select, initTE, Input } from "tw-elements";
     import { getApiData, postApiData, deleteApiData } from '../../utilities/ajax-helpers';
+    import { mapGetters } from "vuex";
 
     export default {
         data() {
@@ -250,8 +251,10 @@
         },
 
         methods: {
+            ...mapGetters(['getToken']),
+
             async getRoomAndTableList(){
-                const response = await getApiData({ url: '/api/entities?type=room_and_table' });
+                const response = await getApiData({ url: '/api/entities?type=room_and_table', token: this.getToken() });
                 if(response.data){
                     this.roomAndTableList = response.data;
                     console.log(this.roomAndTableList)
@@ -259,14 +262,14 @@
             },
 
             async getAreaList(){
-                const response = await getApiData({ url: '/api/areas' });
+                const response = await getApiData({ url: '/api/areas', token: this.getToken() });
                 if(response.data){
                     this.areaList = response.data;
                     console.log(this.areaList)
                 }
             },
             async getServiceCategoryList(){
-                const response = await getApiData({ url: '/api/service_categories' });
+                const response = await getApiData({ url: '/api/service_categories', token: this.getToken() });
                 if(response.data){
                     this.serviceCategoryList = response.data;
                 }
@@ -293,7 +296,7 @@
                 formData.append('entity_type', this.entityType);
                 formData.append('area_id', this.area_id);
                 formData.append('service_category_id', this.service_category_id);
-                let response = await postApiData({url: '/api/entities', form_data: formData});
+                let response = await postApiData({url: '/api/entities', form_data: formData, token: this.getToken()});
                 if(response.success){
                     this.getRoomAndTableList(null);
                     console.log("success")
@@ -322,7 +325,7 @@
 
             async confirmDeleteBtnClicked(){
                 let url = `/api/entities/${this.deleteId}`;
-                let response = await deleteApiData({url: url});
+                let response = await deleteApiData({url: url, token: this.getToken()});
                 if(response.success){
                     this.getRoomAndTableList();
                 }

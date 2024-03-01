@@ -1,6 +1,6 @@
 <template>
     <div>
-        
+
         <div class="">
             <div class="w-[67%] pt-9 px-6">
                 <ul
@@ -36,7 +36,7 @@
                         >Roof Top</a
                         >
                     </li>
-  
+
                 </ul>
 
                 <div class="mb-6">
@@ -76,7 +76,7 @@
                                         </p>
                                     </div>
                                     <div class="absolute bottom-0 w-full flex justify-end">
-                                        
+
                                         <p class="text-2xl text-white">
                                             {{  index+1 }}
                                         </p>
@@ -100,12 +100,12 @@
                         role="tabpanel"
                         aria-labelledby="tabs-profile-tab">
                         Tab 2 content
-                    </div>                    
+                    </div>
                 </div>
             </div>
             <div class="right-sidebar shadow-lg border-l border-gray-200">
                     <!-- secssion right sidebar -->
-                <div v-if="isOpenRoom.step_detail == true" class="relative h-full"> 
+                <div v-if="isOpenRoom.step_detail == true" class="relative h-full">
                     <div class="flex justify-between padding-section border-b">
                         <div>
                                 <p class="text-black text-xl">
@@ -134,7 +134,8 @@
                                     Order Id 1001
                                 </p>
                                 <p class="text-sm text-black font-semibold">
-                                    35,000 MMks
+                                    <!-- 35,000 MMks -->
+                                    {{ value.toLocaleString() }} MMKs
                                 </p>
                             </div>
                             <div class="mb-2">
@@ -147,7 +148,7 @@
                                     Start Time : 9:00 AM Feb 5 2024
                                 </p>
                                 <p class="text-sm text-black">
-                                    Start Time : 9:00 AM Feb 5 2024
+                                    End Time : {{ currentTime }}
                                 </p>
                             </div>
                         </div>
@@ -229,7 +230,7 @@
                             </p>
                         </div>
                         <div class="">
-                            <button @click="btnClickedDoneSession()" class="bg-[#55EFC4] text-black text-center text-sm font-semibold w-full py-3"> 
+                            <button @click="btnClickedDoneSession()" class="bg-[#55EFC4] text-black text-center text-sm font-semibold w-full py-3">
                                 Done Session
                             </button>
                         </div>
@@ -238,7 +239,7 @@
                     <!-- invoice right sidebar -->
                 <div v-if="isOpenRoom.step_invoice == true" class="relative h-full">
                     <div class="flex justify-between padding-section border-b">
-                        <button>   
+                        <button>
                             <i class="far fa-chevron-left"></i>
                          </button>
                         <div>
@@ -256,10 +257,6 @@
                                 <div class="relative">
                                     <input type="text" placeholder="Customer Name"
                                         class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
-                                    <button class="absolute -right-6 transition duration-150 ease-in-out focus:outline-none focus:ring-0"
-                                        data-te-toggle="modal" data-te-target="#create_customer_modal">
-                                        +
-                                    </button>
                                 </div>
                             </div>
                             <div class="mb-4">
@@ -356,7 +353,7 @@
                             </p>
                         </div>
                         <div class="">
-                            <button class="bg-[#55EFC4] text-black text-center text-sm font-semibold w-full py-3"> 
+                            <button class="bg-[#55EFC4] text-black text-center text-sm font-semibold w-full py-3">
                                 Print Invoice
                             </button>
                         </div>
@@ -372,17 +369,17 @@
                                     Open Room {{ selectedRoom }}
                                 </p>
                                 <p class="mb-4 text-black font-semibold">
-                                    Price : 35,000 MMKs
+                                    Price : {{ value.toLocaleString() }} MMKs
                                 </p>
                             </div>
                             <img class="w-[60%] mx-auto mb-6" src="../../../../../public/img/Video_light.png" alt="">
-                            <button  @click="btnClickedOpenRoom" class="bg-[#55EFC4] text-black text-center text-sm font-semibold w-full py-3"> 
+                            <button  @click="btnClickedOpenRoom" class="bg-[#55EFC4] text-black text-center text-sm font-semibold w-full py-3">
                                 Open Room
                             </button>
                         </div>
                     </div>
                 </div>
-                <div class=""  v-if="isOpenRoom.step_2 == true" id="open_room_2">
+                <div class=""  v-show="isOpenRoom.step_2 == true" id="open_room_2">
                     <div class="small-scrollbar overflow-y-auto h-[100vh] pt-8">
                         <div class="padding-section w-2/3 mx-auto ">
                             <div class="mb-4">
@@ -392,7 +389,7 @@
                                 <div class="relative">
                                     <select name="" id="" v-model="selectedCustomer"
                                         class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
-                                        <option :value="customer.id" v-for="(customer, customerIndex) in customerList" :key="customerIndex" > {{ customer.name }} </option>
+                                        <option :value="customer" v-for="(customer, customerIndex) in customerList" :key="customerIndex" > {{ customer.name }} </option>
                                     </select>
                                     <button class="absolute -right-6 transition duration-150 ease-in-out focus:outline-none focus:ring-0"
                                         data-te-toggle="modal" data-te-target="#create_customer_modal">
@@ -404,7 +401,7 @@
                                 <label for="" class="block text-sm text-black mb-3">
                                     Deposit
                                 </label>
-                                <input type="text" placeholder="Diposit"
+                                <input type="text" placeholder="Deposit"
                                     class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
                             </div>
                             <div class="mb-4">
@@ -418,24 +415,24 @@
                                 <label for="" class="block text-sm text-black mb-3">
                                     Male
                                 </label>
-                                <input type="text" placeholder="Male" v-model="male"
+                                <input type="number" placeholder="Male" v-model="male"
                                     class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
                             </div>
                             <div class="mb-4">
                                 <label for="" class="block text-sm text-black mb-3">
                                     Female
                                 </label>
-                                <input type="text" placeholder="Female" v-model="female"
+                                <input type="number" placeholder="Female" v-model="female"
                                     class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
                             </div>
                             <div class="mb-8">
                                 <label for="" class="block text-sm text-black mb-3">
                                     Child
                                 </label>
-                                <input type="text" placeholder="Child" v-model="child"
+                                <input type="number" placeholder="Child" v-model="child"
                                     class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
                             </div>
-                            <button @click="confirmRoomBtnClicked()" class="bg-[#55EFC4] text-black text-center text-sm font-semibold w-full py-3"> 
+                            <button @click="confirmRoomBtnClicked()" class="bg-[#55EFC4] text-black text-center text-sm font-semibold w-full py-3">
                                 Open Room
                             </button>
                         </div>
@@ -573,7 +570,7 @@
                                 <option value="1"> Room</option>
                             </select>
                         </div>
-                        
+
                     </div>
 
                     <div class="flex justify-center px-12 mb-6">
@@ -597,7 +594,7 @@
                         <p class="text-xl w-full text-center">
                             Create Customer
                         </p>
-                        <button type="button" class="absolute top-4 right-4 focus:shadow-none focus:outline-none 
+                        <button type="button" class="absolute top-4 right-4 focus:shadow-none focus:outline-none
                         " id="closeMegaZ"
                             data-te-modal-dismiss aria-label="Close">
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
@@ -652,7 +649,7 @@
                             <textarea v-model="address" class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0"
                                  name="" id="" cols="30" rows="10"></textarea>
                         </div>
-                        
+
                     </div>
 
                     <div class="flex justify-center px-12 mb-6">
@@ -668,8 +665,10 @@
 
 </template>
 <script>
-    import { Modal, Ripple, Select, Datepicker, initTE, Input } from "tw-elements";
+    import { Modal, Ripple, Select, initTE, Tab } from "tw-elements";
     import { getApiData, postApiData, deleteApiData } from '../../../utilities/ajax-helpers';
+    import { getCurrentTime, getCurretDateTime } from '../../../utilities/datetime-helpers';
+    import { mapGetters } from "vuex";
 
     export default {
         data() {
@@ -682,6 +681,7 @@
                     step_detail : false,
                     step_invoice : false
                 },
+                value: 49650,
                 name: null,
                 ph_number:null,
                 email:null,
@@ -696,20 +696,23 @@
                 invoice_id:2,
                 male:null,
                 female:null,
-                child:null
+                child:null,
 
+                currentTime: getCurretDateTime(),
             };
         },
 
         methods: {
+            ...mapGetters(['getToken']),
+
             async getGendersList(){
-                const response = await getApiData({ url: '/api/genders' });
+                const response = await getApiData({ url: '/api/genders', token: this.getToken() });
                 if(response.data){
                     this.genderList = response.data;
                 }
             },
             async getRoomList(){
-                const response = await getApiData({ url: '/api/rooms' });
+                const response = await getApiData({ url: '/api/rooms', token: this.getToken() });
                 if(response.data){
                     this.roomList = response.data;
                     if(this.roomList[0].invoices.length>0){
@@ -725,7 +728,7 @@
                 }
             },
             async getCustomerList(){
-                const response = await getApiData({ url: '/api/customers' });
+                const response = await getApiData({ url: '/api/customers', token: this.getToken() });
                 if(response.data){
                     this.customerList = response.data;
                 }
@@ -733,13 +736,13 @@
             btnClickedIsOpenRoom(id,index){
                 this.selectedRoom = id;
                 if(this.roomList[index].invoices.length>0){
-                    alert(this.roomList[index].invoices.length)
+                    // alert(this.roomList[index].invoices.length)
                     this.isOpenRoom.step_1 = false;
                     this.isOpenRoom.step_2 = false;
                     this.isOpenRoom.step_detail = true;
                 }
                 if(this.roomList[index].invoices.length<1){
-                    alert(this.roomList[index].invoices.length)
+                    // alert(this.roomList[index].invoices.length)
                     this.isOpenRoom.step_1=true;
                     this.isOpenRoom.step_2 = false;
                     this.isOpenRoom.step_detail = false;
@@ -750,29 +753,35 @@
                 this.isOpenRoom.step_1=false;
                 this.isOpenRoom.step_2=true;
             },
-            
+
             createCustomerBtnClicked(){
                 this.createCustomer();
             },
             async createCustomer()
             {
+                console.log(this.email);
+                // return 1;
                 let formData = new FormData();
                 formData.append('gender_id', this.selectedGender);
                 formData.append('name', this.name);
-                formData.append('email', this.email);
+                if(this.email != null){
+                    formData.append('email', this.email);
+                }
                 formData.append('phone_number', this.ph_number);
                 formData.append('address', this.address);
                 formData.append('birthdate', this.date);
-                let response = await postApiData({url: '/api/customers', form_data: formData});
+                let response = await postApiData({url: '/api/customers', form_data: formData, token: this.getToken()});
                 console.log(this.selectedGender+','+this.name+','+this.email+','+this.ph_number+','+this.address+','+this.date)
                 if(response.success){
-                    this.getRoomList(null);
+                    this.customerList.push(response.data);
+                    this.selectedCustomer = response.data;
+                    // this.getRoomList(null);
                     console.log("success")
                     this.closeModal();
                     this.clearCustomerForm();
                 }
                 else{
-                    alert('some errors occur');
+                    console.log('some errors occur');
                 }
             },
 
@@ -782,20 +791,26 @@
             async createRoom()
             {
                 let formData = new FormData();
-                formData.append('invoice_id', this.invoice_id);
+                // formData.append('invoice_id', this.invoice_id);
                 formData.append('entity_id', this.selectedRoom);
-                formData.append('customer_id', this.selectedCustomer);
+                formData.append('customer_id', this.selectedCustomer.id);
                 formData.append('invoice_date', this.invoice_date);
-                formData.append('female', this.female);
-                formData.append('male', this.male);
-                formData.append('child', this.child);
-                let response = await postApiData({url: '/api/rooms/start', form_data: formData});
+                if(this.female > 0){
+                    formData.append('female', +this.female);
+                }
+                if(this.male > 0){
+                    formData.append('male', +this.male);
+                }
+                if(this.child > 0){
+                    formData.append('child', +this.child);
+                }
+                let response = await postApiData({url: '/api/rooms/start', form_data: formData,token: this.getToken()});
                 if(response.success){
                     this.getRoomList();
                     console.log("success")
                 }
                 else{
-                    alert('some errors occur');
+                    console.log('some errors occur');
                 }
             },
             btnClickedDoneSession(){
@@ -825,14 +840,15 @@
             //     }
             // }
         },
-       
+
         mounted()
         {
             this.getGendersList();
             this.getRoomList();
             this.getCustomerList();
             // this.initialSidebarShow();
-            initTE({ Modal, Select, Ripple, Datepicker });
+            initTE({ Modal, Select, Ripple, Tab });
+
         }
     }
 </script>
