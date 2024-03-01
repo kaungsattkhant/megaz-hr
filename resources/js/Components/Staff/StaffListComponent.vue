@@ -338,7 +338,7 @@
 
             async searchStaffs()
             {
-                const response = await getApiData({url:`/api/staffs?keyword=${this.keyword}`});
+                const response = await getApiData({url:`/api/staffs?keyword=${this.keyword}`, token: this.getToken()});
                 if(response)
                 {
                     this.staffList = response.data;
@@ -358,7 +358,7 @@
 
             async confirmDeleteBtnClicked(){
                 let url = `/api/staff/${this.deleteId}`;
-                let response = await deleteApiData({url: url});
+                let response = await deleteApiData({url: url, token: this.getToken()});
                 if(response.success){
                     alert(`deleted`);
                 }

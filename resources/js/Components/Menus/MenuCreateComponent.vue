@@ -406,7 +406,7 @@
                     formData.append('price', this.price);
                     formData.append('items', menuItems);
 
-                    let response = await postApiData({url: `/api/menus`, form_data: formData});
+                    let response = await postApiData({url: `/api/menus`, form_data: formData, token: this.getToken()});
 
                     if(response.success){
                         window.location.replace(`/menus`);

@@ -310,7 +310,7 @@
                 formData.append('area_id', this.selectedArea.id);
                 formData.append('role_id', this.selectedRole.id);
                 formData.append('assigned_days', this.selectedDays);
-                let response = await postApiData({url: '/api/tasks', form_data: formData});
+                let response = await postApiData({url: '/api/tasks', form_data: formData, token: this.getToken()});
                 if(response.success){
                     // window.location.replace('/tasks');
                     this.getTasksList(null);
@@ -327,7 +327,7 @@
 
             async confirmDeleteBtnClicked(){
                 let url = `/api/tasks/${this.deleteId}`;
-                let response = await deleteApiData({url: url});
+                let response = await deleteApiData({url: url, token: this.getToken()});
                 if(response.success){
                     this.getTasksList(null);
                     console.log(`deleted`);

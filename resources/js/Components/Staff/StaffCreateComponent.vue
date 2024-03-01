@@ -298,7 +298,7 @@
                 formData.append('password', this.password);
                 formData.append('roles', this.roleIds);
 
-                let response = await postApiData({url: '/api/staffs', form_data: formData});
+                let response = await postApiData({url: '/api/staffs', form_data: formData, token: this.getToken()});
                 if(response.success){
                     window.location.replace('/staff');
                 }

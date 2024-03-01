@@ -770,7 +770,7 @@
                 formData.append('phone_number', this.ph_number);
                 formData.append('address', this.address);
                 formData.append('birthdate', this.date);
-                let response = await postApiData({url: '/api/customers', form_data: formData});
+                let response = await postApiData({url: '/api/customers', form_data: formData, token: this.getToken()});
                 console.log(this.selectedGender+','+this.name+','+this.email+','+this.ph_number+','+this.address+','+this.date)
                 if(response.success){
                     this.customerList.push(response.data);
@@ -804,7 +804,7 @@
                 if(this.child > 0){
                     formData.append('child', +this.child);
                 }
-                let response = await postApiData({url: '/api/rooms/start', form_data: formData});
+                let response = await postApiData({url: '/api/rooms/start', form_data: formData,token: this.getToken()});
                 if(response.success){
                     this.getRoomList();
                     console.log("success")

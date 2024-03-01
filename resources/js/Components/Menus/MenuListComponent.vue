@@ -165,7 +165,7 @@
 
             async confirmDeleteBtnClicked(){
                 // let url = `/api/staff/${this.deleteId}`;
-                let response = await deleteApiData({url: url});
+                let response = await deleteApiData({url: url, token: this.getToken()});
                 if(response.success){
                     alert(`deleted`);
                 }

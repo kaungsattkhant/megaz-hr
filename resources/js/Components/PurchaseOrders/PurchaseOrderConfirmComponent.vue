@@ -281,7 +281,7 @@
             async confirmRemovePurchaseOrderItemBtnClicked(){
                 if(this.deleteId){
                     let url = `/api/purchase_orders_items/${this.deleteId}`;
-                    let response = await deleteApiData({url: url});
+                    let response = await deleteApiData({url: url, token: this.getToken()});
                     if(response.success){
                         this.purchaseOrderItems.splice(this.deleteIndex, 1);
                     }
@@ -335,7 +335,7 @@
                 formData.append('date', this.date);
                 formData.append('total_price', priceTotal);
                 formData.append('items', JSON.stringify(updatedPurchaseOrderItems));
-                let response = await postApiData({url: `/api/purchase_orders`, form_data:  formData});
+                let response = await postApiData({url: `/api/purchase_orders`, form_data:  formData, token: this.getToken()});
                 alert(`Operation success ${response.success}`);
             },
 

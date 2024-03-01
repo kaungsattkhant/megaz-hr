@@ -232,7 +232,7 @@
                 formData.append('destination_inventory_id', this.selectedInventory);
                 formData.append('quantity', this.amount);
                 formData.append('item_id', this.itemId);
-                let response = await postApiData({url: '/api/transfers', form_data: formData});
+                let response = await postApiData({url: '/api/transfers', form_data: formData, token: this.getToken()});
                 if(response.success){
                     this.getInventoryLegderList(null);
                     console.log(this.inventory_id)

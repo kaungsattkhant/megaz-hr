@@ -323,7 +323,7 @@
                 formData.append('name', this.name);
                 formData.append('inventoryable_type', this.selectedInventoryType);
                 formData.append('inventoryable_id', this.inventoryable_id);
-                let response = await postApiData({url: '/api/inventories', form_data: formData});
+                let response = await postApiData({url: '/api/inventories', form_data: formData, token: this.getToken()});
                 if(response.success){
                     this.getInventoryList(null);
                     console.log("success")
@@ -349,7 +349,7 @@
             },
             async confirmDeleteBtnClicked(){
                 let url = `/api/inventories/${this.deleteId}`;
-                let response = await deleteApiData({url: url});
+                let response = await deleteApiData({url: url, token: this.getToken()});
                 if(response.success){
                     alert(`deleted`);
                 }

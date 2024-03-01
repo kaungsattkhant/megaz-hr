@@ -111,7 +111,7 @@
 
                     </div>
                     <div class="flex justify-center px-12 mb-6">
-                        <button type="button" @click="createAreasBtnClicked"
+                        <button data-te-modal-dismiss type="button" @click="createAreasBtnClicked"
                         class="add-btn focus:outline-none focus:ring-0 ">
                             Create
                         </button>
@@ -258,7 +258,7 @@
                 let formData = new FormData();
                 formData.append('name', this.name);
                 formData.append('area_type_id', this.selectedType);
-                let response = await postApiData({url: '/api/areas', form_data: formData});
+                let response = await postApiData({url: '/api/areas', form_data: formData, token: this.getToken()});
                 if(response.success){
                     this.getAreasList(null);
                     console.log("success")
@@ -274,7 +274,7 @@
 
             async confirmDeleteBtnClicked(){
                 let url = `/api/areas/${this.deleteId}`;
-                let response = await deleteApiData({url: url});
+                let response = await deleteApiData({url: url, token: this.getToken()});
                 if(response.success){
                     this.getAreasList(null);
                     console.log(`deleted`);
