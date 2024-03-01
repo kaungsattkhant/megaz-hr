@@ -280,6 +280,7 @@
 
 <script>
     import { Modal, Ripple, initTE, Input } from "tw-elements";
+    import { mapGetters } from "vuex";
     import { getApiData, deleteApiData } from '../../utilities/ajax-helpers';
 
     export default {
@@ -307,6 +308,7 @@
         },
 
         methods: {
+            ...mapGetters(['getToken']),
 
             async getStaffsList(pageNumber)
             {
@@ -314,7 +316,7 @@
                 if(pageNumber){
                     url = `${url}&page=${pageNumber}`
                 }
-                const response = await getApiData({ url: url });
+                const response = await getApiData({ url: url, token: this.getToken() });
                 if (response.data != null) {
                     this.staffList = response.data.staffs;
                     this.pageNumbers = [];
