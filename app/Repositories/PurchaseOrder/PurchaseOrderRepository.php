@@ -152,19 +152,6 @@ class PurchaseOrderRepository implements PurchaseOrderRepositoryInterface
                     $model->save();
                 }
                 if ($request->type == 'purchase_order') {
-                    // if ($staff->hasRoles('Manager')) {
-                    //     $column = 'manager_check';
-                    //     $is_column = 'is_manager_checked';
-                    //     $status='manager_checked';
-                    // } else if ($staff->hasRoles('Financial')) {
-                    //     $column = 'financial_check';
-                    //     $is_column = 'is_financial_checked';
-                    //     $status='financial_checked';
-                    // } else if ($staff->hasRoles('md')) {
-                    //     $column = 'md';
-                    //     $is_column = 'id_md_checked';
-                    //     $status='md_checked';
-                    // }
 
                     $column_id = $column . '_' . 'id';
                     $column_time = $column . '_' . 'time';
@@ -183,7 +170,7 @@ class PurchaseOrderRepository implements PurchaseOrderRepositoryInterface
                 ResponseMessage('Update successfully', 200);
             }
             ResponseMessage("Data isn't found", 404);
-        } catch (\Exception $e) {
+        }catch (\Exception $e) {
             DB::rollback();
             ResponseMessage($e->getMessage(), 402);
             throw $e;
