@@ -52,9 +52,12 @@
                                     {{ purchaseOrder.status }}
                                 </td>
                                 <td class="whitespace-nowrap px-6 py-4 space-x-4">
-                                    <a :href="'/purchase_orders/'+purchaseOrder.id+'/confirm'" id="" class="pr-1">
+                                    <button class="pr-1" @click="checkPurchaseOrderBtnClicked(purchaseOrder.id)" data-te-toggle="modal" data-te-target="#checkModal">
                                         <i class="far fa-check"></i>
-                                    </a>
+                                    </button>
+                                    <!-- <a :href="'/purchase_orders/'+purchaseOrder.id+'/confirm'" id="" class="pr-1">
+                                        <i class="far fa-check"></i>
+                                    </a> -->
                                     <a :href="'/purchase_orders/'+purchaseOrder.id+'/confirm'" id="" class="pr-1">
                                         <i class="far fa-bars"></i>
                                     </a>
@@ -74,18 +77,66 @@
             </div>
         </div>
     </div>
+
+    <!--Check Modal -->
+    <div data-te-modal-init class="fixed left-0 top-0 z-[1055] hidden h-full w-full overflow-y-auto overflow-x-hidden outline-none"
+        id="checkModal"
+        tabindex="-1"
+        aria-labelledby="exampleModalLabel"
+        aria-hidden="true">
+        <div data-te-modal-dialog-ref class="pointer-events-none relative flex min-h-[calc(100%-1rem)] w-auto translate-y-[-50px]
+            items-center opacity-0 transition-all duration-300 ease-in-out min-[576px]:mx-auto min-[576px]:mt-7
+            min-[576px]:min-h-[calc(100%-3.5rem)] min-[576px]:max-w-[500px]">
+            <div class="min-[576px]:shadow-[0_0.5rem_1rem_rgba(#000, 0.15)] pointer-events-auto relative flex w-full flex-col
+                rounded-md border-none bg-white bg-clip-padding text-current shadow-lg outline-none ">
+                <div class="flex flex-shrink-0 items-center justify-between rounded-t-md border-b-2 border-neutral-100 border-opacity-100 p-4 ">
+                    <!--Modal title-->
+                    <h5 class="text-xl font-medium leading-normal text-neutral-800 " id="exampleModalLabel">
+                        Check Item
+                    </h5>
+                    <!--Close button-->
+                    <button type="button" class="box-content rounded-none border-none hover:no-underline hover:opacity-75 focus:opacity-100 focus:shadow-none focus:outline-none" data-te-modal-dismiss aria-label="Close">
+                        <svg class="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </button>
+                </div>
+
+                <!--Modal body-->
+                <div class="relative flex-auto p-4" data-te-modal-body-ref>
+                    <p>
+                        Are you sure ?
+                    </p>
+                </div>
+
+                <!--Modal footer-->
+                <div class="flex flex-shrink-0 flex-wrap items-center justify-end rounded-b-md border-t-2 border-neutral-100 border-opacity-100 p-4 ">
+                    <button type="button" class="inline-block px-6 pb-2 pt-2.5 text-xs focus:outline-none focus:ring-0 " data-te-modal-dismiss>
+                        Close
+                    </button>
+                    <button @click="confirmCheckPurchaseOrderBtnClicked" type="button" data-te-toggle="modal" data-te-target="#checkModal"
+                    class="ml-1 inline-block rounded bg-blue-600 px-6 pb-2 pt-2.5 text-xs  text-white   focus:outline-none focus:ring-0 ">
+                        Confirm
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
 </template>
 
 <script>
+    import { Modal, initTE } from "tw-elements";
+
     import { mapGetters } from 'vuex';
-    import { getApiData } from '../../utilities/ajax-helpers';
+    import { getApiData, postApiData } from '../../utilities/ajax-helpers';
     import { convertToFriendlyDate } from '../../utilities/datetime-helpers';
 
 
     export default {
         data() {
             return {
-                purchaseOrderList: []
+                purchaseOrderList: [],
+                checkId: null,
             };
         },
 
@@ -105,6 +156,26 @@
                     });
                 }
             },
+
+            checkPurchaseOrderBtnClicked(purchaseOrderId){
+                this.checkId = purchaseOrderId;
+            },
+
+            async confirmCheckPurchaseOrderBtnClicked(){
+                if(this.checkId){
+                    let url = `/api/updateIsCheck`;
+                    let formData = new FormData();
+                    formData.append('type', 'purchase_order');
+                    formData.append('id',this.checkId);
+                    formData.append('value', 1);
+                    let response = await postApiData({url: url, form_data: formData, token: this.getToken()});
+                    if(response.success){
+                        // alert('PO checked');
+                    }
+                }
+
+                this.checkId = null;
+            },
         },
 
         created()
@@ -114,7 +185,7 @@
 
         mounted()
         {
-
+            initTE({Modal});
         }
     }
 </script>
