@@ -2,6 +2,7 @@
 
 namespace App\Repositories\RoomSession;
 
+use App\Models\Invoice;
 use App\Models\RoomSession;
 
 class RoomSessionRepository implements RoomSessionRepositoryInterface
@@ -11,4 +12,6 @@ class RoomSessionRepository implements RoomSessionRepositoryInterface
         $roomSession = RoomSession::create($data);
         return $roomSession;
     }
+
+
 }

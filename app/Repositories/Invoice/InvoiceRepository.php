@@ -93,4 +93,12 @@ class InvoiceRepository implements InvoiceRepositoryInterface
         $headCount = HeadCount::create($data);
         return $headCount;
     }
+
+    public function addSessionDuration(array $data)
+    {
+        $roomAndSession = RoomSession::find($data['invoice_id']);
+        $roomAndSession->session_duration += $data['session_duration'];
+        $roomAndSession->save();
+        return $roomAndSession;
+    }
 }
