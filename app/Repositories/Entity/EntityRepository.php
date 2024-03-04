@@ -61,6 +61,22 @@ class EntityRepository implements EntityRepositoryInterface
         return $entities;
     }
 
+    public function roomDetail(array $data, int $entityId)
+    {
+        $currentDate = CurrentDate();
+        if(isset($data['current_date'])){
+            $currentDate = $data['current_date'];
+        }
+
+        $entity = Entity::with(["invoices" => function ($query) use ($currentDate) {
+            $query->where("complete_date", null)
+            ->whereBetween("invoice_date", [$currentDate . " 00:00:00", $currentDate . " 23:59:59"])
+            ->select("id", "invoice_id", "entity_id")->with(["sessions", "orders.orderItems.menu"]);
+        }])->find($entityId);
+
+        return $entity;
+    }
+
     public function createData(array $data)
     {
         $service = Entity::create($data);

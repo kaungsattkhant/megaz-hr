@@ -183,9 +183,10 @@ Route::post('/menus', [MenuAPIController::class, 'createMenu']);
 Route::post('/menus/{id}/add_price', [MenuAPIController::class, 'addPriceToMenu']);
 
 Route::get('/rooms',[EntityAPIController::class,'getRoomsWithInvoice']);
+Route::get('/rooms/{id}',[EntityAPIController::class,'getRoomDetail']);
 Route::get('/rooms/inactive',[EntityAPIController::class,'getOnlyInactiveRooms']);
 
-Route::post('/rooms/start',[InvoiceAPIController::class,'createInvoiceRoomSession']);
+Route::post('/rooms/start',[InvoiceAPIController::class,'startRoomSession']);
 
 // Route::group(['prefix' => 'management'], function () {});
 Route::get("/test", [TestController::class, "index"]);
