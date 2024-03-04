@@ -187,6 +187,8 @@ Route::get('/rooms/{id}',[EntityAPIController::class,'getRoomDetail']);
 Route::get('/rooms/inactive',[EntityAPIController::class,'getOnlyInactiveRooms']);
 
 Route::post('/rooms/start',[InvoiceAPIController::class,'startRoomSession']);
+Route::post('/rooms/orders',[InvoiceAPIController::class,'addOrder']);
+Route::post('/rooms/add_more_sessions',[InvoiceAPIController::class,'addMoreSessions']);
 
 // Route::group(['prefix' => 'management'], function () {});
 Route::get("/test", [TestController::class, "index"]);
