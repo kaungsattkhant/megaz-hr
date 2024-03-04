@@ -63,22 +63,25 @@
                                     </div>
                                 </div>
                             </div> -->
-                            <div v-for="(room,index) in roomList" :class="room.invoices.length < 1 ? 'bg-[#55EFC4]' : 'bg-[#FF7675]'"  class=" flex-shrink-0 flex-grow p-6 w-40 max-w-44 h-40">
-                                <button @click="btnClickedIsOpenRoom(room.id,index)" class="relative flex flex-col justify-between h-full w-full">
+                            <div v-for="(room,index) in roomList" :class="room.invoices.length < 1 ? 'bg-[#55EFC4]' : 'bg-[#FF7675]'" 
+                                class=" flex-shrink-0 flex-grow p-6 w-40 max-w-44 h-40">
+
+                                <button @click="btnClickedIsOpenRoom(room,index)" class="relative flex flex-col justify-between h-full w-full">
+                                    
                                     <div v-if="room.invoices.length > 0 " class=" flex justify-between flex-col h-full">
                                         <div>
                                             <p class="text-sm text-white">Start Time : 9:00 </p>
                                             <p class="text-sm text-white">Start Time : 9:00 </p>
                                         </div>
 
-                                        <p class="text-base text-white">
-                                            1000MMks
+                                        <p class="text-base text-left text-white">
+                                            {{ room.price_per_hour }}
                                         </p>
                                     </div>
                                     <div class="absolute bottom-0 w-full flex justify-end">
 
-                                        <p class="text-2xl text-white">
-                                            {{  index+1 }}
+                                        <p class="text-xl text-white">
+                                            {{  room.name }}
                                         </p>
                                     </div>
                                 </button>
@@ -366,10 +369,10 @@
                         <div class="w-2/3 mx-auto">
                             <div class="text-center">
                                 <p class="mb-2 text-black font-semibold">
-                                    Open Room {{ selectedRoom }}
+                                    Open {{ selectedRoom.name }}
                                 </p>
                                 <p class="mb-4 text-black font-semibold">
-                                    Price : {{ value.toLocaleString() }} MMKs
+                                    Price : {{ selectedRoom.price_per_hour.toLocaleString() }} MMKs
                                 </p>
                             </div>
                             <img class="w-[60%] mx-auto mb-6" src="../../../../../public/img/Video_light.png" alt="">
@@ -409,6 +412,13 @@
                                     Time
                                 </label>
                                 <input type="datetime-local" placeholder="Time" v-model="invoice_date"
+                                    class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
+                            </div>
+                            <div class="mb-4">
+                                <label for="" class="block text-sm text-black mb-3">
+                                    Duration
+                                </label>
+                                <input type="text" placeholder=""
                                     class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
                             </div>
                             <div class="mb-4">
@@ -690,7 +700,7 @@
                 address:null,
                 selectedGender:null,
                 customerList:null,
-
+                roomName:null,
                 selectedCustomer:null,
                 invoice_date:null,
                 invoice_id:2,
@@ -733,8 +743,8 @@
                     this.customerList = response.data;
                 }
             },
-            btnClickedIsOpenRoom(id,index){
-                this.selectedRoom = id;
+            btnClickedIsOpenRoom(room,index){
+                this.selectedRoom = room;
                 if(this.roomList[index].invoices.length>0){
                     // alert(this.roomList[index].invoices.length)
                     this.isOpenRoom.step_1 = false;
@@ -792,7 +802,7 @@
             {
                 let formData = new FormData();
                 // formData.append('invoice_id', this.invoice_id);
-                formData.append('entity_id', this.selectedRoom);
+                formData.append('entity_id', this.selectedRoom.id);
                 formData.append('customer_id', this.selectedCustomer.id);
                 formData.append('invoice_date', this.invoice_date);
                 if(this.female > 0){
