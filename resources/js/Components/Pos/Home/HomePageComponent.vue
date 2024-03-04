@@ -118,11 +118,11 @@
                         <div class="flex gap-x-3">
                                 <button class="transition duration-150 ease-in-out focus:outline-none focus:ring-0"
                                      data-te-toggle="modal" data-te-target="#change_modal">
-                                    a
+                                     <i class="far fa-random"></i>
                                 </button>
                                 <button class="transition duration-150 ease-in-out focus:outline-none focus:ring-0"
                                      data-te-toggle="modal" data-te-target="#add_menu_modal">
-                                    a
+                                     <i class="far fa-cocktail"></i>
                                 </button>
                                 <button class="transition duration-150 ease-in-out focus:outline-none focus:ring-0"
                                      data-te-toggle="modal" data-te-target="#add_hour_modal">
@@ -134,24 +134,25 @@
                         <div class="padding-section border-b    ">
                             <div class="flex justify-between font-semibold mb-2">
                                 <p class="text-sm text-black">
-                                    Order Id 1001
+                                    Invoice Id {{ selectedRoom.invoices[0].invoice_id }}
                                 </p>
                                 <p class="text-sm text-black font-semibold">
                                     <!-- 35,000 MMks -->
-                                    {{ value.toLocaleString() }} MMKs
+                                    {{ (selectedRoom.price_per_hour * selectedRoom.invoices[0].sessions[0].session_duration).toLocaleString() }} 
+                                    MMKs
                                 </p>
                             </div>
                             <div class="mb-2">
                                 <p class="px-2 py-0.5 bg-[#F19E51] text-white text-xs w-fit">
-                                    Room 301
+                                    Room {{ selectedRoom.name }}
                                 </p>
                             </div>
                             <div class="">
                                 <p class="text-sm text-black mb-2">
-                                    Start Time : 9:00 AM Feb 5 2024
+                                    Start Time : {{ selectedRoom.invoices[0].sessions[0].start_date }}
                                 </p>
                                 <p class="text-sm text-black">
-                                    End Time : {{ currentTime }}
+                                    End Time : {{ selectedRoom.invoices[0].sessions[0].end_date }}
                                 </p>
                             </div>
                         </div>
@@ -159,40 +160,28 @@
                         <div class="padding-section border-b    ">
                             <div class="flex justify-between font-semibold mb-3">
                                 <p class="px-2 py-0.5 bg-[#F19E51] text-white text-xs w-fit">
-                                    Room 301
+                                    Menu Total
                                 </p>
                                 <p class="text-sm text-black font-semibold">
-                                    35,000 MMks
+                                    {{ purchaseMenuList[0].total.toLocaleString() }} MMks
                                 </p>
                             </div>
                             <div class=" grid grid-cols-10 gap-x-2 gap-y-3">
-                                <div class="contents">
-                                    <p class=" col-span-4 text-sm">
-                                        Tiger Bottle
-                                    </p>
-                                    <p class=" col-span-1 text-center text-sm">
-                                        1
-                                    </p>
-                                    <p class=" col-span-2 text-center text-xs">
-                                        FOC
-                                    </p>
-                                    <p class=" col-span-3 text-sm text-right">
-                                        12,000 MMKs
-                                    </p>
-                                </div>
-                                <div class="contents">
-                                    <p class=" col-span-4 text-sm">
-                                        Fried Chicken Rice
-                                    </p>
-                                    <p class=" col-span-1 text-center text-sm">
-                                        1
-                                    </p>
-                                    <p class=" col-span-2 text-center text-xs">
-                                        FOC
-                                    </p>
-                                    <p class=" col-span-3 text-sm text-right">
-                                        112,000 MMKs
-                                    </p>
+                                <div v-for="(menu,index) in purchaseMenuList" class="contents">
+                                    <div v-for="menu2 in menu.order_items" class="contents">
+                                        <p class=" col-span-4 text-sm">
+                                            {{ menu2.menu.name }}
+                                        </p>
+                                        <p class=" col-span-1 text-center text-sm">
+                                            {{ menu2.quantity }}
+                                        </p>
+                                        <p class=" col-span-2 text-center text-xs">
+                                            FOC
+                                        </p>
+                                        <p class=" col-span-3 text-sm text-right">
+                                            {{ menu2.price.toLocaleString() }} MMKs
+                                        </p>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -229,7 +218,8 @@
                     <div class="absolute bottom-0 border-t-2 border-gray-200 w-full padding-section">
                         <div class=" text-right pr-3 mb-3">
                             <p>
-                                Total 10,000 MMKs
+                                Total 
+                                {{ ((selectedRoom.price_per_hour * selectedRoom.invoices[0].sessions[0].session_duration) + purchaseMenuList[0].total).toLocaleString() }} MMKs
                             </p>
                         </div>
                         <div class="">
@@ -369,10 +359,12 @@
                         <div class="w-2/3 mx-auto">
                             <div class="text-center">
                                 <p class="mb-2 text-black font-semibold">
-                                    Open {{ selectedRoom.name }}
+                                    <!-- Open {{ selectedRoom.name }} -->
+                                    open room
                                 </p>
                                 <p class="mb-4 text-black font-semibold">
-                                    Price : {{ selectedRoom.price_per_hour.toLocaleString() }} MMKs
+                                    price : 1000
+                                    <!-- Price : {{ selectedRoom.price_per_hour.toLocaleString() }} MMKs -->
                                 </p>
                             </div>
                             <img class="w-[60%] mx-auto mb-6" src="../../../../../public/img/Video_light.png" alt="">
@@ -418,7 +410,7 @@
                                 <label for="" class="block text-sm text-black mb-3">
                                     Duration
                                 </label>
-                                <input type="text" placeholder=""
+                                <input type="text" placeholder="" v-model="duration"
                                     class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
                             </div>
                             <div class="mb-4">
@@ -530,9 +522,9 @@
 
                     <div class="relative px-16 py-4" data-te-modal-body-ref>
                         <div class="mb-4">
-                            <select name="" id="" placeholder="Room"
+                            <select name="" id="" placeholder="Menu"
                                 class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
-                                <option value="1"> Room</option>
+                                <option v-for="(menu,index) in menuList">{{ menu.name }}</option>
                             </select>
                         </div>
                         <div class="mb-4">
@@ -678,7 +670,6 @@
     import { Modal, Ripple, Select, initTE, Tab } from "tw-elements";
     import { getApiData, postApiData, deleteApiData } from '../../../utilities/ajax-helpers';
     import { getCurrentTime, getCurretDateTime } from '../../../utilities/datetime-helpers';
-    import { mapGetters } from "vuex";
 
     export default {
         data() {
@@ -697,6 +688,7 @@
                 email:null,
                 genderList: [],
                 date:null,
+                duration:null,
                 address:null,
                 selectedGender:null,
                 customerList:null,
@@ -707,22 +699,35 @@
                 male:null,
                 female:null,
                 child:null,
+                menuList: [],
+                purchaseMenuList: [],
+
 
                 currentTime: getCurretDateTime(),
             };
         },
 
         methods: {
-            ...mapGetters(['getToken']),
-
             async getGendersList(){
-                const response = await getApiData({ url: '/api/genders', token: this.getToken() });
+                const response = await getApiData({ url: '/api/genders' });
                 if(response.data){
                     this.genderList = response.data;
                 }
             },
+            async getMenuList(){
+                const response = await getApiData({ url: '/api/menus' });
+                if(response.data){
+                    this.menuList = response.data;
+                }
+            },
+            async getPurchaseMenuList(){
+                const response = await getApiData({ url: '/api/rooms/' + this.selectedRoom.id });
+                if(response.data){
+                    this.purchaseMenuList = response.data.invoices[0].orders;
+                }
+            },
             async getRoomList(){
-                const response = await getApiData({ url: '/api/rooms', token: this.getToken() });
+                const response = await getApiData({ url: '/api/rooms' });
                 if(response.data){
                     this.roomList = response.data;
                     if(this.roomList[0].invoices.length>0){
@@ -738,7 +743,7 @@
                 }
             },
             async getCustomerList(){
-                const response = await getApiData({ url: '/api/customers', token: this.getToken() });
+                const response = await getApiData({ url: '/api/customers' });
                 if(response.data){
                     this.customerList = response.data;
                 }
@@ -750,6 +755,7 @@
                     this.isOpenRoom.step_1 = false;
                     this.isOpenRoom.step_2 = false;
                     this.isOpenRoom.step_detail = true;
+                    this.getPurchaseMenuList();
                 }
                 if(this.roomList[index].invoices.length<1){
                     // alert(this.roomList[index].invoices.length)
@@ -780,7 +786,7 @@
                 formData.append('phone_number', this.ph_number);
                 formData.append('address', this.address);
                 formData.append('birthdate', this.date);
-                let response = await postApiData({url: '/api/customers', form_data: formData, token: this.getToken()});
+                let response = await postApiData({url: '/api/customers', form_data: formData});
                 console.log(this.selectedGender+','+this.name+','+this.email+','+this.ph_number+','+this.address+','+this.date)
                 if(response.success){
                     this.customerList.push(response.data);
@@ -805,6 +811,7 @@
                 formData.append('entity_id', this.selectedRoom.id);
                 formData.append('customer_id', this.selectedCustomer.id);
                 formData.append('invoice_date', this.invoice_date);
+                formData.append('session_duration', this.duration);
                 if(this.female > 0){
                     formData.append('female', +this.female);
                 }
@@ -814,9 +821,12 @@
                 if(this.child > 0){
                     formData.append('child', +this.child);
                 }
-                let response = await postApiData({url: '/api/rooms/start', form_data: formData,token: this.getToken()});
+                let response = await postApiData({url: '/api/rooms/start', form_data: formData});
                 if(response.success){
                     this.getRoomList();
+                    // const index = this.roomList.findIndex(room => room.id == this.selectedRoom.id);
+                    // this.roomList[index] = response.data;
+                    console.log(response.data)
                     console.log("success")
                 }
                 else{
@@ -856,6 +866,7 @@
             this.getGendersList();
             this.getRoomList();
             this.getCustomerList();
+            this.getMenuList();
             // this.initialSidebarShow();
             initTE({ Modal, Select, Ripple, Tab });
 
