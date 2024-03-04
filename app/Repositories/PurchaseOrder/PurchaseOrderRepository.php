@@ -3,6 +3,7 @@
 namespace App\Repositories\PurchaseOrder;
 
 use App\Http\Action\Common\PurchaseOrder as CommonPurchaseOrder;
+use App\Http\Action\Inventory\StoreInventory;
 use App\Models\PurchaseOrder;
 use App\Models\PurchaseOrderItem;
 use Illuminate\Database\Eloquent\Model;
@@ -17,19 +18,19 @@ class PurchaseOrderRepository implements PurchaseOrderRepositoryInterface
         $staff = UserData();
         $purchaseOrders = PurchaseOrder::with(['items.item'])
             ->orderBy('id', 'desc')
-            ->when($staff->hasRoles('Staff'), function ($q)use($staff) {
+            ->when($staff->hasRoles('Staff'), function ($q) use ($staff) {
                 $q
-                ->where('created_by',$staff->id)
-                ->whereIn('status', ['created']);
+                    ->where('created_by', $staff->id)
+                    ->whereIn('status', ['created']);
             })
             ->when($staff->hasRoles('Manager'), function ($q) {
-                $q->whereIn('status', ['manager_checked','created']);
+                $q->whereIn('status', ['manager_checked', 'created']);
             })
             ->when($staff->hasRoles('Financial'), function ($q) {
-                $q->whereIn('status', ['manager_checked','financial_checked']);
+                $q->whereIn('status', ['manager_checked', 'financial_checked']);
             })
             ->when($staff->hasRoles('MD'), function ($q) {
-                $q->whereIn(['status'],['md_checked','financial_checked']);
+                $q->whereIn('status', ['md_checked', 'financial_checked']);
             })
             ->paginate(20);
         return $purchaseOrders;
@@ -37,7 +38,7 @@ class PurchaseOrderRepository implements PurchaseOrderRepositoryInterface
     public function createOrUpdate($request)
     {
         $data = $request->all();
-        $staff=UserData();
+        $staff = UserData();
         $items = json_decode($request->items);
         DB::beginTransaction();
         try {
@@ -138,22 +139,20 @@ class PurchaseOrderRepository implements PurchaseOrderRepositoryInterface
         DB::beginTransaction();
         try {
             $model = Model($request->type)::find($request->id);
+            $this->validateCheck($model, $staff, $request->type);
             if ($model) {
-                if ($staff->hasRoles('Staff')) {
-                    ResponseMessage("Permission isn't allowed",419);
-                }
                 if ($staff->hasRoles('Manager')) {
                     $column = 'manager_check';
                     $is_column = 'is_manager_checked';
-                    $status='manager_checked';
+                    $status = 'manager_checked';
                 } else if ($staff->hasRoles('Financial')) {
                     $column = 'financial_check';
                     $is_column = 'is_financial_checked';
-                    $status='financial_checked';
-                } else if ($staff->hasRoles('md')) {
-                    $column = 'md';
-                    $is_column = 'id_md_checked';
-                    $status='md_checked';
+                    $status = 'financial_checked';
+                } else if ($staff->hasRoles('MD')) {
+                    $column = 'md_check';
+                    $is_column = 'is_md_checked';
+                    $status = 'md_checked';
                 }
                 if ($request->type == 'purchase_order_item') {
                     // $is_column = 'is_manager_checked';
@@ -161,7 +160,6 @@ class PurchaseOrderRepository implements PurchaseOrderRepositoryInterface
                     $model->save();
                 }
                 if ($request->type == 'purchase_order') {
-
                     $column_id = $column . '_' . 'id';
                     $column_time = $column . '_' . 'time';
                     // $column='is_financial_check';
@@ -169,17 +167,22 @@ class PurchaseOrderRepository implements PurchaseOrderRepositoryInterface
                     if ($items->isNotEmpty()) {
                         ResponseMessage('Some items are left to check', 419);
                     }
-                    $staff->hasRoles('md') ?
+                    $staff->hasRoles('MD') ?
                     $model->$is_column = 1 : $model->$column_id = $staff->id;
                     $model->$column_time = now();
                     $model->status = $status;
                     $model->save();
+
+                    #store after md confimed
+                    if ($staff->hasRoles('MD')) {
+                        (new StoreInventory())->inventoryAction($model, 'in', 'purchase_order');
+                    }
                 }
                 DB::commit();
                 ResponseMessage('Update successfully', 200);
             }
             ResponseMessage("Data isn't found", 404);
-        }catch (\Exception $e) {
+        } catch (\Exception $e) {
             DB::rollback();
             ResponseMessage($e->getMessage(), 402);
             throw $e;
@@ -189,5 +192,24 @@ class PurchaseOrderRepository implements PurchaseOrderRepositoryInterface
     public function existIsCheck($model, $is_column, $value)
     {
         return $model->items->whereIn($is_column, $value)->values();
+    }
+
+    public function validateCheck($model, $staff, $type)
+    {
+        if ($model) {
+            if ($staff->hasRoles('Staff')) ResponseMessage("Permission isn't allowed", 419);
+            if($type=='purchase_order'){
+                if ($staff->hasRoles('Manager')) {
+                    if ($model->manager_check_id!=null) ResponseMessage('This Purchase Order is already checked By Manager', 419);
+                } else if ($staff->hasRoles('Financial')) {
+                    if ($model->financial_check_id!=null) ResponseMessage('This Purchase Order is already checked By Financial', 419);
+                } else if ($staff->hasRoles('MD')) {
+                    if ($model->is_md_checked) ResponseMessage('This Purchase Order is already checked By MD', 419);
+                    if(!$model->createdBy->department->inventory){
+                        ResponseMessage('Inventory is required',419);
+                    }
+                }
+            }
+        }
     }
 }

@@ -14,14 +14,12 @@ class Department extends BaseModel
     use HasFactory;
 
     protected $fillable=[
-        'name'
+        'name','inventoryable_id','inventoryable_type'
     ];
 
     protected $hidden=[
         'created_at','updated_at'
     ];
-
-
 
     public function getCreatedAt()
     {
@@ -43,8 +41,8 @@ class Department extends BaseModel
         return $this->hasMany(Role::class);
     }
 
-    public function inventories()
+    public function inventory()
     {
-        return $this->morphMany(Inventory::class, 'inventoryable');
+        return $this->morphOne(Inventory::class, 'inventoryable');
     }
 }

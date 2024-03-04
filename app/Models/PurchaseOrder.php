@@ -52,15 +52,15 @@ class PurchaseOrder extends BaseModel
     }
 
     public function createdBy(){
-        return $this->belongsTo(Staff::class);
+        return $this->belongsTo(Staff::class,'created_by');
     }
 
     public function managerCheckedBy(){
-        return $this->belongsTo(Staff::class);
+        return $this->belongsTo(Staff::class,'manager_checked_id');
     }
 
     public function financialCheckedBy(){
-        return $this->belongsTo(Staff::class);
+        return $this->belongsTo(Staff::class,'financial_checked_id');
     }
 
 

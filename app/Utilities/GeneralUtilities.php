@@ -250,3 +250,10 @@ if (!function_exists('Model')) {
         return Relation::getMorphedModel($model);
     }
 }
+
+if (!function_exists('RelationMorphName')) {
+    function RelationMorphName($model)
+    {
+        return array_search(get_class($model), Relation::morphMap());
+    }
+}

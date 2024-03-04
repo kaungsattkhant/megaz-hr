@@ -17,6 +17,7 @@ return new class extends Migration
             $table->dateTime('date');
             $table->unsignedBigInteger('ledgerable_id');
             $table->string('ledgerable_type');
+            $table->enum('action',['in','out']);
             $table->timestamps();
         });
     }
