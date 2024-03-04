@@ -139,7 +139,7 @@ class PurchaseOrderRepository implements PurchaseOrderRepositoryInterface
         DB::beginTransaction();
         try {
             $model = Model($request->type)::find($request->id);
-            $this->validateCheck($model, $staff, $request->type);
+            $this->validateModel($model, $staff, $request->type);
             if ($model) {
                 if ($staff->hasRoles('Manager')) {
                     $column = 'manager_check';
@@ -194,7 +194,7 @@ class PurchaseOrderRepository implements PurchaseOrderRepositoryInterface
         return $model->items->whereIn($is_column, $value)->values();
     }
 
-    public function validateCheck($model, $staff, $type)
+    public function validateModel($model, $staff, $type)
     {
         if ($model) {
             if ($staff->hasRoles('Staff')) ResponseMessage("Permission isn't allowed", 419);
