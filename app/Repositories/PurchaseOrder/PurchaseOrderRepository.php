@@ -17,8 +17,10 @@ class PurchaseOrderRepository implements PurchaseOrderRepositoryInterface
         $staff = UserData();
         $purchaseOrders = PurchaseOrder::with(['items.item'])
             ->orderBy('id', 'desc')
-            ->when($staff->hasRoles('Staff'), function ($q) {
-                $q->whereIn('status', ['created']);
+            ->when($staff->hasRoles('Staff'), function ($q)use($staff) {
+                $q
+                ->where('created_by',$staff->id)
+                ->whereIn('status', ['created']);
             })
             ->when($staff->hasRoles('Manager'), function ($q) {
                 $q->whereIn('status', ['manager_checked','created']);
@@ -137,6 +139,9 @@ class PurchaseOrderRepository implements PurchaseOrderRepositoryInterface
         try {
             $model = Model($request->type)::find($request->id);
             if ($model) {
+                if ($staff->hasRoles('Staff')) {
+                    ResponseMessage("Permission isn't allowed",419);
+                }
                 if ($staff->hasRoles('Manager')) {
                     $column = 'manager_check';
                     $is_column = 'is_manager_checked';
