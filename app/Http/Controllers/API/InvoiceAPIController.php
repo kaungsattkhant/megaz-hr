@@ -2,24 +2,23 @@
 
 namespace App\Http\Controllers\API;
 
-use App\Http\Controllers\Controller;
-use App\Repositories\Invoice\InvoiceRepositoryInterface;
-use App\Repositories\RoomSession\RoomSessionRepositoryInterface;
 use Illuminate\Http\Request;
+
+use App\Http\Controllers\Controller;
+
+use App\Repositories\Invoice\InvoiceRepositoryInterface;
 
 class InvoiceAPIController extends Controller
 {
     //
     protected $invoiceRepo;
-    protected $roomSessionRepo;
 
-    public function __construct(InvoiceRepositoryInterface $invoiceRepo, RoomSessionRepositoryInterface $roomSessionRepo)
+    public function __construct(InvoiceRepositoryInterface $invoiceRepo)
     {
         $this->invoiceRepo = $invoiceRepo;
-        $this->roomSessionRepo = $roomSessionRepo;
     }
 
-    public function createInvoiceRoomSession(Request $request)
+    public function startRoomSession(Request $request)
     {
         $data = $request->all();
         if(isset($data['male'])){
@@ -43,10 +42,8 @@ class InvoiceAPIController extends Controller
 
         $data['created_by'] = 1;
         $invoice = $this->invoiceRepo->createData($data);
-        $data['start_date'] = currentTime();
-        $data['invoice_id'] = $invoice->id;
-        $roomSession = $this->roomSessionRepo->creaetRoomSession($data);
-        ResponseData($roomSession);
+
+        ResponseData($invoice);
     }
 
 

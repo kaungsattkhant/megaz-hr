@@ -14,5 +14,9 @@ interface EntityRepositoryInterface
 
     public function deleteData(int $id);
 
-    public function roomWithInvoice(array $data);
+    public function roomsWithInvoice(array $data);
+
+    public function roomDetail(array $data, int $entityId);
+
+    public function inactiveRoomsList(Request $request);
 }

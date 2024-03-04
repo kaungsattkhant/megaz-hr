@@ -2,10 +2,14 @@
 
 namespace App\Repositories\Invoice;
 
+use Illuminate\Http\Request;
+
 use App\Models\Entity;
 use App\Models\HeadCount;
 use App\Models\Invoice;
-use Illuminate\Http\Request;
+use App\Models\RoomSession;
+
+use Carbon\Carbon;
 
 class InvoiceRepository implements InvoiceRepositoryInterface
 {
@@ -37,12 +41,26 @@ class InvoiceRepository implements InvoiceRepositoryInterface
 
     public function createData(array $data)
     {
-        $data['area_id'] = Entity::find($data['entity_id'])->area_id;
+        $entity = Entity::find($data['entity_id']);
+        $data['area_id'] = $entity->area_id;
         $headCount = $this->headCountCreate($data);
         $data['head_count_id'] = $headCount->id;
         $invoice = Invoice::create($data);
-        $invoice->invoice_id = $invoice->id;
+
+        $invoice->invoice_id = sprintf('%05d', $invoice->id);
         $invoice->save();
+
+        $entity->is_active = 1;
+        $entity->save();
+
+        $data['invoice_id'] = $invoice->id;
+        $data['start_date'] = $data['invoice_date'];
+        $data['end_date'] = Carbon::parse($data['start_date'])
+        ->addHours($data['session_duration'])
+        ->format('Y-m-d H:i:s');
+        $roomSession = RoomSession::create($data);
+        $invoice->room_session = $roomSession;
+
         return $invoice;
     }
 

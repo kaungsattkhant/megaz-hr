@@ -55,14 +55,27 @@ class EntityAPIController extends Controller
         }
     }
 
-    public function invoiceWithRooms(Request $request)
+    public function getRoomsWithInvoice(Request $request)
     {
         $data = $request->all();
         $data['current_date'] = CurrentDate();
-        $entity = $this->entityRepo->roomWithInvoice($data);
+        $entity = $this->entityRepo->roomsWithInvoice($data);
         ResponseData($entity);
     }
 
+    public function getRoomDetail(Request $request, int $id)
+    {
+        $data = $request->all();
+        $entity = $this->entityRepo->roomDetail($data, $id);
 
+        ResponseData($entity);
+    }
+
+    public function getOnlyInactiveRooms(Request $request)
+    {
+        $entities = $this->entityRepo->inactiveRoomsList($request);
+
+        ResponseData($entities);
+    }
 
 }
