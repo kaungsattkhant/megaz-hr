@@ -17,6 +17,9 @@ class PurchaseOrderRepository implements PurchaseOrderRepositoryInterface
         $staff = UserData();
         $purchaseOrders = PurchaseOrder::with(['items.item'])
             ->orderBy('id', 'desc')
+            ->when($staff->hasRoles('Staff'), function ($q) {
+                $q->whereIn('status', ['created']);
+            })
             ->when($staff->hasRoles('Manager'), function ($q) {
                 $q->whereIn('status', ['manager_checked','created']);
             })
@@ -31,8 +34,8 @@ class PurchaseOrderRepository implements PurchaseOrderRepositoryInterface
     }
     public function createOrUpdate($request)
     {
-        dd(UserData());
         $data = $request->all();
+        $staff=UserData();
         $items = json_decode($request->items);
         DB::beginTransaction();
         try {
@@ -44,7 +47,7 @@ class PurchaseOrderRepository implements PurchaseOrderRepositoryInterface
             $no = (new CommonPurchaseOrder())->getUniqueId($latest, $count);
             $po_id = "PO" . '-' . str_pad($no, $count, "0", STR_PAD_LEFT) . '-' . now()->timestamp;
             $data['po_id'] = $po_id;
-            $data['created_by'] = 1;
+            $data['created_by'] = $staff->id;
             $po = PurchaseOrder::updateOrCreate(
                 ['id' => $data['id']],
                 $data

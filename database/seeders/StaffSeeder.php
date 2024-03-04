@@ -18,45 +18,85 @@ class StaffSeeder extends Seeder
     public function run(): void
     {
         //
-        $kitchenDept = Department::where('name', 'Kitchen Department')->first();
-        $barDept = Department::where('name', 'Bar Department')->first();
+        // $opDept = Department::where('name', 'Operation Department')->first();
+        // $fiDept = Department::where('name', 'Finance Department')->first();
 
-        $kitchenRole = Role::where('department_id', $kitchenDept->id)->pluck('id')->toArray();
-        // $kitchenStaffRole = Role::where('name', 'Staff')->where('department_id', $kitchenDept->id)->first();
+        // $opRole = Role::where('department_id', $opDept->id)->pluck('id')->toArray();
 
-        $barRole = Role::where('department_id', $barDept->id)->pluck('id')->toArray();
+        // $fiRole = Role::where('department_id', $fiDept->id)->pluck('id')->toArray();
+
+        $staffRole = Role::where('name', 'Staff')->first();
+        $managerRole = Role::where('name', 'Manager')->first();
+        $financeRole = Role::where('name', 'Finance')->first();
+        $mdRole = Role::where('name', 'MD')->first();
         // $barStaffRole = Role::where('name', 'Staff')->where('department_id', $barDept->id)->first();
 
         DB::beginTransaction();
         try {
             $faker = Faker::create();
             //for kitcheck
-            foreach (range(1, 20) as $index) {
                 $staff = Staff::create([
                     'gender_id' => $faker->numberBetween(1, 2),
-                    'department_id' => $kitchenDept->id,
+                    'department_id' => $staffRole->department_id,
                     'name' => $faker->name,
-                    'phone_number' => $faker->phoneNumber,
+                    'phone_number' => '091111',
                     'password' => 'password',
                 ]);
-                $randomKitchenRoles = $faker->randomElements($kitchenRole, $faker->numberBetween(1, count($kitchenRole)));
-                $staff->roles()->sync($randomKitchenRoles);
-            }
+                $staff->roles()->sync([$staffRole->id]);
+
+                $staff1 = Staff::create([
+                    'gender_id' => $faker->numberBetween(1, 2),
+                    'department_id' => $staffRole->department_id,
+                    'name' => $faker->name,
+                    'phone_number' => '0911111',
+                    'password' => 'password',
+                ]);
+                $staff1->roles()->sync([$staffRole->id]);
+
+
+                $manager = Staff::create([
+                    'gender_id' => $faker->numberBetween(1, 2),
+                    'department_id' => $managerRole->department_id,
+                    'name' => $faker->name,
+                    'phone_number' => '092222',
+                    'password' => 'password',
+                ]);
+                $manager->roles()->sync([$managerRole->id]);
+
+
+                $finance = Staff::create([
+                    'gender_id' => $faker->numberBetween(1, 2),
+                    'department_id' => $financeRole->department_id,
+                    'name' => $faker->name,
+                    'phone_number' => '093333',
+                    'password' => 'password',
+                ]);
+                $finance->roles()->sync([$financeRole->id]);
+
+
+                $md = Staff::create([
+                    'gender_id' => $faker->numberBetween(1, 2),
+                    'department_id' => $mdRole->department_id,
+                    'name' => $faker->name,
+                    'phone_number' => '094444',
+                    'password' => 'password',
+                ]);
+                $md->roles()->sync([$mdRole->id]);
           
             #endregion
 
-             //for kitcheck
-             foreach (range(1, 20) as $index) {
-                $staff = Staff::create([
-                    'gender_id' => $faker->numberBetween(1, 2),
-                    'department_id' => $barDept->id,
-                    'name' => $faker->name,
-                    'phone_number' => $faker->phoneNumber,
-                    'password' => 'password',
-                ]);
-                $randomBarRoles = $faker->randomElements($barRole, $faker->numberBetween(1, count($barRole)));
-                $staff->roles()->sync($randomBarRoles);
-            }
+            //  //for kitcheck
+            //  foreach (range(1, 20) as $index) {
+            //     $staff = Staff::create([
+            //         'gender_id' => $faker->numberBetween(1, 2),
+            //         'department_id' => $barDept->id,
+            //         'name' => $faker->name,
+            //         'phone_number' => $faker->phoneNumber,
+            //         'password' => 'password',
+            //     ]);
+            //     $randomBarRoles = $faker->randomElements($barRole, $faker->numberBetween(1, count($barRole)));
+            //     $staff->roles()->sync($randomBarRoles);
+            // }
            
             #endregion
             DB::commit();

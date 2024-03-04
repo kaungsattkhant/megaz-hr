@@ -16,11 +16,13 @@ class DepartmentSeeder extends Seeder
     {
         //
         Department::create([
-            'name' => 'Kitchen Department'
+            'name' => 'Operation Department'
         ]);
 
         Department::create([
-            'name' => 'Bar Department'
+            'name' => 'Finance Department'
         ]);
+
+    
     }
 }
