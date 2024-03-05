@@ -10,8 +10,7 @@ class StoreInventory
 {
     public function inventoryAction($model)
     {
-        
-        $morphMapName = array_search(get_class($model), Relation::morphMap());
+        $morphMapName=RelationMorphName($model);
 
         switch ($morphMapName) {
             case 'purchase_order':
