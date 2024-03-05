@@ -12,19 +12,18 @@ class OrderRepository implements OrderRepositoryInterface
         $order = Order::where('invoice_id', $data['invoice_id'])->get()->first();
         if ($order) {
             $order->total_quantity += $data['quantity'];
-            $order->total += $data['original_price'];
+            $order->total += $data['original_price'] * $data['quantity'];
             $order->update($data);
-
             $data['date'] = currentTime();
             $data['order_id'] = $order->id;
             $data['discount_value'] = 0;
             $data['price'] = $data['original_price'] * $data['quantity'];
             $order_items = OrderItem::create($data);
-            return $order->orderItems;
+            return $order;
 
         } else {
             $data['date'] = currentTime();
-            $data['total'] = $data['original_price'];
+            $data['total'] = $data['original_price'] * $data['quantity'];
             $data['total_quantity'] = $data['quantity'];
             $order = Order::create($data);
             $order->update(['order_id' => sprintf('%05d', $order->id)]);
@@ -34,7 +33,7 @@ class OrderRepository implements OrderRepositoryInterface
             $data['price'] = $data['original_price'] * $data['quantity'];
             $order_items = OrderItem::create($data);
 
-            return $order->orderItems;
+            return $order;
 
         }
     }
