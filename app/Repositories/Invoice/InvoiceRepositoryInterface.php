@@ -13,4 +13,6 @@ interface InvoiceRepositoryInterface
     public function updateData(array $data,int $id);
 
     public function deleteData(int $id);
+
+    public function addSessionDuration(array $data);
 }

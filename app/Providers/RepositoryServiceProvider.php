@@ -47,6 +47,8 @@ use App\Repositories\Transfer\TransferRepositoryInterface;
 
 use App\Repositories\Menu\MenuRepository;
 use App\Repositories\Menu\MenuRepositoryInterface;
+use App\Repositories\Order\OrderRepository;
+use App\Repositories\Order\OrderRepositoryInterface;
 use App\Repositories\RoomSession\RoomSessionRepository;
 use App\Repositories\RoomSession\RoomSessionRepositoryInterface;
 
@@ -83,5 +85,6 @@ class RepositoryServiceProvider extends ServiceProvider
         $this->app->bind(MenuRepositoryInterface::class,MenuRepository::class);
         $this->app->bind(InvoiceRepositoryInterface::class,InvoiceRepository::class);
         $this->app->bind(RoomSessionRepositoryInterface::class,RoomSessionRepository::class);
+        $this->app->bind(OrderRepositoryInterface::class,OrderRepository::class);
     }
 }

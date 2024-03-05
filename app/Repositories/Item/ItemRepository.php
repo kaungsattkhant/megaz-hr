@@ -39,7 +39,8 @@ class ItemRepository implements ItemRepositoryInterface
     public function createData(array $data)
     {
         $item = Item::create($data);
-        foreach ($data['uoms'] as $uomId) {
+        $uomIds = json_decode($data['uoms'], true);
+        foreach ($uomIds as $uomId) {
             $item->uoms()->attach($uomId);
         }
         return $item;
