@@ -17,11 +17,11 @@ return new class extends Migration
             $table->unsignedBigInteger('menu_id');
             $table->integer('quantity');
             $table->integer('original_price');
-            $table->integer("discount_value");
+            $table->integer("discount_value")->default(0);
             $table->integer('price');
             $table->unsignedBigInteger('order_id');
-            $table->string('status');
-            $table->boolean('is_complete');
+            $table->string('status')->default('not yet');
+            $table->boolean('is_complete')->default(0);
             $table->timestamps();
         });
     }

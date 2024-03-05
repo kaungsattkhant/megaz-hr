@@ -23,7 +23,7 @@ use App\Http\Controllers\API\TestController;
 use App\Http\Controllers\API\TransferAPIController;
 use App\Http\Controllers\API\UomAPIController;
 use App\Http\Controllers\API\MenuAPIController;
-
+use App\Http\Controllers\API\OrderAPIController;
 use App\Models\ComplaintCategory;
 use App\Models\AreaType;
 use App\Models\Category;
@@ -187,6 +187,8 @@ Route::get('/rooms/{id}',[EntityAPIController::class,'getRoomDetail']);
 Route::get('/rooms/inactive',[EntityAPIController::class,'getOnlyInactiveRooms']);
 
 Route::post('/rooms/start',[InvoiceAPIController::class,'startRoomSession']);
+Route::post('/rooms/orders',[OrderAPIController::class,'addOrder']);
+Route::post('/rooms/add_more_sessions',[InvoiceAPIController::class,'addMoreSessions']);
 
 // Route::group(['prefix' => 'management'], function () {});
 Route::get("/test", [TestController::class, "index"]);

@@ -46,5 +46,11 @@ class InvoiceAPIController extends Controller
         ResponseData($invoice);
     }
 
+    public function addMoreSessions(Request $request){
+
+        $roomAndSession = $this->invoiceRepo->addSessionDuration($request->all());
+        ResponseData($roomAndSession);
+    }
+
 
 }

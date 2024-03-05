@@ -13,12 +13,12 @@ return new class extends Migration
     {
         Schema::create('orders', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('order_id');
+            $table->string('order_id')->nullable();
             $table->integer('total_quantity');
             $table->dateTime('date');
             $table->integer('total');
             $table->unsignedBigInteger('invoice_id');
-            $table->boolean('is_complete');
+            $table->boolean('is_complete')->default(0);
             $table->timestamps();
         });
     }
