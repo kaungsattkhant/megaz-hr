@@ -63,12 +63,12 @@
                                     </div>
                                 </div>
                             </div> -->
-                            <div v-for="(room,index) in roomList" :class="room.invoices.length < 1 ? 'bg-[#55EFC4]' : 'bg-[#FF7675]'" 
+                            <div v-for="(room,index) in roomList" :class="room.is_active == 0 ? 'bg-[#55EFC4]' : 'bg-[#FF7675]'" 
                                 class=" flex-shrink-0 flex-grow p-6 w-40 max-w-44 h-40">
 
                                 <button @click="btnClickedIsOpenRoom(room,index)" class="relative flex flex-col justify-between h-full w-full">
                                     
-                                    <div v-if="room.invoices.length > 0 " class=" flex justify-between flex-col h-full">
+                                    <div v-if="room.is_active == 1 " class=" flex justify-between flex-col h-full">
                                         <div>
                                             <p class="text-sm text-white">Start Time : 9:00 </p>
                                             <p class="text-sm text-white">Start Time : 9:00 </p>
@@ -120,7 +120,7 @@
                                      data-te-toggle="modal" data-te-target="#change_modal">
                                      <i class="far fa-random"></i>
                                 </button>
-                                <button class="transition duration-150 ease-in-out focus:outline-none focus:ring-0"
+                                <button @click="btnClickAddMenu" class="transition duration-150 ease-in-out focus:outline-none focus:ring-0"
                                      data-te-toggle="modal" data-te-target="#add_menu_modal">
                                      <i class="far fa-cocktail"></i>
                                 </button>
@@ -134,11 +134,11 @@
                         <div class="padding-section border-b    ">
                             <div class="flex justify-between font-semibold mb-2">
                                 <p class="text-sm text-black">
-                                    Invoice Id {{ selectedRoom.invoices[0].invoice_id }}
+                                    Invoice Id {{ selectedRoom.invoices.length > 0 ? selectedRoom.invoices[0].invoice_id : '' }}
                                 </p>
                                 <p class="text-sm text-black font-semibold">
                                     <!-- 35,000 MMks -->
-                                    {{ (selectedRoom.price_per_hour * selectedRoom.invoices[0].sessions[0].session_duration).toLocaleString() }} 
+                                    {{ (selectedRoom.price_per_hour * (selectedRoom.invoices[0].length > 0 ? selectedRoom.invoices[0].sessions[0] : 1).session_duration).toLocaleString() }} 
                                     MMKs
                                 </p>
                             </div>
@@ -163,7 +163,7 @@
                                     Menu Total
                                 </p>
                                 <p class="text-sm text-black font-semibold">
-                                    {{ purchaseMenuList[0].total.toLocaleString() }} MMks
+                                    {{ purchaseMenuList.length > 0 ? purchaseMenuList[0].total.toLocaleString() : '0' }} MMks
                                 </p>
                             </div>
                             <div class=" grid grid-cols-10 gap-x-2 gap-y-3">
@@ -217,9 +217,31 @@
 
                     <div class="absolute bottom-0 border-t-2 border-gray-200 w-full padding-section">
                         <div class=" text-right pr-3 mb-3">
-                            <p>
+                            <p class="">
                                 Total 
-                                {{ ((selectedRoom.price_per_hour * selectedRoom.invoices[0].sessions[0].session_duration) + purchaseMenuList[0].total).toLocaleString() }} MMKs
+                                {{ 
+                                    (
+                                        selectedRoom ? 
+                                        ( 
+                                            purchaseMenuList[0] ? 
+                                            (
+                                                (selectedRoom.price_per_hour * selectedRoom.invoices[0].sessions[0].session_duration) + purchaseMenuList[0].total
+                                            ).toLocaleString()  
+                                            : (
+                                                selectedRoom.price_per_hour * selectedRoom.invoices[0].sessions[0].session_duration
+                                                ).toLocaleString()
+                                        ) 
+                                        : 0
+                                    )
+                                    
+                                }} MMKs
+
+                                <!-- <span v-if="purchaseMenuList.length > 1" >
+                                    {{ ((selectedRoom.price_per_hour * selectedRoom.invoices[0].sessions[0].session_duration) + purchaseMenuList[0].total).toLocaleString() }} MMKs
+                                </span>
+                                <span v-else>
+                                    0 MMKs
+                                </span> -->
                             </p>
                         </div>
                         <div class="">
@@ -359,12 +381,10 @@
                         <div class="w-2/3 mx-auto">
                             <div class="text-center">
                                 <p class="mb-2 text-black font-semibold">
-                                    <!-- Open {{ selectedRoom.name }} -->
-                                    open room
+                                    Open {{ selectedRoom ? selectedRoom.name : ''}}
                                 </p>
                                 <p class="mb-4 text-black font-semibold">
-                                    price : 1000
-                                    <!-- Price : {{ selectedRoom.price_per_hour.toLocaleString() }} MMKs -->
+                                    Price : {{ selectedRoom ? selectedRoom.price_per_hour.toLocaleString() : '' }} MMKs
                                 </p>
                             </div>
                             <img class="w-[60%] mx-auto mb-6" src="../../../../../public/img/Video_light.png" alt="">
@@ -511,7 +531,7 @@
                         <p class="text-xl w-full text-center">
                             Add Menu
                         </p>
-                        <button type="button" class="absolute top-4 right-4 focus:shadow-none focus:outline-none"
+                        <button type="button" id="closeModal" class="absolute top-4 right-4 focus:shadow-none focus:outline-none"
                             data-te-modal-dismiss aria-label="Close">
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
                                 stroke="currentColor" class="h-5 w-5">
@@ -522,22 +542,22 @@
 
                     <div class="relative px-16 py-4" data-te-modal-body-ref>
                         <div class="mb-4">
-                            <select name="" id="" placeholder="Menu"
+                            <select name="" id="" placeholder="Menu" v-model="selectedMenu"
                                 class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
-                                <option v-for="(menu,index) in menuList">{{ menu.name }}</option>
+                                <option :value="menu" v-for="(menu,index) in menuList">{{ menu.name }}</option>
                             </select>
                         </div>
                         <div class="mb-4">
                             <!-- <label for="" class="block text-sm text-black mb-3">
                                 Hour
                             </label> -->
-                            <input type="text" placeholder="Qty"
+                            <input type="text" placeholder="Qty" v-model="menuQuantity"
                                 class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
                         </div>
                     </div>
 
                     <div class="flex justify-center px-12 mb-6">
-                        <button class="pos-add-btn focus:outline-none focus:ring-0 ">
+                        <button @click="btnConfirmAddMenu" class="pos-add-btn focus:outline-none focus:ring-0 ">
                             Add Menu
                         </button>
                     </div>
@@ -597,7 +617,7 @@
                             Create Customer
                         </p>
                         <button type="button" class="absolute top-4 right-4 focus:shadow-none focus:outline-none
-                        " id="closeMegaZ"
+                        " id="closeModal"
                             data-te-modal-dismiss aria-label="Close">
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
                                 stroke="currentColor" class="h-5 w-5">
@@ -695,12 +715,18 @@
                 roomName:null,
                 selectedCustomer:null,
                 invoice_date:null,
-                invoice_id:2,
                 male:null,
                 female:null,
                 child:null,
-                menuList: [],
                 purchaseMenuList: [],
+
+                //create menu
+                menuList: [],
+                invoiceId:null,
+                selectedMenu:null,
+                menuQuantity:null,
+                menuPrice:null,
+
 
 
                 currentTime: getCurretDateTime(),
@@ -723,13 +749,24 @@
             async getPurchaseMenuList(){
                 const response = await getApiData({ url: '/api/rooms/' + this.selectedRoom.id });
                 if(response.data){
-                    this.purchaseMenuList = response.data.invoices[0].orders;
+                    if(response.data.invoices.length > 0){
+                        this.purchaseMenuList = response.data.invoices[0].orders;
+                    }
+                    
                 }
             },
             async getRoomList(){
                 const response = await getApiData({ url: '/api/rooms' });
                 if(response.data){
                     this.roomList = response.data;
+                    console.log( this.roomList[0] );
+                }
+            },
+            async initialGetRoomList(){
+                const response = await getApiData({ url: '/api/rooms' });
+                if(response.data){
+                    this.roomList = response.data;
+                    this.selectedRoom = this.roomList[0]
                     if(this.roomList[0].invoices.length>0){
                         this.isOpenRoom.step_1 = false;
                         this.isOpenRoom.step_2 = false;
@@ -740,6 +777,7 @@
                         this.isOpenRoom.step_2 = false;
                         this.isOpenRoom.step_detail = false;
                     }
+                    console.log( this.roomList[0] );
                 }
             },
             async getCustomerList(){
@@ -748,6 +786,7 @@
                     this.customerList = response.data;
                 }
             },
+            
             btnClickedIsOpenRoom(room,index){
                 this.selectedRoom = room;
                 if(this.roomList[index].invoices.length>0){
@@ -762,12 +801,15 @@
                     this.isOpenRoom.step_1=true;
                     this.isOpenRoom.step_2 = false;
                     this.isOpenRoom.step_detail = false;
+                    this.getPurchaseMenuList();
                 }
                 console.log(this.selectedRoom)
             },
             btnClickedOpenRoom(){
                 this.isOpenRoom.step_1=false;
                 this.isOpenRoom.step_2=true;
+                this.isOpenRoom.step_detail=false;                
+                
             },
 
             createCustomerBtnClicked(){
@@ -824,9 +866,16 @@
                 let response = await postApiData({url: '/api/rooms/start', form_data: formData});
                 if(response.success){
                     this.getRoomList();
-                    // const index = this.roomList.findIndex(room => room.id == this.selectedRoom.id);
-                    // this.roomList[index] = response.data;
-                    console.log(response.data)
+                    if(this.selectedRoom.invoices.length>0){
+                        this.getPurchaseMenuList();
+                    }
+                    if(this.selectedRoom.invoices.length<1){
+                        this.purchaseMenuList = [];
+                    }
+                    this.isOpenRoom.step_1 = false;
+                    this.isOpenRoom.step_2 = false;
+                    this.isOpenRoom.step_detail = true;
+                    this.isOpenRoom.step_invoice = false;
                     console.log("success")
                 }
                 else{
@@ -842,7 +891,46 @@
                 this.isOpenRoom.step_detail = false;
                 this.isOpenRoom.step_invoice = true;
 
+            },
+            btnClickAddMenu(){
+                this.invoiceId = this.selectedRoom.invoices[0].invoice_id;
+                console.log(this.invoiceId)
+            },
+
+            btnConfirmAddMenu(){
+                this.addMenu();
+            },
+            async addMenu()
+            {
+                let formData = new FormData();
+                formData.append('invoice_id', this.invoiceId);
+                formData.append('menu_id', this.selectedMenu.id);
+                formData.append('quantity', this.menuQuantity);
+                formData.append('original_price', this.selectedMenu.prices[0].price);
+                let response = await postApiData({url: '/api/rooms/orders', form_data: formData});
+                console.log(this.invoiceId+','+this.selectedMenu.id + ','+ this.menuQuantity +','+this.selectedMenu.prices[0].price)
+                if(response.success){
+                    console.log("success")
+                    this.closeModal();
+                    this.clearMenuForm();
+                    this.getPurchaseMenuList();
+                }
+                else{
+                    console.log('some errors occur');
+                }
+            },
+
+
+            closeModal() {
+                document.getElementById("closeModal").click();
+            },
+
+            clearMenuForm() {
+                this.invoiceId = null,
+                this.menuQuantity = null,
+                this.selectedMenu = null
             }
+
 
             // async initialSidebarShow(){
             //     alert(this.roomList[0].invoices.length)
@@ -864,9 +952,11 @@
         mounted()
         {
             this.getGendersList();
-            this.getRoomList();
+            // this.getRoomList();
+            this.initialGetRoomList();
             this.getCustomerList();
             this.getMenuList();
+            // this.getSelectedRoom();
             // this.initialSidebarShow();
             initTE({ Modal, Select, Ripple, Tab });
 
