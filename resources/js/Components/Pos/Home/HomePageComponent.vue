@@ -138,7 +138,7 @@
                                 </p>
                                 <p class="text-sm text-black font-semibold">
                                     <!-- 35,000 MMks -->
-                                    {{ (selectedRoom.price_per_hour * (selectedRoom.invoices[0].length > 0 ? selectedRoom.invoices[0].sessions[0] : 1).session_duration).toLocaleString() }} 
+                                    {{ (selectedRoom.price_per_hour * (selectedRoom.invoices.length > 0 ? selectedRoom.invoices[0].sessions[0].session_duration : 1)).toLocaleString() }} 
                                     MMKs
                                 </p>
                             </div>
@@ -149,10 +149,10 @@
                             </div>
                             <div class="">
                                 <p class="text-sm text-black mb-2">
-                                    Start Time : {{ selectedRoom.invoices[0].sessions[0].start_date }}
+                                    Start Time : {{ selectedRoom.invoices.length > 0 ? selectedRoom.invoices[0].sessions[0].start_date : '' }}
                                 </p>
                                 <p class="text-sm text-black">
-                                    End Time : {{ selectedRoom.invoices[0].sessions[0].end_date }}
+                                    End Time : {{ selectedRoom.invoices.length > 0 ? selectedRoom.invoices[0].sessions[0].end_date : '' }}
                                 </p>
                             </div>
                         </div>
@@ -223,7 +223,7 @@
                                     (
                                         selectedRoom ? 
                                         ( 
-                                            purchaseMenuList[0] ? 
+                                            purchaseMenuList.length > 0 ? 
                                             (
                                                 (selectedRoom.price_per_hour * selectedRoom.invoices[0].sessions[0].session_duration) + purchaseMenuList[0].total
                                             ).toLocaleString()  
@@ -490,7 +490,7 @@
                             <!-- <label for="" class="block text-sm text-black mb-3">
                                 Hour
                             </label> -->
-                            <input type="text" placeholder="Hour"
+                            <input type="text" placeholder="Hour" v-model="sessionDuration"
                                 class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
                         </div>
                         <div class="mb-4">
@@ -511,7 +511,7 @@
                     </div>
 
                     <div class="flex justify-center px-12 mb-6">
-                        <button class="pos-add-btn focus:outline-none focus:ring-0 ">
+                        <button @click="btnAddHour()" class="pos-add-btn focus:outline-none focus:ring-0 ">
                             Add Hours
                         </button>
                     </div>
@@ -719,6 +719,7 @@
                 female:null,
                 child:null,
                 purchaseMenuList: [],
+                selectedRoomIndex:null,
 
                 //create menu
                 menuList: [],
@@ -726,6 +727,9 @@
                 selectedMenu:null,
                 menuQuantity:null,
                 menuPrice:null,
+                testroom:null,
+
+                sessionDuration:null,
 
 
 
@@ -759,7 +763,7 @@
                 const response = await getApiData({ url: '/api/rooms' });
                 if(response.data){
                     this.roomList = response.data;
-                    console.log( this.roomList[0] );
+                    // console.log( this.roomList[0] );
                 }
             },
             async initialGetRoomList(){
@@ -789,6 +793,7 @@
             
             btnClickedIsOpenRoom(room,index){
                 this.selectedRoom = room;
+                this.selectedRoomIndex = index;
                 if(this.roomList[index].invoices.length>0){
                     // alert(this.roomList[index].invoices.length)
                     this.isOpenRoom.step_1 = false;
@@ -865,17 +870,18 @@
                 }
                 let response = await postApiData({url: '/api/rooms/start', form_data: formData});
                 if(response.success){
-                    this.getRoomList();
+                    await this.getRoomList();
+                    this.selectedRoom = await this.roomList[this.selectedRoomIndex];                    
+                    this.isOpenRoom.step_1 = false;
+                    this.isOpenRoom.step_2 = false;
+                    this.isOpenRoom.step_detail = true;
+                    this.isOpenRoom.step_invoice = false;
                     if(this.selectedRoom.invoices.length>0){
                         this.getPurchaseMenuList();
                     }
                     if(this.selectedRoom.invoices.length<1){
                         this.purchaseMenuList = [];
                     }
-                    this.isOpenRoom.step_1 = false;
-                    this.isOpenRoom.step_2 = false;
-                    this.isOpenRoom.step_detail = true;
-                    this.isOpenRoom.step_invoice = false;
                     console.log("success")
                 }
                 else{
@@ -919,6 +925,28 @@
                     console.log('some errors occur');
                 }
             },
+            btnAddHour(){
+                this.addHour();
+            },
+            async addHour()
+            {
+                let formData = new FormData();
+                formData.append('invoice_id', this.selectedRoom.invoices[0].invoice_id);
+                formData.append('session_duration', this.sessionDuration);
+                let response = await postApiData({url: '/api/rooms/add_more_sessions', form_data: formData});
+                console.log(this.invoiceId+','+this.sessionDuration)
+                if(response.success){
+                    console.log("success")
+
+                    await this.getRoomList();
+                    this.selectedRoom = await this.roomList[this.selectedRoomIndex];  
+                    this.closeModal();
+                    this.clearMenuForm();
+                }
+                else{
+                    console.log('some errors occur');
+                }
+            },
 
 
             closeModal() {
@@ -948,7 +976,11 @@
             //     }
             // }
         },
-
+        watch :{
+            selectedRoom(val, oldVal) {
+                console.log(`new: ${val}, old: ${oldVal}`)
+            },
+        },
         mounted()
         {
             this.getGendersList();
