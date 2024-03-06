@@ -96,7 +96,7 @@ class InvoiceRepository implements InvoiceRepositoryInterface
 
     public function addSessionDuration(array $data)
     {
-        $roomAndSession = RoomSession::find($data['invoice_id']);
+        $roomAndSession = RoomSession::where('invoice_id',$data['invoice_id'])->get()->first();
         $endDate = Carbon::parse($roomAndSession->end_date);
         $endDate->addHours($data['session_duration']);
         $roomAndSession->end_date = $endDate;
