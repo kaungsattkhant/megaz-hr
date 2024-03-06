@@ -2,6 +2,7 @@
 
 namespace App\Repositories\ItemUsageForecast;
 
+use App\Models\ForecastItem;
 use App\Models\ItemUsageForecast;
 use Illuminate\Support\Facades\DB;
 
@@ -56,6 +57,16 @@ class ItemUsageForecastRepository implements ItemUsageForecastInterface
     {
         $itemUsageForecast->forecast_items=$itemUsageForecast->forecast_items;
         return $itemUsageForecast;
+    }
+
+    public function deleteForecastItem($id){
+        $forecastItem = ForecastItem::find($id);
+        if ($forecastItem) {
+            $forecastItem->delete();
+            ResponseMessage("Delete successfully", 200);
+        } else {
+            ResponseMessage("Data isn't found ", 404);
+        }
     }
 
 }

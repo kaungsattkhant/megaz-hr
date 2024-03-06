@@ -28,4 +28,8 @@ class ItemUsageForecastController extends Controller
     public function show(ItemUsageForecast $item_usage_forecast){
         return $this->itemUsageForecastRepo->detail($item_usage_forecast);
     }
+
+    public function destroyForecastItem($id){
+        return $this->itemUsageForecastRepo->deleteForecastItem($id);
+    }
 }

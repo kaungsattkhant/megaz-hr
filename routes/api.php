@@ -101,7 +101,11 @@ Route::middleware('auth:api')->group(function(){
     });
     #item usage forecast
     Route::resource('item_usage_forecasts', ItemUsageForecastController::class)->only(['index','store','show']);
+    Route::controller(ItemUsageForecastController::class)->group(function(){
+        Route::delete('forecast_item/{id}','deleteForecastItem');
+    });
 });
+
 
 
 Route::get('/areas', [AreaController::class, 'getAreas']);
