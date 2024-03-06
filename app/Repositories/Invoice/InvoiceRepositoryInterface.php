@@ -15,4 +15,6 @@ interface InvoiceRepositoryInterface
     public function deleteData(int $id);
 
     public function addSessionDuration(array $data);
+
+    public function invoiceEntityChange(array $data);
 }
