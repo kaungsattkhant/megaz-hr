@@ -11,5 +11,7 @@ interface ItemUsageForecastInterface
 
     public function detail($item_usage_forecast);
 
+    public function delete($id);
+
     public function  deleteForecastItem($item);
 }

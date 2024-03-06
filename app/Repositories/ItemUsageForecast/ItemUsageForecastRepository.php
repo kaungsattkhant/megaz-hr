@@ -58,7 +58,15 @@ class ItemUsageForecastRepository implements ItemUsageForecastInterface
         $itemUsageForecast->forecast_items=$itemUsageForecast->forecast_items;
         return $itemUsageForecast;
     }
-
+    public function delete($id){
+        $itemUsageForecast = ItemUsageForecast::find($id);
+        if ($itemUsageForecast) {
+            $itemUsageForecast->delete();
+            ResponseMessage("Delete successfully", 200);
+        } else {
+            ResponseMessage("Data isn't found ", 404);
+        }
+    }
     public function deleteForecastItem($id){
         $forecastItem = ForecastItem::find($id);
         if ($forecastItem) {

@@ -100,7 +100,7 @@ Route::middleware('auth:api')->group(function(){
         Route::post('updateIsCheck','updateIsCheck');
     });
     #item usage forecast
-    Route::resource('item_usage_forecasts', ItemUsageForecastController::class)->only(['index','store','show']);
+    Route::resource('item_usage_forecasts', ItemUsageForecastController::class)->only(['index','store','show','destroy']);
     Route::controller(ItemUsageForecastController::class)->group(function(){
         Route::delete('forecast_item/{id}','deleteForecastItem');
     });
