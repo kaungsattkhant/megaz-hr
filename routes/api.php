@@ -184,7 +184,7 @@ Route::post('/menus/{id}/add_price', [MenuAPIController::class, 'addPriceToMenu'
 
 Route::get('/rooms',[EntityAPIController::class,'getRoomsWithInvoice']);
 Route::get('/rooms/{id}',[EntityAPIController::class,'getRoomDetail']);
-Route::get('/rooms/inactive',[EntityAPIController::class,'getOnlyInactiveRooms']);
+Route::get('/rooms/lists/inactive',[EntityAPIController::class,'getOnlyInactiveRooms']);
 
 Route::post('/rooms/start',[InvoiceAPIController::class,'startRoomSession']);
 Route::post('/rooms/orders',[OrderAPIController::class,'addOrder']);
