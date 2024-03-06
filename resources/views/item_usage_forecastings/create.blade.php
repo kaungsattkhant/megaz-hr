@@ -4,5 +4,5 @@
 
 @section('item_usage_forecasts', 'active-link')
 @section('content')
-
+    <item-usage-forecast-create-component/>
 @endsection
