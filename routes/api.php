@@ -12,6 +12,7 @@ use App\Http\Controllers\API\EntityAPIController;
 use App\Http\Controllers\API\InventoryAPIController;
 use App\Http\Controllers\API\InvoiceAPIController;
 use App\Http\Controllers\API\ItemAPIController;
+use App\Http\Controllers\API\ItemUsageForecastController;
 use App\Http\Controllers\API\RoleAPIController;
 use App\Http\Controllers\API\ServiceAPIController;
 use App\Http\Controllers\API\StaffAPIController;
@@ -98,24 +99,10 @@ Route::middleware('auth:api')->group(function(){
         Route::delete('/purchase_orders_items/{id}','deletePurchaseOrderItem');
         Route::post('updateIsCheck','updateIsCheck');
     });
+    #item usage forecast
 });
-// Route::controller(PurchaseOrderAPIController::class)->group(function(){
 
-//     Route::get('/purchase_orders','getPurchaseOrder');
-//     Route::post('/purchase_orders','createPurchaseOrder');
-//     // below the route perform update, and kitchen data update and financial update and it depends on condition,
-//     Route::put('/purchase_orders/{id}','updatePurchaseOrder');
-//     Route::get('/purchase_orders/{purchase_order}','detail');
-//     Route::delete('/purchase_orders/{id}','deletePurchaseOrder');
-
-//     Route::get('/purchase_orders_items','getPurchaseOrderItem');
-//     Route::post('/purchase_orders_items','createPurchaseOrderItem');
-
-//     Route::delete('/purchase_orders_items/{id}','deletePurchaseOrderItem');
-//     Route::post('updateIsCheck','updateIsCheck');
-// });
-
-
+Route::resource('item_usage_forecasts', ItemUsageForecastController::class)->only(['index','store','show']);
 
 Route::get('/areas', [AreaController::class, 'getAreas']);
 Route::post('/areas', [AreaController::class, 'createArea']);

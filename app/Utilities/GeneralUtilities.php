@@ -257,3 +257,15 @@ if (!function_exists('RelationMorphName')) {
         return array_search(get_class($model), Relation::morphMap());
     }
 }
+
+if (!function_exists('JsonDecode')) {
+    function JsonDecode($raw_data)
+    {
+        $input_items = stripslashes(str_replace(array('\"', '&quot;', '\n'), '', $raw_data));
+        $json_data = json_decode($input_items);
+        if ($json_data == null) {
+            ResponseMessage('input data is not corrected', 402);
+        }
+        return $json_data;
+    }
+}

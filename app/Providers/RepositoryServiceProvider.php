@@ -23,7 +23,8 @@ use App\Repositories\Invoice\InvoiceRepository;
 use App\Repositories\Invoice\InvoiceRepositoryInterface;
 use App\Repositories\Item\ItemRepository;
 use App\Repositories\Item\ItemRepositoryInterface;
-
+use App\Repositories\ItemUsageForecast\ItemUsageForecastInterface;
+use App\Repositories\ItemUsageForecast\ItemUsageForecastRepository;
 use App\Repositories\PurchaseOrder\PurchaseOrderRepository;
 use App\Repositories\PurchaseOrder\PurchaseOrderRepositoryInterface;
 
@@ -86,5 +87,7 @@ class RepositoryServiceProvider extends ServiceProvider
         $this->app->bind(InvoiceRepositoryInterface::class,InvoiceRepository::class);
         $this->app->bind(RoomSessionRepositoryInterface::class,RoomSessionRepository::class);
         $this->app->bind(OrderRepositoryInterface::class,OrderRepository::class);
+        $this->app->bind(ItemUsageForecastInterface::class,ItemUsageForecastRepository::class);
+
     }
 }
