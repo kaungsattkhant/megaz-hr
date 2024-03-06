@@ -109,7 +109,15 @@ class InvoiceRepository implements InvoiceRepositoryInterface
     public function invoiceEntityChange(array $data)
     {
         $invoice = Invoice::find($data['invoice_id']);
+
+        $originalRoom = Entity::find($invoice->entity_id);
+        $originalRoom->is_active = 0;
+        $originalRoom->save();
         $room = Entity::find($data['entity_id']);
+        $room->is_active = 1;
+        // dd($originalRoom->name,$room->area_id);
+        $room->save();
+
         $invoice->entity_id = $room->id;
         $invoice->area_id = $room->area_id;
         $invoice->save();
