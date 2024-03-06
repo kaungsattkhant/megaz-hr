@@ -10,14 +10,12 @@ class StoreInventory
 {
     public function inventoryAction($model)
     {
-        
-        $morphMapName = array_search(get_class($model), Relation::morphMap());
+        $morphMapName=RelationMorphName($model);
 
         switch ($morphMapName) {
             case 'purchase_order':
                 $this->storePurchaseOrderToInventory($model,$morphMapName,'in');
                 break;
-
         }
     }
 
@@ -34,7 +32,7 @@ class StoreInventory
 
     public function storeItemToInventory($inventoryLedger,$item){
         return $inventoryLedger->inventory_ledger_items()->create([
-            'item_id'=>$item->id,
+            'item_id'=>$item->item_id,
             'quantity'=>$item->quantity,
             'inventory_ledger_-id'=>$inventoryLedger->id,
         ]);
