@@ -100,9 +100,9 @@ Route::middleware('auth:api')->group(function(){
         Route::post('updateIsCheck','updateIsCheck');
     });
     #item usage forecast
+    Route::resource('item_usage_forecasts', ItemUsageForecastController::class)->only(['index','store','show']);
 });
 
-Route::resource('item_usage_forecasts', ItemUsageForecastController::class)->only(['index','store','show']);
 
 Route::get('/areas', [AreaController::class, 'getAreas']);
 Route::post('/areas', [AreaController::class, 'createArea']);
