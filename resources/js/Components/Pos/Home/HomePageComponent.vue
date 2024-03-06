@@ -126,7 +126,7 @@
                                 </button>
                                 <button class="transition duration-150 ease-in-out focus:outline-none focus:ring-0"
                                      data-te-toggle="modal" data-te-target="#add_hour_modal">
-                                    a
+                                     <i class="far fa-hourglass-half"></i>
                                 </button>
                         </div>
                     </div>
@@ -476,7 +476,7 @@
                         <p class="text-xl w-full text-center">
                             Add More Hour
                         </p>
-                        <button type="button" class="absolute top-4 right-4 focus:shadow-none focus:outline-none"
+                        <button type="button" id="closeModal" class="absolute top-4 right-4 focus:shadow-none focus:outline-none"
                             data-te-modal-dismiss aria-label="Close">
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
                                 stroke="currentColor" class="h-5 w-5">
@@ -941,7 +941,7 @@
                     await this.getRoomList();
                     this.selectedRoom = await this.roomList[this.selectedRoomIndex];  
                     this.closeModal();
-                    this.clearMenuForm();
+                    this.clearAddHourForm();
                 }
                 else{
                     console.log('some errors occur');
@@ -954,9 +954,12 @@
             },
 
             clearMenuForm() {
-                this.invoiceId = null,
-                this.menuQuantity = null,
+                this.invoiceId = null
+                this.menuQuantity = null
                 this.selectedMenu = null
+            },
+            clearAddHourForm() {
+                this.sessionDuration = null
             }
 
 
