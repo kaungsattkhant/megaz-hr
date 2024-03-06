@@ -17,16 +17,18 @@ class ItemUsageForecastController extends Controller
     }
 
     public function index(Request $request){
-        return $this->itemUsageForecastRepo->list($request);
+         $itemUsageForecast=$this->itemUsageForecastRepo->list($request);
+         ResponseData($itemUsageForecast);
     }
 
     public function store(Request $request){
-        return $this->itemUsageForecastRepo->updateOrCreate($request);
-
+         $itemUsageForecast=$this->itemUsageForecastRepo->updateOrCreate($request);
+         ResponseData($itemUsageForecast);
     }
 
     public function show(ItemUsageForecast $item_usage_forecast){
-        return $this->itemUsageForecastRepo->detail($item_usage_forecast);
+        $itemUsageForecast= $this->itemUsageForecastRepo->detail($item_usage_forecast);
+        ResponseData($itemUsageForecast);
     }
     public function destroy($id){
         return $this->itemUsageForecastRepo->delete($id);
