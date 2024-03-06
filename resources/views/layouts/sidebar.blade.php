@@ -60,6 +60,12 @@
                             </a>
                         </li>
                         <li>
+                            <a href="{{ route('item_usage_forecasts') }}" class="flex items-center @yield('item_usage_forecasts')">
+                                <i class="fal fa-truck-loading  pr-3"></i>
+                                Item Usage Forecasts
+                            </a>
+                        </li>
+                        <li>
                             <a href="{{ route('roomandtable') }}" class="flex items-center @yield('table')">
                                 <i class="fal fa-user  pr-3"></i>
                                 Room / Table

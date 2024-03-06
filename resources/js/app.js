@@ -27,6 +27,7 @@ import PurchaseOrderListComponent from './Components/PurchaseOrders/PurchaseOrde
 import PurchaseOrderCreateComponent from './Components/PurchaseOrders/PurchaseOrderCreateComponent.vue';
 import PurchaseOrderConfirmComponent from './Components/PurchaseOrders/PurchaseOrderConfirmComponent.vue';
 import ItemCrudComponent from './Components/Items/ItemCrudComponent.vue';
+import ItemUsageForecastListComponent from './Components/ItemUsageForecastings/ItemUsageForecastListComponent.vue';
 
 import LoginComponent from './Components/Auth/LoginComponent.vue';
 import LogoutComponent from './Components/Auth/LogoutComponent.vue';
@@ -54,6 +55,7 @@ app.component('PurchaseOrderListComponent', PurchaseOrderListComponent);
 app.component('PurchaseOrderCreateComponent', PurchaseOrderCreateComponent);
 app.component('PurchaseOrderConfirmComponent', PurchaseOrderConfirmComponent);
 app.component('ItemCrudComponent', ItemCrudComponent);
+app.component('ItemUsageForecastListComponent', ItemUsageForecastListComponent);
 
 app.component('LoginComponent', LoginComponent);
 app.component('LogoutComponent', LogoutComponent);
