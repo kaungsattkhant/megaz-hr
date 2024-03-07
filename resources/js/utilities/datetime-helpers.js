@@ -45,3 +45,29 @@ export function convertToFriendlyDate(dbDateString)
 
     return `${month} ${day}, ${year}`;
 }
+
+export function getFirstDate(dbDateString)
+{
+    let date = new Date(dbDateString);
+    // Set the date to 1 to get the first date of the month
+    date.setDate(1);
+    // Format the result as "YYYY-mm-dd"
+    let firstDateOfMonth = date.toISOString().split('T')[0];
+
+    return firstDateOfMonth;
+}
+
+export function convertToMonth(dbDateString)
+{
+    const unixTimestamp = Date.parse(dbDateString);
+    const months = [
+        "Jan", "Feb", "Mar", "Apr", "May", "Jun",
+        "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
+    ];
+
+    const date = new Date(unixTimestamp);
+    const month = months[date.getMonth()];
+    const year = date.getFullYear();
+
+    return `${month}, ${year}`;
+}

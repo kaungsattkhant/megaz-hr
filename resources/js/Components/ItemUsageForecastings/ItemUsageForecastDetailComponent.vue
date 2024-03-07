@@ -1,8 +1,8 @@
 <template>
-    <div class="px-8">
+<div class="px-8">
         <div class="mb-6">
             <p class="text-xl  text-black font-normal">
-                Create Item Usage Forecast
+                Item Usage Forecast Detail
             </p>
         </div>
 
@@ -29,7 +29,7 @@
             </div>
 
             <div class="mb-0 col-span-3 rounded-md">
-                <label for="" class="block text-sm text-black mb-3">
+                <!-- <label for="" class="block text-sm text-black mb-3">
                     Item
                 </label>
                 <div class="text-sm input-ui w-full bg-transparent rounded-lg focus:ring-0" data-te-select-wrapper-ref>
@@ -39,30 +39,30 @@
                         >
                         <option :value="item" v-for="(item, itemIndex) in itemList" :key="itemIndex"> {{ item.name }} </option>
                     </select>
-                </div>
+                </div> -->
             </div>
 
             <div class="mb-0 col-span-3 rounded-md">
-                <label for="" class="block text-sm text-black mb-3">
+                <!-- <label for="" class="block text-sm text-black mb-3">
                     Amount
                 </label>
-                <input type="number" v-model="amount" class="mt-2 text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
+                <input type="number" v-model="amount" class="mt-2 text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0"> -->
             </div>
 
             <div class="mb-0 col-span-3 rounded-md">
-                <label for="" class="block text-sm text-black mb-3">
+                <!-- <label for="" class="block text-sm text-black mb-3">
                     Quantity
                 </label>
-                <input type="number" v-model="quantity" class="mt-2 text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
+                <input type="number" v-model="quantity" class="mt-2 text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0"> -->
             </div>
 
             <div class="col-span-3">
-                <label for="" class="block text-sm text-black mb-3">
+                <!-- <label for="" class="block text-sm text-black mb-3">
                     &nbsp;
                 </label>
                 <button class="mt-2 h-8 py-1 add-btn" @click="addItemBtnClicked">
                     Add Item
-                </button>
+                </button> -->
             </div>
 
         </div>
@@ -89,7 +89,7 @@
                         <div class="contents" v-for="(forecastItem, forecastItemIndex) in forecastItems" :key="forecastItemIndex">
                             <tr class="bg-white rounded-lg overflow-hidden shadow-lg">
                                 <td class=" px-6 py-4 font-medium ">
-                                    {{ forecastItem.name }}
+                                    {{ forecastItem.item.name }}
                                 </td>
                                 <td class=" px-6 py-4 font-medium ">
                                     {{ forecastItem.quantity }}
@@ -98,7 +98,7 @@
                                     {{ forecastItem.amount }}
                                 </td>
                                 <td class=" px-6 py-4 font-medium ">
-                                    <button @click="removeForecastItemBtnClicked(forecastItemIndex)">
+                                    <button @click="removeForecastItemBtnClicked(forecastItem.id)">
                                         <i class="fal fa-trash  pr-3"></i>
                                     </button>
                                 </td>
@@ -121,14 +121,16 @@
 </template>
 
 <script>
-    import { Modal, Ripple, initTE, Input, Tab, Select } from "tw-elements";
+    import { Modal, Ripple, initTE, Tab, Select } from "tw-elements";
     import { getApiData, postApiData, deleteApiData } from '../../utilities/ajax-helpers';
     import { getCurrentDate, getFirstDate } from "../../utilities/datetime-helpers";
     import { mapGetters } from "vuex";
 
     export default {
+        props: ['forecastId'],
         data() {
             return {
+                itemForecast: null,
                 itemList: [],
                 date: getFirstDate(getCurrentDate()),
                 selectedItem: null,
@@ -142,6 +144,18 @@
 
         methods: {
             ...mapGetters(['getToken']),
+
+            async getItemForecast(){
+                let response = await getApiData({url: `/api/item_usage_forecasts/${this.forecastId}`, token: this.getToken()});
+                if(response.data){
+                    this.itemForecast = response.data;
+                    // delete this.itemForecast.forecast_items;
+                    this.forecastItems = response.data.forecast_items;
+                    // console.log(this.itemForecast);
+                    // console.log(this.forecastItems);
+                }
+            },
+
             async getItemList(){
                 let response = await getApiData({url: `/api/items`, token: this.getToken()});
                 if(response.data){
@@ -178,8 +192,14 @@
                 this.selectedItem = null;
             },
 
-            removeForecastItemBtnClicked(forecastItemIndex){
-                this.forecastItems.splice(forecastItemIndex, 1);
+            async removeForecastItemBtnClicked(id){
+                let url = `/api/forecast_item/${id}`;
+                let response = await deleteApiData({url: url, token: this.getToken()});
+                if(response.success){
+                    let index = this.forecastItems.findIndex(forecastItem => forecastItem.id === id);
+                    console.log(this.forecastItems[index]);
+                    this.forecastItems.splice(index, 1);
+                }
             },
 
             async createBtnClicked(){
@@ -203,7 +223,7 @@
 
         created(){
             this.getItemList();
-            // this.dateInputChanged();
+            this.getItemForecast();
         },
 
         mounted(){
