@@ -52,5 +52,9 @@ class InvoiceAPIController extends Controller
         ResponseData($roomAndSession);
     }
 
+    public function changeRoom(Request $request){
+        $changeRoom = $this->invoiceRepo->invoiceEntityChange($request->all());
+        ResponseData($changeRoom);
+    }
 
 }
