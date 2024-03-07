@@ -34,8 +34,7 @@ class ItemUsageForecastController extends Controller
         ResponseMessage('Deleted');
         return $this->itemUsageForecastRepo->delete($id);
     }
-    public function destroyForecastItem($id){
-        ResponseMessage('Deleted');
+    public function  deleteForecastItem($id){
         return $this->itemUsageForecastRepo->deleteForecastItem($id);
     }
 }
