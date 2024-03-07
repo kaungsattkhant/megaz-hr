@@ -190,6 +190,8 @@ Route::post('/rooms/start',[InvoiceAPIController::class,'startRoomSession']);
 Route::post('/rooms/orders',[OrderAPIController::class,'addOrder']);
 Route::post('/rooms/add_more_sessions',[InvoiceAPIController::class,'addMoreSessions']);
 Route::post('/rooms/change_rooms',[InvoiceAPIController::class,'changeRoom']);
+
+Route::get('/tables',[EntityAPIController::class,'getTablesWithInvoice']);
 // Route::group(['prefix' => 'management'], function () {});
 Route::get("/test", [TestController::class, "index"]);
 
