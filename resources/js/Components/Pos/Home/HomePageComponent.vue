@@ -111,23 +111,23 @@
                 <div v-if="isOpenRoom.step_detail == true" class="relative h-full">
                     <div class="flex justify-between padding-section border-b">
                         <div>
-                                <p class="text-black text-xl">
+                            <p class="text-black text-xl">
                                     Table Details
-                                </p>
+                            </p>
                         </div>
                         <div class="flex gap-x-3">
-                                <button class="transition duration-150 ease-in-out focus:outline-none focus:ring-0"
-                                     data-te-toggle="modal" data-te-target="#change_modal">
-                                     <i class="far fa-random"></i>
-                                </button>
-                                <button @click="btnClickAddMenu" class="transition duration-150 ease-in-out focus:outline-none focus:ring-0"
+                            <button class="transition duration-150 ease-in-out focus:outline-none focus:ring-0"
+                                @click="btnClickedGetChangeableRoomList()" data-te-toggle="modal" data-te-target="#change_modal">
+                                <i class="far fa-random"></i>
+                            </button>
+                            <button @click="btnClickAddMenu" class="transition duration-150 ease-in-out focus:outline-none focus:ring-0"
                                      data-te-toggle="modal" data-te-target="#add_menu_modal">
                                      <i class="far fa-cocktail"></i>
-                                </button>
-                                <button class="transition duration-150 ease-in-out focus:outline-none focus:ring-0"
+                            </button>
+                            <button class="transition duration-150 ease-in-out focus:outline-none focus:ring-0"
                                      data-te-toggle="modal" data-te-target="#add_hour_modal">
                                      <i class="far fa-hourglass-half"></i>
-                                </button>
+                            </button>
                         </div>
                     </div>
                     <div class="small-scrollbar overflow-y-auto" style="height:calc(100% - 195px)">
@@ -531,7 +531,7 @@
                         <p class="text-xl w-full text-center">
                             Add Menu
                         </p>
-                        <button type="button" id="closeModal" class="absolute top-4 right-4 focus:shadow-none focus:outline-none"
+                        <button type="button" id="closeMenuModal" class="absolute top-4 right-4 focus:shadow-none focus:outline-none"
                             data-te-modal-dismiss aria-label="Close">
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
                                 stroke="currentColor" class="h-5 w-5">
@@ -576,7 +576,7 @@
                         <p class="text-xl w-full text-center">
                             Change Room
                         </p>
-                        <button type="button" class="absolute top-4 right-4 focus:shadow-none focus:outline-none"
+                        <button type="button" id="close_change_room_modal" class="absolute top-4 right-4 focus:shadow-none focus:outline-none"
                             data-te-modal-dismiss aria-label="Close">
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
                                 stroke="currentColor" class="h-5 w-5">
@@ -587,16 +587,16 @@
 
                     <div class="relative px-16 py-4" data-te-modal-body-ref>
                         <div class="mb-4">
-                            <select name="" id="" placeholder="Room"
+                            <select name="" id="" placeholder="Room" v-model="change_room"
                                 class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
-                                <option value="1"> Room</option>
+                                <option :value="changeableRoom" :key="index" v-for="(changeableRoom,index) in changeableRoomList">{{ changeableRoom.name }}</option>
                             </select>
                         </div>
 
                     </div>
 
                     <div class="flex justify-center px-12 mb-6">
-                        <button class="pos-add-btn focus:outline-none focus:ring-0 ">
+                        <button @click="btnClickedChangeRoom()" class="pos-add-btn focus:outline-none focus:ring-0 ">
                             Change
                         </button>
                     </div>
@@ -721,17 +721,16 @@
                 purchaseMenuList: [],
                 selectedRoomIndex:null,
 
-                //create menu
+                //create menu , add hour , change room
                 menuList: [],
                 invoiceId:null,
                 selectedMenu:null,
                 menuQuantity:null,
                 menuPrice:null,
                 testroom:null,
-
                 sessionDuration:null,
-
-
+                changeableRoomList:[],
+                change_room:null,
 
                 currentTime: getCurretDateTime(),
             };
@@ -917,7 +916,7 @@
                 console.log(this.invoiceId+','+this.selectedMenu.id + ','+ this.menuQuantity +','+this.selectedMenu.prices[0].price)
                 if(response.success){
                     console.log("success")
-                    this.closeModal();
+                    this.closeMenuModal();
                     this.clearMenuForm();
                     this.getPurchaseMenuList();
                 }
@@ -934,10 +933,8 @@
                 formData.append('invoice_id', this.selectedRoom.invoices[0].invoice_id);
                 formData.append('session_duration', this.sessionDuration);
                 let response = await postApiData({url: '/api/rooms/add_more_sessions', form_data: formData});
-                console.log(this.invoiceId+','+this.sessionDuration)
                 if(response.success){
                     console.log("success")
-
                     await this.getRoomList();
                     this.selectedRoom = await this.roomList[this.selectedRoomIndex];  
                     this.closeModal();
@@ -947,12 +944,47 @@
                     console.log('some errors occur');
                 }
             },
+            btnClickedChangeRoom(){
+                this.changeRoom();
+            },
+            async changeRoom()
+            {
+                let formData = new FormData();
+                formData.append('invoice_id', this.selectedRoom.invoices[0].invoice_id);
+                formData.append('entity_id', this.change_room.id);
+                let response = await postApiData({url: '/api/rooms/change_rooms', form_data: formData});
+                console.log('change room ' + this.selectedRoom.invoices[0].invoice_id+','+this.change_room.id)
+                if(response.success){
+                    console.log("success");
+                    await this.getRoomList();
+                    this.selectedRoom = this.roomList.find(x => x.id === this.change_room.id);
+                    this.closeChangeRoomModal();
+                    this.clearChangeRoomForm();
+                }
+                else{
+                    console.log('some errors occur');
+                }
+            },
+            btnClickedGetChangeableRoomList(){
+                this.getChangeableRoomList();
+            },
+            async getChangeableRoomList(){
+                const response = await getApiData({ url: '/api/rooms/lists/inactive' });
+                if(response.data){
+                    this.changeableRoomList = response.data;
+                }
+            },
 
 
             closeModal() {
                 document.getElementById("closeModal").click();
             },
-
+            closeMenuModal() {
+                document.getElementById("closeMenuModal").click();
+            },
+            closeChangeRoomModal() {
+                document.getElementById("close_change_room_modal").click();
+            },
             clearMenuForm() {
                 this.invoiceId = null
                 this.menuQuantity = null
@@ -960,6 +992,9 @@
             },
             clearAddHourForm() {
                 this.sessionDuration = null
+            },
+            clearChangeRoomForm() {
+                this.change_room = null
             }
 
 
@@ -991,6 +1026,7 @@
             this.initialGetRoomList();
             this.getCustomerList();
             this.getMenuList();
+            // this.getChangeableRoomList();
             // this.getSelectedRoom();
             // this.initialSidebarShow();
             initTE({ Modal, Select, Ripple, Tab });
