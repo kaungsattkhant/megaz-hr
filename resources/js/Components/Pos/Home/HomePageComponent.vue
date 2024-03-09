@@ -22,7 +22,7 @@
                         >KTV</a
                         >
                     </li>
-                    <li role="presentation">
+                    <li role="presentation" @click="btnGetTableListTab()">
                         <a
                         href="#tabs-profile"
                         class="my-2 mr-3 text-white block  px-7 pb-2.5 rounded-full
@@ -102,7 +102,31 @@
                         id="tabs-profile"
                         role="tabpanel"
                         aria-labelledby="tabs-profile-tab">
-                        Tab 2 content
+                        <div class="flex flex-wrap gap-x-4 gap-y-4">
+                            <div v-for="(table,index) in tableList" :class="table.is_active == 0 ? 'bg-[#55EFC4]' : 'bg-[#FF7675]'" 
+                                class=" flex-shrink-0 flex-grow p-6 w-40 max-w-44 h-40">
+
+                                <button class="relative flex flex-col justify-between h-full w-full">
+                                    
+                                    <div v-if="table.is_active == 1 " class=" flex justify-between flex-col h-full">
+                                        <div>
+                                            <p class="text-sm text-white">Start Time : 9:00 </p>
+                                            <p class="text-sm text-white">Start Time : 9:00 </p>
+                                        </div>
+
+                                        <p class="text-base text-left text-white">
+                                            {{ table.price_per_hour }}
+                                        </p>
+                                    </div>
+                                    <div class="absolute bottom-0 w-full flex justify-end">
+
+                                        <p class="text-xl text-white">
+                                            {{  table.name }}
+                                        </p>
+                                    </div>
+                                </button>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -254,7 +278,7 @@
                     <!-- invoice right sidebar -->
                 <div v-if="isOpenRoom.step_invoice == true" class="relative h-full">
                     <div class="flex justify-between padding-section border-b">
-                        <button>
+                        <button @click="btnBackToDetail()">
                             <i class="far fa-chevron-left"></i>
                          </button>
                         <div>
@@ -265,29 +289,44 @@
                     </div>
                     <div class="small-scrollbar overflow-y-auto" style="height:calc(100% - 329px)">
                         <div class="padding-section w-2/3 mx-auto ">
-                            <div class="mb-4">
-                                <label for="" class="block text-sm text-black mb-3">
-                                    Customer Name
-                                </label>
-                                <div class="relative">
-                                    <input type="text" placeholder="Customer Name"
-                                        class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
-                                </div>
-                            </div>
+                            
                             <div class="mb-4">
                                 <label for="" class="block text-sm text-black mb-3">
                                     Discount
                                 </label>
-                                <input type="text" placeholder="Discount"
+                                <input type="number" placeholder="Discount" v-model="printInvoiceData.discount"
                                     class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
                             </div>
                             <div class="mb-4">
                                 <label for="" class="block text-sm text-black mb-3">
                                 Paid Amount
                                 </label>
-                                <input type="text" placeholder="Paid Amount"
+                                <input type="text" placeholder="Paid Amount" v-model="paid_amount"
                                     class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
                             </div>
+                            <div class="mb-4">
+                                <label for="" class="block text-sm text-black mb-3">
+                                    Change
+                                </label>
+                                <div class="relative">
+                                    <input type="text" placeholder="Change" v-model="change"
+                                        class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
+                                </div>
+                            </div>
+                            <div class="mb-4">
+                                <label for="" class="block text-sm text-black mb-3">
+                                    Payment Method
+                                </label>
+                                <div class="relative">
+                                    <select name="" id="" v-model="selectedPaymentMethod"
+                                        class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
+                                        <option value="bank"> Bank </option>
+                                        <option value="cash"> Cash </option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            
                             <div class="mb-4">
                                 <div class="mb-[0.125rem] block min-h-[1.5rem] pl-[1.5rem]">
                                     <input
@@ -327,7 +366,8 @@
                                 Room
                             </p>
                             <p class=" w-28">
-                                1,000,000 MMKs
+                                {{  printInvoiceData.room ? printInvoiceData.room.toLocaleString() : 0 }} MMKs
+                                <!-- {{ (selectedRoom.price_per_hour * (selectedRoom.invoices.length > 0 ? selectedRoom.invoices[0].sessions[0].session_duration : 1)).toLocaleString() }} MMKs -->
                             </p>
                         </div>
                         <div class=" text-sm text-right flex gap-x-2 justify-end pr-2 mb-2">
@@ -335,7 +375,8 @@
                                 Food
                             </p>
                             <p class=" w-28">
-                                1,000,000 MMKs
+                                {{  printInvoiceData.food ? printInvoiceData.food.toLocaleString() : 0}} MMKs
+                                <!-- {{ purchaseMenuList.length > 0 ? purchaseMenuList[0].total.toLocaleString() : '0' }} MMks -->
                             </p>
                         </div>
                         <div class=" text-sm text-right flex gap-x-2 justify-end pr-2 mb-2">
@@ -343,7 +384,7 @@
                                 Service Tax
                             </p>
                             <p class=" w-28">
-                                1,000,000 MMKs
+                                {{  printInvoiceData.service_charge ? printInvoiceData.service_charge.toLocaleString() : 0 }} MMKs
                             </p>
                         </div>
                         <div class=" text-sm text-right flex gap-x-2 justify-end pr-2 mb-2">
@@ -351,7 +392,7 @@
                                 Tax
                             </p>
                             <p class=" w-28">
-                                1,000,000 MMKs
+                                {{  printInvoiceData.tax ? printInvoiceData.tax.toLocaleString() : 0 }} MMKs
                             </p>
                         </div>
                         <div class=" text-sm text-right flex gap-x-2 justify-end pr-2 mb-2">
@@ -359,16 +400,18 @@
                                 Discount
                             </p>
                             <p class=" w-28">
-                                1,000,000 MMKs
+                                {{  printInvoiceData.discount }} MMKs
                             </p>
                         </div>
                         <div class=" text-right pr-3 mb-3">
-                            <p>
-                                Total 10,000 MMKs
+                            <p class="font-semibold">
+                                Total &nbsp;
+                                <!-- {{  (printInvoiceData.room + printInvoiceData.food + printInvoiceData.service_charge + printInvoiceData.tax ) }} -->
+                                {{  printInvoiceData.total ? printInvoiceData.total.toLocaleString() : 0 }} MMKs
                             </p>
                         </div>
                         <div class="">
-                            <button class="bg-[#55EFC4] text-black text-center text-sm font-semibold w-full py-3">
+                            <button @click="btnClickedEndRoom()" class="bg-[#55EFC4] text-black text-center text-sm font-semibold w-full py-3">
                                 Print Invoice
                             </button>
                         </div>
@@ -720,6 +763,17 @@
                 child:null,
                 purchaseMenuList: [],
                 selectedRoomIndex:null,
+                printInvoiceData:{
+                    room:0,
+                    food:0,
+                    service_charge:0,
+                    tax:0,
+                    discount:0,
+                    tatalPrice:0
+                },
+                selectedPaymentMethod:null,
+                change:null,
+                paid_amount:null,
 
                 //create menu , add hour , change room
                 menuList: [],
@@ -731,6 +785,12 @@
                 sessionDuration:null,
                 changeableRoomList:[],
                 change_room:null,
+
+                // doneSession
+                
+
+                //rooftop
+                tableList:[],
 
                 currentTime: getCurretDateTime(),
             };
@@ -797,6 +857,7 @@
                     // alert(this.roomList[index].invoices.length)
                     this.isOpenRoom.step_1 = false;
                     this.isOpenRoom.step_2 = false;
+                    this.isOpenRoom.step_invoice = false;
                     this.isOpenRoom.step_detail = true;
                     this.getPurchaseMenuList();
                 }
@@ -804,6 +865,7 @@
                     // alert(this.roomList[index].invoices.length)
                     this.isOpenRoom.step_1=true;
                     this.isOpenRoom.step_2 = false;
+                    this.isOpenRoom.step_invoice = false;
                     this.isOpenRoom.step_detail = false;
                     this.getPurchaseMenuList();
                 }
@@ -884,19 +946,9 @@
                     console.log("success")
                 }
                 else{
-                    console.log('some errors occur');
+                    console.log('some errors occur')
                 }
-            },
-            btnClickedDoneSession(){
-                this.doneSession();
-            },
-            async doneSession(){
-                this.isOpenRoom.step_1=false;
-                this.isOpenRoom.step_2 = false;
-                this.isOpenRoom.step_detail = false;
-                this.isOpenRoom.step_invoice = true;
-
-            },
+            },            
             btnClickAddMenu(){
                 this.invoiceId = this.selectedRoom.invoices[0].invoice_id;
                 console.log(this.invoiceId)
@@ -975,6 +1027,69 @@
                 }
             },
 
+            btnBackToDetail(){
+                this.isOpenRoom.step_1 = false;
+                this.isOpenRoom.step_2 = false;
+                this.isOpenRoom.step_detail = true;
+                this.isOpenRoom.step_invoice = false;
+            },
+            btnClickedDoneSession(){
+                this.doneSession();
+                
+            },
+            async doneSession(){
+                this.isOpenRoom.step_1=false;
+                this.isOpenRoom.step_2 = false;
+                this.isOpenRoom.step_detail = false;
+                this.isOpenRoom.step_invoice = true;
+                this.printInvoiceData.room = this.selectedRoom.price_per_hour * this.selectedRoom.invoices[0].sessions[0].session_duration
+                if(this.purchaseMenuList.length > 0){
+                    this.printInvoiceData.food = this.purchaseMenuList[0].total
+                }
+                this.printInvoiceData.tax = this.printInvoiceData.food * 0.05
+                this.printInvoiceData.service_charge = (this.printInvoiceData.room + this.printInvoiceData.food) * 0.05 
+                this.printInvoiceData.total = this.printInvoiceData.room + this.printInvoiceData.food + this.printInvoiceData.tax +this.printInvoiceData.service_charge
+
+                this.selectedPaymentMethod = null
+                this.change = null
+                this.paid_amount = null
+                this.printInvoiceData.discount = 0
+            },
+            btnClickedEndRoom(){
+                this.EndRoom();
+            },
+            async EndRoom()
+            {
+                let formData = new FormData();
+                formData.append('invoice_id', this.selectedRoom.invoices[0].invoice_id);
+                formData.append('change', this.change);
+                formData.append('paid_amount', this.paid_amount);
+                formData.append('payment_type', this.selectedPaymentMethod);
+
+                formData.append('discount_value', this.printInvoiceData.discount);
+                formData.append('total_session_price', this.printInvoiceData.room);
+                formData.append('food_charge', this.printInvoiceData.food);
+                formData.append('service_charge', this.printInvoiceData.service_charge);
+                formData.append('tax', this.printInvoiceData.tax);
+                formData.append('total', this.printInvoiceData.total);
+                
+                let response = await postApiData({url: '/api/rooms/done', form_data: formData});
+                if(response.success){
+                    await this.getRoomList();
+                    // this.selectedRoom = await this.roomList[this.selectedRoomIndex]; 
+
+                    this.isOpenRoom.step_1 = true;
+                    this.isOpenRoom.step_2 = false;
+                    this.isOpenRoom.step_detail = false;
+                    this.isOpenRoom.step_invoice = false;
+                    
+                    console.log("success")
+                }
+                else{
+                    console.log('some errors occur');
+                }
+            },
+
 
             closeModal() {
                 document.getElementById("closeModal").click();
@@ -995,8 +1110,19 @@
             },
             clearChangeRoomForm() {
                 this.change_room = null
-            }
+            },
 
+
+            //root top
+            btnGetTableListTab(){
+                this.getTableListTab()
+            },
+            async getTableListTab(){
+                const response = await getApiData({ url: '/api/tables' });
+                if(response.data){
+                    this.tableList = response.data;
+                }
+            }
 
             // async initialSidebarShow(){
             //     alert(this.roomList[0].invoices.length)
