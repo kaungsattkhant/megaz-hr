@@ -15,14 +15,14 @@ class InvoiceRepository implements InvoiceRepositoryInterface
 {
     public function listAllData(Request $request)
     {
-        if($request->per_page || $request->page){
+        if ($request->per_page || $request->page) {
             $totalCount = Invoice::count();
             $pageNumber = 1;
             $perPage = 20;
-            if($request->page){
+            if ($request->page) {
                 $pageNumber = $request->page;
             }
-            if($request->per_page){
+            if ($request->per_page) {
                 $perPage = $request->per_page;
             }
             $skip = ($pageNumber - 1) * $perPage;
@@ -31,8 +31,7 @@ class InvoiceRepository implements InvoiceRepositoryInterface
             $paginationData['invoices'] = $invoices;
 
             return $paginationData;
-        }
-        else{
+        } else {
             $invoices = Invoice::all();
 
             return $invoices;
@@ -56,19 +55,18 @@ class InvoiceRepository implements InvoiceRepositoryInterface
         $data['invoice_id'] = $invoice->id;
         $data['start_date'] = $data['invoice_date'];
         $data['end_date'] = Carbon::parse($data['start_date'])
-        ->addHours($data['session_duration'])
-        ->format('Y-m-d H:i:s');
+            ->addHours($data['session_duration'])
+            ->format('Y-m-d H:i:s');
         $roomSession = RoomSession::create($data);
         $invoice->room_session = $roomSession;
 
         return $invoice;
     }
 
-    public function updateData(array $data,int $id)
+    public function updateData(array $data, int $id)
     {
         $invoice = Invoice::find($id);
-        if($invoice)
-        {
+        if ($invoice) {
             $invoice->updaet($data);
             return $invoice;
         }
@@ -79,8 +77,7 @@ class InvoiceRepository implements InvoiceRepositoryInterface
     public function deleteData(int $id)
     {
         $invoice = Invoice::find($id);
-        if($invoice)
-        {
+        if ($invoice) {
             $invoice->delete();
             return true;
         }
@@ -96,7 +93,7 @@ class InvoiceRepository implements InvoiceRepositoryInterface
 
     public function addSessionDuration(array $data)
     {
-        $roomAndSession = RoomSession::where('invoice_id',$data['invoice_id'])->get()->first();
+        $roomAndSession = RoomSession::where('invoice_id', $data['invoice_id'])->get()->first();
         $endDate = Carbon::parse($roomAndSession->end_date);
         $endDate->addHours($data['session_duration']);
         $roomAndSession->end_date = $endDate;
@@ -122,6 +119,18 @@ class InvoiceRepository implements InvoiceRepositoryInterface
         $invoice->area_id = $room->area_id;
         $invoice->save();
         return $room;
+    }
 
+    public function doneEntityWithInvoice(array $data)
+    {
+        $invoice = Invoice::find($data['invoice_id']);
+        $entity = Entity::find($invoice->entity_id);
+        $entity->is_active = 0;
+        $entity->save();
+        $data['sub_total'] = $data['food_charge'] + $data['total_session_price'];
+        $data['payment_status'] = 'received';
+        $data['complete_date'] = CurrentTime();
+        $invoice->update($data);
+        return $invoice;
     }
 }

@@ -8,7 +8,7 @@ use App\Http\Controllers\Controller;
 
 use App\Http\Requests\Entity\EntityCreateRequest;
 use App\Http\Requests\Entity\EntityUpdateRequest;
-
+use App\Models\Area;
 use App\Repositories\Entity\EntityRepositoryInterface;
 
 class EntityAPIController extends Controller
@@ -60,6 +60,14 @@ class EntityAPIController extends Controller
         $data = $request->all();
         $data['current_date'] = CurrentDate();
         $entity = $this->entityRepo->roomsWithInvoice($data);
+        ResponseData($entity);
+    }
+
+    public function getTablesWithInvoice(Request $request)
+    {
+        $data = $request->all();
+        $data['current_date'] = CurrentDate();
+        $entity = $this->entityRepo->tablesWithInvoice($data);
         ResponseData($entity);
     }
 
