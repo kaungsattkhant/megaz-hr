@@ -34,6 +34,8 @@ class DatabaseSeeder extends Seeder
             ServiceCategorySeeder::class,
             UomSeeder::class,
             ItemSeeder::class,
+            HeadAccountSeeder::class,
+            SubAccountSeeder::class,
         ]);
     }
 }
