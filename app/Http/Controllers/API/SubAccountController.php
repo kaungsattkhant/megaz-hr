@@ -2,12 +2,12 @@
 
 namespace App\Http\Controllers\API;
 
-use App\Models\HeadAccount;
+use App\Models\SubAccount;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Repositories\HeadAccount\HeadAccountInterface;
 
-class HeadAccountController extends Controller
+class SubAccountController extends Controller
 {
     //
     private HeadAccountInterface $headAccountRepo;
@@ -18,18 +18,17 @@ class HeadAccountController extends Controller
     }
     public function index(Request $request)
     {
-        $itemUsageForecast = $this->headAccountRepo->headAccountList($request);
+        $itemUsageForecast = $this->headAccountRepo->subAccountList($request);
         ResponseData($itemUsageForecast);
     }
     public function store(Request $request)
     {
-        $itemUsageForecast = $this->headAccountRepo->updateOrCreateHeadAccount($request);
+        $itemUsageForecast = $this->headAccountRepo->updateOrCreateSubAccount($request);
         ResponseData($itemUsageForecast);
     }
 
-    public function show(HeadAccount $headAccount){
-        $itemUsageForecast= $this->headAccountRepo->detailHeadAccount($headAccount);
+    public function show(SubAccount $sub_account){
+        $itemUsageForecast= $this->headAccountRepo->detailSubAccount($sub_account);
         ResponseData($itemUsageForecast);
     }
-
 }

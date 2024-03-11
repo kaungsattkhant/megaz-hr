@@ -6,11 +6,15 @@ use Illuminate\Http\Request;
 
 interface HeadAccountInterface
 {
-    // public function listAllData(Request $request);
+    public function headAccountList($request);
 
-    public function updateOrCreate($request);
+    public function updateOrCreateHeadAccount($request);
 
-    // public function updateData(array $data,int $id);
+    public function detailHeadAccount($headAccount);
 
-    // public function deleteData(int $id);
+    public function subAccountList($request);
+
+    public function updateOrCreateSubAccount($request);
+
+    public function detailSubAccount($headAccount);
 }
