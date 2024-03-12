@@ -20,6 +20,9 @@ class HeadAccountRepository implements HeadAccountInterface
         $data = $request->all();
         DB::beginTransaction();
         try {
+            if (!isset($request->id)) {
+                $data['id'] = null;
+            }
             $headAccount=HeadAccount::updateOrCreate(
                 ['id' => $data['id']],
                 $data
@@ -50,7 +53,10 @@ class HeadAccountRepository implements HeadAccountInterface
         $data = $request->all();
         DB::beginTransaction();
         try {
-            $subAccount=HeadAccount::updateOrCreate(
+            if (!isset($request->id)) {
+                $data['id'] = null;
+            }
+            $subAccount=SubAccount::updateOrCreate(
                 ['id' => $data['id']],
                 $data
             );

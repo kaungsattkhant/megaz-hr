@@ -18,17 +18,17 @@ class SubAccountController extends Controller
     }
     public function index(Request $request)
     {
-        $itemUsageForecast = $this->headAccountRepo->subAccountList($request);
-        ResponseData($itemUsageForecast);
+        $sub_account = $this->headAccountRepo->subAccountList($request);
+        ResponseData($sub_account);
     }
     public function store(Request $request)
     {
-        $itemUsageForecast = $this->headAccountRepo->updateOrCreateSubAccount($request);
-        ResponseData($itemUsageForecast);
+        $sub_account = $this->headAccountRepo->updateOrCreateSubAccount($request);
+        ResponseData($sub_account);
     }
 
     public function show(SubAccount $sub_account){
-        $itemUsageForecast= $this->headAccountRepo->detailSubAccount($sub_account);
-        ResponseData($itemUsageForecast);
+        $sub_account= $this->headAccountRepo->detailSubAccount($sub_account);
+        ResponseData($sub_account);
     }
 }
