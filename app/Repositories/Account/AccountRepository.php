@@ -16,7 +16,7 @@ class AccountRepository implements AccountInterface
                      DB::raw('COALESCE(SUM(CASE WHEN ledgers.action = "debit" THEN ledgers.value ELSE 0 END), 0) as debit_amount'),
                      DB::raw('COALESCE(SUM(CASE WHEN ledgers.action = "credit" THEN ledgers.value ELSE 0 END), 0) as credit_amount'))
             ->groupBy('accounts.id', 'accounts.name')
-            ->get();
+            ->paginate();
         }
         return Account::where('is_available',1)->get();
     }
