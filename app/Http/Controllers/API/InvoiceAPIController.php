@@ -5,7 +5,7 @@ namespace App\Http\Controllers\API;
 use Illuminate\Http\Request;
 
 use App\Http\Controllers\Controller;
-
+use App\Http\Requests\RoomSession\EndRoomSessionRequest;
 use App\Repositories\Invoice\InvoiceRepositoryInterface;
 
 class InvoiceAPIController extends Controller
@@ -55,6 +55,13 @@ class InvoiceAPIController extends Controller
     public function changeRoom(Request $request){
         $changeRoom = $this->invoiceRepo->invoiceEntityChange($request->all());
         ResponseData($changeRoom);
+    }
+
+    public function endRoom(EndRoomSessionRequest $request)
+    {
+
+        $endRoom = $this->invoiceRepo->doneEntityWithInvoice($request->all());
+        ResponseData($endRoom);
     }
 
 }

@@ -17,4 +17,7 @@ interface InvoiceRepositoryInterface
     public function addSessionDuration(array $data);
 
     public function invoiceEntityChange(array $data);
+
+    public function doneEntityWithInvoice(array $data);
 }
+
