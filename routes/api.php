@@ -111,7 +111,7 @@ Route::middleware('auth:api')->group(function(){
     Route::resource('head_accounts', HeadAccountController::class)->only(['index','store','show','destroy']);
     Route::resource('sub_accounts', SubAccountController::class)->only(['index','store','show','destroy']);
     Route::resource('accounts', AccountController::class)->only(['index','store','show','destroy']);
-});git a
+});
 
 
 Route::controller(ExcelImportController::class)->group(function(){
