@@ -61,8 +61,8 @@ Route::view('/item_usage_forecasts', 'item_usage_forecastings.index')->name('ite
 Route::view('/item_usage_forecasts/{forecastId}/detail', 'item_usage_forecastings.detail')->name('item_usage_forecasts.detail');
 Route::view('/item_usage_forecasts/create', 'item_usage_forecastings.create')->name('item_usage_forecasts.create');
 
-Route::view('/accounting', 'accounting.index')->name('accounting');
-Route::view('/financial_transaction', 'financial_transaction.index')->name('financial_transaction');
+Route::view('/accounting', 'accounting.index')->name('accountings');
+Route::view('/financial_transaction', 'financial_transaction.index')->name('financial_transactions');
 
 //pos
 Route::view('/pos/home', 'pos.home.index')->name('pos');
