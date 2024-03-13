@@ -26,13 +26,13 @@ class InvoiceRepository implements InvoiceRepositoryInterface
                 $perPage = $request->per_page;
             }
             $skip = ($pageNumber - 1) * $perPage;
-            $invoices = Invoice::skip($skip)->take($perPage)->get();
+            $invoices = Invoice::with('customer', 'room')->skip($skip)->take($perPage)->get();
             $paginationData = MakePaginationData($request, $totalCount, 'invoices');
             $paginationData['invoices'] = $invoices;
 
             return $paginationData;
         } else {
-            $invoices = Invoice::all();
+            $invoices = Invoice::with('customer', 'room')->get();
 
             return $invoices;
         }
