@@ -57,3 +57,9 @@ Route::view('/item_usage_forecasts/create', 'item_usage_forecastings.create')->n
 Route::view('/pos/home', 'pos.home.index')->name('pos');
 Route::view('/pos/customer', 'pos.customers.index')->name('customer');
 Route::view('/pos/customer/create', 'pos.customers.create')->name('customer_create');
+Route::view('/pos/ar', 'pos.AR.index')->name('ar');
+Route::view('/pos/cashbook', 'pos.cashbook.index')->name('cashbook');
+Route::view('/pos/cashbook/detail', 'pos.cashbook.detail')->name('cashbook_detail');
+Route::view('/pos/invoices', 'pos.invoices.index')->name('invoices');
+Route::view('/pos/invoices/detail', 'pos.invoices.detail')->name('invoices_detail');
+

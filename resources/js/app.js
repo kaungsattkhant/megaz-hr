@@ -35,6 +35,12 @@ import LogoutComponent from './Components/Auth/LogoutComponent.vue';
 import CustomersListComponent from './Components/Pos/Customers/CustomersListComponent.vue';
 import CustomersCreateComponent from './Components/Pos/Customers/CustomersCreateComponent.vue';
 import HomePageComponent from './Components/Pos/Home/HomePageComponent.vue';
+import ArCrudComponent from './Components/Pos/AR/ArCrudComponent.vue';
+import CashbookCrudComponent from './Components/Pos/Cashbook/CashbookCrudComponent.vue';
+import CashbookDetailComponent from './Components/Pos/Cashbook/CashbookDetailComponent.vue';
+import InvoiceListComponent from './Components/Pos/Invoices/InvoiceListComponent.vue';
+import InvoiceDetailComponent from './Components/Pos/Invoices/InvoiceDetailComponent.vue';
+
 
 const app = createApp({});
 app.component('StaffListComponent', StaffListComponent);
@@ -63,6 +69,11 @@ app.component('LogoutComponent', LogoutComponent);
 app.component('CustomersListComponent', CustomersListComponent);
 app.component('CustomersCreateComponent', CustomersCreateComponent);
 app.component('HomePageComponent', HomePageComponent);
+app.component('ArCrudComponent', ArCrudComponent);
+app.component('CashbookCrudComponent', CashbookCrudComponent);
+app.component('CashbookDetailComponent', CashbookDetailComponent);
+app.component('InvoiceListComponent', InvoiceListComponent);
+app.component('InvoiceDetailComponent', InvoiceDetailComponent);
 
 app.use(store);
 app.mount('#app');
