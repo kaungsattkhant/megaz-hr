@@ -9,14 +9,6 @@
                         </button>
                     </div>
                     <div class="flex gap-x-3">
-                        <button class="pos-add-btn !bg-[#F15181]">
-                            Close
-                        </button>
-                        <button class="pos-add-btn">
-                            <a href="/pos/customer/create" class="a-clear">
-                                Add
-                            </a>
-                        </button>
                     </div>
                 </div>
                 <div>
@@ -24,25 +16,21 @@
                         <table class="min-w-full text-left text-sm font-light">
                             <thead class="border-b font-medium">
                                 <tr>
-                                <th scope="col" class="px-6 py-4">#</th>
-                                <th scope="col" class="px-6 py-4">Customer Name</th>
-                                <th scope="col" class="px-6 py-4">Phone Number</th>
-                                <th scope="col" class="px-6 py-4">Address</th>
+                                    <th scope="col" class="px-6 py-4">Id</th>
+                                    <th scope="col" class="px-6 py-4">Date</th>
+                                    <th scope="col" class="px-6 py-4">Amount</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr class="" v-for="(customer,index) in customerList" :key="index">
+                                <tr class="">
                                     <td class="whitespace-nowrap px-6 py-4 font-medium">
-                                        {{ index++ }}
+                                        1
                                     </td>
                                     <td class="whitespace-nowrap px-6 py-4">
-                                        {{ customer.name }}
+                                        2
                                     </td>
                                     <td class="whitespace-nowrap px-6 py-4">
-                                        {{ customer.phone_number }}
-                                    </td>
-                                    <td class="whitespace-nowrap px-6 py-4">
-                                        {{ customer.address }}
+                                        3
                                     </td>
                                 </tr>
 
@@ -55,16 +43,14 @@
         </div>
 
 
-
-
-
+        
 
 
     </div>
 
 </template>
 <script>
-import { Modal, Ripple, Select, Datepicker, initTE, Input } from "tw-elements";
+    import { Modal, Ripple, Select, Datepicker, initTE, Input } from "tw-elements";
     import { getApiData, postApiData, deleteApiData } from '../../../utilities/ajax-helpers';
     import { mapGetters } from "vuex";
 
@@ -77,18 +63,17 @@ import { Modal, Ripple, Select, Datepicker, initTE, Input } from "tw-elements";
         },
 
         methods: {
-            ...mapGetters(['getToken']),
+            // ...mapGetters(['getToken']),
 
-            async getCustomersList(){
-                const response = await getApiData({ url: '/api/customers' , token: this.getToken()});
-                if(response.data){
-                    this.customerList = response.data;
-                }
-            },
+            // async getCashbookList(){
+            //     const response = await getApiData({ url: '/api/cashbook' , token: this.getToken()});
+            //     if(response.data){
+            //         this.cashbookList = response.data;
+            //     }
+            // },
         },
         mounted()
         {
-            this.getCustomersList();
             initTE({ Modal, Select, Ripple, Datepicker });
         }
     }
