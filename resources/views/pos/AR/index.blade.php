@@ -4,7 +4,7 @@
 @section('ar', 'pos-active-link')
 @section('content')
 <div id="app">
-    <ar-crud-component>
+    <pos-ar-crud-component>
 </div>
     
 

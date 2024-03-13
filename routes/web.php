@@ -68,7 +68,7 @@ Route::view('/financial_transaction', 'financial_transaction.index')->name('fina
 Route::view('/pos/home', 'pos.home.index')->name('pos');
 Route::view('/pos/customer', 'pos.customers.index')->name('customer');
 Route::view('/pos/customer/create', 'pos.customers.create')->name('customer_create');
-Route::view('/pos/ar', 'pos.AR.index')->name('ar');
+Route::view('/pos/ar', 'pos.AR.index')->name('pos_ar');
 Route::view('/pos/cashbook', 'pos.cashbook.index')->name('cashbook');
 Route::view('/pos/cashbook/detail', 'pos.cashbook.detail')->name('cashbook_detail');
 Route::view('/pos/invoices', 'pos.invoices.index')->name('invoices');
