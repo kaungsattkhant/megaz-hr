@@ -2,6 +2,8 @@
 
 namespace App\Providers;
 
+use App\Repositories\Account\AccountInterface;
+use App\Repositories\Account\AccountRepository;
 use Illuminate\Support\ServiceProvider;
 
 use App\Repositories\Area\AreaRepositoryInterface;
@@ -90,6 +92,6 @@ class RepositoryServiceProvider extends ServiceProvider
         $this->app->bind(OrderRepositoryInterface::class,OrderRepository::class);
         $this->app->bind(ItemUsageForecastInterface::class,ItemUsageForecastRepository::class);
         $this->app->bind(HeadAccountInterface::class,HeadAccountRepository::class);
-
+        $this->app->bind(AccountInterface::class,AccountRepository::class);
     }
 }
