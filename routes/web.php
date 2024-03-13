@@ -52,6 +52,10 @@ Route::view('/purchase_orders/create', 'purchase_orders.create')->name('purchase
 Route::view('/purchase_orders/{poId}/confirm', 'purchase_orders.confirm')->name('purchase_orders.confirm');
 Route::view('/accounting', 'accounting.index')->name('accounting');
 Route::view('/financial_transaction', 'financial_transaction.index')->name('financial_transaction');
+Route::view('/cash_book', 'cashbook.index')->name('cash_book');
+Route::view('/ar_list', 'AR.index')->name('ar_list');
+Route::view('/ar_history', 'AR.history')->name('ar_history');
+Route::view('/ar_paid', 'AR.paid')->name('ar_paid');
 
 Route::view('/item_usage_forecasts', 'item_usage_forecastings.index')->name('item_usage_forecasts');
 Route::view('/item_usage_forecasts/{forecastId}/detail', 'item_usage_forecastings.detail')->name('item_usage_forecasts.detail');
@@ -61,7 +65,7 @@ Route::view('/item_usage_forecasts/create', 'item_usage_forecastings.create')->n
 Route::view('/pos/home', 'pos.home.index')->name('pos');
 Route::view('/pos/customer', 'pos.customers.index')->name('customer');
 Route::view('/pos/customer/create', 'pos.customers.create')->name('customer_create');
-Route::view('/pos/ar', 'pos.AR.index')->name('ar');
+Route::view('/pos/ar', 'pos.AR.index')->name('pos_ar');
 Route::view('/pos/cashbook', 'pos.cashbook.index')->name('cashbook');
 Route::view('/pos/cashbook/detail', 'pos.cashbook.detail')->name('cashbook_detail');
 Route::view('/pos/invoices', 'pos.invoices.index')->name('invoices');

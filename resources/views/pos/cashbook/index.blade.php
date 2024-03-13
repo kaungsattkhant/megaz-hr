@@ -4,7 +4,7 @@
 @section('cashbook', 'pos-active-link')
 @section('content')
 <div id="app">
-    <cashbook-crud-component>
+    <pos-cashbook-crud-component>
 </div>
     
 

@@ -1,10 +1,10 @@
 @extends('layouts.main')
 
-@section('page_title', 'AR')
+@section('page_title', 'AR History')
 @section('ar', 'active-link')
 @section('content')
     <div id="app">
-        <ar-list-component/>
+        <ar-history-component/>
 
     </div>
 
