@@ -64,4 +64,10 @@ class InvoiceAPIController extends Controller
         ResponseData($endRoom);
     }
 
+    public function getInvoiceData(Request $request)
+    {
+        $invoice = $this->invoiceRepo->listAllData($request);
+        ResponseData($invoice);
+    }
+
 }
