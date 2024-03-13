@@ -50,6 +50,8 @@ Route::view('/items', 'items.index')->name('items');
 Route::view('/purchase_orders', 'purchase_orders.index')->name('purchase_orders');
 Route::view('/purchase_orders/create', 'purchase_orders.create')->name('purchase_orders.create');
 Route::view('/purchase_orders/{poId}/confirm', 'purchase_orders.confirm')->name('purchase_orders.confirm');
+Route::view('/accounting', 'accounting.index')->name('accounting');
+Route::view('/financial_transaction', 'financial_transaction.index')->name('financial_transaction');
 
 Route::view('/item_usage_forecasts', 'item_usage_forecastings.index')->name('item_usage_forecasts');
 Route::view('/item_usage_forecasts/{forecastId}/detail', 'item_usage_forecastings.detail')->name('item_usage_forecasts.detail');
