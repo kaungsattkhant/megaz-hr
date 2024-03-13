@@ -39,7 +39,9 @@ class StoreInventory
     }
 
     public function storePurchaseOrderToInventory($model,$morphMapName,$action){
-        $purchaseOrderItem=PurchaseOrderItem::where('purchase_order_id',$model->id)->get();
+        $purchaseOrderItem=PurchaseOrderItem::with(['item'])->where('purchase_order_id',$model->id)->get();
+        // $purchaseOrderItemGroupedByCategory=PurchaseOrderItem::
+        // ->where('purchase_order_id',$model->id)->get();
         $inventoryLedger=$this->storeToInventoryLedger($model,$morphMapName,$action);
         foreach($purchaseOrderItem as $po_item){
             $this->storeItemToInventory($inventoryLedger,$po_item);

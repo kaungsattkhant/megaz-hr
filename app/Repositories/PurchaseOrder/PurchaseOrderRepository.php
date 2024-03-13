@@ -20,8 +20,7 @@ class PurchaseOrderRepository implements PurchaseOrderRepositoryInterface
             ->orderBy('id', 'desc')
             ->when($staff->hasRoles('Staff'), function ($q) use ($staff) {
                 $q
-                    ->where('created_by', $staff->id)
-                    ->whereIn('status', ['created']);
+                    ->where('created_by', $staff->id);
             })
             ->when($staff->hasRoles('Manager'), function ($q) {
                 $q->whereIn('status', ['manager_checked', 'created']);
@@ -178,6 +177,7 @@ class PurchaseOrderRepository implements PurchaseOrderRepositoryInterface
                         (new StoreInventory())->inventoryAction($model, 'in', 'purchase_order');
                     }
                 }
+                dd('abc');
                 DB::commit();
                 ResponseMessage('Update successfully', 200);
             }

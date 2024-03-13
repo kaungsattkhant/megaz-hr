@@ -24,7 +24,7 @@ class ItemSeeder extends Seeder
         $faker = Faker::create();
         $uoms=Uom::pluck('id')->toArray();
         $amounts=[1000,2000,3000,4000,5000,6000,7000];
-        $categories=Category::pluck('id')->toArray();
+        $categories=Category::pluck('id')->take(5)->toArray();
         $numCategories = count($categories);
         $numUoms = count($uoms);
         foreach (range(1, 100) as $index) {
