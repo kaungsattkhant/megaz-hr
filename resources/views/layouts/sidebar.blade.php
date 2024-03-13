@@ -32,7 +32,13 @@
                         <li>
                             <a href="{{ route('roles') }}" class="flex items-center @yield('roles')">
                                 <i class="fal fa-tasks  pr-3"></i>
-                                Role
+                                Roles
+                            </a>
+                        </li>
+                        <li>
+                            <a href="{{ route('accountings') }}" class="flex items-center @yield('accounting')">
+                                <i class="fal fa-tasks  pr-3"></i>
+                                Chart of Accounts (COA)
                             </a>
                         </li>
                         <li>

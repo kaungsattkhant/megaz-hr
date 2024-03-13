@@ -2,8 +2,9 @@
 
 namespace App\Repositories\HeadAccount;
 
-use App\Models\HeadAccount;
 use App\Models\SubAccount;
+use App\Models\HeadAccount;
+use Illuminate\Support\Facades\DB;
 
 class HeadAccountRepository implements HeadAccountInterface
 {
@@ -16,7 +17,23 @@ class HeadAccountRepository implements HeadAccountInterface
     }
 
     public function updateOrCreateHeadAccount($request){
-
+        $data = $request->all();
+        DB::beginTransaction();
+        try {
+            if (!isset($request->id)) {
+                $data['id'] = null;
+            }
+            $headAccount=HeadAccount::updateOrCreate(
+                ['id' => $data['id']],
+                $data
+            );
+            DB::commit();
+            return $headAccount;
+        } catch (\Exception $e) {
+            DB::rollback();
+            ResponseMessage($e->getMessage(), 402);
+            throw $e;
+        }
     }
 
     public function detailHeadAccount($headAccount)
@@ -33,7 +50,23 @@ class HeadAccountRepository implements HeadAccountInterface
     }
 
     public function updateOrCreateSubAccount($request){
-
+        $data = $request->all();
+        DB::beginTransaction();
+        try {
+            if (!isset($request->id)) {
+                $data['id'] = null;
+            }
+            $subAccount=SubAccount::updateOrCreate(
+                ['id' => $data['id']],
+                $data
+            );
+            DB::commit();
+            return $subAccount;
+        } catch (\Exception $e) {
+            DB::rollback();
+            ResponseMessage($e->getMessage(), 402);
+            throw $e;
+        }
     }
 
     public function detailSubAccount($subAccount){

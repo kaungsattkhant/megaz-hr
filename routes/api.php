@@ -15,6 +15,7 @@ use App\Http\Controllers\API\AuthController;
 use App\Http\Controllers\API\TaskController;
 use App\Http\Controllers\API\TestController;
 use App\Http\Controllers\API\UomAPIController;
+use App\Http\Controllers\API\AccountController;
 use App\Http\Controllers\API\ItemAPIController;
 use App\Http\Controllers\API\MenuAPIController;
 use App\Http\Controllers\API\RoleAPIController;
@@ -107,10 +108,10 @@ Route::middleware('auth:api')->group(function(){
     Route::controller(ItemUsageForecastController::class)->group(function(){
         Route::delete('forecast_item/{id}','deleteForecastItem');
     });
+    Route::resource('head_accounts', HeadAccountController::class)->only(['index','store','show','destroy']);
+    Route::resource('sub_accounts', SubAccountController::class)->only(['index','store','show','destroy']);
 });
-
-Route::resource('head_accounts', HeadAccountController::class)->only(['index','store','show','destroy']);
-Route::resource('sub_accounts', SubAccountController::class)->only(['index','store','show','destroy']);
+Route::resource('accounts', AccountController::class)->only(['index','store','show','destroy']);
 
 Route::controller(ExcelImportController::class)->group(function(){
     Route::post('/import_account','importAccount');

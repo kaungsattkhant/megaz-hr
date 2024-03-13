@@ -30,6 +30,8 @@ import ItemCrudComponent from './Components/Items/ItemCrudComponent.vue';
 import ItemUsageForecastListComponent from './Components/ItemUsageForecastings/ItemUsageForecastListComponent.vue';
 import ItemUsageForecastCreateComponent from './Components/ItemUsageForecastings/ItemUsageForecastCreateComponent.vue';
 import ItemUsageForecastDetailComponent from './Components/ItemUsageForecastings/ItemUsageForecastDetailComponent.vue';
+import AccountingCrudComponent from './Components/Accounting/AccountingCrudComponent.vue';
+import FinancialTransactionCrudComponent from './Components/FinancialTransaction/FinancialTransactionCrudComponent.vue';
 
 import LoginComponent from './Components/Auth/LoginComponent.vue';
 import LogoutComponent from './Components/Auth/LogoutComponent.vue';
@@ -58,6 +60,8 @@ app.component('InventoryLedgersComponent', InventoryLedgersComponent);
 app.component('MenuListComponent', MenuListComponent);
 app.component('MenuCreateComponent', MenuCreateComponent);
 app.component('ComplainsCrudComponent', ComplainsCrudComponent);
+app.component('AccountingCrudComponent', AccountingCrudComponent);
+app.component('FinancialTransactionCrudComponent', FinancialTransactionCrudComponent);
 
 app.component('PurchaseOrderListComponent', PurchaseOrderListComponent);
 app.component('PurchaseOrderCreateComponent', PurchaseOrderCreateComponent);
