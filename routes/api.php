@@ -1,36 +1,40 @@
 <?php
 
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Route;
-
-use App\Http\Controllers\API\AuthController;
-use App\Http\Controllers\API\AreaController;
-use App\Http\Controllers\API\ComplaintAPIController;
-use App\Http\Controllers\API\CustomerAPIController;
-use App\Http\Controllers\API\DepartmentAPIController;
-use App\Http\Controllers\API\EntityAPIController;
-use App\Http\Controllers\API\InventoryAPIController;
-use App\Http\Controllers\API\InvoiceAPIController;
-use App\Http\Controllers\API\ItemAPIController;
-use App\Http\Controllers\API\RoleAPIController;
-use App\Http\Controllers\API\ServiceAPIController;
-use App\Http\Controllers\API\StaffAPIController;
-use App\Http\Controllers\API\TaskController;
-use App\Http\Controllers\API\ProfileAPIController;
-use App\Http\Controllers\API\PurchaseOrderAPIController;
-use App\Http\Controllers\API\PurchaseOrderItemAPIController;
-use App\Http\Controllers\API\TestController;
-use App\Http\Controllers\API\TransferAPIController;
-use App\Http\Controllers\API\UomAPIController;
-use App\Http\Controllers\API\MenuAPIController;
-use App\Http\Controllers\API\OrderAPIController;
-use App\Models\ComplaintCategory;
-use App\Models\AreaType;
-use App\Models\Category;
 use App\Models\Gender;
+use App\Models\AreaType;
+
+use App\Models\Category;
 use App\Models\MenuCategory;
+use Illuminate\Http\Request;
 use App\Models\PurchaseOrder;
 use App\Models\ServiceCategory;
+use App\Models\ComplaintCategory;
+use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\API\AreaController;
+use App\Http\Controllers\API\AuthController;
+use App\Http\Controllers\API\TaskController;
+use App\Http\Controllers\API\TestController;
+use App\Http\Controllers\API\UomAPIController;
+use App\Http\Controllers\API\ItemAPIController;
+use App\Http\Controllers\API\MenuAPIController;
+use App\Http\Controllers\API\RoleAPIController;
+use App\Http\Controllers\API\OrderAPIController;
+use App\Http\Controllers\API\StaffAPIController;
+use App\Http\Controllers\API\EntityAPIController;
+use App\Http\Controllers\API\InvoiceAPIController;
+use App\Http\Controllers\API\ProfileAPIController;
+use App\Http\Controllers\API\ServiceAPIController;
+use App\Http\Controllers\API\SubAccountController;
+use App\Http\Controllers\API\CustomerAPIController;
+use App\Http\Controllers\API\ExcelImportController;
+use App\Http\Controllers\API\HeadAccountController;
+use App\Http\Controllers\API\TransferAPIController;
+use App\Http\Controllers\API\ComplaintAPIController;
+use App\Http\Controllers\API\InventoryAPIController;
+use App\Http\Controllers\API\DepartmentAPIController;
+use App\Http\Controllers\API\PurchaseOrderAPIController;
+use App\Http\Controllers\API\ItemUsageForecastController;
+use App\Http\Controllers\API\PurchaseOrderItemAPIController;
 
 /*
 |--------------------------------------------------------------------------
@@ -98,22 +102,19 @@ Route::middleware('auth:api')->group(function(){
         Route::delete('/purchase_orders_items/{id}','deletePurchaseOrderItem');
         Route::post('updateIsCheck','updateIsCheck');
     });
+    #item usage forecast
+    Route::resource('item_usage_forecasts', ItemUsageForecastController::class)->only(['index','store','show','destroy']);
+    Route::controller(ItemUsageForecastController::class)->group(function(){
+        Route::delete('forecast_item/{id}','deleteForecastItem');
+    });
 });
-// Route::controller(PurchaseOrderAPIController::class)->group(function(){
 
-//     Route::get('/purchase_orders','getPurchaseOrder');
-//     Route::post('/purchase_orders','createPurchaseOrder');
-//     // below the route perform update, and kitchen data update and financial update and it depends on condition,
-//     Route::put('/purchase_orders/{id}','updatePurchaseOrder');
-//     Route::get('/purchase_orders/{purchase_order}','detail');
-//     Route::delete('/purchase_orders/{id}','deletePurchaseOrder');
+Route::resource('head_accounts', HeadAccountController::class)->only(['index','store','show','destroy']);
+Route::resource('sub_accounts', SubAccountController::class)->only(['index','store','show','destroy']);
 
-//     Route::get('/purchase_orders_items','getPurchaseOrderItem');
-//     Route::post('/purchase_orders_items','createPurchaseOrderItem');
-
-//     Route::delete('/purchase_orders_items/{id}','deletePurchaseOrderItem');
-//     Route::post('updateIsCheck','updateIsCheck');
-// });
+Route::controller(ExcelImportController::class)->group(function(){
+    Route::post('/import_account','importAccount');
+});
 
 
 
@@ -191,6 +192,8 @@ Route::post('/rooms/orders',[OrderAPIController::class,'addOrder']);
 Route::post('/rooms/add_more_sessions',[InvoiceAPIController::class,'addMoreSessions']);
 Route::post('/rooms/change_rooms',[InvoiceAPIController::class,'changeRoom']);
 Route::post('/rooms/done',[InvoiceAPIController::class,'endRoom']);
+
+Route::get('/invoices',[InvoiceAPIController::class,'getInvoiceData']);
 
 Route::get('/tables',[EntityAPIController::class,'getTablesWithInvoice']);
 // Route::group(['prefix' => 'management'], function () {});

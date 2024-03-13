@@ -4,5 +4,9 @@
 
 @section('item_usage_forecasts', 'active-link')
 @section('content')
-    <item-usage-forecast-create-component/>
+
+<div id="app">
+    <item-usage-forecast-detail-component forecast-id="{{$forecastId}}"/>
+</div>
+
 @endsection
