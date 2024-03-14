@@ -14,7 +14,20 @@ class CategorySeeder extends Seeder
     public function run(): void
     {
         //
-        $name=['Food','Drink','Appetizer'];
+        $name=[
+            'Inventory Food',
+            'Inventory Tobacco',
+            'Inventory General',
+            'Inventory Beverage',
+            'Inventory Stationery',
+            'Inventory Packing',
+            'Inventory Cleaning Supplies',
+            'Inventory Hygiene Supplies',
+            'Inventory Decoration',
+            'Inventory China Ware/Glass Ware',
+            'Inventory Utencils',
+            'Inventory Silver & Cutlery'
+        ];
         foreach($name as $n){
             Category::create([
             'name'=>$n,

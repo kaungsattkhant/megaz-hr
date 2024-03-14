@@ -32,7 +32,7 @@ class RoleSeeder extends Seeder
 
         Role::create([
             'department_id' => $finaceDepartment->id,
-            'name' => 'Finance'
+            'name' => 'Financial'
         ]);
 
         Role::create([
