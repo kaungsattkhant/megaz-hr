@@ -27,7 +27,7 @@ class InvoiceRepository implements InvoiceRepositoryInterface
             }
             $skip = ($pageNumber - 1) * $perPage;
 
-            if($request->date) {
+            if ($request->date) {
                 $invoices = Invoice::with('customer', 'room')
                     ->whereBetween('created_at', [$request->date . ' 00:00:00', $request->date . ' 23:59:59'])
                     ->orderBy('created_at', 'desc')
@@ -50,10 +50,10 @@ class InvoiceRepository implements InvoiceRepositoryInterface
         } else {
             if ($request->date) {
                 $invoices = Invoice::with('customer', 'room')
-                ->whereBetween('created_at', [$request->date . ' 00:00:00', $request->date . ' 23:59:59'])
-                ->orderBy('created_at', 'desc')
-                ->get();
-            }else{
+                    ->whereBetween('created_at', [$request->date . ' 00:00:00', $request->date . ' 23:59:59'])
+                    ->orderBy('created_at', 'desc')
+                    ->get();
+            } else {
                 $invoices = Invoice::with('customer', 'room')->get();
             }
 
