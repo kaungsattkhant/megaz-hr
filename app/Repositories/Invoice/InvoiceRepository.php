@@ -26,13 +26,36 @@ class InvoiceRepository implements InvoiceRepositoryInterface
                 $perPage = $request->per_page;
             }
             $skip = ($pageNumber - 1) * $perPage;
-            $invoices = Invoice::with('customer', 'room')->skip($skip)->take($perPage)->get();
+
+            if($request->date) {
+                $invoices = Invoice::with('customer', 'room')
+                    ->whereBetween('created_at', [$request->date . ' 00:00:00', $request->date . ' 23:59:59'])
+                    ->orderBy('created_at', 'desc')
+                    ->skip($skip)
+                    ->take($perPage)
+                    ->get();
+            } else {
+                $invoices = Invoice::with('customer', 'room')
+                    ->orderBy('created_at', 'desc')
+                    ->skip($skip)
+                    ->take($perPage)
+                    ->get();
+            }
+            $paginationData = MakePaginationData($request, $totalCount, 'invoices');
+            $paginationData['invoices'] = $invoices;
             $paginationData = MakePaginationData($request, $totalCount, 'invoices');
             $paginationData['invoices'] = $invoices;
 
             return $paginationData;
         } else {
-            $invoices = Invoice::with('customer', 'room')->get();
+            if ($request->date) {
+                $invoices = Invoice::with('customer', 'room')
+                ->whereBetween('created_at', [$request->date . ' 00:00:00', $request->date . ' 23:59:59'])
+                ->orderBy('created_at', 'desc')
+                ->get();
+            }else{
+                $invoices = Invoice::with('customer', 'room')->get();
+            }
 
             return $invoices;
         }
