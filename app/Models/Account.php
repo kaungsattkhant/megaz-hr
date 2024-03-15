@@ -13,4 +13,8 @@ class Account extends Model
     public function sub_account(){
         return $this->belongsTo(\App\Models\SubAccount::class);
     }
+
+    public function accountByCode($code){
+        return Account::where('account_code',$code)->first();
+    }
 }

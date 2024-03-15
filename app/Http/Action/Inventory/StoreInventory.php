@@ -2,8 +2,10 @@
 
 namespace App\Http\Action\Inventory;
 
+use App\Http\Action\Transaction\PurchaseOrderTransaction;
 use App\Models\InventoryLedger;
 use App\Models\PurchaseOrderItem;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Database\Eloquent\Relations\Relation;
 
 class StoreInventory
@@ -42,11 +44,15 @@ class StoreInventory
         $purchaseOrderItem=PurchaseOrderItem::with(['item'])->where('purchase_order_id',$model->id)->get();
         // $purchaseOrderItemGroupedByCategory=PurchaseOrderItem::
         // ->where('purchase_order_id',$model->id)->get();
+       
         $inventoryLedger=$this->storeToInventoryLedger($model,$morphMapName,$action);
         foreach($purchaseOrderItem as $po_item){
             $this->storeItemToInventory($inventoryLedger,$po_item);
         }
+        (new PurchaseOrderTransaction())->createTransaction($model,$morphMapName);  #create transaction
         return $inventoryLedger;
     }
+
+    
 
 }
