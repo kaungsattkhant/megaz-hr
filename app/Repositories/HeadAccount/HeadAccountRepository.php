@@ -73,4 +73,6 @@ class HeadAccountRepository implements HeadAccountInterface
         $subAccount->head_account=$subAccount->head_account;
         return $subAccount;
     }
+
+    
 }

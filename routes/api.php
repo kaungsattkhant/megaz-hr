@@ -108,10 +108,14 @@ Route::middleware('auth:api')->group(function(){
     Route::controller(ItemUsageForecastController::class)->group(function(){
         Route::delete('forecast_item/{id}','deleteForecastItem');
     });
-    Route::resource('head_accounts', HeadAccountController::class)->only(['index','store','show','destroy']);
+    Route::resource('head_accounts', HeadAccountController::class)-> only(['index','store','show','destroy']);
     Route::resource('sub_accounts', SubAccountController::class)->only(['index','store','show','destroy']);
+    Route::resource('accounts', AccountController::class)->only(['index','store','show','destroy']);
+    Route::controller(AccountController::class)->group(function(){
+        Route::get('sub_account_by_head_account/{id}','getSubAccountByHeadAccount');
+    });
+
 });
-Route::resource('accounts', AccountController::class)->only(['index','store','show','destroy']);
 
 Route::controller(ExcelImportController::class)->group(function(){
     Route::post('/import_account','importAccount');
