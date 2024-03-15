@@ -30,6 +30,12 @@ import ItemCrudComponent from './Components/Items/ItemCrudComponent.vue';
 import ItemUsageForecastListComponent from './Components/ItemUsageForecastings/ItemUsageForecastListComponent.vue';
 import ItemUsageForecastCreateComponent from './Components/ItemUsageForecastings/ItemUsageForecastCreateComponent.vue';
 import ItemUsageForecastDetailComponent from './Components/ItemUsageForecastings/ItemUsageForecastDetailComponent.vue';
+import AccountingCrudComponent from './Components/Accounting/AccountingCrudComponent.vue';
+import FinancialTransactionCrudComponent from './Components/FinancialTransaction/FinancialTransactionCrudComponent.vue';
+import CashbookCrudComponent from './Components/Cashbook/CashbookCrudComponent.vue';
+import ArListComponent from './Components/AR/ArListComponent.vue';
+import ArHistoryComponent from './Components/AR/ArHistoryComponent.vue';
+import ArPaidComponent from './Components/AR/ArPaidComponent.vue';
 
 import LoginComponent from './Components/Auth/LoginComponent.vue';
 import LogoutComponent from './Components/Auth/LogoutComponent.vue';
@@ -37,6 +43,12 @@ import LogoutComponent from './Components/Auth/LogoutComponent.vue';
 import CustomersListComponent from './Components/Pos/Customers/CustomersListComponent.vue';
 import CustomersCreateComponent from './Components/Pos/Customers/CustomersCreateComponent.vue';
 import HomePageComponent from './Components/Pos/Home/HomePageComponent.vue';
+import PosArCrudComponent from './Components/Pos/AR/PosArCrudComponent.vue';
+import PosCashbookCrudComponent from './Components/Pos/Cashbook/PosCashbookCrudComponent.vue';
+import CashbookDetailComponent from './Components/Pos/Cashbook/CashbookDetailComponent.vue';
+import InvoiceListComponent from './Components/Pos/Invoices/InvoiceListComponent.vue';
+import InvoiceDetailComponent from './Components/Pos/Invoices/InvoiceDetailComponent.vue';
+
 
 const app = createApp({});
 app.component('StaffListComponent', StaffListComponent);
@@ -52,6 +64,12 @@ app.component('InventoryLedgersComponent', InventoryLedgersComponent);
 app.component('MenuListComponent', MenuListComponent);
 app.component('MenuCreateComponent', MenuCreateComponent);
 app.component('ComplainsCrudComponent', ComplainsCrudComponent);
+app.component('AccountingCrudComponent', AccountingCrudComponent);
+app.component('FinancialTransactionCrudComponent', FinancialTransactionCrudComponent);
+app.component('CashbookCrudComponent', CashbookCrudComponent);
+app.component('ArListComponent', ArListComponent);
+app.component('ArHistoryComponent', ArHistoryComponent);
+app.component('ArPaidComponent', ArPaidComponent);
 
 app.component('PurchaseOrderListComponent', PurchaseOrderListComponent);
 app.component('PurchaseOrderCreateComponent', PurchaseOrderCreateComponent);
@@ -67,6 +85,11 @@ app.component('LogoutComponent', LogoutComponent);
 app.component('CustomersListComponent', CustomersListComponent);
 app.component('CustomersCreateComponent', CustomersCreateComponent);
 app.component('HomePageComponent', HomePageComponent);
+app.component('PosArCrudComponent', PosArCrudComponent);
+app.component('PosCashbookCrudComponent', PosCashbookCrudComponent);
+app.component('CashbookDetailComponent', CashbookDetailComponent);
+app.component('InvoiceListComponent', InvoiceListComponent);
+app.component('InvoiceDetailComponent', InvoiceDetailComponent);
 
 app.use(store);
 app.mount('#app');
