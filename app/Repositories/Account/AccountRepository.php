@@ -3,6 +3,7 @@
 namespace App\Repositories\Account;
 
 use App\Models\Account;
+use App\Models\SubAccount;
 use Illuminate\Support\Facades\DB;
 
 class AccountRepository implements AccountInterface
@@ -44,6 +45,11 @@ class AccountRepository implements AccountInterface
     public function detail($account)
     {
         return $account;
+    }
+
+    public function getSubAccountByHeadAccount($head_account_id){
+        $sub_account=SubAccount::where('head_account_id',$head_account_id)->get();
+        return $sub_account;
     }
 
 }

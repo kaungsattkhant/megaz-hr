@@ -19,8 +19,7 @@ class PurchaseOrderRepository implements PurchaseOrderRepositoryInterface
         $purchaseOrders = PurchaseOrder::with(['items.item'])
             ->orderBy('id', 'desc')
             ->when($staff->hasRoles('Staff'), function ($q) use ($staff) {
-                $q
-                    ->where('created_by', $staff->id);
+                $q->where('created_by', $staff->id);
             })
             ->when($staff->hasRoles('Manager'), function ($q) {
                 $q->whereIn('status', ['manager_checked', 'created']);
@@ -186,6 +185,7 @@ class PurchaseOrderRepository implements PurchaseOrderRepositoryInterface
             ResponseMessage($e->getMessage(), 402);
             throw $e;
         }
+        
     }
 
     public function existIsCheck($model, $is_column, $value)

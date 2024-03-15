@@ -31,4 +31,9 @@ class AccountController extends Controller
         $account= $this->accountRepo->detail($account);
         ResponseData($account);
     }
+
+    public function getSubAccountByHeadAccount($head_account_id){
+        $account= $this->accountRepo->getSubAccountByHeadAccount($head_account_id);
+        ResponseData($account);
+    }
 }

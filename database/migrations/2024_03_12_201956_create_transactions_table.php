@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('transactions', function (Blueprint $table) {
             $table->id();
-            $table->dateTime('data');
+            $table->dateTime('date');
             $table->text('description')->nullable();
             $table->unsignedInteger('transactionable_id')->nullable();
             $table->char('transactionable_type')->nullable();
