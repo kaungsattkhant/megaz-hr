@@ -29,6 +29,7 @@ use App\Http\Controllers\API\SubAccountController;
 use App\Http\Controllers\API\CustomerAPIController;
 use App\Http\Controllers\API\ExcelImportController;
 use App\Http\Controllers\API\HeadAccountController;
+use App\Http\Controllers\API\TransactionController;
 use App\Http\Controllers\API\TransferAPIController;
 use App\Http\Controllers\API\ComplaintAPIController;
 use App\Http\Controllers\API\InventoryAPIController;
@@ -113,8 +114,10 @@ Route::middleware('auth:api')->group(function(){
     Route::resource('accounts', AccountController::class)->only(['index','store','show','destroy']);
     Route::controller(AccountController::class)->group(function(){
         Route::get('sub_account_by_head_account/{id}','getSubAccountByHeadAccount');
+        Route::get('get_cash_account','getCashAccount');
+        Route::get('account_by_sub_account/{id}','accountBySubAccount');
     });
-
+    Route::resource('transactions', TransactionController::class)->only(['index','store','show','destroy']);
 });
 
 Route::controller(ExcelImportController::class)->group(function(){

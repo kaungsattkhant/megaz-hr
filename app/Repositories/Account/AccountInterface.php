@@ -13,4 +13,8 @@ interface AccountInterface
     public function detail($headAccount);
 
     public function getSubAccountByHeadAccount($head_account_id);
+
+    public function getCashAccount();
+
+    public function accountBySubAccount($sub_account_id);
 }

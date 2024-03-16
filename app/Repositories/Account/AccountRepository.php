@@ -52,4 +52,15 @@ class AccountRepository implements AccountInterface
         return $sub_account;
     }
 
+    public function getCashAccount(){
+        $sub_account=Account::whereHas('sub_account',function($q){
+            $q->where('name','Cash & Bank');
+        })->get();
+        return $sub_account;    
+    }
+    
+    public function accountBySubAccount($sub_account_id){
+        return Account::where('sub_account_id',$sub_account_id)->get();
+    }
+
 }

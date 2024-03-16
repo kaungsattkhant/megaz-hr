@@ -55,6 +55,8 @@ use App\Repositories\Order\OrderRepository;
 use App\Repositories\Order\OrderRepositoryInterface;
 use App\Repositories\RoomSession\RoomSessionRepository;
 use App\Repositories\RoomSession\RoomSessionRepositoryInterface;
+use App\Repositories\Transaction\TransactionInterface;
+use App\Repositories\Transaction\TransactionRepository;
 
 class RepositoryServiceProvider extends ServiceProvider
 {
@@ -93,5 +95,6 @@ class RepositoryServiceProvider extends ServiceProvider
         $this->app->bind(ItemUsageForecastInterface::class,ItemUsageForecastRepository::class);
         $this->app->bind(HeadAccountInterface::class,HeadAccountRepository::class);
         $this->app->bind(AccountInterface::class,AccountRepository::class);
+        $this->app->bind(TransactionInterface::class,TransactionRepository::class);
     }
 }
