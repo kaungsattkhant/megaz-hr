@@ -21,7 +21,9 @@ class TransactionRepository implements TransactionInterface
                 DB::raw("IF(action = 'debit', value, 0) AS debit_amount"),
                 DB::raw("IF(action = 'credit', value, 0) AS credit_amount")
             )->leftJoin('accounts', 'ledgers.account_id', '=', 'accounts.id');
-        }])->get();
+        }])
+        ->isConfirmed(1)
+        ->get();
         return $transactions;
     }
 
@@ -58,5 +60,14 @@ class TransactionRepository implements TransactionInterface
 
     public function detail($transaction){
         dd('jjjj');
+    }
+
+    public function transactionConfirmed($request){
+        $ids=$request->ids;
+        $transaction=Transaction::whereIn('id',$ids)
+        ->update([
+            'is_confirmed'=>$request->value,
+        ]);
+        $transaction ? ResponseMessage('Transaction confimed successfully',200) : ResponseMessage('Transaction confirmed Fail',422);
     }
 }

@@ -163,7 +163,7 @@ class PurchaseOrderRepository implements PurchaseOrderRepositoryInterface
                     // $column='is_financial_check';
                     $items = $this->existIsCheck($model, $is_column, 0);
                     if ($items->isNotEmpty()) {
-                        ResponseMessage('Some items are left to check', 419);
+                        ResponseMessage('Some items are left to check', 422);
                     }
                     $staff->hasRoles('MD') ?
                     $model->$is_column = 1 : $model->$column_id = $staff->id;
@@ -196,16 +196,16 @@ class PurchaseOrderRepository implements PurchaseOrderRepositoryInterface
     public function validateModel($model, $staff, $type)
     {
         if ($model) {
-            if ($staff->hasRoles('Staff')) ResponseMessage("Permission isn't allowed", 419);
+            if ($staff->hasRoles('Staff')) ResponseMessage("Permission isn't allowed", 422);
             if($type=='purchase_order'){
                 if ($staff->hasRoles('Manager')) {
                     if ($model->manager_check_id!=null) ResponseMessage('This Purchase Order is already checked By Manager', 419);
                 } else if ($staff->hasRoles('Financial')) {
-                    if ($model->financial_check_id!=null) ResponseMessage('This Purchase Order is already checked By Financial', 419);
+                    if ($model->financial_check_id!=null) ResponseMessage('This Purchase Order is already checked By Financial', 422);
                 } else if ($staff->hasRoles('MD')) {
-                    if ($model->is_md_checked) ResponseMessage('This Purchase Order is already checked By MD', 419);
+                    if ($model->is_md_checked) ResponseMessage('This Purchase Order is already checked By MD', 422);
                     if(!$model->createdBy->department->inventory){
-                        ResponseMessage('Inventory is required',419);
+                        ResponseMessage('Inventory is required',422);
                     }
                 }
             }

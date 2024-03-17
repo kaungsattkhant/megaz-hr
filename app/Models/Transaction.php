@@ -13,4 +13,8 @@ class Transaction extends Model
     public function ledgers(){
         return $this->hasMany(\App\Models\Ledger::class);
     }
+
+    public function scopeIsConfirmed($query,$bool){
+        return $query->where('is_confirmed',$bool);
+    }
 }

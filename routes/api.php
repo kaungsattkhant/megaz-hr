@@ -117,7 +117,11 @@ Route::middleware('auth:api')->group(function(){
         Route::get('get_cash_account','getCashAccount');
         Route::get('account_by_sub_account/{id}','accountBySubAccount');
     });
+  
     Route::resource('transactions', TransactionController::class)->only(['index','store','show','destroy']);
+    Route::controller(TransactionController::class)->group(function(){
+        Route::post('transaction_confirmed','transactionConfirmed');
+    });
 });
 
 Route::controller(ExcelImportController::class)->group(function(){

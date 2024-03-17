@@ -47,4 +47,6 @@ class AccountController extends Controller
         $sub_account= $this->accountRepo->accountBySubAccount($sub_account_id);
         ResponseData($sub_account);
     }
+
+   
 }

@@ -10,4 +10,6 @@ interface TransactionInterface
     public function updateOrCreate($request);
 
     public function detail($transaction);
+
+    public function transactionConfirmed($request);
 }

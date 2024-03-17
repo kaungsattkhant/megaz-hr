@@ -17,4 +17,6 @@ interface AccountInterface
     public function getCashAccount();
 
     public function accountBySubAccount($sub_account_id);
+
+    public function accountConfirmed($request);
 }

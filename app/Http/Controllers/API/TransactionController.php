@@ -32,4 +32,8 @@ class TransactionController extends Controller
         ResponseData($transaction);
     }
 
+    public function transactionConfirmed(Request $request){
+        $transaction= $this->transactionRepo->transactionConfirmed($request);
+    }
+
 }
