@@ -9,6 +9,15 @@
 
                     </div>
                     <div class="bg-white px-4">
+                        <div class="px-4 pt-6 mb-3">
+                            <span class="datepicker-toggle">
+                                <span class="datepicker-toggle-button pos-add-btn">
+                                    Date
+                                </span>
+                                <input type="date" class="datepicker-input"
+                                    @change="dateChange" v-model="invoice_date">
+                            </span>
+                        </div>
                         <table class="min-w-full text-left text-sm font-light">
                             <thead class="border-b font-medium">
                                 <tr>
@@ -25,16 +34,16 @@
                             <tbody>
                                 <tr @click="btnClickedInvoice(invoice)" class="" v-for="(invoice,index) in invoiceList">
                                         <td class="whitespace-nowrap px-6 py-4 font-medium">
-                                            {{ index++ }}
+                                            {{ invoice.invoice_id }}
                                         </td>
                                         <td class="whitespace-nowrap px-6 py-4">
                                             {{ invoice.invoice_date }}
                                         </td>
                                         <td class="whitespace-nowrap px-6 py-4">
-                                            {{ customerList.find(x => x.id === invoice.customer_id).name }}
+                                            {{ invoice.customer.name }}
                                         </td>
                                         <td class="whitespace-nowrap px-6 py-4">
-                                            {{ roomList.find(x => x.id === invoice.entity_id).name }}
+                                            {{ invoice.room.name }}
                                         </td>
                                         <td class="whitespace-nowrap px-6 py-4">
                                             {{ invoice.total_session_price}}
@@ -88,7 +97,7 @@
                                         Customer Name
                                     </td>
                                     <td class="whitespace-nowrap py-2">
-                                        {{ customerList.find(x => x.id === invoiceDetail.customer_id).name }}
+                                        {{ invoiceDetail.customer.name }}
                                     </td>
                                 </tr>
                                 <tr class="">
@@ -96,7 +105,7 @@
                                         Room
                                     </td>
                                     <td class="whitespace-nowrap py-2">
-                                        {{ roomList.find(x => x.id === invoiceDetail.entity_id).name }}
+                                        {{ invoiceDetail.room.name }}
                                     </td>
                                 </tr>
                                 <tr class="">
@@ -179,7 +188,8 @@
                 roomList:[],
                 invoiceDetail:null,
                 isList:true,
-                isDetail:false
+                isDetail:false,
+                invoice_date:null,
 
             };
         },
@@ -213,7 +223,19 @@
             btnClickedBack(){
                 this.isList = true
                 this.isDetail = false
-            }
+            },
+            dateChange(){
+                this.getDateInvoiceList();
+            },
+            async getDateInvoiceList(){
+                const response = await getApiData({ url: '/api/invoices?date='+ this.invoice_date , token: this.getToken()});
+                if(response.data){
+                    this.invoiceList = response.data;
+                }
+                else{
+                    this.invoiceList = 'test'
+                }
+            },
 
         },
         mounted()
