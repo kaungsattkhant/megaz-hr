@@ -18,5 +18,4 @@ interface AccountInterface
 
     public function accountBySubAccount($sub_account_id);
 
-    public function accountConfirmed($request);
 }

@@ -204,7 +204,7 @@ class PurchaseOrderRepository implements PurchaseOrderRepositoryInterface
                     if ($model->financial_check_id!=null) ResponseMessage('This Purchase Order is already checked By Financial', 422);
                 } else if ($staff->hasRoles('MD')) {
                     if ($model->is_md_checked) ResponseMessage('This Purchase Order is already checked By MD', 422);
-                    if(!$model->createdBy->department->inventory){
+                    if(!$model->createdBy->department->inventory){  
                         ResponseMessage('Inventory is required',422);
                     }
                 }
