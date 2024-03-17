@@ -5,6 +5,7 @@ namespace App\Http\Controllers\API;
 use App\Models\Transaction;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Admin\TransactionRequest;
 use App\Repositories\Transaction\TransactionInterface;
 
 class TransactionController extends Controller
@@ -21,7 +22,7 @@ class TransactionController extends Controller
         $transactions= $this->transactionRepo->list($request);
         ResponseData($transactions);
     }
-    public function store(Request $request){
+    public function store(TransactionRequest $request){
         $transaction= $this->transactionRepo->updateOrCreate($request);
         ResponseData($transaction);
     }
