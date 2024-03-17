@@ -5,6 +5,7 @@ namespace App\Http\Controllers\API;
 use App\Models\Account;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Admin\AccountRequest;
 use App\Repositories\Account\AccountInterface;
 
 class AccountController extends Controller
@@ -21,7 +22,7 @@ class AccountController extends Controller
         $account = $this->accountRepo->list($request);
         ResponseData($account);
     }
-    public function store(Request $request)
+    public function store(AccountRequest $request)
     {
         $account = $this->accountRepo->updateOrCreate($request);
         ResponseData($account);

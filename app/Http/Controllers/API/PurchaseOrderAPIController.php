@@ -11,6 +11,7 @@ use App\Models\PurchaseOrder;
 use App\Models\PurchaseOrderItem;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Admin\PurchaseOrderRequest;
 use App\Http\Requests\PurchaseOrder\PurchaseOrderCreateRequest;
 use App\Http\Requests\PurchaseOrder\PurchaseOrderUpdateRequest;
 use App\Repositories\PurchaseOrder\PurchaseOrderRepositoryInterface;
@@ -30,7 +31,7 @@ class PurchaseOrderAPIController extends Controller
         ResponseData($purchaseOrders);
     }
 
-    public function createPurchaseOrder(Request $request)
+    public function createPurchaseOrder(PurchaseOrderRequest $request)
     {
         $purchaseOrder= $this->purchaseOrderRepo->createOrUpdate($request);
         ResponseData($purchaseOrder);
