@@ -12,7 +12,7 @@ class PurchaseOrderItemRepository implements PurchaseOrderItemRepositoryInterfac
         if($request->per_page || $request->page){
             $totalCount = PurchaseOrderItem::count();
             $pageNumber = 1;
-            $perPage = 20;
+            $perPage = config('common.list_count');
             if($request->page){
                 $pageNumber = $request->page;
             }

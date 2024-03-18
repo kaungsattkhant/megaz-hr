@@ -30,7 +30,7 @@ class PurchaseOrderRepository implements PurchaseOrderRepositoryInterface
             ->when($staff->hasRoles('MD'), function ($q) {
                 $q->whereIn('status', ['md_checked', 'financial_checked']);
             })
-            ->paginate(20);
+            ->paginate(config('common.list_count'));
         return $purchaseOrders;
     }
     public function createOrUpdate($request)
