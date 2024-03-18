@@ -10,7 +10,7 @@ class TransactionRepository implements TransactionInterface
 {
     public function list($request){
         // $transactions=Transaction::with(['ledgers'])->get();
-        $transactions = Transaction::with(['ledgers' => function ($query) {
+        $query = Transaction::with(['ledgers' => function ($query) {
             $query->select(
                 'ledgers.id',
                 'ledgers.value',
@@ -22,8 +22,12 @@ class TransactionRepository implements TransactionInterface
                 DB::raw("IF(action = 'credit', value, 0) AS credit_amount")
             )->leftJoin('accounts', 'ledgers.account_id', '=', 'accounts.id');
         }])
-        ->isConfirmed(1)
-        ->get();
+        ->isConfirmed(1);
+        if($request->per_page || $request->page){
+            $transactions=$query->paginate(config('query_count.report_count'));
+        }else{
+            $transactions=$query->get();
+        }
         return $transactions;
     }
 
