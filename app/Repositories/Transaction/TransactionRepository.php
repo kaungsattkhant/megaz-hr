@@ -24,7 +24,7 @@ class TransactionRepository implements TransactionInterface
         }])
         ->isConfirmed(1);
         if($request->per_page || $request->page){
-            $transactions=$query->paginate(config('query_count.report_count'));
+            $transactions=$query->paginate(config('common.list_count'));
         }else{
             $transactions=$query->get();
         }
