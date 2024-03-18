@@ -1,10 +1,10 @@
 @extends('layouts.main')
 
-@section('page_title', 'Accounting')
-@section('accounting', 'active-link')
+@section('page_title', 'Financial Transactions')
+@section('financial_transactions', 'active-link')
 @section('content')
     <div id="app">
-        <financial-Transaction-crud-component/>
+        <financial-transaction-crud-component/>
 
     </div>
 

@@ -42,6 +42,12 @@
                             </a>
                         </li>
                         <li>
+                            <a href="{{ route('financial_transactions') }}" class="flex items-center @yield('financial_transactions')">
+                                <i class="fal fa-tasks  pr-3"></i>
+                                Financial Transactions
+                            </a>
+                        </li>
+                        <li>
                             <a href="{{ route('inventories') }}" class="flex items-center @yield('inventories')">
                                 <i class="fal fa-inventory  pr-3"></i>
                                 Inventory

@@ -48,7 +48,7 @@
                     <tbody>
 
                         <!-- looping start -->
-                        <div class="contents">
+                        <!-- <div class="contents">
                             <tr class="bg-white rounded-lg overflow-hidden shadow-lg">
                                 <td class=" px-6 py-4 font-medium ">
                                     1
@@ -81,6 +81,84 @@
                                 </td>
                                 <td class="whitespace-nowrap px-6 py-4 ">
                                     March 7
+                                </td>
+                                <td class="whitespace-nowrap px-6 py-4">
+                                    <button
+                                    data-te-toggle="modal" data-te-target="#editModal" id="edit-btn" class="pr-3">
+                                    <i class="fal fa-pen"></i>
+                                    </button>
+                                    <button id="edit-btn" class="pr-3">
+                                    <i class="fal fa-check"></i>
+                                    </button>
+                                    <button
+                                    data-te-toggle="modal" data-te-target="#deleteModal" id="edit-btn" class="pr-1">
+                                        <i class="fas fa-trash-alt"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                            <tr class="">
+                                <td class=" py-2 "></td>
+                            </tr>
+                        </div> -->
+
+                        <div class="contents" v-for="(transaction, transactionIndex) in transactionList" :key="transactionIndex">
+                            <tr class="bg-white rounded-lg overflow-hidden shadow-lg">
+                                <td class=" px-6 py-4 font-medium ">
+                                    {{ ++transactionIndex }}
+                                </td>
+                                <td class="whitespace-nowrap px-6 py-4 ">
+                                    {{ transaction.description }}
+                                </td>
+                                <td class="whitespace-nowrap px-6 py-4 ">
+                                    <div class="text-left">
+                                        <!-- <p class="mb-2" v-for="(ledger) in transaction.ledgers">
+                                            {{ ledger.account_name }}
+                                        </p> -->
+                                        <div v-for="(ledger) in transaction.ledgers">
+                                            <p class="mb-2" v-if="ledger.action == 'debit'">
+                                                {{ ledger.account_name }}
+                                            </p>
+                                        </div>
+                                        <div v-for="(ledger) in transaction.ledgers">
+                                            <p class="mb-2" v-if="ledger.action == 'credit'">
+                                                {{ ledger.account_name }}
+                                            </p>
+                                        </div>
+                                        <!-- <p>
+                                            Item
+                                        </p> -->
+                                    </div>
+                                </td>
+                                <td class="whitespace-nowrap px-6 py-4 ">
+                                    <div class="text-left">
+                                        <div v-for="(ledger) in transaction.ledgers">
+                                            <p class="mb-2" v-if="ledger.action == 'debit'">
+                                                {{ ledger.value }}
+                                            </p>
+                                        </div>
+                                        <div v-for="(ledger) in transaction.ledgers">
+                                            <p class="mb-2" v-if="ledger.action == 'credit'">
+                                                0
+                                            </p>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="whitespace-nowrap px-6 py-4 ">
+                                    <div class="text-left">
+                                        <div v-for="(ledger) in transaction.ledgers">
+                                            <p class="mb-2" v-if="ledger.action == 'credit'">
+                                                {{ ledger.value }}
+                                            </p>
+                                        </div>
+                                        <div v-for="(ledger) in transaction.ledgers">
+                                            <p class="mb-2" v-if="ledger.action == 'debit'">
+                                                0
+                                            </p>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="whitespace-nowrap px-6 py-4 ">
+                                    {{ transaction.date }}
                                 </td>
                                 <td class="whitespace-nowrap px-6 py-4">
                                     <button
@@ -365,13 +443,28 @@
 
     export default {
         data() {
-            return {};
+            return {
+                transactionList: [],
+            };
         },
 
         methods: {
-            
+            ...mapGetters(['getToken']),
+
+            async getTransactionList(){
+                let url = `/api/transactions`;
+                let response = await getApiData({url: url, token: this.getToken()});
+                if(response.data){
+                    this.transactionList = response.data;
+                }
+            },
 
         },
+
+        created(){
+            this.getTransactionList();
+        },
+
         mounted()
         {
             initTE({ Modal,Select, Ripple });
