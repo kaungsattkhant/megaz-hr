@@ -9,19 +9,6 @@ class CashBookRepository implements CashBookInterface
 {
     public function list($request)
     {
-        // $cashBooks = DB::table('ledgers')
-        //     ->whereIn('ledgers.account_id', $cashAccountIds)
-        //     ->join('transactions', 'ledgers.transaction_id', '=', 'transactions.id')
-        //     ->join('accounts', 'ledgers.account_id', '=', 'accounts.id')
-        //     ->join('sub_accounts', 'accounts.sub_account_id', '=', 'sub_accounts.id')
-        //     ->select(
-        //         'transactions.description',
-        //         'accounts.name as account_name',
-        //         'ledgers.value',
-        //         'sub_accounts.name as sub_account_name',
-        //         // DB::raw('SUM(ledgers.value) as balance')
-        //     )
-        //     ->get();
         $cashAccountIds = range(23, 32);
         $latestClosedTransaction = (new CashBookTransaction())->getLatestClosedTransaction();
         $cashbookTransactions = Transaction::with(['ledgers.account'])

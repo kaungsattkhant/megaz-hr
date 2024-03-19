@@ -10,7 +10,6 @@ class StoreTransactionLedger
         $data['date']=now();
         return Transaction::create($data);
     }
-    
    
     public function storeLedger($data){
         return Ledger::create($data);
