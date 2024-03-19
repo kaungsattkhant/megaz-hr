@@ -9,21 +9,24 @@ class CashBookRepository implements CashBookInterface
 {
     public function list($request)
     {
-        $cashAccountIds = range(23, 32);
-        $latestClosedTransaction = (new CashBookTransaction())->getLatestClosedTransaction();
+        // $cashAccountIds = range(23, 32);
+        $cashAccountId=$request->cash_account_id;
+        $latestClosedTransaction = (new CashBookTransaction())->getLatestClosedTransaction($cashAccountId);
         $cashbookTransactions = Transaction::with(['ledgers.account'])
             ->select(['id', 'date', 'description'])
-            ->whereHas('ledgers', function ($query) use ($cashAccountIds) {
-                $query->whereIn('account_id', $cashAccountIds);
+            ->whereHas('ledgers', function ($query) use ($cashAccountId) {
+                // $query->whereIn('account_id', $cashAccountIds);
+                $query->where('account_id', $cashAccountId);
+
             })
             ->when($latestClosedTransaction, function ($q) use ($latestClosedTransaction) {
                 $q->where('id', '>', $latestClosedTransaction);
             })
             ->get();
-
         foreach ($cashbookTransactions as $transaction) {
             foreach ($transaction->ledgers as $ledger) {
-                if (in_array($ledger->account_id, $cashAccountIds)) {
+                // if (in_array($ledger->account_id, $cashAccountIds)) {
+                if ($ledger->account_id==$cashAccountId) {
                     $transaction->type = $ledger->account->name;
                     $transaction->amount = $ledger->value;
                 } else {
@@ -51,8 +54,14 @@ class CashBookRepository implements CashBookInterface
         return $cashbookTransactions;
     }
 
-    public function closeTransaction(){
-        $latestTransaction=Transaction::latest()->first();
+    public function closeTransaction($request){
+        $cashAccountId=$request->cash_account_id;
+        $latestTransaction=Transaction::
+        whereHas('ledgers', function ($query) use ($cashAccountId) {
+            $query->where('account_id', $cashAccountId);    #transaction close depend on transaction
+        })
+        ->latest()
+        ->first();
         if($latestTransaction){
             $latestTransaction->is_closing=1;
             $latestTransaction->closing_date=now();

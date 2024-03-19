@@ -20,7 +20,7 @@ class CashbookController extends Controller
     public function index(Request $request){
         $cashbooks= $this->cashBookRepo->list($request);
         
-        $balance=(new CashBookTransaction())->getOpeningBalance();
+        $balance=(new CashBookTransaction())->getOpeningBalance($request);
         return response()->json([
             'success'=>true,
             'opening_balance'=>$balance->opening_balance,
@@ -30,8 +30,8 @@ class CashbookController extends Controller
         // ResponseData($cashbooks);
     }
 
-    public function closeTransaction(){
-        $cashbooks= $this->cashBookRepo->closeTransaction();
+    public function closeTransaction(Request $request){
+        $cashbooks= $this->cashBookRepo->closeTransaction($request);
     }
 
 }

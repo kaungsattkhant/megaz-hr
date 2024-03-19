@@ -12,14 +12,15 @@ use stdClass;
 
 class CashBookTransaction
 {
-    public function getOpeningBalance(){
-        $cashAccountIds = range(23, 32);
-        $latestClosedTransaction =$this->getLatestClosedTransaction();
+    public function getOpeningBalance($data){
+        $cashAccountId=$data->cash_account_id;
+        $latestClosedTransaction =$this->getLatestClosedTransaction($cashAccountId);
         if($latestClosedTransaction){
             $balance = DB::table('ledgers')
             ->join('transactions', 'ledgers.transaction_id', '=', 'transactions.id')
             ->join('accounts', 'ledgers.account_id', '=', 'accounts.id')
-            ->whereIn('ledgers.account_id', $cashAccountIds)
+            // ->whereIn('ledgers.account_id', $cashAccountId)
+            ->where('ledgers.account_id', $cashAccountId)
             ->where('transactions.id', '<=', $latestClosedTransaction)
             // ->whereDate('transactions.date', '<=', $closingDate) // Compare transaction date with closing date
             ->select(
@@ -35,18 +36,15 @@ class CashBookTransaction
         $balance=new stdClass();
         $balance->opening_balance=0;
         return $balance;
-        
-        // $closingBalance = $balance->opening_balance + $balance->current_debit_balance - $balance->current_credit_balance;
-        // $balance->closing_balance=$closingBalance;
-        // return $balance;
-
-      
     }
 
-    public function getLatestClosedTransaction(){
-        return  DB::table('transactions')
-        ->where('is_closing', true)
+    public function getLatestClosedTransaction($cashAccountId){
+        return Transaction::with(['ledgers.account'])
+        ->select(['id', 'date', 'description'])
+        ->whereHas('ledgers', function ($query) use ($cashAccountId) {
+            $query->where('account_id', $cashAccountId);    #transaction close depend on transaction
+        })->where('is_closing', true)
         ->orderByDesc('date')
-        ->value('id');
+        ->value('transactions.id');
     }
 }

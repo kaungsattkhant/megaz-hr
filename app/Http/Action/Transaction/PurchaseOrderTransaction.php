@@ -23,9 +23,9 @@ class PurchaseOrderTransaction
         $data['created_by'] = UserData()->id;
         $data['transactionable_id'] = $model->id;
         $data['transactionable_type'] = $transactionable_type;
-        $transaction=(new StoreTransactionLedger())->createTransaction($data);
-        $creditAccount = (new Account())->accountByCode('2-1001'); #Inventory Food
+        $creditAccount = (new Account())->accountByCode('2-1001'); # credit account is awalys Office Account
         foreach ($purchaseOrderItemGroupedByCategory as $po_category) {
+            $transaction=(new StoreTransactionLedger())->createTransaction($data);
             $category_id = $po_category->category_id;
             $account_code = null;
             switch ($category_id) {
@@ -49,12 +49,6 @@ class PurchaseOrderTransaction
             #debit
             if ($account_code) {  
                 $debitAccount = (new Account())->accountByCode($account_code); #Inventory Food
-                // $ledger['date'] = now();
-                // $ledger['value'] = $po_category->total_amount;
-                // $ledger['transaction_id'] = $transaction->id;
-                // $ledger['account_id'] = $debit_account->id;
-                // $ledger['action']='debit';
-                // $debit_ledger=(new StoreTransactionLedger())->storeLedger($ledger);
 
                 $debitLedger = (new StoreTransactionLedger())->storeLedger([
                     'value' => $po_category->total_amount,
@@ -62,7 +56,6 @@ class PurchaseOrderTransaction
                     'account_id' => $debitAccount->id,
                     'action' => 'debit',
                 ]);
-
             }
             #credit
             $creditLedger = (new StoreTransactionLedger())->storeLedger([
@@ -73,7 +66,7 @@ class PurchaseOrderTransaction
                 'action' => 'credit',
             ]);
         }
-        return $transaction;
+        return $purchaseOrderItemGroupedByCategory;
     }
 
     public function storeLedger($data){
