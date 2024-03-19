@@ -69,6 +69,9 @@ class CashBookRepository implements CashBookInterface
         if($latestTransaction){
             $latestTransaction->is_closing=1;
             $latestTransaction->closing_date=now();
+            $latestTransaction->save();
+            ResponseMessage('Transaction closing is successfully',200);
         }
+        ResponseMessage('Transaction closing is fail',422);
     }
 }
