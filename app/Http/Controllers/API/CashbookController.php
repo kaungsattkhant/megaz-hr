@@ -21,7 +21,6 @@ class CashbookController extends Controller
         $cashbooks= $this->cashBookRepo->list($request);
         
         $balance=(new CashBookTransaction())->getOpeningBalance();
-        return $balance;
         return response()->json([
             'success'=>true,
             'opening_balance'=>$balance->opening_balance,
@@ -29,6 +28,10 @@ class CashbookController extends Controller
             'data'=>$cashbooks,
         ]);
         // ResponseData($cashbooks);
+    }
+
+    public function closeTransaction(){
+        $cashbooks= $this->cashBookRepo->closeTransaction();
     }
 
 }

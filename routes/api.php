@@ -126,6 +126,7 @@ Route::middleware('auth:api')->group(function(){
 
     Route::controller(CashbookController::class)->group(function(){
         Route::get('cash_books','index');
+        Route::get('close_cashbook_transaction','closeTransaction');
     });
 });
 

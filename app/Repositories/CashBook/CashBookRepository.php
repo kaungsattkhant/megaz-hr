@@ -4,7 +4,6 @@ namespace App\Repositories\CashBook;
 
 use App\Http\Action\Transaction\CashBookTransaction;
 use App\Models\Transaction;
-use Illuminate\Support\Facades\DB;
 
 class CashBookRepository implements CashBookInterface
 {
@@ -24,12 +23,17 @@ class CashBookRepository implements CashBookInterface
         //     )
         //     ->get();
         $cashAccountIds = range(23, 32);
+        $latestClosedTransaction = (new CashBookTransaction())->getLatestClosedTransaction();
         $cashbookTransactions = Transaction::with(['ledgers.account'])
             ->select(['id', 'date', 'description'])
             ->whereHas('ledgers', function ($query) use ($cashAccountIds) {
                 $query->whereIn('account_id', $cashAccountIds);
-            })->get();
-            
+            })
+            ->when($latestClosedTransaction, function ($q) use ($latestClosedTransaction) {
+                $q->where('id', '>', $latestClosedTransaction);
+            })
+            ->get();
+
         foreach ($cashbookTransactions as $transaction) {
             foreach ($transaction->ledgers as $ledger) {
                 if (in_array($ledger->account_id, $cashAccountIds)) {
@@ -58,5 +62,13 @@ class CashBookRepository implements CashBookInterface
         // });
 
         return $cashbookTransactions;
+    }
+
+    public function closeTransaction(){
+        $latestTransaction=Transaction::latest()->first();
+        if($latestTransaction){
+            $latestTransaction->is_closing=1;
+            $latestTransaction->closing_date=now();
+        }
     }
 }

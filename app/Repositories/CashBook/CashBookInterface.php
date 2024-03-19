@@ -6,4 +6,5 @@ interface CashBookInterface
 {
     public function list($request);
 
+    public function closeTransaction();
 }
