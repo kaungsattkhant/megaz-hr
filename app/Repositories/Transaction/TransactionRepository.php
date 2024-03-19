@@ -21,8 +21,8 @@ class TransactionRepository implements TransactionInterface
                 DB::raw("IF(action = 'debit', value, 0) AS debit_amount"),
                 DB::raw("IF(action = 'credit', value, 0) AS credit_amount")
             )->leftJoin('accounts', 'ledgers.account_id', '=', 'accounts.id');
-        }])
-        ->isConfirmed(1);
+        }]);
+        // ->isConfirmed(1);
         if($request->per_page || $request->page){
             $transactions=$query->paginate(config('common.list_count'));
         }else{

@@ -269,3 +269,13 @@ if (!function_exists('JsonDecode')) {
         return $json_data;
     }
 }
+
+if (!function_exists('UnsetData')) {
+    function UnsetData($data, $attributes)
+    {
+        foreach ($attributes as $attribute) {
+            unset($data[$attribute]);
+        }
+        return $data;
+    }
+}

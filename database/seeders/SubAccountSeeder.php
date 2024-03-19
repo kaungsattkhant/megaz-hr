@@ -87,12 +87,27 @@ class SubAccountSeeder extends Seeder
         $subOfCOS=[
             'Selling Expenses',
             'Operation Expense',
-            'Admin & General',
-            'Pay & Related Exps',
+            'Admin & General Expense',
+            'Pay & Related Expense',
             'Gov.Affairs',
             'Fixed Expense',
             'Finance Cost',
             'Year Tax',
+            'Cost of Sales',
+            // 'COS - Food',
+            // 'COS - Beverage',
+            // 'COS - Banquet/Function',
+            // 'COS - Fuel',
+            // 'COS - Carriage Inwards',
+            // 'Selling Expenses',
+            // 'Operation Expense',
+            // 'Admin & General',
+            // 'Pay & Related Exps',
+            // 'Gov.Affairs',
+            // 'Fixed Expense',
+            // 'Finance Cost',
+            // 'Year Tax',
+
         ];
 
         foreach($subOfCOS as $subCOS){
