@@ -581,7 +581,8 @@
                 let url = `/api/transaction_confirmed`;
                 let response = await postApiData({url: url, form_data: formData, token: this.getToken()});
                 if(response.success){
-                    alert(response.message);
+                    // alert(response.message);
+                    window.location.reload();
                 }
 
             },
