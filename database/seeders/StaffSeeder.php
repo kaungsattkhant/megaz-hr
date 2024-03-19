@@ -27,7 +27,7 @@ class StaffSeeder extends Seeder
 
         $staffRole = Role::where('name', 'Staff')->first();
         $managerRole = Role::where('name', 'Manager')->first();
-        $financeRole = Role::where('name', 'Finance')->first();
+        $financeRole = Role::where('name', 'Financial')->first();
         $mdRole = Role::where('name', 'MD')->first();
         // $barStaffRole = Role::where('name', 'Staff')->where('department_id', $barDept->id)->first();
 

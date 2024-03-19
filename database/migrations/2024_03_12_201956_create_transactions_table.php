@@ -18,6 +18,7 @@ return new class extends Migration
             $table->unsignedInteger('transactionable_id')->nullable();
             $table->char('transactionable_type')->nullable();
             $table->boolean('is_confirmed')->default(0);
+            $table->boolean('is_closing')->default(0);
             $table->boolean('created_by');
             $table->unsignedInteger('inventory_id')->nullable();
             $table->timestamps();

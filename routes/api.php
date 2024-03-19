@@ -16,6 +16,7 @@ use App\Http\Controllers\API\TaskController;
 use App\Http\Controllers\API\TestController;
 use App\Http\Controllers\API\UomAPIController;
 use App\Http\Controllers\API\AccountController;
+use App\Http\Controllers\API\CashbookController;
 use App\Http\Controllers\API\ItemAPIController;
 use App\Http\Controllers\API\MenuAPIController;
 use App\Http\Controllers\API\RoleAPIController;
@@ -121,6 +122,10 @@ Route::middleware('auth:api')->group(function(){
     Route::resource('transactions', TransactionController::class)->only(['index','store','show','destroy']);
     Route::controller(TransactionController::class)->group(function(){
         Route::post('transaction_confirmed','transactionConfirmed');
+    });
+
+    Route::controller(CashbookController::class)->group(function(){
+        Route::get('cash_books','index');
     });
 });
 

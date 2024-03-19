@@ -8,7 +8,8 @@ use Illuminate\Support\ServiceProvider;
 
 use App\Repositories\Area\AreaRepositoryInterface;
 use App\Repositories\Area\AreaRepository;
-
+use App\Repositories\CashBook\CashBookInterface;
+use App\Repositories\CashBook\CashBookRepository;
 use App\Repositories\Complaint\ComplaintRepository;
 use App\Repositories\Complaint\ComplaintRepositoryInterface;
 use App\Repositories\Customer\CustomerRepository;
@@ -96,5 +97,6 @@ class RepositoryServiceProvider extends ServiceProvider
         $this->app->bind(HeadAccountInterface::class,HeadAccountRepository::class);
         $this->app->bind(AccountInterface::class,AccountRepository::class);
         $this->app->bind(TransactionInterface::class,TransactionRepository::class);
+        $this->app->bind(CashBookInterface::class,CashBookRepository::class);
     }
 }
