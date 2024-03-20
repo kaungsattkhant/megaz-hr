@@ -1,12 +1,12 @@
 @extends('layouts.main')
 
 @section('page_title', 'Cashbook')
-@section('cashbook', 'active-link')
+@section('advance_cash', 'active-link')
 @section('content')
     <div id="app">
         <cashbook-crud-component
-        :cash-account-id={{ '23' }}
-        :cash-account-name={{ 'Office Cash' }}>
+        :cash-account-id={{ '27' }}
+        :cash-account-name={{ 'Advance Cash' }}>
         </cashbook-crud-component>
 
     </div>
