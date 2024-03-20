@@ -4,6 +4,7 @@ namespace App\Repositories\CashBook;
 
 use App\Http\Action\Transaction\CashBookTransaction;
 use App\Models\Transaction;
+use stdClass;
 
 class CashBookRepository implements CashBookInterface
 {
@@ -23,35 +24,28 @@ class CashBookRepository implements CashBookInterface
                 $q->where('id', '>', $latestClosedTransaction);
             })
             ->get();
+        $current_debit_amount=$current_credit_amount=0;
         foreach ($cashbookTransactions as $transaction) {
             foreach ($transaction->ledgers as $ledger) {
                 // if (in_array($ledger->account_id, $cashAccountIds)) {
                 if ($ledger->account_id==$cashAccountId) {
                     $transaction->type = $ledger->account->name;
                     $transaction->amount = $ledger->value;
+                    $transaction->action = $ledger->action;
+                     $ledger->action=='debit' ? $current_debit_amount+=$transaction->amount : $current_credit_amount+=$transaction->amount ;
                 } else {
                     $transaction->title = $ledger->account->name;
                 }
             }
             UnsetData($transaction, ['ledgers']);
         }
-        // $cashbookTransactions = Transaction::leftJoin('ledgers', 'transactions.id', '=', 'ledgers.transaction_id')
-        // ->leftJoin('accounts', 'ledgers.account_id', '=', 'accounts.id')
-        // ->select('transactions.id', 'transactions.date', 'transactions.description',
-        //          'accounts.name as account_name', 'ledgers.value as ledger_value', 'ledgers.account_id as ledger_account_id')
-        // ->whereIn('ledgers.account_id', $cashAccountIds)
-        // ->get();
-        // $cashbookTransactions->each(function ($transaction) use ($cashAccountIds) {
-        //     if (in_array($transaction->ledger_account_id, $cashAccountIds)) {
-        //         $transaction->type = $transaction->account_name;
-        //         $transaction->amount = $transaction->ledger_value;
-        //     } else {
-        //         $transaction->title = $transaction->account_name;
-        //     }
-        //     unset($transaction->account_name, $transaction->ledger_value, $transaction->ledger_account_id);
-        // });
 
-        return $cashbookTransactions;
+        $balance=(new CashBookTransaction())->getOpeningBalance($request);
+        $data=new stdClass();
+        $data->opening_balance=$balance->opening_balance;
+        $data->remaining_balance=($balance->opening_balance+$current_debit_amount) -$current_credit_amount;
+        $data->cashbook_list=$cashbookTransactions;
+        return $data;
     }
 
     public function closeTransaction($request){
