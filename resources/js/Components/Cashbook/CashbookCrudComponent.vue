@@ -47,26 +47,37 @@
                     </thead>
                     <tbody>
 
-                        <!-- looping start -->
                         <div class="contents">
+                            <tr class="bg-gray rounded-lg overflow-hidden shadow-sm mb-10">
+                                <td class="whitespace-nowrap px-6 py-4 "> &nbsp; </td>
+                                <td class="whitespace-nowrap px-6 py-4 "> &nbsp; </td>
+                                <td class="whitespace-nowrap px-6 py-4 "> &nbsp; </td>
+                                <td class="whitespace-nowrap px-6 py-4 "> &nbsp; </td>
+                                <td class="whitespace-nowrap px-6 py-4 "> &nbsp; </td>
+                                <td class="whitespace-nowrap px-6 py-4 "> {{ (openingBalance) }} </td>
+                                <td class="whitespace-nowrap px-6 py-4 "> &nbsp; </td>
+                            </tr>
+                        </div>
+                        <!-- looping start -->
+                        <div class="contents" v-for="(cashBook, cashBookIndex) in cashBookList" :key="cashBookIndex">
                             <tr class="bg-white rounded-lg overflow-hidden shadow-lg">
                                 <td class=" px-6 py-4 font-medium ">
-                                    1
+                                    {{ cashBook.id }}
                                 </td>
                                 <td class="whitespace-nowrap px-6 py-4 ">
-                                    Title
+                                    {{ cashBook.title }}
                                 </td>
                                 <td class="whitespace-nowrap px-6 py-4 ">
-                                    Amount
+                                    {{ (cashBook.amount).toLocaleString() }}
                                 </td>
                                 <td class="whitespace-nowrap px-6 py-4 ">
-                                    Type
+                                    {{ cashBook.type }}
                                 </td>
                                 <td class="whitespace-nowrap px-6 py-4 ">
-                                    Remark
+                                    {{ cashBook.description }}
                                 </td>
                                 <td class="whitespace-nowrap px-6 py-4 ">
-                                    Balance
+                                    {{ (cashBook.amount).toLocaleString() }}
                                 </td>
                                 <td class="whitespace-nowrap px-6 py-4">
                                     <button
@@ -330,16 +341,36 @@
     import { mapGetters } from "vuex";
 
     export default {
+        props: ["cashAccountId", "cashAccountName"],
         data() {
-            return {};
+            return {
+                openingBalance: 0,
+                cashBookList: [],
+            };
         },
 
         methods: {
-            
+            ...mapGetters(['getToken']),
+
+            async getCashbookList(cashAccountId){
+                let url = `/api/cash_books?cash_account_id=${cashAccountId}`;
+                let response = await getApiData({url: url, token: this.getToken()});
+                if(response.data){
+                    // this.openingBalance = response.opening_balance;
+                    // console.log(response);
+                    this.cashBookList = response.data;
+                }
+            },
 
         },
+
+        created(){
+            this.getCashbookList(this.cashAccountId);
+        },
+
         mounted()
         {
+            // alert(this.cashAccountId);
             initTE({ Modal,Select, Ripple });
         }
     }

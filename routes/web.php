@@ -64,6 +64,19 @@ Route::view('/item_usage_forecasts/create', 'item_usage_forecastings.create')->n
 Route::view('/accounting', 'accounting.index')->name('accountings');
 Route::view('/financial_transaction', 'financial_transaction.index')->name('financial_transactions');
 
+Route::view('/cashbook', 'cashbook.index')->name('cashbook');
+Route::view('/cashbook/office', 'cashbook.cash_office')->name('office_cash');
+Route::view('/cashbook/owner', 'cashbook.cash_owner')->name('owner_cash');
+Route::view('/cashbook/service', 'cashbook.cash_service')->name('service_cash');
+Route::view('/cashbook/advance', 'cashbook.cash_advance')->name('advance_cash');
+Route::view('/cashbook/agm', 'cashbook.cash_agm')->name('agm_cash');
+Route::view('/cashbook/gm', 'cashbook.cash_gm')->name('gm_cash');
+Route::view('/cashbook/ktv_project', 'cashbook.cash_ktv_project')->name('ktv_project_cash');
+
+Route::view('/bankbook/kbz_special_md_gm', 'cashbook.bank_kbz_special_md_gm')->name('kbz_special_bank');
+Route::view('/bankbook/kbz_old_gm', 'cashbook.bank_kbz_old_gm')->name('kbz_old_gm_bank');
+Route::view('/bankbook/kpay', 'cashbook.bank_kpay')->name('kpay_bank');
+
 //pos
 Route::view('/pos/home', 'pos.home.index')->name('pos');
 Route::view('/pos/customer', 'pos.customers.index')->name('customer');

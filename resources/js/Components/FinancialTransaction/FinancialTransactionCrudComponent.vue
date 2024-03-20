@@ -138,7 +138,7 @@
                                     <div class="text-left">
                                         <div v-for="(ledger) in transaction.ledgers">
                                             <p class="mb-2" v-if="ledger.action == 'debit'">
-                                                {{ ledger.value }}
+                                                {{ (ledger.value).toLocaleString() }}
                                             </p>
                                         </div>
                                         <div v-for="(ledger) in transaction.ledgers">
@@ -152,7 +152,7 @@
                                     <div class="text-left">
                                         <div v-for="(ledger) in transaction.ledgers">
                                             <p class="mb-2" v-if="ledger.action == 'credit'">
-                                                {{ ledger.value }}
+                                                {{ (ledger.value).toLocaleString() }}
                                             </p>
                                         </div>
                                         <div v-for="(ledger) in transaction.ledgers">
