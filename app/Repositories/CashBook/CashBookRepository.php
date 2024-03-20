@@ -14,6 +14,7 @@ class CashBookRepository implements CashBookInterface
         $cashAccountId=$request->cash_account_id;
         $latestClosedTransaction = (new CashBookTransaction())->getLatestClosedTransaction($cashAccountId);
         $cashbookTransactions = Transaction::with(['ledgers.account'])
+        ->isConfirmed(1)
             ->select(['id', 'date', 'description'])
             ->whereHas('ledgers', function ($query) use ($cashAccountId) {
                 // $query->whereIn('account_id', $cashAccountIds);

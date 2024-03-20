@@ -66,6 +66,16 @@ class TransactionRepository implements TransactionInterface
         dd('jjjj');
     }
 
+    public function delete($id){
+        $transaction=Transaction::find($id);
+        if($transaction){
+            $transaction->delete();
+            $transaction->ledgers()->delete();
+            ResponseMessage("Delete is successfully",422);
+        }
+        ResponseMessage("Data isn't found",422);
+    }
+
     public function transactionConfirmed($request){
         $ids=$request->ids;
         $transaction=Transaction::whereIn('id',$ids)

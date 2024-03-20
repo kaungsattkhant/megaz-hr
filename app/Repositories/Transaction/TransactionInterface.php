@@ -11,5 +11,7 @@ interface TransactionInterface
 
     public function detail($transaction);
 
+    public function delete($id);
+
     public function transactionConfirmed($request);
 }

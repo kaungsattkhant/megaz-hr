@@ -32,6 +32,11 @@ class TransactionController extends Controller
         ResponseData($transaction);
     }
 
+    public function destroy($id){
+        $transaction= $this->transactionRepo->delete($id);
+        ResponseData($transaction);
+    }
+
     public function transactionConfirmed(Request $request){
         $transaction= $this->transactionRepo->transactionConfirmed($request);
     }

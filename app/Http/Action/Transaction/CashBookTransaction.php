@@ -20,6 +20,7 @@ class CashBookTransaction
             ->join('transactions', 'ledgers.transaction_id', '=', 'transactions.id')
             ->join('accounts', 'ledgers.account_id', '=', 'accounts.id')
             // ->whereIn('ledgers.account_id', $cashAccountId)
+            ->where('transactions.is_confirmed',1)
             ->where('ledgers.account_id', $cashAccountId)
             ->where('transactions.id', '<=', $latestClosedTransaction)
             // ->whereDate('transactions.date', '<=', $closingDate) // Compare transaction date with closing date
@@ -40,6 +41,7 @@ class CashBookTransaction
 
     public function getLatestClosedTransaction($cashAccountId){
         return Transaction::with(['ledgers.account'])
+        ->isConfirmed(1)
         ->select(['id', 'date', 'description'])
         ->whereHas('ledgers', function ($query) use ($cashAccountId) {
             $query->where('account_id', $cashAccountId);    #transaction close depend on transaction
