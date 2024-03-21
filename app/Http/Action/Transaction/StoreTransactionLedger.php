@@ -8,10 +8,16 @@ class StoreTransactionLedger
 {
     public function createTransaction($data){
         $data['date']=now();
-        return Transaction::create($data);
+        return Transaction::updateOrCreate(
+            ['id' => $data['id']],
+            $data
+        );
     }
    
     public function storeLedger($data){
-        return Ledger::create($data);
+        return Ledger::updateOrCreate(
+            ['id' => $data['id']],
+            $data
+        );
     }
 }

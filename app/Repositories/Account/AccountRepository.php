@@ -16,6 +16,10 @@ class AccountRepository implements AccountInterface
             ->leftJoin('transactions', 'transactions.id', '=', 'ledgers.transaction_id')
             ->leftJoin('sub_accounts', 'sub_accounts.id', '=', 'accounts.sub_account_id')
             ->where('transactions.is_confirmed',1)
+            ->when($request->search_input,function($q)use($request){
+                $q->where('accounts.name','LIKE','%'.$request->search_input.'%')
+                ->orWhere('accounts.account_code','LIKE','%'.$request->search_input.'%');
+            })
             ->select('accounts.id','accounts.name','accounts.account_code','accounts.sub_account_id','sub_accounts.name as sub_account_name',
                      DB::raw('COALESCE(SUM(CASE WHEN ledgers.action = "debit" THEN ledgers.value ELSE 0 END), 0) as debit_amount'),
                      DB::raw('COALESCE(SUM(CASE WHEN ledgers.action = "credit" THEN ledgers.value ELSE 0 END), 0) as credit_amount'))
