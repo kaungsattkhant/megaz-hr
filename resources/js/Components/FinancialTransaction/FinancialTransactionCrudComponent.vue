@@ -53,59 +53,6 @@
                     <tbody>
 
                         <!-- looping start -->
-                        <!-- <div class="contents">
-                            <tr class="bg-white rounded-lg overflow-hidden shadow-lg">
-                                <td class=" px-6 py-4 font-medium ">
-                                    1
-                                </td>
-                                <td class="whitespace-nowrap px-6 py-4 ">
-                                    Purchase Order
-                                </td>
-                                <td class="whitespace-nowrap px-6 py-4 ">
-                                    <div class="text-left">
-                                        <p class="mb-2">
-                                            Cash In Hand
-                                        </p>
-                                        <p>
-                                            Item
-                                        </p>
-                                    </div>
-                                </td>
-                                <td class="whitespace-nowrap px-6 py-4 ">
-                                    <div class="text-left">
-                                        <p class="mb-2">
-                                            0
-                                        </p>
-                                        <p>
-                                            5000
-                                        </p>
-                                    </div>
-                                </td>
-                                <td class="whitespace-nowrap px-6 py-4 ">
-                                    5000
-                                </td>
-                                <td class="whitespace-nowrap px-6 py-4 ">
-                                    March 7
-                                </td>
-                                <td class="whitespace-nowrap px-6 py-4">
-                                    <button
-                                    data-te-toggle="modal" data-te-target="#editModal" id="edit-btn" class="pr-3">
-                                    <i class="fal fa-pen"></i>
-                                    </button>
-                                    <button id="edit-btn" class="pr-3">
-                                    <i class="fal fa-check"></i>
-                                    </button>
-                                    <button
-                                    data-te-toggle="modal" data-te-target="#deleteModal" id="edit-btn" class="pr-1">
-                                        <i class="fas fa-trash-alt"></i>
-                                    </button>
-                                </td>
-                            </tr>
-                            <tr class="">
-                                <td class=" py-2 "></td>
-                            </tr>
-                        </div> -->
-
                         <div class="contents" v-for="(transaction, transactionIndex) in transactionList" :key="transactionIndex">
                             <tr class="bg-white rounded-lg overflow-hidden shadow-lg">
                                 <td class=" px-6 py-4 font-medium ">
@@ -189,7 +136,8 @@
                                     <i class="fal fa-check"></i>
                                     </button> -->
                                     <button
-                                    data-te-toggle="modal" data-te-target="#deleteModal" id="edit-btn" class="pr-1">
+                                    data-te-toggle="modal" data-te-target="#deleteModal" id="edit-btn" class="pr-1"
+                                    @click="deleteBtnClicked(transaction.id)">
                                         <i class="fas fa-trash-alt"></i>
                                     </button>
                                 </td>
@@ -380,6 +328,76 @@
             </div>
         </div>
 
+        <!--Delete Modal -->
+        <div
+        data-te-modal-init
+        class="fixed left-0 top-0 z-[1055] hidden h-full w-full overflow-y-auto overflow-x-hidden outline-none"
+        id="deleteModal"
+        tabindex="-1"
+        aria-labelledby="exampleModalLabel"
+        aria-hidden="true">
+        <div
+            data-te-modal-dialog-ref
+            class="pointer-events-none relative flex min-h-[calc(100%-1rem)] w-auto translate-y-[-50px] items-center opacity-0 transition-all duration-300 ease-in-out min-[576px]:mx-auto min-[576px]:mt-7 min-[576px]:min-h-[calc(100%-3.5rem)] min-[576px]:max-w-[500px]">
+                <div
+                class="min-[576px]:shadow-[0_0.5rem_1rem_rgba(#000, 0.15)] pointer-events-auto relative flex w-full flex-col rounded-md border-none bg-white bg-clip-padding text-current shadow-lg outline-none ">
+                <div
+                    class="flex flex-shrink-0 items-center justify-between rounded-t-md border-b-2 border-neutral-100 border-opacity-100 p-4 ">
+                    <!--Modal title-->
+                    <h5
+                    class="text-xl font-medium leading-normal text-neutral-800 "
+                    id="exampleModalLabel">
+                    Delete ?
+                    </h5>
+                    <!--Close button-->
+                    <button
+                    type="button"
+                    class="box-content rounded-none border-none hover:no-underline hover:opacity-75 focus:opacity-100 focus:shadow-none focus:outline-none"
+                    data-te-modal-dismiss
+                    aria-label="Close">
+                    <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke-width="1.5"
+                        stroke="currentColor"
+                        class="h-6 w-6">
+                        <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                    </button>
+                </div>
+
+                <!--Modal body-->
+                <div class="relative flex-auto p-4" data-te-modal-body-ref>
+                    <p>
+                        Are you sure ?
+                    </p>
+                </div>
+
+                <!--Modal footer-->
+                <div
+                    class="flex flex-shrink-0 flex-wrap items-center justify-end rounded-b-md border-t-2 border-neutral-100 border-opacity-100 p-4 ">
+                    <button
+                    type="button"
+                    class="inline-block px-6 pb-2 pt-2.5 text-xs focus:outline-none focus:ring-0 "
+                    data-te-modal-dismiss
+                    >
+                        Close
+                    </button>
+                    <button @click="confirmDeleteBtnClicked"
+                    type="button" data-te-toggle="modal" data-te-target="#deleteModal"
+                    class="ml-1 inline-block rounded bg-red-600 px-6 pb-2 pt-2.5 text-xs  text-white   focus:outline-none focus:ring-0 "
+                    >
+                        Delete
+                    </button>
+                </div>
+                </div>
+            </div>
+        </div>
+
         <!--Confirm Modal -->
         <div
             data-te-modal-init
@@ -477,6 +495,9 @@
                 description: null,
 
                 toBeConfirmTransactionList: [],
+
+                deleteId: null,
+                deleteIndex: null,
             };
         },
 
@@ -583,6 +604,22 @@
                     window.location.reload();
                 }
 
+            },
+
+            deleteBtnClicked(id){
+                this.deleteId = id;
+                let index = this.transactionList.findIndex(transaction => transaction.id == id);
+                if(index != -1){
+                    this.deleteIndex = index;
+                }
+            },
+
+            async confirmDeleteBtnClicked(){
+                let url = `/api/transactions/${this.deleteId}`;
+                let response = await deleteApiData({url: url, token: this.getToken()});
+                if(response.success){
+                    this.transactionList.splice(this.deleteIndex, 1);
+                }
             },
 
         },
