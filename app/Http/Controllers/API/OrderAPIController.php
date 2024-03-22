@@ -18,7 +18,13 @@ class OrderAPIController extends Controller
 
     public function addOrder(OrderCreateRequest $request)
     {
-        $orders = $this->orderRepo->createOrder($request->all());
+        if($request->menuArray)
+        {
+            $orders = $this->orderRepo->createMultipleOrder($request->all());
+        }else{
+            $orders = $this->orderRepo->createOrder($request->all());
+
+        }
         ResponseData($orders);
     }
 }
