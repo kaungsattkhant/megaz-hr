@@ -24,9 +24,10 @@ class OrderCreateRequest extends FormRequest
         return [
             //
             'invoice_id' => 'required',
-            'menu_id' => 'required',
-            'quantity' => 'required',
-            'original_price' => 'required'
+            'menu_id' => 'sometimes',
+            'quantity' => 'sometimes',
+            'original_price' => 'sometimes',
+            'menuArray' => 'sometimes'
         ];
     }
 }

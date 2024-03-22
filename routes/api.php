@@ -118,7 +118,7 @@ Route::middleware('auth:api')->group(function(){
         Route::get('get_cash_account','getCashAccount');
         Route::get('account_by_sub_account/{id}','accountBySubAccount');
     });
-  
+
     Route::resource('transactions', TransactionController::class)->only(['index','store','show','destroy']);
     Route::controller(TransactionController::class)->group(function(){
         Route::post('transaction_confirmed','transactionConfirmed');
@@ -206,7 +206,6 @@ Route::get('/rooms/{id}',[EntityAPIController::class,'getRoomDetail']);
 Route::get('/rooms/lists/inactive',[EntityAPIController::class,'getOnlyInactiveRooms']);
 
 Route::post('/rooms/start',[InvoiceAPIController::class,'startRoomSession']);
-Route::post('/rooms/orders',[OrderAPIController::class,'addOrder']);
 Route::post('/rooms/add_more_sessions',[InvoiceAPIController::class,'addMoreSessions']);
 Route::post('/rooms/change_rooms',[InvoiceAPIController::class,'changeRoom']);
 Route::post('/rooms/done',[InvoiceAPIController::class,'endRoom']);
@@ -218,3 +217,4 @@ Route::get('/tables',[EntityAPIController::class,'getTablesWithInvoice']);
 Route::get("/test", [TestController::class, "index"]);
 
 
+Route::post('/rooms/orders',[OrderAPIController::class,'addOrder']);
