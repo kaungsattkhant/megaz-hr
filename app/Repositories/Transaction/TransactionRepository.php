@@ -33,16 +33,16 @@ class TransactionRepository implements TransactionInterface
         })
         ->when(isset($request->is_confirmed),function($q)use($request){
             $q->isConfirmed($request->is_confirmed);
-        })
-        ->when(($request->from_date && $request->to_date), function ($q) use ($from_date, $to_date, $request) {
-            $q->whereBetween(DB::raw('DATE(transactions.date)'), [$from_date, $to_date]);
-        })
-        ->when(($request->from_date && $request->to_date == null), function ($q) use ($from_date, $request) {
-            $q->whereDate('date', '>=', $from_date);
-        })
-        ->when(($request->from_date == null && $request->to_date), function ($q) use ($to_date, $request) {
-            $q->whereBetween('date', [now(), $to_date]);
         });
+        // ->when(($request->from_date && $request->to_date), function ($q) use ($from_date, $to_date, $request) {
+        //     $q->whereBetween(DB::raw('DATE(transactions.date)'), [$from_date, $to_date]);
+        // })
+        // ->when(($request->from_date && $request->to_date == null), function ($q) use ($from_date, $request) {
+        //     $q->whereDate('date', '>=', $from_date);
+        // })
+        // ->when(($request->from_date == null && $request->to_date), function ($q) use ($to_date, $request) {
+        //     $q->whereBetween('date', [now(), $to_date]);
+        // });
         if($request->per_page || $request->page){
             $transactions=$query->paginate(config('common.list_count'));
         }else{

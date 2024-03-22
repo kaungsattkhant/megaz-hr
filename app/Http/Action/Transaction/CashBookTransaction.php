@@ -46,11 +46,13 @@ class CashBookTransaction
     public function getLatestClosedTransaction($data,$cashAccountId){
         $fromDate = convertDateFormat($data->from_date);
         return Transaction::with(['ledgers.account'])
+        ->withoutGlobalScope('dateFilter')
         ->select(['id', 'date', 'description'])
         ->whereHas('ledgers', function ($query) use ($cashAccountId) {
             $query->where('account_id', $cashAccountId);    #transaction close depend on transaction
         })->where('is_closing', 1)
         ->orderByDesc('date')
+        ->isConfirmed(1)
         ->when(($data->from_date), function ($q) use ($fromDate) {
             $q->whereDate('date', '<', $fromDate);
         })

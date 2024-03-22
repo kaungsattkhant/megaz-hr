@@ -14,24 +14,24 @@ class Transaction extends Model
 
     protected static function booted()
     {
-        // static::addGlobalScope('dateFilter', function (Builder $builder) {
-        //     $builder
-        //     // ->when(request()->filled('is_confirmed'), function ($query) {
-        //     //     $query->isConfirmed(request('is_confirmed'));
-        //     // })
-        //     ->when(request()->has(['from_date', 'to_date']), function ($query) {
-        //         $fromDate = convertDateFormat(request('from_date'));
-        //         $toDate = convertDateFormat(request('to_date'));
+        static::addGlobalScope('dateFilter', function (Builder $builder) {
+            $builder
+            // ->when(request()->filled('is_confirmed'), function ($query) {
+            //     $query->isConfirmed(request('is_confirmed'));
+            // })
+            ->when(request()->has(['from_date', 'to_date']), function ($query) {
+                $fromDate = convertDateFormat(request('from_date'));
+                $toDate = convertDateFormat(request('to_date'));
 
-        //         $query->whereBetween(DB::raw('DATE(date)'), [$fromDate, $toDate]);
-        //     })->when(request()->has('from_date') && !request()->has('to_date'), function ($query) {
-        //         $fromDate = convertDateFormat(request('from_date'));
-        //         $query->whereDate('date', '>=', $fromDate);
-        //     })->when(request()->has('to_date') && !request()->has('from_date'), function ($query) {
-        //         $toDate = convertDateFormat(request('to_date'));
-        //         $query->whereDate('date', '<=', $toDate);
-        //     });
-        // });
+                $query->whereBetween(DB::raw('DATE(date)'), [$fromDate, $toDate]);
+            })->when(request()->has('from_date') && !request()->has('to_date'), function ($query) {
+                $fromDate = convertDateFormat(request('from_date'));
+                $query->whereDate('date', '>=', $fromDate);
+            })->when(request()->has('to_date') && !request()->has('from_date'), function ($query) {
+                $toDate = convertDateFormat(request('to_date'));
+                $query->whereDate('date', '<=', $toDate);
+            });
+        });
     }
 
     public function ledgers(){
