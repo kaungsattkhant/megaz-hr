@@ -43,22 +43,22 @@
                             <th scope="col" class=" px-6 py-4 ">
                                 Balance
                             </th>
-                            <th scope="col" class="px-6 py-4">
+                            <!-- <th scope="col" class="px-6 py-4">
 
-                            </th>
+                            </th> -->
                         </tr>
                     </thead>
                     <tbody>
 
                         <div class="contents">
-                            <tr class="bg-gray rounded-lg overflow-hidden shadow-lg mb-10">
+                            <tr class="bg-gray rounded-lg overflow-hidden shadow-sm mb-10">
                                 <td class="whitespace-nowrap px-6 py-4 "> &nbsp; </td>
                                 <td class="whitespace-nowrap px-6 py-4 "> &nbsp; </td>
                                 <td class="whitespace-nowrap px-6 py-4 "> &nbsp; </td>
                                 <td class="whitespace-nowrap px-6 py-4 "> &nbsp; </td>
                                 <td class="whitespace-nowrap px-6 py-4 "> &nbsp; </td>
                                 <td class="whitespace-nowrap px-6 py-4 "> {{ (openingBalance).toLocaleString() }} </td>
-                                <td class="whitespace-nowrap px-6 py-4 "> &nbsp; </td>
+                                <!-- <td class="whitespace-nowrap px-6 py-4 "> &nbsp; </td> -->
                             </tr>
                             <tr class="">
                                 <td class=" py-2 "></td>
@@ -85,7 +85,7 @@
                                 <td class="whitespace-nowrap px-6 py-4 ">
                                     {{ (cashBook.amount).toLocaleString() }}
                                 </td>
-                                <td class="whitespace-nowrap px-6 py-4">
+                                <!-- <td class="whitespace-nowrap px-6 py-4">
                                     <button
                                     data-te-toggle="modal" data-te-target="#editModal" id="edit-btn" class="pr-3">
                                     <i class="fal fa-pen"></i>
@@ -94,7 +94,7 @@
                                     data-te-toggle="modal" data-te-target="#deleteModal" id="edit-btn" class="pr-1">
                                         <i class="fas fa-trash-alt"></i>
                                     </button>
-                                </td>
+                                </td> -->
                             </tr>
                             <tr class="">
                                 <td class=" py-2 "></td>
@@ -104,14 +104,14 @@
                             <!-- looping end -->
 
                         <div class="contents">
-                            <tr class="bg-gray rounded-lg overflow-hidden shadow-lg mb-10">
+                            <tr class="bg-gray rounded-lg overflow-hidden shadow-sm mb-10">
                                 <td class="whitespace-nowrap px-6 py-4 "> &nbsp; </td>
                                 <td class="whitespace-nowrap px-6 py-4 "> &nbsp; </td>
                                 <td class="whitespace-nowrap px-6 py-4 "> &nbsp; </td>
                                 <td class="whitespace-nowrap px-6 py-4 "> &nbsp; </td>
                                 <td class="whitespace-nowrap px-6 py-4 "> &nbsp; </td>
                                 <td class="whitespace-nowrap px-6 py-4 "> {{ (remainingBalance).toLocaleString() }} </td>
-                                <td class="whitespace-nowrap px-6 py-4 "> &nbsp; </td>
+                                <!-- <td class="whitespace-nowrap px-6 py-4 "> &nbsp; </td> -->
                             </tr>
                             <tr class="">
                                 <td class=" py-2 "></td>

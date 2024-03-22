@@ -62,9 +62,9 @@
                                     @click="editBtnClicked(account.id, index)">
                                         <i class="fal fa-pen"></i>
                                     </button>
-                                    <button data-te-toggle="modal" data-te-target="#deleteModal" id="edit-btn" class="pr-1" @click="deleteBtnClicked(account.id, index)">
+                                    <!-- <button data-te-toggle="modal" data-te-target="#deleteModal" id="edit-btn" class="pr-1" @click="deleteBtnClicked(account.id, index)">
                                         <i class="fas fa-trash-alt"></i>
-                                    </button>
+                                    </button> -->
                                 </td>
                             </tr>
                             <tr class="">

@@ -129,7 +129,8 @@
                                         </label>
                                     </div>
                                     <button
-                                    data-te-toggle="modal" data-te-target="#editModal" id="edit-btn" class="pr-3">
+                                    data-te-toggle="modal" data-te-target="#editModal" id="edit-btn" class="pr-3"
+                                    @click="editBtnClicked(transaction.id)">
                                     <i class="fal fa-pen"></i>
                                     </button>
                                     <!-- <button id="edit-btn" class="pr-3">
@@ -265,63 +266,71 @@
                             </svg>
                         </button>
                     </div>
-                    <!-- <div class="relative px-12 py-4" data-te-modal-body-ref>
+                    <div class="relative px-12 py-4" data-te-modal-body-ref v-if="editTransaction">
                         <div class="mb-4">
                             <label for="" class="block text-sm text-black mb-3">
                                 Parent Account
                             </label>
-                            <select name="" id=""
-                                class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
-                                <option value="1" > 1 </option>
+                            <select name="" id="" v-model="selectedEditSubAccount"
+                                class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0" @change="editSubAccountSelectChanged">
+                                <option :value="subAccount" v-for="(subAccount, subAccountIndex) in subAccountList" :key="subAccountIndex">
+                                    {{ subAccount.name }}
+                                </option>
                             </select>
                         </div>
                         <div class="mb-4">
                             <label for="" class="block text-sm text-black mb-3">
                                 Target Account
                             </label>
-                            <select name="" id=""
+                            <select name="" id="" v-model="selectedEditAccount"
                                 class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
-                                <option value="1" > 1 </option>
+                                <option :value="account" v-for="(account, accountIndex) in accountList" :key="accountIndex">
+                                    {{ account.name }}
+                                </option>
                             </select>
                         </div>
                         <div class="mb-4">
                             <label for="" class="block text-sm text-black mb-3">
                                 Cash Account
                             </label>
-                            <select name="" id=""
+                            <select name="" id="" v-model="selectedEditCashAccount"
                                 class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
-                                <option value="1" > 1 </option>
+                                <!-- <option value="1" > 1 </option> -->
+                                <option :value="cashAccount" v-for="(cashAccount, cashAccountIndex) in cashAccountList" :key="cashAccountIndex">
+                                    {{ cashAccount.name }}
+                                </option>
                             </select>
                         </div>
                         <div class="mb-4">
                             <label for="" class="block text-sm text-black mb-3">
                                 Type
                             </label>
-                            <select name="" id=""
+                            <select name="" id="" v-model="editTransactionAction"
                                 class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
-                                <option value="1" > 1 </option>
+                                <option :selected="editTransactionAction == 'debit'" value="debit" > Debit </option>
+                                <option :selected="editTransactionAction == 'credit'" value="credit" > Credit </option>
                             </select>
                         </div>
                         <div class="mb-4">
                             <label for="" class="block text-sm text-black mb-3">
                                 Amount
                             </label>
-                            <input type="text" placeholder="Area Name"
+                            <input type="number" placeholder="Amount" v-model="editTransactionAmount"
                                 class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
                         </div>
                         <div class="mb-4">
                             <label for="" class="block text-sm text-black mb-3">
                                 Remark
                             </label>
-                            <input type="text" placeholder="Remark"
+                            <input type="text" placeholder="Remark" v-model="editTransactionDescription"
                                 class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
                         </div>
 
-                    </div> -->
+                    </div>
                     <div class="flex justify-center px-12 mb-6">
                         <button data-te-modal-dismiss type="button"
-                        class="add-btn focus:outline-none focus:ring-0 ">
-                            Create
+                        class="add-btn focus:outline-none focus:ring-0 " @click="confirmEditBtnClicked">
+                            Update
                         </button>
                     </div>
                 </div>
@@ -498,6 +507,17 @@
 
                 deleteId: null,
                 deleteIndex: null,
+
+                selectedEditCashAccount: null,
+                selectedEditSubAccount: null,
+                selectedEditAccount: null,
+
+                editId: null,
+                editIndex: null,
+                editTransaction: null,
+                editTransactionDescription: null,
+                editTransactionAmount: null,
+                editTransactionAction: null,
             };
         },
 
@@ -529,11 +549,19 @@
             },
 
             subAccountSelectChanged(){
-                this.getAccountList();
+                this.getAccountList(this.selectedSubAccount.id);
             },
 
-            async getAccountList(){
-                let url = `/api/account_by_sub_account/${this.selectedSubAccount.id}`;
+            async editSubAccountSelectChanged(){
+                let url = `/api/account_by_sub_account/${this.selectedEditSubAccount.id}`;
+                let response = await getApiData({url: url, token: this.getToken()});
+                if(response.data){
+                    this.accountList = response.data;
+                }
+            },
+
+            async getAccountList(subAccountId){
+                let url = `/api/account_by_sub_account/${subAccountId}`;
                 let response = await getApiData({url: url, token: this.getToken()});
                 if(response.data){
                     this.accountList = response.data;
@@ -587,8 +615,6 @@
                 else{
                     this.toBeConfirmTransactionList.push(transactionId);
                 }
-
-                console.log(this.toBeConfirmTransactionList);
             },
 
             async confirmTransactionsBtnClicked(){
@@ -596,7 +622,6 @@
                 this.toBeConfirmTransactionList.forEach((transactionId)=>{
                     formData.append('ids[]', transactionId);
                 });
-                // formData.append('ids', JSON.stringify(this.toBeConfirmTransactionList));
                 formData.append('value', 1);
                 let url = `/api/transaction_confirmed`;
                 let response = await postApiData({url: url, form_data: formData, token: this.getToken()});
@@ -619,6 +644,61 @@
                 let response = await deleteApiData({url: url, token: this.getToken()});
                 if(response.success){
                     this.transactionList.splice(this.deleteIndex, 1);
+                }
+            },
+
+            async editBtnClicked(id){
+                this.editId = id;
+                let index = this.transactionList.findIndex(transaction => transaction.id == id);
+                if(index != -1){
+                    this.editIndex = index;
+                }
+                let url = `/api/transactions/${this.editId}`;
+                let response = await getApiData({url: url, token: this.getToken()});
+                if(response.data){
+                    this.editTransaction = response.data;
+                    this.editTransactionAction = this.editTransaction.action;
+                    this.editTransactionDescription = this.editTransaction.description;
+                    this.editTransactionAmount = this.editTransaction.value;
+                    let cashAccountIndex = this.cashAccountList.findIndex(cashAccount => cashAccount.id == this.editTransaction.cash_account_id);
+                    if(cashAccountIndex != -1){
+                        this.selectedEditCashAccount = this.cashAccountList[index];
+                    }
+                    let fetchAccountUrl = `/api/accounts/${this.editTransaction.account_id}`;
+                    let accountDetailResponse = await getApiData({url: fetchAccountUrl, token: this.getToken()});
+                    if(accountDetailResponse.data){
+                        let subAccountIndex = this.subAccountList.findIndex(subAccount => subAccount.id == accountDetailResponse.data.sub_account_id);
+                        if(subAccountIndex != -1){
+                            this.selectedEditSubAccount = this.subAccountList[subAccountIndex];
+                        }
+
+                        let fetchEditAccountsUrl = `/api/account_by_sub_account/${this.selectedEditSubAccount.id}`;
+                        let fetchedEditAccountsResponse = await getApiData({url: fetchEditAccountsUrl, token: this.getToken()});
+                        if(fetchedEditAccountsResponse.data){
+                            this.accountList = fetchedEditAccountsResponse.data;
+                            let accountIndex = this.accountList.findIndex(account => account.id == this.editTransaction.account_id);
+                            if(accountIndex != -1){
+                                this.selectedEditAccount = this.accountList[index];
+                            }
+                        }
+                    }
+                }
+            },
+
+            async confirmEditBtnClicked(){
+                let formData = new FormData();
+                formData.append('description', this.editTransactionDescription);
+                formData.append('account_id', this.selectedEditAccount.id);
+                formData.append('value', this.editTransactionAmount);
+                formData.append('cash_account_id', this.selectedEditCashAccount.id);
+                formData.append('action', this.editTransactionAction);
+                formData.append('credit_ledger_id', this.editTransaction.credit_ledger_id);
+                formData.append('debit_ledger_id', this.editTransaction.debit_ledger_id);
+                formData.append('id', this.editTransaction.id);
+                let url = `/api/transactions`;
+                let response = await postApiData({url: url, form_data: formData, token: this.getToken()});
+                if(response.success){
+                    window.location.reload();
                 }
             },
 
