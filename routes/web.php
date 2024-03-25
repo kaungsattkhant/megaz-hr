@@ -64,6 +64,9 @@ Route::view('/item_usage_forecasts/create', 'item_usage_forecastings.create')->n
 Route::view('/accounting', 'accounting.index')->name('accountings');
 Route::view('/financial_transaction', 'financial_transaction.index')->name('financial_transactions');
 
+Route::view('/supplier', 'supplier.index')->name('supplier');
+Route::view('/supplier/create', 'supplier.create')->name('supplier_create');
+
 //pos
 Route::view('/pos/home', 'pos.home.index')->name('pos');
 Route::view('/pos/customer', 'pos.customers.index')->name('customer');
