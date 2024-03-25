@@ -30,6 +30,7 @@ class DatabaseSeeder extends Seeder
             RoleSeeder::class,
             GenderSeeder::class,
             CategorySeeder::class,
+            MenuCategorySeeder::class,
             StaffSeeder::class,
             ServiceCategorySeeder::class,
             UomSeeder::class,
