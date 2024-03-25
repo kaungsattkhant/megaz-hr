@@ -176,7 +176,8 @@ class PurchaseOrderRepository implements PurchaseOrderRepositoryInterface
                     }
                 }
                 DB::commit();
-                ResponseMessage('Update successfully', 200);
+                return $model;
+                // ResponseMessage('Update successfully', 200);
             }
             ResponseMessage("Data isn't found", 404);
         } catch (\Exception $e) {
