@@ -22,6 +22,7 @@ use App\Http\Controllers\API\PurchaseOrderAPIController;
 use App\Http\Controllers\API\RoleAPIController;
 use App\Http\Controllers\API\StaffAPIController;
 use App\Http\Controllers\API\SubAccountController;
+use App\Http\Controllers\API\SupplierController;
 use App\Http\Controllers\API\TaskController;
 use App\Http\Controllers\API\TestController;
 use App\Http\Controllers\API\TransactionController;
@@ -127,6 +128,8 @@ Route::middleware('auth:api')->group(function () {
     Route::controller(CommonController::class)->group(function () {
         Route::post('is_active', 'toggleIsActive');
     });
+
+    Route::resource('suppliers', SupplierController::class)->only(['index', 'store', 'show', 'destroy']);
 });
 
 Route::controller(ExcelImportController::class)->group(function () {
