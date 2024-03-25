@@ -124,7 +124,6 @@ class EntityRepository implements EntityRepositoryInterface
     {
         $entities = Entity::where("entity_type", "room_and_table")
         ->where("is_active", 0)->get();
-
         return $entities;
     }
 }
