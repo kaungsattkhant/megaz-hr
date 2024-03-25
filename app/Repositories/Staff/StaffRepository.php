@@ -12,7 +12,7 @@ class StaffRepository implements StaffRepositoryInterface
         if($request->per_page || $request->page){
             $departmentId=$request->department_id;
             return Staff::orderByDesc('id')
-            ->with('department')
+            ->with(['department','roles'])
             ->when($request->search_input,function($q)use($request){
                 $q->where('name','LIKE','%'.$request->search_input.'%');
             })

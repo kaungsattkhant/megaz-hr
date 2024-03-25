@@ -16,7 +16,7 @@ class PurchaseOrderRepository implements PurchaseOrderRepositoryInterface
     public function listAllData(Request $request)
     {
         $staff = UserData();
-        $purchaseOrders = PurchaseOrder::with(['items.item'])
+        $purchaseOrders = PurchaseOrder::with(['items.item','createdBy','managerCheckedBy','financialCheckedBy'])
             ->orderBy('id', 'desc')
             ->when($staff->hasRoles('Staff'), function ($q) use ($staff) {
                 $q->where('created_by', $staff->id);
