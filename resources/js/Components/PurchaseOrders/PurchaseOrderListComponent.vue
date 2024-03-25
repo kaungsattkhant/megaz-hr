@@ -28,9 +28,24 @@
                             <th scope="col" class=" px-6 py-4 ">
                                 Purchase Order Id
                             </th>
+
                             <th scope="col" class=" px-6 py-4 ">
                                 Status
                             </th>
+
+                            <th scope="col" class=" px-6 py-4 ">
+                                Manager Check
+                            </th>
+
+                            <th scope="col" class=" px-6 py-4 ">
+                                Financial Check
+                            </th>
+
+                            <th scope="col" class=" px-6 py-4 ">
+                                Md Check
+                            </th>
+
+
                             <th scope="col" class="px-6 py-4">
 
                             </th>
@@ -48,8 +63,19 @@
                                 <td class="whitespace-nowrap px-6 py-4 ">
                                     {{ purchaseOrder.po_id }}
                                 </td>
+
                                 <td class=" px-6 py-4 ">
                                     {{ purchaseOrder.status }}
+                                </td>
+
+                                <td  class="px-6 py-4">
+                                    {{ purchaseOrder.financial_check_id !== null ? purchaseOrder.financial_check_id : 'unchecked' }}
+                                </td>
+                                <td class="px-6 py-4">
+                                    {{ purchaseOrder.financial_check_id !== null ? purchaseOrder.financial_check_id : 'unchecked' }}
+                                </td>
+                                <td class="px-6 py-4">
+                                    {{ purchaseOrder.financial_check_id !== null ? purchaseOrder.financial_check_id : 'unchecked' }}
                                 </td>
                                 <td class="whitespace-nowrap px-6 py-4 space-x-4">
                                     <button class="pr-1" @click="checkPurchaseOrderBtnClicked(purchaseOrder.id)" data-te-toggle="modal" data-te-target="#checkModal">
@@ -137,11 +163,12 @@
             return {
                 purchaseOrderList: [],
                 checkId: null,
+                loginUser:null
             };
         },
 
         methods: {
-            ...mapGetters(['getToken']),
+            ...mapGetters(['getToken','getUser']),
 
             async getPurhaseOrderList(pageNumber){
                 let url = `/api/purchase_orders`;
@@ -186,6 +213,7 @@
         mounted()
         {
             initTE({Modal});
+            this.loginUser = this.getUser();
         }
     }
 </script>

@@ -16,7 +16,7 @@ class OrderAPIController extends Controller
         $this->orderRepo = $orderRepo;
     }
 
-    public function addOrder(OrderCreateRequest $request)
+    public function addOrder(Request $request)
     {
         if($request->menuArray)
         {
