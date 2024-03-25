@@ -12,27 +12,18 @@ class MenuRepository implements MenuRepositoryInterface
     public function listAllData(Request $request)
     {
         if($request->per_page || $request->page){
-            $totalCount = Menu::where('is_active', 1)->count();
-            $pageNumber = 1;
-            $perPage = 20;
-            if($request->page){
-                $pageNumber = $request->page;
-            }
-            if($request->per_page){
-                $perPage = $request->per_page;
-            }
-            $skip = ($pageNumber - 1) * $perPage;
-            $menus = Menu::with(['category', 'prices', 'items'])
-            ->where('is_active', 1)
-            ->skip($skip)
-            ->take($perPage)
-            ->get();
-
-            $menus = MakePaginationData($request, $totalCount, 'menus', $menus);
-            return $menus;
+            $menu_category_id=$request->menu_category_id;
+            return Menu::with(['menu_category', 'prices', 'items'])
+            ->when($request->search_input,function($q)use($request){
+                $q->where('name','LIKE','%'.$request->search_input.'%');
+            })
+            ->when($menu_category_id,function($query)use($menu_category_id){
+                $query->where('menu_category_id',$menu_category_id);
+            })
+            ->paginate(config('common.list_count'));
         }
         else{
-            $menus = Menu::with(['category', 'prices', 'items'])->where('is_active', 1)->get();
+            $menus = Menu::with(['menu_category', 'prices', 'items'])->where('is_active', 1)->get();
             return $menus;
         }
     }

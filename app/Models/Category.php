@@ -10,7 +10,8 @@ class Category extends BaseModel
     use HasFactory;
 
     protected $fillable=[
-        'name'
+        'name',
+        'is_active',
     ];
 
     public function getCreatedAt()

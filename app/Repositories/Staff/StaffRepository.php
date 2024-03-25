@@ -10,21 +10,16 @@ class StaffRepository implements StaffRepositoryInterface
     public function listAllData(Request $request)
     {
         if($request->per_page || $request->page){
-            $totalCount = Staff::where('is_active', 1)->count();
-            $pageNumber = 1;
-            $perPage = 20;
-            if($request->page){
-                $pageNumber = $request->page;
-            }
-            if($request->per_page){
-                $perPage = $request->per_page;
-            }
-            $skip = ($pageNumber - 1) * $perPage;
-            $staffs = Staff::where('is_active', 1)->skip($skip)->take($perPage)->with('department')->get();
-            $paginationData = MakePaginationData($request, $totalCount, 'staffs');
-            $paginationData['staffs'] = $staffs;
-
-            return $paginationData;
+            $departmentId=$request->department_id;
+            return Staff::orderByDesc('id')
+            ->with('department')
+            ->when($request->search_input,function($q)use($request){
+                $q->where('name','LIKE','%'.$request->search_input.'%');
+            })
+            ->when($departmentId,function($query)use($departmentId){
+                $query->where('department_id',$departmentId);
+            })
+            ->paginate(config('common.list_count'));
         }
         else{
             $staffs = Staff::where('is_active', 1)->get();

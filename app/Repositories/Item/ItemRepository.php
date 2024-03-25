@@ -10,29 +10,22 @@ class ItemRepository implements ItemRepositoryInterface
     public function listAllData(Request $request)
     {
         if($request->per_page || $request->page){
-            $totalCount = Item::count();
-            $pageNumber = 1;
-            $perPage = 20;
-            if($request->page){
-                $pageNumber = $request->page;
-            }
-            if($request->per_page){
-                $perPage = $request->per_page;
-            }
-            $skip = ($pageNumber - 1) * $perPage;
-            $items = Item::skip($skip)->take($perPage)->get();
-            $itemsData = MakePaginationData($request, $totalCount, 'items', $items);
-
-            return $itemsData;
+            $category_id=$request->category_id;
+            return Item::orderByDesc('id')
+            ->when($request->search_input,function($q)use($request){
+                $q->where('name','LIKE','%'.$request->search_input.'%');
+            })
+            ->when($category_id,function($query)use($category_id){
+                $query->where('category_id',$category_id);
+            })
+            ->paginate(config('common.list_count'));
+            
         }
         else{
             if($request->category_id){
-                $items = Item::where('category_id', $request->category_id)->get();
+                return Item::where('category_id', $request->category_id)->get();
             }
-            else{
-                $items = Item::all();
-            }
-            return $items;
+            return Item::all();
         }
     }
 

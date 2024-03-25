@@ -11,8 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('ledgers', function (Blueprint $table) {
+        Schema::table('accounts', function (Blueprint $table) {
             //
+            $table->renameColumn('is_available', 'is_active');
         });
     }
 
@@ -21,7 +22,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('ledgers', function (Blueprint $table) {
+        Schema::table('accounts', function (Blueprint $table) {
             //
         });
     }

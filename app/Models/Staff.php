@@ -71,4 +71,8 @@ class Staff extends Authenticatable
         }
         return false;
     }
+
+    #scope 
+   
+    #end
 }
