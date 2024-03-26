@@ -11,7 +11,7 @@ class HeadAccountRepository implements HeadAccountInterface
 
     public function headAccountList($request){
         if($request->per_page || $request->page){
-            return HeadAccount::where('is_available',1)->paginate(20);
+            return HeadAccount::where('is_available',1)->paginate(config('common.list_count'));
         }
         return HeadAccount::where('is_available',1)->get();
     }
@@ -74,5 +74,6 @@ class HeadAccountRepository implements HeadAccountInterface
         return $subAccount;
     }
 
+    
     
 }

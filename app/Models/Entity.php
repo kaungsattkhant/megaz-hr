@@ -12,7 +12,7 @@ class Entity extends BaseModel
     use HasFactory;
 
     protected $fillable=[
-        'area_id','name','service_category_id','price_per_hour','is_available','entity_type'
+        'area_id','name','service_category_id','price_per_hour','is_available','entity_type',
     ];
 
     public function getCreatedAt()

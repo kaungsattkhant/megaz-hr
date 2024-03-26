@@ -18,7 +18,7 @@ class MenuCategorySeeder extends Seeder
         MenuCategory::create([
             'name' => 'Fast Foods'
         ]);
-        MenuCategory::create([
+        MenuCategory::create([  
             'name' => 'Breakfast'
         ]);
         MenuCategory::create([

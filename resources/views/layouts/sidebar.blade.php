@@ -42,6 +42,116 @@
                             </a>
                         </li>
                         <li>
+                            <a href="{{ route('financial_transactions') }}" class="flex items-center @yield('financial_transactions')">
+                                <i class="fal fa-tasks  pr-3"></i>
+                                Financial Transactions
+                            </a>
+                        </li>
+                        <li>
+                            <button
+                                class="flex items-center pl-9 my-2 text-sm"
+                                type="button"
+                                data-te-collapse-init
+                                data-te-ripple-init
+                                data-te-ripple-color="light"
+                                data-te-target="#collapseCashbooks"
+                                aria-expanded="false"
+                                aria-controls="collapseExample">
+                                    <i class="fal fa-sack-dollar  pr-3"></i>
+                                    Cashbook
+                                </button>
+
+                            <div
+                                class="!visible hidden text-center"
+                                id="collapseCashbooks"
+                                data-te-collapse-item>
+                                <ul>
+                                    <li>
+                                        <a href="{{ route('office_cash') }}" class="flex items-center @yield('office_cash')">
+                                            <i class="fal fa-tasks  pr-3"></i>
+                                            Office Cash Book
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a href="{{ route('owner_cash') }}" class="flex items-center @yield('owner_cash')">
+                                            <i class="fal fa-tasks  pr-3"></i>
+                                            Owner Cash Book
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a href="{{ route('service_cash') }}" class="flex items-center @yield('service_cash')">
+                                            <i class="fal fa-tasks  pr-3"></i>
+                                            Service Cash Book
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a href="{{ route('advance_cash') }}" class="flex items-center @yield('advance_cash')">
+                                            <i class="fal fa-tasks  pr-3"></i>
+                                            Advance Cash Book
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a href="{{ route('agm_cash') }}" class="flex items-center @yield('agm_cash')">
+                                            <i class="fal fa-tasks  pr-3"></i>
+                                            AGM Cash Book
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a href="{{ route('gm_cash') }}" class="flex items-center @yield('gm_cash')">
+                                            <i class="fal fa-tasks  pr-3"></i>
+                                            GM Cash Book
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a href="{{ route('ktv_project_cash') }}" class="flex items-center @yield('ktv_project_cash')">
+                                            <i class="fal fa-tasks  pr-3"></i>
+                                            KTV Project Cash Book
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </li>
+                        <li>
+                            <button
+                                class="flex items-center pl-9 my-2 text-sm"
+                                type="button"
+                                data-te-collapse-init
+                                data-te-ripple-init
+                                data-te-ripple-color="light"
+                                data-te-target="#collapseBankbooks"
+                                aria-expanded="false"
+                                aria-controls="collapseExample">
+                                    <i class="fal fa-money-check-alt  pr-3"></i>
+                                    Bankbook
+                                </button>
+
+                            <div
+                                class="!visible hidden text-center"
+                                id="collapseBankbooks"
+                                data-te-collapse-item>
+                                <ul>
+                                    <li>
+                                        <a href="{{ route('kbz_special_bank') }}" class="flex items-center @yield('kbz_special_bank')">
+                                            <i class="fal fa-tasks  pr-3"></i>
+                                            KBZ Special Account
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a href="{{ route('kbz_old_gm_bank') }}" class="flex items-center @yield('kbz_old_gm_bank')">
+                                            <i class="fal fa-tasks  pr-3"></i>
+                                            KBZ Old Account (GM)
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a href="{{ route('kpay_bank') }}" class="flex items-center @yield('kpay_bank')">
+                                            <i class="fal fa-tasks  pr-3"></i>
+                                            KPay
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </li>
+                        <li>
                             <a href="{{ route('inventories') }}" class="flex items-center @yield('inventories')">
                                 <i class="fal fa-inventory  pr-3"></i>
                                 Inventory

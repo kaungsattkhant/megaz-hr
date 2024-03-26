@@ -31,4 +31,6 @@ class SubAccountController extends Controller
         $sub_account= $this->headAccountRepo->detailSubAccount($sub_account);
         ResponseData($sub_account);
     }
+
+   
 }

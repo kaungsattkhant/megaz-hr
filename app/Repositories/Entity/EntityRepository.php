@@ -54,7 +54,8 @@ class EntityRepository implements EntityRepositoryInterface
     {
         $area = Area::where('name','KTV')->get()->first();
         $currentDate = $data['current_date'];
-        $entities = Entity::where('area_id',$area->id)->where("entity_type", "room_and_table")->where("is_available", 1)->with(["invoices" => function ($query) use ($currentDate) {
+        $entities = Entity::where('area_id',$area->id)->where("entity_type", "room_and
+        _table")->where("is_available", 1)->with(["invoices" => function ($query) use ($currentDate) {
             $query->where("complete_date", null)
             ->whereBetween("invoice_date", [$currentDate . " 00:00:00", $currentDate . " 23:59:59"])
             ->select("id", "invoice_id", "entity_id")->with("sessions");
@@ -123,7 +124,6 @@ class EntityRepository implements EntityRepositoryInterface
     {
         $entities = Entity::where("entity_type", "room_and_table")
         ->where("is_active", 0)->get();
-
         return $entities;
     }
 }

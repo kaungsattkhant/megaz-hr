@@ -1,0 +1,27 @@
+<?php
+
+namespace App\Http\Requests\Admin;
+
+use App\Http\Requests\APIRequest;
+use Illuminate\Contracts\Validation\Validator;
+
+class AccountRequest extends APIRequest
+{
+    public function rules()
+    {
+        return [
+            'name'=>'required',
+            'account_code'=>'required|unique:accounts',
+            'sub_account_id' => 'required',
+        ];
+    }
+    public function authorize()
+    {
+        return parent::authorize();
+    }
+
+    public function failedValidation(Validator $validator)
+    {
+        parent::failedValidation($validator);
+    }
+}

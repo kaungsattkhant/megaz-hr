@@ -13,11 +13,18 @@ class AccountRepository implements AccountInterface
         if($request->per_page || $request->page){
            return  DB::table('accounts')
             ->leftJoin('ledgers', 'accounts.id', '=', 'ledgers.account_id')
-            ->select('accounts.id','accounts.name',
+            ->leftJoin('transactions', 'transactions.id', '=', 'ledgers.transaction_id')
+            ->leftJoin('sub_accounts', 'sub_accounts.id', '=', 'accounts.sub_account_id')
+            ->where('transactions.is_confirmed',1)
+            ->when($request->search_input,function($q)use($request){
+                $q->where('accounts.name','LIKE','%'.$request->search_input.'%')
+                ->orWhere('accounts.account_code','LIKE','%'.$request->search_input.'%');
+            })
+            ->select('accounts.id','accounts.name','accounts.account_code','accounts.sub_account_id','sub_accounts.name as sub_account_name',
                      DB::raw('COALESCE(SUM(CASE WHEN ledgers.action = "debit" THEN ledgers.value ELSE 0 END), 0) as debit_amount'),
                      DB::raw('COALESCE(SUM(CASE WHEN ledgers.action = "credit" THEN ledgers.value ELSE 0 END), 0) as credit_amount'))
             ->groupBy('accounts.id', 'accounts.name')
-            ->paginate();
+            ->paginate(config('common.list_count'));
         }
         return Account::where('is_available',1)->get();
     }
@@ -52,4 +59,16 @@ class AccountRepository implements AccountInterface
         return $sub_account;
     }
 
+    public function getCashAccount(){
+        $sub_account=Account::whereHas('sub_account',function($q){
+            $q->where('name','Cash & Bank');
+        })->get();
+        return $sub_account;    
+    }
+    
+    public function accountBySubAccount($sub_account_id){
+        return Account::where('sub_account_id',$sub_account_id)->get();
+    }
+
+    
 }

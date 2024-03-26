@@ -23,8 +23,9 @@ class PurchaseOrderTransaction
         $data['created_by'] = UserData()->id;
         $data['transactionable_id'] = $model->id;
         $data['transactionable_type'] = $transactionable_type;
-        $transaction = Transaction::create($data);
+        $creditAccount = (new Account())->accountByCode('2-1001'); # credit account is awalys Office Account
         foreach ($purchaseOrderItemGroupedByCategory as $po_category) {
+            $transaction=(new StoreTransactionLedger())->createTransaction($data);
             $category_id = $po_category->category_id;
             $account_code = null;
             switch ($category_id) {
@@ -47,21 +48,25 @@ class PurchaseOrderTransaction
             if($account_code==null) ResponseMessage('Transaction fail',419);
             #debit
             if ($account_code) {  
-                $debit_account = (new Account())->accountByCode($account_code); #Inventory Food
-                $ledger['date'] = now();
-                $ledger['value'] = $po_category->total_amount;
-                $ledger['transaction_id'] = $transaction->id;
-                $ledger['account_id'] = $debit_account->id;
-                $ledger['action']='debit';
-                $debit_ledger=$this->storeLedger($ledger);
+                $debitAccount = (new Account())->accountByCode($account_code); #Inventory Food
+
+                $debitLedger = (new StoreTransactionLedger())->storeLedger([
+                    'value' => $po_category->total_amount,
+                    'transaction_id' => $transaction->id,
+                    'account_id' => $debitAccount->id,
+                    'action' => 'debit',
+                ]);
             }
             #credit
-            $credit_account = (new Account())->accountByCode('2-1001'); #Inventory Food
-            $ledger['action']='credit';
-            $ledger['account_id']=$credit_account->id;
-            $credit_ledger=$this->storeLedger($ledger);
+            $creditLedger = (new StoreTransactionLedger())->storeLedger([
+                'date' => now(),
+                'value' => $po_category->total_amount,
+                'transaction_id' => $transaction->id,
+                'account_id' => $creditAccount->id,
+                'action' => 'credit',
+            ]);
         }
-        return $transaction;
+        return $purchaseOrderItemGroupedByCategory;
     }
 
     public function storeLedger($data){

@@ -4,7 +4,10 @@
 @section('cashbook', 'active-link')
 @section('content')
     <div id="app">
-        <cashbook-crud-component/>
+        <cashbook-crud-component
+        :cash-account-id={{ '23' }}
+        :cash-account-name={{ 'Office Cash' }}>
+        </cashbook-crud-component>
 
     </div>
 

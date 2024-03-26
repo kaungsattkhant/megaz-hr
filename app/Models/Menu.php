@@ -15,7 +15,7 @@ class Menu extends BaseModel
 
     protected $fillable = ['menu_category_id','name', 'is_active'];
 
-    public function category()
+    public function menu_category()
     {
         return $this->belongsTo(MenuCategory::class, 'menu_category_id');
     }

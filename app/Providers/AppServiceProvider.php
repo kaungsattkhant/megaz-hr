@@ -27,6 +27,17 @@ class AppServiceProvider extends ServiceProvider
             'purchase_order' => 'App\Models\PurchaseOrder',
             'staff' => 'App\Models\Staff',
             'purchase_order_item'=>'App\Models\PurchaseOrderItem',
+            'account'=>'App\Models\Account',
+            'category'=>'App\Models\Category',
+            'customer'=>'App\Models\Customer',
+            'entity'=>'App\Models\Entity',
+            'inventory'=>'App\Models\Inventory',
+            'item'=>'App\Models\Item',
+            'menu_category'=>'App\Models\MenuCategory',
+            'menu'=>'App\Models\Menu',
+            'sub_account'=>'App\Models\SubAccount',
+            'task'=>'App\Models\Task',
+            'uom'=>'App\Models\UOM',
         ]);
     }
 }

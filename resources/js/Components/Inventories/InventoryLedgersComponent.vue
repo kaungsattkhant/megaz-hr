@@ -57,22 +57,22 @@
                                     {{ ++index }}
                                 </td>
                                 <td class="whitespace-nowrap px-6 py-4 ">
-                                    {{ ledger[0].item.name }}
+                                    {{ ledger.name }}
                                 </td>
                                 <td class="whitespace-nowrap px-6 py-4 ">
-                                    {{ ledger.opening }}
+                                    {{ ledger.opening_balance }}
                                 </td>
                                 <td class="whitespace-nowrap px-6 py-4 ">
-                                    {{ ledger.in }}
+                                    {{ ledger.in_balance }}
                                 </td>
                                 <td class="whitespace-nowrap px-6 py-4 ">
-                                    {{ ledger.out }}
+                                    {{ ledger.out_balance }}
                                 </td>
                                 <td class="whitespace-nowrap px-6 py-4 ">
-                                    {{ ledger.closing }}
+                                    {{ ledger.closing_balance }}
                                 </td>
                                 <td class="whitespace-nowrap px-6 py-4 ">
-                                    {{ ledger.closing * 1000}}
+                                    {{ ledger.closing_balance * 1000}}
                                 </td>
                                 <td class="whitespace-nowrap px-6 py-4">
                                     <button id="edit-btn" class="pr-1"
@@ -187,28 +187,28 @@
                 if(response.data){
                     this.inventoryLegderList = response.data;
                     // calculate opening, incoming, outgoing and balance
-                    for(let i=0; i<this.inventoryLegderList.length; i++){
-                        this.inventoryLegderList[i]['opening'] = 0;
-                        this.inventoryLegderList[i]['in'] = 0;
-                        this.inventoryLegderList[i]['out'] = 0;
-                        this.inventoryLegderList[i]['closing'] = 0;
-                        for(let j=0; j<this.inventoryLegderList[i].length; j++){
-                            if(this.inventoryLegderList[i][j].type == 'previous incoming'){
-                                this.inventoryLegderList[i]['opening'] += this.inventoryLegderList[i][j].quantity;
-                            }
-                            if(this.inventoryLegderList[i][j].type == 'previous outgoing'){
-                                this.inventoryLegderList[i]['opening'] -= this.inventoryLegderList[i][j].quantity;
-                            }
-                            if(this.inventoryLegderList[i][j].type == 'incoming'){
-                                this.inventoryLegderList[i]['in'] += this.inventoryLegderList[i][j].quantity;
-                            }
-                            if(this.inventoryLegderList[i][j].type == 'outgoing'){
-                                this.inventoryLegderList[i]['out'] += this.inventoryLegderList[i][j].quantity;
-                            }
-                        }
-                        this.inventoryLegderList[i]['closing'] = (this.inventoryLegderList[i]['opening'] + this.inventoryLegderList[i]['in']) - this.inventoryLegderList[i]['out'];
-                        console.log(this.inventoryLegderList[i]);
-                    }
+                    // for(let i=0; i<this.inventoryLegderList.length; i++){
+                    //     this.inventoryLegderList[i]['opening'] = 0;
+                    //     this.inventoryLegderList[i]['in'] = 0;
+                    //     this.inventoryLegderList[i]['out'] = 0;
+                    //     this.inventoryLegderList[i]['closing'] = 0;
+                    //     for(let j=0; j<this.inventoryLegderList[i].length; j++){
+                    //         if(this.inventoryLegderList[i][j].type == 'previous incoming'){
+                    //             this.inventoryLegderList[i]['opening'] += this.inventoryLegderList[i][j].quantity;
+                    //         }
+                    //         if(this.inventoryLegderList[i][j].type == 'previous outgoing'){
+                    //             this.inventoryLegderList[i]['opening'] -= this.inventoryLegderList[i][j].quantity;
+                    //         }
+                    //         if(this.inventoryLegderList[i][j].type == 'incoming'){
+                    //             this.inventoryLegderList[i]['in'] += this.inventoryLegderList[i][j].quantity;
+                    //         }
+                    //         if(this.inventoryLegderList[i][j].type == 'outgoing'){
+                    //             this.inventoryLegderList[i]['out'] += this.inventoryLegderList[i][j].quantity;
+                    //         }
+                    //     }
+                    //     this.inventoryLegderList[i]['closing'] = (this.inventoryLegderList[i]['opening'] + this.inventoryLegderList[i]['in']) - this.inventoryLegderList[i]['out'];
+                    //     console.log(this.inventoryLegderList[i]);
+                    // }
                 }
             },
             async getInventoryList(){

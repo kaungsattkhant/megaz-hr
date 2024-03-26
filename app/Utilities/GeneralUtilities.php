@@ -1,15 +1,16 @@
 <?php
 
+use Carbon\Carbon;
 use GuzzleHttp\Client;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Storage;
+
 use Psr\Http\Message\ResponseInterface;
 
 use Illuminate\Pagination\LengthAwarePaginator;
-
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 
@@ -267,5 +268,22 @@ if (!function_exists('JsonDecode')) {
             ResponseMessage('input data is not corrected', 402);
         }
         return $json_data;
+    }
+}
+
+if (!function_exists('UnsetData')) {
+    function UnsetData($data, $attributes)
+    {
+        foreach ($attributes as $attribute) {
+            unset($data[$attribute]);
+        }
+        return $data;
+    }
+}
+
+if (!function_exists('convertDateFormat')) {
+    function convertDateFormat($data)
+    {
+        return Carbon::parse($data)->format('Y-m-d');
     }
 }

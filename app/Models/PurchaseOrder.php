@@ -25,6 +25,8 @@ class PurchaseOrder extends BaseModel
         'financial_check_time',
         'is_md_checked',
         'md_check_time',
+        'bought_check_id',
+        'bought_check_time',
         'status',
         'created_at',
         'updated_at',
@@ -56,12 +58,15 @@ class PurchaseOrder extends BaseModel
     }
 
     public function managerCheckedBy(){
-        return $this->belongsTo(Staff::class,'manager_checked_id');
+        return $this->belongsTo(Staff::class,'manager_check_id');
     }
 
     public function financialCheckedBy(){
-        return $this->belongsTo(Staff::class,'financial_checked_id');
+        return $this->belongsTo(Staff::class,'financial_check_id');
     }
 
 
+    public function boughtCheckedBy(){
+        return $this->belongsTo(Staff::class,'bought_check_id');
+    }
 }

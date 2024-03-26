@@ -17,4 +17,5 @@ interface HeadAccountInterface
     public function updateOrCreateSubAccount($request);
 
     public function detailSubAccount($headAccount);
+
 }

@@ -20,7 +20,7 @@ class DepartmentSeeder extends Seeder
         ]);
 
         Department::create([
-            'name' => 'Finance Department'
+            'name' => 'Financial Department'
         ]);
 
     

@@ -52,19 +52,19 @@
                                 </td>
 
                                 <td class="whitespace-nowrap px-6 py-4 ">
-                                    unknown
+                                    {{ account.debit_amount }}
                                 </td>
                                 <td class="whitespace-nowrap px-6 py-4 ">
-                                    unknown
+                                    {{ account.credit_amount }}
                                 </td>
                                 <td class="whitespace-nowrap px-6 py-4">
                                     <button data-te-toggle="modal" data-te-target="#editModal" id="edit-btn" class="pr-3"
                                     @click="editBtnClicked(account.id, index)">
                                         <i class="fal fa-pen"></i>
                                     </button>
-                                    <button data-te-toggle="modal" data-te-target="#deleteModal" id="edit-btn" class="pr-1" @click="deleteBtnClicked(account.id, index)">
+                                    <!-- <button data-te-toggle="modal" data-te-target="#deleteModal" id="edit-btn" class="pr-1" @click="deleteBtnClicked(account.id, index)">
                                         <i class="fas fa-trash-alt"></i>
-                                    </button>
+                                    </button> -->
                                 </td>
                             </tr>
                             <tr class="">
@@ -76,6 +76,75 @@
                     </tbody>
                 </table>
             </div>
+
+            <div class="mt-2 ml-2">
+                <ul v-if="paginationGroupsCount > 1" class="list-style-none flex">
+                    <!-- <li>
+                        <button class="relative block rounded bg-transparent px-3 py-1.5 text-sm text-neutral-600 transition-all duration-300
+                        hover:bg-neutral-100 dark:text-white dark:hover:bg-neutral-700 dark:hover:text-white" @click="firstPaginationGroupBtnClicked">
+                            First
+                        </button>
+                    </li> -->
+                    <li v-if="!isFirstGroup">
+                        <button class="relative block rounded bg-transparent px-3 py-1.5 text-sm text-neutral-600 transition-all duration-300
+                        hover:bg-neutral-100 dark:text-white dark:hover:bg-neutral-700 dark:hover:text-white" @click="previousPaginationGroupBtnClicked"
+                        :disabled="isFirstGroup">
+                            Previous
+                        </button>
+                    </li>
+
+                    <!-- loop link 1 , 2 ,3  ... replace normal-pagination with active-pagination for active pagination page-->
+                    <li v-for="(pageNumber, pageNumberIndex) in groupedPageNumbers[currentGroup]" :key="pageNumberIndex"
+                        :aria-current="(pageNumber == currentPage) ? 'page' : ''">
+                        <button v-if="pageNumber == currentPage"
+                            class="relative block rounded bg-neutral-800 px-3 py-1.5 text-sm font-medium text-neutral-50 transition-all duration-300 dark:bg-neutral-900"
+                            :id="'paginationBtn-' + pageNumberIndex" @click="pageBtnClicked(pageNumber)">
+                            {{ pageNumber }}
+                            <span class="absolute -m-px h-px w-px overflow-hidden whitespace-nowrap border-0 p-0 [clip:rect(0,0,0,0)]">
+                                (current)
+                            </span>
+                        </button>
+                        <button v-else
+                            class="normal-pagination relative block rounded bg-transparent px-3 py-1.5 text-sm text-neutral-600 transition-all duration-300 hover:bg-neutral-100 dark:text-white dark:hover:bg-neutral-700 dark:hover:text-white"
+                            :id="'paginationBtn-' + pageNumberIndex" @click="pageBtnClicked(pageNumber)">
+                            {{ pageNumber }}
+                        </button>
+                    </li>
+                    <li v-if="!isLastGroup">
+                        <button class="relative block rounded bg-transparent px-3 py-1.5 text-sm text-neutral-600 transition-all duration-300
+                        hover:bg-neutral-100 dark:text-white dark:hover:bg-neutral-700 dark:hover:text-white" @click="nextPaginationGroupBtnClicked"
+                        :disabled="isLastGroup">
+                            Next
+                        </button>
+                    </li>
+                    <!-- <li>
+                        <button class="relative block rounded bg-transparent px-3 py-1.5 text-sm text-neutral-600 transition-all duration-300
+                        hover:bg-neutral-100 dark:text-white dark:hover:bg-neutral-700 dark:hover:text-white" @click="lastPaginationGroupBtnClicked">
+                            Last
+                        </button>
+                    </li> -->
+                </ul>
+
+                <ul v-else class="list-style-none flex">
+                    <li v-for="(pageNumber, pageNumberIndex) in pageNumbers" :key="pageNumberIndex"
+                        :aria-current="(pageNumber == currentPage) ? 'page' : ''">
+                        <button v-if="pageNumber == currentPage"
+                            class="relative block rounded bg-neutral-800 px-3 py-1.5 text-sm font-medium text-neutral-50 transition-all duration-300 dark:bg-neutral-900"
+                            :id="'paginationBtn-' + pageNumberIndex" @click="pageBtnClicked(pageNumber)">
+                            {{ pageNumber }}
+                            <span class="absolute -m-px h-px w-px overflow-hidden whitespace-nowrap border-0 p-0 [clip:rect(0,0,0,0)]">
+                                (current)
+                            </span>
+                        </button>
+                        <button v-else
+                            class="normal-pagination relative block rounded bg-transparent px-3 py-1.5 text-sm text-neutral-600 transition-all duration-300 hover:bg-neutral-100 dark:text-white dark:hover:bg-neutral-700 dark:hover:text-white"
+                            :id="'paginationBtn-' + pageNumberIndex" @click="pageBtnClicked(pageNumber)">
+                            {{ pageNumber }}
+                        </button>
+                    </li>
+                </ul>
+            </div>
+
         </div>
 
 
@@ -115,6 +184,18 @@
                             </label>
                             <input type="text" placeholder="Account Name" v-model="code"
                                 class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
+                        </div>
+
+                        <div class="mb-4">
+                            <label for="" class="block text-sm text-black mb-3">
+                                Head Account
+                            </label>
+                            <div class="bg-white mb-0 w-[100%] text-sm inline-block" data-te-select-wrapper-ref>
+                                <select data-te-select-init data-te-select-placeholder="Select Sub Account" v-model="selectedHeadAccount"
+                                data-te-select-filter="true" @change="headAccountSelectChanged">
+                                    <option :value="headAccount" v-for="(headAccount, headAccountIndex) in headAccountList"> {{ headAccount.name }} </option>
+                                </select>
+                            </div>
                         </div>
 
                         <div class="mb-4">
@@ -260,10 +341,12 @@
         data() {
             return {
                 accountList: [],
+                headAccountList: [],
                 subAccountList: [],
 
                 code: null,
                 name: null,
+                selectedHeadAccount: null,
                 selectedSubAccount: null,
 
                 nameEdit: null,
@@ -273,25 +356,77 @@
 
                 deleteId: null,
                 deleteIndex: null,
+
+                currentPage: 1,
+                pageNumbers: [],
+                paginationGroupsCount: 1,
+                groupedPageNumbers: [],
+                currentGroup: 0,
+                isFirstGroup: true,
+                isLastGroup: false,
             };
         },
 
         methods: {
             ...mapGetters(['getToken']),
 
-            async getSubAccountList(){
-                let url = `/api/sub_accounts`;
+            async getHeadAccountList(){
+                let url = `/api/head_accounts`;
                 let response = await getApiData({url: url, token: this.getToken()});
                 if(response.data){
-                    this.subAccountList = response.data;
+                    this.headAccountList = response.data;
                 }
             },
 
-            async getAccountList(){
-                let url = `/api/accounts`;
+            async headAccountSelectChanged(){
+                this.getSubAccountList(this.selectedHeadAccount.id);
+            },
+
+            async getSubAccountList(headAccountId){
+                if(headAccountId){
+                    let url = `/api/sub_account_by_head_account/${headAccountId}`;
+                    let response = await getApiData({url: url, token: this.getToken()});
+                    if(response.data){
+                        this.subAccountList = response.data;
+                    }
+                }
+                else{
+                    let url = `/api/sub_accounts/`;
+                    let response = await getApiData({url: url, token: this.getToken()});
+                    if(response.data){
+                        this.subAccountList = response.data;
+                    }
+                }
+            },
+
+            async getAccountList(pageNumber){
+                if(pageNumber){
+                    this.currentPage = pageNumber;
+                }
+                let url = `/api/accounts?page=${this.currentPage}`;
                 let response = await getApiData({url: url, token: this.getToken()});
                 if(response.data){
-                    this.accountList = response.data;
+                    this.accountList = response.data.data;
+
+                    this.pageNumbers = [];
+                    this.lastPageNumber = response.data.last_page;
+
+                    for(let i=1; i<=response.data.last_page; i++){
+                        this.pageNumbers.push(i);
+                    }
+
+                    if(this.pageNumbers.length > 10){
+                        this.groupedPageNumbers = [];
+                        this.paginationGroupsCount = this.pageNumbers.length % 10;
+                        for(let i=0; i<this.pageNumbers.length; i+=10){
+                            let chunk = this.pageNumbers.slice(i, i+10);
+                            this.groupedPageNumbers.push(chunk);
+                        }
+
+                        let lastGroupIndex = this.groupedPageNumbers.length - 1;
+                        this.isFirstGroup = (this.currentGroup === 0);
+                        this.isLastGroup = (lastGroupIndex === this.currentGroup);
+                    }
                 }
             },
 
@@ -329,7 +464,12 @@
                 this.selectedSubAccount = null;
             },
 
-            editBtnClicked(id, index){
+            async editBtnClicked(id, index){
+                let url = `/api/sub_accounts/`;
+                let response = await getApiData({url: url, token: this.getToken()});
+                if(response.data){
+                    this.subAccountList = response.data;
+                }
                 this.editId = id;
                 this.editIndex = index;
                 let editAccount = this.accountList[this.editIndex];
@@ -387,10 +527,41 @@
                 this.deleteIndex = null;
             },
 
+            pageBtnClicked(pageNumber){
+                this.currentPage = pageNumber;
+                this.getAccountList(this.currentPage);
+            },
+
+            nextPaginationGroupBtnClicked(){
+                this.currentGroup += 1;
+                this.currentPage = (this.groupedPageNumbers[this.currentGroup][0]);
+                this.getAccountList(this.currentPage);
+            },
+
+            previousPaginationGroupBtnClicked(){
+                this.currentGroup -= 1;
+                let lastIndex = this.groupedPageNumbers[this.currentGroup].length - 1;
+                this.currentPage = (this.groupedPageNumbers[this.currentGroup][lastIndex]);
+                this.getAccountList(this.currentPage);
+            },
+
+            firstPaginationGroupBtnClicked(){
+                this.currentGroup = 0;
+                this.currentPage = (this.groupedPageNumbers[this.currentGroup][0]);
+                this.getAccountList(this.currentPage);
+            },
+
+            lastPaginationGroupBtnClicked(){
+                this.currentGroup = this.paginationGroupsCount - 1;
+                let lastIndex = this.groupedPageNumbers[this.currentGroup].length - 1;
+                this.currentPage = (this.groupedPageNumbers[this.currentGroup][lastIndex]);
+                this.getAccountList(this.currentPage);
+            }
         },
 
         created(){
-            this.getSubAccountList();
+            this.getHeadAccountList();
+            // this.getSubAccountList();
             this.getAccountList();
         },
 

@@ -16,7 +16,7 @@ class PurchaseOrderRepository implements PurchaseOrderRepositoryInterface
     public function listAllData(Request $request)
     {
         $staff = UserData();
-        $purchaseOrders = PurchaseOrder::with(['items.item'])
+        $purchaseOrders = PurchaseOrder::with(['items.item','createdBy','managerCheckedBy','financialCheckedBy'])
             ->orderBy('id', 'desc')
             ->when($staff->hasRoles('Staff'), function ($q) use ($staff) {
                 $q->where('created_by', $staff->id);
@@ -30,7 +30,7 @@ class PurchaseOrderRepository implements PurchaseOrderRepositoryInterface
             ->when($staff->hasRoles('MD'), function ($q) {
                 $q->whereIn('status', ['md_checked', 'financial_checked']);
             })
-            ->paginate(20);
+            ->paginate(config('common.list_count'));
         return $purchaseOrders;
     }
     public function createOrUpdate($request)
@@ -160,11 +160,10 @@ class PurchaseOrderRepository implements PurchaseOrderRepositoryInterface
                 if ($request->type == 'purchase_order') {
                     $column_id = $column . '_' . 'id';
                     $column_time = $column . '_' . 'time';
-                    // $column='is_financial_check';
-                    $items = $this->existIsCheck($model, $is_column, 0);
-                    if ($items->isNotEmpty()) {
-                        ResponseMessage('Some items are left to check', 419);
-                    }
+                    $this->confirmOrderItem($model, $is_column);
+                    // if ($items->isNotEmpty()) {
+                    //     ResponseMessage('Some items are left to check', 422);
+                    // }
                     $staff->hasRoles('MD') ?
                     $model->$is_column = 1 : $model->$column_id = $staff->id;
                     $model->$column_time = now();
@@ -177,7 +176,8 @@ class PurchaseOrderRepository implements PurchaseOrderRepositoryInterface
                     }
                 }
                 DB::commit();
-                ResponseMessage('Update successfully', 200);
+                return $model;
+                // ResponseMessage('Update successfully', 200);
             }
             ResponseMessage("Data isn't found", 404);
         } catch (\Exception $e) {
@@ -188,24 +188,26 @@ class PurchaseOrderRepository implements PurchaseOrderRepositoryInterface
         
     }
 
-    public function existIsCheck($model, $is_column, $value)
+    public function confirmOrderItem($model, $is_column)
     {
-        return $model->items->whereIn($is_column, $value)->values();
+        return $model->items()->update([
+            $is_column=>1,
+        ]);
     }
 
     public function validateModel($model, $staff, $type)
     {
         if ($model) {
-            if ($staff->hasRoles('Staff')) ResponseMessage("Permission isn't allowed", 419);
+            if ($staff->hasRoles('Staff')) ResponseMessage("Permission isn't allowed", 422);
             if($type=='purchase_order'){
                 if ($staff->hasRoles('Manager')) {
                     if ($model->manager_check_id!=null) ResponseMessage('This Purchase Order is already checked By Manager', 419);
                 } else if ($staff->hasRoles('Financial')) {
-                    if ($model->financial_check_id!=null) ResponseMessage('This Purchase Order is already checked By Financial', 419);
+                    if ($model->financial_check_id!=null) ResponseMessage('This Purchase Order is already checked By Financial', 422);
                 } else if ($staff->hasRoles('MD')) {
-                    if ($model->is_md_checked) ResponseMessage('This Purchase Order is already checked By MD', 419);
-                    if(!$model->createdBy->department->inventory){
-                        ResponseMessage('Inventory is required',419);
+                    if ($model->is_md_checked) ResponseMessage('This Purchase Order is already checked By MD', 422);
+                    if(!$model->createdBy->department->inventory){  
+                        ResponseMessage('Inventory is required',422);
                     }
                 }
             }
