@@ -34,6 +34,8 @@ Route::post('/login',[AuthController::class,'login'])->name('login');
 Route::view('/test', 'staff.index');
 
 Route::middleware('auth')->group(function(){
+    Route::post('/logout',[AuthController::class,'logout'])->name('logout');
+
     Route::view('/roles', 'roles.index')->name('roles');
     Route::view('/staff', 'staff.index')->name('staff');
     Route::view('/staff/create', 'staff.create')->name('staff.crate');

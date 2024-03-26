@@ -5,10 +5,13 @@ namespace Database\Seeders;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
+use Database\Seeders\AreaSeeder;
 use Database\Seeders\ComplaintCategorySeeder;
 use Database\Seeders\DepartmentSeeder;
 use Database\Seeders\GenderSeeder;
+use Database\Seeders\MenuCategorySeeder;
 use Database\Seeders\RoleSeeder;
+use Database\Seeders\ServiceCategorySeeder;
 use Database\Seeders\StaffSeeder;
 
 class DatabaseSeeder extends Seeder
@@ -25,6 +28,7 @@ class DatabaseSeeder extends Seeder
         // (new StaffSeeder())->run();
         // (new ServiceCategorySeeder())->run();
         $this->call([
+            AreaSeeder::class,
             ComplaintCategorySeeder::class,
             DepartmentSeeder::class,
             RoleSeeder::class,
