@@ -122,7 +122,7 @@
                                 aria-expanded="false"
                                 aria-controls="collapseExample">
                                     <i class="fal fa-money-check-alt  pr-3"></i>
-                                    Bankbok
+                                    Bankbook
                                 </button>
 
                             <div
