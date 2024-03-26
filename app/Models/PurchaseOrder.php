@@ -25,6 +25,8 @@ class PurchaseOrder extends BaseModel
         'financial_check_time',
         'is_md_checked',
         'md_check_time',
+        'bought_check_id',
+        'bought_check_time',
         'status',
         'created_at',
         'updated_at',
@@ -64,4 +66,7 @@ class PurchaseOrder extends BaseModel
     }
 
 
+    public function boughtCheckedBy(){
+        return $this->belongsTo(Staff::class,'bought_check_id');
+    }
 }
