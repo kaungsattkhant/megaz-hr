@@ -182,9 +182,16 @@
                             </a>
                         </li>
                         <li>
-                            <a href="{{ route('roomandtable') }}" class="flex items-center @yield('table')">
+                            <a href="{{ route('room') }}" class="flex items-center @yield('room')">
                                 <i class="fal fa-user  pr-3"></i>
-                                Room / Table
+                                Room
+                            </a>
+                        </li>
+
+                        <li>
+                            <a href="{{ route('table') }}" class="flex items-center @yield('table')">
+                                <i class="fal fa-user  pr-3"></i>
+                                Table
                             </a>
                         </li>
                         <li>

@@ -46,7 +46,9 @@ Route::view('/areas', 'areas.index')->name('areas');
 Route::view('/inventories', 'inventories.index')->name('inventories');
 Route::view('/inventories/{inventory_id}/ledger', 'inventories.inventory_ledger')->name('inventory.ledger');
 
-Route::view('/room_and_table', 'tables&rooms.index')->name('roomandtable');
+Route::view('/rooms', 'tables&rooms.index')->name('room');
+Route::view('/tables', 'tables&rooms.table')->name('table');
+
 Route::view('/services', 'services.index')->name('services');
 
 Route::view('/items', 'items.index')->name('items');

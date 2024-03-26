@@ -1,10 +1,10 @@
 @extends('layouts.main')
 
 @section('page_title', 'Table')
-@section('room', 'active-link')
+@section('table', 'active-link')
 @section('content')
     <div id="app">
-        <room-crud-component/>
+        <table-crud-component/>
     </div>
 
 @endsection
