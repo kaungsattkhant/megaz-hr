@@ -29,6 +29,7 @@
                     this.setRoles([]);
                     window.location.replace(`/login`);
                 }
+                window.location.replace(`/login`);
             }
         },
 
