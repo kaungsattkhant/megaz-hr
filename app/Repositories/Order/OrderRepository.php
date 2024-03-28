@@ -51,10 +51,17 @@ class OrderRepository implements OrderRepositoryInterface
     {
         $invoiceId = $data['invoice_id'];
         $order = Order::where('invoice_id',$invoiceId)->get()->first();
-
+        $categorySums = [];
         foreach($data['menuArray'] as $menu)
         {
+            $menuCategoryId = $menu['menu_category_id'];
+            $price = $menu['original_price'] * $menu['quantity'];
 
+            if (!isset($categorySums[$menuCategoryId])) {
+                $categorySums[$menuCategoryId] = 0;
+            }
+
+            $categorySums[$menuCategoryId] += $price;
             $menu['invoice_id'] = $invoiceId;
             if ($order) {
                 $order->total_quantity += $menu['quantity'];
@@ -90,6 +97,7 @@ class OrderRepository implements OrderRepositoryInterface
             }
 
         }
+
 
         return $order;
 
