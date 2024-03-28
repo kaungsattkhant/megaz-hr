@@ -28,9 +28,7 @@ return new class extends Migration
             $table->double('total')->nullable();
             $table->double('tax')->nullable();
             $table->double('sub_total')->default(0);
-            $table->double('paid_amount')->default(0);
             $table->double('total_session_price')->default(0);
-            $table->double('change')->nullable();
             $table->double('discount_value')->default(0);
 
             $table->string('payment_status')->nullable();

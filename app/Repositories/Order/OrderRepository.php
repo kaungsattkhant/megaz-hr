@@ -9,6 +9,7 @@ class OrderRepository implements OrderRepositoryInterface
 {
     public function createOrder(array $data)
     {
+        $price = $data['original_price'] * $data['quantity'];
         $order = Order::where('invoice_id', $data['invoice_id'])->get()->first();
         if ($order) {
             $order->total_quantity += $data['quantity'];
