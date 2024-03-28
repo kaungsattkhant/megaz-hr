@@ -14,11 +14,20 @@ class OrderRepository implements OrderRepositoryInterface
             $order->total_quantity += $data['quantity'];
             $order->total += $data['original_price'] * $data['quantity'];
             $order->update($data);
-            $data['date'] = currentTime();
-            $data['order_id'] = $order->id;
-            $data['discount_value'] = 0;
-            $data['price'] = $data['original_price'] * $data['quantity'];
-            $order_items = OrderItem::create($data);
+            $originalOrderItem = OrderItem::where('menu_id',$data['menu_id'])->where('order_id',$order->id)->get()->first();
+            if($originalOrderItem)
+            {
+                $originalOrderItem->quantity += $data['quantity'];
+                $originalOrderItem->price +=$data['original_price']*$data['quantity'];
+                $originalOrderItem->save();
+            }else{
+                $data['date'] = currentTime();
+                $data['order_id'] = $order->id;
+                $data['discount_value'] = 0;
+                $data['price'] = $data['original_price'] * $data['quantity'];
+                $order_items = OrderItem::create($data);
+            }
+
             return $order;
 
         } else {
@@ -50,12 +59,20 @@ class OrderRepository implements OrderRepositoryInterface
                 $order->total_quantity += $menu['quantity'];
                 $order->total += $menu['original_price'] * $menu['quantity'];
                 $order->update($menu);
-                $menu['date'] = CurrentTime();
-                $menu['order_id'] = $order->id;
-                $menu['discount_value'] = 0;
-                $menu['price'] = $menu['original_price'] * $menu['quantity'];
-                $order_items = OrderItem::create($menu);
 
+                $originalOrderItem = OrderItem::where('menu_id',$menu['menu_id'])->where('order_id',$order->id)->get()->first();
+                if($originalOrderItem)
+                {
+                    $originalOrderItem->quantity += $menu['quantity'];
+                    $originalOrderItem->price +=$menu['original_price']*$menu['quantity'];
+                    $originalOrderItem->save();
+                }else{
+                    $menu['date'] = CurrentTime();
+                    $menu['order_id'] = $order->id;
+                    $menu['discount_value'] = 0;
+                    $menu['price'] = $menu['original_price'] * $menu['quantity'];
+                    $order_items = OrderItem::create($menu);
+                }
 
             } else {
                 $menu['date'] = CurrentTime();
