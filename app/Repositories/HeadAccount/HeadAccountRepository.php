@@ -39,14 +39,14 @@ class HeadAccountRepository implements HeadAccountInterface
     public function detailHeadAccount($headAccount)
     {
         return $headAccount;
-        
+
     }
 
     public function subAccountList($request){
         if($request->per_page || $request->page){
-            return SubAccount::with(['head_account'])->where('is_available',1)->paginate(20);
+            return SubAccount::with(['head_account'])->where('is_active',1)->paginate(20);
         }
-        return SubAccount::with(['head_account'])->where('is_available',1)->get();
+        return SubAccount::with(['head_account'])->where('is_active',1)->get();
     }
 
     public function updateOrCreateSubAccount($request){
@@ -74,6 +74,6 @@ class HeadAccountRepository implements HeadAccountInterface
         return $subAccount;
     }
 
-    
-    
+
+
 }

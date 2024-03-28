@@ -63,9 +63,6 @@
                                 </td>
                                 <td class="whitespace-nowrap px-6 py-4 ">
                                     <div class="text-left">
-                                        <!-- <p class="mb-2" v-for="(ledger) in transaction.ledgers">
-                                            {{ ledger.account_name }}
-                                        </p> -->
                                         <div v-for="(ledger) in transaction.ledgers">
                                             <p class="mb-2" v-if="ledger.action == 'debit'">
                                                 {{ ledger.account_name }}
@@ -76,9 +73,6 @@
                                                 {{ ledger.account_name }}
                                             </p>
                                         </div>
-                                        <!-- <p>
-                                            Item
-                                        </p> -->
                                     </div>
                                 </td>
                                 <td class="whitespace-nowrap px-6 py-4 ">
@@ -98,13 +92,13 @@
                                 <td class="whitespace-nowrap px-6 py-4 ">
                                     <div class="text-left">
                                         <div v-for="(ledger) in transaction.ledgers">
-                                            <p class="mb-2" v-if="ledger.action == 'credit'">
-                                                {{ (ledger.value).toLocaleString() }}
+                                            <p class="mb-2" v-if="ledger.action == 'debit'">
+                                                0
                                             </p>
                                         </div>
                                         <div v-for="(ledger) in transaction.ledgers">
-                                            <p class="mb-2" v-if="ledger.action == 'debit'">
-                                                0
+                                            <p class="mb-2" v-if="ledger.action == 'credit'">
+                                                {{ (ledger.value).toLocaleString() }}
                                             </p>
                                         </div>
                                     </div>
