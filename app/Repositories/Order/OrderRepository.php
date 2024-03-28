@@ -54,6 +54,7 @@ class OrderRepository implements OrderRepositoryInterface
 
         foreach($data['menuArray'] as $menu)
         {
+
             $menu['invoice_id'] = $invoiceId;
             if ($order) {
                 $order->total_quantity += $menu['quantity'];
