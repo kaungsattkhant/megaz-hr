@@ -32,7 +32,10 @@
                                 Title
                             </th>
                             <th scope="col" class=" px-6 py-4 ">
-                                Amount
+                                Debit
+                            </th>
+                            <th scope="col" class=" px-6 py-4 ">
+                                Credit
                             </th>
                             <th scope="col" class=" px-6 py-4 ">
                                 Type
@@ -57,6 +60,7 @@
                                 <td class="whitespace-nowrap px-6 py-4 "> &nbsp; </td>
                                 <td class="whitespace-nowrap px-6 py-4 "> &nbsp; </td>
                                 <td class="whitespace-nowrap px-6 py-4 "> &nbsp; </td>
+                                <td class="whitespace-nowrap px-6 py-4 "> &nbsp; </td>
                                 <td class="whitespace-nowrap px-6 py-4 "> {{ (openingBalance).toLocaleString() }} </td>
                                 <!-- <td class="whitespace-nowrap px-6 py-4 "> &nbsp; </td> -->
                             </tr>
@@ -74,7 +78,14 @@
                                     {{ cashBook.title }}
                                 </td>
                                 <td class="whitespace-nowrap px-6 py-4 ">
-                                    {{ (cashBook.amount).toLocaleString() }}
+                                    <div v-if="cashBook.action == 'debit'">
+                                        {{ (cashBook.amount).toLocaleString() }}
+                                    </div>
+                                </td>
+                                <td class="whitespace-nowrap px-6 py-4 ">
+                                    <div v-if="cashBook.action == 'credit'">
+                                        {{ (cashBook.amount).toLocaleString() }}
+                                    </div>
                                 </td>
                                 <td class="whitespace-nowrap px-6 py-4 ">
                                     {{ cashBook.type }}
@@ -105,6 +116,7 @@
 
                         <div class="contents">
                             <tr class="bg-gray rounded-lg overflow-hidden shadow-sm mb-10">
+                                <td class="whitespace-nowrap px-6 py-4 "> &nbsp; </td>
                                 <td class="whitespace-nowrap px-6 py-4 "> &nbsp; </td>
                                 <td class="whitespace-nowrap px-6 py-4 "> &nbsp; </td>
                                 <td class="whitespace-nowrap px-6 py-4 "> &nbsp; </td>
