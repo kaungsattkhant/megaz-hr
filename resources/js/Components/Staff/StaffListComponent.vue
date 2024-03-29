@@ -29,9 +29,11 @@
                             <th scope="col" class=" px-6 py-4 ">
                                 Phone Number
                             </th>
-
                             <th scope="col" class=" px-6 py-4 ">
                                 Address
+                            </th>
+                            <th scope="col" class=" px-6 py-4 ">
+                                Roles
                             </th>
                             <th scope="col" class=" px-6 py-4 ">
                                 Department
@@ -57,6 +59,11 @@
                                 </td>
                                 <td class=" px-6 py-4 ">
                                     {{ staff.address }}
+                                </td>
+                                <td class="whitespace-nowrap px-6 py-4 ">
+                                    <div v-for="role in staff.roles">
+                                        {{ role.name }}
+                                    </div>
                                 </td>
                                 <td class="whitespace-nowrap px-6 py-4 ">
                                     {{ staff.department.name }}
@@ -318,7 +325,7 @@
                 }
                 const response = await getApiData({ url: url, token: this.getToken() });
                 if (response.data != null) {
-                    this.staffList = response.data.staffs;
+                    this.staffList = response.data.data;
                     this.pageNumbers = [];
                     for (let j = 1; j <= response.last_page; j++) {
                         this.pageNumbers.push(j);

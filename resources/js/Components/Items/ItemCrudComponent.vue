@@ -2,9 +2,22 @@
     <div class="flex justify-between mb-3">
         <div class=" flex">
             <label for="search" class="search-input">
-                <input type="text" class="input-search" placeholder="Search">
+                <input type="text" class="input-search" placeholder="Search" v-model="searchInput">
                 <i class="fal fa-search"></i>
             </label>
+
+            <div class="bg-white mb-0 w-[40%] text-sm inline-block" data-te-select-wrapper-ref>
+                <select data-te-select-init data-te-select-placeholder="Filter by category"
+                data-te-select-filter="true" v-model="searchCategory">
+                    <option v-for="category in itemCategoryList">
+                        {{ category.name }}
+                    </option>
+                </select>
+            </div>
+
+            <button class="add-btn h-8 mx-2 " @click="searchBtnClicked">Search</button>
+            <button class="add-btn h-8 mx-2 " @click="clearSearchBtnClicked">Clear</button>
+
         </div>
         <div class="flex justify-end flex-col">
 
@@ -139,7 +152,7 @@
 </template>
 
 <script>
-    import { Modal, Ripple, initTE } from "tw-elements";
+    import { Modal, Ripple, initTE, Select, Dropdown } from "tw-elements";
     import { getApiData, postApiData, deleteApiData } from '../../utilities/ajax-helpers';
     import { mapGetters } from "vuex";
 
@@ -152,6 +165,8 @@
                 name: '',
                 selectedUOM: null,
                 selectedCategory: null,
+                searchInput: null,
+                searchCategory: null,
             };
         },
 
@@ -193,6 +208,30 @@
                 if(response.success){
                     this.itemList.unshift(response.data);
                 }
+            },
+
+            async searchBtnClicked(){
+                let url = null;
+                console.log(this.searchCategory);
+                if(this.searchInput && this.searchCategory){
+                    url = `/api/items?search_input=${this.searchInput}&category_id=${this.searchCategory.id}&page=1`;
+                }
+                if(this.searchInput && !this.searchCategory){
+                    url = `/api/items?search_input=${this.searchInput}&page=1`;
+                }
+                if((!this.searchInput) && this.searchCategory){
+                    url = `/api/items?category_id=${this.searchCategory.id}&page=1`;
+                }
+                let response = await getApiData({url: url, token: this.getToken()});
+                if(response.data){
+                    this.itemList = response.data.data;
+                }
+            },
+
+            clearSearchBtnClicked(){
+                this.searchInput = null;
+                this.searchCategory = null;
+                this.getItemList();
             }
         },
 
@@ -203,7 +242,7 @@
         },
 
         mounted(){
-            initTE({ Modal, Ripple });
+            initTE({ Modal, Ripple, Select, Dropdown });
         }
     }
 </script>
