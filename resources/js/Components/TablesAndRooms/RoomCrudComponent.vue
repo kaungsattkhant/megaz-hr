@@ -72,6 +72,61 @@
                     </tbody>
                 </table>
             </div>
+
+            <div class="mt-2 ml-2">
+                <ul v-if="paginationGroupsCount > 1" class="list-style-none flex">
+                    <li v-if="!isFirstGroup">
+                        <button class="relative block rounded bg-transparent px-3 py-1.5 text-sm text-neutral-600 transition-all duration-300
+                        hover:bg-neutral-100 dark:text-white dark:hover:bg-neutral-700 dark:hover:text-white" @click="previousPaginationGroupBtnClicked"
+                        :disabled="isFirstGroup">
+                            Previous
+                        </button>
+                    </li>
+
+                    <li v-for="(pageNumber, pageNumberIndex) in groupedPageNumbers[currentGroup]" :key="pageNumberIndex"
+                        :aria-current="(pageNumber == currentPage) ? 'page' : ''">
+                        <button v-if="pageNumber == currentPage"
+                            class="relative block rounded bg-neutral-800 px-3 py-1.5 text-sm font-medium text-neutral-50 transition-all duration-300 dark:bg-neutral-900"
+                            :id="'paginationBtn-' + pageNumberIndex" @click="pageBtnClicked(pageNumber)">
+                            {{ pageNumber }}
+                            <span class="absolute -m-px h-px w-px overflow-hidden whitespace-nowrap border-0 p-0 [clip:rect(0,0,0,0)]">
+                                (current)
+                            </span>
+                        </button>
+                        <button v-else
+                            class="normal-pagination relative block rounded bg-transparent px-3 py-1.5 text-sm text-neutral-600 transition-all duration-300 hover:bg-neutral-100 dark:text-white dark:hover:bg-neutral-700 dark:hover:text-white"
+                            :id="'paginationBtn-' + pageNumberIndex" @click="pageBtnClicked(pageNumber)">
+                            {{ pageNumber }}
+                        </button>
+                    </li>
+                    <li v-if="!isLastGroup">
+                        <button class="relative block rounded bg-transparent px-3 py-1.5 text-sm text-neutral-600 transition-all duration-300
+                        hover:bg-neutral-100 dark:text-white dark:hover:bg-neutral-700 dark:hover:text-white" @click="nextPaginationGroupBtnClicked"
+                        :disabled="isLastGroup">
+                            Next
+                        </button>
+                    </li>
+                </ul>
+
+                <ul v-else class="list-style-none flex">
+                    <li v-for="(pageNumber, pageNumberIndex) in pageNumbers" :key="pageNumberIndex"
+                        :aria-current="(pageNumber == currentPage) ? 'page' : ''">
+                        <button v-if="pageNumber == currentPage"
+                            class="relative block rounded bg-neutral-800 px-3 py-1.5 text-sm font-medium text-neutral-50 transition-all duration-300 dark:bg-neutral-900"
+                            :id="'paginationBtn-' + pageNumberIndex" @click="pageBtnClicked(pageNumber)">
+                            {{ pageNumber }}
+                            <span class="absolute -m-px h-px w-px overflow-hidden whitespace-nowrap border-0 p-0 [clip:rect(0,0,0,0)]">
+                                (current)
+                            </span>
+                        </button>
+                        <button v-else
+                            class="normal-pagination relative block rounded bg-transparent px-3 py-1.5 text-sm text-neutral-600 transition-all duration-300 hover:bg-neutral-100 dark:text-white dark:hover:bg-neutral-700 dark:hover:text-white"
+                            :id="'paginationBtn-' + pageNumberIndex" @click="pageBtnClicked(pageNumber)">
+                            {{ pageNumber }}
+                        </button>
+                    </li>
+                </ul>
+            </div>
         </div>
 
 
@@ -129,9 +184,6 @@
                                 <option :value="area.id" v-for="(area,index) in areaList">{{ area.name }}</option>
                             </select>
                         </div>
-
-
-
                     </div>
                     <div class="flex justify-center px-12 mb-6">
                         <button type="button" @click="createBtnClicked"
@@ -214,14 +266,10 @@
             </div>
         </div>
     </div>
-
-
-
-
 </template>
 
 <script>
-    import { Modal, Ripple, Select, initTE, Input } from "tw-elements";
+    import { Modal, Ripple, Select, initTE, Input, Dropdown } from "tw-elements";
     import { getApiData, postApiData, deleteApiData } from '../../utilities/ajax-helpers';
     import { mapGetters } from "vuex";
 
@@ -240,24 +288,25 @@
                 service_category_id:null,
                 deleteId: null,
 
-                per_page: 10,
+                per_page: 20,
                 pageNumbers: [],
                 currentPage: 1,
                 paginationGroupsCount: 1,
                 per_group: 10,
                 groupedPageNumbers: [],
                 currentGroup: 0,
+                isFirstGroup: true,
+                isLastGroup: false,
             };
         },
 
         methods: {
             ...mapGetters(['getToken']),
 
-            async getRoom(){
+            async getRoomList(pageNumber){
                 const response = await getApiData({ url: '/api/entities?type=room', token: this.getToken() });
                 if(response.data){
                     this.roomList = response.data;
-                    console.log(this.roomList)
                 }
             },
 
@@ -265,7 +314,6 @@
                 const response = await getApiData({ url: '/api/areas', token: this.getToken() });
                 if(response.data){
                     this.areaList = response.data;
-                    console.log(this.areaList)
                 }
             },
             async getServiceCategoryList(){
@@ -298,8 +346,7 @@
                 formData.append('service_category_id', this.service_category_id);
                 let response = await postApiData({url: '/api/entities', form_data: formData, token: this.getToken()});
                 if(response.success){
-                    this.getRoom(null);
-                    console.log("success")
+                    this.getRoomList(null);
                     this.closeModal();
                     this.clearForm();
                 }
@@ -327,23 +374,54 @@
                 let url = `/api/entities/${this.deleteId}`;
                 let response = await deleteApiData({url: url, token: this.getToken()});
                 if(response.success){
-                    this.getRoom();
+                    this.getRoomList(null);
                 }
                 else{
                     alert('some errors occur');
                 }
+            },
+
+            pageBtnClicked(pageNumber){
+                this.currentPage = pageNumber;
+                this.getRoomList(this.currentPage);
+            },
+
+            nextPaginationGroupBtnClicked(){
+                this.currentGroup += 1;
+                this.currentPage = (this.groupedPageNumbers[this.currentGroup][0]);
+                this.getRoomList(this.currentPage);
+            },
+
+            previousPaginationGroupBtnClicked(){
+                this.currentGroup -= 1;
+                let lastIndex = this.groupedPageNumbers[this.currentGroup].length - 1;
+                this.currentPage = (this.groupedPageNumbers[this.currentGroup][lastIndex]);
+                this.getRoomList(this.currentPage);
+            },
+
+            firstPaginationGroupBtnClicked(){
+                this.currentGroup = 0;
+                this.currentPage = (this.groupedPageNumbers[this.currentGroup][0]);
+                this.getRoomList(this.currentPage);
+            },
+
+            lastPaginationGroupBtnClicked(){
+                this.currentGroup = this.paginationGroupsCount - 1;
+                let lastIndex = this.groupedPageNumbers[this.currentGroup].length - 1;
+                this.currentPage = (this.groupedPageNumbers[this.currentGroup][lastIndex]);
+                this.getRoomList(this.currentPage);
             }
-
-
         },
-        mounted()
-        {
 
-            this.getRoom();
+        created(){
+            this.getRoomList(null);
             this.getAreaList();
             this.getServiceCategoryList();
+        },
 
-            initTE({ Modal,Select, Ripple });
+        mounted()
+        {
+            initTE({ Modal,Select, Ripple, Dropdown });
         }
     }
 </script>

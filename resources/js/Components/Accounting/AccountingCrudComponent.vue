@@ -2,10 +2,12 @@
     <div class="flex justify-between mb-3">
         <div class=" flex">
             <label for="search" class="search-input">
-                <input type="text" class="input-search" placeholder="Search">
-
+                <input type="text" class="input-search" placeholder="Search" v-model="searchInput">
                 <i class="fal fa-search"></i>
             </label>
+
+            <button class="add-btn h-8 mx-2 " @click="searchBtnClicked">Search</button>
+            <button class="add-btn h-8 mx-2 " @click="clearSearchBtnClicked">Clear</button>
         </div>
         <div class="flex justify-end flex-col">
 
@@ -45,7 +47,7 @@
                         <div class="contents" v-for="(account, index) in accountList" :key="index">
                             <tr class="bg-white rounded-lg overflow-hidden shadow-lg">
                                 <td class=" px-6 py-4 font-medium ">
-                                    {{ account.account_code }}
+                                    {{ per_page * (currentPage - 1) + (++index) }}
                                 </td>
                                 <td class="whitespace-nowrap px-6 py-4 ">
                                     {{ account.name }}
@@ -363,6 +365,9 @@
                 deleteId: null,
                 deleteIndex: null,
 
+                searchInput: null,
+
+                per_page: 20,
                 currentPage: 1,
                 pageNumbers: [],
                 paginationGroupsCount: 1,
@@ -413,6 +418,7 @@
                 let response = await getApiData({url: url, token: this.getToken()});
                 if(response.data){
                     this.accountList = response.data.data;
+                    this.per_page = response.data.per_page;
 
                     this.pageNumbers = [];
                     this.lastPageNumber = response.data.last_page;
@@ -532,6 +538,23 @@
 
                 this.deleteId = null;
                 this.deleteIndex = null;
+            },
+
+            async searchBtnClicked(){
+                let url = null;
+                if(this.searchInput){
+                    url = `/api/accounts?search_input=${this.searchInput}&page=1`;
+                }
+                let response = await getApiData({url: url, token: this.getToken()});
+                if(response.data){
+                    this.staffList = response.data.data;
+                }
+            },
+
+            clearSearchBtnClicked(){
+                this.searchInput = null;
+                this.searchCategory = null;
+                this.getAccountList(null);
             },
 
             pageBtnClicked(pageNumber){
