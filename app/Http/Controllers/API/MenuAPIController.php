@@ -8,7 +8,7 @@ use App\Http\Controllers\Controller;
 
 use App\Http\Requests\Menu\AddPriceToMenuRequest;
 use App\Http\Requests\Menu\CreateMenuRequest;
-
+use App\Models\Menu;
 use App\Repositories\Menu\MenuRepositoryInterface;
 
 class MenuAPIController extends Controller
@@ -42,5 +42,12 @@ class MenuAPIController extends Controller
         }
 
         ResponseData($menuPrice);
+    }
+
+    public function menuByMenuCategory(int $id)
+    {
+        $menu = Menu::where('menu_category_id',$id)->get();
+        return $menu;
+
     }
 }

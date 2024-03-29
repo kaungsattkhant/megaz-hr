@@ -212,3 +212,5 @@ Route::get('/invoices', [InvoiceAPIController::class, 'getInvoiceData']);
 Route::get('/tables', [EntityAPIController::class, 'getTablesWithInvoice']);
 // Route::group(['prefix' => 'management'], function () {});
 Route::get("/test", [TestController::class, "index"]);
+
+Route::get('/menu_categories/{id}/menus',[MenuAPIController::class,'menuByMenuCategory']);
