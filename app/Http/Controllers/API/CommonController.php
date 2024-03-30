@@ -10,9 +10,13 @@ class CommonController extends Controller
     //
     public function toggleIsActive(Request $request){
         $type=Model($request->type);
+        $column='is_active';
+        if($request->type=='entity'){
+            $column='is_available';
+        }
         $model=$type::find($request->id);
         if($model){
-            $model->update(['is_active' => !$model->is_active]);
+            $model->update([$column => !$model->$column]);
             ResponseMessage('Update successfully',200);
         }
         ResponseMessage('Update fail',422);
