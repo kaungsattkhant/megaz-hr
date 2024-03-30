@@ -47,7 +47,7 @@
                         <div class="contents" v-for="(account, index) in accountList" :key="index">
                             <tr class="bg-white rounded-lg overflow-hidden shadow-lg">
                                 <td class=" px-6 py-4 font-medium ">
-                                    {{ per_page * (currentPage - 1) + (++index) }}
+                                    {{ account.account_code }}
                                 </td>
                                 <td class="whitespace-nowrap px-6 py-4 ">
                                     {{ account.name }}
