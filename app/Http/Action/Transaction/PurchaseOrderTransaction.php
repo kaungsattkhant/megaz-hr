@@ -47,7 +47,7 @@ class PurchaseOrderTransaction
             }
             if($account_code==null) ResponseMessage('Transaction fail',419);
             #debit
-            if ($account_code) {  
+            if ($account_code) {
                 $debitAccount = (new Account())->accountByCode($account_code); #Inventory Food
 
                 $debitLedger = (new StoreTransactionLedger())->storeLedger([

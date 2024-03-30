@@ -2,6 +2,8 @@
 
 namespace App\Repositories\Invoice;
 
+use App\Http\Action\Transaction\StoreTransactionLedger;
+use App\Models\Account;
 use Illuminate\Http\Request;
 
 use App\Models\Entity;
@@ -82,7 +84,7 @@ class InvoiceRepository implements InvoiceRepositoryInterface
         } else {
             $end_date = Carbon::parse($data['start_date'])->addMinutes($data['session_duration'] * 60);
         }
-        $data['entity_id'] =$invoice->entity_id;
+        $data['entity_id'] = $invoice->entity_id;
         $data['end_date'] = $end_date->format('Y-m-d H:i:s');
         $data['price'] = $entity->price_per_hour * $data['session_duration'];
         $roomSession = RoomSession::create($data);
@@ -124,17 +126,15 @@ class InvoiceRepository implements InvoiceRepositoryInterface
         // current Room
         $roomAndSession = RoomSession::where('invoice_id', $data['invoice_id'])->latest()->first();
         // past room and changes of room
-        $roomSessionsWithInvoice = RoomSession::where('invoice_id',$data['invoice_id'])->get();
+        $roomSessionsWithInvoice = RoomSession::where('invoice_id', $data['invoice_id'])->get();
         $originalDuration = 0;
-        foreach($roomSessionsWithInvoice as $room_session)
-        {
+        foreach ($roomSessionsWithInvoice as $room_session) {
             $originalDuration += $room_session->session_duration;
         }
         $invoice = Invoice::find($data['invoice_id']);
 
-        // caculating
+        // caculating last room duration
         $startTime = Carbon::parse($roomAndSession->start_date);
-        dd($roomAndSession);
         $endTime = Carbon::now();
         $duration = $endTime->diffInMinutes($startTime);
         $hours = intdiv($duration, 60);
@@ -143,6 +143,7 @@ class InvoiceRepository implements InvoiceRepositoryInterface
         $roundedDecimalHours = round($decimalHours, 3);
         $roomAndSession->session_duration = $roundedDecimalHours;
 
+        // how much duration left
         $leftDuration = $originalDuration - $roundedDecimalHours;
         $originalRoom = Entity::find($invoice->entity_id);
         $roomAndSession->price = $roundedDecimalHours * $originalRoom->price_per_hour;
@@ -158,11 +159,11 @@ class InvoiceRepository implements InvoiceRepositoryInterface
         $roomData['start_date'] = CurrentTime();
         $roomData['invoice_id'] = $invoice->id;
 
-            // if($data['charge']==true)
-            // {
-            // }else{
-            //     $roomData['price'] = 0;
-            // }
+        // if($data['charge']==true)
+        // {
+        // }else{
+        //     $roomData['price'] = 0;
+        // }
         $roomData['entity_id'] = $invoice->entity_id;
         $roomData['price'] = $originalRoom->price_per_hour * $data['session_duration'];
 
@@ -175,12 +176,6 @@ class InvoiceRepository implements InvoiceRepositoryInterface
         $roomData['end_date'] = $end_date->format('Y-m-d H:i:s');
         $updatedDurationRoom = RoomSession::create($roomData);
 
-        // $endDate = Carbon::parse($roomAndSession->end_date);
-        // $endDate->addHours($data['session_duration']);
-        // $roomAndSession->end_date = $endDate;
-        // $roomAndSession->session_duration += $data['session_duration'];
-        // $endDate = $roomAndSession->end_date;
-        // $roomAndSession->save();
         return $roomAndSession;
     }
 
@@ -188,17 +183,17 @@ class InvoiceRepository implements InvoiceRepositoryInterface
     {
         $invoice = Invoice::find($data['invoice_id']);
         $lastRoomwithInvoice = RoomSession::where('invoice_id', $invoice->id)->latest()->first();
-            $startTime = Carbon::parse($lastRoomwithInvoice->start_date);
-            $endTime = Carbon::now();
+        $startTime = Carbon::parse($lastRoomwithInvoice->start_date);
+        $endTime = Carbon::now();
 
-            $duration = $endTime->diffInMinutes($startTime);
-            $hours = intdiv($duration, 60);
-            $minutes = $duration % 60;
-            $decimalHours = $hours + ($minutes / 60);
-            $roundedDecimalHours = round($decimalHours, 3);
+        $duration = $endTime->diffInMinutes($startTime);
+        $hours = intdiv($duration, 60);
+        $minutes = $duration % 60;
+        $decimalHours = $hours + ($minutes / 60);
+        $roundedDecimalHours = round($decimalHours, 3);
         $invoice = Invoice::find($lastRoomwithInvoice->invoice_id);
         $entity = $invoice->room;
-        $leftDuration = $lastRoomwithInvoice->session_duration- $roundedDecimalHours;
+        $leftDuration = $lastRoomwithInvoice->session_duration - $roundedDecimalHours;
         $lastRoomwithInvoice->session_duration = $roundedDecimalHours;
         $lastRoomwithInvoice->end_date = CurrentTime();
         $lastRoomwithInvoice->price = $roundedDecimalHours * $entity->price_per_hour;
@@ -235,14 +230,189 @@ class InvoiceRepository implements InvoiceRepositoryInterface
 
     public function doneEntityWithInvoice(array $data)
     {
+        $foodCharge = 0;
+        $beverageCharge = 0;
+        foreach ($data['order_categories'] as $menu) {
+            if ($menu['menu_category_id'] == 1 || $menu['menu_category_id'] == 2 || $menu['menu_category_id'] == 3) {
+                $foodCharge += $menu['price'];
+            } else {
+                $beverageCharge += $menu['price'];
+            }
+        }
+
+        $roomSessions = RoomSession::where('invoice_id', $data['invoice_id'])->get();
+        $total_session_price = 0;
+        foreach ($roomSessions as $room) {
+            $total_session_price += $room->price;
+        }
+
         $invoice = Invoice::find($data['invoice_id']);
         $entity = Entity::find($invoice->entity_id);
         $entity->is_active = 0;
         $entity->save();
+
+        if ($data['service_charge'] == true) {
+            $data['service_charge'] = ($foodCharge + $beverageCharge) * 0.05;
+        } else {
+            $data['service_charge'] = 0;
+        }
+
+        if ($data['tax'] == true) {
+            $data['tax'] = round(($foodCharge + $beverageCharge + $total_session_price) * 0.05);
+        } else {
+            $data['tax'] = 0;
+        }
+
+        $data['food_charge'] = $foodCharge + $beverageCharge;
+        $data['total'] = $data['food_charge'] + $total_session_price + $data['service_charge'] + $data['tax'];
+        $data['total_session_price'] = $total_session_price;
         $data['sub_total'] = $data['food_charge'] + $data['total_session_price'];
         $data['payment_status'] = 'received';
         $data['complete_date'] = CurrentTime();
         $invoice->update($data);
+
+        // transaction and ledgers
+        $posCash = Account::where('account_code','2-1011')->get()->first();
+        $foodKtvAcc = Account::where('account_code','5-0101')->first();
+
+        $data['date'] = now();
+        $data['created_by'] = 1;//example
+        $data['transactionable_id'] = $invoice->id;
+        $data['transactionable_type'] = 'invoice';
+
+        $foodTransaction=(new StoreTransactionLedger())->createTransaction($data);
+
+        $foodCreditLedger = (new StoreTransactionLedger())->storeLedger([
+            'value' => $foodCharge,
+            'transaction_id' => $foodTransaction->id,
+            'account_id' => $foodKtvAcc->id,
+            'action' => 'credit',
+        ]);
+
+        $foodCashDebit = (new StoreTransactionLedger())->storeLedger([
+            'value' => $foodCharge,
+            'transaction_id' => $foodTransaction->id,
+            'account_id' => $posCash->id,
+            'action' => 'debit',
+        ]);
+
+        $beverageKtvAcc = Account::where('account_code','5-0102')->get()->first();
+
+        $data['date'] = now();
+        $data['created_by'] = 1;//example
+        $data['transactionable_id'] = $invoice->id;
+        $data['transactionable_type'] = 'invoice';
+
+        $beverageTransaction =(new StoreTransactionLedger())->createTransaction($data);
+
+        $foodCreditLedger = (new StoreTransactionLedger())->storeLedger([
+            'value' => $beverageCharge,
+            'transaction_id' => $beverageTransaction->id,
+            'account_id' => $beverageKtvAcc->id,
+            'action' => 'credit',
+        ]);
+
+        $beverageCashDebit = (new StoreTransactionLedger())->storeLedger([
+            'value' => $beverageCharge,
+            'transaction_id' => $beverageTransaction->id,
+            'account_id' => $posCash->id,
+            'action' => 'debit',
+        ]);
+
+
+        $ktvRoomCharges = Account::where('account_code','5-0103')->get()->first();
+
+        $data['date'] = now();
+        $data['created_by'] = 1;//example
+        $data['transactionable_id'] = $invoice->id;
+        $data['transactionable_type'] = 'invoice';
+
+        $ktvRoomTransaction =(new StoreTransactionLedger())->createTransaction($data);
+
+        $ktvRoomLedger = (new StoreTransactionLedger())->storeLedger([
+            'value' => $total_session_price,
+            'transaction_id' => $ktvRoomTransaction->id,
+            'account_id' => $ktvRoomCharges->id,
+            'action' => 'credit',
+        ]);
+
+        $ktvCashDebit = (new StoreTransactionLedger())->storeLedger([
+            'value' => $total_session_price,
+            'transaction_id' => $ktvRoomTransaction->id,
+            'account_id' => $posCash->id,
+            'action' => 'debit',
+        ]);
+
+        $serviceMoneyAcc =Account::where('account_code','6-2009')->get()->first();
+
+        $data['date'] = now();
+        $data['created_by'] = 1;//example
+        $data['transactionable_id'] = $invoice->id;
+        $data['transactionable_type'] = 'invoice';
+
+        $serviceMoneyTransaction =(new StoreTransactionLedger())->createTransaction($data);
+
+        $serviceLedger = (new StoreTransactionLedger())->storeLedger([
+            'value' => $data['service_charge'],
+            'transaction_id' => $serviceMoneyTransaction->id,
+            'account_id' => $serviceMoneyAcc->id,
+            'action' => 'credit',
+        ]);
+
+        $serviceCashDebit = (new StoreTransactionLedger())->storeLedger([
+            'value' => $data['service_charge'],
+            'transaction_id' => $serviceMoneyTransaction->id,
+            'account_id' => $posCash->id,
+            'action' => 'debit',
+        ]);
+
+        $taxAcc = Account::where('account_code','6-9002')->get()->first();
+
+        $data['date'] = now();
+        $data['created_by'] = 1;//example
+        $data['transactionable_id'] = $invoice->id;
+        $data['transactionable_type'] = 'invoice';
+
+        $taxTransaction =(new StoreTransactionLedger())->createTransaction($data);
+
+        $taxLedger = (new StoreTransactionLedger())->storeLedger([
+            'value' => $data['tax'],
+            'transaction_id' => $taxTransaction->id,
+            'account_id' => $taxAcc->id,
+            'action' => 'credit',
+        ]);
+
+        $textDebit = (new StoreTransactionLedger())->storeLedger([
+            'value' => $data['tax'],
+            'transaction_id' => $taxTransaction->id,
+            'account_id' => $posCash->id,
+            'action' => 'debit',
+        ]);
+        if($data['discount_value'])
+        {
+            $discountAcc = Account::where('account_code','6-2003')->get()->first();
+            $data['date'] = now();
+            $data['created_by'] = 1;//example
+            $data['transactionable_id'] = $invoice->id;
+            $data['transactionable_type'] = 'invoice';
+
+            $discountTransaction =(new StoreTransactionLedger())->createTransaction($data);
+
+            $discountDebit = (new StoreTransactionLedger())->storeLedger([
+                'value' => $data['discount_value'],
+                'transaction_id' => $discountTransaction->id,
+                'account_id' => $discountAcc->id,
+                'action' => 'debit',
+            ]);
+
+            $discountCashCredit = (new StoreTransactionLedger())->storeLedger([
+                'value' => $data['discount_value'],
+                'transaction_id' => $discountTransaction->id,
+                'account_id' => $posCash->id,
+                'action' => 'credit',
+            ]);
+        }
+
         return $invoice;
     }
 }
