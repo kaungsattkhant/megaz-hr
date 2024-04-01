@@ -124,7 +124,7 @@
                                 aria-expanded="false"
                                 aria-controls="collapseExample">
                                     <i class="fal fa-money-check-alt  pr-3"></i>
-                                    Bankbook
+                                    Bankbok
                                 </button>
 
                             <div
@@ -184,9 +184,16 @@
                             </a>
                         </li>
                         <li>
-                            <a href="{{ route('roomandtable') }}" class="flex items-center @yield('table')">
+                            <a href="{{ route('room') }}" class="flex items-center @yield('room')">
                                 <i class="fal fa-user  pr-3"></i>
-                                Room / Table
+                                Room
+                            </a>
+                        </li>
+
+                        <li>
+                            <a href="{{ route('table') }}" class="flex items-center @yield('table')">
+                                <i class="fal fa-user  pr-3"></i>
+                                Table
                             </a>
                         </li>
                         <li>
@@ -196,7 +203,7 @@
                             </a>
                         </li>
                         <li>
-                            <a href="{{ route('complains') }}" class="flex items-center @yield('services')">
+                            <a href="{{ route('complains') }}" class="flex items-center @yield('complains')">
                                 <i class="fal fa-user  pr-3"></i>
                                 Complains
                             </a>

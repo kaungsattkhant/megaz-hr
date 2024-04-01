@@ -2,10 +2,6 @@
     <button class="w-full text-left pl-12" @click="logoutBtnClicked">
         <i class="fal fa-sign-out pr-3"></i>Logout
     </button>
-
-    <form action="/logout" method="POST" id="logout-form">
-        <input type="hidden" v-model="csrfToken" name="_token">
-    </form>
 </template>
 
 <script>
@@ -16,13 +12,13 @@
         name: "LogoutComponent",
         data(){
             return {
-                csrfToken: null,
+
             }
         },
 
         methods: {
             ...mapMutations(['setUser', 'setToken', 'setCsrfToken', 'setDepartment', 'setRoles']),
-            ...mapGetters(['getToken', 'getCsrfToken']),
+            ...mapGetters(['getToken']),
 
             async logoutBtnClicked(){
                 let response = await postApiData({url: `/api/logout`, token: this.getToken()});
@@ -31,16 +27,13 @@
                     this.setToken(null);
                     this.setDepartment(null);
                     this.setRoles([]);
-                    $('#logout-form').submit();
-                    // window.location.replace(`/login`);
+                    window.location.replace(`/login`);
                 }
-                $('#logout-form').submit();
-                // window.location.replace(`/login`);
             }
         },
 
         mounted(){
-            this.csrfToken = this.getCsrfToken();
+
         }
     }
 </script>

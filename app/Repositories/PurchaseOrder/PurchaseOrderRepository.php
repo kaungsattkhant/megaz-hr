@@ -160,10 +160,11 @@ class PurchaseOrderRepository implements PurchaseOrderRepositoryInterface
                 if ($request->type == 'purchase_order') {
                     $column_id = $column . '_' . 'id';
                     $column_time = $column . '_' . 'time';
-                    $this->confirmOrderItem($model, $is_column);
-                    // if ($items->isNotEmpty()) {
-                    //     ResponseMessage('Some items are left to check', 422);
-                    // }
+                    // $column='is_financial_check';
+                    $items = $this->existIsCheck($model, $is_column, 0);
+                    if ($items->isNotEmpty()) {
+                        ResponseMessage('Some items are left to check', 422);
+                    }
                     $staff->hasRoles('MD') ?
                     $model->$is_column = 1 : $model->$column_id = $staff->id;
                     $model->$column_time = now();
@@ -176,8 +177,7 @@ class PurchaseOrderRepository implements PurchaseOrderRepositoryInterface
                     }
                 }
                 DB::commit();
-                return $model;
-                // ResponseMessage('Update successfully', 200);
+                ResponseMessage('Update successfully', 200);
             }
             ResponseMessage("Data isn't found", 404);
         } catch (\Exception $e) {
@@ -188,11 +188,9 @@ class PurchaseOrderRepository implements PurchaseOrderRepositoryInterface
         
     }
 
-    public function confirmOrderItem($model, $is_column)
+    public function existIsCheck($model, $is_column, $value)
     {
-        return $model->items()->update([
-            $is_column=>1,
-        ]);
+        return $model->items->whereIn($is_column, $value)->values();
     }
 
     public function validateModel($model, $staff, $type)

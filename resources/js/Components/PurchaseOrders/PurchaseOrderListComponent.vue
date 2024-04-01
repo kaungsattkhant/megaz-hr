@@ -28,12 +28,24 @@
                             <th scope="col" class=" px-6 py-4 ">
                                 Purchase Order Id
                             </th>
-                            <th scope="col" class=" px-6 py-4 ">
-                                Price Total
-                            </th>
+
                             <th scope="col" class=" px-6 py-4 ">
                                 Status
                             </th>
+
+                            <th scope="col" class=" px-6 py-4 ">
+                                Manager Check
+                            </th>
+
+                            <th scope="col" class=" px-6 py-4 ">
+                                Financial Check
+                            </th>
+
+                            <th scope="col" class=" px-6 py-4 ">
+                                Md Check
+                            </th>
+
+
                             <th scope="col" class="px-6 py-4">
 
                             </th>
@@ -51,36 +63,19 @@
                                 <td class="whitespace-nowrap px-6 py-4 ">
                                     {{ purchaseOrder.po_id }}
                                 </td>
-                                <td class="whitespace-nowrap px-6 py-4 ">
-                                    {{ purchaseOrder.total_price }}
-                                </td>
+
                                 <td class=" px-6 py-4 ">
-                                    <div v-if="departmentName == 'Operation Department'">
-                                        <div v-if="purchaseOrder.manager_check_time != null">
-                                            Manager Checked at {{ purchaseOrder.manager_check_time }}
-                                        </div>
-                                        <div v-else>
-                                            Manager Not Checked
-                                        </div>
-                                    </div>
+                                    {{ purchaseOrder.status }}
+                                </td>
 
-                                    <div v-if="departmentName == 'Management Department'">
-                                        <div v-if="purchaseOrder.md_check_time != null">
-                                            MD Checked at {{ purchaseOrder.md_check_time }}
-                                        </div>
-                                        <div v-else>
-                                            MD Not Checked
-                                        </div>
-                                    </div>
-
-                                    <div v-if="departmentName == 'Financial Department'">
-                                        <div v-if="purchaseOrder.financial_check_time != null">
-                                            Financial Checked at {{ (purchaseOrder.financial_check_time) }}
-                                        </div>
-                                        <div v-else>
-                                            Financial Not Checked
-                                        </div>
-                                    </div>
+                                <td  class="px-6 py-4">
+                                    {{ purchaseOrder.financial_check_id !== null ? purchaseOrder.financial_check_id : 'unchecked' }}
+                                </td>
+                                <td class="px-6 py-4">
+                                    {{ purchaseOrder.financial_check_id !== null ? purchaseOrder.financial_check_id : 'unchecked' }}
+                                </td>
+                                <td class="px-6 py-4">
+                                    {{ purchaseOrder.financial_check_id !== null ? purchaseOrder.financial_check_id : 'unchecked' }}
                                 </td>
                                 <td class="whitespace-nowrap px-6 py-4 space-x-4">
                                     <button class="pr-1" @click="checkPurchaseOrderBtnClicked(purchaseOrder.id)" data-te-toggle="modal" data-te-target="#checkModal">
@@ -168,12 +163,12 @@
             return {
                 purchaseOrderList: [],
                 checkId: null,
-                departmentName: null,
+                loginUser:null
             };
         },
 
         methods: {
-            ...mapGetters(['getToken', 'getDepartment']),
+            ...mapGetters(['getToken','getUser']),
 
             async getPurhaseOrderList(pageNumber){
                 let url = `/api/purchase_orders`;
@@ -202,14 +197,7 @@
                     formData.append('value', 1);
                     let response = await postApiData({url: url, form_data: formData, token: this.getToken()});
                     if(response.success){
-                        alert('Purchase order check success');
-                        let index = this.purchaseOrderList.findIndex(po => po.id == this.checkId);
-                        if(index != -1){
-                            this.purchaseOrderList[index] = response.data;
-                        }
-                    }
-                    else{
-                        alert(response.message);
+                        // alert('PO checked');
                     }
                 }
 
@@ -220,12 +208,12 @@
         created()
         {
             this.getPurhaseOrderList(null);
-            this.departmentName = this.getDepartment().name;
         },
 
         mounted()
         {
             initTE({Modal});
+            this.loginUser = this.getUser();
         }
     }
 </script>

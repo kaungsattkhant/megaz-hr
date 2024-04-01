@@ -55,10 +55,7 @@
                             Amount
                         </th>
                         <th scope="col" class=" px-6 py-4 ">
-                            Cost
-                        </th>
-                        <th scope="col" class=" px-6 py-4 ">
-                            Status
+                            Total
                         </th>
                         <th scope="col" class=" px-6 py-4 ">
 
@@ -81,32 +78,6 @@
                                 {{ (purchaseOrderItem.amount * purchaseOrderItem.quantity).toLocaleString() }}
                             </td>
                             <td class=" px-6 py-4 font-medium ">
-                                <div v-if="departmentName == 'Operation Department'">
-                                    <div v-if="purchaseOrderItem.is_manager_checked == 1">
-                                        Manager Checked
-                                    </div>
-                                    <div v-else>
-                                        Manager Not Checked
-                                    </div>
-                                </div>
-                                <div v-if="departmentName == 'Management Department'">
-                                    <div v-if="purchaseOrderItem.is_md_checked == 1">
-                                        MD Checked
-                                    </div>
-                                    <div v-else>
-                                        MD Not Checked
-                                    </div>
-                                </div>
-                                <div v-if="departmentName == 'Financial Department'">
-                                    <div v-if="purchaseOrderItem.is_financial_checked == 1">
-                                        Financial Checked
-                                    </div>
-                                    <div v-else>
-                                        Financial Not Checked
-                                    </div>
-                                </div>
-                            </td>
-                            <td class=" px-6 py-4 font-medium ">
                                 <button @click="editPurchaseOrderItemBtnClicked(purchaseOrderItemsIndex)" data-te-toggle="modal" data-te-target="#editModal">
                                     <i class="fal fa-pencil  pr-3"></i>
                                 </button>
@@ -124,41 +95,12 @@
                         </tr>
                     </div>
 
-                    <div class="contents">
-                        <tr class="bg-white rounded-lg overflow-hidden shadow-lg">
-                            <td class=" px-6 py-4 font-medium ">
-                                Total
-                            </td>
-                            <td class=" px-6 py-4 font-medium ">
-                                {{ totalQty }}
-                            </td>
-                            <td class=" px-6 py-4 font-medium ">
-                                {{ totalAmount.toLocaleString() }}
-                            </td>
-                            <td class=" px-6 py-4 font-medium ">
-                                {{ totalPrice.toLocaleString() }}
-                            </td>
-                            <td class=" px-6 py-4 font-medium ">
-                                &nbsp;
-                            </td>
-                            <td class=" px-6 py-4 font-medium ">
-                                &nbsp;
-                            </td>
-                        </tr>
-                        <tr class="">
-                            <td class=" py-2 "></td>
-                        </tr>
-                    </div>
                 </tbody>
             </table>
         </div>
         <div>
-            <button class="add-btn mr-1" @click="createPurchaseOrderBtnClicked">
-                Update Purchase Order
-            </button>
-
-            <button class="add-btn ml-1" data-te-toggle="modal" data-te-target="#checkPOModal">
-                Confirm Purchase Order
+            <button class="add-btn" @click="createPurchaseOrderBtnClicked">
+                Create Purchase Order
             </button>
         </div>
     </div>
@@ -305,50 +247,6 @@
             </div>
         </div>
     </div>
-
-    <div data-te-modal-init class="fixed left-0 top-0 z-[1055] hidden h-full w-full overflow-y-auto overflow-x-hidden outline-none"
-        id="checkPOModal"
-        tabindex="-1"
-        aria-labelledby="exampleModalLabel"
-        aria-hidden="true">
-        <div data-te-modal-dialog-ref class="pointer-events-none relative flex min-h-[calc(100%-1rem)] w-auto translate-y-[-50px]
-            items-center opacity-0 transition-all duration-300 ease-in-out min-[576px]:mx-auto min-[576px]:mt-7
-            min-[576px]:min-h-[calc(100%-3.5rem)] min-[576px]:max-w-[500px]">
-            <div class="min-[576px]:shadow-[0_0.5rem_1rem_rgba(#000, 0.15)] pointer-events-auto relative flex w-full flex-col
-                rounded-md border-none bg-white bg-clip-padding text-current shadow-lg outline-none ">
-                <div class="flex flex-shrink-0 items-center justify-between rounded-t-md border-b-2 border-neutral-100 border-opacity-100 p-4 ">
-                    <!--Modal title-->
-                    <h5 class="text-xl font-medium leading-normal text-neutral-800 " id="exampleModalLabel">
-                        Check Purchase Order
-                    </h5>
-                    <!--Close button-->
-                    <button type="button" class="box-content rounded-none border-none hover:no-underline hover:opacity-75 focus:opacity-100 focus:shadow-none focus:outline-none" data-te-modal-dismiss aria-label="Close">
-                        <svg class="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
-                        </svg>
-                    </button>
-                </div>
-
-                <!--Modal body-->
-                <div class="relative flex-auto p-4" data-te-modal-body-ref>
-                    <p>
-                        Are you sure ?
-                    </p>
-                </div>
-
-                <!--Modal footer-->
-                <div class="flex flex-shrink-0 flex-wrap items-center justify-end rounded-b-md border-t-2 border-neutral-100 border-opacity-100 p-4 ">
-                    <button type="button" class="inline-block px-6 pb-2 pt-2.5 text-xs focus:outline-none focus:ring-0 " data-te-modal-dismiss>
-                        Close
-                    </button>
-                    <button @click="checkPurchaseOrderBtnClicked" type="button" data-te-toggle="modal" data-te-target="#checkPOModal"
-                    class="ml-1 inline-block rounded bg-blue-600 px-6 pb-2 pt-2.5 text-xs  text-white   focus:outline-none focus:ring-0 ">
-                        Confirm
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
 </template>
 
 <script>
@@ -372,17 +270,11 @@
 
                 editQuantity: 0,
                 editPurchaseOrderItem: null,
-
-                totalQty: null,
-                totalAmount: null,
-                totalPrice: null,
-
-                departmentName: null,
             };
         },
 
         methods: {
-            ...mapGetters(['getToken', 'getDepartment']),
+            ...mapGetters(['getToken']),
 
             async getItemList(){
                 let response = await getApiData({url: `/api/items`, token: this.getToken()});
@@ -397,7 +289,6 @@
                     this.purchaseOrder = response.data;
                     this.date = this.purchaseOrder.date;
                     this.purchaseOrderItems = this.purchaseOrder.items;
-                    this.calculatePOSummary(this.purchaseOrderItems);
                 }
             },
 
@@ -423,9 +314,6 @@
                         amount: amount,
                     });
                 }
-
-                this.calculatePOSummary(this.purchaseOrderItems);
-
                 this.selectedItem = null;
                 this.quantity = null;
             },
@@ -448,22 +336,8 @@
                 else{
                     this.purchaseOrderItems.splice(this.deleteIndex, 1);
                 }
-
-                this.calculatePOSummary(this.purchaseOrderItems);
-
                 this.deleteId = null;
                 this.deleteIndex = null;
-            },
-
-            calculatePOSummary(poItems){
-                this.totalQty = 0;
-                this.totalAmount = 0;
-                this.totalPrice = 0;
-                poItems.forEach((poItem)=>{
-                    this.totalQty += poItem.quantity;
-                    this.totalAmount += poItem.amount;
-                    this.totalPrice += poItem.amount * poItem.quantity;
-                });
             },
 
             checkPurchaseOrderItemBtnClicked(purchaseOrderItemId){
@@ -478,16 +352,8 @@
                     formData.append('id',this.checkId);
                     formData.append('value', 1);
                     let response = await postApiData({url: url, form_data: formData, token: this.getToken()});
-
                     if(response.success){
-                        let index = this.purchaseOrderItems.findIndex(poItem => poItem.id == this.checkId);
-                        if(index != -1){
-                            this.purchaseOrderItems[index] = response.data;
-                        }
-                        alert('Item check success');
-                    }
-                    else{
-                        alert(response.message);
+                        // alert('Item checked');
                     }
                 }
 
@@ -540,28 +406,11 @@
                 alert(`Operation success ${response.success}`);
             },
 
-            async checkPurchaseOrderBtnClicked(){
-                let url = `/api/updateIsCheck`;
-                let formData = new FormData();
-                formData.append('type', 'purchase_order');
-                formData.append('id',this.purchaseOrderId);
-                formData.append('value', 1);
-                let response = await postApiData({url: url, form_data: formData, token: this.getToken()});
-                if(response.success){
-                    alert('Purchase order check success');
-                    window.location.replace('/purchase_orders');
-                }
-                else{
-                    alert(response.message);
-                }
-            }
-
         },
 
         created(){
             this.getPurchaseOrder();
             this.getItemList();
-            this.departmentName = this.getDepartment().name;
         },
 
         mounted(){

@@ -17,7 +17,7 @@ import DepartmentsCrudComponent from './Components/Departments/DepartmentsCrudCo
 import RolesCrudComponent from './Components/Roles/RolesCrudComponent.vue';
 import AreasCrudComponent from './Components/Areas/AreasCrudComponent.vue';
 import InventoriesCrudComponent from './Components/Inventories/InventoriesCrudComponent.vue';
-import TablesCrudComponent from './Components/TablesAndRooms/TablesCrudComponent.vue';
+import RoomCrudComponent from './Components/TablesAndRooms/RoomCrudComponent.vue';
 import ServicesCrudComponent from './Components/Services/ServicesCrudComponent.vue';
 import InventoryLedgersComponent from './Components/Inventories/InventoryLedgersComponent.vue';
 import MenuListComponent from './Components/Menus/MenuListComponent.vue';
@@ -50,7 +50,7 @@ import PosCashbookCrudComponent from './Components/Pos/Cashbook/PosCashbookCrudC
 import CashbookDetailComponent from './Components/Pos/Cashbook/CashbookDetailComponent.vue';
 import InvoiceListComponent from './Components/Pos/Invoices/InvoiceListComponent.vue';
 import InvoiceDetailComponent from './Components/Pos/Invoices/InvoiceDetailComponent.vue';
-
+import TableCrudComponent from './Components/TablesAndRooms/TableCrudComponent.vue';
 
 const app = createApp({});
 app.component('StaffListComponent', StaffListComponent);
@@ -60,7 +60,7 @@ app.component('DepartmentsCrudComponent', DepartmentsCrudComponent);
 app.component('RolesCrudComponent', RolesCrudComponent);
 app.component('AreasCrudComponent', AreasCrudComponent);
 app.component('InventoriesCrudComponent', InventoriesCrudComponent);
-app.component('TablesCrudComponent', TablesCrudComponent);
+app.component('RoomCrudComponent', RoomCrudComponent);
 app.component('ServicesCrudComponent', ServicesCrudComponent);
 app.component('InventoryLedgersComponent', InventoryLedgersComponent);
 app.component('MenuListComponent', MenuListComponent);
@@ -96,6 +96,7 @@ app.component('PosCashbookCrudComponent', PosCashbookCrudComponent);
 app.component('CashbookDetailComponent', CashbookDetailComponent);
 app.component('InvoiceListComponent', InvoiceListComponent);
 app.component('InvoiceDetailComponent', InvoiceDetailComponent);
+app.component('TableCrudComponent',TableCrudComponent);
 
 app.use(store);
 app.mount('#app');

@@ -26,7 +26,7 @@
                                 #
                             </th>
                             <th scope="col" class=" px-6 py-4 ">
-                                Room / Table
+                                Room
                             </th>
                             <th scope="col" class="px-6 py-4">
                                 Category
@@ -42,7 +42,7 @@
                     <tbody>
 
                         <!-- looping start -->
-                        <div class="contents" v-for="(room, index) in roomAndTableList" :key="index">
+                        <div class="contents" v-for="(room, index) in tableList" :key="index">
                             <tr class="bg-white rounded-lg overflow-hidden shadow-lg">
                                 <td class=" px-6 py-4 font-medium ">
                                     {{ ++index }}
@@ -228,14 +228,14 @@
     export default {
         data() {
             return {
-                roomAndTableList:[],
+                tableList:[],
                 entityTypeList:['Room','Table'],
                 serviceCategoryList:[],
                 areaList:[],
 
                 name: null,
                 pricePerHour:null,
-                entityType:'room_and_table',
+                entityType:'table',
                 area_id:null,
                 service_category_id:null,
                 deleteId: null,
@@ -253,11 +253,11 @@
         methods: {
             ...mapGetters(['getToken']),
 
-            async getRoomAndTableList(){
-                const response = await getApiData({ url: '/api/entities?type=room_and_table', token: this.getToken() });
+            async getTable(){
+                const response = await getApiData({ url: '/api/entities?type=table', token: this.getToken() });
                 if(response.data){
-                    this.roomAndTableList = response.data;
-                    console.log(this.roomAndTableList)
+                    this.tableList = response.data;
+                    console.log(this.tableList)
                 }
             },
 
@@ -298,7 +298,7 @@
                 formData.append('service_category_id', this.service_category_id);
                 let response = await postApiData({url: '/api/entities', form_data: formData, token: this.getToken()});
                 if(response.success){
-                    this.getRoomAndTableList(null);
+                    this.getTable(null);
                     console.log("success")
                     this.closeModal();
                     this.clearForm();
@@ -327,19 +327,17 @@
                 let url = `/api/entities/${this.deleteId}`;
                 let response = await deleteApiData({url: url, token: this.getToken()});
                 if(response.success){
-                    this.getRoomAndTableList();
+                    this.getTable();
                 }
                 else{
                     alert('some errors occur');
                 }
             }
-
-
         },
         mounted()
         {
 
-            this.getRoomAndTableList();
+            this.getTable();
             this.getAreaList();
             this.getServiceCategoryList();
 

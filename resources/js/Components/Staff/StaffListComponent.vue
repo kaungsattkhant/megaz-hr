@@ -2,9 +2,21 @@
     <div class="flex justify-between mb-3">
         <div class=" flex">
             <label for="search" class="search-input">
-                <input type="text" class="input-search" placeholder="Search">
+                <input type="text" class="input-search" placeholder="Search" v-model="searchInput">
                 <i class="fal fa-search"></i>
             </label>
+
+            <div class="bg-white mb-0 w-[40%] text-sm inline-block" data-te-select-wrapper-ref>
+                <select data-te-select-init data-te-select-placeholder="Filter by department"
+                data-te-select-filter="true" v-model="searchCategory">
+                    <option :value="department" v-for="department in departmentList">
+                        {{ department.name }}
+                    </option>
+                </select>
+            </div>
+
+            <button class="add-btn h-8 mx-2 " @click="searchBtnClicked">Search</button>
+            <button class="add-btn h-8 mx-2 " @click="clearSearchBtnClicked">Clear</button>
         </div>
         <div class="flex justify-end flex-col">
             <a href="/staff/create" class="add-btn ">
@@ -29,7 +41,6 @@
                             <th scope="col" class=" px-6 py-4 ">
                                 Phone Number
                             </th>
-
                             <th scope="col" class=" px-6 py-4 ">
                                 Address
                             </th>
@@ -62,7 +73,9 @@
                                     {{ staff.address }}
                                 </td>
                                 <td class="whitespace-nowrap px-6 py-4 ">
-                                    <p v-for=" role in staff.roles"> {{ role.name }} </p>
+                                    <div v-for="role in staff.roles">
+                                        {{ role.name }}
+                                    </div>
                                 </td>
                                 <td class="whitespace-nowrap px-6 py-4 ">
                                     {{ staff.department.name }}
@@ -83,134 +96,64 @@
 
 
                         <!-- looping end -->
-
-                        <!-- <tr class="bg-white rounded-lg overflow-hidden shadow-lg">
-                            <td class=" px-6 py-4 font-medium ">
-                                1
-                            </td>
-                            <td class="whitespace-nowrap px-6 py-4 ">
-                                Mg Mg
-                            </td>
-                            <td class="whitespace-nowrap px-6 py-4 ">
-                                09960327201
-                            </td>
-                            <td class=" px-6 py-4 ">
-                                Lorem ipsum dolor sit amet consectetur adipisicing elit. Nobis voluptatem incidunt
-                                repellendus
-                            </td>
-                            <td class="whitespace-nowrap px-6 py-4 ">
-                                Kitchen
-                            </td>
-                            <td class="whitespace-nowrap px-6 py-4">
-                                <button id="edit-btn" class="pr-1">
-                                    <i class="fas fa-trash-alt"></i>
-                                </button>
-                            </td>
-                        </tr>
-                        <tr class="">
-                            <td class=" py-2 ">
-
-                            </td>
-
-                        </tr>
-                        <tr class="bg-white rounded-lg overflow-hidden shadow-lg">
-                            <td class=" px-6 py-4 font-medium ">
-                                1
-                            </td>
-                            <td class="whitespace-nowrap px-6 py-4 ">
-                                Mg Mg
-                            </td>
-                            <td class="whitespace-nowrap px-6 py-4 ">
-                                09960327201
-                            </td>
-                            <td class=" px-6 py-4 ">
-                                Lorem ipsum dolor sit amet consectetur adipisicing elit. Nobis voluptatem incidunt
-                                repellendus
-                            </td>
-                            <td class="whitespace-nowrap px-6 py-4 ">
-                                Kitchen
-                            </td>
-                            <td class="whitespace-nowrap px-6 py-4">
-                                <button id="edit-btn" class="pr-1">
-                                    <i class="fas fa-trash-alt"></i>
-                                </button>
-                            </td>
-                        </tr>
-                        <tr class="">
-                            <td class=" py-2 ">
-
-                            </td>
-
-                        </tr> -->
-
                     </tbody>
                 </table>
             </div>
+            <div class="mt-2 ml-2">
+                <ul v-if="paginationGroupsCount > 1" class="list-style-none flex">
+                    <li v-if="!isFirstGroup">
+                        <button class="relative block rounded bg-transparent px-3 py-1.5 text-sm text-neutral-600 transition-all duration-300
+                        hover:bg-neutral-100 dark:text-white dark:hover:bg-neutral-700 dark:hover:text-white" @click="previousPaginationGroupBtnClicked"
+                        :disabled="isFirstGroup">
+                            Previous
+                        </button>
+                    </li>
+
+                    <li v-for="(pageNumber, pageNumberIndex) in groupedPageNumbers[currentGroup]" :key="pageNumberIndex"
+                        :aria-current="(pageNumber == currentPage) ? 'page' : ''">
+                        <button v-if="pageNumber == currentPage"
+                            class="relative block rounded bg-neutral-800 px-3 py-1.5 text-sm font-medium text-neutral-50 transition-all duration-300 dark:bg-neutral-900"
+                            :id="'paginationBtn-' + pageNumberIndex" @click="pageBtnClicked(pageNumber)">
+                            {{ pageNumber }}
+                            <span class="absolute -m-px h-px w-px overflow-hidden whitespace-nowrap border-0 p-0 [clip:rect(0,0,0,0)]">
+                                (current)
+                            </span>
+                        </button>
+                        <button v-else
+                            class="normal-pagination relative block rounded bg-transparent px-3 py-1.5 text-sm text-neutral-600 transition-all duration-300 hover:bg-neutral-100 dark:text-white dark:hover:bg-neutral-700 dark:hover:text-white"
+                            :id="'paginationBtn-' + pageNumberIndex" @click="pageBtnClicked(pageNumber)">
+                            {{ pageNumber }}
+                        </button>
+                    </li>
+                    <li v-if="!isLastGroup">
+                        <button class="relative block rounded bg-transparent px-3 py-1.5 text-sm text-neutral-600 transition-all duration-300
+                        hover:bg-neutral-100 dark:text-white dark:hover:bg-neutral-700 dark:hover:text-white" @click="nextPaginationGroupBtnClicked"
+                        :disabled="isLastGroup">
+                            Next
+                        </button>
+                    </li>
+                </ul>
+
+                <ul v-else class="list-style-none flex">
+                    <li v-for="(pageNumber, pageNumberIndex) in pageNumbers" :key="pageNumberIndex"
+                        :aria-current="(pageNumber == currentPage) ? 'page' : ''">
+                        <button v-if="pageNumber == currentPage"
+                            class="relative block rounded bg-neutral-800 px-3 py-1.5 text-sm font-medium text-neutral-50 transition-all duration-300 dark:bg-neutral-900"
+                            :id="'paginationBtn-' + pageNumberIndex" @click="pageBtnClicked(pageNumber)">
+                            {{ pageNumber }}
+                            <span class="absolute -m-px h-px w-px overflow-hidden whitespace-nowrap border-0 p-0 [clip:rect(0,0,0,0)]">
+                                (current)
+                            </span>
+                        </button>
+                        <button v-else
+                            class="normal-pagination relative block rounded bg-transparent px-3 py-1.5 text-sm text-neutral-600 transition-all duration-300 hover:bg-neutral-100 dark:text-white dark:hover:bg-neutral-700 dark:hover:text-white"
+                            :id="'paginationBtn-' + pageNumberIndex" @click="pageBtnClicked(pageNumber)">
+                            {{ pageNumber }}
+                        </button>
+                    </li>
+                </ul>
+            </div>
         </div>
-
-        <div>
-            <ul v-if="pageNumbers.length > 1 && pageNumbers.length < 10" class="list-style-none flex">
-                <li v-for="(pageNumber, pageNumberIndex) in pageNumbers" :key="pageNumberIndex"
-                :aria-current="(pageNumber == currentPage) ? 'page' : ''">
-                    <button v-if="pageNumber == currentPage"
-                        class="relative block rounded bg-black px-3 py-1.5 text-sm font-medium text-white transition-all duration-300"
-                        :id="'paginationBtn-' + pageNumberIndex" @click="pageBtnClicked(pageNumber)">
-                        {{ pageNumber }}
-                        <span class="absolute -m-px h-px w-px overflow-hidden whitespace-nowrap border-0 p-0 [clip:rect(0,0,0,0)]"> (current) </span>
-                    </button>
-                    <button v-else
-                        class="relative block rounded px-3 py-1.5 text-sm transition-all duration-300 hover:bg-neutral-200"
-                        :id="'paginationBtn-' + pageNumberIndex" @click="pageBtnClicked(pageNumber)">
-                        {{ pageNumber }}
-                    </button>
-                </li>
-            </ul>
-
-            <ul v-if="pageNumbers.length >= 10" class="list-style-none flex">
-                <li>
-                    <button class="relative block rounded bg-transparent px-3 py-1.5 text-sm text-neutral-600 transition-all duration-300
-                        hover:bg-neutral-200 dark:text-white dark:hover:bg-neutral-700 dark:hover:text-white" @click="firstPaginationGroupBtnClicked">
-                        First
-                    </button>
-                </li>
-                <li>
-                    <button class="relative block rounded bg-transparent px-3 py-1.5 text-sm text-neutral-600 transition-all duration-300
-                        hover:bg-neutral-200 dark:text-white dark:hover:bg-neutral-700 dark:hover:text-white" @click="previousPaginationGroupBtnClicked">
-                        Previous
-                    </button>
-                </li>
-
-                <!-- loop link 1 , 2 ,3  ... replace normal-pagination with active-pagination for active pagination page-->
-                <li v-for="(pageNumber, pageNumberIndex) in groupedPageNumbers[currentGroup]" :key="pageNumberIndex"
-                    :aria-current="(pageNumber == currentPage) ? 'page' : ''">
-                    <button v-if="pageNumber == currentPage"
-                        class="relative block rounded bg-black px-3 py-1.5 text-sm font-medium text-white transition-all duration-300"
-                        :id="'paginationBtn-' + pageNumberIndex" @click="pageBtnClicked(pageNumber)">
-                        {{ pageNumber }}
-                        <span class="absolute -m-px h-px w-px overflow-hidden whitespace-nowrap border-0 p-0 [clip:rect(0,0,0,0)]"> (current) </span>
-                    </button>
-                    <button v-else
-                        class="relative block rounded px-3 py-1.5 text-sm transition-all duration-300 hover:bg-neutral-200"
-                        :id="'paginationBtn-' + pageNumberIndex" @click="pageBtnClicked(pageNumber)">
-                        {{ pageNumber }}
-                    </button>
-                </li>
-                <li>
-                    <button class="relative block rounded bg-transparent px-3 py-1.5 text-sm text-neutral-600 transition-all duration-300
-                        hover:bg-neutral-200 dark:text-white dark:hover:bg-neutral-700 dark:hover:text-white" @click="nextPaginationGroupBtnClicked">
-                        Next
-                    </button>
-                </li>
-                <li>
-                    <button class="relative block rounded bg-transparent px-3 py-1.5 text-sm text-neutral-600 transition-all duration-300
-                        hover:bg-neutral-200 dark:text-white dark:hover:bg-neutral-700 dark:hover:text-white" @click="lastPaginationGroupBtnClicked">
-                        Last
-                    </button>
-                </li>
-            </ul>
-        </div>
-
-
 
         <!--Delete Modal -->
         <div
@@ -285,7 +228,7 @@
 </template>
 
 <script>
-    import { Modal, Ripple, initTE, Input } from "tw-elements";
+    import { Modal, Ripple, initTE, Input, Select, Dropdown } from "tw-elements";
     import { mapGetters } from "vuex";
     import { getApiData, deleteApiData } from '../../utilities/ajax-helpers';
 
@@ -303,43 +246,63 @@
                 editDepartment:null,
                 deleteId: null,
 
-                per_page: 10,
+                searchInput: null,
+                searchCategory: null,
+
+                per_page: 20,
                 pageNumbers: [],
                 currentPage: 1,
                 paginationGroupsCount: 1,
                 per_group: 10,
                 groupedPageNumbers: [],
                 currentGroup: 0,
+                isFirstGroup: true,
+                isLastGroup: false,
             };
         },
 
         methods: {
             ...mapGetters(['getToken']),
 
+            async getDepartmentList(){
+                let url = `/api/departments`;
+                let response = await getApiData({url: url, token: this.getToken()});
+                if(response.data){
+                    this.departmentList = response.data;
+                }
+            },
+
             async getStaffsList(pageNumber)
             {
-                let url = `api/staffs?per_page=${this.per_page}`;
                 if(pageNumber){
-                    url = `${url}&page=${pageNumber}`
+                    this.currentPage = pageNumber;
                 }
+                let url = `/api/staffs?page=${this.currentPage}`;
                 const response = await getApiData({ url: url, token: this.getToken() });
                 if (response.data != null) {
                     this.staffList = response.data.data;
+                    this.per_page = response.data.per_page;
+
                     this.pageNumbers = [];
-                    for (let j = 1; j <= response.last_page; j++) {
-                        this.pageNumbers.push(j);
+                    this.lastPageNumber = response.data.last_page;
+
+                    for(let i=1; i<=response.data.last_page; i++){
+                        this.pageNumbers.push(i);
                     }
+
                     if(this.pageNumbers.length > 10){
+                        this.groupedPageNumbers = [];
                         this.paginationGroupsCount = this.pageNumbers.length % 10;
-                        for(let i=0; i<this.pageNumbers.length; i+=this.per_group){
-                            let chunk = this.pageNumbers.slice(i, i+this.per_group);
+                        for(let i=0; i<this.pageNumbers.length; i+=10){
+                            let chunk = this.pageNumbers.slice(i, i+10);
                             this.groupedPageNumbers.push(chunk);
                         }
+
+                        let lastGroupIndex = this.groupedPageNumbers.length - 1;
+                        this.isFirstGroup = (this.currentGroup === 0);
+                        this.isLastGroup = (lastGroupIndex === this.currentGroup);
                     }
                 }
-
-                // console.log(response.data);
-                // this.staffList = response.data;
             },
 
             async searchStaffs()
@@ -368,6 +331,29 @@
                 if(response.success){
                     alert(`deleted`);
                 }
+            },
+
+            async searchBtnClicked(){
+                let url = null;
+                if(this.searchInput && this.searchCategory){
+                    url = `/api/staffs?name=${this.searchInput}&department_id=${this.searchCategory.id}&page=1`;
+                }
+                if(this.searchInput && !this.searchCategory){
+                    url = `/api/staffs?name=${this.searchInput}&page=1`;
+                }
+                if((!this.searchInput) && this.searchCategory){
+                    url = `/api/staffs?department_id=${this.searchCategory.id}&page=1`;
+                }
+                let response = await getApiData({url: url, token: this.getToken()});
+                if(response.data){
+                    this.staffList = response.data.data;
+                }
+            },
+
+            clearSearchBtnClicked(){
+                this.searchInput = null;
+                this.searchCategory = null;
+                this.getStaffsList(null);
             },
 
             pageBtnClicked(pageNumber){
@@ -402,9 +388,15 @@
             }
 
         },
+
+        created(){
+            this.getDepartmentList();
+            this.getStaffsList(null);
+        },
+
         mounted()
         {
-            this.getStaffsList(null);
+            initTE({ Modal, Ripple, Input, Select, Dropdown })
         }
     }
 </script>

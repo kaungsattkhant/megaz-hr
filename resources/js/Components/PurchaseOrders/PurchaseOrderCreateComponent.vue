@@ -55,7 +55,7 @@
                             Amount
                         </th>
                         <th scope="col" class=" px-6 py-4 ">
-                            Cost
+                            Total
                         </th>
                         <th scope="col" class=" px-6 py-4 ">
 
@@ -88,28 +88,6 @@
                         </tr>
                     </div>
 
-                    <div class="contents">
-                        <tr class="bg-white rounded-lg overflow-hidden shadow-lg">
-                            <td class=" px-6 py-4 font-medium ">
-                                Total
-                            </td>
-                            <td class=" px-6 py-4 font-medium ">
-                                {{ totalQty }}
-                            </td>
-                            <td class=" px-6 py-4 font-medium ">
-                                {{ totalAmount.toLocaleString() }}
-                            </td>
-                            <td class=" px-6 py-4 font-medium ">
-                                {{ totalPrice.toLocaleString() }}
-                            </td>
-                            <td class=" px-6 py-4 font-medium ">
-                                &nbsp;
-                            </td>
-                        </tr>
-                        <tr class="">
-                            <td class=" py-2 "></td>
-                        </tr>
-                    </div>
                 </tbody>
             </table>
         </div>
@@ -134,9 +112,6 @@
                 selectedItem: null,
                 quantity: null,
                 purchaseOrderItems: [],
-                totalQty: null,
-                totalAmount: null,
-                totalPrice: null,
             };
         },
 
@@ -167,26 +142,12 @@
                     amount: amount,
                 });
 
-                this.calculatePOSummary(this.purchaseOrderItems);
-
                 this.selectedItem = null;
                 this.quantity = null;
             },
 
             removePurchaseOrderItemBtnClicked(purchaseOrderItemsIndex){
                 this.purchaseOrderItems.splice(purchaseOrderItemsIndex, 1);
-                this.calculatePOSummary(this.purchaseOrderItems);
-            },
-
-            calculatePOSummary(poItems){
-                this.totalQty = 0;
-                this.totalAmount = 0;
-                this.totalPrice = 0;
-                poItems.forEach((poItem)=>{
-                    this.totalQty += poItem.quantity;
-                    this.totalAmount += poItem.amount;
-                    this.totalPrice += poItem.amount * poItem.quantity;
-                });
             },
 
             async createPurchaseOrderBtnClicked(){
@@ -208,9 +169,6 @@
                 formData.append('items', JSON.stringify(this.purchaseOrderItems));
                 let response = await postApiData({url: `/api/purchase_orders`, form_data:  formData, token: this.getToken()});
                 alert(`Operation success ${response.success}`);
-                if(response.success){
-                    window.location.replace(`/purchase_orders`);
-                }
             },
 
         },
