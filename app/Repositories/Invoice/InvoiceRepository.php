@@ -134,23 +134,30 @@ class InvoiceRepository implements InvoiceRepositoryInterface
         $invoice = Invoice::find($data['invoice_id']);
 
         // caculating last room duration
+
         $startTime = Carbon::parse($roomAndSession->start_date);
         $endTime = Carbon::now();
-        $duration = $endTime->diffInMinutes($startTime);
-        $hours = intdiv($duration, 60);
-        $minutes = $duration % 60;
-        $decimalHours = $hours + ($minutes / 60);
-        $roundedDecimalHours = round($decimalHours, 3);
-        $roomAndSession->session_duration = $roundedDecimalHours;
+        $durationInMinutes = $endTime->diffInMinutes($startTime);
+        $durationInHours = $durationInMinutes / 60; // Convert minutes to hours
+        $roundedDurationInHours = round($durationInHours, 3);
+
+        // $startTime = Carbon::parse($roomAndSession->start_date);
+        // $endTime = Carbon::now();
+        // $duration = $endTime->diffInMinutes($startTime);
+        // $hours = intdiv($duration, 60);
+        // $minutes = $duration % 60;
+        // $decimalHours = $hours + ($minutes / 60);
+        // $roundedDecimalHours = round($decimalHours, 3);
+        $roomAndSession->session_duration = $roundedDurationInHours;
 
         // how much duration left
-        $leftDuration = $originalDuration - $roundedDecimalHours;
+        $leftDuration = $originalDuration - $roundedDurationInHours;
         $originalRoom = Entity::find($invoice->entity_id);
-        $roomAndSession->price = $roundedDecimalHours * $originalRoom->price_per_hour;
-        if ($roundedDecimalHours >= 1) {
-            $end_date = Carbon::parse(CurrentTime())->addHours($roundedDecimalHours);
+        $roomAndSession->price = $roundedDurationInHours * $originalRoom->price_per_hour;
+        if ($roundedDurationInHours >= 1) {
+            $end_date = Carbon::parse(CurrentTime())->addHours($roundedDurationInHours);
         } else {
-            $end_date = Carbon::parse(CurrentTime())->addMinutes($roundedDecimalHours * 60);
+            $end_date = Carbon::parse(CurrentTime())->addMinutes($roundedDurationInHours * 60);
         }
         $roomAndSession->end_date = $end_date;
         $roomAndSession->save();
@@ -185,18 +192,15 @@ class InvoiceRepository implements InvoiceRepositoryInterface
         $lastRoomwithInvoice = RoomSession::where('invoice_id', $invoice->id)->latest()->first();
         $startTime = Carbon::parse($lastRoomwithInvoice->start_date);
         $endTime = Carbon::now();
-
-        $duration = $endTime->diffInMinutes($startTime);
-        $hours = intdiv($duration, 60);
-        $minutes = $duration % 60;
-        $decimalHours = $hours + ($minutes / 60);
-        $roundedDecimalHours = round($decimalHours, 3);
+        $durationInMinutes = $endTime->diffInMinutes($startTime);
+        $durationInHours = $durationInMinutes / 60; // Convert minutes to hours
+        $roundedDurationInHours = round($durationInHours, 3);
         $invoice = Invoice::find($lastRoomwithInvoice->invoice_id);
         $entity = $invoice->room;
-        $leftDuration = $lastRoomwithInvoice->session_duration - $roundedDecimalHours;
-        $lastRoomwithInvoice->session_duration = $roundedDecimalHours;
+        $leftDuration = $lastRoomwithInvoice->session_duration - $roundedDurationInHours;
+        $lastRoomwithInvoice->session_duration = $roundedDurationInHours;
         $lastRoomwithInvoice->end_date = CurrentTime();
-        $lastRoomwithInvoice->price = $roundedDecimalHours * $entity->price_per_hour;
+        $lastRoomwithInvoice->price = $roundedDurationInHours * $entity->price_per_hour;
         $lastRoomwithInvoice->save();
 
         $originalRoom = Entity::find($invoice->entity_id);
@@ -272,7 +276,12 @@ class InvoiceRepository implements InvoiceRepositoryInterface
         $invoice->update($data);
 
         // transaction and ledgers
-        $posCash = Account::where('account_code','2-1011')->get()->first();
+        if($data['payment_type']=='cash')
+        {
+            $posBook = Account::where('account_code','2-1011')->get()->first();
+        }else{
+            $posBook = Account::where('account_code','2-1012')->get()->first();
+        }
         $foodKtvAcc = Account::where('account_code','5-0101')->first();
 
         $data['date'] = now();
@@ -292,7 +301,7 @@ class InvoiceRepository implements InvoiceRepositoryInterface
         $foodCashDebit = (new StoreTransactionLedger())->storeLedger([
             'value' => $foodCharge,
             'transaction_id' => $foodTransaction->id,
-            'account_id' => $posCash->id,
+            'account_id' => $posBook->id,
             'action' => 'debit',
         ]);
 
@@ -315,7 +324,7 @@ class InvoiceRepository implements InvoiceRepositoryInterface
         $beverageCashDebit = (new StoreTransactionLedger())->storeLedger([
             'value' => $beverageCharge,
             'transaction_id' => $beverageTransaction->id,
-            'account_id' => $posCash->id,
+            'account_id' => $posBook->id,
             'action' => 'debit',
         ]);
 
@@ -339,7 +348,7 @@ class InvoiceRepository implements InvoiceRepositoryInterface
         $ktvCashDebit = (new StoreTransactionLedger())->storeLedger([
             'value' => $total_session_price,
             'transaction_id' => $ktvRoomTransaction->id,
-            'account_id' => $posCash->id,
+            'account_id' => $posBook->id,
             'action' => 'debit',
         ]);
 
@@ -362,7 +371,7 @@ class InvoiceRepository implements InvoiceRepositoryInterface
         $serviceCashDebit = (new StoreTransactionLedger())->storeLedger([
             'value' => $data['service_charge'],
             'transaction_id' => $serviceMoneyTransaction->id,
-            'account_id' => $posCash->id,
+            'account_id' => $posBook->id,
             'action' => 'debit',
         ]);
 
@@ -385,7 +394,7 @@ class InvoiceRepository implements InvoiceRepositoryInterface
         $textDebit = (new StoreTransactionLedger())->storeLedger([
             'value' => $data['tax'],
             'transaction_id' => $taxTransaction->id,
-            'account_id' => $posCash->id,
+            'account_id' => $posBook->id,
             'action' => 'debit',
         ]);
         if($data['discount_value'])
@@ -408,7 +417,7 @@ class InvoiceRepository implements InvoiceRepositoryInterface
             $discountCashCredit = (new StoreTransactionLedger())->storeLedger([
                 'value' => $data['discount_value'],
                 'transaction_id' => $discountTransaction->id,
-                'account_id' => $posCash->id,
+                'account_id' => $posBook->id,
                 'action' => 'credit',
             ]);
         }
