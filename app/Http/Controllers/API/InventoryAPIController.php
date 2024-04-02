@@ -25,7 +25,7 @@ class InventoryAPIController extends Controller
 
     public function createInventory(InventoryCreateRequest $request)
     {
-        $inventory = $this->inventoryRepo->createData($request->all());
+        $inventory = $this->inventoryRepo->createData($request);
         ResponseData($inventory);
     }
 

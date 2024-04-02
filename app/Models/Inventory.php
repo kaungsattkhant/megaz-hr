@@ -10,12 +10,13 @@ class Inventory extends BaseModel
     use HasFactory;
 
     protected $fillable = [
-        'area_id', 'department_id', 'name', 'inventoryable_type', 'inventoryable_id', 'is_active'
+        'area_id', 'department_id', 'name', 'is_active'
     ];
+    
 
     public function inventoryable()
     {
-        return $this->morphTo();
+        return $this->hasMany(Inventoryable::class);
     }
 
     public function getCreatedAt()

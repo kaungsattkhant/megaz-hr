@@ -14,7 +14,7 @@ class Department extends BaseModel
     use HasFactory;
 
     protected $fillable=[
-        'name','inventoryable_id','inventoryable_type'
+        'name','inventory_id',
     ];
 
     protected $hidden=[
@@ -41,8 +41,13 @@ class Department extends BaseModel
         return $this->hasMany(Role::class);
     }
 
+    // public function inventory()
+    // {
+    //     return $this->morphOne(Inventory::class, 'inventoryable');
+    // }
+
     public function inventory()
     {
-        return $this->morphOne(Inventory::class, 'inventoryable');
+        return $this->belongsTo(Inventory::class);
     }
 }

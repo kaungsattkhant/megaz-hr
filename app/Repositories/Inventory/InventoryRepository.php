@@ -2,24 +2,24 @@
 
 namespace App\Repositories\Inventory;
 
-use Illuminate\Http\Request;
-
-use App\Actions\Inventory\GetInventoryStockAction;
-
 use App\Models\Inventory;
+use Illuminate\Http\Request;
+use App\Models\Inventoryable;
+use Illuminate\Support\Facades\DB;
+use App\Actions\Inventory\GetInventoryStockAction;
 
 class InventoryRepository implements InventoryRepositoryInterface
 {
     public function listAllData(Request $request)
     {
-        if($request->per_page || $request->page){
+        if ($request->per_page || $request->page) {
             $totalCount = Inventory::where('is_active', 1)->count();
             $pageNumber = 1;
             $perPage = 20;
-            if($request->page){
+            if ($request->page) {
                 $pageNumber = $request->page;
             }
-            if($request->per_page){
+            if ($request->per_page) {
                 $perPage = $request->per_page;
             }
             $skip = ($pageNumber - 1) * $perPage;
@@ -28,25 +28,66 @@ class InventoryRepository implements InventoryRepositoryInterface
             $paginationData['inventories'] = $inventories;
 
             return $paginationData;
-        }
-        else{
+        } else {
             $inventories = Inventory::where('is_active', 1)->get();
 
             return $inventories;
         }
     }
 
-    public function createData(array $data)
+    public function createData($request)
     {
-        $inventory = Inventory::create($data);
-        return $inventory;
+        $data = $request->all();
+        DB::beginTransaction();
+        try {
+            if (!isset($request->id)) {
+                $data['id'] = null;
+            }
+            $request_inventoryable_id=$request->inventoryable_id;
+
+            $inventory = Inventory::updateOrCreate(
+                ['id' => $data['id']],
+                $data   
+            );
+            if(!isset($request->id)){
+                foreach($request_inventoryable_id as $id){
+                    $inventoryable=$inventory->inventoryable()->create([
+                         'inventoryable_type'=>'department',
+                         'inventoryable_id'=>$id,
+                     ]);
+                 }
+            }else{
+                $inventoryable_id=$inventory->inventoryable->pluck('inventoryable_id')->toArray();
+                // $difference=$request_inventoryable_id->diff($inventoryable_id);
+                $created_ids = array_diff($request_inventoryable_id, $inventoryable_id);
+                $deleted_ids = array_diff($inventoryable_id, $request_inventoryable_id);
+
+                if(count($created_ids)){
+                    // dd('ab');
+                    foreach($created_ids as $id){
+                        $inventoryable=$inventory->inventoryable()->create([
+                             'inventoryable_type'=>'department',
+                             'inventoryable_id'=>$id,
+                         ]);
+                     }
+                }
+                if(count($deleted_ids)){
+                    Inventoryable::whereIn('inventoryable_id',$deleted_ids)->where('inventoryable_type',$request->inventoryable_type)->delete();
+                }
+            }   
+            DB::commit();
+            return $inventory;
+        } catch (\Exception $e) {
+            DB::rollback();
+            ResponseMessage($e->getMessage(), 402);
+            throw $e;
+        }
     }
 
     public function updateData(array $data, int $id)
     {
         $inventory = Inventory::find($id);
-        if($inventory)
-        {
+        if ($inventory) {
             $data = RemoveNullValues($data);
             $inventory->update($data);
         }
@@ -56,7 +97,7 @@ class InventoryRepository implements InventoryRepositoryInterface
     public function deleteData(int $id)
     {
         $inventory = Inventory::find($id);
-        if($inventory){
+        if ($inventory) {
             $inventory->is_active = 0;
             $inventory->save();
         }

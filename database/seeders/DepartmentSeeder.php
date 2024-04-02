@@ -15,14 +15,11 @@ class DepartmentSeeder extends Seeder
     public function run(): void
     {
         //
-        Department::create([
-            'name' => 'Operation Department'
-        ]);
-
-        Department::create([
-            'name' => 'Financial Department'
-        ]);
-
-    
+        $names=['HR','Finance','Admin','Management'];
+        foreach($names as $name){
+            Department::create([
+                'name' => $name,
+            ]);
+        }
     }
 }

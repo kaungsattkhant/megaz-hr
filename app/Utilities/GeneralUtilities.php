@@ -287,3 +287,18 @@ if (!function_exists('convertDateFormat')) {
         return Carbon::parse($data)->format('Y-m-d');
     }
 }
+
+if (!function_exists('checkDepartmentPermission')) {
+    function checkDepartmentPermission($permissions){
+        $departmentName = UserData()->department->name;
+        foreach ($permissions as $key => $value) {
+          if($value == $departmentName){
+            return true;
+          }
+        }
+        return false;
+      }
+}
+
+
+ 
