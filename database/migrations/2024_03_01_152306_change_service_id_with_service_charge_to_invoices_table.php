@@ -13,7 +13,6 @@ return new class extends Migration
     {
         Schema::table('invoices', function (Blueprint $table) {
             //
-            $table->dropColumn('service_id');
             $table->double('service_charge')->after('tax')->nullable();
         });
     }

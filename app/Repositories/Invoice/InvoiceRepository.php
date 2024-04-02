@@ -236,6 +236,7 @@ class InvoiceRepository implements InvoiceRepositoryInterface
     {
         $foodCharge = 0;
         $beverageCharge = 0;
+        $data['order_categories'] = json_decode($data['order_categories'], true);
         foreach ($data['order_categories'] as $menu) {
             if ($menu['menu_category_id'] == 1 || $menu['menu_category_id'] == 2 || $menu['menu_category_id'] == 3) {
                 $foodCharge += $menu['price'];
