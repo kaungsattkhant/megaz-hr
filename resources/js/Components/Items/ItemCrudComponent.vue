@@ -9,7 +9,7 @@
             <div class="bg-white mb-0 w-[40%] text-sm inline-block" data-te-select-wrapper-ref>
                 <select data-te-select-init data-te-select-placeholder="Filter by category"
                 data-te-select-filter="true" v-model="searchCategory">
-                    <option v-for="category in itemCategoryList">
+                    <option :value="category" v-for="category in itemCategoryList">
                         {{ category.name }}
                     </option>
                 </select>
@@ -49,12 +49,11 @@
                         </tr>
                     </thead>
                     <tbody>
-
                         <!-- looping start -->
-                        <div class="contents" v-for="(item, itemIndex) in itemList" :key="itemList">
+                        <div class="contents" v-for="(item, itemIndex) in itemList" :key="itemIndex">
                             <tr class="bg-white rounded-lg overflow-hidden shadow-lg">
                                 <td class=" px-6 py-4 font-medium ">
-                                    {{ ++itemIndex }}
+                                    {{ per_page * (currentPage - 1) + (++itemIndex) }}
                                 </td>
                                 <td class="whitespace-nowrap px-6 py-4 ">
                                     {{ item.name }}
@@ -77,7 +76,60 @@
                         <!-- looping end -->
                     </tbody>
                 </table>
+            </div>
+            <div class="mt-2 ml-2">
+                <ul v-if="paginationGroupsCount > 1" class="list-style-none flex">
+                    <li v-if="!isFirstGroup">
+                        <button class="relative block rounded bg-transparent px-3 py-1.5 text-sm text-neutral-600 transition-all duration-300
+                        hover:bg-neutral-100 dark:text-white dark:hover:bg-neutral-700 dark:hover:text-white" @click="previousPaginationGroupBtnClicked"
+                        :disabled="isFirstGroup">
+                            Previous
+                        </button>
+                    </li>
 
+                    <li v-for="(pageNumber, pageNumberIndex) in groupedPageNumbers[currentGroup]" :key="pageNumberIndex"
+                        :aria-current="(pageNumber == currentPage) ? 'page' : ''">
+                        <button v-if="pageNumber == currentPage"
+                            class="relative block rounded bg-neutral-800 px-3 py-1.5 text-sm font-medium text-neutral-50 transition-all duration-300 dark:bg-neutral-900"
+                            :id="'paginationBtn-' + pageNumberIndex" @click="pageBtnClicked(pageNumber)">
+                            {{ pageNumber }}
+                            <span class="absolute -m-px h-px w-px overflow-hidden whitespace-nowrap border-0 p-0 [clip:rect(0,0,0,0)]">
+                                (current)
+                            </span>
+                        </button>
+                        <button v-else
+                            class="normal-pagination relative block rounded bg-transparent px-3 py-1.5 text-sm text-neutral-600 transition-all duration-300 hover:bg-neutral-100 dark:text-white dark:hover:bg-neutral-700 dark:hover:text-white"
+                            :id="'paginationBtn-' + pageNumberIndex" @click="pageBtnClicked(pageNumber)">
+                            {{ pageNumber }}
+                        </button>
+                    </li>
+                    <li v-if="!isLastGroup">
+                        <button class="relative block rounded bg-transparent px-3 py-1.5 text-sm text-neutral-600 transition-all duration-300
+                        hover:bg-neutral-100 dark:text-white dark:hover:bg-neutral-700 dark:hover:text-white" @click="nextPaginationGroupBtnClicked"
+                        :disabled="isLastGroup">
+                            Next
+                        </button>
+                    </li>
+                </ul>
+
+                <ul v-else class="list-style-none flex">
+                    <li v-for="(pageNumber, pageNumberIndex) in pageNumbers" :key="pageNumberIndex"
+                        :aria-current="(pageNumber == currentPage) ? 'page' : ''">
+                        <button v-if="pageNumber == currentPage"
+                            class="relative block rounded bg-neutral-800 px-3 py-1.5 text-sm font-medium text-neutral-50 transition-all duration-300 dark:bg-neutral-900"
+                            :id="'paginationBtn-' + pageNumberIndex" @click="pageBtnClicked(pageNumber)">
+                            {{ pageNumber }}
+                            <span class="absolute -m-px h-px w-px overflow-hidden whitespace-nowrap border-0 p-0 [clip:rect(0,0,0,0)]">
+                                (current)
+                            </span>
+                        </button>
+                        <button v-else
+                            class="normal-pagination relative block rounded bg-transparent px-3 py-1.5 text-sm text-neutral-600 transition-all duration-300 hover:bg-neutral-100 dark:text-white dark:hover:bg-neutral-700 dark:hover:text-white"
+                            :id="'paginationBtn-' + pageNumberIndex" @click="pageBtnClicked(pageNumber)">
+                            {{ pageNumber }}
+                        </button>
+                    </li>
+                </ul>
             </div>
         </div>
 
@@ -167,6 +219,15 @@
                 selectedCategory: null,
                 searchInput: null,
                 searchCategory: null,
+
+                per_page: 20,
+                currentPage: 1,
+                pageNumbers: [],
+                paginationGroupsCount: 1,
+                groupedPageNumbers: [],
+                currentGroup: 0,
+                isFirstGroup: true,
+                isLastGroup: false,
             };
         },
 
@@ -189,11 +250,35 @@
                 }
             },
 
-            async getItemList(){
-                let url = `/api/items`;
+            async getItemList(pageNumber){
+                if(pageNumber){
+                    this.currentPage = pageNumber;
+                }
+                let url = `/api/items?page=${this.currentPage}`;
                 let response = await getApiData({url: url, token: this.getToken()});
                 if(response.data){
-                    this.itemList = response.data;
+                    this.itemList = response.data.data;
+                    this.per_page = response.data.per_page;
+
+                    this.pageNumbers = [];
+                    this.lastPageNumber = response.data.last_page;
+
+                    for(let i=1; i<=response.data.last_page; i++){
+                        this.pageNumbers.push(i);
+                    }
+
+                    if(this.pageNumbers.length > 10){
+                        this.groupedPageNumbers = [];
+                        this.paginationGroupsCount = this.pageNumbers.length % 10;
+                        for(let i=0; i<this.pageNumbers.length; i+=10){
+                            let chunk = this.pageNumbers.slice(i, i+10);
+                            this.groupedPageNumbers.push(chunk);
+                        }
+
+                        let lastGroupIndex = this.groupedPageNumbers.length - 1;
+                        this.isFirstGroup = (this.currentGroup === 0);
+                        this.isLastGroup = (lastGroupIndex === this.currentGroup);
+                    }
                 }
             },
 
@@ -212,7 +297,6 @@
 
             async searchBtnClicked(){
                 let url = null;
-                console.log(this.searchCategory);
                 if(this.searchInput && this.searchCategory){
                     url = `/api/items?search_input=${this.searchInput}&category_id=${this.searchCategory.id}&page=1`;
                 }
@@ -231,14 +315,45 @@
             clearSearchBtnClicked(){
                 this.searchInput = null;
                 this.searchCategory = null;
-                this.getItemList();
+                this.getItemList(null);
+            },
+
+            pageBtnClicked(pageNumber){
+                this.currentPage = pageNumber;
+                this.getItemList(this.currentPage);
+            },
+
+            nextPaginationGroupBtnClicked(){
+                this.currentGroup += 1;
+                this.currentPage = (this.groupedPageNumbers[this.currentGroup][0]);
+                this.getItemList(this.currentPage);
+            },
+
+            previousPaginationGroupBtnClicked(){
+                this.currentGroup -= 1;
+                let lastIndex = this.groupedPageNumbers[this.currentGroup].length - 1;
+                this.currentPage = (this.groupedPageNumbers[this.currentGroup][lastIndex]);
+                this.getItemList(this.currentPage);
+            },
+
+            firstPaginationGroupBtnClicked(){
+                this.currentGroup = 0;
+                this.currentPage = (this.groupedPageNumbers[this.currentGroup][0]);
+                this.getItemList(this.currentPage);
+            },
+
+            lastPaginationGroupBtnClicked(){
+                this.currentGroup = this.paginationGroupsCount - 1;
+                let lastIndex = this.groupedPageNumbers[this.currentGroup].length - 1;
+                this.currentPage = (this.groupedPageNumbers[this.currentGroup][lastIndex]);
+                this.getItemList(this.currentPage);
             }
         },
 
         created(){
             this.getItemCategoryList();
             this.getUomList();
-            this.getItemList();
+            this.getItemList(null);
         },
 
         mounted(){

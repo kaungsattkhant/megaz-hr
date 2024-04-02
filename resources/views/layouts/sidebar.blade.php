@@ -201,7 +201,7 @@
                             </a>
                         </li>
                         <li>
-                            <a href="{{ route('complains') }}" class="flex items-center @yield('services')">
+                            <a href="{{ route('complains') }}" class="flex items-center @yield('complains')">
                                 <i class="fal fa-user  pr-3"></i>
                                 Complains
                             </a>

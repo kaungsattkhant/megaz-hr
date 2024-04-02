@@ -29,7 +29,7 @@
                         </label>
                     </div>
                     <div class="mb-0 flex justify-center">
-                        <button @click="login" class="bg-[#000000] px-6 py-2 rounded-full text-sm text-black">Login</button>
+                        <button @click="login" class="bg-[#FF4300] px-6 py-2 rounded-full text-sm text-white">Login</button>
                     </div>
                 </div>
             </div>
