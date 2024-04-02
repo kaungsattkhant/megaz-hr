@@ -15,8 +15,10 @@ return new class extends Migration
             $table->id();
             $table->dateTime('start_date');
             $table->dateTime('end_date')->nullable();
-            $table->integer('session_duration')->nullable();
+            $table->double('session_duration')->nullable();
             $table->unsignedBigInteger('invoice_id');
+            $table->unsignedBigInteger('entity_id');
+            $table->double('price');
             $table->timestamps();
         });
     }

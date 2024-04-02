@@ -79,8 +79,8 @@ class EntityRepository implements EntityRepositoryInterface
 
     public function createData(array $data)
     {
-        $service = Entity::create($data);
-        return $service;
+        $entity = Entity::create($data);
+        return $entity;
     }
 
     public function updateData(array $data, int $id)
