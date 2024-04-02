@@ -2,10 +2,13 @@
     <div class="flex justify-between mb-3">
         <div class=" flex">
             <label for="search" class="search-input">
-                <input type="text" class="input-search" placeholder="Search">
+                <input type="text" class="input-search" placeholder="Search" v-model="searchInput">
 
                 <i class="fal fa-search"></i>
             </label>
+
+            <button class="add-btn h-8 mx-2 " @click="searchBtnClicked">Search</button>
+            <button class="add-btn h-8 mx-2 " @click="clearSearchBtnClicked">Clear</button>
         </div>
         <div class="flex justify-end flex-col">
 
@@ -240,6 +243,8 @@
                 service_category_id:null,
                 deleteId: null,
 
+                searchInput: null,
+
                 per_page: 10,
                 pageNumbers: [],
                 currentPage: 1,
@@ -253,7 +258,7 @@
         methods: {
             ...mapGetters(['getToken']),
 
-            async getTable(){
+            async getTableList(pageNumber){
                 const response = await getApiData({ url: '/api/entities?type=table', token: this.getToken() });
                 if(response.data){
                     this.tableList = response.data;
@@ -332,15 +337,33 @@
                 else{
                     alert('some errors occur');
                 }
-            }
-        },
-        mounted()
-        {
+            },
 
-            this.getTable();
+            async searchBtnClicked(){
+                let url = null;
+                if(this.searchInput){
+                    url = `/api/entities?type=table&search_input=${this.searchInput}&page=1`;
+                }
+                let response = await getApiData({url: url, token: this.getToken()});
+                if(response.data){
+                    this.tableList = response.data.data;
+                }
+            },
+
+            clearSearchBtnClicked(){
+                this.searchInput = null;
+                this.getTableList(null);
+            },
+        },
+
+        created(){
+            this.getTableList(null);
             this.getAreaList();
             this.getServiceCategoryList();
+        },
 
+        mounted()
+        {
             initTE({ Modal,Select, Ripple });
         }
     }

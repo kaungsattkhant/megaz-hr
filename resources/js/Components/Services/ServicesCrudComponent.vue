@@ -2,10 +2,13 @@
     <div class="flex justify-between mb-3">
         <div class=" flex">
             <label for="search" class="search-input">
-                <input type="text" class="input-search" placeholder="Search">
+                <input type="text" class="input-search" placeholder="Search" v-model="searchInput">
 
                 <i class="fal fa-search"></i>
             </label>
+
+            <button class="add-btn h-8 mx-2 " @click="searchBtnClicked">Search</button>
+            <button class="add-btn h-8 mx-2 " @click="clearSearchBtnClicked">Clear</button>
         </div>
         <div class="flex justify-end flex-col">
 
@@ -42,7 +45,7 @@
                     <tbody>
 
                         <!-- looping start -->
-                        <div class="contents" v-for="(room, index) in roomAndTableList" :key="index">
+                        <div class="contents" v-for="(room, index) in serviceList" :key="index">
                             <tr class="bg-white rounded-lg overflow-hidden shadow-lg">
                                 <td class=" px-6 py-4 font-medium ">
                                     {{ ++index }}
@@ -228,7 +231,7 @@
     export default {
         data() {
             return {
-                roomAndTableList:[],
+                serviceList:[],
                 entityTypeList:['Room','Table'],
                 serviceCategoryList:[],
                 areaList:[],
@@ -239,6 +242,8 @@
                 area_id:null,
                 service_category_id:null,
                 deleteId: null,
+
+                searchInput: null,
 
                 per_page: 10,
                 pageNumbers: [],
@@ -253,11 +258,11 @@
         methods: {
             ...mapGetters(['getToken']),
 
-            async getRoomAndTableList(){
+            async getServiceList(pageNumber){
                 const response = await getApiData({ url: '/api/entities?type=service', token: this.getToken() });
                 if(response.data){
-                    this.roomAndTableList = response.data;
-                    console.log(this.roomAndTableList)
+                    this.serviceList = response.data;
+                    console.log(this.serviceList)
                 }
             },
 
@@ -268,6 +273,7 @@
                     console.log(this.areaList)
                 }
             },
+
             async getServiceCategoryList(){
                 const response = await getApiData({ url: '/api/service_categories', token: this.getToken() });
                 if(response.data){
@@ -298,7 +304,7 @@
                 formData.append('service_category_id', this.service_category_id);
                 let response = await postApiData({url: '/api/entities', form_data: formData, token: this.getToken()});
                 if(response.success){
-                    this.getRoomAndTableList(null);
+                    this.getServiceList(null);
                     console.log("success")
                     this.closeModal();
                     this.clearForm();
@@ -327,22 +333,39 @@
                 let url = `/api/entities/${this.deleteId}`;
                 let response = await deleteApiData({url: url, token: this.getToken()});
                 if(response.success){
-                    this.getRoomAndTableList();
+                    this.getServiceList();
                 }
                 else{
                     alert('some errors occur');
                 }
-            }
+            },
 
+            async searchBtnClicked(){
+                let url = null;
+                if(this.searchInput){
+                    url = `/api/entities?type=service&search_input=${this.searchInput}&page=1`;
+                }
+                let response = await getApiData({url: url, token: this.getToken()});
+                if(response.data){
+                    this.serviceList = response.data.data;
+                }
+            },
+
+            clearSearchBtnClicked(){
+                this.searchInput = null;
+                this.getServiceList(null);
+            },
 
         },
-        mounted()
-        {
 
-            this.getRoomAndTableList();
+        created(){
+            this.getServiceList(null);
             this.getAreaList();
             this.getServiceCategoryList();
+        },
 
+        mounted()
+        {
             initTE({ Modal,Select, Ripple });
         }
     }

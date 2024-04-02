@@ -24,15 +24,10 @@ class EndRoomSessionRequest extends FormRequest
         return [
             //
             'invoice_id' => 'required',
-            'change' => "required",
             'discount_value' => 'required',
-            'paid_amount' => 'required',
             'payment_type' => "required",
-            'total_session_price' => 'required',
-            'food_charge' => 'required',
             'service_charge' => 'required',
             'tax' => 'required',
-            'total' => 'required'
         ];
     }
 }

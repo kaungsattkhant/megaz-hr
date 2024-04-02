@@ -299,14 +299,14 @@
                 }
                 let response = await getApiData({url: url, token: this.getToken()});
                 if(response.data){
-                    this.itemList = response.data.data;
+                    this.menuList = response.data.data;
                 }
             },
 
             clearSearchBtnClicked(){
                 this.searchInput = null;
                 this.searchCategory = null;
-                this.getItemList(null);
+                this.getMenuList(null);
             },
 
             pageBtnClicked(pageNumber){

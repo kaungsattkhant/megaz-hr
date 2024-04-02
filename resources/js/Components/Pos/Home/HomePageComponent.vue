@@ -143,8 +143,8 @@
                                 </p>
                                 <p class="text-sm text-black font-semibold">
                                     <!-- 35,000 MMks -->
-                                    {{ (selectedRoom.price_per_hour * (selectedRoom.invoices.length > 0 ?
-                                    selectedRoom.invoices[0].sessions[0].session_duration : 1)).toLocaleString() }}
+
+                                    {{ (selectedRoom.price_per_hour * (selectedRoom.invoices.length > 0 ? selectedRoom.invoices[0].sessions[0].session_duration : 1)).toLocaleString() }}
                                     MMKs
                                 </p>
                             </div>
@@ -285,7 +285,7 @@
                                 <input type="number" placeholder="Discount" v-model="printInvoiceData.discount"
                                     class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
                             </div>
-                            <div class="mb-4">
+                            <!-- <div class="mb-4">
                                 <label for="" class="block text-sm text-black mb-3">
                                 Paid Amount
                                 </label>
@@ -300,7 +300,7 @@
                                     <input type="text" placeholder="Change" v-model="change"
                                         class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
                                 </div>
-                            </div>
+                            </div> -->
                             <div class="mb-4">
                                 <label for="" class="block text-sm text-black mb-3">
                                     Payment Method
@@ -1034,8 +1034,8 @@
                     this.printInvoiceData.food = this.purchaseMenuList[0].total
                     this.purchaseMenuList[0].order_items.forEach(element => {
                         this.orderList.push({
-                            'menu_category_id' : element.price ,
-                            'price' : element.menu.menu_category_id
+                            'menu_category_id' : element.menu.menu_category_id ,
+                            'price' : element.price ,
                         })
                     });
 
@@ -1059,18 +1059,18 @@
             {
                 let formData = new FormData();
                 formData.append('invoice_id', this.selectedRoom.invoices[0].invoice_id);
-                formData.append('change', this.change);
-                formData.append('paid_amount', this.paid_amount);
+                // formData.append('change', this.change);
+                // formData.append('paid_amount', this.paid_amount);
                 formData.append('payment_type', this.selectedPaymentMethod);
                 formData.append('discount_value', this.printInvoiceData.discount);
                 formData.append('order_categories', JSON.stringify(this.orderList));
                 
-                formData.append('total_session_price', this.printInvoiceData.room);
-                formData.append('food_charge', this.printInvoiceData.food);
-                formData.append('service_charge', this.printInvoiceData.service_tax);
-                formData.append('tax', this.printInvoiceData.tax);
-                formData.append('total', this.printInvoiceData.total);
-
+                // formData.append('total_session_price', this.printInvoiceData.room);
+                // formData.append('food_charge', this.printInvoiceData.food);
+                formData.append('service_charge', this.printInvoiceData.service_charge);
+                formData.append('tax', this.printInvoiceData.isTax);
+                // formData.append('total', this.printInvoiceData.total);
+                console.log(formData)
                 let response = await postApiData({url: '/api/rooms/done', form_data: formData});
                 if(response.success){
                     await this.getRoomList();
