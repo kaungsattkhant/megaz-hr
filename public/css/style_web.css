@@ -30,8 +30,8 @@
 .side-bar ul {
   padding-top: 0.5rem; }
 
-.side-bar ul li a {
-  padding: 0.75rem 2rem;
+.side-bar ul li a, .side-bar ul li button {
+  padding: 0.75rem 1.5rem;
   margin: 0.25rem 0rem;
   display: flex;
   position: relative;

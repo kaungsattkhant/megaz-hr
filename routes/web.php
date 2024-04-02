@@ -32,6 +32,7 @@ Route::post('/login',[AuthController::class,'login'])->name('login');
 // test
 
 Route::view('/test', 'staff.index');
+Route::view('/testlogin', 'pos.auth.index');
 
 Route::view('/roles', 'roles.index')->name('roles');
 Route::view('/staff', 'staff.index')->name('staff');
@@ -78,6 +79,9 @@ Route::view('/cashbook/ktv_project', 'cashbook.cash_ktv_project')->name('ktv_pro
 Route::view('/bankbook/kbz_special_md_gm', 'cashbook.bank_kbz_special_md_gm')->name('kbz_special_bank');
 Route::view('/bankbook/kbz_old_gm', 'cashbook.bank_kbz_old_gm')->name('kbz_old_gm_bank');
 Route::view('/bankbook/kpay', 'cashbook.bank_kpay')->name('kpay_bank');
+
+Route::view('/supplier', 'supplier.index')->name('supplier');
+Route::view('/supplier/create', 'supplier.create')->name('supplier_create');
 
 //pos
 Route::view('/pos/home', 'pos.home.index')->name('pos');

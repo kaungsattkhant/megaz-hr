@@ -36,6 +36,8 @@ import CashbookCrudComponent from './Components/Cashbook/CashbookCrudComponent.v
 import ArListComponent from './Components/AR/ArListComponent.vue';
 import ArHistoryComponent from './Components/AR/ArHistoryComponent.vue';
 import ArPaidComponent from './Components/AR/ArPaidComponent.vue';
+import SupplierListComponent from './Components/Supplier/SupplierListComponent.vue';
+import SupplierCreateComponent from './Components/Supplier/SupplierCreateComponent.vue';
 
 import LoginComponent from './Components/Auth/LoginComponent.vue';
 import LogoutComponent from './Components/Auth/LogoutComponent.vue';
@@ -78,6 +80,10 @@ app.component('ItemCrudComponent', ItemCrudComponent);
 app.component('ItemUsageForecastListComponent', ItemUsageForecastListComponent);
 app.component('ItemUsageForecastCreateComponent', ItemUsageForecastCreateComponent);
 app.component('ItemUsageForecastDetailComponent', ItemUsageForecastDetailComponent);
+
+
+app.component('SupplierListComponent', SupplierListComponent);
+app.component('SupplierCreateComponent', SupplierCreateComponent);
 
 app.component('LoginComponent', LoginComponent);
 app.component('LogoutComponent', LogoutComponent);

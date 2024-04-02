@@ -36,20 +36,20 @@
                             </a>
                         </li>
                         <li>
-                            <a href="{{ route('accountings') }}" class="flex items-center @yield('accounting')">
+                            <a href="{{ route('accountings') }}" class="flex items-baseline @yield('accounting')">
                                 <i class="fal fa-tasks  pr-3"></i>
                                 Chart of Accounts (COA)
                             </a>
                         </li>
                         <li>
-                            <a href="{{ route('financial_transactions') }}" class="flex items-center @yield('financial_transactions')">
+                            <a href="{{ route('financial_transactions') }}" class="flex items-baseline @yield('financial_transactions')">
                                 <i class="fal fa-tasks  pr-3"></i>
                                 Financial Transactions
                             </a>
                         </li>
-                        <li>
+                        <li class="">
                             <button
-                                class="flex items-center pl-9 my-2 text-sm"
+                                class="relative w-full flex items-baseline"
                                 type="button"
                                 data-te-collapse-init
                                 data-te-ripple-init
@@ -59,10 +59,12 @@
                                 aria-controls="collapseExample">
                                     <i class="fal fa-sack-dollar  pr-3"></i>
                                     Cashbook
+
+                                <i class="fas fa-angle-down absolute right-6" style="top:calc(50% - 7px)"></i>
                                 </button>
 
                             <div
-                                class="!visible hidden text-center"
+                                class="!visible hidden text-center pl-2 bg-[#0001]"
                                 id="collapseCashbooks"
                                 data-te-collapse-item>
                                 <ul>
@@ -103,7 +105,7 @@
                                         </a>
                                     </li>
                                     <li>
-                                        <a href="{{ route('ktv_project_cash') }}" class="flex items-center @yield('ktv_project_cash')">
+                                        <a href="{{ route('ktv_project_cash') }}" class="flex items-baseline @yield('ktv_project_cash')">
                                             <i class="fal fa-tasks  pr-3"></i>
                                             KTV Project Cash Book
                                         </a>
