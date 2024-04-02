@@ -16,27 +16,29 @@ class RoleSeeder extends Seeder
     public function run(): void
     {
         //
-        $operationDept = Department::where('name', 'Operation Department')->first();
-        $finaceDepartment = Department::where('name', 'Financial Department')->first();
+        $hrDept = Department::where('name', 'HR')->first();
+        $financeDept = Department::where('name', 'Finance')->first();
+        $adminDept = Department::where('name', 'Admin')->first();
+        $managementDept = Department::where('name', 'Management')->first();
         // $barDept = Department::where('name', 'Bar Department')->first();
 
         Role::create([
-            'department_id' => $operationDept->id,
+            'department_id' => $hrDept->id,
             'name' => 'Staff'
         ]);
 
         Role::create([
-            'department_id' => $operationDept->id,
+            'department_id' => $managementDept->id,
             'name' => 'Manager'
         ]);
 
         Role::create([
-            'department_id' => $finaceDepartment->id,
+            'department_id' => $financeDept->id,
             'name' => 'Financial'
         ]);
 
         Role::create([
-            'department_id' => $operationDept->id,
+            'department_id' => $managementDept->id,
             'name' => 'MD'
         ]);
 

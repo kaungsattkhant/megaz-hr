@@ -72,6 +72,13 @@ class Staff extends Authenticatable
         return false;
     }
 
+    public function isDepartment($name){
+        if($this->department->name==$name){
+            return true;
+        }
+        return false;
+    }
+
     #scope 
    
     #end

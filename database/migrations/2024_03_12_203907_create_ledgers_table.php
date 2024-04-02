@@ -18,7 +18,7 @@ return new class extends Migration
             $table->char('personable_type')->nullable();
             $table->enum('action',['debit','credit']);
             $table->boolean('is_cashier_confirmed')->default(0);
-            $table->unsignedInteger('transaction_id');
+            $table->foreignId('transaction_id')->constrained()->onDelete('cascade');
             $table->unsignedInteger('account_id');
             $table->timestamps();
         });

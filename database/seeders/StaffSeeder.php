@@ -53,7 +53,6 @@ class StaffSeeder extends Seeder
                 ]);
                 $staff1->roles()->sync([$staffRole->id]);
 
-
                 $manager = Staff::create([
                     'gender_id' => $faker->numberBetween(1, 2),
                     'department_id' => $managerRole->department_id,

@@ -21,7 +21,6 @@ class AuthController extends Controller
         if($loginResponse["code"] != 200){
             ResponseMessage($loginResponse["message"], 401);
         }
-
         else{
             $staff = Staff::with(["gender","department","roles"])->find($loginResponse["user"]["id"]);
             $loginResponse["user"] = $staff;

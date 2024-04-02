@@ -2,11 +2,12 @@
 
 namespace App\Http\Controllers\API;
 
+use App\Models\Inventory;
+use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Inventory\InventoryCreateRequest;
 use App\Http\Requests\Inventory\InventoryUpdateRequest;
 use App\Repositories\Inventory\InventoryRepositoryInterface;
-use Illuminate\Http\Request;
 
 class InventoryAPIController extends Controller
 {
@@ -25,13 +26,19 @@ class InventoryAPIController extends Controller
 
     public function createInventory(InventoryCreateRequest $request)
     {
-        $inventory = $this->inventoryRepo->createData($request->all());
+        $inventory = $this->inventoryRepo->createData($request);
         ResponseData($inventory);
     }
 
     public function updateInventory(InventoryUpdateRequest $request,$id)
     {
         $inventory = $this->inventoryRepo->updateData($request->all(),$id);
+        ResponseData($inventory);
+    }
+
+    public function detail(Inventory $inventory)
+    {
+        $inventory = $this->inventoryRepo->detail($inventory);
         ResponseData($inventory);
     }
 

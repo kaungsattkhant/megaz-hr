@@ -168,6 +168,7 @@ Route::delete('/entities/{id}', [EntityAPIController::class, 'deleteEntity']);
 
 Route::get('/inventories', [InventoryAPIController::class, 'getInventoryData']);
 Route::post('/inventories', [InventoryAPIController::class, 'createInventory']);
+Route::get('/inventories/{inventory}', [InventoryAPIController::class, 'detail']);
 Route::put('/inventories/{id}', [InventoryAPIController::class, 'updateInventory']);
 Route::delete('/inventories/{id}', [InventoryAPIController::class, 'deleteInventory']);
 Route::get('/inventories/{inventoryId}/ledgers', [InventoryAPIController::class, 'getInventoryLedgers']);

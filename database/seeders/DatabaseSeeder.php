@@ -26,6 +26,7 @@ class DatabaseSeeder extends Seeder
         // (new ServiceCategorySeeder())->run();
         $this->call([
             ComplaintCategorySeeder::class,
+            InventorySeeder::class,
             DepartmentSeeder::class,
             RoleSeeder::class,
             GenderSeeder::class,
