@@ -32,6 +32,7 @@ Route::post('/login',[AuthController::class,'login'])->name('login');
 // test
 
 Route::view('/test', 'staff.index');
+Route::view('/testlogin', 'pos.auth.index');
 
 Route::view('/roles', 'roles.index')->name('roles');
 Route::view('/staff', 'staff.index')->name('staff');

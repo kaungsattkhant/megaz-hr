@@ -3,49 +3,27 @@
 
         <div class="">
             <div class="w-[67%] pt-9 px-6">
-                <ul
-                    class="mb-5 flex list-none flex-row flex-wrap border-b-0 pl-0"
-                    role="tablist"
-                    data-te-nav-ref>
+                <ul class="mb-5 flex list-none flex-row flex-wrap border-b-0 pl-0" role="tablist" data-te-nav-ref>
                     <li role="presentation">
-                        <a
-                        href="#tabs-home"
-                        class="my-2 mr-3 text-white block  px-7 pb-2.5 rounded-full
+                        <a href="#tabs-home" class="my-2 mr-3 text-white block  px-7 pb-2.5 rounded-full
                             pt-3 text-xs  hover:isolate bg-[#F0C094]
-                            hover:bg-[#f7a559] focus:isolate data-[te-nav-active]:bg-[#F19E51] "
-                        data-te-toggle="pill"
-                        data-te-target="#tabs-home"
-                        data-te-nav-active
-                        role="tab"
-                        aria-controls="tabs-home"
-                        aria-selected="true"
-                        >KTV</a
-                        >
+                            hover:bg-[#f7a559] focus:isolate data-[te-nav-active]:bg-[#F19E51] " data-te-toggle="pill"
+                            data-te-target="#tabs-home" data-te-nav-active role="tab" aria-controls="tabs-home"
+                            aria-selected="true">KTV</a>
                     </li>
                     <li role="presentation" @click="btnGetTableListTab()">
-                        <a
-                        href="#tabs-profile"
-                        class="my-2 mr-3 text-white block  px-7 pb-2.5 rounded-full
+                        <a href="#tabs-profile" class="my-2 mr-3 text-white block  px-7 pb-2.5 rounded-full
                             pt-3 text-xs  hover:isolate bg-[#F0C094]
-                            hover:bg-[#f7a559] focus:isolate data-[te-nav-active]:bg-[#F19E51]"
-                        data-te-toggle="pill"
-                        data-te-target="#tabs-profile"
-                        role="tab"
-                        aria-controls="tabs-profile"
-                        aria-selected="false"
-                        >Roof Top</a
-                        >
+                            hover:bg-[#f7a559] focus:isolate data-[te-nav-active]:bg-[#F19E51]" data-te-toggle="pill"
+                            data-te-target="#tabs-profile" role="tab" aria-controls="tabs-profile"
+                            aria-selected="false">Roof Top</a>
                     </li>
 
                 </ul>
 
                 <div class="mb-6">
-                    <div
-                        class="hidden opacity-100 transition-opacity duration-150 ease-linear data-[te-tab-active]:block"
-                        id="tabs-home"
-                        role="tabpanel"
-                        aria-labelledby="tabs-home-tab"
-                        data-te-tab-active>
+                    <div class="hidden opacity-100 transition-opacity duration-150 ease-linear data-[te-tab-active]:block"
+                        id="tabs-home" role="tabpanel" aria-labelledby="tabs-home-tab" data-te-tab-active>
                         <div class="flex flex-wrap gap-x-4 gap-y-4">
                             <!-- <div class="bg-[#FF7675] flex-shrink-0 flex-grow p-6 w-40 max-w-44 h-40">
                                 <div class="flex flex-col justify-between h-full">
@@ -63,10 +41,12 @@
                                     </div>
                                 </div>
                             </div> -->
-                            <div v-for="(room,index) in roomList" :class="room.is_active == 0 ? 'bg-[#55EFC4]' : 'bg-[#FF7675]'"
+                            <div v-for="(room,index) in roomList"
+                                :class="room.is_active == 0 ? 'bg-[#55EFC4]' : 'bg-[#FF7675]'"
                                 class=" flex-shrink-0 flex-grow p-6 w-40 max-w-44 h-40">
 
-                                <button @click="btnClickedIsOpenRoom(room,index)" class="relative flex flex-col justify-between h-full w-full">
+                                <button @click="btnClickedIsOpenRoom(room,index)"
+                                    class="relative flex flex-col justify-between h-full w-full">
 
                                     <div v-if="room.is_active == 1 " class=" flex justify-between flex-col h-full">
                                         <div>
@@ -81,7 +61,7 @@
                                     <div class="absolute bottom-0 w-full flex justify-end">
 
                                         <p class="text-xl text-white">
-                                            {{  room.name }}
+                                            {{ room.name }}
                                         </p>
                                     </div>
                                 </button>
@@ -97,13 +77,11 @@
                             </div> -->
                         </div>
                     </div>
-                    <div
-                        class="hidden opacity-0 transition-opacity duration-150 ease-linear data-[te-tab-active]:block"
-                        id="tabs-profile"
-                        role="tabpanel"
-                        aria-labelledby="tabs-profile-tab">
+                    <div class="hidden opacity-0 transition-opacity duration-150 ease-linear data-[te-tab-active]:block"
+                        id="tabs-profile" role="tabpanel" aria-labelledby="tabs-profile-tab">
                         <div class="flex flex-wrap gap-x-4 gap-y-4">
-                            <div v-for="(table,index) in tableList" :class="table.is_active == 0 ? 'bg-[#55EFC4]' : 'bg-[#FF7675]'"
+                            <div v-for="(table,index) in tableList"
+                                :class="table.is_active == 0 ? 'bg-[#55EFC4]' : 'bg-[#FF7675]'"
                                 class=" flex-shrink-0 flex-grow p-6 w-40 max-w-44 h-40">
 
                                 <button class="relative flex flex-col justify-between h-full w-full">
@@ -121,7 +99,7 @@
                                     <div class="absolute bottom-0 w-full flex justify-end">
 
                                         <p class="text-xl text-white">
-                                            {{  table.name }}
+                                            {{ table.name }}
                                         </p>
                                     </div>
                                 </button>
@@ -131,26 +109,28 @@
                 </div>
             </div>
             <div class="right-sidebar shadow-lg border-l border-gray-200">
-                    <!-- secssion right sidebar -->
+                <!-- secssion right sidebar -->
                 <div v-if="isOpenRoom.step_detail == true" class="relative h-full">
                     <div class="flex justify-between padding-section border-b">
                         <div>
                             <p class="text-black text-xl">
-                                    Table Details
+                                Table Details
                             </p>
                         </div>
                         <div class="flex gap-x-3">
                             <button class="transition duration-150 ease-in-out focus:outline-none focus:ring-0"
-                                @click="btnClickedGetChangeableRoomList()" data-te-toggle="modal" data-te-target="#change_modal">
+                                @click="btnClickedGetChangeableRoomList()" data-te-toggle="modal"
+                                data-te-target="#change_modal">
                                 <i class="far fa-random"></i>
                             </button>
-                            <button @click="btnClickAddMenu" class="transition duration-150 ease-in-out focus:outline-none focus:ring-0"
-                                     data-te-toggle="modal" data-te-target="#add_menu_modal">
-                                     <i class="far fa-cocktail"></i>
+                            <button @click="btnClickAddMenu"
+                                class="transition duration-150 ease-in-out focus:outline-none focus:ring-0"
+                                data-te-toggle="modal" data-te-target="#add_menu_modal">
+                                <i class="far fa-cocktail"></i>
                             </button>
                             <button class="transition duration-150 ease-in-out focus:outline-none focus:ring-0"
-                                     data-te-toggle="modal" data-te-target="#add_hour_modal">
-                                     <i class="far fa-hourglass-half"></i>
+                                data-te-toggle="modal" data-te-target="#add_hour_modal">
+                                <i class="far fa-hourglass-half"></i>
                             </button>
                         </div>
                     </div>
@@ -158,11 +138,13 @@
                         <div class="padding-section border-b    ">
                             <div class="flex justify-between font-semibold mb-2">
                                 <p class="text-sm text-black">
-                                    Invoice Id {{ selectedRoom.invoices.length > 0 ? selectedRoom.invoices[0].invoice_id : '' }}
+                                    Invoice Id {{ selectedRoom.invoices.length > 0 ? selectedRoom.invoices[0].invoice_id
+                                    : '' }}
                                 </p>
                                 <p class="text-sm text-black font-semibold">
                                     <!-- 35,000 MMks -->
-                                    {{ (selectedRoom.price_per_hour * (selectedRoom.invoices.length > 0 ? selectedRoom.invoices[0].sessions[0].session_duration : 1)).toLocaleString() }}
+                                    {{ (selectedRoom.price_per_hour * (selectedRoom.invoices.length > 0 ?
+                                    selectedRoom.invoices[0].sessions[0].session_duration : 1)).toLocaleString() }}
                                     MMKs
                                 </p>
                             </div>
@@ -173,10 +155,12 @@
                             </div>
                             <div class="">
                                 <p class="text-sm text-black mb-2">
-                                    Start Time : {{ selectedRoom.invoices.length > 0 ? selectedRoom.invoices[0].sessions[0].start_date : '' }}
+                                    Start Time : {{ selectedRoom.invoices.length > 0 ?
+                                    selectedRoom.invoices[0].sessions[0].start_date : '' }}
                                 </p>
                                 <p class="text-sm text-black">
-                                    End Time : {{ selectedRoom.invoices.length > 0 ? selectedRoom.invoices[0].sessions[0].end_date : '' }}
+                                    End Time : {{ selectedRoom.invoices.length > 0 ?
+                                    selectedRoom.invoices[0].sessions[0].end_date : '' }}
                                 </p>
                             </div>
                         </div>
@@ -187,7 +171,8 @@
                                     Menu Total
                                 </p>
                                 <p class="text-sm text-black font-semibold">
-                                    {{ purchaseMenuList.length > 0 ? purchaseMenuList[0].total.toLocaleString() : '0' }} MMks
+                                    {{ purchaseMenuList.length > 0 ? purchaseMenuList[0].total.toLocaleString() : '0' }}
+                                    MMks
                                 </p>
                             </div>
                             <div class=" grid grid-cols-10 gap-x-2 gap-y-3">
@@ -244,19 +229,20 @@
                             <p class="">
                                 Total
                                 {{
-                                    (
-                                        selectedRoom ?
-                                        (
-                                            purchaseMenuList.length > 0 ?
-                                            (
-                                                (selectedRoom.price_per_hour * selectedRoom.invoices[0].sessions[0].session_duration) + purchaseMenuList[0].total
-                                            ).toLocaleString()
-                                            : (
-                                                selectedRoom.price_per_hour * selectedRoom.invoices[0].sessions[0].session_duration
-                                                ).toLocaleString()
-                                        )
-                                        : 0
-                                    )
+                                (
+                                selectedRoom ?
+                                (
+                                purchaseMenuList.length > 0 ?
+                                (
+                                (selectedRoom.price_per_hour * selectedRoom.invoices[0].sessions[0].session_duration) +
+                                purchaseMenuList[0].total
+                                ).toLocaleString()
+                                : (
+                                selectedRoom.price_per_hour * selectedRoom.invoices[0].sessions[0].session_duration
+                                ).toLocaleString()
+                                )
+                                : 0
+                                )
 
                                 }} MMKs
 
@@ -269,23 +255,25 @@
                             </p>
                         </div>
                         <div class="">
-                            <button @click="btnClickedDoneSession()" class="bg-[#55EFC4] text-black text-center text-sm font-semibold w-full py-3">
+                            <button @click="btnClickedDoneSession()"
+                                class="bg-[#55EFC4] text-black text-center text-sm font-semibold w-full py-3">
                                 Done Session
                             </button>
                         </div>
                     </div>
                 </div>
-                    <!-- invoice right sidebar -->
+                <!-- invoice right sidebar -->
                 <div v-if="isOpenRoom.step_invoice == true" class="relative h-full">
                     <div class="flex justify-between padding-section border-b">
                         <button @click="btnBackToDetail()">
                             <i class="far fa-chevron-left"></i>
-                         </button>
+                        </button>
                         <div>
                             <p class="text-black text-lg">
                                 Print Invoice
                             </p>
-                        </div><div></div>
+                        </div>
+                        <div></div>
                     </div>
                     <div class="small-scrollbar overflow-y-auto" style="height:calc(100% - 329px)">
                         <div class="padding-section w-2/3 mx-auto ">
@@ -329,30 +317,18 @@
 
                             <div class="mb-4">
                                 <div class="mb-[0.125rem] block min-h-[1.5rem] pl-[1.5rem]">
-                                    <input
-                                        class="input-check-pos"
-                                        type="checkbox"
-                                        value=""
-                                        id="tax"
-                                        checked />
-                                    <label
-                                        class="inline-block pl-[0.15rem] hover:cursor-pointer"
-                                        for="tax">
+                                    <input class="input-check-pos" type="checkbox" v-model="printInvoiceData.isTax"
+                                        value="" id="tax" />
+                                    <label class="inline-block pl-[0.15rem] hover:cursor-pointer" for="tax">
                                         Tax
                                     </label>
                                 </div>
                             </div>
                             <div class="mb-4">
                                 <div class="mb-[0.125rem] block min-h-[1.5rem] pl-[1.5rem]">
-                                    <input
-                                        class="input-check-pos"
-                                        type="checkbox"
-                                        value=""
-                                        id="service"
-                                        checked />
-                                    <label
-                                        class="inline-block pl-[0.15rem] hover:cursor-pointer"
-                                        for="service">
+                                    <input class="input-check-pos" type="checkbox"
+                                        v-model="printInvoiceData.service_charge" value="" id="service" />
+                                    <label class="inline-block pl-[0.15rem] hover:cursor-pointer" for="service">
                                         Service Charges
                                     </label>
                                 </div>
@@ -366,7 +342,7 @@
                                 Room
                             </p>
                             <p class=" w-28">
-                                {{  printInvoiceData.room ? printInvoiceData.room.toLocaleString() : 0 }} MMKs
+                                {{ printInvoiceData.room ? printInvoiceData.room.toLocaleString() : 0 }} MMKs
                                 <!-- {{ (selectedRoom.price_per_hour * (selectedRoom.invoices.length > 0 ? selectedRoom.invoices[0].sessions[0].session_duration : 1)).toLocaleString() }} MMKs -->
                             </p>
                         </div>
@@ -375,7 +351,7 @@
                                 Food
                             </p>
                             <p class=" w-28">
-                                {{  printInvoiceData.food ? printInvoiceData.food.toLocaleString() : 0}} MMKs
+                                {{ printInvoiceData.food ? printInvoiceData.food.toLocaleString() : 0}} MMKs
                                 <!-- {{ purchaseMenuList.length > 0 ? purchaseMenuList[0].total.toLocaleString() : '0' }} MMks -->
                             </p>
                         </div>
@@ -384,7 +360,8 @@
                                 Service Tax
                             </p>
                             <p class=" w-28">
-                                {{  printInvoiceData.service_charge ? printInvoiceData.service_charge.toLocaleString() : 0 }} MMKs
+                                {{ printInvoiceData.service_tax ? printInvoiceData.service_tax.toLocaleString() :
+                                0 }} MMKs
                             </p>
                         </div>
                         <div class=" text-sm text-right flex gap-x-2 justify-end pr-2 mb-2">
@@ -392,7 +369,7 @@
                                 Tax
                             </p>
                             <p class=" w-28">
-                                {{  printInvoiceData.tax ? printInvoiceData.tax.toLocaleString() : 0 }} MMKs
+                                {{ printInvoiceData.tax ? printInvoiceData.tax.toLocaleString() : 0 }} MMKs
                             </p>
                         </div>
                         <div class=" text-sm text-right flex gap-x-2 justify-end pr-2 mb-2">
@@ -400,25 +377,26 @@
                                 Discount
                             </p>
                             <p class=" w-28">
-                                {{  printInvoiceData.discount }} MMKs
+                                {{ printInvoiceData.discount }} MMKs
                             </p>
                         </div>
                         <div class=" text-right pr-3 mb-3">
                             <p class="font-semibold">
                                 Total &nbsp;
-                                <!-- {{  (printInvoiceData.room + printInvoiceData.food + printInvoiceData.service_charge + printInvoiceData.tax ) }} -->
-                                {{  printInvoiceData.total ? printInvoiceData.total.toLocaleString() : 0 }} MMKs
+                                <!-- {{  (printInvoiceData.room + printInvoiceData.food + printInvoiceData.service_tax + printInvoiceData.tax ) }} -->
+                                {{ printInvoiceData.total ? printInvoiceData.total.toLocaleString() : 0 }} MMKs
                             </p>
                         </div>
                         <div class="">
-                            <button @click="btnClickedEndRoom()" class="bg-[#55EFC4] text-black text-center text-sm font-semibold w-full py-3">
+                            <button @click="btnClickedEndRoom()"
+                                class="bg-[#55EFC4] text-black text-center text-sm font-semibold w-full py-3">
                                 Print Invoice
                             </button>
                         </div>
                     </div>
                 </div>
 
-                    <!-- open session right sidebar -->
+                <!-- open session right sidebar -->
                 <div class="relative block h-full" v-if="isOpenRoom.step_1 == true" id="open_room_1">
                     <div class="w-full h-full flex justify-center flex-col">
                         <div class="w-2/3 mx-auto">
@@ -431,13 +409,14 @@
                                 </p>
                             </div>
                             <img class="w-[60%] mx-auto mb-6" src="../../../../../public/img/Video_light.png" alt="">
-                            <button  @click="btnClickedOpenRoom" class="bg-[#55EFC4] text-black text-center text-sm font-semibold w-full py-3">
+                            <button @click="btnClickedOpenRoom"
+                                class="bg-[#55EFC4] text-black text-center text-sm font-semibold w-full py-3">
                                 Open Room
                             </button>
                         </div>
                     </div>
                 </div>
-                <div class=""  v-show="isOpenRoom.step_2 == true" id="open_room_2">
+                <div class="" v-show="isOpenRoom.step_2 == true" id="open_room_2">
                     <div class="small-scrollbar overflow-y-auto h-[100vh] pt-8">
                         <div class="padding-section w-2/3 mx-auto ">
                             <div class="mb-4">
@@ -447,9 +426,11 @@
                                 <div class="relative">
                                     <select name="" id="" v-model="selectedCustomer"
                                         class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
-                                        <option :value="customer" v-for="(customer, customerIndex) in customerList" :key="customerIndex" > {{ customer.name }} </option>
+                                        <option :value="customer" v-for="(customer, customerIndex) in customerList"
+                                            :key="customerIndex"> {{ customer.name }} </option>
                                     </select>
-                                    <button class="absolute -right-6 transition duration-150 ease-in-out focus:outline-none focus:ring-0"
+                                    <button
+                                        class="absolute -right-6 transition duration-150 ease-in-out focus:outline-none focus:ring-0"
                                         data-te-toggle="modal" data-te-target="#create_customer_modal">
                                         +
                                     </button>
@@ -497,7 +478,8 @@
                                 <input type="number" placeholder="Child" v-model="child"
                                     class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
                             </div>
-                            <button @click="confirmRoomBtnClicked()" class="bg-[#55EFC4] text-black text-center text-sm font-semibold w-full py-3">
+                            <button @click="confirmRoomBtnClicked()"
+                                class="bg-[#55EFC4] text-black text-center text-sm font-semibold w-full py-3">
                                 Open Room
                             </button>
                         </div>
@@ -507,7 +489,7 @@
         </div>
 
 
-            <!-- add Hour modal -->
+        <!-- add Hour modal -->
         <div data-te-modal-init
             class="fixed left-0 top-0 z-[1055] hidden h-full w-full overflow-y-auto overflow-x-hidden outline-none"
             id="add_hour_modal" tabindex="-1" aria-labelledby="addHourModalLabel" aria-modal="true" role="dialog">
@@ -519,8 +501,9 @@
                         <p class="text-xl w-full text-center">
                             Add More Hour
                         </p>
-                        <button type="button" id="closeModal" class="absolute top-4 right-4 focus:shadow-none focus:outline-none"
-                            data-te-modal-dismiss aria-label="Close">
+                        <button type="button" id="closeModal"
+                            class="absolute top-4 right-4 focus:shadow-none focus:outline-none" data-te-modal-dismiss
+                            aria-label="Close">
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
                                 stroke="currentColor" class="h-5 w-5">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
@@ -538,15 +521,8 @@
                         </div>
                         <div class="mb-4">
                             <div class="mb-[0.125rem] block min-h-[1.5rem] pl-[1.5rem]">
-                                <input
-                                    class="input-check-pos"
-                                    type="checkbox"
-                                    value=""
-                                    id="checkboxChecked"
-                                    checked />
-                                <label
-                                    class="inline-block pl-[0.15rem] hover:cursor-pointer"
-                                    for="checkboxChecked">
+                                <input class="input-check-pos" type="checkbox" value="" id="checkboxChecked" checked />
+                                <label class="inline-block pl-[0.15rem] hover:cursor-pointer" for="checkboxChecked">
                                     Charge
                                 </label>
                             </div>
@@ -562,7 +538,7 @@
             </div>
         </div>
 
-            <!-- add Menu modal -->
+        <!-- add Menu modal -->
         <div data-te-modal-init
             class="fixed left-0 top-0 z-[1055] hidden h-full w-full overflow-y-auto overflow-x-hidden outline-none"
             id="add_menu_modal" tabindex="-1" aria-labelledby="addMenuModalLabel" aria-modal="true" role="dialog">
@@ -574,8 +550,9 @@
                         <p class="text-xl w-full text-center">
                             Add Menu
                         </p>
-                        <button type="button" id="closeMenuModal" class="absolute top-4 right-4 focus:shadow-none focus:outline-none"
-                            data-te-modal-dismiss aria-label="Close">
+                        <button type="button" id="closeMenuModal"
+                            class="absolute top-4 right-4 focus:shadow-none focus:outline-none" data-te-modal-dismiss
+                            aria-label="Close">
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
                                 stroke="currentColor" class="h-5 w-5">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
@@ -607,7 +584,7 @@
                 </div>
             </div>
         </div>
-            <!-- change room modal -->
+        <!-- change room modal -->
         <div data-te-modal-init
             class="fixed left-0 top-0 z-[1055] hidden h-full w-full overflow-y-auto overflow-x-hidden outline-none"
             id="change_modal" tabindex="-1" aria-labelledby="addMenuModalLabel" aria-modal="true" role="dialog">
@@ -619,8 +596,9 @@
                         <p class="text-xl w-full text-center">
                             Change Room
                         </p>
-                        <button type="button" id="close_change_room_modal" class="absolute top-4 right-4 focus:shadow-none focus:outline-none"
-                            data-te-modal-dismiss aria-label="Close">
+                        <button type="button" id="close_change_room_modal"
+                            class="absolute top-4 right-4 focus:shadow-none focus:outline-none" data-te-modal-dismiss
+                            aria-label="Close">
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
                                 stroke="currentColor" class="h-5 w-5">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
@@ -632,7 +610,9 @@
                         <div class="mb-4">
                             <select name="" id="" placeholder="Room" v-model="change_room"
                                 class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
-                                <option :value="changeableRoom" :key="index" v-for="(changeableRoom,index) in changeableRoomList">{{ changeableRoom.name }}</option>
+                                <option :value="changeableRoom" :key="index"
+                                    v-for="(changeableRoom,index) in changeableRoomList">{{ changeableRoom.name }}
+                                </option>
                             </select>
                         </div>
 
@@ -647,10 +627,11 @@
             </div>
         </div>
 
-            <!-- Create Customer modal -->
+        <!-- Create Customer modal -->
         <div data-te-modal-init
             class="fixed left-0 top-0 z-[1055] hidden h-full w-full overflow-y-auto overflow-x-hidden outline-none"
-            id="create_customer_modal" tabindex="-1" aria-labelledby="createCustomerModalLabel" aria-modal="true" role="dialog">
+            id="create_customer_modal" tabindex="-1" aria-labelledby="createCustomerModalLabel" aria-modal="true"
+            role="dialog">
             <div data-te-modal-dialog-ref
                 class="pointer-events-none relative flex min-h-[calc(100%-1rem)] w-auto translate-y-[-50px] items-center opacity-0 transition-all duration-300 ease-in-out min-[576px]:mx-auto min-[576px]:mt-7 min-[576px]:min-h-[calc(100%-3.5rem)] min-[576px]:max-w-[500px]">
                 <div
@@ -660,8 +641,7 @@
                             Create Customer
                         </p>
                         <button type="button" class="absolute top-4 right-4 focus:shadow-none focus:outline-none
-                        " id="closeModal"
-                            data-te-modal-dismiss aria-label="Close">
+                        " id="closeModal" data-te-modal-dismiss aria-label="Close">
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
                                 stroke="currentColor" class="h-5 w-5">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
@@ -697,7 +677,8 @@
                             </label>
                             <select name="" id="" v-model="selectedGender"
                                 class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
-                                <option :value="gender.id" v-for="(gender, genderIndex) in genderList" :key="genderIndex" > {{ gender.name }} </option>
+                                <option :value="gender.id" v-for="(gender, genderIndex) in genderList"
+                                    :key="genderIndex"> {{ gender.name }} </option>
                             </select>
                         </div>
                         <div class="mb-4">
@@ -711,8 +692,9 @@
                             <label for="" class="block text-sm text-black mb-3">
                                 Address
                             </label>
-                            <textarea v-model="address" class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0"
-                                 name="" id="" cols="30" rows="10"></textarea>
+                            <textarea v-model="address"
+                                class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0"
+                                name="" id="" cols="30" rows="10"></textarea>
                         </div>
 
                     </div>
@@ -766,11 +748,16 @@
                 printInvoiceData:{
                     room:0,
                     food:0,
-                    service_charge:0,
+                    service_tax:0,
+                    service_charge:false,
                     tax:0,
+                    isTax:false,
                     discount:0,
-                    tatalPrice:0
+                    tatalPrice:0,
+                    foodList:[]
                 },
+                orderList:[],
+                orderItemsPrice:null,
                 selectedPaymentMethod:null,
                 change:null,
                 paid_amount:null,
@@ -1045,15 +1032,25 @@
                 this.printInvoiceData.room = this.selectedRoom.price_per_hour * this.selectedRoom.invoices[0].sessions[0].session_duration
                 if(this.purchaseMenuList.length > 0){
                     this.printInvoiceData.food = this.purchaseMenuList[0].total
+                    this.purchaseMenuList[0].order_items.forEach(element => {
+                        this.orderList.push({
+                            'menu_category_id' : element.price ,
+                            'price' : element.menu.menu_category_id
+                        })
+                    });
+
                 }
                 this.printInvoiceData.tax = this.printInvoiceData.food * 0.05
-                this.printInvoiceData.service_charge = (this.printInvoiceData.room + this.printInvoiceData.food) * 0.05
-                this.printInvoiceData.total = this.printInvoiceData.room + this.printInvoiceData.food + this.printInvoiceData.tax +this.printInvoiceData.service_charge
+                this.printInvoiceData.service_tax = (this.printInvoiceData.room + this.printInvoiceData.food) * 0.05
+                this.printInvoiceData.total = this.printInvoiceData.room + this.printInvoiceData.food + this.printInvoiceData.tax +this.printInvoiceData.service_tax
+
+                
 
                 this.selectedPaymentMethod = null
                 this.change = null
                 this.paid_amount = null
                 this.printInvoiceData.discount = 0
+
             },
             btnClickedEndRoom(){
                 this.EndRoom();
@@ -1065,11 +1062,12 @@
                 formData.append('change', this.change);
                 formData.append('paid_amount', this.paid_amount);
                 formData.append('payment_type', this.selectedPaymentMethod);
-
                 formData.append('discount_value', this.printInvoiceData.discount);
+                formData.append('order_categories', JSON.stringify(this.orderList));
+                
                 formData.append('total_session_price', this.printInvoiceData.room);
                 formData.append('food_charge', this.printInvoiceData.food);
-                formData.append('service_charge', this.printInvoiceData.service_charge);
+                formData.append('service_charge', this.printInvoiceData.service_tax);
                 formData.append('tax', this.printInvoiceData.tax);
                 formData.append('total', this.printInvoiceData.total);
 
