@@ -2,10 +2,13 @@
     <div class="flex justify-between mb-3">
         <div class=" flex">
             <label for="search" class="search-input">
-                <input type="text" class="input-search" placeholder="Search">
+                <input type="text" class="input-search" placeholder="Search" v-model="searchInput">
 
                 <i class="fal fa-search"></i>
             </label>
+
+            <button class="add-btn h-8 mx-2 " @click="searchBtnClicked">Search</button>
+            <button class="add-btn h-8 mx-2 " @click="clearSearchBtnClicked">Clear</button>
         </div>
         <div class="flex justify-end flex-col">
 
@@ -288,6 +291,8 @@
                 service_category_id:null,
                 deleteId: null,
 
+                searchInput: null,
+
                 per_page: 20,
                 pageNumbers: [],
                 currentPage: 1,
@@ -379,6 +384,23 @@
                 else{
                     alert('some errors occur');
                 }
+            },
+
+            async searchBtnClicked(){
+                let url = null;
+                if(this.searchInput){
+                    url = `/api/entities?type=room&search_input=${this.searchInput}&page=1`;
+                }
+                let response = await getApiData({url: url, token: this.getToken()});
+                if(response.data){
+                    this.roomList = response.data.data;
+                }
+            },
+
+            clearSearchBtnClicked(){
+                this.searchInput = null;
+                this.searchCategory = null;
+                this.getRoomList(null);
             },
 
             pageBtnClicked(pageNumber){

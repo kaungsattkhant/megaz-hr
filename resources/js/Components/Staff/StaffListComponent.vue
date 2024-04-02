@@ -336,10 +336,10 @@
             async searchBtnClicked(){
                 let url = null;
                 if(this.searchInput && this.searchCategory){
-                    url = `/api/staffs?name=${this.searchInput}&department_id=${this.searchCategory.id}&page=1`;
+                    url = `/api/staffs?search_input=${this.searchInput}&department_id=${this.searchCategory.id}&page=1`;
                 }
                 if(this.searchInput && !this.searchCategory){
-                    url = `/api/staffs?name=${this.searchInput}&page=1`;
+                    url = `/api/staffs?search_input=${this.searchInput}&page=1`;
                 }
                 if((!this.searchInput) && this.searchCategory){
                     url = `/api/staffs?department_id=${this.searchCategory.id}&page=1`;
