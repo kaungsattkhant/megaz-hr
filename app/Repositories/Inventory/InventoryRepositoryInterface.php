@@ -4,8 +4,6 @@ namespace App\Repositories\Inventory;
 
 use Illuminate\Http\Request;
 
-use App\Models\Inventory;
-
 interface InventoryRepositoryInterface
 {
     public function listAllData(Request $request);
@@ -17,4 +15,6 @@ interface InventoryRepositoryInterface
     public function deleteData(int $id);
 
     public function getInventoryLedgers(int $inventoryId);
+
+    public function detail($inventory);
 }

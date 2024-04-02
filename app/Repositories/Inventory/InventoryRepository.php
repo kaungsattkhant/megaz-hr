@@ -13,23 +13,28 @@ class InventoryRepository implements InventoryRepositoryInterface
     public function listAllData(Request $request)
     {
         if ($request->per_page || $request->page) {
-            $totalCount = Inventory::where('is_active', 1)->count();
-            $pageNumber = 1;
-            $perPage = 20;
-            if ($request->page) {
-                $pageNumber = $request->page;
-            }
-            if ($request->per_page) {
-                $perPage = $request->per_page;
-            }
-            $skip = ($pageNumber - 1) * $perPage;
-            $inventories = Inventory::where('is_active', 1)->skip($skip)->take($perPage)->get();
-            $paginationData = MakePaginationData($request, $totalCount, 'inventories');
-            $paginationData['inventories'] = $inventories;
+            // $totalCount = Inventory::where('is_active', 1)->count();
+            // $pageNumber = 1;
+            // $perPage = 20;
+            // if ($request->page) {
+            //     $pageNumber = $request->page;
+            // }
+            // if ($request->per_page) {
+            //     $perPage = $request->per_page;
+            // }
+            // $skip = ($pageNumber - 1) * $perPage;
+            // $inventories = Inventory::where('is_active', 1)->skip($skip)->take($perPage)->get();
+            // $paginationData = MakePaginationData($request, $totalCount, 'inventories');
+            // $paginationData['inventories'] = $inventories;
 
-            return $paginationData;
+            // return $paginationData;
+            return Inventory::orderBy('id','desc')
+            ->with(['inventoryable'])
+            ->paginate(config('common.list_count'));
         } else {
-            $inventories = Inventory::where('is_active', 1)->get();
+            $inventories = Inventory::where('is_active', 1)
+            ->with(['inventoryable'])
+            ->get();
 
             return $inventories;
         }
@@ -92,6 +97,11 @@ class InventoryRepository implements InventoryRepositoryInterface
             $inventory->update($data);
         }
         return $inventory;
+    }
+
+    public function detail($inventory){
+        $inventory->inventoryable=$inventory->inventoryable;
+        return $inventory; 
     }
 
     public function deleteData(int $id)
