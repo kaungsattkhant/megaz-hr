@@ -34,7 +34,7 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr class="" v-for="(cashbook,index) in cashbookList.cashbook_list">
+                                <tr class="" v-for="(cashbook,index) in cashbookList">
                                     <td class="whitespace-nowrap px-6 py-4 font-medium">
                                         {{ index+1 }}
                                     </td>
@@ -55,7 +55,7 @@
                                     </td>
                                 </tr>
 
-                                <tr class="" v-for="(cashbook, index) in bankbookList.cashbook_list">
+                                <!-- <tr class="" v-for="(cashbook, index) in bankbookList.cashbook_list">
                                     <td class="whitespace-nowrap px-6 py-4 font-medium">
                                         {{ cashbookLength }}
                                     </td>
@@ -74,7 +74,7 @@
                                     <td class="whitespace-nowrap px-6 py-4">
                                         6
                                     </td>
-                                </tr>
+                                </tr> -->
 
                             </tbody>
                         </table>
@@ -120,7 +120,7 @@
                             </label>
                             <select name="" id=""
                                 class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
-                                <option value="1"> type </option>
+                                <option value="1" v-for="account in cashAccountList"> {{ account.name }} </option>
                             </select>
                         </div>
                         <div class="mb-4">
@@ -168,9 +168,9 @@
         data() {
             return {
                 cashbookList:[],
-                bankbookList:[],
+                // bankbookList:[],
                 totalBookList:null,
-                cashAccountList:null,
+                cashAccountList:[],
                 cashbookId:null,
                 bankbookId:null,
                 cashbookLength:null,
@@ -184,48 +184,31 @@
             async getCashAccount(){
                 const response = await getApiData({ url: '/api/get_cash_account', token: this.getToken() });
                 if (response.data) {
-                    this.cashAccountList = response.data;
-
-                    let posCashAccount = this.cashAccountList.find(account => account.account_code === '2-1011');
+                    let posCashAccount = response.data.find(account => account.account_code === '2-1011');
                     if (posCashAccount) {
-                        this.cashBookId = posCashAccount.id;
-                        console.log(this.cashbookId)
+                        this.getCashbookList(posCashAccount.id);
+                        this.cashAccountList.push(posCashAccount);
                     }
-                    let posBankAccount = this.cashAccountList.find(account => account.account_code === '2-1012');
+                    let posBankAccount = response.data.find(account => account.account_code === '2-1012');
                     if (posBankAccount) {
-                        this.bankBookId = posBankAccount.id;
-                        console.log(this.bankbookId)
+                        this.getCashbookList(posBankAccount.id);
+                        this.cashAccountList.push(posBankAccount);
                     }
-                    // this.cashbookId = this.cashAccountList.find(cashAccountList => cashAccountList.account_code == '2-1011').id;
-                    // this.bankbookId = this.cashAccountList.find(cashAccountList => cashAccountList.account_code == '2-1012').id;
                 }
             },
 
-            async getCashbookList(){
-                if(this.cashbookId != null){
-                    const response = await getApiData({ url: '/api/cash_books?cash_account_id=' + this.cashbookId, token: this.getToken() });
-
-                    if (response.data) {
-                        this.cashbookList = response.data;
-                        this.cashbookLength = this.cashbookList.length;
-                        console.log('got cashbook')
-                    }
-                }
-
-                // console.log(this.cashbookId)
-                
-            },
-            async getBankbookList() {
-                const response = await getApiData({ url: '/api/cash_books?cash_account_id=' + this.bankbookId , token: this.getToken() });
+            async getCashbookList(cashAccountId){
+                console.log(`cash book list called`, cashAccountId);
+                const response = await getApiData({ url: '/api/cash_books?cash_account_id=' + cashAccountId, token: this.getToken() });
                 if (response.data) {
-                    this.bankbookList = response.data;
-                    console.log('got bankbook')
+                    response.data.cashbook_list.forEach((cashBook)=>{
+                        this.cashbookList.push(cashBook);
+                    });
+                    console.log(cashAccountId);
+                    console.log(this.cashbookList);
                 }
+                // console.log(this.cashbookId)
             },
-            async getTotalBookList() {
-                Array.prototype.push.apply(this.cashbookList, this.bankbookList);
-
-            }
 
                 // for close transaction
             // let url = '/api/close_cashbook_transaction?cash_account_id=298';
@@ -238,14 +221,12 @@
         },
         mounted()
         {
-            this.getCashAccount();
-            
-            this.getTotalBookList();
             initTE({ Modal, Select, Ripple, Datepicker });
         },
+
         created(){
-            this.getCashbookList();
-            this.getBankbookList();
+            this.getCashAccount();
+            // this.getTotalBookList();
         }
     }
 </script>
