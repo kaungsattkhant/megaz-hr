@@ -257,16 +257,20 @@ class InvoiceRepository implements InvoiceRepositoryInterface
         $entity = Entity::find($invoice->entity_id);
         $entity->is_active = 0;
         $entity->save();
-        if ($data['service_charge'] == true) {
+        if ($data['service_charge'] === true || strtolower($data['service_charge']) === 'true') {
             $data['service_charge'] = ($foodCharge + $beverageCharge) * 0.05;
-        } else if ($data['service_charge'] == false) {
+        } else if (strtolower($data['service_charge']) === 'false') {
+            $data['service_charge'] = 0;
+        } else {
             $data['service_charge'] = 0;
         }
 
-        if ($data['tax'] == true) {
+        if ($data['tax'] === true || strtolower($data['tax']) === 'true') {
             $data['tax'] = round(($foodCharge + $beverageCharge + $total_session_price) * 0.05);
-        } else if ($data['tax'] == false) {
+        } else if (strtolower($data['tax']) === 'false') {
             $data['tax'] = 0;
+        }else{
+            $data['tax']=0;
         }
 
         $data['food_charge'] = $foodCharge + $beverageCharge;
