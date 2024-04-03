@@ -22,33 +22,8 @@
 
 <body class="small-scrollbar">
 
-    <div class="w-full relative block h-[100vh]" style="background-image: url(../img/megaz.jpg);background-position:center;
-    background-repeat:no-repeat;background-size:cover;background-color:black;">
-        <div class="w-10/12 lg:w-2/6 mx-auto min-h-[80vh] pt-36">
-
-            <div class="mb-6">
-                <div class="px-8">
-                    <div class=" mb-4">
-                        <label for="username" class="text-sm text-white mb-2 block">
-                            Username
-                        </label>
-                        <input type="text" id="username" autocomplete="off" class=" border border-gray-400 bg-white w-full rounded">
-                    </div>
-                    <div class=" mb-12">
-                        <label for="password" class="text-sm text-white mb-2 block">
-                            Password
-                        </label>
-                        <input type="password" id="password" autocomplete="off" class=" border border-gray-400 bg-white w-full rounded">
-                    </div>
-                    <div class="w-full text-center">
-                        <button
-                            class="bg-[#0BA348] w-full mx-auto text-white text-sm rounded-md px-8 py-2 block mb-2.5">
-                            Login
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
+    <div id="app">
+        <login-component-pos/>
     </div>
 
 </body>
