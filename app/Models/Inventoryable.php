@@ -10,8 +10,9 @@ class Inventoryable extends Model
     use HasFactory;
 
     protected $fillable = ['inventory_id', 'inventoryable_type', 'inventoryable_id'];
-
+    
     protected $with=['inventoryable'];
+
     public function inventoryable()
     {
         return $this->morphTo();
