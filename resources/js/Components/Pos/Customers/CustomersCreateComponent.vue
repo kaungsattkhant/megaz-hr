@@ -46,7 +46,7 @@
                             <label for="" class="block text-sm text-black mb-3">
                                 Birthdate
                             </label>
-                            <input type="text" placeholder="2000-02-02" v-model="date"
+                            <input type="date" placeholder="2000-02-02" v-model="date"
                                 class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
                         </div>
                         <div class="mb-4">

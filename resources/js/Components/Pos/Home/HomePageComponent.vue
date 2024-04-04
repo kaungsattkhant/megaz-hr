@@ -685,7 +685,7 @@
                             <label for="" class="block text-sm text-black mb-3">
                                 Birthdate
                             </label>
-                            <input type="text" placeholder="Birthdate" v-model="date"
+                            <input type="date" placeholder="Birthdate" v-model="date"
                                 class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
                         </div>
                         <div class="mb-4">
@@ -1044,7 +1044,7 @@
                 this.printInvoiceData.service_tax = (this.printInvoiceData.room + this.printInvoiceData.food) * 0.05
                 this.printInvoiceData.total = this.printInvoiceData.room + this.printInvoiceData.food + this.printInvoiceData.tax +this.printInvoiceData.service_tax
 
-                
+
 
                 this.selectedPaymentMethod = null
                 this.change = null
@@ -1064,7 +1064,7 @@
                 formData.append('payment_type', this.selectedPaymentMethod);
                 formData.append('discount_value', this.printInvoiceData.discount);
                 formData.append('order_categories', JSON.stringify(this.orderList));
-                
+
                 // formData.append('total_session_price', this.printInvoiceData.room);
                 // formData.append('food_charge', this.printInvoiceData.food);
                 formData.append('service_charge', this.printInvoiceData.service_charge);
