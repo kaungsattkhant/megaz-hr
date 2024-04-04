@@ -39,43 +39,21 @@
                                         {{ index+1 }}
                                     </td>
                                     <td class="whitespace-nowrap px-6 py-4">
-
+                                        {{ cashbook.title }}
                                     </td>
                                     <td class="whitespace-nowrap px-6 py-4">
-                                        3
+                                        {{ cashbook.action }}
                                     </td>
                                     <td class="whitespace-nowrap px-6 py-4">
-                                        4
+                                        {{ cashbook.amount }}
                                     </td>
                                     <td class="whitespace-nowrap px-6 py-4">
-                                        5
+                                        {{ cashbook.description }}
                                     </td>
                                     <td class="whitespace-nowrap px-6 py-4">
-                                        6
+                                        {{ cashbook.amount }}
                                     </td>
                                 </tr>
-
-                                <!-- <tr class="" v-for="(cashbook, index) in bankbookList.cashbook_list">
-                                    <td class="whitespace-nowrap px-6 py-4 font-medium">
-                                        {{ cashbookLength }}
-                                    </td>
-                                    <td class="whitespace-nowrap px-6 py-4">
-
-                                    </td>
-                                    <td class="whitespace-nowrap px-6 py-4">
-                                        3
-                                    </td>
-                                    <td class="whitespace-nowrap px-6 py-4">
-                                        4
-                                    </td>
-                                    <td class="whitespace-nowrap px-6 py-4">
-                                        5
-                                    </td>
-                                    <td class="whitespace-nowrap px-6 py-4">
-                                        6
-                                    </td>
-                                </tr> -->
-
                             </tbody>
                         </table>
                     </div>
@@ -109,32 +87,60 @@
                     <div class="relative px-16 py-4" data-te-modal-body-ref>
                         <div class="mb-4">
                             <label for="" class="block text-sm text-black mb-3">
+                                Parent Account
+                            </label>
+                            <select name="" id="" v-model="selectedSubAccount"
+                                class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0"
+                                @change="subAccountSelectChanged">
+                                <option :value="subAccount" v-for="(subAccount, subAccountIndex) in subAccountList"
+                                    :key="subAccountIndex">
+                                    {{ subAccount.name }}
+                                </option>
+                            </select>
+                        </div>
+                        <div class="mb-4">
+                            <label for="" class="block text-sm text-black mb-3">
                                 Title
                             </label>
-                            <input type="text" placeholder="Title"
+                            <select name="" id="" v-model="selectedAccount"
                                 class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
+                                <option :value="account.id" v-for="(account, accountIndex) in accountList"
+                                    :key="accountIndex">
+                                    {{ account.name }}
+                                </option>
+                            </select>
+                        </div>
+                        <div class="mb-4">
+                            <label for="" class="block text-sm text-black mb-3">
+                                Account Type
+                            </label>
+                            <select name="" id="" v-model="accType"
+                                class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
+                                <option :value="account" v-for="account in cashAccountList"> {{ account.name }} </option>
+                            </select>
                         </div>
                         <div class="mb-4">
                             <label for="" class="block text-sm text-black mb-3">
                                 Type
                             </label>
-                            <select name="" id=""
+                            <select name="" id="" v-model="action"
                                 class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
-                                <option value="1" v-for="account in cashAccountList"> {{ account.name }} </option>
+                                <option value="debit">Debit</option>
+                                <option value="credit">Credit</option>
                             </select>
                         </div>
                         <div class="mb-4">
                             <label for="" class="block text-sm text-black mb-3">
                                 Amount
                             </label>
-                            <input type="text" placeholder="Amount"
+                            <input type="text" placeholder="Amount" v-model="amount"
                                 class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
                         </div>
                         <div class="mb-4">
                             <label for="" class="block text-sm text-black mb-3">
                                 Remark
                             </label>
-                            <textarea
+                            <textarea v-model="description"
                                 class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0"
                                 name="" id="" cols="30" rows="10"></textarea>
                         </div>
@@ -142,7 +148,7 @@
                     </div>
 
                     <div class="flex justify-center px-12 mb-6">
-                        <button class="pos-add-btn !px-16 focus:outline-none focus:ring-0 ">
+                        <button @click="createBtnClicked" class="pos-add-btn !px-16 focus:outline-none focus:ring-0 ">
                             Create
                         </button>
                     </div>
@@ -173,7 +179,17 @@
                 cashAccountList:[],
                 cashbookId:null,
                 bankbookId:null,
-                cashbookLength:null,
+                
+                subAccountList: [],
+                selectedSubAccount: null,
+                accountList: [],
+                selectedAccount: null,
+                accType:null,
+                action: null,
+                amount: null,
+                description: null,
+                cashAccId:null,
+
 
             };
         },
@@ -198,7 +214,6 @@
             },
 
             async getCashbookList(cashAccountId){
-                console.log(`cash book list called`, cashAccountId);
                 const response = await getApiData({ url: '/api/cash_books?cash_account_id=' + cashAccountId, token: this.getToken() });
                 if (response.data) {
                     response.data.cashbook_list.forEach((cashBook)=>{
@@ -207,7 +222,40 @@
                     console.log(cashAccountId);
                     console.log(this.cashbookList);
                 }
-                // console.log(this.cashbookId)
+            },
+
+            async getSubAccountList() {
+                let url = `/api/sub_accounts`;
+                let response = await getApiData({ url: url, token: this.getToken() });
+                if (response.data) {
+                    this.subAccountList = response.data;
+                }
+            },
+
+            subAccountSelectChanged() {
+                this.getAccountList();
+            },
+
+            async getAccountList() {
+                let url = `/api/account_by_sub_account/${this.selectedSubAccount.id}`;
+                let response = await getApiData({ url: url, token: this.getToken() });
+                if (response.data) {
+                    this.accountList = response.data;
+                }
+            },
+            async createBtnClicked() {
+                let formData = new FormData();
+                formData.append('description', this.description);
+                formData.append('account_id', this.selectedAccount);
+                formData.append('value', this.amount);
+                formData.append('cash_account_id', this.accType.id);
+                formData.append('action', this.action);
+
+                let url = `/api/transactions`;
+                let response = await postApiData({ url: url, form_data: formData, token: this.getToken() });
+                if (response.success) {
+                    window.location.reload();
+                }
             },
 
                 // for close transaction
@@ -226,6 +274,7 @@
 
         created(){
             this.getCashAccount();
+            this.getSubAccountList();
             // this.getTotalBookList();
         }
     }
