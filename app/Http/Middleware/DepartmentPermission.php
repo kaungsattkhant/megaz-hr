@@ -18,6 +18,12 @@ class DepartmentPermission
         if(checkDepartmentPermission($departments)){
             return $next($request);
         }
+        foreach($departments as $department){
+            if($department == "Catering"){
+                return redirect()->route('pos.login');
+            }
+        }
+
         return redirect()->route('login');
     }
 }

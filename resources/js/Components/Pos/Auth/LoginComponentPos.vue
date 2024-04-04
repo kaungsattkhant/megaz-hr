@@ -83,7 +83,7 @@
                     });
 
                     this.setRoles(roles);
-                    // this.$refs.signinForm.submit();
+                    this.$refs.signinForm.submit();
 
                     return true;
                 }
@@ -99,7 +99,7 @@
         },
 
         async mounted() {
-            
+
         }
     }
 

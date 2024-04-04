@@ -26,8 +26,7 @@ Route::get('/', function () {
 });
 Route::view('/login', 'auth.login')->name('login_form');
 Route::post('/login', [AuthController::class, 'login'])->name('login');
-// test
-Route::view('/testlogin', 'pos.auth.index');
+
 Route::view('/test', 'staff.index');
 Route::middleware(['departments:HR'])->group(function () {
     Route::view('/roles', 'roles.index')->name('roles');
@@ -86,11 +85,16 @@ Route::view('/supplier', 'supplier.index')->name('supplier');
 Route::view('/supplier/create', 'supplier.create')->name('supplier_create');
 
 //pos
-Route::view('/pos/home', 'pos.home.index')->name('pos');
-Route::view('/pos/customer', 'pos.customers.index')->name('customer');
-Route::view('/pos/customer/create', 'pos.customers.create')->name('customer_create');
-Route::view('/pos/ar', 'pos.AR.index')->name('pos_ar');
-Route::view('/pos/cashbook', 'pos.cashbook.index')->name('cashbooks');
-Route::view('/pos/cashbook/detail', 'pos.cashbook.detail')->name('cashbook_detail');
-Route::view('/pos/invoices', 'pos.invoices.index')->name('invoices');
-Route::view('/pos/invoices/detail', 'pos.invoices.detail')->name('invoices_detail');
+Route::group(['prefix'=>'pos'], function(){
+    Route::view('/login', 'pos.auth.index')->name('pos.login');
+    Route::middleware(['departments:Catering'])->group(function () {
+        Route::view('/home', 'pos.home.index')->name('pos.index');
+        Route::view('/customer', 'pos.customers.index')->name('pos.customers');
+        Route::view('/customer/create', 'pos.customers.create')->name('pos.customers.create');
+        Route::view('/ar', 'pos.AR.index')->name('pos.ar');
+        Route::view('/cashbook', 'pos.cashbook.index')->name('pos.cashbooks');
+        Route::view('/cashbook/detail', 'pos.cashbook.detail')->name('pos.cashbooks.detail');
+        Route::view('/invoices', 'pos.invoices.index')->name('pos.invoices');
+        Route::view('/invoices/detail', 'pos.invoices.detail')->name('pos.invoices.detail');
+    });
+});

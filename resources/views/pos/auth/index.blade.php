@@ -10,7 +10,7 @@
 
 	<link rel="preconnect" href="https://fonts.gstatic.com">
 
-	<title> @yield('page_title')</title>
+	<title> POS Login </title>
     @vite('resources/js/app.js')
 
     <link rel="stylesheet" href="{{asset('css/style_web.css')}}">
@@ -31,4 +31,3 @@
 
 </html>
 
- 
