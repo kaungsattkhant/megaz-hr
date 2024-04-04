@@ -58,6 +58,15 @@
                             Total
                         </th>
                         <th scope="col" class=" px-6 py-4 ">
+                            Manager Checked
+                        </th>
+                        <th scope="col" class=" px-6 py-4 ">
+                            Financial Checked
+                        </th>
+                        <th scope="col" class=" px-6 py-4 ">
+                            MD Checked
+                        </th>
+                        <th scope="col" class=" px-6 py-4 ">
 
                         </th>
                     </tr>
@@ -77,15 +86,24 @@
                             <td class=" px-6 py-4 font-medium ">
                                 {{ (purchaseOrderItem.amount * purchaseOrderItem.quantity).toLocaleString() }}
                             </td>
+                            <td  class="px-6 py-4">
+                                {{ purchaseOrderItem.is_manager_checked == 1 ? 'Yes' : 'No' }}
+                            </td>
+                            <td class="px-6 py-4">
+                                {{ purchaseOrderItem.is_financial_checked == 1 ? 'Yes' : 'No' }}
+                            </td>
+                            <td class="px-6 py-4">
+                                {{ purchaseOrderItem.is_md_checked == 1 ? 'Yes' : 'No' }}
+                            </td>
                             <td class=" px-6 py-4 font-medium ">
-                                <button @click="editPurchaseOrderItemBtnClicked(purchaseOrderItemsIndex)" data-te-toggle="modal" data-te-target="#editModal">
+                                <button v-if="(isManager || isMD) && purchaseOrderItem.is_manager_checked == 0" @click="editPurchaseOrderItemBtnClicked(purchaseOrderItemsIndex)" data-te-toggle="modal" data-te-target="#editModal">
                                     <i class="fal fa-pencil  pr-3"></i>
                                 </button>
-                                <button @click="checkPurchaseOrderItemBtnClicked(purchaseOrderItem.id)" :disabled="purchaseOrderItem.id == null"
+                                <button v-if="(isManager || isMD) && purchaseOrderItem.is_manager_checked == 0" @click="checkPurchaseOrderItemBtnClicked(purchaseOrderItem.id)" :disabled="purchaseOrderItem.id == null"
                                 data-te-toggle="modal" data-te-target="#checkModal">
                                     <i class="fal fa-check  pr-3"></i>
                                 </button>
-                                <button @click="removePurchaseOrderItemBtnClicked(purchaseOrderItemsIndex)" data-te-toggle="modal" data-te-target="#deleteModal">
+                                <button v-if="(isManager || isMD) && purchaseOrderItem.is_manager_checked == 0" @click="removePurchaseOrderItemBtnClicked(purchaseOrderItemsIndex)" data-te-toggle="modal" data-te-target="#deleteModal">
                                     <i class="fal fa-times pr-3"></i>
                                 </button>
                             </td>
@@ -100,7 +118,7 @@
         </div>
         <div>
             <button class="add-btn" @click="createPurchaseOrderBtnClicked">
-                Create Purchase Order
+                Update Purchase Order
             </button>
         </div>
     </div>
@@ -267,6 +285,8 @@
                 deleteId: null,
                 deleteIndex: null,
                 checkId: null,
+                isManager: false,
+                isMD: false,
 
                 editQuantity: 0,
                 editPurchaseOrderItem: null,
@@ -274,7 +294,7 @@
         },
 
         methods: {
-            ...mapGetters(['getToken']),
+            ...mapGetters(['getToken','getUser', 'getRoles', 'getDepartment']),
 
             async getItemList(){
                 let response = await getApiData({url: `/api/items`, token: this.getToken()});
@@ -353,7 +373,8 @@
                     formData.append('value', 1);
                     let response = await postApiData({url: url, form_data: formData, token: this.getToken()});
                     if(response.success){
-                        // alert('Item checked');
+                        alert('Item checked');
+                        window.location.reload();
                     }
                 }
 
@@ -404,11 +425,20 @@
                 formData.append('items', JSON.stringify(updatedPurchaseOrderItems));
                 let response = await postApiData({url: `/api/purchase_orders`, form_data:  formData, token: this.getToken()});
                 alert(`Operation success ${response.success}`);
+                window.location.reload();
             },
 
         },
 
         created(){
+            this.getRoles().forEach((role)=>{
+                if(role.name == 'Manager'){
+                    this.isManager = true;
+                }
+                if(role.name == 'MD'){
+                    this.isMD = true;
+                }
+            });
             this.getPurchaseOrder();
             this.getItemList();
         },

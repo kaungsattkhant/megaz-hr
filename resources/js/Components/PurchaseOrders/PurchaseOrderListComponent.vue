@@ -69,21 +69,22 @@
                                 </td>
 
                                 <td  class="px-6 py-4">
-                                    {{ purchaseOrder.financial_check_id !== null ? purchaseOrder.financial_check_id : 'unchecked' }}
+                                    {{ purchaseOrder.financial_check_id !== null ? 'Yes' : 'No' }}
                                 </td>
                                 <td class="px-6 py-4">
-                                    {{ purchaseOrder.financial_check_id !== null ? purchaseOrder.financial_check_id : 'unchecked' }}
+                                    {{ purchaseOrder.financial_check_id !== null ? 'Yes' : 'No' }}
                                 </td>
                                 <td class="px-6 py-4">
-                                    {{ purchaseOrder.financial_check_id !== null ? purchaseOrder.financial_check_id : 'unchecked' }}
+                                    {{ purchaseOrder.financial_check_id !== null ? 'Yes' : 'No' }}
                                 </td>
                                 <td class="whitespace-nowrap px-6 py-4 space-x-4">
-                                    <button class="pr-1" @click="checkPurchaseOrderBtnClicked(purchaseOrder.id)" data-te-toggle="modal" data-te-target="#checkModal">
+                                    <button v-if="(isManager || isMD)" class="pr-1" @click="checkPurchaseOrderBtnClicked(purchaseOrder.id)" data-te-toggle="modal" data-te-target="#checkModal">
                                         <i class="far fa-check"></i>
                                     </button>
                                     <!-- <a :href="'/purchase_orders/'+purchaseOrder.id+'/confirm'" id="" class="pr-1">
                                         <i class="far fa-check"></i>
                                     </a> -->
+
                                     <a :href="'/purchase_orders/'+purchaseOrder.id+'/confirm'" id="" class="pr-1">
                                         <i class="far fa-bars"></i>
                                     </a>
@@ -163,12 +164,13 @@
             return {
                 purchaseOrderList: [],
                 checkId: null,
-                loginUser:null
+                isManager: false,
+                isMD: false,
             };
         },
 
         methods: {
-            ...mapGetters(['getToken','getUser']),
+            ...mapGetters(['getToken','getUser', 'getRoles', 'getDepartment']),
 
             async getPurhaseOrderList(pageNumber){
                 let url = `/api/purchase_orders`;
@@ -197,7 +199,8 @@
                     formData.append('value', 1);
                     let response = await postApiData({url: url, form_data: formData, token: this.getToken()});
                     if(response.success){
-                        // alert('PO checked');
+                        alert('PO checked');
+                        window.location.reload();
                     }
                 }
 
@@ -207,13 +210,20 @@
 
         created()
         {
+            this.getRoles().forEach((role)=>{
+                if(role.name == 'Manager'){
+                    this.isManager = true;
+                }
+                if(role.name == 'MD'){
+                    this.isMD = true;
+                }
+            });
             this.getPurhaseOrderList(null);
         },
 
         mounted()
         {
             initTE({Modal});
-            this.loginUser = this.getUser();
         }
     }
 </script>
