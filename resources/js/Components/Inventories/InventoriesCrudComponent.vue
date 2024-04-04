@@ -66,6 +66,12 @@
                                     checked:focus:before:transition-[box-shadow_0.2s,transform_0.2s] dark:bg-white/25 dark:after:bg-surface-dark dark:checked:bg-primary dark:checked:after:bg-primary"
                                     type="checkbox"
                                     role="switch"/>
+
+                                    <button
+                                    data-te-toggle="modal" data-te-target="#editModal" id="edit-btn" class="pr-3 ml-2"
+                                    @click="editBtnClicked(inventory.id)">
+                                    <i class="fal fa-pen"></i>
+                                    </button>
                                 </td>
                             </tr>
                             <tr class="">
@@ -120,17 +126,19 @@
                             </select>
                         </div>
 
-                        <div class="mb-4" v-if="typeList.length>0">
+                        <div class="mb-4" v-if="inventoryableList.length>0">
                             <label v-if="selectedInventoryType == 'area'" for="" class="block text-sm text-black mb-3">
                                 Area
                             </label>
                             <label v-if="selectedInventoryType == 'department'" for="" class="block text-sm text-black mb-3">
                                 Department
                             </label>
-                            <select name="" id="" v-model="inventoryable_id"
-                                class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
-                                <option :value="item.id" v-for="(item,index) in typeList">{{ item.name }}</option>
+                            <select name="" id="" v-model="selectedInventoryable"
+                                class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0" @change="inventoryableSelectChanged">
+                                <option :value="inventoryable" v-for="(inventoryable,index) in inventoryableList">{{ inventoryable.name }}</option>
                             </select>
+
+                            <span v-for="inventoryableId in inventoryableIds"> {{ inventoryableId.name }}, </span>
                         </div>
 
                     </div>
@@ -138,6 +146,61 @@
                         <button type="button" @click="createBtnClicked"
                         class="add-btn focus:outline-none focus:ring-0 ">
                             Create
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Edit Modal -->
+        <div data-te-modal-init
+            class="fixed left-0 top-0 z-[1055] hidden h-full w-full overflow-y-auto overflow-x-hidden outline-none"
+            id="editModal" tabindex="-1" aria-labelledby="create_modalLabel" aria-hidden="true">
+            <div data-te-modal-dialog-ref
+                class="pointer-events-none relative w-auto mb-12 translate-y-[-50px] opacity-0 transition-all duration-300 ease-in-out min-[576px]:mx-auto min-[576px]:mt-7 min-[576px]:max-w-[500px]">
+                <div
+                    class="min-[576px]:shadow-[0_0.5rem_1rem_rgba(#000, 0.15)] pointer-events-auto relative flex w-full flex-col rounded-md border-none bg-white bg-clip-padding text-current shadow-lg outline-none">
+
+                    <div class="relative  p-4">
+                        <h5 class="text-xl text-center mt-2 font-medium leading-normal text-black" id="create_modalLabel">
+                            Create Inventory
+                        </h5>
+                        <button type="button" id="close" class="absolute top-4 right-4 focus:shadow-none focus:outline-none"
+                            data-te-modal-dismiss aria-label="Close">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                                stroke="currentColor" class="h-5 w-5">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                        </button>
+                    </div>
+                    <div class="relative px-12 py-4" data-te-modal-body-ref>
+                        <div class="mb-4">
+                            <label for="" class="block text-sm text-black mb-3">
+                                Inventory Name
+                            </label>
+                            <input type="text" placeholder="Inventory Name" v-model="nameEdit"
+                                class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
+                        </div>
+
+                        <div class="mb-4" v-if="inventoryableListEdit.length>0">
+                            <label v-if="selectedInventoryTypeEdit == 'area'" for="" class="block text-sm text-black mb-3">
+                                Area
+                            </label>
+                            <label v-if="selectedInventoryTypeEdit == 'department'" for="" class="block text-sm text-black mb-3">
+                                Department
+                            </label>
+                            <select name="" id="" v-model="selectedInventoryableEdit"
+                                class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0" @change="inventoryableEditSelectChanged">
+                                <option :value="inventoryable" v-for="(inventoryable,index) in inventoryableListEdit">{{ inventoryable.name }}</option>
+                            </select>
+
+                            <span v-for="inventoryableId in inventoryableIdsEdit"> {{ inventoryableId.name }}, </span>
+                        </div>
+                    </div>
+                    <div class="flex justify-center px-12 mb-6">
+                        <button type="button" @click="confirmEditBtnClicked"
+                        class="add-btn focus:outline-none focus:ring-0 ">
+                            Update
                         </button>
                     </div>
                 </div>
@@ -222,7 +285,7 @@
 </template>
 
 <script>
-    import { Modal, Ripple, Select, initTE, Input } from "tw-elements";
+    import { Modal, Ripple, Select, initTE, Input, Dropdown } from "tw-elements";
     import { getApiData, postApiData, deleteApiData } from '../../utilities/ajax-helpers';
     import { mapGetters } from "vuex";
 
@@ -230,12 +293,22 @@
         data() {
             return {
                 inventoryList:[],
-                typeList:[],
+                inventoryableList:[],
                 areaList:[],
                 departmentList:[],
                 name: null,
                 selectedInventoryType:null,
-                inventoryable_id:null,
+                selectedInventoryable: null,
+                inventoryableIds: [],
+
+                inventoryableListEdit: [],
+                editId: null,
+                inventoryEdit: null,
+                nameEdit: null,
+                selectedInventoryTypeEdit: null,
+                selectedInventoryableEdit: null,
+                inventoryableIdsEdit: [],
+
                 deleteId: null,
 
                 per_page: 10,
@@ -251,6 +324,36 @@
         methods: {
             ...mapGetters(['getToken']),
 
+            inventoryableSelectChanged(){
+                if(this.inventoryableIds.length < 1){
+                    this.inventoryableIds.push(this.selectedInventoryable);
+                }
+                else{
+                    let index = this.inventoryableIds.findIndex(inventoryable => inventoryable.id == this.selectedInventoryable.id);
+                    if(index != -1){
+                        this.inventoryableIds.splice(index, 1);
+                    }
+                    else{
+                        this.inventoryableIds.push(this.selectedInventoryable);
+                    }
+                }
+            },
+
+            inventoryableEditSelectChanged(){
+                if(this.inventoryableIdsEdit.length < 1){
+                    this.inventoryableIdsEdit.push(this.selectedInventoryableEdit);
+                }
+                else{
+                    let index = this.inventoryableIdsEdit.findIndex(inventoryable => inventoryable.id == this.selectedInventoryableEdit.id);
+                    if(index != -1){
+                        this.inventoryableIdsEdit.splice(index, 1);
+                    }
+                    else{
+                        this.inventoryableIdsEdit.push(this.selectedInventoryableEdit);
+                    }
+                }
+            },
+
             async getInventoryList(){
                 const response = await getApiData({ url: '/api/inventories', token: this.getToken() });
                 if(response.data){
@@ -261,13 +364,15 @@
             async getAreaList(){
                 const response = await getApiData({ url: '/api/areas', token: this.getToken()});
                 if(response.data){
-                    this.typeList = response.data;
+                    this.inventoryableList = response.data;
+                    this.inventoryableIds = [];
                 }
             },
             async getDepartmentList(){
                 const response = await getApiData({ url: '/api/departments', token: this.getToken() });
                 if(response.data){
-                    this.typeList = response.data;
+                    this.inventoryableList = response.data;
+                    this.inventoryableIds = [];
                 }
             },
 
@@ -281,11 +386,20 @@
                 }
             },
 
+            async getinventoryListForEdit(type){
+                const response = await getApiData({ url: `/api/${type}s`, token: this.getToken()});
+                if(response.data){
+                    this.inventoryableListEdit = response.data;
+                    // console.log(this.inventoryableListEdit);
+                    // this.inventoryableIdsEdit = [];
+                }
+            },
+
             createBtnClicked(){
                 console.log(this.name);
 
                 console.log(this.selectedInventoryType);
-                console.log(this.inventoryable_id)
+                console.log(this.inventoryableIds);
                 this.createInventory();
             },
 
@@ -294,7 +408,9 @@
                 let formData = new FormData();
                 formData.append('name', this.name);
                 formData.append('inventoryable_type', this.selectedInventoryType);
-                formData.append('inventoryable_id', this.inventoryable_id);
+                this.inventoryableIds.forEach((inventoryable)=>{
+                    formData.append('inventoryable_id[]', inventoryable.id);
+                });
                 let response = await postApiData({url: '/api/inventories', form_data: formData, token: this.getToken()});
                 if(response.success){
                     this.getInventoryList(null);
@@ -307,6 +423,32 @@
                 }
             },
 
+            editBtnClicked(id){
+                this.editId = id;
+                let inventory = this.inventoryList.find(inventory => inventory.id == this.editId);
+                if(inventory){
+                    this.inventoryEdit = inventory;
+                    console.log(this.inventoryEdit);
+                    this.nameEdit = this.inventoryEdit.name;
+                    this.selectedInventoryTypeEdit = this.inventoryEdit.inventoryable[0].inventoryable_type;
+                    console.log(this.nameEdit);
+                    console.log(this.selectedInventoryTypeEdit);
+                    this.getinventoryListForEdit(this.selectedInventoryTypeEdit);
+                    this.inventoryEdit.inventoryable.forEach((inventoryable)=>{
+                        // console.log(inventoryable.inventoryable);
+                        this.inventoryableIdsEdit.push(inventoryable.inventoryable);
+                    });
+                    // console.log(this.inventoryableIdsEdit);
+                }
+            },
+
+            confirmEditBtnClicked(){
+                let formData = new FormData();
+                formData.append('name', this.name);
+                formData.append('inventoryable_type', this.selectedInventoryTypeEdit);
+
+            },
+
             closeModal() {
                 document.getElementById("close").click();
             },
@@ -314,7 +456,8 @@
             clearForm() {
                 this.name = null,
                 this.selectedInventoryType = null,
-                this.inventoryable_id = null,
+
+                this.selectedInventoryable = null
                 this.typeList = []
             },
 
@@ -349,12 +492,14 @@
             }
 
         },
+
+        created(){
+            this.getInventoryList();
+        },
+
         mounted()
         {
-
-            this.getInventoryList();
-
-            initTE({ Modal,Select, Ripple });
+            initTE({ Modal,Select, Ripple, Dropdown });
         }
     }
 </script>
