@@ -96,14 +96,14 @@
                                 {{ purchaseOrderItem.is_md_checked == 1 ? 'Yes' : 'No' }}
                             </td>
                             <td class=" px-6 py-4 font-medium ">
-                                <button v-if="(isManager || isMD) && purchaseOrderItem.is_manager_checked == 0" @click="editPurchaseOrderItemBtnClicked(purchaseOrderItemsIndex)" data-te-toggle="modal" data-te-target="#editModal">
+                                <button @click="editPurchaseOrderItemBtnClicked(purchaseOrderItemsIndex)" data-te-toggle="modal" data-te-target="#editModal">
                                     <i class="fal fa-pencil  pr-3"></i>
                                 </button>
-                                <button v-if="(isManager || isMD) && purchaseOrderItem.is_manager_checked == 0" @click="checkPurchaseOrderItemBtnClicked(purchaseOrderItem.id)" :disabled="purchaseOrderItem.id == null"
+                                <button @click="checkPurchaseOrderItemBtnClicked(purchaseOrderItem.id)" :disabled="purchaseOrderItem.id == null"
                                 data-te-toggle="modal" data-te-target="#checkModal">
                                     <i class="fal fa-check  pr-3"></i>
                                 </button>
-                                <button v-if="(isManager || isMD) && purchaseOrderItem.is_manager_checked == 0" @click="removePurchaseOrderItemBtnClicked(purchaseOrderItemsIndex)" data-te-toggle="modal" data-te-target="#deleteModal">
+                                <button @click="removePurchaseOrderItemBtnClicked(purchaseOrderItemsIndex)" data-te-toggle="modal" data-te-target="#deleteModal">
                                     <i class="fal fa-times pr-3"></i>
                                 </button>
                             </td>

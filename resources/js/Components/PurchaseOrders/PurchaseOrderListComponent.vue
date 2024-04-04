@@ -78,7 +78,7 @@
                                     {{ purchaseOrder.financial_check_id !== null ? 'Yes' : 'No' }}
                                 </td>
                                 <td class="whitespace-nowrap px-6 py-4 space-x-4">
-                                    <button v-if="(isManager || isMD)" class="pr-1" @click="checkPurchaseOrderBtnClicked(purchaseOrder.id)" data-te-toggle="modal" data-te-target="#checkModal">
+                                    <button class="pr-1" @click="checkPurchaseOrderBtnClicked(purchaseOrder.id)" data-te-toggle="modal" data-te-target="#checkModal">
                                         <i class="far fa-check"></i>
                                     </button>
                                     <!-- <a :href="'/purchase_orders/'+purchaseOrder.id+'/confirm'" id="" class="pr-1">
