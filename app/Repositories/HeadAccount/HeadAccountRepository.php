@@ -45,7 +45,7 @@ class HeadAccountRepository implements HeadAccountInterface
     public function subAccountList($request){
         if($request->per_page || $request->page){
             return SubAccount::with(['head_account'])
-            // ->where('is_active',1)   
+            // ->where('is_active',1)
             ->paginate(20);
         }
         return SubAccount::with(['head_account'])
