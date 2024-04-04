@@ -22,10 +22,12 @@ class PurchaseOrderRepository implements PurchaseOrderRepositoryInterface
                 $q->where('created_by', $staff->id);
             })
             ->when($staff->hasRoles('Manager'), function ($q) {
-                $q->whereIn('status', ['manager_checked', 'created']);
+                $q->whereIn('status', ['manager_checked', 'created'])
+                ->orWhere('manager_check_id',UserData()->id);
             })
             ->when($staff->hasRoles('Financial'), function ($q) {
-                $q->whereIn('status', ['manager_checked', 'financial_checked']);
+                $q->whereIn('status', ['manager_checked', 'financial_checked'])
+                ->orWhere('financial_check_id',UserData()->id);
             })
             ->when($staff->hasRoles('MD'), function ($q) {
                 $q->whereIn('status', ['md_checked', 'financial_checked']);
