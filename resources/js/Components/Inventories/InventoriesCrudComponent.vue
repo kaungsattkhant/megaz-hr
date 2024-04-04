@@ -28,6 +28,9 @@
                             <th scope="col" class=" px-6 py-4 ">
                                 Inventory Name
                             </th>
+                            <th scope="col" class=" px-6 py-4 ">
+                                Departments/Areas
+                            </th>
                             <th scope="col" class="px-6 py-4">
 
                             </th>
@@ -45,6 +48,11 @@
                                     <a :href="'inventories/'+inventory.id+'/ledger'">
                                     {{ inventory.name }}
                                     </a>
+                                </td>
+                                <td class="whitespace-nowrap px-6 py-4 ">
+                                    <div v-for="inventoryable in inventory.inventoryable">
+                                        {{ inventoryable.inventoryable.name }}
+                                    </div>
                                 </td>
                                 <td class="whitespace-nowrap px-6 py-4">
                                     <!-- <button id="edit-btn" class="pr-1" @click="deleteBtnClicked(inventory.id)"
@@ -199,7 +207,7 @@
                     </div>
                     <div class="flex justify-center px-12 mb-6">
                         <button type="button" @click="confirmEditBtnClicked"
-                        class="add-btn focus:outline-none focus:ring-0 ">
+                        class="add-btn focus:outline-none focus:ring-0 " data-te-modal-dismiss>
                             Update
                         </button>
                     </div>
@@ -442,11 +450,24 @@
                 }
             },
 
-            confirmEditBtnClicked(){
+            async confirmEditBtnClicked(){
                 let formData = new FormData();
-                formData.append('name', this.name);
+                formData.append('id', this.editId);
+                formData.append('name', this.nameEdit);
                 formData.append('inventoryable_type', this.selectedInventoryTypeEdit);
-
+                this.inventoryableIdsEdit.forEach((inventoryable)=>{
+                    formData.append('inventoryable_id[]', inventoryable.id);
+                });
+                let response = await postApiData({url: '/api/inventories', form_data: formData, token: this.getToken()});
+                if(response.success){
+                    this.getInventoryList(null);
+                    console.log("success")
+                    this.closeModal();
+                    this.clearForm();
+                }
+                else{
+                    alert('some errors occur');
+                }
             },
 
             closeModal() {
