@@ -7,7 +7,7 @@
             </label>
         </div>
         <div class="flex justify-end flex-col">
-            <a href="/staff/create" class="add-btn ">
+            <a href="/suppliers/create" class="add-btn ">
                 Add New
             </a>
 
@@ -41,28 +41,31 @@
                         </tr>
                     </thead>
                     <tbody>
-
                         <!-- looping start -->
-                        <div class="contents">
+                        <div class="contents" v-for="(supplier, supplierIndex) in supplierList">
                             <tr class="bg-white rounded-lg overflow-hidden shadow-lg">
                                 <td class=" px-6 py-4 font-medium ">
-                                    1
+                                    {{ ++supplierIndex }}
                                 </td>
                                 <td class="whitespace-nowrap px-6 py-4 ">
-                                    wan tat ma q
+                                    {{ supplier.name }}
                                 </td>
                                 <td class="whitespace-nowrap px-6 py-4 ">
-                                    wan tat ma q
+                                    {{ supplier.shop_name }}
                                 </td>
                                 <td class=" px-6 py-4 ">
-                                    wan tat ma q
+                                    {{ supplier.phone_number }}
                                 </td>
-                                <td class="whitespace-nowrap px-6 py-4 "> 
-                                    wan tat ma q
+                                <td class="whitespace-nowrap px-6 py-4 ">
+                                    {{ supplier.address }}
                                 </td>
                                 <td class="whitespace-nowrap px-6 py-4">
-                                    <button @click="deleteBtnClicked(staff.id)" data-te-toggle="modal"
-                                        data-te-target="#deleteModal" id="edit-btn" class="pr-1">
+                                    <a class="pr-2" :href="'/suppliers/' + supplier.id + '/edit'">
+                                        <i class="fal fa-pen"></i>
+                                    </a>
+
+                                    <button data-te-toggle="modal"
+                                        data-te-target="#deleteModal" id="edit-btn" class="pl-2">
                                         <i class="fas fa-trash-alt"></i>
                                     </button>
                                 </td>
@@ -72,9 +75,6 @@
                                 <td class=" py-2 "></td>
                             </tr>
                         </div>
-
-
-
                     </tbody>
                 </table>
             </div>
@@ -91,12 +91,28 @@ import { getApiData, deleteApiData } from '../../utilities/ajax-helpers';
 export default {
     data() {
         return {
+            supplierList: [],
         };
     },
 
     methods: {
+        ...mapGetters(['getToken']),
+
+        async getSupplierList(){
+            let url = `/api/suppliers`;
+            let response = await getApiData({url: url, token: this.getToken()});
+            if(response.data){
+                this.supplierList = response.data;
+            }
+        },
     },
+
+    created(){
+        this.getSupplierList();
+    },
+
     mounted() {
+
     }
 }
 </script>

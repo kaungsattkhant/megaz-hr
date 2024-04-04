@@ -10,6 +10,7 @@ initTE({ Collapse, Select, Carousel, Modal, Ripple, Dropdown, Datepicker, Input,
 import {createApp} from 'vue/dist/vue.esm-bundler';
 import { store } from './Store';
 
+import NavBarComponent from './Components/Common/NavBarComponent.vue';
 import StaffListComponent from './Components/Staff/StaffListComponent.vue';
 import StaffCreateComponent from './Components/Staff/StaffCreateComponent.vue';
 import TasksCrudComponent from './Components/Tasks/TasksCrudComponent.vue';
@@ -38,6 +39,7 @@ import ArHistoryComponent from './Components/AR/ArHistoryComponent.vue';
 import ArPaidComponent from './Components/AR/ArPaidComponent.vue';
 import SupplierListComponent from './Components/Supplier/SupplierListComponent.vue';
 import SupplierCreateComponent from './Components/Supplier/SupplierCreateComponent.vue';
+import SupplierUpdateComponent from './Components/Supplier/SupplierUpdateComponent.vue';
 import TableCrudComponent from './Components/TablesAndRooms/TableCrudComponent.vue';
 
 import LoginComponent from './Components/Auth/LoginComponent.vue';
@@ -55,6 +57,7 @@ import InvoiceDetailComponent from './Components/Pos/Invoices/InvoiceDetailCompo
 import LoginComponentPos from './Components/Pos/Auth/LoginComponentPos.vue';
 
 const app = createApp({});
+app.component('NavBarComponent', NavBarComponent);
 app.component('StaffListComponent', StaffListComponent);
 app.component('StaffCreateComponent', StaffCreateComponent);
 app.component('TasksCrudComponent', TasksCrudComponent);
@@ -87,6 +90,7 @@ app.component('TableCrudComponent', TableCrudComponent);
 
 app.component('SupplierListComponent', SupplierListComponent);
 app.component('SupplierCreateComponent', SupplierCreateComponent);
+app.component('SupplierUpdateComponent', SupplierUpdateComponent);
 
 app.component('LoginComponent', LoginComponent);
 app.component('LogoutComponent', LogoutComponent);

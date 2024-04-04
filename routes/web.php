@@ -81,8 +81,9 @@ Route::middleware(['departments:Finance'])->group(function () {
 
 });
 
-Route::view('/supplier', 'supplier.index')->name('supplier');
-Route::view('/supplier/create', 'supplier.create')->name('supplier_create');
+Route::view('/suppliers', 'supplier.index')->name('suppliers.index');
+Route::view('/suppliers/create', 'supplier.create')->name('suppliers.create');
+Route::view('/suppliers/{id}/edit', 'supplier.edit')->name('suppliers.edit');
 
 //pos
 Route::group(['prefix'=>'pos'], function(){

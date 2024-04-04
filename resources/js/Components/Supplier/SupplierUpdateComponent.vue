@@ -2,7 +2,7 @@
     <div class="px-8">
         <div class="mb-6">
             <p class="text-xl  text-black font-normal">
-                New Supplier
+                Edit Supplier
             </p>
         </div>
         <div class="grid !grid-cols-12 gap-x-4 mb-6">
@@ -71,18 +71,32 @@
                         </tr>
                     </thead>
                     <tbody>
+                        <tr class="" v-for="(existingItem, existingItemIndex) in existingItems" :key="existingItemIndex">
+                            <td class=" px-6 py-2 font-medium ">
+                                {{ existingItem.name }}
+                            </td>
+                            <td class=" px-6 py-2 font-medium ">
+                                <button>
+                                    <i class="fal fa-trash  pr-3" @click="deleteExistingItemBtnClicked(existingItem.id)" ></i>
+                                </button>
+                            </td>
+                        </tr>
+                        <tr class="">
+                            <td class=" "></td>
+                        </tr>
+
                         <tr class="" v-for="(selectedItem, selectedItemIndex) in selectedItems" :key="selectedItemIndex">
-                            <td class=" px-6 py-4 font-medium ">
+                            <td class=" px-6 py-2 font-medium ">
                                 {{ selectedItem.name }}
                             </td>
-                            <td class=" px-6 py-4 font-medium ">
+                            <td class=" px-6 py-2 font-medium ">
                                 <button>
                                     <i class="fal fa-trash  pr-3" @click="deleteSelectedItemBtnClicked(selectedItem.id)" ></i>
                                 </button>
                             </td>
                         </tr>
                         <tr class="">
-                            <td class=" py-2 "></td>
+                            <td class=" "></td>
                         </tr>
                     </tbody>
                 </table>
@@ -90,7 +104,7 @@
         </div>
         <div>
             <button class="add-btn" @click="createBtnClicked">
-                Create Supplier
+                Update Supplier
             </button>
         </div>
     </div>
@@ -102,10 +116,14 @@ import { getApiData, postApiData, deleteApiData } from '../../utilities/ajax-hel
 import { mapGetters } from "vuex";
 
 export default {
+    props: ["supplierId"],
+
     data() {
         return {
             itemList: [],
             selectedItems: [],
+            existingItems: [],
+            supplier: null,
             name: null,
             shopName: null,
             phoneNumber: null,
@@ -124,6 +142,27 @@ export default {
             }
         },
 
+        deleteExistingItemBtnClicked(id){
+            let index = this.existingItems.findIndex(item => item.id == id);
+            if(index != -1){
+                this.existingItems.splice(index, 1);
+            }
+        },
+
+        async getSupplierDetail(){
+            let url = `/api/suppliers/${this.supplierId}`;
+            let response = await getApiData({url: url, token: this.getToken()});
+            if(response.data){
+                this.supplier = response.data;
+                this.name = this.supplier.name;
+                this.shopName = this.supplier.shop_name;
+                this.phoneNumber = this.supplier.phone_number;
+                this.maxCredit = this.supplier.credit_limit;
+                this.address = this.supplier.address;
+                this.existingItems = this.supplier.items;
+            }
+        },
+
         async getItemList(){
             let url = `/api/items`;
             let response = await getApiData({url: url, token: this.getToken()});
@@ -137,6 +176,13 @@ export default {
         },
 
         async createBtnClicked(){
+            if(this.existingItems.length > 1){
+                this.existingItems.forEach((item)=>{
+                    this.selectedItems.push(item);
+                });
+                this.existingItems = [];
+            }
+
             if(!this.name){
                 this.alertValidationMessage(`supplier name`);
                 return 1;
@@ -163,6 +209,7 @@ export default {
             }
 
             let formData = new FormData();
+            formData.append("id", this.supplierId);
             formData.append("name", this.name);
             formData.append("shop_name", this.shopName);
             formData.append("phone_number", this.phoneNumber);
@@ -175,7 +222,6 @@ export default {
             let url = `/api/suppliers`;
             let response = await postApiData({url: url, form_data: formData, token: this.getToken()});
             if(response.success){
-                // console.log(response);
                 window.location.replace("/suppliers");
             }
         },
@@ -183,6 +229,7 @@ export default {
 
     created(){
         this.getItemList();
+        this.getSupplierDetail();
     },
 
     mounted() {

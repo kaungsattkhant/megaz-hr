@@ -1,6 +1,6 @@
 @extends('layouts.main')
 
-@section('page_title', 'supplier')
+@section('page_title', 'suppliers')
 @section('supplier', 'active-link')
 @section('content')
 

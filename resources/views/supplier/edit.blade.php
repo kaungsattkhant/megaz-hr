@@ -5,7 +5,7 @@
 @section('content')
 
 <div id="app">
-    <supplier-list-component/>
+    <supplier-update-component :supplier-id={{ json_encode($id) }}> </supplier-update-component>
 </div>
 
 @endsection

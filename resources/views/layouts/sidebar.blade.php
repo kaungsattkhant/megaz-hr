@@ -87,7 +87,12 @@
                         </li>
                         @endif
                         @if(checkDepartmentPermission(['Finance']))
-
+                        <li>
+                            <a href="{{ route('suppliers.index') }}" class="flex items-center @yield('suppliers')">
+                                <i class="fal fa-tasks  pr-3"></i>
+                                Suppliers
+                            </a>
+                        </li>
                         <li>
                             <a href="{{ route('accountings') }}" class="flex items-center @yield('accounting')">
                                 <i class="fal fa-tasks  pr-3"></i>
@@ -214,7 +219,7 @@
                             </a>
                         </li>
                         @endif
-                       
+
                     </ul>
 
                 </div>
