@@ -4,26 +4,33 @@
         <div class="">
             <div class="w-[67%] pt-9 px-6">
                 <ul class="mb-5 flex list-none flex-row flex-wrap border-b-0 pl-0" role="tablist" data-te-nav-ref>
-                    <li role="presentation">
+                    <!-- <li role="presentation">
                         <a href="#tabs-home" class="my-2 mr-3 text-white block  px-7 pb-2.5 rounded-full
                             pt-3 text-xs  hover:isolate bg-[#F0C094]
                             hover:bg-[#f7a559] focus:isolate data-[te-nav-active]:bg-[#F19E51] " data-te-toggle="pill"
                             data-te-target="#tabs-home" data-te-nav-active role="tab" aria-controls="tabs-home"
                             aria-selected="true">KTV</a>
+                    </li> -->
+                    <li v-for="(area,index) in areaList" role="presentation" @click="btnGetAreaItemList(area.id)">
+                        <a href="#tabs-profile" class="my-2 mr-3 text-white block  px-7 pb-2.5 rounded-full
+                            pt-3 text-xs  hover:isolate bg-[#F0C094]
+                            hover:bg-[#f7a559] focus:isolate data-[te-nav-active]:bg-[#F19E51]"
+                            :class="area.id == selectedAreaId ? 'bg-[#F19E51]' : 'bg-[#F0C094]'">
+                            {{ area.name }}
+                        </a>
                     </li>
-                    <li role="presentation" @click="btnGetTableListTab()">
+                    <!-- <li role="presentation" @click="btnGetTableListTab()">
                         <a href="#tabs-profile" class="my-2 mr-3 text-white block  px-7 pb-2.5 rounded-full
                             pt-3 text-xs  hover:isolate bg-[#F0C094]
                             hover:bg-[#f7a559] focus:isolate data-[te-nav-active]:bg-[#F19E51]" data-te-toggle="pill"
                             data-te-target="#tabs-profile" role="tab" aria-controls="tabs-profile"
                             aria-selected="false">Roof Top</a>
-                    </li>
+                    </li> -->
 
                 </ul>
 
                 <div class="mb-6">
-                    <div class="hidden opacity-100 transition-opacity duration-150 ease-linear data-[te-tab-active]:block"
-                        id="tabs-home" role="tabpanel" aria-labelledby="tabs-home-tab" data-te-tab-active>
+                    <div class="opacity-100 transition-opacity duration-150 ease-linear">
                         <div class="flex flex-wrap gap-x-4 gap-y-4">
                             <!-- <div class="bg-[#FF7675] flex-shrink-0 flex-grow p-6 w-40 max-w-44 h-40">
                                 <div class="flex flex-col justify-between h-full">
@@ -77,7 +84,7 @@
                             </div> -->
                         </div>
                     </div>
-                    <div class="hidden opacity-0 transition-opacity duration-150 ease-linear data-[te-tab-active]:block"
+                    <!-- <div class="hidden opacity-0 transition-opacity duration-150 ease-linear data-[te-tab-active]:block"
                         id="tabs-profile" role="tabpanel" aria-labelledby="tabs-profile-tab">
                         <div class="flex flex-wrap gap-x-4 gap-y-4">
                             <div v-for="(table,index) in tableList"
@@ -105,7 +112,7 @@
                                 </button>
                             </div>
                         </div>
-                    </div>
+                    </div> -->
                 </div>
             </div>
             <div class="right-sidebar shadow-lg border-l border-gray-200">
@@ -144,7 +151,8 @@
                                 <p class="text-sm text-black font-semibold">
                                     <!-- 35,000 MMks -->
 
-                                    {{ (selectedRoom.price_per_hour * (selectedRoom.invoices.length > 0 ? selectedRoom.invoices[0].sessions[0].session_duration : 1)).toLocaleString() }}
+                                    {{ (selectedRoom.price_per_hour * (selectedRoom.invoices.length > 0 ?
+                                    selectedRoom.invoices[0].sessions[0].session_duration : 1)).toLocaleString() }}
                                     MMKs
                                 </p>
                             </div>
@@ -641,7 +649,7 @@
                             Create Customer
                         </p>
                         <button type="button" class="absolute top-4 right-4 focus:shadow-none focus:outline-none
-                        " id="closeModal" data-te-modal-dismiss aria-label="Close">
+                        " id="closeCustomerModal" data-te-modal-dismiss aria-label="Close">
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
                                 stroke="currentColor" class="h-5 w-5">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
@@ -715,10 +723,13 @@
     import { Modal, Ripple, Select, initTE, Tab } from "tw-elements";
     import { getApiData, postApiData, deleteApiData } from '../../../utilities/ajax-helpers';
     import { getCurrentTime, getCurretDateTime } from '../../../utilities/datetime-helpers';
+    import { mapGetters } from "vuex";
 
     export default {
         data() {
             return {
+                areaList:[],
+                selectedAreaId:null,
                 roomList:[],
                 selectedRoom:null,
                 isOpenRoom: {
@@ -761,6 +772,7 @@
                 selectedPaymentMethod:null,
                 change:null,
                 paid_amount:null,
+                isActive:true,
 
                 //create menu , add hour , change room
                 menuList: [],
@@ -784,6 +796,49 @@
         },
 
         methods: {
+            ...mapGetters(['getToken']),
+            async getAreaList(){
+                let url = '/api/areas'
+                const response = await getApiData({ url: url, token: this.getToken() });
+                if(response.data){
+                    this.areaList = response.data;
+                    this.selectedAreaId = this.areaList[0].id;
+                    let firstAreaId = response.data[0].id;
+                    if (firstAreaId) {
+                        this.initialGetRoomList(firstAreaId);
+                    }
+                }
+            },
+            async initialGetRoomList(firstAreaId) {
+                const response = await getApiData({ url: '/api/areas/' + firstAreaId + '/entities', token: this.getToken() });
+                if (response.data) {
+                    this.roomList = response.data;
+                    this.selectedRoom = this.roomList[0]
+                    if (this.roomList[0].invoices.length > 0) {
+                        this.isOpenRoom.step_1 = false;
+                        this.isOpenRoom.step_2 = false;
+                        this.isOpenRoom.step_detail = true;
+                    }
+                    if (this.roomList[0].invoices.length < 1) {
+                        this.isOpenRoom.step_1 = true;
+                        this.isOpenRoom.step_2 = false;
+                        this.isOpenRoom.step_detail = false;
+                    }
+                }
+            },
+            async btnGetAreaItemList(id){
+                this.selectedAreaId = id;
+                const response = await getApiData({ url: '/api/areas/'+ id +'/entities' });
+                if (response.data) {
+                    this.roomList = response.data;
+                    this.selectedRoom = this.roomList[0]
+                    this.isOpenRoom.step_1 = true;
+                    this.isOpenRoom.step_2 = false;
+                    this.isOpenRoom.step_detail = false;
+                    this.isOpenRoom.step_invoice = false;
+                }
+            },
+            
             async getGendersList(){
                 const response = await getApiData({ url: '/api/genders' });
                 if(response.data){
@@ -797,7 +852,7 @@
                 }
             },
             async getPurchaseMenuList(){
-                const response = await getApiData({ url: '/api/rooms/' + this.selectedRoom.id });
+                const response = await getApiData({ url: '/api/entities/' + this.selectedRoom.id });
                 if(response.data){
                     if(response.data.invoices.length > 0){
                         this.purchaseMenuList = response.data.invoices[0].orders;
@@ -806,30 +861,13 @@
                 }
             },
             async getRoomList(){
-                const response = await getApiData({ url: '/api/rooms' });
+                const response = await getApiData({ url: '/api/areas/' + this.selectedAreaId + '/entities' });
                 if(response.data){
                     this.roomList = response.data;
                     // console.log( this.roomList[0] );
                 }
             },
-            async initialGetRoomList(){
-                const response = await getApiData({ url: '/api/rooms' });
-                if(response.data){
-                    this.roomList = response.data;
-                    this.selectedRoom = this.roomList[0]
-                    if(this.roomList[0].invoices.length>0){
-                        this.isOpenRoom.step_1 = false;
-                        this.isOpenRoom.step_2 = false;
-                        this.isOpenRoom.step_detail = true;
-                    }
-                    if(this.roomList[0].invoices.length<1){
-                        this.isOpenRoom.step_1=true;
-                        this.isOpenRoom.step_2 = false;
-                        this.isOpenRoom.step_detail = false;
-                    }
-                    console.log( this.roomList[0] );
-                }
-            },
+            
             async getCustomerList(){
                 const response = await getApiData({ url: '/api/customers' });
                 if(response.data){
@@ -888,7 +926,7 @@
                     this.selectedCustomer = response.data;
                     // this.getRoomList(null);
                     console.log("success")
-                    this.closeModal();
+                    this.closeCustomerModal();
                     this.clearCustomerForm();
                 }
                 else{
@@ -916,7 +954,7 @@
                 if(this.child > 0){
                     formData.append('child', +this.child);
                 }
-                let response = await postApiData({url: '/api/rooms/start', form_data: formData});
+                let response = await postApiData({ url: '/api/entities/start', form_data: formData});
                 if(response.success){
                     await this.getRoomList();
                     this.selectedRoom = await this.roomList[this.selectedRoomIndex];
@@ -951,7 +989,7 @@
                 formData.append('menu_id', this.selectedMenu.id);
                 formData.append('quantity', this.menuQuantity);
                 formData.append('original_price', this.selectedMenu.prices[0].price);
-                let response = await postApiData({url: '/api/rooms/orders', form_data: formData});
+                let response = await postApiData({ url: '/api/entities/orders', form_data: formData});
                 console.log(this.invoiceId+','+this.selectedMenu.id + ','+ this.menuQuantity +','+this.selectedMenu.prices[0].price)
                 if(response.success){
                     console.log("success")
@@ -971,7 +1009,7 @@
                 let formData = new FormData();
                 formData.append('invoice_id', this.selectedRoom.invoices[0].invoice_id);
                 formData.append('session_duration', this.sessionDuration);
-                let response = await postApiData({url: '/api/rooms/add_more_sessions', form_data: formData});
+                let response = await postApiData({ url: '/api/entities/add_more_sessions', form_data: formData});
                 if(response.success){
                     console.log("success")
                     await this.getRoomList();
@@ -991,7 +1029,7 @@
                 let formData = new FormData();
                 formData.append('invoice_id', this.selectedRoom.invoices[0].invoice_id);
                 formData.append('entity_id', this.change_room.id);
-                let response = await postApiData({url: '/api/rooms/change_rooms', form_data: formData});
+                let response = await postApiData({ url: '/api/entities/change', form_data: formData});
                 console.log('change room ' + this.selectedRoom.invoices[0].invoice_id+','+this.change_room.id)
                 if(response.success){
                     console.log("success");
@@ -1071,7 +1109,7 @@
                 formData.append('tax', this.printInvoiceData.isTax);
                 // formData.append('total', this.printInvoiceData.total);
                 console.log(formData)
-                let response = await postApiData({url: '/api/rooms/done', form_data: formData});
+                let response = await postApiData({ url: '/api/entities/done', form_data: formData});
                 if(response.success){
                     await this.getRoomList();
                     // this.selectedRoom = await this.roomList[this.selectedRoomIndex];
@@ -1094,6 +1132,9 @@
             },
             closeMenuModal() {
                 document.getElementById("closeMenuModal").click();
+            },
+            closeCustomerModal() {
+                document.getElementById("closeCustomerModal").click();
             },
             closeChangeRoomModal() {
                 document.getElementById("close_change_room_modal").click();
@@ -1145,14 +1186,16 @@
         },
         mounted()
         {
+            this.getAreaList();
             this.getGendersList();
             // this.getRoomList();
-            this.initialGetRoomList();
             this.getCustomerList();
             this.getMenuList();
             // this.getChangeableRoomList();
             // this.getSelectedRoom();
             // this.initialSidebarShow();
+
+            // this.initialGetRoomList();
             initTE({ Modal, Select, Ripple, Tab });
 
         }

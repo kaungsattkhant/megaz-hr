@@ -38,6 +38,14 @@
                     </a>
                 </li> -->
                 <li>
+                    <a href="/pos/cashbook" class="flex items-center flex-col  rounded-lg px-6 py-12 @yield('cashbook')">
+                        <i class="fas fa-users mb-1.5 text-2xl"></i>
+                        <span class="">
+                            cashbook
+                        </span>
+                    </a>
+                </li>
+                <li>
                     <a href="/pos/ar" class="flex items-center flex-col  rounded-lg px-6 py-12 @yield('ar')">
                         <i class="fas fa-users mb-1.5 text-2xl"></i>
                         <span class="">
