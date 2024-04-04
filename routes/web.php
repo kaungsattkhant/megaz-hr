@@ -27,7 +27,7 @@ Route::get('/', function () {
 Route::view('/login', 'auth.login')->name('login_form');
 Route::post('/login', [AuthController::class, 'login'])->name('login');
 // test
-
+Route::view('/testlogin', 'pos.auth.index');
 Route::view('/test', 'staff.index');
 Route::middleware(['departments:HR'])->group(function () {
     Route::view('/roles', 'roles.index')->name('roles');
@@ -81,6 +81,9 @@ Route::middleware(['departments:Finance'])->group(function () {
     Route::view('/bankbook/kpay', 'cashbook.bank_kpay')->name('kpay_bank');
 
 });
+
+Route::view('/supplier', 'supplier.index')->name('supplier');
+Route::view('/supplier/create', 'supplier.create')->name('supplier_create');
 
 //pos
 Route::view('/pos/home', 'pos.home.index')->name('pos');

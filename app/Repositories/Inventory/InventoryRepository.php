@@ -57,7 +57,7 @@ class InventoryRepository implements InventoryRepositoryInterface
             if(!isset($request->id)){
                 foreach($request_inventoryable_id as $id){
                     $inventoryable=$inventory->inventoryable()->create([
-                         'inventoryable_type'=>'department',
+                         'inventoryable_type'=>$request->inventoryable_type,
                          'inventoryable_id'=>$id,
                      ]);
                  }

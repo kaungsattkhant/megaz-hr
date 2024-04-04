@@ -2,10 +2,13 @@
     <div class="flex justify-between mb-3">
         <div class=" flex">
             <label for="search" class="search-input">
-                <input type="text" class="input-search" placeholder="Search">
+                <input type="text" class="input-search" placeholder="Search" v-model="searchInput">
 
                 <i class="fal fa-search"></i>
             </label>
+
+            <button class="add-btn h-8 mx-2 " @click="searchBtnClicked">Search</button>
+            <button class="add-btn h-8 mx-2 " @click="clearSearchBtnClicked">Clear</button>
         </div>
         <div class="flex justify-end flex-col">
 
@@ -42,7 +45,7 @@
                     <tbody>
 
                         <!-- looping start -->
-                        <div class="contents" v-for="(room, index) in roomAndTableList" :key="index">
+                        <div class="contents" v-for="(room, index) in serviceList" :key="index">
                             <tr class="bg-white rounded-lg overflow-hidden shadow-lg">
                                 <td class=" px-6 py-4 font-medium ">
                                     {{ ++index }}
@@ -57,10 +60,25 @@
                                     {{ room.price_per_hour }}
                                 </td>
                                 <td class="whitespace-nowrap px-6 py-4">
-                                    <button id="edit-btn" class="pr-1" @click="deleteBtnClicked(room.id)"
+                                    <!-- <button id="edit-btn" class="pr-1" @click="deleteBtnClicked(room.id)"
                                     data-te-toggle="modal" data-te-target="#deleteModal">
                                         <i class="fas fa-trash-alt"></i>
-                                    </button>
+                                    </button> -->
+                                    <input
+                                    :checked="room.is_available == 1"
+                                    @change="isActiveToggled(room.id)"
+                                    class="me-2 mt-[0.3rem] h-3.5 w-8 appearance-none rounded-[0.4375rem] bg-black/25 before:pointer-events-none before:absolute before:h-3.5
+                                    before:w-3.5 before:rounded-full before:bg-transparent before:content-[''] after:absolute after:z-[2] after:-mt-[0.1875rem] after:h-5
+                                    after:w-5 after:rounded-full after:border-none after:bg-white after:shadow-switch-2 after:transition-[background-color_0.2s,transform_0.2s]
+                                    after:content-[''] checked:bg-primary checked:after:absolute checked:after:z-[2] checked:after:-mt-[3px] checked:after:ms-[1.0625rem]
+                                    checked:after:h-5 checked:after:w-5 checked:after:rounded-full checked:after:border-none checked:after:bg-primary checked:after:shadow-switch-1
+                                    checked:after:transition-[background-color_0.2s,transform_0.2s] checked:after:content-[''] hover:cursor-pointer focus:outline-none focus:before:scale-100
+                                    focus:before:opacity-[0.12] focus:before:shadow-switch-3 focus:before:shadow-black/60 focus:before:transition-[box-shadow_0.2s,transform_0.2s]
+                                    focus:after:absolute focus:after:z-[1] focus:after:block focus:after:h-5 focus:after:w-5 focus:after:rounded-full focus:after:content-['']
+                                    checked:focus:border-primary checked:focus:bg-primary checked:focus:before:ms-[1.0625rem] checked:focus:before:scale-100 checked:focus:before:shadow-switch-3
+                                    checked:focus:before:transition-[box-shadow_0.2s,transform_0.2s] dark:bg-white/25 dark:after:bg-surface-dark dark:checked:bg-primary dark:checked:after:bg-primary"
+                                    type="checkbox"
+                                    role="switch"/>
                                 </td>
                             </tr>
                             <tr class="">
@@ -228,7 +246,7 @@
     export default {
         data() {
             return {
-                roomAndTableList:[],
+                serviceList:[],
                 entityTypeList:['Room','Table'],
                 serviceCategoryList:[],
                 areaList:[],
@@ -239,6 +257,8 @@
                 area_id:null,
                 service_category_id:null,
                 deleteId: null,
+
+                searchInput: null,
 
                 per_page: 10,
                 pageNumbers: [],
@@ -253,11 +273,11 @@
         methods: {
             ...mapGetters(['getToken']),
 
-            async getRoomAndTableList(){
+            async getServiceList(pageNumber){
                 const response = await getApiData({ url: '/api/entities?type=service', token: this.getToken() });
                 if(response.data){
-                    this.roomAndTableList = response.data;
-                    console.log(this.roomAndTableList)
+                    this.serviceList = response.data;
+                    console.log(this.serviceList)
                 }
             },
 
@@ -268,6 +288,7 @@
                     console.log(this.areaList)
                 }
             },
+
             async getServiceCategoryList(){
                 const response = await getApiData({ url: '/api/service_categories', token: this.getToken() });
                 if(response.data){
@@ -298,7 +319,7 @@
                 formData.append('service_category_id', this.service_category_id);
                 let response = await postApiData({url: '/api/entities', form_data: formData, token: this.getToken()});
                 if(response.success){
-                    this.getRoomAndTableList(null);
+                    this.getServiceList(null);
                     console.log("success")
                     this.closeModal();
                     this.clearForm();
@@ -319,6 +340,24 @@
                 this.typeList = []
             },
 
+            isActiveToggled(id){
+                let index = this.serviceList.findIndex(table => table.id == id);
+                if(index != -1){
+                    if(this.serviceList[index].is_available == 1){
+                        this.serviceList[index].is_available = 0;
+                    }
+                    else{
+                        this.serviceList[index].is_available = 1;
+                    }
+
+                    let url = `/api/is_active`;
+                    let formData = new FormData();
+                    formData.append('id', id);
+                    formData.append('type', 'entity');
+                    let response = postApiData({url: url, form_data: formData, token: this.getToken()});
+                }
+            },
+
             deleteBtnClicked(id){
                 this.deleteId = id;
             },
@@ -327,22 +366,39 @@
                 let url = `/api/entities/${this.deleteId}`;
                 let response = await deleteApiData({url: url, token: this.getToken()});
                 if(response.success){
-                    this.getRoomAndTableList();
+                    this.getServiceList();
                 }
                 else{
                     alert('some errors occur');
                 }
-            }
+            },
 
+            async searchBtnClicked(){
+                let url = null;
+                if(this.searchInput){
+                    url = `/api/entities?type=service&search_input=${this.searchInput}&page=1`;
+                }
+                let response = await getApiData({url: url, token: this.getToken()});
+                if(response.data){
+                    this.serviceList = response.data.data;
+                }
+            },
+
+            clearSearchBtnClicked(){
+                this.searchInput = null;
+                this.getServiceList(null);
+            },
 
         },
-        mounted()
-        {
 
-            this.getRoomAndTableList();
+        created(){
+            this.getServiceList(null);
             this.getAreaList();
             this.getServiceCategoryList();
+        },
 
+        mounted()
+        {
             initTE({ Modal,Select, Ripple });
         }
     }

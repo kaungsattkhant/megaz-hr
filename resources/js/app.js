@@ -36,6 +36,9 @@ import CashbookCrudComponent from './Components/Cashbook/CashbookCrudComponent.v
 import ArListComponent from './Components/AR/ArListComponent.vue';
 import ArHistoryComponent from './Components/AR/ArHistoryComponent.vue';
 import ArPaidComponent from './Components/AR/ArPaidComponent.vue';
+import SupplierListComponent from './Components/Supplier/SupplierListComponent.vue';
+import SupplierCreateComponent from './Components/Supplier/SupplierCreateComponent.vue';
+import TableCrudComponent from './Components/TablesAndRooms/TableCrudComponent.vue';
 
 import LoginComponent from './Components/Auth/LoginComponent.vue';
 import LogoutComponent from './Components/Auth/LogoutComponent.vue';
@@ -48,7 +51,8 @@ import PosCashbookCrudComponent from './Components/Pos/Cashbook/PosCashbookCrudC
 import CashbookDetailComponent from './Components/Pos/Cashbook/CashbookDetailComponent.vue';
 import InvoiceListComponent from './Components/Pos/Invoices/InvoiceListComponent.vue';
 import InvoiceDetailComponent from './Components/Pos/Invoices/InvoiceDetailComponent.vue';
-import TableCrudComponent from './Components/TablesAndRooms/TableCrudComponent.vue';
+
+import LoginComponentPos from './Components/Pos/Auth/LoginComponentPos.vue';
 
 const app = createApp({});
 app.component('StaffListComponent', StaffListComponent);
@@ -78,6 +82,11 @@ app.component('ItemCrudComponent', ItemCrudComponent);
 app.component('ItemUsageForecastListComponent', ItemUsageForecastListComponent);
 app.component('ItemUsageForecastCreateComponent', ItemUsageForecastCreateComponent);
 app.component('ItemUsageForecastDetailComponent', ItemUsageForecastDetailComponent);
+app.component('TableCrudComponent', TableCrudComponent);
+
+
+app.component('SupplierListComponent', SupplierListComponent);
+app.component('SupplierCreateComponent', SupplierCreateComponent);
 
 app.component('LoginComponent', LoginComponent);
 app.component('LogoutComponent', LogoutComponent);
@@ -90,7 +99,7 @@ app.component('PosCashbookCrudComponent', PosCashbookCrudComponent);
 app.component('CashbookDetailComponent', CashbookDetailComponent);
 app.component('InvoiceListComponent', InvoiceListComponent);
 app.component('InvoiceDetailComponent', InvoiceDetailComponent);
-app.component('TableCrudComponent',TableCrudComponent);
+app.component('LoginComponentPos', LoginComponentPos);
 
 app.use(store);
 app.mount('#app');

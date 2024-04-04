@@ -25,6 +25,7 @@ class DatabaseSeeder extends Seeder
         // (new StaffSeeder())->run();
         // (new ServiceCategorySeeder())->run();
         $this->call([
+            AreaSeeder::class,
             ComplaintCategorySeeder::class,
             InventorySeeder::class,
             DepartmentSeeder::class,
@@ -38,6 +39,7 @@ class DatabaseSeeder extends Seeder
             ItemSeeder::class,
             HeadAccountSeeder::class,
             SubAccountSeeder::class,
+            RoomAndTableSeeder::class,
         ]);
     }
 }

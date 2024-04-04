@@ -68,11 +68,26 @@
                                     {{ menu.prices[0].price }}
                                 </td>
                                 <td class="whitespace-nowrap px-6 py-4">
-                                    <button
+                                    <!-- <button
                                     data-te-toggle="modal" data-te-target="#deleteModal"
                                         id="edit-btn" class="pr-1">
                                         <i class="fas fa-trash-alt"></i>
-                                    </button>
+                                    </button> -->
+                                    <input
+                                    :checked="menu.is_active == 1"
+                                    @change="isActiveToggled(menu.id)"
+                                    class="me-2 mt-[0.3rem] h-3.5 w-8 appearance-none rounded-[0.4375rem] bg-black/25 before:pointer-events-none before:absolute before:h-3.5
+                                    before:w-3.5 before:rounded-full before:bg-transparent before:content-[''] after:absolute after:z-[2] after:-mt-[0.1875rem] after:h-5
+                                    after:w-5 after:rounded-full after:border-none after:bg-white after:shadow-switch-2 after:transition-[background-color_0.2s,transform_0.2s]
+                                    after:content-[''] checked:bg-primary checked:after:absolute checked:after:z-[2] checked:after:-mt-[3px] checked:after:ms-[1.0625rem]
+                                    checked:after:h-5 checked:after:w-5 checked:after:rounded-full checked:after:border-none checked:after:bg-primary checked:after:shadow-switch-1
+                                    checked:after:transition-[background-color_0.2s,transform_0.2s] checked:after:content-[''] hover:cursor-pointer focus:outline-none focus:before:scale-100
+                                    focus:before:opacity-[0.12] focus:before:shadow-switch-3 focus:before:shadow-black/60 focus:before:transition-[box-shadow_0.2s,transform_0.2s]
+                                    focus:after:absolute focus:after:z-[1] focus:after:block focus:after:h-5 focus:after:w-5 focus:after:rounded-full focus:after:content-['']
+                                    checked:focus:border-primary checked:focus:bg-primary checked:focus:before:ms-[1.0625rem] checked:focus:before:scale-100 checked:focus:before:shadow-switch-3
+                                    checked:focus:before:transition-[box-shadow_0.2s,transform_0.2s] dark:bg-white/25 dark:after:bg-surface-dark dark:checked:bg-primary dark:checked:after:bg-primary"
+                                    type="checkbox"
+                                    role="switch"/>
                                 </td>
                             </tr>
 
@@ -206,7 +221,7 @@
 
 <script>
     import { Modal, Ripple, initTE, Input, Select, Dropdown } from "tw-elements";
-    import { getApiData, deleteApiData } from '../../utilities/ajax-helpers';
+    import { getApiData, postApiData, deleteApiData } from '../../utilities/ajax-helpers';
     import { mapGetters } from "vuex";
 
     export default {
@@ -274,6 +289,24 @@
                 }
             },
 
+            isActiveToggled(id){
+                let index = this.menuList.findIndex(menu => menu.id == id);
+                if(index != -1){
+                    if(this.menuList[index].is_active == 1){
+                        this.menuList[index].is_active = 0;
+                    }
+                    else{
+                        this.menuList[index].is_active = 1;
+                    }
+
+                    let url = `/api/is_active`;
+                    let formData = new FormData();
+                    formData.append('id', id);
+                    formData.append('type', 'menu');
+                    let response = postApiData({url: url, form_data: formData, token: this.getToken()});
+                }
+            },
+
             deleteBtnClicked(id){
                 this.deleteId = id;
             },
@@ -299,14 +332,14 @@
                 }
                 let response = await getApiData({url: url, token: this.getToken()});
                 if(response.data){
-                    this.itemList = response.data.data;
+                    this.menuList = response.data.data;
                 }
             },
 
             clearSearchBtnClicked(){
                 this.searchInput = null;
                 this.searchCategory = null;
-                this.getItemList(null);
+                this.getMenuList(null);
             },
 
             pageBtnClicked(pageNumber){

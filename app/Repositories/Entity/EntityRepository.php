@@ -30,7 +30,7 @@ class EntityRepository implements EntityRepositoryInterface
 
     public function roomsWithInvoice(array $data)
     {
-        $area = Area::where('name', 'KTV')->get()->first();
+        $area = Area::where('name', 'KTV Rooms')->first();  //don't need get()
         $currentDate = $data['current_date'];
         $entities = Entity::where('area_id', $area->id)->where("entity_type", "room")->where("is_available", 1)->with(["invoices" => function ($query) use ($currentDate) {
             $query->where("complete_date", null)
@@ -79,8 +79,8 @@ class EntityRepository implements EntityRepositoryInterface
 
     public function createData(array $data)
     {
-        $service = Entity::create($data);
-        return $service;
+        $entity = Entity::create($data);
+        return $entity;
     }
 
     public function updateData(array $data, int $id)
