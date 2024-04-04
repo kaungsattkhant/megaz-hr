@@ -18,7 +18,7 @@ class InvoiceAPIController extends Controller
         $this->invoiceRepo = $invoiceRepo;
     }
 
-    public function startRoomSession(Request $request)
+    public function startEntity(Request $request)
     {
         $data = $request->all();
         if(isset($data['male'])){

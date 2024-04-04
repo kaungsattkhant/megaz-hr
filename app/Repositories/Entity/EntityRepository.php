@@ -28,40 +28,29 @@ class EntityRepository implements EntityRepositoryInterface
         }
     }
 
-    public function roomsWithInvoice(array $data)
+    public function entityWithInvoice(array $data)
     {
-        $area = Area::where('name', 'KTV')->get()->first();
+        $area = Area::find($data['area_id']);
         $currentDate = $data['current_date'];
-        $entities = Entity::where('area_id', $area->id)->where("entity_type", "room")->where("is_available", 1)->with(["invoices" => function ($query) use ($currentDate) {
-            $query->where("complete_date", null)
-                ->whereBetween("invoice_date", [$currentDate . " 00:00:00", $currentDate . " 23:59:59"])
-                ->select("id", "invoice_id", "entity_id")->with("sessions");
-        }])->get();
-
-        return $entities;
-    }
-
-    public function tablesWithInvoice(array $data)
-    {
-        if (isset($data['area_id'])) {
-            $area = Area::find($data['area_id']);
-            if ($area == null) {
-                $area = Area::where('name', 'Rooftop')->get()->first();
-            }
-        } else {
-            $area = Area::where('name', 'Rooftop')->get()->first();
+        if(isset($data['type']))
+        {
+            $entities = Entity::where('area_id', $area->id)->where("entity_type", $data['type'])->where("is_available", 1)->with(["invoices" => function ($query) use ($currentDate) {
+                $query->where("complete_date", null)
+                    ->whereBetween("invoice_date", [$currentDate . " 00:00:00", $currentDate . " 23:59:59"])
+                    ->select("id", "invoice_id", "entity_id")->with("sessions");
+            }])->get();
+        }else{
+            $entities = Entity::where('area_id', $area->id)->where("is_available", 1)->with(["invoices" => function ($query) use ($currentDate) {
+                $query->where("complete_date", null)
+                    ->whereBetween("invoice_date", [$currentDate . " 00:00:00", $currentDate . " 23:59:59"])
+                    ->select("id", "invoice_id", "entity_id")->with("sessions");
+            }])->get();
         }
-        $currentDate = $data['current_date'];
-        $entities = Entity::where('area_id', $area->id)->where("entity_type", "table")->where("is_available", 1)->with(["invoices" => function ($query) use ($currentDate) {
-            $query->where("complete_date", null)
-                ->whereBetween("invoice_date", [$currentDate . " 00:00:00", $currentDate . " 23:59:59"])
-                ->select("id", "invoice_id", "entity_id")->with("sessions");
-        }])->get();
-
         return $entities;
     }
 
-    public function roomDetail(array $data, int $entityId)
+
+    public function entityDetail(array $data, int $entityId)
     {
         $currentDate = CurrentDate();
         if (isset($data['current_date'])) {
