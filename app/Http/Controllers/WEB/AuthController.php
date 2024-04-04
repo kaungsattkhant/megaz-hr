@@ -31,6 +31,7 @@ class AuthController extends Controller
             }
             return redirect()->route('staff');
         }else{
+            dd('ef');
             return redirect()->back();
         }
     }

@@ -55,11 +55,10 @@ Route::middleware(['departments:HR'])->group(function () {
     Route::view('/item_usage_forecasts/{forecastId}/detail', 'item_usage_forecastings.detail')->name('item_usage_forecasts.detail');
     Route::view('/item_usage_forecasts/create', 'item_usage_forecastings.create')->name('item_usage_forecasts.create');
 });
-Route::middleware(['departments:HR,Finance,Manager,MD'])->group(function () {
+Route::middleware(['departments:HR,Finance,Management'])->group(function () {
     Route::view('/purchase_orders', 'purchase_orders.index')->name('purchase_orders');
     Route::view('/purchase_orders/create', 'purchase_orders.create')->name('purchase_orders.create');
     Route::view('/purchase_orders/{poId}/confirm', 'purchase_orders.confirm')->name('purchase_orders.confirm');
-
 });
 
 Route::middleware(['departments:Finance'])->group(function () {
