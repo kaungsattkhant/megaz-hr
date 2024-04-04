@@ -202,6 +202,9 @@
                         alert('PO checked');
                         window.location.reload();
                     }
+                    else{
+                        alert(response.message);
+                    }
                 }
 
                 this.checkId = null;
