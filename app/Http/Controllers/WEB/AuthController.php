@@ -17,6 +17,15 @@ class AuthController extends Controller
             $remember = true;
         }
         if(Auth::attempt(['phone_number'=>$request->phone_number,'password' => $request->password], $remember)){
+            if(checkDepartmentPermission(['HR'])){
+                return redirect()->route('staff');
+            }
+            if(checkDepartmentPermission(['Finance'])){
+                return redirect()->route('financial_transactions');
+            }
+            if(checkDepartmentPermission(['Management'])){
+                return redirect()->route('purchase_orders');
+            }
             return redirect()->route('staff');
         }else{
             return redirect()->back();

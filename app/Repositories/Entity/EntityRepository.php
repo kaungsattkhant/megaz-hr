@@ -31,6 +31,7 @@ class EntityRepository implements EntityRepositoryInterface
     public function entityWithInvoice(array $data)
     {
         $area = Area::find($data['area_id']);
+        $area = Area::where('name', 'KTV Rooms')->first();  //don't need get()
         $currentDate = $data['current_date'];
         if(isset($data['type']))
         {
