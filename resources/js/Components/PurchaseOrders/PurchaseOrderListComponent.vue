@@ -69,13 +69,13 @@
                                 </td>
 
                                 <td  class="px-6 py-4">
-                                    {{ purchaseOrder.financial_check_id !== null ? 'Yes' : 'No' }}
+                                    {{ purchaseOrder.manager_check_id == null ? 'No' : 'Yes' }}
                                 </td>
                                 <td class="px-6 py-4">
-                                    {{ purchaseOrder.financial_check_id !== null ? 'Yes' : 'No' }}
+                                    {{ purchaseOrder.financial_check_id == null ? 'No' : 'Yes' }}
                                 </td>
                                 <td class="px-6 py-4">
-                                    {{ purchaseOrder.financial_check_id !== null ? 'Yes' : 'No' }}
+                                    {{ purchaseOrder.md_check_id == null ? 'No' : 'Yes' }}
                                 </td>
                                 <td class="whitespace-nowrap px-6 py-4 space-x-4">
                                     <button class="pr-1" @click="checkPurchaseOrderBtnClicked(purchaseOrder.id)" data-te-toggle="modal" data-te-target="#checkModal">
