@@ -236,17 +236,16 @@ class InvoiceRepository implements InvoiceRepositoryInterface
     {
         $foodCharge = 0;
         $beverageCharge = 0;
-       if(isset($data['order_categories']))
-       {
-        $data['order_categories'] = json_decode($data['order_categories'], true);
-        foreach ($data['order_categories'] as $menu) {
-            if ($menu['menu_category_id'] == 1 || $menu['menu_category_id'] == 2 || $menu['menu_category_id'] == 3) {
-                $foodCharge += $menu['price'];
-            } else {
-                $beverageCharge += $menu['price'];
+        if (isset($data['order_categories'])) {
+            $data['order_categories'] = json_decode($data['order_categories'], true);
+            foreach ($data['order_categories'] as $menu) {
+                if ($menu['menu_category_id'] == 1 || $menu['menu_category_id'] == 2 || $menu['menu_category_id'] == 3) {
+                    $foodCharge += $menu['price'];
+                } else {
+                    $beverageCharge += $menu['price'];
+                }
             }
         }
-       }
 
         $roomSessions = RoomSession::where('invoice_id', $data['invoice_id'])->get();
         $total_session_price = 0;
@@ -258,18 +257,20 @@ class InvoiceRepository implements InvoiceRepositoryInterface
         $entity = Entity::find($invoice->entity_id);
         $entity->is_active = 0;
         $entity->save();
-
-        if ($data['service_charge'] == true) {
+        if ($data['service_charge'] === true || strtolower($data['service_charge']) === 'true') {
             $data['service_charge'] = ($foodCharge + $beverageCharge) * 0.05;
-        } else if($data['service_charge']==false) {
+        } else if (strtolower($data['service_charge']) === 'false') {
+            $data['service_charge'] = 0;
+        } else {
             $data['service_charge'] = 0;
         }
 
-        if ($data['tax'] == true) {
+        if ($data['tax'] === true || strtolower($data['tax']) === 'true') {
             $data['tax'] = round(($foodCharge + $beverageCharge + $total_session_price) * 0.05);
-        } else if($data['tax']==false){
-
+        } else if (strtolower($data['tax']) === 'false') {
             $data['tax'] = 0;
+        }else{
+            $data['tax']=0;
         }
 
         $data['food_charge'] = $foodCharge + $beverageCharge;
@@ -287,27 +288,27 @@ class InvoiceRepository implements InvoiceRepositoryInterface
             $posBook = Account::where('account_code', '2-1012')->get()->first();
         }
 
+        $data['date'] = now();
+        $data['created_by'] = 1; //example
+        $data['transactionable_id'] = $invoice->id;
+        $data['transactionable_type'] = 'invoice';
+
+        $transaction = (new StoreTransactionLedger())->createTransaction($data);
+
         if (isset($data['order_categories'])) {
             if ($foodCharge != 0) {
                 $foodKtvAcc = Account::where('account_code', '5-0101')->first();
 
-                $data['date'] = now();
-                $data['created_by'] = 1; //example
-                $data['transactionable_id'] = $invoice->id;
-                $data['transactionable_type'] = 'invoice';
-
-                $foodTransaction = (new StoreTransactionLedger())->createTransaction($data);
-
                 $foodCreditLedger = (new StoreTransactionLedger())->storeLedger([
                     'value' => $foodCharge,
-                    'transaction_id' => $foodTransaction->id,
+                    'transaction_id' => $transaction->id,
                     'account_id' => $foodKtvAcc->id,
                     'action' => 'credit',
                 ]);
 
                 $foodCashDebit = (new StoreTransactionLedger())->storeLedger([
                     'value' => $foodCharge,
-                    'transaction_id' => $foodTransaction->id,
+                    'transaction_id' => $transaction->id,
                     'account_id' => $posBook->id,
                     'action' => 'debit',
                 ]);
@@ -316,116 +317,90 @@ class InvoiceRepository implements InvoiceRepositoryInterface
             if ($beverageCharge != 0) {
                 $beverageKtvAcc = Account::where('account_code', '5-0102')->get()->first();
 
-                $data['date'] = now();
-                $data['created_by'] = 1; //example
-                $data['transactionable_id'] = $invoice->id;
-                $data['transactionable_type'] = 'invoice';
-
-                $beverageTransaction = (new StoreTransactionLedger())->createTransaction($data);
-
                 $foodCreditLedger = (new StoreTransactionLedger())->storeLedger([
                     'value' => $beverageCharge,
-                    'transaction_id' => $beverageTransaction->id,
+                    'transaction_id' => $transaction->id,
                     'account_id' => $beverageKtvAcc->id,
                     'action' => 'credit',
                 ]);
 
                 $beverageCashDebit = (new StoreTransactionLedger())->storeLedger([
                     'value' => $beverageCharge,
-                    'transaction_id' => $beverageTransaction->id,
+                    'transaction_id' => $transaction->id,
                     'account_id' => $posBook->id,
                     'action' => 'debit',
                 ]);
             }
         }
 
+       if($total_session_price!=0)
+       {
         $ktvRoomCharges = Account::where('account_code', '5-0103')->get()->first();
-
-        $data['date'] = now();
-        $data['created_by'] = 1; //example
-        $data['transactionable_id'] = $invoice->id;
-        $data['transactionable_type'] = 'invoice';
-
-        $ktvRoomTransaction = (new StoreTransactionLedger())->createTransaction($data);
 
         $ktvRoomLedger = (new StoreTransactionLedger())->storeLedger([
             'value' => $total_session_price,
-            'transaction_id' => $ktvRoomTransaction->id,
+            'transaction_id' => $transaction->id,
             'account_id' => $ktvRoomCharges->id,
             'action' => 'credit',
         ]);
 
         $ktvCashDebit = (new StoreTransactionLedger())->storeLedger([
             'value' => $total_session_price,
-            'transaction_id' => $ktvRoomTransaction->id,
+            'transaction_id' => $transaction->id,
             'account_id' => $posBook->id,
             'action' => 'debit',
         ]);
+       }
 
-        $serviceMoneyAcc = Account::where('account_code', '6-2009')->get()->first();
+        if ($data['service_charge'] != 0 ) {
+            $serviceMoneyAcc = Account::where('account_code', '6-2009')->get()->first();
 
-        $data['date'] = now();
-        $data['created_by'] = 1; //example
-        $data['transactionable_id'] = $invoice->id;
-        $data['transactionable_type'] = 'invoice';
+            $serviceLedger = (new StoreTransactionLedger())->storeLedger([
+                'value' => $data['service_charge'],
+                'transaction_id' => $transaction->id,
+                'account_id' => $serviceMoneyAcc->id,
+                'action' => 'credit',
+            ]);
 
-        $serviceMoneyTransaction = (new StoreTransactionLedger())->createTransaction($data);
+            $serviceCashDebit = (new StoreTransactionLedger())->storeLedger([
+                'value' => $data['service_charge'],
+                'transaction_id' => $transaction->id,
+                'account_id' => $posBook->id,
+                'action' => 'debit',
+            ]);
+        }
 
-        $serviceLedger = (new StoreTransactionLedger())->storeLedger([
-            'value' => $data['service_charge'],
-            'transaction_id' => $serviceMoneyTransaction->id,
-            'account_id' => $serviceMoneyAcc->id,
-            'action' => 'credit',
-        ]);
+        if ($data['tax'] != 0 ) {
+            $taxAcc = Account::where('account_code', '6-9002')->get()->first();
 
-        $serviceCashDebit = (new StoreTransactionLedger())->storeLedger([
-            'value' => $data['service_charge'],
-            'transaction_id' => $serviceMoneyTransaction->id,
-            'account_id' => $posBook->id,
-            'action' => 'debit',
-        ]);
+            $taxLedger = (new StoreTransactionLedger())->storeLedger([
+                'value' => $data['tax'],
+                'transaction_id' => $transaction->id,
+                'account_id' => $taxAcc->id,
+                'action' => 'credit',
+            ]);
 
-        $taxAcc = Account::where('account_code', '6-9002')->get()->first();
+            $textDebit = (new StoreTransactionLedger())->storeLedger([
+                'value' => $data['tax'],
+                'transaction_id' => $transaction->id,
+                'account_id' => $posBook->id,
+                'action' => 'debit',
+            ]);
+        }
 
-        $data['date'] = now();
-        $data['created_by'] = 1; //example
-        $data['transactionable_id'] = $invoice->id;
-        $data['transactionable_type'] = 'invoice';
-
-        $taxTransaction = (new StoreTransactionLedger())->createTransaction($data);
-
-        $taxLedger = (new StoreTransactionLedger())->storeLedger([
-            'value' => $data['tax'],
-            'transaction_id' => $taxTransaction->id,
-            'account_id' => $taxAcc->id,
-            'action' => 'credit',
-        ]);
-
-        $textDebit = (new StoreTransactionLedger())->storeLedger([
-            'value' => $data['tax'],
-            'transaction_id' => $taxTransaction->id,
-            'account_id' => $posBook->id,
-            'action' => 'debit',
-        ]);
-        if ($data['discount_value']) {
+        if ($data['discount_value'] != 0) {
             $discountAcc = Account::where('account_code', '6-2003')->get()->first();
-            $data['date'] = now();
-            $data['created_by'] = 1; //example
-            $data['transactionable_id'] = $invoice->id;
-            $data['transactionable_type'] = 'invoice';
-
-            $discountTransaction = (new StoreTransactionLedger())->createTransaction($data);
 
             $discountDebit = (new StoreTransactionLedger())->storeLedger([
                 'value' => $data['discount_value'],
-                'transaction_id' => $discountTransaction->id,
+                'transaction_id' => $transaction->id,
                 'account_id' => $discountAcc->id,
                 'action' => 'debit',
             ]);
 
             $discountCashCredit = (new StoreTransactionLedger())->storeLedger([
                 'value' => $data['discount_value'],
-                'transaction_id' => $discountTransaction->id,
+                'transaction_id' => $transaction->id,
                 'account_id' => $posBook->id,
                 'action' => 'credit',
             ]);
