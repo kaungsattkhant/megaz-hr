@@ -4,19 +4,20 @@ namespace App\Repositories\Customer;
 
 use App\Models\Customer;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class CustomerRepository implements CustomerRepositoryInterface
 {
     public function listAllData(Request $request)
     {
-        if($request->per_page || $request->page){
+        if ($request->per_page || $request->page) {
             $totalCount = Customer::count();
             $pageNumber = 1;
             $perPage = 20;
-            if($request->page){
+            if ($request->page) {
                 $pageNumber = $request->page;
             }
-            if($request->per_page){
+            if ($request->per_page) {
                 $perPage = $request->per_page;
             }
             $skip = ($pageNumber - 1) * $perPage;
@@ -25,8 +26,7 @@ class CustomerRepository implements CustomerRepositoryInterface
             $paginationData['customers'] = $customers;
 
             return $paginationData;
-        }
-        else{
+        } else {
             $customers = Customer::all();
 
             return $customers;
@@ -35,31 +35,43 @@ class CustomerRepository implements CustomerRepositoryInterface
 
     public function createData(array $data)
     {
-        $customer = Customer::create($data);
-
-        return $customer;
+        DB::beginTransaction();
+        try {
+            $customer = Customer::create($data);
+            DB::commit();
+            return $customer;
+        } catch (\Exception $e) {
+            DB::rollback();
+            ResponseMessage($e->getMessage(), 402);
+            throw $e;
+        }
     }
 
-    public function updateData(array $data,int $id)
+    public function updateData(array $data, int $id)
     {
-        $customer = Customer::find($id);
-        if($customer)
-        {
-            $customer->update($data);
+        DB::beginTransaction();
+        try {
+            $customer = Customer::find($id);
+            if ($customer) {
+                $customer->update($data);
+            }
+            DB::commit();
+            return $customer;
+        } catch (\Exception $e) {
+            DB::rollback();
+            ResponseMessage($e->getMessage(), 402);
+            throw $e;
         }
-        return $customer;
     }
 
     public function deleteData(int $id)
     {
         $customer = Customer::find($id);
-        if($customer)
-        {
-            $customer->is_active=0;
+        if ($customer) {
+            $customer->is_active = 0;
             $customer->save();
             return true;
         }
         return false;
-
     }
 }
