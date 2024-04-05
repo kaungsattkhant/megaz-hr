@@ -5,19 +5,20 @@ namespace App\Repositories\Area;
 use Illuminate\Http\Request;
 
 use App\Models\Area;
+use Illuminate\Support\Facades\DB;
 
 class AreaRepository implements AreaRepositoryInterface
 {
     public function getAreas(Request $request)
     {
-        if($request->per_page || $request->page){
+        if ($request->per_page || $request->page) {
             $totalCount = Area::where('is_active', 1)->count();
             $pageNumber = 1;
             $perPage = 20;
-            if($request->page){
+            if ($request->page) {
                 $pageNumber = $request->page;
             }
-            if($request->per_page){
+            if ($request->per_page) {
                 $perPage = $request->per_page;
             }
             $skip = ($pageNumber - 1) * $perPage;
@@ -26,8 +27,7 @@ class AreaRepository implements AreaRepositoryInterface
             $paginationData['areas'] = $areas;
 
             return $paginationData;
-        }
-        else{
+        } else {
             $areas = Area::with('areaType')->where('is_active', 1)->get();
 
             return $areas;
@@ -36,25 +36,39 @@ class AreaRepository implements AreaRepositoryInterface
 
     public function createData(array $data)
     {
-        $area = Area::create($data);
-
-        return $area;
+        DB::beginTransaction();
+        try {
+            $area = Area::create($data);
+            DB::commit();
+            return $area;
+        } catch (\Exception $e) {
+            DB::rollback();
+            ResponseMessage($e->getMessage(), 402);
+            throw $e;
+        }
     }
 
     public function updateData(array $data, int $id)
     {
-        $area = Area::find($id);
-        if($area){
-            $area->update($data);
+        DB::beginTransaction();
+        try {
+            $area = Area::find($id);
+            if ($area) {
+                $area->update($data);
+            }
+            DB::commit();
+            return $area;
+        } catch (\Exception $e) {
+            DB::rollback();
+            ResponseMessage($e->getMessage(), 402);
+            throw $e;
         }
-
-        return $area;
     }
 
     public function deleteData(int $id)
     {
         $area = Area::find($id);
-        if($area){
+        if ($area) {
             $area->is_active = 0;
             $area->save();
 

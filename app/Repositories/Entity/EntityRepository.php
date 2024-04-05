@@ -5,6 +5,7 @@ namespace App\Repositories\Entity;
 use App\Models\Area;
 use App\Models\Entity;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class EntityRepository implements EntityRepositoryInterface
 {
@@ -31,16 +32,15 @@ class EntityRepository implements EntityRepositoryInterface
     public function entityWithInvoice(array $data)
     {
         $area = Area::find($data['area_id']);
-        $area = Area::where('name', 'KTV Rooms')->first();  //don't need get()
         $currentDate = $data['current_date'];
-        if(isset($data['type']))
-        {
+        if (isset($data['type'])) {
             $entities = Entity::where('area_id', $area->id)->where("entity_type", $data['type'])->where("is_available", 1)->with(["invoices" => function ($query) use ($currentDate) {
                 $query->where("complete_date", null)
                     ->whereBetween("invoice_date", [$currentDate . " 00:00:00", $currentDate . " 23:59:59"])
                     ->select("id", "invoice_id", "entity_id")->with("sessions");
             }])->get();
-        }else{
+        } else {
+
             $entities = Entity::where('area_id', $area->id)->where("is_available", 1)->with(["invoices" => function ($query) use ($currentDate) {
                 $query->where("complete_date", null)
                     ->whereBetween("invoice_date", [$currentDate . " 00:00:00", $currentDate . " 23:59:59"])
@@ -69,18 +69,34 @@ class EntityRepository implements EntityRepositoryInterface
 
     public function createData(array $data)
     {
-        $entity = Entity::create($data);
-        return $entity;
+        DB::beginTransaction();
+        try {
+            $entity = Entity::create($data);
+            DB::commit();
+            return $entity;
+        } catch (\Exception $e) {
+            DB::rollback();
+            ResponseMessage($e->getMessage(), 402);
+            throw $e;
+        }
     }
 
     public function updateData(array $data, int $id)
     {
-        $service = Entity::find($id);
-        if ($service) {
-            $data = RemoveNullValues($data);
-            $service->update($data);
+        DB::beginTransaction();
+        try {
+            $service = Entity::find($id);
+            if ($service) {
+                $data = RemoveNullValues($data);
+                $service->update($data);
+            }
+            DB::commit();
+            return $service;
+        } catch (\Exception $e) {
+            DB::rollback();
+            ResponseMessage($e->getMessage(), 402);
+            throw $e;
         }
-        return $service;
     }
 
     public function deleteData(int $id)
@@ -94,10 +110,14 @@ class EntityRepository implements EntityRepositoryInterface
         return false;
     }
 
-    public function inactiveRoomsList(Request $request)
+    public function inactiveEntityList($data)
     {
-        $entities = Entity::where("entity_type", "room")
-            ->where("is_active", 0)->get();
+        $area = Area::find($data['area_id']);
+        if (isset($data['type'])) {
+            $entities = Entity::where("entity_type", $data['type'])->where('area_id', $area->id)->where("is_active", 0)->get();
+        } else {
+            $entities = Entity::where("is_active", 0)->where('area_id', $area->id)->get();
+        }
 
         return $entities;
     }

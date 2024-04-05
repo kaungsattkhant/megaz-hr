@@ -72,9 +72,11 @@ class EntityAPIController extends Controller
         ResponseData($entity);
     }
 
-    public function getOnlyInactiveRooms(Request $request)
+    public function getOnlyInactiveEntities(Request $request,$id)
     {
-        $entities = $this->entityRepo->inactiveRoomsList($request);
+        $data = $request->all();
+        $data['area_id'] = $id;
+        $entities = $this->entityRepo->inactiveEntityList($data);
 
         ResponseData($entities);
     }

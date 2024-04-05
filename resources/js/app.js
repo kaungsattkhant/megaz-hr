@@ -9,6 +9,21 @@ initTE({ Collapse, Select, Carousel, Modal, Ripple, Dropdown, Datepicker, Input,
 
 import {createApp} from 'vue/dist/vue.esm-bundler';
 import { store } from './Store';
+import firebase from 'firebase/compat/app';
+import 'firebase/compat/messaging';
+import Notifications from '@kyvg/vue3-notification';
+
+const firebaseConfig = {
+    apiKey: import.meta.env.VITE_GOOGLE_API_KEY,
+    authDomain: import.meta.env.VITE_GOOGLE_AUTH_DOMAIN,
+    projectId: import.meta.env.VITE_GOOGLE_PROJECT_ID,
+    storageBucket: import.meta.env.VITE_GOOGLE_STORAGE_BUCKET,
+    messagingSenderId: import.meta.env.VITE_GOOGLE_MESSAGING_SENDER_ID,
+    appId: import.meta.env.VITE_GOOGLE_APP_ID
+};
+
+const app = createApp({});
+firebase.initializeApp(firebaseConfig);
 
 import NavBarComponent from './Components/Common/NavBarComponent.vue';
 import StaffListComponent from './Components/Staff/StaffListComponent.vue';
@@ -56,7 +71,6 @@ import InvoiceDetailComponent from './Components/Pos/Invoices/InvoiceDetailCompo
 
 import LoginComponentPos from './Components/Pos/Auth/LoginComponentPos.vue';
 
-const app = createApp({});
 app.component('NavBarComponent', NavBarComponent);
 app.component('StaffListComponent', StaffListComponent);
 app.component('StaffCreateComponent', StaffCreateComponent);
@@ -106,4 +120,5 @@ app.component('InvoiceDetailComponent', InvoiceDetailComponent);
 app.component('LoginComponentPos', LoginComponentPos);
 
 app.use(store);
+app.use(Notifications);
 app.mount('#app');
