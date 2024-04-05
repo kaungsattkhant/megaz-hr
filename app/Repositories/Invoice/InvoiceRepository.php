@@ -72,6 +72,7 @@ class InvoiceRepository implements InvoiceRepositoryInterface
             $data['area_id'] = $entity->area_id;
             $headCount = $this->headCountCreate($data);
             $data['head_count_id'] = $headCount->id;
+            $data['total_session_price'] = $entity->price_per_hour * $data['session_duration'];
             $invoice = Invoice::create($data);
 
             $invoice->invoice_id = sprintf('%05d', $invoice->id);
@@ -177,6 +178,13 @@ class InvoiceRepository implements InvoiceRepositoryInterface
 
             $roomData['end_date'] = $end_date->format('Y-m-d H:i:s');
             $updatedDurationRoom = RoomSession::create($roomData);
+            $allRooms = RoomSession::where('invoice_id', $invoice->id)->get();
+            $total_session_price = 0;
+            foreach ($allRooms as $room) {
+                $total_session_price += $room->price;
+            }
+            $invoice->total_session_price = $total_session_price;
+            $invoice->save();
             DB::commit();
             return $roomAndSession;
         } catch (\Throwable $e) {
@@ -229,6 +237,13 @@ class InvoiceRepository implements InvoiceRepositoryInterface
 
             $invoice->entity_id = $room->id;
             $invoice->area_id = $room->area_id;
+            $invoice->save();
+            $allRooms = RoomSession::where('invoice_id', $invoice->id)->get();
+            $total_session_price = 0;
+            foreach ($allRooms as $room) {
+                $total_session_price += $room->price;
+            }
+            $invoice->total_session_price = $total_session_price;
             $invoice->save();
             DB::commit();
 

@@ -44,7 +44,7 @@ class EntityRepository implements EntityRepositoryInterface
             $entities = Entity::where('area_id', $area->id)->where("is_available", 1)->with(["invoices" => function ($query) use ($currentDate) {
                 $query->where("complete_date", null)
                     ->whereBetween("invoice_date", [$currentDate . " 00:00:00", $currentDate . " 23:59:59"])
-                    ->select("id", "invoice_id", "entity_id")->with("sessions");
+                    ->select("id", "invoice_id", "entity_id","total_session_price")->with("sessions");
             }])->get();
         }
         return $entities;
@@ -61,7 +61,7 @@ class EntityRepository implements EntityRepositoryInterface
         $entity = Entity::with(["invoices" => function ($query) use ($currentDate) {
             $query->where("complete_date", null)
                 ->whereBetween("invoice_date", [$currentDate . " 00:00:00", $currentDate . " 23:59:59"])
-                ->select("id", "invoice_id", "entity_id")->with(["sessions", "orders.orderItems.menu"]);
+                ->select("id", "invoice_id", "entity_id","total_session_price")->with(["sessions", "orders.orderItems.menu"]);
         }])->find($entityId);
 
         return $entity;
