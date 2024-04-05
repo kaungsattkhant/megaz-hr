@@ -40,6 +40,7 @@
                 <input type="hidden" v-model="phoneNumber" name="phone_number">
                 <input type="hidden" v-model="password" name="password">
                 <input type="hidden" v-model="remember" name="remember">
+                <input type="hidden" v-model="fcmToken" name="fcm_token">
             </form>
         </div>
     </main>
@@ -58,8 +59,6 @@
             return {
                 token: null,
                 csrfToken: null,
-                // firebaseMessaging: null,
-
                 phoneNumber: null,
                 password: null,
                 fcmToken: null,
@@ -111,8 +110,7 @@
         async mounted(){
             try {
                 const permission = await Notification.requestPermission();
-                // console.log('notification permission', permission);
-                console.log(permission);
+                console.log('notification permission', permission);
                 let notiType = 'warn';
                 if(permission == 'denied'){
                     notiType = 'warn';
@@ -121,7 +119,7 @@
                     notiType = 'info';
                     this.firebaseMessaging = firebase.messaging();
                     this.fcmToken = await this.firebaseMessaging.getToken();
-                    console.log(this.fcmToken);
+                    console.log('fcm token',this.fcmToken);
                 }
 
                 this.$notify({
