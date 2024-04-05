@@ -838,7 +838,7 @@
                     this.isOpenRoom.step_invoice = false;
                 }
             },
-            
+
             async getGendersList(){
                 const response = await getApiData({ url: '/api/genders' });
                 if(response.data){
@@ -867,7 +867,7 @@
                     // console.log( this.roomList[0] );
                 }
             },
-            
+
             async getCustomerList(){
                 const response = await getApiData({ url: '/api/customers' });
                 if(response.data){
