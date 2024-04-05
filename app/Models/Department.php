@@ -46,8 +46,13 @@ class Department extends BaseModel
     //     return $this->morphOne(Inventory::class, 'inventoryable');
     // }
 
+    // public function inventory()
+    // {
+    //     return $this->belongsTo(Inventory::class);
+    // }
+
     public function inventory()
     {
-        return $this->belongsTo(Inventory::class);
+        return $this->morphOne(Inventoryable::class, 'inventoryable');
     }
 }

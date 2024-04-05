@@ -28,7 +28,6 @@ class DepartmentRepository implements DepartmentRepositoryInterface
         }
         else{
             $departments = Department::all();
-
             return $departments;
         }
     }

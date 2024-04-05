@@ -52,6 +52,8 @@ use App\Repositories\Transfer\TransferRepositoryInterface;
 
 use App\Repositories\Menu\MenuRepository;
 use App\Repositories\Menu\MenuRepositoryInterface;
+use App\Repositories\Notification\NotificationInterface;
+use App\Repositories\Notification\NotificationRepository;
 use App\Repositories\Order\OrderRepository;
 use App\Repositories\Order\OrderRepositoryInterface;
 use App\Repositories\RoomSession\RoomSessionRepository;
@@ -101,5 +103,6 @@ class RepositoryServiceProvider extends ServiceProvider
         $this->app->bind(TransactionInterface::class,TransactionRepository::class);
         $this->app->bind(CashBookInterface::class,CashBookRepository::class);
         $this->app->bind(SupplierInterface::class,SupplierRepository::class);
+        $this->app->bind(NotificationInterface::class,NotificationRepository::class);
     }
 }
