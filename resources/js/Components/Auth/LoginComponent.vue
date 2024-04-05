@@ -1,4 +1,5 @@
 <template>
+    <notifications position="top center" />
     <main class="w-full block relative ">
         <div class="w-[100vw] h-[100vh] overflow-hidden">
             <!-- <img class="h-auto w-full" src="../../../public/img/loginbackground.jpg" alt=""> -->
@@ -48,8 +49,8 @@
     import { mapMutations } from 'vuex';
     import { postApiData } from '../../utilities/ajax-helpers';
 
-    // import firebase from 'firebase/compat/app';
-    // import 'firebase/messaging';
+    import firebase from 'firebase/compat/app';
+    import 'firebase/messaging';
 
     export default {
         name: "LoginComponent",
@@ -108,30 +109,33 @@
         },
 
         async mounted(){
-            // try {
-            //     const permission = await Notification.requestPermission();
-            //     console.log('notification permission', permission);
-            //     let notiType = 'warn';
-            //     if(permission == 'denied'){
-            //         notiType = 'error';
-            //     }
-            //     if(permission == 'granted'){
-            //         notiType = 'info';
-            //         this.firebaseMessaging = firebase.messaging();
-            //         this.fcmToken = await this.firebaseMessaging.getToken();
-            //     }
+            try {
+                const permission = await Notification.requestPermission();
+                // console.log('notification permission', permission);
+                console.log(permission);
+                let notiType = 'warn';
+                if(permission == 'denied'){
+                    notiType = 'warn';
+                }
+                if(permission == 'granted'){
+                    notiType = 'info';
+                    this.firebaseMessaging = firebase.messaging();
+                    this.fcmToken = await this.firebaseMessaging.getToken();
+                    console.log(this.fcmToken);
+                }
 
-            //     this.$notify({
-            //         text: `Notification permission ${permission}`,
-            //         type: notiType
-            //     });
-            // }
-            // catch (error) {
-            //     this.$notify({
-            //         text: 'Notification permission error',
-            //         type: "error"
-            //     });
-            // }
+                this.$notify({
+                    text: `Notification permission ${permission}`,
+                    type: notiType
+                });
+            }
+            catch (error) {
+                console.log(error);
+                this.$notify({
+                    text: 'Firebase error',
+                    type: "error"
+                });
+            }
         }
     }
 </script>
