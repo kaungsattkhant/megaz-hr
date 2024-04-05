@@ -4,24 +4,24 @@ namespace App\Repositories\Staff;
 
 use App\Models\Staff;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class StaffRepository implements StaffRepositoryInterface
 {
     public function listAllData(Request $request)
     {
-        if($request->per_page || $request->page){
-            $departmentId=$request->department_id;
+        if ($request->per_page || $request->page) {
+            $departmentId = $request->department_id;
             return Staff::orderByDesc('id')
-            ->with(['department','roles'])
-            ->when($request->search_input,function($q)use($request){
-                $q->where('name','LIKE','%'.$request->search_input.'%');
-            })
-            ->when($departmentId,function($query)use($departmentId){
-                $query->where('department_id',$departmentId);
-            })
-            ->paginate(config('common.list_count'));
-        }
-        else{
+                ->with(['department', 'roles'])
+                ->when($request->search_input, function ($q) use ($request) {
+                    $q->where('name', 'LIKE', '%' . $request->search_input . '%');
+                })
+                ->when($departmentId, function ($query) use ($departmentId) {
+                    $query->where('department_id', $departmentId);
+                })
+                ->paginate(config('common.list_count'));
+        } else {
             $staffs = Staff::where('is_active', 1)->get();
 
             return $staffs;
@@ -30,30 +30,45 @@ class StaffRepository implements StaffRepositoryInterface
 
     public function createData(array $data)
     {
-        $data['is_active'] = 1;
-        $data = RemoveNullValues($data);
-        $staff = Staff::create($data);
+        DB::beginTransaction();
+        try {
+            $data['is_active'] = 1;
+            $data = RemoveNullValues($data);
+            $staff = Staff::create($data);
 
-        if (isset($data['roles']) && is_array($data['roles'])) {
-            $staff->roles()->attach($data['roles']);
+            if (isset($data['roles']) && is_array($data['roles'])) {
+                $staff->roles()->attach($data['roles']);
+            }
+            DB::commit();
+            return $staff;
+        } catch (\Exception $e) {
+            DB::rollback();
+            ResponseMessage($e->getMessage(), 402);
+            throw $e;
         }
-        return $staff;
     }
 
-    public function updateData(array $data,int $id)
+    public function updateData(array $data, int $id)
     {
-        $staff = Staff::find($id);
-        if ($staff) {
+        DB::beginTransaction();
+        try {
+            $staff = Staff::find($id);
+            if ($staff) {
 
-            $data = RemoveNullValues($data);
+                $data = RemoveNullValues($data);
 
-            $staff->update($data);
-            if (isset($data['roles'])) {
-                $staff->roles()->sync($data['roles']);
+                $staff->update($data);
+                if (isset($data['roles'])) {
+                    $staff->roles()->sync($data['roles']);
+                }
             }
+            DB::commit();
+            return  $staff;
+        } catch (\Exception $e) {
+            DB::rollback();
+            ResponseMessage($e->getMessage(), 402);
+            throw $e;
         }
-
-        return $staff;
     }
 
     public function deleteData($id)
@@ -71,29 +86,28 @@ class StaffRepository implements StaffRepositoryInterface
 
     public function getStaffByDepartment(Request $request, int $departmentId)
     {
-        if($request->per_page || $request->page){
-            $totalCount = Staff::where('department_id', $departmentId)->where('is_active',1)->count();
+        if ($request->per_page || $request->page) {
+            $totalCount = Staff::where('department_id', $departmentId)->where('is_active', 1)->count();
             $pageNumber = 1;
             $perPage = 20;
-            if($request->page){
+            if ($request->page) {
                 $pageNumber = $request->page;
             }
-            if($request->per_page){
+            if ($request->per_page) {
                 $perPage = $request->per_page;
             }
             $skip = ($pageNumber - 1) * $perPage;
             $staffs = Staff::with('department')->where('department_id', $departmentId)
-            ->where('is_active', 1)
-            ->skip($skip)->take($perPage)
-            ->get();
+                ->where('is_active', 1)
+                ->skip($skip)->take($perPage)
+                ->get();
             $staffData = MakePaginationData($request, $totalCount, 'staffs', $staffs);
 
             return $staffData;
-        }
-        else{
+        } else {
             $staffs = Staff::with('department')->where('department_id', $departmentId)
-            ->where('is_active',1)
-            ->get();
+                ->where('is_active', 1)
+                ->get();
 
             return $staffs;
         }

@@ -18,5 +18,5 @@ interface EntityRepositoryInterface
 
     public function entityDetail(array $data, int $entityId);
 
-    public function inactiveRoomsList(Request $request);
+    public function inactiveEntityList(array $data);
 }
