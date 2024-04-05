@@ -110,7 +110,7 @@ class EntityRepository implements EntityRepositoryInterface
         return false;
     }
 
-    public function inactiveRoomsList($data)
+    public function inactiveEntityList($data)
     {
         $area = Area::find($data['area_id']);
         if (isset($data['type'])) {
