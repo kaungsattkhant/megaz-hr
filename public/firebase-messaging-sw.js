@@ -12,14 +12,24 @@ if ("serviceWorker" in navigator) {
     });
 }
 
+// const firebaseConfig = {
+//      apiKey: "AIzaSyBvqlnvze8StG22p3oulB9foQm1dO3cuu8",
+//      authDomain: "megaz-erp.firebaseapp.com",
+//      projectId: "megaz-erp",
+//      storageBucket: "megaz-erp.appspot.com",
+//      messagingSenderId: "609911397064",
+//      appId: "1:609911397064:web:ec83c2db74e8ece72463fd"
+// };
+
 const firebaseConfig = {
-     apiKey: "AIzaSyBvqlnvze8StG22p3oulB9foQm1dO3cuu8",
-     authDomain: "megaz-erp.firebaseapp.com",
-     projectId: "megaz-erp",
-     storageBucket: "megaz-erp.appspot.com",
-     messagingSenderId: "609911397064",
-     appId: "1:609911397064:web:ec83c2db74e8ece72463fd"
-};
+    apiKey: "AIzaSyAyQupmlsJiHgzdJaTH8Os4uq9Wij268YA",
+    authDomain: "megaz-test.firebaseapp.com",
+    projectId: "megaz-test",
+    storageBucket: "megaz-test.appspot.com",
+    messagingSenderId: "105252991244",
+    appId: "1:105252991244:web:e4e4234ee6c8a2e6c25929",
+    measurementId: "G-7832JEYHFH"
+  };
 
 // Initialize Firebase
 firebase.initializeApp(firebaseConfig);
