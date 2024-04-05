@@ -151,8 +151,10 @@
                                 <p class="text-sm text-black font-semibold">
                                     <!-- 35,000 MMks -->
 
-                                    {{ (selectedRoom.price_per_hour * (selectedRoom.invoices.length > 0 ?
-                                    selectedRoom.invoices[0].sessions[0].session_duration : 1)).toLocaleString() }}
+                                    <!-- {{ (selectedRoom.price_per_hour * (selectedRoom.invoices.length > 0 ?
+                                    selectedRoom.invoices[0].sessions[0].session_duration : 1)).toLocaleString() }} -->
+
+                                    {{ selectedRoom.invoices.length > 0 ? selectedRoom.invoices[0].total_session_price : 0 }}
                                     MMKs
                                 </p>
                             </div>
@@ -237,16 +239,10 @@
                             <p class="">
                                 Total
                                 {{
-                                (
-                                selectedRoom ?
-                                (
-                                purchaseMenuList.length > 0 ?
-                                (
-                                (selectedRoom.price_per_hour * selectedRoom.invoices[0].sessions[0].session_duration) +
-                                purchaseMenuList[0].total
-                                ).toLocaleString()
+                                (selectedRoom ? (purchaseMenuList.length > 0 ? ( selectedRoom.invoices[0].total_session_price+
+                                purchaseMenuList[0].total).toLocaleString()
                                 : (
-                                selectedRoom.price_per_hour * selectedRoom.invoices[0].sessions[0].session_duration
+                                selectedRoom.invoices[0].total_session_price
                                 ).toLocaleString()
                                 )
                                 : 0
