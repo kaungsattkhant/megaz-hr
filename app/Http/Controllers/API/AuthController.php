@@ -11,6 +11,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Staff\StaffLoginRequest;
 
 use App\Models\Staff;
+use App\Models\StaffFcmToken;
 
 class AuthController extends Controller
 {
@@ -18,6 +19,7 @@ class AuthController extends Controller
     public function login(StaffLoginRequest $request)
     {
         $loginResponse = (new APILoginAction("phone_number", $request->phone_number, $request->password, "App\Models\Staff"))->run("staff_token");
+
         if($loginResponse["code"] != 200){
             ResponseMessage($loginResponse["message"], 401);
         }
@@ -34,4 +36,6 @@ class AuthController extends Controller
 
         ResponseMessage("Logout success");
     }
+
+   
 }
