@@ -4,6 +4,7 @@ namespace App\Repositories\PurchaseOrder;
 
 use App\Http\Action\Common\PurchaseOrder as CommonPurchaseOrder;
 use App\Http\Action\Inventory\StoreInventory;
+use App\Http\Action\SendNotification\SendNotification;
 use App\Models\PurchaseOrder;
 use App\Models\PurchaseOrderItem;
 use Illuminate\Database\Eloquent\Model;
@@ -13,6 +14,7 @@ use Illuminate\Support\Facades\DB;
 class PurchaseOrderRepository implements PurchaseOrderRepositoryInterface
 {
     private $select = ['po_id', 'total_price', 'created_by', 'manager_check_id', 'manager_check_time', 'financial_check_id', 'financial_check_time', 'is_md_check', 'status', 'created_at', 'updated_at'];
+    use SendNotification;
     public function listAllData(Request $request)
     {
         $staff = UserData();
@@ -67,6 +69,10 @@ class PurchaseOrderRepository implements PurchaseOrderRepositoryInterface
                 $item_data['item_id'] = $item->item_id;
                 $item_data['amount'] = $item->amount;
                 $po->items()->updateOrCreate(['id' => $item_data['id']], $item_data);
+            }
+            if (!isset($request->id)) {
+                $users=$this->getUserByRole(['Manager']);
+                $this->send($po,'You have received a new PO to confirm','New Purchase Order',$users);
             }
             DB::commit();
             return $po;
@@ -174,6 +180,7 @@ class PurchaseOrderRepository implements PurchaseOrderRepositoryInterface
                     $model->status = $status;
                     $model->save();
                     $this->existIsCheckAndUpdate($model, $is_column, $request->value);
+
                     #store after md confimed
                     if ($staff->hasRoles('MD')) {
                         (new StoreInventory())->inventoryAction($model, 'in', 'purchase_order');
