@@ -30,7 +30,7 @@ class OrderRepository implements OrderRepositoryInterface
                     $data['price'] = $data['original_price'] * $data['quantity'];
                     $order_items = OrderItem::create($data);
                 }
-
+                DB::commit();
                 return $order;
             } else {
                 $data['date'] = currentTime();
@@ -43,10 +43,9 @@ class OrderRepository implements OrderRepositoryInterface
                 $data['discount_value'] = 0;
                 $data['price'] = $data['original_price'] * $data['quantity'];
                 $order_items = OrderItem::create($data);
-
+                DB::commit();
                 return $order;
             }
-            DB::commit();
         } catch (\Exception $e) {
             DB::rollback();
             ResponseMessage($e->getMessage(), 402);
