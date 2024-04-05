@@ -27,7 +27,7 @@ class OrderCreateRequest extends FormRequest
             'menu_id' => 'sometimes',
             'quantity' => 'sometimes',
             'original_price' => 'sometimes',
-            'menuArray' => 'sometimes'
+            'menuArray' => 'sometimes' //for multiple
         ];
     }
 }

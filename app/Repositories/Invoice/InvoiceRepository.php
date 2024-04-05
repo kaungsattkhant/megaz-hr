@@ -306,6 +306,8 @@ class InvoiceRepository implements InvoiceRepositoryInterface
             $data['complete_date'] = CurrentTime();
             $invoice->update($data);
 
+            $debit_total = 0;
+
             // transaction and ledgers
             if ($data['payment_type'] == 'cash') {
                 $posBook = Account::where('account_code', '2-1011')->first();
@@ -317,8 +319,10 @@ class InvoiceRepository implements InvoiceRepositoryInterface
             $data['created_by'] = 1; //example
             $data['transactionable_id'] = $invoice->id;
             $data['transactionable_type'] = 'invoice';
+            $data['is_confirmed'] = 1;
 
             $transaction = (new StoreTransactionLedger())->createTransaction($data);
+
 
             if (isset($data['order_categories'])) {
                 if ($foodCharge != 0) {
@@ -330,15 +334,13 @@ class InvoiceRepository implements InvoiceRepositoryInterface
                             'transaction_id' => $transaction->id,
                             'account_id' => $foodKtvAcc->id,
                             'action' => 'credit',
+                            'is_cashier_confirmed' => 1
+
                         ]);
                     }
 
-                    $foodCashDebit = (new StoreTransactionLedger())->storeLedger([
-                        'value' => $foodCharge,
-                        'transaction_id' => $transaction->id,
-                        'account_id' => $posBook->id,
-                        'action' => 'debit',
-                    ]);
+                    $debit_total += $foodCharge;
+
                 }
 
                 if ($beverageCharge != 0) {
@@ -350,15 +352,13 @@ class InvoiceRepository implements InvoiceRepositoryInterface
                             'transaction_id' => $transaction->id,
                             'account_id' => $beverageKtvAcc->id,
                             'action' => 'credit',
+                            'is_cashier_confirmed' => 1
+
                         ]);
                     }
 
-                    $beverageCashDebit = (new StoreTransactionLedger())->storeLedger([
-                        'value' => $beverageCharge,
-                        'transaction_id' => $transaction->id,
-                        'account_id' => $posBook->id,
-                        'action' => 'debit',
-                    ]);
+                    $debit_total += $beverageCharge;
+
                 }
             }
 
@@ -371,15 +371,13 @@ class InvoiceRepository implements InvoiceRepositoryInterface
                         'transaction_id' => $transaction->id,
                         'account_id' => $ktvRoomAcc->id,
                         'action' => 'credit',
+                        'is_cashier_confirmed' => 1
+
                     ]);
                 }
 
-                $ktvCashDebit = (new StoreTransactionLedger())->storeLedger([
-                    'value' => $total_session_price,
-                    'transaction_id' => $transaction->id,
-                    'account_id' => $posBook->id,
-                    'action' => 'debit',
-                ]);
+                $debit_total += $total_session_price;
+
             }
 
             if ($data['service_charge'] != 0) {
@@ -391,15 +389,13 @@ class InvoiceRepository implements InvoiceRepositoryInterface
                         'transaction_id' => $transaction->id,
                         'account_id' => $serviceMoneyAcc->id,
                         'action' => 'credit',
+                        'is_cashier_confirmed' => 1
+
                     ]);
                 }
 
-                $serviceCashDebit = (new StoreTransactionLedger())->storeLedger([
-                    'value' => $data['service_charge'],
-                    'transaction_id' => $transaction->id,
-                    'account_id' => $posBook->id,
-                    'action' => 'debit',
-                ]);
+                $debit_total += $data['service_charge'];
+
             }
 
             if ($data['tax'] != 0) {
@@ -411,36 +407,31 @@ class InvoiceRepository implements InvoiceRepositoryInterface
                         'transaction_id' => $transaction->id,
                         'account_id' => $taxAcc->id,
                         'action' => 'credit',
+                        'is_cashier_confirmed' => 1
+
                     ]);
                 }
 
-                $textDebit = (new StoreTransactionLedger())->storeLedger([
-                    'value' => $data['tax'],
-                    'transaction_id' => $transaction->id,
-                    'account_id' => $posBook->id,
-                    'action' => 'debit',
-                ]);
+                $debit_total += $data['tax'];
+
             }
 
             if ($data['discount_value'] != 0) {
                 $discountAcc = Account::where('account_code', '6-2003')->first();
 
                 if ($discountAcc != null) {
-                    $discountDebit = (new StoreTransactionLedger())->storeLedger([
-                        'value' => $data['discount_value'],
-                        'transaction_id' => $transaction->id,
-                        'account_id' => $discountAcc->id,
-                        'action' => 'debit',
-                    ]);
+                    $debit_total += $data['discount_value'];
                 }
 
-                $discountCashCredit = (new StoreTransactionLedger())->storeLedger([
-                    'value' => $data['discount_value'],
-                    'transaction_id' => $transaction->id,
-                    'account_id' => $posBook->id,
-                    'action' => 'credit',
-                ]);
             }
+
+            $debitLedger = (new StoreTransactionLedger())->storeLedger([
+                'value' => $debit_total,
+                'transaction_id' => $transaction->id,
+                'account_id' => $posBook->id,
+                'action' => 'debit',
+                'is_cashier_confirmed' => 1
+            ]);
             DB::commit();
             return $invoice;
         } catch (\Throwable $e) {
