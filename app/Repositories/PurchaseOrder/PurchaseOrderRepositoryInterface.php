@@ -21,4 +21,6 @@ interface PurchaseOrderRepositoryInterface
     public function deletePurchaseOrderItem($id);
 
     public function updateIsCheck($request);
+
+    public function boughtPurchaseOrder($request);
 }

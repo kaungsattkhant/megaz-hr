@@ -1,40 +1,41 @@
 <?php
 
-use App\Http\Controllers\API\AccountController;
-use App\Http\Controllers\API\AreaController;
-use App\Http\Controllers\API\AuthController;
-use App\Http\Controllers\API\CashbookController;
-use App\Http\Controllers\API\CommonController;
-use App\Http\Controllers\API\ComplaintAPIController;
-use App\Http\Controllers\API\CustomerAPIController;
-use App\Http\Controllers\API\DepartmentAPIController;
-use App\Http\Controllers\API\EntityAPIController;
-use App\Http\Controllers\API\ExcelImportController;
-use App\Http\Controllers\API\HeadAccountController;
-use App\Http\Controllers\API\InventoryAPIController;
-use App\Http\Controllers\API\InvoiceAPIController;
-use App\Http\Controllers\API\ItemAPIController;
-use App\Http\Controllers\API\ItemUsageForecastController;
-use App\Http\Controllers\API\MenuAPIController;
-use App\Http\Controllers\API\OrderAPIController;
-use App\Http\Controllers\API\ProfileAPIController;
-use App\Http\Controllers\API\PurchaseOrderAPIController;
-use App\Http\Controllers\API\RoleAPIController;
-use App\Http\Controllers\API\StaffAPIController;
-use App\Http\Controllers\API\SubAccountController;
-use App\Http\Controllers\API\SupplierController;
-use App\Http\Controllers\API\TaskController;
-use App\Http\Controllers\API\TestController;
-use App\Http\Controllers\API\TransactionController;
-use App\Http\Controllers\API\TransferAPIController;
-use App\Http\Controllers\API\UomAPIController;
+use App\Models\Gender;
 use App\Models\AreaType;
 use App\Models\Category;
-use App\Models\ComplaintCategory;
-use App\Models\Gender;
 use App\Models\MenuCategory;
 use App\Models\ServiceCategory;
+use App\Models\ComplaintCategory;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\API\AreaController;
+use App\Http\Controllers\API\AuthController;
+use App\Http\Controllers\API\TaskController;
+use App\Http\Controllers\API\TestController;
+use App\Http\Controllers\API\CommonController;
+use App\Http\Controllers\API\UomAPIController;
+use App\Http\Controllers\API\AccountController;
+use App\Http\Controllers\API\ItemAPIController;
+use App\Http\Controllers\API\MenuAPIController;
+use App\Http\Controllers\API\RoleAPIController;
+use App\Http\Controllers\API\CashbookController;
+use App\Http\Controllers\API\OrderAPIController;
+use App\Http\Controllers\API\StaffAPIController;
+use App\Http\Controllers\API\SupplierController;
+use App\Http\Controllers\API\EntityAPIController;
+use App\Http\Controllers\API\InvoiceAPIController;
+use App\Http\Controllers\API\ProfileAPIController;
+use App\Http\Controllers\API\SubAccountController;
+use App\Http\Controllers\API\CustomerAPIController;
+use App\Http\Controllers\API\ExcelImportController;
+use App\Http\Controllers\API\HeadAccountController;
+use App\Http\Controllers\API\TransactionController;
+use App\Http\Controllers\API\TransferAPIController;
+use App\Http\Controllers\API\ComplaintAPIController;
+use App\Http\Controllers\API\InventoryAPIController;
+use App\Http\Controllers\API\NotificationController;
+use App\Http\Controllers\API\DepartmentAPIController;
+use App\Http\Controllers\API\PurchaseOrderAPIController;
+use App\Http\Controllers\API\ItemUsageForecastController;
 
 /*
 |--------------------------------------------------------------------------
@@ -100,6 +101,7 @@ Route::middleware('auth:api')->group(function () {
         Route::post('/purchase_orders_items', 'createPurchaseOrderItem');
 
         Route::delete('/purchase_orders_items/{id}', 'deletePurchaseOrderItem');
+        Route::post('purchase_orders_bought', 'boughtPurchaseOrder');
         Route::post('updateIsCheck', 'updateIsCheck');
     });
     #item usage forecast
@@ -130,11 +132,13 @@ Route::middleware('auth:api')->group(function () {
     });
 
     Route::resource('suppliers', SupplierController::class)->only(['index', 'store', 'show', 'destroy']);
+    Route::resource('notifications',NotificationController::class)->only(['index']);
 });
 
 Route::controller(ExcelImportController::class)->group(function () {
     Route::post('/import_account', 'importAccount');
 });
+
 
 Route::get('/areas', [AreaController::class, 'getAreas']);
 Route::post('/areas', [AreaController::class, 'createArea']);

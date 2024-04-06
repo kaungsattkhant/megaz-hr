@@ -17,6 +17,7 @@ return new class extends Migration
             $table->double('total_price');
             $table->date('date');
             $table->unsignedBigInteger('created_by');
+            $table->boolean('is_bought')->default(0);
             $table->unsignedBigInteger('manager_check_id')->nullable();
             $table->unsignedBigInteger('financial_check_id')->nullable();
             $table->dateTime('manager_check_time')->nullable();

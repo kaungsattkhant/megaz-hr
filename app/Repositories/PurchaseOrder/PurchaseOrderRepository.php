@@ -71,8 +71,11 @@ class PurchaseOrderRepository implements PurchaseOrderRepositoryInterface
                 $po->items()->updateOrCreate(['id' => $item_data['id']], $item_data);
             }
             if (!isset($request->id)) {
-                $users=$this->getUserByRole(['Manager']);
-                $this->send($po,'You have received a new PO to confirm','New Purchase Order',$users);
+                $users=$this->getUserByRole(['HR']);
+                $data = [
+                    'date' => $po->created_at,
+                ];
+                $this->send($po,'You have received a new PO to confirm','New Purchase Order',$users,$data);
             }
             DB::commit();
             return $po;
@@ -222,5 +225,15 @@ class PurchaseOrderRepository implements PurchaseOrderRepositoryInterface
                 }
             }
         }
+    }
+
+    public function boughtPurchaseOrder($request)
+    {
+        $ids=$request->ids;
+        $transaction=PurchaseOrder::whereIn('id',$ids)
+        ->update([
+            'is_bought'=>$request->value,
+        ]);
+        $transaction ? ResponseMessage('PO bought successfully',200) : ResponseMessage('PO bought Fail',422);
     }
 }

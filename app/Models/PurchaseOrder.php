@@ -28,6 +28,7 @@ class PurchaseOrder extends BaseModel
         'status',
         'created_at',
         'updated_at',
+        'is_bought',
     ];
 
     public function getCreatedAt()

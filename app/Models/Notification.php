@@ -11,28 +11,23 @@ use FCM;
 class Notification extends Model
 {
     use HasFactory;
-    protected $fillale=['title','preview','notificationable_id','notificationable_type','created_by'];
+    protected $fillable=['title','preview','notificationable_id','notificationable_type','created_by','date_time'];
 
     public function notificationUsers(){
         return $this->hasMany(\App\Models\NotificationUser::class);
     }
-    public  function toUserMultipleDevice($tokens=null,$title=null,$body=null,$icon,$click_action="https://slazh.com.mm",$add_data){
+    public  function toUserMultipleDevice($tokens=null,$title=null,$body=null,$add_data){
+        $click_action='http://127.0.0.1:8080';
+        $icon=null;
         $optionBuilder = new OptionsBuilder();
         $optionBuilder->setTimeToLive(60*20);
         $notificationBuilder = new PayloadNotificationBuilder($title);
         $notificationBuilder->setBody($body)
-                            ->setSound('default')
-                            ->setBadge(1)
-                            ->setIcon($icon)
-                            ->setClickAction($click_action);
+                            ->setSound('default');
+                            
         $dataBuilder = new PayloadDataBuilder();
         $dataBuilder->addData($add_data);
-        // $dataBuilder->addData(['id' => $noti->id]);
-        // $dataBuilder->addData(['notification_count' => $this->where('is_read',0)->count()]);
-        // $dataBuilder->addData(['type' => $noti->notify->notifiable_type]);
-        // if($noti->notify->notifiable_type=='coupon'){
-        //     $dataBuilder->addData(['code' => $noti->notify->code]);
-        // }
+    
         $option = $optionBuilder->build();
         $notification = $notificationBuilder->build();
         $data = $dataBuilder->build();
