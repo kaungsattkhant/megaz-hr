@@ -54,7 +54,7 @@
                                     {{ room.name }}
                                 </td>
                                 <td class="whitespace-nowrap px-6 py-4 ">
-                                    {{ room.service_category.name }}
+                                    <div v-if="room.service_category"> {{ room.service_category.name }} </div>
                                 </td>
                                 <td class="whitespace-nowrap px-6 py-4 ">
                                     {{ room.price_per_hour }}
@@ -177,7 +177,7 @@
                             <input type="text" placeholder="Room / Table Name" v-model="name"
                                 class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
                         </div>
-                        <div class="mb-4">
+                        <!-- <div class="mb-4">
                             <label for="" class="block text-sm text-black mb-3">
                                 Category
                             </label>
@@ -185,7 +185,7 @@
                                 class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
                                 <option :value="service.id" v-for="(service,index) in serviceCategoryList">{{ service.name }}</option>
                             </select>
-                        </div>
+                        </div> -->
                         <div class="mb-4">
                             <label for="" class="block text-sm text-black mb-3">
                                 Price Per Hour
@@ -363,7 +363,7 @@
                 formData.append('price_per_hour', this.pricePerHour);
                 formData.append('entity_type', this.entityType);
                 formData.append('area_id', this.area_id);
-                formData.append('service_category_id', this.service_category_id);
+                // formData.append('service_category_id', this.service_category_id);
                 let response = await postApiData({url: '/api/entities', form_data: formData, token: this.getToken()});
                 if(response.success){
                     this.getRoomList(null);

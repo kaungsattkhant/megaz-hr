@@ -54,7 +54,7 @@
                                     {{ room.name }}
                                 </td>
                                 <td class="whitespace-nowrap px-6 py-4 ">
-                                    {{ room.service_category.name }}
+                                    <div v-if="room.service_category"> {{ room.service_category.name }} </div>
                                 </td>
                                 <td class="whitespace-nowrap px-6 py-4 ">
                                     {{ room.price_per_hour }}
