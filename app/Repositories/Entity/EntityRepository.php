@@ -33,38 +33,29 @@ class EntityRepository implements EntityRepositoryInterface
     {
         $area = Area::find($data['area_id']);
         $currentDate = $data['current_date'];
-        if (isset($data['type'])) {
-            $entities = Entity::where('area_id', $area->id)->where("entity_type", $data['type'])->where("is_available", 1)->with(["invoices" => function ($query) use ($currentDate) {
-                $query->where("complete_date", null)
-                    ->whereBetween("invoice_date", [$currentDate . " 00:00:00", $currentDate . " 23:59:59"])
-                    ->select("id", "invoice_id", "entity_id")->with("sessions");
-            }])->get();
-        } else {
+
 
             $entities = Entity::where('area_id', $area->id)->where("is_available", 1)->with(["invoices" => function ($query) use ($currentDate) {
-                $query->where("complete_date", null)
-                    ->whereBetween("invoice_date", [$currentDate . " 00:00:00", $currentDate . " 23:59:59"])
-                    ->select("id", "invoice_id", "entity_id","total_session_price")->with("sessions");
+                $query->where("complete_date", null)->select("id", "invoice_id", "entity_id","total_session_price")->with("sessions");
             }])->get();
-        }
+
         return $entities;
     }
 
 
     public function entityDetail(array $data, int $entityId)
     {
-        $currentDate = CurrentDate();
-        if (isset($data['current_date'])) {
-            $currentDate = $data['current_date'];
-        }
-
-        $entity = Entity::with(["invoices" => function ($query) use ($currentDate) {
-            $query->where("complete_date", null)
-                ->whereBetween("invoice_date", [$currentDate . " 00:00:00", $currentDate . " 23:59:59"])
-                ->select("id", "invoice_id", "entity_id","total_session_price")->with(["sessions", "orders.orderItems.menu"]);
+        $entity = Entity::with(["invoices" => function ($query) {
+            $query->whereNull("complete_date")
+                  ->select("id", "invoice_id", "entity_id", "total_session_price")
+                  ->with(["sessions", "orders.orderItems.menu"])
+                  ->latest()
+                  ->limit(1); // Get only the latest invoice
         }])->find($entityId);
 
         return $entity;
+
+
     }
 
     public function createData(array $data)
