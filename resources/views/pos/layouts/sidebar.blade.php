@@ -59,7 +59,8 @@
         </div>
 
     </div>
-    <div class="absolute bottom-0 left-0 w-[11vw] h-24 flex items-end justify-end">
+    <div id="app" class="absolute bottom-0 left-0 w-[11vw] h-24 flex items-end justify-end">
+        <logout-component-pos/>
         <button class="w-full">
             <a href="/pos/ar" class="flex items-center flex-col  rounded-lg px-6 py-12 text-black">
                 <i class="fas fa-users mb-1.5 text-2xl"></i>
