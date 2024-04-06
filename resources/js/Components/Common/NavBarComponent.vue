@@ -1,4 +1,5 @@
 <template>
+    <notifications position="top center" />
     <div class="w-full flex justify-between pr-4">
         <p> {{ user.name }} ({{ department.name }}) </p>
     </div>
@@ -12,17 +13,11 @@
             </button>
             <ul class="absolute z-[1000] float-left m-0 hidden min-w-max list-none overflow-hidden rounded-lg border-none bg-white bg-clip-padding text-base shadow-lg data-[te-dropdown-show]:block dark:bg-surface-dark"
                 aria-labelledby="dropdownMenuButton1" data-te-dropdown-menu-ref>
-                <li>
-                    <a class="block w-full whitespace-nowrap bg-white px-4 py-2 text-sm font-normal text-neutral-700 hover:bg-zinc-200/60 focus:bg-zinc-200/60 focus:outline-none active:bg-zinc-200/60 active:no-underline dark:bg-surface-dark dark:text-white dark:hover:bg-neutral-800/25 dark:focus:bg-neutral-800/25 dark:active:bg-neutral-800/25"
-                        href="#" data-te-dropdown-item-ref>Action</a>
-                </li>
-                <li>
-                    <a class="block w-full whitespace-nowrap bg-white px-4 py-2 text-sm font-normal text-neutral-700 hover:bg-zinc-200/60 focus:bg-zinc-200/60 focus:outline-none active:bg-zinc-200/60 active:no-underline dark:bg-surface-dark dark:text-white dark:hover:bg-neutral-800/25 dark:focus:bg-neutral-800/25 dark:active:bg-neutral-800/25"
-                        href="#" data-te-dropdown-item-ref>Another action</a>
-                </li>
-                <li>
-                    <a class="block w-full whitespace-nowrap bg-white px-4 py-2 text-sm font-normal text-neutral-700 hover:bg-zinc-200/60 focus:bg-zinc-200/60 focus:outline-none active:bg-zinc-200/60 active:no-underline dark:bg-surface-dark dark:text-white dark:hover:bg-neutral-800/25 dark:focus:bg-neutral-800/25 dark:active:bg-neutral-800/25"
-                        href="#" data-te-dropdown-item-ref>Something else here</a>
+                <li v-for="(notification, notificationIndex) in notifications" :key="notificationIndex">
+                    <div class="bg-white rounded-lg shadow-sm p-4 my-2">
+                        <h2 class="text-lg font-semibold text-gray-800"> {{ notification.title }} </h2>
+                        <p class="text-sm text-gray-600 mt-2"> {{ notification.preview }} </p>
+                    </div>
                 </li>
             </ul>
         </div>
@@ -30,24 +25,91 @@
 </template>
 
 <script>
-import { Dropdown ,Modal, Ripple, Select, initTE } from "tw-elements";
+    import firebase from 'firebase/compat/app';
+    import 'firebase/messaging';
+    import { Dropdown ,Modal, Ripple, Select, initTE } from "tw-elements";
     import { mapGetters } from "vuex";
+
+    import { getApiData } from '../../utilities/ajax-helpers';
 
     export default{
         data() {
             return {
+                firebaseMessaging: null,
+                fcmToken: null,
                 user: null,
                 department: null,
+                notifications: [],
             };
         },
 
         methods: {
-            ...mapGetters(['getUser', 'getDepartment']),
+            ...mapGetters(['getUser', 'getDepartment', 'getToken']),
+
+            async getNotifications(){
+                let url = `/api/notifications`;
+                let response = await getApiData({url: url, token: this.getToken()});
+                if(response.data){
+                    this.notifications = response.data;
+                    console.log(this.notifications);
+                }
+            },
+
+            async startOnMessageListener() {
+                console.log(`im running`);
+                try {
+                    await this.firebaseMessaging.onMessage((payload) => {
+                        console.log('message received: ', payload);
+                        let title = payload.notification.title;
+                        let body = payload.notification.body;
+                        let notiOptions = { body: body };
+                        new Notification(title, notiOptions);
+
+                        this.$notify({
+                            title: payload.notification.title,
+                            text: payload.notification.body,
+                            type: "info"
+                        });
+                        this.getNotifications();
+                    });
+                }
+                catch (error) {
+                    console.log('error', error);
+                }
+            },
+
+            async requestPermission() {
+                try {
+                    const permission = await Notification.requestPermission();
+                    if (permission == 'denied') {
+                        this.$notify({
+                            text: `Notification permission ${permission}`,
+                            type: 'warn'
+                        });
+                    }
+                    if (permission == 'granted') {
+                        console.log(`permission granted`);
+                        this.firebaseMessaging = firebase.messaging();
+                        this.fcmToken = await this.firebaseMessaging.getToken();
+                        console.log(this.fcmToken);
+                        this.startOnMessageListener();
+                    }
+                }
+                catch (error) {
+                    this.$notify({
+                        text: 'Firebase error',
+                        type: "error"
+                    });
+                }
+            },
+
         },
 
         created(){
             this.user = this.getUser();
             this.department = this.getDepartment();
+            this.requestPermission();
+            this.getNotifications();
         },
 
         mounted(){
