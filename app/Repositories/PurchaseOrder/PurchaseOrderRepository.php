@@ -168,13 +168,12 @@ class PurchaseOrderRepository implements PurchaseOrderRepositoryInterface
                     // if ($items->isNotEmpty()) {
                     //     ResponseMessage('Some items are left to check', 422);
                     // }
-                    
                     $staff->hasRoles('MD') ?
                     $model->$is_column = 1 : $model->$column_id = $staff->id;
                     $model->$column_time = now();
                     $model->status = $status;
                     $model->save();
-
+                    $this->existIsCheckAndUpdate($model, $is_column, $request->value);
                     #store after md confimed
                     if ($staff->hasRoles('MD')) {
                         (new StoreInventory())->inventoryAction($model, 'in', 'purchase_order');
@@ -192,9 +191,11 @@ class PurchaseOrderRepository implements PurchaseOrderRepositoryInterface
         
     }
 
-    public function existIsCheck($model, $is_column, $value)
+    public function existIsCheckAndUpdate($model, $is_column, $value)
     {
-        return $model->items->whereIn($is_column, $value)->values();
+        return $model->items()->update([
+            $is_column=>$value,
+        ]);
     }
 
     public function validateModel($model, $staff, $type)

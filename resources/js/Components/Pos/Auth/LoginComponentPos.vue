@@ -1,7 +1,7 @@
 <template>
+    <notifications position="top center" />
     <div class="w-full relative block h-[100vh] bg-black">
         <div class="w-10/12 lg:w-2/6 mx-auto min-h-[80vh] pt-36">
-
             <div class="mb-6">
                 <div class="px-8" @keyup.enter="login">
                     <div class=" mb-4">
@@ -30,6 +30,7 @@
                     <input type="hidden" v-model="csrfToken" name="_token">
                     <input type="hidden" v-model="phoneNumber" name="phone_number">
                     <input type="hidden" v-model="password" name="password">
+                    <input type="hidden" v-model="fcmToken" name="fcm_token">
                 </form>
 
             </div>
@@ -40,8 +41,8 @@
     import { mapMutations } from 'vuex';
     import { postApiData } from '../../../utilities/ajax-helpers';
 
-    // import firebase from 'firebase/compat/app';
-    // import 'firebase/messaging';
+    import firebase from 'firebase/compat/app';
+    import 'firebase/messaging';
 
     export default {
         name: "LoginComponent",
@@ -49,7 +50,6 @@
             return {
                 token: null,
                 csrfToken: null,
-                // firebaseMessaging: null,
 
                 phoneNumber: null,
                 password: null,
@@ -99,7 +99,32 @@
         },
 
         async mounted() {
+            try {
+                const permission = await Notification.requestPermission();
+                console.log('notification permission', permission);
+                let notiType = 'warn';
+                if(permission == 'denied'){
+                    notiType = 'warn';
+                }
+                if(permission == 'granted'){
+                    notiType = 'info';
+                    this.firebaseMessaging = firebase.messaging();
+                    this.fcmToken = await this.firebaseMessaging.getToken();
+                    console.log('fcm token',this.fcmToken);
+                }
 
+                this.$notify({
+                    text: `Notification permission ${permission}`,
+                    type: notiType
+                });
+            }
+            catch (error) {
+                console.log(error);
+                this.$notify({
+                    text: 'Firebase error',
+                    type: "error"
+                });
+            }
         }
     }
 

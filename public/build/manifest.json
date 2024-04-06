@@ -4,7 +4,7 @@
     "src": "public/img/Video_light.png"
   },
   "resources/css/app.css": {
-    "file": "assets/app-OJVD8Wqf.css",
+    "file": "assets/app-9tH734sz.css",
     "src": "resources/js/app.js"
   },
   "resources/js/app.js": {
@@ -12,9 +12,9 @@
       "assets/Video_light-nWiE6W6S.png"
     ],
     "css": [
-      "assets/app-OJVD8Wqf.css"
+      "assets/app-9tH734sz.css"
     ],
-    "file": "assets/app-hd6iIrcl.js",
+    "file": "assets/app-Sr5cwpbI.js",
     "isEntry": true,
     "src": "resources/js/app.js"
   }

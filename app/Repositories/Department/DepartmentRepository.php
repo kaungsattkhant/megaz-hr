@@ -28,7 +28,6 @@ class DepartmentRepository implements DepartmentRepositoryInterface
             return $paginationData;
         } else {
             $departments = Department::all();
-
             return $departments;
         }
     }
