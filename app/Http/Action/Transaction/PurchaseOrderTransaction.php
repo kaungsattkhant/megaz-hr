@@ -2,12 +2,11 @@
 
 namespace App\Http\Action\Transaction;
 
-use App\Models\Ledger;
+use App\Http\Action\Transaction\StoreTransactionLedger;
 use App\Models\Account;
-use App\Models\Transaction;
+use App\Models\Ledger;
 use App\Models\PurchaseOrderItem;
 use Illuminate\Support\Facades\DB;
-use App\Http\Action\Transaction\StoreTransactionLedger;
 
 class PurchaseOrderTransaction
 {
@@ -25,7 +24,7 @@ class PurchaseOrderTransaction
         $data['transactionable_type'] = $transactionable_type;
         $creditAccount = (new Account())->accountByCode('2-1001'); # credit account is awalys Office Account
         foreach ($purchaseOrderItemGroupedByCategory as $po_category) {
-            $transaction=(new StoreTransactionLedger())->createTransaction($data);
+            $transaction = (new StoreTransactionLedger())->createTransaction($data);
             $category_id = $po_category->category_id;
             $account_code = null;
             switch ($category_id) {
@@ -45,32 +44,43 @@ class PurchaseOrderTransaction
                     $account_code = '2-1025'; #Inventory Stationery
                     break;
             }
-            if($account_code==null) ResponseMessage('Transaction fail',419);
+            if ($account_code == null) {
+                ResponseMessage('Transaction fail', 419);
+            }
+
             #debit
             if ($account_code) {
                 $debitAccount = (new Account())->accountByCode($account_code); #Inventory Food
 
-                $debitLedger = (new StoreTransactionLedger())->storeLedger([
-                    'value' => $po_category->total_amount,
-                    'transaction_id' => $transaction->id,
-                    'account_id' => $debitAccount->id,
-                    'action' => 'debit',
-                ]);
+                if ($debitAccount) {
+                    $debitLedger = (new StoreTransactionLedger())->storeLedger([
+                        'value' => $po_category->total_amount,
+                        'transaction_id' => $transaction->id,
+                        'account_id' => $debitAccount->id,
+                        'action' => 'debit',
+                    ]);
+                } else {
+                    ResponseMessage('Account is Invalid', 419);
+                }
             }
             #credit
-            $creditLedger = (new StoreTransactionLedger())->storeLedger([
-                'date' => now(),
-                'value' => $po_category->total_amount,
-                'transaction_id' => $transaction->id,
-                'account_id' => $creditAccount->id,
-                'action' => 'credit',
-            ]);
+            if ($creditAccount) {
+                $creditLedger = (new StoreTransactionLedger())->storeLedger([
+                    'date' => now(),
+                    'value' => $po_category->total_amount,
+                    'transaction_id' => $transaction->id,
+                    'account_id' => $creditAccount->id,
+                    'action' => 'credit',
+                ]);
+            } else {
+                ResponseMessage('Account is Invalid', 419);
+            }
         }
         return $purchaseOrderItemGroupedByCategory;
     }
 
-    public function storeLedger($data){
+    public function storeLedger($data)
+    {
         return Ledger::create($data);
     }
 }
-

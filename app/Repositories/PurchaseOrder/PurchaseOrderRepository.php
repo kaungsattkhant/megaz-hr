@@ -186,7 +186,7 @@ class PurchaseOrderRepository implements PurchaseOrderRepositoryInterface
 
                     #store after md confimed
                     if ($staff->hasRoles('MD')) {
-                        (new StoreInventory())->inventoryAction($model, 'in', 'purchase_order');
+                        // (new StoreInventory())->inventoryAction($model, 'in', 'purchase_order');
                     }
                 }
                 DB::commit();
@@ -230,10 +230,16 @@ class PurchaseOrderRepository implements PurchaseOrderRepositoryInterface
     public function boughtPurchaseOrder($request)
     {
         $ids=$request->ids;
-        $transaction=PurchaseOrder::whereIn('id',$ids)
+        $po=PurchaseOrder::whereIn('id',$ids)
         ->update([
             'is_bought'=>$request->value,
         ]);
-        $transaction ? ResponseMessage('PO bought successfully',200) : ResponseMessage('PO bought Fail',422);
+        foreach($ids as $id){
+            $model=PurchaseOrder::find($id);
+            if($model){
+                (new StoreInventory())->inventoryAction($model, 'in', 'purchase_order');
+            }
+        }
+        $po ? ResponseMessage('PO bought successfully',200) : ResponseMessage('PO bought Fail',422);
     }
 }
