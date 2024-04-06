@@ -89,6 +89,7 @@ import InvoiceListComponent from './Components/Pos/Invoices/InvoiceListComponent
 import InvoiceDetailComponent from './Components/Pos/Invoices/InvoiceDetailComponent.vue';
 
 import LoginComponentPos from './Components/Pos/Auth/LoginComponentPos.vue';
+import LogoutComponentPos from './Components/Pos/Auth/LogoutComponentPos.vue';
 
 app.component('NavBarComponent', NavBarComponent);
 app.component('StaffListComponent', StaffListComponent);
@@ -136,7 +137,9 @@ app.component('PosCashbookCrudComponent', PosCashbookCrudComponent);
 app.component('CashbookDetailComponent', CashbookDetailComponent);
 app.component('InvoiceListComponent', InvoiceListComponent);
 app.component('InvoiceDetailComponent', InvoiceDetailComponent);
+
 app.component('LoginComponentPos', LoginComponentPos);
+app.component('LogoutComponentPos', LogoutComponentPos);
 
 app.use(store);
 app.use(Notifications);

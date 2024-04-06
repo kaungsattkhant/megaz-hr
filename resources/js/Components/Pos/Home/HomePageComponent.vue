@@ -1042,7 +1042,7 @@
                 this.getChangeableRoomList();
             },
             async getChangeableRoomList(){
-                const response = await getApiData({ url: '/api/rooms/lists/inactive' });
+                const response = await getApiData({ url: '/api/areas/' + this.selectedAreaId + '/inactive_entities' });
                 if(response.data){
                     this.changeableRoomList = response.data;
                 }
