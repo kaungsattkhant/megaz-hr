@@ -17,6 +17,7 @@ return new class extends Migration
             $table->boolean('is_read_count')->default(0);
             $table->dateTime('read_at')->nullable();
             $table->unsignedInteger('staff_id');
+            $table->unsignedInteger('notification_id');
             $table->timestamps();
         });
     }

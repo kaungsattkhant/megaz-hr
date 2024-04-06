@@ -15,7 +15,6 @@ return new class extends Migration
             $table->bigIncrements('id');
             $table->string('fcm_token');
             $table->unsignedInteger('user_id');
-            $table->unsignedInteger('staff_id');
             $table->timestamps();
         });
     }
