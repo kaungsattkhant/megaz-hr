@@ -30,7 +30,6 @@ trait SendNotification
             $data['type']=$notification->notificationable_type;
             (new Notification())->toUserMultipleDevice($tokens, $title, $preview, $data);
         }
-     
     }
 
     public function getTokensByStaff($user_ids){

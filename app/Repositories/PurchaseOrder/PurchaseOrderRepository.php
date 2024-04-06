@@ -71,7 +71,7 @@ class PurchaseOrderRepository implements PurchaseOrderRepositoryInterface
                 $po->items()->updateOrCreate(['id' => $item_data['id']], $item_data);
             }
             if (!isset($request->id)) {
-                $users=$this->getUserByRole(['HR']);
+                $users=$this->getUserByRole(['Staff']);
                 $data = [
                     'date' => $po->created_at,
                 ];
