@@ -11,7 +11,7 @@
                 <label for="" class="block text-sm text-black mb-3">
                     Name
                 </label>
-                <input type="text" v-model="name"
+                <input type="text" v-model="name" placeholder="Name (Required)"
                     class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
             </div>
             <div class="col-span-3">
@@ -34,9 +34,9 @@
             </div>
             <div class="mb-4 col-span-3 pb-6 rounded-md">
                 <label for="" class="block text-sm text-black mb-3">
-                    NRC
+                    NRC Number
                 </label>
-                <input type="text" v-model="nrcNumber"
+                <input type="text" v-model="nrcNumber" placeholder="NRC (Required)"
                     class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
             </div>
 
@@ -44,7 +44,7 @@
                 <label for="" class="block text-sm text-black mb-3">
                     Father's Name
                 </label>
-                <input type="text" v-model="fathterName"
+                <input type="text" v-model="fathterName" placeholder="Father's Name"
                     class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
             </div>
 
@@ -52,7 +52,7 @@
                 <label for="" class="block text-sm text-black mb-3">
                     Mother's Name
                 </label>
-                <input type="text" v-model="motherName"
+                <input type="text" v-model="motherName" placeholder="Mother's Name"
                     class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
             </div>
 
@@ -60,7 +60,7 @@
                 <label for="" class="block text-sm text-black mb-3">
                     Email
                 </label>
-                <input type="tel" v-model="email"
+                <input type="email" v-model="email" placeholder="Email"
                     class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
             </div>
 
@@ -70,14 +70,14 @@
                 <label for="" class="block text-sm text-black mb-3">
                     Ph Number
                 </label>
-                <input type="tel" v-model="phoneNumber"
+                <input type="tel" v-model="phoneNumber" placeholder="Phone (Required)"
                     class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
             </div>
             <div class="mb-4 col-span-3 pb-6 rounded-md">
                 <label for="" class="block text-sm text-black mb-3">
                     Alt Ph Number
                 </label>
-                <input type="tel" v-model="altPhoneNumber"
+                <input type="tel" v-model="altPhoneNumber" placeholder="Alt Phone"
                     class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
             </div>
             <div class="mb-4 col-span-3 pb-6 rounded-md">
@@ -131,19 +131,23 @@
                 <label for="" class="block text-sm text-black mb-3">
                     State
                 </label>
-                <select name="" id="" v-model="selectedState"
+                <input type="input" v-model="state" placeholder="State (Required)"
+                    class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
+                <!-- <select name="" id="" v-model="selectedState"
                     class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
                     <option value="state1"> State 1 </option>
-                </select>
+                </select> -->
             </div>
             <div class="col-span-3 rounded-md mb-4 pb-6">
                 <label for="" class="block text-sm text-black mb-3">
                     City
                 </label>
-                <select name="" id="" v-model="selectedCity"
+                <input type="input" v-model="city" placeholder="City (Required)"
+                    class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
+                <!-- <select name="" id="" v-model="selectedCity"
                     class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
                     <option value="City 1"> City 1 </option>
-                </select>
+                </select> -->
             </div>
             <div class="col-span-3 rounded-md mb-4 pb-6">
                 <label for="" class="block text-sm text-black mb-3">
@@ -176,21 +180,21 @@
                 <label for="" class="block text-sm text-black mb-3">
                     Primary Contact
                 </label>
-                <input type="text" placeholder="Primary Contact"
+                <input type="text" v-model="primaryName" placeholder="Primary Contact (Required)"
                     class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
             </div>
             <div class="col-span-3 rounded-md mb-4 pb-6">
                 <label for="" class="block text-sm text-black mb-3">
                     Phone Number
                 </label>
-                <input type="text" placeholder="Phone Number"
+                <input type="text" v-model="primaryPhone" placeholder="Phone Number (Required)"
                     class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
             </div>
             <div class="col-span-3 rounded-md mb-4 pb-6">
                 <label for="" class="block text-sm text-black mb-3">
                     Relationship
                 </label>
-                <input type="text" placeholder="Relationship"
+                <input type="text" v-model="primaryRelationship" placeholder="Relationship (Required)"
                     class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
             </div>
             <div class="col-span-3"></div>
@@ -199,21 +203,21 @@
                 <label for="" class="block text-sm text-black mb-3">
                     Secondary Contact
                 </label>
-                <input type="text" placeholder="Primary Contact"
+                <input type="text" v-model="secondaryName" placeholder="Secondary Contact (Required)"
                     class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
             </div>
             <div class="col-span-3 rounded-md mb-4 pb-6">
                 <label for="" class="block text-sm text-black mb-3">
                     Phone Number
                 </label>
-                <input type="text" placeholder="Phone Number"
+                <input type="text" v-model="secondaryPhone" placeholder="Phone Number (Required)"
                     class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
             </div>
             <div class="col-span-3 rounded-md mb-4 pb-6">
                 <label for="" class="block text-sm text-black mb-3">
                     Relationship
                 </label>
-                <input type="text" placeholder="Relationship"
+                <input type="text" v-model="secondaryRelationship" placeholder="Relationship (Required)"
                     class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
             </div>
             <div class="col-span-3"></div>
@@ -345,10 +349,17 @@
                 selectedDepartment: null,
                 selectedRoles: [],
                 roleIds: [],
-                selectedState: null,
-                selectedCity: null,
+                state: null,
+                city: null,
                 address: null,
                 zipCode: null,
+
+                primaryName: null,
+                primaryPhone: null,
+                primaryRelationship: null,
+                secondaryName: null,
+                secondaryPhone: null,
+                secondaryRelationship: null,
             };
         },
 
@@ -383,11 +394,29 @@
                 }
             },
 
+            alertValiationMessage(field)
+            {
+                this.$notify({
+                    title: `Input validation`,
+                    text: `You forgot to privide ${field}, please try again`,
+                    type: "warn"
+                });
+            },
+
             createStaffBtnClicked(){
                 this.roleIds = [];
                 this.selectedRoles.forEach((role)=>{
                     this.roleIds.push(role.id);
                 });
+                if(!this.name){
+                    this.alertValiationMessage('name');
+                    return 1;
+                }
+                if(!this.phoneNumber){
+                    this.alertValiationMessage('phone number');
+                    return 1;
+                }
+
                 // console.log(this.roleIds);
                 // alert(`name = ${this.name}`);
                 // alert(`phone num = ${this.phoneNumber}`);

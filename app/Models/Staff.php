@@ -17,12 +17,32 @@ class Staff extends Authenticatable
     use HasFactory, HasApiTokens;
 
     protected $fillable=[
-        'name','phone_number','nrc_number','address','gender_id','department_id','is_active','password'
+        'name',
+        'phone_number',
+        'alt_phone_number',
+        'email',
+        'nrc_number',
+        'birthdate',
+        'fater_name',
+        'mother_name',
+        'state',
+        'city',
+        'zip_code',
+        'address',
+        'gender_id',
+        'department_id',
+        'is_active',
+        'password'
     ];
 
     protected $hidden=[
         'password','remember_token','created_at','updated_at'
     ];
+
+    public function emergencyContacts()
+    {
+        return $this->hasMany(StaffEmergencyContact::class);
+    }
 
     public function getAuthPassword()
     {
@@ -79,7 +99,7 @@ class Staff extends Authenticatable
         return false;
     }
 
-    #scope 
-   
+    #scope
+
     #end
 }
