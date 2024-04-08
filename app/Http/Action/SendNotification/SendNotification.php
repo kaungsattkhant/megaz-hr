@@ -7,13 +7,13 @@ use App\Models\StaffFcmToken;
 
 trait SendNotification
 {
-    public function send($model,$title,$preview,$users,$data){
+    public function send($model,$users,$data){
         $morphMapName=RelationMorphName($model);
         $user_ids=$users->pluck('id');
         $tokens=$this->getTokensByStaff($user_ids);
         $notification=Notification::create([
-            'title'=>$title,
-            'preview'=>$preview,
+            'title'=>$data['title'],
+            'preview'=>$data['body'],
             'date_time'=>now(),
             'notificationable_id'=>$model->id,
             'notificationable_type'=>$morphMapName,
@@ -27,8 +27,9 @@ trait SendNotification
         }
         if (count($tokens) > 0) {
             $data['notification_id']=$notification->id;
-            $data['type']=$notification->notificationable_type;
-            (new Notification())->toUserMultipleDevice($tokens, $title, $preview, $data);
+            $data['notificationable_type']=$notification->notificationable_type;
+            $data['notificationable_id']=$notification->notificationable_id;
+            (new Notification())->toUserMultipleDevice($tokens,$data);
         }
     }
 
