@@ -27,10 +27,14 @@ class CashBookRepository implements CashBookInterface
             foreach ($transaction->ledgers as $ledger) {
                 // if (!in_array($ledger->account_id, $cashAccountId)) {
                 if (in_array(33, $cashAccountId) || in_array(34, $cashAccountId)) {
-                    if ($ledger->debit_credit == 'debit') {
-                        $current_debit_amount += $ledger->amount;
-                    } elseif ($ledger->debit_credit == 'credit') {
-                        $current_credit_amount += $ledger->amount;
+                    if ($ledger->action == 'debit') {
+                        $current_debit_amount += $ledger->value;
+                        $transaction->type = $ledger->account->name;
+                        $transaction->amount = $ledger->value;
+                        $transaction->action = $ledger->action;
+                        $transaction->title = $ledger->account->name;
+                    } elseif ($ledger->action == 'credit') {
+                        $current_credit_amount += $ledger->value;
                     }
                 } else {
                     if (in_array($ledger->account_id, $cashAccountId)) {
@@ -43,13 +47,16 @@ class CashBookRepository implements CashBookInterface
                     }
                 }
             }
-            
-            if (!in_array(33, $cashAccountId) || !in_array(34, $cashAccountId)) {
+            // if (!in_array(33, $cashAccountId) || !in_array(34, $cashAccountId)) {
                 UnsetData($transaction, ['ledgers']);
-            }
+            // }
 
+            
+            // if (in_array(33, $cashAccountId) || in_array(34, $cashAccountId)) {
+            //    $transaction->transaction_ledgers=$transaction->ledgers->whereNotIn('account_id',$cashAccountId)->values();
+            // }
+            // UnsetData($transaction, ['ledgers']);
         }
-
         $balance = (new CashBookTransaction())->getOpeningBalance($request);
         $data = new stdClass();
         $data->opening_balance = $balance->opening_balance;
