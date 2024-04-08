@@ -189,13 +189,13 @@ class PurchaseOrderRepository implements PurchaseOrderRepositoryInterface
                     $users = collect([]);
                     if ($staff->hasRoles('Manager')) {
                         $users = $this->getUserByRole(['Financial']);
-                        $title = ['You have received a new PO to confirm'];
+                        $title = 'You have received a new PO to confirm';
                     } else if ($staff->hasRoles('Financial')) {
                         $users = $this->getUserByRole(['MD']);
-                        $title = ['You have received a new PO to confirm'];
+                        $title = 'You have received a new PO to confirm';
                     } else if ($staff->hasRoles('MD')) {
                         $users = $this->getUserByRole(['Financial']);
-                        $title = ['You have received a new PO to confirm From MD'];
+                        $title = 'You have received a new PO to confirm From MD';
                     }
                     $data = [
                         'date' => $model->created_at,
