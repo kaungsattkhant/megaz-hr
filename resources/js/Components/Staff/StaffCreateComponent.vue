@@ -14,7 +14,37 @@
                 <input type="text" v-model="name"
                     class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
             </div>
-            <div class="col-span-9"></div>
+            <div class="col-span-3">
+                <label for="" class="block text-sm text-black mb-3">
+                    Date of Birth
+                </label>
+                <input type="date"
+                    class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
+            </div>
+
+            <div class="col-span-3">
+                <label for="" class="block text-sm text-black mb-3">
+                    Father's Name
+                </label>
+                <input type="text"
+                    class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
+            </div>
+
+            <div class="col-span-3">
+                <label for="" class="block text-sm text-black mb-3">
+                    Mother's Name
+                </label>
+                <input type="text"
+                    class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
+            </div>
+
+            <!-- <div class="col-span-9">
+                <label for="" class="block text-sm text-black mb-3">
+                    Email
+                </label>
+                <input type="date"
+                    class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
+            </div> -->
 
             <div class="mb-4 col-span-3 pb-6 rounded-md">
                 <label for="" class="block text-sm text-black mb-3">
@@ -23,6 +53,27 @@
                 <input type="tel" v-model="phoneNumber"
                     class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
             </div>
+            <div class="mb-4 col-span-3 pb-6 rounded-md">
+                <label for="" class="block text-sm text-black mb-3">
+                    Password
+                </label>
+                <input type="password" v-model="password"
+                    class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
+            </div>
+            <!-- <div class="mb-4 col-span-3 pb-6 rounded-md">
+                <label for="" class="block text-sm text-black mb-3">
+                    Alternate Ph Number
+                </label>
+                <input type="tel" v-model="phoneNumber"
+                    class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
+            </div>
+            <div class="mb-4 col-span-3 pb-6 rounded-md">
+                <label for="" class="block text-sm text-black mb-3">
+                    Email
+                </label>
+                <input type="tel" v-model="phoneNumber"
+                    class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
+            </div> -->
             <div class="mb-4 col-span-3 pb-6 rounded-md">
                 <label for="" class="block text-sm text-black mb-3">
                     Gender
@@ -35,13 +86,13 @@
             </div>
             <div class="col-span-6"></div>
 
-            <div class="mb-4 col-span-3 pb-6 rounded-md">
+            <!-- <div class="mb-4 col-span-3 pb-6 rounded-md">
                 <label for="" class="block text-sm text-black mb-3">
                     Password
                 </label>
                 <input type="password" v-model="password"
                     class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
-            </div>
+            </div> -->
             <div class="col-span-9"></div>
 
 
