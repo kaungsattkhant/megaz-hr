@@ -18,18 +18,18 @@ class PurchaseOrderRepository implements PurchaseOrderRepositoryInterface
     public function listAllData(Request $request)
     {
         $staff = UserData();
-        $purchaseOrders = PurchaseOrder::with(['items.item','createdBy','managerCheckedBy','financialCheckedBy'])
+        $purchaseOrders = PurchaseOrder::with(['items.item', 'createdBy', 'managerCheckedBy', 'financialCheckedBy'])
             ->orderBy('id', 'desc')
             ->when($staff->hasRoles('Staff'), function ($q) use ($staff) {
                 $q->where('created_by', $staff->id);
             })
             ->when($staff->hasRoles('Manager'), function ($q) {
                 $q->whereIn('status', ['manager_checked', 'created'])
-                ->orWhere('manager_check_id',UserData()->id);
+                    ->orWhere('manager_check_id', UserData()->id);
             })
             ->when($staff->hasRoles('Financial'), function ($q) {
                 $q->whereIn('status', ['manager_checked', 'financial_checked'])
-                ->orWhere('financial_check_id',UserData()->id);
+                    ->orWhere('financial_check_id', UserData()->id);
             })
             ->when($staff->hasRoles('MD'), function ($q) {
                 $q->whereIn('status', ['md_checked', 'financial_checked']);
@@ -71,11 +71,13 @@ class PurchaseOrderRepository implements PurchaseOrderRepositoryInterface
                 $po->items()->updateOrCreate(['id' => $item_data['id']], $item_data);
             }
             if (!isset($request->id)) {
-                $users=$this->getUserByRole(['Staff']);
+                $users = $this->getUserByRole(['Manager']);
                 $data = [
                     'date' => $po->created_at,
+                    'title' => 'You have received a new PO to confirm',
+                    'body' => 'New Purchase Order',
                 ];
-                $this->send($po,'You have received a new PO to confirm','New Purchase Order',$users,$data);
+                $this->send($po,$users, $data);
             }
             DB::commit();
             return $po;
@@ -172,7 +174,6 @@ class PurchaseOrderRepository implements PurchaseOrderRepositoryInterface
                     $column_id = $column . '_' . 'id';
                     $column_time = $column . '_' . 'time';
                     // $column='is_financial_check';
-
                     // $items = $this->existIsCheck($model, $is_column, 0);
                     // if ($items->isNotEmpty()) {
                     //     ResponseMessage('Some items are left to check', 422);
@@ -183,11 +184,26 @@ class PurchaseOrderRepository implements PurchaseOrderRepositoryInterface
                     $model->status = $status;
                     $model->save();
                     $this->existIsCheckAndUpdate($model, $is_column, $request->value);
-
-                    #store after md confimed
-                    if ($staff->hasRoles('MD')) {
-                        // (new StoreInventory())->inventoryAction($model, 'in', 'purchase_order');
+                    #send notification by specific role
+                    #notification
+                    $users = collect([]);
+                    if ($staff->hasRoles('Manager')) {
+                        $users = $this->getUserByRole(['Financial']);
+                        $title = 'You have received a new PO to confirm';
+                    } else if ($staff->hasRoles('Financial')) {
+                        $users = $this->getUserByRole(['MD']);
+                        $title = 'You have received a new PO to confirm';
+                    } else if ($staff->hasRoles('MD')) {
+                        $users = $this->getUserByRole(['Financial']);
+                        $title = 'You have received a new PO to confirm From MD';
                     }
+                    $data = [
+                        'date' => $model->created_at,
+                        'title' => $title,
+                        'body' => 'New Purchase Order',
+                    ];
+                    $this->send($model, $users, $data);
+                    #end notification
                 }
                 DB::commit();
                 ResponseMessage('Update successfully', 200);
@@ -198,29 +214,41 @@ class PurchaseOrderRepository implements PurchaseOrderRepositoryInterface
             ResponseMessage($e->getMessage(), 402);
             throw $e;
         }
-        
+
     }
 
     public function existIsCheckAndUpdate($model, $is_column, $value)
     {
         return $model->items()->update([
-            $is_column=>$value,
+            $is_column => $value,
         ]);
     }
 
     public function validateModel($model, $staff, $type)
     {
         if ($model) {
-            if ($staff->hasRoles('Staff')) ResponseMessage("Permission isn't allowed", 422);
-            if($type=='purchase_order'){
+            if ($staff->hasRoles('Staff')) {
+                ResponseMessage("Permission isn't allowed", 422);
+            }
+
+            if ($type == 'purchase_order') {
                 if ($staff->hasRoles('Manager')) {
-                    if ($model->manager_check_id!=null) ResponseMessage('This Purchase Order is already checked By Manager', 419);
+                    if ($model->manager_check_id != null) {
+                        ResponseMessage('This Purchase Order is already checked By Manager', 419);
+                    }
+
                 } else if ($staff->hasRoles('Financial')) {
-                    if ($model->financial_check_id!=null) ResponseMessage('This Purchase Order is already checked By Financial', 422);
+                    if ($model->financial_check_id != null) {
+                        ResponseMessage('This Purchase Order is already checked By Financial', 422);
+                    }
+
                 } else if ($staff->hasRoles('MD')) {
-                    if ($model->is_md_checked) ResponseMessage('This Purchase Order is already checked By MD', 422);
-                    if(!$model->createdBy->department->inventory){  
-                        ResponseMessage('Inventory is required',422);
+                    if ($model->is_md_checked) {
+                        ResponseMessage('This Purchase Order is already checked By MD', 422);
+                    }
+
+                    if (!$model->createdBy->department->inventory) {
+                        ResponseMessage('Inventory is required', 422);
                     }
                 }
             }
@@ -229,17 +257,17 @@ class PurchaseOrderRepository implements PurchaseOrderRepositoryInterface
 
     public function boughtPurchaseOrder($request)
     {
-        $ids=$request->ids;
-        $po=PurchaseOrder::whereIn('id',$ids)
-        ->update([
-            'is_bought'=>$request->value,
-        ]);
-        foreach($ids as $id){
-            $model=PurchaseOrder::find($id);
-            if($model){
+        $ids = $request->ids;
+        $po = PurchaseOrder::whereIn('id', $ids)
+            ->update([
+                'is_bought' => $request->value,
+            ]);
+        foreach ($ids as $id) {
+            $model = PurchaseOrder::find($id);
+            if ($model) {
                 (new StoreInventory())->inventoryAction($model, 'in', 'purchase_order');
             }
         }
-        $po ? ResponseMessage('PO bought successfully',200) : ResponseMessage('PO bought Fail',422);
+        $po ? ResponseMessage('PO bought successfully', 200) : ResponseMessage('PO bought Fail', 422);
     }
 }

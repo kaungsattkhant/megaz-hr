@@ -16,13 +16,13 @@ class Notification extends Model
     public function notificationUsers(){
         return $this->hasMany(\App\Models\NotificationUser::class);
     }
-    public  function toUserMultipleDevice($tokens=null,$title=null,$body=null,$add_data){
+    public  function toUserMultipleDevice($tokens=null,$add_data){
         $click_action='http://127.0.0.1:8080';
         $icon=null;
         $optionBuilder = new OptionsBuilder();
         $optionBuilder->setTimeToLive(60*20);
-        $notificationBuilder = new PayloadNotificationBuilder($title);
-        $notificationBuilder->setBody($body)
+        $notificationBuilder = new PayloadNotificationBuilder($add_data['title']);
+        $notificationBuilder->setBody($add_data['body'])
                             ->setSound('default')
                             ->setBadge(1)
                             ->setIcon($icon)
