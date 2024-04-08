@@ -49,7 +49,7 @@ class CashBookTransaction
         ->withoutGlobalScope('dateFilter')
         ->select(['id', 'date', 'description'])
         ->whereHas('ledgers', function ($query) use ($cashAccountId) {
-            $query->where('account_id', $cashAccountId);    #transaction close depend on transaction
+            $query->whereIn('account_id', $cashAccountId);    #transaction close depend on transaction
         })->where('is_closing', 1)
         ->orderByDesc('date')
         ->isConfirmed(1)

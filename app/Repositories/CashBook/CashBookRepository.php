@@ -16,7 +16,7 @@ class CashBookRepository implements CashBookInterface
             ->isConfirmed(1)
             ->select(['id', 'date', 'description'])
             ->whereHas('ledgers', function ($query) use ($cashAccountId) {
-                $query->where('account_id', $cashAccountId);
+                $query->whereIn('account_id', $cashAccountId);
             })
             ->when(($request->from_date == null && $request->to_date == null) && $latestClosedTransaction, function ($q) use ($latestClosedTransaction) {
                 $q->where('id', '>', $latestClosedTransaction->id);
@@ -25,16 +25,29 @@ class CashBookRepository implements CashBookInterface
         $current_debit_amount = $current_credit_amount = 0;
         foreach ($cashbookTransactions as $transaction) {
             foreach ($transaction->ledgers as $ledger) {
-                if ($ledger->account_id == $cashAccountId) {
-                    $transaction->type = $ledger->account->name;
-                    $transaction->amount = $ledger->value;
-                    $transaction->action = $ledger->action;
-                    $ledger->action == 'debit' ? $current_debit_amount += $transaction->amount : $current_credit_amount += $transaction->amount;
+                // if (!in_array($ledger->account_id, $cashAccountId)) {
+                if (in_array(33, $cashAccountId) || in_array(34, $cashAccountId)) {
+                    if ($ledger->debit_credit == 'debit') {
+                        $current_debit_amount += $ledger->amount;
+                    } elseif ($ledger->debit_credit == 'credit') {
+                        $current_credit_amount += $ledger->amount;
+                    }
                 } else {
-                    $transaction->title = $ledger->account->name;
+                    if (in_array($ledger->account_id, $cashAccountId)) {
+                        $transaction->type = $ledger->account->name;
+                        $transaction->amount = $ledger->value;
+                        $transaction->action = $ledger->action;
+                        $ledger->action == 'debit' ? $current_debit_amount += $transaction->amount : $current_credit_amount += $transaction->amount;
+                    } else {
+                        $transaction->title = $ledger->account->name;
+                    }
                 }
             }
-            UnsetData($transaction, ['ledgers']);
+            
+            if (!in_array(33, $cashAccountId) || !in_array(34, $cashAccountId)) {
+                UnsetData($transaction, ['ledgers']);
+            }
+
         }
 
         $balance = (new CashBookTransaction())->getOpeningBalance($request);
