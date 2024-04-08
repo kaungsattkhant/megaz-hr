@@ -25,7 +25,7 @@ class EntityCreateRequest extends FormRequest
             //
             "area_id" => "required",
             "name" => "required",
-            "service_category_id" => "required",
+            "service_category_id" => "sometimes",
             "price_per_hour" => "required",
             "entity_type" => "required"
 
