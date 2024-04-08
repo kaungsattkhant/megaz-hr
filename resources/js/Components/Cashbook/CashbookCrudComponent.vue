@@ -497,7 +497,7 @@
                 if(pageNumber){
                     this.currentPage = pageNumber;
                 }
-                let url = `/api/cash_books?cash_account_id=${cashAccountId}&page=${this.currentPage}`;
+                let url = `/api/cash_books?cash_account_id[]=${cashAccountId}&page=${this.currentPage}`;
                 if(this.fromDate && this.toDate){
                     url = `${url}&from_date=${this.fromDate}&to_date=${this.toDate}`;
                 }
