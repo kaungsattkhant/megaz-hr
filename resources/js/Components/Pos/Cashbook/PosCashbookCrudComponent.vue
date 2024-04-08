@@ -179,7 +179,7 @@
                 cashAccountList:[],
                 cashbookId:null,
                 bankbookId:null,
-                
+
                 subAccountList: [],
                 selectedSubAccount: null,
                 accountList: [],
@@ -202,26 +202,33 @@
                 if (response.data) {
                     let posCashAccount = response.data.find(account => account.account_code === '2-1011');
                     if (posCashAccount) {
-                        this.getCashbookList(posCashAccount.id);
+                        // this.cashAccId = posCashAccount.id;
+                        // this.getCashbookList(posCashAccount.id);
                         this.cashAccountList.push(posCashAccount);
                     }
                     let posBankAccount = response.data.find(account => account.account_code === '2-1012');
                     if (posBankAccount) {
-                        this.getCashbookList(posBankAccount.id);
+                        // this.getCashbookList(posBankAccount.id);
                         this.cashAccountList.push(posBankAccount);
                     }
+
+                    this.getCashbookList(this.cashAccountList);
                 }
             },
 
-            async getCashbookList(cashAccountId){
-                const response = await getApiData({ url: '/api/cash_books?cash_account_id=' + cashAccountId, token: this.getToken() });
+            async getCashbookList(cashAccountList){
+                let url = `/api/cash_books?`;
+                cashAccountList.forEach((cashAccount)=>{
+                    url += `cash_account_id[]=${cashAccount.id}&`;
+                });
+                url = url.substring(0, url.length - 1);
+
+                const response = await getApiData({ url: url, token: this.getToken() });
                 if (response.data) {
                     response.data.cashbook_list.forEach((cashBook)=>{
                         this.cashbookList.push(cashBook);
                     });
-                    console.log(cashAccountId);
                     console.log(this.cashbookList);
-                    
                 }
             },
 
