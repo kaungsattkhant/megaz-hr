@@ -25,12 +25,21 @@ class StaffCreateRequest extends FormRequest
             //
             "name" => "required",
             "phone_number" => "required",
+            "alt_phone_number" => "sometimes",
+            "email" => "sometimes",
+            "birthdate" => "required",
+            "fater_name" => "sometimes",
+            "mother_name" => "sometimes",
+            "state" => "required",
+            "city" => "required",
+            "zip_code" => "required",
             "nrc_number" => "sometimes",
             "address" => "sometimes",
             "gender_id" => "required",
             "department_id" => "required",
             "password" => "required",
             "roles" => "required"
+
         ];
     }
 }

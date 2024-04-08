@@ -3,6 +3,7 @@
 namespace App\Repositories\Staff;
 
 use App\Models\Staff;
+use App\Models\StaffEmergencyContact;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -39,12 +40,23 @@ class StaffRepository implements StaffRepositoryInterface
             if (isset($data['roles']) && is_array($data['roles'])) {
                 $staff->roles()->attach($data['roles']);
             }
+            $data['staff_id'] = $staff->id;
+            $this->createEmegercyContact($data);
             DB::commit();
             return $staff;
         } catch (\Exception $e) {
             DB::rollback();
             ResponseMessage($e->getMessage(), 402);
             throw $e;
+        }
+    }
+
+    public function createEmegercyContact($data)
+    {
+        $staff = StaffEmergencyContact::where('staff_id',$data['staff_id'])->first();
+        if(!$staff)
+        {
+            $staff = StaffEmergencyContact::create($data);
         }
     }
 

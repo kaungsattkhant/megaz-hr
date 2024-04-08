@@ -29,7 +29,7 @@ class StaffAPIController extends Controller
         ResponseData($staffs);
     }
 
-    public function createStaff(StaffCreateRequest $request)
+    public function createStaff(Request $request)
     {
         $data = $request->all();
         $data['roles'] = explode(',', $request->roles);

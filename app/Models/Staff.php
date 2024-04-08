@@ -23,7 +23,7 @@ class Staff extends Authenticatable
         'email',
         'nrc_number',
         'birthdate',
-        'fater_name',
+        'father_name',
         'mother_name',
         'state',
         'city',

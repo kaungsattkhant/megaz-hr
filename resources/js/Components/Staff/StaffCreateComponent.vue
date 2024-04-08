@@ -408,14 +408,100 @@
                 this.selectedRoles.forEach((role)=>{
                     this.roleIds.push(role.id);
                 });
+
+
+
                 if(!this.name){
                     this.alertValiationMessage('name');
                     return 1;
                 }
+
+                if(!this.dob){
+                    this.alertValiationMessage('Date of Birth');
+                    return 1;
+                }
+
+                if(!this.selectedGender){
+                    this.alertValiationMessage('gender');
+                    return 1;
+                }
+
+                if(!this.nrcNumber){
+                    this.alertValiationMessage('Nrc');
+                    return 1;
+                }
+
                 if(!this.phoneNumber){
                     this.alertValiationMessage('phone number');
                     return 1;
                 }
+
+                if(!this.password){
+                    this.alertValiationMessage('password');
+                    return 1;
+                }
+
+
+                if(!this.joinedDate){
+                    this.alertValiationMessage('joined date');
+                    return 1;
+                }
+                if(!this.selectedDepartment)
+                {
+                    this.alertValiationMessage('Department');
+                    return 1;
+                }
+
+                if(this.roleIds.length < 1){
+                    this.alertValiationMessage('Role');
+                    return 1;
+                }
+
+                if(!this.state){
+                    this.alertValiationMessage('state');
+                    return 1;
+                }
+
+                if(!this.city){
+                    this.alertValiationMessage('city');
+                    return 1;
+                }
+
+                if(!this.address){
+                    this.alertValiationMessage('address');
+                    return 1;
+                }
+
+                if(!this.primaryName){
+                    this.alertValiationMessage('Primary name');
+                    return 1;
+                }
+
+                if(!this.primaryPhone){
+                    this.alertValiationMessage('Primary phone');
+                    return 1;
+                }
+
+                if(!this.primaryRelationship){
+                    this.alertValiationMessage('Primary relationship');
+                    return 1;
+                }
+
+                if(!this.secondaryName){
+                    this.alertValiationMessage('Secondary name');
+                    return 1;
+                }
+
+                if(!this.secondaryPhone){
+                    this.alertValiationMessage('Secondary phone');
+                    return 1;
+                }
+
+                if(!this.secondaryRelationship){
+                    this.alertValiationMessage('Secondary relationship');
+                    return 1;
+                }
+
 
                 // console.log(this.roleIds);
                 // alert(`name = ${this.name}`);
@@ -437,13 +523,50 @@
                 if(this.nrcNumber){
                     formData.append('nrc_number', this.nrcNumber);
                 }
-                if(this.address){
-                    formData.append('address', this.address);
+
+
+                if(this.fathterName)
+                {
+                    formData.append('father_name',this.fathterName);
                 }
+
+                if(this.motherName)
+                {
+                    formData.append('mother_name',this.motherName);
+                }
+
+                if(this.email)
+                {
+                    formData.append('email',this.email);
+                }
+
+                if(this.altPhoneNumber)
+                {
+                    formData.append('alt_phone_number',this.altPhoneNumber);
+                }
+
+                if(this.zipCode)
+                {
+                    formData.append('zip_code',this.zipCode);
+                }
+                formData.append('birthdate',this.dob);
+                formData.append('state',this.state);
+                formData.append('address',this.address);
+                formData.append('city',this.city);
                 formData.append('gender_id', this.selectedGender.id);
                 formData.append('department_id', this.selectedDepartment.id);
                 formData.append('password', this.password);
                 formData.append('roles', this.roleIds);
+                formData.append('joined_date',this.joinedDate);
+
+                // for emegercy
+
+                formData.append('primary_name',this.primaryName);
+                formData.append('primary_phone',this.primaryPhone);
+                formData.append('primary_relationship',this.primaryRelationship);
+                formData.append('secondary_name',this.secondaryName);
+                formData.append('secondary_phone',this.secondaryPhone);
+                formData.append('secondary_relationship',this.secondaryRelationship);
 
                 let response = await postApiData({url: '/api/staffs', form_data: formData, token: this.getToken()});
                 if(response.success){
