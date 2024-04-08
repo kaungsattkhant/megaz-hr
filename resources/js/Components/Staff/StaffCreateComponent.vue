@@ -21,8 +21,36 @@
                 <input type="date"
                     class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
             </div>
+            <div class="mb-4 col-span-3 pb-6 rounded-md">
+                <label for="" class="block text-sm text-black mb-3">
+                    Gender
+                </label>
+                <select name="" id="" v-model="selectedGender"
+                    class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
+                    <option :value="gender" v-for="(gender, genderIndex) in genderList" :key="genderIndex"> {{
+                        gender.name }} </option>
 
-            <div class="col-span-3">
+                </select>
+            </div>
+            <div class="mb-4 col-span-3 pb-6 rounded-md">
+                <label for="" class="block text-sm text-black mb-3">
+                    Email
+                </label>
+                <input type="tel" v-model="phoneNumber"
+                    class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
+            </div>
+
+            <div class="col-span-3 mb-4 pb-6">
+                <label for="" class="block text-sm text-black mb-3">
+                    NRC
+                </label>
+                <input type="text" v-model="nrcNumber"
+                    class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
+            </div>
+
+
+
+            <div class="col-span-3 mb-4 pb-6">
                 <label for="" class="block text-sm text-black mb-3">
                     Father's Name
                 </label>
@@ -30,13 +58,14 @@
                     class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
             </div>
 
-            <div class="col-span-3">
+            <div class="col-span-3 mb-4 pb-6">
                 <label for="" class="block text-sm text-black mb-3">
                     Mother's Name
                 </label>
                 <input type="text"
                     class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
             </div>
+            <div class="col-span-3"></div>
 
             <!-- <div class="col-span-9">
                 <label for="" class="block text-sm text-black mb-3">
@@ -55,11 +84,19 @@
             </div>
             <div class="mb-4 col-span-3 pb-6 rounded-md">
                 <label for="" class="block text-sm text-black mb-3">
+                    Alt Ph Number
+                </label>
+                <input type="tel" v-model="phoneNumber"
+                    class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
+            </div>
+            <div class="mb-4 col-span-3 pb-6 rounded-md">
+                <label for="" class="block text-sm text-black mb-3">
                     Password
                 </label>
                 <input type="password" v-model="password"
                     class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
             </div>
+            <div class="col-span-3"></div>
             <!-- <div class="mb-4 col-span-3 pb-6 rounded-md">
                 <label for="" class="block text-sm text-black mb-3">
                     Alternate Ph Number
@@ -74,17 +111,8 @@
                 <input type="tel" v-model="phoneNumber"
                     class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
             </div> -->
-            <div class="mb-4 col-span-3 pb-6 rounded-md">
-                <label for="" class="block text-sm text-black mb-3">
-                    Gender
-                </label>
-                <select name="" id="" v-model="selectedGender"
-                    class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
-                    <option :value="gender" v-for="(gender, genderIndex) in genderList" :key="genderIndex" > {{ gender.name }} </option>
 
-                </select>
-            </div>
-            <div class="col-span-6"></div>
+            <!-- <div class="col-span-3"></div> -->
 
             <!-- <div class="mb-4 col-span-3 pb-6 rounded-md">
                 <label for="" class="block text-sm text-black mb-3">
@@ -93,58 +121,77 @@
                 <input type="password" v-model="password"
                     class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
             </div> -->
-            <div class="col-span-9"></div>
+            <!-- <div class="col-span-9"></div> -->
 
 
-            <div class=" col-span-3 rounded-md">
-                <label for="" class="block text-sm text-black mb-3">
-                    NRC
-                </label>
-            </div>
-            <div class="col-span-4 rounded-md">
+
+            <div class="col-span-3 rounded-md mb-4 pb-6">
                 <label for="" class="block text-sm text-black mb-3">
                     Department
                 </label>
-            </div>
-            <div class="col-span-4 rounded-md">
-                <label for="" class="block text-sm text-black mb-3">
-                    Roles
-                </label>
-            </div>
-            <div class="col-span-1">
-            </div>
-
-
-            <div class="mb-4 col-span-3 pb-6 rounded-md">
-                <input type="text" v-model="nrcNumber"
-                    class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
-            </div>
-            <div class="mb-4 col-span-3 pb-6 rounded-md">
                 <select name="" id="" v-model="selectedDepartment"
                     class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0"
                     @change="departmentSelectChanged">
-                    <option :value="department" v-for="(department, departmentIndex) in departmentList" :key="departmentIndex" > {{ department.name }} </option>
+                    <option :value="department" v-for="(department, departmentIndex) in departmentList"
+                        :key="departmentIndex"> {{ department.name }} </option>
                     <!-- <option value="2">Table</option>
                     <option value="3">Security</option> -->
                 </select>
             </div>
-            <div class=" ">
-                <button class="pl-1 py-2" data-te-toggle="modal" data-te-target="#add_department_modal">
-                    <i class="far fa-plus"></i>
-                </button>
-            </div>
-            <div class="mb-4 col-span-3 pb-6 rounded-md">
-                <div class="bg-white mb-0 w-[90%] text-sm inline-block" data-te-select-wrapper-ref>
-                    <select data-te-select-init data-te-select-placeholder="Select Roles"
-                        data-te-select-filter="true" name="" id="" multiple v-model="selectedRoles"
+            <div class="col-span-3 rounded-md mb-4 pb-6">
+                <label for="" class="block text-sm text-black mb-3">
+                    Roles
+                </label>
+                <div class="bg-white mb-0 w-full text-sm inline-block" data-te-select-wrapper-ref>
+                    <select data-te-select-init data-te-select-placeholder="Select Roles" data-te-select-filter="true"
+                        name="" id="" multiple v-model="selectedRoles"
                         class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
-                        <option :value="role" v-for="(role, roleIndex) in roleList" :key="roleIndex"> {{ role.name }} </option>
+                        <option :value="role" v-for="(role, roleIndex) in roleList" :key="roleIndex"> {{ role.name }}
+                        </option>
                         <!-- <option value="2">Manager</option>
                         <option value="3">Waiter</option> -->
                     </select>
                 </div>
-
             </div>
+            <div class="col-span-3 rounded-md mb-4 pb-6">
+                <label for="" class="block text-sm text-black mb-3">
+                    Joined Date
+                </label>
+                <input type="date"
+                    class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
+            </div>
+
+            <div class="col-span-3"></div>
+
+            <div class="col-span-3 rounded-md mb-4 pb-6">
+                <label for="" class="block text-sm text-black mb-3">
+                    State
+                </label>
+                <select name="" id=""
+                    class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
+                    <option value="state1"> State 1 </option>
+                </select>
+            </div>
+            <div class="col-span-3 rounded-md mb-4 pb-6">
+                <label for="" class="block text-sm text-black mb-3">
+                    City
+                </label>
+                <select name="" id=""
+                    class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
+                    <option value="City 1"> City 1 </option>
+                </select>
+            </div>
+            <div class="col-span-3 rounded-md mb-4 pb-6">
+                <label for="" class="block text-sm text-black mb-3">
+                    Zip Code
+                </label>
+                <input type="text" placeholder="Zip Code"
+                    class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
+            </div>
+
+            <div class="col-span-3"></div>
+
+
             <!-- <div class=" col-span-2">
                 <button class="pl-1 py-2" data-te-toggle="modal" data-te-target="#add_role_modal">
                     <i class="far fa-plus"></i>
@@ -156,12 +203,64 @@
                 <label for="" class="block text-sm text-black mb-3">
                     Address
                 </label>
-                <textarea name="" v-model="address" class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg" id=""
-                    cols="30" rows="10"></textarea>
+                <textarea name="" v-model="address"
+                    class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg" id="" cols="30"
+                    rows="10"></textarea>
             </div>
             <div class="col-span-6"></div>
 
+            <hr class="col-span-12 mb-4">
 
+            <div class=" col-span-12 mb-6">
+                <p class=" text-lg text-black">
+                    Emergency Information
+                </p>
+            </div>
+            <div class="col-span-3 rounded-md mb-4 pb-6">
+                <label for="" class="block text-sm text-black mb-3">
+                    Primary Contact
+                </label>
+                <input type="text" placeholder="Primary Contact"
+                    class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
+            </div>
+            <div class="col-span-3 rounded-md mb-4 pb-6">
+                <label for="" class="block text-sm text-black mb-3">
+                    Phone Number
+                </label>
+                <input type="text" placeholder="Phone Number"
+                    class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
+            </div>
+            <div class="col-span-3 rounded-md mb-4 pb-6">
+                <label for="" class="block text-sm text-black mb-3">
+                    Relationship
+                </label>
+                <input type="text" placeholder="Relationship"
+                    class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
+            </div>
+            <div class="col-span-3"></div>
+
+            <div class="col-span-3 rounded-md mb-4 pb-6">
+                <label for="" class="block text-sm text-black mb-3">
+                    Secondary Contact
+                </label>
+                <input type="text" placeholder="Primary Contact"
+                    class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
+            </div>
+            <div class="col-span-3 rounded-md mb-4 pb-6">
+                <label for="" class="block text-sm text-black mb-3">
+                    Phone Number
+                </label>
+                <input type="text" placeholder="Phone Number"
+                    class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
+            </div>
+            <div class="col-span-3 rounded-md mb-4 pb-6">
+                <label for="" class="block text-sm text-black mb-3">
+                    Relationship
+                </label>
+                <input type="text" placeholder="Relationship"
+                    class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
+            </div>
+            <div class="col-span-3"></div>
 
 
         </div>
