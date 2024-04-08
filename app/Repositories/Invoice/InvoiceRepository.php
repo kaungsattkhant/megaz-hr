@@ -257,8 +257,8 @@ class InvoiceRepository implements InvoiceRepositoryInterface
 
     public function doneEntityWithInvoice(array $data)
     {
-        DB::beginTransaction();
-        try {
+        // DB::beginTransaction();
+        // try {
             $foodCharge = 0;
             $beverageCharge = 0;
             if (isset($data['order_categories'])) {
@@ -421,6 +421,22 @@ class InvoiceRepository implements InvoiceRepositoryInterface
 
                 if ($discountAcc != null) {
                     $debit_total += $data['discount_value'];
+
+                    $debitDiscountLedger = (new StoreTransactionLedger())->storeLedger([
+                        'value' => $data['discount_value'],
+                        'transaction_id' => $transaction->id,
+                        'account_id' => $discountAcc->id,
+                        'action' => 'debit',
+                        'is_cashier_confirmed' => 1
+                    ]);
+
+                    $creditDiscountLedger = (new StoreTransactionLedger())->storeLedger([
+                        'value' => $data['discount_value'],
+                        'transaction_id' => $transaction->id,
+                        'account_id' => $posBook->id,
+                        'action' => 'credit',
+                        'is_cashier_confirmed' => 1
+                    ]);
                 }
 
             }
@@ -434,10 +450,10 @@ class InvoiceRepository implements InvoiceRepositoryInterface
             ]);
             DB::commit();
             return $invoice;
-        } catch (\Throwable $e) {
-            DB::rollback();
-            ResponseMessage($e->getMessage(), 402);
-            throw $e;
-        }
+        // } catch (\Throwable $e) {
+        //     DB::rollback();
+        //     ResponseMessage($e->getMessage(), 402);
+        //     throw $e;
+        // }
     }
 }
