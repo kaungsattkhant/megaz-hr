@@ -13,33 +13,15 @@ import firebase from 'firebase/compat/app';
 import 'firebase/compat/messaging';
 import Notifications from '@kyvg/vue3-notification';
 
-// const firebaseConfig = {
-//     apiKey: import.meta.env.VITE_GOOGLE_API_KEY,
-//     authDomain: import.meta.env.VITE_GOOGLE_AUTH_DOMAIN,
-//     projectId: import.meta.env.VITE_GOOGLE_PROJECT_ID,
-//     storageBucket: import.meta.env.VITE_GOOGLE_STORAGE_BUCKET,
-//     messagingSenderId: import.meta.env.VITE_GOOGLE_MESSAGING_SENDER_ID,
-//     appId: import.meta.env.VITE_GOOGLE_APP_ID
-// };
-
 const firebaseConfig = {
-    apiKey: "AIzaSyA_RiMlzMDYxKF_iT8wBxPAW3NpKxEPxas",
-    authDomain: "megaz-project.firebaseapp.com",
-    projectId: "megaz-project",
-    storageBucket: "megaz-project.appspot.com",
-    messagingSenderId: "25949618078",
-    appId: "1:25949618078:web:86369862c2a1fc084ca08f",
-    measurementId: "G-M6MF9D78DD"
-  };
-//   const firebaseConfig = {
-//     apiKey: "AIzaSyAyQupmlsJiHgzdJaTH8Os4uq9Wij268YA",
-//     authDomain: "megaz-test.firebaseapp.com",
-//     projectId: "megaz-test",
-//     storageBucket: "megaz-test.appspot.com",
-//     messagingSenderId: "105252991244",
-//     appId: "1:105252991244:web:e4e4234ee6c8a2e6c25929",
-//     measurementId: "G-7832JEYHFH"
-//   };
+    apiKey: import.meta.env.VITE_GOOGLE_API_KEY,
+    authDomain: import.meta.env.VITE_GOOGLE_AUTH_DOMAIN,
+    projectId: import.meta.env.VITE_GOOGLE_PROJECT_ID,
+    storageBucket: import.meta.env.VITE_GOOGLE_STORAGE_BUCKET,
+    messagingSenderId: import.meta.env.VITE_GOOGLE_MESSAGING_SENDER_ID,
+    appId: import.meta.env.VITE_GOOGLE_APP_ID,
+    measurementId: import.meta.env.VITE_GOOGLE_MEASUREMENT_ID
+};
 
 const app = createApp({});
 firebase.initializeApp(firebaseConfig);
