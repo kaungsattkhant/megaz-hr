@@ -258,6 +258,7 @@
                 formData.append('value', this.amount);
                 formData.append('cash_account_id', this.accType.id);
                 formData.append('action', this.action);
+                formData.append('is_confirmed', 1);
 
                 let url = `/api/transactions`;
                 let response = await postApiData({ url: url, form_data: formData, token: this.getToken() });
