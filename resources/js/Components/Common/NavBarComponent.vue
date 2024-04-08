@@ -10,12 +10,17 @@
                 type="button" id="dropdownMenuButton1" data-te-dropdown-toggle-ref aria-expanded="false"
                 data-te-ripple-init data-te-ripple-color="light">
                 <i class="fas fa-bell"></i>
+                <div>
+                    <p v-if="newNofiCount > 0" class="ml-1 bg-red-600 w-fit h-fit px-1 rounded-full py-1 text-sm leading-3 text-white">
+                        {{ newNofiCount }}
+                    </p>
+                </div>
             </button>
             <ul class="absolute z-[1000] float-left m-0 hidden min-w-max list-none overflow-hidden rounded-lg border-none bg-white bg-clip-padding text-base shadow-lg data-[te-dropdown-show]:block dark:bg-surface-dark"
                 aria-labelledby="dropdownMenuButton1" data-te-dropdown-menu-ref>
                 <li v-for="(notification, notificationIndex) in notifications" :key="notificationIndex">
                     <div class="bg-white rounded-lg shadow-sm p-4 my-2">
-                        <h2 class="text-lg font-semibold text-gray-800"> {{ notification.title }} </h2>
+                        <h2 class="text-lg font-semibold text-gray-800"> {{ notification.title }} <span v-if="notification.is_new" class="inline-block w-2 h-2 mr-2 bg-red-600 rounded-full"></span> </h2>
                         <p class="text-sm text-gray-600 mt-2"> {{ notification.preview }} </p>
                     </div>
                 </li>
@@ -40,6 +45,7 @@
                 user: null,
                 department: null,
                 notifications: [],
+                newNofiCount: 0,
             };
         },
 
@@ -51,7 +57,14 @@
                 let response = await getApiData({url: url, token: this.getToken()});
                 if(response.data){
                     this.notifications = response.data;
-                    console.log(this.notifications);
+                    this.notifications.forEach(notification => {
+                        notification.notification_users.forEach((userNoti)=>{
+                            if((userNoti.staff_id == this.getUser().id) && userNoti.is_read == 0){
+                                notification.is_new = true;
+                                this.newNofiCount++;
+                            }
+                        });
+                    });
                 }
             },
 

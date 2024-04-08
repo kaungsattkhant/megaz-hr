@@ -18,7 +18,7 @@
                 <label for="" class="block text-sm text-black mb-3">
                     Date of Birth
                 </label>
-                <input type="date"
+                <input type="date" v-model="dob"
                     class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
             </div>
             <div class="mb-4 col-span-3 pb-6 rounded-md">
@@ -27,20 +27,12 @@
                 </label>
                 <select name="" id="" v-model="selectedGender"
                     class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
-                    <option :value="gender" v-for="(gender, genderIndex) in genderList" :key="genderIndex"> {{
-                        gender.name }} </option>
-
+                    <option :value="gender" v-for="(gender, genderIndex) in genderList" :key="genderIndex">
+                        {{ gender.name }}
+                    </option>
                 </select>
             </div>
             <div class="mb-4 col-span-3 pb-6 rounded-md">
-                <label for="" class="block text-sm text-black mb-3">
-                    Email
-                </label>
-                <input type="tel" v-model="phoneNumber"
-                    class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
-            </div>
-
-            <div class="col-span-3 mb-4 pb-6">
                 <label for="" class="block text-sm text-black mb-3">
                     NRC
                 </label>
@@ -48,13 +40,11 @@
                     class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
             </div>
 
-
-
             <div class="col-span-3 mb-4 pb-6">
                 <label for="" class="block text-sm text-black mb-3">
                     Father's Name
                 </label>
-                <input type="text"
+                <input type="text" v-model="fathterName"
                     class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
             </div>
 
@@ -62,18 +52,19 @@
                 <label for="" class="block text-sm text-black mb-3">
                     Mother's Name
                 </label>
-                <input type="text"
+                <input type="text" v-model="motherName"
                     class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
             </div>
-            <div class="col-span-3"></div>
 
-            <!-- <div class="col-span-9">
+            <div class="col-span-3 mb-4 pb-6">
                 <label for="" class="block text-sm text-black mb-3">
                     Email
                 </label>
-                <input type="date"
+                <input type="tel" v-model="email"
                     class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
-            </div> -->
+            </div>
+
+            <div class="col-span-3"></div>
 
             <div class="mb-4 col-span-3 pb-6 rounded-md">
                 <label for="" class="block text-sm text-black mb-3">
@@ -86,7 +77,7 @@
                 <label for="" class="block text-sm text-black mb-3">
                     Alt Ph Number
                 </label>
-                <input type="tel" v-model="phoneNumber"
+                <input type="tel" v-model="altPhoneNumber"
                     class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
             </div>
             <div class="mb-4 col-span-3 pb-6 rounded-md">
@@ -97,33 +88,6 @@
                     class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
             </div>
             <div class="col-span-3"></div>
-            <!-- <div class="mb-4 col-span-3 pb-6 rounded-md">
-                <label for="" class="block text-sm text-black mb-3">
-                    Alternate Ph Number
-                </label>
-                <input type="tel" v-model="phoneNumber"
-                    class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
-            </div>
-            <div class="mb-4 col-span-3 pb-6 rounded-md">
-                <label for="" class="block text-sm text-black mb-3">
-                    Email
-                </label>
-                <input type="tel" v-model="phoneNumber"
-                    class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
-            </div> -->
-
-            <!-- <div class="col-span-3"></div> -->
-
-            <!-- <div class="mb-4 col-span-3 pb-6 rounded-md">
-                <label for="" class="block text-sm text-black mb-3">
-                    Password
-                </label>
-                <input type="password" v-model="password"
-                    class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
-            </div> -->
-            <!-- <div class="col-span-9"></div> -->
-
-
 
             <div class="col-span-3 rounded-md mb-4 pb-6">
                 <label for="" class="block text-sm text-black mb-3">
@@ -157,7 +121,7 @@
                 <label for="" class="block text-sm text-black mb-3">
                     Joined Date
                 </label>
-                <input type="date"
+                <input type="date" v-model="joinedDate"
                     class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
             </div>
 
@@ -167,7 +131,7 @@
                 <label for="" class="block text-sm text-black mb-3">
                     State
                 </label>
-                <select name="" id=""
+                <select name="" id="" v-model="selectedState"
                     class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
                     <option value="state1"> State 1 </option>
                 </select>
@@ -176,7 +140,7 @@
                 <label for="" class="block text-sm text-black mb-3">
                     City
                 </label>
-                <select name="" id=""
+                <select name="" id="" v-model="selectedCity"
                     class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
                     <option value="City 1"> City 1 </option>
                 </select>
@@ -185,19 +149,11 @@
                 <label for="" class="block text-sm text-black mb-3">
                     Zip Code
                 </label>
-                <input type="text" placeholder="Zip Code"
+                <input type="text" v-model="zipCode" placeholder="Zip Code"
                     class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
             </div>
 
             <div class="col-span-3"></div>
-
-
-            <!-- <div class=" col-span-2">
-                <button class="pl-1 py-2" data-te-toggle="modal" data-te-target="#add_role_modal">
-                    <i class="far fa-plus"></i>
-                </button>
-            </div> -->
-
 
             <div class="mb-4 col-span-6 pb-6 rounded-md">
                 <label for="" class="block text-sm text-black mb-3">
@@ -363,6 +319,7 @@
     import { Modal, Ripple, initTE, Input, Select } from "tw-elements";
     import { getApiData, postApiData, deleteApiData } from '../../utilities/ajax-helpers';
     import { mapGetters } from "vuex";
+    import { getCurrentDate } from "../../utilities/datetime-helpers";
 
     export default {
         data() {
@@ -371,16 +328,27 @@
                 genderList: [],
                 departmentList: [],
                 roleList: [],
+                stateList: [],
+                cityList: [],
 
                 name: null,
+                dob: null,
                 phoneNumber: null,
+                altPhoneNumber: null,
+                email: null,
+                fathterName: null,
+                motherName: null,
+                joinedDate: getCurrentDate(),
                 password: null,
                 selectedGender: null,
                 nrcNumber: null,
                 selectedDepartment: null,
                 selectedRoles: [],
                 roleIds: [],
-                address: null
+                selectedState: null,
+                selectedCity: null,
+                address: null,
+                zipCode: null,
             };
         },
 
