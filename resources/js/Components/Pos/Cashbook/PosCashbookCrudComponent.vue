@@ -34,6 +34,16 @@
                                 </tr>
                             </thead>
                             <tbody>
+                                <tr class="">
+
+                                    <td colspan="5" class="whitespace-nowrap px-6 py-4">
+
+                                    </td>
+                                    <td class="whitespace-nowrap px-6 py-4">
+                                        {{ (openingBalance).toLocaleString() }}
+                                    </td>
+                                </tr>
+
                                 <tr class="" v-for="(cashbook,index) in cashbookList">
                                     <td class="whitespace-nowrap px-6 py-4 font-medium">
                                         {{ index+1 }}
@@ -45,13 +55,21 @@
                                         {{ cashbook.action }}
                                     </td>
                                     <td class="whitespace-nowrap px-6 py-4">
-                                        {{ cashbook.amount }}
+                                        {{ (cashbook.amount).toLocaleString() }}
                                     </td>
                                     <td class="whitespace-nowrap px-6 py-4">
                                         {{ cashbook.description }}
                                     </td>
                                     <td class="whitespace-nowrap px-6 py-4">
-                                        {{ cashbook.amount }}
+                                        {{ (cashbook.balance).toLocaleString() }}
+                                    </td>
+                                </tr>
+                                <tr class="">
+                                    <td colspan="5" class="whitespace-nowrap px-6 py-4">
+
+                                    </td>
+                                    <td class="whitespace-nowrap px-6 py-4">
+                                        {{ remainingBalance.toLocaleString() }}
                                     </td>
                                 </tr>
                             </tbody>
@@ -190,6 +208,9 @@
                 description: null,
                 cashAccId:null,
 
+                openingBalance: 0,
+                remainingBalance: 0,
+                currentBalance: 0,
 
             };
         },
@@ -225,10 +246,26 @@
 
                 const response = await getApiData({ url: url, token: this.getToken() });
                 if (response.data) {
+
+                    this.openingBalance = response.data.opening_balance;
+                    this.remainingBalance = response.data.remaining_balance;
+                    // this.currentBalance = this.openingBalance;
                     response.data.cashbook_list.forEach((cashBook)=>{
+                        cashBook.balance = 0;
                         this.cashbookList.push(cashBook);
                     });
                     console.log(this.cashbookList);
+                    this.cashbookList.forEach((cashBook)=>{
+                        if(cashBook.action == 'debit'){
+                            this.currentBalance += cashBook.amount;
+                        }
+                        if(cashBook.action == 'credit'){
+                            this.currentBalance -= cashBook.amount;
+                        }
+                        // this.currentBalance += cashBook.amount;
+                        cashBook.balance += this.currentBalance;
+
+                    });
                 }
             },
 
