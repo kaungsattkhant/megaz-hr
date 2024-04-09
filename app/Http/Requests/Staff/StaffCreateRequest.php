@@ -33,6 +33,7 @@ class StaffCreateRequest extends FormRequest
             "state" => "required",
             "city" => "required",
             "zip_code" => "required",
+            "joined_date" => "required",
             "nrc_number" => "sometimes",
             "address" => "sometimes",
             "gender_id" => "required",

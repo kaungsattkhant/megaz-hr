@@ -21,6 +21,7 @@ class Staff extends Authenticatable
         'phone_number',
         'alt_phone_number',
         'email',
+        'joined_date',
         'nrc_number',
         'birthdate',
         'father_name',
