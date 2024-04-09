@@ -38,6 +38,7 @@ class AppServiceProvider extends ServiceProvider
             'sub_account'=>'App\Models\SubAccount',
             'task'=>'App\Models\Task',
             'uom'=>'App\Models\UOM',
+            'invoice'=>'App\Models\Invoice',
         ]);
     }
 }
