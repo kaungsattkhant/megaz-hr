@@ -34,6 +34,10 @@ class Transaction extends Model
         });
     }
 
+    public function transactionable(){
+        return $this->morphTo();
+    }
+    
     public function ledgers(){
         return $this->hasMany(\App\Models\Ledger::class);
     }
