@@ -45,7 +45,7 @@
                                 MD Checked
                             </th>
 
-                            <th scope="col" class="px-6 py-4">
+                            <th scope="col" class="px-6 py-4 col-span-3">
 
                             </th>
                         </tr>
@@ -76,21 +76,26 @@
                                 <td class="px-6 py-4">
                                     {{ purchaseOrder.is_md_checked == 0 ? 'No' : 'Yes' }}
                                 </td>
+
                                 <td class="whitespace-nowrap px-6 py-4 space-x-4">
                                     <button v-if="purchaseOrder.is_md_checked != 1" class="pr-1" @click="checkPurchaseOrderBtnClicked(purchaseOrder.id)" data-te-toggle="modal" data-te-target="#checkModal">
                                         <i class="far fa-check"></i>
                                     </button>
-                                    <button v-if="(purchaseOrder.is_md_checked == 1) && (purchaseOrder.is_bought == 0) && getDepartment().name == 'Finance'" class="pr-1" @click="buyPurchaseOrderBtnClicked(purchaseOrder.id)" data-te-toggle="modal" data-te-target="#buyModal">
-                                        <i class="far fa-shopping-basket"></i>
-                                    </button>
+                                </td>
 
+                                <td class="whitespace-nowrap px-6 py-4 space-x-4">
+                                    <!-- <button v-if="(purchaseOrder.is_md_checked == 1) && (purchaseOrder.is_bought == 0) && getDepartment().name == 'Finance'" class="pr-1" @click="buyPurchaseOrderBtnClicked(purchaseOrder.id)" data-te-toggle="modal" data-te-target="#buyModal">
+                                        <i class="far fa-shopping-basket"></i>
+                                    </button> -->
+                                    <a :href="'/purchase_orders/'+purchaseOrder.id+'/buy'" v-if="(purchaseOrder.is_md_checked == 1) && (purchaseOrder.is_bought == 0) && getDepartment().name == 'Finance'" id="" class="pr-1">
+                                        <i class="far fa-shopping-basket"></i>
+                                    </a>
+                                </td>
+
+                                <td class="whitespace-nowrap px-6 py-4 space-x-4">
                                     <a :href="'/purchase_orders/'+purchaseOrder.id+'/confirm'" id="" class="pr-1">
                                         <i class="far fa-bars"></i>
                                     </a>
-                                    <!-- <button data-te-toggle="modal" id="edit-btn" class="pr-1"
-                                    data-te-target="#deleteModal">
-                                        <i class="fas fa-trash-alt"></i>
-                                    </button> -->
                                 </td>
                             </tr>
 
@@ -245,11 +250,19 @@
                     formData.append('value', 1);
                     let response = await postApiData({url: url, form_data: formData, token: this.getToken()});
                     if(response.success){
-                        alert('PO checked');
-                        window.location.reload();
+                        this.$notify({
+                            text: `PO Checked`,
+                            type: 'info'
+                        });
+                        setTimeout(()=>{
+                            window.location.reload();
+                        }, 3000);
                     }
                     else{
-                        alert(response.message);
+                        this.$notify({
+                            text: response.message,
+                            type: 'error'
+                        });
                     }
                 }
 
@@ -268,11 +281,19 @@
                     formData.append('value', 1);
                     let response = await postApiData({url: url, form_data: formData, token: this.getToken()});
                     if(response.success){
-                        alert('PO bought');
-                        window.location.reload();
+                        this.$notify({
+                            text: `PO Checked`,
+                            type: 'info'
+                        });
+                        // setTimeout(()=>{
+                        //     window.location.reload();
+                        // }, 3000);
                     }
                     else{
-                        alert(response.message);
+                        this.$notify({
+                            text: response.message,
+                            type: 'error'
+                        });
                     }
                 }
 

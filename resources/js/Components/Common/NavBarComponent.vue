@@ -65,6 +65,7 @@
                 let response = await getApiData({url: url, token: this.getToken()});
                 if(response.data){
                     this.notifications = response.data;
+                    this.newNofiCount = 0;
                     this.notifications.forEach(notification => {
                         notification.notification_users.forEach((userNoti)=>{
                             if((userNoti.staff_id == this.getUser().id) && userNoti.is_read == 0){
