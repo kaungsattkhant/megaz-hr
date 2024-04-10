@@ -13,7 +13,7 @@ class SupplierRepository implements SupplierInterface
         if($request->per_page || $request->page){
             return Supplier::with(['items'])->orderBy('id','DESC')->paginate(config('common.list_count'));
         }
-        return Supplier::orderBy('id', 'ASC')->get();
+        return Supplier::with(['items'])->orderBy('id', 'ASC')->get();
     }
 
     public function updateOrCreate($request){
