@@ -3,10 +3,14 @@
         <div class="">
             <div class="w-full pt-9 px-6">
                 <div class="flex justify-between mb-4">
-                    <div>
+                    <div class="flex gap-x-3">
                         <button class="pos-add-btn">
                             Date
                         </button>
+                        <select name="" id="" v-model="bookType" @change="cashOrBank"
+                            class="text-sm border border-gray-300 input-ui w-full bg-white rounded-lg focus:ring-0">
+                            <option :value="account" v-for="account in cashAccountList"> {{ account.name }} </option>
+                        </select>
                     </div>
                     <div class="flex gap-x-3">
                         <!-- <button class="pos-add-btn !bg-[#F15181]">
@@ -134,7 +138,8 @@
                             </label>
                             <select name="" id="" v-model="accType"
                                 class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
-                                <option :value="account" v-for="account in cashAccountList"> {{ account.name }} </option>
+                                <option :value="account" v-for="account in cashAccountList"> {{ account.name }}
+                                </option>
                             </select>
                         </div>
                         <div class="mb-4">
@@ -176,10 +181,6 @@
 
 
 
-
-
-
-
     </div>
 
 </template>
@@ -197,6 +198,7 @@
                 cashAccountList:[],
                 cashbookId:null,
                 bankbookId:null,
+                bookType:null,
 
                 subAccountList: [],
                 selectedSubAccount: null,
@@ -255,6 +257,32 @@
                         this.cashbookList.push(cashBook);
                     });
                     console.log(this.cashbookList);
+                    this.cashbookList.forEach((cashBook)=>{
+                        if(cashBook.action == 'debit'){
+                            this.currentBalance += cashBook.amount;
+                        }
+                        if(cashBook.action == 'credit'){
+                            this.currentBalance -= cashBook.amount;
+                        }
+                        // this.currentBalance += cashBook.amount;
+                        cashBook.balance += this.currentBalance;
+
+                    });
+                }
+            },
+            async cashOrBank(){
+                let url = `/api/cash_books?cash_account_id[]=` + this.bookType.id;
+                let response = await getApiData({ url: url, token: this.getToken() });
+                if (response.data) {
+                    this.currentBalance = 0;
+                    this.testlist = response.data
+                    this.cashbookList = []
+                    this.openingBalance = response.data.opening_balance;
+                    this.remainingBalance = response.data.remaining_balance;
+                    response.data.cashbook_list.forEach((cashBook) => {
+                        cashBook.balance = 0;
+                        this.cashbookList.push(cashBook);
+                    });
                     this.cashbookList.forEach((cashBook)=>{
                         if(cashBook.action == 'debit'){
                             this.currentBalance += cashBook.amount;
