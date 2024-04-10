@@ -88,10 +88,10 @@
                                 </select>
                             </td>
                             <td class=" px-6 py-4 font-medium ">
-                                <input type="text" class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0" placeholder="Paid Amount">
+                                <input type="number" v-model="purchaseOrderItem.invoice_amount" class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0" placeholder="Paid Amount">
                             </td>
                             <td class=" px-6 py-4 font-medium ">
-                                <input type="text" class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0" placeholder="Invoice Id">
+                                <input type="text" v-model="purchaseOrderItem.invoice_no" class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0" placeholder="Invoice Id">
                             </td>
                         </tr>
                         <tr class="">
@@ -103,8 +103,8 @@
             </table>
         </div>
         <div>
-            <button class="add-btn" @click="createPurchaseOrderBtnClicked">
-                Update Purchase Order
+            <button class="add-btn" @click="buyPurchaseOrderBtnClicked">
+                Buy Purchase Order
             </button>
         </div>
     </div>
@@ -307,32 +307,23 @@
                     this.purchaseOrder = response.data;
                     this.date = this.purchaseOrder.date;
                     this.purchaseOrderItems = this.purchaseOrder.items;
-                    this.purchaseOrderItems.forEach((poItem)=>{
-                        // poItem.supplier = {};
-                        poItem.suppliers = [];
-                        // console.log(poItem);
-                        this.supplierList.forEach((supplier)=>{
-                            supplier.items.forEach((item)=>{
-                                // console.log(`supplier item ${item.name}`);
-                                // console.log(`po item ${poItem.item.name}`);
-                                if(item.id == poItem.item.id){
-                                    poItem.suppliers.push(supplier);
-                                    // console.log(`supplier ${supplier.name} found for ${poItem.item.name}`);
-                                }
+                    setTimeout(()=>{
+                        this.purchaseOrderItems.forEach((poItem)=>{
+                            poItem.suppliers = [];
+                            this.supplierList.forEach((supplier)=>{
+                                supplier.items.forEach((item)=>{
+                                    if(item.id == poItem.item.id){
+                                        poItem.suppliers.push(supplier);
+                                    }
+                                });
                             });
                         });
-                    });
+                    }, 1000);
                 }
             },
 
-            poItemSupplierSelectChanged(poItem){
-                // console.log(this.poItemSupplier);
-                poItem.supplier = this.poItemSupplier;
-                this.poItemSupplier = null;
-                console.log(this.purchaseOrderItems);
-            },
-
             selectPOItemSupplierBtnClicked(purchaseOrderItem, purchaseOrderItemsIndex){
+                // this.purchaseOrderItems[purchaseOrderItemsIndex].supplier_id = this.purchaseOrderItems[purchaseOrderItemsIndex].supplier.id;
                 console.log(this.purchaseOrderItems[purchaseOrderItemsIndex]);
             },
 
@@ -418,6 +409,60 @@
                 console.log(this.purchaseOrderItems[index]);
                 this.editQuantity = 0;
                 this.editPurchaseOrderItem = null;
+            },
+
+            async buyPurchaseOrderBtnClicked(){
+                let priceTotal = 0;
+                this.purchaseOrderItems.forEach((poItem)=>{
+                    if(poItem.supplier == undefined || !poItem.supplier){
+                        this.$notify({
+                            text: `Supplier must be selected for ${poItem.item.name}`,
+                            type: 'error'
+                        });
+                        return 1;
+                    }
+
+                    else if(poItem.invoice_no == undefined || !poItem.invoice_no){
+                        this.$notify({
+                            text: `Invoice number must be filled for ${poItem.item.name}`,
+                            type: 'error'
+                        });
+                        return 1;
+                    }
+
+                    else if(poItem.invoice_amount == undefined || !poItem.invoice_amount){
+                        this.$notify({
+                            text: `Invoice amount must be filled for ${poItem.item.name}`,
+                            type: 'error'
+                        });
+                        return 1;
+                    }
+
+                    else{
+                        poItem.supplier_id = poItem.supplier.id;
+                        priceTotal += poItem.invoice_amount;
+                    }
+                });
+
+                console.log(this.purchaseOrderItems);
+                let formData = new FormData();
+                formData.append('date', this.date);
+                formData.append('total_price', priceTotal);
+                formData.append('is_grn', 1);
+                formData.append('items', JSON.stringify(this.purchaseOrderItems));
+                let response = await postApiData({url: `/api/purchase_orders`, form_data:  formData, token: this.getToken()});
+                if(response.success){
+                    this.$notify({
+                        text: `Request successful`,
+                        type: 'info'
+                    });
+                }
+                else{
+                    this.$notify({
+                        text: `Unknown error`,
+                        type: 'error'
+                    });
+                }
             },
 
             async createPurchaseOrderBtnClicked(){
