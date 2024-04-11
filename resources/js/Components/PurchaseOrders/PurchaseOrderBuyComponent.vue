@@ -311,11 +311,12 @@
                         this.purchaseOrderItems.forEach((poItem)=>{
                             poItem.suppliers = [];
                             this.supplierList.forEach((supplier)=>{
-                                supplier.items.forEach((item)=>{
-                                    if(item.id == poItem.item.id){
-                                        poItem.suppliers.push(supplier);
-                                    }
-                                });
+                                poItem.suppliers.push(supplier);
+                                // supplier.items.forEach((item)=>{
+                                //     if(item.id == poItem.item.id){
+                                //         poItem.suppliers.push(supplier);
+                                //     }
+                                // });
                             });
                         });
                     }, 1000);
