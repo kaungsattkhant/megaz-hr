@@ -67,7 +67,9 @@ class PurchaseOrderRepository implements PurchaseOrderRepositoryInterface
                     $item_data['id'] = null;
                 }
                 $item_data['quantity'] = $item->quantity;
-                $item_data['original_quantity'] = $item->quantity;
+                if($staff->hasRoles('HR')){
+                    $item_data['original_quantity'] = $item->quantity;
+                }
                 $item_data['purchase_order_id'] = $po->id;
                 $item_data['item_id'] = $item->item_id;
                 $item_data['amount'] = $item->amount;
@@ -109,7 +111,7 @@ class PurchaseOrderRepository implements PurchaseOrderRepositoryInterface
 
                 $po_item=$po->items()->updateOrCreate(['id' => $item_data['id']], $item_data);
                 if($request->is_grn){
-                    $grn=$this->storeGRN($po,$item);
+                    $this->storeGRN($po,$item);
                 }
             }
             

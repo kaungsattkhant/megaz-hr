@@ -93,6 +93,22 @@ class Staff extends Authenticatable
         return false;
     }
 
+    public function checkRoles($names){
+        // Convert $names to an array if it's not already one
+        if (!is_array($names)) {
+            $names = [$names];
+        }
+
+        // Check if the user has any of the roles specified in the array
+        foreach ($names as $name) {
+            if ($this->roles->contains('name', $name)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     public function isDepartment($name){
         if($this->department->name==$name){
             return true;
