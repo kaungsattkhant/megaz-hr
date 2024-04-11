@@ -2,14 +2,16 @@
 
 namespace App\Repositories\PurchaseOrder;
 
-use App\Http\Action\Common\PurchaseOrder as CommonPurchaseOrder;
-use App\Http\Action\Inventory\StoreInventory;
-use App\Http\Action\SendNotification\SendNotification;
+use App\Models\PoGrn;
+use Illuminate\Http\Request;
 use App\Models\PurchaseOrder;
 use App\Models\PurchaseOrderItem;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use App\Models\PurchaseOrderItemLeft;
+use Illuminate\Database\Eloquent\Model;
+use App\Http\Action\Inventory\StoreInventory;
+use App\Http\Action\SendNotification\SendNotification;
+use App\Http\Action\Common\PurchaseOrder as CommonPurchaseOrder;
 
 class PurchaseOrderRepository implements PurchaseOrderRepositoryInterface
 {
@@ -39,6 +41,7 @@ class PurchaseOrderRepository implements PurchaseOrderRepositoryInterface
     }
     public function createOrUpdate($request)
     {
+        // dd($request->all());     
         $data = $request->all();
         $staff = UserData();
         $items = json_decode($request->items);
@@ -47,6 +50,7 @@ class PurchaseOrderRepository implements PurchaseOrderRepositoryInterface
             if (!isset($request->id)) {
                 $data['id'] = null;
             }
+           
             $latest = PurchaseOrder::orderBy('created_at', 'desc')->first();
             $count = 4;
             $no = (new CommonPurchaseOrder())->getUniqueId($latest, $count);
@@ -58,7 +62,6 @@ class PurchaseOrderRepository implements PurchaseOrderRepositoryInterface
                 $data
             );
             foreach ($items as $item) {
-                // if (!isset($item->id) || $item->id==null) {
                 if (isset($item->id) && $item->id !== null) {
                     $item_data['id'] = $item->id;
                 } else {
@@ -68,8 +71,45 @@ class PurchaseOrderRepository implements PurchaseOrderRepositoryInterface
                 $item_data['purchase_order_id'] = $po->id;
                 $item_data['item_id'] = $item->item_id;
                 $item_data['amount'] = $item->amount;
-                $po->items()->updateOrCreate(['id' => $item_data['id']], $item_data);
+
+                // $purchaseOrderItem=PurchaseOrderItem::find($item_data['id']);
+                $purchaseOrderItem=$po->items()->where('id',$item_data['id'])->first();
+                if($purchaseOrderItem){
+                    if($item->quantity<$purchaseOrderItem->quantity){
+                        $quantity=$purchaseOrderItem->quantity-$item->quantity;
+                        $column=null;
+                        if($staff->hasRoles('Manager')){
+                            $column='quantity_by_manager';
+                        }
+                        elseif($staff->hasRoles('Financial')){
+                            $column='quantity_by_manager';
+                        } elseif($staff->hasRoles('MD')){
+                            $column='quantity_by_manager';
+                        } elseif( $po->is_md_checked && $staff->hasRoles('Financial')){
+                            $column='quantity_by_manager';
+                        }
+                        // if($column!=null){
+                        //     $po_left=PurchaseOrderItemLeft::updateOrCreate(
+                        //         [
+                        //             'item_id'=>$item->item_id,
+                        //             'purchase_order_id'=>$po->id,
+                        //         ],
+                        //         [
+                        //         'item_id'=>$item->item_id,
+                        //         'purchase_order_id'=>$po->id,
+                        //         'quantity'=>$quantity,
+                        //         $column=>$item->quantity,
+                        //     ]);
+                        // }
+                    }
+                }
+
+                $po_item=$po->items()->updateOrCreate(['id' => $item_data['id']], $item_data);
+                if($request->is_grn){
+                    $this->storeGRN($po,$item);
+                }
             }
+            
             if (!isset($request->id)) {
                 $users = $this->getUserByRole(['Manager']);
                 $data = [
@@ -87,6 +127,17 @@ class PurchaseOrderRepository implements PurchaseOrderRepositoryInterface
             throw $e;
         }
 
+    }
+
+    public function storeGRN($po,$item){
+        return PoGrn::create([
+            'supplier_id'=>$item->supplier_id,
+            'invoice_amount'=>$item->invoice_amount,
+            'invoice_no'=>$item->invoice_no,
+            'item_id'=>$item->item_id,
+            'purchase_order_id'=>$po->id,
+           ]);
+        
     }
 
     public function updateData(array $data, int $id)

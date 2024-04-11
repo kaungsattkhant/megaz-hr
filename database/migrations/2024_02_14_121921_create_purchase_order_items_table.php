@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::create('purchase_order_items', function (Blueprint $table) {
             $table->bigIncrements('id');
+            $table->double('original_quantity');
             $table->double('quantity');
             $table->double('amount');
             $table->foreignId('purchase_order_id')->constrained();

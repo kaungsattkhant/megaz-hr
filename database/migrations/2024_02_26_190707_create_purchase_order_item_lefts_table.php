@@ -16,9 +16,10 @@ return new class extends Migration
             $table->foreignId('purchase_order_id');
             $table->integer('quantity');
             $table->unsignedBigInteger('item_id');
-            $table->boolean('is_manager_checked');
-            $table->boolean('is_financial_checked');
-            $table->boolean('is_md_checked');
+            $table->integer('quantity_by_manager')->nullable();
+            $table->integer('quantity_by_financial')->nullable();
+            $table->integer('quantity_by_md')->nullable();
+            $table->integer('quantity_after_md')->nullable();
             $table->timestamps();
         });
     }
