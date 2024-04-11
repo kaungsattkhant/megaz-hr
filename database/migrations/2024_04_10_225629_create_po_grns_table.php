@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->char('invoice_no')->nullable();
             $table->char('invoice_amount')->default(0);
+            $table->integer('quantity')->default(0);
             $table->longText('remark')->nullable();
             $table->unsignedInteger('item_id');
             $table->unsignedInteger('supplier_id');

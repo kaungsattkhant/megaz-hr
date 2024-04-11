@@ -89,7 +89,6 @@ Route::middleware('auth:api')->group(function () {
     Route::get('/supervisor/staff', [StaffAPIController::class, 'getStaffListBySupervisor']);
     Route::get('/supervisor/staff/{staffId}/tasks', [TaskController::class, 'getStaffTasksBySupervisor']);
     Route::controller(PurchaseOrderAPIController::class)->group(function () {
-
         Route::get('/purchase_orders', 'getPurchaseOrder');
         Route::post('/purchase_orders', 'createPurchaseOrder');
         // below the route perform update, and kitchen data update and financial update and it depends on condition,
@@ -140,6 +139,8 @@ Route::middleware('auth:api')->group(function () {
 Route::controller(ExcelImportController::class)->group(function () {
     Route::post('/import_account', 'importAccount');
 });
+
+// Route::post('purchase_orders', [PurchaseOrderAPIController::class, 'createPurchaseOrder']);
 
 
 Route::get('/areas', [AreaController::class, 'getAreas']);

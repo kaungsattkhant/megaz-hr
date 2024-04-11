@@ -169,9 +169,9 @@
                 formData.append('items', JSON.stringify(this.purchaseOrderItems));
                 let response = await postApiData({url: `/api/purchase_orders`, form_data:  formData, token: this.getToken()});
                 // alert(`Operation success ${response.success}`);
-                setTimeout(()=>{
-                    window.location.replace(`/purchase_orders`);
-                }, 3000);
+                // setTimeout(()=>{
+                //     window.location.replace(`/purchase_orders`);
+                // }, 3000);
             },
 
         },

@@ -9,7 +9,7 @@ class PoGrn extends Model
 {
     use HasFactory;
     
-    protected $fillable=['inovice_no','invoice_amount','supplier_id','item_id','purchase_order_id','remark'];
+    protected $fillable=['inovice_no','invoice_amount','supplier_id','item_id','purchase_order_id','remark','quantity'];
 
     public function supplier()
     {

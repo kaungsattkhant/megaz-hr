@@ -50,7 +50,6 @@ class PurchaseOrderRepository implements PurchaseOrderRepositoryInterface
             if (!isset($request->id)) {
                 $data['id'] = null;
             }
-           
             $latest = PurchaseOrder::orderBy('created_at', 'desc')->first();
             $count = 4;
             $no = (new CommonPurchaseOrder())->getUniqueId($latest, $count);
@@ -68,45 +67,49 @@ class PurchaseOrderRepository implements PurchaseOrderRepositoryInterface
                     $item_data['id'] = null;
                 }
                 $item_data['quantity'] = $item->quantity;
+                $item_data['original_quantity'] = $item->quantity;
                 $item_data['purchase_order_id'] = $po->id;
                 $item_data['item_id'] = $item->item_id;
                 $item_data['amount'] = $item->amount;
 
                 // $purchaseOrderItem=PurchaseOrderItem::find($item_data['id']);
-                $purchaseOrderItem=$po->items()->where('id',$item_data['id'])->first();
-                if($purchaseOrderItem){
-                    if($item->quantity<$purchaseOrderItem->quantity){
-                        $quantity=$purchaseOrderItem->quantity-$item->quantity;
-                        $column=null;
-                        if($staff->hasRoles('Manager')){
-                            $column='quantity_by_manager';
-                        }
-                        elseif($staff->hasRoles('Financial')){
-                            $column='quantity_by_manager';
-                        } elseif($staff->hasRoles('MD')){
-                            $column='quantity_by_manager';
-                        } elseif( $po->is_md_checked && $staff->hasRoles('Financial')){
-                            $column='quantity_by_manager';
-                        }
-                        // if($column!=null){
-                        //     $po_left=PurchaseOrderItemLeft::updateOrCreate(
-                        //         [
-                        //             'item_id'=>$item->item_id,
-                        //             'purchase_order_id'=>$po->id,
-                        //         ],
-                        //         [
-                        //         'item_id'=>$item->item_id,
-                        //         'purchase_order_id'=>$po->id,
-                        //         'quantity'=>$quantity,
-                        //         $column=>$item->quantity,
-                        //     ]);
-                        // }
-                    }
-                }
+                // if($item->is_later_buy){
+                //     $purchaseOrderItem=$po->items()->where('id',$item_data['id'])->first();
+                //     if($purchaseOrderItem){
+                //         if( $item->quantity<$purchaseOrderItem->quantity){
+                //             $quantity=$purchaseOrderItem->original_quantity-$item->quantity;
+                //             $column=null;
+                //             if($staff->hasRoles('Manager')){
+                //                 $column='quantity_by_manager';
+                //             }
+                //             elseif(!$po->is_md_checked &&$staff->hasRoles('Financial')){
+                //                 $column='quantity_by_financial';
+                //             } elseif($staff->hasRoles('MD')){
+                //                 $column='quantity_by_md';
+                //             } elseif($po->is_md_checked && $staff->hasRoles('Financial')){
+                //                 $column='quantity_after_md';
+                //             }
+                //             if($column!=null){
+                //                 $po_left=PurchaseOrderItemLeft::updateOrCreate(
+                //                     [
+                //                         'item_id'=>$item->item_id,
+                //                         'purchase_order_id'=>$po->id,
+                //                     ],
+                //                     [
+                //                     'item_id'=>$item->item_id,
+                //                     'purchase_order_id'=>$po->id,
+                //                     'quantity'=>$quantity,
+                //                     $column=>$item->quantity,
+                //                 ]);
+                //             }
+                //         }
+                //     }
+                // }
+                
 
                 $po_item=$po->items()->updateOrCreate(['id' => $item_data['id']], $item_data);
                 if($request->is_grn){
-                    $this->storeGRN($po,$item);
+                    $grn=$this->storeGRN($po,$item);
                 }
             }
             
@@ -131,6 +134,7 @@ class PurchaseOrderRepository implements PurchaseOrderRepositoryInterface
 
     public function storeGRN($po,$item){
         return PoGrn::create([
+            'quantity'=>$item->quantity,
             'supplier_id'=>$item->supplier_id,
             'invoice_amount'=>$item->invoice_amount,
             'invoice_no'=>$item->invoice_no,
@@ -163,6 +167,7 @@ class PurchaseOrderRepository implements PurchaseOrderRepositoryInterface
     public function detail($purchaseOrder)
     {
         $purchaseOrder->items = $purchaseOrder->items;
+        $purchaseOrder->items->load('item.suppliers');
         return $purchaseOrder;
     }
 

@@ -34,4 +34,9 @@ class Item extends BaseModel
     public function item_prices(){
         return $this->hasOne(ItemPrice::class)->latest('created_at');
     }
+
+    public function suppliers(){
+        return $this->belongsToMany(Supplier::class, 'supplier_items');
+
+    }
 }
