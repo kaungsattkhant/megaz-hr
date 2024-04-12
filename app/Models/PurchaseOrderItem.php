@@ -32,4 +32,8 @@ class PurchaseOrderItem extends BaseModel
         return $this->belongsTo(Item::class);
     }
 
+    public function purchaseOrderItemLeft(){
+        return $this->hasOne(PurchaseOrderItemLeft::class);
+    }
+
 }
