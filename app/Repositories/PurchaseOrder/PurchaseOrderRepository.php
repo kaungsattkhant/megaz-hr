@@ -67,7 +67,7 @@ class PurchaseOrderRepository implements PurchaseOrderRepositoryInterface
                     $item_data['id'] = null;
                 }
                 $item_data['quantity'] = $item->quantity;
-                if($staff->hasRoles('HR')){
+                if($staff->hasRoles('Staff')){
                     $item_data['original_quantity'] = $item->quantity;
                 }
                 $item_data['purchase_order_id'] = $po->id;
@@ -75,38 +75,38 @@ class PurchaseOrderRepository implements PurchaseOrderRepositoryInterface
                 $item_data['amount'] = $item->amount;
 
                 // $purchaseOrderItem=PurchaseOrderItem::find($item_data['id']);
-                // if($item->is_later_buy){
-                //     $purchaseOrderItem=$po->items()->where('id',$item_data['id'])->first();
-                //     if($purchaseOrderItem){
-                //         if( $item->quantity<$purchaseOrderItem->quantity){
-                //             $quantity=$purchaseOrderItem->original_quantity-$item->quantity;
-                //             $column=null;
-                //             if($staff->hasRoles('Manager')){
-                //                 $column='quantity_by_manager';
-                //             }
-                //             elseif(!$po->is_md_checked &&$staff->hasRoles('Financial')){
-                //                 $column='quantity_by_financial';
-                //             } elseif($staff->hasRoles('MD')){
-                //                 $column='quantity_by_md';
-                //             } elseif($po->is_md_checked && $staff->hasRoles('Financial')){
-                //                 $column='quantity_after_md';
-                //             }
-                //             if($column!=null){
-                //                 $po_left=PurchaseOrderItemLeft::updateOrCreate(
-                //                     [
-                //                         'item_id'=>$item->item_id,
-                //                         'purchase_order_id'=>$po->id,
-                //                     ],
-                //                     [
-                //                     'item_id'=>$item->item_id,
-                //                     'purchase_order_id'=>$po->id,
-                //                     'quantity'=>$quantity,
-                //                     $column=>$item->quantity,
-                //                 ]);
-                //             }
-                //         }
-                //     }
-                // }
+                if(isset($item->later_buy) && $item->later_buy){
+                    $purchaseOrderItem=$po->items()->where('id',$item_data['id'])->first();
+                    if($purchaseOrderItem){
+                        if( $item->quantity<$purchaseOrderItem->quantity){
+                            $quantity=$purchaseOrderItem->original_quantity-$item->quantity;
+                            $column=null;
+                            if($staff->hasRoles('Manager')){
+                                $column='quantity_by_manager';
+                            }
+                            elseif(!$po->is_md_checked &&$staff->hasRoles('Financial')){
+                                $column='quantity_by_financial';
+                            } elseif($staff->hasRoles('MD')){
+                                $column='quantity_by_md';
+                            } elseif($po->is_md_checked && $staff->hasRoles('Financial')){
+                                $column='quantity_after_md';
+                            }
+                            if($column!=null){
+                                $po_left=PurchaseOrderItemLeft::updateOrCreate(
+                                    [
+                                        'item_id'=>$item->item_id,
+                                        'purchase_order_id'=>$po->id,
+                                    ],
+                                    [
+                                    'item_id'=>$item->item_id,
+                                    'purchase_order_id'=>$po->id,
+                                    'quantity'=>$quantity,
+                                    $column=>$item->quantity,
+                                ]);
+                            }
+                        }
+                    }
+                }
                 
 
                 $po_item=$po->items()->updateOrCreate(['id' => $item_data['id']], $item_data);
