@@ -810,12 +810,12 @@
                 if (response.data) {
                     this.roomList = response.data;
                     this.selectedRoom = this.roomList[0]
-                    if (this.roomList[0].invoices.length > 0) {
+                    if (this.roomList[0]?.invoices.length > 0) {
                         this.isOpenRoom.step_1 = false;
                         this.isOpenRoom.step_2 = false;
                         this.isOpenRoom.step_detail = true;
                     }
-                    if (this.roomList[0].invoices.length < 1) {
+                    if (this.roomList[0]?.invoices.length < 1) {
                         this.isOpenRoom.step_1 = true;
                         this.isOpenRoom.step_2 = false;
                         this.isOpenRoom.step_detail = false;
