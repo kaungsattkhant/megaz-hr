@@ -59,6 +59,7 @@ Route::middleware(['departments:HR,Finance,Management'])->group(function () {
     Route::view('/purchase_orders', 'purchase_orders.index')->name('purchase_orders');
     Route::view('/purchase_orders/create', 'purchase_orders.create')->name('purchase_orders.create');
     Route::view('/purchase_orders/{poId}/confirm', 'purchase_orders.confirm')->name('purchase_orders.confirm');
+    Route::view('/purchase_orders/{poId}/buy', 'purchase_orders.buy')->name('purchase_orders.buy');
 });
 
 Route::middleware(['departments:Finance'])->group(function () {

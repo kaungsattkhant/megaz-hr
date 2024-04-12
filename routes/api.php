@@ -133,6 +133,8 @@ Route::middleware('auth:api')->group(function () {
 
     Route::resource('suppliers', SupplierController::class)->only(['index', 'store', 'show', 'destroy']);
     Route::resource('notifications',NotificationController::class)->only(['index']);
+    Route::post('notifications/set_seen', [NotificationController::class, 'setSeenNotifications']);
+    Route::post('notifications/{notificationId}/mark_read', [NotificationController::class, 'markReadNotification']);
 });
 
 Route::controller(ExcelImportController::class)->group(function () {

@@ -43,6 +43,7 @@ import ComplainsCrudComponent from './Components/Complains/ComplainsCrudComponen
 import PurchaseOrderListComponent from './Components/PurchaseOrders/PurchaseOrderListComponent.vue';
 import PurchaseOrderCreateComponent from './Components/PurchaseOrders/PurchaseOrderCreateComponent.vue';
 import PurchaseOrderConfirmComponent from './Components/PurchaseOrders/PurchaseOrderConfirmComponent.vue';
+import PurchaseOrderBuyComponent from './Components/PurchaseOrders/PurchaseOrderBuyComponent.vue';
 import ItemCrudComponent from './Components/Items/ItemCrudComponent.vue';
 import ItemUsageForecastListComponent from './Components/ItemUsageForecastings/ItemUsageForecastListComponent.vue';
 import ItemUsageForecastCreateComponent from './Components/ItemUsageForecastings/ItemUsageForecastCreateComponent.vue';
@@ -97,6 +98,7 @@ app.component('ArPaidComponent', ArPaidComponent);
 app.component('PurchaseOrderListComponent', PurchaseOrderListComponent);
 app.component('PurchaseOrderCreateComponent', PurchaseOrderCreateComponent);
 app.component('PurchaseOrderConfirmComponent', PurchaseOrderConfirmComponent);
+app.component('PurchaseOrderBuyComponent', PurchaseOrderBuyComponent);
 app.component('ItemCrudComponent', ItemCrudComponent);
 app.component('ItemUsageForecastListComponent', ItemUsageForecastListComponent);
 app.component('ItemUsageForecastCreateComponent', ItemUsageForecastCreateComponent);

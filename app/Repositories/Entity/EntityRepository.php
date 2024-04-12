@@ -33,15 +33,12 @@ class EntityRepository implements EntityRepositoryInterface
     {
         $area = Area::find($data['area_id']);
         $currentDate = $data['current_date'];
-
-
-            $entities = Entity::where('area_id', $area->id)->where("is_available", 1)->with(["invoices" => function ($query) use ($currentDate) {
-                $query->where("complete_date", null)->select("id", "invoice_id", "entity_id","total_session_price")->with("sessions");
-            }])->get();
+        $entities = Entity::where('area_id', $area->id)->where("is_available", 1)->with(["invoices" => function ($query) use ($currentDate) {
+            $query->where("complete_date", null)->select("id", "invoice_id", "entity_id", "total_session_price")->with("sessions");
+        }])->get();
 
         return $entities;
     }
-
 
     public function entityDetail(array $data, int $entityId)
     {
@@ -54,8 +51,6 @@ class EntityRepository implements EntityRepositoryInterface
         }])->find($entityId);
 
         return $entity;
-
-
     }
 
     public function createData(array $data)

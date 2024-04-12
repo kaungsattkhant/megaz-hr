@@ -53,7 +53,13 @@
                                         {{ index+1 }}
                                     </td>
                                     <td class="whitespace-nowrap px-6 py-4">
-                                        {{ cashbook.title }}
+                                        <div v-if="cashbook.transactionable.invoice_id">
+                                            {{ cashbook.transactionable.invoice_id }}
+                                        </div>
+                                        <div v-else>
+                                            {{ cashbook.title }}
+                                        </div>
+
                                     </td>
                                     <td class="whitespace-nowrap px-6 py-4">
                                         {{ cashbook.action }}

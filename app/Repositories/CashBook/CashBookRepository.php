@@ -12,9 +12,9 @@ class CashBookRepository implements CashBookInterface
     {
         $cashAccountId = $request->cash_account_id;
         $latestClosedTransaction = (new CashBookTransaction())->getLatestClosedTransaction($request, $cashAccountId);
-        $cashbookTransactions = Transaction::with(['ledgers.account'])
+        $cashbookTransactions = Transaction::with(['ledgers.account', 'transactionable'])
             ->isConfirmed(1)
-            ->select(['id', 'date', 'description'])
+            ->select(['id', 'date', 'description', 'transactionable_id', 'transactionable_type'])
             ->whereHas('ledgers', function ($query) use ($cashAccountId) {
                 $query->whereIn('account_id', $cashAccountId);
             })
@@ -24,18 +24,18 @@ class CashBookRepository implements CashBookInterface
             ->get();
         $current_debit_amount = $current_credit_amount = 0;
         foreach ($cashbookTransactions as $transaction) {
+            if ($transaction->transactionable_type == 'invoice') {
+                // dd($transaction->transactionable);
+            }
             foreach ($transaction->ledgers as $ledger) {
                 // if (!in_array($ledger->account_id, $cashAccountId)) {
-                if (in_array(33, $cashAccountId) || in_array(34, $cashAccountId)) {
-                    if ($ledger->action == 'debit') {
-                        $current_debit_amount += $ledger->value;
-                        $transaction->type = $ledger->account->name;
-                        $transaction->amount = $ledger->value;
-                        $transaction->action = $ledger->action;
-                        $transaction->title = $ledger->account->name;
-                    } elseif ($ledger->action == 'credit') {
-                        $current_credit_amount += $ledger->value;
-                    }
+                if (in_array(config('common.pos_cash'), $cashAccountId) || in_array(config('common.pos_cash'), $cashAccountId)) {
+                    $ledger->action == 'debit' ? $current_debit_amount += $transaction->amount : $current_credit_amount += $transaction->amount;
+                    $transaction->title = $transaction->transactionable_type == 'invoice' ? $ledger->account->name . '(' . $transaction->transactionable->invoice_id . ')' : $ledger->account->name;
+                    $transaction->type = $ledger->account->name;
+                    $transaction->amount = $ledger->value;
+                    $transaction->action = $ledger->action;
+                    // $transaction->title = $ledger->account->name;
                 } else {
                     if (in_array($ledger->account_id, $cashAccountId)) {
                         $transaction->type = $ledger->account->name;
@@ -47,11 +47,7 @@ class CashBookRepository implements CashBookInterface
                     }
                 }
             }
-            // if (!in_array(33, $cashAccountId) || !in_array(34, $cashAccountId)) {
-                UnsetData($transaction, ['ledgers']);
-            // }
-
-            
+            UnsetData($transaction, ['ledgers']);
             // if (in_array(33, $cashAccountId) || in_array(34, $cashAccountId)) {
             //    $transaction->transaction_ledgers=$transaction->ledgers->whereNotIn('account_id',$cashAccountId)->values();
             // }
