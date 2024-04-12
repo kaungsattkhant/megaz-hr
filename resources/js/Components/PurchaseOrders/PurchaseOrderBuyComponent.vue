@@ -48,19 +48,25 @@
                         <th scope="col" class=" px-6 py-4 ">
                             Item
                         </th>
-                        <th scope="col" class=" px-6 py-4 ">
-                            Qty
+                        <th scope="col" class=" px-4 py-4 ">
+                            Original Qty
+                        </th>
+                        <th scope="col" class=" px-4 py-4 ">
+                            Current Qty
+                        </th>
+                        <th scope="col" class=" px-4 py-4 ">
+                            Left Qty
                         </th>
                         <th scope="col" class=" px-6 py-4 ">
                             Amount
                         </th>
-                        <th scope="col" class=" px-6 py-4 ">
+                        <th scope="col" class=" px-8 py-4 ">
                             Supplier
                         </th>
-                        <th scope="col" class=" px-6 py-4 ">
+                        <th scope="col" class=" px-2 py-4 ">
                             Paid Amount
                         </th>
-                        <th scope="col" class=" px-6 py-4 ">
+                        <th scope="col" class=" px-2 py-4 ">
                             Invoice Id
                         </th>
                     </tr>
@@ -71,28 +77,36 @@
                             <td class=" px-6 py-4 font-medium ">
                                 {{ purchaseOrderItem.item.name }}
                             </td>
-                            <td class=" px-6 py-4 font-medium ">
+                            <td class=" px-4 py-4 font-medium ">
+                                {{ purchaseOrderItem.original_quantity }}
+                            </td>
+                            <td class=" px-4 py-4 font-medium ">
                                 {{ purchaseOrderItem.quantity }}
+                            </td>
+                            <td class=" px-4 py-4 font-medium ">
+                                <div v-if="purchaseOrderItem.purchase_order_item_left">
+                                    {{ purchaseOrderItem.purchase_order_item_left.quantity }}
+                                </div>
                             </td>
                             <td class=" px-6 py-4 font-medium ">
                                 {{ purchaseOrderItem.amount.toLocaleString() }}
                             </td>
-                            <td class=" px-6 py-4 font-medium ">
+                            <td class=" px-8 py-4 font-medium ">
                                 <div>
                                     <select name="" id=""
                                     v-model="purchaseOrderItem.supplier"
                                     class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0"
                                     @input="selectPOItemSupplierBtnClicked(purchaseOrderItem, purchaseOrderItemsIndex)">
-                                        <option :value="poItemSupplier" v-for="(poItemSupplier, poItemSupplierIndex) in purchaseOrderItem.suppliers" :key="poItemSupplierIndex">
+                                        <option :value="poItemSupplier" v-for="(poItemSupplier, poItemSupplierIndex) in purchaseOrderItem.item.suppliers" :key="poItemSupplierIndex">
                                             {{ poItemSupplier.name }}
                                         </option>
                                     </select>
                                 </div>
                             </td>
-                            <td class=" px-6 py-4 font-medium ">
+                            <td class=" px-2 py-4 font-medium ">
                                 <input type="number" v-model="purchaseOrderItem.invoice_amount" class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0" placeholder="Paid Amount">
                             </td>
-                            <td class=" px-6 py-4 font-medium ">
+                            <td class=" px-2 py-4 font-medium ">
                                 <input type="text" v-model="purchaseOrderItem.invoice_no" class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0" placeholder="Invoice Id">
                             </td>
                         </tr>
@@ -303,25 +317,11 @@
             },
 
             async getPurchaseOrder(){
-                this.getSupplierList();
                 let response = await getApiData({url: `/api/purchase_orders/${this.purchaseOrderId}`, token: this.getToken()});
                 if(response.data){
                     this.purchaseOrder = response.data;
                     this.date = this.purchaseOrder.date;
                     this.purchaseOrderItems = this.purchaseOrder.items;
-                    setTimeout(()=>{
-                        this.purchaseOrderItems.forEach((poItem)=>{
-                            poItem.suppliers = [];
-                            this.supplierList.forEach((supplier)=>{
-                                poItem.suppliers.push(supplier);
-                                // supplier.items.forEach((item)=>{
-                                //     if(item.id == poItem.item.id){
-                                //         poItem.suppliers.push(supplier);
-                                //     }
-                                // });
-                            });
-                        });
-                    }, 1000);
                 }
             },
 
@@ -534,7 +534,6 @@
                 }
             });
             this.getPurchaseOrder();
-            // this.getSupplierList();
             this.getItemList();
         },
 
