@@ -199,7 +199,7 @@
                             <label for="" class="block text-sm text-black mb-3">
                                 Account Code
                             </label>
-                            <input type="text" placeholder="Account Name" v-model="code"
+                            <input type="text" placeholder="Account Code" v-model="code"
                                 class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
                         </div>
 
@@ -208,7 +208,7 @@
                                 Head Account
                             </label>
                             <div class="bg-white mb-0 w-[100%] text-sm inline-block" data-te-select-wrapper-ref>
-                                <select data-te-select-init data-te-select-placeholder="Select Sub Account" v-model="selectedHeadAccount"
+                                <select data-te-select-init data-te-select-placeholder="Select Head Account" v-model="selectedHeadAccount"
                                 data-te-select-filter="true" @change="headAccountSelectChanged">
                                     <option :value="headAccount" v-for="(headAccount, headAccountIndex) in headAccountList"> {{ headAccount.name }} </option>
                                 </select>
@@ -290,7 +290,7 @@
 
                     <div class="flex justify-center px-12 mb-6">
                         <button data-te-modal-dismiss type="button" class="add-btn focus:outline-none focus:ring-0 " @click="confirmEditBtnClicked">
-                            Create
+                            Update
                         </button>
                     </div>
                 </div>

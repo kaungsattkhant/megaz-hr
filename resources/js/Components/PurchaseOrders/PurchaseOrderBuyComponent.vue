@@ -78,14 +78,16 @@
                                 {{ purchaseOrderItem.amount.toLocaleString() }}
                             </td>
                             <td class=" px-6 py-4 font-medium ">
-                                <select name="" id=""
-                                v-model="purchaseOrderItem.supplier"
-                                class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0"
-                                @input="selectPOItemSupplierBtnClicked(purchaseOrderItem, purchaseOrderItemsIndex)">
-                                    <option :value="poItemSupplier" v-for="(poItemSupplier, poItemSupplierIndex) in purchaseOrderItem.suppliers" :key="poItemSupplierIndex">
-                                        {{ poItemSupplier.name }}
-                                    </option>
-                                </select>
+                                <div>
+                                    <select name="" id=""
+                                    v-model="purchaseOrderItem.supplier"
+                                    class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0"
+                                    @input="selectPOItemSupplierBtnClicked(purchaseOrderItem, purchaseOrderItemsIndex)">
+                                        <option :value="poItemSupplier" v-for="(poItemSupplier, poItemSupplierIndex) in purchaseOrderItem.suppliers" :key="poItemSupplierIndex">
+                                            {{ poItemSupplier.name }}
+                                        </option>
+                                    </select>
+                                </div>
                             </td>
                             <td class=" px-6 py-4 font-medium ">
                                 <input type="number" v-model="purchaseOrderItem.invoice_amount" class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0" placeholder="Paid Amount">
@@ -254,7 +256,7 @@
 </template>
 
 <script>
-    import { Modal, initTE } from "tw-elements";
+    import { Modal, initTE, Select, Dropdown } from "tw-elements";
     import { getApiData, postApiData, deleteApiData } from '../../utilities/ajax-helpers';
     import { mapGetters } from "vuex";
 
@@ -414,12 +416,14 @@
 
             async buyPurchaseOrderBtnClicked(){
                 let priceTotal = 0;
+                let stop = true;
                 this.purchaseOrderItems.forEach((poItem)=>{
                     if(poItem.supplier == undefined || !poItem.supplier){
                         this.$notify({
                             text: `Supplier must be selected for ${poItem.item.name}`,
                             type: 'error'
                         });
+                        stop = true;
                         return 1;
                     }
 
@@ -428,6 +432,7 @@
                             text: `Invoice number must be filled for ${poItem.item.name}`,
                             type: 'error'
                         });
+                        stop = true;
                         return 1;
                     }
 
@@ -436,32 +441,51 @@
                             text: `Invoice amount must be filled for ${poItem.item.name}`,
                             type: 'error'
                         });
+                        stop = true;
                         return 1;
                     }
 
                     else{
                         poItem.supplier_id = poItem.supplier.id;
                         priceTotal += poItem.invoice_amount;
+                        stop = false;
                     }
                 });
 
-                console.log(this.purchaseOrderItems);
-                let formData = new FormData();
-                formData.append('date', this.date);
-                formData.append('total_price', priceTotal);
-                formData.append('is_grn', 1);
-                formData.append('items', JSON.stringify(this.purchaseOrderItems));
-                let response = await postApiData({url: `/api/purchase_orders`, form_data:  formData, token: this.getToken()});
-                if(response.success){
-                    this.$notify({
-                        text: `Request successful`,
-                        type: 'info'
-                    });
+                // console.log(this.purchaseOrderItems);
+                console.log(stop);
+                // return 1;
+                let poItems = JSON.parse(JSON.stringify(this.purchaseOrderItems));
+                poItems.forEach((poItem)=>{
+                    delete poItem.suppliers;
+                    delete poItem.supplier;
+                });
+                console.log(poItems);
+                // return 1;
+                if(!stop){
+                    let formData = new FormData();
+                    formData.append('date', this.date);
+                    formData.append('total_price', priceTotal);
+                    formData.append('is_grn', 1);
+                    formData.append('items', JSON.stringify(poItems));
+                    let response = await postApiData({url: `/api/purchase_orders`, form_data:  formData, token: this.getToken()});
+                    if(response.success){
+                        this.$notify({
+                            text: `Request successful`,
+                            type: 'info'
+                        });
+                    }
+                    else{
+                        this.$notify({
+                            text: `Unknown error`,
+                            type: 'error'
+                        });
+                    }
                 }
                 else{
                     this.$notify({
-                        text: `Unknown error`,
-                        type: 'error'
+                        text: `Please check your input`,
+                        type: 'warn'
                     });
                 }
             },
@@ -515,7 +539,7 @@
         },
 
         mounted(){
-            initTE({Modal});
+            initTE({Modal, Select, Dropdown});
         }
     }
 </script>
