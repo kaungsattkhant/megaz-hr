@@ -412,7 +412,7 @@
                 let index = this.purchaseOrderItems.findIndex(poItem => poItem.item_id == this.editPurchaseOrderItem.item_id);
                 if(index != -1){
                     this.purchaseOrderItems[index].quantity = this.editQuantity;
-                    this.purchaseOrderItems[index].later_buy = (this.isLaterBuy)? '1': '0';
+                    this.purchaseOrderItems[index].later_buy = (this.isLaterBuy)? 1: 0;
                     console.log(this.purchaseOrderItems[index]);
                 }
 
@@ -467,7 +467,7 @@
                         type: 'error'
                     });
                 }
-                window.location.replace(`/purchase_orders`);
+                // window.location.replace(`/purchase_orders`);
             },
 
         },
