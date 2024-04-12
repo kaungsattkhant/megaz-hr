@@ -4,6 +4,7 @@ namespace App\Repositories\Invoice;
 
 use App\Http\Action\Transaction\StoreTransactionLedger;
 use App\Models\Account;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
 
 use App\Models\Entity;
@@ -12,7 +13,6 @@ use App\Models\Invoice;
 use App\Models\RoomSession;
 
 use Carbon\Carbon;
-use Illuminate\Support\Facades\DB;
 
 class InvoiceRepository implements InvoiceRepositoryInterface
 {
@@ -257,72 +257,71 @@ class InvoiceRepository implements InvoiceRepositoryInterface
 
     public function doneEntityWithInvoice(array $data)
     {
-        // DB::beginTransaction();
-        // try {
-            $foodCharge = 0;
-            $beverageCharge = 0;
-            if (isset($data['order_categories'])) {
-                $data['order_categories'] = json_decode($data['order_categories'], true);
-                foreach ($data['order_categories'] as $menu) {
-                    if ($menu['menu_category_id'] == 1 || $menu['menu_category_id'] == 2 || $menu['menu_category_id'] == 3) {
-                        $foodCharge += $menu['price'];
-                    } else {
-                        $beverageCharge += $menu['price'];
-                    }
+        $foodCharge = 0;
+        $beverageCharge = 0;
+        if (isset($data['order_categories'])) {
+            $data['order_categories'] = json_decode($data['order_categories'], true);
+            foreach ($data['order_categories'] as $menu) {
+                if ($menu['menu_category_id'] == 1 || $menu['menu_category_id'] == 2 || $menu['menu_category_id'] == 3) {
+                    $foodCharge += $menu['price'];
+                } else {
+                    $beverageCharge += $menu['price'];
                 }
             }
+        }
 
-            $roomSessions = RoomSession::where('invoice_id', $data['invoice_id'])->get();
-            $total_session_price = 0;
-            foreach ($roomSessions as $room) {
-                $total_session_price += $room->price;
-            }
+        $roomSessions = RoomSession::where('invoice_id', $data['invoice_id'])->get();
+        $total_session_price = 0;
+        foreach ($roomSessions as $room) {
+            $total_session_price += $room->price;
+        }
 
-            $invoice = Invoice::find($data['invoice_id']);
-            $entity = Entity::find($invoice->entity_id);
-            $entity->is_active = 0;
-            $entity->save();
-            if ($data['service_charge'] === true || strtolower($data['service_charge']) === 'true') {
-                $data['service_charge'] = ($foodCharge + $beverageCharge) * 0.05;
-            } else if (strtolower($data['service_charge']) === 'false') {
-                $data['service_charge'] = 0;
-            } else {
-                $data['service_charge'] = 0;
-            }
+        $invoice = Invoice::find($data['invoice_id']);
+        $entity = Entity::find($invoice->entity_id);
+        $entity->is_active = 0;
+        $entity->save();
+        if ($data['service_charge'] === true || strtolower($data['service_charge']) === 'true') {
+            $data['service_charge'] = ($foodCharge + $beverageCharge) * 0.05;
+        } else if (strtolower($data['service_charge']) === 'false') {
+            $data['service_charge'] = 0;
+        } else {
+            $data['service_charge'] = 0;
+        }
 
-            if ($data['tax'] === true || strtolower($data['tax']) === 'true') {
-                $data['tax'] = round(($foodCharge + $beverageCharge + $total_session_price) * 0.05);
-            } else if (strtolower($data['tax']) === 'false') {
-                $data['tax'] = 0;
-            } else {
-                $data['tax'] = 0;
-            }
+        if ($data['tax'] === true || strtolower($data['tax']) === 'true') {
+            $data['tax'] = round(($foodCharge + $beverageCharge + $total_session_price) * 0.05);
+        } else if (strtolower($data['tax']) === 'false') {
+            $data['tax'] = 0;
+        } else {
+            $data['tax'] = 0;
+        }
 
-            $data['food_charge'] = $foodCharge + $beverageCharge;
-            $data['total'] = $data['food_charge'] + $total_session_price + $data['service_charge'] + $data['tax'];
-            $data['total_session_price'] = $total_session_price;
-            $data['sub_total'] = $data['food_charge'] + $data['total_session_price'];
-            $data['payment_status'] = 'received';
-            $data['complete_date'] = CurrentTime();
-            $invoice->update($data);
+        $data['food_charge'] = $foodCharge + $beverageCharge;
+        $data['total'] = $data['food_charge'] + $total_session_price + $data['service_charge'] + $data['tax'];
+        $data['total_session_price'] = $total_session_price;
+        $data['sub_total'] = $data['food_charge'] + $data['total_session_price'];
+        $data['payment_status'] = 'received';
+        $data['complete_date'] = CurrentTime();
+        $invoice->update($data);
 
-            $debit_total = 0;
+        $debit_total = 0;
 
-            // transaction and ledgers
-            if ($data['payment_type'] == 'cash') {
-                $posBook = Account::where('account_code', '2-1011')->first();
-            } else {
-                $posBook = Account::where('account_code', '2-1012')->first();
-            }
+        // transaction and ledgers
+        if ($data['payment_type'] == 'cash') {
+            $posBook = Account::where('account_code', '2-1011')->first();
+        } else {
+            $posBook = Account::where('account_code', '2-1012')->first();
+        }
 
-            $data['date'] = now();
-            $data['created_by'] = 1; //example
-            $data['transactionable_id'] = $invoice->id;
-            $data['transactionable_type'] = 'invoice';
-            $data['is_confirmed'] = 1;
+        $data['date'] = now();
+        $data['created_by'] = 1; //example
+        $data['transactionable_id'] = $invoice->id;
+        $data['transactionable_type'] = 'invoice';
+        $data['is_confirmed'] = 1;
 
+        try{
+            DB::beginTransaction();
             $transaction = (new StoreTransactionLedger())->createTransaction($data);
-
 
             if (isset($data['order_categories'])) {
                 if ($foodCharge != 0) {
@@ -340,7 +339,6 @@ class InvoiceRepository implements InvoiceRepositoryInterface
                     }
 
                     $debit_total += $foodCharge;
-
                 }
 
                 if ($beverageCharge != 0) {
@@ -358,7 +356,6 @@ class InvoiceRepository implements InvoiceRepositoryInterface
                     }
 
                     $debit_total += $beverageCharge;
-
                 }
             }
 
@@ -377,7 +374,6 @@ class InvoiceRepository implements InvoiceRepositoryInterface
                 }
 
                 $debit_total += $total_session_price;
-
             }
 
             if ($data['service_charge'] != 0) {
@@ -395,7 +391,6 @@ class InvoiceRepository implements InvoiceRepositoryInterface
                 }
 
                 $debit_total += $data['service_charge'];
-
             }
 
             if ($data['tax'] != 0) {
@@ -413,7 +408,6 @@ class InvoiceRepository implements InvoiceRepositoryInterface
                 }
 
                 $debit_total += $data['tax'];
-
             }
 
             if ($data['discount_value'] != 0) {
@@ -438,7 +432,6 @@ class InvoiceRepository implements InvoiceRepositoryInterface
                         'is_cashier_confirmed' => 1
                     ]);
                 }
-
             }
 
             $debitLedger = (new StoreTransactionLedger())->storeLedger([
@@ -450,10 +443,12 @@ class InvoiceRepository implements InvoiceRepositoryInterface
             ]);
             DB::commit();
             return $invoice;
-        // } catch (\Throwable $e) {
-        //     DB::rollback();
-        //     ResponseMessage($e->getMessage(), 402);
-        //     throw $e;
-        // }
+        }
+
+        catch (\Throwable $e) {
+            DB::rollback();
+            ResponseMessage($e->getMessage(), 402);
+            throw $e;
+        }
     }
 }
