@@ -7,6 +7,7 @@ use App\Models\Item;
 use App\Models\Category;
 use App\Models\ItemPrice;
 use Faker\Factory as Faker;
+use Illuminate\Support\Str;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
@@ -29,8 +30,10 @@ class ItemSeeder extends Seeder
         $numUoms = count($uoms);
         foreach (range(1, 100) as $index) {
             $randomIndex = $faker->numberBetween(0, count($amounts) - 1);
+            $uniqueIdentifier = Str::random(8); // Generate a random 8-character string
+            $itemName = $faker->word . '_' . $uniqueIdentifier; // Append the identifier to the name
             $item=Item::create([
-                'name'=>$faker->word,
+                'name'=>$itemName,
                 'category_id' => $faker->numberBetween(1, $numCategories),
             ]);
             ItemPrice::create([
