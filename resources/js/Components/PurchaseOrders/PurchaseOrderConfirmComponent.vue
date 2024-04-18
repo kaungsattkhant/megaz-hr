@@ -49,7 +49,13 @@
                             Item
                         </th>
                         <th scope="col" class=" px-6 py-4 ">
-                            Qty
+                            Original Qty
+                        </th>
+                        <th scope="col" class=" px-6 py-4 ">
+                            Current Qty
+                        </th>
+                        <th scope="col" class=" px-6 py-4 ">
+                            Left Qty
                         </th>
                         <th scope="col" class=" px-6 py-4 ">
                             Amount
@@ -57,13 +63,13 @@
                         <th scope="col" class=" px-6 py-4 ">
                             Total
                         </th>
-                        <th scope="col" class=" px-6 py-4 ">
+                        <th scope="col" class=" px-2 py-2 ">
                             Manager Checked
                         </th>
-                        <th scope="col" class=" px-6 py-4 ">
+                        <th scope="col" class=" px-2 py-2 ">
                             Financial Checked
                         </th>
-                        <th scope="col" class=" px-6 py-4 ">
+                        <th scope="col" class=" px-2 py-2 ">
                             MD Checked
                         </th>
                         <th scope="col" class=" px-2 py-2 col-span-3">
@@ -78,7 +84,15 @@
                                 {{ purchaseOrderItem.item.name }}
                             </td>
                             <td class=" px-6 py-4 font-medium ">
+                                {{ purchaseOrderItem.original_quantity }}
+                            </td>
+                            <td class=" px-6 py-4 font-medium ">
                                 {{ purchaseOrderItem.quantity }}
+                            </td>
+                            <td class=" px-6 py-4 font-medium ">
+                                <div v-if="purchaseOrderItem.purchase_order_item_left">
+                                    {{ purchaseOrderItem.purchase_order_item_left.quantity }}
+                                </div>
                             </td>
                             <td class=" px-6 py-4 font-medium ">
                                 {{ purchaseOrderItem.amount.toLocaleString() }}
