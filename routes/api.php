@@ -34,6 +34,7 @@ use App\Http\Controllers\API\ComplaintAPIController;
 use App\Http\Controllers\API\InventoryAPIController;
 use App\Http\Controllers\API\NotificationController;
 use App\Http\Controllers\API\DepartmentAPIController;
+use App\Http\Controllers\API\FixedAssetPurchaseAPIController;
 use App\Http\Controllers\API\PurchaseOrderAPIController;
 use App\Http\Controllers\API\ItemUsageForecastController;
 
@@ -128,6 +129,11 @@ Route::middleware('auth:api')->group(function () {
     });
     Route::controller(CommonController::class)->group(function () {
         Route::post('is_active', 'toggleIsActive');
+    });
+
+    Route::controller(FixedAssetPurchaseAPIController::class)->group(function () {
+        Route::get('/fixed_asset_purchases', 'getFixedAssetPurchaseData');
+        Route::post('/fixed_assset_purchases','');
     });
 
     Route::resource('suppliers', SupplierController::class)->only(['index', 'store', 'show', 'destroy']);

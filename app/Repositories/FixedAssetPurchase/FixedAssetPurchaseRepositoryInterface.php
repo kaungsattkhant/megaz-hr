@@ -2,7 +2,9 @@
 
 namespace App\Repositories\FixedAssetPurchase;
 
-interface FixedAssetPurchaseRepository
-{
+use Illuminate\Http\Request;
 
+interface FixedAssetPurchaseRepositoryInterface
+{
+    public function listAllData(Request $request);
 }

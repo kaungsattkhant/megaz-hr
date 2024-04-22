@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use App\Models\FixedAssetPurchase;
 use App\Repositories\Account\AccountInterface;
 use App\Repositories\Account\AccountRepository;
 use Illuminate\Support\ServiceProvider;
@@ -19,6 +20,8 @@ use App\Repositories\Department\DepartmentRepositoryInterface;
 
 use App\Repositories\Entity\EntityRepository;
 use App\Repositories\Entity\EntityRepositoryInterface;
+use App\Repositories\FixedAssetPurchase\FixedAssetPurchaseRepository;
+use App\Repositories\FixedAssetPurchase\FixedAssetPurchaseRepositoryInterface;
 use App\Repositories\HeadAccount\HeadAccountInterface;
 use App\Repositories\HeadAccount\HeadAccountRepository;
 use App\Repositories\Inventory\InventoryRepository;
@@ -104,5 +107,6 @@ class RepositoryServiceProvider extends ServiceProvider
         $this->app->bind(CashBookInterface::class,CashBookRepository::class);
         $this->app->bind(SupplierInterface::class,SupplierRepository::class);
         $this->app->bind(NotificationInterface::class,NotificationRepository::class);
+        $this->app->bind(FixedAssetPurchaseRepositoryInterface::class,FixedAssetPurchaseRepository::class);
     }
 }
