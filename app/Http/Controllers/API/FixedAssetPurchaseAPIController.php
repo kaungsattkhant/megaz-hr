@@ -5,6 +5,7 @@ namespace App\Http\Controllers\API;
 use App\Http\Controllers\Controller;
 use App\Repositories\FixedAssetPurchase\FixedAssetPurchaseRepositoryInterface;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class FixedAssetPurchaseAPIController extends Controller
 {
@@ -21,9 +22,17 @@ class FixedAssetPurchaseAPIController extends Controller
         ResponseData($fixedAssetPurchaseData);
     }
 
-    public function createFixedAssetPurchase(Request $request)
+    public function createFixedAssetPurchaseData(Request $request)
     {
-        $fixedAssetPurchaseData =
+        $data = $request->all();
+        $data['created_by'] = Auth::user()->id;
+        $fixedAssetPurchaseData = $this->fixRepo->createData($data);
+        ResponseData($fixedAssetPurchaseData);
+    }
+
+    public function updateIsCheck(Request $request)
+    {
+        $fixedAssetPurchaseData = $this->fixRepo->updateIsCheck($request);
     }
 
 }

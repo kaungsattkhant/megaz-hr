@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('fixed_asset_purchases', function (Blueprint $table) {
             $table->id();
-            $table->string('fixed_asset_id');
+            $table->string('fixed_asset_id')->nullable();
             $table->dateTime('date');
             $table->string('name');
             $table->string('description');

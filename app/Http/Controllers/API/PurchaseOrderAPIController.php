@@ -72,7 +72,6 @@ class PurchaseOrderAPIController extends Controller
     }
 
     public function updateIsCheck(Request $request){
-        
         $purchase_order_item= $this->purchaseOrderRepo->updateIsCheck($request);
     }
 

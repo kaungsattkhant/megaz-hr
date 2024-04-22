@@ -133,7 +133,8 @@ Route::middleware('auth:api')->group(function () {
 
     Route::controller(FixedAssetPurchaseAPIController::class)->group(function () {
         Route::get('/fixed_asset_purchases', 'getFixedAssetPurchaseData');
-        Route::post('/fixed_assset_purchases','');
+        Route::post('/fixed_asset_purchases','createFixedAssetPurchaseData');
+        Route::post('/fixed_asset_purchase/is_update_checked','updateIsCheck');
     });
 
     Route::resource('suppliers', SupplierController::class)->only(['index', 'store', 'show', 'destroy']);
