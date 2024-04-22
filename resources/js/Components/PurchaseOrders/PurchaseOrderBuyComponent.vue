@@ -104,7 +104,7 @@
                                 </div>
                             </td>
                             <td class=" px-2 py-4 font-medium ">
-                                <input type="number" v-model="purchaseOrderItem.invoice_amount" class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0" placeholder="Paid Amount">
+                                <input type="number" @input="validateNumberInput(purchaseOrderItemsIndex)" pattern="[0-9]" title="Please enter only numbers" v-model="purchaseOrderItem.invoice_amount" class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0" placeholder="Paid Amount">
                             </td>
                             <td class=" px-2 py-4 font-medium ">
                                 <input type="text" v-model="purchaseOrderItem.invoice_no" class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0" placeholder="Invoice Id">
@@ -459,14 +459,21 @@
                 poItems.forEach((poItem)=>{
                     delete poItem.suppliers;
                     delete poItem.supplier;
+                    console.log(poItem);
                 });
-                console.log(poItems);
+                // console.log(poItems);
                 // return 1;
+                let isGRN = '1';
+                // console.log(typeof(isGRN));
+                isGRN = parseInt(isGRN);
+                // console.log(typeof(isGRN));
+                // return 0;
                 if(!stop){
                     let formData = new FormData();
+                    formData.append('po_id', this.purchaseOrder.po_id);
                     formData.append('date', this.date);
                     formData.append('total_price', priceTotal);
-                    formData.append('is_grn', 1);
+                    formData.append('is_grn', isGRN);
                     formData.append('items', JSON.stringify(poItems));
                     let response = await postApiData({url: `/api/purchase_orders`, form_data:  formData, token: this.getToken()});
                     if(response.success){
@@ -522,6 +529,9 @@
                 window.location.reload();
             },
 
+            validateNumberInput(purchaseOrderItemsIndex) {
+                // this.purchaseOrderItems[purchaseOrderItemsIndex].invoice_amount = this.purchaseOrderItems[purchaseOrderItemsIndex].invoice_amount.replace(/[^0-9]/g, "");
+            }
         },
 
         created(){

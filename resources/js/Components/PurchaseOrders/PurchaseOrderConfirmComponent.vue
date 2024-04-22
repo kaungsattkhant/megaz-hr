@@ -415,6 +415,13 @@
 
             editPurchaseOrderItemBtnClicked(purchaseOrderItemsIndex){
                 this.editPurchaseOrderItem = this.purchaseOrderItems[purchaseOrderItemsIndex];
+                console.log(this.editPurchaseOrderItem);
+                if(this.editPurchaseOrderItem.later_buy == 1){
+                    this.isLaterBuy = true;
+                }
+                else{
+                    this.isLaterBuy = false;
+                }
                 this.editQuantity = this.editPurchaseOrderItem.quantity;
             },
 
@@ -462,11 +469,15 @@
                     }
                 });
 
+                let isGRN = '0';
+                isGRN = parseInt(isGRN);
+
                 let formData = new FormData();
                 formData.append('id', this.purchaseOrderId);
                 formData.append('po_id', this.purchaseOrder.po_id);
                 formData.append('date', this.date);
                 formData.append('total_price', priceTotal);
+                formData.append('is_grn', isGRN);
                 formData.append('items', JSON.stringify(updatedPurchaseOrderItems));
                 let response = await postApiData({url: `/api/purchase_orders`, form_data:  formData, token: this.getToken()});
                 if(response.success){
