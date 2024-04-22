@@ -10,7 +10,7 @@ class FixedAssetPurchase extends Model
     use HasFactory;
 
     protected $fillable=[
-        'purchase_id',
+        'fixed_asset_id',
         'date',
         'name',
         'description',

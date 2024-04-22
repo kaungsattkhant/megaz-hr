@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('fixed_asset_depreciations', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('fixed_asset_purchase_id');
+            $table->foreignId('fixed_asset_purchase_id')->constrained()->onDelete('cascade');
             $table->dateTime('date');
             $table->double('depreciated_amount');
             $table->timestamps();

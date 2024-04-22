@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('fixed_asset_purchases', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('purchase_id');
+            $table->unsignedBigInteger('fixed_asset_id');
             $table->dateTime('date');
             $table->string('name');
             $table->string('description');
@@ -24,13 +24,13 @@ return new class extends Migration
             $table->double('remaining_duration');
             $table->dateTime('start_date');
             $table->unsignedBigInteger('created_by');
-            $table->unsignedBigInteger('bought_by');
-            $table->boolean('is_bought');
-            $table->unsignedBigInteger('manager_check_id');
-            $table->dateTime('manager_check_time');
-            $table->dateTime('md_check_time');
-            $table->boolean('is_md_checked');
-            $table->string('status');
+            $table->unsignedBigInteger('bought_by')->nullable();
+            $table->boolean('is_bought')->default(0);
+            $table->unsignedBigInteger('manager_check_id')->nullable();
+            $table->dateTime('manager_check_time')->nullable();
+            $table->dateTime('md_check_time')->nullable();
+            $table->boolean('is_md_checked')->default(0);
+            $table->string('status')->default('created');
             $table->timestamps();
         });
     }
