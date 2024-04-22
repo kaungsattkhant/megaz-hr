@@ -52,7 +52,7 @@ class InventoryRepository implements InventoryRepositoryInterface
 
             $inventory = Inventory::updateOrCreate(
                 ['id' => $data['id']],
-                $data   
+                $data
             );
             if(!isset($request->id)){
                 foreach($request_inventoryable_id as $id){
@@ -79,7 +79,7 @@ class InventoryRepository implements InventoryRepositoryInterface
                 if(count($deleted_ids)){
                     Inventoryable::whereIn('inventoryable_id',$deleted_ids)->where('inventoryable_type',$request->inventoryable_type)->delete();
                 }
-            }   
+            }
             DB::commit();
             return $inventory;
         } catch (\Exception $e) {
@@ -101,7 +101,7 @@ class InventoryRepository implements InventoryRepositoryInterface
 
     public function detail($inventory){
         $inventory->inventoryable=$inventory->inventoryable;
-        return $inventory; 
+        return $inventory;
     }
 
     public function deleteData(int $id)
