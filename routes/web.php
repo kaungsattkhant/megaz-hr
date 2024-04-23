@@ -85,6 +85,8 @@ Route::view('/suppliers', 'supplier.index')->name('suppliers.index');
 Route::view('/suppliers/create', 'supplier.create')->name('suppliers.create');
 Route::view('/suppliers/{id}/edit', 'supplier.edit')->name('suppliers.edit');
 
+Route::view('/fixed_assets', 'fixed_assets.index')->name('fixed_assets.index');
+
 //pos
 Route::group(['prefix'=>'pos'], function(){
     Route::view('/login', 'pos.auth.index')->name('pos.login');
