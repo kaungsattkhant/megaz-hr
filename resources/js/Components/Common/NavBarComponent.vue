@@ -25,7 +25,7 @@
                 <li v-for="(notification, notificationIndex) in notifications" :key="notificationIndex">
                     <div class="bg-gray-100 rounded-lg shadow-sm p-4 my-2">
                         <h2 class="text-lg font-semibold text-gray-800"> {{ notification.title }} <span v-if="notification.is_new" class="inline-block w-2 h-2 mr-2 bg-red-600 rounded-full"></span> </h2>
-                        <p class="text-sm text-gray-600 mt-2"> {{ notification.preview }} </p>
+                        <p class="text-sm text-gray-600 mt-2"> {{ notification.preview }} ( {{ notification.elapsed_moment }} ) </p>
                         <button class="px-2 py-1 rounded-md bg-blue-300 mt-2" @click="markNotificationReadBtnClicked(notification.id, notificationIndex)">
                             <i class="fas fa-check mr-1"></i>
                             Mark as Read
@@ -44,6 +44,7 @@
     import { mapGetters } from "vuex";
 
     import { getApiData, postApiData } from '../../utilities/ajax-helpers';
+    import { getElapsedMoments } from '../../utilities/datetime-helpers';
 
     export default{
         data() {
@@ -82,6 +83,7 @@
             async sidebarNotificationTrayExpanded(){
                 let notificationIds = [];
                 this.notifications.forEach((notification)=>{
+                    notification.elapsed_moment = getElapsedMoments(notification.date_time);
                     notificationIds.push(notification.id);
                 });
                 let formData = new FormData();
