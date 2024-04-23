@@ -35,4 +35,9 @@ class FixedAssetPurchaseAPIController extends Controller
         $fixedAssetPurchaseData = $this->fixRepo->updateIsCheck($request);
     }
 
+    public function boughtFixedAsset(Request $request)
+    {
+        $fixedAssetPurchaseData = $this->fixRepo->fixedAssetBought($request);
+    }
+
 }

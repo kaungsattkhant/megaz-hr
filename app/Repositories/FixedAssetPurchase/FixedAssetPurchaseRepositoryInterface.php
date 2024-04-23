@@ -11,4 +11,6 @@ interface FixedAssetPurchaseRepositoryInterface
     public function createData(array $data);
 
     public function updateIsCheck($request);
+
+    public function fixedAssetBought($request);
 }

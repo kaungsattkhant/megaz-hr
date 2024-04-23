@@ -2,6 +2,9 @@
 
 namespace App\Repositories\FixedAssetPurchase;
 
+use App\Http\Action\Transaction\StoreTransactionLedger;
+use App\Models\Account;
+use App\Models\FixedAssetDepreciation;
 use App\Models\FixedAssetPurchase;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -67,14 +70,13 @@ class FixedAssetPurchaseRepository implements FixedAssetPurchaseRepositoryInterf
                 $fixedAssetPurchase->md_check_time = CurrentTime();
                 $fixedAssetPurchase->is_md_checked = 1;
                 $fixedAssetPurchase->status = 'md checked';
-
             } else {
                 ResponseMessage('Login User is not valid');
             }
             $fixedAssetPurchase->save();
             DB::commit();
             ResponseMessage('Updated successfully');
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             DB::rollback();
             ResponseMessage($e->getMessage(), 402);
             throw $e;
@@ -83,6 +85,67 @@ class FixedAssetPurchaseRepository implements FixedAssetPurchaseRepositoryInterf
 
     public function fixedAssetBought($request)
     {
+        $staff = UserData();
+        DB::beginTransaction();
+        try {
+            $fixedAssetPurchase = FixedAssetPurchase::find($request->id);
+            if ($fixedAssetPurchase) {
+                if ($fixedAssetPurchase->manager_check_id !== null and $fixedAssetPurchase->is_md_checked !== 0) {
+                    $fixedAssetPurchase->bought_by = $staff->id;
+                    $fixedAssetPurchase->is_bought = 1;
+                    $fixedAssetPurchase->status= 'bought';
+                    $fixedAssetPurchase->save();
+                    $fixedAssetDepreciation = FixedAssetDepreciation::create([
+                        'fixed_asset_purchase_id' => $fixedAssetPurchase->id,
+                        'date' => CurrentTime(),
+                        'depreciated_amount' => $fixedAssetPurchase->depreciation_amount,
+                    ]);
 
+                    $accountData = Account::create([
+                        'account_code' => '1-' . $fixedAssetPurchase->fixed_asset_id,
+                        'name' => $fixedAssetPurchase->name,
+                        'sub_account_id' => 6,
+                        'is_available' => 1
+                    ]);
+
+                    $transaction = (new StoreTransactionLedger())->createTransaction([
+                        'date' => now(),
+                        'created_by' => $staff->id,
+                        'transactionable_id' => $fixedAssetPurchase->id,
+                        'transactionable_type' => 'fixed_asset_purchase',
+                        'description' => $fixedAssetPurchase->description,
+                        'is_confirmed' => 1
+                    ]);
+
+                    $officeCashAccount = Account::where('account_code', '2-1001')->first();
+                    $creaditFixedAssetPurchase = (new StoreTransactionLedger())->storeLedger([
+                        'value' => $fixedAssetPurchase->total_price,
+                        'transaction_id' => $transaction->id,
+                        'account_id' => $officeCashAccount->id,
+                        'action' => 'credit',
+                        'is_cashier_confirmed' => 1
+                    ]);
+
+                    $debitFixedAssetPurchase = (new StoreTransactionLedger())->storeLedger([
+                        'value' => $fixedAssetPurchase->total_price,
+                        'transaction_id' => $transaction->id,
+                        'account_id' => $accountData->id,
+                        'action' => 'debit',
+                        'is_cashier_confirmed' => 1
+                    ]);
+
+                    DB::commit();
+                    ResponseMessage('Financial Staff bought successful');
+                } else {
+                    ResponseMessage('Selected Fixed Asset Purchase is not even checked by staff');
+                }
+            } else {
+                ResponseMessage('Fixed Asset Purchase not found');
+            }
+        } catch (\Exception $e) {
+            DB::rollback();
+            ResponseMessage($e->getMessage(), 402);
+            throw $e;
+        }
     }
 }
