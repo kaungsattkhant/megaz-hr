@@ -22,7 +22,7 @@ class StoreInventory
     }
 
     public function storeToInventoryLedger($model,$morphMapName,$action){
-        $inventory_id=$model->createdBy->department->inventory->id;
+        $inventory_id=$model->createdBy->department->inventory->inventory_id;
         return InventoryLedger::create([
             'date'=>now(),
             'ledgerable_id'=>$model->id,
@@ -36,7 +36,7 @@ class StoreInventory
         return $inventoryLedger->inventory_ledger_items()->create([
             'item_id'=>$item->item_id,
             'quantity'=>$item->quantity,
-            'inventory_ledger_-id'=>$inventoryLedger->id,
+            'inventory_ledger_id'=>$inventoryLedger->id,
         ]);
     }
 
