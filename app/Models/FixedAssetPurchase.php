@@ -30,4 +30,9 @@ class FixedAssetPurchase extends Model
         'status'
     ];
 
+    public function fixedAssetDepreciation()
+    {
+        return $this->belongsTo(FixedAssetDepreciation::class);
+    }
+
 }

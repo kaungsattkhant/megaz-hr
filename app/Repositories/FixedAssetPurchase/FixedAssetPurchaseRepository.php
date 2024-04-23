@@ -62,16 +62,21 @@ class FixedAssetPurchaseRepository implements FixedAssetPurchaseRepositoryInterf
         DB::beginTransaction();
         try {
             $fixedAssetPurchase = FixedAssetPurchase::find($request->id);
+            $this->validateModel($fixedAssetPurchase, $staff, 'fixed_asset_purchase');
+
             if ($staff->hasRoles('Manager')) {
                 $fixedAssetPurchase->manager_check_id = $staff->id;
                 $fixedAssetPurchase->manager_check_time = CurrentTime();
                 $fixedAssetPurchase->status = 'manager checked';
             } elseif ($staff->hasRoles('MD')) {
-                $fixedAssetPurchase->md_check_time = CurrentTime();
-                $fixedAssetPurchase->is_md_checked = 1;
-                $fixedAssetPurchase->status = 'md checked';
-            } else {
-                ResponseMessage('Login User is not valid');
+                if($fixedAssetPurchase->manager_check_time !== null){
+                    $fixedAssetPurchase->md_check_time = CurrentTime();
+                    $fixedAssetPurchase->is_md_checked = 1;
+                    $fixedAssetPurchase->status = 'md checked';
+                }else{
+                    ResponseMessage('Manager not checked');
+                }
+
             }
             $fixedAssetPurchase->save();
             DB::commit();
@@ -87,10 +92,17 @@ class FixedAssetPurchaseRepository implements FixedAssetPurchaseRepositoryInterf
     {
         $staff = UserData();
         DB::beginTransaction();
+
         try {
             $fixedAssetPurchase = FixedAssetPurchase::find($request->id);
+            $this->validateModel($fixedAssetPurchase, $staff, 'fixed_asset_bought');
+
             if ($fixedAssetPurchase) {
-                if ($fixedAssetPurchase->manager_check_id !== null and $fixedAssetPurchase->is_md_checked !== 0) {
+                if ($fixedAssetPurchase->is_md_checked !== 0) {
+                    if($fixedAssetPurchase->is_bought==1)
+                    {
+                        ResponseMessage('This fixed asset is already bought .');
+                    }
                     $fixedAssetPurchase->bought_by = $staff->id;
                     $fixedAssetPurchase->is_bought = 1;
                     $fixedAssetPurchase->status= 'bought';
@@ -135,7 +147,7 @@ class FixedAssetPurchaseRepository implements FixedAssetPurchaseRepositoryInterf
                     ]);
 
                     DB::commit();
-                    ResponseMessage('Financial Staff bought successful');
+                    ResponseMessage('Financial Staff bought successful',200);
                 } else {
                     ResponseMessage('Selected Fixed Asset Purchase is not even checked by staff');
                 }
@@ -146,6 +158,29 @@ class FixedAssetPurchaseRepository implements FixedAssetPurchaseRepositoryInterf
             DB::rollback();
             ResponseMessage($e->getMessage(), 402);
             throw $e;
+        }
+    }
+
+
+    public function validateModel($model, $staff, $type)
+    {
+        if ($model) {
+            if ($type == 'fixed_asset_purchase') {
+                if (!($staff->hasRoles('Manager') xor $staff->hasRoles('MD'))) {
+                    ResponseMessage("Permission isn't allowed", 422);
+                }
+
+                if ($staff->hasRoles('Manager')) {
+                    if ($model->manager_check_id != null) {
+                        ResponseMessage('This Purchase Order is already checked By Manager', 419);
+                    }
+
+                }else if ($staff->hasRoles('MD')) {
+                    if ($model->is_md_checked) {
+                        ResponseMessage('This Purchase Order is already checked By MD', 422);
+                    }
+                }
+            }
         }
     }
 }
