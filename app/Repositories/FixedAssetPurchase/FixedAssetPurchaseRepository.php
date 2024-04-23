@@ -147,7 +147,7 @@ class FixedAssetPurchaseRepository implements FixedAssetPurchaseRepositoryInterf
                     ]);
 
                     DB::commit();
-                    ResponseMessage('Financial Staff bought successful',200);
+                    ResponseMessage('Bought successfully',200);
                 } else {
                     ResponseMessage('Selected Fixed Asset Purchase is not even checked by staff');
                 }
