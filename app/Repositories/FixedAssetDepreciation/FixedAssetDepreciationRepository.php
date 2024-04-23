@@ -2,7 +2,7 @@
 
 namespace App\Repositories\FixedAssetDepreciation;
 
-class FixedAssetDepreciation implements FixedAssetDepreciationRepositoryInterface
+class FixedAssetDepreciationRepository implements FixedAssetDepreciationRepositoryInterface
 {
 
 }
