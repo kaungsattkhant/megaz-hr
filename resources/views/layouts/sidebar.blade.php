@@ -88,7 +88,7 @@
                         @endif
                         @if(checkDepartmentPermission(['Finance']))
                         <li>
-                            <a href="{{ route('suppliers.index') }}" class="flex items-center @yield('suppliers')">
+                            <a href="{{ route('suppliers.index') }}" class="flex items-center @yield('supplier')">
                                 <i class="fal fa-tasks  pr-3"></i>
                                 Suppliers
                             </a>
@@ -116,7 +116,7 @@
                                 aria-expanded="false"
                                 aria-controls="collapseExample">
                                     <i class="fal fa-sack-dollar  pr-3"></i>
-                                    Cashbook
+                                    Cash Book
                                 </button>
 
                             <div
@@ -180,7 +180,7 @@
                                 aria-expanded="false"
                                 aria-controls="collapseExample">
                                     <i class="fal fa-money-check-alt  pr-3"></i>
-                                    Bankbok
+                                    Bank Book
                                 </button>
 
                             <div
@@ -216,6 +216,13 @@
                             <a href="{{ route('purchase_orders') }}" class="flex items-center @yield('purchase_orders')">
                                 <i class="fal fa-truck-loading  pr-3"></i>
                                 Purchase Orders
+                            </a>
+                        </li>
+
+                        <li>
+                            <a href="{{ route('fixed_assets.index') }}" class="flex items-center @yield('fixed_asset')">
+                                <i class="fal fa-truck-loading  pr-3"></i>
+                                Fixed Assets
                             </a>
                         </li>
                         @endif
