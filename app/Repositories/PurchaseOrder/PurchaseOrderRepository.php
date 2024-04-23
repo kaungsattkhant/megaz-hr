@@ -118,10 +118,8 @@ class PurchaseOrderRepository implements PurchaseOrderRepositoryInterface
 
                 }
             }
-            if ($request->is_grn) {
-                if ($po) {
-                    (new StoreInventory())->inventoryAction($po, 'in', 'purchase_order');
-                }
+            if ($request->is_grn && $po) {
+                (new StoreInventory())->inventoryAction($po, 'in', 'purchase_order');
             }
             if (!isset($request->id)) {
                 $users = $this->getUserByRole(['Manager']);
