@@ -62,9 +62,12 @@ class FixedAssetPurchaseRepository implements FixedAssetPurchaseRepositoryInterf
             if ($staff->hasRoles('Manager')) {
                 $fixedAssetPurchase->manager_check_id = $staff->id;
                 $fixedAssetPurchase->manager_check_time = CurrentTime();
+                $fixedAssetPurchase->status = 'manager checked';
             } elseif ($staff->hasRoles('MD')) {
                 $fixedAssetPurchase->md_check_time = CurrentTime();
                 $fixedAssetPurchase->is_md_checked = 1;
+                $fixedAssetPurchase->status = 'md checked';
+
             } else {
                 ResponseMessage('Login User is not valid');
             }
@@ -76,5 +79,10 @@ class FixedAssetPurchaseRepository implements FixedAssetPurchaseRepositoryInterf
             ResponseMessage($e->getMessage(), 402);
             throw $e;
         }
+    }
+
+    public function fixedAssetBought($request)
+    {
+
     }
 }
