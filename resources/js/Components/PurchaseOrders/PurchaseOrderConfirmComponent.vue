@@ -479,7 +479,7 @@
 
                 let formData = new FormData();
                 formData.append('id', this.purchaseOrderId);
-                formData.append('po_id', this.purchaseOrder.po_id);
+                // formData.append('po_id', this.purchaseOrder.id);
                 formData.append('date', this.date);
                 formData.append('total_price', priceTotal);
                 formData.append('is_grn', isGRN);

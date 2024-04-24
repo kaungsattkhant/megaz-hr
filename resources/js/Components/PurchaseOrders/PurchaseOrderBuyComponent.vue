@@ -356,7 +356,7 @@ export default {
             // return 0;
             if (!stop) {
                 let formData = new FormData();
-                formData.append('po_id', this.purchaseOrder.po_id);
+                formData.append('id', this.purchaseOrder.id);
                 formData.append('date', this.date);
                 formData.append('total_price', priceTotal);
                 formData.append('is_grn', isGRN);
@@ -368,6 +368,8 @@ export default {
                         text: `Request successful`,
                         type: 'info'
                     });
+
+                    window.location.replace(`/purchase_orders`);
                 }
                 else {
                     this.$notify({

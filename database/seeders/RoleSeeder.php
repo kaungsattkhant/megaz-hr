@@ -20,27 +20,70 @@ class RoleSeeder extends Seeder
         $financeDept = Department::where('name', 'Finance')->first();
         $adminDept = Department::where('name', 'Admin')->first();
         $managementDept = Department::where('name', 'Management')->first();
-        // $barDept = Department::where('name', 'Bar Department')->first();
+        $cateringDept = Department::where('name', 'Catering')->first();
+        $inventoryDept = Department::where('name', 'Inventory')->first();
 
-        Role::create([
-            'department_id' => $hrDept->id,
-            'name' => 'Staff'
-        ]);
+        $basicRoles = ['Staff', 'Supervisor', 'Manager'];
 
-        Role::create([
-            'department_id' => $managementDept->id,
-            'name' => 'Manager'
-        ]);
+        foreach($basicRoles as $roleName){
+            Role::create([
+                'department_id' => $hrDept->id,
+                'name' => $roleName
+            ]);
+        }
 
-        Role::create([
-            'department_id' => $financeDept->id,
-            'name' => 'Financial'
-        ]);
+        foreach($basicRoles as $roleName){
+            Role::create([
+                'department_id' => $financeDept->id,
+                'name' => $roleName
+            ]);
+        }
+
+        foreach($basicRoles as $roleName){
+            Role::create([
+                'department_id' => $managementDept->id,
+                'name' => $roleName
+            ]);
+        }
 
         Role::create([
             'department_id' => $managementDept->id,
             'name' => 'MD'
         ]);
+
+        foreach($basicRoles as $roleName){
+            Role::create([
+                'department_id' => $cateringDept->id,
+                'name' => $roleName
+            ]);
+        }
+
+        foreach($basicRoles as $roleName){
+            Role::create([
+                'department_id' => $inventoryDept->id,
+                'name' => $roleName
+            ]);
+        }
+
+        // Role::create([
+        //     'department_id' => $hrDept->id,
+        //     'name' => 'Staff'
+        // ]);
+
+        // Role::create([
+        //     'department_id' => $managementDept->id,
+        //     'name' => 'Manager'
+        // ]);
+
+        // Role::create([
+        //     'department_id' => $financeDept->id,
+        //     'name' => 'Financial'
+        // ]);
+
+        // Role::create([
+        //     'department_id' => $managementDept->id,
+        //     'name' => 'MD'
+        // ]);
 
     }
 }
