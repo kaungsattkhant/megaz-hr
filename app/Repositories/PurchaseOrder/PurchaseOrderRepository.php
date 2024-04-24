@@ -41,7 +41,6 @@ class PurchaseOrderRepository implements PurchaseOrderRepositoryInterface
     }
     public function createOrUpdate($request)
     {
-        // dd($request->all());
         $data = $request->all();
         $staff = UserData();
         $items = json_decode($request->items);
@@ -56,8 +55,8 @@ class PurchaseOrderRepository implements PurchaseOrderRepositoryInterface
             $po_id = "PO" . '-' . str_pad($no, $count, "0", STR_PAD_LEFT) . '-' . now()->timestamp;
             $data['po_id'] = $po_id;
 
-            if(isset($request->is_grn) && ( $request->is_grn || $request->is_grn=="1")){
-                $data['is_bought']=1;
+            if (isset($request->is_grn) && ($request->is_grn || $request->is_grn == "1")) {
+                $data['is_bought'] = 1;
             }
             if (!$request->id) {
                 $data['created_by'] = $staff->id;
@@ -73,9 +72,10 @@ class PurchaseOrderRepository implements PurchaseOrderRepositoryInterface
                     $item_data['id'] = null;
                 }
                 $item_data['quantity'] = $item->quantity;
-                $item_data['original_quantity']=$item->original_quantity;
                 if ($staff->hasRoles('Staff')) {
                     $item_data['original_quantity'] = $item->quantity;
+                } else {
+                    $item_data['original_quantity'] = $item->original_quantity;
                 }
                 $item_data['purchase_order_id'] = $po->id;
                 $item_data['item_id'] = $item->item_id;
@@ -115,9 +115,12 @@ class PurchaseOrderRepository implements PurchaseOrderRepositoryInterface
                 $po_item = $po->items()->updateOrCreate(['id' => $item_data['id']], $item_data);
                 if ($request->is_grn) {
                     $this->storeGRN($po, $item);
+
                 }
             }
-
+            if ($request->is_grn && $po) {
+                (new StoreInventory())->inventoryAction($po, 'in', 'purchase_order');
+            }
             if (!isset($request->id)) {
                 $users = $this->getUserByRole(['Manager']);
                 $data = [
