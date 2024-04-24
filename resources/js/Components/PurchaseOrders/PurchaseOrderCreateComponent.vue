@@ -125,13 +125,21 @@
                 }
             },
 
+            alertValidationMessage(field){
+                this.$notify({
+                    title: 'Input validation',
+                    text: `You forgot to prvide ${field}, please try again`,
+                    type: 'warn'
+                });
+            },
+
             addItemBtnClicked(){
                 if(!this.selectedItem){
-                    alert('Choose an item first');
+                    this.alertValidationMessage('an item');
                     return 1;
                 }
                 if(this.quantity < 1){
-                    alert('Input quantity');
+                    this.alertValidationMessage('quantity');
                     return 1;
                 }
                 let amount = (this.selectedItem.item_prices)? this.selectedItem.item_prices.price: 0;
@@ -152,11 +160,11 @@
 
             async createPurchaseOrderBtnClicked(){
                 if(!this.date){
-                    alert('Input date');
+                    this.alertValidationMessage('date');
                     return 1;
                 }
                 if(this.purchaseOrderItems.length<1){
-                    alert('Select items');
+                    this.alertValidationMessage('items');
                     return 1;
                 }
                 let priceTotal = 0;
@@ -168,10 +176,23 @@
                 formData.append('total_price', priceTotal);
                 formData.append('items', JSON.stringify(this.purchaseOrderItems));
                 let response = await postApiData({url: `/api/purchase_orders`, form_data:  formData, token: this.getToken()});
-                // alert(`Operation success ${response.success}`);
-                // setTimeout(()=>{
-                //     window.location.replace(`/purchase_orders`);
-                // }, 3000);
+                if(response.success){
+                    this.$notify({
+                        text: `A new purchase order created`,
+                        type: 'info'
+                    });
+
+                    setTimeout(()=>{
+                        window.location.replace(`/purchase_orders`);
+                    }, 3000);
+                }
+                else{
+                    this.$notify({
+                        text: `Some errors occurred`,
+                        type: 'error'
+                    });
+                    console.log(response);
+                }
             },
 
         },
