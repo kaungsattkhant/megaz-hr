@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "11ad755843fe6cf0279a300b986ef086",
+    "content-hash": "65d73cd9412246752979c4512f463c0d",
     "packages": [
         {
             "name": "brick/math",
@@ -2485,6 +2485,55 @@
                 }
             ],
             "time": "2023-10-27T15:32:31+00:00"
+        },
+        {
+            "name": "mrlinnth/mm-regions-cities",
+            "version": "0.1.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/mrlinnth/mm-regions-cities.git",
+                "reference": "6aa64446dbeab9e2b8c7389b858b306161788c8a"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/mrlinnth/mm-regions-cities/zipball/6aa64446dbeab9e2b8c7389b858b306161788c8a",
+                "reference": "6aa64446dbeab9e2b8c7389b858b306161788c8a",
+                "shasum": ""
+            },
+            "require": {
+                "illuminate/database": ">=5.6.0",
+                "illuminate/support": ">=5.6.0",
+                "php": ">=7.0.0"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "Mrlinnth\\Mmrc\\MmrcServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Mrlinnth\\Mmrc\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "description": "Myanmar regions and cities data",
+            "keywords": [
+                "Myanmar",
+                "cities",
+                "laravel",
+                "regions"
+            ],
+            "support": {
+                "issues": "https://github.com/mrlinnth/mm-regions-cities/issues",
+                "source": "https://github.com/mrlinnth/mm-regions-cities/tree/master"
+            },
+            "time": "2020-04-21T05:56:45+00:00"
         },
         {
             "name": "nesbot/carbon",
@@ -8749,5 +8798,5 @@
         "php": "^8.1"
     },
     "platform-dev": [],
-    "plugin-api-version": "2.3.0"
+    "plugin-api-version": "2.6.0"
 }

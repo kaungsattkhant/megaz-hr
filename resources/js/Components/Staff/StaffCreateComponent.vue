@@ -131,23 +131,24 @@
                 <label for="" class="block text-sm text-black mb-3">
                     State
                 </label>
-                <input type="input" v-model="state" placeholder="State (Required)"
-                    class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
-                <!-- <select name="" id="" v-model="selectedState"
-                    class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
-                    <option value="state1"> State 1 </option>
-                </select> -->
+                <!-- <input type="input" v-model="state" placeholder="State (Required)"
+                    class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0"> -->
+                <select name="" id="" v-model="selectedState" class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0"
+                @change="stateSelectChanged">
+                    <option :value="state" v-for="(state, stateIndex) in stateList"> {{ state.name }} </option>
+                </select>
             </div>
             <div class="col-span-3 rounded-md mb-4 pb-6">
                 <label for="" class="block text-sm text-black mb-3">
                     City
                 </label>
-                <input type="input" v-model="city" placeholder="City (Required)"
-                    class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
-                <!-- <select name="" id="" v-model="selectedCity"
-                    class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
-                    <option value="City 1"> City 1 </option>
-                </select> -->
+                <!-- <input type="input" v-model="city" placeholder="City (Required)"
+                    class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0"> -->
+                <select name="" id="" v-model="selectedCity" class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0"
+                @change="citySelectChanged">
+                    <!-- <option value="City 1"> City 1 </option> -->
+                    <option :value="city" v-for="(city, cityIndex) in cityList"> {{ city.name }} </option>
+                </select>
             </div>
             <div class="col-span-3 rounded-md mb-4 pb-6">
                 <label for="" class="block text-sm text-black mb-3">
@@ -333,7 +334,9 @@
                 departmentList: [],
                 roleList: [],
                 stateList: [],
+                selectedState: null,
                 cityList: [],
+                selectedCity: null,
 
                 name: null,
                 dob: null,
@@ -365,6 +368,25 @@
 
         methods: {
             ...mapGetters(['getToken']),
+
+            async getStateList(){
+                let response = await getApiData({url: `/api/mmrc/regions`});
+                if(response.data){
+                    this.stateList = response.data;
+                }
+            },
+
+            async stateSelectChanged(){
+                this.state = this.selectedState.name;
+                let response = await getApiData({url: `/api/mmrc/regions/${this.selectedState.id}`});
+                if(response.data){
+                    this.cityList = response.data.cities;
+                }
+            },
+
+            citySelectChanged(){
+                this.city = this.selectedCity.name;
+            },
 
             async getGenderList(){
                 const response = await getApiData({ url: '/api/genders', token: this.getToken() });
@@ -409,8 +431,6 @@
                     this.roleIds.push(role.id);
                 });
 
-
-
                 if(!this.name){
                     this.alertValiationMessage('name');
                     return 1;
@@ -448,12 +468,12 @@
                 }
                 if(!this.selectedDepartment)
                 {
-                    this.alertValiationMessage('Department');
+                    this.alertValiationMessage('department');
                     return 1;
                 }
 
                 if(this.roleIds.length < 1){
-                    this.alertValiationMessage('Role');
+                    this.alertValiationMessage('role');
                     return 1;
                 }
 
@@ -473,32 +493,32 @@
                 }
 
                 if(!this.primaryName){
-                    this.alertValiationMessage('Primary name');
+                    this.alertValiationMessage('primary name');
                     return 1;
                 }
 
                 if(!this.primaryPhone){
-                    this.alertValiationMessage('Primary phone');
+                    this.alertValiationMessage('primary phone');
                     return 1;
                 }
 
                 if(!this.primaryRelationship){
-                    this.alertValiationMessage('Primary relationship');
+                    this.alertValiationMessage('primary relationship');
                     return 1;
                 }
 
                 if(!this.secondaryName){
-                    this.alertValiationMessage('Secondary name');
+                    this.alertValiationMessage('secondary name');
                     return 1;
                 }
 
                 if(!this.secondaryPhone){
-                    this.alertValiationMessage('Secondary phone');
+                    this.alertValiationMessage('secondary phone');
                     return 1;
                 }
 
                 if(!this.secondaryRelationship){
-                    this.alertValiationMessage('Secondary relationship');
+                    this.alertValiationMessage('secondary relationship');
                     return 1;
                 }
 
@@ -578,12 +598,15 @@
             },
         },
 
-        mounted()
-        {
-            initTE({ Modal,Select, Ripple });
+        created(){
             this.getGenderList();
             this.getDepartmentList();
             // this.getRoleList();
+            this.getStateList();
+        },
+
+        mounted(){
+            initTE({ Modal,Select, Ripple });
         }
     }
 </script>
