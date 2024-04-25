@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('fixed_asset_purchases', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('fixed_asset_id');
+            $table->string('fixed_asset_id')->nullable();
             $table->dateTime('date');
             $table->string('name');
             $table->string('description');
@@ -22,7 +22,7 @@ return new class extends Migration
             $table->double('depreciation_amount');
             $table->double('total_duration');
             $table->double('remaining_duration');
-            $table->dateTime('start_date');
+            $table->date('start_date');
             $table->unsignedBigInteger('created_by');
             $table->unsignedBigInteger('bought_by')->nullable();
             $table->boolean('is_bought')->default(0);

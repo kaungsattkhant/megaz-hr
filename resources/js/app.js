@@ -57,6 +57,7 @@ import ArPaidComponent from './Components/AR/ArPaidComponent.vue';
 import SupplierListComponent from './Components/Supplier/SupplierListComponent.vue';
 import SupplierCreateComponent from './Components/Supplier/SupplierCreateComponent.vue';
 import SupplierUpdateComponent from './Components/Supplier/SupplierUpdateComponent.vue';
+import FixedAssetCrudComponent from './Components/FixedAssets/FixedAssetCrudComponent.vue';
 import TableCrudComponent from './Components/TablesAndRooms/TableCrudComponent.vue';
 
 import LoginComponent from './Components/Auth/LoginComponent.vue';
@@ -109,6 +110,8 @@ app.component('TableCrudComponent', TableCrudComponent);
 app.component('SupplierListComponent', SupplierListComponent);
 app.component('SupplierCreateComponent', SupplierCreateComponent);
 app.component('SupplierUpdateComponent', SupplierUpdateComponent);
+
+app.component('FixedAssetCrudComponent', FixedAssetCrudComponent);
 
 app.component('LoginComponent', LoginComponent);
 app.component('LogoutComponent', LogoutComponent);

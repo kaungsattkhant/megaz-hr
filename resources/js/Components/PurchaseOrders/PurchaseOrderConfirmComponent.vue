@@ -344,13 +344,21 @@
                 }
             },
 
+            alertValidationMessage(field){
+                this.$notify({
+                    title: 'Input validation',
+                    text: `You forgot to prvide ${field}, please try again`,
+                    type: 'warn'
+                });
+            },
+
             addItemBtnClicked(){
                 if(!this.selectedItem){
-                    alert('Choose an item first');
+                    this.alertValidationMessage('an item');
                     return 1;
                 }
                 if(this.quantity < 1){
-                    alert('Input quantity');
+                    this.alertValidationMessage('quantity');
                     return 1;
                 }
                 let existingItemIndex = this.purchaseOrderItems.findIndex(poItem => poItem.item_id == this.selectedItem.id);
@@ -405,7 +413,10 @@
                     formData.append('value', 1);
                     let response = await postApiData({url: url, form_data: formData, token: this.getToken()});
                     if(response.success){
-                        alert('Item checked');
+                        this.$notify({
+                            text: `Item checked`,
+                            type: 'info'
+                        });
                         window.location.reload();
                     }
                 }
@@ -444,17 +455,11 @@
 
             async createPurchaseOrderBtnClicked(){
                 if(!this.date){
-                    this.$notify({
-                        text: `Input date`,
-                        type: 'warn'
-                    });
+                    this.alertValidationMessage(`date`);
                     return 1;
                 }
                 if(this.purchaseOrderItems.length<1){
-                    this.$notify({
-                        text: `Select at least one item`,
-                        type: 'warn'
-                    });
+                    this.alertValidationMessage(`an item`);
                     return 1;
                 }
                 let priceTotal = 0;
@@ -474,7 +479,7 @@
 
                 let formData = new FormData();
                 formData.append('id', this.purchaseOrderId);
-                formData.append('po_id', this.purchaseOrder.po_id);
+                // formData.append('po_id', this.purchaseOrder.id);
                 formData.append('date', this.date);
                 formData.append('total_price', priceTotal);
                 formData.append('is_grn', isGRN);
@@ -485,6 +490,8 @@
                         text: `Purchase order update success`,
                         type: 'info'
                     });
+
+                    window.location.replace(`/purchase_orders`);
                 }
                 else{
                     this.$notify({

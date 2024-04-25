@@ -2,22 +2,23 @@
 
 namespace App\Repositories\PurchaseOrder;
 
-use App\Models\PoGrn;
-use Illuminate\Http\Request;
-use App\Models\PurchaseOrder;
-use App\Models\PurchaseOrderItem;
-use Illuminate\Support\Facades\DB;
-use App\Models\PurchaseOrderItemLeft;
-use Illuminate\Database\Eloquent\Model;
+use App\Http\Action\Common\PurchaseOrder as CommonPurchaseOrder;
 use App\Http\Action\Inventory\StoreInventory;
 use App\Http\Action\SendNotification\SendNotification;
 use App\Http\Action\Transaction\PurchaseOrderTransaction;
-use App\Http\Action\Common\PurchaseOrder as CommonPurchaseOrder;
+use App\Models\PoGrn;
+use App\Models\PurchaseOrder;
+use App\Models\PurchaseOrderItem;
+use App\Models\PurchaseOrderItemLeft;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class PurchaseOrderRepository implements PurchaseOrderRepositoryInterface
 {
     private $select = ['po_id', 'total_price', 'created_by', 'manager_check_id', 'manager_check_time', 'financial_check_id', 'financial_check_time', 'is_md_check', 'status', 'created_at', 'updated_at'];
     use SendNotification;
+    private $morphMapName;
     public function listAllData(Request $request)
     {
         $staff = UserData();
@@ -113,16 +114,18 @@ class PurchaseOrderRepository implements PurchaseOrderRepositoryInterface
                     }
                 }
                 if ($request->is_grn) {
-                    if($item->supplier_id!=null && $item->invoice_amount!=null && $item->invoice_no!=null){
-                        $item_data['is_grn']=1;
+                    if ($item->supplier_id != null && $item->invoice_amount != null && $item->invoice_no != null) {
+                        $item_data['is_grn'] = 1;
                     }
-                    $this->storeGRN($po, $item);
+                    #grn store
+                    $this->storeGRN($item);
+                    #grn
                 }
                 $po_item = $po->items()->updateOrCreate(['id' => $item_data['id']], $item_data);
             }
             if ($request->is_grn && $po) {
-                $morphMapName=RelationMorphName($po);
-                (new PurchaseOrderTransaction())->createTransaction($po,$morphMapName);  #create transaction
+                $morphMapName = RelationMorphName($po);
+                (new PurchaseOrderTransaction())->createTransaction($po, $morphMapName); #create transaction
                 // (new StoreInventory())->inventoryAction($po, 'in', 'purchase_order');
             }
             if (!isset($request->id)) {
@@ -144,16 +147,15 @@ class PurchaseOrderRepository implements PurchaseOrderRepositoryInterface
 
     }
 
-    public function storeGRN($po, $item)
+    public function storeGRN($item)
     {
-        if($item->supplier_id!=null && $item->invoice_amount!=null && $item->invoice_no!=null){
+        if ($item->supplier_id != null && $item->invoice_amount != null && $item->invoice_no != null) {
             return PoGrn::create([
                 'quantity' => $item->quantity,
                 'supplier_id' => $item->supplier_id,
                 'invoice_amount' => $item->invoice_amount,
                 'invoice_no' => $item->invoice_no,
-                'item_id' => $item->item_id,
-                'purchase_order_id' => $po->id,
+                'purchase_order_item_id' => $item->id,
             ]);
         }
     }
@@ -346,22 +348,37 @@ class PurchaseOrderRepository implements PurchaseOrderRepositoryInterface
         // $po ? ResponseMessage('PO bought successfully', 200) : ResponseMessage('PO bought Fail', 422);
         #end
     }
-    
-    public function getPurchaseOrderItemConfirmationList($request){
+
+    public function getPurchaseOrderItemConfirmationList($request)
+    {
         return PurchaseOrderItem::with(['purchase_order'])
-        ->orderBy('id','desc')
-        ->where('is_grn',1)
-        ->paginate(config('common.list_count'));
+            ->orderBy('id', 'desc')
+            ->where('is_grn', 1)
+            ->paginate(config('common.list_count'));
     }
 
-    public function confirmPurchaseOrderItem($request){
-         $po_item=PurchaseOrderItem::find($request->id);
-         if($po_item){
-            $po_item->is_confirmed=1;
-            $po_item->save();
-            ResponseMessage('Update Successfully',200);
-         }
-         ResponseMessage('Not Found',404);
+    public function confirmPurchaseOrderItem($request)
+    {
+        DB::beginTransaction();
+        try {
+            $po_item = PurchaseOrderItem::find($request->id);
+            if ($po_item) {
+                $po_item->is_confirmed = 1;
+                $po_item->save();
+                #store inventory
+                $inventoryLedger = (new StoreInventory())->storeToInventoryLedger($po_item->purchase_order, 'purchase_order', 'in');
+                (new StoreInventory())->storeItemToInventory($inventoryLedger, $po_item);
+                #store inventory
+                DB::commit();
+                ResponseMessage('Update Successfully', 200);
+            }
+            ResponseMessage('Not Found', 404);
+        } catch (\Exception $e) {
+            DB::rollback();
+            ResponseMessage($e->getMessage(), 402);
+            throw $e;
+        }
+
     }
 
 }

@@ -44,4 +44,8 @@ class PurchaseOrderItem extends BaseModel
         return $this->hasOne(PurchaseOrderItemLeft::class);
     }
 
+    public function poGrn(){
+        return $this->hasOne(PoGrn::class);
+    }
+
 }
