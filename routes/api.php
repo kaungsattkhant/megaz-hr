@@ -138,6 +138,11 @@ Route::middleware('auth:api')->group(function () {
         Route::post('/fixed_asset_purchases/bought','boughtFixedAsset');
     });
 
+    Route::controller(TaskController::class)->group(function()
+    {
+        Route::post('/tasks/double_checked','taskDoubleChecked');
+    });
+
     Route::resource('suppliers', SupplierController::class)->only(['index', 'store', 'show', 'destroy']);
     Route::resource('notifications',NotificationController::class)->only(['index']);
     Route::post('notifications/set_seen', [NotificationController::class, 'setSeenNotifications']);
