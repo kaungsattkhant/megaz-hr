@@ -69,6 +69,9 @@
                         <th scope="col" class=" px-4 py-4 ">
                             Left Qty
                         </th>
+                        <th scope="col" class=" px-2 py-2 ">
+
+                        </th>
                         <th scope="col" class=" px-6 py-4 ">
                             Amount
                         </th>
@@ -101,8 +104,14 @@
                                     {{ purchaseOrderItem.purchase_order_item_left.quantity }}
                                 </div>
                             </td>
+                            <td class=" px-2 py-2 font-medium ">
+                                <button data-te-toggle="modal" data-te-target="#editModal"
+                                @click="editPurchaseOrderItemBtnClicked(purchaseOrderItemsIndex)">
+                                    <i class="fal fa-pencil  pr-3"></i>
+                                </button>
+                            </td>
                             <td class=" px-6 py-4 font-medium ">
-                                {{ purchaseOrderItem.amount.toLocaleString() }}
+                                {{ (purchaseOrderItem.quantity * purchaseOrderItem.amount).toLocaleString() }}
                             </td>
                             <td class=" px-8 py-4 font-medium ">
                                 <div>
@@ -190,6 +199,47 @@
                     <button @click="confirmBuyPurchaseOrderBtnClicked" type="button" data-te-toggle="modal" data-te-target="#checkModal"
                     class="ml-1 inline-block rounded bg-blue-600 px-6 pb-2 pt-2.5 text-xs  text-white   focus:outline-none focus:ring-0 ">
                         Confirm
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal -->
+    <div data-te-modal-init class="fixed left-0 top-0 z-[1055] hidden h-full w-full overflow-y-auto overflow-x-hidden outline-none"
+        id="editModal" tabindex="-1" aria-labelledby="create_modalLabel" aria-hidden="true">
+        <div data-te-modal-dialog-ref class="pointer-events-none relative w-auto mb-12 translate-y-[-50px] opacity-0 transition-all duration-300 ease-in-out min-[576px]:mx-auto min-[576px]:mt-7 min-[576px]:max-w-[500px]">
+            <div class="min-[576px]:shadow-[0_0.5rem_1rem_rgba(#000, 0.15)] pointer-events-auto relative flex w-full flex-col rounded-md border-none bg-white bg-clip-padding text-current shadow-lg outline-none">
+                <div class="relative  p-4">
+                    <!--Modal title-->
+                    <h5 class="text-xl text-center mt-2 font-medium leading-normal text-black" id="create_modalLabel">
+                        Edit
+                    </h5>
+                    <!--Close button-->
+                    <button type="button" class="absolute top-4 right-4 focus:shadow-none focus:outline-none"
+                        data-te-modal-dismiss aria-label="Close">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                            stroke="currentColor" class="h-5 w-5">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </button>
+                </div>
+
+                <!--Modal body-->
+                <div class="relative px-12 py-4" data-te-modal-body-ref>
+                    <div class="mb-4">
+                        <label for="" class="block text-sm text-black mb-3">
+                            Quantity
+                        </label>
+                        <input type="number" placeholder="Quantity" v-model="editQuantity" class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
+                    </div>
+                </div>
+
+                <!--Modal footer-->
+                <div class="flex justify-center px-12 mb-6">
+                    <button type="button" @click="confirmEditPurchaseOrderItemBtnClicked" class="add-btn focus:outline-none focus:ring-0 "
+                        data-te-toggle="modal" data-te-target="#editModal">
+                        Edit
                     </button>
                 </div>
             </div>
@@ -291,9 +341,23 @@ export default {
 
         },
 
+        editPurchaseOrderItemBtnClicked(purchaseOrderItemsIndex){
+            this.editPurchaseOrderItem = this.purchaseOrderItems[purchaseOrderItemsIndex];
+            this.editQuantity = this.editPurchaseOrderItem.quantity;
+        },
+
+        confirmEditPurchaseOrderItemBtnClicked(){
+            let index = this.purchaseOrderItems.findIndex(poItem => poItem.item_id == this.editPurchaseOrderItem.item_id);
+            if(index != -1){
+                this.purchaseOrderItems[index].quantity = this.editQuantity;
+            }
+            this.editQuantity = 0;
+            this.editPurchaseOrderItem = null;
+        },
+
         async confirmBuyPurchaseOrderBtnClicked() {
             let priceTotal = 0;
-            let stop = true;
+            let stop = false;
             if(!this.selectedCashAccountId){
                 this.$notify({
                     text: `Cash account must be selected`,
@@ -303,57 +367,39 @@ export default {
                 return 1;
             }
 
-            this.purchaseOrderItems.forEach((poItem) => {
-                if (poItem.supplier == undefined || !poItem.supplier) {
-                    this.$notify({
-                        text: `Supplier must be selected for ${poItem.item.name}`,
-                        type: 'error'
-                    });
-                    stop = true;
-                    return 1;
-                }
+            let poItems = JSON.parse(JSON.stringify(this.purchaseOrderItems));
+            let realPoItems = [];
+            poItems.forEach((poItem, index) => {
+                if(poItem.supplier){
+                    if (poItem.invoice_amount == undefined || !poItem.invoice_amount) {
+                        this.$notify({
+                            text: `Invoice amount must be filled for ${poItem.item.name}`,
+                            type: 'error'
+                        });
+                        stop = true;
+                        return 1;
+                    }
+                    if (poItem.invoice_no == undefined || !poItem.invoice_no) {
+                        this.$notify({
+                            text: `Invoice number must be filled for ${poItem.item.name}`,
+                            type: 'error'
+                        });
+                        stop = true;
+                        return 1;
+                    }
 
-                else if (poItem.invoice_no == undefined || !poItem.invoice_no) {
-                    this.$notify({
-                        text: `Invoice number must be filled for ${poItem.item.name}`,
-                        type: 'error'
-                    });
-                    stop = true;
-                    return 1;
-                }
-
-                else if (poItem.invoice_amount == undefined || !poItem.invoice_amount) {
-                    this.$notify({
-                        text: `Invoice amount must be filled for ${poItem.item.name}`,
-                        type: 'error'
-                    });
-                    stop = true;
-                    return 1;
-                }
-
-                else {
                     poItem.supplier_id = poItem.supplier.id;
                     priceTotal += poItem.invoice_amount;
-                    stop = false;
+                    delete poItem.supplier;
+                    realPoItems.push(poItem);
                 }
             });
 
-            // console.log(this.purchaseOrderItems);
-            console.log(stop);
+            // console.log(realPoItems);
             // return 1;
-            let poItems = JSON.parse(JSON.stringify(this.purchaseOrderItems));
-            poItems.forEach((poItem) => {
-                delete poItem.suppliers;
-                delete poItem.supplier;
-                console.log(poItem);
-            });
-            // console.log(poItems);
-            // return 1;
+
             let isGRN = '1';
-            // console.log(typeof(isGRN));
             isGRN = parseInt(isGRN);
-            // console.log(typeof(isGRN));
-            // return 0;
             if (!stop) {
                 let formData = new FormData();
                 formData.append('id', this.purchaseOrder.id);
@@ -361,7 +407,7 @@ export default {
                 formData.append('total_price', priceTotal);
                 formData.append('is_grn', isGRN);
                 formData.append('cash_account_id', this.selectedCashAccountId);
-                formData.append('items', JSON.stringify(poItems));
+                formData.append('items', JSON.stringify(realPoItems));
                 let response = await postApiData({ url: `/api/purchase_orders`, form_data: formData, token: this.getToken() });
                 if (response.success) {
                     this.$notify({
