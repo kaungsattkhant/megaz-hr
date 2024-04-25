@@ -34,6 +34,15 @@
                             <th scope="col" class=" px-6 py-4 ">
                                 Role
                             </th>
+
+                            <th scope="col" class=" px-6 py-4 ">
+                                Status
+                            </th>
+
+                            <th scope="col" class=" px-6 py-4 ">
+                                Checked
+                            </th>
+
                             <th scope="col" class="px-6 py-4">
 
                             </th>
@@ -56,6 +65,15 @@
                                 <td class=" px-6 py-4 ">
                                     {{ task.role.name }}
                                 </td>
+
+                                <td class=" px-6 py-4 ">
+                                    {{ task.status }}
+                                </td>
+                                <td class="px-6 py-4">
+                                    <i v-if="task.is_double_checked === 1" class="fas fa-check-double" @click="doubleChecked(task.id)"></i>
+                                    <i v-else class="fas fa-check" @click="doubleChecked(task.id)"></i>
+                                </td>
+
                                 <td class="whitespace-nowrap px-6 py-4">
                                     <!-- <button id="edit-btn" class="pr-1"
                                     @click="deleteBtnClicked(task.id)"
@@ -273,8 +291,6 @@
                 selectedRole: null,
                 dayList: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'],
                 selectedDays: [],
-
-
                 per_page: 10,
                 pageNumbers: [],
                 currentPage: 1,
@@ -287,6 +303,20 @@
 
         methods: {
             ...mapGetters(['getToken']),
+
+            async doubleChecked(id)
+            {
+                let url = `/api/tasks/${id}/double_checked`;
+                let response = await postApiData({url:url,token:this.getToken()});
+
+                if(response.success==true)
+                {
+                    this.getTasksList(null);
+                }else{
+                    alert(response.message);
+                }
+
+            },
 
             async getTasksList(pageNumber){
                 let url = `/api/tasks?per_page=${this.per_page}`;

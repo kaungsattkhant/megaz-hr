@@ -95,8 +95,16 @@ class ComplaintRepository implements ComplaintRepositoryInterface
     public function statusChange(string $status,int $id)
     {
         $complaint = Complaint::find($id);
+
         if($complaint !== null)
         {
+            if($complaint->status == $status)
+            {
+                ResponseMessage('Your status is already '."$status",422);
+            }else if($complaint->status == "Done")
+            {
+                ResponseMessage("Status is already Done, cannot change",422);
+            }
             $complaint->status = $status;
             $complaint->save();
 
