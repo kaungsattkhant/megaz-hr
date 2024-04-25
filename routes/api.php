@@ -140,7 +140,7 @@ Route::middleware('auth:api')->group(function () {
 
     Route::controller(TaskController::class)->group(function()
     {
-        Route::post('/tasks/double_checked','taskDoubleChecked');
+        Route::post('/tasks/{id}/double_checked','taskDoubleChecked');
     });
 
     Route::resource('suppliers', SupplierController::class)->only(['index', 'store', 'show', 'destroy']);

@@ -93,15 +93,20 @@ class TaskRepository implements TaskRepositoryInterface
         return $tasks;
     }
 
-    public function doubleCheckTasks($request)
+    public function doubleCheckTasks($id)
     {
         $staff = UserData();
         DB::beginTransaction();
         try {
             if (!$staff->hasRoles('Staff')) {
-                $task = Task::find($request->id);
+                $task = Task::find($id);
                 if ($task->is_double_checked == 1) {
                     ResponseMessage('Task is already double checked');
+                }
+
+                if($task->completed_by==null)
+                {
+                    ResponseMessage('Please complete task first',422);
                 }
                 $task->double_checked_by = $staff->id;
                 $task->is_double_checked = 1;

@@ -33,6 +33,10 @@
                             </th>
 
                             <th scope="col" class="px-6 py-4">
+                                Status
+                            </th>
+
+                            <th scope="col" class="px-6 py-4">
                                 Category
                             </th>
                         </tr>
@@ -55,22 +59,39 @@
                                         {{ complain.description }}
                                     </a>
                                 </td>
+
+                                <td class="whitespace-nowrap px-6 py-4 ">
+                                    <a href="#">
+                                        {{ complain.status }}
+                                    </a>
+                                </td>
                                 <td class="whitespace-nowrap px-6 py-4 ">
                                     <a href="#">
                                         {{ complain.complaint_category.name }}
                                     </a>
                                 </td>
 
-                                <td class="whitespace-nowrap px-6 py-4">
+                                <td class="whitespace-nowrap px-6 py-4 flex gap-5">
                                     <!-- <button id="edit-btn" class="pr-3"
                                     data-te-toggle="modal" data-te-target="#stageModal">
                                         <i class="fal fa-bars"></i>
                                     </button> -->
+
+                                    <button id="edit-btn" class="pr-1"
+                                    @click="statusChangeClick(complain.id)"
+                                    data-te-toggle="modal" data-te-target="#statusChange"
+                                    :disabled="complain.status === 'Done'">
+                                        <i class="far fa-info-circle"></i>
+                                    </button>
+
+
                                     <button id="edit-btn" class="pr-1"
                                     @click="deleteBtnClicked( complain.id)"
                                     data-te-toggle="modal" data-te-target="#deleteModal">
                                         <i class="fas fa-trash-alt"></i>
                                     </button>
+
+
                                 </td>
                             </tr>
                             <tr class="">
@@ -137,6 +158,48 @@
                         <button type="button" @click="createBtnClicked"
                         class="add-btn focus:outline-none focus:ring-0 ">
                             Create
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- status change model -->
+        <div data-te-modal-init
+            class="fixed left-0 top-0 z-[1055] hidden h-full w-full overflow-y-auto overflow-x-hidden outline-none"
+            id="statusChange" tabindex="-1" aria-labelledby="statusChangeLabel" aria-hidden="true">
+            <div data-te-modal-dialog-ref
+                class="pointer-events-none relative w-auto mb-12 translate-y-[-50px] opacity-0 transition-all duration-300 ease-in-out min-[576px]:mx-auto min-[576px]:mt-7 min-[576px]:max-w-[500px]">
+                <div
+                    class="min-[576px]:shadow-[0_0.5rem_1rem_rgba(#000, 0.15)] pointer-events-auto relative flex w-full flex-col rounded-md border-none bg-white bg-clip-padding text-current shadow-lg outline-none">
+
+                    <div class="relative  p-4">
+                        <h5 class="text-xl text-center mt-2 font-medium leading-normal text-black" id="create_modalLabel">
+                            Complain Status
+                        </h5>
+                        <button type="button" id="close" class="absolute top-4 right-4 focus:shadow-none focus:outline-none"
+                            data-te-modal-dismiss aria-label="Close">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                                stroke="currentColor" class="h-5 w-5">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                        </button>
+                    </div>
+                    <div class="relative px-12 py-4" data-te-modal-body-ref>
+                        <div class="mb-4">
+                            <select type="text" placeholder="Complain Title" v-model="change_status" data-te-select-init data-te-select-placeholder="Select Roles"
+                                data-te-select-filter="true"
+                                class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
+                                <option value="In Progress">In Progress</option>
+                                <option value="Done">Done</option>
+
+                            </select>
+                        </div>
+                    </div>
+                    <div class="flex justify-center px-12 mb-6">
+                        <button data-te-modal-dismiss type="button" @click="statusChange"
+                        class="add-btn focus:outline-none focus:ring-0 ">
+                            Confirm
                         </button>
                     </div>
                 </div>
@@ -238,7 +301,9 @@
                 complainCategory:[],
                 title:null,
                 selectedCategory:null,
-                description:null
+                description:null,
+                statusChange_id:null,
+                change_status:null
             };
         },
 
@@ -277,6 +342,28 @@
                 }
                 else{
                     alert('some errors occur');
+                }
+            },
+
+            statusChangeClick(id)
+            {
+                this.statusChange_id = id;
+            },
+
+            async statusChange()
+            {
+                if(!this.change_status){
+                    alert('Please select the status');
+                }
+                let formData = new FormData();
+                formData.append('status',this.change_status);
+                let response = await postApiData({url:`/api/complaints/${this.statusChange_id}/update_status`,form_data:formData,token:this.getToken()})
+                this.change_status == "";
+                if(response.success==true)
+                {
+                    this.getComplain(null);
+                }else{
+                    alert(response.message);
                 }
             },
 
