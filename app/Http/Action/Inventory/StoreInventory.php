@@ -13,7 +13,6 @@ class StoreInventory
     public function inventoryAction($model)
     {
         $morphMapName=RelationMorphName($model);
-
         switch ($morphMapName) {
             case 'purchase_order':
                 $this->storePurchaseOrderToInventory($model,$morphMapName,'in');
@@ -42,9 +41,6 @@ class StoreInventory
 
     public function storePurchaseOrderToInventory($model,$morphMapName,$action){
         $purchaseOrderItem=PurchaseOrderItem::with(['item'])->where('purchase_order_id',$model->id)->get();
-        // $purchaseOrderItemGroupedByCategory=PurchaseOrderItem::
-        // ->where('purchase_order_id',$model->id)->get();
-       
         $inventoryLedger=$this->storeToInventoryLedger($model,$morphMapName,$action);
         foreach($purchaseOrderItem as $po_item){
             $this->storeItemToInventory($inventoryLedger,$po_item);

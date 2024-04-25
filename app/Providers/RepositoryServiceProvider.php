@@ -2,66 +2,68 @@
 
 namespace App\Providers;
 
+use App\Repositories\Uom\UomRepository;
+use Illuminate\Support\ServiceProvider;
+use App\Repositories\Area\AreaRepository;
+
+use App\Repositories\Item\ItemRepository;
+use App\Repositories\Menu\MenuRepository;
+use App\Repositories\Role\RoleRepository;
+use App\Repositories\Task\TaskRepository;
+use App\Repositories\Order\OrderRepository;
+use App\Repositories\Staff\StaffRepository;
+use App\Repositories\Entity\EntityRepository;
 use App\Repositories\Account\AccountInterface;
 use App\Repositories\Account\AccountRepository;
-use Illuminate\Support\ServiceProvider;
-
-use App\Repositories\Area\AreaRepositoryInterface;
-use App\Repositories\Area\AreaRepository;
-use App\Repositories\CashBook\CashBookInterface;
-use App\Repositories\CashBook\CashBookRepository;
-use App\Repositories\Complaint\ComplaintRepository;
-use App\Repositories\Complaint\ComplaintRepositoryInterface;
-use App\Repositories\Customer\CustomerRepository;
-use App\Repositories\Customer\CustomerRepositoryInterface;
-use App\Repositories\Department\DepartmentRepository;
-use App\Repositories\Department\DepartmentRepositoryInterface;
-
-use App\Repositories\Entity\EntityRepository;
-use App\Repositories\Entity\EntityRepositoryInterface;
-use App\Repositories\HeadAccount\HeadAccountInterface;
-use App\Repositories\HeadAccount\HeadAccountRepository;
-use App\Repositories\Inventory\InventoryRepository;
-use App\Repositories\Inventory\InventoryRepositoryInterface;
 use App\Repositories\Invoice\InvoiceRepository;
-use App\Repositories\Invoice\InvoiceRepositoryInterface;
-use App\Repositories\Item\ItemRepository;
+
+use App\Repositories\CashBook\CashBookInterface;
+use App\Repositories\Supplier\SupplierInterface;
+use App\Repositories\Uom\UomRepositoryInterface;
+use App\Repositories\CashBook\CashBookRepository;
+use App\Repositories\Customer\CustomerRepository;
+use App\Repositories\Supplier\SupplierRepository;
+use App\Repositories\Transfer\TransferRepository;
+use App\Repositories\Area\AreaRepositoryInterface;
 use App\Repositories\Item\ItemRepositoryInterface;
-use App\Repositories\ItemUsageForecast\ItemUsageForecastInterface;
-use App\Repositories\ItemUsageForecast\ItemUsageForecastRepository;
-use App\Repositories\PurchaseOrder\PurchaseOrderRepository;
-use App\Repositories\PurchaseOrder\PurchaseOrderRepositoryInterface;
-
-use App\Repositories\PurchaseOrderItem\PurchaseOrderItemRepository;
-use App\Repositories\PurchaseOrderItem\PurchaseOrderItemRepositoryInterface;
-
-use App\Repositories\Role\RoleRepository;
+use App\Repositories\Menu\MenuRepositoryInterface;
 use App\Repositories\Role\RoleRepositoryInterface;
+use App\Repositories\Task\TaskRepositoryInterface;
+use App\Repositories\Complaint\ComplaintRepository;
+use App\Repositories\Inventory\InventoryRepository;
 
-use App\Repositories\Staff\StaffRepository;
+use App\Repositories\Order\OrderRepositoryInterface;
 use App\Repositories\Staff\StaffRepositoryInterface;
 
-use App\Repositories\Task\TaskRepository;
-use App\Repositories\Task\TaskRepositoryInterface;
+use App\Repositories\Department\DepartmentRepository;
+use App\Repositories\Entity\EntityRepositoryInterface;
 
-use App\Repositories\Uom\UomRepository;
-use App\Repositories\Uom\UomRepositoryInterface;
+use App\Repositories\HeadAccount\HeadAccountInterface;
+use App\Repositories\Transaction\TransactionInterface;
 
-use App\Repositories\Transfer\TransferRepository;
-use App\Repositories\Transfer\TransferRepositoryInterface;
+use App\Repositories\HeadAccount\HeadAccountRepository;
+use App\Repositories\RoomSession\RoomSessionRepository;
 
-use App\Repositories\Menu\MenuRepository;
-use App\Repositories\Menu\MenuRepositoryInterface;
+use App\Repositories\Transaction\TransactionRepository;
+use App\Repositories\Invoice\InvoiceRepositoryInterface;
+
 use App\Repositories\Notification\NotificationInterface;
 use App\Repositories\Notification\NotificationRepository;
-use App\Repositories\Order\OrderRepository;
-use App\Repositories\Order\OrderRepositoryInterface;
-use App\Repositories\RoomSession\RoomSessionRepository;
+
+use App\Repositories\Customer\CustomerRepositoryInterface;
+use App\Repositories\Transfer\TransferRepositoryInterface;
+use App\Repositories\PurchaseOrder\PurchaseOrderRepository;
+use App\Repositories\Complaint\ComplaintRepositoryInterface;
+use App\Repositories\Inventory\InventoryRepositoryInterface;
+use App\Repositories\Department\DepartmentRepositoryInterface;
 use App\Repositories\RoomSession\RoomSessionRepositoryInterface;
-use App\Repositories\Supplier\SupplierInterface;
-use App\Repositories\Supplier\SupplierRepository;
-use App\Repositories\Transaction\TransactionInterface;
-use App\Repositories\Transaction\TransactionRepository;
+use App\Repositories\ItemUsageForecast\ItemUsageForecastInterface;
+use App\Repositories\ItemUsageForecast\ItemUsageForecastRepository;
+use App\Repositories\PurchaseOrderItem\PurchaseOrderItemRepository;
+use App\Repositories\PurchaseOrder\PurchaseOrderRepositoryInterface;
+use App\Repositories\PurchaseOrderItemLeft\PurchaseOrderItemLeftInterface;
+use App\Repositories\PurchaseOrderItemLeft\PurchaseOrderItemLeftRepository;
+use App\Repositories\PurchaseOrderItem\PurchaseOrderItemRepositoryInterface;
 
 class RepositoryServiceProvider extends ServiceProvider
 {
@@ -104,5 +106,7 @@ class RepositoryServiceProvider extends ServiceProvider
         $this->app->bind(CashBookInterface::class,CashBookRepository::class);
         $this->app->bind(SupplierInterface::class,SupplierRepository::class);
         $this->app->bind(NotificationInterface::class,NotificationRepository::class);
+        $this->app->bind(PurchaseOrderItemLeftInterface::class,PurchaseOrderItemLeftRepository::class);
+
     }
 }

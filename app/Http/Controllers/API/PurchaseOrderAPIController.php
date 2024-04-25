@@ -79,4 +79,9 @@ class PurchaseOrderAPIController extends Controller
     public function boughtPurchaseOrder(Request $request){
         $purchase_order_item= $this->purchaseOrderRepo->boughtPurchaseOrder($request);
     }
+
+    public function getPurchaseOrderItemConfirmationList(Request $request){
+        $purchaseOrderItem = $this->purchaseOrderRepo->getPurchaseOrderItemConfirmationList($request);
+        ResponseData($purchaseOrderItem);
+    }
 }

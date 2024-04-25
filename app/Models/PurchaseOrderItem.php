@@ -13,7 +13,7 @@ class PurchaseOrderItem extends BaseModel
 
     protected $with=['item'];
     protected $fillable=[
-        'quantity','purchase_order_id','item_id','amount','original_quantity'
+        'quantity','purchase_order_id','item_id','amount','original_quantity','is_grn',
         
 
     ];
@@ -28,8 +28,16 @@ class PurchaseOrderItem extends BaseModel
         return parent::getUpdatedAt();
     }
 
+    public function purchase_order(){
+        return $this->belongsTo(PurchaseOrder::class);
+    }
+    
     public function item(){
         return $this->belongsTo(Item::class);
+    }
+
+    public function purchaseOrderItemLefts(){
+        return $this->hasMany(PurchaseOrderItemLeft::class);
     }
 
     public function purchaseOrderItemLeft(){

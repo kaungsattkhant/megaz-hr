@@ -2,16 +2,17 @@
 
 namespace App\Repositories\PurchaseOrder;
 
-use App\Http\Action\Common\PurchaseOrder as CommonPurchaseOrder;
-use App\Http\Action\Inventory\StoreInventory;
-use App\Http\Action\SendNotification\SendNotification;
 use App\Models\PoGrn;
+use Illuminate\Http\Request;
 use App\Models\PurchaseOrder;
 use App\Models\PurchaseOrderItem;
+use Illuminate\Support\Facades\DB;
 use App\Models\PurchaseOrderItemLeft;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
+use App\Http\Action\Inventory\StoreInventory;
+use App\Http\Action\SendNotification\SendNotification;
+use App\Http\Action\Transaction\PurchaseOrderTransaction;
+use App\Http\Action\Common\PurchaseOrder as CommonPurchaseOrder;
 
 class PurchaseOrderRepository implements PurchaseOrderRepositoryInterface
 {
@@ -111,15 +112,18 @@ class PurchaseOrderRepository implements PurchaseOrderRepositoryInterface
                         }
                     }
                 }
-
-                $po_item = $po->items()->updateOrCreate(['id' => $item_data['id']], $item_data);
                 if ($request->is_grn) {
+                    if($item->supplier_id!=null && $item->invoice_amount!=null && $item->invoice_no!=null){
+                        $item_data['is_grn']=1;
+                    }
                     $this->storeGRN($po, $item);
-
                 }
+                $po_item = $po->items()->updateOrCreate(['id' => $item_data['id']], $item_data);
             }
             if ($request->is_grn && $po) {
-                (new StoreInventory())->inventoryAction($po, 'in', 'purchase_order');
+                $morphMapName=RelationMorphName($po);
+                (new PurchaseOrderTransaction())->createTransaction($po,$morphMapName);  #create transaction
+                // (new StoreInventory())->inventoryAction($po, 'in', 'purchase_order');
             }
             if (!isset($request->id)) {
                 $users = $this->getUserByRole(['Manager']);
@@ -142,15 +146,16 @@ class PurchaseOrderRepository implements PurchaseOrderRepositoryInterface
 
     public function storeGRN($po, $item)
     {
-        return PoGrn::create([
-            'quantity' => $item->quantity,
-            'supplier_id' => $item->supplier_id,
-            'invoice_amount' => $item->invoice_amount,
-            'invoice_no' => $item->invoice_no,
-            'item_id' => $item->item_id,
-            'purchase_order_id' => $po->id,
-        ]);
-
+        if($item->supplier_id!=null && $item->invoice_amount!=null && $item->invoice_no!=null){
+            return PoGrn::create([
+                'quantity' => $item->quantity,
+                'supplier_id' => $item->supplier_id,
+                'invoice_amount' => $item->invoice_amount,
+                'invoice_no' => $item->invoice_no,
+                'item_id' => $item->item_id,
+                'purchase_order_id' => $po->id,
+            ]);
+        }
     }
 
     public function updateData(array $data, int $id)
@@ -339,4 +344,12 @@ class PurchaseOrderRepository implements PurchaseOrderRepositoryInterface
         }
         $po ? ResponseMessage('PO bought successfully', 200) : ResponseMessage('PO bought Fail', 422);
     }
+    
+    public function getPurchaseOrderItemConfirmationList($request){
+        return PurchaseOrderItem::with(['purchase_order'])
+        ->orderBy('id','desc')
+        ->where('is_grn',1)
+        ->paginate(config('common.list_count'));
+    }
+
 }
