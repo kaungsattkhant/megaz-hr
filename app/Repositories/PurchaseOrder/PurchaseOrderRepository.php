@@ -331,18 +331,20 @@ class PurchaseOrderRepository implements PurchaseOrderRepositoryInterface
 
     public function boughtPurchaseOrder($request)
     {
-        $ids = $request->ids;
-        $po = PurchaseOrder::whereIn('id', $ids)
-            ->update([
-                'is_bought' => $request->value,
-            ]);
-        foreach ($ids as $id) {
-            $model = PurchaseOrder::find($id);
-            if ($model) {
-                (new StoreInventory())->inventoryAction($model, 'in', 'purchase_order');
-            }
-        }
-        $po ? ResponseMessage('PO bought successfully', 200) : ResponseMessage('PO bought Fail', 422);
+        #no need
+        // $ids = $request->ids;
+        // $po = PurchaseOrder::whereIn('id', $ids)
+        //     ->update([
+        //         'is_bought' => $request->value,
+        //     ]);
+        // foreach ($ids as $id) {
+        //     $model = PurchaseOrder::find($id);
+        //     if ($model) {
+        //         (new StoreInventory())->inventoryAction($model, 'in', 'purchase_order');
+        //     }
+        // }
+        // $po ? ResponseMessage('PO bought successfully', 200) : ResponseMessage('PO bought Fail', 422);
+        #end
     }
     
     public function getPurchaseOrderItemConfirmationList($request){
@@ -350,6 +352,16 @@ class PurchaseOrderRepository implements PurchaseOrderRepositoryInterface
         ->orderBy('id','desc')
         ->where('is_grn',1)
         ->paginate(config('common.list_count'));
+    }
+
+    public function confirmPurchaseOrderItem($request){
+         $po_item=PurchaseOrderItem::find($request->id);
+         if($po_item){
+            $po_item->is_confirmed=1;
+            $po_item->save();
+            ResponseMessage('Update Successfully',200);
+         }
+         ResponseMessage('Not Found',404);
     }
 
 }

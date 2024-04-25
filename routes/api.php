@@ -105,6 +105,8 @@ Route::middleware('auth:api')->group(function () {
         Route::post('purchase_orders_bought', 'boughtPurchaseOrder');
         Route::post('updateIsCheck', 'updateIsCheck');
         Route::get('/purchase_order_item_confirmation_list', 'getPurchaseOrderItemConfirmationList');
+        Route::get('/confirm_purchase_order_item', 'confirmPurchaseOrderItem');
+        
     });
     #item usage forecast
     Route::resource('item_usage_forecasts', ItemUsageForecastController::class)->only(['index', 'store', 'show', 'destroy']);

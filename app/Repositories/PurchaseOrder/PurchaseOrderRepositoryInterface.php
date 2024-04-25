@@ -25,4 +25,7 @@ interface PurchaseOrderRepositoryInterface
     public function boughtPurchaseOrder($request);
 
     public function getPurchaseOrderItemConfirmationList($request);
+
+    public function confirmPurchaseOrderItem($request);
+
 }
