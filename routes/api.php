@@ -6,6 +6,7 @@ use App\Models\Category;
 use App\Models\MenuCategory;
 use App\Models\ServiceCategory;
 use App\Models\ComplaintCategory;
+use App\Models\PurchaseOrderItemLeft;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\API\AreaController;
 use App\Http\Controllers\API\AuthController;
@@ -37,6 +38,7 @@ use App\Http\Controllers\API\DepartmentAPIController;
 use App\Http\Controllers\API\FixedAssetPurchaseAPIController;
 use App\Http\Controllers\API\PurchaseOrderAPIController;
 use App\Http\Controllers\API\ItemUsageForecastController;
+use App\Http\Controllers\API\PurchaseOrderItemLeftController;
 
 /*
 |--------------------------------------------------------------------------
@@ -103,6 +105,9 @@ Route::middleware('auth:api')->group(function () {
         Route::delete('/purchase_orders_items/{id}', 'deletePurchaseOrderItem');
         Route::post('purchase_orders_bought', 'boughtPurchaseOrder');
         Route::post('updateIsCheck', 'updateIsCheck');
+        Route::get('/purchase_order_item_confirmation_list', 'getPurchaseOrderItemConfirmationList');
+        Route::get('/confirm_purchase_order_item', 'confirmPurchaseOrderItem');
+        
     });
     #item usage forecast
     Route::resource('item_usage_forecasts', ItemUsageForecastController::class)->only(['index', 'store', 'show', 'destroy']);
@@ -147,6 +152,10 @@ Route::middleware('auth:api')->group(function () {
     Route::resource('notifications',NotificationController::class)->only(['index']);
     Route::post('notifications/set_seen', [NotificationController::class, 'setSeenNotifications']);
     Route::post('notifications/{notificationId}/mark_read', [NotificationController::class, 'markReadNotification']);
+
+    #po itemleft
+    Route::resource('purchase_order_item_lefts', PurchaseOrderItemLeftController::class)->only(['index', 'show',]);
+
 });
 
 Route::controller(ExcelImportController::class)->group(function () {

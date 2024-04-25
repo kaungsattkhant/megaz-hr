@@ -17,9 +17,8 @@ return new class extends Migration
             $table->char('invoice_amount')->default(0);
             $table->integer('quantity')->default(0);
             $table->longText('remark')->nullable();
-            $table->unsignedInteger('item_id');
             $table->unsignedInteger('supplier_id');
-            $table->unsignedInteger('purchase_order_id');
+            $table->unsignedInteger('purchase_order_item_id');
             $table->timestamps();
         });
     }
