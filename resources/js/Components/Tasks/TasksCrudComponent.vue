@@ -43,6 +43,14 @@
                                 Checked
                             </th>
 
+                            <th scope="col" class=" px-6 py-4 ">
+                                Done By
+                            </th>
+
+                            <th scope="col" class=" px-6 py-4 ">
+                                Checked by
+                            </th>
+
                             <th scope="col" class="px-6 py-4">
 
                             </th>
@@ -95,6 +103,14 @@
                                     checked:focus:before:transition-[box-shadow_0.2s,transform_0.2s] dark:bg-white/25 dark:after:bg-surface-dark dark:checked:bg-primary dark:checked:after:bg-primary"
                                     type="checkbox"
                                     role="switch"/>
+                                </td>
+
+                                <td class=" px-6 py-4 ">
+                                    <div v-if="task.completedBy"> {{ task.completedBy.name }} </div>
+                                </td>
+
+                                <td class=" px-6 py-4 ">
+                                    <div v-if="task.doubleCheckedBy"> {{ task.doubleCheckedBy.name }} </div>
                                 </td>
                             </tr>
                             <tr class="">

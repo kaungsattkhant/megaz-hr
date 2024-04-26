@@ -45,7 +45,7 @@ class TaskRepository implements TaskRepositoryInterface
                 $perPage = $request->per_page;
             }
             $skip = ($pageNumber - 1) * $perPage;
-            $tasks = Task::where('is_active', 1)->skip($skip)->take($perPage)->with('role.department')->get();
+            $tasks = Task::where('is_active', 1)->skip($skip)->take($perPage)->with(['role.department','completedBy','doubleCheckedBy'])->get();
             $paginationData = MakePaginationData($request, $totalCount, 'tasks');
             $paginationData['tasks'] = $tasks;
 
@@ -93,7 +93,7 @@ class TaskRepository implements TaskRepositoryInterface
         return $tasks;
     }
 
-    public function doubleCheckTasks($id)
+    public function doubleCheckTasks(int $id, string $status)
     {
         $staff = UserData();
         DB::beginTransaction();
@@ -110,7 +110,7 @@ class TaskRepository implements TaskRepositoryInterface
                 }
                 $task->double_checked_by = $staff->id;
                 $task->is_double_checked = 1;
-                $task->status = 'passed';
+                $task->status = $status;
                 $task->save();
                 DB::commit();
                 ResponseMessage('Task double checked done');
