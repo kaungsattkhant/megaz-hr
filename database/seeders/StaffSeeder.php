@@ -20,16 +20,17 @@ class StaffSeeder extends Seeder
     public function run(): void
     {
         $departments = Department::with('roles')->get();
-        foreach($departments as $department){
+        foreach($departments as $i=>$department){
             foreach($department->roles as $departmentRole){
                 try{
                     DB::beginTransaction();
                     $faker = Faker::create();
+                    $phoneNumber = '09' . str_repeat($department->id, 2) . sprintf('%02d',$departmentRole->id);
                     $staff = Staff::create([
                         'gender_id' => $faker->numberBetween(1, 2),
                         'department_id' => $department->id,
                         'name' => $faker->name,
-                        'phone_number' => $faker->phoneNumber,
+                        'phone_number' => $phoneNumber,
                         'password' => 'password',
                     ]);
                     $staff->roles()->sync([$departmentRole->id]);
