@@ -106,11 +106,11 @@
                                 </td>
 
                                 <td class=" px-6 py-4 ">
-                                    <div v-if="task.completedBy"> {{ task.completedBy.name }} </div>
+                                    <div v-if="task.completed_by"> {{ task.completed_by.name }} </div>
                                 </td>
 
                                 <td class=" px-6 py-4 ">
-                                    <div v-if="task.doubleCheckedBy"> {{ task.doubleCheckedBy.name }} </div>
+                                    <div v-if="task.double_checked_by"> {{ task.double_checked_by.name }} </div>
                                 </td>
                             </tr>
                             <tr class="">
