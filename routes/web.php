@@ -34,7 +34,7 @@ Route::middleware(['departments:HR'])->group(function () {
     Route::view('/staff/create', 'staff.create')->name('staff.crate');
 
     Route::view('/tasks', 'tasks.index')->name('tasks');
-    Route::view('/complains', 'complains.index')->name('complains');
+    Route::view('/complaints', 'complains.index')->name('complains');
 
     Route::view('/departments', 'departments.index')->name('departments');
     Route::view('/areas', 'areas.index')->name('areas');
@@ -64,6 +64,8 @@ Route::middleware(['departments:HR,Finance,Management'])->group(function () {
 Route::middleware(['departments:Inventory'])->group(function () {
 
     Route::view('/confirm_purchase_order_items', 'purchase_orders.confirm_poitems')->name('purchase_orders.confirm_poitems');
+    Route::view('/purchase_order_left_items', 'purchase_orders.left_items_index')->name('purchase_orders.left_items_index');
+    Route::view('/purchase_order_left_items/{poId}', 'purchase_orders.left_items_detail')->name('purchase_orders.left_items_detail');
 });
 
 Route::middleware(['departments:Finance'])->group(function () {

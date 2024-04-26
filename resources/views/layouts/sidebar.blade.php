@@ -12,21 +12,9 @@
                                 </a>
                             </li>
                             <li>
-                                <a href="{{ route('tasks') }}" class="flex items-center @yield('tasks')">
-                                    <i class="fal fa-tasks  pr-3"></i>
-                                    Tasks
-                                </a>
-                            </li>
-                            <li>
                                 <a href="{{ route('departments') }}" class="flex items-center @yield('departments')">
                                     <i class="fal fa-network-wired  pr-3"></i>
                                     Department
-                                </a>
-                            </li>
-                            <li>
-                                <a href="{{ route('areas') }}" class="flex items-center @yield('areas')">
-                                    <i class="fal fa-network-wired  pr-3"></i>
-                                    Areas
                                 </a>
                             </li>
                             <li>
@@ -36,17 +24,19 @@
                                 </a>
                             </li>
                             <li>
+                                <a href="{{ route('areas') }}" class="flex items-center @yield('areas')">
+                                    <i class="fal fa-network-wired  pr-3"></i>
+                                    Areas
+                                </a>
+                            </li>
+
+                            <li>
                                 <a href="{{ route('inventories') }}" class="flex items-center @yield('inventories')">
                                     <i class="fal fa-inventory  pr-3"></i>
                                     Inventory
                                 </a>
                             </li>
-                            <li>
-                                <a href="{{ route('menus') }}" class="flex items-center @yield('menus')">
-                                    <i class="fal fa-clipboard-list  pr-3"></i>
-                                    Menu
-                                </a>
-                            </li>
+
                             <li>
                                 <a href="{{ route('items') }}" class="flex items-center @yield('items')">
                                     <i class="fal fa-hand-receiving  pr-3"></i>
@@ -60,6 +50,13 @@
                                     Item Usage Forecasts
                                 </a>
                             </li>
+                            <li>
+                                <a href="{{ route('menus') }}" class="flex items-center @yield('menus')">
+                                    <i class="fal fa-clipboard-list  pr-3"></i>
+                                    Selling Menus
+                                </a>
+                            </li>
+
                             <li>
                                 <a href="{{ route('room') }}" class="flex items-center @yield('room')">
                                     <i class="fal fa-user  pr-3"></i>
@@ -80,9 +77,15 @@
                                 </a>
                             </li>
                             <li>
+                                <a href="{{ route('tasks') }}" class="flex items-center @yield('tasks')">
+                                    <i class="fal fa-tasks  pr-3"></i>
+                                    Tasks
+                                </a>
+                            </li>
+                            <li>
                                 <a href="{{ route('complains') }}" class="flex items-center @yield('complains')">
                                     <i class="fal fa-user  pr-3"></i>
-                                    Complains
+                                    Complaints
                                 </a>
                             </li>
                         @endif
@@ -216,6 +219,14 @@
                             </li>
 
 
+
+                            <li>
+                                <a href="{{ route('purchase_orders.left_items_index') }}"
+                                    class="flex items-center @yield('purchase_order_left_items')">
+                                    <i class="fal fa-truck-loading  pr-3"></i>
+                                    Purchase Orders with Left Items
+                                </a>
+                            </li>
 
                             <li>
                                 <a href="{{ route('fixed_assets.index') }}"
