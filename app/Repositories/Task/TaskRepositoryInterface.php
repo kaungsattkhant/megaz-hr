@@ -20,5 +20,5 @@ interface TaskRepositoryInterface
 
     public function getTasksByStaff(int $id);
 
-    public function doubleCheckTasks(int $id);
+    public function doubleCheckTasks(int $id, string $status);
 }

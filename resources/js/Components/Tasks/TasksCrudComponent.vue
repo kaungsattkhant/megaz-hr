@@ -43,6 +43,14 @@
                                 Checked
                             </th>
 
+                            <th scope="col" class=" px-6 py-4 ">
+                                Done By
+                            </th>
+
+                            <th scope="col" class=" px-6 py-4 ">
+                                Checked by
+                            </th>
+
                             <th scope="col" class="px-6 py-4">
 
                             </th>
@@ -74,12 +82,15 @@
                                     <i v-else class="fas fa-check" @click="doubleChecked(task.id)"></i>
                                 </td>
 
+                                <td class=" px-6 py-4 ">
+                                    <div v-if="task.completed_by"> {{ task.completed_by.name }} </div>
+                                </td>
+
+                                <td class=" px-6 py-4 ">
+                                    <div v-if="task.double_checked_by"> {{ task.double_checked_by.name }} </div>
+                                </td>
+
                                 <td class="whitespace-nowrap px-6 py-4">
-                                    <!-- <button id="edit-btn" class="pr-1"
-                                    @click="deleteBtnClicked(task.id)"
-                                    data-te-toggle="modal" data-te-target="#deleteModal">
-                                        <i class="fas fa-trash-alt"></i>
-                                    </button> -->
                                     <input
                                     :checked="task.is_active == 1"
                                     @change="isActiveToggled(task.id)"
