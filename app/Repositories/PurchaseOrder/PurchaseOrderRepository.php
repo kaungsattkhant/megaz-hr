@@ -24,18 +24,18 @@ class PurchaseOrderRepository implements PurchaseOrderRepositoryInterface
         $staff = UserData();
         $purchaseOrders = PurchaseOrder::with(['items.item', 'createdBy', 'managerCheckedBy', 'financialCheckedBy'])
             ->orderBy('id', 'desc')
-            ->when($staff->hasRoles('Staff'), function ($q) use ($staff) {
+            ->when(checkDepartmentAndRoles('HR',['Staff']), function ($q) use ($staff) {
                 $q->where('created_by', $staff->id);
             })
-            ->when($staff->hasRoles('Manager'), function ($q) {
+            ->when(checkDepartmentAndRoles('HR',['Manager']), function ($q) {
                 $q->whereIn('status', ['manager_checked', 'created'])
                     ->orWhere('manager_check_id', UserData()->id);
             })
-            ->when($staff->hasRoles('Financial'), function ($q) {
+            ->when(checkDepartmentAndRoles('Finance',['Staff']), function ($q) {
                 $q->whereIn('status', ['manager_checked', 'financial_checked'])
                     ->orWhere('financial_check_id', UserData()->id);
             })
-            ->when($staff->hasRoles('MD'), function ($q) {
+            ->when(checkDepartmentAndRoles('Manager',['MD']), function ($q) {
                 $q->whereIn('status', ['md_checked', 'financial_checked']);
             })
             ->paginate(config('common.list_count'));
@@ -74,7 +74,7 @@ class PurchaseOrderRepository implements PurchaseOrderRepositoryInterface
                     $item_data['id'] = null;
                 }
                 $item_data['quantity'] = $item->quantity;
-                if ($staff->hasRoles('Staff')) {
+                if (checkDepartmentAndRoles('HR',['Staff'])) {
                     $item_data['original_quantity'] = $item->quantity;
                 } else {
                     $item_data['original_quantity'] = $item->original_quantity;
@@ -90,13 +90,13 @@ class PurchaseOrderRepository implements PurchaseOrderRepositoryInterface
                         if ($item->quantity < $purchaseOrderItem->quantity) {
                             $quantity = $purchaseOrderItem->original_quantity - $item->quantity;
                             $column = null;
-                            if ($staff->hasRoles('Manager')) {
+                            if (checkDepartmentAndRoles('HR',['Manager'])) {
                                 $column = 'quantity_by_manager';
-                            } elseif (!$po->is_md_checked && $staff->hasRoles('Financial')) {
+                            } elseif (!$po->is_md_checked && checkDepartmentAndRoles('Finance',['Staff'])) {
                                 $column = 'quantity_by_financial';
-                            } elseif ($staff->hasRoles('MD')) {
+                            } elseif (checkDepartmentAndRoles('Management',['MD'])) {
                                 $column = 'quantity_by_md';
-                            } elseif ($po->is_md_checked && $staff->hasRoles('Financial')) {
+                            } elseif ($po->is_md_checked && checkDepartmentAndRoles('Finance',['Staff'])) {
                                 $column = 'quantity_after_md';
                             }
                             if ($column != null) {
@@ -129,7 +129,7 @@ class PurchaseOrderRepository implements PurchaseOrderRepositoryInterface
                 // (new StoreInventory())->inventoryAction($po, 'in', 'purchase_order');
             }
             if (!isset($request->id)) {
-                $users = $this->getUserByRole(['Manager']);
+                $users = $this->getUserByRole('HR',['Manager']);
                 $data = [
                     'date' => $po->created_at,
                     'title' => 'You have received a new PO to confirm',
@@ -228,15 +228,15 @@ class PurchaseOrderRepository implements PurchaseOrderRepositoryInterface
             $model = Model($request->type)::find($request->id);
             $this->validateModel($model, $staff, $request->type);
             if ($model) {
-                if ($staff->hasRoles('Manager')) {
+                if (checkDepartmentAndRoles('HR',['Manager'])) {
                     $column = 'manager_check';
                     $is_column = 'is_manager_checked';
                     $status = 'manager_checked';
-                } else if ($staff->hasRoles('Financial')) {
+                } else if (checkDepartmentAndRoles('Finance',['Staff'])) {
                     $column = 'financial_check';
                     $is_column = 'is_financial_checked';
                     $status = 'financial_checked';
-                } else if ($staff->hasRoles('MD')) {
+                } else if (checkDepartmentAndRoles('Management',['MD'])) {
                     $column = 'md_check';
                     $is_column = 'is_md_checked';
                     $status = 'md_checked';
@@ -254,7 +254,7 @@ class PurchaseOrderRepository implements PurchaseOrderRepositoryInterface
                     // if ($items->isNotEmpty()) {
                     //     ResponseMessage('Some items are left to check', 422);
                     // }
-                    $staff->hasRoles('MD') ?
+                    checkDepartmentAndRoles('Management',['MD']) ?
                     $model->$is_column = 1 : $model->$column_id = $staff->id;
                     $model->$column_time = now();
                     $model->status = $status;
@@ -263,14 +263,14 @@ class PurchaseOrderRepository implements PurchaseOrderRepositoryInterface
                     #send notification by specific role
                     #notification
                     $users = collect([]);
-                    if ($staff->hasRoles('Manager')) {
-                        $users = $this->getUserByRole(['Financial']);
+                    if (checkDepartmentAndRoles('HR',['Manager'])) {
+                        $users = $this->getUserByRole('Finance',['staff']);
                         $title = 'You have received a new PO to confirm';
-                    } else if ($staff->hasRoles('Financial')) {
-                        $users = $this->getUserByRole(['MD']);
+                    } else if (checkDepartmentAndRoles('Finance',['Staff'])) {
+                        $users = $this->getUserByRole('Management',['MD']);
                         $title = 'You have received a new PO to confirm';
-                    } else if ($staff->hasRoles('MD')) {
-                        $users = $this->getUserByRole(['Financial']);
+                    } else if (checkDepartmentAndRoles('Management',['MD'])) {
+                        $users = $this->getUserByRole('Finance',['Staff']);
                         $title = 'You have received a new PO to confirm From MD';
                     }
                     $data = [
@@ -303,29 +303,29 @@ class PurchaseOrderRepository implements PurchaseOrderRepositoryInterface
     public function validateModel($model, $staff, $type)
     {
         if ($model) {
-            if ($staff->hasRoles('Staff')) {
+            if (checkDepartmentAndRoles('HR',['Staff'])) {
                 ResponseMessage("Permission isn't allowed", 422);
             }
 
             if ($type == 'purchase_order') {
-                if ($staff->hasRoles('Manager')) {
+                if (checkDepartmentAndRoles('HR',['Manager'])) {
                     if ($model->manager_check_id != null) {
                         ResponseMessage('This Purchase Order is already checked By Manager', 419);
                     }
 
-                } else if ($staff->hasRoles('Financial')) {
+                } else if (checkDepartmentAndRoles('Finance',['Staff'])) {
                     if ($model->financial_check_id != null) {
                         ResponseMessage('This Purchase Order is already checked By Financial', 422);
                     }
 
-                } else if ($staff->hasRoles('MD')) {
+                } else if (checkDepartmentAndRoles('Management',['MD'])) {
                     if ($model->is_md_checked) {
                         ResponseMessage('This Purchase Order is already checked By MD', 422);
                     }
 
-                    if (!$model->createdBy->department->inventory) {
-                        ResponseMessage('Inventory is required', 422);
-                    }
+                    // if (!$model->createdBy->department->inventory) {
+                    //     ResponseMessage('Inventory is required', 422);
+                    // }
                 }
             }
         }

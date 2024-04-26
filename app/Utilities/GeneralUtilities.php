@@ -300,5 +300,18 @@ if (!function_exists('checkDepartmentPermission')) {
       }
 }
 
+if (!function_exists('checkDepartmentAndRoles')) {
+    function checkDepartmentAndRoles($department,$names){
+        $departmentName = UserData()->department->name;
+        $roles = UserData()->roles;
+        foreach ($names as $name) {
+            if ($roles->contains('name', $name) && $departmentName==$department) {
+                return true;
+            }
+        }
+        return false;
+      }
+}
+
 
  

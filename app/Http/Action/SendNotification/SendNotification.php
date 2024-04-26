@@ -36,12 +36,16 @@ trait SendNotification
     public function getTokensByStaff($user_ids){
         return StaffFcmToken::whereIn('id',$user_ids)->pluck('fcm_token')->toArray();
     }
-    public function getUserByRole($roles){
+    public function getUserByRole($department_name,$roles){
         // $staffs=Staff::whereHas('roles',function(query)use($roles){
         //     $query->whereIn('id',$roles);
         // })->get();
         return \App\Models\Staff::whereHas('roles', function($query) use ($roles) {
             $query->whereIn('name', $roles);
-        })->get();
+        })
+        ->whereHas('department',function($query)use($department_name){
+            $query->where('name',$department_name);
+        })
+        ->get();
     }
 }

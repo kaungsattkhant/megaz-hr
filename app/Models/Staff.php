@@ -86,8 +86,8 @@ class Staff extends Authenticatable
         return $this->hasMany(Task::class, 'completed_by');
     }
 
-    public function hasRoles($name){
-        if($this->roles->contains('name',$name)){
+    public function hasRoles($dept,$name){
+        if($this->roles->contains('name',$name) && $this->department->name==$dept){
             return true;
         }
         return false;
