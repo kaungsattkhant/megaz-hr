@@ -110,9 +110,10 @@ class TaskRepository implements TaskRepositoryInterface
                 }
                 $task->double_checked_by = $staff->id;
                 $task->is_double_checked = 1;
+                $task->status = 'passed';
                 $task->save();
                 DB::commit();
-                ResponseMEssage('Double checked successfull');
+                ResponseMessage('Task double checked done');
             } else {
                 ResponseMessage('Permission is not allowed', 403);
             }

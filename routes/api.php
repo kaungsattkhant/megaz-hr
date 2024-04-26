@@ -91,6 +91,10 @@ Route::middleware('auth:api')->group(function () {
 
     Route::get('/supervisor/staff', [StaffAPIController::class, 'getStaffListBySupervisor']);
     Route::get('/supervisor/staff/{staffId}/tasks', [TaskController::class, 'getStaffTasksBySupervisor']);
+    Route::controller(TaskController::class)->group(function()
+    {
+        Route::post('/tasks/{id}/double_checked','taskDoubleChecked');
+    });
     Route::controller(PurchaseOrderAPIController::class)->group(function () {
         Route::get('/purchase_orders', 'getPurchaseOrder');
         Route::post('/purchase_orders', 'createPurchaseOrder');
@@ -107,7 +111,7 @@ Route::middleware('auth:api')->group(function () {
         Route::post('updateIsCheck', 'updateIsCheck');
         Route::get('/purchase_order_item_confirmation_list', 'getPurchaseOrderItemConfirmationList');
         Route::get('/confirm_purchase_order_item', 'confirmPurchaseOrderItem');
-        
+
     });
     #item usage forecast
     Route::resource('item_usage_forecasts', ItemUsageForecastController::class)->only(['index', 'store', 'show', 'destroy']);
@@ -141,11 +145,6 @@ Route::middleware('auth:api')->group(function () {
         Route::post('/fixed_asset_purchases','createFixedAssetPurchaseData');
         Route::post('/fixed_asset_purchases/is_update_checked','updateIsCheck');
         Route::post('/fixed_asset_purchases/bought','boughtFixedAsset');
-    });
-
-    Route::controller(TaskController::class)->group(function()
-    {
-        Route::post('/tasks/{id}/double_checked','taskDoubleChecked');
     });
 
     Route::resource('suppliers', SupplierController::class)->only(['index', 'store', 'show', 'destroy']);
