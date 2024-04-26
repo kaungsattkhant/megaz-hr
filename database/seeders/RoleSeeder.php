@@ -22,6 +22,7 @@ class RoleSeeder extends Seeder
         $managementDept = Department::where('name', 'Management')->first();
         $cateringDept = Department::where('name', 'Catering')->first();
         $inventoryDept = Department::where('name', 'Inventory')->first();
+        $kitchenDept = Department::where('name', 'Kitchen')->first();
 
         $basicRoles = ['Staff', 'Supervisor', 'Manager'];
 
@@ -61,6 +62,13 @@ class RoleSeeder extends Seeder
         foreach($basicRoles as $roleName){
             Role::create([
                 'department_id' => $inventoryDept->id,
+                'name' => $roleName
+            ]);
+        }
+
+        foreach($basicRoles as $roleName){
+            Role::create([
+                'department_id' => $kitchenDept->id,
                 'name' => $roleName
             ]);
         }
