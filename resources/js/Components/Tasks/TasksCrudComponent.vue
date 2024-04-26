@@ -82,12 +82,15 @@
                                     <i v-else class="fas fa-check" @click="doubleChecked(task.id)"></i>
                                 </td>
 
+                                <td class=" px-6 py-4 ">
+                                    <div v-if="task.completed_by"> {{ task.completed_by.name }} </div>
+                                </td>
+
+                                <td class=" px-6 py-4 ">
+                                    <div v-if="task.double_checked_by"> {{ task.double_checked_by.name }} </div>
+                                </td>
+
                                 <td class="whitespace-nowrap px-6 py-4">
-                                    <!-- <button id="edit-btn" class="pr-1"
-                                    @click="deleteBtnClicked(task.id)"
-                                    data-te-toggle="modal" data-te-target="#deleteModal">
-                                        <i class="fas fa-trash-alt"></i>
-                                    </button> -->
                                     <input
                                     :checked="task.is_active == 1"
                                     @change="isActiveToggled(task.id)"
@@ -103,14 +106,6 @@
                                     checked:focus:before:transition-[box-shadow_0.2s,transform_0.2s] dark:bg-white/25 dark:after:bg-surface-dark dark:checked:bg-primary dark:checked:after:bg-primary"
                                     type="checkbox"
                                     role="switch"/>
-                                </td>
-
-                                <td class=" px-6 py-4 ">
-                                    <div v-if="task.completed_by"> {{ task.completed_by.name }} </div>
-                                </td>
-
-                                <td class=" px-6 py-4 ">
-                                    <div v-if="task.double_checked_by"> {{ task.double_checked_by.name }} </div>
                                 </td>
                             </tr>
                             <tr class="">
