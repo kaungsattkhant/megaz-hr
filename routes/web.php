@@ -60,6 +60,9 @@ Route::middleware(['departments:HR,Finance,Management'])->group(function () {
     Route::view('/purchase_orders/create', 'purchase_orders.create')->name('purchase_orders.create');
     Route::view('/purchase_orders/{poId}/confirm', 'purchase_orders.confirm')->name('purchase_orders.confirm');
     Route::view('/purchase_orders/{poId}/buy', 'purchase_orders.buy')->name('purchase_orders.buy');
+});
+Route::middleware(['departments:Inventory'])->group(function () {
+
     Route::view('/confirm_purchase_order_items', 'purchase_orders.confirm_poitems')->name('purchase_orders.confirm_poitems');
     Route::view('/purchase_order_left_items', 'purchase_orders.left_items_index')->name('purchase_orders.left_items_index');
     Route::view('/purchase_order_left_items/{poId}', 'purchase_orders.left_items_detail')->name('purchase_orders.left_items_detail');
@@ -91,7 +94,7 @@ Route::view('/suppliers/{id}/edit', 'supplier.edit')->name('suppliers.edit');
 Route::view('/fixed_assets', 'fixed_assets.index')->name('fixed_assets.index');
 
 //pos
-Route::group(['prefix'=>'pos'], function(){
+Route::group(['prefix' => 'pos'], function () {
     Route::view('/login', 'pos.auth.index')->name('pos.login');
     Route::middleware(['departments:Catering'])->group(function () {
         Route::view('/home', 'pos.home.index')->name('pos.index');

@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\DB;
 
 class PurchaseOrderTransaction
 {
-    public function createTransaction($model, $transactionable_type = null)
+    public function createTransaction($model, $transactionable_type = null,$cash_account_id)
     {
         $purchaseOrderItemGroupedByCategory = PurchaseOrderItem::join('items', 'purchase_order_items.item_id', '=', 'items.id')
             ->join('categories', 'items.category_id', '=', 'categories.id')
@@ -22,7 +22,6 @@ class PurchaseOrderTransaction
         $data['created_by'] = UserData()->id;
         $data['transactionable_id'] = $model->id;
         $data['transactionable_type'] = $transactionable_type;
-        $creditAccount = (new Account())->accountByCode('2-1001'); # credit account is awalys Office Account
         foreach ($purchaseOrderItemGroupedByCategory as $po_category) {
             $transaction = (new StoreTransactionLedger())->createTransaction($data);
             $category_id = $po_category->category_id;
@@ -64,12 +63,12 @@ class PurchaseOrderTransaction
                 }
             }
             #credit
-            if ($creditAccount) {
+            if ($cash_account_id) {
                 $creditLedger = (new StoreTransactionLedger())->storeLedger([
                     'date' => now(),
                     'value' => $po_category->total_amount,
                     'transaction_id' => $transaction->id,
-                    'account_id' => $creditAccount->id,
+                    'account_id' => $cash_account_id,
                     'action' => 'credit',
                 ]);
             } else {

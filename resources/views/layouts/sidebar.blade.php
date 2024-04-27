@@ -218,13 +218,7 @@
                                 </a>
                             </li>
 
-                            <li>
-                                <a href="{{ route('purchase_orders.confirm_poitems') }}"
-                                    class="flex items-center @yield('confirm_purchase_order_items')">
-                                    <i class="fal fa-truck-loading  pr-3"></i>
-                                    Confirm Purchase Order Items
-                                </a>
-                            </li>
+
 
                             <li>
                                 <a href="{{ route('purchase_orders.left_items_index') }}"
@@ -242,7 +236,15 @@
                                 </a>
                             </li>
                         @endif
-
+                        @if (checkDepartmentAndRoles('Inventory', ['Staff']))
+                            <li>
+                                <a href="{{ route('purchase_orders.confirm_poitems') }}"
+                                    class="flex items-center @yield('confirm_purchase_order_items')">
+                                    <i class="fal fa-truck-loading  pr-3"></i>
+                                    Confirm Purchase Order Items
+                                </a>
+                            </li>
+                        @endif
                     </ul>
 
                 </div>
