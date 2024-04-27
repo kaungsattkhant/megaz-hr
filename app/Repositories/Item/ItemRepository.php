@@ -3,6 +3,7 @@
 namespace App\Repositories\Item;
 
 use App\Models\Item;
+use App\Models\ItemPrice;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -34,6 +35,7 @@ class ItemRepository implements ItemRepositoryInterface
         try {
             $item = Item::create($data);
             $uomIds = json_decode($data['uoms'], true);
+            $price = ItemPrice::create(['item_id'=>$item->id, 'price'=>$data['price']]);
             foreach ($uomIds as $uomId) {
                 $item->uoms()->attach($uomId);
             }
