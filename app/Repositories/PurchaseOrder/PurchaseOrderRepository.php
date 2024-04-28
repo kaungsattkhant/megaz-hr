@@ -365,6 +365,9 @@ class PurchaseOrderRepository implements PurchaseOrderRepositoryInterface
             if (checkDepartmentAndRoles('Inventory', ['Staff'])) {
                 $po_item = PurchaseOrderItem::find($request->id);
                 if ($po_item) {
+                    if($po_item->is_confirmed==1){
+                        ResponseMessage('Already checked',200);
+                    }
                     $po_item->is_confirmed = 1;
                     $po_item->save();
                     #store inventory
