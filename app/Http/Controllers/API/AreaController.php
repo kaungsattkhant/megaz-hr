@@ -27,11 +27,16 @@ class AreaController extends Controller
         ResponseData($areas);
     }
 
+    public function getAreaByAreaType(int $id)
+    {
+        $area = $this->areaRepo->getAreaByAreaType($id);
+        ResponseData($area);
+    }
+
     public function createArea(AreaCreateRequest $request)
     {
         $data = $request->all();
         $area = $this->areaRepo->createData($data);
-
         ResponseData($area);
     }
 

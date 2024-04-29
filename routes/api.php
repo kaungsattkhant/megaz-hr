@@ -165,6 +165,7 @@ Route::controller(ExcelImportController::class)->group(function () {
 
 
 Route::get('/areas', [AreaController::class, 'getAreas']);
+Route::get('/area_types/{id}/areas',[AreaController::class,'getAreaByAreaType']);
 Route::post('/areas', [AreaController::class, 'createArea']);
 Route::put('/areas/{id}', [AreaController::class, 'updateArea']);
 Route::delete('/areas/{id}', [AreaController::class, 'deleteArea']);

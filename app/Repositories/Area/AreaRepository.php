@@ -48,6 +48,12 @@ class AreaRepository implements AreaRepositoryInterface
         }
     }
 
+    public function getAreaByAreaType(int $id)
+    {
+        $areas = Area::where('is_active',1)->where('area_type_id',$id)->get();
+        return $areas;
+    }
+
     public function updateData(array $data, int $id)
     {
         DB::beginTransaction();
@@ -74,7 +80,6 @@ class AreaRepository implements AreaRepositoryInterface
 
             return true;
         }
-
         return false;
     }
 }
