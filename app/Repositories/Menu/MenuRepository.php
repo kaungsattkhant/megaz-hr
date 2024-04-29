@@ -6,23 +6,23 @@ use Illuminate\Http\Request;
 
 use App\Models\Menu;
 use App\Models\MenuPrice;
+use Illuminate\Support\Facades\DB;
 
 class MenuRepository implements MenuRepositoryInterface
 {
     public function listAllData(Request $request)
     {
-        if($request->per_page || $request->page){
-            $menu_category_id=$request->menu_category_id;
+        if ($request->per_page || $request->page) {
+            $menu_category_id = $request->menu_category_id;
             return Menu::with(['menu_category', 'prices', 'items'])
-            ->when($request->search_input,function($q)use($request){
-                $q->where('name','LIKE','%'.$request->search_input.'%');
-            })
-            ->when($menu_category_id,function($query)use($menu_category_id){
-                $query->where('menu_category_id',$menu_category_id);
-            })
-            ->paginate(config('common.list_count'));
-        }
-        else{
+                ->when($request->search_input, function ($q) use ($request) {
+                    $q->where('name', 'LIKE', '%' . $request->search_input . '%');
+                })
+                ->when($menu_category_id, function ($query) use ($menu_category_id) {
+                    $query->where('menu_category_id', $menu_category_id);
+                })
+                ->paginate(config('common.list_count'));
+        } else {
             $menus = Menu::with(['menu_category', 'prices', 'items'])->where('is_active', 1)->get();
             return $menus;
         }
@@ -32,10 +32,10 @@ class MenuRepository implements MenuRepositoryInterface
     {
         $menu = Menu::create($data);
         $this->createMenuPrice($menu->id, $data['price']);
-        foreach($items as $item){
+        foreach ($items as $item) {
             $menu->items()->attach($item['id'], [
                 'weight' => $item['weight'],
-                'is_make_pack' => $item['is_make_pack']? 1:0
+                'is_make_pack' => $item['is_make_pack'] ? 1 : 0
             ]);
         }
 
@@ -45,7 +45,7 @@ class MenuRepository implements MenuRepositoryInterface
     public function createMenuPrice(int $id, float $price)
     {
         $menu = Menu::find($id);
-        if($menu){
+        if ($menu) {
             $menuPrice = MenuPrice::create([
                 "menu_id" => $menu->id,
                 "price" => $price
@@ -55,5 +55,21 @@ class MenuRepository implements MenuRepositoryInterface
         }
 
         return null;
+    }
+
+    public function menuIsActive(int $id)
+    {
+        DB::beginTransaction();
+        try {
+            $menu = Menu::find($id);
+            $menu->is_active = !$menu->is_active;
+            $menu->save();
+            DB::commit();
+            ResponseMessage('Menu is active status has been changed');
+        } catch (\Exception $e) {
+            DB::rollback();
+            ResponseMessage($e->getMessage(), 402);
+            throw $e;
+        }
     }
 }

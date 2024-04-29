@@ -162,8 +162,6 @@ Route::controller(ExcelImportController::class)->group(function () {
 });
 
 // Route::post('purchase_orders', [PurchaseOrderAPIController::class, 'createPurchaseOrder']);
-
-
 Route::get('/areas', [AreaController::class, 'getAreas']);
 Route::get('/area_types/{id}/areas',[AreaController::class,'getAreaByAreaType']);
 Route::post('/areas', [AreaController::class, 'createArea']);
@@ -226,6 +224,7 @@ Route::delete('/customers/{id}', [CustomerAPIController::class, 'deleteCustomer'
 Route::get('/menus', [MenuAPIController::class, 'getMenus']);
 Route::post('/menus', [MenuAPIController::class, 'createMenu']);
 Route::post('/menus/{id}/add_price', [MenuAPIController::class, 'addPriceToMenu']);
+Route::post('/menus/{id}/is_active',[MenuAPIController::class,'menuOnOff']);
 
 Route::get('/areas/{id}/entities', [EntityAPIController::class, 'getEntityWithInvoice']);
 Route::get('/entities/{id}', [EntityAPIController::class, 'getEntityDetail']);
