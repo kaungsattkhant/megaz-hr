@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\Models\Menu;
 use App\Models\MenuPrice;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 
 class MenuRepository implements MenuRepositoryInterface
 {
@@ -30,6 +31,14 @@ class MenuRepository implements MenuRepositoryInterface
 
     public function createData(array $data, array $items)
     {
+
+        $imageData = base64_decode($data['image']);
+        $extension = 'jpg';
+        $hashedName = md5(uniqid() . microtime()) . '.' . $extension;
+        Storage::put('public/images/' . $hashedName, $imageData);
+        $imageUrl = Storage::url('public/images/' . $hashedName);
+        $data['image_url'] = $imageUrl;
+        $data['image_path'] = 'public/images/' . $hashedName;
         $menu = Menu::create($data);
         $this->createMenuPrice($menu->id, $data['price']);
         foreach ($items as $item) {
@@ -44,6 +53,7 @@ class MenuRepository implements MenuRepositoryInterface
 
     public function createMenuPrice(int $id, float $price)
     {
+
         $menu = Menu::find($id);
         if ($menu) {
             $menuPrice = MenuPrice::create([

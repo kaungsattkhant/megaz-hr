@@ -18,7 +18,7 @@ class AreaSeeder extends Seeder
     {
         //
 
-       
+
         $typeOne = AreaType::create([
             'name' => 'Bar and Restaurant'
         ]);

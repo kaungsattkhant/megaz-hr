@@ -45,13 +45,54 @@ class EntityRepository implements EntityRepositoryInterface
         $entity = Entity::with(["invoices" => function ($query) {
             $query->whereNull("complete_date")
                   ->select("id", "invoice_id", "entity_id", "total_session_price")
-                  ->with(["sessions", "orders.orderItems.menu"])
+                  ->with(["sessions", "orders"])
                   ->latest()
-                  ->limit(1); // Get only the latest invoice
+                  ->limit(1);
         }])->find($entityId);
+
+           $consolidatedOrderItems = [];
+
+        foreach ($entity->invoices as $invoice) {
+
+            foreach ($invoice->orders as $order) {
+
+                foreach ($order->orderItems as $item) {
+                    $status = $item->status;
+                    $menuId = $item->menu_id;
+                    $discount_value = $item->discount_value;
+                    $originalPrice = $item->original_price;
+                    $quantity = $item->quantity;
+                    $price = $item->price;
+                    if (isset($consolidatedOrderItems[$status][$menuId])) {
+
+                        $consolidatedOrderItems[$status][$menuId]->quantity += $quantity;
+                        $consolidatedOrderItems[$status][$menuId]->price += $price;
+                        $consolidatedOrderItems[$status][$menuId]->discount_value += $discount_value;
+
+                    } else {
+                        $consolidatedOrderItems[$status][$menuId] =  $item;
+                    }
+
+                }
+            }
+        }
+        foreach ($entity->invoices as $invoice) {
+            foreach ($invoice->orders as $order) {
+                $orderItems = [];
+                foreach ($consolidatedOrderItems as $statusItems) {
+                    foreach ($statusItems as $menuId => $item) {
+                        $orderItems[] = $item;
+                    }
+                }
+                $order->orderItems = $orderItems;
+                return $order;
+            }
+        }
+
 
         return $entity;
     }
+
 
     public function createData(array $data)
     {

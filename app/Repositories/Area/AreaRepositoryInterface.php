@@ -15,4 +15,6 @@ interface AreaRepositoryInterface
     public function deleteData(int $id);
 
     public function getAreaByAreaType(int $id);
+
+    public function getAreaByAreaCategory(int $id);
 }

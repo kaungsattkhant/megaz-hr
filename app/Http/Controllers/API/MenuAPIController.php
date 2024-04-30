@@ -28,6 +28,7 @@ class MenuAPIController extends Controller
 
     public function createMenu(CreateMenuRequest $request)
     {
+
         $data = $request->except('items');
         $items = json_decode($request->items, true)['items'];
         $menu = $this->menuRepo->createData($data, $items);

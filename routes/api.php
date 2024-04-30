@@ -164,6 +164,7 @@ Route::controller(ExcelImportController::class)->group(function () {
 // Route::post('purchase_orders', [PurchaseOrderAPIController::class, 'createPurchaseOrder']);
 Route::get('/areas', [AreaController::class, 'getAreas']);
 Route::get('/area_types/{id}/areas',[AreaController::class,'getAreaByAreaType']);
+Route::get('/area_categories/{id}/areas',[AreaController::class,'getAreaByAreaCategory']);
 Route::post('/areas', [AreaController::class, 'createArea']);
 Route::put('/areas/{id}', [AreaController::class, 'updateArea']);
 Route::delete('/areas/{id}', [AreaController::class, 'deleteArea']);
@@ -243,3 +244,5 @@ Route::get('/invoices', [InvoiceAPIController::class, 'getInvoiceData']);
 Route::get("/test", [TestController::class, "index"]);
 
 Route::get('/menu_categories/{id}/menus',[MenuAPIController::class,'menuByMenuCategory']);
+
+Route::post("/order_status_change",[OrderAPIController::class,'orderItemChangeStatus']);
