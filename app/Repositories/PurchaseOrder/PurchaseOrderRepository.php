@@ -88,8 +88,14 @@ class PurchaseOrderRepository implements PurchaseOrderRepositoryInterface
                 if (isset($item->later_buy) && $item->later_buy) {
                     $purchaseOrderItem = $po->items()->where('id', $item_data['id'])->first();
                     if ($purchaseOrderItem) {
-                        if ($item->quantity < $purchaseOrderItem->quantity) {
+                        if ($item->quantity > $purchaseOrderItem->original_quantity) {
+                            ResponseMessage('Later Buy Quantity must be less than original quantity', 419);
+                        }
+                        if ($item->quantity < $purchaseOrderItem->original_quantity) {
                             $quantity = $purchaseOrderItem->original_quantity - $item->quantity;
+                            if ($quantity < 0) {
+                                ResponseMessage('Later Buy Quantity must be less than original quantity', 419);
+                            }
                             $column = null;
                             if (checkDepartmentAndRoles('HR', ['Manager'])) {
                                 $column = 'quantity_by_manager';
@@ -111,6 +117,8 @@ class PurchaseOrderRepository implements PurchaseOrderRepositoryInterface
                                         $column => $item->quantity,
                                     ]);
                             }
+                        } else {
+                            ResponseMessage('Later Buy Quantity must be less than original quantity', 419);
                         }
                     }
                 }
@@ -126,7 +134,7 @@ class PurchaseOrderRepository implements PurchaseOrderRepositoryInterface
             }
             if ($request->is_grn && $po) {
                 $morphMapName = RelationMorphName($po);
-                (new PurchaseOrderTransaction())->createTransaction($po, $morphMapName ,$request->cash_account_id); #create transaction
+                (new PurchaseOrderTransaction())->createTransaction($po, $morphMapName, $request->cash_account_id); #create transaction
                 // (new StoreInventory())->inventoryAction($po, 'in', 'purchase_order');
             }
             if (!isset($request->id)) {
@@ -365,6 +373,9 @@ class PurchaseOrderRepository implements PurchaseOrderRepositoryInterface
             if (checkDepartmentAndRoles('Inventory', ['Staff'])) {
                 $po_item = PurchaseOrderItem::find($request->id);
                 if ($po_item) {
+                    if ($po_item->is_confirmed == 1) {
+                        ResponseMessage('Already checked', 200);
+                    }
                     $po_item->is_confirmed = 1;
                     $po_item->save();
                     #store inventory
@@ -375,8 +386,8 @@ class PurchaseOrderRepository implements PurchaseOrderRepositoryInterface
                     ResponseMessage('Update Successfully', 200);
                 }
                 ResponseMessage('Not Found', 404);
-            }               
-             ResponseMessage("Permission isn't access", 404);
+            }
+            ResponseMessage("Permission isn't access", 404);
         } catch (\Exception $e) {
             DB::rollback();
             ResponseMessage($e->getMessage(), 402);

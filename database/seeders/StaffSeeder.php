@@ -22,10 +22,22 @@ class StaffSeeder extends Seeder
         $departments = Department::with('roles')->get();
         foreach($departments as $i=>$department){
             foreach($department->roles as $departmentRole){
+                if($departmentRole->name=='Staff'){
+                    $phoneNumber=str_repeat($department->id, 2);
+                }elseif($departmentRole->name=='Supervisor'){
+                    $phoneNumber=str_repeat($department->id, 3);
+                }
+                elseif($departmentRole->name=='Manager'){
+                    $phoneNumber=str_repeat($department->id, 4);
+                }
+                elseif($departmentRole->name=='MD'){
+                    $phoneNumber=str_repeat($department->id, 1);
+                }
                 try{
                     DB::beginTransaction();
                     $faker = Faker::create();
-                    $phoneNumber = '09' . str_repeat($department->id, 2) . sprintf('%02d',$departmentRole->id);
+                    // $phoneNumber = '09' . str_repeat($department->id, 2) . sprintf('%02d',$departmentRole->id);
+                    $phoneNumber = '09' . $phoneNumber;
                     $staff = Staff::create([
                         'gender_id' => $faker->numberBetween(1, 2),
                         'department_id' => $department->id,

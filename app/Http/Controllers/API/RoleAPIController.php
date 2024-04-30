@@ -36,4 +36,9 @@ class RoleAPIController extends Controller
         $role = $this->roleRepo->updateData($request->all(), $id);
         ResponseData($role);
     }
+
+    public function getRoleByDepartment($department_id){
+        $data = $this->roleRepo->getRoleByDepartment($department_id);
+        ResponseData($data);
+    }
 }

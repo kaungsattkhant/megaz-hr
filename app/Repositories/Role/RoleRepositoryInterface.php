@@ -11,4 +11,6 @@ interface RoleRepositoryInterface
     public function createData(array $data);
 
     public function updateData(array $data,int $id);
+
+    public function getRoleByDepartment($department_id);
 }

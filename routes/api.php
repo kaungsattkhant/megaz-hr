@@ -174,6 +174,7 @@ Route::post('/departments', [DepartmentAPIController::class, 'createDepartment']
 Route::put('/departments/{id}', [DepartmentAPIController::class, 'updateDepartment']);
 
 Route::get('/roles', [RoleAPIController::class, 'getRoleData']);
+Route::get('/role_by_department/{department_id}', [RoleAPIController::class, 'getRoleByDepartment']);
 Route::post('/roles', [RoleAPIController::class, 'createRole']);
 Route::put('/roles/{id}', [RoleAPIController::class, 'updateRole']);
 
