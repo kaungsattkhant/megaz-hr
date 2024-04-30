@@ -48,6 +48,10 @@ class MenuAPIController extends Controller
     {
         $menu = Menu::where('menu_category_id',$id)->with('prices')->get();
         ResponseData($menu);
+    }
 
+    public function menuOnOff(int $id)
+    {
+        $menu = $this->menuRepo->menuIsActive($id);
     }
 }

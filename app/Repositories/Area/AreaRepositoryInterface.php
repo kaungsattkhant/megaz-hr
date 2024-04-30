@@ -13,4 +13,6 @@ interface AreaRepositoryInterface
     public function updateData(array $data, int $id);
 
     public function deleteData(int $id);
+
+    public function getAreaByAreaType(int $id);
 }
