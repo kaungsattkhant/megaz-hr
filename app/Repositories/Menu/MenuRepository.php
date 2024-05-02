@@ -31,14 +31,12 @@ class MenuRepository implements MenuRepositoryInterface
 
     public function createData(array $data, array $items)
     {
-
-        $imageData = base64_decode($data['image']);
-        $extension = 'jpg';
+        $imageData = $data['image'];
+        $extension = $imageData->getClientOriginalExtension();
         $hashedName = md5(uniqid() . microtime()) . '.' . $extension;
-        Storage::put('public/images/' . $hashedName, $imageData);
-        $imageUrl = Storage::url('public/images/' . $hashedName);
-        $data['image_url'] = $imageUrl;
-        $data['image_path'] = 'public/images/' . $hashedName;
+        $data['image_path'] = $imageData->storeAs('images', $hashedName, 'public');
+        $data['image_url'] = Storage::url($data['image_path']);
+
         $menu = Menu::create($data);
         $this->createMenuPrice($menu->id, $data['price']);
         foreach ($items as $item) {

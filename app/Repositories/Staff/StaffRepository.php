@@ -36,13 +36,12 @@ class StaffRepository implements StaffRepositoryInterface
             $data['is_active'] = 1;
             $data = RemoveNullValues($data);
             $staff = Staff::create($data);
-            $inventoryIds = isset($data['inventoryIds']) ? json_decode($data['inventoryIds']) : [];
 
             if($data['department_id'] == 6)
             {
+                $inventoryIds = isset($data['inventoryIds']) ? json_decode($data['inventoryIds']) : [];
                 if (is_array($inventoryIds)) {
                     foreach ($inventoryIds as $inventoryId) {
-
                         $staff->inventories()->attach($inventoryId);
                     }
                 }
