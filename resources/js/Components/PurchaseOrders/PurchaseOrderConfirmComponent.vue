@@ -139,6 +139,46 @@
                             <td class=" py-2 "></td>
                         </tr>
                     </div>
+                    <div class="contents">
+                        <tr class="bg-white rounded-lg overflow-hidden shadow-lg">
+                            <td class=" px-6 py-4 font-medium ">
+                                &nbsp;
+                            </td>
+                            <td class=" px-6 py-4 font-medium ">
+                                &nbsp;
+                            </td>
+                            <td class=" px-6 py-4 font-medium ">
+                                &nbsp;
+                            </td>
+                            <td class=" px-6 py-4 font-medium ">
+                                &nbsp;
+                            </td>
+                            <td class=" px-6 py-4 font-medium ">
+                                &nbsp;
+                            </td>
+                            <td class="px-6 py-4">
+                                {{ totalPrice.toLocaleString() }}
+                            </td>
+                            <td class=" px-6 py-4 font-medium ">
+                                &nbsp;
+                            </td>
+                            <td class=" px-6 py-4 font-medium ">
+                                &nbsp;
+                            </td>
+                            <td class=" px-6 py-4 font-medium ">
+                                &nbsp;
+                            </td>
+                            <td class=" px-6 py-4 font-medium ">
+                                &nbsp;
+                            </td>
+                            <td class=" px-6 py-4 font-medium ">
+                                &nbsp;
+                            </td>
+                            <td class=" px-6 py-4 font-medium ">
+                                &nbsp;
+                            </td>
+                        </tr>
+                    </div>
 
                 </tbody>
             </table>
@@ -322,6 +362,8 @@
                 isLaterBuy: false,
                 editQuantity: 0,
                 editPurchaseOrderItem: null,
+
+                totalPrice: 0,
             };
         },
 
@@ -341,6 +383,7 @@
                     this.purchaseOrder = response.data;
                     this.date = this.purchaseOrder.date;
                     this.purchaseOrderItems = this.purchaseOrder.items;
+                    this.updateTotalPrice(this.purchaseOrderItems);
                 }
             },
 
@@ -374,6 +417,7 @@
                         amount: amount,
                     });
                 }
+                this.updateTotalPrice(this.purchaseOrderItems);
                 this.selectedItem = null;
                 this.quantity = null;
             },
@@ -396,6 +440,7 @@
                 else{
                     this.purchaseOrderItems.splice(this.deleteIndex, 1);
                 }
+                this.updateTotalPrice(this.purchaseOrderItems);
                 this.deleteId = null;
                 this.deleteIndex = null;
             },
@@ -502,6 +547,19 @@
                 // window.location.replace(`/purchase_orders`);
             },
 
+            updateTotalPrice(poItems){
+                this.totalPrice = 0;
+                poItems.forEach((item)=>{
+                    this.totalPrice += (item.amount * item.quantity);
+                });
+            },
+
+        },
+
+        watch: {
+            purchaseOrderItems: function(){
+                // alert('PO items changed');
+            },
         },
 
         created(){

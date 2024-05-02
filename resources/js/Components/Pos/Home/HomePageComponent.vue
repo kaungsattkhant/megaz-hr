@@ -824,7 +824,7 @@
             },
             async btnGetAreaItemList(id){
                 this.selectedAreaId = id;
-                const response = await getApiData({ url: '/api/areas/'+ id +'/entities' });
+                const response = await getApiData({ url: '/api/areas/'+ id +'/entities', token: this.getToken() });
                 if (response.data) {
                     this.roomList = response.data;
                     this.selectedRoom = this.roomList[0]
@@ -836,19 +836,19 @@
             },
 
             async getGendersList(){
-                const response = await getApiData({ url: '/api/genders' });
+                const response = await getApiData({ url: '/api/genders', token: this.getToken() });
                 if(response.data){
                     this.genderList = response.data;
                 }
             },
             async getMenuList(){
-                const response = await getApiData({ url: '/api/menus' });
+                const response = await getApiData({ url: '/api/menus', token: this.getToken() });
                 if(response.data){
                     this.menuList = response.data;
                 }
             },
             async getPurchaseMenuList(){
-                const response = await getApiData({ url: '/api/entities/' + this.selectedRoom.id });
+                const response = await getApiData({ url: '/api/entities/' + this.selectedRoom.id, token: this.getToken() });
                 if(response.data){
                     if(response.data.invoices.length > 0){
                         this.purchaseMenuList = response.data.invoices[0].orders;
@@ -857,7 +857,7 @@
                 }
             },
             async getRoomList(){
-                const response = await getApiData({ url: '/api/areas/' + this.selectedAreaId + '/entities' });
+                const response = await getApiData({ url: '/api/areas/' + this.selectedAreaId + '/entities', token: this.getToken() });
                 if(response.data){
                     this.roomList = response.data;
                     // console.log( this.roomList[0] );
@@ -865,7 +865,7 @@
             },
 
             async getCustomerList(){
-                const response = await getApiData({ url: '/api/customers' });
+                const response = await getApiData({ url: '/api/customers', token: this.getToken() });
                 if(response.data){
                     this.customerList = response.data;
                 }
@@ -915,7 +915,7 @@
                 formData.append('phone_number', this.ph_number);
                 formData.append('address', this.address);
                 formData.append('birthdate', this.date);
-                let response = await postApiData({url: '/api/customers', form_data: formData});
+                let response = await postApiData({url: '/api/customers', form_data: formData, token: this.getToken()});
                 console.log(this.selectedGender+','+this.name+','+this.email+','+this.ph_number+','+this.address+','+this.date)
                 if(response.success){
                     this.customerList.push(response.data);
@@ -950,7 +950,7 @@
                 if(this.child > 0){
                     formData.append('child', +this.child);
                 }
-                let response = await postApiData({ url: '/api/entities/start', form_data: formData});
+                let response = await postApiData({ url: '/api/entities/start', form_data: formData, token: this.getToken()});
                 if(response.success){
                     await this.getRoomList();
                     this.selectedRoom = await this.roomList[this.selectedRoomIndex];
@@ -985,7 +985,7 @@
                 formData.append('menu_id', this.selectedMenu.id);
                 formData.append('quantity', this.menuQuantity);
                 formData.append('original_price', this.selectedMenu.prices[0].price);
-                let response = await postApiData({ url: '/api/entities/orders', form_data: formData});
+                let response = await postApiData({ url: '/api/entities/orders', form_data: formData, token: this.getToken()});
                 console.log(this.invoiceId+','+this.selectedMenu.id + ','+ this.menuQuantity +','+this.selectedMenu.prices[0].price)
                 if(response.success){
                     console.log("success")
@@ -1005,7 +1005,7 @@
                 let formData = new FormData();
                 formData.append('invoice_id', this.selectedRoom.invoices[0].invoice_id);
                 formData.append('session_duration', this.sessionDuration);
-                let response = await postApiData({ url: '/api/entities/add_more_sessions', form_data: formData});
+                let response = await postApiData({ url: '/api/entities/add_more_sessions', form_data: formData, token: this.getToken()});
                 if(response.success){
                     console.log("success")
                     await this.getRoomList();
@@ -1025,7 +1025,7 @@
                 let formData = new FormData();
                 formData.append('invoice_id', this.selectedRoom.invoices[0].invoice_id);
                 formData.append('entity_id', this.change_room.id);
-                let response = await postApiData({ url: '/api/entities/change', form_data: formData});
+                let response = await postApiData({ url: '/api/entities/change', form_data: formData, token: this.getToken()});
                 console.log('change room ' + this.selectedRoom.invoices[0].invoice_id+','+this.change_room.id)
                 if(response.success){
                     console.log("success");
@@ -1042,7 +1042,7 @@
                 this.getChangeableRoomList();
             },
             async getChangeableRoomList(){
-                const response = await getApiData({ url: '/api/areas/' + this.selectedAreaId + '/inactive_entities' });
+                const response = await getApiData({ url: '/api/areas/' + this.selectedAreaId + '/inactive_entities', token: this.getToken() });
                 if(response.data){
                     this.changeableRoomList = response.data;
                 }
@@ -1105,7 +1105,7 @@
                 formData.append('tax', this.printInvoiceData.isTax);
                 // formData.append('total', this.printInvoiceData.total);
                 console.log(formData)
-                let response = await postApiData({ url: '/api/entities/done', form_data: formData});
+                let response = await postApiData({ url: '/api/entities/done', form_data: formData, token: this.getToken()});
                 if(response.success){
                     await this.getRoomList();
                     // this.selectedRoom = await this.roomList[this.selectedRoomIndex];
@@ -1153,7 +1153,7 @@
                 this.getTableListTab()
             },
             async getTableListTab(){
-                const response = await getApiData({ url: '/api/tables' });
+                const response = await getApiData({ url: '/api/tables', token: this.getToken() });
                 if(response.data){
                     this.tableList = response.data;
                 }

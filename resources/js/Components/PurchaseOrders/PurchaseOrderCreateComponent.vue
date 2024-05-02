@@ -181,10 +181,10 @@
                         text: `A new purchase order created`,
                         type: 'info'
                     });
-
-                    setTimeout(()=>{
-                        window.location.replace(`/purchase_orders`);
-                    }, 3000);
+                    window.location.replace(`/purchase_orders`);
+                    // setTimeout(()=>{
+                    //     window.location.replace(`/purchase_orders`);
+                    // }, 3000);
                 }
                 else{
                     this.$notify({
