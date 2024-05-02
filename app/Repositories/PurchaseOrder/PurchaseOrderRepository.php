@@ -78,7 +78,7 @@ class PurchaseOrderRepository implements PurchaseOrderRepositoryInterface
                 if (checkDepartmentAndRoles('HR', ['Staff'])) {
                     $item_data['original_quantity'] = $item->quantity;
                 } else {
-                    $item_data['original_quantity'] = $item->original_quantity;
+                    $item_data['original_quantity'] = (isset($item->later_buy) && $item->later_buy)?$item->original_quantity :$item->quantity;
                 }
                 $item_data['purchase_order_id'] = $po->id;
                 $item_data['item_id'] = $item->item_id;
@@ -88,10 +88,10 @@ class PurchaseOrderRepository implements PurchaseOrderRepositoryInterface
                 if (isset($item->later_buy) && $item->later_buy) {
                     $purchaseOrderItem = $po->items()->where('id', $item_data['id'])->first();
                     if ($purchaseOrderItem) {
-                        if ($item->quantity > $purchaseOrderItem->original_quantity) {
+                        if ($item->quantity > $purchaseOrderItem->quantity) {
                             ResponseMessage('Later Buy Quantity must be less than original quantity', 419);
                         }
-                        if ($item->quantity < $purchaseOrderItem->original_quantity) {
+                        if ($item->quantity < $purchaseOrderItem->quantity) {
                             $quantity = $purchaseOrderItem->original_quantity - $item->quantity;
                             if ($quantity < 0) {
                                 ResponseMessage('Later Buy Quantity must be less than original quantity', 419);
@@ -117,9 +117,7 @@ class PurchaseOrderRepository implements PurchaseOrderRepositoryInterface
                                         $column => $item->quantity,
                                     ]);
                             }
-                        } else {
-                            ResponseMessage('Later Buy Quantity must be less than original quantity', 419);
-                        }
+                        } 
                     }
                 }
                 if ($request->is_grn) {

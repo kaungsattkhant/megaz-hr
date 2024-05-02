@@ -29,6 +29,7 @@ class AreaSeeder extends Seeder
 
         Area::create([
             'area_type_id' => $typeOne->id,
+            
             'area_category_id' => $cat1->id,
             'name' => 'Bar Area'
         ]);
