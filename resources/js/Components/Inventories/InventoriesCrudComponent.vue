@@ -422,7 +422,7 @@
                 let response = await postApiData({url: '/api/inventories', form_data: formData, token: this.getToken()});
                 if(response.success){
                     this.getInventoryList(null);
-                    console.log("success")
+                    window.location.reload();
                     this.closeModal();
                     this.clearForm();
                 }
