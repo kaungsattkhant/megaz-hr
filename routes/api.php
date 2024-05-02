@@ -162,6 +162,13 @@ Route::middleware('auth:api')->group(function () {
         Route::get('/confirm_transfer_item', 'confirmTransferItem');
     });
 
+    Route::get('/inventories', [InventoryAPIController::class, 'getInventoryData']);
+    Route::post('/inventories', [InventoryAPIController::class, 'createInventory']);
+    Route::get('/inventories/{inventory}', [InventoryAPIController::class, 'detail']);
+    Route::put('/inventories/{id}', [InventoryAPIController::class, 'updateInventory']);
+    Route::delete('/inventories/{id}', [InventoryAPIController::class, 'deleteInventory']);
+    Route::get('/inventories/{inventoryId}/ledgers', [InventoryAPIController::class, 'getInventoryLedgers']);
+    Route::get('inventory_list',[InventoryAPIController::class, 'inventoryList']);
 });
 
 Route::controller(ExcelImportController::class)->group(function () {
@@ -202,12 +209,7 @@ Route::post('/entities', [EntityAPIController::class, 'createEntity']);
 Route::put('/entities/{id}', [EntityAPIController::class, 'updateEntity']);
 Route::delete('/entities/{id}', [EntityAPIController::class, 'deleteEntity']);
 
-Route::get('/inventories', [InventoryAPIController::class, 'getInventoryData']);
-Route::post('/inventories', [InventoryAPIController::class, 'createInventory']);
-Route::get('/inventories/{inventory}', [InventoryAPIController::class, 'detail']);
-Route::put('/inventories/{id}', [InventoryAPIController::class, 'updateInventory']);
-Route::delete('/inventories/{id}', [InventoryAPIController::class, 'deleteInventory']);
-Route::get('/inventories/{inventoryId}/ledgers', [InventoryAPIController::class, 'getInventoryLedgers']);
+
 
 Route::get('/uoms', [UomAPIController::class, 'getUomData']);
 Route::post('/uoms', [UomAPIController::class, 'createUom']);

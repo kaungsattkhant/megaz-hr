@@ -2,15 +2,16 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Foundation\Auth\User as Authenticatable;
-use Illuminate\Support\Facades\Hash;
-
-use Laravel\Sanctum\HasApiTokens;
+use App\Models\Role;
+use App\Models\Gender;
+use App\Models\Inventory;
 
 use App\Models\Department;
-use App\Models\Gender;
-use App\Models\Role;
+
+use Laravel\Sanctum\HasApiTokens;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Foundation\Auth\User as Authenticatable;
 
 class Staff extends Authenticatable
 {

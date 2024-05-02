@@ -100,7 +100,7 @@ class TransferRepository implements TransferRepositoryInterface
             $no = (new CommonPurchaseOrder())->getUniqueId($latest,'transfer_id',$count);
             $transfer_id = "TRS" . '-' . str_pad($no, $count, "0", STR_PAD_LEFT) . '-' . now()->timestamp;
             $data['transfer_id']=$transfer_id;
-            $data['source_inventory_id']=1;
+            $data['source_inventory_id']=$request->soruce_inventory_id;
             $data['created_by']=UserData()->id;
             $data['date']=  convertDateFormat(now());
             $transfer=Transfer::updateOrCreate(
@@ -117,7 +117,8 @@ class TransferRepository implements TransferRepositoryInterface
     }
 
     public function transferConfirmationList($request){
-        return Transfer::with(['created_by','confirmed_by','source_inventory','destination_inventory'])->where('destination_inventory_id',2)
+        $inventory_ids=InventoryIds();
+        return Transfer::with(['created_by','confirmed_by','source_inventory','destination_inventory'])->whereIn('destination_inventory_id',$inventory_ids)
         ->paginate(config('common.list_count'));
     }
 

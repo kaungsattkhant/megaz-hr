@@ -12,6 +12,7 @@ class InventoryRepository implements InventoryRepositoryInterface
 {
     public function listAllData(Request $request)
     {
+        $inventory_ids=UserData()->inventories->pluck('id')->toArray();
         if ($request->per_page || $request->page) {
             // $totalCount = Inventory::where('is_active', 1)->count();
             // $pageNumber = 1;
@@ -26,16 +27,21 @@ class InventoryRepository implements InventoryRepositoryInterface
             // $inventories = Inventory::where('is_active', 1)->skip($skip)->take($perPage)->get();
             // $paginationData = MakePaginationData($request, $totalCount, 'inventories');
             // $paginationData['inventories'] = $inventories;
-
             // return $paginationData;
             return Inventory::orderBy('id','desc')
+            ->whereHas('inventories',function($query)use($inventory_ids){
+                $query->whereIn('id',$inventory_ids);
+            })
             ->with(['inventoryable'])
             ->paginate(config('common.list_count'));
         } else {
             $inventories = Inventory::where('is_active', 1)
+            ->whereHas('staff',function($query){
+                $query->where('id',UserData()->id);
+            })
+            ->whereIn('id',$inventory_ids)
             ->with(['inventoryable'])
             ->get();
-
             return $inventories;
         }
     }
@@ -118,7 +124,16 @@ class InventoryRepository implements InventoryRepositoryInterface
     public function getInventoryLedgers(int $inventoryId)
     {
         $ledgers = (new GetInventoryStockAction($inventoryId))->run();
-
         return $ledgers;
+    }
+
+    public function inventoryList(){
+        $toInventory=Inventory::where('is_active',1)
+        ->whereNotIn('id',InventoryIds())
+        ->get();
+        return [
+            'source_inventories'=>UserData()->inventories,
+            'destination_inventories'=>$toInventory,
+        ];
     }
 }

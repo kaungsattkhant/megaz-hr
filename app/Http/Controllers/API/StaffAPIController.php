@@ -24,6 +24,7 @@ class StaffAPIController extends Controller
     }
 
     public function getStaffData(Request $request)
+    
     {
         $staffs = $this->staffRepo->listAllData($request);
         ResponseData($staffs);

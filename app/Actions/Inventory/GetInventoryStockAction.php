@@ -130,6 +130,7 @@ class GetInventoryStockAction
                   SUM(CASE WHEN action = "in" AND DATE(date) = CURDATE() THEN quantity ELSE 0 END) - 
                   SUM(CASE WHEN action = "out" AND DATE(date) < CURDATE() THEN quantity ELSE 0 END)) as closing_balance')
             )
+            ->where('inventory_id',$this->inventoryId)
             ->groupBy('item_id');
 
         $result = $itemBalances->get();
