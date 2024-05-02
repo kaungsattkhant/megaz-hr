@@ -131,6 +131,7 @@ class OrderRepository implements OrderRepositoryInterface
             $orderItem = OrderItem::find($data['id']);
             $orderItem->status = $data['status'];
             $orderItem->update();
+
             $users = collect([]);
             $users =  $this->getUserByRole('Catering', ['staff']);
             $title = 'Order Item Status Update';
@@ -141,6 +142,7 @@ class OrderRepository implements OrderRepositoryInterface
                 'body' => 'Order Item status is changed by Kitchen Department',
             ];
             $this->send($orderItem, $users, $data);
+            DB::commit();
             ResponseData($orderItem);
         } catch (\Exception $e) {
             DB::rollback();
