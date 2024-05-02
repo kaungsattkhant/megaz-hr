@@ -40,6 +40,11 @@ class Staff extends Authenticatable
         'password','remember_token','created_at','updated_at'
     ];
 
+    public function inventories()
+    {
+        return $this->belongsToMany(Inventory::class);
+    }
+
     public function emergencyContacts()
     {
         return $this->hasMany(StaffEmergencyContact::class);

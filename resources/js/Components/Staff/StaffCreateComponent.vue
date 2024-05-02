@@ -110,7 +110,8 @@
                     <select data-te-select-init data-te-select-placeholder="Select Roles" data-te-select-filter="true"
                         name="" id="" multiple v-model="selectedRoles"
                         class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
-                        <option :value="role" v-for="(role, roleIndex) in roleList" :key="roleIndex"> {{ role.name }}
+                        <option :value="role" v-for="(role, roleIndex) in roleList" :key="roleIndex">
+                            {{ role.name }}
                         </option>
                         <!-- <option value="2">Manager</option>
                         <option value="3">Waiter</option> -->
@@ -125,7 +126,22 @@
                     class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
             </div>
 
-            <div class="col-span-3"></div>
+            <div class="col-span-3 rounded-md mb-4 pb-6">
+                <label for="" class="block text-sm text-black mb-3">
+                    Inventories
+                </label>
+                <div class="bg-white mb-0 w-full text-sm inline-block" data-te-select-wrapper-ref>
+                    <select :disabled="inventories.length < 1" data-te-select-init data-te-select-placeholder="Select Inventories" data-te-select-filter="true"
+                        name="" id="" multiple v-model="selectedInventories"
+                        class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
+                        <option :value="inventory" v-for="(inventory, inventoryIndex) in inventories" :key="inventoryIndex">
+                            {{ inventory.name }}
+                        </option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- <div class="col-span-3"></div> -->
 
             <div class="col-span-3 rounded-md mb-4 pb-6">
                 <label for="" class="block text-sm text-black mb-3">
@@ -363,6 +379,10 @@
                 secondaryName: null,
                 secondaryPhone: null,
                 secondaryRelationship: null,
+
+                inventories: [],
+                selectedInventories: [],
+                inventoryIds: [],
             };
         },
 
@@ -403,9 +423,16 @@
             },
 
             async departmentSelectChanged(){
-                const response = await getApiData({ url: `/api/roles?department_id=${this.selectedDepartment.id}`, token: this.getToken() });
-                if(response.data){
-                    this.roleList = response.data;
+                this.inventories = [];
+                let rolesResponse = await getApiData({ url: `/api/roles?department_id=${this.selectedDepartment.id}`, token: this.getToken() });
+                if(rolesResponse.data){
+                    this.roleList = rolesResponse.data;
+                }
+                if(this.selectedDepartment.name == 'Inventory'){
+                    let inventoriesResponse = await getApiData({url: `/api/inventories`, token: this.getToken()});
+                    if(inventoriesResponse.data){
+                        this.inventories = inventoriesResponse.data;
+                    }
                 }
             },
 
@@ -427,6 +454,16 @@
 
             createStaffBtnClicked(){
                 this.roleIds = [];
+                this.inventoryIds = [];
+                if(this.selectedDepartment.name == 'Inventory' && this.selectedInventories.length < 1){
+                    this.alertValiationMessage('inventories');
+                    return 1;
+                }
+                if(this.selectedInventories.length > 0){
+                    this.selectedInventories.forEach((inventory)=>{
+                        this.inventoryIds.push(inventory.id);
+                    });
+                }
                 this.selectedRoles.forEach((role)=>{
                     this.roleIds.push(role.id);
                 });
@@ -575,6 +612,9 @@
                 formData.append('city',this.city);
                 formData.append('gender_id', this.selectedGender.id);
                 formData.append('department_id', this.selectedDepartment.id);
+                if(this.inventoryIds.length > 0){
+                    formData.append('inventoryIds', JSON.stringify(this.inventoryIds));
+                }
                 formData.append('password', this.password);
                 formData.append('roles', this.roleIds);
                 formData.append('joined_date',this.joinedDate);
@@ -593,7 +633,14 @@
                     window.location.replace('/staff');
                 }
                 else{
-                    alert('some errors occur');
+                    let message = `Some errors occured`;
+                    if(response.message){
+                        message = response.message;
+                    }
+                    this.$notify({
+                        text: message,
+                        type: "error"
+                    });
                 }
             },
         },

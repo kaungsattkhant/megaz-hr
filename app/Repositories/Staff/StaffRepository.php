@@ -30,12 +30,22 @@ class StaffRepository implements StaffRepositoryInterface
     }
 
     public function createData(array $data)
-    {
+{
         DB::beginTransaction();
         try {
             $data['is_active'] = 1;
             $data = RemoveNullValues($data);
             $staff = Staff::create($data);
+
+            if($data['department_id'] == 6)
+            {
+                $inventoryIds = isset($data['inventoryIds']) ? json_decode($data['inventoryIds']) : [];
+                if (is_array($inventoryIds)) {
+                    foreach ($inventoryIds as $inventoryId) {
+                        $staff->inventories()->attach($inventoryId);
+                    }
+                }
+            }
 
             if (isset($data['roles']) && is_array($data['roles'])) {
                 $staff->roles()->attach($data['roles']);
