@@ -15,6 +15,8 @@ return new class extends Migration
             $table->id();
             $table->foreignId('menu_category_id')->constrained()->onDelete('cascade');
             $table->string('name');
+            $table->string('image_url');
+            $table->string('image_path');
             $table->boolean('is_active')->default(1);
             $table->timestamps();
         });

@@ -28,6 +28,7 @@ class MenuAPIController extends Controller
 
     public function createMenu(CreateMenuRequest $request)
     {
+
         $data = $request->except('items');
         $items = json_decode($request->items, true)['items'];
         $menu = $this->menuRepo->createData($data, $items);
@@ -48,6 +49,10 @@ class MenuAPIController extends Controller
     {
         $menu = Menu::where('menu_category_id',$id)->with('prices')->get();
         ResponseData($menu);
+    }
 
+    public function menuOnOff(int $id)
+    {
+        $menu = $this->menuRepo->menuIsActive($id);
     }
 }

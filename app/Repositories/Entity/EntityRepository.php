@@ -4,6 +4,7 @@ namespace App\Repositories\Entity;
 
 use App\Models\Area;
 use App\Models\Entity;
+use App\Models\OrderItem;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -44,14 +45,46 @@ class EntityRepository implements EntityRepositoryInterface
     {
         $entity = Entity::with(["invoices" => function ($query) {
             $query->whereNull("complete_date")
-                  ->select("id", "invoice_id", "entity_id", "total_session_price")
-                  ->with(["sessions", "orders.orderItems.menu"])
-                  ->latest()
-                  ->limit(1); // Get only the latest invoice
+                ->select("id", "invoice_id", "entity_id", "total_session_price")
+                ->with(["sessions", "orders"])
+                ->latest()
+                ->limit(1);
         }])->find($entityId);
+
+        foreach ($entity->invoices as $invoice) {
+            $consolidatedOrderItems = [];
+
+            foreach ($invoice->orders as $order) {
+                $orderItems = OrderItem::where('order_id', $order->id)->get();
+                foreach ($orderItems as $orderItem) {
+                    $menuId = $orderItem->menu_id;
+                    $status = $orderItem->status;
+
+                    if (isset($consolidatedOrderItems[$menuId][$status])) {
+                        $consolidatedOrderItems[$menuId][$status]->quantity += $orderItem->quantity;
+                        $consolidatedOrderItems[$menuId][$status]->price += $orderItem->price;
+                        $consolidatedOrderItems[$menuId][$status]->discount_price += $orderItem->discount_price;
+                    } else {
+                        $consolidatedOrderItems[$menuId][$status] = $orderItem;
+                    }
+                }
+            }
+
+            foreach ($invoice->orders as $order) {
+                $order->order_items = collect();
+                foreach ($consolidatedOrderItems as $menuId => $itemsByStatus) {
+                    foreach ($itemsByStatus as $status => $order_items) {
+                        $order_items->menu;
+                        $order->order_items->push($order_items);
+                    }
+                }
+            }
+        }
 
         return $entity;
     }
+
+
 
     public function createData(array $data)
     {

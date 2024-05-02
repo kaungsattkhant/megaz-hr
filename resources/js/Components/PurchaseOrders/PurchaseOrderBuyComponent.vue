@@ -143,6 +143,37 @@
                             <td class=" py-2 "></td>
                         </tr>
                     </div>
+                    <div class="contents">
+                        <tr class="bg-white rounded-lg overflow-hidden shadow-lg">
+                            <td class=" px-6 py-4 font-medium ">
+                                &nbsp;
+                            </td>
+                            <td class=" px-6 py-4 font-medium ">
+                                &nbsp;
+                            </td>
+                            <td class=" px-6 py-4 font-medium ">
+                                &nbsp;
+                            </td>
+                            <td class=" px-6 py-4 font-medium ">
+                                &nbsp;
+                            </td>
+                            <td class=" px-6 py-4 font-medium ">
+                                &nbsp;
+                            </td>
+                            <td class="px-6 py-4">
+                                {{ totalPrice.toLocaleString() }}
+                            </td>
+                            <td class=" px-6 py-4 font-medium ">
+                                &nbsp;
+                            </td>
+                            <td class=" px-6 py-4 font-medium ">
+                                &nbsp;
+                            </td>
+                            <td class=" px-6 py-4 font-medium ">
+                                &nbsp;
+                            </td>
+                        </tr>
+                    </div>
 
                 </tbody>
             </table>
@@ -233,6 +264,20 @@
                         </label>
                         <input type="number" placeholder="Quantity" v-model="editQuantity" class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
                     </div>
+                    <div v-if="!(getDepartment().name == 'HR' && isStaff)" class="mb-[0.125rem] block min-h-[1.5rem] pl-[1.5rem]">
+                        <input
+                            v-model="isLaterBuy"
+                            class="relative float-left -ml-[1.5rem] mr-[6px] mt-[0.15rem] h-[1.125rem] w-[1.125rem] appearance-none rounded-[0.25rem] border-[0.125rem] border-solid border-neutral-300 outline-none before:pointer-events-none before:absolute before:h-[0.875rem] before:w-[0.875rem] before:scale-0 before:rounded-full before:bg-transparent before:opacity-0 before:shadow-[0px_0px_0px_13px_transparent] before:content-[''] checked:border-primary checked:bg-primary checked:before:opacity-[0.16] checked:after:absolute checked:after:-mt-px checked:after:ml-[0.25rem] checked:after:block checked:after:h-[0.8125rem] checked:after:w-[0.375rem] checked:after:rotate-45 checked:after:border-[0.125rem] checked:after:border-l-0 checked:after:border-t-0 checked:after:border-solid checked:after:border-white checked:after:bg-transparent checked:after:content-[''] hover:cursor-pointer hover:before:opacity-[0.04] hover:before:shadow-[0px_0px_0px_13px_rgba(0,0,0,0.6)] focus:shadow-none focus:transition-[border-color_0.2s] focus:before:scale-100 focus:before:opacity-[0.12] focus:before:shadow-[0px_0px_0px_13px_rgba(0,0,0,0.6)] focus:before:transition-[box-shadow_0.2s,transform_0.2s] focus:after:absolute focus:after:z-[1] focus:after:block focus:after:h-[0.875rem] focus:after:w-[0.875rem] focus:after:rounded-[0.125rem] focus:after:content-[''] checked:focus:before:scale-100 checked:focus:before:shadow-[0px_0px_0px_13px_#3b71ca] checked:focus:before:transition-[box-shadow_0.2s,transform_0.2s] checked:focus:after:-mt-px checked:focus:after:ml-[0.25rem] checked:focus:after:h-[0.8125rem] checked:focus:after:w-[0.375rem] checked:focus:after:rotate-45 checked:focus:after:rounded-none checked:focus:after:border-[0.125rem] checked:focus:after:border-l-0 checked:focus:after:border-t-0 checked:focus:after:border-solid checked:focus:after:border-white checked:focus:after:bg-transparent dark:border-neutral-600 dark:checked:border-primary dark:checked:bg-primary dark:focus:before:shadow-[0px_0px_0px_13px_rgba(255,255,255,0.4)] dark:checked:focus:before:shadow-[0px_0px_0px_13px_#3b71ca]"
+                            type="checkbox"
+                            value=""
+                            :checked="isLaterBuy"
+                            id="checkboxDefault" />
+                        <label
+                            class="inline-block pl-[0.15rem] hover:cursor-pointer"
+                            for="checkboxDefault">
+                            Later Buy
+                        </label>
+                    </div>
                 </div>
 
                 <!--Modal footer-->
@@ -267,6 +312,7 @@ export default {
             checkId: null,
             isManager: false,
             isMD: false,
+            isStaff: false,
 
             supplierList: [],
             selectedSupplier: null,
@@ -274,8 +320,11 @@ export default {
             cashAccountList: [],
             selectedCashAccountId: null,
 
+            isLaterBuy: false,
             editQuantity: 0,
             editPurchaseOrderItem: null,
+
+            totalPrice: 0,
         };
     },
 
@@ -303,6 +352,7 @@ export default {
                 this.purchaseOrder = response.data;
                 this.date = this.purchaseOrder.date;
                 this.purchaseOrderItems = this.purchaseOrder.items;
+                this.updateTotalPrice(this.purchaseOrderItems);
             }
         },
 
@@ -333,6 +383,7 @@ export default {
                     amount: amount,
                 });
             }
+            this.updateTotalPrice(this.purchaseOrderItems);
             this.selectedItem = null;
             this.quantity = null;
         },
@@ -343,6 +394,12 @@ export default {
 
         editPurchaseOrderItemBtnClicked(purchaseOrderItemsIndex){
             this.editPurchaseOrderItem = this.purchaseOrderItems[purchaseOrderItemsIndex];
+            if(this.editPurchaseOrderItem.later_buy == 1){
+                    this.isLaterBuy = true;
+            }
+            else{
+                this.isLaterBuy = false;
+            }
             this.editQuantity = this.editPurchaseOrderItem.quantity;
         },
 
@@ -350,7 +407,9 @@ export default {
             let index = this.purchaseOrderItems.findIndex(poItem => poItem.item_id == this.editPurchaseOrderItem.item_id);
             if(index != -1){
                 this.purchaseOrderItems[index].quantity = this.editQuantity;
+                this.purchaseOrderItems[index].later_buy = (this.isLaterBuy)? 1: 0;
             }
+            this.updateTotalPrice(this.purchaseOrderItems);
             this.editQuantity = 0;
             this.editPurchaseOrderItem = null;
         },
@@ -434,7 +493,14 @@ export default {
 
         validateNumberInput(purchaseOrderItemsIndex) {
             // this.purchaseOrderItems[purchaseOrderItemsIndex].invoice_amount = this.purchaseOrderItems[purchaseOrderItemsIndex].invoice_amount.replace(/[^0-9]/g, "");
-        }
+        },
+
+        updateTotalPrice(poItems){
+            this.totalPrice = 0;
+            poItems.forEach((item)=>{
+                this.totalPrice += (item.amount * item.quantity);
+            });
+        },
     },
 
     created() {
@@ -444,6 +510,9 @@ export default {
             }
             if (role.name == 'MD') {
                 this.isMD = true;
+            }
+            if (role.name == 'Staff') {
+                this.isStaff = true;
             }
         });
         this.getPurchaseOrder();

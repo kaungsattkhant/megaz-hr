@@ -25,7 +25,8 @@ class CreateMenuRequest extends FormRequest
             //
             'menu_category_id' => 'required',
             'name' => 'required',
-            'items' => 'required'
+            'items' => 'required',
+            'image' => 'required'
         ];
     }
 }

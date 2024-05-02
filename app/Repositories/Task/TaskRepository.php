@@ -98,7 +98,7 @@ class TaskRepository implements TaskRepositoryInterface
         $staff = UserData();
         DB::beginTransaction();
         try {
-            if (!$staff->hasRoles('Staff')) {
+            if ($staff->checkRoles(['Supervisor'])) {
                 $task = Task::find($id);
                 if ($task->is_double_checked == 1) {
                     ResponseMessage('Task is already double checked');
