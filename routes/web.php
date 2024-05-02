@@ -39,8 +39,7 @@ Route::middleware(['departments:HR'])->group(function () {
     Route::view('/departments', 'departments.index')->name('departments');
     Route::view('/areas', 'areas.index')->name('areas');
 
-    Route::view('/inventories', 'inventories.index')->name('inventories');
-    Route::view('/inventories/{inventory_id}/ledger', 'inventories.inventory_ledger')->name('inventory.ledger');
+   
 
     Route::view('/rooms', 'tables&rooms.index')->name('room');
     Route::view('/tables', 'tables&rooms.table')->name('table');
@@ -66,6 +65,8 @@ Route::middleware(['departments:Inventory'])->group(function () {
     Route::view('/confirm_purchase_order_items', 'purchase_orders.confirm_poitems')->name('purchase_orders.confirm_poitems');
     Route::view('/purchase_order_left_items', 'purchase_orders.left_items_index')->name('purchase_orders.left_items_index');
     Route::view('/purchase_order_left_items/{poId}', 'purchase_orders.left_items_detail')->name('purchase_orders.left_items_detail');
+    Route::view('/inventories', 'inventories.index')->name('inventories');
+    Route::view('/inventories/{inventory_id}/ledger', 'inventories.inventory_ledger')->name('inventory.ledger');
 });
 
 Route::middleware(['departments:Finance'])->group(function () {

@@ -155,6 +155,13 @@ Route::middleware('auth:api')->group(function () {
     #po itemleft
     Route::resource('purchase_order_item_lefts', PurchaseOrderItemLeftController::class)->only(['index', 'show',]);
 
+    #transfer
+    Route::resource('transfers', TransferAPIController::class)->only(['index', 'store', 'show', 'destroy']);
+    Route::controller(TransferAPIController::class)->group(function () {
+        Route::get('/transfer_confirmation_list', 'transferConfirmationList');
+        Route::get('/confirm_transfer_item', 'confirmTransferItem');
+    });
+
 });
 
 Route::controller(ExcelImportController::class)->group(function () {
@@ -212,11 +219,13 @@ Route::post('/items', [ItemAPIController::class, 'createItem']);
 Route::put('/items/{id}', [ItemAPIController::class, 'updateItem']);
 Route::delete('/items/{id}', [ItemAPIController::class, 'deleteItem']);
 
-Route::get('/transfers', [TransferAPIController::class, 'getTransferData']);
-Route::post('/transfers', [TransferAPIController::class, 'createTransfer']);
-Route::put('/transfers/{id}', [TransferAPIController::class, 'updateTransfer']);
-Route::delete('/transfers/{id}', [TransferAPIController::class, 'deleteTransfer']);
-Route::post('/transfers/{id}/confirms', [TransferAPIController::class, 'confirmTransfer']);
+
+// Route::get('/transfers', [TransferAPIController::class, 'getTransferData']);
+// Route::post('/transfers', [TransferAPIController::class, 'createTransfer']);
+// Route::put('/transfers/{id}', [TransferAPIController::class, 'updateTransfer']);
+// Route::delete('/transfers/{id}', [TransferAPIController::class, 'deleteTransfer']);
+// Route::post('/transfers/{id}/confirms', [TransferAPIController::class, 'confirmTransfer']);
+
 
 Route::get('/customers', [CustomerAPIController::class, 'getCustomerData']);
 Route::post('/customers', [CustomerAPIController::class, 'createCustomer']);

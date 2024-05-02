@@ -54,13 +54,14 @@ class PurchaseOrderRepository implements PurchaseOrderRepositoryInterface
             }
             $latest = PurchaseOrder::orderBy('created_at', 'desc')->first();
             $count = 4;
-            $no = (new CommonPurchaseOrder())->getUniqueId($latest, $count);
+            $no = (new CommonPurchaseOrder())->getUniqueId($latest,'po_id',$count);
             $po_id = "PO" . '-' . str_pad($no, $count, "0", STR_PAD_LEFT) . '-' . now()->timestamp;
             $data['po_id'] = $po_id;
 
             if (isset($request->is_grn) && ($request->is_grn || $request->is_grn == "1")) {
                 $data['is_bought'] = 1;
             }
+            
             if (!$request->id) {
                 $data['created_by'] = $staff->id;
             }

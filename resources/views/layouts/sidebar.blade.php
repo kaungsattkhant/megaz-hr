@@ -29,14 +29,7 @@
                                     Areas
                                 </a>
                             </li>
-
-                            <li>
-                                <a href="{{ route('inventories') }}" class="flex items-center @yield('inventories')">
-                                    <i class="fal fa-inventory  pr-3"></i>
-                                    Inventory
-                                </a>
-                            </li>
-
+                           
                             <li>
                                 <a href="{{ route('items') }}" class="flex items-center @yield('items')">
                                     <i class="fal fa-hand-receiving  pr-3"></i>
@@ -88,6 +81,14 @@
                                     Complaints
                                 </a>
                             </li>
+                        @endif
+                        @if (checkDepartmentAndRoles('Inventory', ['Staff']))
+                        <li>
+                            <a href="{{ route('inventories') }}" class="flex items-center @yield('inventories')">
+                                <i class="fal fa-inventory  pr-3"></i>
+                                Inventory
+                            </a>
+                        </li>
                         @endif
                         @if (checkDepartmentPermission(['Finance']))
                             <li>
@@ -217,9 +218,6 @@
                                     Purchase Orders
                                 </a>
                             </li>
-
-
-
                             <li>
                                 <a href="{{ route('purchase_orders.left_items_index') }}"
                                     class="flex items-center @yield('purchase_order_left_items')">

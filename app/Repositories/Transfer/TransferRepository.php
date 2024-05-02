@@ -4,6 +4,9 @@ namespace App\Repositories\Transfer;
 
 use App\Models\Transfer;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use App\Http\Action\Inventory\StoreInventory;
+use App\Http\Action\Common\PurchaseOrder as CommonPurchaseOrder;
 
 class TransferRepository implements TransferRepositoryInterface
 {
@@ -76,4 +79,75 @@ class TransferRepository implements TransferRepositoryInterface
         }
         return $transfer;
     }
+
+
+    #api 
+
+    public function list($request){
+        $transfers=Transfer::where('created_by',UserData()->id)->paginate(config('common.list_count'));
+        return $transfers;
+    }
+
+    public function createOrUpdate($request){
+        $data = $request->all();
+        DB::beginTransaction();
+        try {
+            if (!isset($request->id)) {
+                $data['id'] = null;
+            }
+            $latest = Transfer::orderBy('created_at', 'desc')->first();
+            $count = 4;
+            $no = (new CommonPurchaseOrder())->getUniqueId($latest,'transfer_id',$count);
+            $transfer_id = "TRS" . '-' . str_pad($no, $count, "0", STR_PAD_LEFT) . '-' . now()->timestamp;
+            $data['transfer_id']=$transfer_id;
+            $data['source_inventory_id']=1;
+            $data['created_by']=UserData()->id;
+            $data['date']=  convertDateFormat(now());
+            $transfer=Transfer::updateOrCreate(
+                ['id' => $data['id']],
+                $data
+            );
+            DB::commit();
+            return $transfer;
+        } catch (\Exception $e) {
+            DB::rollback();
+            ResponseMessage($e->getMessage(), 402);
+            throw $e;
+        }
+    }
+
+    public function transferConfirmationList($request){
+        return Transfer::with(['created_by','confirmed_by','source_inventory','destination_inventory'])->where('destination_inventory_id',2)
+        ->paginate(config('common.list_count'));
+    }
+
+    public function confirmTransferItem($request){
+        DB::beginTransaction();
+        try {
+            if (checkDepartmentAndRoles('Inventory', ['Staff'])) {
+                $transfer = Transfer::find($request->id);
+                if ($transfer) {
+                    if ($transfer->confirmed_at != null && $transfer->confirmed_by !=null ) {
+                        ResponseMessage('Already checked', 200);
+                    }
+                    $transfer->confirmed_at = now();
+                    $transfer->confirmed_by = UserData()->id;
+                    $transfer->save();
+                    #store inventory
+                    $inventoryLedger = (new StoreInventory())->storeToInventoryLedger($transfer, 'transfer', 'out');
+                    (new StoreInventory())->storeItemToInventory($inventoryLedger, $transfer);
+                    #store inventory
+                    DB::commit();
+                    ResponseMessage('Update Successfully', 200);
+                }
+                ResponseMessage('Not Found', 404);
+            }
+            ResponseMessage("Permission isn't access", 404);
+        } catch (\Exception $e) {
+            DB::rollback();
+            ResponseMessage($e->getMessage(), 402);
+            throw $e;
+        }
+    }
+    #end
 }

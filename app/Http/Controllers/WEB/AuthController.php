@@ -29,7 +29,7 @@ class AuthController extends Controller
                 return redirect()->route('purchase_orders');
             }
             if(checkDepartmentPermission(['Inventory'])){
-                return redirect()->route('purchase_orders.confirm_poitems');
+                return redirect()->route('inventories');
             }
             if(checkDepartmentPermission(['Catering'])){
                 return redirect()->route('pos.index');

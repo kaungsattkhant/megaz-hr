@@ -17,4 +17,11 @@ interface TransferRepositoryInterface
 
     public function transferConfirm(int $id);
 
+    public function createOrUpdate($request);
+
+    public function list($request);
+
+    public function transferConfirmationList($request);
+
+    public function confirmTransferItem($request);
 }
