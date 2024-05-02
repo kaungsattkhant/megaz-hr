@@ -4,6 +4,7 @@ namespace App\Repositories\Entity;
 
 use App\Models\Area;
 use App\Models\Entity;
+use App\Models\OrderItem;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -44,54 +45,45 @@ class EntityRepository implements EntityRepositoryInterface
     {
         $entity = Entity::with(["invoices" => function ($query) {
             $query->whereNull("complete_date")
-                  ->select("id", "invoice_id", "entity_id", "total_session_price")
-                  ->with(["sessions", "orders"])
-                  ->latest()
-                  ->limit(1);
+                ->select("id", "invoice_id", "entity_id", "total_session_price")
+                ->with(["sessions", "orders"])
+                ->latest()
+                ->limit(1);
         }])->find($entityId);
 
-           $consolidatedOrderItems = [];
-
         foreach ($entity->invoices as $invoice) {
+            $consolidatedOrderItems = [];
 
             foreach ($invoice->orders as $order) {
+                $orderItems = OrderItem::where('order_id', $order->id)->get();
+                foreach ($orderItems as $orderItem) {
+                    $menuId = $orderItem->menu_id;
+                    $status = $orderItem->status;
 
-                foreach ($order->orderItems as $item) {
-                    $status = $item->status;
-                    $menuId = $item->menu_id;
-                    $discount_value = $item->discount_value;
-                    $originalPrice = $item->original_price;
-                    $quantity = $item->quantity;
-                    $price = $item->price;
-                    if (isset($consolidatedOrderItems[$status][$menuId])) {
-
-                        $consolidatedOrderItems[$status][$menuId]->quantity += $quantity;
-                        $consolidatedOrderItems[$status][$menuId]->price += $price;
-                        $consolidatedOrderItems[$status][$menuId]->discount_value += $discount_value;
-
+                    if (isset($consolidatedOrderItems[$menuId][$status])) {
+                        $consolidatedOrderItems[$menuId][$status]->quantity += $orderItem->quantity;
+                        $consolidatedOrderItems[$menuId][$status]->price += $orderItem->price;
+                        $consolidatedOrderItems[$menuId][$status]->discount_price += $orderItem->discount_price;
                     } else {
-                        $consolidatedOrderItems[$status][$menuId] =  $item;
+                        $consolidatedOrderItems[$menuId][$status] = $orderItem;
                     }
-
                 }
             }
-        }
-        foreach ($entity->invoices as $invoice) {
+
             foreach ($invoice->orders as $order) {
-                $orderItems = [];
-                foreach ($consolidatedOrderItems as $statusItems) {
-                    foreach ($statusItems as $menuId => $item) {
-                        $orderItems[] = $item;
+                $order->order_items = collect();
+                foreach ($consolidatedOrderItems as $menuId => $itemsByStatus) {
+                    foreach ($itemsByStatus as $status => $order_items) {
+                        $order_items->menu;
+                        $order->order_items->push($order_items);
                     }
                 }
-                $order->orderItems = $orderItems;
-                return $order;
             }
         }
-
 
         return $entity;
     }
+
 
 
     public function createData(array $data)

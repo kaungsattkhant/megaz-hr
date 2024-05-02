@@ -372,7 +372,7 @@ export default {
         },
 
         async createMenuBtnClicked() {
-            if (!this.menuCategoryId || !this.name || !this.price || this.ingredientItems.length < 1) {
+            if (!this.menuCategoryId || !this.name || !this.price || this.ingredientItems.length < 1 ||!this.selectedImage) {
                 alert('Required data must be filled');
             }
             else {
