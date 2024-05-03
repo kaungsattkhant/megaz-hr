@@ -17,4 +17,6 @@ interface StaffRepositoryInterface
     public function deleteData($id);
 
     public function getStaffByDepartment(Request $request, int $departmentId);
+
+    public function staffDetail(int $id);
 }

@@ -76,12 +76,15 @@ class StaffRepository implements StaffRepositoryInterface
         try {
             $staff = Staff::find($id);
             if ($staff) {
-
                 $data = RemoveNullValues($data);
 
                 $staff->update($data);
                 if (isset($data['roles'])) {
                     $staff->roles()->sync($data['roles']);
+                }
+                if (isset($data['inventoryIds'])) {
+                    $inventoryIds = isset($data['inventoryIds']) ? json_decode($data['inventoryIds']) : [];
+                    $staff->inventories()->sync($inventoryIds);
                 }
             }
             DB::commit();
@@ -91,6 +94,16 @@ class StaffRepository implements StaffRepositoryInterface
             ResponseMessage($e->getMessage(), 402);
             throw $e;
         }
+    }
+
+    public function staffDetail(int $id)
+    {
+        $staff = Staff::with('department','roles','inventories','emergencyContacts','gender','completed_tasks')->find($id);
+        if($staff==null)
+        {
+            ResponseMessage("Staff not found or invalid id",404);
+        }
+        return $staff;
     }
 
     public function deleteData($id)

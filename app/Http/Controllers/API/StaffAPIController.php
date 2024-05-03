@@ -76,4 +76,10 @@ class StaffAPIController extends Controller
         $staff = $this->staffRepo->getStaffByDepartment($request, $staff->department_id);
         ResponseData($staff);
     }
+
+    public function detailStaff(int $id)
+    {
+        $staff = $this->staffRepo->staffDetail($id);
+        ResponseData($staff);
+    }
 }
