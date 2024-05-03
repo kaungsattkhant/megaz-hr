@@ -295,6 +295,9 @@ if (!function_exists('checkDepartmentPermission')) {
     {
         $departmentName = UserData()->department->name;
         foreach ($permissions as $key => $value) {
+            if($value == 'all_departments'){
+                return true;
+            }
             if ($value == $departmentName) {
                 return true;
             }

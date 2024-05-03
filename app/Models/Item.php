@@ -16,6 +16,11 @@ class Item extends BaseModel
 
     protected $with=['item_prices'];
 
+    public function category()
+    {
+        return $this->belongsTo(Category::class);
+    }
+
     public function uoms()
     {
         return $this->belongsToMany(Uom::class,'items_uoms', 'item_id', 'uom_id');

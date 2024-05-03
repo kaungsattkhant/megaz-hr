@@ -65,7 +65,7 @@
                                     {{ item.item_prices.price }}
                                 </td>
                                 <td class="whitespace-nowrap px-6 py-4 ">
-                                    {{ item.category_id }}
+                                    {{ item.category.name }}
                                 </td>
                                 <td class="whitespace-nowrap px-6 py-4">
                                     <!-- <button id="edit-btn" class="pr-1">
@@ -321,7 +321,8 @@
                 formData.append('category_id', this.selectedCategory.id);
                 let response = await postApiData({url: url, form_data: formData, token: this.getToken()});
                 if(response.success){
-                    this.getItemList(this.currentPage);
+                    // this.getItemList(this.currentPage);
+                    window.location.reload();
                 }
             },
 

@@ -87,6 +87,25 @@
                             <td class=" py-2 "></td>
                         </tr>
                     </div>
+                    <div class="contents">
+                        <tr class="bg-white rounded-lg overflow-hidden shadow-lg">
+                            <td class=" px-6 py-4 font-medium ">
+                                &nbsp;
+                            </td>
+                            <td class=" px-6 py-4 font-medium ">
+                                &nbsp;
+                            </td>
+                            <td class=" px-6 py-4 font-medium ">
+                                &nbsp;
+                            </td>
+                            <td class="px-6 py-4">
+                                {{ totalPrice.toLocaleString() }}
+                            </td>
+                            <td class=" px-6 py-4 font-medium ">
+                                &nbsp;
+                            </td>
+                        </tr>
+                    </div>
 
                 </tbody>
             </table>
@@ -112,6 +131,8 @@
                 selectedItem: null,
                 quantity: null,
                 purchaseOrderItems: [],
+
+                totalPrice: 0,
             };
         },
 
@@ -150,12 +171,14 @@
                     amount: amount,
                 });
 
+                this.updateTotalPrice(this.purchaseOrderItems);
                 this.selectedItem = null;
                 this.quantity = null;
             },
 
             removePurchaseOrderItemBtnClicked(purchaseOrderItemsIndex){
                 this.purchaseOrderItems.splice(purchaseOrderItemsIndex, 1);
+                this.updateTotalPrice(this.purchaseOrderItems);
             },
 
             async createPurchaseOrderBtnClicked(){
@@ -191,8 +214,14 @@
                         text: `Some errors occurred`,
                         type: 'error'
                     });
-                    console.log(response);
                 }
+            },
+
+            updateTotalPrice(poItems){
+                this.totalPrice = 0;
+                poItems.forEach((item)=>{
+                    this.totalPrice += (item.amount * item.quantity);
+                });
             },
 
         },

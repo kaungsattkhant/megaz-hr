@@ -89,6 +89,11 @@ Route::middleware(['departments:Finance'])->group(function () {
 
 });
 
+Route::middleware(['departments:all_departments'])->group(function () {
+    Route::view('/inventory_transfers_list', 'transfers.transfers_list')->name('transfers.transfers');
+    Route::view('/inventory_receives_list', 'transfers.receives_list')->name('transfers.receives');
+});
+
 Route::view('/suppliers', 'supplier.index')->name('suppliers.index');
 Route::view('/suppliers/create', 'supplier.create')->name('suppliers.create');
 Route::view('/suppliers/{id}/edit', 'supplier.edit')->name('suppliers.edit');

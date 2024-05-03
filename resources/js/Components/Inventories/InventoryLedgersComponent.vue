@@ -10,7 +10,7 @@
         <div class="flex justify-end flex-col">
 
             <button type="button" class="add-btn transition duration-150 ease-in-out focus:outline-none focus:ring-0 "
-                data-te-toggle="modal" data-te-target="#create_modal">
+                data-te-toggle="modal" data-te-target="#checkModal">
                 Add New
             </button>
         </div>
@@ -72,16 +72,14 @@
                                     {{ ledger.closing_balance }}
                                 </td>
                                 <td class="whitespace-nowrap px-6 py-4 ">
-                                    {{ ledger.closing_balance * 1000}}
+                                    {{ ledger.closing_balance * 1000 }}
                                 </td>
                                 <td class="whitespace-nowrap px-6 py-4">
-                                    <button id="edit-btn" class="pr-1"
-                                        @click="transferBtnClicked(ledger[0].item.id)"
+                                    <button id="edit-btn" class="pr-1" @click="transferBtnClicked(ledger.item_id)"
                                         data-te-toggle="modal" data-te-target="#transfer_modal">
                                         <i class="fas fa-exchange-alt"></i>
                                     </button>
-                                    <button class="pl-2"
-                                        data-te-toggle="modal" data-te-target="#defect_modal">
+                                    <button class="pl-2" data-te-toggle="modal" data-te-target="#defect_modal">
                                         <i class="fas fa-exclamation-triangle"></i>
                                     </button>
                                 </td>
@@ -91,7 +89,7 @@
                             </tr>
                         </div>
 
-                            <!-- looping end -->
+                        <!-- looping end -->
                     </tbody>
                 </table>
             </div>
@@ -108,11 +106,13 @@
                     class="min-[576px]:shadow-[0_0.5rem_1rem_rgba(#000, 0.15)] pointer-events-auto relative flex w-full flex-col rounded-md border-none bg-white bg-clip-padding text-current shadow-lg outline-none">
 
                     <div class="relative  p-4">
-                        <h5 class="text-xl text-center mt-2 font-medium leading-normal text-black" id="create_modalLabel">
+                        <h5 class="text-xl text-center mt-2 font-medium leading-normal text-black"
+                            id="create_modalLabel">
                             Transfer
                         </h5>
-                        <button type="button" id="close" class="absolute top-4 right-4 focus:shadow-none focus:outline-none"
-                            data-te-modal-dismiss aria-label="Close">
+                        <button type="button" id="close"
+                            class="absolute top-4 right-4 focus:shadow-none focus:outline-none" data-te-modal-dismiss
+                            aria-label="Close">
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
                                 stroke="currentColor" class="h-5 w-5">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
@@ -123,25 +123,38 @@
 
                         <div class="mb-4">
                             <label for="" class="block text-sm text-black mb-3">
-                                Store
+                                Source Inventory
                             </label>
-                            <select name="" id="" v-model="selectedInventory"
+                            <select name="" id="" v-model="selectedSourceInventory"
                                 class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
-                                <option :value="store.id" v-for="(store,index) in inventoryList">{{ store.name }}</option>
+                                <option :value="sourceInventory.id"
+                                    v-for="(sourceInventory, sourceInventoryIndex) in sourceInventories">{{
+                                    sourceInventory.name }}</option>
                             </select>
                         </div>
                         <div class="mb-4">
                             <label for="" class="block text-sm text-black mb-3">
-                                Amount
+                                Destination Inventory
                             </label>
-                            <input type="text" placeholder="Amount" v-model="amount"
+                            <select name="" id="" v-model="selectedDestinationInventory"
+                                class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
+                                <option :value="destinationInventory.id"
+                                    v-for="(destinationInventory, destinationInventoryIndex) in destinationInventories">
+                                    {{ destinationInventory.name }}</option>
+                            </select>
+                        </div>
+                        <div class="mb-4">
+                            <label for="" class="block text-sm text-black mb-3">
+                                Quantity
+                            </label>
+                            <input type="text" placeholder="Quantity" v-model="quantity"
                                 class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
                         </div>
 
                     </div>
                     <div class="flex justify-center px-12 mb-6">
                         <button type="button" @click="confirmTransferBtnClicked"
-                        class="add-btn focus:outline-none focus:ring-0 ">
+                            class="add-btn focus:outline-none focus:ring-0 ">
                             Transfer
                         </button>
                     </div>
@@ -153,117 +166,173 @@
 
     </div>
 
+    <!--Check Modal -->
+    <div data-te-modal-init
+        class="fixed left-0 top-0 z-[1055] hidden h-full w-full overflow-y-auto overflow-x-hidden outline-none"
+        id="checkModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div data-te-modal-dialog-ref class="pointer-events-none relative flex min-h-[calc(100%-1rem)] w-auto translate-y-[-50px]
+            items-center opacity-0 transition-all duration-300 ease-in-out min-[576px]:mx-auto min-[576px]:mt-7
+            min-[576px]:min-h-[calc(100%-3.5rem)] min-[576px]:max-w-[500px]">
+            <div class="min-[576px]:shadow-[0_0.5rem_1rem_rgba(#000, 0.15)] pointer-events-auto relative flex w-full flex-col
+                rounded-md border-none bg-white bg-clip-padding text-current shadow-lg outline-none ">
+                <div
+                    class="flex flex-shrink-0 items-center justify-between rounded-t-md border-b-2 border-neutral-100 border-opacity-100 p-4 ">
+                    <!--Modal title-->
+                    <h5 class="text-xl font-medium leading-normal text-neutral-800 " id="exampleModalLabel">
+                        Check Item
+                    </h5>
+                    <!--Close button-->
+                    <button type="button"
+                        class="box-content rounded-none border-none hover:no-underline hover:opacity-75 focus:opacity-100 focus:shadow-none focus:outline-none"
+                        data-te-modal-dismiss aria-label="Close">
+                        <svg class="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                            stroke-width="1.5" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </button>
+                </div>
 
+                <!--Modal body-->
+                <div class="relative flex-auto p-4" data-te-modal-body-ref>
+                    <p>
+                        Are you sure ?
+                    </p>
+                </div>
+
+                <!--Modal footer-->
+                <!-- <div class="flex flex-shrink-0 flex-wrap items-center justify-end rounded-b-md border-t-2 border-neutral-100 border-opacity-100 p-4 ">
+                    <button type="button" class="inline-block px-6 pb-2 pt-2.5 text-xs focus:outline-none focus:ring-0 " data-te-modal-dismiss>
+                        Close
+                    </button>
+                    <button @click="confirmCheckPurchaseOrderItemBtnClicked" type="button" data-te-toggle="modal" data-te-target="#checkModal"
+                    class="ml-1 inline-block rounded bg-blue-600 px-6 pb-2 pt-2.5 text-xs  text-white   focus:outline-none focus:ring-0 ">
+                        Confirm
+                    </button>
+                </div> -->
+            </div>
+        </div>
+    </div>
 
 
 </template>
 
 <script>
-    import { Modal, Ripple, Select, initTE, Input } from "tw-elements";
-    import { getApiData, postApiData, deleteApiData } from '../../utilities/ajax-helpers';
-    import { mapGetters } from "vuex";
+import { Modal, Ripple, Select, initTE, Input } from "tw-elements";
+import { getApiData, postApiData, deleteApiData } from '../../utilities/ajax-helpers';
+import { mapGetters } from "vuex";
 
-    export default {
-        data() {
-            return {
-                inventoryLegderList:[],
-                inventoryList:[],
-                testopening:10,
-                selectedInventory:null,
-                amount:null,
-                itemId:null,
+export default {
+    data() {
+        return {
+            inventoryLegderList: [],
+            inventoryList: [],
+            testopening: 10,
+            selectedInventory: null,
+            quantity: null,
+            itemId: null,
 
 
-                deleteId: null,
-            };
+            deleteId: null,
+
+            sourceInventories: [],
+            selectedSourceInventory: null,
+            destinationInventories: [],
+            selectedDestinationInventory: null,
+        };
+    },
+    props: ['inventory_id'],
+
+    methods: {
+        ...mapGetters(['getToken']),
+
+        async getInventoryLegderList() {
+            const response = await getApiData({ url: '/api/inventories/' + this.inventory_id + '/ledgers', token: this.getToken() });
+            if (response.data) {
+                this.inventoryLegderList = response.data;
+            }
         },
-        props:['inventory_id'],
-
-        methods: {
-            ...mapGetters(['getToken']),
-
-            async getInventoryLegderList(){
-                const response = await getApiData({ url: '/api/inventories/'+this.inventory_id+'/ledgers', token: this.getToken() });
-                if(response.data){
-                    this.inventoryLegderList = response.data;
-                    // calculate opening, incoming, outgoing and balance
-                    // for(let i=0; i<this.inventoryLegderList.length; i++){
-                    //     this.inventoryLegderList[i]['opening'] = 0;
-                    //     this.inventoryLegderList[i]['in'] = 0;
-                    //     this.inventoryLegderList[i]['out'] = 0;
-                    //     this.inventoryLegderList[i]['closing'] = 0;
-                    //     for(let j=0; j<this.inventoryLegderList[i].length; j++){
-                    //         if(this.inventoryLegderList[i][j].type == 'previous incoming'){
-                    //             this.inventoryLegderList[i]['opening'] += this.inventoryLegderList[i][j].quantity;
-                    //         }
-                    //         if(this.inventoryLegderList[i][j].type == 'previous outgoing'){
-                    //             this.inventoryLegderList[i]['opening'] -= this.inventoryLegderList[i][j].quantity;
-                    //         }
-                    //         if(this.inventoryLegderList[i][j].type == 'incoming'){
-                    //             this.inventoryLegderList[i]['in'] += this.inventoryLegderList[i][j].quantity;
-                    //         }
-                    //         if(this.inventoryLegderList[i][j].type == 'outgoing'){
-                    //             this.inventoryLegderList[i]['out'] += this.inventoryLegderList[i][j].quantity;
-                    //         }
-                    //     }
-                    //     this.inventoryLegderList[i]['closing'] = (this.inventoryLegderList[i]['opening'] + this.inventoryLegderList[i]['in']) - this.inventoryLegderList[i]['out'];
-                    //     console.log(this.inventoryLegderList[i]);
-                    // }
-                }
-            },
-            async getInventoryList(){
-                const response = await getApiData({ url: '/api/inventories', token: this.getToken()});
-                if(response.data){
-                    this.inventoryList = response.data;
-                }
-            },
-
-            transferBtnClicked(id){
-                this.itemId = id;
-            },
-            confirmTransferBtnClicked(){
-                this.transferInventory();
-            },
-
-            async transferInventory()
-            {
-                let formData = new FormData();
-                formData.append('source_inventory_id', this.inventory_id);
-                formData.append('destination_inventory_id', this.selectedInventory);
-                formData.append('quantity', this.amount);
-                formData.append('item_id', this.itemId);
-                let response = await postApiData({url: '/api/transfers', form_data: formData, token: this.getToken()});
-                if(response.success){
-                    this.getInventoryLegderList(null);
-                    console.log(this.inventory_id)
-                    console.log(this.selectedInventory)
-                    console.log(this.amount)
-                    console.log(this.itemId)
-                    this.closeModal();
-                    this.clearForm();
-                }
-                else{
-                    alert('some errors occur');
-                }
-            },
-
-            closeModal() {
-                document.getElementById("close").click();
-            },
-
-            clearForm() {
-                this.selectedInventory = null,
-                this.amount = null
-            },
-
-
-
+        async getInventoryList() {
+            const response = await getApiData({ url: '/api/inventories', token: this.getToken() });
+            if (response.data) {
+                this.inventoryList = response.data;
+            }
         },
-        mounted()
-        {
-            this.getInventoryLegderList();
-            this.getInventoryList();
-            initTE({ Modal, Select, Ripple });
-        }
+
+        async transferBtnClicked(id) {
+            this.itemId = id;
+            let url = `/api/inventory_list`;
+            let response = await getApiData({ url: url, token: this.getToken() });
+            if (response.data) {
+                this.sourceInventories = response.data.source_inventories;
+                this.destinationInventories = response.data.destination_inventories;
+            }
+        },
+
+        alertValidationMessage(field) {
+            this.$notify({
+                title: 'Input validation',
+                text: `You forgot to provide ${field}, please try again`,
+                type: 'warn'
+            });
+        },
+
+        confirmTransferBtnClicked() {
+            if (!this.selectedSourceInventory) {
+                this.alertValidationMessage(`source inventory`);
+                return 1;
+            }
+            if (!this.selectedDestinationInventory) {
+                this.alertValidationMessage(`destination inventory`);
+                return 1;
+            }
+            if (!this.quantity) {
+                this.alertValidationMessage(`quantity`);
+                return 1;
+            }
+            this.transferInventory();
+        },
+
+        async transferInventory() {
+            let formData = new FormData();
+            formData.append('source_inventory_id', this.selectedSourceInventory);
+            formData.append('destination_inventory_id', this.selectedDestinationInventory);
+            formData.append('quantity', this.quantity);
+            formData.append('item_id', this.itemId);
+            let response = await postApiData({ url: '/api/transfers', form_data: formData, token: this.getToken() });
+            if (response.success) {
+                // this.getInventoryLegderList(null);
+                this.closeModal();
+                this.clearForm();
+                this.$notify({
+                    text: `Success`,
+                    type: 'info'
+                });
+            }
+            else {
+                this.$notify({
+                    text: `some errors occur`,
+                    type: 'error'
+                });
+            }
+        },
+
+        closeModal() {
+            document.getElementById("close").click();
+        },
+
+        clearForm() {
+            this.selectedInventory = null,
+                this.quantity = null
+        },
+    },
+
+    created() {
+        this.getInventoryLegderList();
+        this.getInventoryList();
+    },
+
+    mounted() {
+        initTE({ Modal, Select, Ripple });
     }
+}
 </script>

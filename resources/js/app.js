@@ -38,6 +38,8 @@ import InventoriesCrudComponent from './Components/Inventories/InventoriesCrudCo
 import RoomCrudComponent from './Components/TablesAndRooms/RoomCrudComponent.vue';
 import ServicesCrudComponent from './Components/Services/ServicesCrudComponent.vue';
 import InventoryLedgersComponent from './Components/Inventories/InventoryLedgersComponent.vue';
+import InventoryReceivesListComponent from './Components/Transfers/InventoryReceivesListComponent.vue';
+import InventoryTransfersListComponent from './Components/Transfers/InventoryTransfersListComponent.vue';
 import MenuListComponent from './Components/Menus/MenuListComponent.vue';
 import MenuCreateComponent from './Components/Menus/MenuCreateComponent.vue';
 import ComplainsCrudComponent from './Components/Complains/ComplainsCrudComponent.vue';
@@ -91,6 +93,9 @@ app.component('InventoriesCrudComponent', InventoriesCrudComponent);
 app.component('RoomCrudComponent', RoomCrudComponent);
 app.component('ServicesCrudComponent', ServicesCrudComponent);
 app.component('InventoryLedgersComponent', InventoryLedgersComponent);
+//InventoryTransfersListComponent
+app.component('InventoryReceivesListComponent', InventoryReceivesListComponent);
+app.component('InventoryTransfersListComponent', InventoryTransfersListComponent);
 app.component('MenuListComponent', MenuListComponent);
 app.component('MenuCreateComponent', MenuCreateComponent);
 app.component('ComplainsCrudComponent', ComplainsCrudComponent);
