@@ -77,7 +77,7 @@ class StaffRepository implements StaffRepositoryInterface
             $staff = Staff::find($id);
             if ($staff) {
                 $data = RemoveNullValues($data);
-
+                $staff->emergencyContacts()->updateOrCreate(['staff_id'=>$staff->id],$data);
                 $staff->update($data);
                 if (isset($data['roles'])) {
                     $staff->roles()->sync($data['roles']);
