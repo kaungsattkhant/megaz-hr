@@ -29,7 +29,7 @@
                                     Areas
                                 </a>
                             </li>
-                           
+
                             <li>
                                 <a href="{{ route('items') }}" class="flex items-center @yield('items')">
                                     <i class="fal fa-hand-receiving  pr-3"></i>
@@ -243,6 +243,18 @@
                                 </a>
                             </li>
                         @endif
+                        <li>
+                            <a href="{{ route('transfers.receives') }}" class="flex items-center @yield('inventory_receives')">
+                                <i class="fal fa-user  pr-3"></i>
+                                Inventory Receives List
+                            </a>
+                        </li>
+                        <li>
+                            <a href="{{ route('transfers.transfers') }}" class="flex items-center @yield('inventory_transfers')">
+                                <i class="fal fa-user  pr-3"></i>
+                                Inventory Transfers List
+                            </a>
+                        </li>
                     </ul>
 
                 </div>

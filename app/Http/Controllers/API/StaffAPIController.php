@@ -24,7 +24,7 @@ class StaffAPIController extends Controller
     }
 
     public function getStaffData(Request $request)
-    
+
     {
         $staffs = $this->staffRepo->listAllData($request);
         ResponseData($staffs);
@@ -39,7 +39,7 @@ class StaffAPIController extends Controller
         ResponseData($staff);
     }
 
-    public function updateStaff(StaffUpdateRequest $request, $id)
+    public function updateStaff(Request $request, $id)
     {
         $staff = $this->staffRepo->updateData($request->all(), $id);
        if(!$staff)
@@ -74,6 +74,12 @@ class StaffAPIController extends Controller
             ResponseMessage('Not a supervisor', 403);
         }
         $staff = $this->staffRepo->getStaffByDepartment($request, $staff->department_id);
+        ResponseData($staff);
+    }
+
+    public function detailStaff(int $id)
+    {
+        $staff = $this->staffRepo->staffDetail($id);
         ResponseData($staff);
     }
 }
