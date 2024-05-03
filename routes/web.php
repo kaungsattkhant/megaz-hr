@@ -32,6 +32,7 @@ Route::middleware(['departments:HR'])->group(function () {
     Route::view('/roles', 'roles.index')->name('roles');
     Route::view('/staff', 'staff.index')->name('staff');
     Route::view('/staff/create', 'staff.create')->name('staff.crate');
+    Route::view('/staff/{id}/edit', 'staff.edit')->name('staff.edit');
 
     Route::view('/tasks', 'tasks.index')->name('tasks');
     Route::view('/complaints', 'complains.index')->name('complains');
@@ -39,7 +40,7 @@ Route::middleware(['departments:HR'])->group(function () {
     Route::view('/departments', 'departments.index')->name('departments');
     Route::view('/areas', 'areas.index')->name('areas');
 
-   
+
 
     Route::view('/rooms', 'tables&rooms.index')->name('room');
     Route::view('/tables', 'tables&rooms.table')->name('table');
