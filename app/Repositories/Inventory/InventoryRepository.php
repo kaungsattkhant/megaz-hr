@@ -36,10 +36,10 @@ class InventoryRepository implements InventoryRepositoryInterface
             ->paginate(config('common.list_count'));
         } else {
             $inventories = Inventory::where('is_active', 1)
-            ->whereHas('staff',function($query){
-                $query->where('id',UserData()->id);
-            })
-            ->whereIn('id',$inventory_ids)
+            // ->whereHas('staff',function($query){
+            //     $query->where('id',UserData()->id);
+            // })
+            // ->whereIn('id',$inventory_ids)
             ->with(['inventoryable'])
             ->get();
             return $inventories;
