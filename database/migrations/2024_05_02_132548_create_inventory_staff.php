@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('inventory_staff', function (Blueprint $table) {
             $table->foreignId('staff_id')->constrained()->onDelete('cascade');
             $table->foreignId('inventory_id')->constrained()->onDelete('cascade');
-        });
+        }); 
     }
 
     /**

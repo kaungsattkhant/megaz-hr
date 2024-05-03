@@ -84,7 +84,8 @@ class TransferRepository implements TransferRepositoryInterface
     #api 
 
     public function list($request){
-        $transfers=Transfer::where('created_by',UserData()->id)->paginate(config('common.list_count'));
+        $transfers=Transfer::with(['item','created_by','confirmed_by','source_inventory','destination_inventory'])
+        ->where('created_by',UserData()->id)->paginate(config('common.list_count'));
         return $transfers;
     }
 
@@ -118,7 +119,7 @@ class TransferRepository implements TransferRepositoryInterface
 
     public function transferConfirmationList($request){
         $inventory_ids=InventoryIds();
-        return Transfer::with(['created_by','confirmed_by','source_inventory','destination_inventory'])->whereIn('destination_inventory_id',$inventory_ids)
+        return Transfer::with(['item','created_by','confirmed_by','source_inventory','destination_inventory'])->whereIn('destination_inventory_id',$inventory_ids)
         ->paginate(config('common.list_count'));
     }
 
