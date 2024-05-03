@@ -10,6 +10,13 @@ use Illuminate\Database\Eloquent\Relations\Relation;
 
 class StoreInventory
 {
+    private $inventoryId;
+
+    public function __construct(int $inventoryId)
+    {
+        $this->inventoryId = $inventoryId;
+    }
+    
     public function inventoryAction($model)
     {
         $morphMapName=RelationMorphName($model);
@@ -21,17 +28,13 @@ class StoreInventory
     }
 
     public function storeToInventoryLedger($model,$morphMapName,$action){
-        if(UserData()->department->inventory){
-            $inventory_id=UserData()->department->inventory->inventory_id;
             return InventoryLedger::create([
                 'date'=>now(),
                 'ledgerable_id'=>$model->id,
                 'ledgerable_type'=>$morphMapName,
-                'inventory_id'=>$inventory_id,
+                'inventory_id'=>$this->inventoryId,
                 'action'=>$action,
             ]);
-        }
-        ResponseMessage("Inventory is required",419);
     }
 
     public function storeItemToInventory($inventoryLedger,$item){

@@ -378,8 +378,12 @@ class PurchaseOrderRepository implements PurchaseOrderRepositoryInterface
                     $po_item->is_confirmed = 1;
                     $po_item->save();
                     #store inventory
-                    $inventoryLedger = (new StoreInventory())->storeToInventoryLedger($po_item->purchase_order, 'purchase_order', 'in');
-                    (new StoreInventory())->storeItemToInventory($inventoryLedger, $po_item);
+                    if(!UserData()->department->inventory){
+                        ResponseMessage("Inventory is required",419);
+                    }
+                    $inventoryId=UserData()->department->inventory->inventory_id;
+                    $inventoryLedger = (new StoreInventory($inventoryId))->storeToInventoryLedger($po_item->purchase_order, 'purchase_order', 'in');
+                    (new StoreInventory($inventoryId))->storeItemToInventory($inventoryLedger, $po_item);
                     #store inventory
                     DB::commit();
                     ResponseMessage('Update Successfully', 200);

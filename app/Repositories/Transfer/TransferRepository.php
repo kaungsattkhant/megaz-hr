@@ -2,34 +2,32 @@
 
 namespace App\Repositories\Transfer;
 
+use App\Http\Action\Common\PurchaseOrder as CommonPurchaseOrder;
+use App\Http\Action\Inventory\StoreInventory;
 use App\Models\Transfer;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use App\Http\Action\Inventory\StoreInventory;
-use App\Http\Action\Common\PurchaseOrder as CommonPurchaseOrder;
 
 class TransferRepository implements TransferRepositoryInterface
 {
     public function listAllData(Request $request)
     {
-        if($request->per_page || $request->page){
+        if ($request->per_page || $request->page) {
             $totalCount = Transfer::where('is_active', 1)->count();
             $pageNumber = 1;
             $perPage = 20;
-            if($request->page){
+            if ($request->page) {
                 $pageNumber = $request->page;
             }
-            if($request->per_page){
+            if ($request->per_page) {
                 $perPage = $request->per_page;
             }
             $skip = ($pageNumber - 1) * $perPage;
             $transfers = Transfer::skip($skip)->take($perPage)->with('role.department')->get();
             $paginationData = MakePaginationData($request, $totalCount, 'tasks');
             $paginationData['tasks'] = $transfers;
-
             return $paginationData;
-        }
-        else{
+        } else {
             $transfers = Transfer::all();
 
             return $transfers;
@@ -45,24 +43,22 @@ class TransferRepository implements TransferRepositoryInterface
         return $transfer;
     }
 
-    public function updateData(array $data,int $id)
+    public function updateData(array $data, int $id)
     {
         $transfer = Transfer::find($id);
-        if($transfer)
-        {
-           $transfer->update($data);
+        if ($transfer) {
+            $transfer->update($data);
         }
         return $transfer;
     }
 
     public function deleteData(int $id)
     {
-        $transfer= Transfer::find($id);
-        if($transfer)
-        {
+        $transfer = Transfer::find($id);
+        if ($transfer) {
             $transfer->delete();
             return true;
-        }else{
+        } else {
             return false;
         }
     }
@@ -70,8 +66,7 @@ class TransferRepository implements TransferRepositoryInterface
     public function transferConfirm(int $id)
     {
         $transfer = Transfer::find($id);
-        if($transfer)
-        {
+        if ($transfer) {
             $data['confirmed_at'] = currentTime();
             $data['confirmed_by'] = $id;
             $data['status'] = "confirmed";
@@ -80,16 +75,18 @@ class TransferRepository implements TransferRepositoryInterface
         return $transfer;
     }
 
+    #api
 
-    #api 
-
-    public function list($request){
-        $transfers=Transfer::with(['item','created_by','confirmed_by','source_inventory','destination_inventory'])
-        ->where('created_by',UserData()->id)->paginate(config('common.list_count'));
+    public function list($request)
+    {
+        $transfers = Transfer::with(['item', 'created_by', 'confirmed_by', 'source_inventory', 'destination_inventory'])
+            ->where('created_by', UserData()->id)
+            ->paginate(config('common.list_count'));
         return $transfers;
     }
 
-    public function createOrUpdate($request){
+    public function createOrUpdate($request)
+    {
         $data = $request->all();
         DB::beginTransaction();
         try {
@@ -98,13 +95,13 @@ class TransferRepository implements TransferRepositoryInterface
             }
             $latest = Transfer::orderBy('created_at', 'desc')->first();
             $count = 4;
-            $no = (new CommonPurchaseOrder())->getUniqueId($latest,'transfer_id',$count);
+            $no = (new CommonPurchaseOrder())->getUniqueId($latest, 'transfer_id', $count);
             $transfer_id = "TRS" . '-' . str_pad($no, $count, "0", STR_PAD_LEFT) . '-' . now()->timestamp;
-            $data['transfer_id']=$transfer_id;
-            $data['source_inventory_id']=$request->source_inventory_id;
-            $data['created_by']=UserData()->id;
-            $data['date']=  convertDateFormat(now());
-            $transfer=Transfer::updateOrCreate(
+            $data['transfer_id'] = $transfer_id;
+            $data['source_inventory_id'] = $request->source_inventory_id;
+            $data['created_by'] = UserData()->id;
+            $data['date'] = convertDateFormat(now());
+            $transfer = Transfer::updateOrCreate(
                 ['id' => $data['id']],
                 $data
             );
@@ -117,27 +114,37 @@ class TransferRepository implements TransferRepositoryInterface
         }
     }
 
-    public function transferConfirmationList($request){
-        $inventory_ids=InventoryIds();
-        return Transfer::with(['item','created_by','confirmed_by','source_inventory','destination_inventory'])->whereIn('destination_inventory_id',$inventory_ids)
-        ->paginate(config('common.list_count'));
+    public function transferConfirmationList($request)
+    {
+        $inventory_ids = InventoryIds();
+        return Transfer::with(['item', 'created_by', 'confirmed_by', 'source_inventory', 'destination_inventory'])->whereIn('destination_inventory_id', $inventory_ids)
+            ->paginate(config('common.list_count'));
     }
 
-    public function confirmTransferItem($request){
+    public function confirmTransferItem($request)
+    {
         DB::beginTransaction();
         try {
             if (checkDepartmentAndRoles('Inventory', ['Staff'])) {
                 $transfer = Transfer::find($request->id);
                 if ($transfer) {
-                    if ($transfer->confirmed_at != null && $transfer->confirmed_by !=null ) {
-                        ResponseMessage('Already checked', 200);
-                    }
+                    // if ($transfer->confirmed_at != null && $transfer->confirmed_by != null) {
+                    //     ResponseMessage('Already checked', 200);
+                    // }
                     $transfer->confirmed_at = now();
                     $transfer->confirmed_by = UserData()->id;
+                    $transfer->status = 'complete';
                     $transfer->save();
                     #store inventory
-                    $inventoryLedger = (new StoreInventory())->storeToInventoryLedger($transfer, 'transfer', 'out');
-                    (new StoreInventory())->storeItemToInventory($inventoryLedger, $transfer);
+                    #out
+                    $inventoryId = $transfer->source_inventory_id;
+                    $inventoryLedger = (new StoreInventory($inventoryId))->storeToInventoryLedger($transfer, 'transfer', 'out');
+                    (new StoreInventory($inventoryId))->storeItemToInventory($inventoryLedger, $transfer);
+
+                    #in
+                    $inventoryId = $transfer->destination_inventory_id;
+                    $inventoryLedger = (new StoreInventory($inventoryId))->storeToInventoryLedger($transfer, 'transfer', 'in');
+                    (new StoreInventory($inventoryId))->storeItemToInventory($inventoryLedger, $transfer);
                     #store inventory
                     DB::commit();
                     ResponseMessage('Update Successfully', 200);
