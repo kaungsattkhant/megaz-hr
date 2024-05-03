@@ -195,7 +195,7 @@ Route::put('/roles/{id}', [RoleAPIController::class, 'updateRole']);
 Route::get('/staffs', [StaffAPIController::class, 'getStaffData']);
 Route::get('/staffs/{id}',[StaffAPIController::class,'detailStaff']);
 Route::post('/staffs', [StaffAPIController::class, 'createStaff']);
-Route::put('/staffs/{id}', [StaffAPIController::class, 'updateStaff']);
+Route::post('/staffs/{id}', [StaffAPIController::class, 'updateStaff']);
 Route::delete('/staffs/{id}', [StaffAPIController::class, 'deleteStaff']);
 
 Route::get('/tasks', [TaskController::class, 'getTaskData']);

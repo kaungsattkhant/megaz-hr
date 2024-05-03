@@ -44,7 +44,7 @@
                 <label for="" class="block text-sm text-black mb-3">
                     Father's Name
                 </label>
-                <input type="text" v-model="fathterName" placeholder="Father's Name"
+                <input type="text" v-model="fatherName" placeholder="Father's Name"
                     class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
             </div>
 
@@ -81,11 +81,7 @@
                     class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
             </div>
             <div class="mb-4 col-span-3 pb-6 rounded-md">
-                <label for="" class="block text-sm text-black mb-3">
-                    Password
-                </label>
-                <input type="password" v-model="password"
-                    class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
+                <!-- password deleted -->
             </div>
             <div class="col-span-3"></div>
 
@@ -116,6 +112,7 @@
                         <!-- <option value="2">Manager</option>
                         <option value="3">Waiter</option> -->
                     </select>
+
                 </div>
             </div>
             <div class="col-span-3 rounded-md mb-4 pb-6">
@@ -130,7 +127,7 @@
                 <label for="" class="block text-sm text-black mb-3">
                     Inventories
                 </label>
-                <div class="bg-white mb-0 w-full text-sm inline-block" data-te-select-wrapper-ref>
+                <div class=" mb-0 w-full text-sm inline-block" data-te-select-wrapper-ref>
                     <select :disabled="inventories.length < 1" data-te-select-init data-te-select-placeholder="Select Inventories" data-te-select-filter="true"
                         name="" id="" multiple v-model="selectedInventories"
                         class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
@@ -138,6 +135,7 @@
                             {{ inventory.name }}
                         </option>
                     </select>
+
                 </div>
             </div>
 
@@ -150,8 +148,8 @@
                 <!-- <input type="input" v-model="state" placeholder="State (Required)"
                     class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0"> -->
                 <select name="" id="" v-model="selectedState" class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0"
-                @change="stateSelectChanged">
-                    <option :value="state" v-for="(state, stateIndex) in stateList"> {{ state.name }} </option>
+                @change="stateSelectChanged(selectedState)">
+                    <option :value="state"  v-for="(state, stateIndex) in stateList" :key="stateIndex"> {{ state.name }} </option>
                 </select>
             </div>
             <div class="col-span-3 rounded-md mb-4 pb-6">
@@ -161,9 +159,9 @@
                 <!-- <input type="input" v-model="city" placeholder="City (Required)"
                     class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0"> -->
                 <select name="" id="" v-model="selectedCity" class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0"
-                @change="citySelectChanged">
+                @change="citySelectChanged(selectedCity)">
                     <!-- <option value="City 1"> City 1 </option> -->
-                    <option :value="city" v-for="(city, cityIndex) in cityList"> {{ city.name }} </option>
+                    <option :value="city" v-for="(city, cityIndex) in cityList" :key="cityIndex"> {{ city.name }} </option>
                 </select>
             </div>
             <div class="col-span-3 rounded-md mb-4 pb-6">
@@ -242,7 +240,7 @@
 
         </div>
         <div>
-            <button class="add-btn" @click="createStaffBtnClicked">
+            <button class="add-btn" @click="updateStaffBtnClicked">
                 Create Staff
             </button>
         </div>
@@ -338,7 +336,7 @@
 
 <script>
     import { Modal, Ripple, initTE, Input, Select } from "tw-elements";
-    import { getApiData, postApiData, deleteApiData } from '../../utilities/ajax-helpers';
+    import { getApiData, postApiData, deleteApiData, putApiData } from '../../utilities/ajax-helpers';
     import { mapGetters } from "vuex";
     import { getCurrentDate } from "../../utilities/datetime-helpers";
 
@@ -360,7 +358,7 @@
                 phoneNumber: null,
                 altPhoneNumber: null,
                 email: null,
-                fathterName: null,
+                fatherName: null,
                 motherName: null,
                 joinedDate: getCurrentDate(),
                 password: null,
@@ -384,6 +382,8 @@
                 inventories: [],
                 selectedInventories: [],
                 inventoryIds: [],
+
+                staffDetailData:null
             };
         },
 
@@ -393,7 +393,33 @@
             async getStaffDetail(){
                 let url = `/api/staffs/${this.staffId}`;
                 let response = await getApiData({url: url, token: this.getToken()});
-                if(response.data){
+                if(response.success==true){
+                    this.staffDetailData = response.data;
+                    this.name = this.staffDetailData.name;
+                    this.dob = this.staffDetailData.birthdate;
+                    this.selectedGender = this.staffDetailData.gender;
+                    this.nrcNumber = this.staffDetailData.nrc_number
+                    this.fatherName = this.staffDetailData.father_name;
+                    this.motherName = this.staffDetailData.mother_name;
+                    this.email = this.staffDetailData.email;
+                    this.phoneNumber = this.staffDetailData.phone_number;
+                    this.altPhoneNumber = this.staffDetailData.alt_phone_number;
+                    this.selectedDepartment = this.staffDetailData.department;
+                    this.joinedDate = this.staffDetailData.joined_date;
+                    this.selectedState= this.stateList.find(item => item.name === this.staffDetailData.state);
+                    await this.stateSelectChanged(this.selectedState);
+                    this.selectedCity =this.cityList.find(city=>city.name == this.staffDetailData.city);
+                    this.citySelectChanged(this.selectedCity);
+                    this.zipCode = this.staffDetailData.zip_code;
+                    this.address = this.staffDetailData.address;
+                    this.primaryName = this.staffDetailData.emergency_contacts[0].primary_name;
+                    this.primaryPhone = this.staffDetailData.emergency_contacts[0].primary_phone;
+                    this.primaryRelationship = this.staffDetailData.emergency_contacts[0].primary_relationship
+                    this.secondaryName = this.staffDetailData.emergency_contacts[0].secondary_name;
+                    this.secondaryPhone = this.staffDetailData.emergency_contacts[0].secondary_phone;
+                    this.secondaryRelationship = this.staffDetailData.emergency_contacts[0].secondary_relationship;
+                    this.selectedInventories = this.staffDetailData.inventories.map(inventory => inventory.id);
+                    this.selectedRoles = this.staffDetailData.roles.map(role => role.id);
 
                 }
             },
@@ -405,15 +431,15 @@
                 }
             },
 
-            async stateSelectChanged(){
-                this.state = this.selectedState.name;
+            async stateSelectChanged(selectedState){
+                this.state = selectedState.name;
                 let response = await getApiData({url: `/api/mmrc/regions/${this.selectedState.id}`});
                 if(response.data){
                     this.cityList = response.data.cities;
                 }
             },
 
-            citySelectChanged(){
+            citySelectChanged(city){
                 this.city = this.selectedCity.name;
             },
 
@@ -461,18 +487,17 @@
                 });
             },
 
-            createStaffBtnClicked(){
-                this.roleIds = [];
-                this.inventoryIds = [];
+            updateStaffBtnClicked(){
+                this.inventoryIds = this.selectedInventories;
                 if(this.selectedDepartment.name == 'Inventory' && this.selectedInventories.length < 1){
                     this.alertValiationMessage('inventories');
                     return 1;
                 }
-                if(this.selectedInventories.length > 0){
-                    this.selectedInventories.forEach((inventory)=>{
-                        this.inventoryIds.push(inventory.id);
-                    });
-                }
+                // if(this.selectedInventories.length > 0){
+                //     this.selectedInventories.forEach((inventory)=>{
+                //         this.inventoryIds.push(inventory.id);
+                //     });
+                // }
                 this.selectedRoles.forEach((role)=>{
                     this.roleIds.push(role.id);
                 });
@@ -502,11 +527,6 @@
                     return 1;
                 }
 
-                if(!this.password){
-                    this.alertValiationMessage('password');
-                    return 1;
-                }
-
 
                 if(!this.joinedDate){
                     this.alertValiationMessage('joined date');
@@ -518,10 +538,10 @@
                     return 1;
                 }
 
-                if(this.roleIds.length < 1){
-                    this.alertValiationMessage('role');
-                    return 1;
-                }
+                // if(this.roleIds.length < 1){
+                //     this.alertValiationMessage('role');
+                //     return 1;
+                // }
 
                 if(!this.state){
                     this.alertValiationMessage('state');
@@ -578,10 +598,10 @@
                 // alert(`role = ${this.selectedRole.name}`);
                 // alert(`gender = ${this.selectedGender.name}`);
                 // alert(`address = ${this.address}`);
-                this.createStaff();
+                this.updateStaff();
             },
 
-            async createStaff()
+            async updateStaff()
             {
                 let formData = new FormData();
                 formData.append('name', this.name);
@@ -591,9 +611,9 @@
                 }
 
 
-                if(this.fathterName)
+                if(this.fatherName)
                 {
-                    formData.append('father_name',this.fathterName);
+                    formData.append('father_name',this.fatherName);
                 }
 
                 if(this.motherName)
@@ -621,9 +641,9 @@
                 formData.append('city',this.city);
                 formData.append('gender_id', this.selectedGender.id);
                 formData.append('department_id', this.selectedDepartment.id);
-                if(this.inventoryIds.length > 0){
+
                     formData.append('inventoryIds', JSON.stringify(this.inventoryIds));
-                }
+
                 formData.append('password', this.password);
                 formData.append('roles', this.roleIds);
                 formData.append('joined_date',this.joinedDate);
@@ -637,7 +657,7 @@
                 formData.append('secondary_phone',this.secondaryPhone);
                 formData.append('secondary_relationship',this.secondaryRelationship);
 
-                let response = await postApiData({url: '/api/staffs', form_data: formData, token: this.getToken()});
+                let response = await postApiData({url: `/api/staffs/${this.staffId}`, form_data: formData, token: this.getToken()});
                 if(response.success){
                     window.location.replace('/staff');
                 }
@@ -659,6 +679,7 @@
             this.getDepartmentList();
             // this.getRoleList();
             this.getStateList();
+            this.getStaffDetail();
         },
 
         mounted(){
