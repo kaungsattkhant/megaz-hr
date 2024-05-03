@@ -91,7 +91,7 @@
                 </label>
                 <select name="" id="" v-model="selectedDepartment"
                     class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0"
-                    @change="departmentSelectChanged">
+                    @change="departmentSelectChanged(selectedDepartment)">
                     <option :value="department" v-for="(department, departmentIndex) in departmentList"
                         :key="departmentIndex"> {{ department.name }} </option>
                     <!-- <option value="2">Table</option>
@@ -102,9 +102,9 @@
                 <label for="" class="block text-sm text-black mb-3">
                     Roles
                 </label>
-                <div class="bg-white mb-0 w-full text-sm inline-block" data-te-select-wrapper-ref>
+                <div class=" mb-0 w-full text-sm inline-block" data-te-select-wrapper-ref>
                     <select data-te-select-init data-te-select-placeholder="Select Roles" data-te-select-filter="true"
-                        name="" id="" multiple v-model="selectedRoles"
+                        name="" id="" multiple v-model="roleSelected"
                         class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
                         <option :value="role" v-for="(role, roleIndex) in roleList" :key="roleIndex">
                             {{ role.name }}
@@ -112,6 +112,9 @@
                         <!-- <option value="2">Manager</option>
                         <option value="3">Waiter</option> -->
                     </select>
+                    <div v-for="(role,index) in roles" :key="index" class='py-2 px-3 flex justify-between'>
+                        <span>{{ role.name }}</span><span><i @click="deleteRoleStaff(role.id)" class="fal fa-times text-red-400"></i></span>
+                    </div>
 
                 </div>
             </div>
@@ -135,8 +138,15 @@
                             {{ inventory.name }}
                         </option>
                     </select>
-
+                    <div v-if="staffDetailData">
+                        <div v-if="staffDetailData.inventories">
+                            <div v-for="(inventory,index) in staffDetailData.inventories" :key="index" class='py-2 px-3 flex justify-between'>
+                        <span>{{ inventory.name }}</span><span><i @click="deleteInventoryStaff(inventory.id)" class="fal fa-times text-red-400"></i></span>
+                    </div>
+                        </div>
+                    </div>
                 </div>
+
             </div>
 
             <!-- <div class="col-span-3"></div> -->
@@ -241,7 +251,7 @@
         </div>
         <div>
             <button class="add-btn" @click="updateStaffBtnClicked">
-                Create Staff
+                Update Staff
             </button>
         </div>
 
@@ -365,7 +375,7 @@
                 selectedGender: null,
                 nrcNumber: null,
                 selectedDepartment: null,
-                selectedRoles: [],
+                roleSelected: [],
                 roleIds: [],
                 state: null,
                 city: null,
@@ -383,12 +393,16 @@
                 selectedInventories: [],
                 inventoryIds: [],
 
-                staffDetailData:null
+                staffDetailData:null,
+                staffRoles:null,
+                inventories:[],
+                roles:[]
             };
         },
 
         methods: {
             ...mapGetters(['getToken']),
+
 
             async getStaffDetail(){
                 let url = `/api/staffs/${this.staffId}`;
@@ -405,6 +419,7 @@
                     this.phoneNumber = this.staffDetailData.phone_number;
                     this.altPhoneNumber = this.staffDetailData.alt_phone_number;
                     this.selectedDepartment = this.staffDetailData.department;
+                    this.departmentSelectChanged(this.selectedDepartment);
                     this.joinedDate = this.staffDetailData.joined_date;
                     this.selectedState= this.stateList.find(item => item.name === this.staffDetailData.state);
                     await this.stateSelectChanged(this.selectedState);
@@ -418,10 +433,24 @@
                     this.secondaryName = this.staffDetailData.emergency_contacts[0].secondary_name;
                     this.secondaryPhone = this.staffDetailData.emergency_contacts[0].secondary_phone;
                     this.secondaryRelationship = this.staffDetailData.emergency_contacts[0].secondary_relationship;
-                    this.selectedInventories = this.staffDetailData.inventories.map(inventory => inventory.id);
-                    this.selectedRoles = this.staffDetailData.roles.map(role => role.id);
+                    this.inventories = this.staffDetailData.inventories;
+                    this.roles = this.staffDetailData.roles;
+
+
 
                 }
+            },
+
+            async deleteRoleStaff(role)
+            {
+                let response = await deleteApiData({url:`/api/staffs/${this.staffId}/roles/${role}`});
+                this.getStaffDetail();
+            },
+
+            async deleteInventoryStaff(inventory)
+            {
+                let response = await deleteApiData({url:`/api/staffs/${this.staffId}/inventories/${inventory}`});
+                this.getStaffDetail();
             },
 
             async getStateList(){
@@ -488,18 +517,15 @@
             },
 
             updateStaffBtnClicked(){
-                this.inventoryIds = this.selectedInventories;
-                if(this.selectedDepartment.name == 'Inventory' && this.selectedInventories.length < 1){
-                    this.alertValiationMessage('inventories');
-                    return 1;
+                this.inventoryIds = [];
+
+                if(this.selectedInventories.length > 0){
+                    this.selectedInventories.forEach((inventory)=>{
+                        this.inventoryIds.push(inventory.id);
+                    });
                 }
-                // if(this.selectedInventories.length > 0){
-                //     this.selectedInventories.forEach((inventory)=>{
-                //         this.inventoryIds.push(inventory.id);
-                //     });
-                // }
-                this.selectedRoles.forEach((role)=>{
-                    this.roleIds.push(role.id);
+                this.roleSelected.forEach((item)=>{
+                    this.roleIds.push(item.id);
                 });
 
                 if(!this.name){
@@ -658,6 +684,8 @@
                 formData.append('secondary_relationship',this.secondaryRelationship);
 
                 let response = await postApiData({url: `/api/staffs/${this.staffId}`, form_data: formData, token: this.getToken()});
+                this.roleIds = [];
+                this.roleSelected = [];
                 if(response.success){
                     window.location.replace('/staff');
                 }
