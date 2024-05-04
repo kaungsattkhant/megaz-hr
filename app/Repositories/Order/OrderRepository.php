@@ -7,6 +7,7 @@ use App\Models\OrderItem;
 use Illuminate\Support\Facades\DB;
 use App\Http\Action\SendNotification\SendNotification;
 use App\Models\Staff;
+use Illuminate\Http\Request;
 
 class OrderRepository implements OrderRepositoryInterface
 {
@@ -148,6 +149,50 @@ class OrderRepository implements OrderRepositoryInterface
             DB::rollback();
             ResponseMessage($e->getMessage(), 402);
             throw $e;
+        }
+    }
+
+    public function getOrderItemData(Request $request)
+    {
+        if ($request->per_page || $request->page) {
+            if($request->date)
+            {
+                $date = $request->date;
+            }else{
+                $date = CurrentDate();
+            }
+            $startTime = $date . ' 00:00:00';
+            $endTime = $date . ' 23:59:59';
+
+            $totalCount = OrderItem::whereBetween('created_at', [$startTime, $endTime])->count();
+            $pageNumber = 1;
+            $perPage = 20;
+            if ($request->page) {
+                $pageNumber = $request->page;
+            }
+            if ($request->per_page) {
+                $perPage = $request->per_page;
+            }
+            $skip = ($pageNumber - 1) * $perPage;
+            $order_items = OrderItem::whereBetween('date', [$startTime, $endTime])
+                                        ->skip($skip)
+                                        ->take($perPage)
+                                        ->get();
+            $paginationData = MakePaginationData($request, $totalCount, 'order_items');
+            $paginationData['order_items'] = $order_items;
+
+            return $paginationData;
+        } else {
+            if($request->date)
+            {
+                $startTime = $request->date . ' 00:00:00';
+                $endTime = $request->date . ' 23:59:59';
+                $orderItems = OrderItem::whereBetween('date', [$startTime, $endTime])->get();
+            }else{
+                $orderItems = OrderItem::all();
+            }
+
+            return $orderItems;
         }
     }
 }

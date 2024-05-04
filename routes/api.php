@@ -253,6 +253,8 @@ Route::post('/entities/add_more_sessions', [InvoiceAPIController::class, 'addMor
 Route::post('/entities/change', [InvoiceAPIController::class, 'changeRoom']);
 Route::post('/entities/done', [InvoiceAPIController::class, 'endRoom']);
 
+Route::get('/order_items',[OrderAPIController::class,'getOrderItemList']);
+
 Route::get('/invoices', [InvoiceAPIController::class, 'getInvoiceData']);
 
 // Route::group(['prefix' => 'management'], function () {});

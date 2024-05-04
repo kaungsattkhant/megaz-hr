@@ -22,6 +22,7 @@ return new class extends Migration
             $table->unsignedBigInteger('order_id');
             $table->string('status')->default('not yet');
             $table->boolean('is_complete')->default(0);
+            $table->string('remark')->nullable();
             $table->timestamps();
         });
     }
