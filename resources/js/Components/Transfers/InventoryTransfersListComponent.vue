@@ -58,25 +58,28 @@
                                     {{ per_page * (currentPage - 1) + (++index) }}
                                 </td>
                                 <td class="whitespace-nowrap px-6 py-4 ">
-                                    (Not Present)
+                                    {{ transfer.transfer_id }}
                                 </td>
                                 <td class="whitespace-nowrap px-6 py-4 ">
                                     {{ transfer.date }}
                                 </td>
                                 <td class=" px-6 py-4 ">
-                                    {{ transfer.source_inventory_id }}
+                                    {{ transfer.source_inventory.name }}
                                 </td>
                                 <td class=" px-6 py-4 ">
-                                    {{ transfer.destination_inventory_id }}
+                                    {{ transfer.destination_inventory.name }}
                                 </td>
                                 <td class="whitespace-nowrap px-6 py-4 ">
-                                    {{ transfer.item_id }}
+                                    {{ transfer.item.name }}
                                 </td>
                                 <td class="whitespace-nowrap px-6 py-4 ">
                                     {{ transfer.quantity }}
                                 </td>
                                 <td class="whitespace-nowrap px-6 py-4 ">
-                                    {{ transfer.confirmed_by }}
+                                    <div v-if="transfer.confirmed_by">
+                                        {{ transfer.confirmed_by.name }}
+                                    </div>
+
                                 </td>
                                 <td class="whitespace-nowrap px-6 py-4 ">
                                     {{ transfer.status }}
