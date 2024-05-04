@@ -82,6 +82,13 @@
             </div>
             <div class="mb-4 col-span-3 pb-6 rounded-md">
                 <!-- password deleted -->
+                <div class="mb-4 col-span-3 pb-6 rounded-md">
+                    <label for="" class="block text-sm text-black mb-3">
+                        Password
+                    </label>
+                    <input type="password" v-model="password"
+                        class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
+                </div>
             </div>
             <div class="col-span-3"></div>
 
