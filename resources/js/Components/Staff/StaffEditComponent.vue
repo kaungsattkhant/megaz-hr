@@ -712,7 +712,7 @@
         created(){
             this.getGenderList();
             this.getDepartmentList();
-            // this.getRoleList();
+            this.getRoleList();
             this.getStateList();
             this.getStaffDetail();
         },
