@@ -154,7 +154,8 @@
                                     <!-- {{ (selectedRoom.price_per_hour * (selectedRoom.invoices.length > 0 ?
                                     selectedRoom.invoices[0].sessions[0].session_duration : 1)).toLocaleString() }} -->
 
-                                    {{ selectedRoom.invoices.length > 0 ? selectedRoom.invoices[0].total_session_price : 0 }}
+                                    {{ selectedRoom.invoices.length > 0 ? selectedRoom.invoices[0].total_session_price :
+                                    0 }}
                                     MMKs
                                 </p>
                             </div>
@@ -194,8 +195,9 @@
                                         <p class=" col-span-1 text-center text-sm">
                                             {{ menu2.quantity }}
                                         </p>
-                                        <p class=" col-span-2 text-center text-xs">
-                                            FOC
+                                        <p :class="menu2.status == 'done' ? 'text-green-600 font-semibold' : 'text-gray-500'" 
+                                            class=" col-span-2 text-center text-xs pt-0.5">
+                                            {{ menu2.status }}
                                         </p>
                                         <p class=" col-span-3 text-sm text-right">
                                             {{ menu2.price.toLocaleString() }} MMKs
@@ -239,7 +241,8 @@
                             <p class="">
                                 Total
                                 {{
-                                (selectedRoom ? (purchaseMenuList.length > 0 ? ( selectedRoom.invoices[0].total_session_price+
+                                (selectedRoom ? (purchaseMenuList.length > 0 ? (
+                                selectedRoom.invoices[0].total_session_price+
                                 purchaseMenuList[0].total).toLocaleString()
                                 : (
                                 selectedRoom.invoices[0].total_session_price
@@ -578,6 +581,11 @@
                             <input type="text" placeholder="Qty" v-model="menuQuantity"
                                 class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
                         </div>
+                        <div>
+                            <textarea v-model="remark"
+                                class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0"
+                                name="" id="" cols="30" rows="10" placeholder="Remark"></textarea>
+                        </div>
                     </div>
 
                     <div class="flex justify-center px-12 mb-6">
@@ -775,6 +783,7 @@
                 invoiceId:null,
                 selectedMenu:null,
                 menuQuantity:null,
+                remark:null,
                 menuPrice:null,
                 testroom:null,
                 sessionDuration:null,
@@ -985,8 +994,9 @@
                 formData.append('menu_id', this.selectedMenu.id);
                 formData.append('quantity', this.menuQuantity);
                 formData.append('original_price', this.selectedMenu.prices[0].price);
+                formData.append('remark', this.remark);
                 let response = await postApiData({ url: '/api/entities/orders', form_data: formData, token: this.getToken()});
-                console.log(this.invoiceId+','+this.selectedMenu.id + ','+ this.menuQuantity +','+this.selectedMenu.prices[0].price)
+                // console.log(this.invoiceId+','+this.selectedMenu.id + ','+ this.menuQuantity +','+this.selectedMenu.prices[0].price)
                 if(response.success){
                     console.log("success")
                     this.closeMenuModal();
