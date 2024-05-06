@@ -18,6 +18,10 @@ class InventoryAPIController extends Controller
         $this->inventoryRepo = $inventoryRepo;
     }
 
+    public function getInventory(Request $request){
+        $inventories = $this->inventoryRepo->getInventory($request);
+        ResponseData($inventories);
+    }
     public function getInventoryData(Request $request)
     {
         $inventories = $this->inventoryRepo->listAllData($request);
@@ -64,4 +68,5 @@ class InventoryAPIController extends Controller
         $data = $this->inventoryRepo->inventoryList();
         ResponseData($data);
     }
+
 }
