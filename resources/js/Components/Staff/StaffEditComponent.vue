@@ -426,12 +426,12 @@
                     this.phoneNumber = this.staffDetailData.phone_number;
                     this.altPhoneNumber = this.staffDetailData.alt_phone_number;
                     this.selectedDepartment = this.staffDetailData.department;
-                    this.departmentSelectChanged(this.selectedDepartment);
+                    // this.departmentSelectChanged(this.selectedDepartment);
                     this.joinedDate = this.staffDetailData.joined_date;
-                    this.selectedState= this.stateList.find(item => item.name === this.staffDetailData.state);
-                    await this.stateSelectChanged(this.selectedState);
-                    this.selectedCity =this.cityList.find(city=>city.name == this.staffDetailData.city);
-                    this.citySelectChanged(this.selectedCity);
+                    // this.selectedState= this.stateList.find(item => item.name === this.staffDetailData.state);
+                    // await this.stateSelectChanged(this.selectedState);
+                    // this.selectedCity =this.cityList.find(city=>city.name == this.staffDetailData.city);
+                    // this.citySelectChanged(this.selectedCity);
                     this.zipCode = this.staffDetailData.zip_code;
                     this.address = this.staffDetailData.address;
                     this.primaryName = this.staffDetailData.emergency_contacts[0].primary_name;
@@ -442,9 +442,8 @@
                     this.secondaryRelationship = this.staffDetailData.emergency_contacts[0].secondary_relationship;
                     this.inventories = this.staffDetailData.inventories;
                     this.roles = this.staffDetailData.roles;
-
-
-
+                    this.state = this.staffDetailData.state;
+                    this.city = this.staffDetailData.city;
                 }
             },
 
@@ -464,6 +463,13 @@
                 let response = await getApiData({url: `/api/mmrc/regions`});
                 if(response.data){
                     this.stateList = response.data;
+                    if(this.state){
+                        let index = this.stateList.findIndex(state => state.name === this.state);
+                        if(index != -1){
+                            this.selectedState = this.stateList[index];
+                            this.stateSelectChanged(this.selectedState);
+                        }
+                    }
                 }
             },
 
@@ -472,6 +478,12 @@
                 let response = await getApiData({url: `/api/mmrc/regions/${this.selectedState.id}`});
                 if(response.data){
                     this.cityList = response.data.cities;
+                    if(this.city){
+                        let index = this.cityList.findIndex(city => city.name === this.city);
+                        if(index != -1){
+                            this.selectedCity = this.cityList[index];
+                        }
+                    }
                 }
             },
 
@@ -694,7 +706,7 @@
                 this.roleIds = [];
                 this.roleSelected = [];
                 if(response.success){
-                    window.location.replace('/staff');
+                    // window.location.replace('/staff');
                 }
                 else{
                     let message = `Some errors occured`;
@@ -710,11 +722,11 @@
         },
 
         created(){
+            this.getStaffDetail();
             this.getGenderList();
             this.getDepartmentList();
             this.getRoleList();
             this.getStateList();
-            this.getStaffDetail();
         },
 
         mounted(){
