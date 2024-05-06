@@ -118,7 +118,7 @@ class TransferRepository implements TransferRepositoryInterface
     {
         $inventory_ids = InventoryIds();
         return Transfer::with(['item', 'created_by', 'confirmed_by', 'source_inventory', 'destination_inventory'])
-            ->when($request->status, function ($q) use ($request) {
+            ->when( $request->status, function ($q) use ($request) {
                 $q->where('status', $request->status);
             })
             ->when(checkDepartmentAndRoles('Inventory', ['Staff']), function ($q) use ($inventory_ids) {
