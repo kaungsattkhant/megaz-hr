@@ -16,6 +16,11 @@ class Item extends BaseModel
 
     protected $with=['item_prices'];
 
+    public function category()
+    {
+        return $this->belongsTo(Category::class);
+    }
+
     public function uoms()
     {
         return $this->belongsToMany(Uom::class,'items_uoms', 'item_id', 'uom_id');
@@ -33,5 +38,10 @@ class Item extends BaseModel
 
     public function item_prices(){
         return $this->hasOne(ItemPrice::class)->latest('created_at');
+    }
+
+    public function suppliers(){
+        return $this->belongsToMany(Supplier::class, 'supplier_items');
+
     }
 }

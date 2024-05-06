@@ -11,4 +11,6 @@ interface MenuRepositoryInterface
     public function createMenuPrice(int $id, float $price);
 
     public function listAllData(Request $request);
+
+    public function menuIsActive(int $id);
 }

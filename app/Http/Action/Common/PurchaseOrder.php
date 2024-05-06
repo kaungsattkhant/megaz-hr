@@ -4,10 +4,11 @@ namespace App\Http\Action\Common;
 
 class PurchaseOrder
 {
-    public function getUniqueId($latest,$count){
+    public function getUniqueId($latest,$column,$count){
         // $no=(new CommonPurchaseOrder())->getUniqueId($latest,$count);
-        if ($latest) {
-            $po_id_array = explode('-', $latest->po_id);
+        if ($latest && $latest->$column) {
+            
+            $po_id_array = explode('-', $latest->$column);
             $latest_po_id = (int) $po_id_array[1];
             if (strlen($latest_po_id + 1) > 4 && strlen($latest_po_id) == 4) {
                 $count = strlen($latest_po_id) + 1;

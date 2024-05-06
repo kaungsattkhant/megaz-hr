@@ -32,15 +32,15 @@ Route::middleware(['departments:HR'])->group(function () {
     Route::view('/roles', 'roles.index')->name('roles');
     Route::view('/staff', 'staff.index')->name('staff');
     Route::view('/staff/create', 'staff.create')->name('staff.crate');
+    Route::view('/staff/{id}/edit', 'staff.edit')->name('staff.edit');
 
     Route::view('/tasks', 'tasks.index')->name('tasks');
-    Route::view('/complains', 'complains.index')->name('complains');
+    Route::view('/complaints', 'complains.index')->name('complains');
 
     Route::view('/departments', 'departments.index')->name('departments');
     Route::view('/areas', 'areas.index')->name('areas');
 
-    Route::view('/inventories', 'inventories.index')->name('inventories');
-    Route::view('/inventories/{inventory_id}/ledger', 'inventories.inventory_ledger')->name('inventory.ledger');
+
 
     Route::view('/rooms', 'tables&rooms.index')->name('room');
     Route::view('/tables', 'tables&rooms.table')->name('table');
@@ -60,6 +60,14 @@ Route::middleware(['departments:HR,Finance,Management'])->group(function () {
     Route::view('/purchase_orders/create', 'purchase_orders.create')->name('purchase_orders.create');
     Route::view('/purchase_orders/{poId}/confirm', 'purchase_orders.confirm')->name('purchase_orders.confirm');
     Route::view('/purchase_orders/{poId}/buy', 'purchase_orders.buy')->name('purchase_orders.buy');
+});
+Route::middleware(['departments:Inventory'])->group(function () {
+
+    Route::view('/confirm_purchase_order_items', 'purchase_orders.confirm_poitems')->name('purchase_orders.confirm_poitems');
+    Route::view('/purchase_order_left_items', 'purchase_orders.left_items_index')->name('purchase_orders.left_items_index');
+    Route::view('/purchase_order_left_items/{poId}', 'purchase_orders.left_items_detail')->name('purchase_orders.left_items_detail');
+    Route::view('/inventories', 'inventories.index')->name('inventories');
+    Route::view('/inventories/{inventory_id}/ledger', 'inventories.inventory_ledger')->name('inventory.ledger');
 });
 
 Route::middleware(['departments:Finance'])->group(function () {
@@ -81,12 +89,19 @@ Route::middleware(['departments:Finance'])->group(function () {
 
 });
 
+Route::middleware(['departments:all_departments'])->group(function () {
+    Route::view('/inventory_transfers_list', 'transfers.transfers_list')->name('transfers.transfers');
+    Route::view('/inventory_receives_list', 'transfers.receives_list')->name('transfers.receives');
+});
+
 Route::view('/suppliers', 'supplier.index')->name('suppliers.index');
 Route::view('/suppliers/create', 'supplier.create')->name('suppliers.create');
 Route::view('/suppliers/{id}/edit', 'supplier.edit')->name('suppliers.edit');
 
+Route::view('/fixed_assets', 'fixed_assets.index')->name('fixed_assets.index');
+
 //pos
-Route::group(['prefix'=>'pos'], function(){
+Route::group(['prefix' => 'pos'], function () {
     Route::view('/login', 'pos.auth.index')->name('pos.login');
     Route::middleware(['departments:Catering'])->group(function () {
         Route::view('/home', 'pos.home.index')->name('pos.index');

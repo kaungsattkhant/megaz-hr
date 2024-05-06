@@ -22,17 +22,20 @@ class ComplaintRepository implements ComplaintRepositoryInterface
                 $perPage = $request->per_page;
             }
             $skip = ($pageNumber - 1) * $perPage;
-            $complaints = Complaint::orderBy('id', 'desc')->skip($skip)->take($perPage)->get();
+            $complaints = Complaint::orderBy('id', 'desc')
+                ->with('complaint_category')
+                ->skip($skip)
+                ->take($perPage)
+                ->get();
             $complaints = MakePaginationData($request, $totalCount, 'complaints', $complaints);
-
             return $complaints;
         }
         else{
-            $complaints = Complaint::orderBy('id', 'desc')->get();
-
+            $complaints = Complaint::orderBy('id', 'desc')->with('complaint_category')->get();
             return $complaints;
         }
     }
+
 
     public function listComplaintsByStaff(Request $request, int $staffId)
     {
@@ -48,13 +51,13 @@ class ComplaintRepository implements ComplaintRepositoryInterface
             }
             $skip = ($pageNumber - 1) * $perPage;
             $complaints = Complaint::where('posted_by', $staffId)->orderBy('id', 'desc')
-            ->skip($skip)->take($perPage)->get();
+            ->skip($skip)->take($perPage)->with('complaint_category')->get();
             $complaints = MakePaginationData($request, $totalCount, 'complaints', $complaints);
 
             return $complaints;
         }
         else{
-            $complaints = Complaint::where('posted_by', $staffId)->orderBy('id', 'desc')->get();
+            $complaints = Complaint::where('posted_by', $staffId)->with('complaint_category')->orderBy('id', 'desc')->get();
 
             return $complaints;
         }
@@ -92,8 +95,16 @@ class ComplaintRepository implements ComplaintRepositoryInterface
     public function statusChange(string $status,int $id)
     {
         $complaint = Complaint::find($id);
+
         if($complaint !== null)
         {
+            if($complaint->status == $status)
+            {
+                ResponseMessage('Your status is already '."$status",422);
+            }else if($complaint->status == "Done")
+            {
+                ResponseMessage("Status is already Done, cannot change",422);
+            }
             $complaint->status = $status;
             $complaint->save();
 

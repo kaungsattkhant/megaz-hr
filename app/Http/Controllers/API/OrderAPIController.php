@@ -27,4 +27,15 @@ class OrderAPIController extends Controller
         }
         ResponseData($orders);
     }
+
+    public function orderItemChangeStatus(Request $request)
+    {
+        $orderItems = $this->orderRepo->orderItemStatusChange($request->all());
+    }
+
+    public function getOrderItemList(Request $request)
+    {
+        $orderItems = $this->orderRepo->getOrderItemData($request);
+        ResponseData($orderItems);
+    }
 }

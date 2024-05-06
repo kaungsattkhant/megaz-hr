@@ -93,13 +93,11 @@ class GetInventoryStockAction
         // ->where("ledgerable_type", "sale")
         // ->where("date", "<", CurrentDate() . " 00:00:00")
         // ->with("inventory_ledger_items.item")->get();
-
         // foreach($previousSaleLedgers as $saleLedger){
         //     foreach($saleLedger->inventory_ledger_items as $item){
         //         $previousSaleItems->push($item);
         //     }
         // }
-
         // $previousOutgoingItems = $previousSaleItems->groupBy("item_id")
         // ->map(function($group){
         //     return [
@@ -109,11 +107,9 @@ class GetInventoryStockAction
         //         'item' => $group->first()['item']
         //     ];
         // })->values();
-
         // $mergedPreviousItems = $previousIncomingItems->concat($previousOutgoingItems);
         // $mergedAllItems = $mergedPreviousItems->concat($mergedItems);
         // $items = $mergedAllItems->groupBy("item_id")->values();
-
         // return $items;
 
         $itemBalances = DB::table('inventory_ledger_items')
@@ -128,10 +124,10 @@ class GetInventoryStockAction
                 DB::raw('SUM(CASE WHEN action = "out" AND DATE(date) = CURDATE() THEN quantity ELSE 0 END) as out_balance'),
                 DB::raw('(SUM(CASE WHEN action = "in" AND DATE(date) < CURDATE() THEN quantity ELSE 0 END) + 
                   SUM(CASE WHEN action = "in" AND DATE(date) = CURDATE() THEN quantity ELSE 0 END) - 
-                  SUM(CASE WHEN action = "out" AND DATE(date) < CURDATE() THEN quantity ELSE 0 END)) as closing_balance')
+                  SUM(CASE WHEN action = "out" AND DATE(date) <= CURDATE() THEN quantity ELSE 0 END)) as closing_balance')
             )
+            ->where('inventory_id',$this->inventoryId)
             ->groupBy('item_id');
-
         $result = $itemBalances->get();
 
         return $result;

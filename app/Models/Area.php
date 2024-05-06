@@ -13,7 +13,7 @@ class Area extends BaseModel
     use HasFactory;
 
     protected $fillable=[
-        'name','area_type_id','is_active'
+        'name','area_type_id','is_active','area_category_id',
     ];
 
     public function getCreatedAt()
@@ -29,6 +29,11 @@ class Area extends BaseModel
     public function areaType()
     {
         return $this->belongsTo(AreaType::class);
+    }
+
+    public function areaCategory()
+    {
+        return $this->belongsTo(AreaCategory::class);
     }
 
     public function inventories()

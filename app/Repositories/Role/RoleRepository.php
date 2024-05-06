@@ -74,4 +74,8 @@ class RoleRepository implements RoleRepositoryInterface
             throw $e;
         }
     }
+
+    public function getRoleByDepartment($department_id){
+        return Role::where('department_id',$department_id)->get();
+    }
 }

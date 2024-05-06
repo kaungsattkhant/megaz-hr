@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('areas', function (Blueprint $table) {
             $table->id();
             $table->foreignId('area_type_id')->constrained()->onDelete('cascade');
+            $table->foreignId('area_category_id')->constrained()->onDelete('cascade');
             $table->string('name',45);
             $table->boolean('is_active')->default(1);
             $table->timestamps();

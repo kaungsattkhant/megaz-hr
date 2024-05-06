@@ -6,6 +6,7 @@ use App\Models\Category;
 use App\Models\MenuCategory;
 use App\Models\ServiceCategory;
 use App\Models\ComplaintCategory;
+use App\Models\PurchaseOrderItemLeft;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\API\AreaController;
 use App\Http\Controllers\API\AuthController;
@@ -34,8 +35,10 @@ use App\Http\Controllers\API\ComplaintAPIController;
 use App\Http\Controllers\API\InventoryAPIController;
 use App\Http\Controllers\API\NotificationController;
 use App\Http\Controllers\API\DepartmentAPIController;
+use App\Http\Controllers\API\FixedAssetPurchaseAPIController;
 use App\Http\Controllers\API\PurchaseOrderAPIController;
 use App\Http\Controllers\API\ItemUsageForecastController;
+use App\Http\Controllers\API\PurchaseOrderItemLeftController;
 
 /*
 |--------------------------------------------------------------------------
@@ -88,8 +91,11 @@ Route::middleware('auth:api')->group(function () {
 
     Route::get('/supervisor/staff', [StaffAPIController::class, 'getStaffListBySupervisor']);
     Route::get('/supervisor/staff/{staffId}/tasks', [TaskController::class, 'getStaffTasksBySupervisor']);
+    Route::controller(TaskController::class)->group(function()
+    {
+        Route::post('/tasks/{id}/double_checked','taskDoubleChecked');
+    });
     Route::controller(PurchaseOrderAPIController::class)->group(function () {
-
         Route::get('/purchase_orders', 'getPurchaseOrder');
         Route::post('/purchase_orders', 'createPurchaseOrder');
         // below the route perform update, and kitchen data update and financial update and it depends on condition,
@@ -103,6 +109,9 @@ Route::middleware('auth:api')->group(function () {
         Route::delete('/purchase_orders_items/{id}', 'deletePurchaseOrderItem');
         Route::post('purchase_orders_bought', 'boughtPurchaseOrder');
         Route::post('updateIsCheck', 'updateIsCheck');
+        Route::get('/purchase_order_item_confirmation_list', 'getPurchaseOrderItemConfirmationList');
+        Route::get('/confirm_purchase_order_item', 'confirmPurchaseOrderItem');
+
     });
     #item usage forecast
     Route::resource('item_usage_forecasts', ItemUsageForecastController::class)->only(['index', 'store', 'show', 'destroy']);
@@ -131,18 +140,45 @@ Route::middleware('auth:api')->group(function () {
         Route::post('is_active', 'toggleIsActive');
     });
 
+    Route::controller(FixedAssetPurchaseAPIController::class)->group(function () {
+        Route::get('/fixed_asset_purchases', 'getFixedAssetPurchaseData');
+        Route::post('/fixed_asset_purchases','createFixedAssetPurchaseData');
+        Route::post('/fixed_asset_purchases/is_update_checked','updateIsCheck');
+        Route::post('/fixed_asset_purchases/bought','boughtFixedAsset');
+    });
+
     Route::resource('suppliers', SupplierController::class)->only(['index', 'store', 'show', 'destroy']);
     Route::resource('notifications',NotificationController::class)->only(['index']);
     Route::post('notifications/set_seen', [NotificationController::class, 'setSeenNotifications']);
     Route::post('notifications/{notificationId}/mark_read', [NotificationController::class, 'markReadNotification']);
+
+    #po itemleft
+    Route::resource('purchase_order_item_lefts', PurchaseOrderItemLeftController::class)->only(['index', 'show',]);
+
+    #transfer
+    Route::resource('transfers', TransferAPIController::class)->only(['index', 'store', 'show', 'destroy']);
+    Route::controller(TransferAPIController::class)->group(function () {
+        Route::get('/transfer_confirmation_list', 'transferConfirmationList');
+        Route::get('/confirm_transfer_item', 'confirmTransferItem');
+    });
+
+    Route::get('/inventories', [InventoryAPIController::class, 'getInventoryData']);
+    Route::post('/inventories', [InventoryAPIController::class, 'createInventory']);
+    Route::get('/inventories/{inventory}', [InventoryAPIController::class, 'detail']);
+    Route::put('/inventories/{id}', [InventoryAPIController::class, 'updateInventory']);
+    Route::delete('/inventories/{id}', [InventoryAPIController::class, 'deleteInventory']);
+    Route::get('/inventories/{inventoryId}/ledgers', [InventoryAPIController::class, 'getInventoryLedgers']);
+    Route::get('inventory_list',[InventoryAPIController::class, 'inventoryList']);
 });
 
 Route::controller(ExcelImportController::class)->group(function () {
     Route::post('/import_account', 'importAccount');
 });
 
-
+// Route::post('purchase_orders', [PurchaseOrderAPIController::class, 'createPurchaseOrder']);
 Route::get('/areas', [AreaController::class, 'getAreas']);
+Route::get('/area_types/{id}/areas',[AreaController::class,'getAreaByAreaType']);
+Route::get('/area_categories/{id}/areas',[AreaController::class,'getAreaByAreaCategory']);
 Route::post('/areas', [AreaController::class, 'createArea']);
 Route::put('/areas/{id}', [AreaController::class, 'updateArea']);
 Route::delete('/areas/{id}', [AreaController::class, 'deleteArea']);
@@ -152,13 +188,18 @@ Route::post('/departments', [DepartmentAPIController::class, 'createDepartment']
 Route::put('/departments/{id}', [DepartmentAPIController::class, 'updateDepartment']);
 
 Route::get('/roles', [RoleAPIController::class, 'getRoleData']);
+Route::get('/role_by_department/{department_id}', [RoleAPIController::class, 'getRoleByDepartment']);
 Route::post('/roles', [RoleAPIController::class, 'createRole']);
 Route::put('/roles/{id}', [RoleAPIController::class, 'updateRole']);
 
 Route::get('/staffs', [StaffAPIController::class, 'getStaffData']);
+Route::get('/staffs/{id}',[StaffAPIController::class,'detailStaff']);
 Route::post('/staffs', [StaffAPIController::class, 'createStaff']);
-Route::put('/staffs/{id}', [StaffAPIController::class, 'updateStaff']);
+Route::post('/staffs/{id}', [StaffAPIController::class, 'updateStaff']);
 Route::delete('/staffs/{id}', [StaffAPIController::class, 'deleteStaff']);
+Route::delete('/staffs/{staff_id}/roles/{role_id}',[StaffAPIController::class,'deleteRoleStaff']);
+Route::delete('/staffs/{staff_id}/inventories/{inventory_id}',[StaffAPIController::class,'deleteInventoryStaff']);
+
 
 Route::get('/tasks', [TaskController::class, 'getTaskData']);
 Route::post('/tasks', [TaskController::class, 'createTask']);
@@ -172,12 +213,7 @@ Route::post('/entities', [EntityAPIController::class, 'createEntity']);
 Route::put('/entities/{id}', [EntityAPIController::class, 'updateEntity']);
 Route::delete('/entities/{id}', [EntityAPIController::class, 'deleteEntity']);
 
-Route::get('/inventories', [InventoryAPIController::class, 'getInventoryData']);
-Route::post('/inventories', [InventoryAPIController::class, 'createInventory']);
-Route::get('/inventories/{inventory}', [InventoryAPIController::class, 'detail']);
-Route::put('/inventories/{id}', [InventoryAPIController::class, 'updateInventory']);
-Route::delete('/inventories/{id}', [InventoryAPIController::class, 'deleteInventory']);
-Route::get('/inventories/{inventoryId}/ledgers', [InventoryAPIController::class, 'getInventoryLedgers']);
+
 
 Route::get('/uoms', [UomAPIController::class, 'getUomData']);
 Route::post('/uoms', [UomAPIController::class, 'createUom']);
@@ -189,11 +225,13 @@ Route::post('/items', [ItemAPIController::class, 'createItem']);
 Route::put('/items/{id}', [ItemAPIController::class, 'updateItem']);
 Route::delete('/items/{id}', [ItemAPIController::class, 'deleteItem']);
 
-Route::get('/transfers', [TransferAPIController::class, 'getTransferData']);
-Route::post('/transfers', [TransferAPIController::class, 'createTransfer']);
-Route::put('/transfers/{id}', [TransferAPIController::class, 'updateTransfer']);
-Route::delete('/transfers/{id}', [TransferAPIController::class, 'deleteTransfer']);
-Route::post('/transfers/{id}/confirms', [TransferAPIController::class, 'confirmTransfer']);
+
+// Route::get('/transfers', [TransferAPIController::class, 'getTransferData']);
+// Route::post('/transfers', [TransferAPIController::class, 'createTransfer']);
+// Route::put('/transfers/{id}', [TransferAPIController::class, 'updateTransfer']);
+// Route::delete('/transfers/{id}', [TransferAPIController::class, 'deleteTransfer']);
+// Route::post('/transfers/{id}/confirms', [TransferAPIController::class, 'confirmTransfer']);
+
 
 Route::get('/customers', [CustomerAPIController::class, 'getCustomerData']);
 Route::post('/customers', [CustomerAPIController::class, 'createCustomer']);
@@ -203,6 +241,7 @@ Route::delete('/customers/{id}', [CustomerAPIController::class, 'deleteCustomer'
 Route::get('/menus', [MenuAPIController::class, 'getMenus']);
 Route::post('/menus', [MenuAPIController::class, 'createMenu']);
 Route::post('/menus/{id}/add_price', [MenuAPIController::class, 'addPriceToMenu']);
+Route::post('/menus/{id}/is_active',[MenuAPIController::class,'menuOnOff']);
 
 Route::get('/areas/{id}/entities', [EntityAPIController::class, 'getEntityWithInvoice']);
 Route::get('/entities/{id}', [EntityAPIController::class, 'getEntityDetail']);
@@ -214,9 +253,13 @@ Route::post('/entities/add_more_sessions', [InvoiceAPIController::class, 'addMor
 Route::post('/entities/change', [InvoiceAPIController::class, 'changeRoom']);
 Route::post('/entities/done', [InvoiceAPIController::class, 'endRoom']);
 
+Route::get('/order_items',[OrderAPIController::class,'getOrderItemList']);
+
 Route::get('/invoices', [InvoiceAPIController::class, 'getInvoiceData']);
 
 // Route::group(['prefix' => 'management'], function () {});
 Route::get("/test", [TestController::class, "index"]);
 
 Route::get('/menu_categories/{id}/menus',[MenuAPIController::class,'menuByMenuCategory']);
+
+Route::post("/order_status_change",[OrderAPIController::class,'orderItemChangeStatus']);

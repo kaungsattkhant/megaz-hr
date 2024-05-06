@@ -3,6 +3,7 @@
 namespace App\Repositories\Item;
 
 use App\Models\Item;
+use App\Models\ItemPrice;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -12,7 +13,7 @@ class ItemRepository implements ItemRepositoryInterface
     {
         if ($request->per_page || $request->page) {
             $category_id = $request->category_id;
-            return Item::orderByDesc('id')
+            return Item::with('category')->orderByDesc('id')
                 ->when($request->search_input, function ($q) use ($request) {
                     $q->where('name', 'LIKE', '%' . $request->search_input . '%');
                 })
@@ -22,9 +23,9 @@ class ItemRepository implements ItemRepositoryInterface
                 ->paginate(config('common.list_count'));
         } else {
             if ($request->category_id) {
-                return Item::where('category_id', $request->category_id)->get();
+                return Item::with('category')->where('category_id', $request->category_id)->get();
             }
-            return Item::all();
+            return Item::with('category')->get();
         }
     }
 
@@ -34,6 +35,7 @@ class ItemRepository implements ItemRepositoryInterface
         try {
             $item = Item::create($data);
             $uomIds = json_decode($data['uoms'], true);
+            $price = ItemPrice::create(['item_id'=>$item->id, 'price'=>$data['price']]);
             foreach ($uomIds as $uomId) {
                 $item->uoms()->attach($uomId);
             }

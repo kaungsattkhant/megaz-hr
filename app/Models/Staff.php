@@ -2,15 +2,16 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Foundation\Auth\User as Authenticatable;
-use Illuminate\Support\Facades\Hash;
-
-use Laravel\Sanctum\HasApiTokens;
+use App\Models\Role;
+use App\Models\Gender;
+use App\Models\Inventory;
 
 use App\Models\Department;
-use App\Models\Gender;
-use App\Models\Role;
+
+use Laravel\Sanctum\HasApiTokens;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Foundation\Auth\User as Authenticatable;
 
 class Staff extends Authenticatable
 {
@@ -39,6 +40,11 @@ class Staff extends Authenticatable
     protected $hidden=[
         'password','remember_token','created_at','updated_at'
     ];
+
+    public function inventories()
+    {
+        return $this->belongsToMany(Inventory::class);
+    }
 
     public function emergencyContacts()
     {
@@ -86,10 +92,26 @@ class Staff extends Authenticatable
         return $this->hasMany(Task::class, 'completed_by');
     }
 
-    public function hasRoles($name){
-        if($this->roles->contains('name',$name)){
+    public function hasRoles($dept,$name){
+        if($this->roles->contains('name',$name) && $this->department->name==$dept){
             return true;
         }
+        return false;
+    }
+
+    public function checkRoles($names){
+        // Convert $names to an array if it's not already one
+        if (!is_array($names)) {
+            $names = [$names];
+        }
+
+        // Check if the user has any of the roles specified in the array
+        foreach ($names as $name) {
+            if ($this->roles->contains('name', $name)) {
+                return true;
+            }
+        }
+
         return false;
     }
 

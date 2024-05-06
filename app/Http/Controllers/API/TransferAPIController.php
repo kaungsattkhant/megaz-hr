@@ -51,4 +51,28 @@ class TransferAPIController extends Controller
         $transfer = $this->transferRepo->transferConfirm($id);
         ResponseData($transfer);
     }
+
+
+    #api
+
+    public function store(Request $request){
+        $transfer = $this->transferRepo->createOrUpdate($request);
+        ResponseData($transfer);
+    }
+
+    public function index(Request $request){
+        $transfer = $this->transferRepo->list($request);
+        ResponseData($transfer);
+    }
+
+    public function transferConfirmationList(Request $request){
+        $data = $this->transferRepo->transferConfirmationList($request);
+        ResponseData($data);
+    }
+
+    public function confirmTransferItem(Request $request){
+        $data = $this->transferRepo->confirmTransferItem($request);
+        ResponseData($data);
+    }
+    #end
 }

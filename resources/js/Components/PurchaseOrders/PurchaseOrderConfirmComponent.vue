@@ -49,7 +49,13 @@
                             Item
                         </th>
                         <th scope="col" class=" px-6 py-4 ">
-                            Qty
+                            Original Qty
+                        </th>
+                        <th scope="col" class=" px-6 py-4 ">
+                            Current Qty
+                        </th>
+                        <th scope="col" class=" px-6 py-4 ">
+                            Left Qty
                         </th>
                         <th scope="col" class=" px-6 py-4 ">
                             Amount
@@ -57,13 +63,13 @@
                         <th scope="col" class=" px-6 py-4 ">
                             Total
                         </th>
-                        <th scope="col" class=" px-6 py-4 ">
+                        <th scope="col" class=" px-2 py-2 ">
                             Manager Checked
                         </th>
-                        <th scope="col" class=" px-6 py-4 ">
+                        <th scope="col" class=" px-2 py-2 ">
                             Financial Checked
                         </th>
-                        <th scope="col" class=" px-6 py-4 ">
+                        <th scope="col" class=" px-2 py-2 ">
                             MD Checked
                         </th>
                         <th scope="col" class=" px-2 py-2 col-span-3">
@@ -78,7 +84,15 @@
                                 {{ purchaseOrderItem.item.name }}
                             </td>
                             <td class=" px-6 py-4 font-medium ">
+                                {{ purchaseOrderItem.original_quantity }}
+                            </td>
+                            <td class=" px-6 py-4 font-medium ">
                                 {{ purchaseOrderItem.quantity }}
+                            </td>
+                            <td class=" px-6 py-4 font-medium ">
+                                <div v-if="purchaseOrderItem.purchase_order_item_left">
+                                    {{ purchaseOrderItem.purchase_order_item_left.quantity }}
+                                </div>
                             </td>
                             <td class=" px-6 py-4 font-medium ">
                                 {{ purchaseOrderItem.amount.toLocaleString() }}
@@ -123,6 +137,46 @@
                         </tr>
                         <tr class="">
                             <td class=" py-2 "></td>
+                        </tr>
+                    </div>
+                    <div class="contents">
+                        <tr class="bg-white rounded-lg overflow-hidden shadow-lg">
+                            <td class=" px-6 py-4 font-medium ">
+                                &nbsp;
+                            </td>
+                            <td class=" px-6 py-4 font-medium ">
+                                &nbsp;
+                            </td>
+                            <td class=" px-6 py-4 font-medium ">
+                                &nbsp;
+                            </td>
+                            <td class=" px-6 py-4 font-medium ">
+                                &nbsp;
+                            </td>
+                            <td class=" px-6 py-4 font-medium ">
+                                &nbsp;
+                            </td>
+                            <td class="px-6 py-4">
+                                {{ totalPrice.toLocaleString() }}
+                            </td>
+                            <td class=" px-6 py-4 font-medium ">
+                                &nbsp;
+                            </td>
+                            <td class=" px-6 py-4 font-medium ">
+                                &nbsp;
+                            </td>
+                            <td class=" px-6 py-4 font-medium ">
+                                &nbsp;
+                            </td>
+                            <td class=" px-6 py-4 font-medium ">
+                                &nbsp;
+                            </td>
+                            <td class=" px-6 py-4 font-medium ">
+                                &nbsp;
+                            </td>
+                            <td class=" px-6 py-4 font-medium ">
+                                &nbsp;
+                            </td>
                         </tr>
                     </div>
 
@@ -308,6 +362,8 @@
                 isLaterBuy: false,
                 editQuantity: 0,
                 editPurchaseOrderItem: null,
+
+                totalPrice: 0,
             };
         },
 
@@ -327,16 +383,25 @@
                     this.purchaseOrder = response.data;
                     this.date = this.purchaseOrder.date;
                     this.purchaseOrderItems = this.purchaseOrder.items;
+                    this.updateTotalPrice(this.purchaseOrderItems);
                 }
+            },
+
+            alertValidationMessage(field){
+                this.$notify({
+                    title: 'Input validation',
+                    text: `You forgot to provide ${field}, please try again`,
+                    type: 'warn'
+                });
             },
 
             addItemBtnClicked(){
                 if(!this.selectedItem){
-                    alert('Choose an item first');
+                    this.alertValidationMessage('an item');
                     return 1;
                 }
                 if(this.quantity < 1){
-                    alert('Input quantity');
+                    this.alertValidationMessage('quantity');
                     return 1;
                 }
                 let existingItemIndex = this.purchaseOrderItems.findIndex(poItem => poItem.item_id == this.selectedItem.id);
@@ -352,6 +417,7 @@
                         amount: amount,
                     });
                 }
+                this.updateTotalPrice(this.purchaseOrderItems);
                 this.selectedItem = null;
                 this.quantity = null;
             },
@@ -374,6 +440,7 @@
                 else{
                     this.purchaseOrderItems.splice(this.deleteIndex, 1);
                 }
+                this.updateTotalPrice(this.purchaseOrderItems);
                 this.deleteId = null;
                 this.deleteIndex = null;
             },
@@ -391,7 +458,10 @@
                     formData.append('value', 1);
                     let response = await postApiData({url: url, form_data: formData, token: this.getToken()});
                     if(response.success){
-                        alert('Item checked');
+                        this.$notify({
+                            text: `Item checked`,
+                            type: 'info'
+                        });
                         window.location.reload();
                     }
                 }
@@ -401,6 +471,13 @@
 
             editPurchaseOrderItemBtnClicked(purchaseOrderItemsIndex){
                 this.editPurchaseOrderItem = this.purchaseOrderItems[purchaseOrderItemsIndex];
+                console.log(this.editPurchaseOrderItem);
+                if(this.editPurchaseOrderItem.later_buy == 1){
+                    this.isLaterBuy = true;
+                }
+                else{
+                    this.isLaterBuy = false;
+                }
                 this.editQuantity = this.editPurchaseOrderItem.quantity;
             },
 
@@ -412,7 +489,7 @@
                 let index = this.purchaseOrderItems.findIndex(poItem => poItem.item_id == this.editPurchaseOrderItem.item_id);
                 if(index != -1){
                     this.purchaseOrderItems[index].quantity = this.editQuantity;
-                    this.purchaseOrderItems[index].later_buy = (this.isLaterBuy)? '1': '0';
+                    this.purchaseOrderItems[index].later_buy = (this.isLaterBuy)? 1: 0;
                     console.log(this.purchaseOrderItems[index]);
                 }
 
@@ -423,17 +500,11 @@
 
             async createPurchaseOrderBtnClicked(){
                 if(!this.date){
-                    this.$notify({
-                        text: `Input date`,
-                        type: 'warn'
-                    });
+                    this.alertValidationMessage(`date`);
                     return 1;
                 }
                 if(this.purchaseOrderItems.length<1){
-                    this.$notify({
-                        text: `Select at least one item`,
-                        type: 'warn'
-                    });
+                    this.alertValidationMessage(`an item`);
                     return 1;
                 }
                 let priceTotal = 0;
@@ -448,11 +519,15 @@
                     }
                 });
 
+                let isGRN = '0';
+                isGRN = parseInt(isGRN);
+
                 let formData = new FormData();
                 formData.append('id', this.purchaseOrderId);
-                formData.append('po_id', this.purchaseOrder.po_id);
+                // formData.append('po_id', this.purchaseOrder.id);
                 formData.append('date', this.date);
                 formData.append('total_price', priceTotal);
+                formData.append('is_grn', isGRN);
                 formData.append('items', JSON.stringify(updatedPurchaseOrderItems));
                 let response = await postApiData({url: `/api/purchase_orders`, form_data:  formData, token: this.getToken()});
                 if(response.success){
@@ -460,6 +535,8 @@
                         text: `Purchase order update success`,
                         type: 'info'
                     });
+
+                    window.location.replace(`/purchase_orders`);
                 }
                 else{
                     this.$notify({
@@ -467,9 +544,22 @@
                         type: 'error'
                     });
                 }
-                window.location.replace(`/purchase_orders`);
+                // window.location.replace(`/purchase_orders`);
             },
 
+            updateTotalPrice(poItems){
+                this.totalPrice = 0;
+                poItems.forEach((item)=>{
+                    this.totalPrice += (item.amount * item.quantity);
+                });
+            },
+
+        },
+
+        watch: {
+            purchaseOrderItems: function(){
+                // alert('PO items changed');
+            },
         },
 
         created(){

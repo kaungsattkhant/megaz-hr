@@ -26,55 +26,72 @@
                                 #
                             </th>
                             <th scope="col" class=" px-6 py-4 ">
-                                Inventory Name
+                                Title
                             </th>
                             <th scope="col" class="px-6 py-4">
+                                Description
+                            </th>
 
+                            <th scope="col" class="px-6 py-4">
+                                Status
+                            </th>
+
+                            <th scope="col" class="px-6 py-4">
+                                Category
                             </th>
                         </tr>
                     </thead>
                     <tbody>
 
                         <!-- looping start -->
-                        <div class="contents">
-                            <tr class="bg-white rounded-lg overflow-hidden shadow-lg">
+                        <div v-for="(complain,index) in complainList" :key="index" class="contents">
+                            <tr  class="bg-white rounded-lg overflow-hidden shadow-lg">
                                 <td class=" px-6 py-4 font-medium ">
-                                    1
+                                    {{ index+1 }}
                                 </td>
                                 <td class="whitespace-nowrap px-6 py-4 ">
                                     <a href="#">
-                                        Complain
+                                        {{ complain.title }}
                                     </a>
                                 </td>
                                 <td class="whitespace-nowrap px-6 py-4 ">
                                     <a href="#">
-                                        Description
+                                        {{ complain.description }}
+                                    </a>
+                                </td>
+
+                                <td class="whitespace-nowrap px-6 py-4 ">
+                                    <a href="#">
+                                        {{ complain.status }}
                                     </a>
                                 </td>
                                 <td class="whitespace-nowrap px-6 py-4 ">
                                     <a href="#">
-                                        Category
+                                        {{ complain.complaint_category.name }}
                                     </a>
                                 </td>
-                                <td class="whitespace-nowrap px-6 py-4 ">
-                                    <a href="#">
-                                        By
-                                    </a>
-                                </td>
-                                <td class="whitespace-nowrap px-6 py-4 ">
-                                    <a href="#">
-                                        Status
-                                    </a>
-                                </td>
-                                <td class="whitespace-nowrap px-6 py-4">
-                                    <button id="edit-btn" class="pr-3"
+
+                                <td class="whitespace-nowrap px-6 py-4 flex gap-5">
+                                    <!-- <button id="edit-btn" class="pr-3"
                                     data-te-toggle="modal" data-te-target="#stageModal">
                                         <i class="fal fa-bars"></i>
-                                    </button>
+                                    </button> -->
+
                                     <button id="edit-btn" class="pr-1"
+                                    @click="statusChangeClick(complain.id)"
+                                    data-te-toggle="modal" data-te-target="#statusChange"
+                                    :disabled="complain.status === 'Done'">
+                                        <i class="far fa-info-circle"></i>
+                                    </button>
+
+
+                                    <button id="edit-btn" class="pr-1"
+                                    @click="deleteBtnClicked( complain.id)"
                                     data-te-toggle="modal" data-te-target="#deleteModal">
                                         <i class="fas fa-trash-alt"></i>
                                     </button>
+
+
                                 </td>
                             </tr>
                             <tr class="">
@@ -115,25 +132,25 @@
                             <label for="" class="block text-sm text-black mb-3">
                                 Complain Title
                             </label>
-                            <input type="text" placeholder="Inventory Name" v-model="name"
+                            <input type="text" placeholder="Complain Title" v-model="title"
                                 class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
                         </div>
                         <div class="mb-4">
                             <label for="" class="block text-sm text-black mb-3">
                                 Category
                             </label>
-                            <select name="" id="" v-model="selectedInventoryType"
+                            <select name="" id="" v-model="selectedCategory"
                                 class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
-                                <option value="area">Area</option>
-	                            <option value="department">Department</option>
+                                <option v-for="(category,index) in complainCategory" :key="index" :value=category.id >{{ category.name }}</option>
+
                             </select>
                         </div>
                         <div class="mb-4">
                             <label for="" class="block text-sm text-black mb-3">
-                                Complain Title
+                                Complain Description
                             </label>
-                            <textarea class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0"
-                                 name="" id="" cols="30" rows="10"></textarea>
+                            <textarea v-model='description' class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0"
+                                 name="" id="" cols="30" rows="10" placeholder="Complain Description"></textarea>
 
                         </div>
                     </div>
@@ -147,10 +164,10 @@
             </div>
         </div>
 
-        <!-- Stage Modal -->
+        <!-- status change model -->
         <div data-te-modal-init
             class="fixed left-0 top-0 z-[1055] hidden h-full w-full overflow-y-auto overflow-x-hidden outline-none"
-            id="stage_modal" tabindex="-1" aria-labelledby="stage_modalLabel" aria-hidden="true">
+            id="statusChange" tabindex="-1" aria-labelledby="statusChangeLabel" aria-hidden="true">
             <div data-te-modal-dialog-ref
                 class="pointer-events-none relative w-auto mb-12 translate-y-[-50px] opacity-0 transition-all duration-300 ease-in-out min-[576px]:mx-auto min-[576px]:mt-7 min-[576px]:max-w-[500px]">
                 <div
@@ -158,7 +175,7 @@
 
                     <div class="relative  p-4">
                         <h5 class="text-xl text-center mt-2 font-medium leading-normal text-black" id="create_modalLabel">
-                            Stage
+                            Complain Status
                         </h5>
                         <button type="button" id="close" class="absolute top-4 right-4 focus:shadow-none focus:outline-none"
                             data-te-modal-dismiss aria-label="Close">
@@ -169,22 +186,20 @@
                         </button>
                     </div>
                     <div class="relative px-12 py-4" data-te-modal-body-ref>
-
                         <div class="mb-4">
-                            <label for="" class="block text-sm text-black mb-3">
-                                Stage
-                            </label>
-                            <select name="" id="" v-model="selectedInventoryType"
+                            <select type="text" placeholder="Complain Title" v-model="change_status" data-te-select-init data-te-select-placeholder="Select Roles"
+                                data-te-select-filter="true"
                                 class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
-                                <option value="area">Area</option>
-	                            <option value="department">Department</option>
+                                <option value="In Progress">In Progress</option>
+                                <option value="Done">Done</option>
+
                             </select>
                         </div>
                     </div>
                     <div class="flex justify-center px-12 mb-6">
-                        <button type="button" @click="createBtnClicked"
+                        <button data-te-modal-dismiss type="button" @click="statusChange"
                         class="add-btn focus:outline-none focus:ring-0 ">
-                            Create
+                            Confirm
                         </button>
                     </div>
                 </div>
@@ -270,15 +285,12 @@
     export default {
         data() {
             return {
-                inventoryList:[],
+                complainList:[],
                 typeList:[],
                 areaList:[],
                 departmentList:[],
                 name: null,
-                selectedInventoryType:null,
-                inventoryable_id:null,
                 deleteId: null,
-
                 per_page: 10,
                 pageNumbers: [],
                 currentPage: 1,
@@ -286,47 +298,45 @@
                 per_group: 10,
                 groupedPageNumbers: [],
                 currentGroup: 0,
+                complainCategory:[],
+                title:null,
+                selectedCategory:null,
+                description:null,
+                statusChange_id:null,
+                change_status:null
             };
         },
 
         methods: {
             ...mapGetters(['getToken']),
 
-            async getInventoryList(){
-                const response = await getApiData({ url: '/api/inventories', token: this.getToken() });
+            async getComplain(){
+                const response = await getApiData({ url: '/api/complaints', token: this.getToken() });
                 if(response.data){
-                    this.inventoryList = response.data;
-                }
-            },
-
-            async getAreaList(){
-                const response = await getApiData({ url: '/api/areas' , token: this.getToken()});
-                if(response.data){
-                    this.typeList = response.data;
-                }
-            },
-            async getDepartmentList(){
-                const response = await getApiData({ url: '/api/departments', token: this.getToken() });
-                if(response.data){
-                    this.typeList = response.data;
+                    this.complainList = response.data;
                 }
             },
 
             createBtnClicked(){
-                console.log(this.inventoryable_id)
-                this.createInventory();
+                this.createComplain();
             },
 
-            async createInventory()
+            async getComplainCategory()
+            {
+                let response = await getApiData({url:'/api/complaint_categories'});
+                this.complainCategory = response.data;
+
+            },
+
+            async createComplain()
             {
                 let formData = new FormData();
-                formData.append('name', this.name);
-                formData.append('inventoryable_type', this.selectedInventoryType);
-                formData.append('inventoryable_id', this.inventoryable_id);
-                let response = await postApiData({url: '/api/inventories', form_data: formData, token: this.getToken()});
+                formData.append('title', this.title);
+                formData.append('description', this.description);
+                formData.append('complaint_category_id', this.selectedCategory);
+                let response = await postApiData({url: '/api/complaints', form_data: formData, token: this.getToken()});
                 if(response.success){
-                    this.getInventoryList(null);
-                    console.log("success")
+                    this.getComplain(null);
                     this.closeModal();
                     this.clearForm();
                 }
@@ -335,20 +345,41 @@
                 }
             },
 
+            statusChangeClick(id)
+            {
+                this.statusChange_id = id;
+            },
+
+            async statusChange()
+            {
+                if(!this.change_status){
+                    alert('Please select the status');
+                }
+                let formData = new FormData();
+                formData.append('status',this.change_status);
+                let response = await postApiData({url:`/api/complaints/${this.statusChange_id}/update_status`,form_data:formData,token:this.getToken()})
+                this.change_status == "";
+                if(response.success==true)
+                {
+                    this.getComplain(null);
+                }else{
+                    alert(response.message);
+                }
+            },
+
             closeModal() {
                 document.getElementById("close").click();
             },
             clearForm() {
-                this.name = null,
-                this.selectedInventoryType = null,
-                this.inventoryable_id = null,
-                this.typeList = []
+                this.title = null,
+                this.selectedCategory = null,
+                this.description = null
             },
             deleteBtnClicked(id){
                 this.deleteId = id;
             },
             async confirmDeleteBtnClicked(){
-                let url = `/api/inventories/${this.deleteId}`;
+                let url = `/api/complaints/${this.deleteId}`;
                 let response = await deleteApiData({url: url, token: this.getToken()});
                 if(response.success){
                     alert(`deleted`);
@@ -359,7 +390,8 @@
         mounted()
         {
 
-            this.getInventoryList();
+            this.getComplain();
+            this.getComplainCategory();
 
             initTE({ Modal,Select, Ripple });
         }

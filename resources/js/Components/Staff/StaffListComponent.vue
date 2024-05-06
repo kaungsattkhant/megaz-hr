@@ -81,11 +81,9 @@
                                     {{ staff.department.name }}
                                 </td>
                                 <td class="whitespace-nowrap px-6 py-4">
-                                    <!-- <button @click="deleteBtnClicked(staff.id)"
-                                    data-te-toggle="modal" data-te-target="#deleteModal"
-                                        id="edit-btn" class="pr-1">
-                                        <i class="fas fa-trash-alt"></i>
-                                    </button> -->
+                                    <a :href="'/staff/' + staff.id + '/edit'" class="pr-2 ">
+                                        <i class="fal fa-pen"></i>
+                                    </a>
                                     <input
                                     :checked="staff.is_active == 1"
                                     @change="isActiveToggled(staff.id)"

@@ -19,4 +19,6 @@ interface TaskRepositoryInterface
     public function deleteData(int $id);
 
     public function getTasksByStaff(int $id);
+
+    public function doubleCheckTasks(int $id, string $status);
 }

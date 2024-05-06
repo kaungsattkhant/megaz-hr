@@ -23,4 +23,9 @@ interface PurchaseOrderRepositoryInterface
     public function updateIsCheck($request);
 
     public function boughtPurchaseOrder($request);
+
+    public function getPurchaseOrderItemConfirmationList($request);
+
+    public function confirmPurchaseOrderItem($request);
+
 }

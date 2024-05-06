@@ -17,4 +17,6 @@ interface InventoryRepositoryInterface
     public function getInventoryLedgers(int $inventoryId);
 
     public function detail($inventory);
+
+    public function inventoryList();
 }

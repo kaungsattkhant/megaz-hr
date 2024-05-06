@@ -51,7 +51,7 @@
                 </label>
                 <div class="bg-white mb-0 w-[90%] text-sm inline-block" data-te-select-wrapper-ref>
                     <select data-te-select-init data-te-select-placeholder="Select Items" v-model="selectedItems"
-                    data-te-select-filter="true" multiple>
+                    data-te-select-filter="true" multiple @change="itemSelectChanged">
                         <option :value="item" v-for="(item, itemIndex) in itemList" :key="itemIndex">
                             {{ item.name }}
                         </option>
@@ -147,6 +147,18 @@ export default {
             if(index != -1){
                 this.existingItems.splice(index, 1);
             }
+        },
+
+        itemSelectChanged(){
+            console.log(`Existing items`,this.existingItems);
+            console.log(`Selected items`,this.selectedItems);
+            this.existingItems.forEach((existingItem)=>{
+                this.selectedItems.forEach((selectedItem)=>{
+                    if(existingItem.id == selectedItem.id){
+                        this.selectedItems.pop();
+                    }
+                });
+            });
         },
 
         async getSupplierDetail(){

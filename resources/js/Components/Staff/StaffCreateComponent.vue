@@ -110,7 +110,8 @@
                     <select data-te-select-init data-te-select-placeholder="Select Roles" data-te-select-filter="true"
                         name="" id="" multiple v-model="selectedRoles"
                         class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
-                        <option :value="role" v-for="(role, roleIndex) in roleList" :key="roleIndex"> {{ role.name }}
+                        <option :value="role" v-for="(role, roleIndex) in roleList" :key="roleIndex">
+                            {{ role.name }}
                         </option>
                         <!-- <option value="2">Manager</option>
                         <option value="3">Waiter</option> -->
@@ -125,29 +126,45 @@
                     class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
             </div>
 
-            <div class="col-span-3"></div>
+            <div class="col-span-3 rounded-md mb-4 pb-6">
+                <label for="" class="block text-sm text-black mb-3">
+                    Inventories
+                </label>
+                <div class="bg-white mb-0 w-full text-sm inline-block" data-te-select-wrapper-ref>
+                    <select :disabled="inventories.length < 1" data-te-select-init data-te-select-placeholder="Select Inventories" data-te-select-filter="true"
+                        name="" id="" multiple v-model="selectedInventories"
+                        class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
+                        <option :value="inventory" v-for="(inventory, inventoryIndex) in inventories" :key="inventoryIndex">
+                            {{ inventory.name }}
+                        </option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- <div class="col-span-3"></div> -->
 
             <div class="col-span-3 rounded-md mb-4 pb-6">
                 <label for="" class="block text-sm text-black mb-3">
                     State
                 </label>
-                <input type="input" v-model="state" placeholder="State (Required)"
-                    class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
-                <!-- <select name="" id="" v-model="selectedState"
-                    class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
-                    <option value="state1"> State 1 </option>
-                </select> -->
+                <!-- <input type="input" v-model="state" placeholder="State (Required)"
+                    class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0"> -->
+                <select name="" id="" v-model="selectedState" class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0"
+                @change="stateSelectChanged">
+                    <option :value="state" v-for="(state, stateIndex) in stateList"> {{ state.name }} </option>
+                </select>
             </div>
             <div class="col-span-3 rounded-md mb-4 pb-6">
                 <label for="" class="block text-sm text-black mb-3">
                     City
                 </label>
-                <input type="input" v-model="city" placeholder="City (Required)"
-                    class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
-                <!-- <select name="" id="" v-model="selectedCity"
-                    class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
-                    <option value="City 1"> City 1 </option>
-                </select> -->
+                <!-- <input type="input" v-model="city" placeholder="City (Required)"
+                    class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0"> -->
+                <select name="" id="" v-model="selectedCity" class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0"
+                @change="citySelectChanged">
+                    <!-- <option value="City 1"> City 1 </option> -->
+                    <option :value="city" v-for="(city, cityIndex) in cityList"> {{ city.name }} </option>
+                </select>
             </div>
             <div class="col-span-3 rounded-md mb-4 pb-6">
                 <label for="" class="block text-sm text-black mb-3">
@@ -333,7 +350,9 @@
                 departmentList: [],
                 roleList: [],
                 stateList: [],
+                selectedState: null,
                 cityList: [],
+                selectedCity: null,
 
                 name: null,
                 dob: null,
@@ -360,11 +379,34 @@
                 secondaryName: null,
                 secondaryPhone: null,
                 secondaryRelationship: null,
+
+                inventories: [],
+                selectedInventories: [],
+                inventoryIds: [],
             };
         },
 
         methods: {
             ...mapGetters(['getToken']),
+
+            async getStateList(){
+                let response = await getApiData({url: `/api/mmrc/regions`});
+                if(response.data){
+                    this.stateList = response.data;
+                }
+            },
+
+            async stateSelectChanged(){
+                this.state = this.selectedState.name;
+                let response = await getApiData({url: `/api/mmrc/regions/${this.selectedState.id}`});
+                if(response.data){
+                    this.cityList = response.data.cities;
+                }
+            },
+
+            citySelectChanged(){
+                this.city = this.selectedCity.name;
+            },
 
             async getGenderList(){
                 const response = await getApiData({ url: '/api/genders', token: this.getToken() });
@@ -381,9 +423,16 @@
             },
 
             async departmentSelectChanged(){
-                const response = await getApiData({ url: `/api/roles?department_id=${this.selectedDepartment.id}`, token: this.getToken() });
-                if(response.data){
-                    this.roleList = response.data;
+                this.inventories = [];
+                let rolesResponse = await getApiData({ url: `/api/roles?department_id=${this.selectedDepartment.id}`, token: this.getToken() });
+                if(rolesResponse.data){
+                    this.roleList = rolesResponse.data;
+                }
+                if(this.selectedDepartment.name == 'Inventory'){
+                    let inventoriesResponse = await getApiData({url: `/api/inventories`, token: this.getToken()});
+                    if(inventoriesResponse.data){
+                        this.inventories = inventoriesResponse.data;
+                    }
                 }
             },
 
@@ -405,11 +454,19 @@
 
             createStaffBtnClicked(){
                 this.roleIds = [];
+                this.inventoryIds = [];
+                if(this.selectedDepartment.name == 'Inventory' && this.selectedInventories.length < 1){
+                    this.alertValiationMessage('inventories');
+                    return 1;
+                }
+                if(this.selectedInventories.length > 0){
+                    this.selectedInventories.forEach((inventory)=>{
+                        this.inventoryIds.push(inventory.id);
+                    });
+                }
                 this.selectedRoles.forEach((role)=>{
                     this.roleIds.push(role.id);
                 });
-
-
 
                 if(!this.name){
                     this.alertValiationMessage('name');
@@ -448,12 +505,12 @@
                 }
                 if(!this.selectedDepartment)
                 {
-                    this.alertValiationMessage('Department');
+                    this.alertValiationMessage('department');
                     return 1;
                 }
 
                 if(this.roleIds.length < 1){
-                    this.alertValiationMessage('Role');
+                    this.alertValiationMessage('role');
                     return 1;
                 }
 
@@ -473,32 +530,32 @@
                 }
 
                 if(!this.primaryName){
-                    this.alertValiationMessage('Primary name');
+                    this.alertValiationMessage('primary name');
                     return 1;
                 }
 
                 if(!this.primaryPhone){
-                    this.alertValiationMessage('Primary phone');
+                    this.alertValiationMessage('primary phone');
                     return 1;
                 }
 
                 if(!this.primaryRelationship){
-                    this.alertValiationMessage('Primary relationship');
+                    this.alertValiationMessage('primary relationship');
                     return 1;
                 }
 
                 if(!this.secondaryName){
-                    this.alertValiationMessage('Secondary name');
+                    this.alertValiationMessage('secondary name');
                     return 1;
                 }
 
                 if(!this.secondaryPhone){
-                    this.alertValiationMessage('Secondary phone');
+                    this.alertValiationMessage('secondary phone');
                     return 1;
                 }
 
                 if(!this.secondaryRelationship){
-                    this.alertValiationMessage('Secondary relationship');
+                    this.alertValiationMessage('secondary relationship');
                     return 1;
                 }
 
@@ -555,6 +612,9 @@
                 formData.append('city',this.city);
                 formData.append('gender_id', this.selectedGender.id);
                 formData.append('department_id', this.selectedDepartment.id);
+                if(this.inventoryIds.length > 0){
+                    formData.append('inventoryIds', JSON.stringify(this.inventoryIds));
+                }
                 formData.append('password', this.password);
                 formData.append('roles', this.roleIds);
                 formData.append('joined_date',this.joinedDate);
@@ -573,17 +633,27 @@
                     window.location.replace('/staff');
                 }
                 else{
-                    alert('some errors occur');
+                    let message = `Some errors occured`;
+                    if(response.message){
+                        message = response.message;
+                    }
+                    this.$notify({
+                        text: message,
+                        type: "error"
+                    });
                 }
             },
         },
 
-        mounted()
-        {
-            initTE({ Modal,Select, Ripple });
+        created(){
             this.getGenderList();
             this.getDepartmentList();
             // this.getRoleList();
+            this.getStateList();
+        },
+
+        mounted(){
+            initTE({ Modal,Select, Ripple });
         }
     }
 </script>

@@ -24,7 +24,6 @@ class CustomerRepository implements CustomerRepositoryInterface
             $customers = Customer::where('is_active')->skip($skip)->take($perPage)->get();
             $paginationData = MakePaginationData($request, $totalCount, 'customers');
             $paginationData['customers'] = $customers;
-
             return $paginationData;
         } else {
             $customers = Customer::all();

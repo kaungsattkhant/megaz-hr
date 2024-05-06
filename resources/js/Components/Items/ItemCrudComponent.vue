@@ -41,6 +41,9 @@
                                 Item Name
                             </th>
                             <th scope="col" class=" px-6 py-4 ">
+                                Price
+                            </th>
+                            <th scope="col" class=" px-6 py-4 ">
                                 Category
                             </th>
                             <th scope="col" class="px-6 py-4">
@@ -59,7 +62,10 @@
                                     {{ item.name }}
                                 </td>
                                 <td class="whitespace-nowrap px-6 py-4 ">
-                                    {{ item.category_id }}
+                                    {{ item.item_prices.price }}
+                                </td>
+                                <td class="whitespace-nowrap px-6 py-4 ">
+                                    {{ item.category.name }}
                                 </td>
                                 <td class="whitespace-nowrap px-6 py-4">
                                     <!-- <button id="edit-btn" class="pr-1">
@@ -186,6 +192,13 @@
                         </div>
                         <div class="mb-4">
                             <label for="" class="block text-sm text-black mb-3">
+                                Price
+                            </label>
+                            <input type="number" placeholder="Item Price" v-model="price"
+                                class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
+                        </div>
+                        <div class="mb-4">
+                            <label for="" class="block text-sm text-black mb-3">
                                 UOM
                             </label>
                             <select name="" id="" v-model="selectedUOM"
@@ -230,6 +243,7 @@
                 itemList: [],
                 uomList: [],
                 name: '',
+                price: null,
                 selectedUOM: null,
                 selectedCategory: null,
                 searchInput: null,
@@ -303,10 +317,12 @@
                 let seletedUOMs = [this.selectedUOM.id];
                 formData.append('uoms', JSON.stringify(seletedUOMs));
                 formData.append('name', this.name);
+                formData.append('price', this.price);
                 formData.append('category_id', this.selectedCategory.id);
                 let response = await postApiData({url: url, form_data: formData, token: this.getToken()});
                 if(response.success){
-                    this.itemList.unshift(response.data);
+                    // this.getItemList(this.currentPage);
+                    window.location.reload();
                 }
             },
 

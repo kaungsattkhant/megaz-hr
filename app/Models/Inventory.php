@@ -12,7 +12,7 @@ class Inventory extends BaseModel
     protected $fillable = [
         'area_id', 'department_id', 'name', 'is_active'
     ];
-    
+
 
     public function inventoryable()
     {
@@ -32,5 +32,10 @@ class Inventory extends BaseModel
     public function inventory_ledgers()
     {
         return $this->hasMany(InventoryLedger::class);
+    }
+
+    public function staff()
+    {
+        return $this->belongsToMany(Staff::class,'inventory_staff', 'inventory_id', 'staff_id');
     }
 }

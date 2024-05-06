@@ -24,6 +24,7 @@ class StaffAPIController extends Controller
     }
 
     public function getStaffData(Request $request)
+
     {
         $staffs = $this->staffRepo->listAllData($request);
         ResponseData($staffs);
@@ -38,7 +39,7 @@ class StaffAPIController extends Controller
         ResponseData($staff);
     }
 
-    public function updateStaff(StaffUpdateRequest $request, $id)
+    public function updateStaff(Request $request, $id)
     {
         $staff = $this->staffRepo->updateData($request->all(), $id);
        if(!$staff)
@@ -74,5 +75,21 @@ class StaffAPIController extends Controller
         }
         $staff = $this->staffRepo->getStaffByDepartment($request, $staff->department_id);
         ResponseData($staff);
+    }
+
+    public function detailStaff(int $id)
+    {
+        $staff = $this->staffRepo->staffDetail($id);
+        ResponseData($staff);
+    }
+
+    public function deleteRoleStaff(int $staff_id, int $role_id)
+    {
+        $staff = $this->staffRepo->deleteStaffRole($staff_id,$role_id);
+    }
+
+    public function deleteInventoryStaff(int $staff_id, int $inventory_id)
+    {
+        $staff = $this->staffRepo->deleteStaffInventory($staff_id,$inventory_id);
     }
 }

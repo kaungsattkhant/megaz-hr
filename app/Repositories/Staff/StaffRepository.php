@@ -2,6 +2,8 @@
 
 namespace App\Repositories\Staff;
 
+use App\Models\Inventory;
+use App\Models\Role;
 use App\Models\Staff;
 use App\Models\StaffEmergencyContact;
 use Illuminate\Http\Request;
@@ -37,6 +39,15 @@ class StaffRepository implements StaffRepositoryInterface
             $data = RemoveNullValues($data);
             $staff = Staff::create($data);
 
+            if ($data['department_id'] == 6) {
+                $inventoryIds = isset($data['inventoryIds']) ? json_decode($data['inventoryIds']) : [];
+                if (is_array($inventoryIds)) {
+                    foreach ($inventoryIds as $inventoryId) {
+                        $staff->inventories()->attach($inventoryId);
+                    }
+                }
+            }
+
             if (isset($data['roles']) && is_array($data['roles'])) {
                 $staff->roles()->attach($data['roles']);
             }
@@ -53,25 +64,28 @@ class StaffRepository implements StaffRepositoryInterface
 
     public function createEmegercyContact($data)
     {
-        $staff = StaffEmergencyContact::where('staff_id',$data['staff_id'])->first();
-        if(!$staff)
-        {
+        $staff = StaffEmergencyContact::where('staff_id', $data['staff_id'])->first();
+        if (!$staff) {
             $staff = StaffEmergencyContact::create($data);
         }
     }
 
     public function updateData(array $data, int $id)
     {
+
         DB::beginTransaction();
         try {
             $staff = Staff::find($id);
             if ($staff) {
-
                 $data = RemoveNullValues($data);
-
+                $staff->emergencyContacts()->updateOrCreate(['staff_id' => $staff->id], $data);
                 $staff->update($data);
                 if (isset($data['roles'])) {
-                    $staff->roles()->sync($data['roles']);
+                    $staff->roles()->attach($data['roles']);
+                }
+                if (isset($data['inventoryIds'])) {
+                    $inventoryIds = isset($data['inventoryIds']) ? json_decode($data['inventoryIds']) : [];
+                    $staff->inventories()->attach($inventoryIds);
                 }
             }
             DB::commit();
@@ -81,6 +95,15 @@ class StaffRepository implements StaffRepositoryInterface
             ResponseMessage($e->getMessage(), 402);
             throw $e;
         }
+    }
+
+    public function staffDetail(int $id)
+    {
+        $staff = Staff::with('department', 'roles', 'inventories', 'emergencyContacts', 'gender', 'completed_tasks')->find($id);
+        if ($staff == null) {
+            ResponseMessage("Staff not found or invalid id", 404);
+        }
+        return $staff;
     }
 
     public function deleteData($id)
@@ -122,6 +145,47 @@ class StaffRepository implements StaffRepositoryInterface
                 ->get();
 
             return $staffs;
+        }
+    }
+
+    public function deleteStaffRole(int $staff_id, int $role_id)
+    {
+        DB::beginTransaction();
+        try {
+            $staff = Staff::find($staff_id);
+            $role = Role::find($role_id);
+            if (!$staff || !$role) {
+                ResponseMessage('Staff or Role not found');
+            } else {
+                $staff->roles()->detach($role->id);
+                DB::commit();
+                ResponseMessage("Detach successfully");
+            }
+        } catch (\Exception $e) {
+            DB::rollback();
+            ResponseMessage($e->getMessage(), 402);
+            throw $e;
+        }
+    }
+
+
+    public function deleteStaffInventory(int $staff_id, int $inventory_id)
+    {
+        DB::beginTransaction();
+        try {
+            $staff = Staff::find($staff_id);
+            $inventory = Inventory::find($inventory_id);
+            if (!$staff || !$inventory) {
+                ResponseMessage('Staff or inventory not found');
+            } else {
+                $staff->inventories()->detach($inventory->id);
+                DB::commit();
+                ResponseMessage("Detach successfully");
+            }
+        } catch (\Exception $e) {
+            DB::rollback();
+            ResponseMessage($e->getMessage(), 402);
+            throw $e;
         }
     }
 }
