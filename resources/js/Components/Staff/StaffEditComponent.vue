@@ -382,7 +382,7 @@
                 selectedGender: null,
                 nrcNumber: null,
                 selectedDepartment: null,
-                roleSelected: [],
+                roleSelected:[],
                 roleIds: [],
                 state: null,
                 city: null,
@@ -536,13 +536,14 @@
             },
 
             updateStaffBtnClicked(){
+                this.roleIds = [];
                 this.inventoryIds = [];
-
                 if(this.selectedInventories.length > 0){
                     this.selectedInventories.forEach((inventory)=>{
                         this.inventoryIds.push(inventory.id);
                     });
                 }
+
                 this.roleSelected.forEach((item)=>{
                     this.roleIds.push(item.id);
                 });
@@ -686,11 +687,12 @@
                 formData.append('city',this.city);
                 formData.append('gender_id', this.selectedGender.id);
                 formData.append('department_id', this.selectedDepartment.id);
-
-                    formData.append('inventoryIds', JSON.stringify(this.inventoryIds));
-
+                formData.append('inventoryIds', JSON.stringify(this.inventoryIds));
                 formData.append('password', this.password);
-                formData.append('roles', this.roleIds);
+                this.roleIds.forEach(roleId => {
+                    formData.append('roles[]', roleId);
+                });
+
                 formData.append('joined_date',this.joinedDate);
 
                 // for emegercy
@@ -703,10 +705,8 @@
                 formData.append('secondary_relationship',this.secondaryRelationship);
 
                 let response = await postApiData({url: `/api/staffs/${this.staffId}`, form_data: formData, token: this.getToken()});
-                this.roleIds = [];
-                this.roleSelected = [];
                 if(response.success){
-                    // window.location.replace('/staff');
+                    window.location.replace('/staff');
                 }
                 else{
                     let message = `Some errors occured`;
