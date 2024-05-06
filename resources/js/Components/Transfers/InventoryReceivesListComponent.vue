@@ -70,7 +70,7 @@
                                     {{ receive.destination_inventory.name }}
                                 </td>
                                 <td class="whitespace-nowrap px-6 py-4 ">
-                                    {{ receive.item_id }}
+                                    {{ receive.item.name }}
                                 </td>
                                 <td class="whitespace-nowrap px-6 py-4 ">
                                     {{ receive.quantity }}
@@ -82,7 +82,7 @@
                                     {{ receive.status }}
                                 </td>
                                 <td class="whitespace-nowrap px-6 py-4">
-                                    <button data-te-toggle="modal" data-te-target="#confirmModal" @click="receiveBtnClicked(receive.id)">
+                                    <button data-te-toggle="modal" data-te-target="#confirmModal" :disabled=" receive.status != 'pending'" @click="receiveBtnClicked(receive.id)">
                                         <i class="fal fa-bars"></i>
                                     </button>
                                 </td>
