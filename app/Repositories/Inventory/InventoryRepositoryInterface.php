@@ -19,4 +19,6 @@ interface InventoryRepositoryInterface
     public function detail($inventory);
 
     public function inventoryList();
+    
+    public function getInventory($request);
 }
