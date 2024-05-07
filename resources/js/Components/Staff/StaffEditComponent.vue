@@ -119,8 +119,9 @@
                         <!-- <option value="2">Manager</option>
                         <option value="3">Waiter</option> -->
                     </select>
-                    <div v-for="(role,index) in roles" :key="index" class='py-2 px-3 flex justify-between'>
-                        <span>{{ role.name }}</span><span><i @click="deleteRoleStaff(role.id)" class="fal fa-times text-red-400"></i></span>
+                    <div v-for="(role, index) in roles" :key="index" class='py-2 px-3 flex justify-between'>
+                        <span>{{ role.name }}</span><span><i @click="deleteRoleStaff(role.id)"
+                                class="fal fa-times text-red-400"></i></span>
                     </div>
 
                 </div>
@@ -138,18 +139,22 @@
                     Inventories
                 </label>
                 <div class=" mb-0 w-full text-sm inline-block" data-te-select-wrapper-ref>
-                    <select :disabled="inventories.length < 1" data-te-select-init data-te-select-placeholder="Select Inventories" data-te-select-filter="true"
-                        name="" id="" multiple v-model="selectedInventories"
+                    <select :disabled="inventories.length < 1" data-te-select-init
+                        data-te-select-placeholder="Select Inventories" data-te-select-filter="true" name="" id=""
+                        multiple v-model="selectedInventories"
                         class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
-                        <option :value="inventory" v-for="(inventory, inventoryIndex) in inventories" :key="inventoryIndex">
+                        <option :value="inventory" v-for="(inventory, inventoryIndex) in inventories"
+                            :key="inventoryIndex">
                             {{ inventory.name }}
                         </option>
                     </select>
                     <div v-if="staffDetailData">
                         <div v-if="staffDetailData.inventories">
-                            <div v-for="(inventory,index) in staffDetailData.inventories" :key="index" class='py-2 px-3 flex justify-between'>
-                        <span>{{ inventory.name }}</span><span><i @click="deleteInventoryStaff(inventory.id)" class="fal fa-times text-red-400"></i></span>
-                    </div>
+                            <div v-for="(inventory, index) in staffDetailData.inventories" :key="index"
+                                class='py-2 px-3 flex justify-between'>
+                                <span>{{ inventory.name }}</span><span><i @click="deleteInventoryStaff(inventory.id)"
+                                        class="fal fa-times text-red-400"></i></span>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -164,9 +169,11 @@
                 </label>
                 <!-- <input type="input" v-model="state" placeholder="State (Required)"
                     class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0"> -->
-                <select name="" id="" v-model="selectedState" class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0"
-                @change="stateSelectChanged(selectedState)">
-                    <option :value="state"  v-for="(state, stateIndex) in stateList" :key="stateIndex"> {{ state.name }} </option>
+                <select name="" id="" v-model="selectedState"
+                    class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0"
+                    @change="stateSelectChanged(selectedState)">
+                    <option :value="state" v-for="(state, stateIndex) in stateList" :key="stateIndex"> {{ state.name }}
+                    </option>
                 </select>
             </div>
             <div class="col-span-3 rounded-md mb-4 pb-6">
@@ -175,10 +182,12 @@
                 </label>
                 <!-- <input type="input" v-model="city" placeholder="City (Required)"
                     class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0"> -->
-                <select name="" id="" v-model="selectedCity" class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0"
-                @change="citySelectChanged(selectedCity)">
+                <select name="" id="" v-model="selectedCity"
+                    class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0"
+                    @change="citySelectChanged(selectedCity)">
                     <!-- <option value="City 1"> City 1 </option> -->
-                    <option :value="city" v-for="(city, cityIndex) in cityList" :key="cityIndex"> {{ city.name }} </option>
+                    <option :value="city" v-for="(city, cityIndex) in cityList" :key="cityIndex"> {{ city.name }}
+                    </option>
                 </select>
             </div>
             <div class="col-span-3 rounded-md mb-4 pb-6">
@@ -352,385 +361,375 @@
 </template>
 
 <script>
-    import { Modal, Ripple, initTE, Input, Select } from "tw-elements";
-    import { getApiData, postApiData, deleteApiData, putApiData } from '../../utilities/ajax-helpers';
-    import { mapGetters } from "vuex";
-    import { getCurrentDate } from "../../utilities/datetime-helpers";
+import { Modal, Ripple, initTE, Input, Select } from "tw-elements";
+import { getApiData, postApiData, deleteApiData, putApiData } from '../../utilities/ajax-helpers';
+import { mapGetters } from "vuex";
+import { getCurrentDate } from "../../utilities/datetime-helpers";
 
-    export default {
-        props: ["staffId"],
-        data() {
-            return {
-                staffList: [],
-                genderList: [],
-                departmentList: [],
-                roleList: [],
-                stateList: [],
-                selectedState: null,
-                cityList: [],
-                selectedCity: null,
+export default {
+    props: ["staffId"],
+    data() {
+        return {
+            staffList: [],
+            genderList: [],
+            departmentList: [],
+            roleList: [],
+            stateList: [],
+            selectedState: null,
+            cityList: [],
+            selectedCity: null,
 
-                name: null,
-                dob: null,
-                phoneNumber: null,
-                altPhoneNumber: null,
-                email: null,
-                fatherName: null,
-                motherName: null,
-                joinedDate: getCurrentDate(),
-                password: null,
-                selectedGender: null,
-                nrcNumber: null,
-                selectedDepartment: null,
-                roleSelected:[],
-                roleIds: [],
-                state: null,
-                city: null,
-                address: null,
-                zipCode: null,
+            name: null,
+            dob: null,
+            phoneNumber: null,
+            altPhoneNumber: null,
+            email: null,
+            fatherName: null,
+            motherName: null,
+            joinedDate: getCurrentDate(),
+            password: null,
+            selectedGender: null,
+            nrcNumber: null,
+            selectedDepartment: null,
+            roleSelected: [],
+            roleIds: [],
+            state: null,
+            city: null,
+            address: null,
+            zipCode: null,
 
-                primaryName: null,
-                primaryPhone: null,
-                primaryRelationship: null,
-                secondaryName: null,
-                secondaryPhone: null,
-                secondaryRelationship: null,
+            primaryName: null,
+            primaryPhone: null,
+            primaryRelationship: null,
+            secondaryName: null,
+            secondaryPhone: null,
+            secondaryRelationship: null,
 
-                inventories: [],
-                selectedInventories: [],
-                inventoryIds: [],
+            inventories: [],
+            selectedInventories: [],
+            inventoryIds: [],
 
-                staffDetailData:null,
-                staffRoles:null,
-                inventories:[],
-                roles:[]
-            };
+            staffDetailData: null,
+            staffRoles: null,
+            inventories: [],
+            roles: []
+        };
+    },
+
+    methods: {
+        ...mapGetters(['getToken']),
+
+
+        async getStaffDetail() {
+            let url = `/api/staffs/${this.staffId}`;
+            let response = await getApiData({ url: url, token: this.getToken() });
+            if (response.success == true) {
+                this.staffDetailData = response.data;
+                this.name = this.staffDetailData.name;
+                this.dob = this.staffDetailData.birthdate;
+                this.selectedGender = this.staffDetailData.gender;
+                this.nrcNumber = this.staffDetailData.nrc_number
+                this.fatherName = this.staffDetailData.father_name;
+                this.motherName = this.staffDetailData.mother_name;
+                this.email = this.staffDetailData.email;
+                this.phoneNumber = this.staffDetailData.phone_number;
+                this.altPhoneNumber = this.staffDetailData.alt_phone_number;
+                this.selectedDepartment = this.staffDetailData.department;
+                // this.departmentSelectChanged(this.selectedDepartment);
+                this.joinedDate = this.staffDetailData.joined_date;
+                // this.selectedState= this.stateList.find(item => item.name === this.staffDetailData.state);
+                // await this.stateSelectChanged(this.selectedState);
+                // this.selectedCity =this.cityList.find(city=>city.name == this.staffDetailData.city);
+                // this.citySelectChanged(this.selectedCity);
+                this.zipCode = this.staffDetailData.zip_code;
+                this.address = this.staffDetailData.address;
+                this.primaryName = this.staffDetailData.emergency_contacts[0].primary_name;
+                this.primaryPhone = this.staffDetailData.emergency_contacts[0].primary_phone;
+                this.primaryRelationship = this.staffDetailData.emergency_contacts[0].primary_relationship
+                this.secondaryName = this.staffDetailData.emergency_contacts[0].secondary_name;
+                this.secondaryPhone = this.staffDetailData.emergency_contacts[0].secondary_phone;
+                this.secondaryRelationship = this.staffDetailData.emergency_contacts[0].secondary_relationship;
+                this.inventories = this.staffDetailData.inventories;
+                this.roles = this.staffDetailData.roles;
+                this.state = this.staffDetailData.state;
+                this.city = this.staffDetailData.city;
+            }
         },
 
-        methods: {
-            ...mapGetters(['getToken']),
-
-
-            async getStaffDetail(){
-                let url = `/api/staffs/${this.staffId}`;
-                let response = await getApiData({url: url, token: this.getToken()});
-                if(response.success==true){
-                    this.staffDetailData = response.data;
-                    this.name = this.staffDetailData.name;
-                    this.dob = this.staffDetailData.birthdate;
-                    this.selectedGender = this.staffDetailData.gender;
-                    this.nrcNumber = this.staffDetailData.nrc_number
-                    this.fatherName = this.staffDetailData.father_name;
-                    this.motherName = this.staffDetailData.mother_name;
-                    this.email = this.staffDetailData.email;
-                    this.phoneNumber = this.staffDetailData.phone_number;
-                    this.altPhoneNumber = this.staffDetailData.alt_phone_number;
-                    this.selectedDepartment = this.staffDetailData.department;
-                    // this.departmentSelectChanged(this.selectedDepartment);
-                    this.joinedDate = this.staffDetailData.joined_date;
-                    // this.selectedState= this.stateList.find(item => item.name === this.staffDetailData.state);
-                    // await this.stateSelectChanged(this.selectedState);
-                    // this.selectedCity =this.cityList.find(city=>city.name == this.staffDetailData.city);
-                    // this.citySelectChanged(this.selectedCity);
-                    this.zipCode = this.staffDetailData.zip_code;
-                    this.address = this.staffDetailData.address;
-                    this.primaryName = this.staffDetailData.emergency_contacts[0].primary_name;
-                    this.primaryPhone = this.staffDetailData.emergency_contacts[0].primary_phone;
-                    this.primaryRelationship = this.staffDetailData.emergency_contacts[0].primary_relationship
-                    this.secondaryName = this.staffDetailData.emergency_contacts[0].secondary_name;
-                    this.secondaryPhone = this.staffDetailData.emergency_contacts[0].secondary_phone;
-                    this.secondaryRelationship = this.staffDetailData.emergency_contacts[0].secondary_relationship;
-                    this.inventories = this.staffDetailData.inventories;
-                    this.roles = this.staffDetailData.roles;
-                    this.state = this.staffDetailData.state;
-                    this.city = this.staffDetailData.city;
-                }
-            },
-
-            async deleteRoleStaff(role)
-            {
-                let response = await deleteApiData({url:`/api/staffs/${this.staffId}/roles/${role}`});
-                this.getStaffDetail();
-            },
-
-            async deleteInventoryStaff(inventory)
-            {
-                let response = await deleteApiData({url:`/api/staffs/${this.staffId}/inventories/${inventory}`});
-                this.getStaffDetail();
-            },
-
-            async getStateList(){
-                let response = await getApiData({url: `/api/mmrc/regions`});
-                if(response.data){
-                    this.stateList = response.data;
-                    if(this.state){
-                        let index = this.stateList.findIndex(state => state.name === this.state);
-                        if(index != -1){
-                            this.selectedState = this.stateList[index];
-                            this.stateSelectChanged(this.selectedState);
-                        }
-                    }
-                }
-            },
-
-            async stateSelectChanged(selectedState){
-                this.state = selectedState.name;
-                let response = await getApiData({url: `/api/mmrc/regions/${this.selectedState.id}`});
-                if(response.data){
-                    this.cityList = response.data.cities;
-                    if(this.city){
-                        let index = this.cityList.findIndex(city => city.name === this.city);
-                        if(index != -1){
-                            this.selectedCity = this.cityList[index];
-                        }
-                    }
-                }
-            },
-
-            citySelectChanged(city){
-                this.city = this.selectedCity.name;
-            },
-
-            async getGenderList(){
-                const response = await getApiData({ url: '/api/genders', token: this.getToken() });
-                if(response.data){
-                    this.genderList = response.data;
-                }
-            },
-
-            async getDepartmentList(){
-                const response = await getApiData({ url: '/api/departments' , token: this.getToken()});
-                if(response.data){
-                    this.departmentList = response.data;
-                }
-            },
-
-            async departmentSelectChanged(){
-                this.inventories = [];
-                let rolesResponse = await getApiData({ url: `/api/roles?department_id=${this.selectedDepartment.id}`, token: this.getToken() });
-                if(rolesResponse.data){
-                    this.roleList = rolesResponse.data;
-                }
-                if(this.selectedDepartment.name == 'Inventory'){
-                    let inventoriesResponse = await getApiData({url: `/api/inventories`, token: this.getToken()});
-                    if(inventoriesResponse.data){
-                        this.inventories = inventoriesResponse.data;
-                    }
-                }
-            },
-
-            async getRoleList(){
-                const response = await getApiData({ url: '/api/roles', token: this.getToken() });
-                if(response.data){
-                    this.roleList = response.data;
-                }
-            },
-
-            alertValiationMessage(field)
-            {
-                this.$notify({
-                    title: `Input validation`,
-                    text: `You forgot to privide ${field}, please try again`,
-                    type: "warn"
-                });
-            },
-
-            updateStaffBtnClicked(){
-                this.roleIds = [];
-                this.inventoryIds = [];
-                if(this.selectedInventories.length > 0){
-                    this.selectedInventories.forEach((inventory)=>{
-                        this.inventoryIds.push(inventory.id);
-                    });
-                }
-
-                this.roleSelected.forEach((item)=>{
-                    this.roleIds.push(item.id);
-                });
-
-                if(!this.name){
-                    this.alertValiationMessage('name');
-                    return 1;
-                }
-
-                if(!this.dob){
-                    this.alertValiationMessage('Date of Birth');
-                    return 1;
-                }
-
-                if(!this.selectedGender){
-                    this.alertValiationMessage('gender');
-                    return 1;
-                }
-
-                if(!this.nrcNumber){
-                    this.alertValiationMessage('Nrc');
-                    return 1;
-                }
-
-                if(!this.phoneNumber){
-                    this.alertValiationMessage('phone number');
-                    return 1;
-                }
-
-
-                if(!this.joinedDate){
-                    this.alertValiationMessage('joined date');
-                    return 1;
-                }
-                if(!this.selectedDepartment)
-                {
-                    this.alertValiationMessage('department');
-                    return 1;
-                }
-
-                // if(this.roleIds.length < 1){
-                //     this.alertValiationMessage('role');
-                //     return 1;
-                // }
-
-                if(!this.state){
-                    this.alertValiationMessage('state');
-                    return 1;
-                }
-
-                if(!this.city){
-                    this.alertValiationMessage('city');
-                    return 1;
-                }
-
-                if(!this.address){
-                    this.alertValiationMessage('address');
-                    return 1;
-                }
-
-                if(!this.primaryName){
-                    this.alertValiationMessage('primary name');
-                    return 1;
-                }
-
-                if(!this.primaryPhone){
-                    this.alertValiationMessage('primary phone');
-                    return 1;
-                }
-
-                if(!this.primaryRelationship){
-                    this.alertValiationMessage('primary relationship');
-                    return 1;
-                }
-
-                if(!this.secondaryName){
-                    this.alertValiationMessage('secondary name');
-                    return 1;
-                }
-
-                if(!this.secondaryPhone){
-                    this.alertValiationMessage('secondary phone');
-                    return 1;
-                }
-
-                if(!this.secondaryRelationship){
-                    this.alertValiationMessage('secondary relationship');
-                    return 1;
-                }
-
-
-                // console.log(this.roleIds);
-                // alert(`name = ${this.name}`);
-                // alert(`phone num = ${this.phoneNumber}`);
-                // alert(`password = ${this.password}`);
-                // alert(`nrc = ${this.nrcNumber}`);
-                // alert(`department = ${this.selectedDepartment.name}`);
-                // alert(`role = ${this.selectedRole.name}`);
-                // alert(`gender = ${this.selectedGender.name}`);
-                // alert(`address = ${this.address}`);
-                this.updateStaff();
-            },
-
-            async updateStaff()
-            {
-                let formData = new FormData();
-                formData.append('name', this.name);
-                formData.append('phone_number', this.phoneNumber);
-                if(this.nrcNumber){
-                    formData.append('nrc_number', this.nrcNumber);
-                }
-
-
-                if(this.fatherName)
-                {
-                    formData.append('father_name',this.fatherName);
-                }
-
-                if(this.motherName)
-                {
-                    formData.append('mother_name',this.motherName);
-                }
-
-                if(this.email)
-                {
-                    formData.append('email',this.email);
-                }
-
-                if(this.altPhoneNumber)
-                {
-                    formData.append('alt_phone_number',this.altPhoneNumber);
-                }
-
-                if(this.zipCode)
-                {
-                    formData.append('zip_code',this.zipCode);
-                }
-                formData.append('birthdate',this.dob);
-                formData.append('state',this.state);
-                formData.append('address',this.address);
-                formData.append('city',this.city);
-                formData.append('gender_id', this.selectedGender.id);
-                formData.append('department_id', this.selectedDepartment.id);
-                formData.append('inventoryIds', JSON.stringify(this.inventoryIds));
-                formData.append('password', this.password);
-                this.roleIds.forEach(roleId => {
-                    formData.append('roles[]', roleId);
-                });
-
-                formData.append('joined_date',this.joinedDate);
-
-                // for emegercy
-
-                formData.append('primary_name',this.primaryName);
-                formData.append('primary_phone',this.primaryPhone);
-                formData.append('primary_relationship',this.primaryRelationship);
-                formData.append('secondary_name',this.secondaryName);
-                formData.append('secondary_phone',this.secondaryPhone);
-                formData.append('secondary_relationship',this.secondaryRelationship);
-
-                let response = await postApiData({url: `/api/staffs/${this.staffId}`, form_data: formData, token: this.getToken()});
-                if(response.success){
-                    window.location.replace('/staff');
-                }
-                else{
-                    let message = `Some errors occured`;
-                    if(response.message){
-                        message = response.message;
-                    }
-                    this.$notify({
-                        text: message,
-                        type: "error"
-                    });
-                }
-            },
-        },
-
-        created(){
+        async deleteRoleStaff(role) {
+            let response = await deleteApiData({ url: `/api/staffs/${this.staffId}/roles/${role}` });
             this.getStaffDetail();
-            this.getGenderList();
-            this.getDepartmentList();
-            this.getRoleList();
-            this.getStateList();
         },
 
-        mounted(){
-            initTE({ Modal,Select, Ripple });
-        }
+        async deleteInventoryStaff(inventory) {
+            let response = await deleteApiData({ url: `/api/staffs/${this.staffId}/inventories/${inventory}` });
+            this.getStaffDetail();
+        },
+
+        async getStateList() {
+            let response = await getApiData({ url: `/api/mmrc/regions` });
+            if (response.data) {
+                this.stateList = response.data;
+                if (this.state) {
+                    let index = this.stateList.findIndex(state => state.name === this.state);
+                    if (index != -1) {
+                        this.selectedState = this.stateList[index];
+                        this.stateSelectChanged(this.selectedState);
+                    }
+                }
+            }
+        },
+
+        async stateSelectChanged(selectedState) {
+            this.state = selectedState.name;
+            let response = await getApiData({ url: `/api/mmrc/regions/${this.selectedState.id}` });
+            if (response.data) {
+                this.cityList = response.data.cities;
+                if (this.city) {
+                    let index = this.cityList.findIndex(city => city.name === this.city);
+                    if (index != -1) {
+                        this.selectedCity = this.cityList[index];
+                    }
+                }
+            }
+        },
+
+        citySelectChanged(city) {
+            this.city = this.selectedCity.name;
+        },
+
+        async getGenderList() {
+            const response = await getApiData({ url: '/api/genders', token: this.getToken() });
+            if (response.data) {
+                this.genderList = response.data;
+            }
+        },
+
+        async getDepartmentList() {
+            const response = await getApiData({ url: '/api/departments', token: this.getToken() });
+            if (response.data) {
+                this.departmentList = response.data;
+            }
+        },
+
+        async departmentSelectChanged() {
+            let rolesResponse = await getApiData({ url: `/api/roles?department_id=${this.selectedDepartment.id}`, token: this.getToken() });
+            if (rolesResponse.data) {
+                this.roleList = rolesResponse.data;
+            }
+        },
+
+        async getInventoryList() {
+            let response = await getApiData({ url: `/api/get_inventory`, token: this.getToken() });
+            if (response.data) {
+                this.inventories = response.data;
+            }
+        },
+        async getRoleList() {
+            const response = await getApiData({ url: '/api/roles', token: this.getToken() });
+            if (response.data) {
+                this.roleList = response.data;
+            }
+        },
+
+        alertValiationMessage(field) {
+            this.$notify({
+                title: `Input validation`,
+                text: `You forgot to privide ${field}, please try again`,
+                type: "warn"
+            });
+        },
+
+        updateStaffBtnClicked() {
+            this.roleIds = [];
+            this.inventoryIds = [];
+            if (this.selectedInventories.length > 0) {
+                this.selectedInventories.forEach((inventory) => {
+                    this.inventoryIds.push(inventory.id);
+                });
+            }
+
+            this.roleSelected.forEach((item) => {
+                this.roleIds.push(item.id);
+            });
+
+            if (!this.name) {
+                this.alertValiationMessage('name');
+                return 1;
+            }
+
+            if (!this.dob) {
+                this.alertValiationMessage('Date of Birth');
+                return 1;
+            }
+
+            if (!this.selectedGender) {
+                this.alertValiationMessage('gender');
+                return 1;
+            }
+
+            if (!this.nrcNumber) {
+                this.alertValiationMessage('Nrc');
+                return 1;
+            }
+
+            if (!this.phoneNumber) {
+                this.alertValiationMessage('phone number');
+                return 1;
+            }
+
+
+            if (!this.joinedDate) {
+                this.alertValiationMessage('joined date');
+                return 1;
+            }
+            if (!this.selectedDepartment) {
+                this.alertValiationMessage('department');
+                return 1;
+            }
+
+            // if(this.roleIds.length < 1){
+            //     this.alertValiationMessage('role');
+            //     return 1;
+            // }
+
+            if (!this.state) {
+                this.alertValiationMessage('state');
+                return 1;
+            }
+
+            if (!this.city) {
+                this.alertValiationMessage('city');
+                return 1;
+            }
+
+            if (!this.address) {
+                this.alertValiationMessage('address');
+                return 1;
+            }
+
+            if (!this.primaryName) {
+                this.alertValiationMessage('primary name');
+                return 1;
+            }
+
+            if (!this.primaryPhone) {
+                this.alertValiationMessage('primary phone');
+                return 1;
+            }
+
+            if (!this.primaryRelationship) {
+                this.alertValiationMessage('primary relationship');
+                return 1;
+            }
+
+            if (!this.secondaryName) {
+                this.alertValiationMessage('secondary name');
+                return 1;
+            }
+
+            if (!this.secondaryPhone) {
+                this.alertValiationMessage('secondary phone');
+                return 1;
+            }
+
+            if (!this.secondaryRelationship) {
+                this.alertValiationMessage('secondary relationship');
+                return 1;
+            }
+
+
+            // console.log(this.roleIds);
+            // alert(`name = ${this.name}`);
+            // alert(`phone num = ${this.phoneNumber}`);
+            // alert(`password = ${this.password}`);
+            // alert(`nrc = ${this.nrcNumber}`);
+            // alert(`department = ${this.selectedDepartment.name}`);
+            // alert(`role = ${this.selectedRole.name}`);
+            // alert(`gender = ${this.selectedGender.name}`);
+            // alert(`address = ${this.address}`);
+            this.updateStaff();
+        },
+
+        async updateStaff() {
+            let formData = new FormData();
+            formData.append('name', this.name);
+            formData.append('phone_number', this.phoneNumber);
+            if (this.nrcNumber) {
+                formData.append('nrc_number', this.nrcNumber);
+            }
+
+
+            if (this.fatherName) {
+                formData.append('father_name', this.fatherName);
+            }
+
+            if (this.motherName) {
+                formData.append('mother_name', this.motherName);
+            }
+
+            if (this.email) {
+                formData.append('email', this.email);
+            }
+
+            if (this.altPhoneNumber) {
+                formData.append('alt_phone_number', this.altPhoneNumber);
+            }
+
+            if (this.zipCode) {
+                formData.append('zip_code', this.zipCode);
+            }
+            formData.append('birthdate', this.dob);
+            formData.append('state', this.state);
+            formData.append('address', this.address);
+            formData.append('city', this.city);
+            formData.append('gender_id', this.selectedGender.id);
+            formData.append('department_id', this.selectedDepartment.id);
+            formData.append('inventoryIds', JSON.stringify(this.inventoryIds));
+            formData.append('password', this.password);
+            this.roleIds.forEach(roleId => {
+                formData.append('roles[]', roleId);
+            });
+
+            formData.append('joined_date', this.joinedDate);
+
+            // for emegercy
+
+            formData.append('primary_name', this.primaryName);
+            formData.append('primary_phone', this.primaryPhone);
+            formData.append('primary_relationship', this.primaryRelationship);
+            formData.append('secondary_name', this.secondaryName);
+            formData.append('secondary_phone', this.secondaryPhone);
+            formData.append('secondary_relationship', this.secondaryRelationship);
+
+            let response = await postApiData({ url: `/api/staffs/${this.staffId}`, form_data: formData, token: this.getToken() });
+            if (response.success) {
+                window.location.replace('/staff');
+            }
+            else {
+                let message = `Some errors occured`;
+                if (response.message) {
+                    message = response.message;
+                }
+                this.$notify({
+                    text: message,
+                    type: "error"
+                });
+            }
+        },
+    },
+
+    created() {
+        this.getStaffDetail();
+        this.getGenderList();
+        this.getDepartmentList();
+        this.getRoleList();
+        this.getInventoryList();
+        this.getStateList();
+    },
+
+    mounted() {
+        initTE({ Modal, Select, Ripple });
     }
+}
 </script>

@@ -48,6 +48,7 @@ Route::middleware(['departments:HR'])->group(function () {
     Route::view('/services', 'services.index')->name('services');
 
     Route::view('/items', 'items.index')->name('items');
+    Route::view('/uoms', 'item_uoms.index')->name('uoms');
     Route::view('/menus', 'menus.index')->name('menus');
     Route::view('/menus/create', 'menus.create')->name('menus.create');
 
@@ -71,6 +72,10 @@ Route::middleware(['departments:Inventory'])->group(function () {
 });
 
 Route::middleware(['departments:Finance'])->group(function () {
+    Route::view('/suppliers', 'supplier.index')->name('suppliers.index');
+    Route::view('/suppliers/create', 'supplier.create')->name('suppliers.create');
+    Route::view('/suppliers/{id}/edit', 'supplier.edit')->name('suppliers.edit');
+
     Route::view('/accounting', 'accounting.index')->name('accountings');
     Route::view('/financial_transaction', 'financial_transaction.index')->name('financial_transactions');
 
@@ -87,18 +92,13 @@ Route::middleware(['departments:Finance'])->group(function () {
     Route::view('/bankbook/kbz_old_gm', 'cashbook.bank_kbz_old_gm')->name('kbz_old_gm_bank');
     Route::view('/bankbook/kpay', 'cashbook.bank_kpay')->name('kpay_bank');
 
+    Route::view('/fixed_assets', 'fixed_assets.index')->name('fixed_assets.index');
 });
 
 Route::middleware(['departments:all_departments'])->group(function () {
     Route::view('/inventory_transfers_list', 'transfers.transfers_list')->name('transfers.transfers');
     Route::view('/inventory_receives_list', 'transfers.receives_list')->name('transfers.receives');
 });
-
-Route::view('/suppliers', 'supplier.index')->name('suppliers.index');
-Route::view('/suppliers/create', 'supplier.create')->name('suppliers.create');
-Route::view('/suppliers/{id}/edit', 'supplier.edit')->name('suppliers.edit');
-
-Route::view('/fixed_assets', 'fixed_assets.index')->name('fixed_assets.index');
 
 //pos
 Route::group(['prefix' => 'pos'], function () {

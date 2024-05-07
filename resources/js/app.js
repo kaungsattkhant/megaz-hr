@@ -54,6 +54,7 @@ import ItemCrudComponent from './Components/Items/ItemCrudComponent.vue';
 import ItemUsageForecastListComponent from './Components/ItemUsageForecastings/ItemUsageForecastListComponent.vue';
 import ItemUsageForecastCreateComponent from './Components/ItemUsageForecastings/ItemUsageForecastCreateComponent.vue';
 import ItemUsageForecastDetailComponent from './Components/ItemUsageForecastings/ItemUsageForecastDetailComponent.vue';
+import UomCrudComponent from './Components/ItemUom/UomCrudComponent.vue';
 import AccountingCrudComponent from './Components/Accounting/AccountingCrudComponent.vue';
 import FinancialTransactionCrudComponent from './Components/FinancialTransaction/FinancialTransactionCrudComponent.vue';
 import CashbookCrudComponent from './Components/Cashbook/CashbookCrudComponent.vue';
@@ -93,7 +94,6 @@ app.component('InventoriesCrudComponent', InventoriesCrudComponent);
 app.component('RoomCrudComponent', RoomCrudComponent);
 app.component('ServicesCrudComponent', ServicesCrudComponent);
 app.component('InventoryLedgersComponent', InventoryLedgersComponent);
-//InventoryTransfersListComponent
 app.component('InventoryReceivesListComponent', InventoryReceivesListComponent);
 app.component('InventoryTransfersListComponent', InventoryTransfersListComponent);
 app.component('MenuListComponent', MenuListComponent);
@@ -117,6 +117,7 @@ app.component('ItemCrudComponent', ItemCrudComponent);
 app.component('ItemUsageForecastListComponent', ItemUsageForecastListComponent);
 app.component('ItemUsageForecastCreateComponent', ItemUsageForecastCreateComponent);
 app.component('ItemUsageForecastDetailComponent', ItemUsageForecastDetailComponent);
+app.component('UomCrudComponent', UomCrudComponent);
 app.component('TableCrudComponent', TableCrudComponent);
 
 
