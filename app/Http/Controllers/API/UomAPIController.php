@@ -47,5 +47,11 @@ class UomAPIController extends Controller
 
     }
 
+    public function getUomConversionList(Request $request)
+    {
+        $uomConversions = $this->uomRepo->uomConversaionList($request);
+        ResponseData($uomConversions);
+    }
+
 
 }
