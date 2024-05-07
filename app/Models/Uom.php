@@ -9,11 +9,17 @@ class Uom extends Model
 {
     use HasFactory;
     protected $fillable=[
-        'name','is_active'
+        'name','is_active','created_by',
     ];
 
     public function items()
     {
         return $this->belongsToMany(Uom::class,'items_uoms', 'item_id', 'uom_id');
     }
+
+    public function createdStaff()
+    {
+        return $this->belongsTo(Staff::class,'created_by');
+    }
+
 }
