@@ -250,6 +250,12 @@
                             </li>
                         @endif
                         <li>
+                            <a href="{{ route('transfers.index') }}" class="flex items-center @yield('inventory_histories')">
+                                <i class="fal fa-user  pr-3"></i>
+                                Inventory Transfer Histories
+                            </a>
+                        </li>
+                        <li>
                             <a href="{{ route('transfers.receives') }}" class="flex items-center @yield('inventory_receives')">
                                 <i class="fal fa-user  pr-3"></i>
                                 Inventory Receives List

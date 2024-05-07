@@ -27,10 +27,10 @@
                                 #
                             </th>
                             <th scope="col" class=" px-6 py-4 ">
-                                Source Unit
+                                Base Unit
                             </th>
                             <th scope="col" class=" px-6 py-4 ">
-                                Target Unit
+                                Conversion Unit
                             </th>
                             <th scope="col" class=" px-6 py-4 ">
                                 Conversion
@@ -173,21 +173,21 @@
                 <div class="relative px-12 py-4" data-te-modal-body-ref>
                     <div class="mb-4">
                         <label for="" class="block text-sm text-black mb-3">
-                            Source Unit
+                            Base Unit
                         </label>
-                        <input type="text" placeholder="Unit" class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
+                        <input type="text" placeholder="Unit" v-model="baseUnit" class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
                     </div>
                     <div class="mb-4">
                         <label for="" class="block text-sm text-black mb-3">
-                            Target Unit
+                            Conversion Unit
                         </label>
-                        <input type="text" placeholder="Unit" class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
+                        <input type="text" placeholder="Unit" v-model="conversionUnit" class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
                     </div>
                     <div class="mb-4">
                         <label for="" class="block text-sm text-black mb-3">
                             Conversion Rate
                         </label>
-                        <input type="number" placeholder="Conversion rate" class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
+                        <input type="number" placeholder="Conversion rate" v-model="conversionRate" class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
                     </div>
                 </div>
 
@@ -213,6 +213,10 @@ export default {
         return {
             uomList: [],
 
+            baseUnit: null,
+            conversionUnit: null,
+            conversionRate: null,
+
             per_page: 20,
             currentPage: 1,
             pageNumbers: [],
@@ -235,14 +239,33 @@ export default {
             }
         },
 
+        alertValiationMessage(field) {
+            this.$notify({
+                title: `Input validation`,
+                text: `You forgot to privide ${field}, please try again`,
+                type: "warn"
+            });
+        },
+
         async createBtnClicked() {
+            if(!this.baseUnit){
+                this.alertValiationMessage(`base unit`);
+                return 1;
+            }
+            if(!this.conversionUnit){
+                this.alertValiationMessage(`conversion unit`);
+                return 1;
+            }
+            if(!this.conversionRate){
+                this.alertValiationMessage(`conversion rate`);
+                return 1;
+            }
             let url = `/api/uoms`;
-            // let formData = new FormData();
-            // let seletedUOMs = [this.selectedUOM.id];
-            // formData.append('uoms', JSON.stringify(seletedUOMs));
-            // formData.append('name', this.name);
-            // formData.append('price', this.price);
-            // formData.append('category_id', this.selectedCategory.id);
+            let formData = new FormData();
+            formData.append('base_unit_name', this.baseUnit);
+            formData.append('conversion_unit_name', this.conversionUnit);
+            formData.append('conversion', this.conversionRate);
+
             // let response = await postApiData({url: url, form_data: formData, token: this.getToken()});
             // if(response.success){
             // this.getUomList(this.currentPage);
