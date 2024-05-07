@@ -42,25 +42,25 @@
                     </thead>
                     <tbody>
                         <!-- looping start -->
-                        <!-- <div class="contents" v-for="(item, itemIndex) in itemList" :key="itemIndex">
+                        <div class="contents" v-for="(uom, itemIndex) in uomList" :key="itemIndex">
                             <tr class="bg-white rounded-lg overflow-hidden shadow-lg">
                                 <td class=" px-6 py-4 font-medium ">
                                     {{ per_page * (currentPage - 1) + (++itemIndex) }}
                                 </td>
                                 <td class="whitespace-nowrap px-6 py-4 ">
-                                    {{ item.name }}
+                                    {{ uom.base_unit.name }}
                                 </td>
                                 <td class="whitespace-nowrap px-6 py-4 ">
-                                    {{ item.item_prices.price }}
+                                    {{ uom.conversion_unit.name }}
                                 </td>
                                 <td class="whitespace-nowrap px-6 py-4 ">
-                                    {{ item.category.name }}
+                                    {{ uom.conversion }}
                                 </td>
                                 <td class="whitespace-nowrap px-6 py-4">
                                     <button id="edit-btn" class="pr-1">
-                                        <i class="fas fa-trash-alt"></i>
+                                        <i class="fas fa-pencil-alt" @click="editBtnClicked(uom)" data-te-toggle="modal" data-te-target="#edit_modal"></i>
                                     </button>
-                                    <input
+                                    <!-- <input
                                     :checked="item.is_active == 1"
                                     @change="isActiveToggled(item.id)"
                                     class="me-2 mt-[0.3rem] h-3.5 w-8 appearance-none rounded-[0.4375rem] bg-black/25 before:pointer-events-none before:absolute before:h-3.5
@@ -74,14 +74,14 @@
                                     checked:focus:border-primary checked:focus:bg-primary checked:focus:before:ms-[1.0625rem] checked:focus:before:scale-100 checked:focus:before:shadow-switch-3
                                     checked:focus:before:transition-[box-shadow_0.2s,transform_0.2s] dark:bg-white/25 dark:after:bg-surface-dark dark:checked:bg-primary dark:checked:after:bg-primary"
                                     type="checkbox"
-                                    role="switch"/>
+                                    role="switch"/> -->
                                 </td>
                             </tr>
 
                             <tr class="">
                                 <td class=" py-2 "></td>
                             </tr>
-                        </div> -->
+                        </div>
 
                         <!-- looping end -->
                     </tbody>
@@ -145,6 +145,7 @@
             </div>
         </div>
     </div>
+
     <!-- Modal -->
     <div data-te-modal-init
         class="fixed left-0 top-0 z-[1055] hidden h-full w-full overflow-y-auto overflow-x-hidden outline-none"
@@ -193,9 +194,66 @@
 
                 <!--Modal footer-->
                 <div class="flex justify-center px-12 mb-6">
-                    <button type="button" class="add-btn focus:outline-none focus:ring-0 " @click="createBtnClicked"
+                    <button type="button" class="add-btn focus:outline-none focus:ring-0 " @click="confirmCreateBtnClicked"
                         data-te-modal-dismiss>
                         Create
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal -->
+    <div data-te-modal-init
+        class="fixed left-0 top-0 z-[1055] hidden h-full w-full overflow-y-auto overflow-x-hidden outline-none"
+        id="edit_modal" tabindex="-1" aria-labelledby="create_modalLabel" aria-hidden="true">
+        <div data-te-modal-dialog-ref
+            class="pointer-events-none relative w-auto mb-12 translate-y-[-50px] opacity-0 transition-all duration-300 ease-in-out min-[576px]:mx-auto min-[576px]:mt-7 min-[576px]:max-w-[500px]">
+            <div
+                class="min-[576px]:shadow-[0_0.5rem_1rem_rgba(#000, 0.15)] pointer-events-auto relative flex w-full flex-col rounded-md border-none bg-white bg-clip-padding text-current shadow-lg outline-none">
+
+                <div class="relative  p-4">
+                    <!--Modal title-->
+                    <h5 class="text-xl text-center mt-2 font-medium leading-normal text-black" id="create_modalLabel">
+                        Edit UOM
+                    </h5>
+                    <!--Close button-->
+                    <button type="button" class="absolute top-4 right-4 focus:shadow-none focus:outline-none"
+                        data-te-modal-dismiss aria-label="Close">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                            stroke="currentColor" class="h-5 w-5">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </button>
+                </div>
+
+                <!--Modal body-->
+                <div class="relative px-12 py-4" data-te-modal-body-ref>
+                    <div class="mb-4">
+                        <label for="" class="block text-sm text-black mb-3">
+                            Base Unit
+                        </label>
+                        <input type="text" placeholder="Unit" v-model="baseUnit" class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
+                    </div>
+                    <div class="mb-4">
+                        <label for="" class="block text-sm text-black mb-3">
+                            Conversion Unit
+                        </label>
+                        <input type="text" placeholder="Unit" v-model="conversionUnit" class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
+                    </div>
+                    <div class="mb-4">
+                        <label for="" class="block text-sm text-black mb-3">
+                            Conversion Rate
+                        </label>
+                        <input type="number" placeholder="Conversion rate" v-model="conversionRate" class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
+                    </div>
+                </div>
+
+                <!--Modal footer-->
+                <div class="flex justify-center px-12 mb-6">
+                    <button type="button" class="add-btn focus:outline-none focus:ring-0 " @click="confirmEditBtnClicked"
+                        data-te-modal-dismiss>
+                        Edit
                     </button>
                 </div>
             </div>
@@ -205,7 +263,7 @@
 
 <script>
 import { Modal, Ripple, initTE, Select, Dropdown } from "tw-elements";
-import { getApiData, postApiData, deleteApiData } from '../../utilities/ajax-helpers';
+import { getApiData, postApiData, putApiData, deleteApiData } from '../../utilities/ajax-helpers';
 import { mapGetters } from "vuex";
 
 export default {
@@ -216,6 +274,9 @@ export default {
             baseUnit: null,
             conversionUnit: null,
             conversionRate: null,
+
+            baseUnitId: null,
+            conversionUnitId: null,
 
             per_page: 20,
             currentPage: 1,
@@ -231,23 +292,47 @@ export default {
     methods: {
         ...mapGetters(['getToken']),
 
-        async getUomList() {
-            let url = `/api/uoms`;
+        async getUomList(pageNumber) {
+            if (pageNumber) {
+                this.currentPage = pageNumber;
+            }
+            let url = `/api/uom_conversions?page=${this.currentPage}`;
             let response = await getApiData({ url: url, token: this.getToken() });
             if (response.data) {
-                this.uomList = response.data;
+                this.uomList = response.data.uoms;
+                this.per_page = response.data.per_page;
+
+                this.pageNumbers = [];
+                this.lastPageNumber = response.data.last_page;
+
+                for (let i = 1; i <= response.data.last_page; i++) {
+                    this.pageNumbers.push(i);
+                }
+
+                if (this.pageNumbers.length > 10) {
+                    this.groupedPageNumbers = [];
+                    this.paginationGroupsCount = this.pageNumbers.length % 10;
+                    for (let i = 0; i < this.pageNumbers.length; i += 10) {
+                        let chunk = this.pageNumbers.slice(i, i + 10);
+                        this.groupedPageNumbers.push(chunk);
+                    }
+
+                    let lastGroupIndex = this.groupedPageNumbers.length - 1;
+                    this.isFirstGroup = (this.currentGroup === 0);
+                    this.isLastGroup = (lastGroupIndex === this.currentGroup);
+                }
             }
         },
 
         alertValiationMessage(field) {
             this.$notify({
                 title: `Input validation`,
-                text: `You forgot to privide ${field}, please try again`,
+                text: `You forgot to provide ${field}, please try again`,
                 type: "warn"
             });
         },
 
-        async createBtnClicked() {
+        async confirmCreateBtnClicked() {
             if(!this.baseUnit){
                 this.alertValiationMessage(`base unit`);
                 return 1;
@@ -260,17 +345,46 @@ export default {
                 this.alertValiationMessage(`conversion rate`);
                 return 1;
             }
-            let url = `/api/uoms`;
+            let url = `/api/uom_conversions`;
             let formData = new FormData();
             formData.append('base_unit_name', this.baseUnit);
             formData.append('conversion_unit_name', this.conversionUnit);
             formData.append('conversion', this.conversionRate);
 
-            // let response = await postApiData({url: url, form_data: formData, token: this.getToken()});
-            // if(response.success){
-            // this.getUomList(this.currentPage);
-            //     window.location.reload();
-            // }
+            let response = await postApiData({url: url, form_data: formData, token: this.getToken()});
+            if(response.success){
+                this.getUomList(this.currentPage);
+                this.baseUnit = null;
+                this.conversionUnit = null;
+                this.conversionRate = null;
+                // window.location.reload();
+            }
+        },
+
+        editBtnClicked(uom){
+            this.baseUnitId = uom.base_unit_id;
+            this.conversionUnitId = uom.conversion_unit_id;
+            this.baseUnit = uom.base_unit.name;
+            this.conversionUnit = uom.conversion_unit.name;
+            this.conversionRate = uom.conversion;
+        },
+
+        async confirmEditBtnClicked(){
+            let url = `/api/uom_conversions/update`;
+            let formData = new FormData();
+            formData.append('base_unit_id', this.baseUnitId);
+            formData.append('conversion_unit_id', this.conversionUnitId);
+            formData.append('conversion', this.conversionRate);
+            formData.append('base_unit_name', this.baseUnit);
+            formData.append('conversion_unit_name', this.conversionUnit);
+            let response = await postApiData({url: url, form_data: formData, token: this.getToken()});
+            if(response.success){
+                this.getUomList(this.currentPage);
+                this.baseUnit = null;
+                this.conversionUnit = null;
+                this.conversionRate = null;
+                // window.location.reload();
+            }
         },
 
         isActiveToggled(id) {
@@ -330,7 +444,7 @@ export default {
     },
 
     created() {
-        this.getUomList();
+        this.getUomList(null);
     },
 
     mounted() {

@@ -450,7 +450,7 @@ export default {
         alertValiationMessage(field) {
             this.$notify({
                 title: `Input validation`,
-                text: `You forgot to privide ${field}, please try again`,
+                text: `You forgot to provide ${field}, please try again`,
                 type: "warn"
             });
         },
