@@ -29,9 +29,9 @@ class UomAPIController extends Controller
         ResponseData($uom );
     }
 
-    public function updateUom(UomUpdateRequest $request,int $id)
+    public function updateUomConversion(UomUpdateRequest $request)
     {
-        $uom = $this->uomRepo->updateData($request->all(),$id);
+        $uom = $this->uomRepo->updateUomConversion($request->all());
         ResponseData($uom);
     }
 
