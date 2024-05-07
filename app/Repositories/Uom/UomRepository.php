@@ -71,7 +71,6 @@ class UomRepository implements UomRepositoryInterface
             $data['created_by'] = UserData()->id;
             $uomConversion = UomConversion::create($data);
             DB::commit();
-
             $uomConversion = UomConversion::with('baseUnit', 'conversionUnit')->find($uomConversion->id);
             return $uomConversion;
         } catch (\Exception $e) {
@@ -88,6 +87,7 @@ class UomRepository implements UomRepositoryInterface
             $data['created_by'] = UserData()->id;
             $data['name'] = $name;
             $uom = Uom::create($data);
+            DB::commit();
             return $uom;
         } catch (\Exception $e) {
             DB::rollback();
