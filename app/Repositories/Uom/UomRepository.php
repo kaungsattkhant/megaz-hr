@@ -36,7 +36,7 @@ class UomRepository implements UomRepositoryInterface
     public function uomConversaionList(Request $request)
     {
         if ($request->per_page || $request->page) {
-            $totalCount = UomConversion::with('baseUnit','conversionUnit')->count();
+            $totalCount = UomConversion::with('baseUnit', 'conversionUnit')->count();
             $pageNumber = 1;
             $perPage = 20;
             if ($request->page) {
@@ -46,13 +46,13 @@ class UomRepository implements UomRepositoryInterface
                 $perPage = $request->per_page;
             }
             $skip = ($pageNumber - 1) * $perPage;
-            $uoms = UomConversion::with('baseUnit','conversionUnit')->skip($skip)->take($perPage)->get();
+            $uoms = UomConversion::with('baseUnit', 'conversionUnit')->skip($skip)->take($perPage)->get();
             $paginationData = MakePaginationData($request, $totalCount, 'uoms');
             $paginationData['uoms'] = $uoms;
 
             return $paginationData;
         } else {
-            $uoms = UomConversion::with('baseUnit','conversionUnit')->get();
+            $uoms = UomConversion::with('baseUnit', 'conversionUnit')->get();
             return $uoms;
         }
     }
@@ -96,13 +96,39 @@ class UomRepository implements UomRepositoryInterface
         }
     }
 
-    public function updateData(array $data, int $id)
+    public function updateUomConversion($data)
     {
-        $uom = Uom::find($id);
-        if ($uom) {
-            $uom->update($data);
+        DB::beginTransaction();
+        try {
+            $baseUnitUom = $this->updateData($data['base_unit_name'], $data['base_unit_id']);
+            $conversionUom = $this->updateData($data['conversion_unit_name'], $data['conversion_unit_id']);
+            $uomConversion = UomConversion::where('base_unit_id', $data['base_unit_id'])->where('conversion_unit_id', $data['conversion_unit_id'])->first();
+            $uomConversion->update($data);
+            DB::commit();
+            return $uomConversion;
+        } catch (\Exception $e) {
+            DB::rollBack();
+            ResponseMEssage($e->getMessage(), 402);
+            throw $e;
         }
-        return $uom;
+    }
+
+    public function updateData(string $name, int $id)
+    {
+        DB::beginTransaction();
+        try {
+            $uom = Uom::find($id);
+            if ($uom) {
+                $uom->name = $name;
+                $uom->save();
+                DB::commit();
+            }
+            return $uom;
+        } catch (\Exception $e) {
+            DB::rollBack();
+            ResponseMessage($e->getMessage(), 402);
+            throw $e;
+        }
     }
 
     public function deleteData(int $id)
