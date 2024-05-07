@@ -8,7 +8,7 @@ interface UomRepositoryInterface
 {
     public function listAllData(Request $request);
 
-    public function createData(array $data);
+    public function createUomConversion(array $data);
 
     public function updateData(array $data,int $id);
 

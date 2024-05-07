@@ -11,11 +11,13 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('uoms', function (Blueprint $table) {
+        Schema::create('uom_conversions', function (Blueprint $table) {
             $table->id();
-            $table->string('name',45);
+            $table->unsignedBigInteger('base_unit_id')->constrained()->onDelete('cascade');
+            $table->unsignedBigInteger('conversion_unit_id')->constrained()->onDelete('cascade');
+            $table->double('conversion');
+            $table->boolean('is_active')->default(1);
             $table->unsignedBigInteger('created_by');
-            $table->boolean('is_active',0)->default(1);
             $table->timestamps();
         });
     }
@@ -25,6 +27,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('uoms');
+        Schema::dropIfExists('uom_conversions');
     }
 };

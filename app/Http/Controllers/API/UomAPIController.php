@@ -25,7 +25,7 @@ class UomAPIController extends Controller
 
     public function createUom(UomCreateRequest $request)
     {
-        $uom = $this->uomRepo->createData($request->all());
+        $uom = $this->uomRepo->createUomConversion($request->all());
         ResponseData($uom );
     }
 
