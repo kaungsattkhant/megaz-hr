@@ -219,6 +219,7 @@ Route::get('/uoms', [UomAPIController::class, 'getUomData']);
 Route::post('/uoms', [UomAPIController::class, 'createUom']);
 Route::put('/uoms/{id}', [UomAPIController::class, 'updateUom']);
 Route::delete('/uoms/{id}', [UomAPIController::class, 'deleteUom']);
+Route::get('/uom_conversions',[UomAPIController::class,'getUomConversionList']);
 
 Route::get('/items', [ItemAPIController::class, 'getItemData']);
 Route::post('/items', [ItemAPIController::class, 'createItem']);

@@ -33,7 +33,7 @@ class Invoice extends Model
         return $this->hasMany(Order::class);
     }
 
-    public function entity()
+    public function room()
     {
         return $this->belongsTo(Entity::class,'entity_id');
     }
