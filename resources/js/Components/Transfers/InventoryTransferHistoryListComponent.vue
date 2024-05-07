@@ -24,7 +24,10 @@
                                 Transfer Id
                             </th>
                             <th scope="col" class=" px-6 py-4 ">
-                                Date
+                                Created Date
+                            </th>
+                            <th scope="col" class=" px-6 py-4 ">
+                                Confirmed Date
                             </th>
                             <th scope="col" class=" px-6 py-4 ">
                                 Source Inventory
@@ -42,56 +45,54 @@
                                 Trasnferred By
                             </th>
                             <th scope="col" class=" px-6 py-4 ">
-                                Status
+                                Received By
                             </th>
-                            <th scope="col" class="px-6 py-4">
+                            <!-- <th scope="col" class="px-6 py-4">
 
-                            </th>
+                            </th> -->
                         </tr>
                     </thead>
                     <tbody>
 
                         <!-- looping start -->
-                        <!-- <div class="contents" v-for="(receive, index) in receivesList" :key="index">
+                        <div class="contents" v-for="(transfer, index) in transferList" :key="index">
                             <tr class="bg-white rounded-lg overflow-hidden shadow-lg">
                                 <td class=" px-6 py-4 font-medium ">
                                     {{ per_page * (currentPage - 1) + (++index) }}
                                 </td>
                                 <td class="whitespace-nowrap px-6 py-4 ">
-                                    {{ receive.transfer_id }}
+                                    {{ transfer.transfer_id }}
                                 </td>
                                 <td class="whitespace-nowrap px-6 py-4 ">
-                                    {{ receive.date }}
+                                    {{ transfer.date }}
+                                </td>
+                                <td class="whitespace-nowrap px-6 py-4 ">
+                                    {{ transfer.confirmed_date }}
                                 </td>
                                 <td class=" px-6 py-4 ">
-                                    {{ receive.source_inventory.name }}
+                                    {{ transfer.source_inventory.name }}
                                 </td>
                                 <td class=" px-6 py-4 ">
-                                    {{ receive.destination_inventory.name }}
+                                    {{ transfer.destination_inventory.name }}
                                 </td>
                                 <td class="whitespace-nowrap px-6 py-4 ">
-                                    {{ receive.item.name }}
+                                    {{ transfer.item.name }}
                                 </td>
                                 <td class="whitespace-nowrap px-6 py-4 ">
-                                    {{ receive.quantity }}
+                                    {{ transfer.quantity }}
                                 </td>
                                 <td class="whitespace-nowrap px-6 py-4 ">
-                                    {{ receive.created_by.name }}
+                                    {{ transfer.created_by.name }}
                                 </td>
                                 <td class="whitespace-nowrap px-6 py-4 ">
-                                    {{ receive.status }}
-                                </td>
-                                <td class="whitespace-nowrap px-6 py-4">
-                                    <button data-te-toggle="modal" data-te-target="#confirmModal" :disabled=" receive.status != 'pending'" @click="receiveBtnClicked(receive.id)">
-                                        <i class="fal fa-bars"></i>
-                                    </button>
+                                    <div v-if="transfer.confirmed_by"> {{ transfer.confirmed_by.name }} </div>
                                 </td>
                             </tr>
 
                             <tr class="">
                                 <td class=" py-2 "></td>
                             </tr>
-                        </div> -->
+                        </div>
 
                         <!-- looping end -->
                     </tbody>
@@ -167,7 +168,7 @@ export default {
     data() {
         return {
             transferList: [],
-            receiveId: null,
+            transferId: null,
 
             per_page: 20,
             pageNumbers: [],
@@ -193,9 +194,11 @@ export default {
             if (response.data) {
                 this.transferList = response.data.data;
                 console.log(this.transferList);
-                this.transferList.forEach((receive) => {
+                this.transferList.forEach((transfer) => {
                     transfer.date = convertToFriendlyDate(transfer.date);
-                    transfer.confirmed_date = convertToFriendlyDate(transfer.confirmed_at);
+                    if(transfer.confirmed_at){
+                        transfer.confirmed_date = convertToFriendlyDate(transfer.confirmed_at);
+                    }
                 });
                 this.per_page = response.data.per_page;
 
@@ -218,19 +221,6 @@ export default {
                     this.isFirstGroup = (this.currentGroup === 0);
                     this.isLastGroup = (lastGroupIndex === this.currentGroup);
                 }
-            }
-        },
-
-        receiveBtnClicked(id) {
-            this.receiveId = id;
-        },
-
-        async confirmReceiveBtnClicked() {
-            let url = `/api/confirm_transfer_item?id=${this.receiveId}`;
-            let response = await getApiData({ url: url, token: this.getToken() });
-            if (response.success) {
-                this.transferList = [];
-                this.getInventoryTransferHistoryList(this.currentPage);
             }
         },
 
