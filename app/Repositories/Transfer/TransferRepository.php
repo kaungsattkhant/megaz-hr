@@ -142,6 +142,7 @@ class TransferRepository implements TransferRepositoryInterface
                     $transfer->status = 'complete';
                     $transfer->save();
                     #store inventory
+                    
                     #out
                     $inventoryId = $transfer->source_inventory_id;
                     $inventoryLedger = (new StoreInventory($inventoryId))->storeToInventoryLedger($transfer, 'transfer', 'out');
