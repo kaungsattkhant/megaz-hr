@@ -23,9 +23,7 @@ class UomCreateRequest extends FormRequest
     {
         return [
             //
-            "base_unit_name" => "required",
-            "conversion_unit_name" => "required",
-            'conversion' => 'required',
+            "name" => 'required'
         ];
     }
 }

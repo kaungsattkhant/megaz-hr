@@ -33,6 +33,57 @@ class UomRepository implements UomRepositoryInterface
         }
     }
 
+    public function createUom(array $data)
+    {
+        DB::beginTransaction();
+        try {
+            $data['created_by'] = UserData()->id;
+            $data['name'] = $data['name'];
+            $uom = Uom::firstOrCreate(['name' => $data['name']], $data);
+            DB::commit();
+            return $uom;
+        } catch (\Exception $e) {
+            DB::rollback();
+            ResponseMessage($e->getMessage(), 402);
+            throw $e;
+        }
+    }
+
+    public function updateData(array $data, int $id)
+    {
+        DB::beginTransaction();
+        try {
+            $uom = Uom::find($id);
+            if ($uom) {
+                $uom->name = $data['name'];
+                $uom->save();
+                DB::commit();
+                return $uom;
+            } else {
+                ResponseMessage("Uom not found", 404);
+            }
+        } catch (\Exception $e) {
+            DB::rollBack();
+            ResponseMessage($e->getMessage(), 402);
+            throw $e;
+        }
+    }
+
+    public function deleteData(int $id)
+    {
+        $uom = Uom::find($id);
+        if ($uom) {
+            $uom->is_active = 0;
+            $uom->save();
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    // uom conversion
+
+
     public function uomConversaionList(Request $request)
     {
         if ($request->per_page || $request->page) {
@@ -61,17 +112,9 @@ class UomRepository implements UomRepositoryInterface
     {
         DB::beginTransaction();
         try {
-            $baseUnitUom = $this->createUom($data['base_unit_name']);
-            $conversionUom = $this->createUom($data['conversion_unit_name']);
-
-            $data['base_unit_id'] = $baseUnitUom->id;
-            $data['conversion_unit_id'] = $conversionUom->id;
-
-            $data['converstion'] = $data['conversion'];
             $data['created_by'] = UserData()->id;
             $uomConversion = UomConversion::create($data);
             DB::commit();
-            $uomConversion = UomConversion::with('baseUnit', 'conversionUnit')->find($uomConversion->id);
             return $uomConversion;
         } catch (\Exception $e) {
             DB::rollback();
@@ -80,29 +123,12 @@ class UomRepository implements UomRepositoryInterface
         }
     }
 
-    public function createUom(string $name)
-    {
-        DB::beginTransaction();
-        try {
-            $data['created_by'] = UserData()->id;
-            $data['name'] = $name;
-            $uom = Uom::create($data);
-            DB::commit();
-            return $uom;
-        } catch (\Exception $e) {
-            DB::rollback();
-            ResponseMessage($e->getMessage(), 402);
-            throw $e;
-        }
-    }
 
-    public function updateUomConversion($data)
+    public function updateUomConversion(array $data, int $id)
     {
         DB::beginTransaction();
         try {
-            $baseUnitUom = $this->updateData($data['base_unit_name'], $data['base_unit_id']);
-            $conversionUom = $this->updateData($data['conversion_unit_name'], $data['conversion_unit_id']);
-            $uomConversion = UomConversion::where('base_unit_id', $data['base_unit_id'])->where('conversion_unit_id', $data['conversion_unit_id'])->first();
+            $uomConversion = UomConversion::find($id);
             $uomConversion->update($data);
             DB::commit();
             return $uomConversion;
@@ -110,36 +136,6 @@ class UomRepository implements UomRepositoryInterface
             DB::rollBack();
             ResponseMEssage($e->getMessage(), 402);
             throw $e;
-        }
-    }
-
-    public function updateData(string $name, int $id)
-    {
-        DB::beginTransaction();
-        try {
-            $uom = Uom::find($id);
-            if ($uom) {
-                $uom->name = $name;
-                $uom->save();
-                DB::commit();
-            }
-            return $uom;
-        } catch (\Exception $e) {
-            DB::rollBack();
-            ResponseMessage($e->getMessage(), 402);
-            throw $e;
-        }
-    }
-
-    public function deleteData(int $id)
-    {
-        $uom = Uom::find($id);
-        if ($uom) {
-            $uom->is_active = 0;
-            $uom->save();
-            return true;
-        } else {
-            return false;
         }
     }
 }
