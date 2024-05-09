@@ -12,10 +12,7 @@
         </div>
         <div class="flex justify-end flex-col">
             <div class="flex gap-3">
-                <button type="button" class="add-btn transition duration-150 ease-in-out focus:outline-none focus:ring-0 "
-                data-te-toggle="modal" data-te-target="#create_modal">
-                Add New
-            </button>
+
 
             <button type="button" class="add-btn transition duration-150 ease-in-out focus:outline-none focus:ring-0 "
                 data-te-toggle="modal" data-te-target="#uom">
@@ -33,36 +30,27 @@
                             <th scope="col" class=" px-6 py-4 ">
                                 #
                             </th>
-                            <th scope="col" class=" px-6 py-4 ">
-                                Base Unit
-                            </th>
-                            <th scope="col" class=" px-6 py-4 ">
-                                Conversion Unit
-                            </th>
-                            <th scope="col" class=" px-6 py-4 ">
-                                Conversion
-                            </th>
-                            <th scope="col" class="px-6 py-4">
 
+                            <th scope="col" class=" px-6 py-4 ">
+                               Name
+                            </th>
+
+                            <th scope="col" class="px-6 py-4">
+                                Action
                             </th>
                         </tr>
                     </thead>
                     <tbody>
                         <!-- looping start -->
-                        <div class="contents" v-for="(uom, itemIndex) in uomConversionList" :key="itemIndex">
+                        <div class="contents" v-for="(uom, itemIndex) in uomList" :key="itemIndex">
                             <tr class="bg-white rounded-lg overflow-hidden shadow-lg">
                                 <td class=" px-6 py-4 font-medium ">
                                     {{ per_page * (currentPage - 1) + (++itemIndex) }}
                                 </td>
                                 <td class="whitespace-nowrap px-6 py-4 ">
-                                    {{ uom.base_unit.name }}
+                                    {{ uom.name }}
                                 </td>
-                                <td class="whitespace-nowrap px-6 py-4 ">
-                                    {{ uom.conversion_unit.name }}
-                                </td>
-                                <td class="whitespace-nowrap px-6 py-4 ">
-                                    {{ uom.conversion }}
-                                </td>
+
                                 <td class="whitespace-nowrap px-6 py-4">
                                     <button id="edit-btn" class="pr-1">
                                         <i class="fas fa-pencil-alt" @click="editBtnClicked(uom)" data-te-toggle="modal" data-te-target="#edit_modal"></i>
@@ -154,66 +142,6 @@
     </div>
 
     <!-- Modal -->
-    <div data-te-modal-init
-        class="fixed left-0 top-0 z-[1055] hidden h-full w-full overflow-y-auto overflow-x-hidden outline-none"
-        id="create_modal" tabindex="-1" aria-labelledby="create_modalLabel" aria-hidden="true">
-        <div data-te-modal-dialog-ref
-            class="pointer-events-none relative w-auto mb-12 translate-y-[-50px] opacity-0 transition-all duration-300 ease-in-out min-[576px]:mx-auto min-[576px]:mt-7 min-[576px]:max-w-[500px]">
-            <div
-                class="min-[576px]:shadow-[0_0.5rem_1rem_rgba(#000, 0.15)] pointer-events-auto relative flex w-full flex-col rounded-md border-none bg-white bg-clip-padding text-current shadow-lg outline-none">
-
-                <div class="relative  p-4">
-                    <!--Modal title-->
-                    <h5 class="text-xl text-center mt-2 font-medium leading-normal text-black" id="create_modalLabel">
-                        Create UOM
-                    </h5>
-                    <!--Close button-->
-                    <button type="button" class="absolute top-4 right-4 focus:shadow-none focus:outline-none"
-                        data-te-modal-dismiss aria-label="Close">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
-                            stroke="currentColor" class="h-5 w-5">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
-                        </svg>
-                    </button>
-                </div>
-
-                <!--Modal body-->
-                <div class="relative px-12 py-4" data-te-modal-body-ref>
-                    <div class="mb-4">
-                        <label for="" class="block text-sm text-black mb-3">
-                            Base Unit
-                        </label>
-                        <select type="text" placeholder="Unit" v-model="baseUnit" class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
-                            <option v-for='(uom,index) in uomList' :key=index :value=uom.id >{{ uom.name }}</option>
-                        </select>
-
-                    </div>
-                    <div class="mb-4">
-                        <label for="" class="block text-sm text-black mb-3">
-                            Conversion Unit
-                        </label>
-                        <select type="text" placeholder="Unit" v-model="conversionUnit" class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
-                            <option v-for='(uom,index) in uomList' :key=index :value=uom.id >{{ uom.name }}</option>
-                        </select>
-                    </div>
-                    <div class="mb-4">
-                        <label for="" class="block text-sm text-black mb-3">
-                            Conversion Rate
-                        </label>
-                        <input type="number" placeholder="Conversion rate" v-model="conversionRate" class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
-                    </div>
-                </div>
-
-                <!--Modal footer-->
-                <div class="flex justify-center px-12 mb-6">
-                    <button type="button" class="add-btn focus:outline-none focus:ring-0 " @click="confirmCreateBtnClicked"
-                        data-te-modal-dismiss>
-                        Create
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
 
     <div data-te-modal-init
         class="fixed left-0 top-0 z-[1055] hidden h-full w-full overflow-y-auto overflow-x-hidden outline-none"
@@ -251,7 +179,7 @@
 
                 <!--Modal footer-->
                 <div class="flex justify-center px-12 mb-6">
-                    <button type="button" class="add-btn focus:outline-none focus:ring-0 " @click="confirmUomCreate"
+                    <button type="button" class="add-btn focus:outline-none focus:ring-0 " @click="confirmCreateBtnClicked"
                         data-te-modal-dismiss>
                         Create
                     </button>
@@ -286,27 +214,12 @@
 
                 <!--Modal body-->
                 <div class="relative px-12 py-4" data-te-modal-body-ref>
+
                     <div class="mb-4">
                         <label for="" class="block text-sm text-black mb-3">
-                            Base Unit
+                            Uom Name
                         </label>
-                        <select type="text" placeholder="Unit" v-model="baseUnitedit" class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
-                            <option v-for='(uom,index) in uomList' :key=index :value=uom.id >{{ uom.name }}</option>
-                        </select>
-                    </div>
-                    <div class="mb-4">
-                        <label for="" class="block text-sm text-black mb-3">
-                            Conversion Unit
-                        </label>
-                        <select type="text" placeholder="Unit" v-model="conversionUnitedit" class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
-                            <option v-for='(uom,index) in uomList' :key=index :value=uom.id >{{ uom.name }}</option>
-                        </select>
-                    </div>
-                    <div class="mb-4">
-                        <label for="" class="block text-sm text-black mb-3">
-                            Conversion Rate
-                        </label>
-                        <input type="number" placeholder="Conversion rate" v-model="conversionRate" class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
+                        <input type="text" placeholder="Uom" v-model="editUomName" class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
                     </div>
                 </div>
 
@@ -330,7 +243,7 @@ import { mapGetters } from "vuex";
 export default {
     data() {
         return {
-            uomConversionList: [],
+            uomList: [],
 
             baseUnit: null,
             conversionUnit: null,
@@ -352,21 +265,22 @@ export default {
 
             baseUnitedit:null,
             conversionUnitedit:null,
-            editUomConversionId:null
+            editUomId:null,
+            editUomName:null
         };
     },
 
     methods: {
         ...mapGetters(['getToken']),
 
-        async getUomConversionList(pageNumber) {
+        async getUomList(pageNumber) {
             if (pageNumber) {
                 this.currentPage = pageNumber;
             }
-            let url = `/api/uom_conversions?page=${this.currentPage}`;
+            let url = `/api/uoms?page=${this.currentPage}`;
             let response = await getApiData({ url: url, token: this.getToken() });
             if (response.data) {
-                this.uomConversionList = response.data.uoms;
+                this.uomList = response.data.uoms;
                 this.per_page = response.data.per_page;
 
                 this.pageNumbers = [];
@@ -391,16 +305,7 @@ export default {
             }
         },
 
-        async getUom()
-        {
-            console.log('it working');
-            let url = '/api/uoms';
-            let response = await getApiData({url:url ,token: this.getToken()});
-            if(response.success==true)
-            {
-                this.uomList = response.data;
-            }
-        },
+
 
         alertValiationMessage(field) {
             this.$notify({
@@ -410,140 +315,100 @@ export default {
             });
         },
 
-        async confirmUomCreate()
-        {
-            if(!this.uom_name)
-            {
-                this.alertValiationMessage('Uom name');
-                return 1;
-            }
-
-            let url = `/api/uoms`
-            let formData = new FormData();
-            formData.append('name',this.uom_name);
-
-            let response = await postApiData({url:url, form_data: formData,token:this.getToken()});
-            if(response.success==true)
-            {
-                this.uom_name = "";
-                this.getUom();
-            }
-
-        },
 
         async confirmCreateBtnClicked() {
-            if(!this.baseUnit){
-                this.alertValiationMessage(`base unit`);
+            if(!this.uom_name){
+                this.alertValiationMessage(` uom name`);
                 return 1;
             }
-            if(!this.conversionUnit){
-                this.alertValiationMessage(`conversion unit`);
-                return 1;
-            }
-            if(!this.conversionRate){
-                this.alertValiationMessage(`conversion rate`);
-                return 1;
-            }
-            let url = `/api/uom_conversions`;
+            let url = `/api/uoms`;
             let formData = new FormData();
-            formData.append('base_unit_id', this.baseUnit);
-            formData.append('conversion_unit_id', this.conversionUnit);
-            formData.append('conversion', this.conversionRate);
+            formData.append('name', this.uom_name);
 
             let response = await postApiData({url: url, form_data: formData, token: this.getToken()});
             if(response.success){
-                this.getUomConversionList(this.currentPage);
-                this.baseUnit = null;
-                this.conversionUnit = null;
-                this.conversionRate = null;
+                this.getUomList(this.currentPage);
+                this.uom_name = null;
                 // window.location.reload();
             }
         },
 
         editBtnClicked(uom){
-            this.editUomConversionId = uom.id;
-            this.baseUnitedit = uom.base_unit_id;
-            this.conversionUnitedit = uom.conversion_unit_id;
-            this.conversionRate = uom.conversion;
+            this.editUomId = uom.id;
+            this.editUomName = uom.name;
+
         },
 
         async confirmEditBtnClicked(){
-            let url = `/api/uom_conversions/${this.editUomConversionId}`;
+            let url = `/api/uoms/${this.editUomId}`;
             let formData = new FormData();
-            formData.append('base_unit_id', this.baseUnitedit);
-            formData.append('conversion_unit_id', this.conversionUnitedit);
-            formData.append('conversion', this.conversionRate);
+            formData.append('name', this.editUomName);
 
             let response = await postApiData({url: url, form_data: formData, token: this.getToken()});
             if(response.success){
-                this.getUomConversionList(this.currentPage);
-                this.baseUnitedit = null;
-                this.conversionUnitedit = null;
-                this.conversionRate = null;
-
+                this.getUomList(this.currentPage);
+                this.editUomName = null;
             }
         },
 
-        isActiveToggled(id) {
-            let index = this.uomConversionList.findIndex(uom => uom.id == id);
-            if (index != -1) {
-                if (this.uomConversionList[index].is_active == 1) {
-                    this.uomConversionList[index].is_active = 0;
-                }
-                else {
-                    this.uomConversionList[index].is_active = 1;
-                }
+        // isActiveToggled(id) {
+        //     let index = this.uomList.findIndex(uom => uom.id == id);
+        //     if (index != -1) {
+        //         if (this.uomList[index].is_active == 1) {
+        //             this.uomList[index].is_active = 0;
+        //         }
+        //         else {
+        //             this.uomList[index].is_active = 1;
+        //         }
 
-                let url = `/api/is_active`;
-                let formData = new FormData();
-                formData.append('id', id);
-                formData.append('type', 'item');
-                let response = postApiData({ url: url, form_data: formData, token: this.getToken() });
-            }
-        },
+        //         let url = `/api/is_active`;
+        //         let formData = new FormData();
+        //         formData.append('id', id);
+        //         formData.append('type', 'item');
+        //         let response = postApiData({ url: url, form_data: formData, token: this.getToken() });
+        //     }
+        // },
 
         clearSearchBtnClicked() {
             this.searchInput = null;
             this.searchCategory = null;
-            this.getUomConversionList(null);
+            this.getUomList(null);
         },
 
         pageBtnClicked(pageNumber) {
             this.currentPage = pageNumber;
-            this.getUomConversionList(this.currentPage);
+            this.getUomList(this.currentPage);
         },
 
         nextPaginationGroupBtnClicked() {
             this.currentGroup += 1;
             this.currentPage = (this.groupedPageNumbers[this.currentGroup][0]);
-            this.getUomConversionList(this.currentPage);
+            this.getUomList(this.currentPage);
         },
 
         previousPaginationGroupBtnClicked() {
             this.currentGroup -= 1;
             let lastIndex = this.groupedPageNumbers[this.currentGroup].length - 1;
             this.currentPage = (this.groupedPageNumbers[this.currentGroup][lastIndex]);
-            this.getUomConversionList(this.currentPage);
+            this.getUomList(this.currentPage);
         },
 
         firstPaginationGroupBtnClicked() {
             this.currentGroup = 0;
             this.currentPage = (this.groupedPageNumbers[this.currentGroup][0]);
-            this.getUomConversionList(this.currentPage);
+            this.getUomList(this.currentPage);
         },
 
         lastPaginationGroupBtnClicked() {
             this.currentGroup = this.paginationGroupsCount - 1;
             let lastIndex = this.groupedPageNumbers[this.currentGroup].length - 1;
             this.currentPage = (this.groupedPageNumbers[this.currentGroup][lastIndex]);
-            this.getUomConversionList(this.currentPage);
+            this.getUomList(this.currentPage);
         }
     },
 
     created() {
-        this.getUomConversionList(null);
-        this.getUom();
-
+        this.getUomList(null);
     },
 
     mounted() {

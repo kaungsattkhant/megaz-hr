@@ -55,7 +55,7 @@ import ItemCrudComponent from './Components/Items/ItemCrudComponent.vue';
 import ItemUsageForecastListComponent from './Components/ItemUsageForecastings/ItemUsageForecastListComponent.vue';
 import ItemUsageForecastCreateComponent from './Components/ItemUsageForecastings/ItemUsageForecastCreateComponent.vue';
 import ItemUsageForecastDetailComponent from './Components/ItemUsageForecastings/ItemUsageForecastDetailComponent.vue';
-import UomCrudComponent from './Components/ItemUom/UomCrudComponent.vue';
+import UomConversionCrudComponent from './Components/ItemUom/UomConversionCrudComponent.vue';
 import AccountingCrudComponent from './Components/Accounting/AccountingCrudComponent.vue';
 import FinancialTransactionCrudComponent from './Components/FinancialTransaction/FinancialTransactionCrudComponent.vue';
 import CashbookCrudComponent from './Components/Cashbook/CashbookCrudComponent.vue';
@@ -79,6 +79,7 @@ import PosCashbookCrudComponent from './Components/Pos/Cashbook/PosCashbookCrudC
 import CashbookDetailComponent from './Components/Pos/Cashbook/CashbookDetailComponent.vue';
 import InvoiceListComponent from './Components/Pos/Invoices/InvoiceListComponent.vue';
 import InvoiceDetailComponent from './Components/Pos/Invoices/InvoiceDetailComponent.vue';
+import UomCrudComponent from './Components/Uoms/UomCrudComponent.vue';
 
 import LoginComponentPos from './Components/Pos/Auth/LoginComponentPos.vue';
 import LogoutComponentPos from './Components/Pos/Auth/LogoutComponentPos.vue';
@@ -119,7 +120,8 @@ app.component('ItemCrudComponent', ItemCrudComponent);
 app.component('ItemUsageForecastListComponent', ItemUsageForecastListComponent);
 app.component('ItemUsageForecastCreateComponent', ItemUsageForecastCreateComponent);
 app.component('ItemUsageForecastDetailComponent', ItemUsageForecastDetailComponent);
-app.component('UomCrudComponent', UomCrudComponent);
+app.component('UomConversionCrudComponent', UomConversionCrudComponent);
+app.component('UomCrudComponent',UomCrudComponent);
 app.component('TableCrudComponent', TableCrudComponent);
 
 
