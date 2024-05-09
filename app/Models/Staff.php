@@ -87,6 +87,11 @@ class Staff extends Authenticatable
         return $this->belongsToMany(Role::class);
     }
 
+    public function permissions()
+    {
+        return $this->belongsToMany(Permission::class);
+    }
+
     public function completed_tasks()
     {
         return $this->hasMany(Task::class, 'completed_by');

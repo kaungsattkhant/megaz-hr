@@ -4,99 +4,107 @@
 
                 <div class="relative w-[16vw] pt-12">
                     <ul class=" mb-4">
-                        @if (checkDepartmentPermission(['HR']))
+                        @if (checkFeaturePermission('staff'))
                             <li>
                                 <a href="{{ route('staff') }}" class="flex items-center @yield('staffs')">
                                     <i class="fal fa-user  pr-3"></i>
                                     Staff
                                 </a>
                             </li>
+                        @endif
+                        @if (checkFeaturePermission('department'))
                             <li>
                                 <a href="{{ route('departments') }}" class="flex items-center @yield('departments')">
                                     <i class="fal fa-network-wired  pr-3"></i>
                                     Department
                                 </a>
                             </li>
+                        @endif
+                        @if (checkFeaturePermission('role'))
                             <li>
                                 <a href="{{ route('roles') }}" class="flex items-center @yield('roles')">
                                     <i class="fal fa-tasks  pr-3"></i>
                                     Roles
                                 </a>
                             </li>
+                        @endif
+                        @if (checkFeaturePermission('area'))
                             <li>
                                 <a href="{{ route('areas') }}" class="flex items-center @yield('areas')">
                                     <i class="fal fa-network-wired  pr-3"></i>
                                     Areas
                                 </a>
                             </li>
-
+                        @endif
+                        @if (checkFeaturePermission('item'))
                             <li>
                                 <a href="{{ route('items') }}" class="flex items-center @yield('items')">
                                     <i class="fal fa-hand-receiving  pr-3"></i>
                                     Items
                                 </a>
                             </li>
-                            <li>
-                                <a href="{{ route('uoms') }}" class="flex items-center @yield('uoms')">
-                                    <i class="fal fa-hand-receiving  pr-3"></i>
-                                    UOMs
-                                </a>
-                            </li>
-                            <li>
-                                <a href="{{ route('item_usage_forecasts') }}"
-                                    class="flex items-center @yield('item_usage_forecasts')">
-                                    <i class="fal fa-truck-loading  pr-3"></i>
-                                    Item Usage Forecasts
-                                </a>
-                            </li>
-                            <li>
-                                <a href="{{ route('menus') }}" class="flex items-center @yield('menus')">
-                                    <i class="fal fa-clipboard-list  pr-3"></i>
-                                    Selling Menus
-                                </a>
-                            </li>
-
-                            <li>
-                                <a href="{{ route('room') }}" class="flex items-center @yield('room')">
-                                    <i class="fal fa-user  pr-3"></i>
-                                    Room
-                                </a>
-                            </li>
-
-                            <li>
-                                <a href="{{ route('table') }}" class="flex items-center @yield('table')">
-                                    <i class="fal fa-user  pr-3"></i>
-                                    Table
-                                </a>
-                            </li>
-                            <li>
-                                <a href="{{ route('services') }}" class="flex items-center @yield('services')">
-                                    <i class="fal fa-user  pr-3"></i>
-                                    Services
-                                </a>
-                            </li>
-                            <li>
-                                <a href="{{ route('tasks') }}" class="flex items-center @yield('tasks')">
-                                    <i class="fal fa-tasks  pr-3"></i>
-                                    Tasks
-                                </a>
-                            </li>
-                            <li>
-                                <a href="{{ route('complains') }}" class="flex items-center @yield('complains')">
-                                    <i class="fal fa-user  pr-3"></i>
-                                    Complaints
-                                </a>
-                            </li>
                         @endif
-                        @if (checkDepartmentAndRoles('Inventory', ['Staff']))
+                        @if (checkFeaturePermission('uom'))
                         <li>
-                            <a href="{{ route('inventories') }}" class="flex items-center @yield('inventories')">
-                                <i class="fal fa-inventory  pr-3"></i>
-                                Inventory
+                            <a href="{{ route('uoms') }}" class="flex items-center @yield('uoms')">
+                                <i class="fal fa-hand-receiving  pr-3"></i>
+                                UOMs
                             </a>
                         </li>
                         @endif
-                        @if (checkDepartmentPermission(['Finance']))
+                        {{-- <li>
+                            <a href="{{ route('item_usage_forecasts') }}" class="flex items-center @yield('item_usage_forecasts')">
+                                <i class="fal fa-truck-loading  pr-3"></i>
+                                Item Usage Forecasts
+                            </a>
+                        </li>
+                        <li>
+                            <a href="{{ route('menus') }}" class="flex items-center @yield('menus')">
+                                <i class="fal fa-clipboard-list  pr-3"></i>
+                                Selling Menus
+                            </a>
+                        </li>
+
+                        <li>
+                            <a href="{{ route('room') }}" class="flex items-center @yield('room')">
+                                <i class="fal fa-user  pr-3"></i>
+                                Room
+                            </a>
+                        </li>
+
+                        <li>
+                            <a href="{{ route('table') }}" class="flex items-center @yield('table')">
+                                <i class="fal fa-user  pr-3"></i>
+                                Table
+                            </a>
+                        </li>
+                        <li>
+                            <a href="{{ route('services') }}" class="flex items-center @yield('services')">
+                                <i class="fal fa-user  pr-3"></i>
+                                Services
+                            </a>
+                        </li>
+                        <li>
+                            <a href="{{ route('tasks') }}" class="flex items-center @yield('tasks')">
+                                <i class="fal fa-tasks  pr-3"></i>
+                                Tasks
+                            </a>
+                        </li>
+                        <li>
+                            <a href="{{ route('complains') }}" class="flex items-center @yield('complains')">
+                                <i class="fal fa-user  pr-3"></i>
+                                Complaints
+                            </a>
+                        </li>
+                        @if (checkFeaturePermission('Inventory', ['Staff']))
+                            <li>
+                                <a href="{{ route('inventories') }}" class="flex items-center @yield('inventories')">
+                                    <i class="fal fa-inventory  pr-3"></i>
+                                    Inventory
+                                </a>
+                            </li>
+                        @endif
+                        @if (checkFeaturePermission(['Finance']))
                             <li>
                                 <a href="{{ route('suppliers.index') }}" class="flex items-center @yield('supplier')">
                                     <i class="fal fa-tasks  pr-3"></i>
@@ -213,10 +221,9 @@
                                 </div>
                             </li>
                         @endif
-                        {{-- @if (checkDepartmentPermission(['HR', 'Management', 'Finance'])) --}}
-                        @if (checkDepartmentAndRoles('HR', ['Staff', 'Manager']) ||
-                                checkDepartmentAndRoles('Management', ['MD']) ||
-                                checkDepartmentAndRoles('Finance', ['Staff']))
+                        @if (checkFeaturePermission('HR', ['Staff', 'Manager']) ||
+                                checkFeaturePermission('Management', ['MD']) ||
+                                checkFeaturePermission('Finance', ['Staff']))
                             <li>
                                 <a href="{{ route('purchase_orders') }}"
                                     class="flex items-center @yield('purchase_orders')">
@@ -240,7 +247,7 @@
                                 </a>
                             </li>
                         @endif
-                        @if (checkDepartmentAndRoles('Inventory', ['Staff']))
+                        @if (checkFeaturePermission('Inventory', ['Staff']))
                             <li>
                                 <a href="{{ route('purchase_orders.confirm_poitems') }}"
                                     class="flex items-center @yield('confirm_purchase_order_items')">
@@ -262,11 +269,12 @@
                             </a>
                         </li>
                         <li>
-                            <a href="{{ route('transfers.transfers') }}" class="flex items-center @yield('inventory_transfers')">
+                            <a href="{{ route('transfers.transfers') }}"
+                                class="flex items-center @yield('inventory_transfers')">
                                 <i class="fal fa-user  pr-3"></i>
                                 Inventory Transfers List
                             </a>
-                        </li>
+                        </li> --}}
                     </ul>
 
                 </div>

@@ -28,27 +28,48 @@ Route::view('/login', 'auth.login')->name('login_form');
 Route::post('/login', [AuthController::class, 'login'])->name('login');
 
 Route::view('/test', 'staff.index');
-Route::middleware(['departments:HR'])->group(function () {
+
+#change middleware
+Route::middleware(['departments:role'])->group(function () {
     Route::view('/roles', 'roles.index')->name('roles');
+
+});
+Route::middleware(['departments:staff'])->group(function () {
     Route::view('/staff', 'staff.index')->name('staff');
     Route::view('/staff/create', 'staff.create')->name('staff.crate');
     Route::view('/staff/{id}/edit', 'staff.edit')->name('staff.edit');
+});
 
+Route::middleware(['departments:uom'])->group(function () {
+    Route::view('/uoms', 'item_uoms.index')->name('uoms');
+});
+
+Route::middleware(['departments:item'])->group(function () {
+    Route::view('/items', 'items.index')->name('items');
+});
+
+Route::middleware(['departments:task'])->group(function () {
     Route::view('/tasks', 'tasks.index')->name('tasks');
-    Route::view('/complaints', 'complains.index')->name('complains');
-
+});
+Route::middleware(['departments:department'])->group(function () {
     Route::view('/departments', 'departments.index')->name('departments');
+});
+
+Route::middleware(['departments:department'])->group(function () {
     Route::view('/areas', 'areas.index')->name('areas');
+});
 
+#changed middleware
 
+Route::middleware(['departments:HR'])->group(function () {
+
+    Route::view('/complaints', 'complains.index')->name('complains');
 
     Route::view('/rooms', 'tables&rooms.index')->name('room');
     Route::view('/tables', 'tables&rooms.table')->name('table');
 
     Route::view('/services', 'services.index')->name('services');
 
-    Route::view('/items', 'items.index')->name('items');
-    Route::view('/uoms', 'item_uoms.index')->name('uoms');
     Route::view('/menus', 'menus.index')->name('menus');
     Route::view('/menus/create', 'menus.create')->name('menus.create');
 
