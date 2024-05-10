@@ -351,23 +351,6 @@ export default {
             }
         },
 
-        // isActiveToggled(id) {
-        //     let index = this.uomList.findIndex(uom => uom.id == id);
-        //     if (index != -1) {
-        //         if (this.uomList[index].is_active == 1) {
-        //             this.uomList[index].is_active = 0;
-        //         }
-        //         else {
-        //             this.uomList[index].is_active = 1;
-        //         }
-
-        //         let url = `/api/is_active`;
-        //         let formData = new FormData();
-        //         formData.append('id', id);
-        //         formData.append('type', 'item');
-        //         let response = postApiData({ url: url, form_data: formData, token: this.getToken() });
-        //     }
-        // },
 
         clearSearchBtnClicked() {
             this.searchInput = null;

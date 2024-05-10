@@ -228,6 +228,7 @@ Route::get('/items', [ItemAPIController::class, 'getItemData']);
 Route::post('/items', [ItemAPIController::class, 'createItem']);
 Route::put('/items/{id}', [ItemAPIController::class, 'updateItem']);
 Route::delete('/items/{id}', [ItemAPIController::class, 'deleteItem']);
+Route::post('/item_prices/{id}',[ItemAPIController::class,'addItemPrice']);
 
 
 // Route::get('/transfers', [TransferAPIController::class, 'getTransferData']);

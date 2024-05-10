@@ -36,11 +36,11 @@ class MenuRepository implements MenuRepositoryInterface
         $hashedName = md5(uniqid() . microtime()) . '.' . $extension;
         $data['image_path'] = $imageData->storeAs('images', $hashedName, 'public');
         $data['image_url'] = Storage::url($data['image_path']);
-
         $menu = Menu::create($data);
         $this->createMenuPrice($menu->id, $data['price']);
         foreach ($items as $item) {
             $menu->items()->attach($item['id'], [
+                'uom_id' => $item['uom_id'],
                 'weight' => $item['weight'],
                 'is_make_pack' => $item['is_make_pack'] ? 1 : 0
             ]);
