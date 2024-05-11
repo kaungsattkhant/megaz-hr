@@ -3,6 +3,10 @@
   font-family: 'Poppins';
   src: url("../fonts/Poppins-Regular.ttf") format("truetype"); }
 /* width */
+.font-inter {
+  font-family: Inter,sans-serif;
+  color: #333335; }
+
 .small-scrollbar::-webkit-scrollbar {
   width: 4px; }
 
@@ -20,14 +24,17 @@
 
 .side-bar {
   position: fixed;
-  width: 16%;
-  background-color: #E94B18;
+  background-color: #111c43;
   color: white;
   min-height: 100vh;
   padding-top: 1.5rem;
   border-right: 1px solid #e5e5e5; }
 
 .side-bar ul {
+  width: 92%;
+  margin: auto;
+  padding-left: 4px;
+  padding-right: 4px;
   padding-top: 0.5rem; }
 
 .side-bar ul li a, .side-bar ul li button {
@@ -37,13 +44,12 @@
   position: relative;
   font-size: 14px;
   color: white;
-  font-family: 'Lato'; }
+  font-family: Inter, sans-serif; }
 
 .side-bar ul li a.active-link {
   color: white;
-  background-color: #fff3;
-  border-radius: 8px;
-  border-radius: 0 !important; }
+  background-color: #fff2;
+  border-radius: 6px; }
 
 .side-bar ul li a i {
   width: 2rem;
@@ -56,7 +62,8 @@
 
 .main-content {
   margin-left: auto;
-  width: 84%;
+  width: 100%;
+  margin-inline-start: 15rem;
   display: inline-block; }
 
 .inner-container {
@@ -80,7 +87,7 @@
   font-size: 14px;
   padding: 6px 16px;
   border-radius: 3px;
-  background-color: #EB6E47 !important;
+  background-color: #845adf !important;
   color: white; }
 
 .input-ui {

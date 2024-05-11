@@ -2,7 +2,7 @@
             <div class="relative pb-12 overflow-y-hidden small-scrollbar h-[100vh]"
                 onmouseover="this.style.overflowY='scroll'" onmouseout="this.style.overflowY='hidden'">
 
-                <div class="relative w-[16vw] pt-12">
+                <div class="relative w-[15rem] pt-12">
                     <ul class=" mb-4">
                         @if (checkDepartmentPermission(['HR']))
                             <li>
@@ -261,7 +261,7 @@
 
             </div>
             <div id="app"
-                class="absolute bottom-0 left-0 w-[16vw] h-14 bg-[#df3b06] border-t border-[#0002] flex items-center justify-start">
+                class="absolute bottom-0 left-0 w-[16vw] h-14 bg-[#111c43] border-t border-[#0002] flex items-center justify-start">
                 <logout-component />
             </div>
         </nav>
