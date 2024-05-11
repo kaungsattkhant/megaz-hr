@@ -77,6 +77,7 @@
                                     </td>
                                     <td class="whitespace-nowrap text-left p-4 border-r font-inter ">
                                         {{ staff.phone_number }}
+                                        
                                     </td>
                                     <td class="  p-4 border-r font-inter ">
                                         {{ staff.address }}
