@@ -12,4 +12,9 @@ class Pack extends Model
     protected $fillable = [
         'menu_id','date','expired_at','created_by','expired_at','created_by','status'
     ];
+
+    public function packMenus()
+    {
+        return $this->hasMany(PackMenu::class);
+    }
 }

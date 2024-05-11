@@ -12,4 +12,9 @@ class PackMenu extends Model
     protected $fillable =[
         'pack_id','item_id','uom_id','quantity','menu_id'
     ];
+
+    public function pack()
+    {
+        return $this->belongsTo(Pack::class);
+    }
 }
