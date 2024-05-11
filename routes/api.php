@@ -38,6 +38,7 @@ use App\Http\Controllers\API\DepartmentAPIController;
 use App\Http\Controllers\API\FixedAssetPurchaseAPIController;
 use App\Http\Controllers\API\PurchaseOrderAPIController;
 use App\Http\Controllers\API\ItemUsageForecastController;
+use App\Http\Controllers\API\PackAPIController;
 use App\Http\Controllers\API\PurchaseOrderItemLeftController;
 
 /*
@@ -146,6 +147,8 @@ Route::middleware('auth:api')->group(function () {
         Route::post('/fixed_asset_purchases/is_update_checked','updateIsCheck');
         Route::post('/fixed_asset_purchases/bought','boughtFixedAsset');
     });
+
+    Route::post('/packs',[PackAPIController::class,'createPack']);
 
     Route::resource('suppliers', SupplierController::class)->only(['index', 'store', 'show', 'destroy']);
     Route::resource('notifications',NotificationController::class)->only(['index']);
