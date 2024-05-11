@@ -43,4 +43,10 @@ class ItemAPIController extends Controller
             ResponseMessage('Item not found or some error occur');
         }
     }
+
+    public function addItemPrice(Request $request,int $id)
+    {
+        $item = $this->itemRepo->addPriceItem($request->all(),$id);
+        ResponseData($item);
+    }
 }
