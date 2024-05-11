@@ -31,27 +31,33 @@ class MenuRepository implements MenuRepositoryInterface
 
     public function createData(array $data, array $items)
     {
-        $imageData = $data['image'];
-        $extension = $imageData->getClientOriginalExtension();
-        $hashedName = md5(uniqid() . microtime()) . '.' . $extension;
-        $data['image_path'] = $imageData->storeAs('images', $hashedName, 'public');
-        $data['image_url'] = Storage::url($data['image_path']);
-
-        $menu = Menu::create($data);
-        $this->createMenuPrice($menu->id, $data['price']);
-        foreach ($items as $item) {
-            $menu->items()->attach($item['id'], [
-                'weight' => $item['weight'],
-                'is_make_pack' => $item['is_make_pack'] ? 1 : 0
-            ]);
+        DB::beginTransaction();
+        try {
+            $imageData = $data['image'];
+            $extension = $imageData->getClientOriginalExtension();
+            $hashedName = md5(uniqid() . microtime()) . '.' . $extension;
+            $data['image_path'] = $imageData->storeAs('images', $hashedName, 'public');
+            $data['image_url'] = Storage::url($data['image_path']);
+            $menu = Menu::create($data);
+            $this->createMenuPrice($menu->id, $data['price']);
+            foreach ($items as $item) {
+                $menu->items()->attach($item['id'], [
+                    'uom_id' => $item['uom_id'],
+                    'weight' => $item['weight'],
+                    'is_make_pack' => $item['is_make_pack'] ? 1 : 0
+                ]);
+            }
+            DB::commit();
+            return $menu;
+        } catch (\Exception $e) {
+            DB::rollBack();
+            ResponseMessage($e->getMessage(), 402);
+            throw $e;
         }
-
-        return $menu;
     }
 
     public function createMenuPrice(int $id, float $price)
     {
-
         $menu = Menu::find($id);
         if ($menu) {
             $menuPrice = MenuPrice::create([

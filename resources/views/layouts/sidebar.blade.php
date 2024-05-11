@@ -43,6 +43,12 @@
                                 </a>
                             </li>
                             <li>
+                                <a href="{{ route('uom_conversions') }}" class="flex items-center @yield('uom_conversions')">
+                                    <i class="fal fa-hand-receiving  pr-3"></i>
+                                    UOM Conversions
+                                </a>
+                            </li>
+                            <li>
                                 <a href="{{ route('item_usage_forecasts') }}"
                                     class="flex items-center @yield('item_usage_forecasts')">
                                     <i class="fal fa-truck-loading  pr-3"></i>

@@ -68,6 +68,8 @@ use App\Repositories\PurchaseOrderItemLeft\PurchaseOrderItemLeftInterface;
 use App\Repositories\PurchaseOrderItemLeft\PurchaseOrderItemLeftRepository;
 use App\Repositories\PurchaseOrderItem\PurchaseOrderItemRepositoryInterface;
 use App\Repositories\FixedAssetPurchase\FixedAssetPurchaseRepositoryInterface;
+use App\Repositories\Pack\PackRepository;
+use App\Repositories\Pack\PackRepositoryInterface;
 
 class RepositoryServiceProvider extends ServiceProvider
 {
@@ -112,5 +114,6 @@ class RepositoryServiceProvider extends ServiceProvider
         $this->app->bind(NotificationInterface::class,NotificationRepository::class);
         $this->app->bind(PurchaseOrderItemLeftInterface::class,PurchaseOrderItemLeftRepository::class);
         $this->app->bind(FixedAssetPurchaseRepositoryInterface::class,FixedAssetPurchaseRepository::class);
+        $this->app->bind(PackRepositoryInterface::class,PackRepository::class);
     }
 }

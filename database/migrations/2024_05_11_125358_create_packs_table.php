@@ -11,12 +11,14 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('item_menu', function (Blueprint $table) {
+        Schema::create('packs', function (Blueprint $table) {
+            $table->id();
             $table->foreignId('menu_id')->constrained()->onDelete('cascade');
-            $table->foreignId('item_id')->constrained()->onDelete('cascade');
-            $table->foreignId('uom_id')->constrained()->onDelete('cascade');
-            $table->string('weight');
-            $table->boolean('is_make_pack');
+            $table->dateTime('date');
+            $table->dateTime('expired_at');
+            $table->unsignedBigInteger('created_by');
+            $table->string('status');
+            $table->timestamps();
         });
     }
 
@@ -25,6 +27,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('item_menu');
+        Schema::dropIfExists('packs');
     }
 };

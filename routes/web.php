@@ -48,7 +48,8 @@ Route::middleware(['departments:HR'])->group(function () {
     Route::view('/services', 'services.index')->name('services');
 
     Route::view('/items', 'items.index')->name('items');
-    Route::view('/uoms', 'item_uoms.index')->name('uoms');
+    Route::view('/uom_conversions', 'item_uoms.index')->name('uom_conversions');
+    Route::view('/uoms','uoms.index')->name('uoms');
     Route::view('/menus', 'menus.index')->name('menus');
     Route::view('/menus/create', 'menus.create')->name('menus.create');
 

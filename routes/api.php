@@ -38,6 +38,7 @@ use App\Http\Controllers\API\DepartmentAPIController;
 use App\Http\Controllers\API\FixedAssetPurchaseAPIController;
 use App\Http\Controllers\API\PurchaseOrderAPIController;
 use App\Http\Controllers\API\ItemUsageForecastController;
+use App\Http\Controllers\API\PackAPIController;
 use App\Http\Controllers\API\PurchaseOrderItemLeftController;
 
 /*
@@ -147,6 +148,8 @@ Route::middleware('auth:api')->group(function () {
         Route::post('/fixed_asset_purchases/bought','boughtFixedAsset');
     });
 
+    Route::post('/packs',[PackAPIController::class,'createPack']);
+
     Route::resource('suppliers', SupplierController::class)->only(['index', 'store', 'show', 'destroy']);
     Route::resource('notifications',NotificationController::class)->only(['index']);
     Route::post('notifications/set_seen', [NotificationController::class, 'setSeenNotifications']);
@@ -216,7 +219,7 @@ Route::delete('/entities/{id}', [EntityAPIController::class, 'deleteEntity']);
 
 Route::get('/uoms', [UomAPIController::class, 'getUomData']);
 Route::post('/uoms',[UomAPIController::class,'createUom']);
-Route::put('/uoms/{id}',[UomAPIController::class,'updateUom']);
+Route::post('/uoms/{id}',[UomAPIController::class,'updateUom']);
 Route::delete('/uoms/{id}', [UomAPIController::class, 'deleteUom']);
 
 // uom conversion
@@ -228,6 +231,7 @@ Route::get('/items', [ItemAPIController::class, 'getItemData']);
 Route::post('/items', [ItemAPIController::class, 'createItem']);
 Route::put('/items/{id}', [ItemAPIController::class, 'updateItem']);
 Route::delete('/items/{id}', [ItemAPIController::class, 'deleteItem']);
+Route::post('/item_prices/{id}',[ItemAPIController::class,'addItemPrice']);
 
 
 // Route::get('/transfers', [TransferAPIController::class, 'getTransferData']);

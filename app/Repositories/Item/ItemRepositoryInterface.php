@@ -13,4 +13,7 @@ interface ItemRepositoryInterface
     public function updateData(array $data,int $id);
 
     public function deleteData(int $id);
+
+    public function addPriceItem(array $data, int $id);
+
 }

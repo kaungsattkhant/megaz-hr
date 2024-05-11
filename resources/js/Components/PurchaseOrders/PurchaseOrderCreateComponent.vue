@@ -34,6 +34,21 @@
 
             <div class="col-span-3">
                 <label for="" class="block text-sm text-black mb-3">
+                    UOM
+                </label>
+                <div class="text-sm input-ui w-full bg-transparent rounded-lg focus:ring-0" data-te-select-wrapper-ref>
+                    <select data-te-select-init data-te-select-placeholder="Select UOM"
+                        data-te-select-filter="true" name="" id="" v-model="selectedUom"
+                        class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
+                        <option :value="uom" v-for="(uom, uomIndex) in uomList" :key="uomIndex">
+                            {{ uom.name }}
+                        </option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="col-span-3">
+                <label for="" class="block text-sm text-black mb-3">
                     &nbsp;
                 </label>
                 <button class="add-btn" @click="addItemBtnClicked"> Add </button>
@@ -50,6 +65,9 @@
                         </th>
                         <th scope="col" class=" px-6 py-4 ">
                             Qty
+                        </th>
+                        <th scope="col" class=" px-6 py-4 ">
+                            UOM
                         </th>
                         <th scope="col" class=" px-6 py-4 ">
                             Amount
@@ -70,6 +88,9 @@
                             </td>
                             <td class=" px-6 py-4 font-medium ">
                                 {{ purchaseOrderItem.quantity }}
+                            </td>
+                            <td class=" px-6 py-4 font-medium ">
+                                {{ purchaseOrderItem.uom_name }}
                             </td>
                             <td class=" px-6 py-4 font-medium ">
                                 {{ purchaseOrderItem.amount.toLocaleString() }}
@@ -119,6 +140,7 @@
 </template>
 
 <script>
+    import { initTE, Select, Dropdown } from "tw-elements";
     import { getApiData, postApiData } from '../../utilities/ajax-helpers';
     import { getCurrentDate } from '../../utilities/datetime-helpers';
     import { mapGetters } from "vuex";
@@ -129,6 +151,10 @@
                 date: getCurrentDate(),
                 itemList: [],
                 selectedItem: null,
+
+                uomList: [],
+                selectedUom: null,
+
                 quantity: null,
                 purchaseOrderItems: [],
 
@@ -146,6 +172,13 @@
                 }
             },
 
+            async getUomList() {
+                let response = await getApiData({ url: `/api/uoms`, token: this.getToken() });
+                if (response.data) {
+                    this.uomList = response.data;
+                }
+            },
+
             alertValidationMessage(field){
                 this.$notify({
                     title: 'Input validation',
@@ -159,6 +192,10 @@
                     this.alertValidationMessage('an item');
                     return 1;
                 }
+                if(!this.selectedUom){
+                    this.alertValidationMessage('a uom');
+                    return 1;
+                }
                 if(this.quantity < 1){
                     this.alertValidationMessage('quantity');
                     return 1;
@@ -169,10 +206,13 @@
                     name: this.selectedItem.name,
                     quantity: this.quantity,
                     amount: amount,
+                    uom_id: this.selectedUom.id,
+                    uom_name: this.selectedUom.name
                 });
 
                 this.updateTotalPrice(this.purchaseOrderItems);
                 this.selectedItem = null;
+                this.selectedUom = null;
                 this.quantity = null;
             },
 
@@ -228,10 +268,11 @@
 
         created(){
             this.getItemList();
+            this.getUomList();
         },
 
         mounted(){
-
+            initTE({Select, Dropdown});
         }
     }
 </script>

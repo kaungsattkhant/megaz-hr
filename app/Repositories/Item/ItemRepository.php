@@ -34,11 +34,11 @@ class ItemRepository implements ItemRepositoryInterface
         DB::beginTransaction();
         try {
             $item = Item::create($data);
-            $uomIds = json_decode($data['uoms'], true);
-            $price = ItemPrice::create(['item_id'=>$item->id, 'price'=>$data['price']]);
-            foreach ($uomIds as $uomId) {
-                $item->uoms()->attach($uomId);
-            }
+            $price = ItemPrice::create(['item_id' => $item->id, 'price' => $data['price'],'uom_id'=>$data['uom_id']]);
+            // $uomIds = json_decode($data['uoms'], true);
+            // foreach ($uomIds as $uomId) {
+            //     $item->uoms()->attach($uomId);
+            // }
             DB::commit();
             return $item;
         } catch (\Exception $e) {
@@ -65,6 +65,24 @@ class ItemRepository implements ItemRepositoryInterface
         } catch (\Exception $e) {
             DB::rollback();
             ResponseMessage($e->getMessage(), 402);
+            throw $e;
+        }
+    }
+
+    public function addPriceItem(array $data, int $id)
+    {
+        DB::beginTransaction();
+        try {
+            $item_price = ItemPrice::where('item_id', $id)->latest('created_at')->first();
+            $new_item_price['uom_id'] = $item_price->uom_id;
+            $new_item_price['price'] = $data['price'];
+            $new_item_price['item_id'] = $id;
+            $createdItemPrice = ItemPrice::create($new_item_price);
+            DB::commit();
+            return $createdItemPrice;
+        } catch (\Exception $e) {
+            DB::rollBack();
+            ResponseMessage($e->getMessage(), 422);
             throw $e;
         }
     }
