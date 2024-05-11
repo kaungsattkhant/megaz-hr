@@ -13,8 +13,8 @@ class Pack extends Model
         'menu_id','date','expired_at','created_by','expired_at','created_by','status'
     ];
 
-    public function packMenus()
+    public function packItems()
     {
-        return $this->hasMany(PackMenu::class);
+        return $this->hasMany(PackItem::class);
     }
 }
