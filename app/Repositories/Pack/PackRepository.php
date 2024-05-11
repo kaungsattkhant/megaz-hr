@@ -26,7 +26,7 @@ class PackRepository implements PackRepositoryInterface
                     'status' => 'not yet'
                 ]);
                 foreach ($menuItems as $item) {
-                    PackMenu::create([
+                    $pack = PackMenu::create([
                         'pack_id' => $pack->id,
                         'item_id' => $item->id,
                         'uom_id' => $item->pivot->uom_id,
@@ -35,6 +35,7 @@ class PackRepository implements PackRepositoryInterface
                     ]);
                 }
                 DB::commit();
+                ResponseMessage("Packing successfully");
             }
         } catch (\Exception $e) {
             DB::rollBack();
