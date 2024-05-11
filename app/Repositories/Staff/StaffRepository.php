@@ -72,17 +72,27 @@ class StaffRepository implements StaffRepositoryInterface
 
     public function updateData(array $data, int $id)
     {
-
         DB::beginTransaction();
         try {
             $staff = Staff::find($id);
             if ($staff) {
                 $data = RemoveNullValues($data);
                 $staff->emergencyContacts()->updateOrCreate(['staff_id' => $staff->id], $data);
-                $staff->update($data);
-                if (isset($data['roles'])) {
-                    $staff->roles()->attach($data['roles']);
+                if($staff->department_id != $data['department_id'])
+                {
+                    $staff->roles()->detach();
                 }
+                $staff->update($data);
+
+                if (isset($data['roles']) && $data['roles'] !== null) {
+                    $rolesToAttach = $data['roles'];
+                    $currentRoles = $staff->roles()->pluck('id')->toArray();
+                    $rolesToAttach = array_diff($rolesToAttach, $currentRoles);
+                    if (!empty($rolesToAttach)) {
+                        $staff->roles()->attach($rolesToAttach);
+                    }
+                }
+
                 if (isset($data['inventoryIds'])) {
                     $inventoryIds = isset($data['inventoryIds']) ? json_decode($data['inventoryIds']) : [];
                     $staff->inventories()->attach($inventoryIds);

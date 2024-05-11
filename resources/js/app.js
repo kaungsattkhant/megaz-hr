@@ -40,6 +40,7 @@ import ServicesCrudComponent from './Components/Services/ServicesCrudComponent.v
 import InventoryLedgersComponent from './Components/Inventories/InventoryLedgersComponent.vue';
 import InventoryReceivesListComponent from './Components/Transfers/InventoryReceivesListComponent.vue';
 import InventoryTransfersListComponent from './Components/Transfers/InventoryTransfersListComponent.vue';
+import InventoryTransferHistoryListComponent from './Components/Transfers/InventoryTransferHistoryListComponent.vue';
 import MenuListComponent from './Components/Menus/MenuListComponent.vue';
 import MenuCreateComponent from './Components/Menus/MenuCreateComponent.vue';
 import ComplainsCrudComponent from './Components/Complains/ComplainsCrudComponent.vue';
@@ -54,6 +55,7 @@ import ItemCrudComponent from './Components/Items/ItemCrudComponent.vue';
 import ItemUsageForecastListComponent from './Components/ItemUsageForecastings/ItemUsageForecastListComponent.vue';
 import ItemUsageForecastCreateComponent from './Components/ItemUsageForecastings/ItemUsageForecastCreateComponent.vue';
 import ItemUsageForecastDetailComponent from './Components/ItemUsageForecastings/ItemUsageForecastDetailComponent.vue';
+import UomConversionCrudComponent from './Components/ItemUom/UomConversionCrudComponent.vue';
 import AccountingCrudComponent from './Components/Accounting/AccountingCrudComponent.vue';
 import FinancialTransactionCrudComponent from './Components/FinancialTransaction/FinancialTransactionCrudComponent.vue';
 import CashbookCrudComponent from './Components/Cashbook/CashbookCrudComponent.vue';
@@ -77,6 +79,7 @@ import PosCashbookCrudComponent from './Components/Pos/Cashbook/PosCashbookCrudC
 import CashbookDetailComponent from './Components/Pos/Cashbook/CashbookDetailComponent.vue';
 import InvoiceListComponent from './Components/Pos/Invoices/InvoiceListComponent.vue';
 import InvoiceDetailComponent from './Components/Pos/Invoices/InvoiceDetailComponent.vue';
+import UomCrudComponent from './Components/Uoms/UomCrudComponent.vue';
 
 import LoginComponentPos from './Components/Pos/Auth/LoginComponentPos.vue';
 import LogoutComponentPos from './Components/Pos/Auth/LogoutComponentPos.vue';
@@ -93,9 +96,9 @@ app.component('InventoriesCrudComponent', InventoriesCrudComponent);
 app.component('RoomCrudComponent', RoomCrudComponent);
 app.component('ServicesCrudComponent', ServicesCrudComponent);
 app.component('InventoryLedgersComponent', InventoryLedgersComponent);
-//InventoryTransfersListComponent
 app.component('InventoryReceivesListComponent', InventoryReceivesListComponent);
 app.component('InventoryTransfersListComponent', InventoryTransfersListComponent);
+app.component('InventoryTransferHistoryListComponent', InventoryTransferHistoryListComponent);
 app.component('MenuListComponent', MenuListComponent);
 app.component('MenuCreateComponent', MenuCreateComponent);
 app.component('ComplainsCrudComponent', ComplainsCrudComponent);
@@ -117,6 +120,8 @@ app.component('ItemCrudComponent', ItemCrudComponent);
 app.component('ItemUsageForecastListComponent', ItemUsageForecastListComponent);
 app.component('ItemUsageForecastCreateComponent', ItemUsageForecastCreateComponent);
 app.component('ItemUsageForecastDetailComponent', ItemUsageForecastDetailComponent);
+app.component('UomConversionCrudComponent', UomConversionCrudComponent);
+app.component('UomCrudComponent',UomCrudComponent);
 app.component('TableCrudComponent', TableCrudComponent);
 
 

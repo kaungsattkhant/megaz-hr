@@ -25,13 +25,13 @@ class UomAPIController extends Controller
 
     public function createUom(UomCreateRequest $request)
     {
-        $uom = $this->uomRepo->createData($request->all());
-        ResponseData($uom );
+        $uom =  $this->uomRepo->createUom($request->all());
+        ResponseData($uom);
     }
 
     public function updateUom(UomUpdateRequest $request,int $id)
     {
-        $uom = $this->uomRepo->updateData($request->all(),$id);
+        $uom =  $this->uomRepo->updateData($request->all(),$id);
         ResponseData($uom);
     }
 
@@ -45,6 +45,27 @@ class UomAPIController extends Controller
             ResponseMessage('Uom not found or some error occur');
         }
 
+    }
+
+    // uom conversion
+
+    public function createUomConversion(Request $request)
+    {
+        $uom = $this->uomRepo->createUomConversion($request->all());
+        ResponseData($uom );
+    }
+
+    public function updateUomConversion(Request $request,int $id)
+    {
+        $uom = $this->uomRepo->updateUomConversion($request->all(),$id);
+        ResponseData($uom);
+    }
+
+
+    public function getUomConversionList(Request $request)
+    {
+        $uomConversions = $this->uomRepo->uomConversaionList($request);
+        ResponseData($uomConversions);
     }
 
 

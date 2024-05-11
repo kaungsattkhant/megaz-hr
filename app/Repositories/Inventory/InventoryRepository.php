@@ -46,6 +46,13 @@ class InventoryRepository implements InventoryRepositoryInterface
         }
     }
 
+    public function getInventory($request){
+        $inventories = Inventory::where('is_active', 1)
+        ->with(['inventoryable'])
+        ->get();
+        return $inventories;
+    }
+
     public function createData($request)
     {
         $data = $request->all();

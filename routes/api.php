@@ -214,11 +214,15 @@ Route::put('/entities/{id}', [EntityAPIController::class, 'updateEntity']);
 Route::delete('/entities/{id}', [EntityAPIController::class, 'deleteEntity']);
 
 
-
 Route::get('/uoms', [UomAPIController::class, 'getUomData']);
-Route::post('/uoms', [UomAPIController::class, 'createUom']);
-Route::put('/uoms/{id}', [UomAPIController::class, 'updateUom']);
+Route::post('/uoms',[UomAPIController::class,'createUom']);
+Route::post('/uoms/{id}',[UomAPIController::class,'updateUom']);
 Route::delete('/uoms/{id}', [UomAPIController::class, 'deleteUom']);
+
+// uom conversion
+Route::post('/uom_conversions', [UomAPIController::class, 'createUomConversion']);
+Route::post('/uom_conversions/{id}',[UomAPIController::class,'updateUomConversion']);
+Route::get('/uom_conversions',[UomAPIController::class,'getUomConversionList']);
 
 Route::get('/items', [ItemAPIController::class, 'getItemData']);
 Route::post('/items', [ItemAPIController::class, 'createItem']);

@@ -37,6 +37,18 @@
                                 </a>
                             </li>
                             <li>
+                                <a href="{{ route('uoms') }}" class="flex items-center @yield('uoms')">
+                                    <i class="fal fa-hand-receiving  pr-3"></i>
+                                    UOMs
+                                </a>
+                            </li>
+                            <li>
+                                <a href="{{ route('uom_conversions') }}" class="flex items-center @yield('uom_conversions')">
+                                    <i class="fal fa-hand-receiving  pr-3"></i>
+                                    UOM Conversions
+                                </a>
+                            </li>
+                            <li>
                                 <a href="{{ route('item_usage_forecasts') }}"
                                     class="flex items-center @yield('item_usage_forecasts')">
                                     <i class="fal fa-truck-loading  pr-3"></i>
@@ -243,6 +255,12 @@
                                 </a>
                             </li>
                         @endif
+                        <li>
+                            <a href="{{ route('transfers.index') }}" class="flex items-center @yield('inventory_histories')">
+                                <i class="fal fa-user  pr-3"></i>
+                                Inventory Transfer Histories
+                            </a>
+                        </li>
                         <li>
                             <a href="{{ route('transfers.receives') }}" class="flex items-center @yield('inventory_receives')">
                                 <i class="fal fa-user  pr-3"></i>

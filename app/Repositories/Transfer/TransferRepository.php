@@ -117,7 +117,13 @@ class TransferRepository implements TransferRepositoryInterface
     public function transferConfirmationList($request)
     {
         $inventory_ids = InventoryIds();
-        return Transfer::with(['item', 'created_by', 'confirmed_by', 'source_inventory', 'destination_inventory'])->whereIn('destination_inventory_id', $inventory_ids)
+        return Transfer::with(['item', 'created_by', 'confirmed_by', 'source_inventory', 'destination_inventory'])
+            ->when( $request->status, function ($q) use ($request) {
+                $q->where('status', $request->status);
+            })
+            ->when(checkDepartmentAndRoles('Inventory', ['Staff']), function ($q) use ($inventory_ids) {
+                $q->whereIn('destination_inventory_id', $inventory_ids);
+            })
             ->paginate(config('common.list_count'));
     }
 
