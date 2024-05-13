@@ -172,6 +172,16 @@ Route::middleware('auth:api')->group(function () {
     Route::delete('/inventories/{id}', [InventoryAPIController::class, 'deleteInventory']);
     Route::get('/inventories/{inventoryId}/ledgers', [InventoryAPIController::class, 'getInventoryLedgers']);
     Route::get('inventory_list',[InventoryAPIController::class, 'inventoryList']);
+
+    Route::get('/uoms', [UomAPIController::class, 'getUomData']);
+    Route::post('/uoms',[UomAPIController::class,'createUom']);
+    Route::post('/uoms/{id}',[UomAPIController::class,'updateUom']);
+    Route::delete('/uoms/{id}', [UomAPIController::class, 'deleteUom']);
+
+    // uom conversion
+    Route::post('/uom_conversions', [UomAPIController::class, 'createUomConversion']);
+    Route::post('/uom_conversions/{id}',[UomAPIController::class,'updateUomConversion']);
+    Route::get('/uom_conversions',[UomAPIController::class,'getUomConversionList']);
 });
 
 Route::controller(ExcelImportController::class)->group(function () {
@@ -217,29 +227,18 @@ Route::put('/entities/{id}', [EntityAPIController::class, 'updateEntity']);
 Route::delete('/entities/{id}', [EntityAPIController::class, 'deleteEntity']);
 
 
-Route::get('/uoms', [UomAPIController::class, 'getUomData']);
-Route::post('/uoms',[UomAPIController::class,'createUom']);
-Route::post('/uoms/{id}',[UomAPIController::class,'updateUom']);
-Route::delete('/uoms/{id}', [UomAPIController::class, 'deleteUom']);
-
-// uom conversion
-Route::post('/uom_conversions', [UomAPIController::class, 'createUomConversion']);
-Route::post('/uom_conversions/{id}',[UomAPIController::class,'updateUomConversion']);
-Route::get('/uom_conversions',[UomAPIController::class,'getUomConversionList']);
-
 Route::get('/items', [ItemAPIController::class, 'getItemData']);
 Route::post('/items', [ItemAPIController::class, 'createItem']);
 Route::put('/items/{id}', [ItemAPIController::class, 'updateItem']);
 Route::delete('/items/{id}', [ItemAPIController::class, 'deleteItem']);
 Route::post('/item_prices/{id}',[ItemAPIController::class,'addItemPrice']);
-
+Route::get('/get_uom_conversion_by_uom',[UomAPIController::class,'getUomConversionByUom']);
 
 // Route::get('/transfers', [TransferAPIController::class, 'getTransferData']);
 // Route::post('/transfers', [TransferAPIController::class, 'createTransfer']);
 // Route::put('/transfers/{id}', [TransferAPIController::class, 'updateTransfer']);
 // Route::delete('/transfers/{id}', [TransferAPIController::class, 'deleteTransfer']);
 // Route::post('/transfers/{id}/confirms', [TransferAPIController::class, 'confirmTransfer']);
-
 
 Route::get('/customers', [CustomerAPIController::class, 'getCustomerData']);
 Route::post('/customers', [CustomerAPIController::class, 'createCustomer']);

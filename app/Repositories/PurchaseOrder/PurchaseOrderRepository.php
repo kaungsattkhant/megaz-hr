@@ -84,7 +84,7 @@ class PurchaseOrderRepository implements PurchaseOrderRepositoryInterface
                 $item_data['purchase_order_id'] = $po->id;
                 $item_data['item_id'] = $item->item_id;
                 $item_data['amount'] = $item->amount;
-
+                $item_data['uom_id'] = $item->uom_id;
                 // $purchaseOrderItem=PurchaseOrderItem::find($item_data['id']);
                 if (isset($item->later_buy) && $item->later_buy) {
                     $purchaseOrderItem = $po->items()->where('id', $item_data['id'])->first();
@@ -192,10 +192,10 @@ class PurchaseOrderRepository implements PurchaseOrderRepositoryInterface
     {
         $purchaseOrder->items = $purchaseOrder->items;
         $purchaseOrder->items->load('purchaseOrderItemLeft');
+        $purchaseOrder->items->load('item.suppliers');
         foreach ($purchaseOrder->items as $item) {
             $item->later_buy = $item->purchaseOrderItemLeft ? 1 : 0;
         }
-        $purchaseOrder->items->load('item.suppliers');
         return $purchaseOrder;
     }
 
@@ -298,7 +298,6 @@ class PurchaseOrderRepository implements PurchaseOrderRepositoryInterface
             ResponseMessage($e->getMessage(), 402);
             throw $e;
         }
-
     }
 
     public function existIsCheckAndUpdate($model, $is_column, $value)
