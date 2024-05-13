@@ -119,11 +119,11 @@
                             <td class=" px-6 py-4 font-medium ">
                                 &nbsp;
                             </td>
-                            <td class="px-6 py-4">
-                                {{ totalPrice.toLocaleString() }}
-                            </td>
                             <td class=" px-6 py-4 font-medium ">
                                 &nbsp;
+                            </td>
+                            <td class="px-6 py-4">
+                                {{ totalPrice.toLocaleString() }}
                             </td>
                         </tr>
                     </div>
@@ -187,7 +187,7 @@
                 });
             },
 
-            addItemBtnClicked(){
+            async addItemBtnClicked(){
                 if(!this.selectedItem){
                     this.alertValidationMessage('an item');
                     return 1;
@@ -200,7 +200,27 @@
                     this.alertValidationMessage('quantity');
                     return 1;
                 }
-                let amount = (this.selectedItem.item_prices)? this.selectedItem.item_prices.price: 0;
+                let url = `/api/get_uom_conversion_by_uom?po_uom_id=${this.selectedUom.id}&item_uom_id=${this.selectedItem.item_prices.uom_id}`;
+                let response = await getApiData({url: url, token: this.getToken()});
+                let amount = 0;
+                if(response.data){
+                    console.log(response.data);
+                    amount = response.data;
+                    this.$notify({
+                        text: `Uom conversion by uom value ${amount}`,
+                        type: 'info'
+                    });
+                }
+                else{
+                    this.$notify({
+                        title: 'Error',
+                        text: `No matching uom price found`,
+                        type: 'error'
+                    });
+
+                    return 1;
+                }
+                // amount = (this.selectedItem.item_prices)? this.selectedItem.item_prices.price: 0;
                 this.purchaseOrderItems.push({
                     item_id: this.selectedItem.id,
                     name: this.selectedItem.name,
