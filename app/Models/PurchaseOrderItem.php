@@ -13,9 +13,7 @@ class PurchaseOrderItem extends BaseModel
 
     protected $with=['item'];
     protected $fillable=[
-        'quantity','purchase_order_id','item_id','amount','original_quantity','is_grn',
-        
-
+        'quantity','purchase_order_id','item_id','amount','original_quantity','is_grn','uom_id'
     ];
 
     public function getCreatedAt()
@@ -34,6 +32,10 @@ class PurchaseOrderItem extends BaseModel
     
     public function item(){
         return $this->belongsTo(Item::class);
+    }
+
+    public function uom(){
+        return $this->belongsTo(Uom::class);
     }
 
     public function purchaseOrderItemLefts(){

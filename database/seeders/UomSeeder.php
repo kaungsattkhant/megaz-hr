@@ -24,7 +24,10 @@ class UomSeeder extends Seeder
             'pack',
         ];
         foreach ($name as $n) {
-            Uom::create(['name' => $n]);
+            Uom::create([
+                'name' => $n,
+                'created_by'=>1,
+            ]);
         }
     }
 }
