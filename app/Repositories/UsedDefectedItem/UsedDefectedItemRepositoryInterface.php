@@ -4,7 +4,7 @@ namespace App\Repositories\UsedDefectedItem;
 
 use Illuminate\Http\Request;
 
-interface UsedDefectedITemRepositoryInterface
+interface UsedDefectedItemRepositoryInterface
 {
     public function listUsedDefectList(Request $request);
 

@@ -6,7 +6,7 @@ use App\Models\UsedDefectedItem;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
-class UsedDefectedItemRepository implements UsedDefectedITemRepositoryInterface
+class UsedDefectedItemRepository implements UsedDefectedItemRepositoryInterface
 {
     public function listUsedDefectList(Request $request)
     {
