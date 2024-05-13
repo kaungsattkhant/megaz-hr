@@ -18,21 +18,23 @@ class PackRepository implements PackRepositoryInterface
             $menu = Menu::find($data['menu_id']);
             $menuItems = $menu->items;
 
-            $pack = Pack::create([
-                'menu_id' => $data['menu_id'],
-                'date' => CurrentTime(),
-                'expired_at' => $data['expired_at'],
-                'created_by' => $data['created_by'],
-                'status' => 'not yet'
-            ]);
 
-            foreach ($menuItems as $item) {
-                $packItem = PackItem::create([
-                    'pack_id' => $pack->id,
-                    'item_id' => $item->id,
-                    'uom_id' => $item->pivot->uom_id,
-                    'quantity' => $item->pivot->weight
+             for ($i = 0; $i < $data['quantity']; $i++) {
+                $pack = Pack::create([
+                    'menu_id' => $data['menu_id'],
+                    'date' => CurrentTime(),
+                    'expired_at' => $data['expired_at'],
+                    'created_by' => $data['created_by'],
+                    'status' => 'not yet'
                 ]);
+                foreach ($menuItems as $item) {
+                    $packItem = PackItem::create([
+                        'pack_id' => $pack->id,
+                        'item_id' => $item->id,
+                        'uom_id' => $item->pivot->uom_id,
+                        'quantity' => $item->pivot->weight
+                    ]);
+                }
             }
 
             DB::commit();

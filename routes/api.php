@@ -40,6 +40,7 @@ use App\Http\Controllers\API\PurchaseOrderAPIController;
 use App\Http\Controllers\API\ItemUsageForecastController;
 use App\Http\Controllers\API\PackAPIController;
 use App\Http\Controllers\API\PurchaseOrderItemLeftController;
+use App\Http\Controllers\API\UsedDefectedAPIController;
 
 /*
 |--------------------------------------------------------------------------
@@ -271,3 +272,6 @@ Route::get("/test", [TestController::class, "index"]);
 Route::get('/menu_categories/{id}/menus',[MenuAPIController::class,'menuByMenuCategory']);
 
 Route::post("/order_status_change",[OrderAPIController::class,'orderItemChangeStatus']);
+
+Route::get('/used_defected_items',[UsedDefectedAPIController::class,'lisltUsedDefectedItem']);
+Route::post('/used_defected_items',[UsedDefectedAPIController::class,'createUsedDefected']);
