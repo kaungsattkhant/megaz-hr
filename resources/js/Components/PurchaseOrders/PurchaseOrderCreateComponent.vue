@@ -206,6 +206,7 @@
                 if(response.data){
                     console.log(response.data);
                     amount = response.data;
+                    amount = amount * this.selectedItem.item_prices.price;
                     this.$notify({
                         text: `Uom conversion by uom value ${amount}`,
                         type: 'info'
