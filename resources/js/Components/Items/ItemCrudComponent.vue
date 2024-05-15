@@ -203,7 +203,18 @@
                             </label>
                             <select name="" id="" v-model="selectedUOM"
                                 class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
-                                <option :value="uom" v-for="(uom, uomIndex) in uomList" :key="uomList"> {{ uom.name }}
+                                <option :value="uom" v-for="(uom, uomIndex) in uomList" :key="uomIndex"> {{ uom.name }}
+                                </option>
+                            </select>
+                        </div>
+
+                        <div class="mb-4">
+                            <label for="" class="block text-sm text-black mb-3">
+                                Base Unit Uom
+                            </label>
+                            <select name="" id="" v-model="selectedBaseUom"
+                                class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
+                                <option :value="uom" v-for="(uom, uomIndex) in uomList" :key="uomIndex"> {{ uom.name }}
                                 </option>
                             </select>
                         </div>
@@ -316,6 +327,7 @@ export default {
             currentGroup: 0,
             isFirstGroup: true,
             isLastGroup: false,
+            selectedBaseUom:null
         };
     },
 
@@ -389,12 +401,17 @@ export default {
         },
 
         async createBtnClicked() {
+            if (!this.selectedUOM || !this.name || !this.price || !this.selectedCategory ||!this.selectedBaseUom) {
+                alert('Required data must be filled');
+                return false;
+            }
             let url = `/api/items`;
             let formData = new FormData();
             formData.append('uom_id', this.selectedUOM.id);
             formData.append('name', this.name);
             formData.append('price', this.price);
             formData.append('category_id', this.selectedCategory.id);
+            formData.append('base_uom_id',this.selectedBaseUom.id);
             let response = await postApiData({ url: url, form_data: formData, token: this.getToken() });
             if (response.success) {
                 // this.getItemList(this.currentPage);
