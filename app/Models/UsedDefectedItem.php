@@ -12,4 +12,14 @@ class UsedDefectedItem extends Model
     protected $fillable =[
         'date','item_id','uom_id','type','quantity','remark','created_by'
     ];
+
+    public function item()
+    {
+        return $this->belongsTo(Item::class);
+    }
+
+    public function uom()
+    {
+        return $this->belongsTo(Uom::class);
+    }
 }

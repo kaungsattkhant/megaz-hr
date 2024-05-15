@@ -59,6 +59,8 @@ use App\Repositories\PurchaseOrder\PurchaseOrderRepository;
 use App\Repositories\Complaint\ComplaintRepositoryInterface;
 use App\Repositories\Inventory\InventoryRepositoryInterface;
 use App\Repositories\Department\DepartmentRepositoryInterface;
+use App\Repositories\Feature\FeatureRepository;
+use App\Repositories\Feature\FeatureRepositoryInterface;
 use App\Repositories\RoomSession\RoomSessionRepositoryInterface;
 use App\Repositories\ItemUsageForecast\ItemUsageForecastInterface;
 use App\Repositories\ItemUsageForecast\ItemUsageForecastRepository;
@@ -119,5 +121,6 @@ class RepositoryServiceProvider extends ServiceProvider
         $this->app->bind(FixedAssetPurchaseRepositoryInterface::class,FixedAssetPurchaseRepository::class);
         $this->app->bind(PackRepositoryInterface::class,PackRepository::class);
         $this->app->bind(UsedDefectedITemRepositoryInterface::class,UsedDefectedItemRepository::class);
+        $this->app->bind(FeatureRepositoryInterface::class,FeatureRepository::class);
     }
 }

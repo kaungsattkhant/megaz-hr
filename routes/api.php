@@ -35,6 +35,7 @@ use App\Http\Controllers\API\ComplaintAPIController;
 use App\Http\Controllers\API\InventoryAPIController;
 use App\Http\Controllers\API\NotificationController;
 use App\Http\Controllers\API\DepartmentAPIController;
+use App\Http\Controllers\API\FeatureAPIController;
 use App\Http\Controllers\API\FixedAssetPurchaseAPIController;
 use App\Http\Controllers\API\PurchaseOrderAPIController;
 use App\Http\Controllers\API\ItemUsageForecastController;
@@ -277,3 +278,5 @@ Route::post('/used_defected_items',[UsedDefectedAPIController::class,'createUsed
 
 
 Route::get('get_inventory',[InventoryAPIController::class, 'getInventory']);
+// feature
+Route::get('/features',[FeatureAPIController::class,'getFeatureData']);

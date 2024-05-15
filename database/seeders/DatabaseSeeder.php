@@ -36,7 +36,7 @@ class DatabaseSeeder extends Seeder
             StaffSeeder::class,
             ServiceCategorySeeder::class,
             UomSeeder::class,
-            ItemSeeder::class,
+            // ItemSeeder::class,
             HeadAccountSeeder::class,
             SubAccountSeeder::class,
             RoomAndTableSeeder::class,

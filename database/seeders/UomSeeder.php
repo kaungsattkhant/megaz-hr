@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use App\Models\Uom;
+use App\Models\UomConversion;
 use Illuminate\Database\Seeder;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 
@@ -24,10 +25,24 @@ class UomSeeder extends Seeder
             'pack',
         ];
         foreach ($name as $n) {
-            Uom::create([
+            $uom=Uom::create([
                 'name' => $n,
                 'created_by'=>1,
             ]);
+            if($uom){
+                UomConversion::firstOrCreate(
+                    [
+                        'base_unit_id' => $uom->id,
+                        'conversion_unit_id' => $uom->id,
+                    ], [
+                        'base_unit_id' => $uom->id,
+                        'conversion_unit_id' => $uom->id,
+                        'conversion'=>1,
+                        'created_by'=>1,
+                        'is_show'=>0
+                    ]
+                );
+            }
         }
     }
 }

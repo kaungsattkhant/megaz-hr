@@ -17,6 +17,7 @@ return new class extends Migration
             $table->double('quantity');
             $table->double('amount');
             $table->foreignId('uom_id')->constrained();
+            $table->foreignId('uom_conversion_id')->constrained();
             $table->foreignId('purchase_order_id')->constrained();
             $table->foreignId('item_id')->constrained();
             $table->boolean('is_manager_checked')->default(0);

@@ -10,7 +10,7 @@ class UomConversion extends Model
     use HasFactory;
 
     protected $fillable =[
-        'base_unit_id','conversion_unit_id','conversion', 'is_active','created_by'
+        'base_unit_id','conversion_unit_id','conversion','is_show', 'is_active','created_by'
     ];
 
     public function createdStaff()

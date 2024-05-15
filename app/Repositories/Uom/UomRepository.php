@@ -40,6 +40,21 @@ class UomRepository implements UomRepositoryInterface
             $data['created_by'] = UserData()->id;
             $data['name'] = $data['name'];
             $uom = Uom::firstOrCreate(['name' => $data['name']], $data);
+            if ($uom) {
+                UomConversion::firstOrCreate(
+                    [
+                        'base_unit_id' => $uom->id,
+                        'conversion_unit_id' => $uom->id,
+                        'conversion'=>1,
+                    ], [
+                        'base_unit_id' => $uom->id,
+                        'conversion_unit_id' => $uom->id,
+                        'conversion'=>1,
+                        'created_by'=>UserData()->id,
+                        'is_show'=>0
+                    ]
+                );
+            }
             DB::commit();
             return $uom;
         } catch (\Exception $e) {
@@ -83,11 +98,10 @@ class UomRepository implements UomRepositoryInterface
 
     // uom conversion
 
-
     public function uomConversaionList(Request $request)
     {
         if ($request->per_page || $request->page) {
-            $totalCount = UomConversion::with('baseUnit', 'conversionUnit')->count();
+            $totalCount = UomConversion::with('baseUnit', 'conversionUnit')->where('is_show',1)->count();
             $pageNumber = 1;
             $perPage = 20;
             if ($request->page) {
@@ -97,10 +111,9 @@ class UomRepository implements UomRepositoryInterface
                 $perPage = $request->per_page;
             }
             $skip = ($pageNumber - 1) * $perPage;
-            $uoms = UomConversion::with('baseUnit', 'conversionUnit')->skip($skip)->take($perPage)->get();
+            $uoms = UomConversion::with('baseUnit', 'conversionUnit')->skip($skip)->take($perPage)->where('is_show',1)->get();
             $paginationData = MakePaginationData($request, $totalCount, 'uoms');
             $paginationData['uoms'] = $uoms;
-
             return $paginationData;
         } else {
             $uoms = UomConversion::with('baseUnit', 'conversionUnit')->get();
@@ -122,7 +135,6 @@ class UomRepository implements UomRepositoryInterface
             throw $e;
         }
     }
-
 
     public function updateUomConversion(array $data, int $id)
     {

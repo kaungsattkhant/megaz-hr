@@ -13,7 +13,7 @@ class PurchaseOrderItem extends BaseModel
 
     protected $with=['item'];
     protected $fillable=[
-        'quantity','purchase_order_id','item_id','amount','original_quantity','is_grn','uom_id','conversion_id'
+        'quantity','purchase_order_id','item_id','amount','original_quantity','is_grn','uom_id','uom_conversion_id'
     ];
 
     public function getCreatedAt()
