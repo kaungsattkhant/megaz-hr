@@ -2,6 +2,7 @@
 
 namespace App\Repositories\Staff;
 
+use App\Models\Feature;
 use App\Models\Inventory;
 use App\Models\Role;
 use App\Models\Staff;
@@ -101,9 +102,22 @@ class StaffRepository implements StaffRepositoryInterface
                     }
                 }
 
-                if (isset($data['inventoryIds'])) {
-                    $inventoryIds = isset($data['inventoryIds']) ? json_decode($data['inventoryIds']) : [];
-                    $staff->inventories()->attach($inventoryIds);
+                if (isset($data['inventoryIds']) && $data['inventoryIds'] !== null) {
+                    $inventoryIdsToAttach = json_decode($data['inventoryIds'], true);
+                    $currentInventoryIds = $staff->inventories()->pluck('id')->toArray();
+                    $inventoryIdsToAttach = array_diff($inventoryIdsToAttach, $currentInventoryIds);
+                    if (!empty($inventoryIdsToAttach)) {
+                        $staff->inventories()->attach($inventoryIdsToAttach);
+                    }
+                }
+
+                if (isset($data['featureIds']) && $data['featureIds'] !== null) {
+                    $featuireIds = json_decode($data['featureIds'], true);
+                    $currentFeatureList = $staff->features()->pluck('id')->toArray();
+                    $featuireIds = array_diff($featuireIds, $currentFeatureList);
+                    if (!empty($featuireIds)) {
+                        $staff->features()->attach($featuireIds);
+                    }
                 }
             }
             DB::commit();
@@ -117,7 +131,7 @@ class StaffRepository implements StaffRepositoryInterface
 
     public function staffDetail(int $id)
     {
-        $staff = Staff::with('department', 'roles', 'inventories', 'emergencyContacts', 'gender', 'completed_tasks')->find($id);
+        $staff = Staff::with('department', 'roles', 'inventories', 'emergencyContacts', 'gender', 'completed_tasks','features')->find($id);
         if ($staff == null) {
             ResponseMessage("Staff not found or invalid id", 404);
         }
@@ -177,7 +191,7 @@ class StaffRepository implements StaffRepositoryInterface
             } else {
                 $staff->roles()->detach($role->id);
                 DB::commit();
-                ResponseMessage("Detach successfully");
+                ResponseMessage("Role detach successfully");
             }
         } catch (\Exception $e) {
             DB::rollback();
@@ -197,6 +211,27 @@ class StaffRepository implements StaffRepositoryInterface
                 ResponseMessage('Staff or inventory not found');
             } else {
                 $staff->inventories()->detach($inventory->id);
+                DB::commit();
+                ResponseMessage("Inventory detach successfully");
+            }
+        } catch (\Exception $e) {
+            DB::rollback();
+            ResponseMessage($e->getMessage(), 402);
+            throw $e;
+        }
+    }
+
+
+    public function deleteStaffFeature(int $staff_id, int $feature_id)
+    {
+        DB::beginTransaction();
+        try {
+            $staff = Staff::find($staff_id);
+            $feature = Feature::find($feature_id);
+            if (!$staff || !$feature) {
+                ResponseMessage('Staff or feature not found');
+            } else {
+                $staff->features()->detach($feature->id);
                 DB::commit();
                 ResponseMessage("Detach successfully");
             }

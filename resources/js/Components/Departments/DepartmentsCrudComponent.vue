@@ -27,6 +27,9 @@
                             <th scope="col" class=" px-6 py-4 ">
                                 Name
                             </th>
+                            <th scope="col" class=" px-6 py-4 ">
+                                Features
+                            </th>
                             <th scope="col" class="px-6 py-4">
 
                             </th>
@@ -42,6 +45,11 @@
                                 </td>
                                 <td class="whitespace-nowrap px-6 py-4 ">
                                     {{ department.name }}
+                                </td>
+                                <td class="whitespace-nowrap px-6 py-4 ">
+                                    <div v-for="feature in department.features">
+                                        {{ feature.name }},
+                                    </div>
                                 </td>
                                 <td class="whitespace-nowrap px-6 py-4">
                                     <button @click="deleteBtnClicked(department.id)"
@@ -96,6 +104,17 @@
                             <input type="text" placeholder="Department Name" v-model="name"
                                 class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
                         </div>
+                        <div class="mb-4">
+                            <label for="" class="block text-sm text-black mb-3">
+                                Department Features
+                            </label>
+                            <select data-te-select-init data-te-select-placeholder="Select Features"
+                                data-te-select-filter="true" name="" id="" multiple v-model="selectedFeatures"
+                                class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0"
+                                @change="featureSelectChanged">
+                                <option :value="feature.name" v-for="(feature, featureIndex) in featureList" :key="featureIndex"> {{ feature.name }} </option>
+                            </select>
+                        </div>
                     </div>
 
                     <!--Modal footer-->
@@ -108,13 +127,6 @@
                 </div>
             </div>
         </div>
-
-
-
-
-
-
-
 
         <!--Delete Modal -->
         <div
@@ -199,12 +211,13 @@
     export default {
         data() {
             return {
-
-
                 departmentList: [],
                 name: null,
                 deleteId: null,
 
+                featureList: [],
+                selectedFeatures: [],
+                targetSelectedFeatures: [],
 
                 per_page: 10,
                 pageNumbers: [],
@@ -226,12 +239,39 @@
                 }
             },
 
+            async getFeatureList(){
+                let response = await getApiData({ url: `/api/features`, token: this.getToken() });
+                if(response.data){
+                    this.featureList = response.data;
+                }
+            },
+
+            alertValidationMessage(field) {
+                this.$notify({
+                    title: 'Input validation',
+                    text: `You forgot to provide ${field}, please try again`,
+                    type: 'warn'
+                });
+            },
+
+            featureSelectChanged(){
+                // console.log(this.selectedFeatures);
+            },
+
             createDepartmentsBtnClicked(){
-                // alert(`name = ${this.name}`);
-                // alert(`tasks = ${this.tasks}`);
-                // alert(`department = ${this.selectedDepartment.name}`);
-                // alert(`role = ${this.selectedRole.name}`);
-                // alert(`date = ${this.selectedDate}`);
+                if(!this.name){
+                    this.alertValidationMessage('name');
+                    return 1;
+                }
+                if(this.selectedFeatures.length < 1){
+                    this.alertValidationMessage('department features');
+                    return 1;
+                }
+                this.selectedFeatures.forEach((feature)=>{
+                    let selectedFeature = this.featureList.find(featureFromFeatureList => featureFromFeatureList.name == feature);
+                    this.targetSelectedFeatures.push(selectedFeature.id);
+                });
+
                 this.createDepartment();
             },
 
@@ -239,6 +279,8 @@
             {
                 let formData = new FormData();
                 formData.append('name', this.name);
+                formData.append('featureIds', JSON.stringify(this.targetSelectedFeatures));
+
                 let response = await postApiData({url: '/api/departments', form_data: formData, token: this.getToken()});
                 if(response.success){
                     // window.location.replace('/tasks');
@@ -246,7 +288,10 @@
                     // alert('test');
                 }
                 else{
-                    alert('some errors occur');
+                    this.$notify({
+                        text: `Some errors occur`,
+                        type: 'error'
+                    });
                 }
             },
 
@@ -266,8 +311,8 @@
         },
         mounted()
         {
-
             this.getDepartmentList();
+            this.getFeatureList();
             initTE({ Modal,Select, Ripple });
         }
     }

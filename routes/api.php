@@ -168,6 +168,7 @@ Route::middleware('auth:api')->group(function () {
     });
 
     Route::get('/inventories', [InventoryAPIController::class, 'getInventoryData']);
+    Route::get('/get_inventory', [InventoryAPIController::class, 'getInventory']);
     Route::post('/inventories', [InventoryAPIController::class, 'createInventory']);
     Route::get('/inventories/{inventory}', [InventoryAPIController::class, 'detail']);
     Route::put('/inventories/{id}', [InventoryAPIController::class, 'updateInventory']);
@@ -214,6 +215,7 @@ Route::post('/staffs/{id}', [StaffAPIController::class, 'updateStaff']);
 Route::delete('/staffs/{id}', [StaffAPIController::class, 'deleteStaff']);
 Route::delete('/staffs/{staff_id}/roles/{role_id}',[StaffAPIController::class,'deleteRoleStaff']);
 Route::delete('/staffs/{staff_id}/inventories/{inventory_id}',[StaffAPIController::class,'deleteInventoryStaff']);
+Route::delete('/staffs/{staff_id}/features/{feature_id}',[StaffAPIController::class,'deleteFeatureStaff']);
 
 
 Route::get('/tasks', [TaskController::class, 'getTaskData']);
