@@ -47,10 +47,18 @@ class StaffRepository implements StaffRepositoryInterface
                     }
                 }
             }
-
             if (isset($data['roles']) && is_array($data['roles'])) {
                 $staff->roles()->attach($data['roles']);
             }
+
+            if(isset($data['featureIds']))
+            {
+                $featureIds = json_decode($data['featureIds']);
+                foreach ($featureIds as $featureId) {
+                    $staff->features()->attach($featureId);
+                }
+            }
+
             $data['staff_id'] = $staff->id;
             $this->createEmegercyContact($data);
             DB::commit();

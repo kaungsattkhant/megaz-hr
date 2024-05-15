@@ -55,4 +55,9 @@ class Department extends BaseModel
     {
         return $this->morphOne(Inventoryable::class, 'inventoryable');
     }
+
+    public function features()
+    {
+        return $this->belongsToMany(Feature::class,'department_feature');
+    }
 }
