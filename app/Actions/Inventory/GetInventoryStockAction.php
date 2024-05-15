@@ -2,7 +2,6 @@
 
 namespace App\Actions\Inventory;
 
-use App\Models\InventoryLedger;
 use Illuminate\Support\Facades\DB;
 
 class GetInventoryStockAction
@@ -114,20 +113,40 @@ class GetInventoryStockAction
 
         $itemBalances = DB::table('inventory_ledger_items')
             ->join('items', 'inventory_ledger_items.item_id', '=', 'items.id')
+            ->join(DB::raw('(SELECT * FROM item_prices WHERE (item_id, created_at) IN
+            (SELECT item_id, MAX(created_at)
+             FROM item_prices
+             GROUP BY item_id)) as latest_prices'),
+                'items.id', '=', 'latest_prices.item_id')
+            ->join('uoms as item_uom', 'latest_prices.uom_id', '=', 'item_uom.id')
+            ->join('uoms as base_uom', 'items.uom_id', '=', 'base_uom.id')
             ->join('inventory_ledgers', 'inventory_ledger_items.inventory_ledger_id', '=', 'inventory_ledgers.id')
+            ->join('uom_conversions', function ($join) {
+                $join->on('items.uom_id', '=', 'uom_conversions.base_unit_id')
+                    ->on('latest_prices.uom_id', '=', 'uom_conversions.conversion_unit_id')
+                    ->where('uom_conversions.is_active', 1);
+            })
             ->select(
                 'items.name',
-                'item_id',
-                DB::raw('(SUM(CASE WHEN action = "in" AND DATE(date) < CURDATE() THEN quantity ELSE 0 END) - 
+                'inventory_ledger_items.item_id', // Prefix the table name here
+                'latest_prices.uom_id as conversion_unit_id',
+                'items.uom_id as item_uom_id as base_unit_id',
+                'item_uom.name as conversion_uom_name',
+                'base_uom.name as base_uom_name',
+                'uom_conversions.conversion',
+                DB::raw('(SUM(CASE WHEN action = "in" AND DATE(date) < CURDATE() THEN quantity ELSE 0 END) -
                   SUM(CASE WHEN action = "out" AND DATE(date) < CURDATE() THEN quantity ELSE 0 END)) as opening_balance'),
                 DB::raw('SUM(CASE WHEN action = "in" AND DATE(date) = CURDATE() THEN quantity ELSE 0 END) as in_balance'),
                 DB::raw('SUM(CASE WHEN action = "out" AND DATE(date) = CURDATE() THEN quantity ELSE 0 END) as out_balance'),
-                DB::raw('(SUM(CASE WHEN action = "in" AND DATE(date) < CURDATE() THEN quantity ELSE 0 END) + 
-                  SUM(CASE WHEN action = "in" AND DATE(date) = CURDATE() THEN quantity ELSE 0 END) - 
+                // DB::raw('((SUM(CASE WHEN action = "in" AND DATE(date) < CURDATE() THEN quantity ELSE 0 END) + 
+                //   SUM(CASE WHEN action = "in" AND DATE(date) = CURDATE() THEN quantity ELSE 0 END) - 
+                //   SUM(CASE WHEN action = "out" AND DATE(date) <= CURDATE() THEN quantity ELSE 0 END)) / uom_conversions.conversion) as closing_balance')
+                DB::raw('(SUM(CASE WHEN action = "in" AND DATE(date) < CURDATE() THEN quantity ELSE 0 END) +
+                  SUM(CASE WHEN action = "in" AND DATE(date) = CURDATE() THEN quantity ELSE 0 END) -
                   SUM(CASE WHEN action = "out" AND DATE(date) <= CURDATE() THEN quantity ELSE 0 END)) as closing_balance')
-            )
-            ->where('inventory_id',$this->inventoryId)
-            ->groupBy('item_id');
+                )
+            ->where('inventory_id', $this->inventoryId)
+            ->groupBy('inventory_ledger_items.item_id', 'items.name', 'latest_prices.uom_id', 'items.uom_id', 'uom_conversions.conversion');
         $result = $itemBalances->get();
 
         return $result;

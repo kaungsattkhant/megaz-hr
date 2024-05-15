@@ -75,11 +75,11 @@ class UomAPIController extends Controller
         $uom_conversion=UomConversion::where('base_unit_id',$request->po_uom_id)
         ->where('conversion_unit_id',$request->item_uom_id)
         ->first();
-        $conversion=1;
         if($uom_conversion){
             $conversion= $uom_conversion->conversion;
+            ResponseData($conversion);
         }
-        ResponseData($conversion);
+        ResponseMessage('Uom conversion is required');
     }
     #end
 
