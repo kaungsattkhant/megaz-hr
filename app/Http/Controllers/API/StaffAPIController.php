@@ -92,4 +92,10 @@ class StaffAPIController extends Controller
     {
         $staff = $this->staffRepo->deleteStaffInventory($staff_id,$inventory_id);
     }
+
+
+    public function deleteFeatureStaff(int $staff_id, int $feature_id)
+    {
+        $staff = $this->staffRepo->deleteStaffFeature($staff_id,$feature_id);
+    }
 }

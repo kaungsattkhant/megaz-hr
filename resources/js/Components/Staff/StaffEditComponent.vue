@@ -138,7 +138,7 @@
                 <label for="" class="block text-sm text-black mb-3">
                     Authorized Features
                 </label>
-                <div class="bg-white mb-0 w-full text-sm inline-block" data-te-select-wrapper-ref>
+                <div class=" mb-0 w-full text-sm inline-block" data-te-select-wrapper-ref>
                     <select data-te-select-init data-te-select-placeholder="Select Features" data-te-select-filter="true"
                         name="" id="" multiple v-model="selectedFeatures"
                         class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
@@ -146,6 +146,10 @@
                             {{ feature.name }}
                         </option>
                     </select>
+                    <div v-for="(feature, index) in editFeatureList" :key="index" class='py-2 px-3 flex justify-between'>
+                        <span>{{ feature.name }}</span><span><i @click="deletefeatureStaff(feature)"
+                                class="fal fa-times text-red-400"></i></span>
+                    </div>
                 </div>
             </div>
 
@@ -430,7 +434,8 @@ export default {
             staffDetailData: null,
             staffRoles: null,
             inventories: [],
-            roles: []
+            roles: [],
+            editFeatureList:[]
         };
     },
 
@@ -471,17 +476,37 @@ export default {
                 this.roles = this.staffDetailData.roles;
                 this.state = this.staffDetailData.state;
                 this.city = this.staffDetailData.city;
+                this.editFeatureList = this.staffDetailData.features;
+                console.log(this.editFeatureList);
+
             }
         },
 
         async deleteRoleStaff(role) {
             let response = await deleteApiData({ url: `/api/staffs/${this.staffId}/roles/${role}` });
-            this.getStaffDetail();
+            if(response.success==true)
+            {
+                this.getStaffDetail();
+            }
+        },
+
+        async deletefeatureStaff(feature)
+        {
+            let url = `/api/staffs/${this.staffId}/features/${feature.id}`;
+            console.log(url);
+            let response = await deleteApiData({url:`/api/staffs/${this.staffId}/features/${feature.id}`});
+            if(response.success==true)
+            {
+                this.getStaffDetail();
+            }
         },
 
         async deleteInventoryStaff(inventory) {
             let response = await deleteApiData({ url: `/api/staffs/${this.staffId}/inventories/${inventory}` });
-            this.getStaffDetail();
+            if(response.success==true)
+            {
+                this.getStaffDetail();
+            }
         },
 
         async getStateList() {
@@ -577,6 +602,10 @@ export default {
                 });
             }
 
+            this.selectedFeatures.forEach((feature) => {
+                this.featureIds.push(feature.id);
+            });
+            console.log(this.featureIds);
             this.roleSelected.forEach((item) => {
                 this.roleIds.push(item.id);
             });
@@ -715,6 +744,7 @@ export default {
             formData.append('department_id', this.selectedDepartment.id);
             formData.append('inventoryIds', JSON.stringify(this.inventoryIds));
             formData.append('password', this.password);
+            formData.append('featureIds', JSON.stringify(this.featureIds));
             this.roleIds.forEach(roleId => {
                 formData.append('roles[]', roleId);
             });
