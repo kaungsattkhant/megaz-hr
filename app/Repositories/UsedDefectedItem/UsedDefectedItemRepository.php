@@ -20,7 +20,7 @@ class UsedDefectedItemRepository implements UsedDefectedItemRepositoryInterface
             $startTime = $date . ' 00:00:00';
             $endTime = $date . ' 23:59:59';
 
-            $totalCount = UsedDefectedItem::whereBetween('created_at', [$startTime, $endTime])->count();
+            $totalCount = UsedDefectedItem::with('item','uom')->whereBetween('created_at', [$startTime, $endTime])->count();
             $pageNumber = 1;
             $perPage = 20;
             if ($request->page) {
@@ -30,7 +30,7 @@ class UsedDefectedItemRepository implements UsedDefectedItemRepositoryInterface
                 $perPage = $request->per_page;
             }
             $skip = ($pageNumber - 1) * $perPage;
-            $used_defected_items = UsedDefectedItem::whereBetween('date', [$startTime, $endTime])
+            $used_defected_items = UsedDefectedItem::with('item','uom')->whereBetween('date', [$startTime, $endTime])
                             ->skip($skip)
                             ->take($perPage)
                             ->get();
@@ -43,9 +43,9 @@ class UsedDefectedItemRepository implements UsedDefectedItemRepositoryInterface
             {
                 $startTime = $request->date . ' 00:00:00';
                 $endTime = $request->date . ' 23:59:59';
-                $usedDefectedItem = UsedDefectedItem::whereBetween('date', [$startTime, $endTime])->get();
+                $usedDefectedItem = UsedDefectedItem::with('item','uom')->whereBetween('date', [$startTime, $endTime])->get();
             }else{
-                $usedDefectedItem = UsedDefectedItem::all();
+                $usedDefectedItem = UsedDefectedItem::with('item','uom')->get();
             }
 
             return $usedDefectedItem;
