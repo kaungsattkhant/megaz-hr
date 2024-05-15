@@ -44,7 +44,7 @@
                 <label for="" class="block text-sm text-black mb-3">
                     Father's Name
                 </label>
-                <input type="text" v-model="fathterName" placeholder="Father's Name"
+                <input type="text" v-model="fatherName" placeholder="Father's Name"
                     class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
             </div>
 
@@ -64,7 +64,15 @@
                     class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
             </div>
 
-            <div class="col-span-3"></div>
+            <div class="mb-4 col-span-3 pb-6 rounded-md">
+                <label for="" class="block text-sm text-black mb-3">
+                    Joined Date
+                </label>
+                <input type="date" v-model="joinedDate"
+                    class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
+            </div>
+
+            <!-- <div class="col-span-3"></div> -->
 
             <div class="mb-4 col-span-3 pb-6 rounded-md">
                 <label for="" class="block text-sm text-black mb-3">
@@ -113,17 +121,22 @@
                         <option :value="role" v-for="(role, roleIndex) in roleList" :key="roleIndex">
                             {{ role.name }}
                         </option>
-                        <!-- <option value="2">Manager</option>
-                        <option value="3">Waiter</option> -->
                     </select>
                 </div>
             </div>
             <div class="col-span-3 rounded-md mb-4 pb-6">
                 <label for="" class="block text-sm text-black mb-3">
-                    Joined Date
+                    Authorized Features
                 </label>
-                <input type="date" v-model="joinedDate"
-                    class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
+                <div class="bg-white mb-0 w-full text-sm inline-block" data-te-select-wrapper-ref>
+                    <select data-te-select-init data-te-select-placeholder="Select Features" data-te-select-filter="true"
+                        name="" id="" multiple v-model="selectedFeatures"
+                        class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
+                        <option :value="feature" v-for="(feature, featureIndex) in featureList" :key="featureIndex">
+                            {{ feature.name }}
+                        </option>
+                    </select>
+                </div>
             </div>
 
             <div class="col-span-3 rounded-md mb-4 pb-6">
@@ -353,6 +366,7 @@ export default {
             genderList: [],
             departmentList: [],
             roleList: [],
+            featureList: [],
             stateList: [],
             selectedState: null,
             cityList: [],
@@ -363,7 +377,7 @@ export default {
             phoneNumber: null,
             altPhoneNumber: null,
             email: null,
-            fathterName: null,
+            fatherName: null,
             motherName: null,
             joinedDate: getCurrentDate(),
             password: null,
@@ -372,6 +386,8 @@ export default {
             selectedDepartment: null,
             selectedRoles: [],
             roleIds: [],
+            selectedFeatures: [],
+            featureIds: [],
             state: null,
             city: null,
             address: null,
@@ -427,9 +443,13 @@ export default {
         },
 
         async departmentSelectChanged() {
+            this.featureList = [];
             let rolesResponse = await getApiData({ url: `/api/roles?department_id=${this.selectedDepartment.id}`, token: this.getToken() });
             if (rolesResponse.data) {
                 this.roleList = rolesResponse.data;
+            }
+            if(this.selectedDepartment.features.length > 0){
+                this.featureList = this.selectedDepartment.features;
             }
         },
 
@@ -470,6 +490,9 @@ export default {
             this.selectedRoles.forEach((role) => {
                 this.roleIds.push(role.id);
             });
+            this.selectedFeatures.forEach((feature) => {
+                this.featureIds.push(feature.id);
+            });
 
             if (!this.name) {
                 this.alertValiationMessage('name');
@@ -501,7 +524,6 @@ export default {
                 return 1;
             }
 
-
             if (!this.joinedDate) {
                 this.alertValiationMessage('joined date');
                 return 1;
@@ -512,7 +534,12 @@ export default {
             }
 
             if (this.roleIds.length < 1) {
-                this.alertValiationMessage('role');
+                this.alertValiationMessage('roles');
+                return 1;
+            }
+
+            if (this.featureIds.length < 1) {
+                this.alertValiationMessage('authorized features');
                 return 1;
             }
 
@@ -583,8 +610,8 @@ export default {
             }
 
 
-            if (this.fathterName) {
-                formData.append('father_name', this.fathterName);
+            if (this.fatherName) {
+                formData.append('father_name', this.fatherName);
             }
 
             if (this.motherName) {
@@ -613,6 +640,7 @@ export default {
             }
             formData.append('password', this.password);
             formData.append('roles', this.roleIds);
+            formData.append('featureIds', JSON.stringify(this.featureIds));
             formData.append('joined_date', this.joinedDate);
 
             // for emegercy

@@ -168,6 +168,7 @@ Route::middleware('auth:api')->group(function () {
     });
 
     Route::get('/inventories', [InventoryAPIController::class, 'getInventoryData']);
+    Route::get('/get_inventory', [InventoryAPIController::class, 'getInventory']);
     Route::post('/inventories', [InventoryAPIController::class, 'createInventory']);
     Route::get('/inventories/{inventory}', [InventoryAPIController::class, 'detail']);
     Route::put('/inventories/{id}', [InventoryAPIController::class, 'updateInventory']);

@@ -2,7 +2,7 @@
     <div class="px-8">
         <div class="mb-6">
             <p class="text-xl  text-black font-normal">
-                Add Staff
+                Edit Staff
             </p>
         </div>
         <div class="grid !grid-cols-12 gap-x-4 mb-6">
@@ -64,7 +64,15 @@
                     class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
             </div>
 
-            <div class="col-span-3"></div>
+            <div class="col-span-3 rounded-md mb-4 pb-6">
+                <label for="" class="block text-sm text-black mb-3">
+                    Joined Date
+                </label>
+                <input type="date" v-model="joinedDate"
+                    class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
+            </div>
+
+            <!-- <div class="col-span-3"></div> -->
 
             <div class="mb-4 col-span-3 pb-6 rounded-md">
                 <label for="" class="block text-sm text-black mb-3">
@@ -81,15 +89,13 @@
                     class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
             </div>
             <div class="mb-4 col-span-3 pb-6 rounded-md">
-                <!-- password deleted -->
-                <div class="mb-4 col-span-3 pb-6 rounded-md">
-                    <label for="" class="block text-sm text-black mb-3">
-                        Password
-                    </label>
-                    <input type="password" v-model="password"
-                        class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
-                </div>
+                <label for="" class="block text-sm text-black mb-3">
+                    Password
+                </label>
+                <input type="password" disabled
+                    class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
             </div>
+
             <div class="col-span-3"></div>
 
             <div class="col-span-3 rounded-md mb-4 pb-6">
@@ -100,7 +106,9 @@
                     class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0"
                     @change="departmentSelectChanged(selectedDepartment)">
                     <option :value="department" v-for="(department, departmentIndex) in departmentList"
-                        :key="departmentIndex"> {{ department.name }} </option>
+                        :key="departmentIndex">
+                        {{ department.name }}
+                    </option>
                     <!-- <option value="2">Table</option>
                     <option value="3">Security</option> -->
                 </select>
@@ -128,10 +136,17 @@
             </div>
             <div class="col-span-3 rounded-md mb-4 pb-6">
                 <label for="" class="block text-sm text-black mb-3">
-                    Joined Date
+                    Authorized Features
                 </label>
-                <input type="date" v-model="joinedDate"
-                    class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
+                <div class="bg-white mb-0 w-full text-sm inline-block" data-te-select-wrapper-ref>
+                    <select data-te-select-init data-te-select-placeholder="Select Features" data-te-select-filter="true"
+                        name="" id="" multiple v-model="selectedFeatures"
+                        class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
+                        <option :value="feature" v-for="(feature, featureIndex) in featureList" :key="featureIndex">
+                            {{ feature.name }}
+                        </option>
+                    </select>
+                </div>
             </div>
 
             <div class="col-span-3 rounded-md mb-4 pb-6">
@@ -374,6 +389,7 @@ export default {
             genderList: [],
             departmentList: [],
             roleList: [],
+            featureList: [],
             stateList: [],
             selectedState: null,
             cityList: [],
@@ -393,6 +409,8 @@ export default {
             selectedDepartment: null,
             roleSelected: [],
             roleIds: [],
+            selectedFeatures: [],
+            featureIds: [],
             state: null,
             city: null,
             address: null,
@@ -509,13 +527,23 @@ export default {
             const response = await getApiData({ url: '/api/departments', token: this.getToken() });
             if (response.data) {
                 this.departmentList = response.data;
+                this.departmentList.forEach((department)=>{
+                    if(this.staffDetailData.department_id == department.id){
+                        this.selectedDepartment = department;
+                        this.departmentSelectChanged();
+                    }
+                });
             }
         },
 
         async departmentSelectChanged() {
+            this.featureList = [];
             let rolesResponse = await getApiData({ url: `/api/roles?department_id=${this.selectedDepartment.id}`, token: this.getToken() });
             if (rolesResponse.data) {
                 this.roleList = rolesResponse.data;
+            }
+            if(this.selectedDepartment.features.length > 0){
+                this.featureList = this.selectedDepartment.features;
             }
         },
 
@@ -525,12 +553,12 @@ export default {
                 this.inventories = response.data;
             }
         },
-        async getRoleList() {
-            const response = await getApiData({ url: '/api/roles', token: this.getToken() });
-            if (response.data) {
-                this.roleList = response.data;
-            }
-        },
+        // async getRoleList() {
+        //     const response = await getApiData({ url: '/api/roles', token: this.getToken() });
+        //     if (response.data) {
+        //         this.roleList = response.data;
+        //     }
+        // },
 
         alertValiationMessage(field) {
             this.$notify({
@@ -723,7 +751,7 @@ export default {
         this.getStaffDetail();
         this.getGenderList();
         this.getDepartmentList();
-        this.getRoleList();
+        // this.getRoleList();
         this.getInventoryList();
         this.getStateList();
     },
