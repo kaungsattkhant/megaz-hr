@@ -1,82 +1,88 @@
 <template>
-    <div class="flex justify-between mb-3">
-        <div class=" flex">
-            <label for="search" class="search-input">
-                <input type="text" class="input-search" placeholder="Search" v-model="searchInput">
-                <i class="fal fa-search"></i>
-            </label>
+    <div>
+        <p class=" text-lg font-semibold font-inter">
+            Selling Menus
+        </p>
+    </div>
+    <div class="mt-4 bg-white">
+        <div class="btn-container">
+            <div class=" flex gap-x-4">
+                <label for="search" class="search-input">
+                    <input type="text" class="input-search" placeholder="Search" v-model="searchInput">
+                    <i class="fal fa-search"></i>
+                </label>
 
-            <div class="bg-white mb-0 w-[40%] text-sm inline-block" data-te-select-wrapper-ref>
-                <select data-te-select-init data-te-select-placeholder="Filter by category"
-                data-te-select-filter="true" v-model="searchCategory">
-                    <option :value="category" v-for="category in menuCategoryList">
-                        {{ category.name }}
-                    </option>
-                </select>
+                <div class="bg-white mb-0 w-[40%] text-xs h-8 border-b border-black rounded-bl-[4px] rounded-br-[4px] overflow-hidden inline-block"
+                    data-te-select-wrapper-ref>
+                    <select data-te-select-init data-te-select-placeholder="Filter by category"
+                        data-te-select-filter="true" v-model="searchCategory">
+                        <option :value="category" v-for="category in menuCategoryList">
+                            {{ category.name }}
+                        </option>
+                    </select>
+                </div>
+
+                <button class="add-btn " @click="searchBtnClicked">Search</button>
+                <button class="add-btn " @click="clearSearchBtnClicked">Clear</button>
             </div>
 
-            <button class="add-btn h-8 mx-2 " @click="searchBtnClicked">Search</button>
-            <button class="add-btn h-8 mx-2 " @click="clearSearchBtnClicked">Clear</button>
+            <div class="flex justify-end flex-col">
+                <a href="/menus/create" class="add-btn ">
+                    Add New
+                </a>
+
+            </div>
         </div>
+        <div class="box-container-table">
+            <div class="overflow-x-auto">
+                <!-- <div class="inline-block min-w-full py-2 sm:px-6 lg:px-8"> -->
+                <div class="table-container">
+                    <table class="primary-table">
+                        <thead class="">
+                            <tr>
+                                <th scope="col" class="  ">
+                                    #
+                                </th>
+                                <th scope="col" class="  ">
+                                    Menu Name
+                                </th>
+                                <th scope="col" class="  ">
+                                    Ingredients
+                                </th>
 
-        <div class="flex justify-end flex-col">
-            <a href="/menus/create" class="add-btn ">
-                Add New
-            </a>
+                                <th scope="col" class="  ">
+                                    Price
+                                </th>
+                                <th scope="col" class="">
 
-        </div>
-    </div>
-    <div class="block rounded-xl">
-        <div class="overflow-x-auto">
-            <!-- <div class="inline-block min-w-full py-2 sm:px-6 lg:px-8"> -->
-            <div class="overflow-hidden ">
-                <table class="min-w-full primary-table rounded-xl text-center text-sm font-light ">
-                    <thead class="border-b font-medium ">
-                        <tr>
-                            <th scope="col" class=" px-6 py-4 ">
-                                #
-                            </th>
-                            <th scope="col" class=" px-6 py-4 ">
-                                Menu Name
-                            </th>
-                            <th scope="col" class=" px-6 py-4 ">
-                                Ingredients
-                            </th>
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
 
-                            <th scope="col" class=" px-6 py-4 ">
-                                Price
-                            </th>
-                            <th scope="col" class="px-6 py-4">
-
-                            </th>
-                        </tr>
-                    </thead>
-                    <tbody>
-
-                        <div class="contents" v-for="(menu, index) in menuList" :key="index">
-                            <tr class="bg-white rounded-lg overflow-hidden shadow-lg">
-                                <td class=" px-6 py-4 font-medium ">
-                                    {{ per_page * (currentPage - 1) + (++index) }}
-                                </td>
-                                <td class="whitespace-nowrap px-6 py-4 ">
-                                    {{ menu.name }}
-                                </td>
-                                <td class="whitespace-nowrap px-6 py-4 ">
-                                    <p v-for="(ingredient, ingredientIndex) in menu.items"> {{ ingredient.name }} </p>
-                                </td>
-                                <td class=" px-6 py-4 ">
-                                    {{ menu.prices[0].price }}
-                                </td>
-                                <td class="whitespace-nowrap px-6 py-4">
-                                    <!-- <button
+                            <div class="contents" v-for="(menu, index) in menuList" :key="index">
+                                <tr class="">
+                                    <td class="  ">
+                                        {{ per_page * (currentPage - 1) + (++index) }}
+                                    </td>
+                                    <td class="whitespace-nowrap  ">
+                                        {{ menu.name }}
+                                    </td>
+                                    <td class="whitespace-nowrap  ">
+                                        <p v-for="(ingredient, ingredientIndex) in menu.items"> {{ ingredient.name }}
+                                        </p>
+                                    </td>
+                                    <td class="  ">
+                                        {{ menu.prices[0].price }}
+                                    </td>
+                                    <td class="whitespace-nowrap ">
+                                        <!-- <button
                                     data-te-toggle="modal" data-te-target="#deleteModal"
                                         id="edit-btn" class="pr-1">
                                         <i class="fas fa-trash-alt"></i>
                                     </button> -->
-                                    <input
-                                    :checked="menu.is_active == 1"
-                                    @change="isActiveToggled(menu.id)"
-                                    class="me-2 mt-[0.3rem] h-3.5 w-8 appearance-none rounded-[0.4375rem] bg-black/25 before:pointer-events-none before:absolute before:h-3.5
+                                        <input :checked="menu.is_active == 1" @change="isActiveToggled(menu.id)"
+                                            class="me-2 mt-[0.3rem] h-3.5 w-8 appearance-none rounded-[0.4375rem] bg-black/25 before:pointer-events-none before:absolute before:h-3.5
                                     before:w-3.5 before:rounded-full before:bg-transparent before:content-[''] after:absolute after:z-[2] after:-mt-[0.1875rem] after:h-5
                                     after:w-5 after:rounded-full after:border-none after:bg-white after:shadow-switch-2 after:transition-[background-color_0.2s,transform_0.2s]
                                     after:content-[''] checked:bg-primary checked:after:absolute checked:after:z-[2] checked:after:-mt-[3px] checked:after:ms-[1.0625rem]
@@ -86,77 +92,74 @@
                                     focus:after:absolute focus:after:z-[1] focus:after:block focus:after:h-5 focus:after:w-5 focus:after:rounded-full focus:after:content-['']
                                     checked:focus:border-primary checked:focus:bg-primary checked:focus:before:ms-[1.0625rem] checked:focus:before:scale-100 checked:focus:before:shadow-switch-3
                                     checked:focus:before:transition-[box-shadow_0.2s,transform_0.2s] dark:bg-white/25 dark:after:bg-surface-dark dark:checked:bg-primary dark:checked:after:bg-primary"
-                                    type="checkbox"
-                                    role="switch"/>
-                                </td>
-                            </tr>
+                                            type="checkbox" role="switch" />
+                                    </td>
+                                </tr>
+                            </div>
+                        </tbody>
+                    </table>
+                </div>
 
-                            <tr class="">
-                                <td class=" py-2 "></td>
-                            </tr>
-                        </div>
-                    </tbody>
-                </table>
+                <div class="mt-2 ml-2">
+                    <ul v-if="paginationGroupsCount > 1" class="list-style-none flex">
+                        <li v-if="!isFirstGroup">
+                            <button class="relative block rounded bg-transparent px-3 py-1.5 text-sm text-neutral-600 transition-all duration-300
+                        hover:bg-neutral-100 dark:text-white dark:hover:bg-neutral-700 dark:hover:text-white"
+                                @click="previousPaginationGroupBtnClicked" :disabled="isFirstGroup">
+                                Previous
+                            </button>
+                        </li>
+
+                        <li v-for="(pageNumber, pageNumberIndex) in groupedPageNumbers[currentGroup]"
+                            :key="pageNumberIndex" :aria-current="(pageNumber == currentPage) ? 'page' : ''">
+                            <button v-if="pageNumber == currentPage"
+                                class="relative block rounded bg-neutral-800 px-3 py-1.5 text-sm font-medium text-neutral-50 transition-all duration-300 dark:bg-neutral-900"
+                                :id="'paginationBtn-' + pageNumberIndex" @click="pageBtnClicked(pageNumber)">
+                                {{ pageNumber }}
+                                <span
+                                    class="absolute -m-px h-px w-px overflow-hidden whitespace-nowrap border-0 p-0 [clip:rect(0,0,0,0)]">
+                                    (current)
+                                </span>
+                            </button>
+                            <button v-else
+                                class="normal-pagination relative block rounded bg-transparent px-3 py-1.5 text-sm text-neutral-600 transition-all duration-300 hover:bg-neutral-100 dark:text-white dark:hover:bg-neutral-700 dark:hover:text-white"
+                                :id="'paginationBtn-' + pageNumberIndex" @click="pageBtnClicked(pageNumber)">
+                                {{ pageNumber }}
+                            </button>
+                        </li>
+                        <li v-if="!isLastGroup">
+                            <button class="relative block rounded bg-transparent px-3 py-1.5 text-sm text-neutral-600 transition-all duration-300
+                        hover:bg-neutral-100 dark:text-white dark:hover:bg-neutral-700 dark:hover:text-white"
+                                @click="nextPaginationGroupBtnClicked" :disabled="isLastGroup">
+                                Next
+                            </button>
+                        </li>
+                    </ul>
+
+                    <ul v-else class="list-style-none flex">
+                        <li v-for="(pageNumber, pageNumberIndex) in pageNumbers" :key="pageNumberIndex"
+                            :aria-current="(pageNumber == currentPage) ? 'page' : ''">
+                            <button v-if="pageNumber == currentPage"
+                                class="relative block rounded bg-neutral-800 px-3 py-1.5 text-sm font-medium text-neutral-50 transition-all duration-300 dark:bg-neutral-900"
+                                :id="'paginationBtn-' + pageNumberIndex" @click="pageBtnClicked(pageNumber)">
+                                {{ pageNumber }}
+                                <span
+                                    class="absolute -m-px h-px w-px overflow-hidden whitespace-nowrap border-0 p-0 [clip:rect(0,0,0,0)]">
+                                    (current)
+                                </span>
+                            </button>
+                            <button v-else
+                                class="normal-pagination relative block rounded bg-transparent px-3 py-1.5 text-sm text-neutral-600 transition-all duration-300 hover:bg-neutral-100 dark:text-white dark:hover:bg-neutral-700 dark:hover:text-white"
+                                :id="'paginationBtn-' + pageNumberIndex" @click="pageBtnClicked(pageNumber)">
+                                {{ pageNumber }}
+                            </button>
+                        </li>
+                    </ul>
+                </div>
             </div>
 
-            <div class="mt-2 ml-2">
-                <ul v-if="paginationGroupsCount > 1" class="list-style-none flex">
-                    <li v-if="!isFirstGroup">
-                        <button class="relative block rounded bg-transparent px-3 py-1.5 text-sm text-neutral-600 transition-all duration-300
-                        hover:bg-neutral-100 dark:text-white dark:hover:bg-neutral-700 dark:hover:text-white" @click="previousPaginationGroupBtnClicked"
-                        :disabled="isFirstGroup">
-                            Previous
-                        </button>
-                    </li>
-
-                    <li v-for="(pageNumber, pageNumberIndex) in groupedPageNumbers[currentGroup]" :key="pageNumberIndex"
-                        :aria-current="(pageNumber == currentPage) ? 'page' : ''">
-                        <button v-if="pageNumber == currentPage"
-                            class="relative block rounded bg-neutral-800 px-3 py-1.5 text-sm font-medium text-neutral-50 transition-all duration-300 dark:bg-neutral-900"
-                            :id="'paginationBtn-' + pageNumberIndex" @click="pageBtnClicked(pageNumber)">
-                            {{ pageNumber }}
-                            <span class="absolute -m-px h-px w-px overflow-hidden whitespace-nowrap border-0 p-0 [clip:rect(0,0,0,0)]">
-                                (current)
-                            </span>
-                        </button>
-                        <button v-else
-                            class="normal-pagination relative block rounded bg-transparent px-3 py-1.5 text-sm text-neutral-600 transition-all duration-300 hover:bg-neutral-100 dark:text-white dark:hover:bg-neutral-700 dark:hover:text-white"
-                            :id="'paginationBtn-' + pageNumberIndex" @click="pageBtnClicked(pageNumber)">
-                            {{ pageNumber }}
-                        </button>
-                    </li>
-                    <li v-if="!isLastGroup">
-                        <button class="relative block rounded bg-transparent px-3 py-1.5 text-sm text-neutral-600 transition-all duration-300
-                        hover:bg-neutral-100 dark:text-white dark:hover:bg-neutral-700 dark:hover:text-white" @click="nextPaginationGroupBtnClicked"
-                        :disabled="isLastGroup">
-                            Next
-                        </button>
-                    </li>
-                </ul>
-
-                <ul v-else class="list-style-none flex">
-                    <li v-for="(pageNumber, pageNumberIndex) in pageNumbers" :key="pageNumberIndex"
-                        :aria-current="(pageNumber == currentPage) ? 'page' : ''">
-                        <button v-if="pageNumber == currentPage"
-                            class="relative block rounded bg-neutral-800 px-3 py-1.5 text-sm font-medium text-neutral-50 transition-all duration-300 dark:bg-neutral-900"
-                            :id="'paginationBtn-' + pageNumberIndex" @click="pageBtnClicked(pageNumber)">
-                            {{ pageNumber }}
-                            <span class="absolute -m-px h-px w-px overflow-hidden whitespace-nowrap border-0 p-0 [clip:rect(0,0,0,0)]">
-                                (current)
-                            </span>
-                        </button>
-                        <button v-else
-                            class="normal-pagination relative block rounded bg-transparent px-3 py-1.5 text-sm text-neutral-600 transition-all duration-300 hover:bg-neutral-100 dark:text-white dark:hover:bg-neutral-700 dark:hover:text-white"
-                            :id="'paginationBtn-' + pageNumberIndex" @click="pageBtnClicked(pageNumber)">
-                            {{ pageNumber }}
-                        </button>
-                    </li>
-                </ul>
-            </div>
-        </div>
-
-        <!--Delete Modal -->
-        <!-- <div
+            <!--Delete Modal -->
+            <!-- <div
         data-te-modal-init
         class="fixed left-0 top-0 z-[1055] hidden h-full w-full overflow-y-auto overflow-x-hidden outline-none"
         id="deleteModal"
@@ -216,6 +219,7 @@
                 </div>
             </div>
         </div> -->
+        </div>
     </div>
 </template>
 

@@ -1,7 +1,7 @@
 <template>
-    <div class="px-8">
+    <div class="px-0">
         <div class="mb-6">
-            <p class="text-xl  text-black font-normal">
+            <p class="text-lg font-semibold font-inter">
                 Create Item Usage Forecast
             </p>
         </div>
@@ -12,8 +12,9 @@
                 <label for="" class="block text-sm text-black mb-3">
                     Month
                 </label>
-                <input type="date" v-model="date" class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0"
-                @change="dateInputChanged">
+                <input type="date" v-model="date"
+                    class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0"
+                    @change="dateInputChanged">
             </div>
 
             <div class="mb-4 col-span-3 pb-6 rounded-md">
@@ -29,82 +30,82 @@
             </div>
 
             <div class="mb-0 col-span-3 rounded-md">
-                <label for="" class="block text-sm text-black mb-3">
+                <label for="" class="label-form mb-3">
                     Item
                 </label>
-                <div class="text-sm input-ui w-full bg-transparent rounded-lg focus:ring-0" data-te-select-wrapper-ref>
-                    <select data-te-select-init data-te-select-placeholder="Select Item"
-                        data-te-select-filter="true" name="" id="" v-model="selectedItem"
-                        class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0"
-                        >
-                        <option :value="item" v-for="(item, itemIndex) in itemList" :key="itemIndex"> {{ item.name }} </option>
+                <div class="text-sm w-full bg-transparent rounded-lg focus:ring-0" data-te-select-wrapper-ref>
+                    <select data-te-select-init data-te-select-placeholder="Select Item" data-te-select-filter="true"
+                        name="" id="" v-model="selectedItem"
+                        class="input-ui">
+                        <option :value="item" v-for="(item, itemIndex) in itemList" :key="itemIndex"> {{ item.name }}
+                        </option>
                     </select>
                 </div>
             </div>
 
             <div class="mb-0 col-span-3 rounded-md">
-                <label for="" class="block text-sm text-black mb-3">
+                <label for="" class="label-form mb-3">
                     Amount
                 </label>
-                <input type="number" v-model="amount" class="mt-2 text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
+                <input type="number" v-model="amount"
+                    class="input-ui">
             </div>
 
             <div class="mb-0 col-span-3 rounded-md">
-                <label for="" class="block text-sm text-black mb-3">
+                <label for="" class="label-form mb-3">
                     Quantity
                 </label>
-                <input type="number" v-model="quantity" class="mt-2 text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
+                <input type="number" v-model="quantity"
+                    class="input-ui">
             </div>
 
             <div class="col-span-3">
-                <label for="" class="block text-sm text-black mb-3">
+                <label for="" class="label-form mb-3">
                     &nbsp;
                 </label>
-                <button class="mt-2 h-8 py-1 add-btn" @click="addItemBtnClicked">
+                <button class="add-btn" @click="addItemBtnClicked">
                     Add Item
                 </button>
             </div>
 
         </div>
 
-        <div class=" bg-white p-8 rounded-md shadow-md mb-8">
-            <div>
-                <table class="min-w-full primary-table rounded-xl text-center text-sm font-light ">
-                    <thead class="border-b font-medium ">
+        <div class=" bg-white py-4 px-4 rounded-md shadow-md mb-8">
+            <div class="table-container">
+                <table class="primary-table">
+                    <thead class="">
                         <tr>
-                            <th scope="col" class=" px-6 py-4 ">
+                            <th scope="col" class=" text-left ">
                                 Name
                             </th>
-                            <th scope="col" class=" px-6 py-4 ">
+                            <th scope="col" class="  ">
                                 Quantity
                             </th>
-                            <th scope="col" class=" px-6 py-4 ">
+                            <th scope="col" class="  ">
                                 Amount
                             </th>
-                            <th scope="col" class=" px-6 py-4 ">
+                            <th scope="col" class="  ">
                             </th>
                         </tr>
                     </thead>
                     <tbody>
-                        <div class="contents" v-for="(forecastItem, forecastItemIndex) in forecastItems" :key="forecastItemIndex">
-                            <tr class="bg-white rounded-lg overflow-hidden shadow-lg">
-                                <td class=" px-6 py-4 font-medium ">
+                        <div class="contents" v-for="(forecastItem, forecastItemIndex) in forecastItems"
+                            :key="forecastItemIndex">
+                            <tr class="">
+                                <td class="text-left">
                                     {{ forecastItem.name }}
                                 </td>
-                                <td class=" px-6 py-4 font-medium ">
+                                <td class="  ">
                                     {{ forecastItem.quantity }}
                                 </td>
-                                <td class=" px-6 py-4 font-medium ">
+                                <td class="  ">
                                     {{ forecastItem.amount }}
                                 </td>
-                                <td class=" px-6 py-4 font-medium ">
+                                <td class="  ">
                                     <button @click="removeForecastItemBtnClicked(forecastItemIndex)">
                                         <i class="fal fa-trash  pr-3"></i>
                                     </button>
                                 </td>
-                            </tr>
-                            <tr class="">
-                                <td class=" py-2 "></td>
                             </tr>
                         </div>
                     </tbody>
