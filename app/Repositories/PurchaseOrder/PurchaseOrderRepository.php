@@ -85,6 +85,7 @@ class PurchaseOrderRepository implements PurchaseOrderRepositoryInterface
                 $item_data['item_id'] = $item->item_id;
                 $item_data['amount'] = $item->amount;
                 $item_data['uom_id'] = $item->uom_id;
+                $item_data['uom_conversion_id'] = $item->uom_conversion_id;
                 // $purchaseOrderItem=PurchaseOrderItem::find($item_data['id']);
                 if (isset($item->later_buy) && $item->later_buy) {
                     $purchaseOrderItem = $po->items()->where('id', $item_data['id'])->first();
