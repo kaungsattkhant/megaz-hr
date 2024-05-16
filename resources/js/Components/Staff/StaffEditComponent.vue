@@ -564,7 +564,7 @@ export default {
                         });
                     }
 
-                }, 200);
+                }, 800);
             }
         },
 
@@ -764,7 +764,9 @@ export default {
                     formData.append('roles[]', roleId);
                 });
             }
-            formData.append('password', this.password);
+            if(this.password){
+                formData.append('password', this.password);
+            }
             formData.append('joined_date', this.joinedDate);
             // for emegercy
 
