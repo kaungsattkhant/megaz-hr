@@ -555,12 +555,15 @@ export default {
             if (response.data) {
                 this.departmentList = response.data;
                 setTimeout(()=>{
-                    this.departmentList.forEach((department)=>{
-                        if(this.staffDetailData.department_id == department.id){
-                            this.selectedDepartment = department;
-                            this.departmentSelectChanged();
-                        }
-                    });
+                    if(this.staffDetailData){
+                        this.departmentList.forEach((department)=>{
+                            if(this.staffDetailData.department_id == department.id){
+                                this.selectedDepartment = department;
+                                this.departmentSelectChanged();
+                            }
+                        });
+                    }
+
                 }, 200);
             }
         },
