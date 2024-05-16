@@ -42,7 +42,7 @@
                                 Balance
                             </th>
                             <th scope="col" class=" px-6 py-4 ">
-                                Amount
+                                Total Balance
                             </th>
                             <th scope="col" class="px-6 py-4">
 
@@ -69,17 +69,17 @@
                                     {{ ledger.out_balance }}
                                 </td>
                                 <td class="whitespace-nowrap px-6 py-4 ">
-                                    {{ ledger.closing_balance }}
+                                    {{ ledger.closing_balance }} {{ ledger.conversion_uom_name }}
                                 </td>
                                 <td class="whitespace-nowrap px-6 py-4 ">
-                                    {{ ledger.closing_balance * 1000 }}
+                                    {{ ledger.closing_balance / ledger.conversion }} {{ ledger.base_uom_name }}
                                 </td>
                                 <td class="whitespace-nowrap px-6 py-4">
-                                    <button id="edit-btn" class="pr-1" @click="transferBtnClicked(ledger.item_id)"
+                                    <button id="edit-btn" class="pr-1" @click="transferBtnClicked(ledger.item_id, index-1)"
                                         data-te-toggle="modal" data-te-target="#transfer_modal">
                                         <i class="fas fa-exchange-alt"></i>
                                     </button>
-                                    <button class="pl-2" @click="addDefectBtnClicked(ledger.item_id)"
+                                    <button class="pl-2" @click="addDefectBtnClicked(ledger.item_id, index-1)"
                                     data-te-toggle="modal" data-te-target="#add_defect_modal">
                                         <i class="fas fa-exclamation-triangle"></i>
                                     </button>
@@ -150,6 +150,18 @@
                             </label>
                             <input type="number" placeholder="Quantity" v-model="quantity" class="text-sm border border-gray-300
                             input-ui w-full bg-transparent rounded-lg focus:ring-0">
+                        </div>
+
+                        <div class="mb-4">
+                            <label for="" class="block text-sm text-black mb-3">
+                                UOM
+                            </label>
+                            <select name="" id="" v-model="selectedUom"
+                                class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
+                                <option :value="uom" v-for="(uom, uomIndex) in uomList">
+                                    {{ uom.name }}
+                                </option>
+                            </select>
                         </div>
 
                     </div>
@@ -310,6 +322,7 @@ export default {
             quantity: null,
             itemId: null,
 
+            transferItem: null,
             deleteId: null,
 
             sourceInventories: [],
@@ -318,6 +331,7 @@ export default {
             selectedDestinationInventory: null,
 
             defectItemId: null,
+            defeectItem: null,
             type: null,
             defectQuantity: null,
             uomList: [],
@@ -329,6 +343,14 @@ export default {
 
     methods: {
         ...mapGetters(['getToken']),
+
+        alertValidationMessage(field) {
+            this.$notify({
+                title: 'Input validation',
+                text: `You forgot to provide ${field}, please try again`,
+                type: 'warn'
+            });
+        },
 
         async getInventoryLegderList() {
             const response = await getApiData({ url: '/api/inventories/' + this.inventory_id + '/ledgers', token: this.getToken() });
@@ -351,26 +373,9 @@ export default {
             }
         },
 
-        async transferBtnClicked(id) {
-            this.itemId = id;
-            let url = `/api/inventory_list`;
-            let response = await getApiData({ url: url, token: this.getToken() });
-            if (response.data) {
-                this.sourceInventories = response.data.source_inventories;
-                this.destinationInventories = response.data.destination_inventories;
-            }
-        },
-
-        alertValidationMessage(field) {
-            this.$notify({
-                title: 'Input validation',
-                text: `You forgot to provide ${field}, please try again`,
-                type: 'warn'
-            });
-        },
-
-        addDefectBtnClicked(id){
+        addDefectBtnClicked(id, ledgerIndex){
             this.defectItemId = id;
+            this.defeectItem = this.inventoryLegderList[ledgerIndex];
         },
 
         async confirmAddDefectBtnClicked(){
@@ -391,6 +396,7 @@ export default {
             formData.append('quantity', this.defectQuantity);
             formData.append('uom_id', this.selectedUom.id);
             formData.append('type', this.type);
+            formData.append('base_unit_id', this.defeectItem.base_unit_id);
             if(this.defectRemark){
                 formData.append('remark', this.defectRemark);
             }
@@ -415,6 +421,18 @@ export default {
             this.defectRemark = null;
             this.defectQuantity = null;
             this.type = null;
+            this.defeectItem = null;
+        },
+
+        async transferBtnClicked(id, ledgerIndex) {
+            this.itemId = id;
+            this.transferItem = this.inventoryLegderList[ledgerIndex];
+            let url = `/api/inventory_list`;
+            let response = await getApiData({ url: url, token: this.getToken() });
+            if (response.data) {
+                this.sourceInventories = response.data.source_inventories;
+                this.destinationInventories = response.data.destination_inventories;
+            }
         },
 
         confirmTransferBtnClicked() {
@@ -430,6 +448,10 @@ export default {
                 this.alertValidationMessage(`quantity`);
                 return 1;
             }
+            if(!this.selectedUom){
+                this.alertValidationMessage(`UOM`);
+                return 1;
+            }
             this.transferInventory();
         },
 
@@ -439,6 +461,8 @@ export default {
             formData.append('destination_inventory_id', this.selectedDestinationInventory);
             formData.append('quantity', this.quantity);
             formData.append('item_id', this.itemId);
+            formData.append('uom_id', this.selectedUom.id);
+            formData.append('base_unit_id', this.transferItem.base_unit_id);
             let response = await postApiData({ url: '/api/transfers', form_data: formData, token: this.getToken() });
             if (response.success) {
                 // this.getInventoryLegderList(null);
@@ -455,6 +479,9 @@ export default {
                     type: 'error'
                 });
             }
+
+            this.selectedUom = null;
+            this.transferItem = null;
         },
 
         closeModal() {
