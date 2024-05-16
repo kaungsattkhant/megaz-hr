@@ -95,29 +95,18 @@ class StaffRepository implements StaffRepositoryInterface
 
                 if (isset($data['roles']) && $data['roles'] !== null) {
                     $rolesToAttach = $data['roles'];
-                    $currentRoles = $staff->roles()->pluck('id')->toArray();
-                    $rolesToAttach = array_diff($rolesToAttach, $currentRoles);
-                    if (!empty($rolesToAttach)) {
-                        $staff->roles()->attach($rolesToAttach);
-                    }
+                    $staff->roles()->sync($rolesToAttach);
                 }
 
                 if (isset($data['inventoryIds']) && $data['inventoryIds'] !== null) {
-                    $inventoryIdsToAttach = json_decode($data['inventoryIds'], true);
-                    $currentInventoryIds = $staff->inventories()->pluck('id')->toArray();
-                    $inventoryIdsToAttach = array_diff($inventoryIdsToAttach, $currentInventoryIds);
-                    if (!empty($inventoryIdsToAttach)) {
-                        $staff->inventories()->attach($inventoryIdsToAttach);
-                    }
+                    $inventoryIds = json_decode($data['inventoryIds'], true);
+                    $staff->inventories()->sync($inventoryIds);
                 }
 
                 if (isset($data['featureIds']) && $data['featureIds'] !== null) {
-                    $featuireIds = json_decode($data['featureIds'], true);
-                    $currentFeatureList = $staff->features()->pluck('id')->toArray();
-                    $featuireIds = array_diff($featuireIds, $currentFeatureList);
-                    if (!empty($featuireIds)) {
-                        $staff->features()->attach($featuireIds);
-                    }
+                    $featureIds = json_decode($data['featureIds'], true);
+                    $staff->features()->sync($featureIds);
+
                 }
             }
             DB::commit();
