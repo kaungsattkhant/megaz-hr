@@ -128,8 +128,8 @@
                         <option value="3">Waiter</option> -->
                     </select>
                     <div v-for="(role, index) in roles" :key="index" class='py-2 px-3 flex justify-between'>
-                        <span>{{ role.name }}</span><span><i @click="deleteRoleStaff(role.id)"
-                                class="fal fa-times text-red-400"></i></span>
+                        <span>{{ role.name }}</span>
+                        <!-- <span> <i @click="deleteRoleStaff(role.id)" class="fal fa-times text-red-400"></i> </span> -->
                     </div>
 
                 </div>
@@ -147,8 +147,8 @@
                         </option>
                     </select>
                     <div v-for="(feature, index) in editFeatureList" :key="index" class='py-2 px-3 flex justify-between'>
-                        <span>{{ feature.name }}</span><span><i @click="deletefeatureStaff(feature)"
-                                class="fal fa-times text-red-400"></i></span>
+                        <span>{{ feature.name }}</span>
+                        <!-- <span><i @click="deletefeatureStaff(feature)" class="fal fa-times text-red-400"></i></span> -->
                     </div>
                 </div>
             </div>
@@ -171,8 +171,8 @@
                         <div v-if="staffDetailData.inventories">
                             <div v-for="(inventory, index) in staffDetailData.inventories" :key="index"
                                 class='py-2 px-3 flex justify-between'>
-                                <span>{{ inventory.name }}</span><span><i @click="deleteInventoryStaff(inventory.id)"
-                                        class="fal fa-times text-red-400"></i></span>
+                                <span>{{ inventory.name }}</span>
+                                <!-- <span><i @click="deleteInventoryStaff(inventory.id)" class="fal fa-times text-red-400"></i></span> -->
                             </div>
                         </div>
                     </div>
@@ -554,12 +554,14 @@ export default {
             const response = await getApiData({ url: '/api/departments', token: this.getToken() });
             if (response.data) {
                 this.departmentList = response.data;
-                this.departmentList.forEach((department)=>{
-                    if(this.staffDetailData.department_id == department.id){
-                        this.selectedDepartment = department;
-                        this.departmentSelectChanged();
-                    }
-                });
+                setTimeout(()=>{
+                    this.departmentList.forEach((department)=>{
+                        if(this.staffDetailData.department_id == department.id){
+                            this.selectedDepartment = department;
+                            this.departmentSelectChanged();
+                        }
+                    });
+                }, 200);
             }
         },
 
@@ -604,13 +606,17 @@ export default {
                 });
             }
 
-            this.selectedFeatures.forEach((feature) => {
-                this.featureIds.push(feature.id);
-            });
-            console.log(this.featureIds);
-            this.roleSelected.forEach((item) => {
-                this.roleIds.push(item.id);
-            });
+            if(this.selectedFeatures.length > 0){
+                this.selectedFeatures.forEach((feature) => {
+                    this.featureIds.push(feature.id);
+                });
+            }
+
+            if(this.roleSelected.length > 0){
+                this.roleSelected.forEach((item) => {
+                    this.roleIds.push(item.id);
+                });
+            }
 
             if (!this.name) {
                 this.alertValiationMessage('name');
@@ -744,15 +750,19 @@ export default {
             formData.append('city', this.city);
             formData.append('gender_id', this.selectedGender.id);
             formData.append('department_id', this.selectedDepartment.id);
-            formData.append('inventoryIds', JSON.stringify(this.inventoryIds));
+            if(this.inventoryIds.length > 0){
+                formData.append('inventoryIds', JSON.stringify(this.inventoryIds));
+            }
+            if(this.featureIds.length > 0){
+                formData.append('featureIds', JSON.stringify(this.featureIds));
+            }
+            if(this.roleIds.length > 0){
+                this.roleIds.forEach(roleId => {
+                    formData.append('roles[]', roleId);
+                });
+            }
             formData.append('password', this.password);
-            formData.append('featureIds', JSON.stringify(this.featureIds));
-            this.roleIds.forEach(roleId => {
-                formData.append('roles[]', roleId);
-            });
-
             formData.append('joined_date', this.joinedDate);
-
             // for emegercy
 
             formData.append('primary_name', this.primaryName);
