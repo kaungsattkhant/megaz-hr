@@ -58,7 +58,12 @@ class DepartmentRepository implements DepartmentRepositoryInterface
             if ($department) {
                 $data = RemoveNullValues($data);
                 $department->update($data);
+                if (!empty($data['featureIds'])) {
+                    $featureIds = json_decode($data['featureIds'],true);
+                    $department->features()->sync($featureIds);
+                }
             }
+
             DB::commit();
             return $department;
         } catch (\Exception $e) {
