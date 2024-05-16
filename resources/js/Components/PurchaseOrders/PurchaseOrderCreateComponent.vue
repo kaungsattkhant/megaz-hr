@@ -202,10 +202,11 @@
                 }
                 let url = `/api/get_uom_conversion_by_uom?po_uom_id=${this.selectedUom.id}&item_uom_id=${this.selectedItem.item_prices.uom_id}`;
                 let response = await getApiData({url: url, token: this.getToken()});
+                let uomConversion = null;
                 let amount = 0;
                 if(response.data){
-                    console.log(response.data);
-                    amount = response.data;
+                    uomConversion = response.data;
+                    amount = uomConversion.conversion;
                     amount = amount * this.selectedItem.item_prices.price;
                     this.$notify({
                         text: `Uom conversion by uom value ${amount}`,
@@ -228,7 +229,8 @@
                     quantity: this.quantity,
                     amount: amount,
                     uom_id: this.selectedUom.id,
-                    uom_name: this.selectedUom.name
+                    uom_name: this.selectedUom.name,
+                    uom_conversion_id: uomConversion.id,
                 });
 
                 this.updateTotalPrice(this.purchaseOrderItems);
