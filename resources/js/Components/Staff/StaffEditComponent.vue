@@ -466,12 +466,14 @@ export default {
                 // this.citySelectChanged(this.selectedCity);
                 this.zipCode = this.staffDetailData.zip_code;
                 this.address = this.staffDetailData.address;
-                this.primaryName = this.staffDetailData.emergency_contacts[0].primary_name;
-                this.primaryPhone = this.staffDetailData.emergency_contacts[0].primary_phone;
-                this.primaryRelationship = this.staffDetailData.emergency_contacts[0].primary_relationship
-                this.secondaryName = this.staffDetailData.emergency_contacts[0].secondary_name;
-                this.secondaryPhone = this.staffDetailData.emergency_contacts[0].secondary_phone;
-                this.secondaryRelationship = this.staffDetailData.emergency_contacts[0].secondary_relationship;
+                if(this.staffDetailData.emergency_contacts.length > 0){
+                    this.primaryName = this.staffDetailData.emergency_contacts[0].primary_name;
+                    this.primaryPhone = this.staffDetailData.emergency_contacts[0].primary_phone;
+                    this.primaryRelationship = this.staffDetailData.emergency_contacts[0].primary_relationship
+                    this.secondaryName = this.staffDetailData.emergency_contacts[0].secondary_name;
+                    this.secondaryPhone = this.staffDetailData.emergency_contacts[0].secondary_phone;
+                    this.secondaryRelationship = this.staffDetailData.emergency_contacts[0].secondary_relationship;
+                }
                 this.inventories = this.staffDetailData.inventories;
                 this.roles = this.staffDetailData.roles;
                 this.state = this.staffDetailData.state;
