@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
+use App\Models\UomConversion;
 use App\Repositories\Item\ItemRepositoryInterface;
 use Illuminate\Http\Request;
 
@@ -43,4 +44,12 @@ class ItemAPIController extends Controller
             ResponseMessage('Item not found or some error occur');
         }
     }
+
+    public function addItemPrice(Request $request,int $id)
+    {
+        $item = $this->itemRepo->addPriceItem($request->all(),$id);
+        ResponseData($item);
+    }
+
+   
 }

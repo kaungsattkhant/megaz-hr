@@ -11,7 +11,7 @@ class DepartmentRepository implements DepartmentRepositoryInterface
     public function listAllData(Request $request)
     {
         if ($request->per_page || $request->page) {
-            $totalCount = Department::count();
+            $totalCount = Department::with('features')->count();
             $pageNumber = 1;
             $perPage = 20;
             if ($request->page) {
@@ -21,13 +21,13 @@ class DepartmentRepository implements DepartmentRepositoryInterface
                 $perPage = $request->per_page;
             }
             $skip = ($pageNumber - 1) * $perPage;
-            $departments = Department::skip($skip)->take($perPage)->get();
+            $departments = Department::with('features')->skip($skip)->take($perPage)->get();
             $paginationData = MakePaginationData($request, $totalCount, 'departments');
             $paginationData['departments'] = $departments;
 
             return $paginationData;
         } else {
-            $departments = Department::all();
+            $departments = Department::with('features')->get();
             return $departments;
         }
     }
@@ -37,6 +37,10 @@ class DepartmentRepository implements DepartmentRepositoryInterface
         DB::beginTransaction();
         try {
             $department = Department::create($data);
+            $featureIds = json_decode($data['featureIds'], true);
+            foreach ($featureIds as $feature) {
+                $department->features()->attach($feature);
+            }
             DB::commit();
             return $department;
         } catch (\Exception $e) {
@@ -54,7 +58,12 @@ class DepartmentRepository implements DepartmentRepositoryInterface
             if ($department) {
                 $data = RemoveNullValues($data);
                 $department->update($data);
+                if (!empty($data['featureIds'])) {
+                    $featureIds = json_decode($data['featureIds'],true);
+                    $department->features()->sync($featureIds);
+                }
             }
+
             DB::commit();
             return $department;
         } catch (\Exception $e) {

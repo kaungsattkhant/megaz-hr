@@ -79,7 +79,8 @@
                                         data-te-toggle="modal" data-te-target="#transfer_modal">
                                         <i class="fas fa-exchange-alt"></i>
                                     </button>
-                                    <button class="pl-2" data-te-toggle="modal" data-te-target="#defect_modal">
+                                    <button class="pl-2" @click="addDefectBtnClicked(ledger.item_id)"
+                                    data-te-toggle="modal" data-te-target="#add_defect_modal">
                                         <i class="fas fa-exclamation-triangle"></i>
                                     </button>
                                 </td>
@@ -127,9 +128,9 @@
                             </label>
                             <select name="" id="" v-model="selectedSourceInventory"
                                 class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
-                                <option :value="sourceInventory.id"
-                                    v-for="(sourceInventory, sourceInventoryIndex) in sourceInventories">{{
-                                    sourceInventory.name }}</option>
+                                <option :value="sourceInventory.id" v-for="(sourceInventory, sourceInventoryIndex) in sourceInventories">
+                                    {{ sourceInventory.name }}
+                                </option>
                             </select>
                         </div>
                         <div class="mb-4">
@@ -138,17 +139,17 @@
                             </label>
                             <select name="" id="" v-model="selectedDestinationInventory"
                                 class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
-                                <option :value="destinationInventory.id"
-                                    v-for="(destinationInventory, destinationInventoryIndex) in destinationInventories">
-                                    {{ destinationInventory.name }}</option>
+                                <option :value="destinationInventory.id" v-for="(destinationInventory, destinationInventoryIndex) in destinationInventories">
+                                    {{ destinationInventory.name }}
+                                </option>
                             </select>
                         </div>
                         <div class="mb-4">
                             <label for="" class="block text-sm text-black mb-3">
                                 Quantity
                             </label>
-                            <input type="text" placeholder="Quantity" v-model="quantity"
-                                class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
+                            <input type="number" placeholder="Quantity" v-model="quantity" class="text-sm border border-gray-300
+                            input-ui w-full bg-transparent rounded-lg focus:ring-0">
                         </div>
 
                     </div>
@@ -161,9 +162,87 @@
                 </div>
             </div>
         </div>
+    </div>
 
+    <!--Check Modal -->
+    <div data-te-modal-init
+        class="fixed left-0 top-0 z-[1055] hidden h-full w-full overflow-y-auto overflow-x-hidden outline-none"
+        id="add_defect_modal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div data-te-modal-dialog-ref class="pointer-events-none relative flex min-h-[calc(100%-1rem)] w-auto translate-y-[-50px]
+            items-center opacity-0 transition-all duration-300 ease-in-out min-[576px]:mx-auto min-[576px]:mt-7
+            min-[576px]:min-h-[calc(100%-3.5rem)] min-[576px]:max-w-[500px]">
+            <div class="min-[576px]:shadow-[0_0.5rem_1rem_rgba(#000, 0.15)] pointer-events-auto relative flex w-full flex-col
+                rounded-md border-none bg-white bg-clip-padding text-current shadow-lg outline-none ">
+                <div
+                    class="flex flex-shrink-0 items-center justify-between rounded-t-md border-b-2 border-neutral-100 border-opacity-100 p-4 ">
+                    <!--Modal title-->
+                    <h5 class="text-xl font-medium leading-normal text-neutral-800 " id="exampleModalLabel">
+                        Add Used/Defect Item
+                    </h5>
+                    <!--Close button-->
+                    <button type="button"
+                        class="box-content rounded-none border-none hover:no-underline hover:opacity-75 focus:opacity-100 focus:shadow-none focus:outline-none"
+                        data-te-modal-dismiss aria-label="Close">
+                        <svg class="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                            stroke-width="1.5" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </button>
+                </div>
 
+                <!--Modal body-->
+                <div class="relative flex-auto p-4" data-te-modal-body-ref>
+                    <div class="mb-4">
+                        <label for="" class="block text-sm text-black mb-3">
+                            Defect / Used
+                        </label>
+                        <select name="" id="" v-model="type" class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
+                            <option value="defect"> Defect </option>
+                            <option value="used"> Used </option>
+                        </select>
+                    </div>
 
+                    <div class="mb-4">
+                        <label for="" class="block text-sm text-black mb-3">
+                            UOM
+                        </label>
+                        <select name="" id="" v-model="selectedUom"
+                            class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
+                            <option :value="uom" v-for="(uom, uomIndex) in uomList">
+                                {{ uom.name }}
+                            </option>
+                        </select>
+                    </div>
+
+                    <div class="mb-4">
+                        <label for="" class="block text-sm text-black mb-3">
+                            Quantity
+                        </label>
+                        <input type="number" placeholder="Quantity" v-model="defectQuantity" class="text-sm border border-gray-300
+                        input-ui w-full bg-transparent rounded-lg focus:ring-0">
+                    </div>
+
+                    <div class="mb-4">
+                        <label for="" class="block text-sm text-black mb-3">
+                            Remark
+                        </label>
+                        <textarea v-model="defectRemark" class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0"
+                        name="" id="" cols="15" rows="5"></textarea>
+                    </div>
+                </div>
+
+                <!--Modal footer-->
+                <div class="flex flex-shrink-0 flex-wrap items-center justify-end rounded-b-md border-t-2 border-neutral-100 border-opacity-100 p-4 ">
+                    <button type="button" class="inline-block px-6 pb-2 pt-2.5 text-xs focus:outline-none focus:ring-0 " data-te-modal-dismiss>
+                        Close
+                    </button>
+                    <button @click="confirmAddDefectBtnClicked" type="button" data-te-toggle="modal" data-te-target="#add_defect_modal"
+                    class="ml-1 inline-block rounded bg-blue-600 px-6 pb-2 pt-2.5 text-xs  text-white   focus:outline-none focus:ring-0 ">
+                        Confirm
+                    </button>
+                </div>
+            </div>
+        </div>
     </div>
 
     <!--Check Modal -->
@@ -231,13 +310,19 @@ export default {
             quantity: null,
             itemId: null,
 
-
             deleteId: null,
 
             sourceInventories: [],
             selectedSourceInventory: null,
             destinationInventories: [],
             selectedDestinationInventory: null,
+
+            defectItemId: null,
+            type: null,
+            defectQuantity: null,
+            uomList: [],
+            selectedUom: null,
+            defectRemark: null,
         };
     },
     props: ['inventory_id'],
@@ -258,6 +343,14 @@ export default {
             }
         },
 
+        async getUomList() {
+            let url = `/api/uoms`;
+            let response = await getApiData({ url: url, token: this.getToken() });
+            if (response.data) {
+                this.uomList = response.data;
+            }
+        },
+
         async transferBtnClicked(id) {
             this.itemId = id;
             let url = `/api/inventory_list`;
@@ -274,6 +367,54 @@ export default {
                 text: `You forgot to provide ${field}, please try again`,
                 type: 'warn'
             });
+        },
+
+        addDefectBtnClicked(id){
+            this.defectItemId = id;
+        },
+
+        async confirmAddDefectBtnClicked(){
+            if(!this.type){
+                this.alertValidationMessage(`defect type`);
+                return 1;
+            }
+            if(!this.selectedUom){
+                this.alertValidationMessage(`UOM`);
+                return 1;
+            }
+            if(!this.defectQuantity){
+                this.alertValidationMessage(`quantity`);
+                return 1;
+            }
+            let formData = new FormData();
+            formData.append('item_id', this.defectItemId);
+            formData.append('quantity', this.defectQuantity);
+            formData.append('uom_id', this.selectedUom.id);
+            formData.append('type', this.type);
+            if(this.defectRemark){
+                formData.append('remark', this.defectRemark);
+            }
+
+            let url = `/api/used_defected_items`;
+            let response = await postApiData({url: url, form_data: formData, token: this.getToken()});
+            if(response.success){
+                this.$notify({
+                    text: `Success`,
+                    type: 'info'
+                });
+            }
+            else{
+                this.$notify({
+                    text: response.message,
+                    type: 'info'
+                });
+            }
+
+            this.selectedUom = null;
+            this.defectItemId = null;
+            this.defectRemark = null;
+            this.defectQuantity = null;
+            this.type = null;
         },
 
         confirmTransferBtnClicked() {
@@ -329,6 +470,7 @@ export default {
     created() {
         this.getInventoryLegderList();
         this.getInventoryList();
+        this.getUomList();
     },
 
     mounted() {

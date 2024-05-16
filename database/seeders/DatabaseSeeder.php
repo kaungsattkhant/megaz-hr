@@ -7,6 +7,7 @@ use Illuminate\Database\Seeder;
 
 use Database\Seeders\ComplaintCategorySeeder;
 use Database\Seeders\DepartmentSeeder;
+use Database\Seeders\FeatureSeeder;
 use Database\Seeders\GenderSeeder;
 use Database\Seeders\RoleSeeder;
 use Database\Seeders\StaffSeeder;
@@ -36,10 +37,11 @@ class DatabaseSeeder extends Seeder
             StaffSeeder::class,
             ServiceCategorySeeder::class,
             UomSeeder::class,
-            ItemSeeder::class,
+            // ItemSeeder::class,
             HeadAccountSeeder::class,
             SubAccountSeeder::class,
             RoomAndTableSeeder::class,
+            FeatureSeeder::class,
         ]);
     }
 }

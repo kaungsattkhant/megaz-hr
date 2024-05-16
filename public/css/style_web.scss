@@ -125,7 +125,8 @@
   color: black; }
 
 .table-container{
-  border: 1px solid #e5e7eb;
+  // border: 1px solid #e5e7eb;
+  position: relative;
 }
 .primary-table{
   min-width: 100%;
@@ -133,6 +134,9 @@
   line-height: 1.25rem;
   text-align: center;
   font-weight: 300;
+  border-top: 1px solid #e5e7eb;
+  border-left: 1px solid #e5e7eb;
+  border-right: 1px solid #e5e7eb;
 }
 .primary-table thead{
   border-bottom-width: 1px;

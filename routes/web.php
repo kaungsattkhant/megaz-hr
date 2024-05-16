@@ -64,7 +64,6 @@ Route::middleware(['departments:HR,Finance,Management'])->group(function () {
     Route::view('/purchase_orders/{poId}/buy', 'purchase_orders.buy')->name('purchase_orders.buy');
 });
 Route::middleware(['departments:Inventory'])->group(function () {
-
     Route::view('/confirm_purchase_order_items', 'purchase_orders.confirm_poitems')->name('purchase_orders.confirm_poitems');
     Route::view('/purchase_order_left_items', 'purchase_orders.left_items_index')->name('purchase_orders.left_items_index');
     Route::view('/purchase_order_left_items/{poId}', 'purchase_orders.left_items_detail')->name('purchase_orders.left_items_detail');
@@ -92,7 +91,6 @@ Route::middleware(['departments:Finance'])->group(function () {
     Route::view('/bankbook/kbz_special_md_gm', 'cashbook.bank_kbz_special_md_gm')->name('kbz_special_bank');
     Route::view('/bankbook/kbz_old_gm', 'cashbook.bank_kbz_old_gm')->name('kbz_old_gm_bank');
     Route::view('/bankbook/kpay', 'cashbook.bank_kpay')->name('kpay_bank');
-
     Route::view('/fixed_assets', 'fixed_assets.index')->name('fixed_assets.index');
 });
 

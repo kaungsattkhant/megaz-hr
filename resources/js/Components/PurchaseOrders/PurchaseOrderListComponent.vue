@@ -272,7 +272,7 @@
                         });
                         setTimeout(()=>{
                             window.location.reload();
-                        }, 3000);
+                        }, 200);
                     }
                     else{
                         this.$notify({

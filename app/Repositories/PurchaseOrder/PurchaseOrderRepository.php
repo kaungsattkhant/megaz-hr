@@ -35,7 +35,7 @@ class PurchaseOrderRepository implements PurchaseOrderRepositoryInterface
                 $q->whereIn('status', ['manager_checked', 'financial_checked'])
                     ->orWhere('financial_check_id', UserData()->id);
             })
-            ->when(checkDepartmentAndRoles('Manager', ['MD']), function ($q) {
+            ->when(checkDepartmentAndRoles('Management', ['MD']), function ($q) {
                 $q->whereIn('status', ['md_checked', 'financial_checked']);
             })
             ->paginate(config('common.list_count'));
@@ -84,42 +84,43 @@ class PurchaseOrderRepository implements PurchaseOrderRepositoryInterface
                 $item_data['purchase_order_id'] = $po->id;
                 $item_data['item_id'] = $item->item_id;
                 $item_data['amount'] = $item->amount;
-
+                $item_data['uom_id'] = $item->uom_id;
+                $item_data['uom_conversion_id'] = $item->uom_conversion_id;
                 // $purchaseOrderItem=PurchaseOrderItem::find($item_data['id']);
                 if (isset($item->later_buy) && $item->later_buy) {
                     $purchaseOrderItem = $po->items()->where('id', $item_data['id'])->first();
-                    if ($purchaseOrderItem) {
-                        if ($item->quantity > $purchaseOrderItem->quantity) {
-                            ResponseMessage('Later Buy Quantity must be less than original quantity', 419);
-                        }
-                        if ($item->quantity < $purchaseOrderItem->quantity) {
-                            $quantity = $purchaseOrderItem->original_quantity - $item->quantity;
-                            if ($quantity < 0) {
+                        if ($purchaseOrderItem) {
+                            if ($item->quantity > $purchaseOrderItem->quantity) {
                                 ResponseMessage('Later Buy Quantity must be less than original quantity', 419);
                             }
-                            $column = null;
-                            if (checkDepartmentAndRoles('HR', ['Manager'])) {
-                                $column = 'quantity_by_manager';
-                            } elseif (!$po->is_md_checked && checkDepartmentAndRoles('Finance', ['Staff'])) {
-                                $column = 'quantity_by_financial';
-                            } elseif (checkDepartmentAndRoles('Management', ['MD'])) {
-                                $column = 'quantity_by_md';
-                            } elseif ($po->is_md_checked && checkDepartmentAndRoles('Finance', ['Staff'])) {
-                                $column = 'quantity_after_md';
-                            }
-                            if ($column != null) {
-                                $po_left = PurchaseOrderItemLeft::updateOrCreate(
-                                    [
-                                        'purchase_order_item_id' => $item->id,
-                                    ],
-                                    [
-                                        'purchase_order_item_id' => $item->id,
-                                        'quantity' => $quantity,
-                                        $column => $item->quantity,
-                                    ]);
-                            }
-                        } 
-                    }
+                            if ($item->quantity < $purchaseOrderItem->quantity) {
+                                $quantity = $purchaseOrderItem->original_quantity - $item->quantity;
+                                if ($quantity < 0) {
+                                    ResponseMessage('Later Buy Quantity must be less than original quantity', 419);
+                                }
+                                $column = null;
+                                if (checkDepartmentAndRoles('HR', ['Manager'])) {
+                                    $column = 'quantity_by_manager';
+                                } elseif (!$po->is_md_checked && checkDepartmentAndRoles('Finance', ['Staff'])) {
+                                    $column = 'quantity_by_financial';
+                                } elseif (checkDepartmentAndRoles('Management', ['MD'])) {
+                                    $column = 'quantity_by_md';
+                                } elseif ($po->is_md_checked && checkDepartmentAndRoles('Finance', ['Staff'])) {
+                                    $column = 'quantity_after_md';
+                                }
+                                if ($column != null) {
+                                    $po_left = PurchaseOrderItemLeft::updateOrCreate(
+                                        [
+                                            'purchase_order_item_id' => $item->id,
+                                        ],
+                                        [
+                                            'purchase_order_item_id' => $item->id,
+                                            'quantity' => $quantity,
+                                            $column => $item->quantity,
+                                        ]);
+                                }
+                            } 
+                        }
                 }
                 if ($request->is_grn) {
                     if ($item->supplier_id != null && $item->invoice_amount != null && $item->invoice_no != null) {
@@ -192,10 +193,10 @@ class PurchaseOrderRepository implements PurchaseOrderRepositoryInterface
     {
         $purchaseOrder->items = $purchaseOrder->items;
         $purchaseOrder->items->load('purchaseOrderItemLeft');
+        $purchaseOrder->items->load('item.suppliers');
         foreach ($purchaseOrder->items as $item) {
             $item->later_buy = $item->purchaseOrderItemLeft ? 1 : 0;
         }
-        $purchaseOrder->items->load('item.suppliers');
         return $purchaseOrder;
     }
 
@@ -298,7 +299,6 @@ class PurchaseOrderRepository implements PurchaseOrderRepositoryInterface
             ResponseMessage($e->getMessage(), 402);
             throw $e;
         }
-
     }
 
     public function existIsCheckAndUpdate($model, $is_column, $value)

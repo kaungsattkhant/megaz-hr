@@ -39,6 +39,7 @@ class ItemSeeder extends Seeder
             ItemPrice::create([
                 'price'=>$amounts[$randomIndex],
                 'item_id'=>$item->id,
+                'uom_id'=>$faker->numberBetween(1, $numUoms),
             ]);
             $randomUoms = $faker->randomElements($uoms, $faker->numberBetween(1, $numUoms));
             $item->uoms()->sync($randomUoms);

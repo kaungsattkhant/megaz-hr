@@ -23,8 +23,7 @@
                 <label for="" class="label-form mb-3">
                     Gender
                 </label>
-                <select name="" id="" v-model="selectedGender"
-                    class="input-ui h-[34px]">
+                <select name="" id="" v-model="selectedGender" class="input-ui h-[34px]">
                     <option :value="gender" v-for="(gender, genderIndex) in genderList" :key="genderIndex">
                         {{ gender.name }}
                     </option>
@@ -41,7 +40,7 @@
                 <label for="" class="label-form mb-3">
                     Father's Name
                 </label>
-                <input type="text" v-model="fathterName" placeholder="Father's Name" class="input-ui">
+                <input type="text" v-model="fatherName" placeholder="Father's Name" class="input-ui">
             </div>
 
             <div class="col-span-3 mb-4 pb-6">
@@ -58,7 +57,15 @@
                 <input type="email" v-model="email" placeholder="Email" class="input-ui">
             </div>
 
-            <div class="col-span-3"></div>
+            <div class="mb-4 col-span-3 pb-6 rounded-md">
+                <label for="" class="block text-sm text-black mb-3">
+                    Joined Date
+                </label>
+                <input type="date" v-model="joinedDate"
+                    class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
+            </div>
+
+            <!-- <div class="col-span-3"></div> -->
 
             <div class="mb-4 col-span-3 pb-6 rounded-md">
                 <label for="" class="label-form mb-3">
@@ -70,15 +77,13 @@
                 <label for="" class="label-form mb-3">
                     Alt Ph Number
                 </label>
-                <input type="tel" v-model="altPhoneNumber" placeholder="Alt Phone"
-                    class="input-ui">
+                <input type="tel" v-model="altPhoneNumber" placeholder="Alt Phone" class="input-ui">
             </div>
             <div class="mb-4 col-span-3 pb-6 rounded-md">
                 <label for="" class="label-form mb-3">
                     Password
                 </label>
-                <input type="password" v-model="password"
-                    class="input-ui">
+                <input type="password" v-model="password" class="input-ui">
             </div>
             <div class="col-span-3"></div>
 
@@ -86,8 +91,7 @@
                 <label for="" class="label-form mb-3">
                     Department
                 </label>
-                <select name="" id="" v-model="selectedDepartment"
-                    class="input-ui h-[34px]"
+                <select name="" id="" v-model="selectedDepartment" class="input-ui h-[34px]"
                     @change="departmentSelectChanged">
                     <option :value="department" v-for="(department, departmentIndex) in departmentList"
                         :key="departmentIndex"> {{ department.name }} </option>
@@ -101,22 +105,26 @@
                 </label>
                 <div class="bg-white mb-0 w-full text-sm inline-block h-[34px]" data-te-select-wrapper-ref>
                     <select data-te-select-init data-te-select-placeholder="Select Roles" data-te-select-filter="true"
-                        name="" id="" multiple v-model="selectedRoles"
-                        class="input-ui h-[34px]">
+                        name="" id="" multiple v-model="selectedRoles" class="input-ui h-[34px]">
                         <option :value="role" v-for="(role, roleIndex) in roleList" :key="roleIndex">
                             {{ role.name }}
                         </option>
-                        <!-- <option value="2">Manager</option>
-                        <option value="3">Waiter</option> -->
                     </select>
                 </div>
             </div>
             <div class="col-span-3 rounded-md mb-4 pb-6">
-                <label for="" class="label-form mb-3">
-                    Joined Date
+                <label for="" class="block text-sm text-black mb-3">
+                    Authorized Features
                 </label>
-                <input type="date" v-model="joinedDate"
-                    class="input-ui">
+                <div class="bg-white mb-0 w-full text-sm inline-block" data-te-select-wrapper-ref>
+                    <select data-te-select-init data-te-select-placeholder="Select Features"
+                        data-te-select-filter="true" name="" id="" multiple v-model="selectedFeatures"
+                        class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
+                        <option :value="feature" v-for="(feature, featureIndex) in featureList" :key="featureIndex">
+                            {{ feature.name }}
+                        </option>
+                    </select>
+                </div>
             </div>
 
             <div class="col-span-3 rounded-md mb-4 pb-6">
@@ -126,8 +134,7 @@
                 <div>
                     <select :disabled="inventories.length < 1" data-te-select-init
                         data-te-select-placeholder="Select Inventories" data-te-select-filter="true" name="" id=""
-                        multiple v-model="selectedInventories"
-                        class="input-ui h-[34px]">
+                        multiple v-model="selectedInventories" class="input-ui h-[34px]">
                         <option :value="inventory" v-for="(inventory, inventoryIndex) in inventories"
                             :key="inventoryIndex">
                             {{ inventory.name }}
@@ -144,9 +151,7 @@
                 </label>
                 <!-- <input type="input" v-model="state" placeholder="State (Required)"
                     class="input-ui"> -->
-                <select name="" id="" v-model="selectedState"
-                    class="input-ui"
-                    @change="stateSelectChanged">
+                <select name="" id="" v-model="selectedState" class="input-ui" @change="stateSelectChanged">
                     <option :value="state" v-for="(state, stateIndex) in stateList"> {{ state.name }} </option>
                 </select>
             </div>
@@ -156,9 +161,7 @@
                 </label>
                 <!-- <input type="input" v-model="city" placeholder="City (Required)"
                     class="input-ui"> -->
-                <select name="" id="" v-model="selectedCity"
-                    class="input-ui"
-                    @change="citySelectChanged">
+                <select name="" id="" v-model="selectedCity" class="input-ui" @change="citySelectChanged">
                     <!-- <option value="City 1"> City 1 </option> -->
                     <option :value="city" v-for="(city, cityIndex) in cityList"> {{ city.name }} </option>
                 </select>
@@ -167,8 +170,7 @@
                 <label for="" class="label-form mb-3">
                     Zip Code
                 </label>
-                <input type="text" v-model="zipCode" placeholder="Zip Code"
-                    class="input-ui">
+                <input type="text" v-model="zipCode" placeholder="Zip Code" class="input-ui">
             </div>
 
             <div class="col-span-3"></div>
@@ -177,8 +179,7 @@
                 <label for="" class="label-form mb-3">
                     Address
                 </label>
-                <textarea name="" v-model="address"
-                    class="input-ui w-full bg-transparent rounded-lg" id="" cols="30"
+                <textarea name="" v-model="address" class="input-ui w-full bg-transparent rounded-lg" id="" cols="30"
                     rows="10"></textarea>
             </div>
             <div class="col-span-6"></div>
@@ -194,22 +195,19 @@
                 <label for="" class="label-form mb-3">
                     Primary Contact
                 </label>
-                <input type="text" v-model="primaryName" placeholder="Primary Contact (Required)"
-                    class="input-ui">
+                <input type="text" v-model="primaryName" placeholder="Primary Contact (Required)" class="input-ui">
             </div>
             <div class="col-span-3 rounded-md mb-4 pb-6">
                 <label for="" class="label-form mb-3">
                     Phone Number
                 </label>
-                <input type="text" v-model="primaryPhone" placeholder="Phone Number (Required)"
-                    class="input-ui">
+                <input type="text" v-model="primaryPhone" placeholder="Phone Number (Required)" class="input-ui">
             </div>
             <div class="col-span-3 rounded-md mb-4 pb-6">
                 <label for="" class="label-form mb-3">
                     Relationship
                 </label>
-                <input type="text" v-model="primaryRelationship" placeholder="Relationship (Required)"
-                    class="input-ui">
+                <input type="text" v-model="primaryRelationship" placeholder="Relationship (Required)" class="input-ui">
             </div>
             <div class="col-span-3"></div>
 
@@ -217,15 +215,13 @@
                 <label for="" class="label-form mb-3">
                     Secondary Contact
                 </label>
-                <input type="text" v-model="secondaryName" placeholder="Secondary Contact (Required)"
-                    class="input-ui">
+                <input type="text" v-model="secondaryName" placeholder="Secondary Contact (Required)" class="input-ui">
             </div>
             <div class="col-span-3 rounded-md mb-4 pb-6">
                 <label for="" class="label-form mb-3">
                     Phone Number
                 </label>
-                <input type="text" v-model="secondaryPhone" placeholder="Phone Number (Required)"
-                    class="input-ui">
+                <input type="text" v-model="secondaryPhone" placeholder="Phone Number (Required)" class="input-ui">
             </div>
             <div class="col-span-3 rounded-md mb-4 pb-6">
                 <label for="" class="label-form mb-3">
@@ -259,24 +255,27 @@
                         <button type="button" class="absolute top-4 right-4 focus:shadow-none focus:outline-none"
                             data-te-modal-dismiss aria-label="Close">
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
-                                stroke="currentColor" class="h-5 w-5">
+                                stroke="currentColor" class="h-4 w-4">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
                             </svg>
                         </button>
                     </div>
 
-                    <div class="relative px-12 py-4" data-te-modal-body-ref>
+                    <div class="relative px-6 py-4 border-b" data-te-modal-body-ref>
 
                         <div class="mb-4">
-                            <label for="" class="block text-sm text-black mb-3">
+                            <label for="" class="label-form mb-3">
                                 Department
                             </label>
-                            <input type="text" placeholder="Department"
-                                class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
+                            <input type="text" placeholder="Department" class="input-ui">
                         </div>
                     </div>
 
-                    <div class="flex justify-center px-12 mb-6">
+                    <div class="flex justify-end gap-x-4 px-6 mb-6 pt-4">
+                        <button type="button" class="cancel-btn focus:shadow-none focus:outline-none"
+                            data-te-modal-dismiss aria-label="Close">
+                            Cancel
+                        </button>
                         <button type="button" class="add-btn focus:outline-none focus:ring-0 ">
                             Add
                         </button>
@@ -322,7 +321,11 @@
                         </div>
                     </div>
 
-                    <div class="flex justify-center px-12 mb-6">
+                    <div class="flex justify-end gap-x-4 px-6 mb-6 pt-4">
+                        <button type="button" class="cancel-btn focus:shadow-none focus:outline-none"
+                            data-te-modal-dismiss aria-label="Close">
+                            Cancel
+                        </button>
                         <button type="button" class="add-btn focus:outline-none focus:ring-0 ">
                             Add
                         </button>
@@ -346,6 +349,7 @@ export default {
             genderList: [],
             departmentList: [],
             roleList: [],
+            featureList: [],
             stateList: [],
             selectedState: null,
             cityList: [],
@@ -356,7 +360,7 @@ export default {
             phoneNumber: null,
             altPhoneNumber: null,
             email: null,
-            fathterName: null,
+            fatherName: null,
             motherName: null,
             joinedDate: getCurrentDate(),
             password: null,
@@ -365,6 +369,8 @@ export default {
             selectedDepartment: null,
             selectedRoles: [],
             roleIds: [],
+            selectedFeatures: [],
+            featureIds: [],
             state: null,
             city: null,
             address: null,
@@ -420,9 +426,13 @@ export default {
         },
 
         async departmentSelectChanged() {
+            this.featureList = [];
             let rolesResponse = await getApiData({ url: `/api/roles?department_id=${this.selectedDepartment.id}`, token: this.getToken() });
             if (rolesResponse.data) {
                 this.roleList = rolesResponse.data;
+            }
+            if(this.selectedDepartment.features.length > 0){
+                this.featureList = this.selectedDepartment.features;
             }
         },
 
@@ -463,6 +473,9 @@ export default {
             this.selectedRoles.forEach((role) => {
                 this.roleIds.push(role.id);
             });
+            this.selectedFeatures.forEach((feature) => {
+                this.featureIds.push(feature.id);
+            });
 
             if (!this.name) {
                 this.alertValiationMessage('name');
@@ -494,7 +507,6 @@ export default {
                 return 1;
             }
 
-
             if (!this.joinedDate) {
                 this.alertValiationMessage('joined date');
                 return 1;
@@ -505,7 +517,12 @@ export default {
             }
 
             if (this.roleIds.length < 1) {
-                this.alertValiationMessage('role');
+                this.alertValiationMessage('roles');
+                return 1;
+            }
+
+            if (this.featureIds.length < 1) {
+                this.alertValiationMessage('authorized features');
                 return 1;
             }
 
@@ -576,8 +593,8 @@ export default {
             }
 
 
-            if (this.fathterName) {
-                formData.append('father_name', this.fathterName);
+            if (this.fatherName) {
+                formData.append('father_name', this.fatherName);
             }
 
             if (this.motherName) {
@@ -606,6 +623,7 @@ export default {
             }
             formData.append('password', this.password);
             formData.append('roles', this.roleIds);
+            formData.append('featureIds', JSON.stringify(this.featureIds));
             formData.append('joined_date', this.joinedDate);
 
             // for emegercy
