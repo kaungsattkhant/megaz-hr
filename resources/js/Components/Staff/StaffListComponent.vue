@@ -5,10 +5,10 @@
         </p>
     </div>
     <div class="mt-4 bg-white">
-        <div class="flex justify-between mb-3 px-4 py-4 border-b">
+        <div class="btn-container">
             <div class=" flex gap-x-4">
-                <label for="search" class="search-input h-8">
-                    <input type="text" class="input-search h-full !pt-1 pb-0 text-xs" placeholder="Search"
+                <label for="search" class="search-input">
+                    <input type="text" class="input-search" placeholder="Search"
                         v-model="searchInput">
                     <i class="fal fa-search"></i>
                 </label>
@@ -33,32 +33,32 @@
 
             </div>
         </div>
-        <div class="block mx-4 mt-4 pb-4">
-            <div class="overflow-x-auto">
+        <div class="box-container-table">
+            <div class=" overflow-x-auto">
                 <!-- <div class="inline-block min-w-full py-2 sm:px-6 lg:px-8"> -->
-                <div class="border">
-                    <table class="min-w-full primary-table rounded-xl text-center text-sm font-light ">
-                        <thead class="border-b font-medium ">
+                <div class=" table-container">
+                    <table class="primary-table">
+                        <thead class="">
                             <tr>
-                                <th scope="col" class=" p-3 border-r font-inter">
+                                <th scope="col" class="">
                                     #
                                 </th>
-                                <th scope="col" class=" p-3 border-r text-left font-inter">
+                                <th scope="col" class=" text-left">
                                     Name
                                 </th>
-                                <th scope="col" class=" p-3 border-r text-left font-inter">
+                                <th scope="col" class=" text-left">
                                     Phone Number
                                 </th>
-                                <th scope="col" class=" p-3 border-r font-inter">
+                                <th scope="col" class=" ">
                                     Address
                                 </th>
-                                <th scope="col" class=" p-3 border-r font-inter">
+                                <th scope="col" class=" ">
                                     Roles
                                 </th>
-                                <th scope="col" class=" p-3 border-r font-inter">
+                                <th scope="col" class=" ">
                                     Department
                                 </th>
-                                <th scope="col" class=" p-3">
+                                <th scope="col" class="">
 
                                 </th>
 
@@ -68,29 +68,29 @@
 
                             <!-- looping start -->
                             <div class="contents" v-for="(staff, index) in staffList" :key="index">
-                                <tr class="bg-white border-b overflow-hidden">
-                                    <td class=" p-4 border-r font-inter font-medium ">
+                                <tr class="">
+                                    <td class=" ">
                                         {{ per_page * (currentPage - 1) + (++index) }}
                                     </td>
-                                    <td class="whitespace-nowrap text-left p-4 border-r font-inter ">
+                                    <td class="whitespace-nowrap text-left  ">
                                         {{ staff.name }}
                                     </td>
-                                    <td class="whitespace-nowrap text-left p-4 border-r font-inter ">
+                                    <td class="whitespace-nowrap text-left  ">
                                         {{ staff.phone_number }}
-                                        
+
                                     </td>
-                                    <td class="  p-4 border-r font-inter ">
+                                    <td class="   ">
                                         {{ staff.address }}
                                     </td>
-                                    <td class="whitespace-nowrap  p-4 border-r font-inter ">
+                                    <td class="whitespace-nowrap   ">
                                         <div v-for="role in staff.roles">
                                             {{ role.name }}
                                         </div>
                                     </td>
-                                    <td class="whitespace-nowrap  p-4 border-r font-inter ">
+                                    <td class="whitespace-nowrap   ">
                                         {{ staff.department.name }}
                                     </td>
-                                    <td class="whitespace-nowrap  p-4 border-r font-inter relative">
+                                    <td class="whitespace-nowrap   relative">
                                         <a :href="'/staff/' + staff.id + '/edit'" class="pr-2 ">
                                             <i class="fal fa-pen"></i>
                                         </a>

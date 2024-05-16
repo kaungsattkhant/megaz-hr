@@ -1,35 +1,36 @@
 <template>
-    <div class="px-8">
+    <div class="px-0">
         <div class="mb-6">
-            <p class="text-xl  text-black font-normal">
+            <p class="text-lg font-semibold font-inter">
                 Add Purchase Order
             </p>
         </div>
 
-        <div class="grid grid-rows-3 grid-cols-12 grid-flow-col gap-x-8 bg-white p-8 rounded-md shadow-md mb-8">
-            <div class="mb-4 row-span-2 col-span-12 w-48 pb-6 rounded-md">
-                <label for="" class="block text-sm text-black mb-3">
+        <div class="grid grid-cols-12 gap-x-8 bg-white pt-4 pb-8 px-4 rounded-md shadow-md mb-8">
+            <div class="mb-6 col-span-3">
+                <label for="" class="label-form mb-3">
                     Date
                 </label>
-                <input type="date" v-model="date" class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
+                <input type="date" v-model="date" class="input-ui">
             </div>
+            <div class="col-span-9"></div>
 
             <div class="col-span-3">
-                <label for="" class="block text-sm text-black mb-3">
+                <label for="" class="label-form mb-3">
                     Item Name
                 </label>
-                <select name="" id="" v-model="selectedItem"
-                class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
-                    <option :value="item" v-for="(item, itemIndex) in itemList" :key="itemIndex" > {{ item.name }} </option>
+                <select name="" id="" v-model="selectedItem" class="input-ui">
+                    <option :value="item" v-for="(item, itemIndex) in itemList" :key="itemIndex"> {{ item.name }}
+                    </option>
                 </select>
 
             </div>
 
             <div class="col-span-3">
-                <label for="" class="block text-sm text-black mb-3">
+                <label for="" class="label-form mb-3">
                     Qty
                 </label>
-                <input type="number" v-model="quantity" class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0" placeholder="Qty">
+                <input type="number" v-model="quantity" class="input-ui" placeholder="Qty">
             </div>
 
             <div class="col-span-3">
@@ -41,74 +42,69 @@
 
         </div>
 
-        <div class="grid grid-rows-3 grid-flow-col gap-x-8 bg-white p-8 rounded-md shadow-md mb-8">
-            <table class="min-w-full primary-table rounded-xl text-center text-sm font-light ">
-                <thead class="border-b font-medium ">
-                    <tr>
-                        <th scope="col" class=" px-6 py-4 ">
-                            Item
-                        </th>
-                        <th scope="col" class=" px-6 py-4 ">
-                            Qty
-                        </th>
-                        <th scope="col" class=" px-6 py-4 ">
-                            Amount
-                        </th>
-                        <th scope="col" class=" px-6 py-4 ">
-                            Total
-                        </th>
-                        <th scope="col" class=" px-6 py-4 ">
+        <div class=" bg-white px-4 py-4 rounded-md shadow-md mb-8">
+            <div class="table-container">
+                <table class="primary-table">
+                    <thead class="">
+                        <tr>
+                            <th scope="col" class="text-left">
+                                Item
+                            </th>
+                            <th scope="col" class="">
+                                Qty
+                            </th>
+                            <th scope="col" class="">
+                                Amount
+                            </th>
+                            <th scope="col" class="">
+                                Total
+                            </th>
+                            <th scope="col" class="">
 
-                        </th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <div class="contents" v-for="(purchaseOrderItem, purchaseOrderItemsIndex) in purchaseOrderItems" :key="purchaseOrderItemsIndex">
-                        <tr class="bg-white rounded-lg overflow-hidden shadow-lg">
-                            <td class=" px-6 py-4 font-medium ">
-                                {{ purchaseOrderItem.name }}
-                            </td>
-                            <td class=" px-6 py-4 font-medium ">
-                                {{ purchaseOrderItem.quantity }}
-                            </td>
-                            <td class=" px-6 py-4 font-medium ">
-                                {{ purchaseOrderItem.amount.toLocaleString() }}
-                            </td>
-                            <td class=" px-6 py-4 font-medium ">
-                                {{ (purchaseOrderItem.amount * purchaseOrderItem.quantity).toLocaleString() }}
-                            </td>
-                            <td class=" px-6 py-4 font-medium ">
-                                <button @click="removePurchaseOrderItemBtnClicked(purchaseOrderItemsIndex)">
-                                    <i class="fal fa-trash  pr-3"></i>
-                                </button>
-                            </td>
+                            </th>
                         </tr>
-                        <tr class="">
-                            <td class=" py-2 "></td>
-                        </tr>
-                    </div>
-                    <div class="contents">
-                        <tr class="bg-white rounded-lg overflow-hidden shadow-lg">
-                            <td class=" px-6 py-4 font-medium ">
-                                &nbsp;
-                            </td>
-                            <td class=" px-6 py-4 font-medium ">
-                                &nbsp;
-                            </td>
-                            <td class=" px-6 py-4 font-medium ">
-                                &nbsp;
-                            </td>
-                            <td class="px-6 py-4">
-                                {{ totalPrice.toLocaleString() }}
-                            </td>
-                            <td class=" px-6 py-4 font-medium ">
-                                &nbsp;
-                            </td>
-                        </tr>
-                    </div>
+                    </thead>
+                    <tbody>
+                        <div class="contents" v-for="(purchaseOrderItem, purchaseOrderItemsIndex) in purchaseOrderItems"
+                            :key="purchaseOrderItemsIndex">
+                            <tr class="">
+                                <td class="text-left">
+                                    {{ purchaseOrderItem.name }}
+                                </td>
+                                <td class="">
+                                    {{ purchaseOrderItem.quantity }}
+                                </td>
+                                <td class="">
+                                    {{ purchaseOrderItem.amount.toLocaleString() }}
+                                </td>
+                                <td class="">
+                                    {{ (purchaseOrderItem.amount * purchaseOrderItem.quantity).toLocaleString() }}
+                                </td>
+                                <td class="">
+                                    <button @click="removePurchaseOrderItemBtnClicked(purchaseOrderItemsIndex)">
+                                        <i class="fal fa-trash  pr-3"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                        </div>
+                        <div class="contents">
+                            <tr class="">
+                                <td class="" colspan="3">
+                                    &nbsp;
+                                </td>
+                                
+                                <td class="">
+                                    {{ totalPrice.toLocaleString() }}
+                                </td>
+                                <td class="">
+                                    &nbsp;
+                                </td>
+                            </tr>
+                        </div>
 
-                </tbody>
-            </table>
+                    </tbody>
+                </table>
+            </div>
         </div>
         <div>
             <button class="add-btn" @click="createPurchaseOrderBtnClicked">

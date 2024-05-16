@@ -1,277 +1,270 @@
 <template>
-    <div class="flex justify-between mb-3">
-        <div class=" flex">
-            <label for="search" class="search-input">
-                <input type="text" class="input-search" placeholder="Search">
-
-                <i class="fal fa-search"></i>
-            </label>
-        </div>
-        <div class="flex justify-end flex-col">
-
-            <button type="button" class="add-btn transition duration-150 ease-in-out focus:outline-none focus:ring-0 "
-                data-te-toggle="modal" data-te-target="#create_modal">
-                Add New
-            </button>
-        </div>
+    <div>
+        <p class=" text-lg font-semibold font-inter">
+            Complaints
+        </p>
     </div>
-    <div class="block rounded-xl">
-        <div class="overflow-x-auto">
-            <!-- <div class="inline-block min-w-full py-2 sm:px-6 lg:px-8"> -->
-            <div class="overflow-hidden ">
-                <table class="min-w-full primary-table rounded-xl text-center text-sm font-light ">
-                    <thead class="border-b font-medium ">
-                        <tr>
-                            <th scope="col" class=" px-6 py-4 ">
-                                #
-                            </th>
-                            <th scope="col" class=" px-6 py-4 ">
-                                Title
-                            </th>
-                            <th scope="col" class="px-6 py-4">
-                                Description
-                            </th>
+    <div class="mt-4 bg-white">
+        <div class="btn-container">
+            <div class=" flex">
+                <label for="search" class="search-input">
+                    <input type="text" class="input-search" placeholder="Search">
 
-                            <th scope="col" class="px-6 py-4">
-                                Status
-                            </th>
+                    <i class="fal fa-search"></i>
+                </label>
+            </div>
+            <div class="flex justify-end flex-col">
 
-                            <th scope="col" class="px-6 py-4">
-                                Category
-                            </th>
-                        </tr>
-                    </thead>
-                    <tbody>
+                <button type="button"
+                    class="add-btn transition duration-150 ease-in-out focus:outline-none focus:ring-0 "
+                    data-te-toggle="modal" data-te-target="#create_modal">
+                    Add New
+                </button>
+            </div>
+        </div>
+        <div class="box-container-table">
+            <div class="overflow-x-auto">
+                <!-- <div class="inline-block min-w-full py-2 sm:px-6 lg:px-8"> -->
+                <div class="table-container">
+                    <table class="primary-table  ">
+                        <thead class="  ">
+                            <tr>
+                                <th scope="col" class="  ">
+                                    #
+                                </th>
+                                <th scope="col" class="  ">
+                                    Title
+                                </th>
+                                <th scope="col" class="">
+                                    Description
+                                </th>
 
-                        <!-- looping start -->
-                        <div v-for="(complain,index) in complainList" :key="index" class="contents">
-                            <tr  class="bg-white rounded-lg overflow-hidden shadow-lg">
-                                <td class=" px-6 py-4 font-medium ">
-                                    {{ index+1 }}
-                                </td>
-                                <td class="whitespace-nowrap px-6 py-4 ">
-                                    <a href="#">
-                                        {{ complain.title }}
-                                    </a>
-                                </td>
-                                <td class="whitespace-nowrap px-6 py-4 ">
-                                    <a href="#">
-                                        {{ complain.description }}
-                                    </a>
-                                </td>
+                                <th scope="col" class="">
+                                    Status
+                                </th>
 
-                                <td class="whitespace-nowrap px-6 py-4 ">
-                                    <a href="#">
-                                        {{ complain.status }}
-                                    </a>
-                                </td>
-                                <td class="whitespace-nowrap px-6 py-4 ">
-                                    <a href="#">
-                                        {{ complain.complaint_category.name }}
-                                    </a>
-                                </td>
+                                <th scope="col" class="">
+                                    Category
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
 
-                                <td class="whitespace-nowrap px-6 py-4 flex gap-5">
-                                    <!-- <button id="edit-btn" class="pr-3"
+                            <!-- looping start -->
+                            <div v-for="(complain,index) in complainList" :key="index" class="contents">
+                                <tr class="">
+                                    <td class="  ">
+                                        {{ index+1 }}
+                                    </td>
+                                    <td class="whitespace-nowrap  ">
+                                        <a href="#">
+                                            {{ complain.title }}
+                                        </a>
+                                    </td>
+                                    <td class="whitespace-nowrap  ">
+                                        <a href="#">
+                                            {{ complain.description }}
+                                        </a>
+                                    </td>
+
+                                    <td class="whitespace-nowrap  ">
+                                        <a href="#">
+                                            {{ complain.status }}
+                                        </a>
+                                    </td>
+                                    <td class="whitespace-nowrap  ">
+                                        <a href="#">
+                                            {{ complain.complaint_category.name }}
+                                        </a>
+                                    </td>
+
+                                    <td class="whitespace-nowrap  flex justify-center gap-5">
+                                        <!-- <button id="edit-btn" class="pr-3"
                                     data-te-toggle="modal" data-te-target="#stageModal">
                                         <i class="fal fa-bars"></i>
                                     </button> -->
 
-                                    <button id="edit-btn" class="pr-1"
-                                    @click="statusChangeClick(complain.id)"
-                                    data-te-toggle="modal" data-te-target="#statusChange"
-                                    :disabled="complain.status === 'Done'">
-                                        <i class="far fa-info-circle"></i>
-                                    </button>
+                                        <button id="edit-btn" class="pr-1" @click="statusChangeClick(complain.id)"
+                                            data-te-toggle="modal" data-te-target="#statusChange"
+                                            :disabled="complain.status === 'Done'">
+                                            <i class="far fa-info-circle"></i>
+                                        </button>
 
 
-                                    <button id="edit-btn" class="pr-1"
-                                    @click="deleteBtnClicked( complain.id)"
-                                    data-te-toggle="modal" data-te-target="#deleteModal">
-                                        <i class="fas fa-trash-alt"></i>
-                                    </button>
+                                        <button id="edit-btn" class="pr-1" @click="deleteBtnClicked( complain.id)"
+                                            data-te-toggle="modal" data-te-target="#deleteModal">
+                                            <i class="fas fa-trash-alt"></i>
+                                        </button>
 
 
-                                </td>
-                            </tr>
-                            <tr class="">
-                                <td class=" py-2 "></td>
-                            </tr>
-                        </div>
+                                    </td>
+                                </tr>
+                            </div>
 
                             <!-- looping end -->
-                    </tbody>
-                </table>
+                        </tbody>
+                    </table>
+                </div>
             </div>
-        </div>
 
 
-        <!-- Create Modal -->
-        <div data-te-modal-init
-            class="fixed left-0 top-0 z-[1055] hidden h-full w-full overflow-y-auto overflow-x-hidden outline-none"
-            id="create_modal" tabindex="-1" aria-labelledby="create_modalLabel" aria-hidden="true">
-            <div data-te-modal-dialog-ref
-                class="pointer-events-none relative w-auto mb-12 translate-y-[-50px] opacity-0 transition-all duration-300 ease-in-out min-[576px]:mx-auto min-[576px]:mt-7 min-[576px]:max-w-[500px]">
-                <div
-                    class="min-[576px]:shadow-[0_0.5rem_1rem_rgba(#000, 0.15)] pointer-events-auto relative flex w-full flex-col rounded-md border-none bg-white bg-clip-padding text-current shadow-lg outline-none">
+            <!-- Create Modal -->
+            <div data-te-modal-init
+                class="fixed left-0 top-0 z-[1055] hidden h-full w-full overflow-y-auto overflow-x-hidden outline-none"
+                id="create_modal" tabindex="-1" aria-labelledby="create_modalLabel" aria-hidden="true">
+                <div data-te-modal-dialog-ref
+                    class="pointer-events-none relative w-auto mb-12 translate-y-[-50px] opacity-0 transition-all duration-300 ease-in-out min-[576px]:mx-auto min-[576px]:mt-7 min-[576px]:max-w-[500px]">
+                    <div
+                        class="min-[576px]:shadow-[0_0.5rem_1rem_rgba(#000, 0.15)] pointer-events-auto relative flex w-full flex-col rounded-md border-none bg-white bg-clip-padding text-current shadow-lg outline-none">
 
-                    <div class="relative  p-4">
-                        <h5 class="text-xl text-center mt-2 font-medium leading-normal text-black" id="create_modalLabel">
-                            Create Complain
-                        </h5>
-                        <button type="button" id="close" class="absolute top-4 right-4 focus:shadow-none focus:outline-none"
-                            data-te-modal-dismiss aria-label="Close">
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
-                                stroke="currentColor" class="h-5 w-5">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
-                            </svg>
-                        </button>
-                    </div>
-                    <div class="relative px-12 py-4" data-te-modal-body-ref>
-                        <div class="mb-4">
-                            <label for="" class="block text-sm text-black mb-3">
-                                Complain Title
-                            </label>
-                            <input type="text" placeholder="Complain Title" v-model="title"
-                                class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
+                        <div class="relative flex justify-between py-2 px-6 border-b">
+                            <h5 class="text-base text-center mt-2 font-semibold leading-normal font-inter"
+                                id="create_modalLabel">
+                                Create Complain
+                            </h5>
+                            <button type="button" class="text-xs focus:shadow-none focus:outline-none"
+                                data-te-modal-dismiss aria-label="Close">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                    stroke-width="1.5" stroke="currentColor" class="h-4 w-4">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                                </svg>
+                            </button>
                         </div>
-                        <div class="mb-4">
-                            <label for="" class="block text-sm text-black mb-3">
-                                Category
-                            </label>
-                            <select name="" id="" v-model="selectedCategory"
-                                class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
-                                <option v-for="(category,index) in complainCategory" :key="index" :value=category.id >{{ category.name }}</option>
+                        <div class="relative px-6 py-4 border-b" data-te-modal-body-ref>
+                            <div class="mb-4">
+                                <label for="" class="label-form mb-3">
+                                    Complain Title
+                                </label>
+                                <input type="text" placeholder="Complain Title" v-model="title" class="input-ui">
+                            </div>
+                            <div class="mb-4">
+                                <label for="" class="label-form mb-3">
+                                    Category
+                                </label>
+                                <select name="" id="" v-model="selectedCategory" class="input-ui">
+                                    <option v-for="(category,index) in complainCategory" :key="index"
+                                        :value=category.id>{{
+                                        category.name }}</option>
 
-                            </select>
-                        </div>
-                        <div class="mb-4">
-                            <label for="" class="block text-sm text-black mb-3">
-                                Complain Description
-                            </label>
-                            <textarea v-model='description' class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0"
-                                 name="" id="" cols="30" rows="10" placeholder="Complain Description"></textarea>
+                                </select>
+                            </div>
+                            <div class="mb-4">
+                                <label for="" class="label-form mb-3">
+                                    Complain Description
+                                </label>
+                                <textarea v-model='description' class="input-ui" name="" id="" cols="30" rows="10"
+                                    placeholder="Complain Description"></textarea>
 
+                            </div>
                         </div>
-                    </div>
-                    <div class="flex justify-center px-12 mb-6">
-                        <button type="button" @click="createBtnClicked"
-                        class="add-btn focus:outline-none focus:ring-0 ">
-                            Create
-                        </button>
+                        <div class="flex justify-end gap-x-4 px-6 mb-6 pt-4">
+                            <button type="button" class="cancel-btn focus:shadow-none focus:outline-none"
+                                data-te-modal-dismiss aria-label="Close">
+                                Cancel
+                            </button>
+                            <button type="button" @click="createBtnClicked"
+                                class="add-btn focus:outline-none focus:ring-0 ">
+                                Create
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
 
-        <!-- status change model -->
-        <div data-te-modal-init
-            class="fixed left-0 top-0 z-[1055] hidden h-full w-full overflow-y-auto overflow-x-hidden outline-none"
-            id="statusChange" tabindex="-1" aria-labelledby="statusChangeLabel" aria-hidden="true">
-            <div data-te-modal-dialog-ref
-                class="pointer-events-none relative w-auto mb-12 translate-y-[-50px] opacity-0 transition-all duration-300 ease-in-out min-[576px]:mx-auto min-[576px]:mt-7 min-[576px]:max-w-[500px]">
-                <div
-                    class="min-[576px]:shadow-[0_0.5rem_1rem_rgba(#000, 0.15)] pointer-events-auto relative flex w-full flex-col rounded-md border-none bg-white bg-clip-padding text-current shadow-lg outline-none">
+            <!-- status change model -->
+            <div data-te-modal-init
+                class="fixed left-0 top-0 z-[1055] hidden h-full w-full overflow-y-auto overflow-x-hidden outline-none"
+                id="statusChange" tabindex="-1" aria-labelledby="statusChangeLabel" aria-hidden="true">
+                <div data-te-modal-dialog-ref
+                    class="pointer-events-none relative w-auto mb-12 translate-y-[-50px] opacity-0 transition-all duration-300 ease-in-out min-[576px]:mx-auto min-[576px]:mt-7 min-[576px]:max-w-[500px]">
+                    <div
+                        class="min-[576px]:shadow-[0_0.5rem_1rem_rgba(#000, 0.15)] pointer-events-auto relative flex w-full flex-col rounded-md border-none bg-white bg-clip-padding text-current shadow-lg outline-none">
 
-                    <div class="relative  p-4">
-                        <h5 class="text-xl text-center mt-2 font-medium leading-normal text-black" id="create_modalLabel">
-                            Complain Status
-                        </h5>
-                        <button type="button" id="close" class="absolute top-4 right-4 focus:shadow-none focus:outline-none"
-                            data-te-modal-dismiss aria-label="Close">
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
-                                stroke="currentColor" class="h-5 w-5">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
-                            </svg>
-                        </button>
-                    </div>
-                    <div class="relative px-12 py-4" data-te-modal-body-ref>
-                        <div class="mb-4">
-                            <select type="text" placeholder="Complain Title" v-model="change_status" data-te-select-init data-te-select-placeholder="Select Roles"
-                                data-te-select-filter="true"
-                                class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
-                                <option value="In Progress">In Progress</option>
-                                <option value="Done">Done</option>
-
-                            </select>
+                        <div class="relative flex justify-between py-2 px-6 border-b">
+                            <h5 class="text-base text-center mt-2 font-semibold leading-normal font-inter"
+                                id="create_modalLabel">
+                                Complain Status
+                            </h5>
+                            <button type="button" class="text-xs focus:shadow-none focus:outline-none"
+                                data-te-modal-dismiss aria-label="Close">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                    stroke-width="1.5" stroke="currentColor" class="h-4 w-4">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                                </svg>
+                            </button>
                         </div>
-                    </div>
-                    <div class="flex justify-center px-12 mb-6">
-                        <button data-te-modal-dismiss type="button" @click="statusChange"
-                        class="add-btn focus:outline-none focus:ring-0 ">
-                            Confirm
-                        </button>
+                        <div class="relative px-6 py-4 border-b" data-te-modal-body-ref>
+                            <div class="mb-4">
+                                <select type="text" placeholder="Complain Title" v-model="change_status"
+                                    data-te-select-init data-te-select-placeholder="Select Roles"
+                                    data-te-select-filter="true"
+                                    class="input-ui">
+                                    <option value="In Progress">In Progress</option>
+                                    <option value="Done">Done</option>
+
+                                </select>
+                            </div>
+                        </div>
+                        <div class="flex justify-end gap-x-4 px-6 mb-4 pt-6">
+                            <button type="button" class="cancel-btn focus:shadow-none focus:outline-none"
+                                data-te-modal-dismiss aria-label="Close">
+                                Cancel
+                            </button>
+                            <button data-te-modal-dismiss type="button" @click="statusChange"
+                                class="add-btn focus:outline-none focus:ring-0 ">
+                                Confirm
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
 
 
-        <!-- Modal -->
-        <div
-        data-te-modal-init
-        class="fixed left-0 top-0 z-[1055] hidden h-full w-full overflow-y-auto overflow-x-hidden outline-none"
-        id="deleteModal"
-        tabindex="-1"
-        aria-labelledby="exampleModalLabel"
-        aria-hidden="true">
-        <div
-            data-te-modal-dialog-ref
-            class="pointer-events-none relative flex min-h-[calc(100%-1rem)] w-auto translate-y-[-50px] items-center opacity-0 transition-all duration-300 ease-in-out min-[576px]:mx-auto min-[576px]:mt-7 min-[576px]:min-h-[calc(100%-3.5rem)] min-[576px]:max-w-[500px]">
-                <div
-                class="min-[576px]:shadow-[0_0.5rem_1rem_rgba(#000, 0.15)] pointer-events-auto relative flex w-full flex-col rounded-md border-none bg-white bg-clip-padding text-current shadow-lg outline-none ">
+            <!-- Modal -->
+            <div data-te-modal-init
+                class="fixed left-0 top-0 z-[1055] hidden h-full w-full overflow-y-auto overflow-x-hidden outline-none"
+                id="deleteModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                <div data-te-modal-dialog-ref
+                    class="pointer-events-none relative flex min-h-[calc(100%-1rem)] w-auto translate-y-[-50px] items-center opacity-0 transition-all duration-300 ease-in-out min-[576px]:mx-auto min-[576px]:mt-7 min-[576px]:min-h-[calc(100%-3.5rem)] min-[576px]:max-w-[500px]">
                     <div
-                        class="flex flex-shrink-0 items-center justify-between rounded-t-md border-b-2 border-neutral-100 border-opacity-100 p-4 ">
-                        <h5
-                        class="text-xl font-medium leading-normal text-neutral-800 "
-                        id="exampleModalLabel">
-                        Delete ?
-                        </h5>
-                        <button
-                            type="button"
-                            class="box-content rounded-none border-none hover:no-underline hover:opacity-75 focus:opacity-100 focus:shadow-none focus:outline-none"
-                            data-te-modal-dismiss
-                            aria-label="Close">
-                            <svg
-                                xmlns="http://www.w3.org/2000/svg"
-                                fill="none"
-                                viewBox="0 0 24 24"
-                                stroke-width="1.5"
-                                stroke="currentColor"
-                                class="h-6 w-6">
-                                <path
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
-                                d="M6 18L18 6M6 6l12 12" />
-                            </svg>
-                        </button>
-                    </div>
-                    <div class="relative flex-auto p-4" data-te-modal-body-ref>
-                        <p>
-                            Are you sure ?
-                        </p>
-                    </div>
-                    <div
-                        class="flex flex-shrink-0 flex-wrap items-center justify-end rounded-b-md border-t-2 border-neutral-100 border-opacity-100 p-4 ">
-                        <button
-                        type="button"
-                        class="inline-block px-6 pb-2 pt-2.5 text-xs focus:outline-none focus:ring-0 "
-                        data-te-modal-dismiss
-                        >
-                            Close
-                        </button>
-                        <button @click="confirmDeleteBtnClicked"
-                        type="button" data-te-toggle="modal" data-te-target="#deleteModal"
-                        class="ml-1 inline-block rounded bg-red-600 px-6 pb-2 pt-2.5 text-xs  text-white   focus:outline-none focus:ring-0 "
-                        >
-                            Delete
-                        </button>
+                        class="min-[576px]:shadow-[0_0.5rem_1rem_rgba(#000, 0.15)] pointer-events-auto relative flex w-full flex-col rounded-md border-none bg-white bg-clip-padding text-current shadow-lg outline-none ">
+                        <div
+                            class="flex flex-shrink-0 items-center justify-between rounded-t-md border-b-2 border-neutral-100 border-opacity-100 p-4 ">
+                            <h5 class="text-xl font-medium leading-normal text-neutral-800 " id="exampleModalLabel">
+                                Delete ?
+                            </h5>
+                            <button type="button"
+                                class="box-content rounded-none border-none hover:no-underline hover:opacity-75 focus:opacity-100 focus:shadow-none focus:outline-none"
+                                data-te-modal-dismiss aria-label="Close">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                    stroke-width="1.5" stroke="currentColor" class="h-6 w-6">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                                </svg>
+                            </button>
+                        </div>
+                        <div class="relative flex-auto p-4" data-te-modal-body-ref>
+                            <p>
+                                Are you sure ?
+                            </p>
+                        </div>
+                        <div
+                            class="flex flex-shrink-0 flex-wrap items-center justify-end rounded-b-md border-t-2 border-neutral-100 border-opacity-100 p-4 ">
+                            <button type="button"
+                                class="inline-block px-6 pb-2 pt-2.5 text-xs focus:outline-none focus:ring-0 "
+                                data-te-modal-dismiss>
+                                Close
+                            </button>
+                            <button @click="confirmDeleteBtnClicked" type="button" data-te-toggle="modal"
+                                data-te-target="#deleteModal"
+                                class="ml-1 inline-block rounded bg-red-600 px-6 pb-2 pt-2.5 text-xs  text-white   focus:outline-none focus:ring-0 ">
+                                Delete
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-
 
 
 

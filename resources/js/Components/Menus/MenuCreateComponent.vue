@@ -1,7 +1,7 @@
 <template>
-    <div class="px-8">
-        <div class="mb-6">
-            <p class="text-xl  text-black font-normal">
+    <div class="px-0">
+        <div class="mb-4 mt-3">
+            <p class="text-lg font-semibold font-inter">
                 Add Menu
             </p>
         </div>
@@ -9,27 +9,24 @@
 
         <div class="grid !grid-cols-12 gap-x-8 bg-white p-8 rounded-md shadow-md mb-8">
             <div class="mb-4 col-span-3 pb-6 rounded-md">
-                <label for="" class="block text-sm text-black mb-3">
+                <label for="" class="label-form mb-3">
                     Name
                 </label>
-                <input type="text" v-model="name"
-                    class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
+                <input type="text" v-model="name" class="input-ui ">
             </div>
             <div class="mb-4 col-span-3 pb-6 rounded-md">
-                <label for="" class="block text-sm text-black mb-3">
+                <label for="" class="label-form mb-3">
                     Price
                 </label>
-                <input type="text" v-model="price"
-                    class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
+                <input type="text" v-model="price" class="input-ui ">
             </div>
             <div class="mb-4 col-span-3 pb-6 rounded-md">
-                <label for="" class="block text-sm text-black mb-3">
+                <label for="" class="label-form mb-3">
                     Menu Category
                 </label>
-                <div class="text-sm input-ui w-full bg-transparent rounded-lg focus:ring-0" data-te-select-wrapper-ref>
+                <div class="text-sm " data-te-select-wrapper-ref>
                     <select data-te-select-init data-te-select-placeholder="Select Category"
-                        data-te-select-filter="true" name="" id="" v-model="menuCategoryId"
-                        class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
+                        data-te-select-filter="true" name="" id="" v-model="menuCategoryId" class="input-ui ">
                         <option :value="menuCategory.id" v-for="(menuCategory, menuCategoryIndex) in menuCategoryList"
                             :key="menuCategoryIndex"> {{ menuCategory.name }} </option>
                     </select>
@@ -38,13 +35,12 @@
             <div class="col-span-3"></div>
 
             <div class="mb-0 col-span-3 rounded-md">
-                <label for="" class="block text-sm text-black mb-3">
+                <label for="" class="label-form mb-3">
                     Category
                 </label>
-                <div class="text-sm input-ui w-full bg-transparent rounded-lg focus:ring-0" data-te-select-wrapper-ref>
+                <div class="text-sm w-full" data-te-select-wrapper-ref>
                     <select data-te-select-init data-te-select-placeholder="Select Category"
-                        data-te-select-filter="true" name="" id="" v-model="selectedItemCategory"
-                        class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0"
+                        data-te-select-filter="true" name="" id="" v-model="selectedItemCategory" class="input-ui"
                         @change="itemCategorySelectChanged">
                         <option :value="itemCategory" v-for="(itemCategory, itemCategoryIndex) in itemCategoryList"
                             :key="itemCategoryIndex"> {{ itemCategory.name }} </option>
@@ -52,25 +48,23 @@
                 </div>
             </div>
             <div class="mb-0 col-span-3 rounded-md">
-                <label for="" class="block text-sm text-black mb-3">
+                <label for="" class="label-form mb-3">
                     Ingredients
                 </label>
-                <div class="text-sm input-ui w-full bg-transparent rounded-lg focus:ring-0" data-te-select-wrapper-ref>
+                <div class=" w-full " data-te-select-wrapper-ref>
                     <select data-te-select-init data-te-select-placeholder="Select Category"
-                        data-te-select-filter="true" name="" id="" v-model="selectedItem"
-                        class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
+                        data-te-select-filter="true" name="" id="" v-model="selectedItem" class="input-ui ">
                         <option :value="item" v-for="(item, itemIndex) in itemList" :key="itemIndex"> {{ item.name }}
                         </option>
                     </select>
                 </div>
             </div>
             <div class="mb-0 col-span-3 rounded-md">
-                <label for="" class="block text-sm text-black mb-3">
+                <label for="" class="label-form mb-3">
                     Weight
                 </label>
 
-                <input type="text" v-model="weight"
-                    class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
+                <input type="text" v-model="weight" class="input-ui mb-2">
                 <!--Default checkbox-->
                 <div class="mb-[0.125rem] block min-h-[1.5rem] pl-[1.5rem]">
                     <input
@@ -86,16 +80,17 @@
             </div>
 
             <div class="mb-0 col-span-3 rounded-md">
-                <label for="" class="block text-sm text-black mb-3">
+                <label for="" class="label-form mb-3">
                     Images
                 </label>
-                <div class="text-sm input-ui w-full bg-transparent rounded-lg focus:ring-0" data-te-select-wrapper-ref>
-                    <input type='file' @change="handleFileChange" class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0" />
+                <div class="" data-te-select-wrapper-ref>
+                    <input type='file' @change="handleFileChange"
+                        class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg  !p-1 focus:ring-0" />
                 </div>
 
             </div>
             <div class="col-span-3">
-                <label for="" class="block text-sm text-black mb-3">
+                <label for="" class="label-form mb-3">
                     &nbsp;
                 </label>
                 <button class="add-btn" @click="addItemBtnClicked">
@@ -105,29 +100,29 @@
 
         </div>
 
-        <div class=" bg-white p-8 rounded-md shadow-md mb-8">
+        <div class=" bg-white py-4 px-8 rounded-md shadow-md mb-8">
             <ul class="mb-5 flex list-none flex-row flex-wrap border-b-0 pl-0" role="tablist" data-te-nav-ref>
                 <li role="presentation">
                     <a href="#tabs-ingredients"
-                        class="my-2 block border-x-0 border-b-2 border-t-0 border-transparent px-7 pb-3.5 pt-4 text-xs font-medium uppercase leading-tight text-neutral-500 hover:isolate hover:border-transparent hover:bg-neutral-100 focus:isolate focus:border-transparent data-[te-nav-active]:border-primary data-[te-nav-active]:text-primary dark:text-neutral-400 dark:hover:bg-transparent dark:data-[te-nav-active]:border-primary-400 dark:data-[te-nav-active]:text-primary-400"
+                        class="my-2 block border-x-0 px-7 pb-3.5 pt-3 rounded-md font-inter text-xs font-medium  leading-tight text-neutral-500 hover:isolate hover:border-transparent hover:bg-neutral-100 focus:isolate focus:border-transparent data-[te-nav-active]:text-[#845adf] data-[te-nav-active]:bg-[#845adf1a]"
                         data-te-toggle="pill" data-te-target="#tabs-home" data-te-nav-active role="tab"
                         aria-controls="tabs-home" aria-selected="true">Ingredients</a>
                 </li>
                 <li role="presentation">
                     <a href="#tabs-profile"
-                        class="my-2 block border-x-0 border-b-2 border-t-0 border-transparent px-7 pb-3.5 pt-4 text-xs font-medium uppercase leading-tight text-neutral-500 hover:isolate hover:border-transparent hover:bg-neutral-100 focus:isolate focus:border-transparent data-[te-nav-active]:border-primary data-[te-nav-active]:text-primary dark:text-neutral-400 dark:hover:bg-transparent dark:data-[te-nav-active]:border-primary-400 dark:data-[te-nav-active]:text-primary-400"
+                        class="my-2 block border-x-0 px-7 pb-3.5 pt-3 rounded-md font-inter text-xs font-medium  leading-tight text-neutral-500 hover:isolate hover:border-transparent hover:bg-neutral-100 focus:isolate focus:border-transparent  data-[te-nav-active]:text-[#845adf] data-[te-nav-active]:bg-[#845adf1a]"
                         data-te-toggle="pill" data-te-target="#tabs-profile" role="tab" aria-controls="tabs-profile"
                         aria-selected="false">Profile</a>
                 </li>
                 <li role="presentation">
                     <a href="#tabs-messages"
-                        class="my-2 block border-x-0 border-b-2 border-t-0 border-transparent px-7 pb-3.5 pt-4 text-xs font-medium uppercase leading-tight text-neutral-500 hover:isolate hover:border-transparent hover:bg-neutral-100 focus:isolate focus:border-transparent data-[te-nav-active]:border-primary data-[te-nav-active]:text-primary dark:text-neutral-400 dark:hover:bg-transparent dark:data-[te-nav-active]:border-primary-400 dark:data-[te-nav-active]:text-primary-400"
+                        class="my-2 block border-x-0 px-7 pb-3.5 pt-3 rounded-md font-inter text-xs font-medium  leading-tight text-neutral-500 hover:isolate hover:border-transparent hover:bg-neutral-100 focus:isolate focus:border-transparent  data-[te-nav-active]:text-[#845adf] data-[te-nav-active]:bg-[#845adf1a]"
                         data-te-toggle="pill" data-te-target="#tabs-messages" role="tab" aria-controls="tabs-messages"
                         aria-selected="false">Messages</a>
                 </li>
                 <li role="presentation">
                     <a href="#tabs-contact"
-                        class="disabled pointer-events-none my-2 block border-x-0 border-b-2 border-t-0 border-transparent bg-transparent px-7 pb-3.5 pt-4 text-xs font-medium uppercase leading-tight text-neutral-400 hover:isolate hover:border-transparent hover:bg-neutral-100 focus:isolate focus:border-transparent dark:text-neutral-600"
+                        class="my-2 block border-x-0 px-7 pb-3.5 pt-3 rounded-md font-inter text-xs font-medium  leading-tight text-neutral-500 hover:isolate hover:border-transparent hover:bg-neutral-100 focus:isolate focus:border-transparent  data-[te-nav-active]:text-[#845adf] data-[te-nav-active]:bg-[#845adf1a]"
                         data-te-toggle="pill" data-te-target="#tabs-contact" role="tab" aria-controls="tabs-contact"
                         aria-selected="false">Contact</a>
                 </li>
@@ -136,37 +131,37 @@
             <div class="mb-6">
                 <div class="hidden opacity-100 transition-opacity duration-150 ease-linear data-[te-tab-active]:block"
                     id="tabs-ingredients" role="tabpanel" aria-labelledby="tabs-home-tab" data-te-tab-active>
-                    <div>
-                        <table class="min-w-full primary-table rounded-xl text-center text-sm font-light ">
-                            <thead class="border-b font-medium ">
+                    <div class="table-container">
+                        <table class="primary-table">
+                            <thead class="">
                                 <tr>
-                                    <th scope="col" class=" px-6 py-4 ">
+                                    <th scope="col" class="">
                                         Item
                                     </th>
-                                    <th scope="col" class=" px-6 py-4 ">
+                                    <th scope="col" class="">
                                         Weight
                                     </th>
-                                    <th scope="col" class=" px-6 py-4 ">
+                                    <th scope="col" class="">
                                         Is packed?
                                     </th>
-                                    <th scope="col" class=" px-6 py-4 ">
+                                    <th scope="col" class="">
 
                                     </th>
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr class="bg-white rounded-lg overflow-hidden shadow-lg"
+                                <tr class=""
                                     v-for="(ingredient, ingredientIndex) in ingredientItems" :key="ingredientIndex">
-                                    <td class=" px-6 py-4 font-medium ">
+                                    <td class="">
                                         {{ ingredient.name }}
                                     </td>
-                                    <td class=" px-6 py-4 font-medium ">
+                                    <td class="">
                                         {{ ingredient.weight }}
                                     </td>
-                                    <td class=" px-6 py-4 font-medium ">
+                                    <td class="">
                                         {{ ingredient.is_make_pack }}
                                     </td>
-                                    <td class=" px-6 py-4 font-medium ">
+                                    <td class="">
                                         <button @click="removeIngredientBtnClicked(ingredientIndex)">
                                             <i class="fal fa-trash  pr-3"></i>
                                         </button>

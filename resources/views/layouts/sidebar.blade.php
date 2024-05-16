@@ -279,7 +279,7 @@
 
             </div>
             <div id="app"
-                class="absolute bottom-0 left-0 w-[16vw] h-14 bg-[#111c43] border-t border-[#0002] flex items-center justify-start">
+                class="absolute bottom-0 left-0 w-[15rem] h-14 bg-[#111c43] border-t border-[#0002] flex items-center justify-start">
                 <logout-component />
             </div>
         </nav>
