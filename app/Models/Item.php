@@ -46,17 +46,18 @@ class Item extends BaseModel
 
     }
 
-    public function uomConversion()
-    {
-        return $this->hasOneThrough(
-            UomConversion::class,
-            ItemPrice::class,
-            'item_id', // Foreign key on ItemPrice table
-            'conversion_unit_id', // Foreign key on UomConversion table
-            'id', // Local key on Item table
-            'uom_id' // Local key on ItemPrice table
-        );
-    }
+    
+    // public function uomConversion()
+    // {
+    //     return $this->hasOneThrough(
+    //         UomConversion::class,
+    //         ItemPrice::class,
+    //         'item_id', // Foreign key on ItemPrice table
+    //         'conversion_unit_id', // Foreign key on UomConversion table
+    //         'id', // Local key on Item table
+    //         'uom_id' // Local key on ItemPrice table
+    //     );
+    // }
 
     public function getItemPriceWithConversionAttribute()
 

@@ -50,8 +50,9 @@ class PurchaseOrderItem extends BaseModel
         return $this->hasOne(PoGrn::class);
     }
 
-    public function conversionUom(){
-        return $this->belongsTo(UomConversion::class,'conversion_id');
+    public function uomConversion(){
+        return $this->belongsTo(UomConversion::class,'uom_conversion_id');
     }
+
 
 }
