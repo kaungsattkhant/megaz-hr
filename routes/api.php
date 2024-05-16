@@ -201,7 +201,7 @@ Route::delete('/areas/{id}', [AreaController::class, 'deleteArea']);
 
 Route::get('/departments', [DepartmentAPIController::class, 'getDepartmentData']);
 Route::post('/departments', [DepartmentAPIController::class, 'createDepartment']);
-Route::put('/departments/{id}', [DepartmentAPIController::class, 'updateDepartment']);
+Route::post('/departments/{id}', [DepartmentAPIController::class, 'updateDepartment']);
 
 Route::get('/roles', [RoleAPIController::class, 'getRoleData']);
 Route::get('/role_by_department/{department_id}', [RoleAPIController::class, 'getRoleByDepartment']);

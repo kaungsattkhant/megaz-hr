@@ -52,11 +52,17 @@
                                     </div>
                                 </td>
                                 <td class="whitespace-nowrap px-6 py-4">
-                                    <button @click="deleteBtnClicked(department.id)"
-                                    data-te-toggle="modal" data-te-target="#deleteModal"
+                                    <button @click="editBtnClicked(department.id)"
+                                    data-te-toggle="modal" data-te-target="#editModal"
                                     id="edit-btn" class="pr-1">
-                                        <i class="fas fa-trash-alt"></i>
+                                        <i class="fas fa-pen"></i>
                                     </button>
+
+                                    <!-- <button @click="deleteBtnClicked(department.id)"
+                                    data-te-toggle="modal" data-te-target="#deleteModal"
+                                    class="pr-1">
+                                        <i class="fas fa-trash-alt"></i>
+                                    </button> -->
                                 </td>
                             </tr>
                             <tr class="">
@@ -120,6 +126,63 @@
                     <!--Modal footer-->
                     <div class="flex justify-center px-12 mb-6">
                         <button type="button" @click="createDepartmentsBtnClicked"
+                        class="add-btn focus:outline-none focus:ring-0 " data-te-modal-dismiss>
+                            Create
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Edit Modal -->
+        <div data-te-modal-init
+            class="fixed left-0 top-0 z-[1055] hidden h-full w-full overflow-y-auto overflow-x-hidden outline-none"
+            id="editModal" tabindex="-1" aria-labelledby="create_modalLabel" aria-hidden="true">
+            <div data-te-modal-dialog-ref
+                class="pointer-events-none relative w-auto mb-12 translate-y-[-50px] opacity-0 transition-all duration-300 ease-in-out min-[576px]:mx-auto min-[576px]:mt-7 min-[576px]:max-w-[500px]">
+                <div
+                    class="min-[576px]:shadow-[0_0.5rem_1rem_rgba(#000, 0.15)] pointer-events-auto relative flex w-full flex-col rounded-md border-none bg-white bg-clip-padding text-current shadow-lg outline-none">
+
+                    <div class="relative  p-4">
+                        <!--Modal title-->
+                        <h5 class="text-xl text-center mt-2 font-medium leading-normal text-black" id="create_modalLabel">
+                            Create Department
+                        </h5>
+                        <!--Close button-->
+                        <button type="button" class="absolute top-4 right-4 focus:shadow-none focus:outline-none"
+                            data-te-modal-dismiss aria-label="Close">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                                stroke="currentColor" class="h-5 w-5">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                        </button>
+                    </div>
+
+                    <!--Modal body-->
+                    <div class="relative px-12 py-4" data-te-modal-body-ref>
+                        <div class="mb-4">
+                            <label for="" class="block text-sm text-black mb-3">
+                                Department Name
+                            </label>
+                            <input type="text" placeholder="Department Name" v-model="editName"
+                                class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
+                        </div>
+                        <div class="mb-4">
+                            <label for="" class="block text-sm text-black mb-3">
+                                Department Features
+                            </label>
+                            <select data-te-select-init data-te-select-placeholder="Select Features"
+                                data-te-select-filter="true" name="" id="" multiple v-model="selectedFeatures"
+                                class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0"
+                                @change="featureSelectChanged">
+                                <option :value="feature.name" v-for="(feature, featureIndex) in featureList" :key="featureIndex"> {{ feature.name }} </option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!--Modal footer-->
+                    <div class="flex justify-center px-12 mb-6">
+                        <button type="button" @click="confirmEditBtnClicked"
                         class="add-btn focus:outline-none focus:ring-0 " data-te-modal-dismiss>
                             Create
                         </button>
@@ -213,6 +276,10 @@
             return {
                 departmentList: [],
                 name: null,
+
+                editName: null,
+                editId: null,
+
                 deleteId: null,
 
                 featureList: [],
@@ -256,6 +323,43 @@
 
             featureSelectChanged(){
                 // console.log(this.selectedFeatures);
+            },
+
+            editBtnClicked(id){
+                this.targetSelectedFeatures = [];
+                this.editId = id;
+                let index = this.departmentList.findIndex(department => department.id == this.editId);
+                if(index != -1){
+                    this.editName = this.departmentList[index].name;
+                }
+            },
+
+            async confirmEditBtnClicked(){
+                if(!this.editName){
+                    this.alertValidationMessage('name');
+                    return 1;
+                }
+                if(this.selectedFeatures.length > 0){
+                    this.selectedFeatures.forEach((feature)=>{
+                        let selectedFeature = this.featureList.find(featureFromFeatureList => featureFromFeatureList.name == feature);
+                        this.targetSelectedFeatures.push(selectedFeature.id);
+                    });
+                }
+                let formData = new FormData();
+                formData.append('name', this.editName);
+                if(this.targetSelectedFeatures.length > 0){
+                    formData.append('featureIds', JSON.stringify(this.targetSelectedFeatures));
+                }
+                let url = `/api/departments/${this.editId}`;
+                let response = await postApiData({url: url, form_data: formData, token: this.getToken()});
+                if(response.success){
+                    this.getDepartmentList(null);
+                }
+
+                this.selectedFeatures = [];
+                this.editId = null;
+                this.editName = null;
+                this.targetSelectedFeatures = [];
             },
 
             createDepartmentsBtnClicked(){
