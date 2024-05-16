@@ -95,6 +95,7 @@
                                         <!-- <button v-if="(purchaseOrder.is_md_checked == 1) && (purchaseOrder.is_bought == 0) && getDepartment().name == 'Finance'" class="pr-1" @click="buyPurchaseOrderBtnClicked(purchaseOrder.id)" data-te-toggle="modal" data-te-target="#buyModal">
                                         <i class="far fa-shopping-basket"></i>
                                     </button> -->
+                                    
                                         <a :href="'/purchase_orders/'+purchaseOrder.id+'/buy'"
                                             v-if="(purchaseOrder.is_md_checked == 1) && (purchaseOrder.is_bought == 0) && getDepartment().name == 'Finance'"
                                             id="" class="pr-1">
