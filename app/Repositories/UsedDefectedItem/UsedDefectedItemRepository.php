@@ -86,7 +86,7 @@ class UsedDefectedItemRepository implements UsedDefectedItemRepositoryInterface
             }
 
             $uomConversion = UomConversion::where('base_unit_id', $data['base_uom_id'])->where('conversion_unit_id', $data['uom_id'])->first();
-            // $data['uom_conversion_id'] = $uomConversion->id;
+            $data['uom_conversion_id'] = $uomConversion->id;
             $data['created_by'] = UserData()->id;
             $data['date'] = CurrentTime();
             $usedDefectedItem = UsedDefectedItem::create($data);
