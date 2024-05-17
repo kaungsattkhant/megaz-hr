@@ -331,7 +331,7 @@ export default {
             selectedDestinationInventory: null,
 
             defectItemId: null,
-            defeectItem: null,
+            defectItem: null,
             type: null,
             defectQuantity: null,
             uomList: [],
@@ -398,7 +398,7 @@ export default {
 
         addDefectBtnClicked(id, ledgerIndex){
             this.defectItemId = id;
-            this.defeectItem = this.inventoryLegderList[ledgerIndex];
+            this.defectItem = this.inventoryLegderList[ledgerIndex];
         },
 
         async confirmAddDefectBtnClicked(){
@@ -419,7 +419,7 @@ export default {
             formData.append('quantity', this.defectQuantity);
             formData.append('uom_id', this.selectedUom.id);
             formData.append('type', this.type);
-            formData.append('base_unit_id', this.defeectItem.base_unit_id);
+            formData.append('base_uom_id', this.defectItem.base_unit_id);
             if(this.defectRemark){
                 formData.append('remark', this.defectRemark);
             }
@@ -444,7 +444,7 @@ export default {
             this.defectRemark = null;
             this.defectQuantity = null;
             this.type = null;
-            this.defeectItem = null;
+            this.defectItem = null;
         },
 
         async transferBtnClicked(id, ledgerIndex) {
