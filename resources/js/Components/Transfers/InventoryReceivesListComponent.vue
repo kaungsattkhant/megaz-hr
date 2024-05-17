@@ -1,157 +1,162 @@
 <template>
-    <div class="flex justify-between mb-3">
-        <div class=" flex">
-            <label for="search" class="search-input">
-                <input type="text" class="input-search" placeholder="Search">
-
-                <i class="fal fa-search"></i>
-            </label>
-        </div>
-        <div class="flex justify-end flex-col">
-
-        </div>
+    <div>
+        <p class=" text-lg font-semibold font-inter">
+            Inventory Receives
+        </p>
     </div>
-    <div class="block rounded-xl">
-        <div class="overflow-x-auto">
-            <div class="overflow ">
-                <table class="min-w-full primary-table rounded-xl text-center text-sm font-light ">
-                    <thead class="border-b font-medium ">
-                        <tr>
-                            <th scope="col" class=" px-6 py-4 ">
-                                #
-                            </th>
-                            <th scope="col" class=" px-6 py-4 ">
-                                Transfer Id
-                            </th>
-                            <th scope="col" class=" px-6 py-4 ">
-                                Date
-                            </th>
-                            <th scope="col" class=" px-6 py-4 ">
-                                Source Inventory
-                            </th>
-                            <th scope="col" class=" px-6 py-4 ">
-                                Destination Inventory
-                            </th>
-                            <th scope="col" class=" px-6 py-4 ">
-                                Item
-                            </th>
-                            <th scope="col" class=" px-6 py-4 ">
-                                Quantity
-                            </th>
-                            <th scope="col" class=" px-6 py-4 ">
-                                Trasnferred By
-                            </th>
-                            <th scope="col" class=" px-6 py-4 ">
-                                Status
-                            </th>
-                            <th scope="col" class="px-6 py-4">
+    <div class="mt-4 bg-white">
+        <div class="btn-container">
+            <div class=" flex">
+                <label for="search" class="search-input">
+                    <input type="text" class="input-search" placeholder="Search">
 
-                            </th>
-                        </tr>
-                    </thead>
-                    <tbody>
-
-                        <!-- looping start -->
-                        <div class="contents" v-for="(receive, index) in receivesList" :key="index">
-                            <tr class="bg-white rounded-lg overflow-hidden shadow-lg">
-                                <td class=" px-6 py-4 font-medium ">
-                                    {{ per_page * (currentPage - 1) + (++index) }}
-                                </td>
-                                <td class="whitespace-nowrap px-6 py-4 ">
-                                    {{ receive.transfer_id }}
-                                </td>
-                                <td class="whitespace-nowrap px-6 py-4 ">
-                                    {{ receive.date }}
-                                </td>
-                                <td class=" px-6 py-4 ">
-                                    {{ receive.source_inventory.name }}
-                                </td>
-                                <td class=" px-6 py-4 ">
-                                    {{ receive.destination_inventory.name }}
-                                </td>
-                                <td class="whitespace-nowrap px-6 py-4 ">
-                                    {{ receive.item.name }}
-                                </td>
-                                <td class="whitespace-nowrap px-6 py-4 ">
-                                    {{ receive.quantity }}
-                                </td>
-                                <td class="whitespace-nowrap px-6 py-4 ">
-                                    {{ receive.created_by.name }}
-                                </td>
-                                <td class="whitespace-nowrap px-6 py-4 ">
-                                    {{ receive.status }}
-                                </td>
-                                <td class="whitespace-nowrap px-6 py-4">
-                                    <button data-te-toggle="modal" data-te-target="#confirmModal" :disabled=" receive.status != 'pending'" @click="receiveBtnClicked(receive.id)">
-                                        <i class="fal fa-bars"></i>
-                                    </button>
-                                </td>
-                            </tr>
-
-                            <tr class="">
-                                <td class=" py-2 "></td>
-                            </tr>
-                        </div>
-
-                        <!-- looping end -->
-                    </tbody>
-                </table>
+                    <i class="fal fa-search"></i>
+                </label>
             </div>
-            <div class="mt-2 ml-2">
-                <ul v-if="paginationGroupsCount > 1" class="list-style-none flex">
-                    <li v-if="!isFirstGroup">
-                        <button class="relative block rounded bg-transparent px-3 py-1.5 text-sm text-neutral-600 transition-all duration-300
-                        hover:bg-neutral-100 dark:text-white dark:hover:bg-neutral-700 dark:hover:text-white"
-                            @click="previousPaginationGroupBtnClicked" :disabled="isFirstGroup">
-                            Previous
-                        </button>
-                    </li>
+            <div class="flex justify-end flex-col">
 
-                    <li v-for="(pageNumber, pageNumberIndex) in groupedPageNumbers[currentGroup]" :key="pageNumberIndex"
-                        :aria-current="(pageNumber == currentPage) ? 'page' : ''">
-                        <button v-if="pageNumber == currentPage"
-                            class="relative block rounded bg-neutral-800 px-3 py-1.5 text-sm font-medium text-neutral-50 transition-all duration-300 dark:bg-neutral-900"
-                            :id="'paginationBtn-' + pageNumberIndex" @click="pageBtnClicked(pageNumber)">
-                            {{ pageNumber }}
-                            <span
-                                class="absolute -m-px h-px w-px overflow-hidden whitespace-nowrap border-0 p-0 [clip:rect(0,0,0,0)]">
-                                (current)
-                            </span>
-                        </button>
-                        <button v-else
-                            class="normal-pagination relative block rounded bg-transparent px-3 py-1.5 text-sm text-neutral-600 transition-all duration-300 hover:bg-neutral-100 dark:text-white dark:hover:bg-neutral-700 dark:hover:text-white"
-                            :id="'paginationBtn-' + pageNumberIndex" @click="pageBtnClicked(pageNumber)">
-                            {{ pageNumber }}
-                        </button>
-                    </li>
-                    <li v-if="!isLastGroup">
-                        <button class="relative block rounded bg-transparent px-3 py-1.5 text-sm text-neutral-600 transition-all duration-300
-                        hover:bg-neutral-100 dark:text-white dark:hover:bg-neutral-700 dark:hover:text-white"
-                            @click="nextPaginationGroupBtnClicked" :disabled="isLastGroup">
-                            Next
-                        </button>
-                    </li>
-                </ul>
+            </div>
+        </div>
+        <div class="box-container-table">
+            <div class="overflow-x-auto">
+                <div class="table-container ">
+                    <table class=" primary-table">
+                        <thead class="">
+                            <tr>
+                                <th scope="col" class="  ">
+                                    #
+                                </th>
+                                <th scope="col" class="  ">
+                                    Transfer Id
+                                </th>
+                                <th scope="col" class="  ">
+                                    Date
+                                </th>
+                                <th scope="col" class="  ">
+                                    Source Inventory
+                                </th>
+                                <th scope="col" class="  ">
+                                    Destination Inventory
+                                </th>
+                                <th scope="col" class="  ">
+                                    Item
+                                </th>
+                                <th scope="col" class="  ">
+                                    Quantity
+                                </th>
+                                <th scope="col" class="  ">
+                                    Trasnferred By
+                                </th>
+                                <th scope="col" class="  ">
+                                    Status
+                                </th>
+                                <th scope="col" class="">
 
-                <ul v-else class="list-style-none flex">
-                    <li v-for="(pageNumber, pageNumberIndex) in pageNumbers" :key="pageNumberIndex"
-                        :aria-current="(pageNumber == currentPage) ? 'page' : ''">
-                        <button v-if="pageNumber == currentPage"
-                            class="relative block rounded bg-neutral-800 px-3 py-1.5 text-sm font-medium text-neutral-50 transition-all duration-300 dark:bg-neutral-900"
-                            :id="'paginationBtn-' + pageNumberIndex" @click="pageBtnClicked(pageNumber)">
-                            {{ pageNumber }}
-                            <span
-                                class="absolute -m-px h-px w-px overflow-hidden whitespace-nowrap border-0 p-0 [clip:rect(0,0,0,0)]">
-                                (current)
-                            </span>
-                        </button>
-                        <button v-else
-                            class="normal-pagination relative block rounded bg-transparent px-3 py-1.5 text-sm text-neutral-600 transition-all duration-300 hover:bg-neutral-100 dark:text-white dark:hover:bg-neutral-700 dark:hover:text-white"
-                            :id="'paginationBtn-' + pageNumberIndex" @click="pageBtnClicked(pageNumber)">
-                            {{ pageNumber }}
-                        </button>
-                    </li>
-                </ul>
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+
+                            <!-- looping start -->
+                            <div class="contents" v-for="(receive, index) in receivesList" :key="index">
+                                <tr class="">
+                                    <td class="  ">
+                                        {{ per_page * (currentPage - 1) + (++index) }}
+                                    </td>
+                                    <td class="whitespace-nowrap  ">
+                                        {{ receive.transfer_id }}
+                                    </td>
+                                    <td class="whitespace-nowrap  ">
+                                        {{ receive.date }}
+                                    </td>
+                                    <td class="  ">
+                                        {{ receive.source_inventory.name }}
+                                    </td>
+                                    <td class="  ">
+                                        {{ receive.destination_inventory.name }}
+                                    </td>
+                                    <td class="whitespace-nowrap  ">
+                                        {{ receive.item.name }}
+                                    </td>
+                                    <td class="whitespace-nowrap  ">
+                                        {{ receive.quantity }}
+                                    </td>
+                                    <td class="whitespace-nowrap  ">
+                                        {{ receive.created_by.name }}
+                                    </td>
+                                    <td class="whitespace-nowrap  ">
+                                        {{ receive.status }}
+                                    </td>
+                                    <td class="whitespace-nowrap">
+                                        <button data-te-toggle="modal" data-te-target="#confirmModal"
+                                            :disabled=" receive.status != 'pending'"
+                                            @click="receiveBtnClicked(receive.id)">
+                                            <i class="fal fa-bars"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                            </div>
+
+                            <!-- looping end -->
+                        </tbody>
+                    </table>
+                </div>
+                <div class="mt-2 ml-2">
+                    <ul v-if="paginationGroupsCount > 1" class="list-style-none flex">
+                        <li v-if="!isFirstGroup">
+                            <button class="relative block rounded bg-transparent px-3 py-1.5 text-sm text-neutral-600 transition-all duration-300
+                        hover:bg-neutral-100 dark:text-white dark:hover:bg-neutral-700 dark:hover:text-white"
+                                @click="previousPaginationGroupBtnClicked" :disabled="isFirstGroup">
+                                Previous
+                            </button>
+                        </li>
+
+                        <li v-for="(pageNumber, pageNumberIndex) in groupedPageNumbers[currentGroup]"
+                            :key="pageNumberIndex" :aria-current="(pageNumber == currentPage) ? 'page' : ''">
+                            <button v-if="pageNumber == currentPage"
+                                class="relative block rounded bg-neutral-800 px-3 py-1.5 text-sm font-medium text-neutral-50 transition-all duration-300 dark:bg-neutral-900"
+                                :id="'paginationBtn-' + pageNumberIndex" @click="pageBtnClicked(pageNumber)">
+                                {{ pageNumber }}
+                                <span
+                                    class="absolute -m-px h-px w-px overflow-hidden whitespace-nowrap border-0 p-0 [clip:rect(0,0,0,0)]">
+                                    (current)
+                                </span>
+                            </button>
+                            <button v-else
+                                class="normal-pagination relative block rounded bg-transparent px-3 py-1.5 text-sm text-neutral-600 transition-all duration-300 hover:bg-neutral-100 dark:text-white dark:hover:bg-neutral-700 dark:hover:text-white"
+                                :id="'paginationBtn-' + pageNumberIndex" @click="pageBtnClicked(pageNumber)">
+                                {{ pageNumber }}
+                            </button>
+                        </li>
+                        <li v-if="!isLastGroup">
+                            <button class="relative block rounded bg-transparent px-3 py-1.5 text-sm text-neutral-600 transition-all duration-300
+                        hover:bg-neutral-100 dark:text-white dark:hover:bg-neutral-700 dark:hover:text-white"
+                                @click="nextPaginationGroupBtnClicked" :disabled="isLastGroup">
+                                Next
+                            </button>
+                        </li>
+                    </ul>
+
+                    <ul v-else class="list-style-none flex">
+                        <li v-for="(pageNumber, pageNumberIndex) in pageNumbers" :key="pageNumberIndex"
+                            :aria-current="(pageNumber == currentPage) ? 'page' : ''">
+                            <button v-if="pageNumber == currentPage"
+                                class="relative block rounded bg-neutral-800 px-3 py-1.5 text-sm font-medium text-neutral-50 transition-all duration-300 dark:bg-neutral-900"
+                                :id="'paginationBtn-' + pageNumberIndex" @click="pageBtnClicked(pageNumber)">
+                                {{ pageNumber }}
+                                <span
+                                    class="absolute -m-px h-px w-px overflow-hidden whitespace-nowrap border-0 p-0 [clip:rect(0,0,0,0)]">
+                                    (current)
+                                </span>
+                            </button>
+                            <button v-else
+                                class="normal-pagination relative block rounded bg-transparent px-3 py-1.5 text-sm text-neutral-600 transition-all duration-300 hover:bg-neutral-100 dark:text-white dark:hover:bg-neutral-700 dark:hover:text-white"
+                                :id="'paginationBtn-' + pageNumberIndex" @click="pageBtnClicked(pageNumber)">
+                                {{ pageNumber }}
+                            </button>
+                        </li>
+                    </ul>
+                </div>
             </div>
         </div>
     </div>
@@ -190,12 +195,15 @@
                 </div>
 
                 <!--Modal footer-->
-                <div class="flex flex-shrink-0 flex-wrap items-center justify-end rounded-b-md border-t-2 border-neutral-100 border-opacity-100 p-4 ">
-                    <button type="button" class="inline-block px-6 pb-2 pt-2.5 text-xs focus:outline-none focus:ring-0 " data-te-modal-dismiss>
+                <div
+                    class="flex flex-shrink-0 flex-wrap items-center justify-end rounded-b-md border-t-2 border-neutral-100 border-opacity-100 p-4 ">
+                    <button type="button" class="inline-block px-6 pb-2 pt-2.5 text-xs focus:outline-none focus:ring-0 "
+                        data-te-modal-dismiss>
                         Close
                     </button>
-                    <button @click="confirmReceiveBtnClicked" type="button" data-te-toggle="modal" data-te-target="#confirmModal"
-                    class="ml-1 inline-block rounded bg-blue-600 px-6 pb-2 pt-2.5 text-xs  text-white   focus:outline-none focus:ring-0 ">
+                    <button @click="confirmReceiveBtnClicked" type="button" data-te-toggle="modal"
+                        data-te-target="#confirmModal"
+                        class="ml-1 inline-block rounded bg-blue-600 px-6 pb-2 pt-2.5 text-xs  text-white   focus:outline-none focus:ring-0 ">
                         Confirm
                     </button>
                 </div>

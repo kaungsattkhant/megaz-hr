@@ -1,19 +1,20 @@
 <template>
-<div class="px-8">
+    <div class="px-0">
         <div class="mb-6">
-            <p class="text-xl  text-black font-normal">
+            <p class="text-lg font-semibold font-inter">
                 Item Usage Forecast Detail
             </p>
         </div>
 
 
-        <div class="grid !grid-cols-12 gap-x-8 bg-white p-8 rounded-md shadow-md mb-8">
+        <div class="grid !grid-cols-12 gap-x-4 bg-white mt-4 pt-4  px-4 mb-6 shadow-md rounded-md">
             <div class="mb-4 col-span-3 pb-6 rounded-md">
                 <label for="" class="block text-sm text-black mb-3">
                     Month
                 </label>
-                <input type="date" v-model="date" class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0"
-                @change="dateInputChanged">
+                <input type="date" v-model="date"
+                    class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0"
+                    @change="dateInputChanged">
             </div>
 
             <div class="mb-4 col-span-3 pb-6 rounded-md">
@@ -67,44 +68,42 @@
 
         </div>
 
-        <div class=" bg-white p-8 rounded-md shadow-md mb-8">
-            <div>
-                <table class="min-w-full primary-table rounded-xl text-center text-sm font-light ">
-                    <thead class="border-b font-medium ">
+        <div class=" bg-white py-4 px-4 rounded-md shadow-md mb-8">
+            <div class="table-container">
+                <table class="primary-table">
+                    <thead class="">
                         <tr>
-                            <th scope="col" class=" px-6 py-4 ">
+                            <th scope="col" class="text-left">
                                 Name
                             </th>
-                            <th scope="col" class=" px-6 py-4 ">
+                            <th scope="col" class="">
                                 Quantity
                             </th>
-                            <th scope="col" class=" px-6 py-4 ">
+                            <th scope="col" class="">
                                 Amount
                             </th>
-                            <th scope="col" class=" px-6 py-4 ">
+                            <th scope="col" class="">
                             </th>
                         </tr>
                     </thead>
                     <tbody>
-                        <div class="contents" v-for="(forecastItem, forecastItemIndex) in forecastItems" :key="forecastItemIndex">
-                            <tr class="bg-white rounded-lg overflow-hidden shadow-lg">
-                                <td class=" px-6 py-4 font-medium ">
+                        <div class="contents" v-for="(forecastItem, forecastItemIndex) in forecastItems"
+                            :key="forecastItemIndex">
+                            <tr class="">
+                                <td class="text-left">
                                     {{ forecastItem.item.name }}
                                 </td>
-                                <td class=" px-6 py-4 font-medium ">
+                                <td class="">
                                     {{ forecastItem.quantity }}
                                 </td>
-                                <td class=" px-6 py-4 font-medium ">
+                                <td class="">
                                     {{ forecastItem.amount }}
                                 </td>
-                                <td class=" px-6 py-4 font-medium ">
+                                <td class="">
                                     <button @click="removeForecastItemBtnClicked(forecastItem.id)">
                                         <i class="fal fa-trash  pr-3"></i>
                                     </button>
                                 </td>
-                            </tr>
-                            <tr class="">
-                                <td class=" py-2 "></td>
                             </tr>
                         </div>
                     </tbody>

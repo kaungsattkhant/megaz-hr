@@ -231,7 +231,7 @@
                 if (response.data) {
                     let posCashAccount = response.data.find(account => account.account_code === '2-1011');
                     if (posCashAccount) {
-                        // this.cashAccId = posCashAccount.id;
+                        this.cashAccId = posCashAccount.id;
                         // this.getCashbookList(posCashAccount.id);
                         this.cashAccountList.push(posCashAccount);
                     }
@@ -246,12 +246,13 @@
             },
 
             async getCashbookList(cashAccountList){
-                let url = `/api/cash_books?`;
-                cashAccountList.forEach((cashAccount)=>{
-                    url += `cash_account_id[]=${cashAccount.id}&`;
-                });
-                url = url.substring(0, url.length - 1);
+                // let url = `/api/cash_books?`;
+                // cashAccountList.forEach((cashAccount)=>{
+                //     url += `cash_account_id[]=${cashAccount.id}&`;
+                // });
+                // url = url.substring(0, url.length - 1);
 
+                let url = '/api/cash_books?cash_account_id[]=' + this.cashAccId
                 const response = await getApiData({ url: url, token: this.getToken() });
                 if (response.data) {
 
@@ -263,6 +264,7 @@
                         this.cashbookList.push(cashBook);
                     });
                     console.log(this.cashbookList);
+
                     this.cashbookList.forEach((cashBook)=>{
                         if(cashBook.action == 'debit'){
                             this.currentBalance += cashBook.amount;
