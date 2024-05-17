@@ -9,10 +9,10 @@
         </div>
         <div class="flex justify-end flex-col">
 
-            <button type="button" class="add-btn transition duration-150 ease-in-out focus:outline-none focus:ring-0 "
+            <!-- <button type="button" class="add-btn transition duration-150 ease-in-out focus:outline-none focus:ring-0 "
                 data-te-toggle="modal" data-te-target="#checkModal">
                 Add New
-            </button>
+            </button> -->
         </div>
     </div>
     <div class="block rounded-xl">
@@ -60,19 +60,19 @@
                                     {{ ledger.name }}
                                 </td>
                                 <td class="whitespace-nowrap px-6 py-4 ">
-                                    {{ ledger.opening_balance }}
+                                    {{ ledger.opening_balance }} {{ ledger.conversion_uom_name }}
                                 </td>
                                 <td class="whitespace-nowrap px-6 py-4 ">
-                                    {{ ledger.in_balance }}
+                                    {{ ledger.in_balance }} {{ ledger.conversion_uom_name }}
                                 </td>
                                 <td class="whitespace-nowrap px-6 py-4 ">
-                                    {{ ledger.out_balance }}
+                                    {{ ledger.out_balance }} {{ ledger.conversion_uom_name }}
                                 </td>
                                 <td class="whitespace-nowrap px-6 py-4 ">
                                     {{ ledger.closing_balance }} {{ ledger.conversion_uom_name }}
                                 </td>
                                 <td class="whitespace-nowrap px-6 py-4 ">
-                                    {{ ledger.closing_balance / ledger.conversion }} {{ ledger.base_uom_name }}
+                                    {{ ledger.base_balance }} {{ ledger.conversion_balance }}
                                 </td>
                                 <td class="whitespace-nowrap px-6 py-4">
                                     <button id="edit-btn" class="pr-1" @click="transferBtnClicked(ledger.item_id, index-1)"
@@ -337,6 +337,16 @@ export default {
             uomList: [],
             selectedUom: null,
             defectRemark: null,
+
+            per_page: 20,
+            pageNumbers: [],
+            currentPage: 1,
+            paginationGroupsCount: 1,
+            per_group: 10,
+            groupedPageNumbers: [],
+            currentGroup: 0,
+            isFirstGroup: true,
+            isLastGroup: false,
         };
     },
     props: ['inventory_id'],
@@ -352,10 +362,23 @@ export default {
             });
         },
 
-        async getInventoryLegderList() {
-            const response = await getApiData({ url: '/api/inventories/' + this.inventory_id + '/ledgers', token: this.getToken() });
+        async getInventoryLegderList(pageNumber) {
+            if(pageNumber){
+                this.currentPage = pageNumber;
+            }
+            let url = `/api/inventories/${this.inventory_id}/ledgers?page=${this.currentPage}`
+            const response = await getApiData({ url: url, token: this.getToken() });
             if (response.data) {
                 this.inventoryLegderList = response.data;
+                this.inventoryLegderList.forEach(ledger => {
+                    ledger.base_balance = Math.floor(ledger.closing_balance / ledger.conversion) + ' ' + ledger.base_uom_name;
+                    ledger.conversion_balance = null;
+                    let conversionBalance = ledger.closing_balance % ledger.conversion;
+                    if(conversionBalance > 0){
+                        ledger.conversion_balance = conversionBalance + ' ' + ledger.conversion_uom_name;
+                    }
+
+                });
             }
         },
         async getInventoryList() {
@@ -495,7 +518,7 @@ export default {
     },
 
     created() {
-        this.getInventoryLegderList();
+        this.getInventoryLegderList(null);
         this.getInventoryList();
         this.getUomList();
     },
