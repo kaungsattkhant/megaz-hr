@@ -16,9 +16,10 @@ return new class extends Migration
             $table->dateTime('date');
             $table->foreignId('item_id')->constrained();
             $table->foreignId('uom_id')->constrained();
+            $table->foreignId('uom_conversion_id')->constrained();
             $table->string('type');
             $table->double('quantity');
-            $table->string('remark');
+            $table->string('remark')->nullable();
             $table->unsignedBigInteger('created_by');
             $table->timestamps();
         });
