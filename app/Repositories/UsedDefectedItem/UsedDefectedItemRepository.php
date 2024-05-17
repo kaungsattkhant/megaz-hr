@@ -77,7 +77,7 @@ class UsedDefectedItemRepository implements UsedDefectedItemRepositoryInterface
             } else if ($data['base_uom_id'] == $data['uom_id']) {
                 $uomRate = UomConversion::where('base_unit_id', $data['uom_id'])->where('conversion_unit_id', $latestItemPrice->uom_id)->first();
                 // dd($uomRate->conversion);
-                $value = $data['quantity'] / $uomRate->conversion;
+                $value = $data['quantity'] * $uomRate->conversion;
             } else {
                 ResponseMessage('Given Uom cannot be caculate, please selecte proper Uom', 402);
             }
