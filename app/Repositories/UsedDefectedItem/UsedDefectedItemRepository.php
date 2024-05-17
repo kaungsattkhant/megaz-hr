@@ -2,6 +2,9 @@
 
 namespace App\Repositories\UsedDefectedItem;
 
+use App\Models\InventoryLedgerItem;
+use App\Models\Item;
+use App\Models\UomConversion;
 use App\Models\UsedDefectedItem;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -55,9 +58,17 @@ class UsedDefectedItemRepository implements UsedDefectedItemRepositoryInterface
     {
         DB::beginTransaction();
         try {
+            $item = Item::find($data['item_id']);
+            $uomConversion = UomConversion::where('base_unit_id',$data['base_uom_id'],'conversion_unit_id',$data['uom_id'])->first()->id;
+            dd($uomConversion);
+            dd('stop');
+            $data['uom_conversion_id'] = $uomConversion->id;
             $data['created_by'] = UserData()->id;
             $data['date'] = CurrentTime();
             $usedDefectedItem = UsedDefectedItem::create($data);
+
+            $inventoryLedgerItem = InventoryLedgerItem::where('item_id',$data['item_id'])->first();
+
             DB::commit();
             return $usedDefectedItem;
         } catch (\Exception $e) {
