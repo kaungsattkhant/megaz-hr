@@ -2,7 +2,10 @@
 
 namespace App\Repositories\Transfer;
 
+use App\Http\Action\Common\Conversion;
 use App\Http\Action\Common\PurchaseOrder as CommonPurchaseOrder;
+use App\Http\Action\Common\UomConversion;
+use App\Http\Action\Inventory\InventoryLedger;
 use App\Http\Action\Inventory\StoreInventory;
 use App\Models\Transfer;
 use Illuminate\Http\Request;
@@ -95,12 +98,19 @@ class TransferRepository implements TransferRepositoryInterface
             }
             $latest = Transfer::orderBy('created_at', 'desc')->first();
             $count = 4;
+            $uom_coversion=(new Conversion($request->uom_id,$request->base_uom_id))->run();
+            #check is enough transfer quantity
+            $quantity=$uom_coversion->conversion*$request->quantity;
+            (new InventoryLedger($request->source_inventory_id))->isEnoughQuantityByItem($request->item_id,$quantity);
+
             $no = (new CommonPurchaseOrder())->getUniqueId($latest, 'transfer_id', $count);
             $transfer_id = "TRS" . '-' . str_pad($no, $count, "0", STR_PAD_LEFT) . '-' . now()->timestamp;
             $data['transfer_id'] = $transfer_id;
             $data['source_inventory_id'] = $request->source_inventory_id;
             $data['created_by'] = UserData()->id;
             $data['date'] = convertDateFormat(now());
+            $data['uom_conversion_id']=$uom_coversion->id;
+            $data['uom_id']=$request->uom_id;
             $transfer = Transfer::updateOrCreate(
                 ['id' => $data['id']],
                 $data

@@ -16,7 +16,7 @@ class Transfer extends BaseModel
     protected $fillable =[
         'transfer_id','source_inventory_id','destination_inventory_id',
         'quantity','item_id', 'date','created_by', 'confirmed_at',
-        'confirmed_by', 'status'
+        'confirmed_by', 'status','uom_id','uom_conversion_id',
     ];
 
     public function confirmed_by()
@@ -32,6 +32,14 @@ class Transfer extends BaseModel
     public function item()
     {
         return $this->belongsTo(Item::class);
+    }
+
+    public function uomConversion(){
+        return $this->belongsTo(UomConversion::class,'uom_conversion_id');
+    }
+
+    public function uom(){
+        return $this->belongsTo(Uom::class,'uom_id');
     }
 
     public function source_inventory()
