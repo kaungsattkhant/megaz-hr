@@ -35,10 +35,13 @@ use App\Http\Controllers\API\ComplaintAPIController;
 use App\Http\Controllers\API\InventoryAPIController;
 use App\Http\Controllers\API\NotificationController;
 use App\Http\Controllers\API\DepartmentAPIController;
+use App\Http\Controllers\API\FeatureAPIController;
 use App\Http\Controllers\API\FixedAssetPurchaseAPIController;
 use App\Http\Controllers\API\PurchaseOrderAPIController;
 use App\Http\Controllers\API\ItemUsageForecastController;
+use App\Http\Controllers\API\PackAPIController;
 use App\Http\Controllers\API\PurchaseOrderItemLeftController;
+use App\Http\Controllers\API\UsedDefectedAPIController;
 
 /*
 |--------------------------------------------------------------------------
@@ -147,6 +150,8 @@ Route::middleware('auth:api')->group(function () {
         Route::post('/fixed_asset_purchases/bought','boughtFixedAsset');
     });
 
+    Route::post('/packs',[PackAPIController::class,'createPack']);
+
     Route::resource('suppliers', SupplierController::class)->only(['index', 'store', 'show', 'destroy']);
     Route::resource('notifications',NotificationController::class)->only(['index']);
     Route::post('notifications/set_seen', [NotificationController::class, 'setSeenNotifications']);
@@ -163,12 +168,23 @@ Route::middleware('auth:api')->group(function () {
     });
 
     Route::get('/inventories', [InventoryAPIController::class, 'getInventoryData']);
+    Route::get('/get_inventory', [InventoryAPIController::class, 'getInventory']);
     Route::post('/inventories', [InventoryAPIController::class, 'createInventory']);
     Route::get('/inventories/{inventory}', [InventoryAPIController::class, 'detail']);
     Route::put('/inventories/{id}', [InventoryAPIController::class, 'updateInventory']);
     Route::delete('/inventories/{id}', [InventoryAPIController::class, 'deleteInventory']);
     Route::get('/inventories/{inventoryId}/ledgers', [InventoryAPIController::class, 'getInventoryLedgers']);
     Route::get('inventory_list',[InventoryAPIController::class, 'inventoryList']);
+
+    Route::get('/uoms', [UomAPIController::class, 'getUomData']);
+    Route::post('/uoms',[UomAPIController::class,'createUom']);
+    Route::post('/uoms/{id}',[UomAPIController::class,'updateUom']);
+    Route::delete('/uoms/{id}', [UomAPIController::class, 'deleteUom']);
+
+    // uom conversion
+    Route::post('/uom_conversions', [UomAPIController::class, 'createUomConversion']);
+    Route::post('/uom_conversions/{id}',[UomAPIController::class,'updateUomConversion']);
+    Route::get('/uom_conversions',[UomAPIController::class,'getUomConversionList']);
 });
 
 Route::controller(ExcelImportController::class)->group(function () {
@@ -185,7 +201,7 @@ Route::delete('/areas/{id}', [AreaController::class, 'deleteArea']);
 
 Route::get('/departments', [DepartmentAPIController::class, 'getDepartmentData']);
 Route::post('/departments', [DepartmentAPIController::class, 'createDepartment']);
-Route::put('/departments/{id}', [DepartmentAPIController::class, 'updateDepartment']);
+Route::post('/departments/{id}', [DepartmentAPIController::class, 'updateDepartment']);
 
 Route::get('/roles', [RoleAPIController::class, 'getRoleData']);
 Route::get('/role_by_department/{department_id}', [RoleAPIController::class, 'getRoleByDepartment']);
@@ -199,6 +215,7 @@ Route::post('/staffs/{id}', [StaffAPIController::class, 'updateStaff']);
 Route::delete('/staffs/{id}', [StaffAPIController::class, 'deleteStaff']);
 Route::delete('/staffs/{staff_id}/roles/{role_id}',[StaffAPIController::class,'deleteRoleStaff']);
 Route::delete('/staffs/{staff_id}/inventories/{inventory_id}',[StaffAPIController::class,'deleteInventoryStaff']);
+Route::delete('/staffs/{staff_id}/features/{feature_id}',[StaffAPIController::class,'deleteFeatureStaff']);
 
 
 Route::get('/tasks', [TaskController::class, 'getTaskData']);
@@ -214,28 +231,18 @@ Route::put('/entities/{id}', [EntityAPIController::class, 'updateEntity']);
 Route::delete('/entities/{id}', [EntityAPIController::class, 'deleteEntity']);
 
 
-Route::get('/uoms', [UomAPIController::class, 'getUomData']);
-Route::post('/uoms',[UomAPIController::class,'createUom']);
-Route::put('/uoms/{id}',[UomAPIController::class,'updateUom']);
-Route::delete('/uoms/{id}', [UomAPIController::class, 'deleteUom']);
-
-// uom conversion
-Route::post('/uom_conversions', [UomAPIController::class, 'createUomConversion']);
-Route::post('/uom_conversions/{id}',[UomAPIController::class,'updateUomConversion']);
-Route::get('/uom_conversions',[UomAPIController::class,'getUomConversionList']);
-
 Route::get('/items', [ItemAPIController::class, 'getItemData']);
 Route::post('/items', [ItemAPIController::class, 'createItem']);
 Route::put('/items/{id}', [ItemAPIController::class, 'updateItem']);
 Route::delete('/items/{id}', [ItemAPIController::class, 'deleteItem']);
-
+Route::post('/item_prices/{id}',[ItemAPIController::class,'addItemPrice']);
+Route::get('/get_uom_conversion_by_uom',[UomAPIController::class,'getUomConversionByUom']);
 
 // Route::get('/transfers', [TransferAPIController::class, 'getTransferData']);
 // Route::post('/transfers', [TransferAPIController::class, 'createTransfer']);
 // Route::put('/transfers/{id}', [TransferAPIController::class, 'updateTransfer']);
 // Route::delete('/transfers/{id}', [TransferAPIController::class, 'deleteTransfer']);
 // Route::post('/transfers/{id}/confirms', [TransferAPIController::class, 'confirmTransfer']);
-
 
 Route::get('/customers', [CustomerAPIController::class, 'getCustomerData']);
 Route::post('/customers', [CustomerAPIController::class, 'createCustomer']);
@@ -267,3 +274,11 @@ Route::get("/test", [TestController::class, "index"]);
 Route::get('/menu_categories/{id}/menus',[MenuAPIController::class,'menuByMenuCategory']);
 
 Route::post("/order_status_change",[OrderAPIController::class,'orderItemChangeStatus']);
+
+Route::get('/used_defected_items',[UsedDefectedAPIController::class,'lisltUsedDefectedItem']);
+Route::post('/used_defected_items',[UsedDefectedAPIController::class,'createUsedDefected']);
+
+
+Route::get('get_inventory',[InventoryAPIController::class, 'getInventory']);
+// feature
+Route::get('/features',[FeatureAPIController::class,'getFeatureData']);

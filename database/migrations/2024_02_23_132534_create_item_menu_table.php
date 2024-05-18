@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('item_menu', function (Blueprint $table) {
             $table->foreignId('menu_id')->constrained()->onDelete('cascade');
             $table->foreignId('item_id')->constrained()->onDelete('cascade');
+            $table->foreignId('uom_id')->constrained()->onDelete('cascade');
             $table->string('weight');
             $table->boolean('is_make_pack');
         });

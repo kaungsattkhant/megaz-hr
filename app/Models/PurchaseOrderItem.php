@@ -13,9 +13,7 @@ class PurchaseOrderItem extends BaseModel
 
     protected $with=['item'];
     protected $fillable=[
-        'quantity','purchase_order_id','item_id','amount','original_quantity','is_grn',
-        
-
+        'quantity','purchase_order_id','item_id','amount','original_quantity','is_grn','uom_id','uom_conversion_id'
     ];
 
     public function getCreatedAt()
@@ -36,6 +34,10 @@ class PurchaseOrderItem extends BaseModel
         return $this->belongsTo(Item::class);
     }
 
+    public function uom(){
+        return $this->belongsTo(Uom::class);
+    }
+
     public function purchaseOrderItemLefts(){
         return $this->hasMany(PurchaseOrderItemLeft::class);
     }
@@ -47,5 +49,10 @@ class PurchaseOrderItem extends BaseModel
     public function poGrn(){
         return $this->hasOne(PoGrn::class);
     }
+
+    public function uomConversion(){
+        return $this->belongsTo(UomConversion::class,'uom_conversion_id');
+    }
+
 
 }

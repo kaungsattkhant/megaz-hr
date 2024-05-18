@@ -323,8 +323,8 @@ if (!function_exists('checkDepartmentAndRoles')) {
 if (!function_exists('checkFeaturePermission')) {
     function checkFeaturePermission($name)
     {
-        $permissions = UserData()->permissions;
-        if ($permissions->contains('slug', $name)) {
+        $features = UserData()->features;
+        if ($features->contains('slug', $name)) {
             return true;
         }
         return false;

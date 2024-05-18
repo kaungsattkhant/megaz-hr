@@ -1,131 +1,62 @@
 <template>
-    <div class="px-8">
+    <div class="px-0">
         <div class="mb-6">
-            <p class="text-xl  text-black font-normal">
-                Add Staff
+            <p class="text-lg font-semibold font-inter">
+                Edit Staff
             </p>
         </div>
-        <div class="grid !grid-cols-12 gap-x-4 mb-6">
+        <div class="grid !grid-cols-12 gap-x-4 mb-6 bg-white mt-4 pt-4  px-4">
 
             <div class="mb-4 col-span-3 pb-6 rounded-md">
-                <label for="" class="block text-sm text-black mb-3">
+                <label for="" class="label-form mb-3">
                     Name
                 </label>
-                <input type="text" v-model="name" placeholder="Name (Required)"
-                    class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
+                <input type="text" v-model="name" placeholder="Name (Required)" class="input-ui">
             </div>
             <div class="col-span-3">
-                <label for="" class="block text-sm text-black mb-3">
+                <label for="" class="label-form mb-3">
                     Date of Birth
                 </label>
-                <input type="date" v-model="dob"
-                    class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
+                <input type="date" v-model="dob" class="input-ui">
             </div>
             <div class="mb-4 col-span-3 pb-6 rounded-md">
-                <label for="" class="block text-sm text-black mb-3">
+                <label for="" class="label-form mb-3">
                     Gender
                 </label>
-                <select name="" id="" v-model="selectedGender"
-                    class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
+                <select name="" id="" v-model="selectedGender" class="input-ui">
                     <option :value="gender" v-for="(gender, genderIndex) in genderList" :key="genderIndex">
                         {{ gender.name }}
                     </option>
                 </select>
             </div>
             <div class="mb-4 col-span-3 pb-6 rounded-md">
-                <label for="" class="block text-sm text-black mb-3">
+                <label for="" class="label-form mb-3">
                     NRC Number
                 </label>
-                <input type="text" v-model="nrcNumber" placeholder="NRC (Required)"
-                    class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
+                <input type="text" v-model="nrcNumber" placeholder="NRC (Required)" class="input-ui">
             </div>
 
             <div class="col-span-3 mb-4 pb-6">
-                <label for="" class="block text-sm text-black mb-3">
+                <label for="" class="label-form mb-3">
                     Father's Name
                 </label>
-                <input type="text" v-model="fatherName" placeholder="Father's Name"
-                    class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
+                <input type="text" v-model="fatherName" placeholder="Father's Name" class="input-ui">
             </div>
 
             <div class="col-span-3 mb-4 pb-6">
-                <label for="" class="block text-sm text-black mb-3">
+                <label for="" class="label-form mb-3">
                     Mother's Name
                 </label>
-                <input type="text" v-model="motherName" placeholder="Mother's Name"
-                    class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
+                <input type="text" v-model="motherName" placeholder="Mother's Name" class="input-ui">
             </div>
 
             <div class="col-span-3 mb-4 pb-6">
-                <label for="" class="block text-sm text-black mb-3">
+                <label for="" class="label-form mb-3">
                     Email
                 </label>
-                <input type="email" v-model="email" placeholder="Email"
-                    class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
+                <input type="email" v-model="email" placeholder="Email" class="input-ui">
             </div>
 
-            <div class="col-span-3"></div>
-
-            <div class="mb-4 col-span-3 pb-6 rounded-md">
-                <label for="" class="block text-sm text-black mb-3">
-                    Ph Number
-                </label>
-                <input type="tel" v-model="phoneNumber" placeholder="Phone (Required)"
-                    class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
-            </div>
-            <div class="mb-4 col-span-3 pb-6 rounded-md">
-                <label for="" class="block text-sm text-black mb-3">
-                    Alt Ph Number
-                </label>
-                <input type="tel" v-model="altPhoneNumber" placeholder="Alt Phone"
-                    class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
-            </div>
-            <div class="mb-4 col-span-3 pb-6 rounded-md">
-                <!-- password deleted -->
-                <div class="mb-4 col-span-3 pb-6 rounded-md">
-                    <label for="" class="block text-sm text-black mb-3">
-                        Password
-                    </label>
-                    <input type="password" v-model="password"
-                        class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
-                </div>
-            </div>
-            <div class="col-span-3"></div>
-
-            <div class="col-span-3 rounded-md mb-4 pb-6">
-                <label for="" class="block text-sm text-black mb-3">
-                    Department
-                </label>
-                <select name="" id="" v-model="selectedDepartment"
-                    class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0"
-                    @change="departmentSelectChanged(selectedDepartment)">
-                    <option :value="department" v-for="(department, departmentIndex) in departmentList"
-                        :key="departmentIndex"> {{ department.name }} </option>
-                    <!-- <option value="2">Table</option>
-                    <option value="3">Security</option> -->
-                </select>
-            </div>
-            <div class="col-span-3 rounded-md mb-4 pb-6">
-                <label for="" class="block text-sm text-black mb-3">
-                    Roles
-                </label>
-                <div class=" mb-0 w-full text-sm inline-block" data-te-select-wrapper-ref>
-                    <select data-te-select-init data-te-select-placeholder="Select Roles" data-te-select-filter="true"
-                        name="" id="" multiple v-model="roleSelected"
-                        class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
-                        <option :value="role" v-for="(role, roleIndex) in roleList" :key="roleIndex">
-                            {{ role.name }}
-                        </option>
-                        <!-- <option value="2">Manager</option>
-                        <option value="3">Waiter</option> -->
-                    </select>
-                    <div v-for="(role, index) in roles" :key="index" class='py-2 px-3 flex justify-between'>
-                        <span>{{ role.name }}</span><span><i @click="deleteRoleStaff(role.id)"
-                                class="fal fa-times text-red-400"></i></span>
-                    </div>
-
-                </div>
-            </div>
             <div class="col-span-3 rounded-md mb-4 pb-6">
                 <label for="" class="block text-sm text-black mb-3">
                     Joined Date
@@ -134,15 +65,91 @@
                     class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
             </div>
 
+            <!-- <div class="col-span-3"></div> -->
+
+            <div class="mb-4 col-span-3 pb-6 rounded-md">
+                <label for="" class="label-form mb-3">
+                    Ph Number
+                </label>
+                <input type="tel" v-model="phoneNumber" placeholder="Phone (Required)" class="input-ui">
+            </div>
+            <div class="mb-4 col-span-3 pb-6 rounded-md">
+                <label for="" class="label-form mb-3">
+                    Alt Ph Number
+                </label>
+                <input type="tel" v-model="altPhoneNumber" placeholder="Alt Phone" class="input-ui">
+            </div>
+            <div class="mb-4 col-span-3 pb-6 rounded-md">
+                <label for="" class="label-form mb-3">
+                    Password
+                </label>
+                <input type="password" disabled
+                    class="input-ui">
+            </div>
+            <div class="col-span-3"></div>
+
+            <div class="col-span-3 rounded-md mb-4 pb-6">
+                <label for="" class="label-form mb-3">
+                    Department
+                </label>
+                <select name="" id="" v-model="selectedDepartment" class="input-ui"
+                    @change="departmentSelectChanged(selectedDepartment)">
+                    <option :value="department" v-for="(department, departmentIndex) in departmentList"
+                        :key="departmentIndex">
+                        {{ department.name }}
+                    </option>
+                    <!-- <option value="2">Table</option>
+                    <option value="3">Security</option> -->
+                </select>
+            </div>
+            <div class="col-span-3 rounded-md mb-4 pb-6">
+                <label for="" class="label-form mb-3">
+                    Roles
+                </label>
+                <div class=" mb-0 w-full text-sm inline-block" data-te-select-wrapper-ref>
+                    <select data-te-select-init data-te-select-placeholder="Select Roles" data-te-select-filter="true"
+                        name="" id="" multiple v-model="roleSelected" class="input-ui">
+                        <option :value="role" v-for="(role, roleIndex) in roleList" :key="roleIndex">
+                            {{ role.name }}
+                        </option>
+                        <!-- <option value="2">Manager</option>
+                        <option value="3">Waiter</option> -->
+                    </select>
+                    <div v-for="(role, index) in roles" :key="index" class='py-2 px-3 flex justify-between'>
+                        <span>{{ role.name }}</span>
+                        <!-- <span> <i @click="deleteRoleStaff(role.id)" class="fal fa-times text-red-400"></i> </span> -->
+                    </div>
+
+                </div>
+            </div>
             <div class="col-span-3 rounded-md mb-4 pb-6">
                 <label for="" class="block text-sm text-black mb-3">
+                    Authorized Features
+                </label>
+                <div class=" mb-0 w-full text-sm inline-block" data-te-select-wrapper-ref>
+                    <select data-te-select-init data-te-select-placeholder="Select Features"
+                        data-te-select-filter="true" name="" id="" multiple v-model="selectedFeatures"
+                        class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
+                        <option :value="feature" v-for="(feature, featureIndex) in featureList" :key="featureIndex">
+                            {{ feature.name }}
+                        </option>
+                    </select>
+                    <div v-for="(feature, index) in editFeatureList" :key="index"
+                        class='py-2 px-3 flex justify-between'>
+                        <span>{{ feature.name }}</span>
+                        <!-- <span><i @click="deletefeatureStaff(feature)" class="fal fa-times text-red-400"></i></span> -->
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-span-3 rounded-md mb-4 pb-6">
+                <label for="" class="label-form mb-3">
                     Inventories
                 </label>
                 <div class=" mb-0 w-full text-sm inline-block" data-te-select-wrapper-ref>
                     <select :disabled="inventories.length < 1" data-te-select-init
                         data-te-select-placeholder="Select Inventories" data-te-select-filter="true" name="" id=""
-                        multiple v-model="selectedInventories"
-                        class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
+                        multiple v-model="selectedInventories" class="input-ui">
                         <option :value="inventory" v-for="(inventory, inventoryIndex) in inventories"
                             :key="inventoryIndex">
                             {{ inventory.name }}
@@ -152,8 +159,8 @@
                         <div v-if="staffDetailData.inventories">
                             <div v-for="(inventory, index) in staffDetailData.inventories" :key="index"
                                 class='py-2 px-3 flex justify-between'>
-                                <span>{{ inventory.name }}</span><span><i @click="deleteInventoryStaff(inventory.id)"
-                                        class="fal fa-times text-red-400"></i></span>
+                                <span>{{ inventory.name }}</span>
+                                <!-- <span><i @click="deleteInventoryStaff(inventory.id)" class="fal fa-times text-red-400"></i></span> -->
                             </div>
                         </div>
                     </div>
@@ -164,44 +171,40 @@
             <!-- <div class="col-span-3"></div> -->
 
             <div class="col-span-3 rounded-md mb-4 pb-6">
-                <label for="" class="block text-sm text-black mb-3">
+                <label for="" class="label-form mb-3">
                     State
                 </label>
                 <!-- <input type="input" v-model="state" placeholder="State (Required)"
-                    class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0"> -->
-                <select name="" id="" v-model="selectedState"
-                    class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0"
+                    class="input-ui"> -->
+                <select name="" id="" v-model="selectedState" class="input-ui"
                     @change="stateSelectChanged(selectedState)">
                     <option :value="state" v-for="(state, stateIndex) in stateList" :key="stateIndex"> {{ state.name }}
                     </option>
                 </select>
             </div>
             <div class="col-span-3 rounded-md mb-4 pb-6">
-                <label for="" class="block text-sm text-black mb-3">
+                <label for="" class="label-form mb-3">
                     City
                 </label>
                 <!-- <input type="input" v-model="city" placeholder="City (Required)"
-                    class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0"> -->
-                <select name="" id="" v-model="selectedCity"
-                    class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0"
-                    @change="citySelectChanged(selectedCity)">
+                    class="input-ui"> -->
+                <select name="" id="" v-model="selectedCity" class="input-ui" @change="citySelectChanged(selectedCity)">
                     <!-- <option value="City 1"> City 1 </option> -->
                     <option :value="city" v-for="(city, cityIndex) in cityList" :key="cityIndex"> {{ city.name }}
                     </option>
                 </select>
             </div>
             <div class="col-span-3 rounded-md mb-4 pb-6">
-                <label for="" class="block text-sm text-black mb-3">
+                <label for="" class="label-form mb-3">
                     Zip Code
                 </label>
-                <input type="text" v-model="zipCode" placeholder="Zip Code"
-                    class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
+                <input type="text" v-model="zipCode" placeholder="Zip Code" class="input-ui">
             </div>
 
             <div class="col-span-3"></div>
 
             <div class="mb-4 col-span-6 pb-6 rounded-md">
-                <label for="" class="block text-sm text-black mb-3">
+                <label for="" class="label-form mb-3">
                     Address
                 </label>
                 <textarea name="" v-model="address"
@@ -218,48 +221,43 @@
                 </p>
             </div>
             <div class="col-span-3 rounded-md mb-4 pb-6">
-                <label for="" class="block text-sm text-black mb-3">
+                <label for="" class="label-form mb-3">
                     Primary Contact
                 </label>
-                <input type="text" v-model="primaryName" placeholder="Primary Contact (Required)"
-                    class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
+                <input type="text" v-model="primaryName" placeholder="Primary Contact (Required)" class="input-ui">
             </div>
             <div class="col-span-3 rounded-md mb-4 pb-6">
-                <label for="" class="block text-sm text-black mb-3">
+                <label for="" class="label-form mb-3">
                     Phone Number
                 </label>
-                <input type="text" v-model="primaryPhone" placeholder="Phone Number (Required)"
-                    class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
+                <input type="text" v-model="primaryPhone" placeholder="Phone Number (Required)" class="input-ui">
             </div>
             <div class="col-span-3 rounded-md mb-4 pb-6">
-                <label for="" class="block text-sm text-black mb-3">
+                <label for="" class="label-form mb-3">
                     Relationship
                 </label>
-                <input type="text" v-model="primaryRelationship" placeholder="Relationship (Required)"
-                    class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
+                <input type="text" v-model="primaryRelationship" placeholder="Relationship (Required)" class="input-ui">
             </div>
             <div class="col-span-3"></div>
 
             <div class="col-span-3 rounded-md mb-4 pb-6">
-                <label for="" class="block text-sm text-black mb-3">
+                <label for="" class="label-form mb-3">
                     Secondary Contact
                 </label>
-                <input type="text" v-model="secondaryName" placeholder="Secondary Contact (Required)"
-                    class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
+                <input type="text" v-model="secondaryName" placeholder="Secondary Contact (Required)" class="input-ui">
             </div>
             <div class="col-span-3 rounded-md mb-4 pb-6">
-                <label for="" class="block text-sm text-black mb-3">
+                <label for="" class="label-form mb-3">
                     Phone Number
                 </label>
-                <input type="text" v-model="secondaryPhone" placeholder="Phone Number (Required)"
-                    class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
+                <input type="text" v-model="secondaryPhone" placeholder="Phone Number (Required)" class="input-ui">
             </div>
             <div class="col-span-3 rounded-md mb-4 pb-6">
-                <label for="" class="block text-sm text-black mb-3">
+                <label for="" class="label-form mb-3">
                     Relationship
                 </label>
                 <input type="text" v-model="secondaryRelationship" placeholder="Relationship (Required)"
-                    class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
+                    class="input-ui">
             </div>
             <div class="col-span-3"></div>
 
@@ -295,11 +293,10 @@
                     <div class="relative px-12 py-4" data-te-modal-body-ref>
 
                         <div class="mb-4">
-                            <label for="" class="block text-sm text-black mb-3">
+                            <label for="" class="label-form mb-3">
                                 Department
                             </label>
-                            <input type="text" placeholder="Department"
-                                class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
+                            <input type="text" placeholder="Department" class="input-ui">
                         </div>
                     </div>
 
@@ -334,18 +331,16 @@
 
                     <div class="relative px-12 py-4" data-te-modal-body-ref>
                         <div class="mb-4">
-                            <label for="" class="block text-sm text-black mb-3">
+                            <label for="" class="label-form mb-3">
                                 Role
                             </label>
-                            <input type="text" placeholder="Role"
-                                class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
+                            <input type="text" placeholder="Role" class="input-ui">
                         </div>
                         <div class="mb-4">
-                            <label for="" class="block text-sm text-black mb-3">
+                            <label for="" class="label-form mb-3">
                                 Department
                             </label>
-                            <input type="text" placeholder="Department"
-                                class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
+                            <input type="text" placeholder="Department" class="input-ui">
                         </div>
                     </div>
 
@@ -374,6 +369,7 @@ export default {
             genderList: [],
             departmentList: [],
             roleList: [],
+            featureList: [],
             stateList: [],
             selectedState: null,
             cityList: [],
@@ -393,6 +389,8 @@ export default {
             selectedDepartment: null,
             roleSelected: [],
             roleIds: [],
+            selectedFeatures: [],
+            featureIds: [],
             state: null,
             city: null,
             address: null,
@@ -412,7 +410,8 @@ export default {
             staffDetailData: null,
             staffRoles: null,
             inventories: [],
-            roles: []
+            roles: [],
+            editFeatureList:[]
         };
     },
 
@@ -443,27 +442,49 @@ export default {
                 // this.citySelectChanged(this.selectedCity);
                 this.zipCode = this.staffDetailData.zip_code;
                 this.address = this.staffDetailData.address;
-                this.primaryName = this.staffDetailData.emergency_contacts[0].primary_name;
-                this.primaryPhone = this.staffDetailData.emergency_contacts[0].primary_phone;
-                this.primaryRelationship = this.staffDetailData.emergency_contacts[0].primary_relationship
-                this.secondaryName = this.staffDetailData.emergency_contacts[0].secondary_name;
-                this.secondaryPhone = this.staffDetailData.emergency_contacts[0].secondary_phone;
-                this.secondaryRelationship = this.staffDetailData.emergency_contacts[0].secondary_relationship;
+                if(this.staffDetailData.emergency_contacts.length > 0){
+                    this.primaryName = this.staffDetailData.emergency_contacts[0].primary_name;
+                    this.primaryPhone = this.staffDetailData.emergency_contacts[0].primary_phone;
+                    this.primaryRelationship = this.staffDetailData.emergency_contacts[0].primary_relationship
+                    this.secondaryName = this.staffDetailData.emergency_contacts[0].secondary_name;
+                    this.secondaryPhone = this.staffDetailData.emergency_contacts[0].secondary_phone;
+                    this.secondaryRelationship = this.staffDetailData.emergency_contacts[0].secondary_relationship;
+                }
                 this.inventories = this.staffDetailData.inventories;
                 this.roles = this.staffDetailData.roles;
                 this.state = this.staffDetailData.state;
                 this.city = this.staffDetailData.city;
+                this.editFeatureList = this.staffDetailData.features;
+                console.log(this.editFeatureList);
+
             }
         },
 
         async deleteRoleStaff(role) {
             let response = await deleteApiData({ url: `/api/staffs/${this.staffId}/roles/${role}` });
-            this.getStaffDetail();
+            if(response.success==true)
+            {
+                this.getStaffDetail();
+            }
+        },
+
+        async deletefeatureStaff(feature)
+        {
+            let url = `/api/staffs/${this.staffId}/features/${feature.id}`;
+            console.log(url);
+            let response = await deleteApiData({url:`/api/staffs/${this.staffId}/features/${feature.id}`});
+            if(response.success==true)
+            {
+                this.getStaffDetail();
+            }
         },
 
         async deleteInventoryStaff(inventory) {
             let response = await deleteApiData({ url: `/api/staffs/${this.staffId}/inventories/${inventory}` });
-            this.getStaffDetail();
+            if(response.success==true)
+            {
+                this.getStaffDetail();
+            }
         },
 
         async getStateList() {
@@ -509,13 +530,28 @@ export default {
             const response = await getApiData({ url: '/api/departments', token: this.getToken() });
             if (response.data) {
                 this.departmentList = response.data;
+                setTimeout(()=>{
+                    if(this.staffDetailData){
+                        this.departmentList.forEach((department)=>{
+                            if(this.staffDetailData.department_id == department.id){
+                                this.selectedDepartment = department;
+                                this.departmentSelectChanged();
+                            }
+                        });
+                    }
+
+                }, 800);
             }
         },
 
         async departmentSelectChanged() {
+            this.featureList = [];
             let rolesResponse = await getApiData({ url: `/api/roles?department_id=${this.selectedDepartment.id}`, token: this.getToken() });
             if (rolesResponse.data) {
                 this.roleList = rolesResponse.data;
+            }
+            if(this.selectedDepartment.features.length > 0){
+                this.featureList = this.selectedDepartment.features;
             }
         },
 
@@ -525,12 +561,12 @@ export default {
                 this.inventories = response.data;
             }
         },
-        async getRoleList() {
-            const response = await getApiData({ url: '/api/roles', token: this.getToken() });
-            if (response.data) {
-                this.roleList = response.data;
-            }
-        },
+        // async getRoleList() {
+        //     const response = await getApiData({ url: '/api/roles', token: this.getToken() });
+        //     if (response.data) {
+        //         this.roleList = response.data;
+        //     }
+        // },
 
         alertValiationMessage(field) {
             this.$notify({
@@ -549,9 +585,17 @@ export default {
                 });
             }
 
-            this.roleSelected.forEach((item) => {
-                this.roleIds.push(item.id);
-            });
+            if(this.selectedFeatures.length > 0){
+                this.selectedFeatures.forEach((feature) => {
+                    this.featureIds.push(feature.id);
+                });
+            }
+
+            if(this.roleSelected.length > 0){
+                this.roleSelected.forEach((item) => {
+                    this.roleIds.push(item.id);
+                });
+            }
 
             if (!this.name) {
                 this.alertValiationMessage('name');
@@ -685,14 +729,21 @@ export default {
             formData.append('city', this.city);
             formData.append('gender_id', this.selectedGender.id);
             formData.append('department_id', this.selectedDepartment.id);
-            formData.append('inventoryIds', JSON.stringify(this.inventoryIds));
-            formData.append('password', this.password);
-            this.roleIds.forEach(roleId => {
-                formData.append('roles[]', roleId);
-            });
-
+            if(this.inventoryIds.length > 0){
+                formData.append('inventoryIds', JSON.stringify(this.inventoryIds));
+            }
+            if(this.featureIds.length > 0){
+                formData.append('featureIds', JSON.stringify(this.featureIds));
+            }
+            if(this.roleIds.length > 0){
+                this.roleIds.forEach(roleId => {
+                    formData.append('roles[]', roleId);
+                });
+            }
+            if(this.password){
+                formData.append('password', this.password);
+            }
             formData.append('joined_date', this.joinedDate);
-
             // for emegercy
 
             formData.append('primary_name', this.primaryName);
@@ -723,7 +774,7 @@ export default {
         this.getStaffDetail();
         this.getGenderList();
         this.getDepartmentList();
-        this.getRoleList();
+        // this.getRoleList();
         this.getInventoryList();
         this.getStateList();
     },

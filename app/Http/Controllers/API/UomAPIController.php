@@ -2,11 +2,12 @@
 
 namespace App\Http\Controllers\API;
 
+use Illuminate\Http\Request;
+use App\Models\UomConversion;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Uom\UomCreateRequest;
 use App\Http\Requests\Uom\UomUpdateRequest;
 use App\Repositories\Uom\UomRepositoryInterface;
-use Illuminate\Http\Request;
 
 class UomAPIController extends Controller
 {
@@ -68,5 +69,18 @@ class UomAPIController extends Controller
         ResponseData($uomConversions);
     }
 
+
+     #test
+     public function getUomConversionByUom(Request $request){
+        $uom_conversion=UomConversion::where('base_unit_id',$request->po_uom_id)
+        ->where('conversion_unit_id',$request->item_uom_id)
+        ->first();
+        if($uom_conversion){
+            // $conversion= $uom_conversion->conversion;
+            ResponseData($uom_conversion);
+        }
+        ResponseMessage('Uom conversion is required');
+    }
+    #end
 
 }

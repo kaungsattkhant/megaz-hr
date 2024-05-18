@@ -127,6 +127,11 @@ class Staff extends Authenticatable
         return false;
     }
 
+    public function features()
+    {
+        return $this->belongsToMany(Feature::class,'feature_staff');
+    }
+
     #scope
 
     #end

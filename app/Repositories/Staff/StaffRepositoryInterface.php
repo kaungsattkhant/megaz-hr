@@ -24,4 +24,6 @@ interface StaffRepositoryInterface
 
     public function deleteStaffInventory(int $staff_id, int $inventory_id);
 
+    public function deleteStaffFeature(int $staff_id, int $feature_id);
+
 }

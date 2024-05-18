@@ -1,7 +1,7 @@
 <template>
-    <div class="px-8">
-        <div class="mb-6">
-            <p class="text-xl  text-black font-normal">
+    <div class="px-0">
+        <div class="mb-4 mt-3">
+            <p class="text-lg font-semibold font-inter">
                 Add Menu
             </p>
         </div>
@@ -9,93 +9,101 @@
 
         <div class="grid !grid-cols-12 gap-x-8 bg-white p-8 rounded-md shadow-md mb-8">
             <div class="mb-4 col-span-3 pb-6 rounded-md">
-                <label for="" class="block text-sm text-black mb-3">
+                <label for="" class="label-form mb-3">
                     Name
                 </label>
-                <input type="text" v-model="name"
-                    class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
+                <input type="text" v-model="name" class="input-ui ">
             </div>
             <div class="mb-4 col-span-3 pb-6 rounded-md">
-                <label for="" class="block text-sm text-black mb-3">
+                <label for="" class="label-form mb-3">
                     Price
                 </label>
-                <input type="text" v-model="price"
-                    class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
+                <input type="text" v-model="price" class="input-ui ">
             </div>
             <div class="mb-4 col-span-3 pb-6 rounded-md">
-                <label for="" class="block text-sm text-black mb-3">
+                <label for="" class="label-form mb-3">
                     Menu Category
                 </label>
-                <div class="text-sm input-ui w-full bg-transparent rounded-lg focus:ring-0" data-te-select-wrapper-ref>
+                <div class="text-xs text-black h-8 border-b border-black rounded-bl-[4px] rounded-br-[4px] overflow-hidden inline-block"
+                    data-te-select-wrapper-ref>
                     <select data-te-select-init data-te-select-placeholder="Select Category"
-                        data-te-select-filter="true" name="" id="" v-model="menuCategoryId"
-                        class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
+                        data-te-select-filter="true" name="" id="" v-model="menuCategoryId" class="input-ui">
                         <option :value="menuCategory.id" v-for="(menuCategory, menuCategoryIndex) in menuCategoryList"
                             :key="menuCategoryIndex"> {{ menuCategory.name }} </option>
                     </select>
                 </div>
             </div>
-            <div class="col-span-3"></div>
-
             <div class="mb-0 col-span-3 rounded-md">
                 <label for="" class="block text-sm text-black mb-3">
+                    Images
+                </label>
+                <div class="">
+                    <input type='file' @change="handleFileChange" class="input-ui w-full !p-1 text-xs" />
+                </div>
+
+            </div>
+            <div class="mb-0 col-span-3 rounded-md">
+                <label for="" class="label-form mb-3">
                     Category
                 </label>
-                <div class="text-sm input-ui w-full bg-transparent rounded-lg focus:ring-0" data-te-select-wrapper-ref>
+                <div class="text-xs text-black h-8 border-b border-black rounded-bl-[4px] rounded-br-[4px] overflow-hidden inline-block"
+                    data-te-select-wrapper-ref>
                     <select data-te-select-init data-te-select-placeholder="Select Category"
-                        data-te-select-filter="true" name="" id="" v-model="selectedItemCategory"
-                        class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0"
+                        data-te-select-filter="true" name="" id="" v-model="selectedItemCategory" class="input-ui"
                         @change="itemCategorySelectChanged">
                         <option :value="itemCategory" v-for="(itemCategory, itemCategoryIndex) in itemCategoryList"
                             :key="itemCategoryIndex"> {{ itemCategory.name }} </option>
                     </select>
                 </div>
             </div>
+
             <div class="mb-0 col-span-3 rounded-md">
-                <label for="" class="block text-sm text-black mb-3">
+                <label for="" class="label-form mb-3">
                     Ingredients
                 </label>
-                <div class="text-sm input-ui w-full bg-transparent rounded-lg focus:ring-0" data-te-select-wrapper-ref>
-                    <select data-te-select-init data-te-select-placeholder="Select Category"
-                        data-te-select-filter="true" name="" id="" v-model="selectedItem"
-                        class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
+                <div class="text-xs text-black h-8 border-b border-black rounded-bl-[4px] rounded-br-[4px] overflow-hidden inline-block"
+                    data-te-select-wrapper-ref>
+                    <select data-te-select-init data-te-select-placeholder="Select Item" data-te-select-filter="true"
+                        name="" id="" v-model="selectedItem" class="input-ui">
                         <option :value="item" v-for="(item, itemIndex) in itemList" :key="itemIndex"> {{ item.name }}
                         </option>
                     </select>
                 </div>
             </div>
             <div class="mb-0 col-span-3 rounded-md">
-                <label for="" class="block text-sm text-black mb-3">
+                <label for="" class="label-form mb-3">
                     Weight
                 </label>
-
-                <input type="text" v-model="weight"
-                    class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
-                <!--Default checkbox-->
+                <input type="text" v-model="weight" class="input-ui mb-2">
                 <div class="mb-[0.125rem] block min-h-[1.5rem] pl-[1.5rem]">
                     <input
                         class="relative float-left -ml-[1.5rem] mr-[6px] mt-[0.15rem] h-[1.125rem] w-[1.125rem] appearance-none rounded-[0.25rem] border-[0.125rem] border-solid border-neutral-300 outline-none before:pointer-events-none before:absolute before:h-[0.875rem] before:w-[0.875rem] before:scale-0 before:rounded-full before:bg-transparent before:opacity-0 before:shadow-[0px_0px_0px_13px_transparent] before:content-[''] checked:border-primary checked:bg-primary checked:before:opacity-[0.16] checked:after:absolute checked:after:-mt-px checked:after:ml-[0.25rem] checked:after:block checked:after:h-[0.8125rem] checked:after:w-[0.375rem] checked:after:rotate-45 checked:after:border-[0.125rem] checked:after:border-l-0 checked:after:border-t-0 checked:after:border-solid checked:after:border-white checked:after:bg-transparent checked:after:content-[''] hover:cursor-pointer hover:before:opacity-[0.04] hover:before:shadow-[0px_0px_0px_13px_rgba(0,0,0,0.6)] focus:shadow-none focus:transition-[border-color_0.2s] focus:before:scale-100 focus:before:opacity-[0.12] focus:before:shadow-[0px_0px_0px_13px_rgba(0,0,0,0.6)] focus:before:transition-[box-shadow_0.2s,transform_0.2s] focus:after:absolute focus:after:z-[1] focus:after:block focus:after:h-[0.875rem] focus:after:w-[0.875rem] focus:after:rounded-[0.125rem] focus:after:content-[''] checked:focus:before:scale-100 checked:focus:before:shadow-[0px_0px_0px_13px_#3b71ca] checked:focus:before:transition-[box-shadow_0.2s,transform_0.2s] checked:focus:after:-mt-px checked:focus:after:ml-[0.25rem] checked:focus:after:h-[0.8125rem] checked:focus:after:w-[0.375rem] checked:focus:after:rotate-45 checked:focus:after:rounded-none checked:focus:after:border-[0.125rem] checked:focus:after:border-l-0 checked:focus:after:border-t-0 checked:focus:after:border-solid checked:focus:after:border-white checked:focus:after:bg-transparent dark:border-neutral-600 dark:checked:border-primary dark:checked:bg-primary dark:focus:before:shadow-[0px_0px_0px_13px_rgba(255,255,255,0.4)] dark:checked:focus:before:shadow-[0px_0px_0px_13px_#3b71ca]"
                         type="checkbox" value="true" v-model="isMakePack" id="checkboxDefault" ref="is_make_pack"
                         @change="isMakePackCheckChanged" />
-                    <label class="inline-block pl-[0.15rem] hover:cursor-pointer" for="checkboxDefault">
+                    <label class="inline-block pl-[0.15rem] hover:cursor-pointer label-form !text-sm"
+                        for="checkboxDefault">
                         Is make pack?
                     </label>
                 </div>
-
-
             </div>
-
             <div class="mb-0 col-span-3 rounded-md">
-                <label for="" class="block text-sm text-black mb-3">
-                    Images
+                <label for="" class="label-form mb-3">
+                    UOM
                 </label>
-                <div class="text-sm input-ui w-full bg-transparent rounded-lg focus:ring-0" data-te-select-wrapper-ref>
-                    <input type='file' @change="handleFileChange" class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0" />
+                <div class="text-xs text-black h-8 border-b border-black rounded-bl-[4px] rounded-br-[4px] overflow-hidden inline-block"
+                    data-te-select-wrapper-ref>
+                    <select data-te-select-init data-te-select-placeholder="Select UOM" data-te-select-filter="true"
+                        name="" id="" v-model="selectedUom" class="input-ui">
+                        <option :value="uom" v-for="(uom, uomIndex) in uomList" :key="uomIndex">
+                            {{ uom.name }}
+                        </option>
+                    </select>
                 </div>
 
             </div>
+
             <div class="col-span-3">
-                <label for="" class="block text-sm text-black mb-3">
+                <label for="" class="label-form mb-3">
                     &nbsp;
                 </label>
                 <button class="add-btn" @click="addItemBtnClicked">
@@ -105,29 +113,29 @@
 
         </div>
 
-        <div class=" bg-white p-8 rounded-md shadow-md mb-8">
+        <div class=" bg-white py-4 px-8 rounded-md shadow-md mb-8">
             <ul class="mb-5 flex list-none flex-row flex-wrap border-b-0 pl-0" role="tablist" data-te-nav-ref>
                 <li role="presentation">
                     <a href="#tabs-ingredients"
-                        class="my-2 block border-x-0 border-b-2 border-t-0 border-transparent px-7 pb-3.5 pt-4 text-xs font-medium uppercase leading-tight text-neutral-500 hover:isolate hover:border-transparent hover:bg-neutral-100 focus:isolate focus:border-transparent data-[te-nav-active]:border-primary data-[te-nav-active]:text-primary dark:text-neutral-400 dark:hover:bg-transparent dark:data-[te-nav-active]:border-primary-400 dark:data-[te-nav-active]:text-primary-400"
+                        class="my-2 block border-x-0 px-7 pb-3.5 pt-3 rounded-md font-inter text-xs font-medium  leading-tight text-neutral-500 hover:isolate hover:border-transparent hover:bg-neutral-100 focus:isolate focus:border-transparent data-[te-nav-active]:text-[#845adf] data-[te-nav-active]:bg-[#845adf1a]"
                         data-te-toggle="pill" data-te-target="#tabs-home" data-te-nav-active role="tab"
                         aria-controls="tabs-home" aria-selected="true">Ingredients</a>
                 </li>
                 <li role="presentation">
                     <a href="#tabs-profile"
-                        class="my-2 block border-x-0 border-b-2 border-t-0 border-transparent px-7 pb-3.5 pt-4 text-xs font-medium uppercase leading-tight text-neutral-500 hover:isolate hover:border-transparent hover:bg-neutral-100 focus:isolate focus:border-transparent data-[te-nav-active]:border-primary data-[te-nav-active]:text-primary dark:text-neutral-400 dark:hover:bg-transparent dark:data-[te-nav-active]:border-primary-400 dark:data-[te-nav-active]:text-primary-400"
+                        class="my-2 block border-x-0 px-7 pb-3.5 pt-3 rounded-md font-inter text-xs font-medium  leading-tight text-neutral-500 hover:isolate hover:border-transparent hover:bg-neutral-100 focus:isolate focus:border-transparent  data-[te-nav-active]:text-[#845adf] data-[te-nav-active]:bg-[#845adf1a]"
                         data-te-toggle="pill" data-te-target="#tabs-profile" role="tab" aria-controls="tabs-profile"
                         aria-selected="false">Profile</a>
                 </li>
                 <li role="presentation">
                     <a href="#tabs-messages"
-                        class="my-2 block border-x-0 border-b-2 border-t-0 border-transparent px-7 pb-3.5 pt-4 text-xs font-medium uppercase leading-tight text-neutral-500 hover:isolate hover:border-transparent hover:bg-neutral-100 focus:isolate focus:border-transparent data-[te-nav-active]:border-primary data-[te-nav-active]:text-primary dark:text-neutral-400 dark:hover:bg-transparent dark:data-[te-nav-active]:border-primary-400 dark:data-[te-nav-active]:text-primary-400"
+                        class="my-2 block border-x-0 px-7 pb-3.5 pt-3 rounded-md font-inter text-xs font-medium  leading-tight text-neutral-500 hover:isolate hover:border-transparent hover:bg-neutral-100 focus:isolate focus:border-transparent  data-[te-nav-active]:text-[#845adf] data-[te-nav-active]:bg-[#845adf1a]"
                         data-te-toggle="pill" data-te-target="#tabs-messages" role="tab" aria-controls="tabs-messages"
                         aria-selected="false">Messages</a>
                 </li>
                 <li role="presentation">
                     <a href="#tabs-contact"
-                        class="disabled pointer-events-none my-2 block border-x-0 border-b-2 border-t-0 border-transparent bg-transparent px-7 pb-3.5 pt-4 text-xs font-medium uppercase leading-tight text-neutral-400 hover:isolate hover:border-transparent hover:bg-neutral-100 focus:isolate focus:border-transparent dark:text-neutral-600"
+                        class="my-2 block border-x-0 px-7 pb-3.5 pt-3 rounded-md font-inter text-xs font-medium  leading-tight text-neutral-500 hover:isolate hover:border-transparent hover:bg-neutral-100 focus:isolate focus:border-transparent  data-[te-nav-active]:text-[#845adf] data-[te-nav-active]:bg-[#845adf1a]"
                         data-te-toggle="pill" data-te-target="#tabs-contact" role="tab" aria-controls="tabs-contact"
                         aria-selected="false">Contact</a>
                 </li>
@@ -136,37 +144,43 @@
             <div class="mb-6">
                 <div class="hidden opacity-100 transition-opacity duration-150 ease-linear data-[te-tab-active]:block"
                     id="tabs-ingredients" role="tabpanel" aria-labelledby="tabs-home-tab" data-te-tab-active>
-                    <div>
-                        <table class="min-w-full primary-table rounded-xl text-center text-sm font-light ">
-                            <thead class="border-b font-medium ">
+                    <div class="table-container">
+                        <table class="primary-table">
+                            <thead class="">
                                 <tr>
-                                    <th scope="col" class=" px-6 py-4 ">
+                                    <th scope="col" class="">
                                         Item
                                     </th>
-                                    <th scope="col" class=" px-6 py-4 ">
+                                    <th scope="col" class="">
                                         Weight
                                     </th>
-                                    <th scope="col" class=" px-6 py-4 ">
+                                    <th scope="col" class="">
+                                        UOM
+                                    </th>
+                                    <th scope="col" class="">
                                         Is packed?
                                     </th>
-                                    <th scope="col" class=" px-6 py-4 ">
+                                    <th scope="col" class="">
 
                                     </th>
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr class="bg-white rounded-lg overflow-hidden shadow-lg"
-                                    v-for="(ingredient, ingredientIndex) in ingredientItems" :key="ingredientIndex">
-                                    <td class=" px-6 py-4 font-medium ">
+                                <tr class="" v-for="(ingredient, ingredientIndex) in ingredientItems"
+                                    :key="ingredientIndex">
+                                    <td class="">
                                         {{ ingredient.name }}
                                     </td>
-                                    <td class=" px-6 py-4 font-medium ">
+                                    <td class="">
                                         {{ ingredient.weight }}
                                     </td>
-                                    <td class=" px-6 py-4 font-medium ">
+                                    <td class="">
+                                        {{ ingredient.uom_name }}
+                                    </td>
+                                    <td class="">
                                         {{ ingredient.is_make_pack }}
                                     </td>
-                                    <td class=" px-6 py-4 font-medium ">
+                                    <td class="">
                                         <button @click="removeIngredientBtnClicked(ingredientIndex)">
                                             <i class="fal fa-trash  pr-3"></i>
                                         </button>
@@ -298,6 +312,9 @@ export default {
             itemCategoryList: [],
             itemList: [],
 
+            uomList: [],
+            selectedUom: null,
+
             menuCategoryId: null,
             name: null,
             price: null,
@@ -345,6 +362,13 @@ export default {
             }
         },
 
+        async getUomList() {
+            let response = await getApiData({ url: `/api/uoms`, token: this.getToken() });
+            if (response.data) {
+                this.uomList = response.data;
+            }
+        },
+
         isMakePackCheckChanged() {
             this.isMakePack = this.$refs.is_make_pack.checked;
         },
@@ -353,12 +377,17 @@ export default {
             if (!this.weight) {
                 alert('You forgot to specify weight');
             }
+            else if(!this.selectedUom){
+                alert('You forgot to specify UOM');
+            }
             else {
                 this.ingredientItems.push({
                     id: this.selectedItem.id,
                     name: this.selectedItem.name,
                     weight: this.weight,
-                    is_make_pack: this.isMakePack
+                    is_make_pack: this.isMakePack,
+                    uom_id: this.selectedUom.id,
+                    uom_name: this.selectedUom.name
                 });
             }
 
@@ -396,6 +425,7 @@ export default {
     created() {
         this.getMenuCategoryList();
         this.getItemCategoryList();
+        this.getUomList();
     },
 
     mounted() {

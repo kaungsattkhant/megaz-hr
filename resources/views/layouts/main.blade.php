@@ -7,7 +7,7 @@
         <div class="main-content">
             @include('layouts.navbar')
 
-            <main class="inner-container bg-gray-100 py-4">
+            <main class="inner-container bg-[#f0f1f700] py-4">
                 @yield('content')
             </main>
         </div>

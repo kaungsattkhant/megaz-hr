@@ -16,7 +16,7 @@ class StoreInventory
     {
         $this->inventoryId = $inventoryId;
     }
-    
+
     public function inventoryAction($model)
     {
         $morphMapName=RelationMorphName($model);
@@ -40,7 +40,7 @@ class StoreInventory
     public function storeItemToInventory($inventoryLedger,$item){
         return $inventoryLedger->inventory_ledger_items()->create([
             'item_id'=>$item->item_id,
-            'quantity'=>$item->quantity,
+            'quantity'=>$item->quantity*$item->uomConversion->conversion,
             'inventory_ledger_id'=>$inventoryLedger->id,
         ]);
     }
@@ -55,6 +55,6 @@ class StoreInventory
         return $inventoryLedger;
     }
 
-    
+
 
 }

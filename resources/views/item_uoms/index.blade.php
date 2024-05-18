@@ -2,10 +2,10 @@
 
 @section('page_title', 'UOM')
 
-@section('uoms', 'active-link')
+@section('uom_conversions', 'active-link')
 @section('content')
 
-<uom-crud-component/>
+<uom-conversion-crud-component/>
 
 
 @endsection

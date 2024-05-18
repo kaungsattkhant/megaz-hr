@@ -3,6 +3,7 @@
 namespace App\Providers;
 
 use App\Models\FixedAssetPurchase;
+use App\Models\UsedDefectedItem;
 use App\Repositories\Uom\UomRepository;
 use Illuminate\Support\ServiceProvider;
 
@@ -58,6 +59,8 @@ use App\Repositories\PurchaseOrder\PurchaseOrderRepository;
 use App\Repositories\Complaint\ComplaintRepositoryInterface;
 use App\Repositories\Inventory\InventoryRepositoryInterface;
 use App\Repositories\Department\DepartmentRepositoryInterface;
+use App\Repositories\Feature\FeatureRepository;
+use App\Repositories\Feature\FeatureRepositoryInterface;
 use App\Repositories\RoomSession\RoomSessionRepositoryInterface;
 use App\Repositories\ItemUsageForecast\ItemUsageForecastInterface;
 use App\Repositories\ItemUsageForecast\ItemUsageForecastRepository;
@@ -68,6 +71,10 @@ use App\Repositories\PurchaseOrderItemLeft\PurchaseOrderItemLeftInterface;
 use App\Repositories\PurchaseOrderItemLeft\PurchaseOrderItemLeftRepository;
 use App\Repositories\PurchaseOrderItem\PurchaseOrderItemRepositoryInterface;
 use App\Repositories\FixedAssetPurchase\FixedAssetPurchaseRepositoryInterface;
+use App\Repositories\Pack\PackRepository;
+use App\Repositories\Pack\PackRepositoryInterface;
+use App\Repositories\UsedDefectedItem\UsedDefectedItemRepository;
+use App\Repositories\UsedDefectedItem\UsedDefectedITemRepositoryInterface;
 
 class RepositoryServiceProvider extends ServiceProvider
 {
@@ -112,5 +119,8 @@ class RepositoryServiceProvider extends ServiceProvider
         $this->app->bind(NotificationInterface::class,NotificationRepository::class);
         $this->app->bind(PurchaseOrderItemLeftInterface::class,PurchaseOrderItemLeftRepository::class);
         $this->app->bind(FixedAssetPurchaseRepositoryInterface::class,FixedAssetPurchaseRepository::class);
+        $this->app->bind(PackRepositoryInterface::class,PackRepository::class);
+        $this->app->bind(UsedDefectedITemRepositoryInterface::class,UsedDefectedItemRepository::class);
+        $this->app->bind(FeatureRepositoryInterface::class,FeatureRepository::class);
     }
 }
