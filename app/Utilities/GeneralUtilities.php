@@ -295,7 +295,7 @@ if (!function_exists('checkDepartmentPermission')) {
     {
         $departmentName = UserData()->department->name;
         foreach ($permissions as $key => $value) {
-            if($value == 'all_departments'){
+            if ($value == 'all_departments') {
                 return true;
             }
             if ($value == $departmentName) {
@@ -315,6 +315,17 @@ if (!function_exists('checkDepartmentAndRoles')) {
             if ($roles->contains('name', $name) && $departmentName == $department) {
                 return true;
             }
+        }
+        return false;
+    }
+}
+
+if (!function_exists('checkFeaturePermission')) {
+    function checkFeaturePermission($name)
+    {
+        $features = UserData()->features;
+        if ($features->contains('slug', $name)) {
+            return true;
         }
         return false;
     }

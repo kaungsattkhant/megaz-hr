@@ -17,7 +17,9 @@ return new class extends Migration
             $table->unsignedBigInteger('source_inventory_id');
             $table->unsignedBigInteger('destination_inventory_id');
             $table->double('quantity');
-            $table->foreignId('item_id')->constrained()->onDelete('cascade');
+            $table->foreignId('item_id')->constrained();
+            $table->foreignId('uom_id')->constrained();
+            $table->foreignId('uom_conversion_id')->constrained();
             $table->dateTime('date');
             $table->unsignedBigInteger('created_by');
             $table->dateTime('confirmed_at')->nullable();
