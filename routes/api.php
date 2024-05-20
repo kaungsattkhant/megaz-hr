@@ -279,7 +279,7 @@ Route::post("/order_status_change",[OrderAPIController::class,'orderItemChangeSt
 
 Route::get('/used_defected_items',[UsedDefectedAPIController::class,'lisltUsedDefectedItem']);
 Route::post('/used_defected_items',[UsedDefectedAPIController::class,'createUsedDefected']);
-Route::post('/used_defected_items/{id}',[UsedDefectedAPIController::class,'usedDefectConfirm']);
+Route::post('/used_defected_items/{id}/confirm',[UsedDefectedAPIController::class,'usedDefectConfirm']);
 
 
 Route::get('get_inventory',[InventoryAPIController::class, 'getInventory']);

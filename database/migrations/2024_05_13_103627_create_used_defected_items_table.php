@@ -17,6 +17,7 @@ return new class extends Migration
             $table->foreignId('item_id')->constrained();
             $table->foreignId('uom_id')->constrained();
             $table->foreignId('uom_conversion_id')->constrained();
+            $table->foreignId('inventory_id')->constrained();
             $table->string('type');
             $table->double('quantity');
             $table->string('remark')->nullable();
