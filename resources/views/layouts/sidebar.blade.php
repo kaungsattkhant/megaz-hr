@@ -266,7 +266,6 @@
                             </li>
                         @endif
                         @if (checkFeaturePermission('purchase-order-confirmation'))
-
                             <li>
                                 <a href="{{ route('purchase_orders.confirm_poitems') }}"
                                     class="flex items-center @yield('confirm_purchase_order_items')">
