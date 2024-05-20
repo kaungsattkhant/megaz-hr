@@ -102,14 +102,13 @@ Route::middleware(['departments:HR,Finance,Management'])->group(function () {
     Route::view('/purchase_orders/{poId}/buy', 'purchase_orders.buy')->name('purchase_orders.buy');
 });
 
-
 Route::middleware(['departments:Inventory'])->group(function () {
     Route::view('/confirm_purchase_order_items', 'purchase_orders.confirm_poitems')->name('purchase_orders.confirm_poitems');
     Route::view('/purchase_order_left_items', 'purchase_orders.left_items_index')->name('purchase_orders.left_items_index');
     Route::view('/purchase_order_left_items/{poId}', 'purchase_orders.left_items_detail')->name('purchase_orders.left_items_detail');
 });
 
-Route::middleware(['departments:Finance'])->group(function () {
+Route::middleware(['departments:supplier'])->group(function () {
     Route::view('/suppliers', 'supplier.index')->name('suppliers.index');
     Route::view('/suppliers/create', 'supplier.create')->name('suppliers.create');
     Route::view('/suppliers/{id}/edit', 'supplier.edit')->name('suppliers.edit');
