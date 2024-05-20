@@ -294,7 +294,7 @@ export default {
         },
 
         async confirmCheckBtnClicked(){
-            let url = `/api/used_defected_items/${this.confirmItemId}`;
+            let url = `/api/used_defected_items/${this.confirmItemId}/confirm`;
             let response = await postApiData({url: url, token: this.getToken()});
             if(response.success){
                 this.$notify({
