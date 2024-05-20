@@ -273,6 +273,12 @@
                                 Inventory Transfers List
                             </a>
                         </li>
+                        <li>
+                            <a href="{{ route('used_defected_items.index') }}" class="flex items-center @yield('used_defected_items')">
+                                <i class="fal fa-user  pr-3"></i>
+                                Used Defected Items
+                            </a>
+                        </li>
                     </ul>
 
                 </div>

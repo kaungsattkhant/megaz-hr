@@ -98,6 +98,7 @@ Route::middleware(['departments:all_departments'])->group(function () {
     Route::view('/inventory_transfers', 'transfers.index')->name('transfers.index');
     Route::view('/inventory_transfers_list', 'transfers.transfers_list')->name('transfers.transfers');
     Route::view('/inventory_receives_list', 'transfers.receives_list')->name('transfers.receives');
+    Route::view('/used_defected_items', 'used_defected_items.index')->name('used_defected_items.index');
 });
 
 //pos
