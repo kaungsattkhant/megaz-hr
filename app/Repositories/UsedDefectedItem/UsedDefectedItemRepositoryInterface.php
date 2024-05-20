@@ -9,4 +9,6 @@ interface UsedDefectedItemRepositoryInterface
     public function listUsedDefectList(Request $request);
 
     public function createData(array $data);
+
+    public function confirmUsedDefect(int $id);
 }

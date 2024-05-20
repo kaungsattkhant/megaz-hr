@@ -15,6 +15,12 @@ class PackAPIController extends Controller
         $this->packRepo = $packRepo;
     }
 
+    public function getPacksData(Request $request)
+    {
+        $packs = $this->packRepo->listAllData($request);
+        ResponseData($packs);
+    }
+
     public function createPack(Request $request)
     {
         $pack = $this->packRepo->createPack($request->all());

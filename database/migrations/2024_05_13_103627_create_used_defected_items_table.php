@@ -21,6 +21,9 @@ return new class extends Migration
             $table->double('quantity');
             $table->string('remark')->nullable();
             $table->unsignedBigInteger('created_by');
+            $table->boolean('is_confirmed')->default(0);
+            $table->unsignedBigInteger('confirmed_by')->nullable();
+            $table->dateTime('confirmed_at')->nullable();
             $table->timestamps();
         });
     }
