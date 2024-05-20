@@ -93,11 +93,12 @@
                                     </td>
 
                                     <td class="whitespace-nowrap  ">
-                                        No
+                                        <div v-if="item.is_confirmed == 1" >Yes</div>
+                                        <div v-else >No</div>
                                     </td>
 
                                     <td class="whitespace-nowrap ">
-                                        <button id="edit-btn" class="pr-1">
+                                        <button id="edit-btn" class="pr-1" :disabled="item.is_confirmed == 1" >
                                             <i class="fas fa-check" @click="checkBtnClicked(item)"
                                                 data-te-toggle="modal" data-te-target="#checkModal"></i>
                                         </button>
@@ -292,9 +293,21 @@ export default {
             this.confirmItemId = item.id;
         },
 
-        confirmCheckBtnClicked(){
-            let url = ``;
-
+        async confirmCheckBtnClicked(){
+            let url = `/api/used_defected_items/${this.confirmItemId}`;
+            let response = await postApiData({url: url, token: this.getToken()});
+            if(response.success){
+                this.$notify({
+                    text: `Used defected item confirmed`,
+                    type: "info"
+                });
+            }
+            else{
+                this.$notify({
+                    text: `Used defected item confirmation error`,
+                    type: "error"
+                });
+            }
         },
 
         clearSearchBtnClicked() {
