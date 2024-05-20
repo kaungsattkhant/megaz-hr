@@ -13,6 +13,11 @@ class Pack extends Model
         'menu_id','date','expired_at','created_by','status'
     ];
 
+    public function menu()
+    {
+        return $this->belongsTo(Menu::class);
+    }
+
     public function packItems()
     {
         return $this->hasMany(PackItem::class);

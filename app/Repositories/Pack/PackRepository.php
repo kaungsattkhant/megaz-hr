@@ -13,6 +13,36 @@ use Illuminate\Support\Facades\DB;
 
 class PackRepository implements PackRepositoryInterface
 {
+    public function listAllData(Request $request)
+    {
+        if ($request->per_page || $request->page) {
+
+            $totalCount = Pack::with('menu')->count();
+            $pageNumber = 1;
+            $perPage = 20;
+            if ($request->page) {
+                $pageNumber = $request->page;
+            }
+            if ($request->per_page) {
+                $perPage = $request->per_page;
+            }
+            $skip = ($pageNumber - 1) * $perPage;
+            $packs = Pack::with('menu')
+                ->skip($skip)
+                ->take($perPage)
+                ->get();
+            $paginationData = MakePaginationData($request, $totalCount, 'packs');
+            $paginationData['packs'] = $packs;
+
+            return $paginationData;
+        } else {
+
+            $packs = Pack::with('menu')->get();
+            return $packs;
+        }
+    }
+
+
     public function createPack(array $data)
     {
         DB::beginTransaction();
@@ -21,7 +51,7 @@ class PackRepository implements PackRepositoryInterface
             $menu = Menu::find($data['menu_id']);
             $menuItems = $menu->items;
 
-             for ($i = 0; $i < $data['quantity']; $i++) {
+            for ($i = 0; $i < $data['quantity']; $i++) {
                 $pack = Pack::create([
                     'menu_id' => $data['menu_id'],
                     'date' => CurrentTime(),
@@ -45,9 +75,8 @@ class PackRepository implements PackRepositoryInterface
                         }
                     }
                     $stockInInventory = $enterInventoryValue - $outInventroyValue;
-                    if($stockInInventory < $item->pivot->weight)
-                    {
-                        ResponseMessage('Stock is not enough',402);
+                    if ($stockInInventory < $item->pivot->weight) {
+                        ResponseMessage('Stock is not enough', 402);
                     }
                     $packItem = PackItem::create([
                         'pack_id' => $pack->id,
@@ -71,5 +100,4 @@ class PackRepository implements PackRepositoryInterface
             return ResponseMessage($e->getMessage(), 402);
         }
     }
-
 }

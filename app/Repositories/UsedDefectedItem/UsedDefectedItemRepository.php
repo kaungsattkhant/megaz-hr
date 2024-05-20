@@ -54,12 +54,42 @@ class UsedDefectedItemRepository implements UsedDefectedItemRepositoryInterface
             return $usedDefectedItem;
         }
     }
+
+
     public function createData(array $data)
     {
         DB::beginTransaction();
         try {
-            $item = Item::find($data['item_id']);
-            $itemInventories = InventoryLedgerItem::where('item_id', $data['item_id'])->get();
+            $uomConversion = UomConversion::where('base_unit_id', $data['base_uom_id'])->where('conversion_unit_id', $data['uom_id'])->first();
+            if(!$uomConversion)
+            {
+                ResponseMessage('Uom Conversion not found',404);
+            }
+            $data['uom_conversion_id'] = $uomConversion->id;
+            $data['created_by'] = UserData()->id;
+            $data['date'] = CurrentTime();
+            $usedDefectedItem = UsedDefectedItem::create($data);
+            DB::commit();
+            return $usedDefectedItem;
+        } catch (\Exception $e) {
+            DB::rollBack();
+            ResponseMessage($e->getMessage(), 402);
+            throw $e;
+        }
+    }
+
+    public function confirmUsedDefect(int $id)
+    {
+        DB::beginTransaction();
+        try {
+            $usedDefectItem = UsedDefectedItem::find($id);
+            $usedDefectItem->confirmed_by = UserData()->id;
+            $usedDefectItem->is_confirmed = 1;
+            $usedDefectItem->confirmed_at = CurrentTime();
+            $usedDefectItem->save();
+
+            $item = Item::find($usedDefectItem->item_id);
+            $itemInventories = InventoryLedgerItem::where('item_id', $usedDefectItem->item_id)->get();
             $enterInventoryValue = 0;
             $outInventroyValue = 0;
 
@@ -71,39 +101,34 @@ class UsedDefectedItemRepository implements UsedDefectedItemRepositoryInterface
                 }
             }
             $stockInInventory = $enterInventoryValue - $outInventroyValue;
+
+            $uomConversion = UomConversion::find($usedDefectItem->uom_conversion_id);
+
             $latestItemPrice = $item->item_prices()->orderBy('created_at', 'desc')->first();
-            if ($latestItemPrice->uom_id == $data['uom_id']) {
-                $value = $data['quantity'] * $item->uomConversion->conversion;
-            } else if ($data['base_uom_id'] == $data['uom_id']) {
-                $uomRate = UomConversion::where('base_unit_id', $data['uom_id'])->where('conversion_unit_id', $latestItemPrice->uom_id)->first();
-                // dd($uomRate->conversion);
-                $value = $data['quantity'] * $uomRate->conversion;
+            if ($latestItemPrice->uom_id == $usedDefectItem->uom_id) {
+                $value = $usedDefectItem->quantity * $item->uomConversion->conversion;
+            } else if ($uomConversion->base_unit_id == $usedDefectItem->uom_id) {
+                $uomRate = UomConversion::where('base_unit_id', $usedDefectItem->uom_id)->where('conversion_unit_id', $latestItemPrice->uom_id)->first();
+                if (!$uomRate) {
+                    ResponseMessage('Please select appropriate Uom', 402);
+                }
+                $value = $usedDefectItem->quantity * $uomRate->conversion;
             } else {
                 ResponseMessage('Given Uom cannot be caculate, please selecte proper Uom', 402);
             }
             if ($value > $stockInInventory) {
                 ResponseMessage("Stock is not enough", 402);
             }
-
-            $uomConversion = UomConversion::where('base_unit_id', $data['base_uom_id'])->where('conversion_unit_id', $data['uom_id'])->first();
-            $data['uom_conversion_id'] = $uomConversion->id;
-            $data['created_by'] = UserData()->id;
-            $data['date'] = CurrentTime();
-            $usedDefectedItem = UsedDefectedItem::create($data);
-
             $inventoryId = UserData()->department->inventory->inventory_id;
-
-            $inventoryLedger = (new StoreInventory($inventoryId))->storeToInventoryLedger($usedDefectedItem, 'used_defect_item', 'out');
+            $inventoryLedger = (new StoreInventory($inventoryId))->storeToInventoryLedger($usedDefectItem, 'used_defect_item', 'out');
 
             $inventoryLedger->inventory_ledger_items()->create([
-                'item_id' => $item->id,
+                'item_id' => $usedDefectItem->item_id,
                 'quantity' => $value,
                 'inventory_ledger_id' => $inventoryLedger->id,
             ]);
-
-            $inventoryLedgerItem = InventoryLedgerItem::where('item_id', $data['item_id'])->first();
             DB::commit();
-            return $usedDefectedItem;
+            ResponseMessage("Successfully packed",200);
         } catch (\Exception $e) {
             DB::rollBack();
             ResponseMessage($e->getMessage(), 402);

@@ -26,4 +26,10 @@ class UsedDefectedAPIController extends Controller
         $usedDefect = $this->usedDefectRepo->createData($request->all());
         ResponseData($usedDefect);
     }
+
+    public function usedDefectConfirm(int $id)
+    {
+        // dd($id);
+        $usedDefect = $this->usedDefectRepo->confirmUsedDefect($id);
+    }
 }
