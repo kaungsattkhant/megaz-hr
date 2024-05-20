@@ -67,6 +67,7 @@ class UsedDefectedItemRepository implements UsedDefectedItemRepositoryInterface
             }
             $data['uom_conversion_id'] = $uomConversion->id;
             $data['created_by'] = UserData()->id;
+            $data['inventory_id'] = UserData()->department->inventory->inventory_id;
             $data['date'] = CurrentTime();
             $usedDefectedItem = UsedDefectedItem::create($data);
             DB::commit();
@@ -119,7 +120,7 @@ class UsedDefectedItemRepository implements UsedDefectedItemRepositoryInterface
             if ($value > $stockInInventory) {
                 ResponseMessage("Stock is not enough", 402);
             }
-            $inventoryId = UserData()->department->inventory->inventory_id;
+            $inventoryId = $usedDefectItem->inventory_id;
             $inventoryLedger = (new StoreInventory($inventoryId))->storeToInventoryLedger($usedDefectItem, 'used_defect_item', 'out');
 
             $inventoryLedger->inventory_ledger_items()->create([
@@ -128,7 +129,7 @@ class UsedDefectedItemRepository implements UsedDefectedItemRepositoryInterface
                 'inventory_ledger_id' => $inventoryLedger->id,
             ]);
             DB::commit();
-            ResponseMessage("Successfully packed",200);
+            ResponseMessage("Used defected Item confirmed",200);
         } catch (\Exception $e) {
             DB::rollBack();
             ResponseMessage($e->getMessage(), 402);
