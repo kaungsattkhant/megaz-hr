@@ -32,8 +32,8 @@ Route::view('/test', 'staff.index');
 #change middleware
 Route::middleware(['departments:role'])->group(function () {
     Route::view('/roles', 'roles.index')->name('roles');
-
 });
+
 Route::middleware(['departments:staff'])->group(function () {
     Route::view('/staff', 'staff.index')->name('staff');
     Route::view('/staff/create', 'staff.create')->name('staff.crate');
@@ -51,11 +51,12 @@ Route::middleware(['departments:item'])->group(function () {
 Route::middleware(['departments:task'])->group(function () {
     Route::view('/tasks', 'tasks.index')->name('tasks');
 });
+
 Route::middleware(['departments:department'])->group(function () {
     Route::view('/departments', 'departments.index')->name('departments');
 });
 
-Route::middleware(['departments:department'])->group(function () {
+Route::middleware(['departments:area'])->group(function () {
     Route::view('/areas', 'areas.index')->name('areas');
 });
 
@@ -63,48 +64,62 @@ Route::middleware(['departments:inventory'])->group(function () {
     Route::view('/inventories', 'inventories.index')->name('inventories');
     Route::view('/inventories/{inventory_id}/ledger', 'inventories.inventory_ledger')->name('inventory.ledger');
 });
+
 Route::middleware(['departments:inventory-transfer-list'])->group(function () {
     Route::view('/inventory_transfers', 'transfers.index')->name('transfers.index');
     Route::view('/inventory_transfers_list', 'transfers.transfers_list')->name('transfers.transfers');
-
-});
-Route::middleware(['departments:inventory-receive-list'])->group(function () {
     Route::view('/inventory_receives_list', 'transfers.receives_list')->name('transfers.receives');
+});
+
+Route::middleware(['departments:inventory-receive-list'])->group(function () {
+    // Route::view('/inventory_receives_list', 'transfers.receives_list')->name('transfers.receives');
 });
 Route::middleware(['departments:inventory-confirmation'])->group(function () {
 });
 #changed middleware
 
-Route::middleware(['departments:HR'])->group(function () {
+Route::middleware(['departments:complaint'])->group(function () {
 
     Route::view('/complaints', 'complains.index')->name('complains');
 
-    Route::view('/rooms', 'tables&rooms.index')->name('room');
-    Route::view('/tables', 'tables&rooms.table')->name('table');
-
+});
+Route::middleware(['departments:service'])->group(function () {
     Route::view('/services', 'services.index')->name('services');
-
-
-    Route::view('/items', 'items.index')->name('items');
+});
+Route::middleware(['departments:uom-conversion'])->group(function () {
     Route::view('/uom_conversions', 'item_uoms.index')->name('uom_conversions');
-    Route::view('/uoms','uoms.index')->name('uoms');
+});
+
+Route::middleware(['departments:menu'])->group(function () {
     Route::view('/menus', 'menus.index')->name('menus');
     Route::view('/menus/create', 'menus.create')->name('menus.create');
+});
+Route::middleware(['departments:table'])->group(function () {
+    Route::view('/tables', 'tables&rooms.table')->name('table');
+});
+Route::middleware(['departments:room'])->group(function () {
+    Route::view('/rooms', 'tables&rooms.index')->name('room');
+});
 
+Route::middleware(['departments:item-usage-forecast'])->group(function () {
     Route::view('/item_usage_forecasts', 'item_usage_forecastings.index')->name('item_usage_forecasts');
     Route::view('/item_usage_forecasts/{forecastId}/detail', 'item_usage_forecastings.detail')->name('item_usage_forecasts.detail');
     Route::view('/item_usage_forecasts/create', 'item_usage_forecastings.create')->name('item_usage_forecasts.create');
 });
-Route::middleware(['departments:HR,Finance,Management'])->group(function () {
+Route::middleware(['departments:purchase-order'])->group(function () {
     Route::view('/purchase_orders', 'purchase_orders.index')->name('purchase_orders');
     Route::view('/purchase_orders/create', 'purchase_orders.create')->name('purchase_orders.create');
     Route::view('/purchase_orders/{poId}/confirm', 'purchase_orders.confirm')->name('purchase_orders.confirm');
     Route::view('/purchase_orders/{poId}/buy', 'purchase_orders.buy')->name('purchase_orders.buy');
 });
 
-Route::middleware(['departments:Inventory'])->group(function () {
+Route::middleware(['departments:purchase-order-confirmation'])->group(function () {
     Route::view('/confirm_purchase_order_items', 'purchase_orders.confirm_poitems')->name('purchase_orders.confirm_poitems');
+});
+Route::middleware(['departments:purchase-order-item-left'])->group(function () {
     Route::view('/purchase_order_left_items', 'purchase_orders.left_items_index')->name('purchase_orders.left_items_index');
+});
+Route::middleware(['departments:purchase-order-item-left-confirmation'])->group(function () {
     Route::view('/purchase_order_left_items/{poId}', 'purchase_orders.left_items_detail')->name('purchase_orders.left_items_detail');
 });
 
@@ -112,10 +127,10 @@ Route::middleware(['departments:supplier'])->group(function () {
     Route::view('/suppliers', 'supplier.index')->name('suppliers.index');
     Route::view('/suppliers/create', 'supplier.create')->name('suppliers.create');
     Route::view('/suppliers/{id}/edit', 'supplier.edit')->name('suppliers.edit');
-
+});
+Route::middleware(['departments:cashbook'])->group(function () {
     Route::view('/accounting', 'accounting.index')->name('accountings');
     Route::view('/financial_transaction', 'financial_transaction.index')->name('financial_transactions');
-
     Route::view('/cashbook', 'cashbook.index')->name('cashbook');
     Route::view('/cashbook/office', 'cashbook.cash_office')->name('office_cash');
     Route::view('/cashbook/owner', 'cashbook.cash_owner')->name('owner_cash');
@@ -128,6 +143,8 @@ Route::middleware(['departments:supplier'])->group(function () {
     Route::view('/bankbook/kbz_special_md_gm', 'cashbook.bank_kbz_special_md_gm')->name('kbz_special_bank');
     Route::view('/bankbook/kbz_old_gm', 'cashbook.bank_kbz_old_gm')->name('kbz_old_gm_bank');
     Route::view('/bankbook/kpay', 'cashbook.bank_kpay')->name('kpay_bank');
+});
+Route::middleware(['departments:fixed-asset'])->group(function () {
     Route::view('/fixed_assets', 'fixed_assets.index')->name('fixed_assets.index');
 });
 

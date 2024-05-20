@@ -2,10 +2,8 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
-use Illuminate\Database\Seeder;
-
 use App\Models\Department;
+use Illuminate\Database\Seeder;
 
 class DepartmentSeeder extends Seeder
 {
@@ -15,11 +13,28 @@ class DepartmentSeeder extends Seeder
     public function run(): void
     {
         //
-        $names=['HR','Finance','Admin','Management', 'Catering', 'Inventory', 'Kitchen'];
-        foreach($names as $name){
-            Department::create([
+        $names = ['HR', 'Finance', 'Admin', 'Management', 'Catering', 'Inventory', 'Kitchen'];
+        $hr_features = config('common.hr_features');
+        $inventory_features = config('common.inventory_features');
+        $finance_features = config('common.finance_features');
+        foreach ($names as $name) {
+            $department = Department::create([
                 'name' => $name,
             ]);
+            switch ($name) {
+                case 'HR':
+                    $department->features()->sync($hr_features);
+                    break;
+                case 'Finance':
+                    $department->features()->sync($finance_features);
+                    break;
+                case 'Inventory':
+                    $department->features()->sync($inventory_features);
+                    break;
+                default:
+                    $department->features()->sync($hr_features);
+            }
+            $department->features()->sync($hr_features);
         }
     }
 }

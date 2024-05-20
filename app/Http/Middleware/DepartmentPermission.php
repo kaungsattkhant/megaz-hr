@@ -17,7 +17,6 @@ class DepartmentPermission
     public function handle(Request $request, Closure $next,$permission): Response
     {
         $staff = UserData();
-        
         if(checkFeaturePermission($permission)){
             return $next($request);
         }
