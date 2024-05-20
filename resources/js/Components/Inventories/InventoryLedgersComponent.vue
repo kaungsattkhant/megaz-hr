@@ -486,6 +486,7 @@ export default {
             formData.append('item_id', this.itemId);
             formData.append('uom_id', this.selectedUom.id);
             formData.append('base_uom_id', this.transferItem.base_unit_id);
+            formData.append('conversion_uom_id', this.transferItem.conversion_unit_id);
             let response = await postApiData({ url: '/api/transfers', form_data: formData, token: this.getToken() });
             if (response.success) {
                 // this.getInventoryLegderList(null);
