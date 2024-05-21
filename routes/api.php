@@ -257,7 +257,6 @@ Route::post('/menus/{id}/add_price', [MenuAPIController::class, 'addPriceToMenu'
 Route::post('/menus/{id}/is_active',[MenuAPIController::class,'menuOnOff']);
 Route::get('/menus/{id}',[MenuAPIController::class,'detailMenu']);
 
-
 Route::get('/areas/{id}/entities', [EntityAPIController::class, 'getEntityWithInvoice']);
 Route::get('/entities/{id}', [EntityAPIController::class, 'getEntityDetail']);
 Route::get('/areas/{id}/inactive_entities', [EntityAPIController::class, 'getOnlyInactiveEntities']);
