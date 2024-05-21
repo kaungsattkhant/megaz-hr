@@ -55,4 +55,10 @@ class MenuAPIController extends Controller
     {
         $menu = $this->menuRepo->menuIsActive($id);
     }
+
+    public function detailMenu(int $id)
+    {
+        $menu = $this->menuRepo->menuDetail($id);
+        ResponseData($menu);
+    }
 }

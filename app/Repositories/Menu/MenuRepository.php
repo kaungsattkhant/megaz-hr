@@ -71,6 +71,12 @@ class MenuRepository implements MenuRepositoryInterface
         return null;
     }
 
+    public function menuDetail(int $id)
+    {
+        $menu = Menu::find($id)->with('items','prices','menu_category')->first();
+        return $menu;
+    }
+
     public function menuIsActive(int $id)
     {
         DB::beginTransaction();
