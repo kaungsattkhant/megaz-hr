@@ -12,12 +12,14 @@ class PurchaseOrderTransaction
 {
     public function createTransaction($model, $transactionable_type = null,$cash_account_id)
     {
+
         $purchaseOrderItemGroupedByCategory = PurchaseOrderItem::join('items', 'purchase_order_items.item_id', '=', 'items.id')
             ->join('categories', 'items.category_id', '=', 'categories.id')
             ->select('categories.name', 'items.category_id', DB::raw('SUM(purchase_order_items.quantity * purchase_order_items.amount) as total_amount'))
-            ->groupBy('items.category_id')
+            ->groupBy('items.category_id','categories.name')
             ->where('purchase_order_id', $model->id)
             ->get();
+
         $data['date'] = now();
         $data['created_by'] = UserData()->id;
         $data['transactionable_id'] = $model->id;
