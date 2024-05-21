@@ -61,4 +61,12 @@ class MenuAPIController extends Controller
         $menu = $this->menuRepo->menuDetail($id);
         ResponseData($menu);
     }
+
+    public function menuEdit(Request $request,int $id)
+    {
+        $data = $request->except('items');
+        $items = json_decode($request->items, true)['items'];
+        $menu = $this->menuRepo->editMenu($id, $data, $items);
+        ResponseData($menu);
+    }
 }
