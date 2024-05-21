@@ -76,11 +76,9 @@
                                         {{ menu.prices[0].price }}
                                     </td>
                                     <td class="whitespace-nowrap ">
-                                        <!-- <button
-                                    data-te-toggle="modal" data-te-target="#deleteModal"
-                                        id="edit-btn" class="pr-1">
-                                        <i class="fas fa-trash-alt"></i>
-                                    </button> -->
+                                        <a :href="`/menus/${menu.id}/edit`" id="edit-btn" class="pr-1">
+                                            <i class="fas fa-pen"></i>
+                                        </a>
                                         <input :checked="menu.is_active == 1" @change="isActiveToggled(menu.id)"
                                             class="me-2 mt-[0.3rem] h-3.5 w-8 appearance-none rounded-[0.4375rem] bg-black/25 before:pointer-events-none before:absolute before:h-3.5
                                     before:w-3.5 before:rounded-full before:bg-transparent before:content-[''] after:absolute after:z-[2] after:-mt-[0.1875rem] after:h-5

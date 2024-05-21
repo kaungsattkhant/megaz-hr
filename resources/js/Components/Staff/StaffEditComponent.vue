@@ -424,6 +424,7 @@ export default {
             let response = await getApiData({ url: url, token: this.getToken() });
             if (response.success == true) {
                 this.staffDetailData = response.data;
+                // this.getInventoryList(this.staffDetailData.department_id);
                 this.name = this.staffDetailData.name;
                 this.dob = this.staffDetailData.birthdate;
                 this.selectedGender = this.staffDetailData.gender;
@@ -455,7 +456,7 @@ export default {
                 this.state = this.staffDetailData.state;
                 this.city = this.staffDetailData.city;
                 this.editFeatureList = this.staffDetailData.features;
-                console.log(this.editFeatureList);
+                // console.log(this.editFeatureList);
 
             }
         },
@@ -553,10 +554,18 @@ export default {
             if(this.selectedDepartment.features.length > 0){
                 this.featureList = this.selectedDepartment.features;
             }
+            // console.log(this.selectedDepartment.inventories);
+            this.selectedDepartment.inventories.forEach((inventoryData)=>{
+                this.inventories.push(inventoryData.inventory);
+            });
         },
 
-        async getInventoryList() {
-            let response = await getApiData({ url: `/api/get_inventory`, token: this.getToken() });
+        async getInventoryList(departmentId) {
+            let url = `/api/get_inventory`;
+            if(departmentId){
+                url = `${url}?department_id=${departmentId}`;
+            }
+            let response = await getApiData({ url: url, token: this.getToken() });
             if (response.data) {
                 this.inventories = response.data;
             }
@@ -775,7 +784,7 @@ export default {
         this.getGenderList();
         this.getDepartmentList();
         // this.getRoleList();
-        this.getInventoryList();
+        // this.getInventoryList();
         this.getStateList();
     },
 
