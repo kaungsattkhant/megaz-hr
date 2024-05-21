@@ -38,13 +38,13 @@
                             </li>
                             <li>
                                 <a href="{{ route('uoms') }}" class="flex items-center @yield('uoms')">
-                                    <i class="fal fa-hand-receiving  pr-3"></i>
+                                    <i class="fal fa-balance-scale  pr-3"></i>
                                     UOMs
                                 </a>
                             </li>
                             <li>
                                 <a href="{{ route('uom_conversions') }}" class="flex items-center @yield('uom_conversions')">
-                                    <i class="fal fa-hand-receiving  pr-3"></i>
+                                    <i class="fal fa-balance-scale  pr-3"></i>
                                     UOM Conversions
                                 </a>
                             </li>
@@ -64,20 +64,20 @@
 
                             <li>
                                 <a href="{{ route('room') }}" class="flex items-center @yield('room')">
-                                    <i class="fal fa-user  pr-3"></i>
+                                    <i class="fal fa-microphone-alt  pr-3"></i>
                                     Room
                                 </a>
                             </li>
 
                             <li>
                                 <a href="{{ route('table') }}" class="flex items-center @yield('table')">
-                                    <i class="fal fa-user  pr-3"></i>
+                                    <i class="fal fa-utensils  pr-3"></i>
                                     Table
                                 </a>
                             </li>
                             <li>
                                 <a href="{{ route('services') }}" class="flex items-center @yield('services')">
-                                    <i class="fal fa-user  pr-3"></i>
+                                    <i class="fal fa-users-cog  pr-3"></i>
                                     Services
                                 </a>
                             </li>
@@ -89,7 +89,7 @@
                             </li>
                             <li>
                                 <a href="{{ route('complains') }}" class="flex items-center @yield('complains')">
-                                    <i class="fal fa-user  pr-3"></i>
+                                    <i class="fal fa-envelope-open-text  pr-3"></i>
                                     Complaints
                                 </a>
                             </li>
@@ -232,7 +232,7 @@
                             </li>
                             <li>
                                 <a href="{{ route('purchase_orders.left_items_index') }}"
-                                    class="flex items-center @yield('purchase_order_left_items')">
+                                    class="flex items-baseline @yield('purchase_order_left_items')">
                                     <i class="fal fa-truck-loading  pr-3"></i>
                                     Purchase Orders with Left Items
                                 </a>
@@ -257,19 +257,19 @@
                         @endif
                         <li>
                             <a href="{{ route('transfers.index') }}" class="flex items-center @yield('inventory_histories')">
-                                <i class="fal fa-user  pr-3"></i>
+                                <i class="fal fa-inventory  pr-3"></i>
                                 Inventory Transfer Histories
                             </a>
                         </li>
                         <li>
                             <a href="{{ route('transfers.receives') }}" class="flex items-center @yield('inventory_receives')">
-                                <i class="fal fa-user  pr-3"></i>
+                                <i class="fal fa-inventory  pr-3"></i>
                                 Inventory Receives List
                             </a>
                         </li>
                         <li>
                             <a href="{{ route('transfers.transfers') }}" class="flex items-center @yield('inventory_transfers')">
-                                <i class="fal fa-user  pr-3"></i>
+                                <i class="fal fa-inventory  pr-3"></i>
                                 Inventory Transfers List
                             </a>
                         </li>
