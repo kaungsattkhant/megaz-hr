@@ -268,8 +268,9 @@ export default {
                 this.name = this.menu.name;
                 this.price = this.menu.prices[this.menu.prices.length - 1].price;
                 setTimeout(()=>{
+                    this.reconstructMenuCategory(this.menu.menu_category_id);
                     this.reconstructAttachedIngredients(this.menu.items);
-                }, 200);
+                }, 700);
             }
         },
 
@@ -293,6 +294,14 @@ export default {
             });
         },
 
+        reconstructMenuCategory(previousMenuCategoryId){
+            this.menuCategoryList.forEach((menuCategory)=>{
+                if(menuCategory.id == previousMenuCategoryId){
+                    this.selectedMenuCategory = menuCategory;
+                }
+            });
+        },
+
         handleFileChange(event) {
             const selectedFile = event.target.files[0];
             this.selectedImage = selectedFile;
@@ -302,15 +311,15 @@ export default {
             let response = await getApiData({ url: `/api/menu_categories`, token: this.getToken() });
             if (response.data) {
                 this.menuCategoryList = response.data;
-                if(this.menu){
-                    setTimeout(()=>{
-                        this.menuCategoryList.forEach((menuCategory)=>{
-                            if(menuCategory.id == this.menu.menu_category_id){
-                                this.selectedMenuCategory = menuCategory;
-                            }
-                        });
-                    }, 200);
-                }
+                // if(this.menu){
+                //     setTimeout(()=>{
+                //         this.menuCategoryList.forEach((menuCategory)=>{
+                //             if(menuCategory.id == this.menu.menu_category_id){
+                //                 this.selectedMenuCategory = menuCategory;
+                //             }
+                //         });
+                //     }, 500);
+                // }
             }
         },
 
@@ -395,7 +404,7 @@ export default {
                 formData.append('items', menuItems);
                 formData.append('image',this.selectedImage);
 
-                let response = await postApiData({ url: `/api/menus`, form_data: formData, token: this.getToken() });
+                let response = await postApiData({ url: `/api/menus/${this.menu.id}`, form_data: formData, token: this.getToken() });
 
                 if (response.success) {
                     window.location.replace(`/menus`);
@@ -406,9 +415,9 @@ export default {
 
     created() {
         this.getUomList();
-        this.getMenuDetail();
         this.getMenuCategoryList();
         this.getItemCategoryList();
+        this.getMenuDetail();
     },
 
     mounted() {

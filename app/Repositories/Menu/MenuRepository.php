@@ -73,7 +73,8 @@ class MenuRepository implements MenuRepositoryInterface
 
     public function menuDetail(int $id)
     {
-        $menu = Menu::find($id)->with('items.uoms', 'prices', 'menu_category')->first();
+        // $menu = Menu::find($id)->with('items.uoms', 'prices', 'menu_category')->first();
+        $menu = Menu::with('items.uoms', 'prices', 'menu_category')->find($id);
         return $menu;
     }
 
