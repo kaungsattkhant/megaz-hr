@@ -66,8 +66,7 @@ class UsedDefectedItemRepository implements UsedDefectedItemRepositoryInterface
                 ResponseMessage('Uom Conversion not found',404);
             }
             $data['uom_conversion_id'] = $uomConversion->id;
-            $data['created_by'] = UserData()->id;
-            $data['inventory_id'] = UserData()->department->inventory->inventory_id;
+            $data['created_by'] = UserData()->id;;
             $data['date'] = CurrentTime();
             $usedDefectedItem = UsedDefectedItem::create($data);
             DB::commit();
