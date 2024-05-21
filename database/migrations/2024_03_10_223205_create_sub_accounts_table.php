@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('name');
             $table->unsignedBigInteger('head_account_id');
-            $table->boolean('is_available')->default(1);
+            $table->boolean('is_active')->default(1);
             $table->timestamps();
         });
     }
