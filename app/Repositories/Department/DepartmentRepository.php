@@ -27,7 +27,7 @@ class DepartmentRepository implements DepartmentRepositoryInterface
 
             return $paginationData;
         } else {
-            $departments = Department::with('inventories','features')->get();
+            $departments = Department::with('inventories.inventory','features')->get();
             return $departments;
         }
     }

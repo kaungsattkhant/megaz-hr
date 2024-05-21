@@ -92,4 +92,25 @@ class MenuRepository implements MenuRepositoryInterface
             throw $e;
         }
     }
+
+    public function editMenu(int $id,array $data)
+    {
+        $menu = Menu::find($id);
+        if(isset($data['image'])){
+            $imageData = $data['image'];
+            $extension = $imageData->getClientOriginalExtension();
+            $hashedName = md5(uniqid() . microtime()) . '.' . $extension;
+            $data['image_path'] = $imageData->storeAs('images', $hashedName, 'public');
+            $data['image_url'] = Storage::url($data['image_path']);
+        }
+
+        $menu->update($data);
+        if (isset($data['price'])) {
+           $menuPrices = MenuPrice::where('menu_id',$id)->latest();
+           $menuPrices->price = $data['price'];
+           $menuPrices->save();
+        }
+
+
+    }
 }
