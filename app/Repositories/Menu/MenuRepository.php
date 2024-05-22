@@ -113,8 +113,8 @@ class MenuRepository implements MenuRepositoryInterface
             if (isset($data['price'])) {
                 $this->updateMenuPrice($menu->id, $data['price']);
             }
-
             if (isset($items)) {
+                $menu->items()->detach();
                 $syncData = [];
                 foreach ($items as $item) {
                     $syncData[$item['id']] = [
@@ -123,7 +123,6 @@ class MenuRepository implements MenuRepositoryInterface
                         'is_make_pack' => $item['is_make_pack'] ? 1 : 0
                     ];
                 }
-
                 $menu->items()->sync($syncData);
             }
 
@@ -141,13 +140,11 @@ class MenuRepository implements MenuRepositoryInterface
         $menuPrice = MenuPrice::where('menu_id', $id)->latest()->first();
         if ($menuPrice) {
             if ($menuPrice->price != $price) {
-                $menuPrice->update(['price' => $price]);
+                MenuPrice::create([
+                    'menu_id' => $id,
+                    'price' => $price
+                ]);
             }
-        } else {
-            MenuPrice::create([
-                'menu_id' => $id,
-                'price' => $price
-            ]);
         }
     }
 }
