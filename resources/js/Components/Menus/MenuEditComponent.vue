@@ -402,7 +402,10 @@ export default {
                 formData.append('name', this.name);
                 formData.append('price', this.price);
                 formData.append('items', menuItems);
-                formData.append('image',this.selectedImage);
+                if(this.selectedImage)
+                {
+                    formData.append('image',this.selectedImage);
+                }
 
                 let response = await postApiData({ url: `/api/menus/${this.menu.id}`, form_data: formData, token: this.getToken() });
 
