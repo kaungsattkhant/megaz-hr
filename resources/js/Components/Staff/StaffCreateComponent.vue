@@ -23,11 +23,20 @@
                 <label for="" class="label-form mb-3">
                     Gender
                 </label>
-                <select name="" id="" v-model="selectedGender" class="input-ui h-[34px]">
+                <div class="bg-white mb-0 w-full text-sm inline-block h-[34px]" data-te-select-wrapper-ref>
+                    <select data-te-select-init data-te-select-placeholder="Select Gender" data-te-select-filter="true"
+                        name="" id="" v-model="selectedGender" class="input-ui h-[34px]"
+                        @change="stateSelectChanged">
+                        <option :value="gender" v-for="(gender, genderIndex) in genderList" :key="genderIndex">
+                            {{ gender.name }}
+                        </option>
+                    </select>
+                </div>
+                <!-- <select name="" id="" v-model="selectedGender" class="input-ui h-[34px]">
                     <option :value="gender" v-for="(gender, genderIndex) in genderList" :key="genderIndex">
                         {{ gender.name }}
                     </option>
-                </select>
+                </select> -->
             </div>
             <div class="mb-4 col-span-3 pb-6 rounded-md">
                 <label for="" class="label-form mb-3">
@@ -91,16 +100,18 @@
                 <label for="" class="label-form mb-3">
                     Department
                 </label>
-                <select name="" id="" v-model="selectedDepartment" class="input-ui h-[34px]"
-                    @change="departmentSelectChanged">
-                    <option :value="department" v-for="(department, departmentIndex) in departmentList"
+                <div class="bg-white mb-0 w-full text-sm inline-block h-[34px]" data-te-select-wrapper-ref>
+                    <select data-te-select-init data-te-select-placeholder="Select Department" data-te-select-filter="true"
+                        name="" id="" v-model="selectedDepartment" class="input-ui h-[34px]"
+                        @change="departmentSelectChanged">
+                        <option :value="department" v-for="(department, departmentIndex) in departmentList"
                         :key="departmentIndex"> {{ department.name }} </option>
-                    <!-- <option value="2">Table</option>
-                    <option value="3">Security</option> -->
-                </select>
+                    </select>
+                </div>
             </div>
+
             <div class="col-span-3 rounded-md mb-4 pb-6">
-                <label for="" class="label-form mb-3">
+                <!-- <label for="" class="label-form mb-3">
                     Roles
                 </label>
                 <div class="bg-white mb-0 w-full text-sm inline-block h-[34px]" data-te-select-wrapper-ref>
@@ -110,10 +121,23 @@
                             {{ role.name }}
                         </option>
                     </select>
+                </div>-->
+                <div>
+                    <label class="label-form mb-3">Roles</label>
+                    <multiselect v-model="selectedRoles" :options="roleList" :multiple="true" :close-on-select="false" :clear-on-select="false"
+                    :preserve-search="true" placeholder="Select Roles" label="name" track-by="id" :preselect-first="true">
+                        <template #selection="{ values, search, isOpen }">
+                            <span class="multiselect__single"
+                                v-if="values.length"
+                                v-show="!isOpen">{{ values.length }} roles selected</span>
+                        </template>
+                    </multiselect>
+                    <pre class="language-json" v-for="selectedRole in selectedRoles" ><code>{{ selectedRole.name }}</code></pre>
                 </div>
             </div>
+
             <div class="col-span-3 rounded-md mb-4 pb-6">
-                <label for="" class="block text-sm text-black mb-3">
+                <!-- <label for="" class="block text-sm text-black mb-3">
                     Authorized Features
                 </label>
                 <div class="bg-white mb-0 w-full text-sm inline-block" data-te-select-wrapper-ref>
@@ -124,11 +148,23 @@
                             {{ feature.name }}
                         </option>
                     </select>
+                </div> -->
+                <div>
+                    <label class="label-form mb-3">Authorized Features</label>
+                    <multiselect v-model="selectedFeatures" :options="featureList" :multiple="true" :close-on-select="false" :clear-on-select="false"
+                    :preserve-search="true" placeholder="Select Features" label="name" track-by="id" :preselect-first="true">
+                        <template #selection="{ values, search, isOpen }">
+                            <span class="multiselect__single"
+                                v-if="values.length"
+                                v-show="!isOpen">{{ values.length }} features selected</span>
+                        </template>
+                    </multiselect>
+                    <pre class="language-json" v-for="selectedFeature in selectedFeatures" ><code>{{ selectedFeature.name }}</code></pre>
                 </div>
             </div>
 
             <div class="col-span-3 rounded-md mb-4 pb-6">
-                <label for="" class="label-form mb-3">
+                <!-- <label for="" class="label-form mb-3">
                     Inventories
                 </label>
                 <div>
@@ -140,6 +176,18 @@
                             {{ inventory.name }}
                         </option>
                     </select>
+                </div> -->
+                <div>
+                    <label class="label-form mb-3">Inventories</label>
+                    <multiselect v-model="selectedInventories" :options="inventories" :multiple="true" :close-on-select="false" :clear-on-select="false"
+                    :preserve-search="true" placeholder="Select Inventories" label="name" track-by="id" :preselect-first="true">
+                        <template #selection="{ values, search, isOpen }">
+                            <span class="multiselect__single"
+                                v-if="values.length"
+                                v-show="!isOpen">{{ values.length }} inventories selected</span>
+                        </template>
+                    </multiselect>
+                    <pre class="language-json" v-for="selectedInventorie in selectedInventories" ><code>{{ selectedInventorie.name }}</code></pre>
                 </div>
             </div>
 
@@ -149,22 +197,31 @@
                 <label for="" class="label-form mb-3">
                     State
                 </label>
-                <!-- <input type="input" v-model="state" placeholder="State (Required)"
-                    class="input-ui"> -->
-                <select name="" id="" v-model="selectedState" class="input-ui" @change="stateSelectChanged">
-                    <option :value="state" v-for="(state, stateIndex) in stateList"> {{ state.name }} </option>
-                </select>
+                <div class="bg-white mb-0 w-full text-sm inline-block h-[34px]" data-te-select-wrapper-ref>
+                    <select data-te-select-init data-te-select-placeholder="Select State" data-te-select-filter="true"
+                        name="" id="" v-model="selectedState" class="input-ui h-[34px]"
+                        @change="stateSelectChanged">
+                        <option :value="state" v-for="(state, stateIndex) in stateList"> {{ state.name }} </option>
+                    </select>
+                </div>
             </div>
+
             <div class="col-span-3 rounded-md mb-4 pb-6">
                 <label for="" class="label-form mb-3">
                     City
                 </label>
+                <div class="bg-white mb-0 w-full text-sm inline-block h-[34px]" data-te-select-wrapper-ref>
+                    <select data-te-select-init data-te-select-placeholder="Select City" data-te-select-filter="true"
+                        name="" id="" v-model="selectedCity" class="input-ui h-[34px]"
+                        @change="citySelectChanged">
+                        <option :value="city" v-for="(city, cityIndex) in cityList"> {{ city.name }} </option>
+                    </select>
+                </div>
                 <!-- <input type="input" v-model="city" placeholder="City (Required)"
                     class="input-ui"> -->
-                <select name="" id="" v-model="selectedCity" class="input-ui" @change="citySelectChanged">
-                    <!-- <option value="City 1"> City 1 </option> -->
+                <!-- <select name="" id="" v-model="selectedCity" class="input-ui" @change="citySelectChanged">
                     <option :value="city" v-for="(city, cityIndex) in cityList"> {{ city.name }} </option>
-                </select>
+                </select> -->
             </div>
             <div class="col-span-3 rounded-md mb-4 pb-6">
                 <label for="" class="label-form mb-3">
@@ -340,16 +397,33 @@
 import { Modal, Ripple, initTE, Input, Select } from "tw-elements";
 import { getApiData, postApiData, deleteApiData } from '../../utilities/ajax-helpers';
 import { mapGetters } from "vuex";
+import Multiselect from 'vue-multiselect';
 import { getCurrentDate } from "../../utilities/datetime-helpers";
 
 export default {
+    components: {
+        Multiselect
+    },
     data() {
         return {
-            staffList: [],
             genderList: [],
+            selectedGender: null,
+
             departmentList: [],
+            selectedDepartment: null,
+
             roleList: [],
+            selectedRoles: [],
+            roleIds: [],
+
             featureList: [],
+            selectedFeatures: [],
+            featureIds: [],
+
+            inventories: [],
+            selectedInventories: [],
+            inventoryIds: [],
+
             stateList: [],
             selectedState: null,
             cityList: [],
@@ -364,13 +438,7 @@ export default {
             motherName: null,
             joinedDate: getCurrentDate(),
             password: null,
-            selectedGender: null,
             nrcNumber: null,
-            selectedDepartment: null,
-            selectedRoles: [],
-            roleIds: [],
-            selectedFeatures: [],
-            featureIds: [],
             state: null,
             city: null,
             address: null,
@@ -382,10 +450,6 @@ export default {
             secondaryName: null,
             secondaryPhone: null,
             secondaryRelationship: null,
-
-            inventories: [],
-            selectedInventories: [],
-            inventoryIds: [],
         };
     },
 
@@ -428,6 +492,9 @@ export default {
         async departmentSelectChanged() {
             this.featureList = [];
             this.inventories = [];
+            this.selectedRoles = [];
+            this.selectedFeatures = [];
+            this.selectedInventories = [];
             let rolesResponse = await getApiData({ url: `/api/roles?department_id=${this.selectedDepartment.id}`, token: this.getToken() });
             if (rolesResponse.data) {
                 this.roleList = rolesResponse.data;
@@ -464,7 +531,9 @@ export default {
 
         createStaffBtnClicked() {
             this.roleIds = [];
+            this.featureIds = [];
             this.inventoryIds = [];
+
             if (this.selectedDepartment.name == 'Inventory' && this.selectedInventories.length < 1) {
                 this.alertValiationMessage('inventories');
                 return 1;
@@ -474,9 +543,11 @@ export default {
                     this.inventoryIds.push(inventory.id);
                 });
             }
+
             this.selectedRoles.forEach((role) => {
                 this.roleIds.push(role.id);
             });
+
             this.selectedFeatures.forEach((feature) => {
                 this.featureIds.push(feature.id);
             });
@@ -575,16 +646,6 @@ export default {
                 return 1;
             }
 
-
-            // console.log(this.roleIds);
-            // alert(`name = ${this.name}`);
-            // alert(`phone num = ${this.phoneNumber}`);
-            // alert(`password = ${this.password}`);
-            // alert(`nrc = ${this.nrcNumber}`);
-            // alert(`department = ${this.selectedDepartment.name}`);
-            // alert(`role = ${this.selectedRole.name}`);
-            // alert(`gender = ${this.selectedGender.name}`);
-            // alert(`address = ${this.address}`);
             this.createStaff();
         },
 
@@ -669,3 +730,5 @@ export default {
     }
 }
 </script>
+
+<style src="node_modules/vue-multiselect/dist/vue-multiselect.css"></style>

@@ -15,7 +15,7 @@
             <div class="flex justify-end flex-col">
                 <button type="button"
                     class="add-btn transition duration-150 ease-in-out focus:outline-none focus:ring-0 "
-                    data-te-toggle="modal" data-te-target="#create_modal">
+                    data-te-toggle="modal" data-te-target="#create_modal" @click="addBtnClicked">
                     Add New
                 </button>
             </div>
@@ -110,7 +110,7 @@
                             <div>
                                 <label class="block text-sm text-black mb-3">Department Features</label>
                                 <multiselect v-model="selectedFeatures" :options="featureList" :multiple="true" :close-on-select="false" :clear-on-select="false"
-                                            :preserve-search="true" placeholder="Pick some" label="name" track-by="id" :preselect-first="true">
+                                            :preserve-search="true" placeholder="Select features" label="name" track-by="id" :preselect-first="true">
                                 <template #selection="{ values, search, isOpen }">
                                     <span class="multiselect__single"
                                         v-if="values.length"
@@ -128,7 +128,7 @@
                             data-te-modal-dismiss aria-label="Close">
                             Cancel
                         </button>
-                        <button type="button" @click="createDepartmentsBtnClicked"
+                        <button type="button" @click="confirmCreateBtnClicked"
                             class="add-btn focus:outline-none focus:ring-0 " data-te-modal-dismiss>
                             Create
                         </button>
@@ -223,7 +223,7 @@
                             <div>
                                 <label class="block text-sm text-black mb-3">Department Features</label>
                                 <multiselect v-model="selectedFeatures" :options="featureList" :multiple="true" :close-on-select="false" :clear-on-select="false"
-                                            :preserve-search="true" placeholder="Pick some" label="name" track-by="id" :preselect-first="true">
+                                            :preserve-search="true" placeholder="Select features" label="name" track-by="id" :preselect-first="true">
                                 <template #selection="{ values, search, isOpen }">
                                     <span class="multiselect__single"
                                         v-if="values.length"
@@ -347,7 +347,11 @@
                 this.editName = null;
             },
 
-            createDepartmentsBtnClicked(){
+            addBtnClicked(){
+                this.selectedFeatures = [];
+            },
+
+            confirmCreateBtnClicked(){
                 if(!this.name){
                     this.alertValidationMessage('name');
                     return 1;
