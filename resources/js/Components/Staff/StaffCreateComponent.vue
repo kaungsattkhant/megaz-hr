@@ -506,7 +506,9 @@ export default {
                // this.inventories.push(inventoryData.inventory);
             // });
 
-            this.inventories.push(this.selectedDepartment.inventory.inventory);
+            if(this.selectedDepartment.inventory){
+                this.inventories.push(this.selectedDepartment.inventory.inventory);
+            }
         },
 
         async getInventoryList() {

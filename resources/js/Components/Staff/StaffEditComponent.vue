@@ -451,7 +451,10 @@ export default {
                 //         this.inventories.push(inventoryData.inventory);
                 //     });
                 // }
-                this.inventories.push(this.selectedDepartment.inventory.inventory);
+                if(this.selectedDepartment.inventory){
+                    this.inventories.push(this.selectedDepartment.inventory.inventory);
+                }
+
 
                 if (this.staff.inventories.length > 0) {
                     this.selectedInventories = this.staff.inventories;
@@ -494,7 +497,9 @@ export default {
             // this.selectedDepartment.inventories.forEach((inventoryData) => {
             //     this.inventories.push(inventoryData.inventory);
             // });
-            this.inventories.push(this.selectedDepartment.inventory.inventory);
+            if(this.selectedDepartment.inventory){
+                this.inventories.push(this.selectedDepartment.inventory.inventory);
+            }
         },
 
         async getStateList() {
