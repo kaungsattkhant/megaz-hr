@@ -60,7 +60,7 @@ class UsedDefectedItemRepository implements UsedDefectedItemRepositoryInterface
     {
         DB::beginTransaction();
         try {
-            $uomConversion = UomConversion::where('base_unit_id', $data['base_uom_id'])->where('conversion_unit_id', $data['uom_id'])->first();
+            $uomConversion = UomConversion::where('base_unit_id',$data['uom_id'])->where('conversion_unit_id', $data['base_uom_id'])->first();
             if(!$uomConversion)
             {
                 ResponseMessage('Uom Conversion not found',404);

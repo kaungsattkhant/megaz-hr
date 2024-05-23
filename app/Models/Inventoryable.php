@@ -20,7 +20,7 @@ class Inventoryable extends Model
 
     public function inventory()
     {
-        return $this->belongsTo(\App\Models\inventory::class);
+        return $this->belongsTo(\App\Models\Inventory::class);
     }
 
 
