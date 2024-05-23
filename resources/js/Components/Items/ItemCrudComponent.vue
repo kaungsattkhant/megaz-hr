@@ -257,7 +257,7 @@
                     </div>
                     <div class="mb-4">
                         <label for="" class="label-form mb-3">
-                            Base Unit Uom
+                            Base Unit Uom (Inventory သိမ်းဆည်း unit)
                         </label>
                         <select name="" id="" v-model="selectedBaseUom" class="input-ui">
                             <option :value="uom" v-for="(uom, uomIndex) in uomList" :key="uomIndex"> {{ uom.name }}
