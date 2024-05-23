@@ -111,17 +111,6 @@
             </div>
 
             <div class="col-span-3 rounded-md mb-4 pb-6">
-                <!-- <label for="" class="label-form mb-3">
-                    Roles
-                </label>
-                <div class="bg-white mb-0 w-full text-sm inline-block h-[34px]" data-te-select-wrapper-ref>
-                    <select data-te-select-init data-te-select-placeholder="Select Roles" data-te-select-filter="true"
-                        name="" id="" multiple v-model="selectedRoles" class="input-ui h-[34px]">
-                        <option :value="role" v-for="(role, roleIndex) in roleList" :key="roleIndex">
-                            {{ role.name }}
-                        </option>
-                    </select>
-                </div>-->
                 <div>
                     <label class="label-form mb-3">Roles</label>
                     <multiselect v-model="selectedRoles" :options="roleList" :multiple="true" :close-on-select="false" :clear-on-select="false"
@@ -132,23 +121,13 @@
                                 v-show="!isOpen">{{ values.length }} roles selected</span>
                         </template>
                     </multiselect>
-                    <pre class="language-json" v-for="selectedRole in selectedRoles" ><code>{{ selectedRole.name }}</code></pre>
+                    <div class="flex gap-x-2 flex-wrap mt-1">
+                        <span class="font-inter after-coma" v-for="selectedRole in selectedRoles">{{ selectedRole.name }}</span>
+                    </div>
                 </div>
             </div>
 
             <div class="col-span-3 rounded-md mb-4 pb-6">
-                <!-- <label for="" class="block text-sm text-black mb-3">
-                    Authorized Features
-                </label>
-                <div class="bg-white mb-0 w-full text-sm inline-block" data-te-select-wrapper-ref>
-                    <select data-te-select-init data-te-select-placeholder="Select Features"
-                        data-te-select-filter="true" name="" id="" multiple v-model="selectedFeatures"
-                        class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
-                        <option :value="feature" v-for="(feature, featureIndex) in featureList" :key="featureIndex">
-                            {{ feature.name }}
-                        </option>
-                    </select>
-                </div> -->
                 <div>
                     <label class="label-form mb-3">Authorized Features</label>
                     <multiselect v-model="selectedFeatures" :options="featureList" :multiple="true" :close-on-select="false" :clear-on-select="false"
@@ -159,24 +138,13 @@
                                 v-show="!isOpen">{{ values.length }} features selected</span>
                         </template>
                     </multiselect>
-                    <pre class="language-json" v-for="selectedFeature in selectedFeatures" ><code>{{ selectedFeature.name }}</code></pre>
+                    <div class="flex gap-x-2 flex-wrap mt-1">
+                        <span class="font-inter after-coma" v-for="selectedFeature in selectedFeatures">{{ selectedFeature.name }}</span>
+                    </div>
                 </div>
             </div>
 
             <div class="col-span-3 rounded-md mb-4 pb-6">
-                <!-- <label for="" class="label-form mb-3">
-                    Inventories
-                </label>
-                <div>
-                    <select :disabled="inventories.length < 1" data-te-select-init
-                        data-te-select-placeholder="Select Inventories" data-te-select-filter="true" name="" id=""
-                        multiple v-model="selectedInventories" class="input-ui h-[34px]">
-                        <option :value="inventory" v-for="(inventory, inventoryIndex) in inventories"
-                            :key="inventoryIndex">
-                            {{ inventory.name }}
-                        </option>
-                    </select>
-                </div> -->
                 <div>
                     <label class="label-form mb-3">Inventories</label>
                     <multiselect v-model="selectedInventories" :options="inventories" :multiple="true" :close-on-select="false" :clear-on-select="false"
@@ -188,10 +156,11 @@
                         </template>
                     </multiselect>
                     <pre class="language-json" v-for="selectedInventorie in selectedInventories" ><code>{{ selectedInventorie.name }}</code></pre>
+                    <div class="flex gap-x-2 flex-wrap mt-1">
+                        <span class="font-inter after-coma" v-for="selectedRole in selectedRoles">{{ selectedRole.name }}</span>
+                    </div>
                 </div>
             </div>
-
-            <!-- <div class="col-span-3"></div> -->
 
             <div class="col-span-3 rounded-md mb-4 pb-6">
                 <label for="" class="label-form mb-3">
@@ -217,12 +186,8 @@
                         <option :value="city" v-for="(city, cityIndex) in cityList"> {{ city.name }} </option>
                     </select>
                 </div>
-                <!-- <input type="input" v-model="city" placeholder="City (Required)"
-                    class="input-ui"> -->
-                <!-- <select name="" id="" v-model="selectedCity" class="input-ui" @change="citySelectChanged">
-                    <option :value="city" v-for="(city, cityIndex) in cityList"> {{ city.name }} </option>
-                </select> -->
             </div>
+
             <div class="col-span-3 rounded-md mb-4 pb-6">
                 <label for="" class="label-form mb-3">
                     Zip Code
