@@ -39,6 +39,8 @@
     .input-form{
         @apply focus:ring-0 focus:outline-none focus:shadow-none
     }
-
+    .container-card{
+        @apply bg-white mt-4 pt-4  px-5
+    }
 
     }

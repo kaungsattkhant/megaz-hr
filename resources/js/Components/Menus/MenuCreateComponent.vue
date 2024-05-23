@@ -1,6 +1,6 @@
 <template>
     <div class="px-0">
-        <div class="mb-4 mt-3">
+        <div class="mb-4 ">
             <p class="text-lg font-semibold font-inter">
                 Add Menu
             </p>
@@ -24,7 +24,7 @@
                 <label for="" class="label-form mb-3">
                     Menu Category
                 </label>
-                <div class="text-xs text-black h-8 border-b border-black rounded-bl-[4px] rounded-br-[4px] overflow-hidden inline-block"
+                <div class="bg-white mb-0 w-full text-sm inline-block h-[34px]"
                     data-te-select-wrapper-ref>
                     <select data-te-select-init data-te-select-placeholder="Select Category"
                         data-te-select-filter="true" name="" id="" v-model="menuCategoryId" class="input-ui">
@@ -46,7 +46,7 @@
                 <label for="" class="label-form mb-3">
                     Category
                 </label>
-                <div class="text-xs text-black h-8 border-b border-black rounded-bl-[4px] rounded-br-[4px] overflow-hidden inline-block"
+                <div class="bg-white mb-0 w-full text-sm inline-block h-[34px]"
                     data-te-select-wrapper-ref>
                     <select data-te-select-init data-te-select-placeholder="Select Category"
                         data-te-select-filter="true" name="" id="" v-model="selectedItemCategory" class="input-ui"
@@ -61,7 +61,7 @@
                 <label for="" class="label-form mb-3">
                     Ingredients
                 </label>
-                <div class="text-xs text-black h-8 border-b border-black rounded-bl-[4px] rounded-br-[4px] overflow-hidden inline-block"
+                <div class="bg-white mb-0 w-full text-sm inline-block h-[34px]"
                     data-te-select-wrapper-ref>
                     <select data-te-select-init data-te-select-placeholder="Select Item" data-te-select-filter="true"
                         name="" id="" v-model="selectedItem" class="input-ui">
@@ -89,8 +89,8 @@
             <div class="mb-0 col-span-3 rounded-md">
                 <label for="" class="label-form mb-3">
                     UOM
-                </label>
-                <div class="text-xs text-black h-8 border-b border-black rounded-bl-[4px] rounded-br-[4px] overflow-hidden inline-block"
+                </label>4
+                <div class="bg-white mb-0 w-full text-sm inline-block h-[34px]"
                     data-te-select-wrapper-ref>
                     <select data-te-select-init data-te-select-placeholder="Select UOM" data-te-select-filter="true"
                         name="" id="" v-model="selectedUom" class="input-ui">

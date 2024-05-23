@@ -47,7 +47,7 @@
                         @if (checkFeaturePermission('uom'))
                             <li>
                                 <a href="{{ route('uoms') }}" class="flex items-center @yield('uoms')">
-                                    <i class="fal fa-hand-receiving  pr-3"></i>
+                                    <i class="fal fa-balance-scale  pr-3"></i>
                                     UOMs
                                 </a>
                             </li>
@@ -73,7 +73,7 @@
                         @if (checkFeaturePermission('room'))
                             <li>
                                 <a href="{{ route('room') }}" class="flex items-center @yield('room')">
-                                    <i class="fal fa-user  pr-3"></i>
+                                    <i class="fal fa-microphone-alt  pr-3"></i>
                                     Room
                                 </a>
                             </li>
@@ -82,7 +82,7 @@
                         @if (checkFeaturePermission('table'))
                             <li>
                                 <a href="{{ route('table') }}" class="flex items-center @yield('table')">
-                                    <i class="fal fa-user  pr-3"></i>
+                                    <i class="fal fa-utensils  pr-3"></i>
                                     Table
                                 </a>
                             </li>
@@ -90,7 +90,7 @@
                         @if (checkFeaturePermission('service'))
                             <li>
                                 <a href="{{ route('services') }}" class="flex items-center @yield('services')">
-                                    <i class="fal fa-user  pr-3"></i>
+                                    <i class="fal fa-users-cog  pr-3"></i>
                                     Services
                                 </a>
                             </li>
@@ -106,7 +106,7 @@
                         @if (checkFeaturePermission('complaint'))
                             <li>
                                 <a href="{{ route('complains') }}" class="flex items-center @yield('complains')">
-                                    <i class="fal fa-user  pr-3"></i>
+                                    <i class="fal fa-envelope-open-text  pr-3"></i>
                                     Complaints
                                 </a>
                             </li>

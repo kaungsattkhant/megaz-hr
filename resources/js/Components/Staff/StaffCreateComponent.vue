@@ -2,10 +2,10 @@
     <div class="px-0">
         <div class="mb-6">
             <p class="text-lg font-semibold font-inter">
-                Add Staff
+                Create New Staff
             </p>
         </div>
-        <div class="grid !grid-cols-12 gap-x-4 mb-6 bg-white mt-4 pt-4  px-4">
+        <div class="grid !grid-cols-12 gap-x-4 mb-6 container-card">
 
             <div class="mb-4 col-span-3 pb-6 rounded-md">
                 <label for="" class="label-form mb-3">

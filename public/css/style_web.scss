@@ -42,7 +42,7 @@
   padding-top: 0.5rem; }
 
 .side-bar ul li a,.side-bar ul li button {
-  padding: 0.75rem 1.5rem;
+  padding: 0.75rem 1rem;
   margin: 0.25rem 0rem;
   display: flex;
   position: relative;
@@ -110,7 +110,7 @@
   font-size: 0.875rem!important;
   line-height: 1.25rem!important;
   border: 1px solid #d1d5db!important;
-  padding: 6px 6px!important;
+  padding: 9px 6px!important;
   width: 100%!important;
   background: transparent!important;
   border-radius: 0.35rem!important;
@@ -198,7 +198,7 @@
     font-family: Inter, sans-serif;
     padding-left: 32px;
     background: none;
-    padding-top: 4px;
+    padding-top: 8px;
     text-align: left;
     padding-bottom: 0; }
   
@@ -329,4 +329,12 @@
     margin: 0;
     padding: 0;
     cursor: pointer;
+  }
+
+
+  .after-coma::after{
+    content: ',';
+  }
+  .after-coma:last-child::after{
+    content: ''!important;
   }

@@ -111,14 +111,16 @@
                                 roles selected</span>
                         </template>
                     </multiselect>
-                    <pre class="language-json" v-for="selectedRole in selectedRoles"><code>{{ selectedRole.name }}</code></pre>
+                    <div class="flex gap-x-2 flex-wrap mt-1">
+                        <span class="font-inter after-coma" v-for="selectedRole in selectedRoles">{{ selectedRole.name }}</span>
+                    </div>
                 </div>
             </div>
 
             <div class="col-span-3 rounded-md mb-4 pb-6">
                 <div>
                     <label class="label-form mb-3">Authorized Features</label>
-                    <multiselect v-model="selectedFeatures" :options="featureList" :multiple="true"
+                    <multiselect class="text-xs" v-model="selectedFeatures" :options="featureList" :multiple="true"
                         :close-on-select="false" :clear-on-select="false" :preserve-search="true"
                         placeholder="Select Features" label="name" track-by="id" :preselect-first="true">
                         <template #selection="{ values, search, isOpen }">
@@ -126,7 +128,9 @@
                                 features selected</span>
                         </template>
                     </multiselect>
-                    <pre class="language-json" v-for="selectedFeature in selectedFeatures"><code>{{ selectedFeature.name }}</code></pre>
+                    <div class="flex gap-x-2 flex-wrap mt-1">
+                    <span class="font-inter after-coma" v-for="selectedFeature in selectedFeatures">{{ selectedFeature.name }}</span>
+                    </div>
                 </div>
             </div>
 
