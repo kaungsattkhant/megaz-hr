@@ -11,7 +11,7 @@ class DepartmentRepository implements DepartmentRepositoryInterface
     public function listAllData(Request $request)
     {
         if ($request->per_page || $request->page) {
-            $totalCount = Department::with('inventory','features')->count();
+            $totalCount = Department::with('inventory.inventory','features')->count();
             $pageNumber = 1;
             $perPage = 20;
             if ($request->page) {
@@ -21,13 +21,13 @@ class DepartmentRepository implements DepartmentRepositoryInterface
                 $perPage = $request->per_page;
             }
             $skip = ($pageNumber - 1) * $perPage;
-            $departments = Department::with('inventory','features')->skip($skip)->take($perPage)->get();
+            $departments = Department::with('inventory.inventory','features')->skip($skip)->take($perPage)->get();
             $paginationData = MakePaginationData($request, $totalCount, 'departments');
             $paginationData['departments'] = $departments;
 
             return $paginationData;
         } else {
-            $departments = Department::with('inventory','features')->get();
+            $departments = Department::with('inventory.inventory','features')->get();
             return $departments;
         }
     }
