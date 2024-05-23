@@ -422,7 +422,7 @@ export default {
 
                 setTimeout(() => {
                     this.reconstructStaffData();
-                }, 900);
+                }, 1300);
             }
         },
 
