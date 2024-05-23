@@ -60,13 +60,18 @@ class UsedDefectedItemRepository implements UsedDefectedItemRepositoryInterface
     {
         DB::beginTransaction();
         try {
-            $uomConversion = UomConversion::where('base_unit_id',$data['uom_id'])->where('conversion_unit_id', $data['base_uom_id'])->first();
-            if(!$uomConversion)
-            {
-                ResponseMessage('Uom Conversion not found',404);
+
+            $item = Item::find($data['item_id']);
+            $uomConversion = UomConversion::where('base_unit_id', $data['uom_id'])->where('conversion_unit_id', $item->base_uom_id)->first();
+            if (!$uomConversion) {
+                ResponseMessage('Uom Conversion not found', 404);
             }
             $data['uom_conversion_id'] = $uomConversion->id;
-            $data['created_by'] = UserData()->id;;
+            $data['created_by'] = UserData()->id;
+            if(isset($data['inventory_id']))
+            {
+                $data['inventory_id'] = UserData()->department->inventory->inventory_id;
+            }
             $data['date'] = CurrentTime();
             $usedDefectedItem = UsedDefectedItem::create($data);
             DB::commit();
@@ -105,17 +110,16 @@ class UsedDefectedItemRepository implements UsedDefectedItemRepositoryInterface
             $uomConversion = UomConversion::find($usedDefectItem->uom_conversion_id);
 
             $latestItemPrice = $item->item_prices()->orderBy('created_at', 'desc')->first();
-            if ($latestItemPrice->uom_id == $usedDefectItem->uom_id) {
-                $value = $usedDefectItem->quantity * $item->uomConversion->conversion;
-            } else if ($uomConversion->base_unit_id == $usedDefectItem->uom_id) {
-                $uomRate = UomConversion::where('base_unit_id', $usedDefectItem->uom_id)->where('conversion_unit_id', $latestItemPrice->uom_id)->first();
-                if (!$uomRate) {
-                    ResponseMessage('Please select appropriate Uom', 402);
-                }
-                $value = $usedDefectItem->quantity * $uomRate->conversion;
-            } else {
-                ResponseMessage('Given Uom cannot be caculate, please selecte proper Uom', 402);
+
+            $value = 0;
+            if ($usedDefectItem->uom_id == $uomConversion->conversion_unit_id) {
+                $value = $usedDefectItem->quantity;
+            } else if ($latestItemPrice->uom_id = $usedDefectItem->uom_id) {
+                $value = $usedDefectItem->quantity * $uomConversion->conversion;
+            }else{
+                ResponseMessage('Please select appropriate uom',402);
             }
+            // dd($value,$stockInInventory);
             if ($value > $stockInInventory) {
                 ResponseMessage("Stock is not enough", 402);
             }
@@ -128,7 +132,7 @@ class UsedDefectedItemRepository implements UsedDefectedItemRepositoryInterface
                 'inventory_ledger_id' => $inventoryLedger->id,
             ]);
             DB::commit();
-            ResponseMessage("Used defected Item confirmed",200);
+            ResponseMessage("Used defected Item confirmed", 200);
         } catch (\Exception $e) {
             DB::rollBack();
             ResponseMessage($e->getMessage(), 402);
