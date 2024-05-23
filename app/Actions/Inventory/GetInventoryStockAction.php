@@ -122,17 +122,17 @@ class GetInventoryStockAction
             ->join('uoms as base_uom', 'items.base_uom_id', '=', 'base_uom.id')
             ->join('inventory_ledgers', 'inventory_ledger_items.inventory_ledger_id', '=', 'inventory_ledgers.id')
             ->join('uom_conversions', function ($join) {
-                $join->on('items.base_uom_id', '=', 'uom_conversions.base_unit_id')
-                    ->on('latest_prices.uom_id', '=', 'uom_conversions.conversion_unit_id')
+                $join->on('latest_prices.uom_id', '=', 'uom_conversions.base_unit_id')
+                    ->on('items.base_uom_id', '=', 'uom_conversions.conversion_unit_id')
                     ->where('uom_conversions.is_active', 1);
             })
             ->select(
                 'items.name',
                 'inventory_ledger_items.item_id', // Prefix the table name here
-                'latest_prices.uom_id as conversion_unit_id',
-                'items.base_uom_id  as base_unit_id',
-                'item_uom.name as conversion_uom_name',
-                'base_uom.name as base_uom_name',
+                'latest_prices.uom_id as base_unit_id',
+                'items.base_uom_id  as conversion_unit_id',
+                'item_uom.name as base_uom_name',   
+                'base_uom.name as conversion_uom_name',
                 'uom_conversions.conversion',
                 DB::raw('(SUM(CASE WHEN action = "in" AND DATE(date) < CURDATE() THEN quantity ELSE 0 END) -
                   SUM(CASE WHEN action = "out" AND DATE(date) < CURDATE() THEN quantity ELSE 0 END)) as opening_balance'),
@@ -146,7 +146,7 @@ class GetInventoryStockAction
                   SUM(CASE WHEN action = "out" AND DATE(date) <= CURDATE() THEN quantity ELSE 0 END)) as closing_balance')
             )
             ->where('inventory_id', $this->inventoryId)
-            ->groupBy('inventory_ledger_items.item_id', 'items.name', 'latest_prices.uom_id', 'items.base_uom_id', 'uom_conversions.conversion','item_uom.name','base_uom.name');
+            ->groupBy('inventory_ledger_items.item_id', 'items.name', 'latest_prices.uom_id', 'items.base_uom_id', 'uom_conversions.conversion', 'item_uom.name', 'base_uom.name');
         $result = $itemBalances->get();
 
         return $result;
