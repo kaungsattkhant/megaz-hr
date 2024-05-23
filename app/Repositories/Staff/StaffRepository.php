@@ -40,7 +40,7 @@ class StaffRepository implements StaffRepositoryInterface
             $data = RemoveNullValues($data);
             $staff = Staff::create($data);
 
-            if ($data['department_id'] == 6) {
+            if (isset($data['inventoryIds'])) {
                 $inventoryIds = isset($data['inventoryIds']) ? json_decode($data['inventoryIds']) : [];
                 if (is_array($inventoryIds)) {
                     foreach ($inventoryIds as $inventoryId) {
