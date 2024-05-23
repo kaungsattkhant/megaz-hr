@@ -2,15 +2,12 @@
 
 namespace Database\Seeders;
 
-use Exception;
-
 use App\Models\Department;
-use App\Models\Gender;
-use App\Models\Role;
 use App\Models\Staff;
+use Exception;
+use Faker\Factory as Faker;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
-use Faker\Factory as Faker;
 
 class StaffSeeder extends Seeder
 {
@@ -20,20 +17,22 @@ class StaffSeeder extends Seeder
     public function run(): void
     {
         $departments = Department::with('roles')->get();
-        foreach($departments as $i=>$department){
-            foreach($department->roles as $departmentRole){
-                if($departmentRole->name=='Staff'){
-                    $phoneNumber=str_repeat($department->id, 2);
-                }elseif($departmentRole->name=='Supervisor'){
-                    $phoneNumber=str_repeat($department->id, 3);
+        $hr_features = config('common.hr_features');
+        $inventory_features = config('common.inventory_features');
+        $finance_features = config('common.finance_features');
+        $management_features = config('common.management_features');
+        foreach ($departments as $i => $department) {
+            foreach ($department->roles as $departmentRole) {
+                if ($departmentRole->name == 'Staff') {
+                    $phoneNumber = str_repeat($department->id, 2);
+                } elseif ($departmentRole->name == 'Supervisor') {
+                    $phoneNumber = str_repeat($department->id, 3);
+                } elseif ($departmentRole->name == 'Manager') {
+                    $phoneNumber = str_repeat($department->id, 4);
+                } elseif ($departmentRole->name == 'MD') {
+                    $phoneNumber = str_repeat($department->id, 1);
                 }
-                elseif($departmentRole->name=='Manager'){
-                    $phoneNumber=str_repeat($department->id, 4);
-                }
-                elseif($departmentRole->name=='MD'){
-                    $phoneNumber=str_repeat($department->id, 1);
-                }
-                try{
+                try {
                     DB::beginTransaction();
                     $faker = Faker::create();
                     // $phoneNumber = '09' . str_repeat($department->id, 2) . sprintf('%02d',$departmentRole->id);
@@ -45,9 +44,27 @@ class StaffSeeder extends Seeder
                         'phone_number' => $phoneNumber,
                         'password' => 'password',
                     ]);
+                    $department_id = $department->id;
+                    switch ($department_id) {
+                        case 1:
+                            $staff->features()->sync($hr_features);
+                            break;
+                        case 2:
+                            $staff->features()->sync($finance_features);
+                            break;
+                        case 4:
+                            $staff->features()->sync($management_features);
+                            break;
+                        case 6:
+                            $staff->features()->sync($inventory_features);
+                            break;
+
+                        default:
+                            $staff->features()->sync($hr_features);
+                    }
                     $staff->roles()->sync([$departmentRole->id]);
                     DB::commit();
-                }catch(Exception $e){
+                } catch (Exception $e) {
                     DB::rollBack();
                 }
             }
@@ -105,7 +122,6 @@ class StaffSeeder extends Seeder
         //         ]);
         //         $finance->roles()->sync([$financeRole->id]);
 
-
         //         $md = Staff::create([
         //             'gender_id' => $faker->numberBetween(1, 2),
         //             'department_id' => $mdRole->department_id,
@@ -115,22 +131,22 @@ class StaffSeeder extends Seeder
         //         ]);
         //         $md->roles()->sync([$mdRole->id]);
 
-            #endregion
+        #endregion
 
-            //  //for kitcheck
-            //  foreach (range(1, 20) as $index) {
-            //     $staff = Staff::create([
-            //         'gender_id' => $faker->numberBetween(1, 2),
-            //         'department_id' => $barDept->id,
-            //         'name' => $faker->name,
-            //         'phone_number' => $faker->phoneNumber,
-            //         'password' => 'password',
-            //     ]);
-            //     $randomBarRoles = $faker->randomElements($barRole, $faker->numberBetween(1, count($barRole)));
-            //     $staff->roles()->sync($randomBarRoles);
-            // }
+        //  //for kitcheck
+        //  foreach (range(1, 20) as $index) {
+        //     $staff = Staff::create([
+        //         'gender_id' => $faker->numberBetween(1, 2),
+        //         'department_id' => $barDept->id,
+        //         'name' => $faker->name,
+        //         'phone_number' => $faker->phoneNumber,
+        //         'password' => 'password',
+        //     ]);
+        //     $randomBarRoles = $faker->randomElements($barRole, $faker->numberBetween(1, count($barRole)));
+        //     $staff->roles()->sync($randomBarRoles);
+        // }
 
-            #endregion
+        #endregion
         //     DB::commit();
         // } catch (\Exception $e) {
         //     DB::rollback();

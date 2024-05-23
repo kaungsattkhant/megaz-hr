@@ -1,185 +1,173 @@
 <template>
-    <div class="flex justify-between mb-3">
-        <div class=" flex">
-            <input type="date" class="h-8 mr-2 rounded-md" v-model="fromDate">
-            <input type="date" class="h-8 mx-2 rounded-md" v-model="toDate">
+    <div>
+        <p class=" text-lg font-semibold font-inter">
+            CashBook
+        </p>
+    </div>
+    <div class="mt-4 bg-white">
+        <div class="btn-container">
+            <div class=" flex gap-x-4">
+                <input type="date" class="h-8 mr-2 rounded-md" v-model="fromDate">
+                <input type="date" class="h-8 mx-2 rounded-md" v-model="toDate">
 
-            <button class="add-btn h-8 mx-2 " @click="searchBtnClicked">Search</button>
-            <button class="add-btn h-8 mx-2 " @click="clearSearchBtnClicked">Clear</button>
+                <button class="add-btn " @click="searchBtnClicked">Search</button>
+                <button class="add-btn " @click="clearSearchBtnClicked">Clear</button>
+            </div>
+            <div class="flex justify-end flex-col">
+
+                <button type="button" class="add-btn transition duration-150 ease-in-out focus:outline-none focus:ring-0 "
+                    data-te-toggle="modal" data-te-target="#create_modal">
+                    Add New
+                </button>
+            </div>
         </div>
-        <div class="flex justify-end flex-col">
+        <div class="box-container-table">
+            <div class="overflow-x-auto">
+                <button type="button" class="mt-4 add-btn transition duration-150 ease-in-out focus:outline-none focus:ring-0 "
+                data-te-toggle="modal" data-te-target="#confirm_modal">
+                    Close Cash Book
+                </button>
+                <div class="table-container ">
+                    <table class="primary-table">
+                        <thead class="">
+                            <tr>
+                                <th scope="col" class="">
+                                    Code
+                                </th>
+                                <th scope="col" class="">
+                                    Title
+                                </th>
+                                <th scope="col" class="">
+                                    Debit
+                                </th>
+                                <th scope="col" class="">
+                                    Credit
+                                </th>
+                                <th scope="col" class="">
+                                    Type
+                                </th>
+                                <th scope="col" class="">
+                                    Remark
+                                </th>
+                                <th scope="col" class="">
+                                    Balance
+                                </th>
+                                <!-- <th scope="col" class="px-6 py-4">
 
-            <button type="button" class="add-btn transition duration-150 ease-in-out focus:outline-none focus:ring-0 "
-                data-te-toggle="modal" data-te-target="#create_modal">
-                Add New
-            </button>
+                                </th> -->
+                            </tr>
+                        </thead>
+                        <tbody>
+
+                            <div class="contents">
+                                <tr class="">
+                                    <td class="whitespace-nowrap " colspan="6"> &nbsp; </td>
+                                    <td class="whitespace-nowrap "> {{ (openingBalance).toLocaleString() }} </td>
+                                    <!-- <td class="whitespace-nowrap "> &nbsp; </td> -->
+                                </tr>
+                            </div>
+                            <!-- looping start -->
+                            <div class="contents" v-for="(cashBook, cashBookIndex) in cashBookList" :key="cashBookIndex">
+                                <tr class="">
+                                    <td class="">
+                                        {{ cashBook.id }}
+                                    </td>
+                                    <td class="whitespace-nowrap  ">
+                                        {{ cashBook.title }}
+                                    </td>
+                                    <td class="whitespace-nowrap  ">
+                                        <div v-if="cashBook.action == 'debit'">
+                                            {{ (cashBook.amount).toLocaleString() }}
+                                        </div>
+                                    </td>
+                                    <td class="whitespace-nowrap  ">
+                                        <div v-if="cashBook.action == 'credit'">
+                                            {{ (cashBook.amount).toLocaleString() }}
+                                        </div>
+                                    </td>
+                                    <td class="whitespace-nowrap  ">
+                                        {{ cashBook.type }}
+                                    </td>
+                                    <td class="whitespace-nowrap  ">
+                                        {{ cashBook.description }}
+                                    </td>
+                                    <td class="whitespace-nowrap  ">
+                                        {{ (cashBook.amount).toLocaleString() }}
+                                    </td>
+                                </tr>
+                            </div>
+
+                            <!-- looping end -->
+
+                            <div class="contents">
+                                <tr class="">
+                                    <td class="whitespace-nowrap  " colspan="6"> &nbsp; </td>
+                                    <td class="whitespace-nowrap  "> {{ (remainingBalance).toLocaleString() }} </td>
+                                    <!-- <td class="whitespace-nowrap px-6 py-4 "> &nbsp; </td> -->
+                                </tr>
+                            </div>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="mt-2 ml-2">
+                    <ul v-if="paginationGroupsCount > 1" class="list-style-none flex">
+                        <li v-if="!isFirstGroup">
+                            <button class="relative block rounded bg-transparent px-3 py-1.5 text-sm text-neutral-600 transition-all duration-300
+                            hover:bg-neutral-100 dark:text-white dark:hover:bg-neutral-700 dark:hover:text-white" @click="previousPaginationGroupBtnClicked"
+                            :disabled="isFirstGroup">
+                                Previous
+                            </button>
+                        </li>
+
+                        <li v-for="(pageNumber, pageNumberIndex) in groupedPageNumbers[currentGroup]" :key="pageNumberIndex"
+                            :aria-current="(pageNumber == currentPage) ? 'page' : ''">
+                            <button v-if="pageNumber == currentPage"
+                                class="relative block rounded bg-neutral-800 px-3 py-1.5 text-sm font-medium text-neutral-50 transition-all duration-300 dark:bg-neutral-900"
+                                :id="'paginationBtn-' + pageNumberIndex" @click="pageBtnClicked(pageNumber)">
+                                {{ pageNumber }}
+                                <span class="absolute -m-px h-px w-px overflow-hidden whitespace-nowrap border-0 p-0 [clip:rect(0,0,0,0)]">
+                                    (current)
+                                </span>
+                            </button>
+                            <button v-else
+                                class="normal-pagination relative block rounded bg-transparent px-3 py-1.5 text-sm text-neutral-600 transition-all duration-300 hover:bg-neutral-100 dark:text-white dark:hover:bg-neutral-700 dark:hover:text-white"
+                                :id="'paginationBtn-' + pageNumberIndex" @click="pageBtnClicked(pageNumber)">
+                                {{ pageNumber }}
+                            </button>
+                        </li>
+                        <li v-if="!isLastGroup">
+                            <button class="relative block rounded bg-transparent px-3 py-1.5 text-sm text-neutral-600 transition-all duration-300
+                            hover:bg-neutral-100 dark:text-white dark:hover:bg-neutral-700 dark:hover:text-white" @click="nextPaginationGroupBtnClicked"
+                            :disabled="isLastGroup">
+                                Next
+                            </button>
+                        </li>
+                    </ul>
+
+                    <ul v-else class="list-style-none flex">
+                        <li v-for="(pageNumber, pageNumberIndex) in pageNumbers" :key="pageNumberIndex"
+                            :aria-current="(pageNumber == currentPage) ? 'page' : ''">
+                            <button v-if="pageNumber == currentPage"
+                                class="relative block rounded bg-neutral-800 px-3 py-1.5 text-sm font-medium text-neutral-50 transition-all duration-300 dark:bg-neutral-900"
+                                :id="'paginationBtn-' + pageNumberIndex" @click="pageBtnClicked(pageNumber)">
+                                {{ pageNumber }}
+                                <span class="absolute -m-px h-px w-px overflow-hidden whitespace-nowrap border-0 p-0 [clip:rect(0,0,0,0)]">
+                                    (current)
+                                </span>
+                            </button>
+                            <button v-else
+                                class="normal-pagination relative block rounded bg-transparent px-3 py-1.5 text-sm text-neutral-600 transition-all duration-300 hover:bg-neutral-100 dark:text-white dark:hover:bg-neutral-700 dark:hover:text-white"
+                                :id="'paginationBtn-' + pageNumberIndex" @click="pageBtnClicked(pageNumber)">
+                                {{ pageNumber }}
+                            </button>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
         </div>
     </div>
-    <div class="block rounded-xl">
-        <div class="overflow-x-auto">
-            <button type="button" class="mt-4 add-btn transition duration-150 ease-in-out focus:outline-none focus:ring-0 "
-            data-te-toggle="modal" data-te-target="#confirm_modal">
-                Close Cash Book
-            </button>
-            <div class="overflow-hidden ">
-                <table class="min-w-full primary-table rounded-xl text-center text-sm font-light ">
-                    <thead class="border-b font-medium ">
-                        <tr>
-                            <th scope="col" class=" px-6 py-4 ">
-                                Code
-                            </th>
-                            <th scope="col" class=" px-6 py-4 ">
-                                Title
-                            </th>
-                            <th scope="col" class=" px-6 py-4 ">
-                                Debit
-                            </th>
-                            <th scope="col" class=" px-6 py-4 ">
-                                Credit
-                            </th>
-                            <th scope="col" class=" px-6 py-4 ">
-                                Type
-                            </th>
-                            <th scope="col" class=" px-6 py-4 ">
-                                Remark
-                            </th>
-                            <th scope="col" class=" px-6 py-4 ">
-                                Balance
-                            </th>
-                            <!-- <th scope="col" class="px-6 py-4">
-
-                            </th> -->
-                        </tr>
-                    </thead>
-                    <tbody>
-
-                        <div class="contents">
-                            <tr class="bg-gray rounded-lg overflow-hidden shadow-sm mb-10">
-                                <td class="whitespace-nowrap px-6 py-4 "> &nbsp; </td>
-                                <td class="whitespace-nowrap px-6 py-4 "> &nbsp; </td>
-                                <td class="whitespace-nowrap px-6 py-4 "> &nbsp; </td>
-                                <td class="whitespace-nowrap px-6 py-4 "> &nbsp; </td>
-                                <td class="whitespace-nowrap px-6 py-4 "> &nbsp; </td>
-                                <td class="whitespace-nowrap px-6 py-4 "> &nbsp; </td>
-                                <td class="whitespace-nowrap px-6 py-4 "> {{ (openingBalance).toLocaleString() }} </td>
-                                <!-- <td class="whitespace-nowrap px-6 py-4 "> &nbsp; </td> -->
-                            </tr>
-                            <tr class="">
-                                <td class=" py-2 "></td>
-                            </tr>
-                        </div>
-                        <!-- looping start -->
-                        <div class="contents" v-for="(cashBook, cashBookIndex) in cashBookList" :key="cashBookIndex">
-                            <tr class="bg-white rounded-lg overflow-hidden shadow-lg">
-                                <td class=" px-6 py-4 font-medium ">
-                                    {{ cashBook.id }}
-                                </td>
-                                <td class="whitespace-nowrap px-6 py-4 ">
-                                    {{ cashBook.title }}
-                                </td>
-                                <td class="whitespace-nowrap px-6 py-4 ">
-                                    <div v-if="cashBook.action == 'debit'">
-                                        {{ (cashBook.amount).toLocaleString() }}
-                                    </div>
-                                </td>
-                                <td class="whitespace-nowrap px-6 py-4 ">
-                                    <div v-if="cashBook.action == 'credit'">
-                                        {{ (cashBook.amount).toLocaleString() }}
-                                    </div>
-                                </td>
-                                <td class="whitespace-nowrap px-6 py-4 ">
-                                    {{ cashBook.type }}
-                                </td>
-                                <td class="whitespace-nowrap px-6 py-4 ">
-                                    {{ cashBook.description }}
-                                </td>
-                                <td class="whitespace-nowrap px-6 py-4 ">
-                                    {{ (cashBook.amount).toLocaleString() }}
-                                </td>
-                            </tr>
-                            <tr class="">
-                                <td class=" py-2 "></td>
-                            </tr>
-                        </div>
-
-                        <!-- looping end -->
-
-                        <div class="contents">
-                            <tr class="bg-gray rounded-lg overflow-hidden shadow-sm mb-10">
-                                <td class="whitespace-nowrap px-6 py-4 "> &nbsp; </td>
-                                <td class="whitespace-nowrap px-6 py-4 "> &nbsp; </td>
-                                <td class="whitespace-nowrap px-6 py-4 "> &nbsp; </td>
-                                <td class="whitespace-nowrap px-6 py-4 "> &nbsp; </td>
-                                <td class="whitespace-nowrap px-6 py-4 "> &nbsp; </td>
-                                <td class="whitespace-nowrap px-6 py-4 "> &nbsp; </td>
-                                <td class="whitespace-nowrap px-6 py-4 "> {{ (remainingBalance).toLocaleString() }} </td>
-                                <!-- <td class="whitespace-nowrap px-6 py-4 "> &nbsp; </td> -->
-                            </tr>
-                            <tr class="">
-                                <td class=" py-2 "></td>
-                            </tr>
-                        </div>
-                    </tbody>
-                </table>
-            </div>
-
-            <div class="mt-2 ml-2">
-                <ul v-if="paginationGroupsCount > 1" class="list-style-none flex">
-                    <li v-if="!isFirstGroup">
-                        <button class="relative block rounded bg-transparent px-3 py-1.5 text-sm text-neutral-600 transition-all duration-300
-                        hover:bg-neutral-100 dark:text-white dark:hover:bg-neutral-700 dark:hover:text-white" @click="previousPaginationGroupBtnClicked"
-                        :disabled="isFirstGroup">
-                            Previous
-                        </button>
-                    </li>
-
-                    <li v-for="(pageNumber, pageNumberIndex) in groupedPageNumbers[currentGroup]" :key="pageNumberIndex"
-                        :aria-current="(pageNumber == currentPage) ? 'page' : ''">
-                        <button v-if="pageNumber == currentPage"
-                            class="relative block rounded bg-neutral-800 px-3 py-1.5 text-sm font-medium text-neutral-50 transition-all duration-300 dark:bg-neutral-900"
-                            :id="'paginationBtn-' + pageNumberIndex" @click="pageBtnClicked(pageNumber)">
-                            {{ pageNumber }}
-                            <span class="absolute -m-px h-px w-px overflow-hidden whitespace-nowrap border-0 p-0 [clip:rect(0,0,0,0)]">
-                                (current)
-                            </span>
-                        </button>
-                        <button v-else
-                            class="normal-pagination relative block rounded bg-transparent px-3 py-1.5 text-sm text-neutral-600 transition-all duration-300 hover:bg-neutral-100 dark:text-white dark:hover:bg-neutral-700 dark:hover:text-white"
-                            :id="'paginationBtn-' + pageNumberIndex" @click="pageBtnClicked(pageNumber)">
-                            {{ pageNumber }}
-                        </button>
-                    </li>
-                    <li v-if="!isLastGroup">
-                        <button class="relative block rounded bg-transparent px-3 py-1.5 text-sm text-neutral-600 transition-all duration-300
-                        hover:bg-neutral-100 dark:text-white dark:hover:bg-neutral-700 dark:hover:text-white" @click="nextPaginationGroupBtnClicked"
-                        :disabled="isLastGroup">
-                            Next
-                        </button>
-                    </li>
-                </ul>
-
-                <ul v-else class="list-style-none flex">
-                    <li v-for="(pageNumber, pageNumberIndex) in pageNumbers" :key="pageNumberIndex"
-                        :aria-current="(pageNumber == currentPage) ? 'page' : ''">
-                        <button v-if="pageNumber == currentPage"
-                            class="relative block rounded bg-neutral-800 px-3 py-1.5 text-sm font-medium text-neutral-50 transition-all duration-300 dark:bg-neutral-900"
-                            :id="'paginationBtn-' + pageNumberIndex" @click="pageBtnClicked(pageNumber)">
-                            {{ pageNumber }}
-                            <span class="absolute -m-px h-px w-px overflow-hidden whitespace-nowrap border-0 p-0 [clip:rect(0,0,0,0)]">
-                                (current)
-                            </span>
-                        </button>
-                        <button v-else
-                            class="normal-pagination relative block rounded bg-transparent px-3 py-1.5 text-sm text-neutral-600 transition-all duration-300 hover:bg-neutral-100 dark:text-white dark:hover:bg-neutral-700 dark:hover:text-white"
-                            :id="'paginationBtn-' + pageNumberIndex" @click="pageBtnClicked(pageNumber)">
-                            {{ pageNumber }}
-                        </button>
-                    </li>
-                </ul>
-            </div>
-        </div>
-
-
         <!-- Modal -->
         <div data-te-modal-init
             class="fixed left-0 top-0 z-[1055] hidden h-full w-full overflow-y-auto overflow-x-hidden outline-none"
@@ -431,7 +419,7 @@
             </div>
         </div>
 
-    </div>
+    
 
 </template>
 

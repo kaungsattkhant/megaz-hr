@@ -16,7 +16,7 @@ class StoreInventory
     {
         $this->inventoryId = $inventoryId;
     }
-    
+
     public function inventoryAction($model)
     {
         $morphMapName=RelationMorphName($model);
@@ -55,6 +55,6 @@ class StoreInventory
         return $inventoryLedger;
     }
 
-    
+
 
 }

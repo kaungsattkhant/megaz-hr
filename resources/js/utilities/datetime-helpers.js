@@ -46,6 +46,24 @@ export function convertToFriendlyDate(dbDateString)
     return `${month} ${day}, ${year}`;
 }
 
+export function convertToFriendlyDateTime(dbDateString)
+{
+    const date = new Date(dbDateString);
+    const options = {
+        year: 'numeric',
+        month: 'short',
+        day: '2-digit',
+        hour: 'numeric',
+        minute: '2-digit',
+        hour12: true
+      };
+
+      const formattedDate = date.toLocaleDateString('en-US', options);
+      const formattedTime = date.toLocaleTimeString('en-US', options);
+
+      return formattedTime;
+}
+
 export function getFirstDate(dbDateString)
 {
     let date = new Date(dbDateString);

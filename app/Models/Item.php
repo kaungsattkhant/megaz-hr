@@ -46,7 +46,7 @@ class Item extends BaseModel
 
     }
 
-    
+
     public function uomConversion()
     {
         return $this->hasOneThrough(
@@ -62,7 +62,7 @@ class Item extends BaseModel
     public function getItemPriceWithConversionAttribute()
 
 
-    
+
     {
         // Calculate the item price with conversion
         $itemPrice = $this->item_prices->price; // Price of the item

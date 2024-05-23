@@ -42,6 +42,7 @@ use App\Http\Controllers\API\ItemUsageForecastController;
 use App\Http\Controllers\API\PackAPIController;
 use App\Http\Controllers\API\PurchaseOrderItemLeftController;
 use App\Http\Controllers\API\UsedDefectedAPIController;
+use App\Models\UsedDefectedItem;
 
 /*
 |--------------------------------------------------------------------------
@@ -151,6 +152,7 @@ Route::middleware('auth:api')->group(function () {
     });
 
     Route::post('/packs',[PackAPIController::class,'createPack']);
+    Route::get('/packs',[PackAPIController::class,'getPacksData']);
 
     Route::resource('suppliers', SupplierController::class)->only(['index', 'store', 'show', 'destroy']);
     Route::resource('notifications',NotificationController::class)->only(['index']);
@@ -277,6 +279,7 @@ Route::post("/order_status_change",[OrderAPIController::class,'orderItemChangeSt
 
 Route::get('/used_defected_items',[UsedDefectedAPIController::class,'lisltUsedDefectedItem']);
 Route::post('/used_defected_items',[UsedDefectedAPIController::class,'createUsedDefected']);
+Route::post('/used_defected_items/{id}/confirm',[UsedDefectedAPIController::class,'usedDefectConfirm']);
 
 
 Route::get('get_inventory',[InventoryAPIController::class, 'getInventory']);

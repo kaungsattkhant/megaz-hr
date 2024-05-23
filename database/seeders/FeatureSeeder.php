@@ -22,6 +22,7 @@ class FeatureSeeder extends Seeder
             'area',
             'room',
             'table',
+            'service',
             'item',
             'uom conversion',
             'uom',
@@ -37,8 +38,9 @@ class FeatureSeeder extends Seeder
             'cashbook',
             'fixed asset',
             'customer',
+            'purchase order item left',
+            'purchase order item left confirmation'
         ];
-
         foreach ($features as $feature) {
             Feature::create([
                 'name' => Str::title($feature),

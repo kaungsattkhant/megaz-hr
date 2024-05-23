@@ -16,7 +16,7 @@ return new class extends Migration
             $table->string('account_code',25)->unique();
             $table->string('name');
             $table->unsignedInteger('sub_account_id');
-            $table->boolean('is_available')->default(1);
+            $table->boolean('is_active')->default(1);
             $table->timestamps();
         });
     }

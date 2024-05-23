@@ -61,7 +61,7 @@ class PurchaseOrderRepository implements PurchaseOrderRepositoryInterface
             if (isset($request->is_grn) && ($request->is_grn || $request->is_grn == "1")) {
                 $data['is_bought'] = 1;
             }
-            
+
             if (!$request->id) {
                 $data['created_by'] = $staff->id;
             }
@@ -119,7 +119,7 @@ class PurchaseOrderRepository implements PurchaseOrderRepositoryInterface
                                             $column => $item->quantity,
                                         ]);
                                 }
-                            } 
+                            }
                         }
                 }
                 if ($request->is_grn) {
@@ -382,6 +382,7 @@ class PurchaseOrderRepository implements PurchaseOrderRepositoryInterface
                         ResponseMessage("Inventory is required",419);
                     }
                     $inventoryId=UserData()->department->inventory->inventory_id;
+                    
                     $inventoryLedger = (new StoreInventory($inventoryId))->storeToInventoryLedger($po_item->purchase_order, 'purchase_order', 'in');
                     (new StoreInventory($inventoryId))->storeItemToInventory($inventoryLedger, $po_item);
                     #store inventory

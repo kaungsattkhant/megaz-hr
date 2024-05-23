@@ -2,6 +2,9 @@
 
 namespace App\Repositories\Pack;
 
+use App\Http\Action\Inventory\StoreInventory;
+use App\Models\InventoryLedgerItem;
+use App\Models\Item;
 use App\Models\Menu;
 use App\Models\Pack;
 use App\Models\PackItem;
@@ -10,6 +13,36 @@ use Illuminate\Support\Facades\DB;
 
 class PackRepository implements PackRepositoryInterface
 {
+    public function listAllData(Request $request)
+    {
+        if ($request->per_page || $request->page) {
+
+            $totalCount = Pack::with('menu')->count();
+            $pageNumber = 1;
+            $perPage = 20;
+            if ($request->page) {
+                $pageNumber = $request->page;
+            }
+            if ($request->per_page) {
+                $perPage = $request->per_page;
+            }
+            $skip = ($pageNumber - 1) * $perPage;
+            $packs = Pack::with('menu')
+                ->skip($skip)
+                ->take($perPage)
+                ->get();
+            $paginationData = MakePaginationData($request, $totalCount, 'packs');
+            $paginationData['packs'] = $packs;
+
+            return $paginationData;
+        } else {
+
+            $packs = Pack::with('menu')->get();
+            return $packs;
+        }
+    }
+
+
     public function createPack(array $data)
     {
         DB::beginTransaction();
@@ -18,8 +51,7 @@ class PackRepository implements PackRepositoryInterface
             $menu = Menu::find($data['menu_id']);
             $menuItems = $menu->items;
 
-
-             for ($i = 0; $i < $data['quantity']; $i++) {
+            for ($i = 0; $i < $data['quantity']; $i++) {
                 $pack = Pack::create([
                     'menu_id' => $data['menu_id'],
                     'date' => CurrentTime(),
@@ -27,12 +59,36 @@ class PackRepository implements PackRepositoryInterface
                     'created_by' => $data['created_by'],
                     'status' => 'not yet'
                 ]);
+                $inventoryId = UserData()->department->inventory->inventory_id;
+                $inventoryLedger = (new StoreInventory($inventoryId))->storeToInventoryLedger($pack, 'pack', 'out');
+
                 foreach ($menuItems as $item) {
+                    $itemInventories = InventoryLedgerItem::where('item_id', $item->id)->get();
+                    $enterInventoryValue = 0;
+                    $outInventroyValue = 0;
+
+                    foreach ($itemInventories as $itemInventory) {
+                        if ($itemInventory->inventory_ledger->action == 'in') {
+                            $enterInventoryValue += $itemInventory->quantity;
+                        } else if ($itemInventory->inventory_ledger->action == 'out') {
+                            $outInventroyValue += $itemInventory->quantity;
+                        }
+                    }
+                    $stockInInventory = $enterInventoryValue - $outInventroyValue;
+                    if ($stockInInventory < $item->pivot->weight) {
+                        ResponseMessage('Stock is not enough', 402);
+                    }
                     $packItem = PackItem::create([
                         'pack_id' => $pack->id,
                         'item_id' => $item->id,
                         'uom_id' => $item->pivot->uom_id,
                         'quantity' => $item->pivot->weight
+                    ]);
+
+                    $inventoryLedger->inventory_ledger_items()->create([
+                        'item_id' => $item->id,
+                        'quantity' => $item->pivot->weight,
+                        'inventory_ledger_id' => $inventoryLedger->id,
                     ]);
                 }
             }
@@ -44,5 +100,4 @@ class PackRepository implements PackRepositoryInterface
             return ResponseMessage($e->getMessage(), 402);
         }
     }
-
 }

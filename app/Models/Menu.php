@@ -34,4 +34,9 @@ class Menu extends BaseModel
     {
         return $this->hasOne(OrderItem::class);
     }
+
+    public function pack()
+    {
+        return $this->belongsTo(Pack::class);
+    }
 }

@@ -29,6 +29,7 @@ class DatabaseSeeder extends Seeder
             AreaSeeder::class,
             ComplaintCategorySeeder::class,
             // InventorySeeder::class,
+            FeatureSeeder::class,
             DepartmentSeeder::class,
             RoleSeeder::class,
             GenderSeeder::class,
@@ -41,7 +42,6 @@ class DatabaseSeeder extends Seeder
             HeadAccountSeeder::class,
             SubAccountSeeder::class,
             RoomAndTableSeeder::class,
-            FeatureSeeder::class,
         ]);
     }
 }
