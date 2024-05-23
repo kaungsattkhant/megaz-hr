@@ -22,7 +22,7 @@ class UomAPIController extends Controller
     {
         $uoms = $this->uomRepo->listAllData($request);
         ResponseData($uoms);
-    }
+    }   
 
     public function createUom(UomCreateRequest $request)
     {
@@ -72,11 +72,24 @@ class UomAPIController extends Controller
 
      #test
      public function getUomConversionByUom(Request $request){
-        $uom_conversion=UomConversion::where('base_unit_id',$request->po_uom_id)
-        ->where('conversion_unit_id',$request->item_uom_id)
-        ->first();
+        // $request['base_uom_id']=6;
+        // $request['item_uom_id']=7;
+        // $request['item_price']=30000;
+        // $request['quantity']=3;
+        if($request->po_uom_id==$request->item_uom_id){
+            $uom_conversion=UomConversion::where('base_unit_id',$request->po_uom_id)
+            ->where('conversion_unit_id',$request->base_uom_id)
+            ->first();
+            // $request->item_price*$request->quantity/$uom_conversion->conversion;
+        }
+        if($request->po_uom_id==$request->base_uom_id){
+            $uom_conversion=UomConversion::where('base_unit_id',$request->item_uom_id)
+            ->where('conversion_unit_id',$request->po_uom_id)
+            ->first();
+        }
         if($uom_conversion){
-            // $conversion= $uom_conversion->conversion;
+            $priceByItem=$request->item_price/$uom_conversion->conversion;
+            $uom_conversion->price=$priceByItem;
             ResponseData($uom_conversion);
         }
         ResponseMessage('Uom conversion is required');
