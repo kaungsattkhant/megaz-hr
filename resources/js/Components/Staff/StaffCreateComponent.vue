@@ -427,6 +427,7 @@ export default {
 
         async departmentSelectChanged() {
             this.featureList = [];
+            this.inventories = [];
             let rolesResponse = await getApiData({ url: `/api/roles?department_id=${this.selectedDepartment.id}`, token: this.getToken() });
             if (rolesResponse.data) {
                 this.roleList = rolesResponse.data;
@@ -434,6 +435,9 @@ export default {
             if(this.selectedDepartment.features.length > 0){
                 this.featureList = this.selectedDepartment.features;
             }
+            this.selectedDepartment.inventories.forEach((inventoryData)=>{
+                this.inventories.push(inventoryData.inventory);
+            });
         },
 
         async getInventoryList() {
@@ -656,7 +660,7 @@ export default {
         this.getGenderList();
         this.getDepartmentList();
         // this.getRoleList();
-        this.getInventoryList();
+        // this.getInventoryList();
         this.getStateList();
     },
 

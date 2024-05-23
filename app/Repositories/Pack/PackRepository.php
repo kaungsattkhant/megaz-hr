@@ -13,34 +13,30 @@ use Illuminate\Support\Facades\DB;
 
 class PackRepository implements PackRepositoryInterface
 {
-    public function listAllData(Request $request)
+    public function listAllData(Request $request,)
     {
-        if ($request->per_page || $request->page) {
+        if ($request->menu_id !== null) {
+            $query = Pack::with('menu')->where('menu_id', $request->menu_id);
+        } else {
+            $query = Pack::with('menu');
+        }
 
-            $totalCount = Pack::with('menu')->count();
-            $pageNumber = 1;
-            $perPage = 20;
-            if ($request->page) {
-                $pageNumber = $request->page;
-            }
-            if ($request->per_page) {
-                $perPage = $request->per_page;
-            }
+        if ($request->per_page || $request->page) {
+            $totalCount = $query->count();
+            $pageNumber = $request->page ?? 1;
+            $perPage = $request->per_page ?? 20;
             $skip = ($pageNumber - 1) * $perPage;
-            $packs = Pack::with('menu')
-                ->skip($skip)
-                ->take($perPage)
-                ->get();
+            $packs = $query->skip($skip)->take($perPage)->get();
             $paginationData = MakePaginationData($request, $totalCount, 'packs');
             $paginationData['packs'] = $packs;
 
             return $paginationData;
         } else {
-
-            $packs = Pack::with('menu')->get();
+            $packs = $query->get();
             return $packs;
         }
     }
+
 
 
     public function createPack(array $data)
@@ -59,6 +55,7 @@ class PackRepository implements PackRepositoryInterface
                     'created_by' => $data['created_by'],
                     'status' => 'not yet'
                 ]);
+                // dd(UserData()->department->inventory->inventory_id);
                 $inventoryId = UserData()->department->inventory->inventory_id;
                 $inventoryLedger = (new StoreInventory($inventoryId))->storeToInventoryLedger($pack, 'pack', 'out');
 

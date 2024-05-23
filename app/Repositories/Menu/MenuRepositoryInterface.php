@@ -13,4 +13,8 @@ interface MenuRepositoryInterface
     public function listAllData(Request $request);
 
     public function menuIsActive(int $id);
+
+    public function menuDetail(int $id);
+
+    public function editMenu(int $id, array $data, array $items);
 }
