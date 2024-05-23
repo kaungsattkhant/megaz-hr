@@ -97,10 +97,11 @@ class StaffRepository implements StaffRepositoryInterface
                     $rolesToAttach = $data['roles'];
                     $staff->roles()->sync($rolesToAttach);
                 }
-
                 if (isset($data['inventoryIds']) && $data['inventoryIds'] !== null) {
                     $inventoryIds = json_decode($data['inventoryIds'], true);
                     $staff->inventories()->sync($inventoryIds);
+                }else{
+                    $staff->inventories()->detach();
                 }
 
                 if (isset($data['featureIds']) && $data['featureIds'] !== null) {
