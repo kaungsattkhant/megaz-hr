@@ -55,6 +55,7 @@ class PackRepository implements PackRepositoryInterface
                     'created_by' => $data['created_by'],
                     'status' => 'not yet'
                 ]);
+                // dd(UserData()->department->inventory->inventory_id);
                 $inventoryId = UserData()->department->inventory->inventory_id;
                 $inventoryLedger = (new StoreInventory($inventoryId))->storeToInventoryLedger($pack, 'pack', 'out');
 
