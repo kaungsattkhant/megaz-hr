@@ -270,7 +270,7 @@ export default {
                 setTimeout(()=>{
                     this.reconstructMenuCategory(this.menu.menu_category_id);
                     this.reconstructAttachedIngredients(this.menu.items);
-                }, 700);
+                }, 900);
             }
         },
 

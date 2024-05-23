@@ -15,7 +15,7 @@
             <div class="flex justify-end flex-col">
                 <button type="button"
                     class="add-btn transition duration-150 ease-in-out focus:outline-none focus:ring-0 "
-                    data-te-toggle="modal" data-te-target="#create_modal">
+                    data-te-toggle="modal" data-te-target="#create_modal" @click="addBtnClicked">
                     Add New
                 </button>
             </div>
@@ -105,26 +105,30 @@
                             </label>
                             <input type="text" placeholder="Department Name" v-model="name" class="input-ui">
                         </div>
+
                         <div class="mb-4">
-                            <label for="" class="block text-sm text-black mb-3">
-                                Department Features
-                            </label>
-                            <select data-te-select-init data-te-select-placeholder="Select Features"
-                                data-te-select-filter="true" name="" id="" multiple v-model="selectedFeatures"
-                                class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0"
-                                @change="featureSelectChanged">
-                                <option :value="feature.name" v-for="(feature, featureIndex) in featureList"
-                                    :key="featureIndex"> {{ feature.name }} </option>
-                            </select>
+                            <div>
+                                <label class="block text-sm text-black mb-3">Department Features</label>
+                                <multiselect v-model="selectedFeatures" :options="featureList" :multiple="true" :close-on-select="false" :clear-on-select="false"
+                                            :preserve-search="true" placeholder="Select features" label="name" track-by="id" :preselect-first="true">
+                                <template #selection="{ values, search, isOpen }">
+                                    <span class="multiselect__single"
+                                        v-if="values.length"
+                                        v-show="!isOpen">{{ values.length }} features selected</span>
+                                </template>
+                                </multiselect>
+                                <!-- <pre class="language-json" v-for="selectedFeature in selectedFeatures" ><code>{{ selectedFeature.name }}</code></pre> -->
+                            </div>
                         </div>
                     </div>
+
                     <!--Modal footer-->
                     <div class="flex justify-end gap-x-4 px-6 mb-6 pt-4">
                         <button type="button" class="cancel-btn focus:shadow-none focus:outline-none"
                             data-te-modal-dismiss aria-label="Close">
                             Cancel
                         </button>
-                        <button type="button" @click="createDepartmentsBtnClicked"
+                        <button type="button" @click="confirmCreateBtnClicked"
                             class="add-btn focus:outline-none focus:ring-0 " data-te-modal-dismiss>
                             Create
                         </button>
@@ -132,6 +136,7 @@
                 </div>
             </div>
         </div>
+
         <!--Delete Modal -->
         <div data-te-modal-init
             class="fixed left-0 top-0 z-[1055] hidden h-full w-full overflow-y-auto overflow-x-hidden outline-none"
@@ -179,6 +184,7 @@
                 </div>
             </div>
         </div>
+
         <!-- Edit Modal -->
         <div data-te-modal-init
             class="fixed left-0 top-0 z-[1055] hidden h-full w-full overflow-y-auto overflow-x-hidden outline-none"
@@ -212,16 +218,20 @@
                             </label>
                             <input type="text" placeholder="Department Name" v-model="editName" class="input-ui">
                         </div>
+
                         <div class="mb-4">
-                            <label for="" class="label-form mb-3">
-                                Department Features
-                            </label>
-                            <select data-te-select-init data-te-select-placeholder="Select Features"
-                                data-te-select-filter="true" name="" id="" multiple v-model="selectedFeatures"
-                                class="input-ui" @change="featureSelectChanged">
-                                <option :value="feature.name" v-for="(feature, featureIndex) in featureList"
-                                    :key="featureIndex"> {{ feature.name }} </option>
-                            </select>
+                            <div>
+                                <label class="block text-sm text-black mb-3">Department Features</label>
+                                <multiselect v-model="selectedFeatures" :options="featureList" :multiple="true" :close-on-select="false" :clear-on-select="false"
+                                            :preserve-search="true" placeholder="Select features" label="name" track-by="id" :preselect-first="true">
+                                <template #selection="{ values, search, isOpen }">
+                                    <span class="multiselect__single"
+                                        v-if="values.length"
+                                        v-show="!isOpen">{{ values.length }} features selected</span>
+                                </template>
+                                </multiselect>
+                                <!-- <pre class="language-json" v-for="selectedFeature in selectedFeatures" ><code>{{ selectedFeature.name }}</code></pre> -->
+                            </div>
                         </div>
                     </div>
 
@@ -239,52 +249,6 @@
                 </div>
             </div>
         </div>
-
-        <!--Delete Modal -->
-        <!-- <div data-te-modal-init
-            class="fixed left-0 top-0 z-[1055] hidden h-full w-full overflow-y-auto overflow-x-hidden outline-none"
-            id="deleteModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-            <div data-te-modal-dialog-ref
-                class="pointer-events-none relative flex min-h-[calc(100%-1rem)] w-auto translate-y-[-50px] items-center opacity-0 transition-all duration-300 ease-in-out min-[576px]:mx-auto min-[576px]:mt-7 min-[576px]:min-h-[calc(100%-3.5rem)] min-[576px]:max-w-[500px]">
-                <div
-                    class="min-[576px]:shadow-[0_0.5rem_1rem_rgba(#000, 0.15)] pointer-events-auto relative flex w-full flex-col rounded-md border-none bg-white bg-clip-padding text-current shadow-lg outline-none ">
-                    <div
-                        class="flex flex-shrink-0 items-center justify-between rounded-t-md border-b-2 border-neutral-100 border-opacity-100 p-4 ">
-                        <h5 class="text-xl font-medium leading-normal text-neutral-800 " id="exampleModalLabel">
-                            Delete ?
-                        </h5>
-                        <button type="button"
-                            class="box-content rounded-none border-none hover:no-underline hover:opacity-75 focus:opacity-100 focus:shadow-none focus:outline-none"
-                            data-te-modal-dismiss aria-label="Close">
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
-                                stroke="currentColor" class="h-6 w-6">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
-                            </svg>
-                        </button>
-                    </div>
-                    <div class="relative flex-auto p-4" data-te-modal-body-ref>
-                        <p>
-                            Are you sure ?
-                        </p>
-                    </div>
-                    <div
-                        class="flex flex-shrink-0 flex-wrap items-center justify-end rounded-b-md border-t-2 border-neutral-100 border-opacity-100 p-4 ">
-                        <button type="button"
-                            class="inline-block px-6 pb-2 pt-2.5 text-xs focus:outline-none focus:ring-0 "
-                            data-te-modal-dismiss>
-                            Close
-                        </button>
-                        <button @click="confirmDeleteBtnClicked" type="button" data-te-toggle="modal"
-                            data-te-target="#deleteModal"
-                            class="ml-1 inline-block rounded bg-red-600 px-6 pb-2 pt-2.5 text-xs  text-white   focus:outline-none focus:ring-0 ">
-                            Delete
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div> -->
-
-
     </div>
 </template>
 
@@ -292,8 +256,12 @@
     import { Modal, Ripple, Select, initTE, Input } from "tw-elements";
     import { getApiData, postApiData, deleteApiData } from '../../utilities/ajax-helpers';
     import { mapGetters } from "vuex";
+    import Multiselect from 'vue-multiselect';
 
     export default {
+        components: {
+            Multiselect
+        },
         data() {
             return {
                 departmentList: [],
@@ -306,7 +274,6 @@
 
                 featureList: [],
                 selectedFeatures: [],
-                targetSelectedFeatures: [],
 
                 per_page: 10,
                 pageNumbers: [],
@@ -343,16 +310,13 @@
                 });
             },
 
-            featureSelectChanged(){
-                // console.log(this.selectedFeatures);
-            },
-
             editBtnClicked(id){
-                this.targetSelectedFeatures = [];
+                this.selectedFeatures = [];
                 this.editId = id;
                 let index = this.departmentList.findIndex(department => department.id == this.editId);
                 if(index != -1){
                     this.editName = this.departmentList[index].name;
+                    this.selectedFeatures = this.departmentList[index].features;
                 }
             },
 
@@ -361,16 +325,16 @@
                     this.alertValidationMessage('name');
                     return 1;
                 }
+                let featureIds = [];
                 if(this.selectedFeatures.length > 0){
-                    this.selectedFeatures.forEach((feature)=>{
-                        let selectedFeature = this.featureList.find(featureFromFeatureList => featureFromFeatureList.name == feature);
-                        this.targetSelectedFeatures.push(selectedFeature.id);
+                    this.selectedFeatures.forEach((selectedFeature)=>{
+                        featureIds.push(selectedFeature.id);
                     });
                 }
                 let formData = new FormData();
                 formData.append('name', this.editName);
-                if(this.targetSelectedFeatures.length > 0){
-                    formData.append('featureIds', JSON.stringify(this.targetSelectedFeatures));
+                if(featureIds.length > 0){
+                    formData.append('featureIds', JSON.stringify(featureIds));
                 }
                 let url = `/api/departments/${this.editId}`;
                 let response = await postApiData({url: url, form_data: formData, token: this.getToken()});
@@ -381,10 +345,13 @@
                 this.selectedFeatures = [];
                 this.editId = null;
                 this.editName = null;
-                this.targetSelectedFeatures = [];
             },
 
-            createDepartmentsBtnClicked(){
+            addBtnClicked(){
+                this.selectedFeatures = [];
+            },
+
+            confirmCreateBtnClicked(){
                 if(!this.name){
                     this.alertValidationMessage('name');
                     return 1;
@@ -393,25 +360,24 @@
                     this.alertValidationMessage('department features');
                     return 1;
                 }
-                this.selectedFeatures.forEach((feature)=>{
-                    let selectedFeature = this.featureList.find(featureFromFeatureList => featureFromFeatureList.name == feature);
-                    this.targetSelectedFeatures.push(selectedFeature.id);
-                });
 
                 this.createDepartment();
             },
 
             async createDepartment()
             {
+                let featureIds = [];
+                this.selectedFeatures.forEach((selectedFeature)=>{
+                    featureIds.push(selectedFeature.id);
+                });
                 let formData = new FormData();
                 formData.append('name', this.name);
-                formData.append('featureIds', JSON.stringify(this.targetSelectedFeatures));
+                formData.append('featureIds', JSON.stringify(featureIds));
 
                 let response = await postApiData({url: '/api/departments', form_data: formData, token: this.getToken()});
                 if(response.success){
-                    // window.location.replace('/tasks');
                     this.getDepartmentList(null);
-                    // alert('test');
+                    this.selectedFeatures = [];
                 }
                 else{
                     this.$notify({
@@ -419,6 +385,7 @@
                         type: 'error'
                     });
                 }
+
             },
 
             deleteBtnClicked(id){
@@ -443,3 +410,5 @@
         }
     }
 </script>
+
+<style src="node_modules/vue-multiselect/dist/vue-multiselect.css"></style>
