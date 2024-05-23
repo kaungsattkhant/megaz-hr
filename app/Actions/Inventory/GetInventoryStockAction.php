@@ -129,9 +129,9 @@ class GetInventoryStockAction
             ->select(
                 'items.name',
                 'inventory_ledger_items.item_id', // Prefix the table name here
-                'latest_prices.uom_id as base_unit_id',
-                'items.base_uom_id  as conversion_unit_id',
-                'item_uom.name as base_uom_name',   
+                'latest_prices.uom_id as item_uom_id',
+                'items.base_uom_id  as base_unit_id',
+                'item_uom.name as base_uom_name',
                 'base_uom.name as conversion_uom_name',
                 'uom_conversions.conversion',
                 DB::raw('(SUM(CASE WHEN action = "in" AND DATE(date) < CURDATE() THEN quantity ELSE 0 END) -

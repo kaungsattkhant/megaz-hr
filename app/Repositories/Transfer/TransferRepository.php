@@ -141,7 +141,7 @@ class TransferRepository implements TransferRepositoryInterface
     {
         DB::beginTransaction();
         try {
-            if (checkDepartmentAndRoles('Inventory', ['Staff'])) {
+            // if (checkDepartmentAndRoles('Inventory', ['Staff'])) {
                 $transfer = Transfer::find($request->id);
                 if ($transfer) {
                     // if ($transfer->confirmed_at != null && $transfer->confirmed_by != null) {
@@ -167,7 +167,7 @@ class TransferRepository implements TransferRepositoryInterface
                     ResponseMessage('Update Successfully', 200);
                 }
                 ResponseMessage('Not Found', 404);
-            }
+            // }
             ResponseMessage("Permission isn't access", 404);
         } catch (\Exception $e) {
             DB::rollback();
