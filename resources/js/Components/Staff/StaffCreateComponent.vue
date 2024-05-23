@@ -155,9 +155,8 @@
                                 v-show="!isOpen">{{ values.length }} inventories selected</span>
                         </template>
                     </multiselect>
-                    <pre class="language-json" v-for="selectedInventorie in selectedInventories" ><code>{{ selectedInventorie.name }}</code></pre>
                     <div class="flex gap-x-2 flex-wrap mt-1">
-                        <span class="font-inter after-coma" v-for="selectedRole in selectedRoles">{{ selectedRole.name }}</span>
+                        <span class="font-inter after-coma" v-for="selectedInventorie in selectedInventories">{{ selectedInventorie.name }}</span>
                     </div>
                 </div>
             </div>
