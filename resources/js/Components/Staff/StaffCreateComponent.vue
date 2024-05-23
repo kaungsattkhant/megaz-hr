@@ -502,9 +502,11 @@ export default {
             if(this.selectedDepartment.features.length > 0){
                 this.featureList = this.selectedDepartment.features;
             }
-            this.selectedDepartment.inventories.forEach((inventoryData)=>{
-                this.inventories.push(inventoryData.inventory);
-            });
+            // this.selectedDepartment.inventories.forEach((inventoryData)=>{
+               // this.inventories.push(inventoryData.inventory);
+            // });
+
+            this.inventories.push(this.selectedDepartment.inventory.inventory);
         },
 
         async getInventoryList() {

@@ -446,11 +446,13 @@ export default {
                 }
                 this.selectedFeatures = this.staff.features;
 
-                if (this.selectedDepartment.inventories.length > 0) {
-                    this.selectedDepartment.inventories.forEach((inventoryData) => {
-                        this.inventories.push(inventoryData.inventory);
-                    });
-                }
+                // if (this.selectedDepartment.inventories.length > 0) {
+                //     this.selectedDepartment.inventories.forEach((inventoryData) => {
+                //         this.inventories.push(inventoryData.inventory);
+                //     });
+                // }
+                this.inventories.push(this.selectedDepartment.inventory.inventory);
+
                 if (this.staff.inventories.length > 0) {
                     this.selectedInventories = this.staff.inventories;
                 }
@@ -489,9 +491,10 @@ export default {
             if (this.selectedDepartment.features.length > 0) {
                 this.featureList = this.selectedDepartment.features;
             }
-            this.selectedDepartment.inventories.forEach((inventoryData) => {
-                this.inventories.push(inventoryData.inventory);
-            });
+            // this.selectedDepartment.inventories.forEach((inventoryData) => {
+            //     this.inventories.push(inventoryData.inventory);
+            // });
+            this.inventories.push(this.selectedDepartment.inventory.inventory);
         },
 
         async getStateList() {
