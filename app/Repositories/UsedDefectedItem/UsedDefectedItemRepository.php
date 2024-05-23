@@ -68,10 +68,12 @@ class UsedDefectedItemRepository implements UsedDefectedItemRepositoryInterface
             }
             $data['uom_conversion_id'] = $uomConversion->id;
             $data['created_by'] = UserData()->id;
-            if(isset($data['inventory_id']))
+            // dd(UserData()->department->inventory->inventory_id);
+            if(!isset($data['inventory_id']))
             {
                 $data['inventory_id'] = UserData()->department->inventory->inventory_id;
             }
+
             $data['date'] = CurrentTime();
             $usedDefectedItem = UsedDefectedItem::create($data);
             DB::commit();

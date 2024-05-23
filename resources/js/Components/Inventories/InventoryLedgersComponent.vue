@@ -416,7 +416,7 @@ export default {
             }
             let formData = new FormData();
             formData.append('item_id', this.defectItemId);
-            formData.append('inventory_id', this.inventory_id);
+            // formData.append('inventory_id', this.inventory_id);/
             formData.append('quantity', this.defectQuantity);
             formData.append('uom_id', this.selectedUom.id);
             formData.append('type', this.type);
