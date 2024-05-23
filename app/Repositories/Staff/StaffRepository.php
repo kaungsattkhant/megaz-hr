@@ -40,7 +40,7 @@ class StaffRepository implements StaffRepositoryInterface
             $data = RemoveNullValues($data);
             $staff = Staff::create($data);
 
-            if ($data['department_id'] == 6) {
+            if (isset($data['inventoryIds'])) {
                 $inventoryIds = isset($data['inventoryIds']) ? json_decode($data['inventoryIds']) : [];
                 if (is_array($inventoryIds)) {
                     foreach ($inventoryIds as $inventoryId) {
@@ -97,10 +97,11 @@ class StaffRepository implements StaffRepositoryInterface
                     $rolesToAttach = $data['roles'];
                     $staff->roles()->sync($rolesToAttach);
                 }
-
                 if (isset($data['inventoryIds']) && $data['inventoryIds'] !== null) {
                     $inventoryIds = json_decode($data['inventoryIds'], true);
                     $staff->inventories()->sync($inventoryIds);
+                }else{
+                    $staff->inventories()->detach();
                 }
 
                 if (isset($data['featureIds']) && $data['featureIds'] !== null) {

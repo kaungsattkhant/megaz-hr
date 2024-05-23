@@ -44,6 +44,7 @@ import InventoryTransferHistoryListComponent from './Components/Transfers/Invent
 import UsedDefectedItemsListComponent from './Components/UsedDefectedItems/UsedDefectedItemsListComponent.vue';
 import MenuListComponent from './Components/Menus/MenuListComponent.vue';
 import MenuCreateComponent from './Components/Menus/MenuCreateComponent.vue';
+import MenuEditComponent from './Components/Menus/MenuEditComponent.vue';
 import ComplainsCrudComponent from './Components/Complains/ComplainsCrudComponent.vue';
 import PurchaseOrderListComponent from './Components/PurchaseOrders/PurchaseOrderListComponent.vue';
 import PurchaseOrderCreateComponent from './Components/PurchaseOrders/PurchaseOrderCreateComponent.vue';
@@ -103,6 +104,7 @@ app.component('InventoryTransferHistoryListComponent', InventoryTransferHistoryL
 app.component('UsedDefectedItemsListComponent', UsedDefectedItemsListComponent);
 app.component('MenuListComponent', MenuListComponent);
 app.component('MenuCreateComponent', MenuCreateComponent);
+app.component('MenuEditComponent', MenuEditComponent);
 app.component('ComplainsCrudComponent', ComplainsCrudComponent);
 app.component('AccountingCrudComponent', AccountingCrudComponent);
 app.component('FinancialTransactionCrudComponent', FinancialTransactionCrudComponent);

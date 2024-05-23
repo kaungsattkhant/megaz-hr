@@ -4,17 +4,18 @@
     "src": "public/img/Video_light.png"
   },
   "resources/css/app.css": {
-    "file": "assets/app-j_sp49-U.css",
-    "src": "resources/js/app.js"
+    "file": "assets/app-hX2vnn9S.css",
+    "isEntry": true,
+    "src": "resources/css/app.css"
   },
   "resources/js/app.js": {
     "assets": [
       "assets/Video_light-nWiE6W6S.png"
     ],
     "css": [
-      "assets/app-j_sp49-U.css"
+      "assets/app-1WuA5hod.css"
     ],
-    "file": "assets/app-wZriAIN2.js",
+    "file": "assets/app-epRoKk1Q.js",
     "isEntry": true,
     "src": "resources/js/app.js"
   }

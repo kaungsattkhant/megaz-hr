@@ -10,7 +10,7 @@ class Inventoryable extends Model
     use HasFactory;
 
     protected $fillable = ['inventory_id', 'inventoryable_type', 'inventoryable_id'];
-    
+
     protected $with=['inventoryable'];
 
     public function inventoryable()
@@ -20,7 +20,8 @@ class Inventoryable extends Model
 
     public function inventory()
     {
-        return $this->belongsTo(\App\Models\inventory::class);
+        return $this->belongsTo(\App\Models\Inventory::class);
     }
+
 
 }

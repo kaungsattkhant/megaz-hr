@@ -71,6 +71,13 @@ class MenuRepository implements MenuRepositoryInterface
         return null;
     }
 
+    public function menuDetail(int $id)
+    {
+        // $menu = Menu::find($id)->with('items.uoms', 'prices', 'menu_category')->first();
+        $menu = Menu::with('items.uoms', 'prices', 'menu_category')->find($id);
+        return $menu;
+    }
+
     public function menuIsActive(int $id)
     {
         DB::beginTransaction();
@@ -84,6 +91,60 @@ class MenuRepository implements MenuRepositoryInterface
             DB::rollback();
             ResponseMessage($e->getMessage(), 402);
             throw $e;
+        }
+    }
+
+    public function editMenu(int $id, array $data, array $items)
+    {
+        DB::beginTransaction();
+        try {
+            $menu = Menu::findOrFail($id);
+
+            if (isset($data['image'])) {
+                $imageData = $data['image'];
+                $extension = $imageData->getClientOriginalExtension();
+                $hashedName = md5(uniqid() . microtime()) . '.' . $extension;
+                $data['image_path'] = $imageData->storeAs('images', $hashedName, 'public');
+                $data['image_url'] = Storage::url($data['image_path']);
+            }
+
+            $menu->update($data);
+
+            if (isset($data['price'])) {
+                $this->updateMenuPrice($menu->id, $data['price']);
+            }
+            if (isset($items)) {
+                $menu->items()->detach();
+                $syncData = [];
+                foreach ($items as $item) {
+                    $syncData[$item['id']] = [
+                        'uom_id' => $item['uom_id'],
+                        'weight' => $item['weight'],
+                        'is_make_pack' => $item['is_make_pack'] ? 1 : 0
+                    ];
+                }
+                $menu->items()->sync($syncData);
+            }
+
+            DB::commit();
+            return $menu;
+        } catch (\Exception $e) {
+            DB::rollBack();
+            ResponseMessage($e->getMessage(), 402);
+            throw $e;
+        }
+    }
+
+    public function updateMenuPrice(int $id, float $price)
+    {
+        $menuPrice = MenuPrice::where('menu_id', $id)->latest()->first();
+        if ($menuPrice) {
+            if ($menuPrice->price != $price) {
+                MenuPrice::create([
+                    'menu_id' => $id,
+                    'price' => $price
+                ]);
+            }
         }
     }
 }
