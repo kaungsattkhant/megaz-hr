@@ -72,10 +72,6 @@ class UomAPIController extends Controller
 
      #test
      public function getUomConversionByUom(Request $request){
-        // $request['base_uom_id']=6;
-        // $request['item_uom_id']=7;
-        // $request['item_price']=30000;
-        // $request['quantity']=3;
         if($request->po_uom_id==$request->item_uom_id){
             $uom_conversion=UomConversion::where('base_unit_id',$request->po_uom_id)
             ->where('conversion_unit_id',$request->base_uom_id)
