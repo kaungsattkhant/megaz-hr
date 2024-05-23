@@ -98,7 +98,6 @@ class TransferRepository implements TransferRepositoryInterface
             }
             $latest = Transfer::orderBy('created_at', 'desc')->first();
             $count = 4;
-
             $uom_conversion=(new Conversion($request->uom_id,$request->base_uom_id))->run();
             #check is enough transfer quantity
             $quantity=$uom_conversion->conversion*$request->quantity;
