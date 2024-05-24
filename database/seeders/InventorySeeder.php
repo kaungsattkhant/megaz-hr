@@ -5,6 +5,9 @@ namespace Database\Seeders;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
+use App\Models\Department;
+use App\Models\Inventory;
+
 class InventorySeeder extends Seeder
 {
     /**
@@ -12,19 +15,17 @@ class InventorySeeder extends Seeder
      */
     public function run(): void
     {
-        //
-        // $names=['Inventory-1'];
-        $departMentIds=[1,2,3,4];
-        // foreach($names as $name){
-            $inventory=\App\Models\Inventory::create([
-                'name'=>'Inventory-1'
+        $departments = Department::all();
+        foreach($departments as $department){
+            $inventory = Inventory::create([
+                'name' => ($department->name == 'Inventory')?'Main Inventory': $department->name . ' Inventory',
+                'is_active' => 1
             ]);
-            foreach($departMentIds as $deptId){
-                $inventory->inventoryable()->create([
-                    'inventoryable_type'=>'department',
-                    'inventoryable_id'=>$deptId,
-                ]);
-            }
-        // }
+
+            $inventory->inventoryable()->create([
+                'inventoryable_type' => 'department',
+                'inventoryable_id' => $department->id,
+            ]);
+        }
     }
 }
