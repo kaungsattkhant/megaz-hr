@@ -158,11 +158,10 @@ class FixedAssetPurchaseRepository implements FixedAssetPurchaseRepositoryInterf
                         'is_confirmed' => 1
                     ]);
 
-                    $officeCashAccount = Account::where('account_code', '2-1001')->first();
                     $creaditFixedAssetPurchase = (new StoreTransactionLedger())->storeLedger([
                         'value' => $fixedAssetPurchase->total_price,
                         'transaction_id' => $transaction->id,
-                        'account_id' => $officeCashAccount->id,
+                        'account_id' => $request->cash_account_id,
                         'action' => 'credit',
                         'is_cashier_confirmed' => 1
                     ]);
