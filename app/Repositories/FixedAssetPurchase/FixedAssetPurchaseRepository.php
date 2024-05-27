@@ -21,15 +21,15 @@ class FixedAssetPurchaseRepository implements FixedAssetPurchaseRepositoryInterf
             $q->where('created_by', $staff->id);
         })
         ->when(checkDepartmentAndRoles('HR', ['Manager']), function ($q) {
-            $q->whereIn('status', ['manager_checked', 'created'])
+            $q->whereIn('status', ['manager_checked', 'created','bought'])
                 ->orWhere('manager_check_id', UserData()->id);
         })
         ->when(checkDepartmentAndRoles('Finance', ['Staff']), function ($q) {
-            $q->whereIn('status', ['manager_checked', 'financial_checked'])
+            $q->whereIn('status', ['manager_checked', 'financial_checked','bought'])
                 ->orWhere('finance_check_id', UserData()->id);
         })
         ->when(checkDepartmentAndRoles('Management', ['MD']), function ($q) {
-            $q->whereIn('status', ['md_checked', 'financial_checked']);
+            $q->whereIn('status', ['md_checked', 'financial_checked','bought']);
         })
         ->paginate(config('common.list_count'));
 
@@ -64,7 +64,7 @@ class FixedAssetPurchaseRepository implements FixedAssetPurchaseRepositoryInterf
             $data['remaining_duration'] = $data['total_duration'];
             $data['start_date'] = CurrentDate();
             $fixedAssetPurchase = FixedAssetPurchase::create($data);
-            $fixedAssetPurchase->fixed_asset_id = sprintf('%05d', $fixedAssetPurchase->id);
+            $fixedAssetPurchase->fixed_asset_id = sprintf('%03d', $fixedAssetPurchase->id);
             $fixedAssetPurchase->save();
             DB::commit();
             return $fixedAssetPurchase;
@@ -143,7 +143,7 @@ class FixedAssetPurchaseRepository implements FixedAssetPurchaseRepositoryInterf
                     ]);
 
                     $accountData = Account::create([
-                        'account_code' => '1-' . $fixedAssetPurchase->fixed_asset_id,
+                        'account_code' => '1-10' . $fixedAssetPurchase->fixed_asset_id,
                         'name' => $fixedAssetPurchase->name,
                         'sub_account_id' => 6,
                         'is_available' => 1
