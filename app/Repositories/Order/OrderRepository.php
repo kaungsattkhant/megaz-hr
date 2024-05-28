@@ -133,7 +133,7 @@ class OrderRepository implements OrderRepositoryInterface
         try {
             $users = UserData();
             $orderItem = OrderItem::find($data['id']);
-            if ($data['status'] == 'sold') {
+            if ($data['status'] == 'done') {
                 $packs = Pack::where('menu_id', $orderItem->menu_id)->where('status', 'not yet')->where('expired_at', '>', CurrentTime())->orderBy('expired_at', 'asc')->take($orderItem->quantity)->get();
                 ResponseData($packs);
                 if (count($packs) < $orderItem->quantity) {
@@ -141,7 +141,7 @@ class OrderRepository implements OrderRepositoryInterface
                 }
                 foreach ($packs as $pack) {
                     if ($pack->status == 'not yet') {
-                        $pack->status = 'used';
+                        $pack->status = 'sold';
                         $pack->save();
                     }
                 }
