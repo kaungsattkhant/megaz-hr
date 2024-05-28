@@ -141,7 +141,7 @@ class OrderRepository implements OrderRepositoryInterface
                 }
                 foreach ($packs as $pack) {
                     if ($pack->status == 'not yet') {
-                        $pack->status = 'used';
+                        $pack->status = 'sold';
                         $pack->save();
                     }
                 }

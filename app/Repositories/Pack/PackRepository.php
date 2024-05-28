@@ -53,7 +53,7 @@ class PackRepository implements PackRepositoryInterface
                     'date' => CurrentTime(),
                     'expired_at' => $data['expired_at'],
                     'created_by' => $data['created_by'],
-                    'status' => 'not yet'
+                    'status' => 'ready'
                 ]);
                 // dd(UserData()->department->inventory->inventory_id);
                 $inventoryId = UserData()->department->inventory->inventory_id;
