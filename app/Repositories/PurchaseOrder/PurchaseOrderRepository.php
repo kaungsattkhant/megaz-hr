@@ -125,6 +125,9 @@ class PurchaseOrderRepository implements PurchaseOrderRepositoryInterface
                 if ($request->is_grn) {
                     if ($item->supplier_id != null && $item->invoice_amount != null && $item->invoice_no != null) {
                         $item_data['is_grn'] = 1;
+                        if($item->invoice_amount<$item->quantity*$item->amount){
+                            // (new PurchaseOrderTransaction())->createTransaction($po, $morphMapName, $request->cash_account_id); #create transaction
+                        }
                     }
                     #grn store
                     $this->storeGRN($item);
@@ -135,7 +138,6 @@ class PurchaseOrderRepository implements PurchaseOrderRepositoryInterface
             if ($request->is_grn && $po) {
                 $morphMapName = RelationMorphName($po);
                 (new PurchaseOrderTransaction())->createTransaction($po, $morphMapName, $request->cash_account_id); #create transaction
-                // (new StoreInventory())->inventoryAction($po, 'in', 'purchase_order');
             }
             if (!isset($request->id)) {
                 $users = $this->getUserByRole('HR', ['Manager']);
@@ -153,7 +155,6 @@ class PurchaseOrderRepository implements PurchaseOrderRepositoryInterface
             ResponseMessage($e->getMessage(), 402);
             throw $e;
         }
-
     }
 
     public function storeGRN($item)

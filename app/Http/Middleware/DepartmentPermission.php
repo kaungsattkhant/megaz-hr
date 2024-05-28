@@ -18,6 +18,7 @@ class DepartmentPermission
     {
         $staff = UserData();
         if(checkFeaturePermission($permission)){
+            
             return $next($request);
         }
         // foreach($departments as $department){

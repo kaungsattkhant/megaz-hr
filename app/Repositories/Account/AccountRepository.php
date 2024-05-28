@@ -70,5 +70,12 @@ class AccountRepository implements AccountInterface
         return Account::where('sub_account_id',$sub_account_id)->get();
     }
 
+    public function getPayableAccount(){
+        return Account::whereHas('sub_account.head_account',function($q){
+            $q->where('head_account_id',config('common.liabilities'));
+        })
+        ->get();
+    }
+
     
 }
