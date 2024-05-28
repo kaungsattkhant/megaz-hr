@@ -134,7 +134,7 @@ class OrderRepository implements OrderRepositoryInterface
             $users = UserData();
             $orderItem = OrderItem::find($data['id']);
             if ($data['status'] == 'done') {
-                $packs = Pack::where('menu_id', $orderItem->menu_id)->where('status', 'not yet')->where('expired_at', '>', CurrentTime())->orderBy('expired_at', 'asc')->take($orderItem->quantity)->get();
+                $packs = Pack::where('menu_id', $orderItem->menu_id)->where('status', 'ready')->where('expired_at', '>', CurrentTime())->orderBy('expired_at', 'asc')->take($orderItem->quantity)->get();
                 ResponseData($packs);
                 if (count($packs) < $orderItem->quantity) {
                     ResponseMessage('Packs not enough', 422);
