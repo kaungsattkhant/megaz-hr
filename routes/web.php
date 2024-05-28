@@ -159,7 +159,7 @@ Route::middleware(['departments:fixed-asset'])->group(function () {
 //pos
 Route::group(['prefix' => 'pos'], function () {
     Route::view('/login', 'pos.auth.index')->name('pos.login');
-    Route::middleware(['departments:Catering'])->group(function () {
+    Route::middleware(['departments:pos'])->group(function () {
         Route::view('/home', 'pos.home.index')->name('pos.index');
         Route::view('/customer', 'pos.customers.index')->name('pos.customers');
         Route::view('/customer/create', 'pos.customers.create')->name('pos.customers.create');
