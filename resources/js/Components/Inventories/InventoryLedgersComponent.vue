@@ -126,23 +126,27 @@
                             <label for="" class="block text-sm text-black mb-3">
                                 Source Inventory
                             </label>
-                            <select name="" id="" v-model="selectedSourceInventory"
-                                class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
-                                <option :value="sourceInventory.id" v-for="(sourceInventory, sourceInventoryIndex) in sourceInventories">
-                                    {{ sourceInventory.name }}
-                                </option>
-                            </select>
+                            <div class="bg-white mb-0 w-full text-sm inline-block" data-te-select-wrapper-ref>
+                                <select data-te-select-init data-te-select-placeholder="Select Source Inventory"
+                                data-te-select-filter="true" v-model="selectedSourceInventory">
+                                    <option :value="sourceInventory.id" v-for="(sourceInventory, sourceInventoryIndex) in sourceInventories">
+                                        {{ sourceInventory.name }}
+                                    </option>
+                                </select>
+                            </div>
                         </div>
                         <div class="mb-4">
                             <label for="" class="block text-sm text-black mb-3">
                                 Destination Inventory
                             </label>
-                            <select name="" id="" v-model="selectedDestinationInventory"
-                                class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
-                                <option :value="destinationInventory.id" v-for="(destinationInventory, destinationInventoryIndex) in destinationInventories">
-                                    {{ destinationInventory.name }}
-                                </option>
-                            </select>
+                            <div class="bg-white mb-0 w-full text-sm inline-block" data-te-select-wrapper-ref>
+                                <select data-te-select-init data-te-select-placeholder="Select Destination Inventory"
+                                data-te-select-filter="true" v-model="selectedDestinationInventory">
+                                    <option :value="destinationInventory.id" v-for="(destinationInventory, destinationInventoryIndex) in destinationInventories">
+                                        {{ destinationInventory.name }}
+                                    </option>
+                                </select>
+                            </div>
                         </div>
                         <div class="mb-4">
                             <label for="" class="block text-sm text-black mb-3">
@@ -156,12 +160,14 @@
                             <label for="" class="block text-sm text-black mb-3">
                                 UOM
                             </label>
-                            <select name="" id="" v-model="selectedUom"
-                                class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
-                                <option :value="uom" v-for="(uom, uomIndex) in uomList">
-                                    {{ uom.name }}
-                                </option>
-                            </select>
+                            <div class="bg-white mb-0 w-full text-sm inline-block" data-te-select-wrapper-ref>
+                                <select data-te-select-init data-te-select-placeholder="Select UOM"
+                                data-te-select-filter="true" v-model="selectedUom">
+                                    <option :value="uom" v-for="(uom, uomIndex) in uomList">
+                                        {{ uom.name }}
+                                    </option>
+                                </select>
+                            </div>
                         </div>
 
                     </div>
@@ -208,22 +214,27 @@
                         <label for="" class="block text-sm text-black mb-3">
                             Defect / Used
                         </label>
-                        <select name="" id="" v-model="type" class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
-                            <option value="defect"> Defect </option>
-                            <option value="used"> Used </option>
-                        </select>
+                        <div class="bg-white mb-0 w-full text-sm inline-block" data-te-select-wrapper-ref>
+                            <select data-te-select-init data-te-select-placeholder="Select Type"
+                            data-te-select-filter="true" v-model="type">
+                                <option value="defect"> Defect </option>
+                                <option value="used"> Used </option>
+                            </select>
+                        </div>
                     </div>
 
                     <div class="mb-4">
                         <label for="" class="block text-sm text-black mb-3">
                             UOM
                         </label>
-                        <select name="" id="" v-model="selectedUom"
-                            class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
-                            <option :value="uom" v-for="(uom, uomIndex) in uomList">
-                                {{ uom.name }}
-                            </option>
-                        </select>
+                        <div class="bg-white mb-0 w-full text-sm inline-block" data-te-select-wrapper-ref>
+                            <select data-te-select-init data-te-select-placeholder="Select UOM"
+                            data-te-select-filter="true" v-model="selectedUom">
+                                <option :value="uom" v-for="(uom, uomIndex) in uomList">
+                                    {{ uom.name }}
+                                </option>
+                            </select>
+                        </div>
                     </div>
 
                     <div class="mb-4">

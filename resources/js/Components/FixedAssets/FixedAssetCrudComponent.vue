@@ -542,9 +542,9 @@ export default {
                 });
             }
 
-            // setTimeout(()=>{
-            //     window.location.reload();
-            // }, 900);
+            setTimeout(()=>{
+                window.location.reload();
+            }, 900);
         },
     },
 
