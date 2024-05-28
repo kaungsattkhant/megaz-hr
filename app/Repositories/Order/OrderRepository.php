@@ -6,6 +6,7 @@ use App\Models\Order;
 use App\Models\OrderItem;
 use Illuminate\Support\Facades\DB;
 use App\Http\Action\SendNotification\SendNotification;
+use App\Models\Pack;
 use App\Models\Staff;
 use Illuminate\Http\Request;
 
@@ -16,6 +17,7 @@ class OrderRepository implements OrderRepositoryInterface
     {
         DB::beginTransaction();
         try {
+
             $price = $data['original_price'] * $data['quantity'];
             $order = Order::where('invoice_id', $data['invoice_id'])->get()->first();
             if ($order) {
@@ -28,6 +30,8 @@ class OrderRepository implements OrderRepositoryInterface
                 $data['discount_value'] = 0;
                 $data['price'] = $data['original_price'] * $data['quantity'];
                 $order_items = OrderItem::create($data);
+
+
 
                 DB::commit();
                 return $order;
@@ -128,11 +132,22 @@ class OrderRepository implements OrderRepositoryInterface
         DB::beginTransaction();
         try {
             $users = UserData();
-
             $orderItem = OrderItem::find($data['id']);
+            if ($data['status'] == 'sold') {
+                $packs = Pack::where('menu_id', $orderItem->menu_id)->where('status', 'not yet')->where('expired_at', '>', CurrentTime())->orderBy('expired_at', 'asc')->take($orderItem->quantity)->get();
+                ResponseData($packs);
+                if (count($packs) < $orderItem->quantity) {
+                    ResponseMessage('Packs not enough', 422);
+                }
+                foreach ($packs as $pack) {
+                    if ($pack->status == 'not yet') {
+                        $pack->status = 'used';
+                        $pack->save();
+                    }
+                }
+            }
             $orderItem->status = $data['status'];
             $orderItem->update();
-
             $users = collect([]);
             $users =  $this->getUserByRole('Catering', ['staff']);
             $title = 'Order Item Status Update';
@@ -155,16 +170,15 @@ class OrderRepository implements OrderRepositoryInterface
     public function getOrderItemData(Request $request)
     {
         if ($request->per_page || $request->page) {
-            if($request->date)
-            {
+            if ($request->date) {
                 $date = $request->date;
-            }else{
+            } else {
                 $date = CurrentDate();
             }
             $startTime = $date . ' 00:00:00';
             $endTime = $date . ' 23:59:59';
 
-            $totalCount = OrderItem::with('menu','order.invoice.room')->whereBetween('created_at', [$startTime, $endTime])->count();
+            $totalCount = OrderItem::with('menu', 'order.invoice.room')->whereBetween('created_at', [$startTime, $endTime])->count();
             $pageNumber = 1;
             $perPage = 20;
             if ($request->page) {
@@ -174,23 +188,22 @@ class OrderRepository implements OrderRepositoryInterface
                 $perPage = $request->per_page;
             }
             $skip = ($pageNumber - 1) * $perPage;
-            $order_items = OrderItem::with('menu','order.invoice.room')
-                            ->whereBetween('date', [$startTime, $endTime])
-                            ->skip($skip)
-                            ->take($perPage)
-                            ->get();
+            $order_items = OrderItem::with('menu', 'order.invoice.room')
+                ->whereBetween('date', [$startTime, $endTime])
+                ->skip($skip)
+                ->take($perPage)
+                ->get();
             $paginationData = MakePaginationData($request, $totalCount, 'order_items');
             $paginationData['order_items'] = $order_items;
 
             return $paginationData;
         } else {
-            if($request->date)
-            {
+            if ($request->date) {
                 $startTime = $request->date . ' 00:00:00';
                 $endTime = $request->date . ' 23:59:59';
-                $orderItems = OrderItem::with('menu','order.invoice.room')->whereBetween('date', [$startTime, $endTime])->get();
-            }else{
-                $orderItems = OrderItem::with('menu','order.invoice.room')->get();
+                $orderItems = OrderItem::with('menu', 'order.invoice.room')->whereBetween('date', [$startTime, $endTime])->get();
+            } else {
+                $orderItems = OrderItem::with('menu', 'order.invoice.room')->get();
             }
 
             return $orderItems;
