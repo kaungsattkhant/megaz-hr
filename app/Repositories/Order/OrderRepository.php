@@ -135,12 +135,11 @@ class OrderRepository implements OrderRepositoryInterface
             $orderItem = OrderItem::find($data['id']);
             if ($data['status'] == 'done') {
                 $packs = Pack::where('menu_id', $orderItem->menu_id)->where('status', 'ready')->where('expired_at', '>', CurrentTime())->orderBy('expired_at', 'asc')->take($orderItem->quantity)->get();
-                ResponseData($packs);
                 if (count($packs) < $orderItem->quantity) {
                     ResponseMessage('Packs not enough', 422);
                 }
                 foreach ($packs as $pack) {
-                    if ($pack->status == 'not yet') {
+                    if ($pack->status == 'ready') {
                         $pack->status = 'sold';
                         $pack->save();
                     }
@@ -159,7 +158,7 @@ class OrderRepository implements OrderRepositoryInterface
             ];
             $this->send($orderItem, $users, $data);
             DB::commit();
-            ResponseData($orderItem);
+            ResponseMessage('Order Item status is changed successfully');
         } catch (\Exception $e) {
             DB::rollback();
             ResponseMessage($e->getMessage(), 402);
