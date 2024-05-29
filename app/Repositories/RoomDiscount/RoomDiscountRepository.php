@@ -4,6 +4,7 @@ namespace App\Repositories\RoomDiscount;
 
 use App\Models\RoomDiscount;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class RoomDiscountRepository implements RoomDiscountRepositoryInterface
 {
@@ -15,22 +16,46 @@ class RoomDiscountRepository implements RoomDiscountRepositoryInterface
 
     public function createData(array $data)
     {
-        $data['created_by'] = UserData()->id;
-        $roomDiscount = RoomDiscount::create($data);
-        ResponseData($roomDiscount);
+        DB::beginTransaction();
+        try {
+            $data['created_by'] = UserData()->id;
+            $roomDiscount = RoomDiscount::create($data);
+            DB::commit();
+            ResponseData($roomDiscount);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            ResponseMessage($e->getMessage(), 422);
+            throw $e;
+        }
     }
 
     public function editData(int $id, array $data)
     {
-        $roomDiscount = RoomDiscount::find($id);
-        $roomDiscount->update($data);
-        ResponseData($roomDiscount);
+        DB::beginTransaction();
+        try {
+            $roomDiscount = RoomDiscount::find($id);
+            $roomDiscount->update($data);
+            DB::commit();
+            ResponseData($roomDiscount);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            ResponseMessage($e->getMessage(), 422);
+            throw $e;
+        }
     }
 
     public function deleteData(int $id)
     {
-        $roomDiscount = RoomDiscount::find($id);
-        $roomDiscount->delete();
-        Responsemessage("Room Discount deleted");
+        DB::beginTransaction();
+        try {
+            $roomDiscount = RoomDiscount::find($id);
+            $roomDiscount->delete();
+            DB::commit();
+            Responsemessage("Room Discount deleted");
+        } catch (\Exception $e) {
+            DB::rollBack();
+            ResponseMessage($e->getMessage(), 422);
+            throw $e;
+        }
     }
 }
