@@ -18,6 +18,8 @@ use App\Repositories\Entity\EntityRepository;
 use App\Repositories\Account\AccountInterface;
 
 use App\Repositories\Account\AccountRepository;
+use App\Repositories\AccountPayable\AccountPayableInterface;
+use App\Repositories\AccountPayable\AccountPayableRepository;
 use App\Repositories\Invoice\InvoiceRepository;
 use App\Repositories\CashBook\CashBookInterface;
 use App\Repositories\Supplier\SupplierInterface;
@@ -126,6 +128,7 @@ class RepositoryServiceProvider extends ServiceProvider
         $this->app->bind(PackRepositoryInterface::class,PackRepository::class);
         $this->app->bind(UsedDefectedITemRepositoryInterface::class,UsedDefectedItemRepository::class);
         $this->app->bind(FeatureRepositoryInterface::class,FeatureRepository::class);
+        $this->app->bind(AccountPayableInterface::class,AccountPayableRepository::class);
         $this->app->bind(MenuServiceDiscountRepositoryInterface::class,MenuServiceDiscountRepository::class);
         $this->app->bind(RoomDiscountRepositoryInterface::class,RoomDiscountRepository::class);
     }
