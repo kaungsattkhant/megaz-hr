@@ -56,6 +56,10 @@
                             </th>
 
                             <th scope="col" class=" px-6 py-4 ">
+                                Financial Checked
+                            </th>
+
+                            <th scope="col" class=" px-6 py-4 ">
                                 MD Check
                             </th>
 
@@ -104,12 +108,26 @@
                                 </td>
 
                                 <td class="px-6 py-4">
+                                    {{ fixedAsset.finance_check_id == null ? 'No' : 'Yes' }}
+                                </td>
+
+                                <td class="px-6 py-4">
                                     {{ fixedAsset.is_md_checked == 0 ? 'No' : 'Yes' }}
                                 </td>
 
                                 <td class=" px-6 py-4 font-medium ">
-                                    <button data-te-toggle="modal" data-te-target="#checkModal" @click="checkBtnClicked(fixedAsset.id)">
+                                    <button data-te-toggle="modal" data-te-target="#checkModal"
+                                    v-if="fixedAsset.is_md_checked != 1"
+                                    @click="checkBtnClicked(fixedAsset.id)">
                                         <i class="fal fa-check  pr-3"></i>
+                                    </button>
+                                </td>
+
+                                <td class="whitespace-nowrap  space-x-4">
+                                    <button class="pr-1" data-te-toggle="modal" data-te-target="#buyModal"
+                                    v-if="(fixedAsset.is_md_checked == 1) && (fixedAsset.is_bought == 0) && getDepartment().name == 'Finance'"
+                                    @click="fixedAssetBuyBtnClicked(fixedAsset.id)">
+                                        <i class="far fa-shopping-basket"></i>
                                     </button>
                                 </td>
                             </tr>
@@ -320,6 +338,63 @@
             </div>
         </div>
     </div>
+
+    <!--Buy Modal -->
+    <div data-te-modal-init
+        class="fixed left-0 top-0 z-[1055] hidden h-full w-full overflow-y-auto overflow-x-hidden outline-none"
+        id="buyModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div data-te-modal-dialog-ref class="pointer-events-none relative flex min-h-[calc(100%-1rem)] w-auto translate-y-[-50px]
+            items-center opacity-0 transition-all duration-300 ease-in-out min-[576px]:mx-auto min-[576px]:mt-7
+            min-[576px]:min-h-[calc(100%-3.5rem)] min-[576px]:max-w-[500px]">
+            <div class="min-[576px]:shadow-[0_0.5rem_1rem_rgba(#000, 0.15)] pointer-events-auto relative flex w-full flex-col
+                rounded-md border-none bg-white bg-clip-padding text-current shadow-lg outline-none ">
+                <div
+                    class="flex flex-shrink-0 items-center justify-between rounded-t-md border-b-2 border-neutral-100 border-opacity-100 p-4 ">
+                    <!--Modal title-->
+                    <h5 class="text-xl font-medium leading-normal text-neutral-800 " id="exampleModalLabel">
+                        Buy this fixed asset?
+                    </h5>
+                    <!--Close button-->
+                    <button type="button"
+                        class="box-content rounded-none border-none hover:no-underline hover:opacity-75 focus:opacity-100 focus:shadow-none focus:outline-none"
+                        data-te-modal-dismiss aria-label="Close">
+                        <svg class="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                            stroke-width="1.5" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </button>
+                </div>
+
+                <!--Modal body-->
+                <div class="relative flex-auto p-4" data-te-modal-body-ref>
+                    <div class="mb-4">
+                        <label for="" class="label-form mb-3">
+                            Cash Account
+                        </label>
+                        <select name="" id="" v-model="selectedCashAccount" class="input-ui">
+                            <option :value="cashAccount" v-for="(cashAccount, cashAccountIndex) in cashAccountList" :key="cashAccountIndex">
+                                {{ cashAccount.name }}
+                            </option>
+                        </select>
+                    </div>
+                </div>
+
+                <!--Modal footer-->
+                <div
+                    class="flex flex-shrink-0 flex-wrap items-center justify-end rounded-b-md border-t-2 border-neutral-100 border-opacity-100 p-4 ">
+                    <button type="button" class="inline-block px-6 pb-2 pt-2.5 text-xs focus:outline-none focus:ring-0 "
+                        data-te-modal-dismiss>
+                        Close
+                    </button>
+                    <button @click="confirmBuyFixedAssetBtnClicked" type="button" data-te-toggle="modal"
+                        data-te-target="#buyModal"
+                        class="ml-1 inline-block rounded bg-blue-600 px-6 pb-2 pt-2.5 text-xs  text-white   focus:outline-none focus:ring-0 ">
+                        Confirm
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
 </template>
 
 <script>
@@ -334,6 +409,7 @@ export default {
     data() {
         return {
             fixedAssetPurchases: [],
+
 
             name: null,
             date: null,
@@ -356,11 +432,24 @@ export default {
             isStaff: false,
             isMD: false,
             checkId: null,
+
+            buyFixedAssetId: null,
+            cashAccountList: [],
+            selectedCashAccount: null,
+
         };
     },
 
     methods: {
         ...mapGetters(['getToken', 'getUser', 'getRoles', 'getDepartment']),
+
+        async getCashAccountList() {
+            let url = `/api/get_cash_account`;
+            let response = await getApiData({ url: url, token: this.getToken() });
+            if (response.data) {
+                this.cashAccountList = response.data;
+            }
+        },
 
         async getFixedAssetPurchases() {
             let response = await getApiData({ url: `/api/fixed_asset_purchases?page=1`, token: this.getToken() });
@@ -411,7 +500,7 @@ export default {
 
                 setTimeout(()=>{
                     window.location.reload();
-                }, 3000);
+                }, 900);
             }
             else{
                 this.$notify({
@@ -420,6 +509,42 @@ export default {
                 });
             }
             // console.log(response);
+        },
+
+        fixedAssetBuyBtnClicked(id){
+            this.buyFixedAssetId = id;
+        },
+
+        async confirmBuyFixedAssetBtnClicked(){
+            if(!this.selectedCashAccount){
+                this.$notify({
+                    text: 'No cash account selected',
+                    type: 'warn'
+                });
+
+                return 1;
+            }
+            let url = `/api/fixed_asset_purchases/bought`;
+            let formData = new FormData();
+            formData.append('id', this.buyFixedAssetId);
+            formData.append('cash_account_id', this.selectedCashAccount.id);
+            let response = await postApiData({url: url, form_data: formData, token: this.getToken()});
+            if(response.success){
+                this.$notify({
+                    text: `Fixed asset bought successuflly`,
+                    type: 'info'
+                });
+            }
+            else{
+                this.$notify({
+                    text: `Fixed asset buy not success`,
+                    type: 'error'
+                });
+            }
+
+            // setTimeout(()=>{
+            //     window.location.reload();
+            // }, 900);
         },
     },
 
@@ -436,6 +561,7 @@ export default {
             }
         });
         this.getFixedAssetPurchases();
+        this.getCashAccountList();
     },
 
     mounted() {

@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('menu_id')->constrained()->onDelete('cascade');
             $table->dateTime('date');
-            $table->dateTime('expired_at');
+            $table->date('expired_at');
             $table->unsignedBigInteger('created_by');
             $table->string('status');
             $table->timestamps();

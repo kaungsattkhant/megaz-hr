@@ -30,6 +30,8 @@ return new class extends Migration
             $table->dateTime('manager_check_time')->nullable();
             $table->dateTime('md_check_time')->nullable();
             $table->boolean('is_md_checked')->default(0);
+            $table->dateTime('finance_check_time')->nullable();
+            $table->unsignedBigInteger('finance_check_id')->nullable();
             $table->string('status')->default('created');
             $table->timestamps();
         });

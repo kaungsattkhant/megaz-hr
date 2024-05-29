@@ -27,6 +27,8 @@ class FixedAssetPurchase extends Model
         'manager_check_time',
         'md_check_time',
         'is_md_checked',
+        'finance_check_time',
+        'finance_check_id',
         'status'
     ];
 
