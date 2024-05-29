@@ -58,6 +58,14 @@
                     </select>
                 </div>
             </div>
+            <div class="mb-4 col-span-3 pb-6 rounded-md">
+                <label for="" class="block text-sm text-black mb-3">
+                    AP Account
+                </label>
+                <multiselect v-model="selectedAccount" :options="apAccountList" :close-on-select="true"
+                :clear-on-select="false" :preserve-search="true" placeholder="Select Payable Acount" label="name"
+                track-by="id" :preselect-first="true" @select="citySelectChanged(selectedCity)"></multiselect>
+            </div>
 
             <div class=" col-span-12">
                 <table class="min-w-[40%] text-sm font-light ">
@@ -100,12 +108,18 @@
 import { Modal, Ripple, initTE, Input, Select, Dropdown } from "tw-elements";
 import { getApiData, postApiData, deleteApiData } from '../../utilities/ajax-helpers';
 import { mapGetters } from "vuex";
+import Multiselect from 'vue-multiselect';
 
 export default {
+    components: {
+        Multiselect
+    },
     data() {
         return {
             itemList: [],
+            apAccountList: [],
             selectedItems: [],
+            selectedAccount: null,
             name: null,
             shopName: null,
             phoneNumber: null,
@@ -129,6 +143,14 @@ export default {
             let response = await getApiData({url: url, token: this.getToken()});
             if(response.data){
                 this.itemList = response.data;
+            }
+        },
+
+        async getAPAccounts(){
+            let url = `/api/get_payable_account`;
+            let response = await getApiData({url: url, token: this.getToken()});
+            if(response.data){
+                this.apAccountList = response.data;
             }
         },
 
@@ -182,6 +204,7 @@ export default {
     },
 
     created(){
+        this.getAPAccounts();
         this.getItemList();
     },
 
