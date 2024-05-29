@@ -39,8 +39,10 @@ use App\Http\Controllers\API\FeatureAPIController;
 use App\Http\Controllers\API\FixedAssetPurchaseAPIController;
 use App\Http\Controllers\API\PurchaseOrderAPIController;
 use App\Http\Controllers\API\ItemUsageForecastController;
+use App\Http\Controllers\API\MenuServiceDiscountAPIController;
 use App\Http\Controllers\API\PackAPIController;
 use App\Http\Controllers\API\PurchaseOrderItemLeftController;
+use App\Http\Controllers\API\RoomDiscountAPIController;
 use App\Http\Controllers\API\UsedDefectedAPIController;
 use App\Models\UsedDefectedItem;
 
@@ -182,6 +184,22 @@ Route::middleware('auth:api')->group(function () {
     Route::post('/uoms',[UomAPIController::class,'createUom']);
     Route::post('/uoms/{id}',[UomAPIController::class,'updateUom']);
     Route::delete('/uoms/{id}', [UomAPIController::class, 'deleteUom']);
+
+
+    Route::controller(MenuServiceDiscountAPIController::class)->group(function () {
+        Route::get('/menu_service_discounts', 'getMenuServiceDiscountData');
+        Route::post('/menu_service_discounts', 'createMenuServiceDiscount');
+        Route::post('/menu_service_discounts/{id}','editMenuServiceDiscount');
+        Route::delete('/menu_service_discounts/{id}','deleteMenuServiceDiscount');
+    });
+
+    Route::controller(RoomDiscountAPIController::class)->group(function ()
+    {
+        Route::get('/room_discounts','getRoomDiscount');
+        Route::post('/room_discounts','createRoomDiscount');
+        Route::post('/room_discounts/{id}','editRoomDiscount');
+        Route::delete('/room_discounts/{id}','deleteRoomDiscount');
+    });
 
     // uom conversion
     Route::post('/uom_conversions', [UomAPIController::class, 'createUomConversion']);
