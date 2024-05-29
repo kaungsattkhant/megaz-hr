@@ -15,4 +15,7 @@ class Ledger extends Model
     public function transaction(){
         return $this->belongsTo(\App\Models\Transaction::class);
     }
+    public function personable(){
+        return $this->morphTo();
+    }
 }

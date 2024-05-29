@@ -10,19 +10,37 @@ use Illuminate\Support\Facades\DB;
 
 class PurchaseOrderTransaction
 {
-    public function createTransaction($model, $transactionable_type = null,$cash_account_id)
+    public function createTransaction($model, $transactionable_type = null, $cash_account_id)
     {
+        // $purchaseOrderItemGroupedByCategory = PurchaseOrderItem::with('poGrn')->join('items', 'purchase_order_items.item_id', '=', 'items.id')
+        //     ->join('categories', 'items.category_id', '=', 'categories.id')
+        //     ->join('po_grns', 'purchase_order_items.id', '=', 'po_grns.purchase_order_item_id')
+        //     ->select(
+        //         'categories.name', 'items.category_id', DB::raw('SUM(purchase_order_items.quantity * purchase_order_items.amount) as total_amount'), DB::raw('SUM(po_grns.invoice_amount) as total_invoice_amount'))
+        //     ->groupBy( 'items.category_id', 'categories.name')
+        //     ->where('purchase_order_items.purchase_order_id', $model->id)
+        //     ->get();
 
-        $purchaseOrderItemGroupedByCategory = PurchaseOrderItem::join('items', 'purchase_order_items.item_id', '=', 'items.id')
-            ->join('categories', 'items.category_id', '=', 'categories.id')
-            ->select('categories.name', 'items.category_id', DB::raw('SUM(purchase_order_items.quantity * purchase_order_items.amount) as total_amount'))
-            ->groupBy('items.category_id','categories.name')
-            ->where('purchase_order_id', $model->id)
-            ->get();
-
+        $purchaseOrderItemGroupedByCategory = PurchaseOrderItem::join('po_grns', 'purchase_order_items.id', '=', 'po_grns.purchase_order_item_id')
+        ->join('items', 'purchase_order_items.item_id', '=', 'items.id')
+        ->join('categories', 'items.category_id', '=', 'categories.id')
+        ->join('suppliers', 'suppliers.id', '=', 'po_grns.supplier_id')
+        ->select(
+            'suppliers.account_id',
+            'suppliers.id as supplier_id',
+            'suppliers.name as supplier_name',
+            'categories.name as category_name',
+            'items.category_id',
+            DB::raw('SUM(purchase_order_items.quantity * purchase_order_items.amount) as total_amount'),
+            DB::raw('SUM(po_grns.invoice_amount) as total_invoice_amount')
+        )
+        ->where('purchase_order_items.purchase_order_id', $model->id)
+        ->groupBy('suppliers.id', 'suppliers.name', 'categories.id', 'categories.name')
+        ->get();
         $data['date'] = now();
         $data['created_by'] = UserData()->id;
         $data['transactionable_id'] = $model->id;
+        $data['is_confirmed'] = 1;
         $data['transactionable_type'] = $transactionable_type;
         foreach ($purchaseOrderItemGroupedByCategory as $po_category) {
             $transaction = (new StoreTransactionLedger())->createTransaction($data);
@@ -48,11 +66,9 @@ class PurchaseOrderTransaction
             if ($account_code == null) {
                 ResponseMessage('Transaction fail', 419);
             }
-
             #debit
             if ($account_code) {
                 $debitAccount = (new Account())->accountByCode($account_code); #Inventory Food
-
                 if ($debitAccount) {
                     $debitLedger = (new StoreTransactionLedger())->storeLedger([
                         'value' => $po_category->total_amount,
@@ -68,13 +84,25 @@ class PurchaseOrderTransaction
             if ($cash_account_id) {
                 $creditLedger = (new StoreTransactionLedger())->storeLedger([
                     'date' => now(),
-                    'value' => $po_category->total_amount,
+                    'value' => $po_category->total_invoice_amount,
                     'transaction_id' => $transaction->id,
                     'account_id' => $cash_account_id,
                     'action' => 'credit',
                 ]);
             } else {
                 ResponseMessage('Account is Invalid', 419);
+            }
+            #store AP 
+            if($po_category->total_invoice_amount<$po_category->total_amount){
+                $AP = (new StoreTransactionLedger())->storeLedger([
+                    'date' => now(),
+                    'value' => $po_category->total_amount-$po_category->total_invoice_amount,
+                    'transaction_id' => $transaction->id,
+                    'account_id' => $po_category->account_id,
+                    'personable_id'=>$po_category->supplier_id,
+                    'personable_type'=>'supplier',
+                    'action' => 'credit',
+                ]);
             }
         }
         return $purchaseOrderItemGroupedByCategory;

@@ -23,6 +23,7 @@ class SupplierRepository implements SupplierInterface
             if (!isset($request->id)) {
                 $data['id'] = null;
             }
+            $data['account_id']=14;
             $supplier=Supplier::updateOrCreate(
                 ['id' => $data['id']],
                 $data
