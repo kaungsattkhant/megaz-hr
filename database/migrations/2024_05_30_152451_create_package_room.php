@@ -11,9 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('package_room_session', function (Blueprint $table) {
-           $table->foreignId('package_id');
-           $table->foreignid('room_session_id');
+        Schema::create('package_room', function (Blueprint $table) {
+            $table->foreignId('package_id')->constrained()->onDelete('cascade');
+            $table->foreignId('room_id')->constrained()->onDelete('cascade');
         });
     }
 
@@ -22,6 +22,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('package_room_session');
+        Schema::dropIfExists('package_room');
     }
 };

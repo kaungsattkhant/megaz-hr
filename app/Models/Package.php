@@ -13,14 +13,10 @@ class Package extends Model
         'name','from_date','to_date','price','session','is_ktv','is_active','created_by'
     ];
 
-    public function roomSessions()
-    {
-        return $this->belongsToMany(RoomSession::class);
-    }
 
     public function rooms()
     {
-        return $this->belongsToMany(RoomSession::class);
+        return $this->belongsToMany(Entity::class, 'package_room', 'package_id', 'room_id');
     }
 
     public function menuPackages()
