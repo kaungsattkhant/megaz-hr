@@ -11,7 +11,7 @@ class SupplierRepository implements SupplierInterface
 
     public function list($request){
         if($request->per_page || $request->page){
-            return Supplier::with(['items'])->orderBy('id','DESC')->paginate(config('common.list_count'));
+            return Supplier::with(['account','items'])->orderBy('id','DESC')->paginate(config('common.list_count'));
         }
         return Supplier::with(['items'])->orderBy('id', 'ASC')->get();
     }
@@ -23,7 +23,6 @@ class SupplierRepository implements SupplierInterface
             if (!isset($request->id)) {
                 $data['id'] = null;
             }
-            $data['account_id']=14;
             $supplier=Supplier::updateOrCreate(
                 ['id' => $data['id']],
                 $data

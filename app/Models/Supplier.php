@@ -15,4 +15,8 @@ class Supplier extends Model
     {
         return $this->belongsToMany(Item::class,'supplier_items');
     }
+
+    public function account(){
+        return $this->belongsTo(Account::class);
+    }
 }

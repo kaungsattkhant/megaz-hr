@@ -3,6 +3,7 @@
 namespace App\Repositories\AccountPayable;
 
 use App\Models\Ledger;
+use App\Models\Account;
 use Illuminate\Support\Facades\DB;
 
 class AccountPayableRepository implements AccountPayableInterface
@@ -34,4 +35,32 @@ class AccountPayableRepository implements AccountPayableInterface
         ->get();
         return $ledger;
     }
+    public function createPayableAccount($request){
+        $latestAccount=Account::where('sub_account_id',$request->sub_account_id)
+        ->orderByRaw("CAST(SUBSTRING_INDEX(account_code, '-', -1) AS UNSIGNED) DESC")
+        ->first();
+        // ->max('account_code');
+        
+        if($latestAccount){
+            $latestAccountCodeNo = explode('-', $latestAccount->account_code);
+            // dd($account_code_no[1]);
+            $new_account_code=(int)$latestAccountCodeNo[1]+1;
+            $code=$latestAccountCodeNo[0].'-'.$new_account_code;
+            $account=Account::create([
+                'name'=>$request->name,
+                'account_code'=>$code,
+                'sub_account_id'=>$request->sub_account_id,
+            ]);
+            return $account;
+        }
+        ResponseMessage('Something is wrong',419);
+    }
+
+    public function getPayableAccount(){
+        return Account::whereHas('sub_account.head_account',function($q){
+            $q->where('head_account_id',config('common.liabilities'));
+        })
+        ->get();
+    }
+
 }
