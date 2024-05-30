@@ -12,8 +12,8 @@ class RoomDiscount extends Model
         'name','from_date','to_date','session','free_session','room_id','created_by','is_active'
     ];
 
-    public function room()
+    public function rooms()
     {
-        return $this->belongsTo(RoomSession::class);
+        return $this->belongsToMany(Entity::class);
     }
 }

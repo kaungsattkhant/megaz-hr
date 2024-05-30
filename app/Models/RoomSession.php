@@ -23,8 +23,5 @@ class RoomSession extends Model
         return $this->hasMany(Entity::class,'entity_id');
     }
 
-    public function packages()
-    {
-        return $this->belongsToMany(Package::class);
-    }
+
 }

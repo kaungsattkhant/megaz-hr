@@ -40,4 +40,10 @@ class Entity extends BaseModel
         return $this->morphMany(MenuServiceDiscount::class, 'discountable');
     }
 
+    public function roomDiscounts()
+    {
+        return $this->belongsToMany(RoomDiscount::class);
+    }
+
+
 }

@@ -10,7 +10,7 @@ class RoomDiscountRepository implements RoomDiscountRepositoryInterface
 {
     public function listAllData(Request $request)
     {
-        $roomDiscounts = RoomDiscount::with('room')->paginate(config('common.list_count'));
+        $roomDiscounts = RoomDiscount::with('rooms')->paginate(config('common.list_count'));
         ResponseData($roomDiscounts);
     }
 
@@ -20,6 +20,14 @@ class RoomDiscountRepository implements RoomDiscountRepositoryInterface
         try {
             $data['created_by'] = UserData()->id;
             $roomDiscount = RoomDiscount::create($data);
+            if($data['roomIds'])
+            {
+                $roomIds = json_decode($data['roomIds']);
+                foreach($roomIds as $roomId)
+                {
+                   $roomDiscount->rooms()->attach($roomId);
+                }
+            }
             DB::commit();
             ResponseData($roomDiscount);
         } catch (\Exception $e) {
@@ -35,6 +43,11 @@ class RoomDiscountRepository implements RoomDiscountRepositoryInterface
         try {
             $roomDiscount = RoomDiscount::find($id);
             $roomDiscount->update($data);
+            if($data['roomIds'])
+            {
+                $roomIds = json_decode($data['roomIds']);
+                $roomDiscount->rooms()->sync($roomIds);
+            }
             DB::commit();
             ResponseData($roomDiscount);
         } catch (\Exception $e) {
