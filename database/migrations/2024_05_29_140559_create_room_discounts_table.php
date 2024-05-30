@@ -11,18 +11,18 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('room_discounts', function (Blueprint $table) {
-            $table->id();
-            $table->string('name');
-            $table->date('from_date');
-            $table->date('to_date');
-            $table->double('session');
-            $table->double('free_session');
-            $table->foreignId('room_id');
-            $table->unsignedBigInteger('created_by');
-            $table->boolean('is_active')->default(1);
-            $table->timestamps();
-        });
+        // Schema::create('room_discounts', function (Blueprint $table) {
+        //     $table->id();
+        //     $table->string('name');
+        //     $table->date('from_date');
+        //     $table->date('to_date');
+        //     $table->double('session');
+        //     $table->double('free_session');
+        //     $table->foreignId('room_id');
+        //     $table->unsignedBigInteger('created_by');
+        //     $table->boolean('is_active')->default(1);
+        //     $table->timestamps();
+        // });
     }
 
     /**

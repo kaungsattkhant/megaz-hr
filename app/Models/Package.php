@@ -17,4 +17,14 @@ class Package extends Model
     {
         return $this->belongsToMany(RoomSession::class);
     }
+
+    public function rooms()
+    {
+        return $this->belongsToMany(RoomSession::class);
+    }
+
+    public function menuPackages()
+    {
+        return $this->hasMany(MenuPackage::class);
+    }
 }
