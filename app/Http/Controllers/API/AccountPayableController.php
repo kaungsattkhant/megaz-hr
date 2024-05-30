@@ -20,4 +20,14 @@ class AccountPayableController extends Controller
         $data = $this->accountPayableRepo->list($request);
         ResponseData($data);
     }
+
+    public function getPayableAccount(){
+        $data= $this->accountPayableRepo->getPayableAccount();
+        ResponseData($data);
+    }
+
+    public function createPayableAccount(Request $request){
+        $data= $this->accountPayableRepo->createPayableAccount($request);
+        ResponseData($data);
+    }
 }

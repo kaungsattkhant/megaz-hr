@@ -132,6 +132,10 @@ Route::middleware('auth:api')->group(function () {
         Route::get('account_by_sub_account/{id}', 'accountBySubAccount');
         Route::get('get_payable_account', 'getPayableAccount');
     });
+    Route::controller(AccountPayableController::class)->group(function () {
+        Route::get('account_payables','index');
+        Route::post('create_payable_account','createPayableAccount');
+    });
 
     Route::resource('transactions', TransactionController::class)->only(['index', 'store', 'show', 'destroy']);
     Route::controller(TransactionController::class)->group(function () {
@@ -193,9 +197,7 @@ Route::middleware('auth:api')->group(function () {
     
 });
 
-Route::controller(AccountPayableController::class)->group(function () {
-    Route::get('account_payables','index');
-});
+
 
 Route::controller(ExcelImportController::class)->group(function () {
     Route::post('/import_account', 'importAccount');

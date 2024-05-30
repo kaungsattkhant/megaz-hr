@@ -48,10 +48,7 @@ class AccountController extends Controller
         ResponseData($sub_account);
     }
 
-    public function getPayableAccount(){
-        $data= $this->accountRepo->getPayableAccount();
-        ResponseData($data);
-    }
+    
 
    
 }
