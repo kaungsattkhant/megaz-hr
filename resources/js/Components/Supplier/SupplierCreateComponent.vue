@@ -207,7 +207,7 @@ export default {
             let response = await postApiData({url: url, form_data: formData, token: this.getToken()});
             if(response.success){
                 // console.log(response);
-                // window.location.replace("/suppliers");
+                window.location.replace("/suppliers");
             }
         },
     },
