@@ -41,6 +41,7 @@ use App\Http\Controllers\API\FixedAssetPurchaseAPIController;
 use App\Http\Controllers\API\PurchaseOrderAPIController;
 use App\Http\Controllers\API\ItemUsageForecastController;
 use App\Http\Controllers\API\MenuServiceDiscountAPIController;
+use App\Http\Controllers\API\PackageAPIController;
 use App\Http\Controllers\API\PackAPIController;
 use App\Http\Controllers\API\PurchaseOrderItemLeftController;
 use App\Http\Controllers\API\RoomDiscountAPIController;
@@ -201,6 +202,14 @@ Route::middleware('auth:api')->group(function () {
         Route::post('/room_discounts','createRoomDiscount');
         Route::post('/room_discounts/{id}','editRoomDiscount');
         Route::delete('/room_discounts/{id}','deleteRoomDiscount');
+    });
+
+    Route::controller(PackageAPIController::class)->group(function()
+    {
+        Route::get('/packages','getPackage');
+        Route::post('/packages','createPackage');
+        Route::post('/packages/{id}','editPackage');
+        Route::delete('/packages/{id}','deletePackage');
     });
 
     // uom conversion
