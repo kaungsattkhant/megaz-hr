@@ -64,7 +64,7 @@
                 </label>
                 <multiselect v-model="selectedAccount" :options="apAccountList" :close-on-select="true"
                 :clear-on-select="false" :preserve-search="true" placeholder="Select Payable Acount" label="name"
-                track-by="id" :preselect-first="true" @select="citySelectChanged(selectedCity)"></multiselect>
+                track-by="id" :preselect-first="true"></multiselect>
             </div>
 
             <div class=" col-span-12">
@@ -154,8 +154,12 @@ export default {
             }
         },
 
-        alertValidationMessage(field){
-            alert(`You forgot to provide ${field}, please try again`);
+        alertValiationMessage(field) {
+            this.$notify({
+                title: `Input validation`,
+                text: `You forgot to provide ${field}, please try again`,
+                type: "warn"
+            });
         },
 
         async createBtnClicked(){
@@ -183,6 +187,10 @@ export default {
                 this.alertValidationMessage(`supplier credit limit`);
                 return 1;
             }
+            if(!this.selectedAccount){
+                this.alertValidationMessage(`supplier account payable`);
+                return 1;
+            }
 
             let formData = new FormData();
             formData.append("name", this.name);
@@ -190,6 +198,7 @@ export default {
             formData.append("phone_number", this.phoneNumber);
             formData.append("credit_limit", this.maxCredit);
             formData.append("address", this.address);
+            formData.append("account_id", this.selectedAccount.id);
             this.selectedItems.forEach((item)=>{
                 formData.append("items[]", item.id);
             });
@@ -198,7 +207,7 @@ export default {
             let response = await postApiData({url: url, form_data: formData, token: this.getToken()});
             if(response.success){
                 // console.log(response);
-                window.location.replace("/suppliers");
+                // window.location.replace("/suppliers");
             }
         },
     },
