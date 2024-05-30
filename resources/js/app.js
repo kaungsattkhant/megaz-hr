@@ -69,6 +69,10 @@ import SupplierCreateComponent from './Components/Supplier/SupplierCreateCompone
 import SupplierUpdateComponent from './Components/Supplier/SupplierUpdateComponent.vue';
 import FixedAssetCrudComponent from './Components/FixedAssets/FixedAssetCrudComponent.vue';
 import TableCrudComponent from './Components/TablesAndRooms/TableCrudComponent.vue';
+import PackagesListComponent from './Components/Packages/PackagesListComponent.vue';
+import PackagesCreateComponent from './Components/Packages/PackagesCreateComponent.vue';
+import MenuAndServiceDiscountCrudComponent from './Components/MenuAndServiceDiscount/MenuAndServiceDiscountCrudComponent.vue';
+import RoomDiscountCrudComponent from './Components/RoomDiscount/RoomDiscountCrudComponent.vue';
 
 import LoginComponent from './Components/Auth/LoginComponent.vue';
 import LogoutComponent from './Components/Auth/LogoutComponent.vue';
@@ -112,6 +116,10 @@ app.component('CashbookCrudComponent', CashbookCrudComponent);
 app.component('ArListComponent', ArListComponent);
 app.component('ArHistoryComponent', ArHistoryComponent);
 app.component('ArPaidComponent', ArPaidComponent);
+app.component('PackagesListComponent', PackagesListComponent);
+app.component('PackagesCreateComponent', PackagesCreateComponent);
+app.component('MenuAndServiceDiscountCrudComponent', MenuAndServiceDiscountCrudComponent);
+app.component('RoomDiscountCrudComponent', RoomDiscountCrudComponent);
 
 app.component('PurchaseOrderListComponent', PurchaseOrderListComponent);
 app.component('PurchaseOrderCreateComponent', PurchaseOrderCreateComponent);

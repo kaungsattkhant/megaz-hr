@@ -73,8 +73,14 @@ use App\Repositories\PurchaseOrderItemLeft\PurchaseOrderItemLeftInterface;
 use App\Repositories\PurchaseOrderItemLeft\PurchaseOrderItemLeftRepository;
 use App\Repositories\PurchaseOrderItem\PurchaseOrderItemRepositoryInterface;
 use App\Repositories\FixedAssetPurchase\FixedAssetPurchaseRepositoryInterface;
+use App\Repositories\MenuServiceDiscount\MenuServiceDiscountRepository;
+use App\Repositories\MenuServiceDiscount\MenuServiceDiscountRepositoryInterface;
 use App\Repositories\Pack\PackRepository;
 use App\Repositories\Pack\PackRepositoryInterface;
+use App\Repositories\Package\PackageRepository;
+use App\Repositories\Package\PackageRepositoryInterface;
+use App\Repositories\RoomDiscount\RoomDiscountRepository;
+use App\Repositories\RoomDiscount\RoomDiscountRepositoryInterface;
 use App\Repositories\UsedDefectedItem\UsedDefectedItemRepository;
 use App\Repositories\UsedDefectedItem\UsedDefectedITemRepositoryInterface;
 
@@ -125,5 +131,8 @@ class RepositoryServiceProvider extends ServiceProvider
         $this->app->bind(UsedDefectedITemRepositoryInterface::class,UsedDefectedItemRepository::class);
         $this->app->bind(FeatureRepositoryInterface::class,FeatureRepository::class);
         $this->app->bind(AccountPayableInterface::class,AccountPayableRepository::class);
+        $this->app->bind(MenuServiceDiscountRepositoryInterface::class,MenuServiceDiscountRepository::class);
+        $this->app->bind(RoomDiscountRepositoryInterface::class,RoomDiscountRepository::class);
+        $this->app->bind(PackageRepositoryInterface::class,PackageRepository::class);
     }
 }

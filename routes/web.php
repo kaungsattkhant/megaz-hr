@@ -170,3 +170,12 @@ Route::group(['prefix' => 'pos'], function () {
         Route::view('/invoices/detail', 'pos.invoices.detail')->name('pos.invoices.detail');
     });
 });
+
+
+
+
+//test
+Route::view('/packages', 'packages.index');
+Route::view('/packagescreate', 'packages.create');
+Route::view('/menu_service_discounts', 'menu_and_service_discount.index');
+Route::view('/room_discounts', 'room_discount.index');

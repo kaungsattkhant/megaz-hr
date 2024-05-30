@@ -39,4 +39,9 @@ class Menu extends BaseModel
     {
         return $this->belongsTo(Pack::class);
     }
+
+    public function menuServiceDiscounts()
+    {
+        return $this->morphMany(MenuServiceDiscount::class, 'discountable');
+    }
 }
