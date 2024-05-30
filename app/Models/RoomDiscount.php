@@ -11,4 +11,9 @@ class RoomDiscount extends Model
     protected $fillable = [
         'name','from_date','to_date','session','free_session','room_id','created_by','is_active'
     ];
+
+    public function rooms()
+    {
+        return $this->belongsToMany(Entity::class);
+    }
 }

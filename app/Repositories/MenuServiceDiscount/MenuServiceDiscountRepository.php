@@ -9,17 +9,15 @@ use Illuminate\Support\Facades\DB;
 class MenuServiceDiscountRepository implements MenuServiceDiscountRepositoryInterface
 {
     public function listAllData(Request $request)
-{
-    $msd = MenuServiceDiscount::with('discountable')->paginate(config('common.list_count'));
-
-    foreach ($msd as $item) {
-        if ($item->discountable instanceof \App\Models\Menu) {
-            $item->discountable->load('prices');
+    {
+        $msd = MenuServiceDiscount::with('discountable')->paginate(config('common.list_count'));
+        foreach ($msd as $item) {
+            if ($item->discountable_type =='menu') {
+                $item->discountable->load('prices');
+            }
         }
+        ResponseData($msd);
     }
-
-    return ResponseData($msd);
-}
 
 
 

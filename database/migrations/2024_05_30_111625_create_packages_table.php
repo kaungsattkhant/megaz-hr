@@ -17,7 +17,7 @@ return new class extends Migration
             $table->date('from_date');
             $table->date('to_date');
             $table->double('price');
-            $table->double('session');
+            $table->double('session')->nullable();
             $table->boolean('is_ktv');
             $table->boolean('is_active')->default(1);
             $table->unsignedBigInteger('created_by');

@@ -18,7 +18,7 @@ return new class extends Migration
             $table->date('to_date');
             $table->double('session');
             $table->double('free_session');
-            $table->foreignId('room_id');
+            // $table->foreignId('room_id');
             $table->unsignedBigInteger('created_by');
             $table->boolean('is_active')->default(1);
             $table->timestamps();
