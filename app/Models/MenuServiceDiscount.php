@@ -12,4 +12,9 @@ class MenuServiceDiscount extends Model
     protected $fillable=[
         'name','from_date','to_date','type','discountable_id','discountable_type','discount_price','created_by','is_active'
     ];
+
+    public function discountable()
+    {
+        return $this->morphTo();
+    }
 }
