@@ -17,6 +17,7 @@ class DepartmentSeeder extends Seeder
         $hr_features = config('common.hr_features');
         $inventory_features = config('common.inventory_features');
         $finance_features = config('common.finance_features');
+        $catering_features = config('common.catering_features');
         foreach ($names as $name) {
             $department = Department::create([
                 'name' => $name,
@@ -30,11 +31,13 @@ class DepartmentSeeder extends Seeder
                     break;
                 case 'Inventory':
                     $department->features()->sync($inventory_features);
+                case 'Catering':
+                    $department->features()->sync($catering_features);
                     break;
                 default:
                     $department->features()->sync($hr_features);
             }
-            $department->features()->sync($hr_features);
+            // $department->features()->sync($hr_features);
         }
     }
 }
