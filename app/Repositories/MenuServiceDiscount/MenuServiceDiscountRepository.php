@@ -19,8 +19,6 @@ class MenuServiceDiscountRepository implements MenuServiceDiscountRepositoryInte
         ResponseData($msd);
     }
 
-
-
     public function createData(array $data)
     {
         DB::beginTransaction();

@@ -11,13 +11,13 @@ class PackageRepository implements PackageRepositoryInterface
 {
     public function listAllData(Request $request)
     {
-        $packages=  Package::with('menuPackages.menu','rooms')->paginate(config('common.list_count'));
+        $packages=  Package::with('menuPackages.menu.prices','rooms')->paginate(config('common.list_count'));
         Responsedata($packages);
     }
 
     public function detailPackage(int $id)
     {
-        $package = Package::where('id',$id)->with('menuPackages.menu','rooms')->first();
+        $package = Package::where('id',$id)->with('menuPackages.menu.prices','rooms')->first();
         ResponseData($package);
     }
 

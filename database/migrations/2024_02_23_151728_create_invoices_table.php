@@ -14,25 +14,25 @@ return new class extends Migration
         Schema::create('invoices', function (Blueprint $table) {
             $table->id();
             $table->string('invoice_id')->unique()->nullable();
-            $table->foreignId('area_id')->onDelete('cascade');
-            $table->foreignId('entity_id')->constrained()->onDelete('cascade');
-            $table->foreignId('customer_id')->constrained()->onDelete('cascade');
-            $table->unsignedBigInteger('head_count_id')->nullable();
-
-            $table->unsignedBigInteger('service_id')->nullable();
-            $table->unsignedBigInteger('created_by');
             $table->dateTime('invoice_date');
             $table->dateTime('complete_date')->nullable();
-
+            $table->unsignedBigInteger('created_by');
             $table->double('total')->nullable();
             $table->double('tax')->nullable();
             $table->double('sub_total')->default(0);
+            $table->double('paid_amount'); //new
             $table->double('total_session_price')->default(0);
-            $table->double('discount_value')->default(0);
-
+            $table->double('change')->default(0);//new
+            $table->foreignId('area_id')->onDelete('cascade');
+            $table->double('service_charge');
+            $table->unsignedBigInteger('head_count_id')->nullable();
             $table->string('payment_status')->nullable();
             $table->string('payment_type')->nullable();
-
+            $table->double('discount_value')->default(0);
+            $table->foreignId('customer_id')->constrained()->onDelete('cascade');
+            $table->foreignId('package_id')->constrained()->onDelete('cascade')->nullable();//new
+            $table->foreignId('room_discount_id')->constrained()->onDelete('cascade')->nullable();//new
+            // $table->foreignId('entity_id')->constrained()->onDelete('cascade');
             $table->timestamps();
         });
     }
