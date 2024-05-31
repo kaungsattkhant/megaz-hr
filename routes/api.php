@@ -133,9 +133,9 @@ Route::middleware('auth:api')->group(function () {
         Route::get('sub_account_by_head_account/{id}', 'getSubAccountByHeadAccount');
         Route::get('get_cash_account', 'getCashAccount');
         Route::get('account_by_sub_account/{id}', 'accountBySubAccount');
-        Route::get('get_payable_account', 'getPayableAccount');
     });
     Route::controller(AccountPayableController::class)->group(function () {
+        Route::get('get_payable_account', 'getPayableAccount');
         Route::get('account_payables','index');
         Route::post('create_payable_account','createPayableAccount');
     });
