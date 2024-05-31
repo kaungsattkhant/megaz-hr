@@ -9,10 +9,14 @@ class Supplier extends Model
 {
     use HasFactory;
     
-    protected $fillable=['name','shop_name','phone_number','address','credit_limit'];
+    protected $fillable=['name','shop_name','phone_number','address','credit_limit','account_id'];
 
     public function items()
     {
         return $this->belongsToMany(Item::class,'supplier_items');
+    }
+
+    public function account(){
+        return $this->belongsTo(Account::class);
     }
 }

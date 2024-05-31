@@ -49,6 +49,10 @@ class Transaction extends Model
         return $this->hasOne(\App\Models\Ledger::class)->orderBy('id', 'desc');
     }
 
+    public function supplier(){
+        return $this->belongsTo(\App\Models\Supplier::class);
+    }
+
     public function scopeIsConfirmed($query,$bool){
         $isConfirmed=[$bool];
         if($bool=="-1"){

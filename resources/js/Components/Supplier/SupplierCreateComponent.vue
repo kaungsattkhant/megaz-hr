@@ -58,6 +58,23 @@
                     </select>
                 </div>
             </div>
+            <div class="mb-4 col-span-3 pb-6 rounded-md">
+                <label for="" class="block text-sm text-black mb-3">
+                    AP Account
+                </label>
+                <multiselect v-model="selectedAccount" :options="apAccountList" :close-on-select="true"
+                :clear-on-select="false" :preserve-search="true" placeholder="Select Payable Acount" label="name"
+                track-by="id" :preselect-first="true"></multiselect>
+            </div>
+
+            <div class="col-span-3 rounded-md">
+                <label for="" class="block text-sm text-black mb-3">
+                    &nbsp;
+                </label>
+                <button class="add-btn mt-0.5" data-te-toggle="modal" data-te-target="#create_modal">
+                    <i class="fal fa-plus"></i>
+                </button>
+            </div>
 
             <div class=" col-span-12">
                 <table class="min-w-[40%] text-sm font-light ">
@@ -94,23 +111,89 @@
             </button>
         </div>
     </div>
+
+    <!-- Modal -->
+    <div data-te-modal-init
+            class="fixed left-0 top-0 z-[1055] hidden h-full w-full overflow-y-auto overflow-x-hidden outline-none"
+            id="create_modal" tabindex="-1" aria-labelledby="create_modalLabel" aria-hidden="true">
+            <div data-te-modal-dialog-ref
+                class="pointer-events-none relative w-auto mb-12 translate-y-[-50px] opacity-0 transition-all duration-300 ease-in-out min-[576px]:mx-auto min-[576px]:mt-7 min-[576px]:max-w-[500px]">
+                <div
+                    class="min-[576px]:shadow-[0_0.5rem_1rem_rgba(#000, 0.15)] pointer-events-auto relative flex w-full flex-col rounded-md border-none bg-white bg-clip-padding text-current shadow-lg outline-none">
+
+                    <div class="relative flex justify-between py-2 px-6 border-b">
+                        <h5 class="text-base text-center mt-2 font-semibold leading-normal font-inter"
+                            id="create_modalLabel">
+                            Create Supplier AP Account
+                        </h5>
+                        <button type="button" class="text-xs focus:shadow-none focus:outline-none" data-te-modal-dismiss
+                            aria-label="Close">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                                stroke="currentColor" class="h-4 w-4">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                        </button>
+                    </div>
+                    <div class="relative px-6 py-4 border-b" data-te-modal-body-ref>
+
+                        <div class="mb-4">
+                            <label for="" class="label-form mb-3">
+                                Name
+                            </label>
+                            <input type="text" v-model="apAccountName" placeholder="AP Account Name"  class="input-ui">
+                        </div>
+
+                        <div class="mb-4">
+                            <div>
+                                <label class="label-form mb-3">AP Sub Account</label>
+                                <multiselect v-model="selectedPayableSubAccount" :options="payableSubAccountList" :close-on-select="true"
+                                :clear-on-select="false" :preserve-search="true" placeholder="Select Sub Account" label="name"
+                                track-by="id" :preselect-first="true"></multiselect>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!--Modal footer-->
+                    <div class="flex justify-end gap-x-4 px-6 mb-6 pt-4">
+                        <button type="button" class="cancel-btn focus:shadow-none focus:outline-none"
+                            data-te-modal-dismiss aria-label="Close">
+                            Cancel
+                        </button>
+                        <button type="button" @click="createAPAccountBtnClicked"
+                            class="add-btn focus:outline-none focus:ring-0 " data-te-modal-dismiss>
+                            Create
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
 </template>
 
 <script>
 import { Modal, Ripple, initTE, Input, Select, Dropdown } from "tw-elements";
 import { getApiData, postApiData, deleteApiData } from '../../utilities/ajax-helpers';
 import { mapGetters } from "vuex";
+import Multiselect from 'vue-multiselect';
 
 export default {
+    components: {
+        Multiselect
+    },
     data() {
         return {
             itemList: [],
+            apAccountList: [],
             selectedItems: [],
+            selectedAccount: null,
             name: null,
             shopName: null,
             phoneNumber: null,
             address: null,
             maxCredit: null,
+
+            payableSubAccountList: [],
+            selectedPayableSubAccount: null,
+            apAccountName: null,
         };
     },
 
@@ -132,8 +215,20 @@ export default {
             }
         },
 
-        alertValidationMessage(field){
-            alert(`You forgot to provide ${field}, please try again`);
+        async getAPAccounts(){
+            let url = `/api/get_payable_account`;
+            let response = await getApiData({url: url, token: this.getToken()});
+            if(response.data){
+                this.apAccountList = response.data;
+            }
+        },
+
+        alertValiationMessage(field) {
+            this.$notify({
+                title: `Input validation`,
+                text: `You forgot to provide ${field}, please try again`,
+                type: "warn"
+            });
         },
 
         async createBtnClicked(){
@@ -161,6 +256,10 @@ export default {
                 this.alertValidationMessage(`supplier credit limit`);
                 return 1;
             }
+            if(!this.selectedAccount){
+                this.alertValidationMessage(`supplier account payable`);
+                return 1;
+            }
 
             let formData = new FormData();
             formData.append("name", this.name);
@@ -168,6 +267,7 @@ export default {
             formData.append("phone_number", this.phoneNumber);
             formData.append("credit_limit", this.maxCredit);
             formData.append("address", this.address);
+            formData.append("account_id", this.selectedAccount.id);
             this.selectedItems.forEach((item)=>{
                 formData.append("items[]", item.id);
             });
@@ -179,10 +279,32 @@ export default {
                 window.location.replace("/suppliers");
             }
         },
+
+        async getPayableSubAccountList(){
+            let url = `/api/sub_account_by_head_account/4`;
+            let response = await getApiData({url: url, token: this.getToken()});
+            if(response.data){
+                this.payableSubAccountList = response.data;
+            }
+        },
+
+        async createAPAccountBtnClicked(){
+            let url = `/api/create_payable_account`;
+            let formData = new FormData();
+            formData.append("name", this.apAccountName);
+            formData.append("sub_account_id", this.selectedPayableSubAccount.id);
+            let response = await postApiData({url: url, form_data: formData, token: this.getToken()});
+            if(response.success){
+                this.apAccountList.unshift(response.data);
+                this.selectedAccount = response.data;
+            }
+        },
     },
 
     created(){
+        this.getAPAccounts();
         this.getItemList();
+        this.getPayableSubAccountList();
     },
 
     mounted() {
@@ -190,3 +312,5 @@ export default {
     },
 }
 </script>
+
+<style src="node_modules/vue-multiselect/dist/vue-multiselect.css"></style>

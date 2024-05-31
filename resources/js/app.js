@@ -61,6 +61,7 @@ import UomConversionCrudComponent from './Components/ItemUom/UomConversionCrudCo
 import AccountingCrudComponent from './Components/Accounting/AccountingCrudComponent.vue';
 import FinancialTransactionCrudComponent from './Components/FinancialTransaction/FinancialTransactionCrudComponent.vue';
 import CashbookCrudComponent from './Components/Cashbook/CashbookCrudComponent.vue';
+import ApListComponent from './Components/AP/ApListComponent.vue';
 import ArListComponent from './Components/AR/ArListComponent.vue';
 import ArHistoryComponent from './Components/AR/ArHistoryComponent.vue';
 import ArPaidComponent from './Components/AR/ArPaidComponent.vue';
@@ -69,6 +70,10 @@ import SupplierCreateComponent from './Components/Supplier/SupplierCreateCompone
 import SupplierUpdateComponent from './Components/Supplier/SupplierUpdateComponent.vue';
 import FixedAssetCrudComponent from './Components/FixedAssets/FixedAssetCrudComponent.vue';
 import TableCrudComponent from './Components/TablesAndRooms/TableCrudComponent.vue';
+import PackagesListComponent from './Components/Packages/PackagesListComponent.vue';
+import PackagesCreateComponent from './Components/Packages/PackagesCreateComponent.vue';
+import MenuAndServiceDiscountCrudComponent from './Components/MenuAndServiceDiscount/MenuAndServiceDiscountCrudComponent.vue';
+import RoomDiscountCrudComponent from './Components/RoomDiscount/RoomDiscountCrudComponent.vue';
 
 import LoginComponent from './Components/Auth/LoginComponent.vue';
 import LogoutComponent from './Components/Auth/LogoutComponent.vue';
@@ -109,9 +114,14 @@ app.component('ComplainsCrudComponent', ComplainsCrudComponent);
 app.component('AccountingCrudComponent', AccountingCrudComponent);
 app.component('FinancialTransactionCrudComponent', FinancialTransactionCrudComponent);
 app.component('CashbookCrudComponent', CashbookCrudComponent);
+app.component('ApListComponent', ApListComponent);
 app.component('ArListComponent', ArListComponent);
 app.component('ArHistoryComponent', ArHistoryComponent);
 app.component('ArPaidComponent', ArPaidComponent);
+app.component('PackagesListComponent', PackagesListComponent);
+app.component('PackagesCreateComponent', PackagesCreateComponent);
+app.component('MenuAndServiceDiscountCrudComponent', MenuAndServiceDiscountCrudComponent);
+app.component('RoomDiscountCrudComponent', RoomDiscountCrudComponent);
 
 app.component('PurchaseOrderListComponent', PurchaseOrderListComponent);
 app.component('PurchaseOrderCreateComponent', PurchaseOrderCreateComponent);

@@ -15,6 +15,7 @@ use App\Http\Controllers\API\TestController;
 use App\Http\Controllers\API\CommonController;
 use App\Http\Controllers\API\UomAPIController;
 use App\Http\Controllers\API\AccountController;
+use App\Http\Controllers\API\AccountPayableController;
 use App\Http\Controllers\API\ItemAPIController;
 use App\Http\Controllers\API\MenuAPIController;
 use App\Http\Controllers\API\RoleAPIController;
@@ -133,6 +134,11 @@ Route::middleware('auth:api')->group(function () {
         Route::get('get_cash_account', 'getCashAccount');
         Route::get('account_by_sub_account/{id}', 'accountBySubAccount');
     });
+    Route::controller(AccountPayableController::class)->group(function () {
+        Route::get('get_payable_account', 'getPayableAccount');
+        Route::get('account_payables','index');
+        Route::post('create_payable_account','createPayableAccount');
+    });
 
     Route::resource('transactions', TransactionController::class)->only(['index', 'store', 'show', 'destroy']);
     Route::controller(TransactionController::class)->group(function () {
@@ -215,7 +221,11 @@ Route::middleware('auth:api')->group(function () {
     Route::post('/uom_conversions', [UomAPIController::class, 'createUomConversion']);
     Route::post('/uom_conversions/{id}',[UomAPIController::class,'updateUomConversion']);
     Route::get('/uom_conversions',[UomAPIController::class,'getUomConversionList']);
+
+    
 });
+
+
 
 Route::controller(ExcelImportController::class)->group(function () {
     Route::post('/import_account', 'importAccount');
