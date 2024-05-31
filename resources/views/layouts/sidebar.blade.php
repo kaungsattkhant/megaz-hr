@@ -265,6 +265,15 @@
                                 </a>
                             </li>
                         @endif
+                        @if (checkFeaturePermission('account-payables'))
+                            <li>
+                                <a href="{{ route('AP.index') }}"
+                                    class="flex items-center @yield('account_payables')">
+                                    <i class="fal fa-truck-loading  pr-3"></i>
+                                    AP
+                                </a>
+                            </li>
+                        @endif
                         @if (checkFeaturePermission('purchase-order-confirmation'))
                             <li>
                                 <a href="{{ route('purchase_orders.confirm_poitems') }}"

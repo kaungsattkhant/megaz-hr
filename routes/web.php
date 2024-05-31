@@ -149,6 +149,9 @@ Route::middleware(['departments:cashbook'])->group(function () {
 Route::middleware(['departments:fixed-asset'])->group(function () {
     Route::view('/fixed_assets', 'fixed_assets.index')->name('fixed_assets.index');
 });
+Route::middleware(['departments:account-payables'])->group(function () {
+    Route::view('/account_payables', 'AP.index')->name('AP.index');
+});
 
 // Route::middleware(['departments:all_departments'])->group(function () {
 //     Route::view('/inventory_transfers', 'transfers.index')->name('transfers.index');
