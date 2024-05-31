@@ -28,7 +28,6 @@ class PackageRepository implements PackageRepositoryInterface
             ]);
 
             if(isset($data['roomIds'])){
-
                 $rooms = json_decode($data['roomIds']);
                 foreach($rooms as $room)
                 {
