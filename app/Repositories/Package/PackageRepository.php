@@ -11,7 +11,7 @@ class PackageRepository implements PackageRepositoryInterface
 {
     public function listAllData(Request $request)
     {
-        $packages=  Package::with('menuPackages')->paginate(config('common.list_count'));
+        $packages=  Package::with('menuPackages','rooms')->paginate(config('common.list_count'));
         Responsedata($packages);
     }
 
@@ -27,8 +27,9 @@ class PackageRepository implements PackageRepositoryInterface
                 'package_id' => $package->id
             ]);
 
-            if(isset($data['roomSessionIds'])){
-                $rooms = json_decode($data['roomSessionIds']);
+            if(isset($data['roomIds'])){
+
+                $rooms = json_decode($data['roomIds']);
                 foreach($rooms as $room)
                 {
                     $package->rooms()->attach($room);
@@ -51,9 +52,9 @@ class PackageRepository implements PackageRepositoryInterface
             $package = Package::find($id);
 
             $package->update($data);
-            if(isset($data['roomSessionIds']))
+            if(isset($data['roomIds']))
             {
-                $roomIds = json_decode($data['roomSessionIds']);
+                $roomIds = json_decode($data['roomIds']);
                 $package->rooms()->sync($roomIds);
             }
             DB::commit();
