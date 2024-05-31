@@ -179,6 +179,6 @@ Route::group(['prefix' => 'pos'], function () {
 
 //test
 Route::view('/packages', 'packages.index');
-Route::view('/packagescreate', 'packages.create');
+Route::view('/packages/create', 'packages.create');
 Route::view('/menu_service_discounts', 'menu_and_service_discount.index');
 Route::view('/room_discounts', 'room_discount.index');
