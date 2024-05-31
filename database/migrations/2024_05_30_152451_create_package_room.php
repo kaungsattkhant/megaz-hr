@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('package_room', function (Blueprint $table) {
             $table->foreignId('package_id')->constrained()->onDelete('cascade');
-            $table->foreignId('room_id')->constrained()->onDelete('cascade');
+            $table->unsignedBigInteger('room_id');
         });
     }
 
