@@ -138,6 +138,8 @@ Route::middleware('auth:api')->group(function () {
         Route::get('get_payable_account', 'getPayableAccount');
         Route::get('account_payables','index');
         Route::post('create_payable_account','createPayableAccount');
+        Route::get('account_payable_transaction_list','listOfAccountPayableTransaction');
+        Route::post('create_payable_transaction','createPayableTransaction');
     });
 
     Route::resource('transactions', TransactionController::class)->only(['index', 'store', 'show', 'destroy']);

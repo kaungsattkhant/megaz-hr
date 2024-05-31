@@ -10,4 +10,8 @@ interface AccountPayableInterface
     public function getPayableAccount();
 
     public function createPayableAccount($request);
+
+    public function createPayableTransaction($request);
+
+    public function listOfAccountPayableTransaction($request);
 }

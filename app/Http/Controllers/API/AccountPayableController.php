@@ -30,4 +30,14 @@ class AccountPayableController extends Controller
         $data= $this->accountPayableRepo->createPayableAccount($request);
         ResponseData($data);
     }
+
+    public function createPayableTransaction(Request $request){
+        $data= $this->accountPayableRepo->createPayableTransaction($request);
+        ResponseData($data);
+    }
+
+    public function listOfAccountPayableTransaction(Request $request){
+        $data= $this->accountPayableRepo->listOfAccountPayableTransaction($request);
+        ResponseData($data);
+    }
 }
