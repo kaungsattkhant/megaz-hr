@@ -14,8 +14,8 @@ return new class extends Migration
         Schema::create('menu_packages', function (Blueprint $table) {
             $table->id();
             $table->foreignId('menu_id')->constrained()->onDelete('cascade');
-            $table->double('quantity');
             $table->foreignId('package_id')->constrained()->onDelete('cascade');
+            $table->double('quantity');
             $table->timestamps();
         });
     }

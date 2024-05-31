@@ -205,6 +205,7 @@ Route::middleware('auth:api')->group(function () {
     Route::controller(PackageAPIController::class)->group(function()
     {
         Route::get('/packages','getPackage');
+        Route::get('/packages/{id}','detailPackage');
         Route::post('/packages','createPackage');
         Route::post('/packages/{id}','editPackage');
         Route::delete('/packages/{id}','deletePackage');

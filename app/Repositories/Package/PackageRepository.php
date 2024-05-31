@@ -11,8 +11,14 @@ class PackageRepository implements PackageRepositoryInterface
 {
     public function listAllData(Request $request)
     {
-        $packages=  Package::with('menuPackages','rooms')->paginate(config('common.list_count'));
+        $packages=  Package::with('menuPackages.menu','rooms')->paginate(config('common.list_count'));
         Responsedata($packages);
+    }
+
+    public function detailPackage(int $id)
+    {
+        $package = Package::where('id',$id)->with('menuPackages.menu','rooms')->first();
+        ResponseData($package);
     }
 
     public function createData(array $data)
@@ -21,12 +27,19 @@ class PackageRepository implements PackageRepositoryInterface
         try{
             $data['created_by'] = UserData()->id;
             $package = Package::create($data);
-            $menu_package = MenuPackage::create([
-                'menu_id' => $data['menu_id'],
-                'quantity' => $data['quantity'],
-                'package_id' => $package->id
-            ]);
 
+            if(isset($data['menuIds']))
+            {
+                $menuIds = json_decode($data['menuIds']);
+                foreach($menuIds as $menu)
+                {
+                    $menu_package = MenuPackage::create([
+                        'menu_id' => $menu->menu_id,
+                        'quantity' => $menu->quantity,
+                        'package_id' => $package->id
+                    ]);
+                }
+            }
             if(isset($data['roomIds'])){
                 $rooms = json_decode($data['roomIds']);
                 foreach($rooms as $room)
@@ -49,12 +62,22 @@ class PackageRepository implements PackageRepositoryInterface
         DB::beginTransaction();
         try{
             $package = Package::find($id);
-
             $package->update($data);
             if(isset($data['roomIds']))
             {
                 $roomIds = json_decode($data['roomIds']);
                 $package->rooms()->sync($roomIds);
+            }
+            if (isset($data['menuIds'])) {
+                $menuIds = json_decode($data['menuIds']);
+                MenuPackage::where('package_id', $package->id)->delete();
+                foreach ($menuIds as $menu) {
+                    MenuPackage::create([
+                        'menu_id' => $menu->menu_id,
+                        'quantity' => $menu->quantity,
+                        'package_id' => $package->id
+                    ]);
+                }
             }
             DB::commit();
             ResponseMessage($package);
