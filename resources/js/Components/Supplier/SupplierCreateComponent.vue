@@ -248,7 +248,7 @@ export default {
         },
 
         async getAPAccounts(){
-            let url = `/api/account_payables`;
+            let url = `/api/get_payable_account`;
             let response = await getApiData({url: url, token: this.getToken()});
             if(response.data){
                 this.apAccountList = response.data;
@@ -327,7 +327,7 @@ export default {
             formData.append("sub_account_id", this.selectedPayableSubAccount.id);
             let response = await postApiData({url: url, form_data: formData, token: this.getToken()});
             if(response.success){
-                this.apAccountList.push(response.data);
+                this.apAccountList.unshift(response.data);
                 this.selectedAccount = response.data;
             }
         },
