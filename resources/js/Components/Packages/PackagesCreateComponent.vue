@@ -305,6 +305,8 @@
                         text: `Package created successfully`,
                         type: "info"
                     });
+
+                    window.location.replace('/packages');
                 }
                 else{
                     this.$notify({

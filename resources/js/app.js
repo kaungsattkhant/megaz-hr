@@ -62,6 +62,7 @@ import AccountingCrudComponent from './Components/Accounting/AccountingCrudCompo
 import FinancialTransactionCrudComponent from './Components/FinancialTransaction/FinancialTransactionCrudComponent.vue';
 import CashbookCrudComponent from './Components/Cashbook/CashbookCrudComponent.vue';
 import ApListComponent from './Components/AP/ApListComponent.vue';
+import ApHistoryComponent from './Components/AP/ApHistoryComponent.vue';
 import ArListComponent from './Components/AR/ArListComponent.vue';
 import ArHistoryComponent from './Components/AR/ArHistoryComponent.vue';
 import ArPaidComponent from './Components/AR/ArPaidComponent.vue';
@@ -115,6 +116,7 @@ app.component('AccountingCrudComponent', AccountingCrudComponent);
 app.component('FinancialTransactionCrudComponent', FinancialTransactionCrudComponent);
 app.component('CashbookCrudComponent', CashbookCrudComponent);
 app.component('ApListComponent', ApListComponent);
+app.component('ApHistoryComponent', ApHistoryComponent);
 app.component('ArListComponent', ArListComponent);
 app.component('ArHistoryComponent', ArHistoryComponent);
 app.component('ArPaidComponent', ArPaidComponent);

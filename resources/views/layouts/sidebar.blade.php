@@ -273,6 +273,13 @@
                                     AP
                                 </a>
                             </li>
+                            <li>
+                                <a href="{{ route('AP.history') }}"
+                                    class="flex items-center @yield('ap_history')">
+                                    <i class="fal fa-truck-loading  pr-3"></i>
+                                    AP Transactions
+                                </a>
+                            </li>
                         @endif
                         @if (checkFeaturePermission('purchase-order-confirmation'))
                             <li>

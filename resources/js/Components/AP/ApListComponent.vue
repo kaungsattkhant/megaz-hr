@@ -23,15 +23,13 @@
                                 Supplier Name
                             </th>
                             <th scope="col" class=" px-6 py-4 ">
-                                Current Credit
-                            </th>
-
-                            <th scope="col" class=" px-6 py-4 ">
                                 Total Credit
                             </th>
-
                             <th scope="col" class=" px-6 py-4 ">
-                                Debit
+                                Total Debit
+                            </th>
+                            <th scope="col" class=" px-6 py-4 ">
+                                Outstanding Debt
                             </th>
                             <th scope="col" class=" px-6 py-4 ">
                                 &nbsp;
@@ -52,12 +50,13 @@
                                 </td>
 
                                 <td class=" px-6 py-4 ">
-                                    {{ (ap.total_credit_amount).toLocaleString() }}
+                                    {{ (ap.debit_amount).toLocaleString() }}
                                 </td>
 
                                 <td class=" px-6 py-4 ">
-                                    {{ (ap.debit_amount).toLocaleString() }}
+                                    {{ (ap.total_credit_amount).toLocaleString() }}
                                 </td>
+
                                 <td class=" px-6 py-4 ">
                                     <button class="add-btn mt-0.5" data-te-toggle="modal" data-te-target="#create_modal"
                                     @click="payCreditBtnClicked(ap)">
@@ -123,7 +122,7 @@
                             data-te-modal-dismiss aria-label="Close">
                             Cancel
                         </button>
-                        <button type="button"
+                        <button type="button" @click="confirmPayCreditBtnClicked"
                             class="add-btn focus:outline-none focus:ring-0 " data-te-modal-dismiss>
                             Create
                         </button>
@@ -170,6 +169,14 @@
         methods: {
             ...mapGetters(['getToken']),
 
+            alertValiationMessage(field) {
+                this.$notify({
+                    title: `Input validation`,
+                    text: `You forgot to provide ${field}, please try again`,
+                    type: "warn"
+                });
+            },
+
             async getCashAccountList() {
                 let url = `/api/get_cash_account`;
                 let response = await getApiData({ url: url, token: this.getToken() });
@@ -199,6 +206,38 @@
                 this.selectedAP = ap;
                 this.payAmount = this.selectedAP.total_credit_amount;
             },
+
+            async confirmPayCreditBtnClicked(){
+                if(!this.payAmount){
+                    this.alertValiationMessage(`credit pay amount`);
+                    return 1;
+                }
+                if(!this.selectedCashAccount){
+                    this.alertValiationMessage(`cash account`);
+                    return 1;
+                }
+                let formData = new FormData();
+                formData.append('supplier_id', this.selectedAP.supplier_id);
+                formData.append('value', this.payAmount);
+                formData.append('cash_account_id', this.selectedCashAccount.id);
+                formData.append('account_id', this.selectedAP.account_id);
+                let url = `/api/create_payable_transaction`;
+                let response = await postApiData({url: url, form_data: formData, token: this.getToken()});
+                if(response.success){
+                    this.$notify({
+                        text: `Credit transaction added successfully`,
+                        type: "info"
+                    });
+
+                    this.getAccountPayables(this.currentPage);
+                }
+                else{
+                    this.$notify({
+                        text: `Credit transaction added failed`,
+                        type: "error"
+                    });
+                }
+            }
         },
 
         created(){
