@@ -134,6 +134,13 @@ class InventoryRepository implements InventoryRepositoryInterface
         return $ledgers;
     }
 
+    public function getInventoryLedgerList($request){
+        // dd(UserData());
+        $inventoryId=UserData()->department->inventory->inventory_id;
+        $ledgers = (new GetInventoryStockAction($inventoryId))->run();
+        return $ledgers;
+    }
+
     public function inventoryList(){
         $toInventory=Inventory::where('is_active',1)
         ->whereNotIn('id',InventoryIds())

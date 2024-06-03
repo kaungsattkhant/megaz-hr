@@ -16,4 +16,6 @@ interface ItemRepositoryInterface
 
     public function addPriceItem(array $data, int $id);
 
+    public function getItemPriceListByItem($item_id);
+
 }

@@ -130,6 +130,7 @@ class GetInventoryStockAction
                 'items.name',
                 'inventory_ledger_items.item_id', // Prefix the table name here
                 'latest_prices.uom_id as item_uom_id',
+                'latest_prices.price',
                 'items.base_uom_id  as base_unit_id',
                 'item_uom.name as base_uom_name',
                 'base_uom.name as conversion_uom_name',
@@ -138,15 +139,16 @@ class GetInventoryStockAction
                   SUM(CASE WHEN action = "out" AND DATE(date) < CURDATE() THEN quantity ELSE 0 END)) as opening_balance'),
                 DB::raw('SUM(CASE WHEN action = "in" AND DATE(date) = CURDATE() THEN quantity ELSE 0 END) as in_balance'),
                 DB::raw('SUM(CASE WHEN action = "out" AND DATE(date) = CURDATE() THEN quantity ELSE 0 END) as out_balance'),
-                // DB::raw('((SUM(CASE WHEN action = "in" AND DATE(date) < CURDATE() THEN quantity ELSE 0 END) +
-                //   SUM(CASE WHEN action = "in" AND DATE(date) = CURDATE() THEN quantity ELSE 0 END) -
-                //   SUM(CASE WHEN action = "out" AND DATE(date) <= CURDATE() THEN quantity ELSE 0 END)) / uom_conversions.conversion) as closing_balance')
                 DB::raw('(SUM(CASE WHEN action = "in" AND DATE(date) < CURDATE() THEN quantity ELSE 0 END) +
                   SUM(CASE WHEN action = "in" AND DATE(date) = CURDATE() THEN quantity ELSE 0 END) -
-                  SUM(CASE WHEN action = "out" AND DATE(date) <= CURDATE() THEN quantity ELSE 0 END)) as closing_balance')
+                  SUM(CASE WHEN action = "out" AND DATE(date) <= CURDATE() THEN quantity ELSE 0 END)) as closing_balance'),
+                DB::raw('((latest_prices.price / uom_conversions.conversion) *
+                  (SUM(CASE WHEN action = "in" AND DATE(date) < CURDATE() THEN quantity ELSE 0 END) +
+                  SUM(CASE WHEN action = "in" AND DATE(date) = CURDATE() THEN quantity ELSE 0 END) -
+                  SUM(CASE WHEN action = "out" AND DATE(date) <= CURDATE() THEN quantity ELSE 0 END))) as total_value')
             )
             ->where('inventory_id', $this->inventoryId)
-            ->groupBy('inventory_ledger_items.item_id', 'items.name', 'latest_prices.uom_id', 'items.base_uom_id', 'uom_conversions.conversion', 'item_uom.name', 'base_uom.name');
+            ->groupBy('inventory_ledger_items.item_id', 'items.name', 'latest_prices.price', 'latest_prices.uom_id', 'items.base_uom_id', 'uom_conversions.conversion', 'item_uom.name', 'base_uom.name');
         $result = $itemBalances->get();
 
         return $result;

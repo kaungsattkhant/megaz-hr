@@ -69,4 +69,9 @@ class InventoryAPIController extends Controller
         ResponseData($data);
     }
 
+    public function getInventoryLedgerList(Request $request){
+        $data = $this->inventoryRepo->getInventoryLedgerList($request);
+        ResponseData($data);
+    }
+
 }
