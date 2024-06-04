@@ -16,6 +16,7 @@ return new class extends Migration
             $table->string('invoice_id')->unique()->nullable();
             $table->dateTime('invoice_date');
             $table->dateTime('complete_date')->nullable();
+            $table->string('invoice_type');
             $table->unsignedBigInteger('created_by');
             $table->double('total')->nullable();
             $table->double('tax')->nullable();
