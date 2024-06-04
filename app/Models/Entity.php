@@ -45,5 +45,4 @@ class Entity extends BaseModel
         return $this->belongsToMany(RoomDiscount::class);
     }
 
-
 }

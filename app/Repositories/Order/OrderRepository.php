@@ -6,6 +6,7 @@ use App\Models\Order;
 use App\Models\OrderItem;
 use Illuminate\Support\Facades\DB;
 use App\Http\Action\SendNotification\SendNotification;
+use App\Models\Menu;
 use App\Models\Pack;
 use App\Models\Staff;
 use Illuminate\Http\Request;
@@ -17,7 +18,6 @@ class OrderRepository implements OrderRepositoryInterface
     {
         DB::beginTransaction();
         try {
-
             $price = $data['original_price'] * $data['quantity'];
             $order = Order::where('invoice_id', $data['invoice_id'])->get()->first();
             if ($order) {
@@ -30,8 +30,6 @@ class OrderRepository implements OrderRepositoryInterface
                 $data['discount_value'] = 0;
                 $data['price'] = $data['original_price'] * $data['quantity'];
                 $order_items = OrderItem::create($data);
-
-
 
                 DB::commit();
                 return $order;
@@ -71,52 +69,73 @@ class OrderRepository implements OrderRepositoryInterface
         DB::beginTransaction();
         try {
             $invoiceId = $data['invoice_id'];
-            $order = Order::where('invoice_id', $invoiceId)->get()->first();
+            $order = Order::where('invoice_id', $invoiceId)->first();
             $categorySums = [];
-            foreach ($data['menuArray'] as $menu) {
-                $menuCategoryId = $menu['menu_category_id'];
-                $price = $menu['original_price'] * $menu['quantity'];
+            $totalDiscount = 0;
+
+            foreach ($data['menuArray'] as $menuData) {
+                $menuCategoryId = $menuData['menu_category_id'];
+                $price = $menuData['original_price'] * $menuData['quantity'];
 
                 if (!isset($categorySums[$menuCategoryId])) {
                     $categorySums[$menuCategoryId] = 0;
                 }
 
                 $categorySums[$menuCategoryId] += $price;
-                $menu['invoice_id'] = $invoiceId;
+                $menuData['invoice_id'] = $invoiceId;
+
+                $menu = Menu::find($menuData['menu_id']);
+                dd($menu->menuServiceDiscounts());
+                $latestMenuServiceDiscount = $menu->menuServiceDiscounts()
+                    ->whereDate('from_date', '<=', CurrentDate())
+                    ->whereDate('to_date', '>=', CurrentDate())
+                    ->orderBy('created_at', 'desc')
+                    ->where('type','menu')
+                    ->first();
+
+                if ($latestMenuServiceDiscount) {
+                    $discountAmount = $latestMenuServiceDiscount->discount_price * $menuData['quantity'];
+                    $totalDiscount += $discountAmount;
+                    $menuData['menu_service_discount_id'] = $latestMenuServiceDiscount->id;
+                    $menuData['discount_value'] = $latestMenuServiceDiscount->discount_price;
+                }else{
+                    $discountAmount = 0;
+                }
+
                 if ($order) {
-                    $order->total_quantity += $menu['quantity'];
-                    $order->total += $menu['original_price'] * $menu['quantity'];
-                    $order->update($menu);
+                    $order->total_quantity += $menuData['quantity'];
+                    $order->total_discount_price += $discountAmount; // update total discount only for this order
+                    $order->total += $menuData['original_price'] * $menuData['quantity'];
+                    $order->update($menuData);
 
-                    $originalOrderItem = OrderItem::where('menu_id', $menu['menu_id'])->where('order_id', $order->id)->get()->first();
+                    $originalOrderItem = OrderItem::where('menu_id', $menuData['menu_id'])->where('order_id', $order->id)->first();
 
-                    $menu['date'] = CurrentTime();
-                    $menu['order_id'] = $order->id;
-                    $menu['discount_value'] = 0;
-                    $menu['price'] = $menu['original_price'] * $menu['quantity'];
-                    $order_items = OrderItem::create($menu);
+                    $menuData['date'] = CurrentTime();
+                    $menuData['order_id'] = $order->id;
+                    $menuData['price'] = $menuData['original_price'] * $menuData['quantity'];
+                    $order_items = OrderItem::create($menuData);
                 } else {
-                    $menu['date'] = CurrentTime();
-                    $menu['total'] = $menu['original_price'] * $menu['quantity'];
-                    $menu['total_quantity'] = $menu['quantity'];
-                    $order = Order::create($menu);
+                    $menuData['date'] = CurrentTime();
+                    $menuData['total'] = $menuData['original_price'] * $menuData['quantity'];
+                    $menuData['total_quantity'] = $menuData['quantity'];
+                    $menuData['total_discount_price'] = $discountAmount; // update total discount only for this order
+                    $order = Order::create($menuData);
                     $order->update(['order_id' => sprintf('%05d', $order->id)]);
 
-                    $menu['order_id'] = $order->id;
-                    $menu['discount_value'] = 0;
-                    $menu['price'] = $menu['original_price'] * $menu['quantity'];
-                    $order_items = OrderItem::create($menu);
+                    $menuData['order_id'] = $order->id;
+                    $menuData['price'] = $menuData['original_price'] * $menuData['quantity'];
+                    $order_items = OrderItem::create($menuData);
                 }
             }
-            $users =  $this->getUserByRole('Kitchen', ['staff']);
-            $title = 'New Order Arrived';
+            // $users = $this->getUserByRole('Kitchen', ['staff']);
+            // $title = 'New Order Arrived';
 
-            $data = [
-                'date' => CurrentTime(),
-                'title' => $title,
-                'body' => 'New Order arrived to kitchen',
-            ];
-            $this->send($order_items, $users, $data);
+            // $notificationData = [
+            //     'date' => CurrentTime(),
+            //     'title' => $title,
+            //     'body' => 'New Order arrived to kitchen',
+            // ];
+            // $this->send($order_items, $users, $notificationData);
 
             DB::commit();
             return $order;
@@ -127,6 +146,8 @@ class OrderRepository implements OrderRepositoryInterface
         }
     }
 
+
+
     public function orderItemStatusChange(array $data)
     {
         DB::beginTransaction();
@@ -136,7 +157,6 @@ class OrderRepository implements OrderRepositoryInterface
             if ($data['status'] == 'done') {
                 $packs = Pack::where('menu_id', $orderItem->menu_id)->where('status', 'ready')->where('expired_at', '>', CurrentTime())->orderBy('expired_at', 'asc')->take($orderItem->quantity)->get();
                 if (count($packs) < $orderItem->quantity) {
-                    ResponseMessage('Packs not enough', 422);
                 }
                 foreach ($packs as $pack) {
                     if ($pack->status == 'ready') {

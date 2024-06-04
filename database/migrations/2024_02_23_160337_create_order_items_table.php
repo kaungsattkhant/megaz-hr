@@ -22,7 +22,7 @@ return new class extends Migration
             $table->unsignedBigInteger('order_id');
             $table->string('status')->default('not yet');
             $table->boolean('is_complete')->default(0);
-            $table->foreignId('menu_service_discount_id')->foreignId()->constrained()->onDelete('cascade');
+            $table->foreignId('menu_service_discount_id')->nullable()->foreignId()->constrained()->onDelete('cascade');
             $table->string('remark')->nullable();
             $table->timestamps();
         });

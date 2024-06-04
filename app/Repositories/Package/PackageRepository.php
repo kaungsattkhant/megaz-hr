@@ -26,8 +26,13 @@ class PackageRepository implements PackageRepositoryInterface
         DB::beginTransaction();
         try{
             $data['created_by'] = UserData()->id;
-            $package = Package::create($data);
+            $roomIds = json_decode($data['roomIds']);
+            $isValid = $this->validatePackingDates($roomIds, $data['from_date'], $data['to_date']);
 
+            if ($isValid==true) {
+                ResponseMessage('Package dates overlap with existing packages for the specified rooms.', 422);
+            }
+            $package = Package::create($data);
             if(isset($data['menuIds']))
             {
                 $menuIds = json_decode($data['menuIds']);
@@ -56,6 +61,28 @@ class PackageRepository implements PackageRepositoryInterface
             throw $e;
         }
     }
+
+
+    public function validatePackingDates(array $roomIds, $fromDate, $toDate)
+    {
+        foreach ($roomIds as $roomId) {
+            $overlappingPacking = Package::whereHas('rooms', function ($query) use ($roomId) {
+                $query->where('entities.id', $roomId);
+            })
+                ->where(function ($query) use ($fromDate, $toDate) {
+                    $query->where('from_date', '<=', $toDate)
+                        ->where('to_date', '>=', $fromDate);
+                })->first();
+
+                // dd($overlappingPacking);
+            if ($overlappingPacking==null) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
 
     public function editData(int $id, array $data)
     {

@@ -9,7 +9,9 @@ class Order extends Model
 {
     use HasFactory;
     protected $fillable =[
-        'order_id','total_quantity','date','total','invoice_id','is_complete'
+        'order_id','total_quantity','date','total',
+        'total_discount_price',
+        'invoice_id','is_complete'
     ];
 
     public function invoice()
