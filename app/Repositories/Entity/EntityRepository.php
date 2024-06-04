@@ -34,12 +34,20 @@ class EntityRepository implements EntityRepositoryInterface
     {
         $area = Area::find($data['area_id']);
         $currentDate = $data['current_date'];
-        $entities = Entity::where('area_id', $area->id)->where("is_available", 1)->with(["invoices" => function ($query) use ($currentDate) {
-            $query->where("complete_date", null)->select("id", "invoice_id", "entity_id", "total_session_price")->with("sessions");
-        }])->get();
+        $entities = Entity::where('area_id', $area->id)
+            ->where('is_available', 1)
+            ->with(['roomSessions' => function ($query) {
+                $query->with(['invoice' => function ($query) {
+                    $query->where('complete_date', null)
+                        ->orderBy('created_at', 'desc')
+                        ->limit(1);
+                }])->latest()->take(1);
+            }])
+            ->get();
 
         return $entities;
     }
+
 
     public function entityDetail(array $data, int $entityId)
     {

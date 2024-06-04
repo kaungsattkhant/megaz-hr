@@ -102,6 +102,8 @@ class InvoiceRepository implements InvoiceRepositoryInterface
             } else {
                 $end_date = null;
             }
+
+
             if ($end_date == null) {
                 $data['end_date'] = null;
             } else {
