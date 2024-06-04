@@ -117,6 +117,7 @@ class AccountPayableRepository implements AccountPayableInterface
         ->select(
             // 'ledgers.created_at as date',
             DB::raw("DATE_FORMAT(ledgers.created_at, '%M %d %Y %H:%i') as date"),
+            'accounts.name as account_name',
             'ledgers.personable_id as supplier_id',
             'suppliers.account_id',
             'suppliers.name as supplier_name',

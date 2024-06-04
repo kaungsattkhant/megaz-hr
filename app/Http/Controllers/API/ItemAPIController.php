@@ -51,5 +51,10 @@ class ItemAPIController extends Controller
         ResponseData($item);
     }
 
+    public function getItemPriceListByItem($item_id){
+        $item = $this->itemRepo->getItemPriceListByItem($item_id);
+        ResponseData($item);
+    }
+
    
 }
