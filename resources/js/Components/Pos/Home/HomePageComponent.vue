@@ -195,7 +195,7 @@
                                         <p class=" col-span-1 text-center text-sm">
                                             {{ menu2.quantity }}
                                         </p>
-                                        <p :class="menu2.status == 'done' ? 'text-green-600 font-semibold' : 'text-gray-500'" 
+                                        <p :class="menu2.status == 'done' ? 'text-green-600 font-semibold' : 'text-gray-500'"
                                             class=" col-span-2 text-center text-xs pt-0.5">
                                             {{ menu2.status }}
                                         </p>
