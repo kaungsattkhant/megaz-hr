@@ -428,6 +428,19 @@
                         <div class="padding-section w-2/3 mx-auto ">
                             <div class="mb-4">
                                 <label for="" class="block text-sm text-black mb-3">
+                                    Type
+                                </label>
+                                <div class="relative">
+                                    <select name="" id="" v-model="type"
+                                        class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
+                                        <option value="package"> Package </option>
+                                        <option value="session">  Session </option>
+                                        <option value="endless_time"> Endless Time </option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="mb-4">
+                                <label for="" class="block text-sm text-black mb-3">
                                     Customer Name
                                 </label>
                                 <div class="relative">
@@ -754,6 +767,7 @@
                 customerList:null,
                 roomName:null,
                 selectedCustomer:null,
+                type:null,
                 invoice_date:null,
                 male:null,
                 female:null,
@@ -871,6 +885,7 @@
                     this.roomList = response.data;
                     // console.log( this.roomList[0] );
                 }
+                console.log(this.selectedAreaId)
             },
 
             async getCustomerList(){
@@ -923,6 +938,7 @@
                 }
                 formData.append('phone_number', this.ph_number);
                 formData.append('address', this.address);
+                formData.append('type', this.type);
                 formData.append('birthdate', this.date);
                 let response = await postApiData({url: '/api/customers', form_data: formData, token: this.getToken()});
                 console.log(this.selectedGender+','+this.name+','+this.email+','+this.ph_number+','+this.address+','+this.date)
