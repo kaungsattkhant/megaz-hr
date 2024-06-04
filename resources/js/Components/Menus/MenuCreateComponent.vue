@@ -89,7 +89,7 @@
             <div class="mb-0 col-span-3 rounded-md">
                 <label for="" class="label-form mb-3">
                     UOM
-                </label>4
+                </label>
                 <div class="bg-white mb-0 w-full text-sm inline-block h-[34px]"
                     data-te-select-wrapper-ref>
                     <select data-te-select-init data-te-select-placeholder="Select UOM" data-te-select-filter="true"
@@ -152,6 +152,9 @@
                                         Item
                                     </th>
                                     <th scope="col" class="">
+                                        Price
+                                    </th>
+                                    <th scope="col" class="">
                                         Weight
                                     </th>
                                     <th scope="col" class="">
@@ -172,6 +175,9 @@
                                         {{ ingredient.name }}
                                     </td>
                                     <td class="">
+                                        {{ (ingredient.price).toLocaleString() }}
+                                    </td>
+                                    <td class="">
                                         {{ ingredient.weight }}
                                     </td>
                                     <td class="">
@@ -184,6 +190,27 @@
                                         <button @click="removeIngredientBtnClicked(ingredientIndex)">
                                             <i class="fal fa-trash  pr-3"></i>
                                         </button>
+                                    </td>
+                                </tr>
+
+                                <tr>
+                                    <td class="">
+                                        &nbsp;
+                                    </td>
+                                    <td class="">
+                                        {{ ingredientItemPriceTotal }}
+                                    </td>
+                                    <td class="">
+
+                                    </td>
+                                    <td class="">
+
+                                    </td>
+                                    <td class="">
+
+                                    </td>
+                                    <td class="">
+
                                     </td>
                                 </tr>
                             </tbody>
@@ -325,6 +352,7 @@ export default {
             weight: null,
             isMakePack: false,
             ingredientItems: [],
+            ingredientItemPriceTotal: null,
 
             selectedImage: null
 
@@ -339,6 +367,13 @@ export default {
                 title: `Input validation`,
                 text: `You forgot to provide ${field}, please try again`,
                 type: "warn"
+            });
+        },
+
+        updateItemPriceTotal(items){
+            this.ingredientItemPriceTotal = 0;
+            items.forEach((item)=>{
+                this.ingredientItemPriceTotal += item.price;
             });
         },
 
@@ -381,6 +416,7 @@ export default {
         },
 
         addItemBtnClicked() {
+            console.log(this.selectedItem);
             if (!this.weight) {
                 this.alertValiationMessage('weight');
                 return 1;
@@ -392,6 +428,7 @@ export default {
             else {
                 this.ingredientItems.push({
                     id: this.selectedItem.id,
+                    price: this.selectedItem.item_prices.price,
                     name: this.selectedItem.name,
                     weight: this.weight,
                     is_make_pack: this.isMakePack,
@@ -400,6 +437,8 @@ export default {
                 });
             }
 
+            this.updateItemPriceTotal(this.ingredientItems);
+
             this.weight = null;
             this.isMakePack = false;
             this.$refs.is_make_pack.checked = false;
@@ -407,6 +446,7 @@ export default {
 
         removeIngredientBtnClicked(ingredientIndex) {
             this.ingredientItems.splice(ingredientIndex, 1);
+            this.updateItemPriceTotal(this.ingredientItems);
         },
 
         async createMenuBtnClicked() {

@@ -21,6 +21,7 @@ class StaffSeeder extends Seeder
         $inventory_features = config('common.inventory_features');
         $finance_features = config('common.finance_features');
         $management_features = config('common.management_features');
+        $catering_features = config('common.catering_features');
         foreach ($departments as $i => $department) {
             foreach ($department->roles as $departmentRole) {
                 if ($departmentRole->name == 'Staff') {
@@ -54,6 +55,9 @@ class StaffSeeder extends Seeder
                             break;
                         case 4:
                             $staff->features()->sync($management_features);
+                            break;
+                        case 5:
+                            $staff->features()->sync($catering_features);
                             break;
                         case 6:
                             $staff->features()->sync($inventory_features);
