@@ -75,7 +75,6 @@ class InvoiceRepository implements InvoiceRepositoryInterface
             $headCount = $this->headCountCreate($data);
             $data['head_count_id'] = $headCount->id;
             $data['created_by'] = UserData()->id;
-            $result = 0;
             if ($data['type'] == 'package') {
                 $package = Package::find($data['package_id']);
                 $rooms = $package->rooms()->pluck('id');
@@ -100,19 +99,6 @@ class InvoiceRepository implements InvoiceRepositoryInterface
                 $data['total_session_price'] = $data['session_duration'] * $entity->price_per_hour;
                 $data['price'] = $data['total_session_price'];
 
-                $latestRoomDiscount = $entity->roomDiscounts()
-                    ->whereDate('from_date', '<=', $data['invoice_date'])
-                    ->whereDate('to_date', '>=', $data['invoice_date'])
-                    ->latest()
-                    ->first();
-                if ($latestRoomDiscount) {
-                    if ($latestRoomDiscount->session <= $data['session_duration']) {
-                        $invoiceDate = Carbon::parse($data['invoice_date']);
-                        $result = floor($data['session_duration'] / $latestRoomDiscount->session);
-                        $data['room_discount_id'] = $latestRoomDiscount->id;
-                        $end_date = Carbon::parse($data['invoice_date'])->addMinutes(($data['session_duration'] + $result) * 60);
-                    }
-                }
             } else {
                 $end_date = null;
             }
@@ -132,9 +118,6 @@ class InvoiceRepository implements InvoiceRepositoryInterface
             $data['entity_id'] = $entity->id;
 
             $data['start_date'] = $data['invoice_date'];
-            if ($result > 0) {
-                $data['discount_session'] = $result;
-            }
             $roomSession = RoomSession::create($data);
             $invoice->room_session = $roomSession;
             DB::commit();
@@ -178,9 +161,8 @@ class InvoiceRepository implements InvoiceRepositoryInterface
     public function addSessionDuration(array $data)
     {
         DB::beginTransaction();
-        try { // current Room
+        try {
             $roomAndSession = RoomSession::where('invoice_id', $data['invoice_id'])->latest()->first();
-            // past room and changes of room
             $roomSessionsWithInvoice = RoomSession::where('invoice_id', $data['invoice_id'])->get();
             $originalDuration = 0;
             foreach ($roomSessionsWithInvoice as $room_session) {
@@ -188,7 +170,6 @@ class InvoiceRepository implements InvoiceRepositoryInterface
             }
             $invoice = Invoice::find($data['invoice_id']);
 
-            // caculating last room duration
 
             $startTime = Carbon::parse($roomAndSession->start_date);
             $endTime = Carbon::now();
