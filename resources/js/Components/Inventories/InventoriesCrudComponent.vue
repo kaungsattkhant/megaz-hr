@@ -45,9 +45,7 @@
                                     {{ ++index }}
                                 </td>
                                 <td class="whitespace-nowrap px-6 py-4 ">
-                                    <a :href="'inventories/'+inventory.id+'/ledger'">
                                     {{ inventory.name }}
-                                    </a>
                                 </td>
                                 <td class="whitespace-nowrap px-6 py-4 ">
                                     <div v-for="inventoryable in inventory.inventoryable">
