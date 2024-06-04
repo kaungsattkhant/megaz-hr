@@ -227,7 +227,7 @@ Route::middleware('auth:api')->group(function () {
     Route::post('/uom_conversions/{id}',[UomAPIController::class,'updateUomConversion']);
     Route::get('/uom_conversions',[UomAPIController::class,'getUomConversionList']);
 
-    
+
 });
 
 
