@@ -91,15 +91,18 @@ class InvoiceRepository implements InvoiceRepositoryInterface
                 $data['total_session_price'] = 0;
                 $data['paid_amount'] = $package->price;
                 $data['package_id'] = $package->id;
-                $data['session_duration'] = $package->session;
+                $data['session_duration'] = $package->session; // nullable
                 $data['price'] = $package->price;
+                $data['invoice_type'] = 'package';
             } else if ($data['type'] == 'session') {
 
                 $end_date = Carbon::parse($data['invoice_date'])->addMinutes($data['session_duration'] * 60);
                 $data['total_session_price'] = $data['session_duration'] * $entity->price_per_hour;
                 $data['price'] = $data['total_session_price'];
+                $data['invoice_type'] = 'session';
 
-            } else {
+            } else if($data['type'] == 'endless_time') {
+                $data['invoice_type'] = 'endless_time';
                 $end_date = null;
             }
 

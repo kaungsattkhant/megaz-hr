@@ -59,6 +59,7 @@ class InvoiceAPIController extends Controller
                     'remark' => 'package order',
                 ];
             });
+            $order['order_type'] = 'package';
             $order['invoice_id'] = $invoice->id;
             $this->orderRepo->createMultipleOrder($order);
 
