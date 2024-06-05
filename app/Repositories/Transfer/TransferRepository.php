@@ -31,7 +31,6 @@ class TransferRepository implements TransferRepositoryInterface
             return $paginationData;
         } else {
             $transfers = Transfer::all();
-
             return $transfers;
         }
     }
@@ -83,7 +82,7 @@ class TransferRepository implements TransferRepositoryInterface
     {
         $from_date = convertDateFormat($request->from_date);
         $to_date = convertDateFormat($request->to_date);
-        $transfers = Transfer::with(['item', 'created_by', 'confirmed_by', 'source_inventory', 'destination_inventory'])
+        $transfers = Transfer::with(['item','uom', 'created_by', 'confirmed_by', 'source_inventory', 'destination_inventory'])
             ->where('created_by', UserData()->id)
             ->when(($request->from_date && $request->to_date), function ($q) use ($from_date, $to_date) {
                 $q->whereBetween(DB::raw('DATE(transfers.created_at)'), [$from_date, $to_date]);
@@ -139,7 +138,7 @@ class TransferRepository implements TransferRepositoryInterface
         $from_date = convertDateFormat($request->from_date);
         $to_date = convertDateFormat($request->to_date);
         $inventory_ids = InventoryIds();
-        return Transfer::with(['item', 'created_by', 'confirmed_by', 'source_inventory', 'destination_inventory'])
+        return Transfer::with(['item', 'uom','created_by', 'confirmed_by', 'source_inventory', 'destination_inventory'])
             ->when($request->status, function ($q) use ($request) {
                 $q->where('status', $request->status);
             })
