@@ -75,6 +75,7 @@ class InvoiceRepository implements InvoiceRepositoryInterface
             $headCount = $this->headCountCreate($data);
             $data['head_count_id'] = $headCount->id;
             $data['created_by'] = UserData()->id;
+
             if ($data['type'] == 'package') {
                 $package = Package::find($data['package_id']);
                 $rooms = $package->rooms()->pluck('id');
@@ -178,46 +179,51 @@ class InvoiceRepository implements InvoiceRepositoryInterface
                 ResponseMessage('Room with session duration can only added duration');
             }
 
-            $startTime = Carbon::parse($roomAndSession->start_date);
-            $endTime = Carbon::now();
-            $durationInMinutes = $endTime->diffInMinutes($startTime);
-            $durationInHours = $durationInMinutes / 60; // Convert minutes to hours
-            $roundedDurationInHours = round($durationInHours, 3);
-            $roomAndSession->session_duration = $roundedDurationInHours;
+            // $startTime = Carbon::parse($roomAndSession->start_date);
+            // $endTime = Carbon::now();
+            // $durationInMinutes = $endTime->diffInMinutes($startTime);
+            // $durationInHours = $durationInMinutes / 60; // Convert minutes to hours
+            // $roundedDurationInHours = round($durationInHours, 3);
+            // $roomAndSession->session_duration = $roundedDurationInHours;
 
             // how much duration left
-            $leftDuration = $originalDuration - $roundedDurationInHours;
-            $originalRoom = Entity::find($invoice->entity_id);
-            $roomAndSession->price = $roundedDurationInHours * $originalRoom->price_per_hour;
-            if ($roundedDurationInHours >= 1) {
-                $end_date = Carbon::parse(CurrentTime())->addHours($roundedDurationInHours);
-            } else {
-                $end_date = Carbon::parse(CurrentTime())->addMinutes($roundedDurationInHours * 60);
-            }
-            $roomAndSession->end_date = $end_date;
-            $roomAndSession->save();
-
-            $roomData['session_duration'] = $data['session_duration'] + $leftDuration;
-            $roomData['start_date'] = CurrentTime();
-            $roomData['invoice_id'] = $invoice->id;
-            $roomData['entity_id'] = $invoice->entity_id;
+            // $leftDuration = $originalDuration - $roundedDurationInHours;
+            // $latestSession = $invoice->sessions->sortByDesc('created_at')->first();
+            // $originalRoom = Entity::find($latestSession->entity_id);
+            // $roomAndSession->price = $roundedDurationInHours * $originalRoom->price_per_hour;
+            // if ($roundedDurationInHours >= 1) {
+            //     $end_date = Carbon::parse(CurrentTime())->addHours($roundedDurationInHours);
+            // } else {
+            //     $end_date = Carbon::parse(CurrentTime())->addMinutes($roundedDurationInHours * 60);
+            // }
 
             if ($data['session_duration'] >= 1) {
-                $end_date = Carbon::parse($roomData['start_date'])->addHours($data['session_duration']);
+                $end_date = Carbon::parse($roomAndSession->end_date)->addHours($data['session_duration']);
             } else {
-                $end_date = Carbon::parse($roomData['start_date'])->addMinutes($data['session_duration'] * 60);
+                $end_date = Carbon::parse($roomAndSession->end_date)->addMinutes($data['session_duration'] * 60);
             }
-            $roomData['price'] = $originalRoom->price_per_hour * $roomData['session_duration'];
+            $roomAndSession->price += $data['session_duration'] * $roomAndSession->entity->price_per_hour;
+            $roomAndSession->end_date = $end_date->format('Y-m-d H:i:s');
+            $roomAndSession->session_duration +=$data['session_duration'];
+            $roomAndSession->save();
 
-            $roomData['end_date'] = $end_date->format('Y-m-d H:i:s');
-            $updatedDurationRoom = RoomSession::create($roomData);
+            // $roomData['session_duration'] = $data['session_duration'] + $leftDuration;
+            // $roomData['start_date'] = CurrentTime();
+            // $roomData['invoice_id'] = $invoice->id;
+            // $roomData['entity_id'] = $latestSession->entity_id;
+
+
+            // $roomData['price'] = $originalRoom->price_per_hour * $roomData['session_duration'];
+
+            // $roomData['end_date'] = $end_date->format('Y-m-d H:i:s');
+            // $updatedDurationRoom = RoomSession::create($roomData);
             $allRooms = RoomSession::where('invoice_id', $invoice->id)->get();
-            $total_session_price = 0;
-            foreach ($allRooms as $room) {
-                $total_session_price += $room->price;
-            }
-            $invoice->total_session_price = $total_session_price;
-            $invoice->save();
+            // $total_session_price = 0;
+            // foreach ($allRooms as $room) {
+            //     $total_session_price += $room->price;
+            // }
+            // $invoice->total_session_price = $total_session_price;
+            // $invoice->save();
             DB::commit();
             return $roomAndSession;
         } catch (\Throwable $e) {

@@ -34,33 +34,25 @@ class EntityRepository implements EntityRepositoryInterface
     {
         $area = Area::find($data['area_id']);
         $currentDate = $data['current_date'];
-        $entities = Entity::where('area_id', $area->id)
-            ->where('is_available', 1)
-            ->with(['roomSessions' => function ($query) {
-                $query->with(['invoice' => function ($query) {
-                    $query->where('complete_date', null)
-                        ->orderBy('created_at', 'desc')
-                        ->limit(1);
-                }])->latest()->take(1);
-            }])
-            ->get();
+
+        $entities = Entity::where('is_available',1)->with(['roomSessions' => function ($query)
+        {
+            $query->latest()->first();
+        }])->get();
 
         return $entities;
     }
 
 
+
+
     public function entityDetail(array $data, int $entityId)
     {
         $entity = Entity::where('is_available', 1)
-            ->with(['roomSessions' => function ($query) {
-                $query->with(['invoice' => function ($query) {
-                    $query->where('complete_date', null)
-                        ->orderBy('created_at', 'desc')
-                        ->limit(1);
-                }])->latest()->take(1);
-            }])
-            ->find($entityId);
-
+        ->with(['roomSessions' => function ($query) {
+            $query->latest()->first();
+        }])
+        ->find($entityId);
 
         foreach ($entity->roomSessions as $roomSession) {
             $invoice = $roomSession->invoice; // Access the invoice for the current room session
@@ -97,7 +89,6 @@ class EntityRepository implements EntityRepositoryInterface
                 }
             }
         }
-
 
         return $entity;
     }
