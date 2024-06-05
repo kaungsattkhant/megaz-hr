@@ -11,9 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('invoices', function (Blueprint $table) {
-            //
-            $table->double('service_charge')->after('tax')->nullable();
+        Schema::create('package_room', function (Blueprint $table) {
+            $table->foreignId('package_id')->constrained()->onDelete('cascade');
+            $table->unsignedBigInteger('room_id');
         });
     }
 
@@ -22,8 +22,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('invoices', function (Blueprint $table) {
-            //
-        });
+        Schema::dropIfExists('package_room');
     }
 };

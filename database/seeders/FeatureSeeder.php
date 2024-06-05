@@ -39,7 +39,13 @@ class FeatureSeeder extends Seeder
             'fixed asset',
             'customer',
             'purchase order item left',
-            'purchase order item left confirmation'
+            'purchase order item left confirmation',
+            'pos',
+            'room discount',
+            'package',
+            'menu service discount',
+            'account payables',
+            'inventory stocks',
         ];
         foreach ($features as $feature) {
             Feature::create([

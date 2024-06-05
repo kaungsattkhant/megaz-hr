@@ -32,7 +32,22 @@ class StaffAPIController extends Controller
 
     public function createStaff(Request $request)
     {
-        $data = $request->all();
+        $data = $request->except(['nrc_front_image', 'nrc_back_image', 'household_registration_image']);
+        if($request->hasFile('nrc_front_image')){
+            $uploadedFile = UploadFileToServer($request, 'nrc_front_image', 'staff_images');
+            $data['nrc_front_url'] = $uploadedFile['file_url'];
+            $data['nrc_front_path'] = $uploadedFile['file_path'];
+        }
+        if($request->hasFile('nrc_back_image')){
+            $uploadedFile = UploadFileToServer($request, 'nrc_back_image', 'staff_images');
+            $data['nrc_back_url'] = $uploadedFile['file_url'];
+            $data['nrc_back_path'] = $uploadedFile['file_path'];
+        }
+        if($request->hasFile('household_registration_image')){
+            $uploadedFile = UploadFileToServer($request, 'household_registration_image', 'staff_images');
+            $data['household_registration_url'] = $uploadedFile['file_url'];
+            $data['household_registration_path'] = $uploadedFile['file_path'];
+        }
         $data['roles'] = explode(',', $request->roles);
         $staff = $this->staffRepo->createData($data);
 
@@ -41,12 +56,29 @@ class StaffAPIController extends Controller
 
     public function updateStaff(Request $request, $id)
     {
-        $staff = $this->staffRepo->updateData($request->all(), $id);
-       if(!$staff)
-       {
-        ResponseMessage('Staff not found with given ID',404);
-       }
-       ResponseData($staff);
+        $data = $request->except(['nrc_front_image', 'nrc_back_image', 'household_registration_image']);
+        if($request->hasFile('nrc_front_image')){
+            $uploadedFile = UploadFileToServer($request, 'nrc_front_image', 'staff_images');
+            $data['nrc_front_url'] = $uploadedFile['file_url'];
+            $data['nrc_front_path'] = $uploadedFile['file_path'];
+        }
+        if($request->hasFile('nrc_back_image')){
+            $uploadedFile = UploadFileToServer($request, 'nrc_back_image', 'staff_images');
+            $data['nrc_back_url'] = $uploadedFile['file_url'];
+            $data['nrc_back_path'] = $uploadedFile['file_path'];
+        }
+        if($request->hasFile('household_registration_image')){
+            $uploadedFile = UploadFileToServer($request, 'household_registration_image', 'staff_images');
+            $data['household_registration_url'] = $uploadedFile['file_url'];
+            $data['household_registration_path'] = $uploadedFile['file_path'];
+        }
+        $staff = $this->staffRepo->updateData($data, $id);
+
+        if(!$staff)
+        {
+            ResponseMessage('Staff not found with given ID',404);
+        }
+        ResponseData($staff);
     }
 
     public function deleteStaff($id)

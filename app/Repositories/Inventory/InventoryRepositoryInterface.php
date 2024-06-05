@@ -14,11 +14,13 @@ interface InventoryRepositoryInterface
 
     public function deleteData(int $id);
 
-    public function getInventoryLedgers(int $inventoryId);
+    public function getInventoryLedgers(int $inventoryId,$request);
 
     public function detail($inventory);
 
     public function inventoryList();
     
     public function getInventory($request);
+
+    public function getInventoryLedgerList($request);
 }

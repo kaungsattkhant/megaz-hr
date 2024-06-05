@@ -97,4 +97,9 @@ class ItemRepository implements ItemRepositoryInterface
             return false;
         }
     }
+
+    public function getItemPriceListByItem($item_id){
+        return ItemPrice::with('uom')->orderBy('id','desc')->where('item_id',$item_id)->paginate(20);
+    }
+
 }

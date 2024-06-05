@@ -146,43 +146,11 @@
                         <div class="mb-4">
                             <div>
                                 <label class="label-form mb-3">AP Sub Account</label>
-                                <!-- <multiselect v-model="selectedPayableSubAccount" :options="payableSubAccountList" :multiple="true"
-                                    :close-on-select="false" :clear-on-select="false" :preserve-search="true"
-                                    placeholder="Select Sub Account" label="name" track-by="id" :preselect-first="true">
-                                </multiselect> -->
                                 <multiselect v-model="selectedPayableSubAccount" :options="payableSubAccountList" :close-on-select="true"
                                 :clear-on-select="false" :preserve-search="true" placeholder="Select Sub Account" label="name"
                                 track-by="id" :preselect-first="true"></multiselect>
                             </div>
                         </div>
-
-                        <!-- <div class="mb-4">
-                            <label for="" class="label-form mb-3">
-                                Used Session
-                            </label>
-                            <input type="number" placeholder="Used Session" v-model="session" class="input-ui">
-                        </div>
-
-                        <div class="mb-4">
-                            <label for="" class="label-form mb-3">
-                                Free Session
-                            </label>
-                            <input type="number" placeholder="Free Session" v-model="freeSession" class="input-ui">
-                        </div>
-
-                        <div class="mb-4">
-                            <label for="" class="label-form mb-3">
-                                From
-                            </label>
-                            <input type="date" placeholder="From" v-model="startDate" :min="today" class="input-ui">
-                        </div>
-
-                        <div class="mb-4">
-                            <label for="" class="label-form mb-3">
-                                To
-                            </label>
-                            <input type="date" placeholder="To" v-model="endDate" :min="today" class="input-ui">
-                        </div> -->
                     </div>
 
                     <!--Modal footer-->
@@ -248,7 +216,7 @@ export default {
         },
 
         async getAPAccounts(){
-            let url = `/api/account_payables`;
+            let url = `/api/get_payable_account`;
             let response = await getApiData({url: url, token: this.getToken()});
             if(response.data){
                 this.apAccountList = response.data;
@@ -327,7 +295,7 @@ export default {
             formData.append("sub_account_id", this.selectedPayableSubAccount.id);
             let response = await postApiData({url: url, form_data: formData, token: this.getToken()});
             if(response.success){
-                this.apAccountList.push(response.data);
+                this.apAccountList.unshift(response.data);
                 this.selectedAccount = response.data;
             }
         },

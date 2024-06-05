@@ -11,4 +11,9 @@ class MenuPackage extends Model
     protected $fillable =[
         'menu_id','quantity','package_id'
     ];
+
+    public function menu()
+    {
+        return $this->belongsTo(Menu::class,'menu_id');
+    }
 }

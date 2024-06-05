@@ -54,6 +54,7 @@ import ConfirmPurchaseOrderItemsComponent from './Components/PurchaseOrders/Conf
 import PurchaseOrderWithLeftItemsComponent from './Components/PurchaseOrders/PurchaseOrderWithLeftItemsComponent.vue';
 import LeftItemListComponent from './Components/PurchaseOrders/LeftItemListComponent.vue';
 import ItemCrudComponent from './Components/Items/ItemCrudComponent.vue';
+import ItemPricingHistoryComponent from './Components/Items/ItemPricingHistoryComponent.vue';
 import ItemUsageForecastListComponent from './Components/ItemUsageForecastings/ItemUsageForecastListComponent.vue';
 import ItemUsageForecastCreateComponent from './Components/ItemUsageForecastings/ItemUsageForecastCreateComponent.vue';
 import ItemUsageForecastDetailComponent from './Components/ItemUsageForecastings/ItemUsageForecastDetailComponent.vue';
@@ -61,6 +62,8 @@ import UomConversionCrudComponent from './Components/ItemUom/UomConversionCrudCo
 import AccountingCrudComponent from './Components/Accounting/AccountingCrudComponent.vue';
 import FinancialTransactionCrudComponent from './Components/FinancialTransaction/FinancialTransactionCrudComponent.vue';
 import CashbookCrudComponent from './Components/Cashbook/CashbookCrudComponent.vue';
+import ApListComponent from './Components/AP/ApListComponent.vue';
+import ApHistoryComponent from './Components/AP/ApHistoryComponent.vue';
 import ArListComponent from './Components/AR/ArListComponent.vue';
 import ArHistoryComponent from './Components/AR/ArHistoryComponent.vue';
 import ArPaidComponent from './Components/AR/ArPaidComponent.vue';
@@ -113,6 +116,8 @@ app.component('ComplainsCrudComponent', ComplainsCrudComponent);
 app.component('AccountingCrudComponent', AccountingCrudComponent);
 app.component('FinancialTransactionCrudComponent', FinancialTransactionCrudComponent);
 app.component('CashbookCrudComponent', CashbookCrudComponent);
+app.component('ApListComponent', ApListComponent);
+app.component('ApHistoryComponent', ApHistoryComponent);
 app.component('ArListComponent', ArListComponent);
 app.component('ArHistoryComponent', ArHistoryComponent);
 app.component('ArPaidComponent', ArPaidComponent);
@@ -129,6 +134,7 @@ app.component('ConfirmPurchaseOrderItemsComponent', ConfirmPurchaseOrderItemsCom
 app.component('PurchaseOrderWithLeftItemsComponent', PurchaseOrderWithLeftItemsComponent);
 app.component('LeftItemListComponent', LeftItemListComponent);
 app.component('ItemCrudComponent', ItemCrudComponent);
+app.component('ItemPricingHistoryComponent', ItemPricingHistoryComponent);
 app.component('ItemUsageForecastListComponent', ItemUsageForecastListComponent);
 app.component('ItemUsageForecastCreateComponent', ItemUsageForecastCreateComponent);
 app.component('ItemUsageForecastDetailComponent', ItemUsageForecastDetailComponent);

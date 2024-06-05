@@ -59,13 +59,18 @@ class InventoryAPIController extends Controller
 
     public function getInventoryLedgers(Request $request, int $inventoryId)
     {
-        $ledgers = $this->inventoryRepo->getInventoryLedgers($inventoryId);
+        $ledgers = $this->inventoryRepo->getInventoryLedgers($inventoryId,$request);
 
         ResponseData($ledgers);
     }
 
     public function inventoryList(){
         $data = $this->inventoryRepo->inventoryList();
+        ResponseData($data);
+    }
+
+    public function getInventoryLedgerList(Request $request){
+        $data = $this->inventoryRepo->getInventoryLedgerList($request);
         ResponseData($data);
     }
 

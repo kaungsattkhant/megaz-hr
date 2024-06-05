@@ -16,4 +16,8 @@ class ItemPrice extends Model
         return $this->belongsTo(Item::class);
     }
 
+    public function uom(){
+        return $this->belongsTo(Uom::class);
+    }
+
 }

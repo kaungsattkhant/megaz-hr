@@ -17,6 +17,7 @@ return new class extends Migration
             $table->integer('total_quantity');
             $table->dateTime('date');
             $table->integer('total');
+            $table->double('total_discount_price')->default(0);
             $table->unsignedBigInteger('invoice_id');
             $table->boolean('is_complete')->default(0);
             $table->timestamps();

@@ -11,9 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('package_room_session', function (Blueprint $table) {
-           $table->foreignId('package_id');
-           $table->foreignid('room_session_id');
+        Schema::table('item_menu', function (Blueprint $table) {
+            //
+            $table->decimal('price')->after('weight');
         });
     }
 
@@ -22,6 +22,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('package_room_session');
+        Schema::table('item_menu', function (Blueprint $table) {
+            //
+        });
     }
 };

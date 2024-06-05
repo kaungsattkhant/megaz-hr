@@ -35,4 +35,9 @@ class PackageAPIController extends Controller
     {
         $packages = $this->packageRepo->deleteData($id);
     }
+
+    public function detailPackage(int $id)
+    {
+        $package = $this->packageRepo->detailPackage($id);
+    }
 }

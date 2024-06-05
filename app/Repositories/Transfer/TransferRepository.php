@@ -4,7 +4,6 @@ namespace App\Repositories\Transfer;
 
 use App\Http\Action\Common\Conversion;
 use App\Http\Action\Common\PurchaseOrder as CommonPurchaseOrder;
-use App\Http\Action\Common\UomConversion;
 use App\Http\Action\Inventory\InventoryLedger;
 use App\Http\Action\Inventory\StoreInventory;
 use App\Models\Transfer;
@@ -32,7 +31,6 @@ class TransferRepository implements TransferRepositoryInterface
             return $paginationData;
         } else {
             $transfers = Transfer::all();
-
             return $transfers;
         }
     }
@@ -82,8 +80,19 @@ class TransferRepository implements TransferRepositoryInterface
 
     public function list($request)
     {
-        $transfers = Transfer::with(['item', 'created_by', 'confirmed_by', 'source_inventory', 'destination_inventory'])
+        $from_date = convertDateFormat($request->from_date);
+        $to_date = convertDateFormat($request->to_date);
+        $transfers = Transfer::with(['item','uom', 'created_by', 'confirmed_by', 'source_inventory', 'destination_inventory'])
             ->where('created_by', UserData()->id)
+            ->when(($request->from_date && $request->to_date), function ($q) use ($from_date, $to_date) {
+                $q->whereBetween(DB::raw('DATE(transfers.created_at)'), [$from_date, $to_date]);
+            })
+            ->when(($request->from_date && $request->to_date == null), function ($q) use ($from_date) {
+                $q->whereDate('transfers.created_at', '>=', $from_date);
+            })
+            ->when(($request->from_date == null && $request->to_date), function ($q) use ($to_date) {
+                $q->whereBetween('transfers.created_at', [now(), $to_date]);
+            })
             ->paginate(config('common.list_count'));
         return $transfers;
     }
@@ -98,10 +107,10 @@ class TransferRepository implements TransferRepositoryInterface
             }
             $latest = Transfer::orderBy('created_at', 'desc')->first();
             $count = 4;
-            $uom_conversion=(new Conversion($request->uom_id,$request->base_uom_id))->run();
+            $uom_conversion = (new Conversion($request->uom_id, $request->base_uom_id))->run();
             #check is enough transfer quantity
-            $quantity=$uom_conversion->conversion*$request->quantity;
-            (new InventoryLedger($request->source_inventory_id))->isEnoughQuantityByItem($request->item_id,$quantity);
+            $quantity = $uom_conversion->conversion * $request->quantity;
+            (new InventoryLedger($request->source_inventory_id))->isEnoughQuantityByItem($request->item_id, $quantity);
 
             $no = (new CommonPurchaseOrder())->getUniqueId($latest, 'transfer_id', $count);
             $transfer_id = "TRS" . '-' . str_pad($no, $count, "0", STR_PAD_LEFT) . '-' . now()->timestamp;
@@ -109,8 +118,8 @@ class TransferRepository implements TransferRepositoryInterface
             $data['source_inventory_id'] = $request->source_inventory_id;
             $data['created_by'] = UserData()->id;
             $data['date'] = convertDateFormat(now());
-            $data['uom_conversion_id']=$uom_conversion->id;
-            $data['uom_id']=$request->uom_id;
+            $data['uom_conversion_id'] = $uom_conversion->id;
+            $data['uom_id'] = $request->uom_id;
             $transfer = Transfer::updateOrCreate(
                 ['id' => $data['id']],
                 $data
@@ -126,10 +135,21 @@ class TransferRepository implements TransferRepositoryInterface
 
     public function transferConfirmationList($request)
     {
+        $from_date = convertDateFormat($request->from_date);
+        $to_date = convertDateFormat($request->to_date);
         $inventory_ids = InventoryIds();
-        return Transfer::with(['item', 'created_by', 'confirmed_by', 'source_inventory', 'destination_inventory'])
-            ->when( $request->status, function ($q) use ($request) {
+        return Transfer::with(['item', 'uom','created_by', 'confirmed_by', 'source_inventory', 'destination_inventory'])
+            ->when($request->status, function ($q) use ($request) {
                 $q->where('status', $request->status);
+            })
+            ->when(($request->from_date && $request->to_date), function ($q) use ($from_date, $to_date) {
+                $q->whereBetween(DB::raw('DATE(transfers.confimed_by)'), [$from_date, $to_date]);
+            })
+            ->when(($request->from_date && $request->to_date == null), function ($q) use ($from_date) {
+                $q->whereDate('transfers.confimed_by', '>=', $from_date);
+            })
+            ->when(($request->from_date == null && $request->to_date), function ($q) use ($to_date) {
+                $q->whereBetween('transfers.confimed_by', [now(), $to_date]);
             })
             ->when(checkDepartmentAndRoles('Inventory', ['Staff']), function ($q) use ($inventory_ids) {
                 $q->whereIn('destination_inventory_id', $inventory_ids);
@@ -142,31 +162,54 @@ class TransferRepository implements TransferRepositoryInterface
         DB::beginTransaction();
         try {
             // if (checkDepartmentAndRoles('Inventory', ['Staff'])) {
-                $transfer = Transfer::find($request->id);
-                if ($transfer) {
-                    // if ($transfer->confirmed_at != null && $transfer->confirmed_by != null) {
-                    //     ResponseMessage('Already checked', 200);
-                    // }
-                    $transfer->confirmed_at = now();
-                    $transfer->confirmed_by = UserData()->id;
-                    $transfer->status = 'complete';
-                    $transfer->save();
-                    #store inventory
-                    
-                    #out
-                    $inventoryId = $transfer->source_inventory_id;
-                    $inventoryLedger = (new StoreInventory($inventoryId))->storeToInventoryLedger($transfer, 'transfer', 'out');
-                    (new StoreInventory($inventoryId))->storeItemToInventory($inventoryLedger, $transfer);
+            $transfer = Transfer::find($request->id);
+            if ($transfer) {
+                // if ($transfer->confirmed_at != null && $transfer->confirmed_by != null) {
+                //     ResponseMessage('Already checked', 200);
+                // }
+                $transfer->confirmed_at = now();
+                $transfer->confirmed_by = UserData()->id;
+                $transfer->status = 'complete';
+                $transfer->save();
+                #store inventory
 
-                    #in
-                    $inventoryId = $transfer->destination_inventory_id;
-                    $inventoryLedger = (new StoreInventory($inventoryId))->storeToInventoryLedger($transfer, 'transfer', 'in');
-                    (new StoreInventory($inventoryId))->storeItemToInventory($inventoryLedger, $transfer);
-                    #store inventory
-                    DB::commit();
-                    ResponseMessage('Update Successfully', 200);
-                }
-                ResponseMessage('Not Found', 404);
+                #out
+                $inventoryId = $transfer->source_inventory_id;
+                $inventoryLedger = (new StoreInventory($inventoryId))->storeToInventoryLedger($transfer, 'transfer', 'out');
+                (new StoreInventory($inventoryId))->storeItemToInventory($inventoryLedger, $transfer);
+
+                #in
+                $inventoryId = $transfer->destination_inventory_id;
+                $inventoryLedger = (new StoreInventory($inventoryId))->storeToInventoryLedger($transfer, 'transfer', 'in');
+                (new StoreInventory($inventoryId))->storeItemToInventory($inventoryLedger, $transfer);
+                #store inventory
+                DB::commit();
+                ResponseMessage('Update Successfully', 200);
+            }
+            ResponseMessage('Not Found', 404);
+            // }
+            ResponseMessage("Permission isn't access", 404);
+        } catch (\Exception $e) {
+            DB::rollback();
+            ResponseMessage($e->getMessage(), 402);
+            throw $e;
+        }
+    }
+
+    public function cancelTransferItem(Request $request)
+    {
+        DB::beginTransaction();
+        try {
+            $transfer = Transfer::find($request->id);
+            if ($transfer) {
+                $transfer->confirmed_at = now();
+                $transfer->confirmed_by = UserData()->id;
+                $transfer->status = 'cancelled';
+                $transfer->save();
+                DB::commit();
+                ResponseMessage('Update Successfully', 200);
+            }
+            ResponseMessage('Not Found', 404);
             // }
             ResponseMessage("Permission isn't access", 404);
         } catch (\Exception $e) {

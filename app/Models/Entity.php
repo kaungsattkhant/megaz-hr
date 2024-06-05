@@ -45,5 +45,10 @@ class Entity extends BaseModel
         return $this->belongsToMany(RoomDiscount::class);
     }
 
+    public function roomSessions()
+    {
+        return $this->hasMany(RoomSession::class);
+    }
+
 
 }

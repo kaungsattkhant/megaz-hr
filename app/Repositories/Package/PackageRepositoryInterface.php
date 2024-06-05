@@ -13,4 +13,6 @@ interface PackageRepositoryInterface
     public function editData(int $id, array $data);
 
     public function deleteData(int $id);
+
+    public function detailPackage(int $id);
 }

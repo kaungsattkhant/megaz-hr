@@ -7,11 +7,19 @@
     <div class="mt-4 bg-white">
         <div class="btn-container">
             <div class=" flex">
-                <label for="search" class="search-input">
-                    <input type="text" class="input-search" placeholder="Search">
+                <div>
+                    <label for="search" class="search-input mx-2 px-2 py-1"> From Date </label>
+                    <input type="date" v-model="fromDate" class="search-input rounded">
+                </div>
 
-                    <i class="fal fa-search"></i>
-                </label>
+                <div>
+                    <label for="search" class="search-input mx-2 px-2 py-1"> To Date </label>
+                    <input type="date" v-model="toDate" class="search-input rounded">
+                </div>
+                <div class="ml-2 px-2">
+                    <button class="mx-1 add-btn h-8 text-[13px] font-inter" @click="searchBtnClicked">Filter</button>
+                    <button class="mx-1 add-btn h-8 text-[13px] font-inter" @click="clearSearchBtnClicked">Clear</button>
+                </div>
             </div>
             <div class="flex justify-end flex-col">
 
@@ -43,6 +51,9 @@
                                 </th>
                                 <th scope="col" class="  ">
                                     Quantity
+                                </th>
+                                <th scope="col" class="  ">
+                                    UOM
                                 </th>
                                 <th scope="col" class="  ">
                                     Trasnferred By
@@ -82,16 +93,24 @@
                                         {{ receive.quantity }}
                                     </td>
                                     <td class="whitespace-nowrap  ">
+                                        {{ receive.uom.name }}
+                                    </td>
+                                    <td class="whitespace-nowrap  ">
                                         {{ receive.created_by.name }}
                                     </td>
                                     <td class="whitespace-nowrap  ">
                                         {{ receive.status }}
                                     </td>
                                     <td class="whitespace-nowrap">
-                                        <button data-te-toggle="modal" data-te-target="#confirmModal"
+                                        <button class="mx-1" data-te-toggle="modal" data-te-target="#confirmModal"
                                             :disabled=" receive.status != 'pending'"
                                             @click="receiveBtnClicked(receive.id)">
-                                            <i class="fal fa-bars"></i>
+                                            <i class="fal fa-check"></i>
+                                        </button>
+                                        <button class="mx-1" data-te-toggle="modal" data-te-target="#cancelModal"
+                                            :disabled=" receive.status != 'pending'"
+                                            @click="cancelReceiveBtnClicked(receive.id)">
+                                            <i class="fal fa-times"></i>
                                         </button>
                                     </td>
                                 </tr>
@@ -210,6 +229,56 @@
             </div>
         </div>
     </div>
+
+    <!--Check Modal -->
+    <div data-te-modal-init
+        class="fixed left-0 top-0 z-[1055] hidden h-full w-full overflow-y-auto overflow-x-hidden outline-none"
+        id="cancelModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div data-te-modal-dialog-ref class="pointer-events-none relative flex min-h-[calc(100%-1rem)] w-auto translate-y-[-50px]
+            items-center opacity-0 transition-all duration-300 ease-in-out min-[576px]:mx-auto min-[576px]:mt-7
+            min-[576px]:min-h-[calc(100%-3.5rem)] min-[576px]:max-w-[500px]">
+            <div class="min-[576px]:shadow-[0_0.5rem_1rem_rgba(#000, 0.15)] pointer-events-auto relative flex w-full flex-col
+                rounded-md border-none bg-white bg-clip-padding text-current shadow-lg outline-none ">
+                <div
+                    class="flex flex-shrink-0 items-center justify-between rounded-t-md border-b-2 border-neutral-100 border-opacity-100 p-4 ">
+                    <!--Modal title-->
+                    <h5 class="text-xl font-medium leading-normal text-neutral-800 " id="exampleModalLabel">
+                        Cancel Receive
+                    </h5>
+                    <!--Close button-->
+                    <button type="button"
+                        class="box-content rounded-none border-none hover:no-underline hover:opacity-75 focus:opacity-100 focus:shadow-none focus:outline-none"
+                        data-te-modal-dismiss aria-label="Close">
+                        <svg class="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                            stroke-width="1.5" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </button>
+                </div>
+
+                <!--Modal body-->
+                <div class="relative flex-auto p-4" data-te-modal-body-ref>
+                    <p>
+                        Are you sure ?
+                    </p>
+                </div>
+
+                <!--Modal footer-->
+                <div
+                    class="flex flex-shrink-0 flex-wrap items-center justify-end rounded-b-md border-t-2 border-neutral-100 border-opacity-100 p-4 ">
+                    <button type="button" class="inline-block px-6 pb-2 pt-2.5 text-xs focus:outline-none focus:ring-0 "
+                        data-te-modal-dismiss>
+                        Close
+                    </button>
+                    <button @click="confirmCancelReceiveBtnClicked" type="button" data-te-toggle="modal"
+                        data-te-target="#cancelModal"
+                        class="ml-1 inline-block rounded bg-blue-600 px-6 pb-2 pt-2.5 text-xs  text-white   focus:outline-none focus:ring-0 ">
+                        Confirm
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
 </template>
 
 <script>
@@ -223,6 +292,9 @@ export default {
         return {
             receivesList: [],
             receiveId: null,
+
+            fromDate: null,
+            toDate: null,
 
             per_page: 20,
             pageNumbers: [],
@@ -244,6 +316,9 @@ export default {
                 this.currentPage = pageNumber;
             }
             let url = `/api/transfer_confirmation_list?page=${this.currentPage}`;
+            if(this.fromDate && this.toDate){
+                url = `${url}&from_date=${this.fromDate}&to_date=${this.toDate}`;
+            }
             let response = await getApiData({ url: url, token: this.getToken() });
             if (response.data) {
                 this.receivesList = response.data.data;
@@ -285,6 +360,29 @@ export default {
                 this.receivesList = [];
                 this.getInventoryReceivesList(this.currentPage);
             }
+        },
+
+        cancelReceiveBtnClicked(id){
+            this.receiveId = id;
+        },
+
+        async confirmCancelReceiveBtnClicked(){
+            let url = `/api/cancel_transfer_item?id=${this.receiveId}`;
+            let response = await getApiData({url: url, token: this.getToken()});
+            if(response.success){
+                this.receivesList = [];
+                this.getInventoryReceivesList(this.currentPage);
+            }
+        },
+
+        searchBtnClicked(){
+            this.getInventoryReceivesList(this.currentPage);
+        },
+
+        clearSearchBtnClicked(){
+            this.fromDate = null;
+            this.toDate = null;
+            this.getInventoryReceivesList(this.currentPage);
         },
 
         pageBtnClicked(pageNumber) {
