@@ -195,5 +195,28 @@ class TransferRepository implements TransferRepositoryInterface
             throw $e;
         }
     }
+
+    public function cancelTransferItem(Request $request)
+    {
+        DB::beginTransaction();
+        try {
+            $transfer = Transfer::find($request->id);
+            if ($transfer) {
+                $transfer->confirmed_at = now();
+                $transfer->confirmed_by = UserData()->id;
+                $transfer->status = 'cancelled';
+                $transfer->save();
+                DB::commit();
+                ResponseMessage('Update Successfully', 200);
+            }
+            ResponseMessage('Not Found', 404);
+            // }
+            ResponseMessage("Permission isn't access", 404);
+        } catch (\Exception $e) {
+            DB::rollback();
+            ResponseMessage($e->getMessage(), 402);
+            throw $e;
+        }
+    }
     #end
 }

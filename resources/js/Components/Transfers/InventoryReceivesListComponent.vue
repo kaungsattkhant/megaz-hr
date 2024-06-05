@@ -53,6 +53,9 @@
                                     Quantity
                                 </th>
                                 <th scope="col" class="  ">
+                                    UOM
+                                </th>
+                                <th scope="col" class="  ">
                                     Trasnferred By
                                 </th>
                                 <th scope="col" class="  ">
@@ -90,6 +93,9 @@
                                         {{ receive.quantity }}
                                     </td>
                                     <td class="whitespace-nowrap  ">
+                                        {{ receive.uom.name }}
+                                    </td>
+                                    <td class="whitespace-nowrap  ">
                                         {{ receive.created_by.name }}
                                     </td>
                                     <td class="whitespace-nowrap  ">
@@ -103,7 +109,7 @@
                                         </button>
                                         <button class="mx-1" data-te-toggle="modal" data-te-target="#cancelModal"
                                             :disabled=" receive.status != 'pending'"
-                                            @click="receiveBtnClicked(receive.id)">
+                                            @click="cancelReceiveBtnClicked(receive.id)">
                                             <i class="fal fa-times"></i>
                                         </button>
                                     </td>
@@ -265,7 +271,7 @@
                         Close
                     </button>
                     <button @click="confirmCancelReceiveBtnClicked" type="button" data-te-toggle="modal"
-                        data-te-target="#confirmModal"
+                        data-te-target="#cancelModal"
                         class="ml-1 inline-block rounded bg-blue-600 px-6 pb-2 pt-2.5 text-xs  text-white   focus:outline-none focus:ring-0 ">
                         Confirm
                     </button>
@@ -349,6 +355,19 @@ export default {
 
         async confirmReceiveBtnClicked(){
             let url = `/api/confirm_transfer_item?id=${this.receiveId}`;
+            let response = await getApiData({url: url, token: this.getToken()});
+            if(response.success){
+                this.receivesList = [];
+                this.getInventoryReceivesList(this.currentPage);
+            }
+        },
+
+        cancelReceiveBtnClicked(id){
+            this.receiveId = id;
+        },
+
+        async confirmCancelReceiveBtnClicked(){
+            let url = `/api/cancel_transfer_item?id=${this.receiveId}`;
             let response = await getApiData({url: url, token: this.getToken()});
             if(response.success){
                 this.receivesList = [];

@@ -24,4 +24,6 @@ interface TransferRepositoryInterface
     public function transferConfirmationList($request);
 
     public function confirmTransferItem($request);
+
+    public function cancelTransferItem(Request $request);
 }

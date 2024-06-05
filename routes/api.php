@@ -178,6 +178,7 @@ Route::middleware('auth:api')->group(function () {
     Route::controller(TransferAPIController::class)->group(function () {
         Route::get('/transfer_confirmation_list', 'transferConfirmationList');
         Route::get('/confirm_transfer_item', 'confirmTransferItem');
+        Route::get('/cancel_transfer_item', 'cancelTransferItem');
     });
 
     Route::get('/inventories', [InventoryAPIController::class, 'getInventoryData']);

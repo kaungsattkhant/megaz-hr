@@ -54,6 +54,9 @@
                                     Quantity
                                 </th>
                                 <th scope="col" class="  ">
+                                    UOM
+                                </th>
+                                <th scope="col" class="  ">
                                     Trasnferred By
                                 </th>
                                 <th scope="col" class="  ">
@@ -92,6 +95,9 @@
                                     </td>
                                     <td class="whitespace-nowrap  ">
                                         {{ transfer.quantity }}
+                                    </td>
+                                    <td class="whitespace-nowrap  ">
+                                        {{ transfer.uom.name }}
                                     </td>
                                     <td class="whitespace-nowrap  ">
                                         {{ transfer.created_by.name }}
