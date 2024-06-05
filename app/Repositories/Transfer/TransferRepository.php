@@ -143,13 +143,13 @@ class TransferRepository implements TransferRepositoryInterface
                 $q->where('status', $request->status);
             })
             ->when(($request->from_date && $request->to_date), function ($q) use ($from_date, $to_date) {
-                $q->whereBetween(DB::raw('DATE(transfers.confimed_by)'), [$from_date, $to_date]);
+                $q->whereBetween(DB::raw('DATE(transfers.confirmed_by)'), [$from_date, $to_date]);
             })
             ->when(($request->from_date && $request->to_date == null), function ($q) use ($from_date) {
-                $q->whereDate('transfers.confimed_by', '>=', $from_date);
+                $q->whereDate('transfers.confirmed_by', '>=', $from_date);
             })
             ->when(($request->from_date == null && $request->to_date), function ($q) use ($to_date) {
-                $q->whereBetween('transfers.confimed_by', [now(), $to_date]);
+                $q->whereBetween('transfers.confirmed_by', [now(), $to_date]);
             })
             ->when(checkDepartmentAndRoles('Inventory', ['Staff']), function ($q) use ($inventory_ids) {
                 $q->whereIn('destination_inventory_id', $inventory_ids);
