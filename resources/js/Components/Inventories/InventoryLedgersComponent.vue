@@ -1,19 +1,28 @@
 <template>
     <div class="flex justify-between mb-3">
         <div class=" flex">
-            <label for="search" class="search-input">
-                <input type="text" class="input-search" placeholder="Search">
+            <div>
+                <label for="search" class="search-input mx-2 px-2 py-1"> From Date </label>
+                <input type="date" v-model="fromDate" class="search-input rounded">
+            </div>
 
-                <i class="fal fa-search"></i>
-            </label>
+            <div>
+                <label for="search" class="search-input mx-2 px-2 py-1"> To Date </label>
+                <input type="date" v-model="toDate" class="search-input rounded">
+            </div>
+            <div class="ml-2 px-2">
+                <button class="mx-1 add-btn h-8 text-[13px] font-inter" @click="searchBtnClicked">Filter</button>
+                <button class="mx-1 add-btn h-8 text-[13px] font-inter" @click="clearSearchBtnClicked">Clear</button>
+            </div>
+
         </div>
-        <div class="flex justify-end flex-col">
+        <!-- <div class="flex justify-end flex-col">
 
-            <!-- <button type="button" class="add-btn transition duration-150 ease-in-out focus:outline-none focus:ring-0 "
+            <button type="button" class="add-btn transition duration-150 ease-in-out focus:outline-none focus:ring-0 "
                 data-te-toggle="modal" data-te-target="#checkModal">
                 Add New
-            </button> -->
-        </div>
+            </button>
+        </div> -->
     </div>
     <div class="block rounded-xl">
 
@@ -390,6 +399,9 @@ export default {
             selectedUom: null,
             defectRemark: null,
 
+            fromDate: null,
+            toDate: null,
+
             per_page: 20,
             pageNumbers: [],
             currentPage: 1,
@@ -418,10 +430,13 @@ export default {
             if(pageNumber){
                 this.currentPage = pageNumber;
             }
-            // let url = `/api/inventories/${this.inventory_id}/ledgers?page=${this.currentPage}`;
             let url = `/api/inventory_ledger_list`;
+            if(this.fromDate && this.toDate){
+                url = `${url}?from_date=${this.fromDate}&to_date=${this.toDate}`;
+            }
             const response = await getApiData({ url: url, token: this.getToken() });
             if (response.data) {
+                this.totalValuation = 0;
                 this.inventoryLegderList = response.data;
                 this.inventoryLegderList.forEach(ledger => {
                     ledger.base_balance = Math.floor(ledger.closing_balance / ledger.conversion) + ' ' + ledger.base_uom_name;
@@ -561,6 +576,16 @@ export default {
 
             this.selectedUom = null;
             this.transferItem = null;
+        },
+
+        searchBtnClicked(){
+            this.getInventoryLegderList();
+        },
+
+        clearSearchBtnClicked(){
+            this.fromDate = null;
+            this.toDate = null;
+            this.getInventoryLegderList();
         },
 
         closeModal() {
