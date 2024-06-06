@@ -301,8 +301,31 @@
                     </div>
                     <div class="small-scrollbar overflow-y-auto" style="height:calc(100% - 329px)">
                         <div class="padding-section w-2/3 mx-auto ">
-
                             <div class="mb-4">
+                                <label for="" class="block text-sm text-black mb-3">
+                                    Discount Type
+                                </label>
+                                <div class="relative">
+                                    <select name="" id="" v-model="discount_type" @change="getRoomDiscount"
+                                        class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
+                                        <option value="room_discount">  Room Discount </option>
+                                        <option value="fix_amount"> Fix Ammount  </option>
+                                        <option value="percentage"> Percentage </option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="mb-4" v-show="discount_type == 'room_discount'">
+                                <label for="" class="block text-sm text-black mb-3">
+                                    Room Disount
+                                </label>
+                                <div class="relative">
+                                    <select name="" id="" v-model="room_discount"
+                                        class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
+                                        <option v-for="rd in roomDiscountList" :value="rd.id">  {{ rd.name }} </option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="mb-4" v-show="discount_type != 'room_discount'">
                                 <label for="" class="block text-sm text-black mb-3">
                                     Discount
                                 </label>
@@ -842,7 +865,9 @@
                 change_room:null,
 
                 // doneSession
-
+                roomDiscountList:null,
+                discount_type: null,
+                isShowDiscount:true,
 
                 //rooftop
                 tableList:[],
@@ -1132,14 +1157,16 @@
             async changeRoom()
             {
                 let formData = new FormData();
-                formData.append('invoice_id', this.selectedRoom.invoices[0].invoice_id);
+                formData.append('invoice_id', this.selectedRoom.room_sessions[0].invoice.invoice_id);
                 formData.append('entity_id', this.change_room.id);
                 let response = await postApiData({ url: '/api/entities/change', form_data: formData, token: this.getToken()});
-                console.log('change room ' + this.selectedRoom.invoices[0].invoice_id+','+this.change_room.id)
+                console.log('change room ' + this.selectedRoom.room_sessions[0].invoice.invoice_id+','+this.change_room.id)
                 if(response.success){
                     console.log("success");
                     await this.getRoomList();
-                    this.selectedRoom = this.roomList.find(x => x.id === this.change_room.id);
+                    // this.selectedRoom = this.roomList.find(x => x.id === this.change_room.id);
+                    this.selectedRoomId = this.change_room.id;
+                    this.getSelectedRoom();
                     this.closeChangeRoomModal();
                     this.clearChangeRoomForm();
                 }
@@ -1197,17 +1224,32 @@
                 this.printInvoiceData.discount = 0
 
             },
+            async getRoomDiscount(){
+                const response = await getApiData({ url: '/api/room_discounts', token: this.getToken() });
+                if(response.data){
+                    this.roomDiscountList = response.data.data;
+                }
+            },
             btnClickedEndRoom(){
                 this.EndRoom();
             },
             async EndRoom()
             {
                 let formData = new FormData();
-                formData.append('invoice_id', this.selectedRoom.invoices[0].invoice_id);
+                formData.append('invoice_id', this.selectedRoom.room_sessions[0].invoice.invoice_id);
                 // formData.append('change', this.change);
                 // formData.append('paid_amount', this.paid_amount);
                 formData.append('payment_type', this.selectedPaymentMethod);
-                formData.append('discount_value', this.printInvoiceData.discount);
+                formData.append('discount_type', this.discount_type);
+                if(this.discount_type == 'fix_amount'){
+                    formData.append('discount_amount', this.printInvoiceData.discount);
+                }
+                if(this.discount_type == 'percentage'){
+                    formData.append('discount_percentage', this.printInvoiceData.discount);
+                }
+                if(this.discount_type == 'room_discount'){
+                    formData.append('room_discount_id', this.room_discount);
+                }
                 formData.append('order_categories', JSON.stringify(this.orderList));
 
                 // formData.append('total_session_price', this.printInvoiceData.room);
