@@ -20,14 +20,31 @@ class OrderRepository implements OrderRepositoryInterface
         try {
             $price = $data['original_price'] * $data['quantity'];
             $order = Order::where('invoice_id', $data['invoice_id'])->get()->first();
+            $menu = Menu::find($data['menu_id']);
+            $latestMenuServiceDiscount = $menu->menuServiceDiscounts()
+                    ->whereDate('from_date', '<=', CurrentDate())
+                    ->whereDate('to_date', '>=', CurrentDate())
+                    ->orderBy('created_at', 'desc')
+                    ->where('type', 'menu')
+                    ->first();
+            if($latestMenuServiceDiscount)
+            {
+                $discountAmount = $latestMenuServiceDiscount->discount_price * $data['quantity'];
+                $data['menu_service_discount_id'] = $latestMenuServiceDiscount->id;
+                $data['discount_value'] = $latestMenuServiceDiscount->discount_price;
+            }else{
+                $discountAmount = 0;
+            }
+
             if ($order) {
                 $order->total_quantity += $data['quantity'];
+                $order->total_discount_price += $discountAmount;
                 $order->total += $data['original_price'] * $data['quantity'];
+                $order->total_discount_price += $discountAmount;
                 $order->update($data);
 
                 $data['date'] = currentTime();
                 $data['order_id'] = $order->id;
-                $data['discount_value'] = 0;
                 $data['price'] = $data['original_price'] * $data['quantity'];
                 $order_items = OrderItem::create($data);
 
@@ -37,11 +54,11 @@ class OrderRepository implements OrderRepositoryInterface
                 $data['date'] = currentTime();
                 $data['total'] = $data['original_price'] * $data['quantity'];
                 $data['total_quantity'] = $data['quantity'];
+                $order->total_discount_price = $discountAmount;
                 $order = Order::create($data);
                 $order->update(['order_id' => sprintf('%05d', $order->id)]);
 
                 $data['order_id'] = $order->id;
-                $data['discount_value'] = 0;
                 $data['price'] = $data['original_price'] * $data['quantity'];
                 $order_items = OrderItem::create($data);
                 DB::commit();
@@ -85,27 +102,32 @@ class OrderRepository implements OrderRepositoryInterface
                 $menuData['invoice_id'] = $invoiceId;
 
                 $menu = Menu::find($menuData['menu_id']);
-                dd($menu->menuServiceDiscounts());
-                $latestMenuServiceDiscount = $menu->menuServiceDiscounts()
+                $latestMenuServiceDiscount = null;
+                if(!isset($data['order_type']))
+                {
+                    $latestMenuServiceDiscount = $menu->menuServiceDiscounts()
                     ->whereDate('from_date', '<=', CurrentDate())
                     ->whereDate('to_date', '>=', CurrentDate())
                     ->orderBy('created_at', 'desc')
-                    ->where('type','menu')
+                    ->where('type', 'menu')
                     ->first();
-
+                }
                 if ($latestMenuServiceDiscount) {
                     $discountAmount = $latestMenuServiceDiscount->discount_price * $menuData['quantity'];
                     $totalDiscount += $discountAmount;
                     $menuData['menu_service_discount_id'] = $latestMenuServiceDiscount->id;
                     $menuData['discount_value'] = $latestMenuServiceDiscount->discount_price;
-                }else{
+                } else {
                     $discountAmount = 0;
                 }
-
                 if ($order) {
                     $order->total_quantity += $menuData['quantity'];
                     $order->total_discount_price += $discountAmount; // update total discount only for this order
                     $order->total += $menuData['original_price'] * $menuData['quantity'];
+                    if(isset($data['order_type']))
+                    {
+                        $order->total = 0;
+                    }
                     $order->update($menuData);
 
                     $originalOrderItem = OrderItem::where('menu_id', $menuData['menu_id'])->where('order_id', $order->id)->first();
@@ -113,6 +135,10 @@ class OrderRepository implements OrderRepositoryInterface
                     $menuData['date'] = CurrentTime();
                     $menuData['order_id'] = $order->id;
                     $menuData['price'] = $menuData['original_price'] * $menuData['quantity'];
+                    if(isset($data['order_type']))
+                    {
+                        $menuData['price'] = 0;
+                    }
                     $order_items = OrderItem::create($menuData);
                 } else {
                     $menuData['date'] = CurrentTime();
