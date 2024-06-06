@@ -139,3 +139,62 @@
         </div>
     </body>
 </html>
+
+
+
+
+
+{ 
+    "current_page": 1,
+    "data": [ 
+        { 
+            "id": 1, 
+            "name": "test package", 
+            "from_date": "2024-06-05", 
+            "to_date": "2024-06-07", 
+            "price": 30000, 
+            "session": 3, 
+            "is_ktv": 1, 
+            "is_active": 1, 
+            "created_by": 1, 
+            "created_at": "2024-06-05T10:57:08.000000Z", 
+            "updated_at": "2024-06-05T10:57:08.000000Z", 
+            "menu_packages": [
+                 { 
+                    "id": 1, 
+                    "menu_id": 1, 
+                    "package_id": 1, 
+                    "quantity": 5, 
+                    "created_at": "2024-06-05T10:57:08.000000Z", 
+                    "updated_at": "2024-06-05T10:57:08.000000Z", 
+                    "menu": { 
+                        "id": 1, 
+                        "menu_category_id": 4, 
+                        "name": "beer", 
+                        "image_url": "", 
+                        "image_path": "", 
+                        "is_active": 1, 
+                        "prices": [
+                            { 
+                                "id": 1, 
+                                "menu_id": 1, 
+                                "price": 3000 
+                            } 
+                            ] 
+                        } 
+                    }, 
+                    { "id": 2, 
+                        "menu_id": 3, 
+                        "package_id": 1, 
+                        "quantity": 3, 
+                        "created_at": 
+                        "2024-06-05T10:57:08.000000Z", 
+                        "updated_at": "2024-06-05T10:57:08.000000Z", 
+                        "menu": { 
+                            "id": 3, 
+                            "menu_category_id": 1, 
+                            "name": "Fried Potatoes", 
+                            "image_url": "", 
+                            "image_path": "", 
+                            "is_active": 1, 
+                            "prices": [ { "id": 5, "menu_id": 3, "price": 3400 } ] } } ], "rooms": [ { "id": 3, "name": "Room-C", "price_per_hour": 10000, "entity_type": "room", "area_id": 3, "service_category_id": null, "is_available": 1, "is_active": 0, "pivot": { "package_id": 1, "room_id": 3 } }, { "id": 1, "name": "Room-A", "price_per_hour": 30000, "entity_type": "room", "area_id": 3, "service_category_id": null, "is_available": 1, "is_active": 0, "pivot": { "package_id": 1, "room_id": 1 } }, { "id": 4, "name": "Room-D", "price_per_hour": 10000, "entity_type": "room", "area_id": 3, "service_category_id": null, "is_available": 1, "is_active": 0, "pivot": { "package_id": 1, "room_id": 4 } } ] }, { "id": 2, "name": "test package 2", "from_date": "2024-06-05", "to_date": "2024-06-09", "price": 15000, "session": 3, "is_ktv": 1, "is_active": 1, "created_by": 1, "created_at": "2024-06-05T10:59:01.000000Z", "updated_at": "2024-06-05T10:59:01.000000Z", "menu_packages": [ { "id": 3, "menu_id": 1, "package_id": 2, "quantity": 2, "created_at": "2024-06-05T10:59:01.000000Z", "updated_at": "2024-06-05T10:59:01.000000Z", "menu": { "id": 1, "menu_category_id": 4, "name": "beer", "image_url": "", "image_path": "", "is_active": 1, "prices": [ { "id": 1, "menu_id": 1, "price": 3000 } ] } } ], "rooms": [ { "id": 1, "name": "Room-A", "price_per_hour": 30000, "entity_type": "room", "area_id": 3, "service_category_id": null, "is_available": 1, "is_active": 0, "pivot": { "package_id": 2, "room_id": 1 } }, { "id": 2, "name": "Room-B", "price_per_hour": 15000, "entity_type": "room", "area_id": 3, "service_category_id": null, "is_available": 1, "is_active": 1, "pivot": { "package_id": 2, "room_id": 2 } }, { "id": 3, "name": "Room-C", "price_per_hour": 10000, "entity_type": "room", "area_id": 3, "service_category_id": null, "is_available": 1, "is_active": 0, "pivot": { "package_id": 2, "room_id": 3 } }, { "id": 4, "name": "Room-D", "price_per_hour": 10000, "entity_type": "room", "area_id": 3, "service_category_id": null, "is_available": 1, "is_active": 0, "pivot": { "package_id": 2, "room_id": 4 } } ] }, { "id": 3, "name": "test package 3", "from_date": "2024-06-11", "to_date": "2024-06-12", "price": 50000, "session": 3, "is_ktv": 1, "is_active": 1, "created_by": 1, "created_at": "2024-06-05T11:01:37.000000Z", "updated_at": "2024-06-05T11:01:37.000000Z", "menu_packages": [ { "id": 4, "menu_id": 1, "package_id": 3, "quantity": 30, "created_at": "2024-06-05T11:01:37.000000Z", "updated_at": "2024-06-05T11:01:37.000000Z", "menu": { "id": 1, "menu_category_id": 4, "name": "beer", "image_url": "", "image_path": "", "is_active": 1, "prices": [ { "id": 1, "menu_id": 1, "price": 3000 } ] } } ], "rooms": [ { "id": 2, "name": "Room-B", "price_per_hour": 15000, "entity_type": "room", "area_id": 3, "service_category_id": null, "is_available": 1, "is_active": 1, "pivot": { "package_id": 3, "room_id": 2 } }, { "id": 3, "name": "Room-C", "price_per_hour": 10000, "entity_type": "room", "area_id": 3, "service_category_id": null, "is_available": 1, "is_active": 0, "pivot": { "package_id": 3, "room_id": 3 } } ] } ], "first_page_url": "http://127.0.0.1:8000/api/packages?page=1", "from": 1, "last_page": 1, "last_page_url": "http://127.0.0.1:8000/api/packages?page=1", "links": [ { "url": null, "label": "&laquo; Previous", "active": false }, { "url": "http://127.0.0.1:8000/api/packages?page=1", "label": "1", "active": true }, { "url": null, "label": "Next &raquo;", "active": false } ], "next_page_url": null, "path": "http://127.0.0.1:8000/api/packages", "per_page": 20, "prev_page_url": null, "to": 3, "total": 3 }

@@ -31,6 +31,9 @@
 
                 <div class="mb-6">
                     <div class="opacity-100 transition-opacity duration-150 ease-linear">
+                        <p v-for="pack in packageList">
+                            {{ pack.name }}
+                        </p>
                         <div class="flex flex-wrap gap-x-4 gap-y-4">
                             <!-- <div class="bg-[#FF7675] flex-shrink-0 flex-grow p-6 w-40 max-w-44 h-40">
                                 <div class="flex flex-col justify-between h-full">
@@ -145,7 +148,7 @@
                         <div class="padding-section border-b    ">
                             <div class="flex justify-between font-semibold mb-2">
                                 <p class="text-sm text-black">
-                                    Invoice Id {{ selectedRoom.invoices.length > 0 ? selectedRoom.invoices[0].invoice_id
+                                    Invoice Id {{ selectedRoom.room_sessions.length > 0 ? selectedRoom.room_sessions[0].invoice.invoice_id
                                     : '' }}
                                 </p>
                                 <p class="text-sm text-black font-semibold">
@@ -154,7 +157,7 @@
                                     <!-- {{ (selectedRoom.price_per_hour * (selectedRoom.invoices.length > 0 ?
                                     selectedRoom.invoices[0].sessions[0].session_duration : 1)).toLocaleString() }} -->
 
-                                    {{ selectedRoom.invoices.length > 0 ? selectedRoom.invoices[0].total_session_price :
+                                    {{ selectedRoom.room_sessions.length > 0 ? selectedRoom.room_sessions[0].invoice.total_session_price :
                                     0 }}
                                     MMKs
                                 </p>
@@ -166,12 +169,12 @@
                             </div>
                             <div class="">
                                 <p class="text-sm text-black mb-2">
-                                    Start Time : {{ selectedRoom.invoices.length > 0 ?
-                                    selectedRoom.invoices[0].sessions[0].start_date : '' }}
+                                    Start Time : {{ selectedRoom.room_sessions.length > 0 ?
+                                    selectedRoom.room_sessions[0].start_date : '' }}
                                 </p>
                                 <p class="text-sm text-black">
-                                    End Time : {{ selectedRoom.invoices.length > 0 ?
-                                    selectedRoom.invoices[0].sessions[0].end_date : '' }}
+                                    End Time : {{ selectedRoom.room_sessions.length > 0 ?
+                                    selectedRoom.room_sessions[0].end_date : '' }}
                                 </p>
                             </div>
                         </div>
@@ -241,11 +244,11 @@
                             <p class="">
                                 Total
                                 {{
-                                (selectedRoom ? (purchaseMenuList.length > 0 ? (
-                                selectedRoom.invoices[0].total_session_price+
+                                (selectedRoom.room_sessions.length > 0  ? (purchaseMenuList.length > 0 ? (
+                                selectedRoom.room_sessions[0].invoice.total_session_price+
                                 purchaseMenuList[0].total).toLocaleString()
                                 : (
-                                selectedRoom.invoices[0].total_session_price
+                                selectedRoom.room_sessions[0].invoice.total_session_price
                                 ).toLocaleString()
                                 )
                                 : 0
@@ -426,19 +429,7 @@
                 <div class="" v-show="isOpenRoom.step_2 == true" id="open_room_2">
                     <div class="small-scrollbar overflow-y-auto h-[100vh] pt-8">
                         <div class="padding-section w-2/3 mx-auto ">
-                            <div class="mb-4">
-                                <label for="" class="block text-sm text-black mb-3">
-                                    Type
-                                </label>
-                                <div class="relative">
-                                    <select name="" id="" v-model="type"
-                                        class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
-                                        <option value="package"> Package </option>
-                                        <option value="session">  Session </option>
-                                        <option value="endless_time"> Endless Time </option>
-                                    </select>
-                                </div>
-                            </div>
+                            
                             <div class="mb-4">
                                 <label for="" class="block text-sm text-black mb-3">
                                     Customer Name
@@ -458,6 +449,33 @@
                             </div>
                             <div class="mb-4">
                                 <label for="" class="block text-sm text-black mb-3">
+                                    Type
+                                </label>
+                                <div class="relative">
+                                    <select name="" id="" v-model="type" @change="getPackageList"
+                                        class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
+                                        <option value="session">  Session </option>
+                                        <option value="package"> Package </option>
+                                        <option value="endless_time"> Endless Time </option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="mb-4" v-show="this.type == 'package'">
+                                <label for="" class="block text-sm text-black mb-3">
+                                    Packages
+                                </label>
+                                <div class="relative">
+                                    <select name="" id="" v-model="selectedPackage"
+                                        class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
+                                        <option v-for="pack in packageList" :value="pack.id">
+                                            {{ pack.name }}
+                                        </option>
+                                        <!-- <option v-for="(package,index) in packageList" :value="index"> {{ package }}</option> -->
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="mb-4">
+                                <label for="" class="block text-sm text-black mb-3">
                                     Deposit
                                 </label>
                                 <input type="text" placeholder="Deposit"
@@ -470,11 +488,12 @@
                                 <input type="datetime-local" placeholder="Time" v-model="invoice_date"
                                     class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
                             </div>
-                            <div class="mb-4">
+                            <div class="mb-4" v-show="this.type == 'session'">
                                 <label for="" class="block text-sm text-black mb-3">
                                     Duration
                                 </label>
-                                <input type="text" placeholder="" v-model="duration"
+                                <input type="text" placeholder="" v-model="duration" :disabled="this.type == 'package' || this.type == 'endless_time'"
+                                    :class="this.type == 'package' || this.type == 'endless_time' ? ' cursor-not-allowed ' : ''"
                                     class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
                             </div>
                             <div class="mb-4">
@@ -767,7 +786,9 @@
                 customerList:null,
                 roomName:null,
                 selectedCustomer:null,
-                type:null,
+                type:'session',
+                packageList:null,
+                selectedPackage:null,
                 invoice_date:null,
                 male:null,
                 female:null,
@@ -851,10 +872,20 @@
                 if (response.data) {
                     this.roomList = response.data;
                     this.selectedRoom = this.roomList[0]
-                    this.isOpenRoom.step_1 = true;
-                    this.isOpenRoom.step_2 = false;
-                    this.isOpenRoom.step_detail = false;
-                    this.isOpenRoom.step_invoice = false;
+                    if(this.selectedRoom.is_active == 1){
+                        this.isOpenRoom.step_1 = false;
+                        this.isOpenRoom.step_2 = false;
+                        this.isOpenRoom.step_detail = true;
+                        this.isOpenRoom.step_invoice = false;
+                    }
+                    else{
+                        this.isOpenRoom.step_1 = true;
+                        this.isOpenRoom.step_2 = false;
+                        this.isOpenRoom.step_detail = false;
+                        this.isOpenRoom.step_invoice = false;
+                        
+                    }
+                    
                 }
             },
 
@@ -873,8 +904,8 @@
             async getPurchaseMenuList(){
                 const response = await getApiData({ url: '/api/entities/' + this.selectedRoom.id, token: this.getToken() });
                 if(response.data){
-                    if(response.data.invoices.length > 0){
-                        this.purchaseMenuList = response.data.invoices[0].orders;
+                    if(response.data.room_sessions.length > 0){
+                        this.purchaseMenuList = response.data.room_sessions[0].invoice.orders;
                     }
 
                 }
@@ -894,32 +925,52 @@
                     this.customerList = response.data;
                 }
             },
+            async getPackageList(){
+                if(this.type == 'package'){
+                    const response = await getApiData({ url: '/api/packages', token: this.getToken() });
+                    if(response.data){
+                        this.packageList = response.data.data;
+                    }
+                }
+                else{
+                    this.packageList = null;
+                }
+
+            },
 
             btnClickedIsOpenRoom(room,index){
+                // if(room.is_active == 1){
+                //     this.isOpenRoom.step_1 = false;
+                //     this.isOpenRoom.step_2 = false;
+                //     this.isOpenRoom.step_invoice = false;
+                //     this.isOpenRoom.step_detail = true;
+                // };
                 this.selectedRoom = room;
                 this.selectedRoomIndex = index;
-                if(this.roomList[index].invoices.length>0){
-                    // alert(this.roomList[index].invoices.length)
+                // alert(this.roomList[index].room_sessions.length)
+                if(this.roomList[index].room_sessions.length > 0){
+                    // alert(this.roomList[index].room_sessions.length + ' > 0')
                     this.isOpenRoom.step_1 = false;
                     this.isOpenRoom.step_2 = false;
                     this.isOpenRoom.step_invoice = false;
                     this.isOpenRoom.step_detail = true;
                     this.getPurchaseMenuList();
-                }
-                if(this.roomList[index].invoices.length<1){
-                    // alert(this.roomList[index].invoices.length)
+                };
+                if(this.roomList[index].room_sessions.length == 0){
+                    // alert(this.roomList[index].room_sessions.length + ' = 0 ')
                     this.isOpenRoom.step_1=true;
                     this.isOpenRoom.step_2 = false;
                     this.isOpenRoom.step_invoice = false;
                     this.isOpenRoom.step_detail = false;
                     this.getPurchaseMenuList();
-                }
+                };
                 console.log(this.selectedRoom)
             },
             btnClickedOpenRoom(){
                 this.isOpenRoom.step_1=false;
                 this.isOpenRoom.step_2=true;
                 this.isOpenRoom.step_detail=false;
+                this.isOpenRoom.step_invoice=false;
 
             },
 
@@ -938,7 +989,6 @@
                 }
                 formData.append('phone_number', this.ph_number);
                 formData.append('address', this.address);
-                formData.append('type', this.type);
                 formData.append('birthdate', this.date);
                 let response = await postApiData({url: '/api/customers', form_data: formData, token: this.getToken()});
                 console.log(this.selectedGender+','+this.name+','+this.email+','+this.ph_number+','+this.address+','+this.date)
@@ -965,7 +1015,15 @@
                 formData.append('entity_id', this.selectedRoom.id);
                 formData.append('customer_id', this.selectedCustomer.id);
                 formData.append('invoice_date', this.invoice_date);
-                formData.append('session_duration', this.duration);
+                if(this.type == 'session'){
+                    formData.append('session_duration', this.duration);
+
+                }
+                if(this.type == 'package'){
+                    formData.append('package_id', this.selectedPackage);
+
+                }
+                formData.append('type', this.type);
                 if(this.female > 0){
                     formData.append('female', +this.female);
                 }
@@ -983,10 +1041,10 @@
                     this.isOpenRoom.step_2 = false;
                     this.isOpenRoom.step_detail = true;
                     this.isOpenRoom.step_invoice = false;
-                    if(this.selectedRoom.invoices.length>0){
+                    if(this.selectedRoom.room_sessions[0].invoice.length>0){
                         this.getPurchaseMenuList();
                     }
-                    if(this.selectedRoom.invoices.length<1){
+                    if(this.selectedRoom.room_sessions[0].invoice.length<1){
                         this.purchaseMenuList = [];
                     }
                     console.log("success")
@@ -996,8 +1054,8 @@
                 }
             },
             btnClickAddMenu(){
-                this.invoiceId = this.selectedRoom.invoices[0].invoice_id;
-                console.log(this.invoiceId)
+                this.invoiceId = this.selectedRoom.room_sessions[0].invoice.invoice_id;
+                console.log('invoice id ' + this.invoiceId)
             },
 
             btnConfirmAddMenu(){
@@ -1029,7 +1087,7 @@
             async addHour()
             {
                 let formData = new FormData();
-                formData.append('invoice_id', this.selectedRoom.invoices[0].invoice_id);
+                formData.append('invoice_id', this.selectedRoom.room_sessions[0].invoice.invoice_id);
                 formData.append('session_duration', this.sessionDuration);
                 let response = await postApiData({ url: '/api/entities/add_more_sessions', form_data: formData, token: this.getToken()});
                 if(response.success){
@@ -1074,6 +1132,8 @@
                 }
             },
 
+            
+
             btnBackToDetail(){
                 this.isOpenRoom.step_1 = false;
                 this.isOpenRoom.step_2 = false;
@@ -1089,7 +1149,7 @@
                 this.isOpenRoom.step_2 = false;
                 this.isOpenRoom.step_detail = false;
                 this.isOpenRoom.step_invoice = true;
-                this.printInvoiceData.room = this.selectedRoom.price_per_hour * this.selectedRoom.invoices[0].sessions[0].session_duration
+                this.printInvoiceData.room = this.selectedRoom.price_per_hour * this.selectedRoom.room_sessions[0].session_duration
                 if(this.purchaseMenuList.length > 0){
                     this.printInvoiceData.food = this.purchaseMenuList[0].total
                     this.purchaseMenuList[0].order_items.forEach(element => {
@@ -1218,6 +1278,7 @@
             // this.initialSidebarShow();
 
             // this.initialGetRoomList();
+            this.getPackageList();
             initTE({ Modal, Select, Ripple, Tab });
 
         }
