@@ -337,10 +337,14 @@ class InvoiceRepository implements InvoiceRepositoryInterface
             $total_session_price += $room->price;
         }
 
-
         $invoice = Invoice::find($data['invoice_id']);
-
+        $orderDiscount = 0;
         $order = Order::where('invoice_id', $invoice->id)->first();
+        if($order)
+        {
+            $orderDiscount = $order->total_discount_price;
+        }
+
         $lastRoomwithInvoice = RoomSession::where('invoice_id', $invoice->id)->latest()->first();
         $latestSession = $invoice->sessions->sortByDesc('created_at')->first();
         $entity = Entity::find($latestSession->entity_id);
@@ -365,43 +369,51 @@ class InvoiceRepository implements InvoiceRepositoryInterface
             $data['tax'] = 0;
         }
         if ($invoice->invoice_type == 'package') {
-            $data['total'] = $invoice->paid_amount;
-            $data['food_charge'] = 0;
+            $data['food_charge'] = $foodCharge + $beverageCharge;
+            $data['food_charge'] = $data['food_charge'] - $orderDiscount;
+            $data['total'] = $data['food_charge'];
+            $total_session_price = 0;
             $data['total_session_price'] = 0;
         } else if ($invoice->invoice_type == 'session') {
                 $data['food_charge'] = $foodCharge + $beverageCharge;
-                $data['food_charge'] = $data['food_charge'] - $order->total_discount_price;
+                $data['food_charge'] = $data['food_charge'] - $orderDiscount;
                 $data['total'] = $data['food_charge'] + $total_session_price + $data['service_charge'] + $data['tax'];
                 $data['total_session_price'] = $total_session_price;
         } else if($invoice->invoice_type =='endless_time') {
-                $invoiceDate = Carbon::parse($invoice->invoice_date); // Parse the invoice_date
+
+                $invoiceDate = Carbon::parse($invoice->invoice_date);
                 $currentDate = Carbon::now();
-                $hoursDifference = $invoiceDate->diffInHours($currentDate);
+                $minutesDifference = $currentDate->diffInMinutes($invoiceDate);
+                $hoursDifference = $minutesDifference / 60;
+                $hoursDifference = number_format($hoursDifference, 2);
                 if($hoursDifference < 3)
                 {
                     ResponseData("You can't end this room before 3 hours", 402);
                 }
                 $latestSession->session_duration = $hoursDifference;
                 $endlessTimeSessionDuration = $hoursDifference;
-                $latestSession->price = $hoursDifference * $entity->price_per_hour;
-                $latestSession->end_date = CurrentDate();
-
+                $sessionPrice = $hoursDifference * $entity->price_per_hour;
+                $latestSession->price =$sessionPrice;
+                $total_session_price = $sessionPrice;
+                $latestSession->end_date = CurrentTime();
+                $latestSession->save();
                 $data['food_charge'] = $foodCharge + $beverageCharge;
-                $data['food_charge'] = $data['food_charge'] - $order->total_discount_price;
-                $data['total'] = $data['food_charge'] + $total_session_price + $data['service_charge'] + $data['tax'];
-                $data['total_session_price'] = $total_session_price;
-
+                $data['food_charge'] = $data['food_charge'] - $orderDiscount;
+                $data['total'] = $data['food_charge'] + $sessionPrice + $data['service_charge'] + $data['tax'];
+                $data['total_session_price'] = $sessionPrice;
         }
 
         if (isset($data['discount_type'])) {
             if ($data['discount_type']) {
                 if ($data['discount_type'] == 'fix_amount') {
-                    $data['discount_amount'] = $data['discount_amount'];
+                    $data['discount_value'] = $data['discount_value'];
+                    $data['discount_type'] = 'fix_amount';
                 } else if ($data['discount_type'] == 'percentage') {
                     if ($data['discount_percentage'] < 0 || $data['discount_percentage'] > 100) {
                         ResponseMessage('Discount percentage should be between 0 and 100');
                     }
-                    $data['discount_amount'] = ($data['total'] * $data['discount_percentage']) / 100;
+                    $data['discount_value'] = ($data['food_charge'] + $total_session_price) *( $data['discount_percentage'] / 100);
+                    $data['discount_type'] = 'percentage';
                 }else if($data['discount_type'] == 'room_discount')
                 {
                     if($invoice->invoice_type =='package'){
@@ -418,8 +430,8 @@ class InvoiceRepository implements InvoiceRepositoryInterface
                             {
                                 if($invoice->invoice_type=='endless_time')
                                 {
-                                    $latestSession->session = $endlessTimeSessionDuration;
-                                    $caculation= floor($endlessTimeSessionDuration/$roomDiscount->session) * $roomDiscount->discount_session;
+                                    $latestSession->session_duration = $endlessTimeSessionDuration;
+                                    $caculation= floor($endlessTimeSessionDuration/$roomDiscount->session);
                                     $latestSession->discount_session = $caculation;
                                     $latestSession->update();
                                     $entity->is_active=1;
@@ -428,8 +440,10 @@ class InvoiceRepository implements InvoiceRepositoryInterface
                                     ResponseMessage('Enjoy your discount',200);
 
                                 }else{
-                                    $latestSession->session_duration += floor($latestSession->session_duration/$roomDiscount->session);
-                                    $latestSession->discount_session = floor($latestSession->session_duration/$roomDiscount->session);
+                                    // dd($latestSession->session_duration,floor($latestSession->session_duration/$roomDiscount->session),$latestSession->discount_session);
+                                    $durationValue =floor($latestSession->session_duration/$roomDiscount->session);
+                                    $latestSession->session_duration += $durationValue;
+                                    $latestSession->discount_session = $durationValue;
                                     $latestSession->update();
                                     $entity->is_active=1;
                                     DB::commit();
@@ -449,13 +463,18 @@ class InvoiceRepository implements InvoiceRepositoryInterface
             }
         }
         $data['total'] = $data['food_charge'] + $total_session_price + $data['service_charge'] + $data['tax'];
-        $data['order_discount_value'] = $order->total_discount_price;
+        if($invoice->invoice_type=='package')
+        {
+            $data['total'] = 0;
+            $data['tax'] = 0;
+            $data['service_charge'] = 0;
+        }
+        $data['order_discount_value'] = $orderDiscount;
         $data['sub_total'] = $data['food_charge'] + $data['total_session_price'];
         $data['payment_status'] = 'received';
         $data['complete_date'] = CurrentTime();
 
         $invoice->update($data);
-
         $debit_total = 0;
         DB::commit(); //testign purpose need to delete
         return $invoice; //testign purpose need to delete
