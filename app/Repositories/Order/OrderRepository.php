@@ -31,11 +31,10 @@ class OrderRepository implements OrderRepositoryInterface
             {
                 $discountAmount = $latestMenuServiceDiscount->discount_price * $data['quantity'];
                 $data['menu_service_discount_id'] = $latestMenuServiceDiscount->id;
-                $data['discount_value'] = $latestMenuServiceDiscount->discount_price;
+                $data['discount_value'] = $latestMenuServiceDiscount->discount_price * $data['quantity'];
             }else{
                 $discountAmount = 0;
             }
-
             if ($order) {
                 $order->total_quantity += $data['quantity'];
                 $order->total_discount_price += $discountAmount;
@@ -54,7 +53,7 @@ class OrderRepository implements OrderRepositoryInterface
                 $data['date'] = currentTime();
                 $data['total'] = $data['original_price'] * $data['quantity'];
                 $data['total_quantity'] = $data['quantity'];
-                $order->total_discount_price = $discountAmount;
+                $data['total_discount_price'] = $discountAmount;
                 $order = Order::create($data);
                 $order->update(['order_id' => sprintf('%05d', $order->id)]);
 
@@ -62,15 +61,15 @@ class OrderRepository implements OrderRepositoryInterface
                 $data['price'] = $data['original_price'] * $data['quantity'];
                 $order_items = OrderItem::create($data);
                 DB::commit();
-                $users =  $this->getUserByRole('Kitchen', ['staff']);
-                $title = 'New Order Arrived';
+                // $users =  $this->getUserByRole('Kitchen', ['staff']);
+                // $title = 'New Order Arrived';
 
-                $data = [
-                    'date' => CurrentTime(),
-                    'title' => $title,
-                    'body' => 'New Order arrived to kitchen',
-                ];
-                $this->send($order_items, $users, $data);
+                // $data = [
+                //     'date' => CurrentTime(),
+                //     'title' => $title,
+                //     'body' => 'New Order arrived to kitchen',
+                // ];
+                // $this->send($order_items, $users, $data);
 
                 return $order;
             }
@@ -116,7 +115,7 @@ class OrderRepository implements OrderRepositoryInterface
                     $discountAmount = $latestMenuServiceDiscount->discount_price * $menuData['quantity'];
                     $totalDiscount += $discountAmount;
                     $menuData['menu_service_discount_id'] = $latestMenuServiceDiscount->id;
-                    $menuData['discount_value'] = $latestMenuServiceDiscount->discount_price;
+                    $menuData['discount_value'] = $latestMenuServiceDiscount->discount_price * $menuData['quantity'];
                 } else {
                     $discountAmount = 0;
                 }
