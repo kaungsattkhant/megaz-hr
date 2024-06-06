@@ -43,7 +43,9 @@ class FeatureSeeder extends Seeder
             'pos',
             'room discount',
             'package',
-            'menu service discount'
+            'menu service discount',
+            'account payables',
+            'inventory stocks',
         ];
         foreach ($features as $feature) {
             Feature::create([

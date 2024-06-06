@@ -35,6 +35,7 @@ class Staff extends Authenticatable
         'department_id',
         'is_active',
         'password',
+        'bank_account_number',
         'nrc_front_url',
         'nrc_front_path',
         'nrc_back_url',

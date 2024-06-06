@@ -74,5 +74,11 @@ class TransferAPIController extends Controller
         $data = $this->transferRepo->confirmTransferItem($request);
         ResponseData($data);
     }
+
+    public function cancelTransferItem(Request $request)
+    {
+        $transfer = $this->transferRepo->cancelTransferItem($request);
+        ResponseData($transfer);
+    }
     #end
 }

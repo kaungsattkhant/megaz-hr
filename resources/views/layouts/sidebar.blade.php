@@ -115,7 +115,7 @@
                             <li>
                                 <a href="{{ route('inventories') }}" class="flex items-center @yield('inventories')">
                                     <i class="fal fa-inventory  pr-3"></i>
-                                    Inventory
+                                    Inventories
                                 </a>
                             </li>
                         @endif
@@ -281,6 +281,15 @@
                                 </a>
                             </li>
                         @endif
+                        @if (checkFeaturePermission('inventory-stocks'))
+                        <li>
+                            <a href="{{ route('inventory_stocks.index') }}"
+                                class="flex items-center @yield('inventory_stocks')">
+                                <i class="fal fa-truck-loading  pr-3"></i>
+                                Inventory Stocks
+                            </a>
+                        </li>
+                        @endif
                         @if (checkFeaturePermission('purchase-order-confirmation'))
                             <li>
                                 <a href="{{ route('purchase_orders.confirm_poitems') }}"
@@ -319,6 +328,36 @@
                                     Used Defected Items
                                 </a>
                             </li>
+                        @endif
+
+                        @if (checkFeaturePermission('room-discount'))
+                        <li>
+                            <a href="{{ route('room_discount.index') }}"
+                                class="flex items-center @yield('room_discount')">
+                                <i class="fal fa-truck-loading  pr-3"></i>
+                                Room Discount
+                            </a>
+                        </li>
+                        @endif
+
+                        @if (checkFeaturePermission('menu-service-discount'))
+                        <li>
+                            <a href="{{ route('menu_service_discount.index') }}"
+                                class="flex items-center @yield('menu&service_discount')">
+                                <i class="fal fa-truck-loading  pr-3"></i>
+                                Menu Service Discount
+                            </a>
+                        </li>
+                        @endif
+
+                        @if (checkFeaturePermission('package'))
+                        <li>
+                            <a href="{{ route('packages.index') }}"
+                                class="flex items-center @yield('packages')">
+                                <i class="fal fa-truck-loading  pr-3"></i>
+                                Packages
+                            </a>
+                        </li>
                         @endif
 
                     </ul>

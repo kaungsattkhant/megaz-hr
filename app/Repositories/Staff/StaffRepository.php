@@ -91,6 +91,24 @@ class StaffRepository implements StaffRepositoryInterface
                 {
                     $staff->roles()->detach();
                 }
+                if(isset($data['nrc_front_path'])){
+                    if($staff->nrc_front_path){
+                        DeleteFileFromServer($staff->nrc_front_path);
+                    }
+                }
+
+                if(isset($data['nrc_back_path'])){
+                    if($staff->nrc_back_path){
+                        DeleteFileFromServer($staff->nrc_back_path);
+                    }
+                }
+
+                if(isset($data['household_registration_path'])){
+                    if($staff->household_registration_path){
+                        DeleteFileFromServer($staff->household_registration_path);
+                    }
+                }
+
                 $staff->update($data);
 
                 if (isset($data['roles']) && $data['roles'] !== null) {

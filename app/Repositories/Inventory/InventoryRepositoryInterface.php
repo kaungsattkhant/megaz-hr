@@ -14,7 +14,7 @@ interface InventoryRepositoryInterface
 
     public function deleteData(int $id);
 
-    public function getInventoryLedgers(int $inventoryId);
+    public function getInventoryLedgers(int $inventoryId,$request);
 
     public function detail($inventory);
 

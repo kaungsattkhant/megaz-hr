@@ -8,11 +8,19 @@
 
         <div class="btn-container">
             <div class=" flex">
-                <label for="search" class="search-input">
-                    <input type="text" class="input-search" placeholder="Search">
+                <div>
+                    <label for="search" class="search-input mx-2 px-2 py-1"> From Date </label>
+                    <input type="date" v-model="fromDate" class="search-input rounded">
+                </div>
 
-                    <i class="fal fa-search"></i>
-                </label>
+                <div>
+                    <label for="search" class="search-input mx-2 px-2 py-1"> To Date </label>
+                    <input type="date" v-model="toDate" class="search-input rounded">
+                </div>
+                <div class="ml-2 px-2">
+                    <button class="mx-1 add-btn h-8 text-[13px] font-inter" @click="searchBtnClicked">Filter</button>
+                    <button class="mx-1 add-btn h-8 text-[13px] font-inter" @click="clearSearchBtnClicked">Clear</button>
+                </div>
             </div>
             <div class="flex justify-end flex-col">
 
@@ -44,6 +52,9 @@
                                 </th>
                                 <th scope="col" class="  ">
                                     Quantity
+                                </th>
+                                <th scope="col" class="  ">
+                                    UOM
                                 </th>
                                 <th scope="col" class="  ">
                                     Received By
@@ -81,6 +92,9 @@
                                     </td>
                                     <td class="whitespace-nowrap  ">
                                         {{ transfer.quantity }}
+                                    </td>
+                                    <td class="whitespace-nowrap  ">
+                                        {{ transfer.uom.name }}
                                     </td>
                                     <td class="whitespace-nowrap  ">
                                         <div v-if="transfer.confirmed_by">
@@ -176,6 +190,9 @@ export default {
             transfersList: [],
             transferId: null,
 
+            fromDate: null,
+            toDate: null,
+
             per_page: 20,
             pageNumbers: [],
             currentPage: 1,
@@ -196,6 +213,9 @@ export default {
                 this.currentPage = pageNumber;
             }
             let url = `/api/transfers?page=${this.currentPage}`;
+            if(this.fromDate && this.toDate){
+                url = `${url}&from_date=${this.fromDate}&to_date=${this.toDate}`;
+            }
             let response = await getApiData({ url: url, token: this.getToken() });
             if (response.data) {
                 this.transfersList = response.data.data;
@@ -224,6 +244,16 @@ export default {
                     this.isLastGroup = (lastGroupIndex === this.currentGroup);
                 }
             }
+        },
+
+        searchBtnClicked(){
+            this.getInventoryTransfersList(this.currentPage);
+        },
+
+        clearSearchBtnClicked(){
+            this.fromDate = null;
+            this.toDate = null;
+            this.getInventoryTransfersList(this.currentPage);
         },
 
         pageBtnClicked(pageNumber) {

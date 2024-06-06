@@ -27,7 +27,7 @@ class Menu extends BaseModel
 
     public function items()
     {
-        return $this->belongsToMany(Item::class)->withPivot(['weight', 'is_make_pack','uom_id']);
+        return $this->belongsToMany(Item::class)->withPivot(['weight','price', 'is_make_pack','uom_id']);
     }
 
     public function orderItem()

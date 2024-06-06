@@ -1,117 +1,47 @@
 <template>
     <div>
         <p class=" text-lg font-semibold font-inter">
-            Inventory Transfer History
+            Item Pricing History
         </p>
     </div>
     <div class="mt-4 bg-white">
-        <div class="btn-container">
-            <div class=" flex">
-                <div>
-                    <label for="search" class="search-input mx-2 px-2 py-1"> From Date </label>
-                    <input type="date" v-model="fromDate" class="search-input rounded">
-                </div>
-
-                <div>
-                    <label for="search" class="search-input mx-2 px-2 py-1"> To Date </label>
-                    <input type="date" v-model="toDate" class="search-input rounded">
-                </div>
-                <div class="ml-2 px-2">
-                    <button class="mx-1 add-btn h-8 text-[13px] font-inter" @click="searchBtnClicked">Filter</button>
-                    <button class="mx-1 add-btn h-8 text-[13px] font-inter" @click="clearSearchBtnClicked">Clear</button>
-                </div>
-
-            </div>
-        </div>
+        <div class="btn-container"></div>
         <div class="box-container-table">
             <div class="overflow-x-auto">
-                <div class="table-container ">
+                <div class="table-container">
                     <table class="primary-table">
-                        <thead class="">
+                        <thead>
                             <tr>
-                                <th scope="col" class="  ">
-                                    #
-                                </th>
-                                <th scope="col" class="  ">
-                                    Transfer Id
-                                </th>
-                                <th scope="col" class="  ">
-                                    Created Date
-                                </th>
-                                <th scope="col" class="  ">
-                                    Confirmed Date
-                                </th>
-                                <th scope="col" class="  ">
-                                    Source Inventory
-                                </th>
-                                <th scope="col" class="  ">
-                                    Destination Inventory
-                                </th>
-                                <th scope="col" class="  ">
-                                    Item
-                                </th>
-                                <th scope="col" class="  ">
-                                    Quantity
-                                </th>
-                                <th scope="col" class="  ">
-                                    UOM
-                                </th>
-                                <th scope="col" class="  ">
-                                    Trasnferred By
-                                </th>
-                                <th scope="col" class="  ">
-                                    Received By
-                                </th>
-                                <!-- <th scope="col" class="px-6 py-4">
-
-                            </th> -->
+                                <th>#</th>
+                                <th>UOM</th>
+                                <th>Price</th>
+                                <th>Date</th>
                             </tr>
                         </thead>
                         <tbody>
-
                             <!-- looping start -->
-                            <div class="contents" v-for="(transfer, index) in transferList" :key="index">
+                            <div class="contents" v-for="(pricing, pricingIndex) in pricingHistoryList" :key="pricingIndex">
                                 <tr class="">
-                                    <td class="  ">
-                                        {{ per_page * (currentPage - 1) + (++index) }}
+                                    <td class="">
+                                        {{ per_page * (currentPage - 1) + (++pricingIndex) }}
                                     </td>
-                                    <td class="whitespace-nowrap  ">
-                                        {{ transfer.transfer_id }}
+                                    <td class="whitespace-nowrap">
+                                        {{ pricing.uom.name }}
                                     </td>
-                                    <td class="whitespace-nowrap  ">
-                                        {{ transfer.date }}
+                                    <td class="whitespace-nowrap">
+                                        {{ (pricing.price).toLocaleString() }}
                                     </td>
-                                    <td class="whitespace-nowrap  ">
-                                        {{ transfer.confirmed_date }}
-                                    </td>
-                                    <td class="  ">
-                                        {{ transfer.source_inventory.name }}
-                                    </td>
-                                    <td class="  ">
-                                        {{ transfer.destination_inventory.name }}
-                                    </td>
-                                    <td class="whitespace-nowrap  ">
-                                        {{ transfer.item.name }}
-                                    </td>
-                                    <td class="whitespace-nowrap  ">
-                                        {{ transfer.quantity }}
-                                    </td>
-                                    <td class="whitespace-nowrap  ">
-                                        {{ transfer.uom.name }}
-                                    </td>
-                                    <td class="whitespace-nowrap  ">
-                                        {{ transfer.created_by.name }}
-                                    </td>
-                                    <td class="whitespace-nowrap  ">
-                                        <div v-if="transfer.confirmed_by"> {{ transfer.confirmed_by.name }} </div>
+                                    <td class="whitespace-nowrap">
+                                        <div v-if="pricing.created_at"> {{ pricing.created_at }} </div>
+                                        <div v-else> No date </div>
                                     </td>
                                 </tr>
                             </div>
 
-                            <!-- looping end -->
                         </tbody>
                     </table>
                 </div>
+
                 <div class="mt-2 ml-2">
                     <ul v-if="paginationGroupsCount > 1" class="list-style-none flex">
                         <li v-if="!isFirstGroup">
@@ -174,66 +104,58 @@
 </template>
 
 <script>
-import { Modal, Ripple, Select, initTE, Input } from "tw-elements";
+import { Modal, Ripple, initTE, Select, Dropdown } from "tw-elements";
 import { getApiData, postApiData, deleteApiData } from '../../utilities/ajax-helpers';
-import { convertToFriendlyDate } from '../../utilities/datetime-helpers';
+import { convertToFriendlyDateTime } from "../../utilities/datetime-helpers";
 import { mapGetters } from "vuex";
 
 export default {
+    props: ["itemId"],
     data() {
         return {
-            transferList: [],
-            transferId: null,
-
-            fromDate: null,
-            toDate: null,
+            item: null,
+            pricingHistoryList: [],
 
             per_page: 20,
-            pageNumbers: [],
             currentPage: 1,
+            pageNumbers: [],
             paginationGroupsCount: 1,
-            per_group: 10,
             groupedPageNumbers: [],
             currentGroup: 0,
             isFirstGroup: true,
             isLastGroup: false,
+            selectedBaseUom:null
         };
     },
 
     methods: {
         ...mapGetters(['getToken']),
 
-        async getInventoryTransferHistoryList(pageNumber) {
-            if (pageNumber) {
+        async getItemPricingHistory(pageNumber){
+            if(pageNumber){
                 this.currentPage = pageNumber;
             }
-            let url = `/api/transfer_confirmation_list?status=complete&page=${this.currentPage}`;
-            if(this.fromDate && this.toDate){
-                url = `${url}&from_date=${this.fromDate}&to_date=${this.toDate}`;
-            }
-            let response = await getApiData({ url: url, token: this.getToken() });
-            if (response.data) {
-                this.transferList = response.data.data;
-                this.transferList.forEach((transfer) => {
-                    transfer.date = convertToFriendlyDate(transfer.date);
-                    if(transfer.confirmed_at){
-                        transfer.confirmed_date = convertToFriendlyDate(transfer.confirmed_at);
-                    }
+            let url = `/api/item_price_list_by_item/${this.itemId}?page=${this.currentPage}&per_page=${this.per_page}`;
+            let response = await getApiData({url: url, token: this.getToken()});
+            if(response.data){
+                this.pricingHistoryList = response.data.data;
+                this.pricingHistoryList.forEach((pricing)=>{
+                    pricing.created_at = convertToFriendlyDateTime(pricing.created_at);
                 });
                 this.per_page = response.data.per_page;
 
                 this.pageNumbers = [];
                 this.lastPageNumber = response.data.last_page;
 
-                for (let i = 1; i <= response.data.last_page; i++) {
+                for(let i=1; i<=response.data.last_page; i++){
                     this.pageNumbers.push(i);
                 }
 
-                if (this.pageNumbers.length > 10) {
+                if(this.pageNumbers.length > 10){
                     this.groupedPageNumbers = [];
                     this.paginationGroupsCount = this.pageNumbers.length % 10;
-                    for (let i = 0; i < this.pageNumbers.length; i += 10) {
-                        let chunk = this.pageNumbers.slice(i, i + 10);
+                    for(let i=0; i<this.pageNumbers.length; i+=10){
+                        let chunk = this.pageNumbers.slice(i, i+10);
                         this.groupedPageNumbers.push(chunk);
                     }
 
@@ -244,54 +166,44 @@ export default {
             }
         },
 
-        searchBtnClicked(){
-            this.getInventoryTransferHistoryList(this.currentPage);
-        },
-
-        clearSearchBtnClicked(){
-            this.fromDate = null;
-            this.toDate = null;
-            this.getInventoryTransferHistoryList(this.currentPage);
-        },
-
         pageBtnClicked(pageNumber) {
             this.currentPage = pageNumber;
-            this.getInventoryTransferHistoryList(this.currentPage);
+            this.getItemList(this.currentPage);
         },
 
         nextPaginationGroupBtnClicked() {
             this.currentGroup += 1;
             this.currentPage = (this.groupedPageNumbers[this.currentGroup][0]);
-            this.getInventoryTransferHistoryList(this.currentPage);
+            this.getItemList(this.currentPage);
         },
 
         previousPaginationGroupBtnClicked() {
             this.currentGroup -= 1;
             let lastIndex = this.groupedPageNumbers[this.currentGroup].length - 1;
             this.currentPage = (this.groupedPageNumbers[this.currentGroup][lastIndex]);
-            this.getInventoryTransferHistoryList(this.currentPage);
+            this.getItemList(this.currentPage);
         },
 
         firstPaginationGroupBtnClicked() {
             this.currentGroup = 0;
             this.currentPage = (this.groupedPageNumbers[this.currentGroup][0]);
-            this.getInventoryTransferHistoryList(this.currentPage);
+            this.getItemList(this.currentPage);
         },
 
         lastPaginationGroupBtnClicked() {
             this.currentGroup = this.paginationGroupsCount - 1;
             let lastIndex = this.groupedPageNumbers[this.currentGroup].length - 1;
             this.currentPage = (this.groupedPageNumbers[this.currentGroup][lastIndex]);
-            this.getInventoryTransferHistoryList(this.currentPage);
+            this.getItemList(this.currentPage);
         }
     },
 
     created() {
-        this.getInventoryTransferHistoryList(null);
+        this.getItemPricingHistory(null);
     },
 
     mounted() {
-        initTE({ Modal, Select, Ripple });
+        initTE({ Modal, Ripple, Select, Dropdown });
     }
 }
 </script>

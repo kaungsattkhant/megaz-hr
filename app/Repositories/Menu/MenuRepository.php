@@ -44,6 +44,7 @@ class MenuRepository implements MenuRepositoryInterface
                 $menu->items()->attach($item['id'], [
                     'uom_id' => $item['uom_id'],
                     'weight' => $item['weight'],
+                    'price' => $item['price'],
                     'is_make_pack' => $item['is_make_pack'] ? 1 : 0
                 ]);
             }
@@ -114,16 +115,27 @@ class MenuRepository implements MenuRepositoryInterface
                 $this->updateMenuPrice($menu->id, $data['price']);
             }
             if (isset($items)) {
-                $menu->items()->detach();
+                // $menu->items()->detach();
                 $syncData = [];
                 foreach ($items as $item) {
+                    if($menu->items()->where('item_id', $item['id'])->where('uom_id', $item['uom_id'])->first()){
+                        $menu->items()->detach($item['id']);
+                    }
                     $syncData[$item['id']] = [
                         'uom_id' => $item['uom_id'],
                         'weight' => $item['weight'],
+                        'price' => $item['price'],
                         'is_make_pack' => $item['is_make_pack'] ? 1 : 0
                     ];
+
+                    $menu->items()->attach($item['id'], [
+                        'uom_id' => $item['uom_id'],
+                        'weight' => $item['weight'],
+                        'price' => $item['price'],
+                        'is_make_pack' => $item['is_make_pack'] ? 1 : 0
+                    ]);
                 }
-                $menu->items()->sync($syncData);
+                // $menu->items()->sync($syncData);
             }
 
             DB::commit();
