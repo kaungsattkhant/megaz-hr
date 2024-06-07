@@ -100,11 +100,13 @@ class InvoiceRepository implements InvoiceRepositoryInterface
                 $data['session_duration'] = $package->session; // nullable
                 $data['price'] = $package->price;
                 $data['invoice_type'] = 'package';
+                $data['total'] = $package->price;
             } else if ($data['type'] == 'session') {
 
                 $end_date = Carbon::parse($data['invoice_date'])->addMinutes($data['session_duration'] * 60);
                 $data['total_session_price'] = $data['session_duration'] * $entity->price_per_hour;
                 $data['price'] = $data['total_session_price'];
+                $data['total'] = $data['total_session_price'];
                 $data['invoice_type'] = 'session';
             } else if ($data['type'] == 'endless_time') {
                 $data['invoice_type'] = 'endless_time';
@@ -371,7 +373,7 @@ class InvoiceRepository implements InvoiceRepositoryInterface
         if ($invoice->invoice_type == 'package') {
             $data['food_charge'] = $foodCharge + $beverageCharge;
             $data['food_charge'] = $data['food_charge'] - $orderDiscount;
-            $data['total'] = $data['food_charge'];
+            $data['total'] = $data['food_charge'] + $invoice->paid_amount;
             $total_session_price = 0;
             $data['total_session_price'] = 0;
         } else if ($invoice->invoice_type == 'session') {
@@ -424,8 +426,7 @@ class InvoiceRepository implements InvoiceRepositoryInterface
                         if (!$roomDiscount->rooms->contains($entity->id)) {
                             ResponseMessage('Selected discount cannot be applied', 422);
                         }
-                        if($data['is_room_discount'] == 1)
-                        {
+
                             if($roomDiscount->session <= $latestSession->session_duration)
                             {
                                 if($invoice->invoice_type=='endless_time')
@@ -454,21 +455,21 @@ class InvoiceRepository implements InvoiceRepositoryInterface
                             }else{
                                 ResponseMessage('Discount cannot be applied',422);
                             }
-                        }else{
-                            $data['discount_type'] = 'room_discount';
-                        }
+
 
                     }
                 }
             }
         }
-        $data['total'] = $data['food_charge'] + $total_session_price + $data['service_charge'] + $data['tax'];
         if($invoice->invoice_type=='package')
         {
-            $data['total'] = 0;
             $data['tax'] = 0;
             $data['service_charge'] = 0;
+            $data['paid_amount'] = $invoice->paid_amount + $data['food_charge'];
+        }else{
+            $data['total'] = $data['food_charge'] + $total_session_price + $data['service_charge'] + $data['tax'];
         }
+        $data['discount_type'] = $invoice->discount_type;
         $data['order_discount_value'] = $orderDiscount;
         $data['sub_total'] = $data['food_charge'] + $data['total_session_price'];
         $data['payment_status'] = 'received';

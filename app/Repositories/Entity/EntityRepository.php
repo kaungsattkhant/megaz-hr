@@ -35,7 +35,7 @@ class EntityRepository implements EntityRepositoryInterface
         $area = Area::find($data['area_id']);
         $currentDate = $data['current_date'];
 
-        $entities = Entity::where('is_available',1)->with(['roomSessions' => function ($query)
+        $entities = Entity::where('is_available',1)->where('area_id',$data['area_id'])->with(['roomSessions' => function ($query)
         {
             $query->latest()->first();
         }])->get();
