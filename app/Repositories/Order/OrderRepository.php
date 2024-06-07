@@ -140,6 +140,7 @@ class OrderRepository implements OrderRepositoryInterface
                     }
                     $order_items = OrderItem::create($menuData);
                 } else {
+
                     $menuData['date'] = CurrentTime();
                     $menuData['total'] = $menuData['original_price'] * $menuData['quantity'];
                     $menuData['total_quantity'] = $menuData['quantity'];
@@ -148,7 +149,10 @@ class OrderRepository implements OrderRepositoryInterface
                     $order->update(['order_id' => sprintf('%05d', $order->id)]);
 
                     $menuData['order_id'] = $order->id;
-                    $menuData['price'] = $menuData['original_price'] * $menuData['quantity'];
+                    if(isset($data['order_type']))
+                    {
+                        $menuData['price'] = 0;
+                    }
                     $order_items = OrderItem::create($menuData);
                 }
             }

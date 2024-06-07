@@ -243,6 +243,10 @@ class InvoiceRepository implements InvoiceRepositoryInterface
         DB::beginTransaction();
         try {
             $invoice = Invoice::find($data['invoice_id']);
+            if($invoice->invoice_type=='package')
+            {
+                ResponseMessage('Room with package cannot change room');
+            }
             $lastRoomwithInvoice = RoomSession::where('invoice_id', $invoice->id)->latest()->first();
             $startTime = Carbon::parse($lastRoomwithInvoice->start_date);
             $endTime = Carbon::now();
@@ -349,9 +353,12 @@ class InvoiceRepository implements InvoiceRepositoryInterface
 
         $lastRoomwithInvoice = RoomSession::where('invoice_id', $invoice->id)->latest()->first();
         $latestSession = $invoice->sessions->sortByDesc('created_at')->first();
+        // if($invoice->invoice_type=='endless_time')
+        // {
+        //     $latest
+        // }
         $entity = Entity::find($latestSession->entity_id);
-        $entity->is_active = 0;
-        $entity->save();
+
 
         // service_charge
         if ($data['service_charge'] === true || strtolower($data['service_charge']) === 'true') {
@@ -474,7 +481,8 @@ class InvoiceRepository implements InvoiceRepositoryInterface
         $data['sub_total'] = $data['food_charge'] + $data['total_session_price'];
         $data['payment_status'] = 'received';
         $data['complete_date'] = CurrentTime();
-
+        $entity->is_active = 0;
+        $entity->save();
         $invoice->update($data);
         $debit_total = 0;
         DB::commit(); //testign purpose need to delete

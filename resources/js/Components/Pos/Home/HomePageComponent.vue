@@ -148,7 +148,7 @@
                         <div class="padding-section border-b    ">
                             <div class="flex justify-between font-semibold mb-2">
                                 <p class="text-sm text-black">
-                                    Invoice Id 
+                                    Invoice Id
                                     <!-- {{ selectedRoom.room_sessions[0].invoice.invoice_id ? selectedRoom.room_sessions[0].invoice.invoice_id
                                     : '' }} -->
 
@@ -253,14 +253,14 @@
                             <p class="">
                                 Total
                                 {{
-                                (selectedRoom.room_sessions[0].length > 0  ? 
-                                    (purchaseMenuList.length > 0 ? 
+                                (selectedRoom.room_sessions[0].length > 0  ?
+                                    (purchaseMenuList.length > 0 ?
                                         (
                                             (selectedRoom.room_sessions[0].invoice.total_session_price ? selectedRoom.room_sessions[0].invoice.total_session_price : 0)
                                              +
-                                            (purchaseMenuList[0].length > 0 ? purchaseMenuList[0].total : 0 ) 
+                                            (purchaseMenuList[0].length > 0 ? purchaseMenuList[0].total : 0 )
                                         ).toLocaleString()
-                                        : 
+                                        :
                                         (
                                         selectedRoom.room_sessions[0].invoice.total_session_price ? selectedRoom.room_sessions[0].invoice.total_session_price : 0
                                         ).toLocaleString()
@@ -466,7 +466,7 @@
                 <div class="" v-show="isOpenRoom.step_2 == true" id="open_room_2">
                     <div class="small-scrollbar overflow-y-auto h-[100vh] pt-8">
                         <div class="padding-section w-2/3 mx-auto ">
-                            
+
                             <div class="mb-4">
                                 <label for="" class="block text-sm text-black mb-3">
                                     Customer Name
@@ -925,9 +925,9 @@
                         this.isOpenRoom.step_2 = false;
                         this.isOpenRoom.step_detail = false;
                         this.isOpenRoom.step_invoice = false;
-                        
+
                     }
-                    
+
                 }
             },
 
@@ -981,7 +981,7 @@
             },
 
             async btnClickedIsOpenRoom(room,index){
-                
+
                 this.selectedRoomId = room.id;
                 this.selectedRoomIndex = index;
                 this.getSelectedRoom();
@@ -1095,7 +1095,7 @@
                             this.purchaseMenuList = [];
                         }
                     }
-                    
+
                     console.log("success")
                 }
                 else{
@@ -1184,7 +1184,7 @@
                 }
             },
 
-            
+
 
             btnBackToDetail(){
                 this.isOpenRoom.step_1 = false;
@@ -1242,7 +1242,7 @@
                 formData.append('payment_type', this.selectedPaymentMethod);
                 formData.append('discount_type', this.discount_type);
                 if(this.discount_type == 'fix_amount'){
-                    formData.append('discount_amount', this.printInvoiceData.discount);
+                    formData.append('discount_value', this.printInvoiceData.discount);
                 }
                 if(this.discount_type == 'percentage'){
                     formData.append('discount_percentage', this.printInvoiceData.discount);
