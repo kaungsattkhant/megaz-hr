@@ -285,7 +285,7 @@
                                 <div class="relative">
                                     <select name="" id="" v-model="room_discount"
                                         class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
-                                        <option v-for="rd in roomDiscountList" :value="rd.id">  {{ rd.name }} </option>
+                                        <option v-for="rd in roomDiscountList" :value="rd">  {{ rd.name }} </option>
                                     </select>
                                 </div>
                             </div>
@@ -1222,11 +1222,9 @@
                     formData.append('discount_percentage', this.printInvoiceData.discount);
                 }
                 if(this.discount_type == 'room_discount'){
-                    formData.append('room_discount_id', this.room_discount);
+                    formData.append('room_discount_id', this.room_discount.id);
                 }
-
                 formData.append('order_categories', JSON.stringify(this.orderList));
-
                 // formData.append('total_session_price', this.printInvoiceData.room);
                 // formData.append('food_charge', this.printInvoiceData.food);
                 formData.append('service_charge', this.printInvoiceData.service_charge);
@@ -1237,7 +1235,6 @@
                 if(response.success){
                     await this.getRoomList();
                     // this.selectedRoom = await this.roomList[this.selectedRoomIndex];
-
                     this.isOpenRoom.step_1 = true;
                     this.isOpenRoom.step_2 = false;
                     this.isOpenRoom.step_detail = false;
