@@ -16,16 +16,24 @@ class Invoice extends Model
         'created_by',
         'total',
         'tax',
-        'service_charge',
         'sub_total',
+        'paid_amount',
         'total_session_price',
+        'change',
         'area_id',
-        'entity_id',
+        'service_charge',
         'head_count_id',
         'payment_status',
         'payment_type',
         'discount_value',
-        'customer_id'
+        'customer_id',
+        'packag
+        e_id',
+        'room_discount_id',
+        'invoice_type',
+        'discount_type',
+        'invoice_type',
+        'order_discount_value'
     ];
 
     public function orders()

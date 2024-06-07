@@ -163,26 +163,32 @@
                                     rows="4"></textarea>
                             </div>
                             <div class="mb-4">
-                                <label for="" class="label-form mb-3">
-                                    Area
-                                </label>
-                                <select name="" id="" v-model="selectedArea" class="input-ui">
-                                    <option :value="area" v-for="(area, areaIndex) in areaList" :key="areaIndex">
-                                        {{ area.name }}
-                                    </option>
+                                <div>
+                                    <label class="label-form mb-3"> Area </label>
+                                    <multiselect v-model="selectedArea" :options="areaList" :close-on-select="true"
+                                        :clear-on-select="false" :preserve-search="true" placeholder="Select Area" label="name"
+                                        track-by="id" :preselect-first="true"></multiselect>
+                                </div>
+                            </div>
 
-                                </select>
-                            </div>
                             <div class="mb-4">
-                                <label for="" class="label-form mb-3">
-                                    Role
-                                </label>
-                                <select data-te-select-init data-te-select-placeholder="Select Roles"
-                                    data-te-select-filter="true" name="" id="" v-model="selectedRole" class="input-ui">
-                                    <option :value="role" v-for="(role, roleIndex) in roleList" :key="roleIndex"> {{
-                                        role.name }} </option>
-                                </select>
+                                <div>
+                                    <label class="label-form mb-3"> Department </label>
+                                    <multiselect v-model="selectedDepartment" :options="departmentList" :close-on-select="true"
+                                        :clear-on-select="false" :preserve-search="true" placeholder="Select Department" label="name"
+                                        track-by="id" :preselect-first="true" @select="departmentSelectChanged()"></multiselect>
+                                </div>
                             </div>
+
+                            <div class="mb-4">
+                                <div>
+                                    <label class="label-form mb-3"> Role </label>
+                                    <multiselect v-model="selectedRole" :options="roleList" :close-on-select="true"
+                                        :clear-on-select="false" :preserve-search="true" placeholder="Select Role" label="name"
+                                        track-by="id" :preselect-first="true"></multiselect>
+                                </div>
+                            </div>
+
                             <div class="mb-4">
                                 <label for="" class="label-form mb-3">
                                     Assigned Days
@@ -272,20 +278,26 @@
 <script>
     import { mapGetters } from "vuex";
     import { Modal, Ripple, Select, initTE, Input } from "tw-elements";
+    import Multiselect from 'vue-multiselect';
     import { getApiData, postApiData, deleteApiData } from '../../utilities/ajax-helpers';
 
 
     export default {
+        components: {
+            Multiselect
+        },
         data() {
             return {
                 tasksList: [],
                 areaList: [],
+                departmentList: [],
                 roleList: [],
                 deleteId: null,
                 name: null,
                 tasks: null,
                 selectedArea: null,
                 selectedRole: null,
+                selectedDepartment: null,
                 dayList: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'],
                 selectedDays: [],
                 per_page: 10,
@@ -333,8 +345,19 @@
                 }
             },
 
-            async getRoleList(){
-                const response = await getApiData({ url: '/api/roles', token: this.getToken() });
+            async getDepartmentList(){
+                const response = await getApiData({ url: '/api/departments', token: this.getToken() });
+                if(response.data){
+                    this.departmentList = response.data;
+                }
+            },
+
+            departmentSelectChanged(){
+                this.getRoleList(this.selectedDepartment.id);
+            },
+
+            async getRoleList(departmentId){
+                const response = await getApiData({ url: `/api/role_by_department/${departmentId}`, token: this.getToken() });
                 if(response.data){
                     this.roleList = response.data;
                 }
@@ -399,9 +422,11 @@
         {
             this.getTasksList(null);
             this.getAreaList();
-            this.getRoleList();
+            this.getDepartmentList();
 
             initTE({ Modal,Select, Ripple });
         }
     }
 </script>
+
+<style src="node_modules/vue-multiselect/dist/vue-multiselect.css"></style>

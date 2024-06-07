@@ -10,8 +10,11 @@ use Illuminate\Http\Request;
 use App\Models\Entity;
 use App\Models\HeadCount;
 use App\Models\Invoice;
+use App\Models\Order;
+use App\Models\Package;
+use App\Models\RoomDiscount;
 use App\Models\RoomSession;
-
+use App\Repositories\Order\OrderRepository;
 use Carbon\Carbon;
 
 class InvoiceRepository implements InvoiceRepositoryInterface
@@ -72,25 +75,60 @@ class InvoiceRepository implements InvoiceRepositoryInterface
             $data['area_id'] = $entity->area_id;
             $headCount = $this->headCountCreate($data);
             $data['head_count_id'] = $headCount->id;
-            $data['total_session_price'] = $entity->price_per_hour * $data['session_duration'];
-            $invoice = Invoice::create($data);
+            $data['created_by'] = UserData()->id;
 
+            if ($data['type'] == 'package') {
+                $package = Package::find($data['package_id']);
+                if(!$package)
+                {
+                    ResponseMessage('Package not found',403);
+                }
+                $rooms = $package->rooms()->pluck('id');
+                $roomExists = $rooms->contains($entity->id);
+                if ($roomExists == false) {
+                    ResponseMessage('Selected Package cannot used by chosen room');
+                }
+                $invoiceDate = Carbon::parse($data['invoice_date']);
+                if ($invoiceDate->lt($package->from_date) || $invoiceDate->gt($package->to_date)) {
+                    ResponseMessage('The selected package is not available for the given date.');
+                }
+
+                $end_date = Carbon::parse($data['invoice_date'])->addHours($package->session);
+                $data['total_session_price'] = 0;
+                $data['paid_amount'] = $package->price;
+                $data['package_id'] = $package->id;
+                $data['session_duration'] = $package->session; // nullable
+                $data['price'] = $package->price;
+                $data['invoice_type'] = 'package';
+                $data['total'] = $package->price;
+            } else if ($data['type'] == 'session') {
+
+                $end_date = Carbon::parse($data['invoice_date'])->addMinutes($data['session_duration'] * 60);
+                $data['total_session_price'] = $data['session_duration'] * $entity->price_per_hour;
+                $data['price'] = $data['total_session_price'];
+                $data['total'] = $data['total_session_price'];
+                $data['invoice_type'] = 'session';
+            } else if ($data['type'] == 'endless_time') {
+                $data['invoice_type'] = 'endless_time';
+                $end_date = null;
+            }
+
+
+            if ($end_date == null) {
+                $data['end_date'] = null;
+            } else {
+                $data['end_date'] = $end_date->format('Y-m-d H:i:s');
+            }
+            $invoice = Invoice::create($data);
             $invoice->invoice_id = sprintf('%05d', $invoice->id);
             $invoice->save();
-
             $entity->is_active = 1;
             $entity->save();
 
             $data['invoice_id'] = $invoice->id;
+            $data['entity_id'] = $entity->id;
+
             $data['start_date'] = $data['invoice_date'];
-            if ($data['session_duration'] >= 1) {
-                $end_date = Carbon::parse($data['start_date'])->addHours($data['session_duration']);
-            } else {
-                $end_date = Carbon::parse($data['start_date'])->addMinutes($data['session_duration'] * 60);
-            }
-            $data['entity_id'] = $invoice->entity_id;
-            $data['end_date'] = $end_date->format('Y-m-d H:i:s');
-            $data['price'] = $entity->price_per_hour * $data['session_duration'];
             $roomSession = RoomSession::create($data);
             $invoice->room_session = $roomSession;
             DB::commit();
@@ -101,6 +139,7 @@ class InvoiceRepository implements InvoiceRepositoryInterface
             throw $e;
         }
     }
+
 
     public function updateData(array $data, int $id)
     {
@@ -133,58 +172,63 @@ class InvoiceRepository implements InvoiceRepositoryInterface
     public function addSessionDuration(array $data)
     {
         DB::beginTransaction();
-        try { // current Room
+        try {
             $roomAndSession = RoomSession::where('invoice_id', $data['invoice_id'])->latest()->first();
-            // past room and changes of room
             $roomSessionsWithInvoice = RoomSession::where('invoice_id', $data['invoice_id'])->get();
             $originalDuration = 0;
             foreach ($roomSessionsWithInvoice as $room_session) {
                 $originalDuration += $room_session->session_duration;
             }
             $invoice = Invoice::find($data['invoice_id']);
+            if ($invoice->invoice_type = !'session') {
+                ResponseMessage('Room with session duration can only added duration');
+            }
 
-            // caculating last room duration
-
-            $startTime = Carbon::parse($roomAndSession->start_date);
-            $endTime = Carbon::now();
-            $durationInMinutes = $endTime->diffInMinutes($startTime);
-            $durationInHours = $durationInMinutes / 60; // Convert minutes to hours
-            $roundedDurationInHours = round($durationInHours, 3);
-            $roomAndSession->session_duration = $roundedDurationInHours;
+            // $startTime = Carbon::parse($roomAndSession->start_date);
+            // $endTime = Carbon::now();
+            // $durationInMinutes = $endTime->diffInMinutes($startTime);
+            // $durationInHours = $durationInMinutes / 60; // Convert minutes to hours
+            // $roundedDurationInHours = round($durationInHours, 3);
+            // $roomAndSession->session_duration = $roundedDurationInHours;
 
             // how much duration left
-            $leftDuration = $originalDuration - $roundedDurationInHours;
-            $originalRoom = Entity::find($invoice->entity_id);
-            $roomAndSession->price = $roundedDurationInHours * $originalRoom->price_per_hour;
-            if ($roundedDurationInHours >= 1) {
-                $end_date = Carbon::parse(CurrentTime())->addHours($roundedDurationInHours);
-            } else {
-                $end_date = Carbon::parse(CurrentTime())->addMinutes($roundedDurationInHours * 60);
-            }
-            $roomAndSession->end_date = $end_date;
-            $roomAndSession->save();
-
-            $roomData['session_duration'] = $data['session_duration'] + $leftDuration;
-            $roomData['start_date'] = CurrentTime();
-            $roomData['invoice_id'] = $invoice->id;
-            $roomData['entity_id'] = $invoice->entity_id;
+            // $leftDuration = $originalDuration - $roundedDurationInHours;
+            // $latestSession = $invoice->sessions->sortByDesc('created_at')->first();
+            // $originalRoom = Entity::find($latestSession->entity_id);
+            // $roomAndSession->price = $roundedDurationInHours * $originalRoom->price_per_hour;
+            // if ($roundedDurationInHours >= 1) {
+            //     $end_date = Carbon::parse(CurrentTime())->addHours($roundedDurationInHours);
+            // } else {
+            //     $end_date = Carbon::parse(CurrentTime())->addMinutes($roundedDurationInHours * 60);
+            // }
 
             if ($data['session_duration'] >= 1) {
-                $end_date = Carbon::parse($roomData['start_date'])->addHours($data['session_duration']);
+                $end_date = Carbon::parse($roomAndSession->end_date)->addHours($data['session_duration']);
             } else {
-                $end_date = Carbon::parse($roomData['start_date'])->addMinutes($data['session_duration'] * 60);
+                $end_date = Carbon::parse($roomAndSession->end_date)->addMinutes($data['session_duration'] * 60);
             }
-            $roomData['price'] = $originalRoom->price_per_hour * $roomData['session_duration'];
+            $roomAndSession->price += $data['session_duration'] * $roomAndSession->entity->price_per_hour;
+            $roomAndSession->end_date = $end_date->format('Y-m-d H:i:s');
+            $roomAndSession->session_duration += $data['session_duration'];
+            $roomAndSession->save();
 
-            $roomData['end_date'] = $end_date->format('Y-m-d H:i:s');
-            $updatedDurationRoom = RoomSession::create($roomData);
+            // $roomData['session_duration'] = $data['session_duration'] + $leftDuration;
+            // $roomData['start_date'] = CurrentTime();
+            // $roomData['invoice_id'] = $invoice->id;
+            // $roomData['entity_id'] = $latestSession->entity_id;
+
+
+            // $roomData['price'] = $originalRoom->price_per_hour * $roomData['session_duration'];
+
+            // $roomData['end_date'] = $end_date->format('Y-m-d H:i:s');
+            // $updatedDurationRoom = RoomSession::create($roomData);
             $allRooms = RoomSession::where('invoice_id', $invoice->id)->get();
-            $total_session_price = 0;
-            foreach ($allRooms as $room) {
-                $total_session_price += $room->price;
-            }
-            $invoice->total_session_price = $total_session_price;
-            $invoice->save();
+            // $total_session_price = 0;
+            // foreach ($allRooms as $room) {
+            //     $total_session_price += $room->price;
+            // }
+            // $invoice->total_session_price = $total_session_price;
+            // $invoice->save();
             DB::commit();
             return $roomAndSession;
         } catch (\Throwable $e) {
@@ -206,36 +250,53 @@ class InvoiceRepository implements InvoiceRepositoryInterface
             $durationInHours = $durationInMinutes / 60; // Convert minutes to hours
             $roundedDurationInHours = round($durationInHours, 3);
             $invoice = Invoice::find($lastRoomwithInvoice->invoice_id);
-            $entity = $invoice->room;
+            $latestSession = $invoice->sessions->sortByDesc('created_at')->first();
+            $latestRoomOfInvoice = Entity::find($latestSession->entity_id);
+            $entity = $latestRoomOfInvoice;
             $leftDuration = $lastRoomwithInvoice->session_duration - $roundedDurationInHours;
             $lastRoomwithInvoice->session_duration = $roundedDurationInHours;
             $lastRoomwithInvoice->end_date = CurrentTime();
-            $lastRoomwithInvoice->price = $roundedDurationInHours * $entity->price_per_hour;
+            if ($invoice->invoice_type == 'endless_time') {
+                $lastRoomwithInvoice->price = 0;
+            } elseif ($invoice->invoice_type == 'package') {
+                $lastRoomwithInvoice->price = 0;
+            } else {
+                $lastRoomwithInvoice->price = $roundedDurationInHours * $entity->price_per_hour;
+            }
             $lastRoomwithInvoice->save();
 
-            $originalRoom = Entity::find($invoice->entity_id);
-            $originalRoom->is_active = 0;
-            $originalRoom->save();
+            $latestRoomOfInvoice->is_active = 0;
+            $latestRoomOfInvoice->save();
             $room = Entity::find($data['entity_id']);
+            if ($room->is_active == 1) {
+                ResponseMessage('Room is currently active. Please choose another room', 422);
+            }
             $room->is_active = 1;
             $room->save();
-
             $roomData['start_date'] = CurrentTime();
             $roomData['invoice_id'] = $invoice->id;
             $roomData['session_duration'] = $leftDuration;
             $roomData['price'] = $room->price_per_hour * $leftDuration;
             $roomData['entity_id'] = $room->id;
 
-            if ($leftDuration >= 1) {
-                $end_date = Carbon::parse($roomData['start_date'])->addHours($leftDuration);
+            if ($invoice->invoice_type == 'endless_time') {
+                $roomData['end_date'] = null;
+                $roomData['session_duration'] = null;
+                $roomData['price'] = 0;
             } else {
-                $end_date = Carbon::parse($roomData['start_date'])->addMinutes($leftDuration * 60);
+                if ($leftDuration >= 1) {
+                    $end_date = Carbon::parse($roomData['start_date'])->addHours($leftDuration);
+                    $roomData['end_date'] = $end_date->format('Y-m-d H:i:s');
+                } else {
+                    $end_date = Carbon::parse($roomData['start_date'])->addMinutes($leftDuration * 60);
+                    $roomData['end_date'] = $end_date->format('Y-m-d H:i:s');
+                }
+                if ($invoice->invoice_type == 'package') {
+                    $roomData['price'] = 0;
+                }
             }
-
-            $roomData['end_date'] = $end_date->format('Y-m-d H:i:s');
             $newRoomAndSession = RoomSession::create($roomData);
 
-            $invoice->entity_id = $room->id;
             $invoice->area_id = $room->area_id;
             $invoice->save();
             $allRooms = RoomSession::where('invoice_id', $invoice->id)->get();
@@ -259,6 +320,8 @@ class InvoiceRepository implements InvoiceRepositoryInterface
     {
         $foodCharge = 0;
         $beverageCharge = 0;
+        $endlessTimeSessionDuration = 0;
+
         if (isset($data['order_categories'])) {
             $data['order_categories'] = json_decode($data['order_categories'], true);
             foreach ($data['order_categories'] as $menu) {
@@ -277,9 +340,20 @@ class InvoiceRepository implements InvoiceRepositoryInterface
         }
 
         $invoice = Invoice::find($data['invoice_id']);
-        $entity = Entity::find($invoice->entity_id);
+        $orderDiscount = 0;
+        $order = Order::where('invoice_id', $invoice->id)->first();
+        if($order)
+        {
+            $orderDiscount = $order->total_discount_price;
+        }
+
+        $lastRoomwithInvoice = RoomSession::where('invoice_id', $invoice->id)->latest()->first();
+        $latestSession = $invoice->sessions->sortByDesc('created_at')->first();
+        $entity = Entity::find($latestSession->entity_id);
         $entity->is_active = 0;
         $entity->save();
+
+        // service_charge
         if ($data['service_charge'] === true || strtolower($data['service_charge']) === 'true') {
             $data['service_charge'] = ($foodCharge + $beverageCharge) * 0.05;
         } else if (strtolower($data['service_charge']) === 'false') {
@@ -288,6 +362,7 @@ class InvoiceRepository implements InvoiceRepositoryInterface
             $data['service_charge'] = 0;
         }
 
+        // tax
         if ($data['tax'] === true || strtolower($data['tax']) === 'true') {
             $data['tax'] = round(($foodCharge + $beverageCharge + $total_session_price) * 0.05);
         } else if (strtolower($data['tax']) === 'false') {
@@ -295,160 +370,115 @@ class InvoiceRepository implements InvoiceRepositoryInterface
         } else {
             $data['tax'] = 0;
         }
+        if ($invoice->invoice_type == 'package') {
+            $data['food_charge'] = $foodCharge + $beverageCharge;
+            $data['food_charge'] = $data['food_charge'] - $orderDiscount;
+            $data['total'] = $data['food_charge'] + $invoice->paid_amount;
+            $total_session_price = 0;
+            $data['total_session_price'] = 0;
+        } else if ($invoice->invoice_type == 'session') {
+                $data['food_charge'] = $foodCharge + $beverageCharge;
+                $data['food_charge'] = $data['food_charge'] - $orderDiscount;
+                $data['total'] = $data['food_charge'] + $total_session_price + $data['service_charge'] + $data['tax'];
+                $data['total_session_price'] = $total_session_price;
+        } else if($invoice->invoice_type =='endless_time') {
 
-        $data['food_charge'] = $foodCharge + $beverageCharge;
-        $data['total'] = $data['food_charge'] + $total_session_price + $data['service_charge'] + $data['tax'];
-        $data['total_session_price'] = $total_session_price;
+                $invoiceDate = Carbon::parse($invoice->invoice_date);
+                $currentDate = Carbon::now();
+                $minutesDifference = $currentDate->diffInMinutes($invoiceDate);
+                $hoursDifference = $minutesDifference / 60;
+                $hoursDifference = number_format($hoursDifference, 2);
+                if($hoursDifference < 3)
+                {
+                    ResponseData("You can't end this room before 3 hours", 402);
+                }
+                $latestSession->session_duration = $hoursDifference;
+                $endlessTimeSessionDuration = $hoursDifference;
+                $sessionPrice = $hoursDifference * $entity->price_per_hour;
+                $latestSession->price =$sessionPrice;
+                $total_session_price = $sessionPrice;
+                $latestSession->end_date = CurrentTime();
+                $latestSession->save();
+                $data['food_charge'] = $foodCharge + $beverageCharge;
+                $data['food_charge'] = $data['food_charge'] - $orderDiscount;
+                $data['total'] = $data['food_charge'] + $sessionPrice + $data['service_charge'] + $data['tax'];
+                $data['total_session_price'] = $sessionPrice;
+        }
+
+        if (isset($data['discount_type'])) {
+            if ($data['discount_type']) {
+                if ($data['discount_type'] == 'fix_amount') {
+                    $data['discount_value'] = $data['discount_value'];
+                    $data['discount_type'] = 'fix_amount';
+                } else if ($data['discount_type'] == 'percentage') {
+                    if ($data['discount_percentage'] < 0 || $data['discount_percentage'] > 100) {
+                        ResponseMessage('Discount percentage should be between 0 and 100');
+                    }
+                    $data['discount_value'] = ($data['food_charge'] + $total_session_price) *( $data['discount_percentage'] / 100);
+                    $data['discount_type'] = 'percentage';
+                }else if($data['discount_type'] == 'room_discount')
+                {
+                    if($invoice->invoice_type =='package'){
+                        ResponseMessage('Room with packages can not have discount',402);
+                    }else
+                    {
+                        $roomDiscount = RoomDiscount::find($data['room_discount_id']);
+                        if (!$roomDiscount->rooms->contains($entity->id)) {
+                            ResponseMessage('Selected discount cannot be applied', 422);
+                        }
+
+                            if($roomDiscount->session <= $latestSession->session_duration)
+                            {
+                                if($invoice->invoice_type=='endless_time')
+                                {
+                                    $latestSession->session_duration = $endlessTimeSessionDuration;
+                                    $caculation= floor($endlessTimeSessionDuration/$roomDiscount->session);
+                                    $latestSession->discount_session = $caculation;
+                                    $latestSession->update();
+                                    $entity->is_active=1;
+                                    DB::commit();
+                                    $data['invoice'] = 'room_discount';
+                                    ResponseMessage('Enjoy your discount',200);
+
+                                }else{
+                                    // dd($latestSession->session_duration,floor($latestSession->session_duration/$roomDiscount->session),$latestSession->discount_session);
+                                    $durationValue =floor($latestSession->session_duration/$roomDiscount->session);
+                                    $latestSession->session_duration += $durationValue;
+                                    $latestSession->discount_session = $durationValue;
+                                    $latestSession->update();
+                                    $entity->is_active=1;
+                                    DB::commit();
+                                    $data['invoice'] = 'room_discount';
+                                    ResponseMessage('Enjoy your discount',200);
+
+                                }
+                            }else{
+                                ResponseMessage('Discount cannot be applied',422);
+                            }
+
+
+                    }
+                }
+            }
+        }
+        if($invoice->invoice_type=='package')
+        {
+            $data['tax'] = 0;
+            $data['service_charge'] = 0;
+            $data['paid_amount'] = $invoice->paid_amount + $data['food_charge'];
+        }else{
+            $data['total'] = $data['food_charge'] + $total_session_price + $data['service_charge'] + $data['tax'];
+        }
+        $data['discount_type'] = $invoice->discount_type;
+        $data['order_discount_value'] = $orderDiscount;
         $data['sub_total'] = $data['food_charge'] + $data['total_session_price'];
         $data['payment_status'] = 'received';
         $data['complete_date'] = CurrentTime();
+
         $invoice->update($data);
-
         $debit_total = 0;
+        DB::commit(); //testign purpose need to delete
+        return $invoice; //testign purpose need to delete
 
-        // transaction and ledgers
-        if ($data['payment_type'] == 'cash') {
-            $posBook = Account::where('account_code', '2-1011')->first();
-        } else {
-            $posBook = Account::where('account_code', '2-1012')->first();
-        }
-
-        $data['date'] = now();
-        $data['created_by'] = 1; //example
-        $data['transactionable_id'] = $invoice->id;
-        $data['transactionable_type'] = 'invoice';
-        $data['is_confirmed'] = 1;
-
-        try{
-            DB::beginTransaction();
-            $transaction = (new StoreTransactionLedger())->createTransaction($data);
-
-            if (isset($data['order_categories'])) {
-                if ($foodCharge != 0) {
-                    $foodKtvAcc = Account::where('account_code', '5-0101')->first();
-
-                    if ($foodKtvAcc != null) {
-                        $foodCreditLedger = (new StoreTransactionLedger())->storeLedger([
-                            'value' => $foodCharge,
-                            'transaction_id' => $transaction->id,
-                            'account_id' => $foodKtvAcc->id,
-                            'action' => 'credit',
-                            'is_cashier_confirmed' => 1
-
-                        ]);
-                    }
-
-                    $debit_total += $foodCharge;
-                }
-
-                if ($beverageCharge != 0) {
-                    $beverageKtvAcc = Account::where('account_code', '5-0102')->first();
-
-                    if ($beverageKtvAcc != null) {
-                        $beverageCreditLedger = (new StoreTransactionLedger())->storeLedger([
-                            'value' => $beverageCharge,
-                            'transaction_id' => $transaction->id,
-                            'account_id' => $beverageKtvAcc->id,
-                            'action' => 'credit',
-                            'is_cashier_confirmed' => 1
-
-                        ]);
-                    }
-
-                    $debit_total += $beverageCharge;
-                }
-            }
-
-            if ($total_session_price != 0) {
-                $ktvRoomAcc = Account::where('account_code', '5-0103')->first();
-
-                if ($ktvRoomAcc != null) {
-                    $ktvRoomLedger = (new StoreTransactionLedger())->storeLedger([
-                        'value' => $total_session_price,
-                        'transaction_id' => $transaction->id,
-                        'account_id' => $ktvRoomAcc->id,
-                        'action' => 'credit',
-                        'is_cashier_confirmed' => 1
-
-                    ]);
-                }
-
-                $debit_total += $total_session_price;
-            }
-
-            if ($data['service_charge'] != 0) {
-                $serviceMoneyAcc = Account::where('account_code', '6-2009')->first();
-
-                if ($serviceMoneyAcc != null) {
-                    $serviceLedger = (new StoreTransactionLedger())->storeLedger([
-                        'value' => $data['service_charge'],
-                        'transaction_id' => $transaction->id,
-                        'account_id' => $serviceMoneyAcc->id,
-                        'action' => 'credit',
-                        'is_cashier_confirmed' => 1
-
-                    ]);
-                }
-
-                $debit_total += $data['service_charge'];
-            }
-
-            if ($data['tax'] != 0) {
-                $taxAcc = Account::where('account_code', '6-9002')->first();
-
-                if ($data['tax'] != null) {
-                    $taxLedger = (new StoreTransactionLedger())->storeLedger([
-                        'value' => $data['tax'],
-                        'transaction_id' => $transaction->id,
-                        'account_id' => $taxAcc->id,
-                        'action' => 'credit',
-                        'is_cashier_confirmed' => 1
-
-                    ]);
-                }
-
-                $debit_total += $data['tax'];
-            }
-
-            if ($data['discount_value'] != 0) {
-                $discountAcc = Account::where('account_code', '6-2003')->first();
-
-                if ($discountAcc != null) {
-                    $debit_total += $data['discount_value'];
-
-                    $debitDiscountLedger = (new StoreTransactionLedger())->storeLedger([
-                        'value' => $data['discount_value'],
-                        'transaction_id' => $transaction->id,
-                        'account_id' => $discountAcc->id,
-                        'action' => 'debit',
-                        'is_cashier_confirmed' => 1
-                    ]);
-
-                    $creditDiscountLedger = (new StoreTransactionLedger())->storeLedger([
-                        'value' => $data['discount_value'],
-                        'transaction_id' => $transaction->id,
-                        'account_id' => $posBook->id,
-                        'action' => 'credit',
-                        'is_cashier_confirmed' => 1
-                    ]);
-                }
-            }
-
-            $debitLedger = (new StoreTransactionLedger())->storeLedger([
-                'value' => $debit_total,
-                'transaction_id' => $transaction->id,
-                'account_id' => $posBook->id,
-                'action' => 'debit',
-                'is_cashier_confirmed' => 1
-            ]);
-            DB::commit();
-            return $invoice;
-        }
-
-        catch (\Throwable $e) {
-            DB::rollback();
-            ResponseMessage($e->getMessage(), 402);
-            throw $e;
-        }
     }
 }

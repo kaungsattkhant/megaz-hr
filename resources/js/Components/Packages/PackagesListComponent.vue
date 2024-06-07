@@ -1,24 +1,21 @@
 <template>
     <div>
         <p class=" text-lg font-semibold font-inter">
-            Staff
+            Packages
         </p>
     </div>
     <div class="mt-4 bg-white">
         <div class="btn-container">
             <div class=" flex gap-x-4">
                 <label for="search" class="search-input">
-                    <input type="text" class="input-search" placeholder="Search"
-                        v-model="searchInput">
+                    <input type="text" class="input-search" placeholder="Search">
                     <i class="fal fa-search"></i>
                 </label>
 
-                
-
-                <button class="add-btn h-8 text-[13px] font-inter" @click="searchBtnClicked">Search</button>
+                <button class="add-btn h-8 text-[13px] font-inter">Search</button>
             </div>
             <div class="flex justify-end flex-col">
-                <a href="/staff/create" class="add-btn text-[13px] font-inter">
+                <a href="/packages/create" class="add-btn text-[13px] font-inter">
                     Add New
                 </a>
 
@@ -52,20 +49,26 @@
                         <tbody>
 
                             <!-- looping start -->
-                            <div class="contents">
+                            <div class="contents" v-for="(promotionPackage, index) in promotionPackageList" :key="index">
                                 <tr class="">
                                     <td class=" ">
-                                        1
+                                        {{ ++index }}
                                     </td>
                                     <td class="whitespace-nowrap text-left  ">
-                                        Package name 
+                                        {{ promotionPackage.name }}
                                     </td>
                                     <td class="whitespace-nowrap text-left  ">
-                                        Price
-
+                                        {{ (promotionPackage.price).toLocaleString() }}
                                     </td>
                                     <td class="   ">
-                                        Item
+                                        <div>
+                                            Menus: <span v-for="menuPackage in promotionPackage.menu_packages"> {{ menuPackage.menu.name }},  </span>
+                                        </div>
+                                        <hr>
+                                        <div>
+                                            Rooms: <span v-for="room in promotionPackage.rooms"> {{ room.name }},  </span>
+                                        </div>
+
                                     </td>
                                     <td class="whitespace-nowrap   relative">
                                         <a href="#" class="pr-2 ">
@@ -144,16 +147,41 @@
     export default {
         data() {
             return {
+                promotionPackageList: [],
 
+                per_page: 20,
+                pageNumbers: [],
+                currentPage: 1,
+                paginationGroupsCount: 1,
+                per_group: 10,
+                groupedPageNumbers: [],
+                currentGroup: 0,
+                isFirstGroup: true,
+                isLastGroup: false,
             };
         },
 
         methods: {
+            ...mapGetters(['getToken']),
 
+            async getPromotionPackageList(pageNumber){
+                if(pageNumber){
+                    this.currentPage = pageNumber;
+                }
+
+                let url = `/api/packages?page=${this.currentPage}&per_page=${this.per_page}`;
+                let response = await getApiData({url: url, token: this.getToken()});
+                if(response.data){
+                    this.promotionPackageList = response.data.data;
+                }
+            },
         },
 
-        mounted()
-        {
+        created(){
+            this.getPromotionPackageList();
+        },
+
+        mounted(){
             initTE({ Modal, Ripple, Input, Select, Dropdown })
         }
     }

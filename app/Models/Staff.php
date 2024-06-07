@@ -34,7 +34,14 @@ class Staff extends Authenticatable
         'gender_id',
         'department_id',
         'is_active',
-        'password'
+        'password',
+        'bank_account_number',
+        'nrc_front_url',
+        'nrc_front_path',
+        'nrc_back_url',
+        'nrc_back_path',
+        'household_registration_url',
+        'household_registration_path'
     ];
 
     protected $hidden=[

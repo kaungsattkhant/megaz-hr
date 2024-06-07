@@ -6,21 +6,26 @@ use Illuminate\Http\Request;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\RoomSession\EndRoomSessionRequest;
+use App\Models\Package;
 use App\Repositories\Invoice\InvoiceRepositoryInterface;
+use App\Repositories\Order\OrderRepositoryInterface;
 
 class InvoiceAPIController extends Controller
 {
     //
     protected $invoiceRepo;
+    protected $orderRepo;
 
-    public function __construct(InvoiceRepositoryInterface $invoiceRepo)
+    public function __construct(InvoiceRepositoryInterface $invoiceRepo, OrderRepositoryInterface $orderRepo)
     {
         $this->invoiceRepo = $invoiceRepo;
+        $this->orderRepo = $orderRepo;
     }
 
     public function startEntity(Request $request)
     {
         $data = $request->all();
+
         if(isset($data['male'])){
             $data['male'] = (int) $data['male'];
         }
@@ -42,6 +47,23 @@ class InvoiceAPIController extends Controller
 
         $data['created_by'] = 1;
         $invoice = $this->invoiceRepo->createData($data);
+        if($data['type'] == 'package')
+        {
+            $package= Package::where('id',$data['package_id'])->first();
+            $order['menuArray'] = $package->menuPackages->map(function($menuPackage) {
+                return [
+                    'menu_id' => $menuPackage->menu_id,
+                    'quantity' => $menuPackage->quantity,
+                    'original_price' => $menuPackage->menu->prices->first()->price ?? 0,
+                    'menu_category_id' => $menuPackage->menu->menu_category_id,
+                    'remark' => 'package order',
+                ];
+            });
+            $order['order_type'] = 'package';
+            $order['invoice_id'] = $invoice->id;
+            $this->orderRepo->createMultipleOrder($order);
+
+        }
 
         ResponseData($invoice);
     }
@@ -57,9 +79,8 @@ class InvoiceAPIController extends Controller
         ResponseData($changeRoom);
     }
 
-    public function endRoom(EndRoomSessionRequest $request)
+    public function endRoom(Request $request)
     {
-
         $endRoom = $this->invoiceRepo->doneEntityWithInvoice($request->all());
         ResponseData($endRoom);
     }

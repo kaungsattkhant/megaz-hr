@@ -48,6 +48,9 @@ export function convertToFriendlyDate(dbDateString)
 
 export function convertToFriendlyDateTime(dbDateString)
 {
+    if(!dbDateString){
+        return null;
+    }
     const date = new Date(dbDateString);
     const options = {
         year: 'numeric',

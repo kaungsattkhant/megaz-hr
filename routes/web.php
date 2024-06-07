@@ -46,6 +46,7 @@ Route::middleware(['departments:uom'])->group(function () {
 
 Route::middleware(['departments:item'])->group(function () {
     Route::view('/items', 'items.index')->name('items');
+    Route::view('/items/{id}/pricing_history', 'items.pricing_history')->name('items.pricing_history');
 });
 
 Route::middleware(['departments:task'])->group(function () {
@@ -62,7 +63,7 @@ Route::middleware(['departments:area'])->group(function () {
 
 Route::middleware(['departments:inventory'])->group(function () {
     Route::view('/inventories', 'inventories.index')->name('inventories');
-    Route::view('/inventories/{inventory_id}/ledger', 'inventories.inventory_ledger')->name('inventory.ledger');
+    // Route::view('/inventories/{inventory_id}/ledger', 'inventories.inventory_ledger')->name('inventory.ledger');
 });
 
 Route::middleware(['departments:inventory-transfer-list'])->group(function () {
@@ -149,6 +150,10 @@ Route::middleware(['departments:cashbook'])->group(function () {
 Route::middleware(['departments:fixed-asset'])->group(function () {
     Route::view('/fixed_assets', 'fixed_assets.index')->name('fixed_assets.index');
 });
+Route::middleware(['departments:account-payables'])->group(function () {
+    Route::view('/account_payables', 'AP.index')->name('AP.index');
+    Route::view('/account_payables/transactions', 'AP.history')->name('AP.history');
+});
 
 // Route::middleware(['departments:all_departments'])->group(function () {
 //     Route::view('/inventory_transfers', 'transfers.index')->name('transfers.index');
@@ -172,10 +177,21 @@ Route::group(['prefix' => 'pos'], function () {
 });
 
 
+Route::middleware(['departments:inventory-stocks'])->group(function () {
+    Route::view('/inventory_stocks', 'inventory_stocks.index')->name('inventory_stocks.index');
+});
 
+Route::middleware(['departments:package'])->group(function () {
+    Route::view('/packages', 'packages.index')->name('packages.index');
+    Route::view('/packages/create', 'packages.create')->name('packages.create');
+});
+
+Route::middleware(['departments:menu-service-discount'])->group(function () {
+    Route::view('/menu_service_discounts', 'menu_and_service_discount.index')->name('menu_service_discount.index');
+});
+Route::middleware(['departments:room-discount'])->group(function () {
+    Route::view('/room_discounts', 'room_discount.index')->name('room_discount.index');
+});
 
 //test
-Route::view('/packages', 'packages.index');
-Route::view('/packagescreate', 'packages.create');
-Route::view('/menu_service_discounts', 'menu_and_service_discount.index');
-Route::view('/room_discounts', 'room_discount.index');
+

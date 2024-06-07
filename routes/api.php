@@ -178,6 +178,7 @@ Route::middleware('auth:api')->group(function () {
     Route::controller(TransferAPIController::class)->group(function () {
         Route::get('/transfer_confirmation_list', 'transferConfirmationList');
         Route::get('/confirm_transfer_item', 'confirmTransferItem');
+        Route::get('/cancel_transfer_item', 'cancelTransferItem');
     });
 
     Route::get('/inventories', [InventoryAPIController::class, 'getInventoryData']);
@@ -216,6 +217,7 @@ Route::middleware('auth:api')->group(function () {
     Route::controller(PackageAPIController::class)->group(function()
     {
         Route::get('/packages','getPackage');
+        Route::get('/packages/{id}','detailPackage');
         Route::post('/packages','createPackage');
         Route::post('/packages/{id}','editPackage');
         Route::delete('/packages/{id}','deletePackage');
@@ -226,7 +228,7 @@ Route::middleware('auth:api')->group(function () {
     Route::post('/uom_conversions/{id}',[UomAPIController::class,'updateUomConversion']);
     Route::get('/uom_conversions',[UomAPIController::class,'getUomConversionList']);
 
-    
+
 });
 
 

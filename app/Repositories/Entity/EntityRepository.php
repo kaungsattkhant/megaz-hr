@@ -34,48 +34,57 @@ class EntityRepository implements EntityRepositoryInterface
     {
         $area = Area::find($data['area_id']);
         $currentDate = $data['current_date'];
-        $entities = Entity::where('area_id', $area->id)->where("is_available", 1)->with(["invoices" => function ($query) use ($currentDate) {
-            $query->where("complete_date", null)->select("id", "invoice_id", "entity_id", "total_session_price")->with("sessions");
+
+        $entities = Entity::where('is_available',1)->where('area_id',$data['area_id'])->with(['roomSessions' => function ($query)
+        {
+            $query->latest()->first();
         }])->get();
 
         return $entities;
     }
 
+
+
+
     public function entityDetail(array $data, int $entityId)
     {
-        $entity = Entity::with(["invoices" => function ($query) {
-            $query->whereNull("complete_date")
-                ->select("id", "invoice_id", "entity_id", "total_session_price")
-                ->with(["sessions", "orders"])
-                ->latest()
-                ->limit(1);
-        }])->find($entityId);
+        $entity = Entity::where('is_available', 1)
+        ->with(['roomSessions' => function ($query) {
+            $query->latest()->first();
+        }])
+        ->find($entityId);
 
-        foreach ($entity->invoices as $invoice) {
-            $consolidatedOrderItems = [];
+        foreach ($entity->roomSessions as $roomSession) {
+            $invoice = $roomSession->invoice; // Access the invoice for the current room session
 
-            foreach ($invoice->orders as $order) {
-                $orderItems = OrderItem::where('order_id', $order->id)->get();
-                foreach ($orderItems as $orderItem) {
-                    $menuId = $orderItem->menu_id;
-                    $status = $orderItem->status;
+            if ($invoice) { // Check if there is an associated invoice
+                $consolidatedOrderItems = [];
 
-                    if (isset($consolidatedOrderItems[$menuId][$status])) {
-                        $consolidatedOrderItems[$menuId][$status]->quantity += $orderItem->quantity;
-                        $consolidatedOrderItems[$menuId][$status]->price += $orderItem->price;
-                        $consolidatedOrderItems[$menuId][$status]->discount_price += $orderItem->discount_price;
-                    } else {
-                        $consolidatedOrderItems[$menuId][$status] = $orderItem;
+                foreach ($invoice->orders as $order) {
+                    $orderItems = OrderItem::where('order_id', $order->id)->get();
+
+                    foreach ($orderItems as $orderItem) {
+                        $menuId = $orderItem->menu_id;
+                        $status = $orderItem->status;
+
+                        if (isset($consolidatedOrderItems[$menuId][$status])) {
+                            $consolidatedOrderItems[$menuId][$status]->quantity += $orderItem->quantity;
+                            $consolidatedOrderItems[$menuId][$status]->price += $orderItem->price;
+                            $consolidatedOrderItems[$menuId][$status]->discount_price += $orderItem->discount_price;
+                        } else {
+                            $consolidatedOrderItems[$menuId][$status] = $orderItem;
+                        }
                     }
                 }
-            }
 
-            foreach ($invoice->orders as $order) {
-                $order->order_items = collect();
-                foreach ($consolidatedOrderItems as $menuId => $itemsByStatus) {
-                    foreach ($itemsByStatus as $status => $order_items) {
-                        $order_items->menu;
-                        $order->order_items->push($order_items);
+                foreach ($invoice->orders as $order) {
+                    $order->order_items = collect();
+
+                    foreach ($consolidatedOrderItems as $menuId => $itemsByStatus) {
+                        foreach ($itemsByStatus as $status => $order_items) {
+                            $order_items->menu;
+                            $order->order_items->push($order_items);
+                        }
                     }
                 }
             }

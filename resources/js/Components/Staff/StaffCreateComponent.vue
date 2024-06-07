@@ -203,7 +203,46 @@
                 <textarea name="" v-model="address" class="input-ui w-full bg-transparent rounded-lg" id="" cols="30"
                     rows="10"></textarea>
             </div>
+
             <div class="col-span-6"></div>
+
+            <div class="col-span-3 rounded-md mb-4 pb-6">
+                <label for="nrc-front" class="label-form mb-3">
+                    NRC Front
+                </label>
+                <input type="file" accept="image/png, image/gif, image/jpeg" id="nrc-front" ref="nrc_front_image"
+                class="flex flex-col items-center justify-center h-12 w-full bg-gray-100 rounded-md border-2 border-gray-300
+                border-dashed transition-colors hover:bg-gray-200 dark:bg-gray-800 dark:border-gray-600 dark:hover:bg-gray-700"/>
+            </div>
+
+            <div class="col-span-3 rounded-md mb-4 pb-6">
+                <label for="nrc-back" class="label-form mb-3">
+                    NRC Back
+                </label>
+                <input type="file" accept="image/png, image/gif, image/jpeg" id="nrc-back" ref="nrc_back_image"
+                class="flex flex-col items-center justify-center h-12 w-full bg-gray-100 rounded-md border-2 border-gray-300
+                border-dashed transition-colors hover:bg-gray-200 dark:bg-gray-800 dark:border-gray-600 dark:hover:bg-gray-700"/>
+            </div>
+
+            <div class="col-span-3 rounded-md mb-4 pb-6">
+                <label for="household-registration" class="label-form mb-3">
+                    Household Registration
+                </label>
+                <input type="file" accept="image/png, image/gif, image/jpeg" id="household-registration" ref="household_registration_image"
+                class="flex flex-col items-center justify-center h-12 w-full bg-gray-100 rounded-md border-2 border-gray-300
+                border-dashed transition-colors hover:bg-gray-200 dark:bg-gray-800 dark:border-gray-600 dark:hover:bg-gray-700"/>
+            </div>
+
+            <div class="col-span-3"></div>
+
+            <div class="col-span-3 rounded-md mb-4 pb-6">
+                <label for="" class="label-form mb-3">
+                    Bank Account Number
+                </label>
+                <input type="text" v-model="bankAccountNumber" placeholder="Bank Account Number" class="input-ui">
+            </div>
+
+            <div class="col-span-9"></div>
 
             <hr class="col-span-12 mb-4">
 
@@ -252,7 +291,6 @@
                     class="input-ui">
             </div>
             <div class="col-span-3"></div>
-
 
         </div>
         <div>
@@ -408,6 +446,11 @@ export default {
             address: null,
             zipCode: null,
 
+            nrcFrontFile: null,
+            nrcBackFile: null,
+            houseHoldRegistrationFile: null,
+            bankAccountNumber: null,
+
             primaryName: null,
             primaryPhone: null,
             primaryRelationship: null,
@@ -501,6 +544,18 @@ export default {
             this.roleIds = [];
             this.featureIds = [];
             this.inventoryIds = [];
+
+            if(this.$refs.nrc_front_image.files[0]){
+                this.nrcFrontFile = this.$refs.nrc_front_image.files[0];
+            }
+
+            if(this.$refs.nrc_back_image.files[0]){
+                this.nrcBackFile = this.$refs.nrc_back_image.files[0];
+            }
+
+            if(this.$refs.household_registration_image.files[0]){
+                this.houseHoldRegistrationFile = this.$refs.household_registration_image.files[0];
+            }
 
             if (this.selectedDepartment.name == 'Inventory' && this.selectedInventories.length < 1) {
                 this.alertValiationMessage('inventories');
@@ -645,6 +700,11 @@ export default {
             if (this.zipCode) {
                 formData.append('zip_code', this.zipCode);
             }
+
+            if (this.bankAccountNumber) {
+                formData.append('bank_account_number', this.bankAccountNumber);
+            }
+
             formData.append('birthdate', this.dob);
             formData.append('state', this.state);
             formData.append('address', this.address);
@@ -658,6 +718,18 @@ export default {
             formData.append('roles', this.roleIds);
             formData.append('featureIds', JSON.stringify(this.featureIds));
             formData.append('joined_date', this.joinedDate);
+
+            if(this.nrcFrontFile){
+                formData.append('nrc_front_image', this.nrcFrontFile);
+            }
+
+            if(this.nrcBackFile){
+                formData.append('nrc_back_image', this.nrcBackFile);
+            }
+
+            if(this.houseHoldRegistrationFile){
+                formData.append('household_registration_image', this.houseHoldRegistrationFile);
+            }
 
             // for emegercy
 
