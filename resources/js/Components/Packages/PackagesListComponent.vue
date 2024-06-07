@@ -15,7 +15,7 @@
                 <button class="add-btn h-8 text-[13px] font-inter">Search</button>
             </div>
             <div class="flex justify-end flex-col">
-                <a href="/staff/create" class="add-btn text-[13px] font-inter">
+                <a href="/packages/create" class="add-btn text-[13px] font-inter">
                     Add New
                 </a>
 
