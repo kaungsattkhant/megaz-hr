@@ -79,9 +79,8 @@ class InvoiceAPIController extends Controller
         ResponseData($changeRoom);
     }
 
-    public function endRoom(EndRoomSessionRequest $request)
+    public function endRoom(Request $request)
     {
-
         $endRoom = $this->invoiceRepo->doneEntityWithInvoice($request->all());
         ResponseData($endRoom);
     }
