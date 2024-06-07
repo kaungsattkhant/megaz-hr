@@ -3,6 +3,7 @@
 
         <div class="">
             <div class="w-[67%] pt-9 px-6">
+                <p>{{ testsession }}</p>
                 <ul class="mb-5 flex list-none flex-row flex-wrap border-b-0 pl-0" role="tablist" data-te-nav-ref>
                     <li v-for="(area,index) in areaList" role="presentation" @click="btnGetAreaItemList(area.id)">
                         <a href="#tabs-profile" class="my-2 mr-3 text-white block  px-7 pb-2.5 rounded-full
@@ -361,7 +362,7 @@
                                 Food
                             </p>
                             <p class=" w-28">
-                                {{ printInvoiceData.food ? printInvoiceData.food.toLocaleString() : 0}} MMKs
+                                {{ printInvoiceData.isTax ? (printInvoiceData.food ? printInvoiceData.food.toLocaleString() : 0) : 0 }} MMKs
                                 <!-- {{ purchaseMenuList.length > 0 ? purchaseMenuList[0].total.toLocaleString() : '0' }} MMks -->
                             </p>
                         </div>
@@ -370,8 +371,8 @@
                                 Service Tax
                             </p>
                             <p class=" w-28">
-                                {{ printInvoiceData.service_tax ? printInvoiceData.service_tax.toLocaleString() :
-                                0 }} MMKs
+                                {{ printInvoiceData.service_charge == true? (printInvoiceData.service_tax ? printInvoiceData.service_tax.toLocaleString() :
+                                0) : 0 }} MMKs
                             </p>
                         </div>
                         <div class=" text-sm text-right flex gap-x-2 justify-end pr-2 mb-2">
@@ -837,6 +838,7 @@
                 tableList:[],
 
                 currentTime: getCurretDateTime(),
+                testsession:null
             };
         },
 
@@ -1165,6 +1167,14 @@
                 this.isOpenRoom.step_2 = false;
                 this.isOpenRoom.step_detail = false;
                 this.isOpenRoom.step_invoice = true;
+
+                let formData = new FormData();
+                formData.append('invoice_id', this.selectedRoom.room_sessions[0].invoice.invoice_id);
+                let response = await postApiData({ url: '/api/room_done', form_data: formData, token: this.getToken()});
+                if(response.success){
+                    this.testsession = response.data
+                    console.log("success")
+                }
                 this.printInvoiceData.room = this.selectedRoom.price_per_hour * this.selectedRoom.room_sessions[0].session_duration
                 if(this.purchaseMenuList.length > 0){
                     this.printInvoiceData.food = this.purchaseMenuList[0].total
