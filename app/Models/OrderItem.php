@@ -11,7 +11,7 @@ class OrderItem extends Model
 
     protected $fillable = [
         'date','menu_id','quantity','original_price','discount_value','price','order_id','status','is_complete',
-        'menu_service_discount_id',
+        'menu_service_discount_id','price',
         'remark'
     ];
 
