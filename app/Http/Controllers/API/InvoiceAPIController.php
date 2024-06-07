@@ -59,6 +59,7 @@ class InvoiceAPIController extends Controller
                     'remark' => 'package order',
                 ];
             });
+            $order['order_type'] = 'package';
             $order['invoice_id'] = $invoice->id;
             $this->orderRepo->createMultipleOrder($order);
 
@@ -78,9 +79,8 @@ class InvoiceAPIController extends Controller
         ResponseData($changeRoom);
     }
 
-    public function endRoom(EndRoomSessionRequest $request)
+    public function endRoom(Request $request)
     {
-
         $endRoom = $this->invoiceRepo->doneEntityWithInvoice($request->all());
         ResponseData($endRoom);
     }

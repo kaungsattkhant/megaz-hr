@@ -16,6 +16,8 @@ return new class extends Migration
             $table->string('invoice_id')->unique()->nullable();
             $table->dateTime('invoice_date');
             $table->dateTime('complete_date')->nullable();
+            $table->string('invoice_type');
+            $table->string('discount_type')->nullable();
             $table->unsignedBigInteger('created_by');
             $table->double('total')->nullable();
             $table->double('tax')->nullable();
@@ -29,6 +31,7 @@ return new class extends Migration
             $table->string('payment_status')->nullable();
             $table->string('payment_type')->nullable();
             $table->double('discount_value')->default(0);
+            $table->double('order_discount_value')->default(0);
             $table->foreignId('customer_id')->constrained()->onDelete('cascade');
             $table->foreignId('package_id')->nullable()->constrained()->onDelete('cascade');//new
             $table->foreignId('room_discount_id')->nullable()->constrained()->onDelete('cascade')->nullable();//new

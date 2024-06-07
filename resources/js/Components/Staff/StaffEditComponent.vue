@@ -220,6 +220,13 @@
 
             <div class="col-span-3"></div>
 
+            <div class="col-span-3 rounded-md mb-4 pb-6">
+                <label for="" class="label-form mb-3">
+                    Bank Account Number
+                </label>
+                <input type="text" v-model="bankAccountNumber" placeholder="Bank Account Number" class="input-ui">
+            </div>
+
             <hr class="col-span-12 mb-4">
 
             <div class=" col-span-12 mb-6">
@@ -419,6 +426,7 @@ export default {
             nrcFrontFile: null,
             nrcBackFile: null,
             houseHoldRegistrationFile: null,
+            bankAccountNumber: null,
 
             primaryName: null,
             primaryPhone: null,
@@ -450,6 +458,7 @@ export default {
                 this.joinedDate = this.staff.joined_date;
                 this.zipCode = this.staff.zip_code;
                 this.address = this.staff.address;
+                this.bankAccountNumber = this.staff.bank_account_number;
                 if (this.staff.emergency_contacts.length > 0) {
                     this.primaryName = this.staff.emergency_contacts[0].primary_name;
                     this.primaryPhone = this.staff.emergency_contacts[0].primary_phone;
@@ -649,20 +658,20 @@ export default {
                 return 1;
             }
 
-            if (!this.dob) {
-                this.alertValiationMessage('Date of Birth');
-                return 1;
-            }
+            // if (!this.dob) {
+            //     this.alertValiationMessage('Date of Birth');
+            //     return 1;
+            // }
 
             if (!this.selectedGender) {
                 this.alertValiationMessage('gender');
                 return 1;
             }
 
-            if (!this.nrcNumber) {
-                this.alertValiationMessage('Nrc');
-                return 1;
-            }
+            // if (!this.nrcNumber) {
+            //     this.alertValiationMessage('Nrc');
+            //     return 1;
+            // }
 
             if (!this.phoneNumber) {
                 this.alertValiationMessage('phone number');
@@ -674,6 +683,7 @@ export default {
                 this.alertValiationMessage('joined date');
                 return 1;
             }
+
             if (!this.selectedDepartment) {
                 this.alertValiationMessage('department');
                 return 1;
@@ -694,35 +704,35 @@ export default {
                 return 1;
             }
 
-            if (!this.primaryName) {
-                this.alertValiationMessage('primary name');
-                return 1;
-            }
+            // if (!this.primaryName) {
+            //     this.alertValiationMessage('primary name');
+            //     return 1;
+            // }
 
-            if (!this.primaryPhone) {
-                this.alertValiationMessage('primary phone');
-                return 1;
-            }
+            // if (!this.primaryPhone) {
+            //     this.alertValiationMessage('primary phone');
+            //     return 1;
+            // }
 
-            if (!this.primaryRelationship) {
-                this.alertValiationMessage('primary relationship');
-                return 1;
-            }
+            // if (!this.primaryRelationship) {
+            //     this.alertValiationMessage('primary relationship');
+            //     return 1;
+            // }
 
-            if (!this.secondaryName) {
-                this.alertValiationMessage('secondary name');
-                return 1;
-            }
+            // if (!this.secondaryName) {
+            //     this.alertValiationMessage('secondary name');
+            //     return 1;
+            // }
 
-            if (!this.secondaryPhone) {
-                this.alertValiationMessage('secondary phone');
-                return 1;
-            }
+            // if (!this.secondaryPhone) {
+            //     this.alertValiationMessage('secondary phone');
+            //     return 1;
+            // }
 
-            if (!this.secondaryRelationship) {
-                this.alertValiationMessage('secondary relationship');
-                return 1;
-            }
+            // if (!this.secondaryRelationship) {
+            //     this.alertValiationMessage('secondary relationship');
+            //     return 1;
+            // }
 
             this.updateStaff();
         },
@@ -753,6 +763,10 @@ export default {
 
             if (this.zipCode) {
                 formData.append('zip_code', this.zipCode);
+            }
+
+            if (this.bankAccountNumber) {
+                formData.append('bank_account_number', this.bankAccountNumber);
             }
 
             if(this.password){

@@ -235,6 +235,15 @@
 
             <div class="col-span-3"></div>
 
+            <div class="col-span-3 rounded-md mb-4 pb-6">
+                <label for="" class="label-form mb-3">
+                    Bank Account Number
+                </label>
+                <input type="text" v-model="bankAccountNumber" placeholder="Bank Account Number" class="input-ui">
+            </div>
+
+            <div class="col-span-9"></div>
+
             <hr class="col-span-12 mb-4">
 
             <div class=" col-span-12 mb-6">
@@ -282,7 +291,6 @@
                     class="input-ui">
             </div>
             <div class="col-span-3"></div>
-
 
         </div>
         <div>
@@ -441,6 +449,7 @@ export default {
             nrcFrontFile: null,
             nrcBackFile: null,
             houseHoldRegistrationFile: null,
+            bankAccountNumber: null,
 
             primaryName: null,
             primaryPhone: null,
@@ -691,6 +700,11 @@ export default {
             if (this.zipCode) {
                 formData.append('zip_code', this.zipCode);
             }
+
+            if (this.bankAccountNumber) {
+                formData.append('bank_account_number', this.bankAccountNumber);
+            }
+
             formData.append('birthdate', this.dob);
             formData.append('state', this.state);
             formData.append('address', this.address);

@@ -13,7 +13,8 @@ return new class extends Migration
     {
         Schema::table('staff', function (Blueprint $table) {
             //
-            $table->string('nrc_front_url')->after('address')->nullable();
+            $table->string('bank_account_number')->after('address')->nullable();
+            $table->string('nrc_front_url')->after('bank_account_number')->nullable();
             $table->string('nrc_front_path')->after('nrc_front_url')->nullable();
             $table->string('nrc_back_url')->after('nrc_front_path')->nullable();
             $table->string('nrc_back_path')->after('nrc_back_url')->nullable();
