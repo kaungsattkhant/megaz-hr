@@ -184,6 +184,8 @@ class InvoiceRepository implements InvoiceRepositoryInterface
                 ResponseMessage('Room with session duration can only added duration');
             }
 
+            $invoice->total_session_price += $data['session_duration'] * $roomAndSession->entity->price_per_hour;
+
             // $startTime = Carbon::parse($roomAndSession->start_date);
             // $endTime = Carbon::now();
             // $durationInMinutes = $endTime->diffInMinutes($startTime);
@@ -320,11 +322,53 @@ class InvoiceRepository implements InvoiceRepositoryInterface
         }
     }
 
+    public function doneRoom(array $data)
+    {
+      DB::beginTransaction();
+      try{
+        $invoice = Invoice::find($data['invoice_id']);
+        $latestRoomSession = RoomSession::where('invoice_id', $invoice->id)->orderBy('created_at', 'desc')->first();
+        $entity = Entity::find($latestRoomSession->entity_id);
+        if($invoice->invoice_type=='endless_time')
+        {
+                $invoiceDate = Carbon::parse($invoice->invoice_date);
+                $currentDate = Carbon::now();
+                $minutesDifference = $currentDate->diffInMinutes($invoiceDate);
+                $hoursDifference = $minutesDifference / 60;
+                $hoursDifference = number_format($hoursDifference, 2);
+
+                if($hoursDifference < 3)
+                {
+                    ResponseData("You can't end this room before 3 hours", 402);
+                }
+
+                $data['session_duration'] = $hoursDifference;
+                $data['end_date'] = CurrentTime();
+                $data['price'] = $hoursDifference * $entity->price_per_hour;
+
+        }
+
+        $entity->is_active = 0;
+        $entity->save();
+
+        $latestRoomSession->update($data);
+        DB::commit();
+        ResponseData($latestRoomSession);
+      }catch(\Exception $e)
+      {
+        DB::rollBack();
+        ResponseMessage($e->getMessage(),422);
+        throw $e;
+      }
+
+    }
+
     public function doneEntityWithInvoice(array $data)
     {
         $foodCharge = 0;
         $beverageCharge = 0;
-        $endlessTimeSessionDuration = 0;
+        $total_session_price = 0;
+        $orderDiscount = 0;
 
         if (isset($data['order_categories'])) {
             $data['order_categories'] = json_decode($data['order_categories'], true);
@@ -338,13 +382,11 @@ class InvoiceRepository implements InvoiceRepositoryInterface
         }
 
         $roomSessions = RoomSession::where('invoice_id', $data['invoice_id'])->get();
-        $total_session_price = 0;
         foreach ($roomSessions as $room) {
             $total_session_price += $room->price;
         }
 
         $invoice = Invoice::find($data['invoice_id']);
-        $orderDiscount = 0;
         $order = Order::where('invoice_id', $invoice->id)->first();
         if($order)
         {
@@ -353,10 +395,6 @@ class InvoiceRepository implements InvoiceRepositoryInterface
 
         $lastRoomwithInvoice = RoomSession::where('invoice_id', $invoice->id)->latest()->first();
         $latestSession = $invoice->sessions->sortByDesc('created_at')->first();
-        // if($invoice->invoice_type=='endless_time')
-        // {
-        //     $latest
-        // }
         $entity = Entity::find($latestSession->entity_id);
 
 

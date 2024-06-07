@@ -91,4 +91,10 @@ class InvoiceAPIController extends Controller
         ResponseData($invoice);
     }
 
+    public function doneRoom(Request $request)
+    {
+        $invoice = $this->invoiceRepo->doneRoom($request->all());
+        ResponseData($invoice);
+    }
+
 }
