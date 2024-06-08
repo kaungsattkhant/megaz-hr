@@ -348,7 +348,15 @@
                     </div>
 
                     <div class="absolute bottom-0 border-t-2 border-gray-200 w-full padding-section !pt-3">
-                        <div class=" text-sm text-right flex gap-x-2 justify-end pr-2 mb-2">
+                        <div v-if="isPackage" class=" text-sm text-right flex gap-x-2 justify-end pr-2 mb-2">
+                            <p>
+                                Package Price
+                            </p>
+                            <p class=" w-28">
+                                {{ packagePrice.toLocaleString() }} MMKs
+                            </p>
+                        </div>
+                        <div v-if="!isPackage" class=" text-sm text-right flex gap-x-2 justify-end pr-2 mb-2">
                             <p>
                                 Room
                             </p>
@@ -362,13 +370,14 @@
                                 Food
                             </p>
                             <p class=" w-28">
-                                {{ printInvoiceData.isTax ? (printInvoiceData.food ? printInvoiceData.food.toLocaleString() : 0) : 0 }} MMKs
+                                {{ printInvoiceData.food ? printInvoiceData.food.toLocaleString() : 0 }} MMks
+                                <!-- {{ printInvoiceData.isTax ? (printInvoiceData.food ? printInvoiceData.food.toLocaleString() : 0) : 0 }} MMKs -->
                                 <!-- {{ purchaseMenuList.length > 0 ? purchaseMenuList[0].total.toLocaleString() : '0' }} MMks -->
                             </p>
                         </div>
                         <div class=" text-sm text-right flex gap-x-2 justify-end pr-2 mb-2">
                             <p>
-                                Service Tax
+                                Service Charge
                             </p>
                             <p class=" w-28">
                                 {{ printInvoiceData.service_charge == true? (printInvoiceData.service_tax ? printInvoiceData.service_tax.toLocaleString() :
@@ -380,7 +389,9 @@
                                 Tax
                             </p>
                             <p class=" w-28">
-                                {{ printInvoiceData.tax ? printInvoiceData.tax.toLocaleString() : 0 }} MMKs
+                                {{ printInvoiceData.isTax == true? (printInvoiceData.tax ? printInvoiceData.tax.toLocaleString() :
+                                    0) : 0 }} MMKs
+                                <!-- {{ printInvoiceData.tax ? printInvoiceData.tax.toLocaleString() : 0 }} MMKs -->
                             </p>
                         </div>
                         <div class=" text-sm text-right flex gap-x-2 justify-end pr-2 mb-2">
@@ -395,7 +406,10 @@
                             <p class="font-semibold">
                                 Total &nbsp;
                                 <!-- {{  (printInvoiceData.room + printInvoiceData.food + printInvoiceData.service_tax + printInvoiceData.tax ) }} -->
-                                {{ printInvoiceData.total ? printInvoiceData.total.toLocaleString() : 0 }} MMKs
+                                <!-- {{ printInvoiceData.total ? printInvoiceData.total.toLocaleString() : 0 }} MMKs -->
+                                {{ (printInvoiceData.total ? printInvoiceData.total : 0) 
+                                    + (printInvoiceData.service_charge == true? (printInvoiceData.service_tax ? printInvoiceData.service_tax :0) : 0) 
+                                    + (printInvoiceData.isTax == true? (printInvoiceData.tax ? printInvoiceData.tax : 0) : 0) }} MMKs
                             </p>
                         </div>
                         <div class="">
@@ -809,7 +823,7 @@
                     tatalPrice:0,
                     foodList:[]
                 },
-
+                room_discount:null,
                 orderList:[],
                 orderItemsPrice:null,
                 selectedPaymentMethod:null,
@@ -831,6 +845,8 @@
 
                 // doneSession
                 roomDiscountList:null,
+                isPackage:false,
+                packagePrice:null,
                 discount_type: null,
                 isShowDiscount:true,
 
@@ -1212,10 +1228,23 @@
                     });
 
                 }
+                if(this.selectedRoom.room_sessions[0].invoice.invoice_type == 'package'){
+                    this.isPackage = true;
+                    this.packagePrice = this.selectedRoom.room_sessions[0].invoice.paid_amount
+                }
+                
+                
                 // room price = this.printInvoiceData.room
-                this.printInvoiceData.tax = this.printInvoiceData.food * 0.05
-                this.printInvoiceData.service_tax = (this.printInvoiceData.room + this.printInvoiceData.food) * 0.05
-                this.printInvoiceData.total = this.printInvoiceData.room + this.printInvoiceData.food + this.printInvoiceData.tax +this.printInvoiceData.service_tax
+                if(this.service_charge = true){
+                    this.printInvoiceData.service_tax = (this.printInvoiceData.room + this.printInvoiceData.food) * 0.05
+                }
+                if(this.isTax = true){
+                    this.printInvoiceData.tax = this.printInvoiceData.food * 0.05
+                }
+                
+                
+                this.printInvoiceData.total = this.printInvoiceData.room + this.printInvoiceData.food
+                // this.printInvoiceData.total = this.printInvoiceData.room + this.printInvoiceData.food + this.printInvoiceData.tax +this.printInvoiceData.service_tax
 
                 this.selectedPaymentMethod = null
                 this.change = null
