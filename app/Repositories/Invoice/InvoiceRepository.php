@@ -489,6 +489,7 @@ class InvoiceRepository implements InvoiceRepositoryInterface
             }
         }
         // dd($discount_value);
+        $data['room_discount_value'] = $room_discount_value;
         $data['total'] -= ($discount_value + $room_discount_value);
         $data['tax'] = $tax;
         $data['service_charge'] = $tax;
