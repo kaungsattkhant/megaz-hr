@@ -1241,8 +1241,6 @@
                 if(this.isTax = true){
                     this.printInvoiceData.tax = this.printInvoiceData.food * 0.05
                 }
-                
-                
                 this.printInvoiceData.total = this.printInvoiceData.room + this.printInvoiceData.food
                 // this.printInvoiceData.total = this.printInvoiceData.room + this.printInvoiceData.food + this.printInvoiceData.tax +this.printInvoiceData.service_tax
 
