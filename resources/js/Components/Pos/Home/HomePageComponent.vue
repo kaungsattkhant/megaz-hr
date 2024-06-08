@@ -809,7 +809,7 @@
                     tatalPrice:0,
                     foodList:[]
                 },
-                
+
                 orderList:[],
                 orderItemsPrice:null,
                 selectedPaymentMethod:null,
@@ -1169,13 +1169,39 @@
                 this.isOpenRoom.step_invoice = true;
 
                 let formData = new FormData();
+                let roomSessions = [];
                 formData.append('invoice_id', this.selectedRoom.room_sessions[0].invoice.invoice_id);
                 let response = await postApiData({ url: '/api/room_done', form_data: formData, token: this.getToken()});
                 if(response.success){
                     this.testsession = response.data
+                    roomSessions = response.data;
                     console.log("success")
                 }
-                this.printInvoiceData.room = this.selectedRoom.price_per_hour * this.selectedRoom.room_sessions[0].session_duration
+                let roomChargeTotal = 0;
+                if(this.room_discount){
+                    roomSessions.forEach(roomSession => {
+                        if(roomSession.session_duration < 1){
+                            roomChargeTotal += roomSession.price; // or roomSession.session_duration * roomSession.entity.price_per_hour;
+                        }
+                        else{
+                            let perGroup = this.room_discount.session + this.room_discount.free_session;
+                            let completeGroups = roomSession.session_duration % perGroup; // need to consider fractional session durations
+                            let factor = (this.room_discount.free_session * completeGroups);
+                            let remainings = roomSession.session_duration - (perGroup * completeGroups);
+                            let priceForCompleteGroups = completeGroups * factor * roomSession.entity.price_per_hour;
+                            let priceForRemainings = remainings * roomSession.entity.price_per_hour;
+                            roomChargeTotal += (priceForCompleteGroups + priceForRemainings);
+                        }
+                    });
+                }
+                else{
+                    roomSessions.forEach(roomSession => {
+                        roomChargeTotal += roomSession.price; // or roomSession.session_duration * roomSession.entity.price_per_hour;
+                    });
+                }
+                this.printInvoiceData.room = this.selectedRoom.price_per_hour * this.selectedRoom.room_sessions[0].session_duration; // <== this
+                this.printInvoiceData.room = roomChargeTotal; // <== or that
+
                 if(this.purchaseMenuList.length > 0){
                     this.printInvoiceData.food = this.purchaseMenuList[0].total
                     this.purchaseMenuList[0].order_items.forEach(element => {
