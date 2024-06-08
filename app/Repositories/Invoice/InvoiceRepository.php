@@ -86,11 +86,11 @@ class InvoiceRepository implements InvoiceRepositoryInterface
                 $rooms = $package->rooms()->pluck('id');
                 $roomExists = $rooms->contains($entity->id);
                 if ($roomExists == false) {
-                    ResponseMessage('Selected Package cannot used by chosen room');
+                    ResponseMessage('Selected Package cannot used by chosen room',422);
                 }
                 $invoiceDate = Carbon::parse($data['invoice_date']);
                 if ($invoiceDate->lt($package->from_date) || $invoiceDate->gt($package->to_date)) {
-                    ResponseMessage('The selected package is not available for the given date.');
+                    ResponseMessage('The selected package is not available for the given date.',422);
                 }
 
                 $end_date = Carbon::parse($data['invoice_date'])->addHours($package->session);
@@ -430,12 +430,13 @@ class InvoiceRepository implements InvoiceRepositoryInterface
 
         if ($invoice->invoice_type == 'package') {
            $foodDrink = $foodCharge + $beverageCharge;
-           $foodDrink =$foodDrink - $orderDiscount;
+           $foodDrink =$foodDrink;
             $data['total'] =($foodDrink + $invoice->paid_amount + $tax + $service_charge) - $orderDiscount;
 
         } else if ($invoice->invoice_type == 'session') {
                $foodDrink = $foodCharge + $beverageCharge;
-               $foodDrink =$foodDrink - $orderDiscount ;
+               $foodDrink =$foodDrink ;
+            //    dd($foodDrink, $total_session_price,$service_charge, $tax);
                 $data['total'] =($foodDrink + $total_session_price + $service_charge +$tax) - $orderDiscount;
                 $data['total_session_price'] = $total_session_price;
         } else if($invoice->invoice_type =='endless_time') {
@@ -443,11 +444,10 @@ class InvoiceRepository implements InvoiceRepositoryInterface
                 $lastRoomwithInvoice->end_date = CurrentTime();
                 $lastRoomwithInvoice->save();
                $foodDrink = $foodCharge + $beverageCharge;
-               $foodDrink =$foodDrink - $orderDiscount ;
+               $foodDrink =$foodDrink;
                 $data['total'] =($foodDrink + $total_session_price + $service_charge + $tax) - $orderDiscount;
                 $data['total_session_price'] = $total_session_price;
         }
-
         if (isset($data['discount_type'])) {
             if ($data['discount_type']) {
                 if ($data['discount_type'] == 'fix_amount') {
@@ -472,12 +472,8 @@ class InvoiceRepository implements InvoiceRepositoryInterface
 
                             if($roomDiscount->session <= $lastRoomwithInvoice->session_duration)
                             {
-                                if($invoice->invoice_type=='endless_time')
-                                {
 
                                     $room_discount_value = $total_session_price - $data['room_discount_amount'];
-
-                                }
 
                             }else{
                                 ResponseMessage('Discount cannot be applied',422);
@@ -488,13 +484,17 @@ class InvoiceRepository implements InvoiceRepositoryInterface
                 }
             }
         }
-        // dd($discount_value);
         $data['room_discount_value'] = $room_discount_value;
-        $data['total'] -= ($discount_value + $room_discount_value);
+        $discount_value = $data['discount_value'];
+        $discount_total = $discount_value + $room_discount_value;
+        $data['total'] -= $discount_total;
         $data['tax'] = $tax;
-        $data['service_charge'] = $tax;
+        $data['service_charge'] = $service_charge;
         $data['total_session_price'] = $total_session_price;
-        $data['discount_type'] = $invoice->discount_type;
+        if($data['discount_type'] != null)
+        {
+            $data['discount_type'] = $invoice->discount_type;
+        }
         $data['order_discount_value'] = $orderDiscount;
         $data['sub_total'] =$foodDrink + $total_session_price;
         $data['payment_status'] = 'received';

@@ -32,7 +32,8 @@ class Invoice extends Model
         'invoice_type',
         'discount_type',
         'invoice_type',
-        'order_discount_value'
+        'order_discount_value',
+        'room_discount_value'
     ];
 
     public function orders()
