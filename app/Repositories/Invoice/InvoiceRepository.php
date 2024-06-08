@@ -180,8 +180,8 @@ class InvoiceRepository implements InvoiceRepositoryInterface
                 $originalDuration += $room_session->session_duration;
             }
             $invoice = Invoice::find($data['invoice_id']);
-            if ($invoice->invoice_type = !'session') {
-                ResponseMessage('Room with session duration can only added duration');
+            if ($invoice->invoice_type != 'session') {
+                ResponseMessage('Room with session duration can only be added duration',422);
             }
 
             $invoice->total_session_price += $data['session_duration'] * $roomAndSession->entity->price_per_hour;
@@ -379,6 +379,7 @@ class InvoiceRepository implements InvoiceRepositoryInterface
         $tax = 0;
         $foodDrink = 0;
         $discount_value = 0;
+        $room_discount_value= 0;
 
 
         if (isset($data['order_categories'])) {
@@ -473,27 +474,11 @@ class InvoiceRepository implements InvoiceRepositoryInterface
                             {
                                 if($invoice->invoice_type=='endless_time')
                                 {
-                                    $lastRoomwithInvoice->session_duration = $endlessTimeSessionDuration;
-                                    $caculation= floor($endlessTimeSessionDuration/$roomDiscount->session);
-                                    $lastRoomwithInvoice->discount_session = $caculation;
-                                    $lastRoomwithInvoice->update();
-                                    $entity->is_active=1;
-                                    DB::commit();
-                                    $data['invoice'] = 'room_discount';
-                                    ResponseMessage('Enjoy your discount',200);
 
-                                }else{
-                                    // dd($lastRoomwithInvoice->session_duration,floor($lastRoomwithInvoice->session_duration/$roomDiscount->session),$lastRoomwithInvoice->discount_session);
-                                    $durationValue =floor($lastRoomwithInvoice->session_duration/$roomDiscount->session);
-                                    $lastRoomwithInvoice->session_duration += $durationValue;
-                                    $lastRoomwithInvoice->discount_session = $durationValue;
-                                    $lastRoomwithInvoice->update();
-                                    $entity->is_active=1;
-                                    DB::commit();
-                                    $data['invoice'] = 'room_discount';
-                                    ResponseMessage('Enjoy your discount',200);
+                                    $room_discount_value = $total_session_price - $data['room_discount_amount'];
 
                                 }
+
                             }else{
                                 ResponseMessage('Discount cannot be applied',422);
                             }
@@ -503,8 +488,8 @@ class InvoiceRepository implements InvoiceRepositoryInterface
                 }
             }
         }
-        $discount_value = $data['discount_value'];
-        $data['total'] -= $discount_value;
+        // dd($discount_value);
+        $data['total'] -= ($discount_value + $room_discount_value);
         $data['tax'] = $tax;
         $data['service_charge'] = $tax;
         $data['total_session_price'] = $total_session_price;
