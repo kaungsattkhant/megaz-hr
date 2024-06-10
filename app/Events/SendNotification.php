@@ -42,4 +42,4 @@ class SendNotification implements ShouldBroadcast
             new PrivateChannel("send-notification.{$this->role_id}"),
         ];
     }
-}1 
+}
