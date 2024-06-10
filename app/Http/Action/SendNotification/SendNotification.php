@@ -19,7 +19,6 @@ trait SendNotification
             'notificationable_type'=>$morphMapName,
             'created_by'=>UserData()->id,
         ]);
-        
         foreach($user_ids as $user_id){
             $notification->notificationUsers()->create([
                 'staff_id'=>$user_id,
@@ -29,7 +28,7 @@ trait SendNotification
             $data['notification_id']=$notification->id;
             $data['notificationable_type']=$notification->notificationable_type;
             $data['notificationable_id']=$notification->notificationable_id;
-            (new Notification())->toUserMultipleDevice($tokens,$data);
+            // (new Notification())->toUserMultipleDevice($tokens,$data);
         }
     }
 

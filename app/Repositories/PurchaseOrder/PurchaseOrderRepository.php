@@ -2,6 +2,7 @@
 
 namespace App\Repositories\PurchaseOrder;
 
+use App\Events\SendNotification as EventsSendNotification;
 use App\Http\Action\Common\PurchaseOrder as CommonPurchaseOrder;
 use App\Http\Action\Inventory\StoreInventory;
 use App\Http\Action\SendNotification\SendNotification;
@@ -141,12 +142,17 @@ class PurchaseOrderRepository implements PurchaseOrderRepositoryInterface
             }
             if (!isset($request->id)) {
                 $users = $this->getUserByRole('HR', ['Manager']);
+                $role_id=1;
                 $data = [
                     'date' => $po->created_at,
                     'title' => 'You have received a new PO to confirm',
                     'body' => 'New Purchase Order',
                 ];
-                $this->send($po, $users, $data);
+                #send old notificaiton 
+                // $this->send($po, $users, $data);
+                #end
+                broadcast(new EventsSendNotification($po,$users,$role_id,$data));
+
             }
             DB::commit();
             return $po;
