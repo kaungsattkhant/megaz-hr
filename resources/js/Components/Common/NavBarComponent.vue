@@ -43,6 +43,9 @@
     import { Dropdown ,Modal, Ripple, Select, initTE } from "tw-elements";
     import { mapGetters } from "vuex";
 
+    import Echo from 'laravel-echo';
+    import Pusher from 'pusher-js';
+
     import { getApiData, postApiData } from '../../utilities/ajax-helpers';
     import { getElapsedMoments } from '../../utilities/datetime-helpers';
 
@@ -55,11 +58,12 @@
                 department: null,
                 notifications: [],
                 newNofiCount: 0,
+                intervalId: null,
             };
         },
 
         methods: {
-            ...mapGetters(['getUser', 'getDepartment', 'getToken']),
+            ...mapGetters(['getUser', 'getDepartment', 'getToken', 'getRoles']),
 
             async getNotifications(){
                 let url = `/api/notifications`;
@@ -104,10 +108,10 @@
             },
 
             async startOnMessageListener() {
-                console.log(`im running`);
+                // console.log(`im running`);
                 try {
                     await this.firebaseMessaging.onMessage((payload) => {
-                        console.log('message received: ', payload);
+                        // console.log('message received: ', payload);
                         let title = payload.notification.title;
                         let body = payload.notification.body;
                         let notiOptions = { body: body };
@@ -122,7 +126,7 @@
                     });
                 }
                 catch (error) {
-                    console.log('error', error);
+                    // console.log('error', error);
                 }
             },
 
@@ -136,7 +140,7 @@
                         });
                     }
                     if (permission == 'granted') {
-                        console.log(`permission granted`);
+                        // console.log(`permission granted`);
                         this.firebaseMessaging = firebase.messaging();
                         this.fcmToken = await this.firebaseMessaging.getToken();
                         console.log(this.fcmToken);
@@ -151,6 +155,13 @@
                 }
             },
 
+            listenBroadCastNotifications(){
+                console.log(`listining notifications on send-notification channel`);
+                Echo.private('send-notification.' + 1)
+                .notification((notification) => {
+                    console.log(notification.type);
+                });
+            },
         },
 
         created(){
@@ -158,10 +169,15 @@
             this.department = this.getDepartment();
             this.requestPermission();
             this.getNotifications();
+            this.intervalId = setInterval(this.listenBroadCastNotifications, 1000);
         },
 
         mounted(){
             initTE({ Dropdown, Modal, Select, Ripple });
         },
+
+        beforeDestroy() {
+            clearInterval(this.intervalId);
+        }
     }
 </script>
