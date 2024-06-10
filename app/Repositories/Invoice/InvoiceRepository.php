@@ -468,19 +468,16 @@ class InvoiceRepository implements InvoiceRepositoryInterface
             $data['tax'] = $tax;
             $data['service_charge'] = $service_charge;
             $data['total_session_price'] = $total_session_price;
-            if ($data['discount_type']==null) {
+            // dd($data['discount_type']);
+            if (!isset($data['discount_type'])) {
                 $data['discount_type'] = null;
-            } else {
-                $data['discount_type'] = $invoice->discount_type;
             }
-            dd($data['discount_type']);
             $data['order_discount_value'] = $orderDiscount;
             $data['sub_total'] = ($data['total']) - ($tax + $service_charge);
             $data['payment_status'] = 'received';
             $data['complete_date'] = CurrentTime();
             $entity->is_active = 0;
             $entity->save();
-            dd($data);
             $invoice->update($data);
             $debit_total = 0;
             DB::commit(); //testign purpose need to delete
