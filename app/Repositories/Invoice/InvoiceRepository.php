@@ -343,17 +343,18 @@ class InvoiceRepository implements InvoiceRepositoryInterface
                 $hoursDifference = $minutesDifference / 60;
                 $hoursDifference = number_format($hoursDifference, 2);
                 if ($hoursDifference < 3) {
-                    ResponseData("You can't end this room before 3 hours", 402);
+                    ResponseMessage("You can't end this room before 3 hours", 402);
                 }
-
                 $data['session_duration'] = $hoursDifference;
                 $data['end_date'] = CurrentTime();
                 $data['price'] = $hoursDifference * $entity->price_per_hour;
             }
-
             $latestRoomSession->update($data);
+            $invoice = Invoice::find($data['invoice_id']);
+            $latestRoomSessions = RoomSession::where('invoice_id',$invoice->id)->with('entity')->get();
+
             DB::commit();
-            ResponseData($roomSessions);
+            ResponseData($latestRoomSessions);
         } catch (\Exception $e) {
             DB::rollBack();
             ResponseMessage($e->getMessage(), 422);
