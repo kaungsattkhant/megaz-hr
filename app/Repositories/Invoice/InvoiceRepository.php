@@ -17,6 +17,7 @@ use App\Models\RoomSession;
 use App\Repositories\Order\OrderRepository;
 use Carbon\Carbon;
 
+
 class InvoiceRepository implements InvoiceRepositoryInterface
 {
     public function listAllData(Request $request)
@@ -338,10 +339,9 @@ class InvoiceRepository implements InvoiceRepositoryInterface
             if ($invoice->invoice_type == 'endless_time') {
                 $invoiceDate = Carbon::parse($invoice->invoice_date);
                 $currentDate = Carbon::now();
-                $minutesDifference = $currentDate->diffInMinutes($invoiceDate);
+                $minutesDifference = $invoiceDate->diffInMinutes($currentDate);
                 $hoursDifference = $minutesDifference / 60;
                 $hoursDifference = number_format($hoursDifference, 2);
-
                 if ($hoursDifference < 3) {
                     ResponseData("You can't end this room before 3 hours", 402);
                 }
@@ -467,15 +467,19 @@ class InvoiceRepository implements InvoiceRepositoryInterface
             $data['tax'] = $tax;
             $data['service_charge'] = $service_charge;
             $data['total_session_price'] = $total_session_price;
-            if ($data['discount_type'] != null) {
+            if ($data['discount_type']==null) {
+                $data['discount_type'] = null;
+            } else {
                 $data['discount_type'] = $invoice->discount_type;
             }
+            dd($data['discount_type']);
             $data['order_discount_value'] = $orderDiscount;
             $data['sub_total'] = ($data['total']) - ($tax + $service_charge);
             $data['payment_status'] = 'received';
             $data['complete_date'] = CurrentTime();
             $entity->is_active = 0;
             $entity->save();
+            dd($data);
             $invoice->update($data);
             $debit_total = 0;
             DB::commit(); //testign purpose need to delete
