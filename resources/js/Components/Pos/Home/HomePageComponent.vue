@@ -272,7 +272,7 @@
                                 <div class="relative">
                                     <select name="" id="" v-model="discount_type" @change="getRoomDiscount"
                                         class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
-                                        <option value="room_discount">  Room Discount </option>
+                                        <option value="room_discount" :disabled="selectedRoom.room_sessions[0].invoice.invoice_type == 'package'">  Room Discount </option>
                                         <option value="fix_amount"> Fix Ammount  </option>
                                         <option value="percentage"> Percentage </option>
                                     </select>
@@ -407,10 +407,10 @@
                             <p class="font-semibold">
                                 Total &nbsp;
                                 <!-- {{  (printInvoiceData.room + printInvoiceData.food + printInvoiceData.service_tax + printInvoiceData.tax ) }} -->
-                                <!-- {{ printInvoiceData.total ? printInvoiceData.total.toLocaleString() : 0 }} MMKs -->
-                                {{ (printInvoiceData.total ? printInvoiceData.total : 0)
+                                {{ printInvoiceData.total ? printInvoiceData.total.toLocaleString() : 0 }} MMKs
+                                <!-- {{ (printInvoiceData.total ? printInvoiceData.total : 0)
                                     + (printInvoiceData.service_charge == true? (printInvoiceData.service_tax ? printInvoiceData.service_tax :0) : 0)
-                                    + (printInvoiceData.isTax == true? (printInvoiceData.tax ? printInvoiceData.tax : 0) : 0) }} MMKs
+                                    + (printInvoiceData.isTax == true? (printInvoiceData.tax ? printInvoiceData.tax : 0) : 0) }} MMKs -->
                             </p>
                         </div>
                         <div class="">
@@ -1214,6 +1214,7 @@
 
                 }
                 if(this.selectedRoom.room_sessions[0].invoice.invoice_type == 'package'){
+                    this.printInvoiceData.room = this.selectedRoom.room_sessions[0].invoice.paid_amount;
                     this.isPackage = true;
                     this.packagePrice = this.selectedRoom.room_sessions[0].invoice.paid_amount
                 }
@@ -1265,8 +1266,12 @@
                 }
 
                 roomChargeTotal = paidSession * pricePerHour;
-
-                this.printInvoiceData.room = roomChargeTotal;
+                if(this.selectedRoom.room_sessions[0].invoice.invoice_type == 'package'){
+                    this.printInvoiceData.room = this.selectedRoom.room_sessions[0].invoice.paid_amount;
+                }
+                else{
+                    this.printInvoiceData.room = roomChargeTotal;
+                }
                 this.printInvoiceData.roomDiscountAmount = roomChargeTotal;
                 this.printInvoiceData.discountSession = totalSession - paidSession;
                 this.printInvoiceData.total = this.printInvoiceData.room + this.printInvoiceData.food;
@@ -1288,7 +1293,13 @@
                         roomChargeTotal = roomSession.session_duration * roomSession.entity.price_per_hour;
                     });
 
-                    this.printInvoiceData.room = roomChargeTotal;
+                    
+                    if(this.selectedRoom.room_sessions[0].invoice.invoice_type == 'package'){
+                        this.printInvoiceData.room = this.selectedRoom.room_sessions[0].invoice.paid_amount;
+                    }
+                    else{
+                        this.printInvoiceData.room = roomChargeTotal;
+                    }
                     this.printInvoiceData.roomDiscountAmount = null;
                     this.printInvoiceData.discountSession = null;
                 }
