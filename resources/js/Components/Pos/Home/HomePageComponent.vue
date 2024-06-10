@@ -1212,7 +1212,6 @@
                             'price' : element.price ,
                         })
                     });
-
                 }
                 if(this.selectedRoom.room_sessions[0].invoice.invoice_type == 'package'){
                     this.printInvoiceData.room = this.selectedRoom.room_sessions[0].invoice.paid_amount;
