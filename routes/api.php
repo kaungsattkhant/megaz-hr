@@ -337,3 +337,6 @@ Route::post('/used_defected_items/{id}/confirm',[UsedDefectedAPIController::clas
 Route::get('get_inventory',[InventoryAPIController::class, 'getInventory']);
 // feature
 Route::get('/features',[FeatureAPIController::class,'getFeatureData']);
+
+
+Route::post('send_notification', [NotificationController::class, 'sendNotification']);

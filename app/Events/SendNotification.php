@@ -27,6 +27,10 @@ class SendNotification implements ShouldBroadcast
     {
         //
         $this->role_id=$role_id;
+        $this->date=$notification->date;
+        $this->title=$notification->title;
+        $this->body=$notification->body;
+
     }
 
     /**
@@ -38,6 +42,13 @@ class SendNotification implements ShouldBroadcast
     {
         return [
             new PrivateChannel("send-notification.{$this->role_id}"),
+        ];
+    }
+    public function broadcastWith()
+    {
+        return [
+            'date' => $this->date,
+            'title' => $this->title,
         ];
     }
 }

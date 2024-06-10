@@ -166,7 +166,7 @@
         mounted(){
             initTE({ Dropdown, Modal, Select, Ripple });
 
-            Echo.private('send-notification.' + 1)
+            window.Echo.private('send-notification.' + 1)
             .notification((notification) => {
                 console.log(notification.type);
             });
