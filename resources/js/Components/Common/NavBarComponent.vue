@@ -43,6 +43,9 @@
     import { Dropdown ,Modal, Ripple, Select, initTE } from "tw-elements";
     import { mapGetters } from "vuex";
 
+    import Echo from 'laravel-echo';
+    import Pusher from 'pusher-js';
+
     import { getApiData, postApiData } from '../../utilities/ajax-helpers';
     import { getElapsedMoments } from '../../utilities/datetime-helpers';
 
@@ -59,7 +62,7 @@
         },
 
         methods: {
-            ...mapGetters(['getUser', 'getDepartment', 'getToken']),
+            ...mapGetters(['getUser', 'getDepartment', 'getToken', 'getRoles']),
 
             async getNotifications(){
                 let url = `/api/notifications`;
@@ -162,6 +165,11 @@
 
         mounted(){
             initTE({ Dropdown, Modal, Select, Ripple });
+
+            Echo.private('send-notification.' + 1)
+            .notification((notification) => {
+                console.log(notification.type);
+            });
         },
     }
 </script>
