@@ -28,5 +28,5 @@ const messaging = firebase.messaging();
 
 self.addEventListener("fetch", (event) => {
     // Handle fetch events here
-    console.log('fetching');
+    // console.log('fetching');
 });

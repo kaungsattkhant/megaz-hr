@@ -322,7 +322,7 @@
                                     <select name="" id="" v-model="selectedPaymentMethod"
                                         class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
                                         <option value="bank"> Bank </option>
-                                        <option value="cash"> Cash </option>
+                                        <option value="cash" selected> Cash </option>
                                     </select>
                                 </div>
                             </div>
@@ -408,10 +408,10 @@
                             <p class="font-semibold">
                                 Total &nbsp;
                                 <!-- {{  (printInvoiceData.room + printInvoiceData.food + printInvoiceData.service_tax + printInvoiceData.tax ) }} -->
-                                {{ printInvoiceData.total ? printInvoiceData.total.toLocaleString() : 0 }} MMKs
-                                <!-- {{ (printInvoiceData.total ? printInvoiceData.total : 0)
+                                <!-- {{ printInvoiceData.total ? printInvoiceData.total.toLocaleString() : 0 }} MMKs -->
+                                {{ (printInvoiceData.total ? printInvoiceData.total : 0)
                                     + (printInvoiceData.service_charge == true? (printInvoiceData.service_tax ? printInvoiceData.service_tax :0) : 0)
-                                    + (printInvoiceData.isTax == true? (printInvoiceData.tax ? printInvoiceData.tax : 0) : 0) }} MMKs -->
+                                    + (printInvoiceData.isTax == true? (printInvoiceData.tax ? printInvoiceData.tax : 0) : 0) }} MMKs
                             </p>
                         </div>
                         <div class="">
@@ -828,7 +828,7 @@
                 room_discount:null,
                 orderList:[],
                 orderItemsPrice:null,
-                selectedPaymentMethod:null,
+                selectedPaymentMethod:'cash',
                 change:null,
                 paid_amount:null,
                 isActive:true,
@@ -1034,6 +1034,7 @@
 
             confirmRoomBtnClicked(){
                 this.createRoom();
+                this.getPurchaseMenuList();
             },
             async createRoom()
             {
