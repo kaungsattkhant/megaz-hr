@@ -408,8 +408,15 @@ class InvoiceRepository implements InvoiceRepositoryInterface
         $lastRoomwithInvoice = RoomSession::where('invoice_id', $invoice->id)->latest()->first();
         $entity = Entity::find($lastRoomwithInvoice->entity_id);
 
-        $tax = $data['tax'];
-        $service_charge = $data['service_charge'];
+        if(isset($data['tax']))
+        {
+            $tax = $data['tax'];
+        }
+
+        if(isset($data['service_charge']))
+        {
+            $service_charge = $data['service_charge'];
+        }
         // all granted,food charge,beverage charge, total_session_price, orderDiscount, service_charge, tax
 
         if ($invoice->invoice_type == 'package') {
