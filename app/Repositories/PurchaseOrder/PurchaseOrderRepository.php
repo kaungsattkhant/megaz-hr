@@ -142,7 +142,6 @@ class PurchaseOrderRepository implements PurchaseOrderRepositoryInterface
             }
             if (!isset($request->id)) {
                 $users = $this->getUserByRole('HR', ['Manager']);
-                $role_id=1;
                 $data = [
                     'date' => $po->created_at,
                     'title' => 'You have received a new PO to confirm',
@@ -151,7 +150,6 @@ class PurchaseOrderRepository implements PurchaseOrderRepositoryInterface
                 #send old notificaiton 
                 // $this->send($po, $users, $data);
                 #end
-                broadcast(new EventsSendNotification($po,$users,$role_id,$data));
 
             }
             DB::commit();

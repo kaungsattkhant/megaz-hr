@@ -4,10 +4,12 @@ namespace App\Http\Action\SendNotification;
 
 use App\Models\Notification;
 use App\Models\StaffFcmToken;
+use App\Events\SendNotification as EventsSendNotification;
 
 trait SendNotification
 {
     public function send($model,$users,$data){
+        $role_id=1;#test
         $morphMapName=RelationMorphName($model);
         $user_ids=$users->pluck('id');
         $tokens=$this->getTokensByStaff($user_ids);
@@ -30,6 +32,7 @@ trait SendNotification
             $data['notificationable_id']=$notification->notificationable_id;
             // (new Notification())->toUserMultipleDevice($tokens,$data);
         }
+        broadcast(new EventsSendNotification($notification,$role_id));
     }
 
     public function getTokensByStaff($user_ids){

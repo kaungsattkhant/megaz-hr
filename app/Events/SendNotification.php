@@ -2,6 +2,7 @@
 
 namespace App\Events;
 
+use App\Models\Notification;
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Broadcasting\PresenceChannel;
@@ -22,13 +23,10 @@ class SendNotification implements ShouldBroadcast
     private $title;
     private $body;
 
-    public function __construct($model,$user,$role_id,$data)
+    public function __construct(Notification $notification,$role_id)
     {
         //
         $this->role_id=$role_id;
-        $this->date=$data['date'];
-        $this->title=$data['title'];
-        $this->body=$data['body'];
     }
 
     /**
