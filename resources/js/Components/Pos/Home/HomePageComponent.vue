@@ -3,7 +3,7 @@
 
         <div class="">
             <div class="w-[67%] pt-9 px-6">
-                <p>{{ testsession }}</p>
+                <p>{{ roomSessionData }}</p>
                 <ul class="mb-5 flex list-none flex-row flex-wrap border-b-0 pl-0" role="tablist" data-te-nav-ref>
                     <li v-for="(area,index) in areaList" role="presentation" @click="btnGetAreaItemList(area.id)">
                         <a href="#tabs-profile" class="my-2 mr-3 text-white block  px-7 pb-2.5 rounded-full
@@ -284,7 +284,8 @@
                                 </label>
                                 <div class="relative">
                                     <select name="" id="" v-model="room_discount"
-                                        class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
+                                        class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0"
+                                        @change="roomDiscountSelectChanged">
                                         <option v-for="rd in roomDiscountList" :value="rd">  {{ rd.name }} </option>
                                     </select>
                                 </div>
@@ -407,8 +408,8 @@
                                 Total &nbsp;
                                 <!-- {{  (printInvoiceData.room + printInvoiceData.food + printInvoiceData.service_tax + printInvoiceData.tax ) }} -->
                                 <!-- {{ printInvoiceData.total ? printInvoiceData.total.toLocaleString() : 0 }} MMKs -->
-                                {{ (printInvoiceData.total ? printInvoiceData.total : 0) 
-                                    + (printInvoiceData.service_charge == true? (printInvoiceData.service_tax ? printInvoiceData.service_tax :0) : 0) 
+                                {{ (printInvoiceData.total ? printInvoiceData.total : 0)
+                                    + (printInvoiceData.service_charge == true? (printInvoiceData.service_tax ? printInvoiceData.service_tax :0) : 0)
                                     + (printInvoiceData.isTax == true? (printInvoiceData.tax ? printInvoiceData.tax : 0) : 0) }} MMKs
                             </p>
                         </div>
@@ -854,7 +855,7 @@
                 tableList:[],
 
                 currentTime: getCurretDateTime(),
-                testsession:null
+                roomSessionData:null
             };
         },
 
@@ -1178,6 +1179,7 @@
                 this.doneSession();
 
             },
+
             async doneSession(){
                 this.isOpenRoom.step_1=false;
                 this.isOpenRoom.step_2 = false;
@@ -1189,33 +1191,16 @@
                 formData.append('invoice_id', this.selectedRoom.room_sessions[0].invoice.invoice_id);
                 let response = await postApiData({ url: '/api/room_done', form_data: formData, token: this.getToken()});
                 if(response.success){
-                    this.testsession = response.data
+                    this.roomSessionData = response.data;
                     roomSessions = response.data;
                     console.log("success")
                 }
                 let roomChargeTotal = 0;
-                if(this.room_discount){
-                    roomSessions.forEach(roomSession => {
-                        if(roomSession.session_duration < 1){
-                            roomChargeTotal += roomSession.price; // or roomSession.session_duration * roomSession.entity.price_per_hour;
-                        }
-                        else{
-                            let perGroup = this.room_discount.session + this.room_discount.free_session;
-                            let completeGroups = roomSession.session_duration % perGroup; // need to consider fractional session durations
-                            let factor = (this.room_discount.free_session * completeGroups);
-                            let remainings = roomSession.session_duration - (perGroup * completeGroups);
-                            let priceForCompleteGroups = completeGroups * factor * roomSession.entity.price_per_hour;
-                            let priceForRemainings = remainings * roomSession.entity.price_per_hour;
-                            roomChargeTotal += (priceForCompleteGroups + priceForRemainings);
-                        }
-                    });
-                }
-                else{
-                    roomSessions.forEach(roomSession => {
-                        roomChargeTotal += roomSession.price; // or roomSession.session_duration * roomSession.entity.price_per_hour;
-                    });
-                }
-                this.printInvoiceData.room = this.selectedRoom.price_per_hour * this.selectedRoom.room_sessions[0].session_duration; // <== this
+                roomSessions.forEach(roomSession => {
+                    roomChargeTotal = roomSession.session_duration * roomSession.entity.price_per_hour;
+                    // roomChargeTotal += roomSession.price; // or roomSession.session_duration * roomSession.entity.price_per_hour;
+                });
+
                 this.printInvoiceData.room = roomChargeTotal; // <== or that
 
                 if(this.purchaseMenuList.length > 0){
@@ -1232,8 +1217,8 @@
                     this.isPackage = true;
                     this.packagePrice = this.selectedRoom.room_sessions[0].invoice.paid_amount
                 }
-                
-                
+
+
                 // room price = this.printInvoiceData.room
                 if(this.service_charge = true){
                     this.printInvoiceData.service_tax = (this.printInvoiceData.room + this.printInvoiceData.food) * 0.05
@@ -1241,7 +1226,7 @@
                 if(this.isTax = true){
                     this.printInvoiceData.tax = this.printInvoiceData.food * 0.05
                 }
-                this.printInvoiceData.total = this.printInvoiceData.room + this.printInvoiceData.food
+                this.printInvoiceData.total = this.printInvoiceData.room + this.printInvoiceData.food;
                 // this.printInvoiceData.total = this.printInvoiceData.room + this.printInvoiceData.food + this.printInvoiceData.tax +this.printInvoiceData.service_tax
 
                 this.selectedPaymentMethod = null
@@ -1250,12 +1235,67 @@
                 this.printInvoiceData.discount = 0
 
             },
-            async getRoomDiscount(){
-                const response = await getApiData({ url: '/api/room_discounts', token: this.getToken() });
-                if(response.data){
-                    this.roomDiscountList = response.data.data;
+
+            roomDiscountSelectChanged() {
+                let roomChargeTotal = 0;
+                let roomSessions = this.roomSessionData;
+                let totalSession = 0;
+                let originalSessions = this.room_discount.session;
+                let discountSessions = this.room_discount.free_session;
+                let totalDiscounts = originalSessions + discountSessions;
+                let paidSession = 0;
+                let pricePerHour = 0;
+                roomSessions.forEach(roomSession => {
+                    totalSession += roomSession.session_duration;
+                    pricePerHour = roomSession.entity.price_per_hour;
+                });
+                if(totalSession <= totalDiscounts){
+                    if(totalSession > originalSessions){
+                        paidSession = originalSessions;
+                    }
+                    else{
+                        paidSession = totalSession;
+                    }
                 }
+                else{
+                    let q = Math.floor(totalSession / totalDiscounts);
+                    let qProdOrig = q * originalSessions;
+                    let r = totalSession % totalDiscounts;
+                    paidSession = (qProdOrig + r);
+                }
+
+                roomChargeTotal = paidSession * pricePerHour;
+
+                this.printInvoiceData.room = roomChargeTotal;
+                this.printInvoiceData.roomDiscountAmount = roomChargeTotal;
+                this.printInvoiceData.discountSession = totalSession - paidSession;
+                this.printInvoiceData.total = this.printInvoiceData.room + this.printInvoiceData.food;
             },
+
+            async getRoomDiscount(){
+                if(this.discount_type == 'room_discount'){
+                    const response = await getApiData({ url: '/api/room_discounts', token: this.getToken() });
+                    if(response.data){
+                        this.roomDiscountList = response.data.data;
+                    }
+                }
+                else{
+                    this.roomDiscountList = [];
+                    this.room_discount = null;
+                    let roomChargeTotal = 0;
+                    let roomSessions = this.roomSessionData;
+                    roomSessions.forEach(roomSession => {
+                        roomChargeTotal = roomSession.session_duration * roomSession.entity.price_per_hour;
+                    });
+
+                    this.printInvoiceData.room = roomChargeTotal;
+                    this.printInvoiceData.roomDiscountAmount = null;
+                    this.printInvoiceData.discountSession = null;
+                }
+
+                this.printInvoiceData.total = this.printInvoiceData.room + this.printInvoiceData.food;
+            },
+
             btnClickedEndRoom(){
                 this.EndRoom();
             },
@@ -1280,9 +1320,19 @@
                 formData.append('order_categories', JSON.stringify(this.orderList));
                 // formData.append('total_session_price', this.printInvoiceData.room);
                 // formData.append('food_charge', this.printInvoiceData.food);
-                formData.append('service_charge', this.printInvoiceData.service_charge);
-                formData.append('tax', this.printInvoiceData.isTax);
+                // formData.append('service_charge', this.printInvoiceData.service_charge);
+                // formData.append('tax', this.printInvoiceData.isTax);
+                if(this.printInvoiceData.service_charge){
+                    formData.append('service_charge', this.printInvoiceData.service_tax);
+                }
+                if(this.printInvoiceData.isTax){
+                    formData.append('tax', this.printInvoiceData.tax);
+                }
                 // formData.append('total', this.printInvoiceData.total);
+                if(this.room_discount){
+                    formData.append('room_discount_amount', this.printInvoiceData.roomDiscountAmount);
+                    formData.append('discount_session', this.printInvoiceData.discountSession);
+                }
                 console.log(formData)
                 let response = await postApiData({ url: '/api/entities/done', form_data: formData, token: this.getToken()});
                 if(response.success){
