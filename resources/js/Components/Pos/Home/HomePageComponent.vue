@@ -3,7 +3,6 @@
 
         <div class="">
             <div class="w-[67%] pt-9 px-6">
-                <p>{{ roomSessionData }}</p>
                 <ul class="mb-5 flex list-none flex-row flex-wrap border-b-0 pl-0" role="tablist" data-te-nav-ref>
                     <li v-for="(area,index) in areaList" role="presentation" @click="btnGetAreaItemList(area.id)">
                         <a href="#tabs-profile" class="my-2 mr-3 text-white block  px-7 pb-2.5 rounded-full
