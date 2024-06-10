@@ -1202,7 +1202,6 @@
                     roomChargeTotal = roomSession.session_duration * roomSession.entity.price_per_hour;
                     // roomChargeTotal += roomSession.price; // or roomSession.session_duration * roomSession.entity.price_per_hour;
                 });
-
                 this.printInvoiceData.room = roomChargeTotal; // <== or that
 
                 if(this.purchaseMenuList.length > 0){
