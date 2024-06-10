@@ -215,7 +215,7 @@
                         <div class=" text-right pr-3 mb-3">
                             <p class="">
                                 Total
-                                {{
+                                <!-- {{
                                 (selectedRoom.room_sessions[0].length > 0  ?
                                     (purchaseMenuList.length > 0 ?
                                         (
@@ -231,7 +231,8 @@
                                 : 0
                                 )
 
-                                }}
+                                }} -->
+                                {{ printInvoiceData.room + printInvoiceData.food }}
                                 MMKs
 
                                 <!-- <span v-if="purchaseMenuList.length > 1" >
