@@ -316,6 +316,7 @@ Route::post('/entities/orders', [OrderAPIController::class, 'addOrder']);
 Route::post('/entities/add_more_sessions', [InvoiceAPIController::class, 'addMoreSessions']);
 Route::post('/entities/change', [InvoiceAPIController::class, 'changeRoom']);
 Route::post('/entities/done', [InvoiceAPIController::class, 'endRoom']);
+Route::post('/room_done',[InvoiceAPIController::class,'doneRoom']);
 
 Route::get('/order_items',[OrderAPIController::class,'getOrderItemList']);
 
@@ -336,3 +337,6 @@ Route::post('/used_defected_items/{id}/confirm',[UsedDefectedAPIController::clas
 Route::get('get_inventory',[InventoryAPIController::class, 'getInventory']);
 // feature
 Route::get('/features',[FeatureAPIController::class,'getFeatureData']);
+
+
+Route::post('send_notification', [NotificationController::class, 'sendNotification']);

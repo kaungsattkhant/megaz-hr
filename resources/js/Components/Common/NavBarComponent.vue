@@ -43,6 +43,9 @@
     import { Dropdown ,Modal, Ripple, Select, initTE } from "tw-elements";
     import { mapGetters } from "vuex";
 
+    import Echo from 'laravel-echo';
+    import Pusher from 'pusher-js';
+
     import { getApiData, postApiData } from '../../utilities/ajax-helpers';
     import { getElapsedMoments } from '../../utilities/datetime-helpers';
 
@@ -55,11 +58,12 @@
                 department: null,
                 notifications: [],
                 newNofiCount: 0,
+                intervalId: null,
             };
         },
 
         methods: {
-            ...mapGetters(['getUser', 'getDepartment', 'getToken']),
+            ...mapGetters(['getUser', 'getDepartment', 'getToken', 'getRoles']),
 
             async getNotifications(){
                 let url = `/api/notifications`;
@@ -104,10 +108,10 @@
             },
 
             async startOnMessageListener() {
-                console.log(`im running`);
+                // console.log(`im running`);
                 try {
                     await this.firebaseMessaging.onMessage((payload) => {
-                        console.log('message received: ', payload);
+                        // console.log('message received: ', payload);
                         let title = payload.notification.title;
                         let body = payload.notification.body;
                         let notiOptions = { body: body };
@@ -122,7 +126,7 @@
                     });
                 }
                 catch (error) {
-                    console.log('error', error);
+                    // console.log('error', error);
                 }
             },
 
@@ -136,7 +140,7 @@
                         });
                     }
                     if (permission == 'granted') {
-                        console.log(`permission granted`);
+                        // console.log(`permission granted`);
                         this.firebaseMessaging = firebase.messaging();
                         this.fcmToken = await this.firebaseMessaging.getToken();
                         console.log(this.fcmToken);
@@ -151,6 +155,23 @@
                 }
             },
 
+            listenBroadCastNotifications(channel, event){
+                // console.log(`listining notifications on ${channel} channel`);
+                window.Echo.channel(channel)
+                .listen(event,(response)=>{
+                    console.log(response);
+                    let title = response.data.title;
+                    let body = response.data.body;
+                    let notiOptions = { body: body };
+                    new Notification(title, notiOptions);
+                    this.$notify({
+                        title: response.data.title,
+                        text: response.data.body,
+                        type: "info"
+                    });
+                    this.getNotifications();
+                });
+            },
         },
 
         created(){
@@ -162,6 +183,24 @@
 
         mounted(){
             initTE({ Dropdown, Modal, Select, Ripple });
+
+            let channelName = `send-notification.${this.getDepartment().id}`;
+            let eventName = `SendNotification`;
+
+            this.listenBroadCastNotifications(channelName, eventName);
+
+            // window.Echo.channel('send-notification.' + 1)
+            // .listen('SendNotification',(response)=>{
+            //     console.log(response);
+            // });
+            // .notification((notification) => {
+            //     console.log(notification.type);
+            // });
+
         },
+
+        beforeDestroy() {
+            clearInterval(this.intervalId);
+        }
     }
 </script>
