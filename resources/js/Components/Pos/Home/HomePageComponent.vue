@@ -3,7 +3,6 @@
 
         <div class="">
             <div class="w-[67%] pt-9 px-6">
-                <p>{{ roomSessionData }}</p>
                 <ul class="mb-5 flex list-none flex-row flex-wrap border-b-0 pl-0" role="tablist" data-te-nav-ref>
                     <li v-for="(area,index) in areaList" role="presentation" @click="btnGetAreaItemList(area.id)">
                         <a href="#tabs-profile" class="my-2 mr-3 text-white block  px-7 pb-2.5 rounded-full
@@ -215,7 +214,7 @@
                         <div class=" text-right pr-3 mb-3">
                             <p class="">
                                 Total
-                                {{
+                                <!-- {{
                                 (selectedRoom.room_sessions[0].length > 0  ?
                                     (purchaseMenuList.length > 0 ?
                                         (
@@ -231,7 +230,8 @@
                                 : 0
                                 )
 
-                                }}
+                                }} -->
+                                {{ printInvoiceData.room + printInvoiceData.food }}
                                 MMKs
 
                                 <!-- <span v-if="purchaseMenuList.length > 1" >
@@ -272,7 +272,7 @@
                                 <div class="relative">
                                     <select name="" id="" v-model="discount_type" @change="getRoomDiscount"
                                         class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
-                                        <option value="room_discount">  Room Discount </option>
+                                        <option value="room_discount" :disabled="selectedRoom.room_sessions[0].invoice.invoice_type == 'package'">  Room Discount </option>
                                         <option value="fix_amount"> Fix Ammount  </option>
                                         <option value="percentage"> Percentage </option>
                                     </select>
@@ -321,7 +321,7 @@
                                     <select name="" id="" v-model="selectedPaymentMethod"
                                         class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
                                         <option value="bank"> Bank </option>
-                                        <option value="cash"> Cash </option>
+                                        <option value="cash" selected> Cash </option>
                                     </select>
                                 </div>
                             </div>
@@ -827,7 +827,7 @@
                 room_discount:null,
                 orderList:[],
                 orderItemsPrice:null,
-                selectedPaymentMethod:null,
+                selectedPaymentMethod:'cash',
                 change:null,
                 paid_amount:null,
                 isActive:true,
@@ -1033,6 +1033,7 @@
 
             confirmRoomBtnClicked(){
                 this.createRoom();
+                this.getPurchaseMenuList();
             },
             async createRoom()
             {
@@ -1200,7 +1201,6 @@
                     roomChargeTotal = roomSession.session_duration * roomSession.entity.price_per_hour;
                     // roomChargeTotal += roomSession.price; // or roomSession.session_duration * roomSession.entity.price_per_hour;
                 });
-
                 this.printInvoiceData.room = roomChargeTotal; // <== or that
 
                 if(this.purchaseMenuList.length > 0){
@@ -1211,9 +1211,9 @@
                             'price' : element.price ,
                         })
                     });
-
                 }
                 if(this.selectedRoom.room_sessions[0].invoice.invoice_type == 'package'){
+                    this.printInvoiceData.room = this.selectedRoom.room_sessions[0].invoice.paid_amount;
                     this.isPackage = true;
                     this.packagePrice = this.selectedRoom.room_sessions[0].invoice.paid_amount
                 }
@@ -1265,8 +1265,12 @@
                 }
 
                 roomChargeTotal = paidSession * pricePerHour;
-
-                this.printInvoiceData.room = roomChargeTotal;
+                if(this.selectedRoom.room_sessions[0].invoice.invoice_type == 'package'){
+                    this.printInvoiceData.room = this.selectedRoom.room_sessions[0].invoice.paid_amount;
+                }
+                else{
+                    this.printInvoiceData.room = roomChargeTotal;
+                }
                 this.printInvoiceData.roomDiscountAmount = roomChargeTotal;
                 this.printInvoiceData.discountSession = totalSession - paidSession;
                 this.printInvoiceData.total = this.printInvoiceData.room + this.printInvoiceData.food;
@@ -1288,7 +1292,13 @@
                         roomChargeTotal = roomSession.session_duration * roomSession.entity.price_per_hour;
                     });
 
-                    this.printInvoiceData.room = roomChargeTotal;
+                    
+                    if(this.selectedRoom.room_sessions[0].invoice.invoice_type == 'package'){
+                        this.printInvoiceData.room = this.selectedRoom.room_sessions[0].invoice.paid_amount;
+                    }
+                    else{
+                        this.printInvoiceData.room = roomChargeTotal;
+                    }
                     this.printInvoiceData.roomDiscountAmount = null;
                     this.printInvoiceData.discountSession = null;
                 }

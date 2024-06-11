@@ -155,15 +155,22 @@
                 }
             },
 
-            listenBroadCastNotifications(){
-                // console.log(`listining notifications on send-notification channel`);
-                // window.Echo.channel('send-notification.' + 1)
-                // .listen('SendNotification',(response)=>{
-                //     console.log(response);
-                // });
-                // .notification((notification) => {
-                //     console.log('hello');
-                // });
+            listenBroadCastNotifications(channel, event){
+                // console.log(`listining notifications on ${channel} channel`);
+                window.Echo.channel(channel)
+                .listen(event,(response)=>{
+                    console.log(response);
+                    let title = response.data.title;
+                    let body = response.data.body;
+                    let notiOptions = { body: body };
+                    new Notification(title, notiOptions);
+                    this.$notify({
+                        title: response.data.title,
+                        text: response.data.body,
+                        type: "info"
+                    });
+                    this.getNotifications();
+                });
             },
         },
 
@@ -172,16 +179,21 @@
             this.department = this.getDepartment();
             this.requestPermission();
             this.getNotifications();
-            this.intervalId = setInterval(this.listenBroadCastNotifications, 1000);
         },
 
         mounted(){
             initTE({ Dropdown, Modal, Select, Ripple });
 
-            window.Echo.channel('send-notification.' + 3)
-            .listen('SendNotification',(response)=>{
-                console.log(response);
-            });
+
+            let channelName = `send-notification.${this.getDepartment().id}`;
+            let eventName = `SendNotification`;
+
+            this.listenBroadCastNotifications(channelName, eventName);
+
+            // window.Echo.channel('send-notification.' + 1)
+            // .listen('SendNotification',(response)=>{
+            //     console.log(response);
+            // });
             // .notification((notification) => {
             //     console.log(notification.type);
             // });
