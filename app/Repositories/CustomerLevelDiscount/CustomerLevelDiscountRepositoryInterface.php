@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Repositories\Customer;
+namespace App\Repositories\CustomerLevelDiscount;
 
 use Illuminate\Http\Request;
 
-interface CustomerRepositoryInterface
+interface CustomerLevelDiscountRepositoryInterface
 {
     public function listAllData(Request $request);
 
@@ -13,7 +13,4 @@ interface CustomerRepositoryInterface
     public function updateData(array $data, int $id);
 
     public function deleteData(int $id);
-
-    public function getCustomersWithUpcomingBirthdays();
-
 }

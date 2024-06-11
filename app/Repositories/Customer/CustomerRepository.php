@@ -3,6 +3,7 @@
 namespace App\Repositories\Customer;
 
 use App\Models\Customer;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -29,6 +30,29 @@ class CustomerRepository implements CustomerRepositoryInterface
             $customers = Customer::all();
 
             return $customers;
+        }
+    }
+
+    public function getCustomersWithUpcomingBirthdays()
+    {
+        $today = Carbon::today();
+        $dateAfter7Days = $today->copy()->addDays(7);
+
+        if ($dateAfter7Days->year > $today->year) {
+            $endOfYear = Carbon::create($today->year, 12, 31);
+            $startOfYear = Carbon::create($dateAfter7Days->year, 1, 1);
+
+            $bdCus = Customer::where(function ($query) use ($today, $endOfYear) {
+                $query->whereBetween(DB::raw('DAYOFYEAR(birthdate)'), [$today->dayOfYear, $endOfYear->dayOfYear]);
+            })->orWhere(function ($query) use ($dateAfter7Days, $startOfYear) {
+                $query->whereBetween(DB::raw('DAYOFYEAR(birthdate)'), [$startOfYear->dayOfYear, $dateAfter7Days->dayOfYear]);
+            })->get();
+            ResponseData($bdCus);
+        } else {
+            return Customer::whereBetween(
+                DB::raw('DAYOFYEAR(birthdate)'),
+                [$today->dayOfYear, $dateAfter7Days->dayOfYear]
+            )->get();
         }
     }
 

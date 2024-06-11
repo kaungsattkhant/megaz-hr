@@ -45,4 +45,10 @@ class CustomerAPIController extends Controller
             ResponseMessage('Customer not found or some error occur');
         }
     }
+
+    public function upComingBdList()
+    {
+        $upComingBdList = $this->customerRepo->getCustomersWithUpcomingBirthdays();
+        ResponseData($upComingBdList);
+    }
 }

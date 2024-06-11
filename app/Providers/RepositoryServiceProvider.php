@@ -30,6 +30,8 @@ use App\Repositories\Supplier\SupplierRepository;
 
 use App\Repositories\Transfer\TransferRepository;
 use App\Repositories\Area\AreaRepositoryInterface;
+use App\Repositories\BirthdayPromotion\BirthdayPromotionRepository;
+use App\Repositories\BirthdayPromotion\BirthdayPromotionRepositoryInterface;
 use App\Repositories\Item\ItemRepositoryInterface;
 use App\Repositories\Menu\MenuRepositoryInterface;
 use App\Repositories\Role\RoleRepositoryInterface;
@@ -59,6 +61,8 @@ use App\Repositories\Customer\CustomerRepositoryInterface;
 use App\Repositories\Transfer\TransferRepositoryInterface;
 use App\Repositories\PurchaseOrder\PurchaseOrderRepository;
 use App\Repositories\Complaint\ComplaintRepositoryInterface;
+use App\Repositories\CustomerLevelDiscount\CustomerLevelDiscountRepository;
+use App\Repositories\CustomerLevelDiscount\CustomerLevelDiscountRepositoryInterface;
 use App\Repositories\Inventory\InventoryRepositoryInterface;
 use App\Repositories\Department\DepartmentRepositoryInterface;
 use App\Repositories\Feature\FeatureRepository;
@@ -134,5 +138,7 @@ class RepositoryServiceProvider extends ServiceProvider
         $this->app->bind(MenuServiceDiscountRepositoryInterface::class,MenuServiceDiscountRepository::class);
         $this->app->bind(RoomDiscountRepositoryInterface::class,RoomDiscountRepository::class);
         $this->app->bind(PackageRepositoryInterface::class,PackageRepository::class);
+        $this->app->bind(BirthdayPromotionRepositoryInterface::class,BirthdayPromotionRepository::class);
+        $this->app->bind(CustomerLevelDiscountRepositoryInterface::class,CustomerLevelDiscountRepository::class);
     }
 }

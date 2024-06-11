@@ -18,6 +18,7 @@ use App\Http\Controllers\API\CommonController;
 use App\Http\Controllers\API\UomAPIController;
 use App\Http\Controllers\API\AccountController;
 use App\Http\Controllers\API\AccountPayableController;
+use App\Http\Controllers\API\BirthDayPromotionAPIController;
 use App\Http\Controllers\API\ItemAPIController;
 use App\Http\Controllers\API\MenuAPIController;
 use App\Http\Controllers\API\RoleAPIController;
@@ -35,6 +36,7 @@ use App\Http\Controllers\API\HeadAccountController;
 use App\Http\Controllers\API\TransactionController;
 use App\Http\Controllers\API\TransferAPIController;
 use App\Http\Controllers\API\ComplaintAPIController;
+use App\Http\Controllers\API\CustomerLevelDiscountAPIController;
 use App\Http\Controllers\API\InventoryAPIController;
 use App\Http\Controllers\API\NotificationController;
 use App\Http\Controllers\API\DepartmentAPIController;
@@ -301,6 +303,7 @@ Route::get('/get_uom_conversion_by_uom',[UomAPIController::class,'getUomConversi
 // Route::post('/transfers/{id}/confirms', [TransferAPIController::class, 'confirmTransfer']);
 
 Route::get('/customers', [CustomerAPIController::class, 'getCustomerData']);
+RoutE::get('/bd_customers',[CustomerAPIController::class,'upComingBdList']);
 Route::post('/customers', [CustomerAPIController::class, 'createCustomer']);
 Route::put('/customers/{id}', [CustomerAPIController::class, 'updateCustomer']);
 Route::delete('/customers/{id}', [CustomerAPIController::class, 'deleteCustomer']);
@@ -343,6 +346,22 @@ Route::post('/used_defected_items/{id}/confirm',[UsedDefectedAPIController::clas
 Route::get('get_inventory',[InventoryAPIController::class, 'getInventory']);
 // feature
 Route::get('/features',[FeatureAPIController::class,'getFeatureData']);
+
+Route::controller(BirthDayPromotionAPIController::class)->group(function ()
+{
+    Route::get('/birthday_promotions','getBirthdayPromotions');
+    Route::post('/birthday_promotions','createBDPromotion');
+    Route::post('/birthday_promotions/{id}','updateBDPromotion');
+    Route::delete('/birthday_promotions/{id}','deleteBDPromotion');
+});
+
+Route::controller(CustomerLevelDiscountAPIController::class)->group(function ()
+{
+    Route::get('/customer_level_discounts','getCustomerLevelDiscountData');
+    Route::post('/customer_level_discounts','createCustomerLevelDiscount');
+    Route::post('/customer_level_discounts/{id}','updateCustomerLevelDiscount');
+    Route::delete('/customer_level_discounts/{id}','deleteCustomerLevelDiscount');
+});
 
 
 Route::post('send_notification', [NotificationController::class, 'sendNotification']);

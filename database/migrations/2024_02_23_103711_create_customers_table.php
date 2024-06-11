@@ -14,11 +14,13 @@ return new class extends Migration
         Schema::create('customers', function (Blueprint $table) {
             $table->id();
             $table->foreignId('gender_id')->constrained()->onDelete('cascade');
+            $table->foreignId('township_id')->constrained()->onDelete('cascade');
             $table->string('name',45);
             $table->string('phone_number')->unique();
             $table->date('birthdate');
             $table->string('email')->unique()->nullable();
             $table->string('address');
+            $table->double('rentation')->default(0);
             $table->boolean('is_active')->default(1);
             $table->timestamps();
         });

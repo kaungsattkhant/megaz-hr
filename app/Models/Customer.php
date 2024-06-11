@@ -12,7 +12,7 @@ class Customer extends Model
     use HasFactory;
 
     protected $fillable=[
-        'gender_id','name','phone_number','birthdate','email','address','is_active',
+        'gender_id','name','phone_number','birthdate','email','address','is_active','township_id','rentation'
     ];
 
     public function gender()
