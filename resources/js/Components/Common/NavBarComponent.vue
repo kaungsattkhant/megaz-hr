@@ -159,6 +159,7 @@
                 // console.log(`listining notifications on ${channel} channel`);
                 window.Echo.channel(channel)
                 .listen(event,(response)=>{
+                    response = JSON.parse(response);
                     console.log(response);
                     let title = response.data.title;
                     let body = response.data.body;
