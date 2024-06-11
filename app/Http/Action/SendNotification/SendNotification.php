@@ -32,7 +32,8 @@ trait SendNotification
             // (new Notification())->toUserMultipleDevice($tokens,$data);
         // }
         if ($users->isNotEmpty()) {
-            broadcast(new EventsSendNotification($notification,$data['role_id']));
+            $role_id=$users->pluck('roles.*.id')->flatten()[0];
+            broadcast(new EventsSendNotification($notification,$role_id));
         }
     }
 

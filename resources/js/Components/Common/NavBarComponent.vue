@@ -159,14 +159,15 @@
                 // console.log(`listining notifications on ${channel} channel`);
                 window.Echo.channel(channel)
                 .listen(event,(response)=>{
+
                     console.log(response);
-                    let title = response.data.title;
-                    let body = response.data.body;
+                    let title = response.title;
+                    let body = response.body;
                     let notiOptions = { body: body };
                     new Notification(title, notiOptions);
                     this.$notify({
-                        title: response.data.title,
-                        text: response.data.body,
+                        title: title,
+                        text: body,
                         type: "info"
                     });
                     this.getNotifications();
