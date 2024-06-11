@@ -194,4 +194,6 @@ Route::middleware(['departments:room-discount'])->group(function () {
 });
 
 //test
-
+Route::view('/crm/customers', 'CRM.customers.index')->name('crm.customers.index');
+Route::view('/crm/customers/birthdays', 'CRM.customers.birthdays')->name('crm.customers.birthdays');
+Route::view('/crm/level_discounts', 'CRM.level_discounts.index')->name('crm.level_discounts.index');
