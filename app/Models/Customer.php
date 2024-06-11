@@ -19,4 +19,9 @@ class Customer extends Model
     {
         return $this->belongsTo(Gender::class);
     }
+
+    public function township()
+    {
+        return $this->belongsTo(Township::class);
+    }
 }
