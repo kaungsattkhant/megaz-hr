@@ -916,8 +916,10 @@
                 const response = await getApiData({ url: '/api/areas/'+ id +'/entities', token: this.getToken() });
                 if (response.data) {
                     this.roomList = response.data;
-                    this.selectedRoomId = response.data[0].id;
-                    this.getSelectedRoom();
+                    if(response.data[0]){
+                        this.selectedRoomId = response.data[0].id;
+                        this.getSelectedRoom();
+                    }
                     if(this.roomList[0]?.room_sessions.is_active == 1){
                         this.isOpenRoom.step_1 = false;
                         this.isOpenRoom.step_2 = false;
@@ -1116,7 +1118,6 @@
             },
             async addMenu()
             {
-                console.log('test add menu')
                 let formData = new FormData();
                 formData.append('invoice_id', this.invoiceId);
                 formData.append('menu_id', this.selectedMenu.id);
