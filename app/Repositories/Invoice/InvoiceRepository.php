@@ -351,7 +351,7 @@ class InvoiceRepository implements InvoiceRepositoryInterface
             }
             $latestRoomSession->update($data);
             $invoice = Invoice::find($data['invoice_id']);
-            $latestRoomSessions = RoomSession::where('invoice_id',$invoice->id)->with('entity')->get();
+            $latestRoomSessions = RoomSession::where('invoice_id', $invoice->id)->with('entity')->get();
 
             DB::commit();
             ResponseData($latestRoomSessions);
@@ -426,34 +426,32 @@ class InvoiceRepository implements InvoiceRepositoryInterface
                 $data['total'] = ($foodDrink + $total_session_price + $service_charge + $tax) - $orderDiscount;
                 $data['total_session_price'] = $total_session_price;
             }
-            if (isset($data['discount_type'])) {
-                if ($data['discount_type']) {
-                    if ($data['discount_type'] == 'fix_amount') {
-                        $data['discount_value'] = $data['discount_value'];
-                        $data['discount_type'] = 'fix_amount';
-                    } else if ($data['discount_type'] == 'percentage') {
-                        if ($data['discount_percentage'] < 0 || $data['discount_percentage'] > 100) {
-                            ResponseMessage('Discount percentage should be between 0 and 100');
-                        }
-                        $data['discount_value'] = ($data['food_charge'] + $total_session_price) * ($data['discount_percentage'] / 100);
-                        $data['discount_type'] = 'percentage';
-                    } else if ($data['discount_type'] == 'room_discount') {
-                        if ($invoice->invoice_type == 'package') {
-                            ResponseMessage('Room with packages can not have discount', 402);
-                        } else {
-                            $roomDiscount = RoomDiscount::find($data['room_discount_id']);
-                            if (!$roomDiscount->rooms->contains($entity->id)) {
-                                ResponseMessage('Selected discount cannot be applied', 422);
-                            }
 
-                            if ($roomDiscount->session <= $lastRoomwithInvoice->session_duration) {
-                                $room_discount_value = $total_session_price - $data['room_discount_amount'];
-                                $total_session_price = $data['room_discount_amount'];
-                                $lastRoomwithInvoice->discount_session = $data['discount_session'];
-                                $lastRoomwithInvoice->save();
-                            } else {
-                                ResponseMessage('Discount cannot be applied', 422);
-                            }
+            if (isset($data['discount_type'])) {
+                if ($data['discount_type'] == 'fix_amount') {
+                    $data['discount_type'] = 'fix_amount';
+                } else if ($data['discount_type'] == 'percentage') {
+                    if ($data['discount_percentage'] < 0 || $data['discount_percentage'] > 100) {
+                        ResponseMessage('Discount percentage should be between 0 and 100');
+                    }
+                    $data['discount_value'] = ($data['total']) * ($data['discount_percentage'] / 100);
+                    $data['discount_type'] = 'percentage';
+                } else if ($data['discount_type'] == 'room_discount') {
+                    if ($invoice->invoice_type == 'package') {
+                        ResponseMessage('Room with packages can not have discount', 402);
+                    } else {
+                        $roomDiscount = RoomDiscount::find($data['room_discount_id']);
+                        if (!$roomDiscount->rooms->contains($entity->id)) {
+                            ResponseMessage('Selected discount cannot be applied', 422);
+                        }
+
+                        if ($roomDiscount->session <= $lastRoomwithInvoice->session_duration) {
+                            $room_discount_value = $total_session_price - $data['room_discount_amount'];
+                            $total_session_price = $data['room_discount_amount'];
+                            $lastRoomwithInvoice->discount_session = $data['discount_session'];
+                            $lastRoomwithInvoice->save();
+                        } else {
+                            ResponseMessage('Discount cannot be applied', 422);
                         }
                     }
                 }
