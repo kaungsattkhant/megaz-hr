@@ -49,6 +49,34 @@
                             <input type="date" placeholder="2000-02-02" v-model="date"
                                 class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
                         </div>
+
+                        <div class=" mb-4">
+                                <label for="" class="text-sm text-black mb-2 block">
+                                    Division
+                                </label>
+                                <select class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0"
+                                    v-model="selectedDivision"
+                                    @change="divisionSelectChanged" >
+                                    <option class="text-sm" :value="division" v-for="(division,divisionIndex) in divisionList" :key="divisionIndex">
+                                        {{ division.name }}
+                                    </option>
+
+                                </select>
+                        </div>
+
+                        <div class=" mb-4">
+                                <label for="" class="text-sm text-black mb-2 block">
+                                    Township
+                                </label>
+                                <select class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0"
+                                    v-model="selectedTownship"
+                                    @change="townshipSelectChanged" >
+                                    <option class="text-sm" :value="township" v-for="(township,index) in townshipList" :key="index">
+                                        {{ township.name }}
+                                    </option>
+
+                                </select>
+                        </div>
                         <div class="mb-4">
                             <label for="" class="block text-sm text-black mb-3">
                                 Address
@@ -93,6 +121,10 @@ import { Modal, Ripple, Select, Datepicker, initTE, Input } from "tw-elements";
                 address:null,
                 selectedGender:null,
                 deleteId: null,
+                selectedDivision:null,
+                divisionList:null,
+                selectedTownship:null,
+                townshipList:null,
 
             };
         },
@@ -106,7 +138,22 @@ import { Modal, Ripple, Select, Datepicker, initTE, Input } from "tw-elements";
                     this.genderList = response.data;
                 }
             },
-
+            async getDivisionList(){
+                const response = await getApiData( { url: '/api/divisions', token: this.getToken() } );
+                if(response.data){
+                    this.divisionList = response.data;
+                }
+            },
+            divisionSelectChanged(){
+                this.getTownShipList();
+            },
+            async getTownShipList(){
+                this.townshipList = this.divisionList.find(x => x.id === this.selectedDivision.id).townships;
+                // const response = await getApiData( { url: '/api', token: this.getToken() } );
+                // if(response.data){
+                //     this.townshipList = response.data;
+                // }
+            },
             createCustomerBtnClicked(){
                 this.createCustomer();
             },
@@ -120,6 +167,7 @@ import { Modal, Ripple, Select, Datepicker, initTE, Input } from "tw-elements";
                 formData.append('phone_number', this.ph_number);
                 formData.append('address', this.address);
                 formData.append('birthdate', this.date);
+                formData.append('township_id', this.selectedTownship.id);
                 let response = await postApiData({url: '/api/customers', form_data: formData, token: this.getToken()});
                 console.log(this.selectedGender+','+this.name+','+this.email+','+this.ph_number+','+this.address+','+this.date)
                 if(response.success){
@@ -132,7 +180,8 @@ import { Modal, Ripple, Select, Datepicker, initTE, Input } from "tw-elements";
             },
         },
         mounted()
-        {
+        {   
+            this.getDivisionList();
             this.getGendersList();
             initTE({ Modal, Select, Ripple, Datepicker });
         }

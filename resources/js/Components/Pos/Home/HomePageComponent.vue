@@ -214,13 +214,13 @@
                         <div class=" text-right pr-3 mb-3">
                             <p class="">
                                 Total
-                                <!-- {{
-                                (selectedRoom.room_sessions[0].length > 0  ?
+                                {{
+                                (selectedRoom ?
                                     (purchaseMenuList.length > 0 ?
                                         (
                                             (selectedRoom.room_sessions[0].invoice.total_session_price ? selectedRoom.room_sessions[0].invoice.total_session_price : 0)
                                              +
-                                            (purchaseMenuList[0].length > 0 ? purchaseMenuList[0].total : 0 )
+                                            (purchaseMenuList.length > 0 ? purchaseMenuList[0].total : 'a' )
                                         ).toLocaleString()
                                         :
                                         (
@@ -230,8 +230,8 @@
                                 : 0
                                 )
 
-                                }} -->
-                                {{ printInvoiceData.room + printInvoiceData.food }}
+                                }}
+                                <!-- {{ printInvoiceData.room + printInvoiceData.food }} -->
                                 MMKs
 
                                 <!-- <span v-if="purchaseMenuList.length > 1" >
@@ -291,11 +291,29 @@
                                 </div>
                             </div>
                             <div class="mb-4" v-show="discount_type != 'room_discount'">
+                                <!-- <div v-show="discount_type == 'fix_amount'">
+                                    <label for="" class="block text-sm text-black mb-3">
+                                        Discount
+                                    </label>
+                                    <input type="number" placeholder="Discount" v-model="printInvoiceData.discount"
+                                        class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
+                                 </div>
+                                <div v-show="discount_type == 'percentage'">
+                                    <label for="" class="block text-sm text-black mb-3">
+                                        Discount
+                                    </label>
+                                    <input type="number" placeholder="Percentage" v-model="printInvoiceData.discount"
+                                        min="0" max="100"
+                                        class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
+                                </div> -->
+
                                 <label for="" class="block text-sm text-black mb-3">
                                     Discount
                                 </label>
-                                <input type="number" placeholder="Discount" v-model="printInvoiceData.discount"
+                                <input type="number" placeholder="Discount" v-model="printInvoiceData.discount" @input="discountChanged"
                                     class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
+                                
+                                
                             </div>
                             <!-- <div class="mb-4">
                                 <label for="" class="block text-sm text-black mb-3">
@@ -400,7 +418,7 @@
                                 Discount
                             </p>
                             <p class=" w-28">
-                                {{ printInvoiceData.discount }} MMKs
+                                {{ printInvoiceData.discount }} {{ this.discount_type == 'percentage' ? '%' : 'MMKs' }}
                             </p>
                         </div>
                         <div class=" text-right pr-3 mb-3">
@@ -748,6 +766,33 @@
                             <input type="date" placeholder="Birthdate" v-model="date"
                                 class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
                         </div>
+                        <div class=" mb-4">
+                            <label for="" class="text-sm text-black mb-2 block">
+                                Division
+                            </label>
+                            <select class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0"
+                                v-model="selectedDivision"
+                                @change="divisionSelectChanged" >
+                                <option class="text-sm" :value="division" v-for="(division,divisionIndex) in divisionList" :key="divisionIndex">
+                                    {{ division.name }}
+                                </option>
+
+                            </select>
+                        </div>
+
+                        <div class=" mb-4">
+                            <label for="" class="text-sm text-black mb-2 block">
+                                Township
+                            </label>
+                            <select class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0"
+                                v-model="selectedTownship"
+                                @change="townshipSelectChanged" >
+                                <option class="text-sm" :value="township" v-for="(township,index) in townshipList" :key="index">
+                                    {{ township.name }}
+                                </option>
+
+                            </select>
+                        </div>
                         <div class="mb-4">
                             <label for="" class="block text-sm text-black mb-3">
                                 Address
@@ -798,6 +843,10 @@
                 genderList: [],
                 date:null,
                 duration:null,
+                selectedDivision:null,
+                divisionList:null,
+                selectedTownship:null,
+                townshipList:null,
                 address:null,
                 selectedGender:null,
                 customerList:null,
@@ -877,8 +926,10 @@
                 const response = await getApiData({ url: '/api/areas/' + firstAreaId + '/entities', token: this.getToken() });
                 if (response.data) {
                     this.roomList = response.data;
-                    this.selectedRoomId = response.data[0].id
-                    this.getSelectedRoom();
+                    if(response.data[0]){
+                        this.selectedRoomId = response.data[0].id
+                        this.getSelectedRoom();
+                    }
                     if (this.roomList[0]?.room_sessions.length > 0) {
                         this.isOpenRoom.step_1 = false;
                         this.isOpenRoom.step_2 = false;
@@ -896,8 +947,10 @@
                 const response = await getApiData({ url: '/api/areas/'+ id +'/entities', token: this.getToken() });
                 if (response.data) {
                     this.roomList = response.data;
-                    this.selectedRoomId = response.data[0].id;
-                    this.getSelectedRoom();
+                    if(response.data[0]){
+                        this.selectedRoomId = response.data[0].id;
+                        this.getSelectedRoom();
+                    }
                     if(this.roomList[0]?.room_sessions.is_active == 1){
                         this.isOpenRoom.step_1 = false;
                         this.isOpenRoom.step_2 = false;
@@ -968,7 +1021,7 @@
 
                 this.selectedRoomId = room.id;
                 this.selectedRoomIndex = index;
-                this.getSelectedRoom();
+                await this.getSelectedRoom();
                 if(this.roomList[index].is_active == 1){
                     this.isOpenRoom.step_1 = false;
                     this.isOpenRoom.step_2 = false;
@@ -983,7 +1036,7 @@
                     this.isOpenRoom.step_invoice = false;
                     this.isOpenRoom.step_detail = false;
                     this.getPurchaseMenuList();
-                };
+                };  
             },
             async getSelectedRoom(){
                 const response = await getApiData({ url: '/api/entities/' + this.selectedRoomId, token: this.getToken() });
@@ -998,6 +1051,19 @@
                 this.isOpenRoom.step_invoice=false;
                 this.clearOpenRoomForm();
 
+            },
+
+            async getDivisionList(){
+                const response = await getApiData( { url: '/api/divisions', token: this.getToken() } );
+                if(response.data){
+                    this.divisionList = response.data;
+                }
+            },
+            divisionSelectChanged(){
+                this.getTownShipList();
+            },
+            async getTownShipList(){
+                this.townshipList = this.divisionList.find(x => x.id === this.selectedDivision.id).townships;
             },
 
             createCustomerBtnClicked(){
@@ -1016,13 +1082,13 @@
                 formData.append('phone_number', this.ph_number);
                 formData.append('address', this.address);
                 formData.append('birthdate', this.date);
+                formData.append('township_id', this.selectedTownship.id);
                 let response = await postApiData({url: '/api/customers', form_data: formData, token: this.getToken()});
                 console.log(this.selectedGender+','+this.name+','+this.email+','+this.ph_number+','+this.address+','+this.date)
                 if(response.success){
                     this.customerList.push(response.data);
                     this.selectedCustomer = response.data;
-                    // this.getRoomList(null);
-                    console.log("success")
+                    console.log("success customer")
                     this.closeCustomerModal();
                     this.clearCustomerForm();
                 }
@@ -1096,7 +1162,6 @@
             },
             async addMenu()
             {
-                console.log('test add menu')
                 let formData = new FormData();
                 formData.append('invoice_id', this.invoiceId);
                 formData.append('menu_id', this.selectedMenu.id);
@@ -1176,6 +1241,8 @@
                 this.isOpenRoom.step_detail = true;
                 this.isOpenRoom.step_invoice = false;
             },
+
+            
             btnClickedDoneSession(){
                 this.doneSession();
 
@@ -1305,6 +1372,16 @@
 
                 this.printInvoiceData.total = this.printInvoiceData.room + this.printInvoiceData.food;
             },
+            discountChanged(){
+                if(this.discount_type == 'percentage'){
+                    this.printInvoiceData.total = (this.printInvoiceData.room + this.printInvoiceData.food) - (this.printInvoiceData.room + this.printInvoiceData.food) * (this.printInvoiceData.discount / 100 ) ;
+                }
+                else{
+                    this.printInvoiceData.total = (this.printInvoiceData.room + this.printInvoiceData.food) - this.printInvoiceData.discount;
+                }
+                
+                
+            },
 
             btnClickedEndRoom(){
                 this.EndRoom();
@@ -1433,14 +1510,9 @@
         {
             this.getAreaList();
             this.getGendersList();
-            // this.getRoomList();
+            this.getDivisionList();
             this.getCustomerList();
             this.getMenuList();
-            // this.getChangeableRoomList();
-            // this.getSelectedRoom();
-            // this.initialSidebarShow();
-
-            // this.initialGetRoomList();
             this.getPackageList();
             initTE({ Modal, Select, Ripple, Tab });
 
