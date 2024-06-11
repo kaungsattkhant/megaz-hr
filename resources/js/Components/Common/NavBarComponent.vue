@@ -184,7 +184,7 @@
         mounted(){
             initTE({ Dropdown, Modal, Select, Ripple });
 
-            let channelName = `send-notification.${this.getDepartment().id}`;
+            let channelName = `send-notification.${this.getRoles()[0].id}`;
             let eventName = `SendNotification`;
 
             this.listenBroadCastNotifications(channelName, eventName);
