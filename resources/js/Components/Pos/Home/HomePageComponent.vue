@@ -766,6 +766,33 @@
                             <input type="date" placeholder="Birthdate" v-model="date"
                                 class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
                         </div>
+                        <div class=" mb-4">
+                            <label for="" class="text-sm text-black mb-2 block">
+                                Division
+                            </label>
+                            <select class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0"
+                                v-model="selectedDivision"
+                                @change="divisionSelectChanged" >
+                                <option class="text-sm" :value="division" v-for="(division,divisionIndex) in divisionList" :key="divisionIndex">
+                                    {{ division.name }}
+                                </option>
+
+                            </select>
+                        </div>
+
+                        <div class=" mb-4">
+                            <label for="" class="text-sm text-black mb-2 block">
+                                Township
+                            </label>
+                            <select class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0"
+                                v-model="selectedTownship"
+                                @change="townshipSelectChanged" >
+                                <option class="text-sm" :value="township" v-for="(township,index) in townshipList" :key="index">
+                                    {{ township.name }}
+                                </option>
+
+                            </select>
+                        </div>
                         <div class="mb-4">
                             <label for="" class="block text-sm text-black mb-3">
                                 Address
@@ -816,6 +843,10 @@
                 genderList: [],
                 date:null,
                 duration:null,
+                selectedDivision:null,
+                divisionList:null,
+                selectedTownship:null,
+                townshipList:null,
                 address:null,
                 selectedGender:null,
                 customerList:null,
@@ -1022,6 +1053,19 @@
 
             },
 
+            async getDivisionList(){
+                const response = await getApiData( { url: '/api/divisions', token: this.getToken() } );
+                if(response.data){
+                    this.divisionList = response.data;
+                }
+            },
+            divisionSelectChanged(){
+                this.getTownShipList();
+            },
+            async getTownShipList(){
+                this.townshipList = this.divisionList.find(x => x.id === this.selectedDivision.id).townships;
+            },
+
             createCustomerBtnClicked(){
                 this.createCustomer();
             },
@@ -1038,13 +1082,13 @@
                 formData.append('phone_number', this.ph_number);
                 formData.append('address', this.address);
                 formData.append('birthdate', this.date);
+                formData.append('township_id', this.selectedTownship.id);
                 let response = await postApiData({url: '/api/customers', form_data: formData, token: this.getToken()});
                 console.log(this.selectedGender+','+this.name+','+this.email+','+this.ph_number+','+this.address+','+this.date)
                 if(response.success){
                     this.customerList.push(response.data);
                     this.selectedCustomer = response.data;
-                    // this.getRoomList(null);
-                    console.log("success")
+                    console.log("success customer")
                     this.closeCustomerModal();
                     this.clearCustomerForm();
                 }
@@ -1466,14 +1510,9 @@
         {
             this.getAreaList();
             this.getGendersList();
-            // this.getRoomList();
+            this.getDivisionList();
             this.getCustomerList();
             this.getMenuList();
-            // this.getChangeableRoomList();
-            // this.getSelectedRoom();
-            // this.initialSidebarShow();
-
-            // this.initialGetRoomList();
             this.getPackageList();
             initTE({ Modal, Select, Ripple, Tab });
 

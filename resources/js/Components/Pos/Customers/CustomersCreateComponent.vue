@@ -57,7 +57,6 @@
                                 <select class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0"
                                     v-model="selectedDivision"
                                     @change="divisionSelectChanged" >
-                                    <!-- <option value="" hidden selected></option> -->
                                     <option class="text-sm" :value="division" v-for="(division,divisionIndex) in divisionList" :key="divisionIndex">
                                         {{ division.name }}
                                     </option>
@@ -72,7 +71,6 @@
                                 <select class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0"
                                     v-model="selectedTownship"
                                     @change="townshipSelectChanged" >
-                                    <!-- <option value="" hidden selected></option> -->
                                     <option class="text-sm" :value="township" v-for="(township,index) in townshipList" :key="index">
                                         {{ township.name }}
                                     </option>
