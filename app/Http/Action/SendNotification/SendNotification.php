@@ -9,7 +9,6 @@ use App\Events\SendNotification as EventsSendNotification;
 trait SendNotification
 {
     public function send($model,$users,$data){
-        $role_id=1;#test
         $morphMapName=RelationMorphName($model);
         $user_ids=$users->pluck('id');
         $tokens=$this->getTokensByStaff($user_ids);
@@ -32,8 +31,8 @@ trait SendNotification
             // $data['notificationable_id']=$notification->notificationable_id;
             // (new Notification())->toUserMultipleDevice($tokens,$data);
         // }
-        if (count($tokens) > 0) {
-            broadcast(new EventsSendNotification($notification,$role_id));
+        if ($users->isNotEmpty()) {
+            broadcast(new EventsSendNotification($notification,$data['role_id']));
         }
     }
 
@@ -44,7 +43,7 @@ trait SendNotification
         // $staffs=Staff::whereHas('roles',function(query)use($roles){
         //     $query->whereIn('id',$roles);
         // })->get();
-        return \App\Models\Staff::whereHas('roles', function($query) use ($roles) {
+        return \App\Models\Staff::with(['roles'])->whereHas('roles', function($query) use ($roles) {
             $query->whereIn('name', $roles);
         })
         ->whereHas('department',function($query)use($department_name){

@@ -148,9 +148,14 @@ class PurchaseOrderRepository implements PurchaseOrderRepositoryInterface
                     'body' => 'New Purchase Order',
                 ];
                 #send old notificaiton 
-                // $this->send($po, $users, $data);
                 #end
-
+                if($users->isNotEmpty()){
+                    $role_id=$users->pluck('roles.*.id')->flatten()[0];
+                    // $department_id=$users[0]->department_id;
+                    // dd($role_id.$department_id);
+                    $data['role_id']=$role_id;
+                    $this->send($po, $users, $data);
+                }
             }
             DB::commit();
             return $po;

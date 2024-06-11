@@ -178,7 +178,7 @@
         mounted(){
             initTE({ Dropdown, Modal, Select, Ripple });
 
-            window.Echo.channel('send-notification.' + 1)
+            window.Echo.channel('send-notification.' + 3)
             .listen('SendNotification',(response)=>{
                 console.log(response);
             });
