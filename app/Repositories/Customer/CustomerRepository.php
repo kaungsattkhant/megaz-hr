@@ -73,4 +73,13 @@ class CustomerRepository implements CustomerRepositoryInterface
         }
         return false;
     }
+
+    public function listOfCustomer($request){
+        $customers = DB::table('invoices')
+        ->join('customers', 'invoices.customer_id', '=', 'customers.id')
+        ->select('customers.id','customers.name','customers.id as customer_id', 'customers.phone_number', 'customers.birthdate', 'customers.email', 'customers.address', DB::raw('SUM(invoices.total) as total_amount'))
+        ->groupBy('customers.id','customers.name', 'customers.phone_number', 'customers.birthdate', 'customers.email', 'customers.address')
+        ->paginate();
+        return $customers;
+    }
 }

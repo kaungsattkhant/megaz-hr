@@ -45,4 +45,9 @@ class CustomerAPIController extends Controller
             ResponseMessage('Customer not found or some error occur');
         }
     }
+
+    public function listOfCustomer(Request $request){
+        $customers = $this->customerRepo->listOfCustomer($request);
+        ResponseData($customers);
+    }
 }
