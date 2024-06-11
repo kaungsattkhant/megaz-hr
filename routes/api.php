@@ -1,5 +1,7 @@
 <?php
 
+use App\Models\Division;
+use App\Models\Township;
 use App\Models\Gender;
 use App\Models\AreaType;
 use App\Models\Category;
@@ -81,6 +83,10 @@ Route::get('/area_types', function () {
 
 Route::get('/menu_categories', function () {
     ResponseData(MenuCategory::where('is_active', 1)->get());
+});
+
+Route::get('/divisions', function () {
+    ResponseData(Division::with('townships')->get());
 });
 
 Route::post('/login', [AuthController::class, 'login']);
@@ -337,3 +343,6 @@ Route::post('/used_defected_items/{id}/confirm',[UsedDefectedAPIController::clas
 Route::get('get_inventory',[InventoryAPIController::class, 'getInventory']);
 // feature
 Route::get('/features',[FeatureAPIController::class,'getFeatureData']);
+
+
+Route::post('send_notification', [NotificationController::class, 'sendNotification']);

@@ -7,6 +7,8 @@ use Illuminate\Database\Seeder;
 
 use Database\Seeders\ComplaintCategorySeeder;
 use Database\Seeders\DepartmentSeeder;
+use Database\Seeders\DivisionSeeder;
+use Database\Seeders\TownshipSeeder;
 use Database\Seeders\FeatureSeeder;
 use Database\Seeders\InventorySeeder;
 use Database\Seeders\GenderSeeder;
@@ -27,6 +29,8 @@ class DatabaseSeeder extends Seeder
         // (new StaffSeeder())->run();
         // (new ServiceCategorySeeder())->run();
         $this->call([
+            DivisionSeeder::class,
+            TownshipSeeder::class,
             AreaSeeder::class,
             ComplaintCategorySeeder::class,
             // InventorySeeder::class,

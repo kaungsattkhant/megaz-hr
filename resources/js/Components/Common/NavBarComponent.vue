@@ -155,11 +155,22 @@
                 }
             },
 
-            listenBroadCastNotifications(){
-                console.log(`listining notifications on send-notification channel`);
-                Echo.private('send-notification.' + 1)
-                .notification((notification) => {
-                    console.log(notification.type);
+            listenBroadCastNotifications(channel, event){
+                // console.log(`listining notifications on ${channel} channel`);
+                window.Echo.channel(channel)
+                .listen(event,(response)=>{
+                    // response = JSON.parse(response);
+                    console.log(response);
+                    let title = response.title;
+                    let body = response.body;
+                    let notiOptions = { body: body };
+                    new Notification(title, notiOptions);
+                    this.$notify({
+                        title: title,
+                        text: body,
+                        type: "info"
+                    });
+                    this.getNotifications();
                 });
             },
         },
@@ -169,11 +180,24 @@
             this.department = this.getDepartment();
             this.requestPermission();
             this.getNotifications();
-            this.intervalId = setInterval(this.listenBroadCastNotifications, 1000);
         },
 
         mounted(){
             initTE({ Dropdown, Modal, Select, Ripple });
+
+            let channelName = `send-notification.${this.getRoles()[0].id}`;
+            let eventName = `SendNotification`;
+
+            this.listenBroadCastNotifications(channelName, eventName);
+
+            // window.Echo.channel('send-notification.' + 1)
+            // .listen('SendNotification',(response)=>{
+            //     console.log(response);
+            // });
+            // .notification((notification) => {
+            //     console.log(notification.type);
+            // });
+
         },
 
         beforeDestroy() {

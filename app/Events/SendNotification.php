@@ -18,15 +18,19 @@ class SendNotification implements ShouldBroadcast
     /**
      * Create a new event instance.
      */
-    private $role_id;
-    private $date;
-    private $title;
-    private $body;
+    public $role_id;
+    public $date;
+    public $title;
+    public $body;
 
     public function __construct(Notification $notification,$role_id)
     {
         //
         $this->role_id=$role_id;
+        $this->date=$notification->date;
+        $this->title=$notification->title;
+        $this->body=$notification->body;
+
     }
 
     /**
@@ -37,7 +41,15 @@ class SendNotification implements ShouldBroadcast
     public function broadcastOn(): array
     {
         return [
-            new PrivateChannel("send-notification.{$this->role_id}"),
+            new Channel("send-notification.{$this->role_id}"),
+        ];
+    }
+    public function broadcastWith()
+    {
+        return [
+            'date' => $this->date,
+            'title' => $this->title,
+            'body' => $this->body,
         ];
     }
 }
