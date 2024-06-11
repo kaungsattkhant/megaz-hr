@@ -156,11 +156,14 @@
             },
 
             listenBroadCastNotifications(){
-                console.log(`listining notifications on send-notification channel`);
-                Echo.private('send-notification.' + 1)
-                .notification((notification) => {
-                    console.log(notification.type);
-                });
+                // console.log(`listining notifications on send-notification channel`);
+                // window.Echo.channel('send-notification.' + 1)
+                // .listen('SendNotification',(response)=>{
+                //     console.log(response);
+                // });
+                // .notification((notification) => {
+                //     console.log('hello');
+                // });
             },
         },
 
@@ -174,6 +177,15 @@
 
         mounted(){
             initTE({ Dropdown, Modal, Select, Ripple });
+
+            window.Echo.channel('send-notification.' + 1)
+            .listen('SendNotification',(response)=>{
+                console.log(response);
+            });
+            // .notification((notification) => {
+            //     console.log(notification.type);
+            // });
+
         },
 
         beforeDestroy() {

@@ -26,13 +26,15 @@ trait SendNotification
                 'staff_id'=>$user_id,
             ]);
         }
-        if (count($tokens) > 0) {
-            $data['notification_id']=$notification->id;
-            $data['notificationable_type']=$notification->notificationable_type;
-            $data['notificationable_id']=$notification->notificationable_id;
+        // if (count($tokens) > 0) {
+            // $data['notification_id']=$notification->id;
+            // $data['notificationable_type']=$notification->notificationable_type;
+            // $data['notificationable_id']=$notification->notificationable_id;
             // (new Notification())->toUserMultipleDevice($tokens,$data);
+        // }
+        if (count($tokens) > 0) {
+            broadcast(new EventsSendNotification($notification,$role_id));
         }
-        broadcast(new EventsSendNotification($notification,$role_id));
     }
 
     public function getTokensByStaff($user_ids){

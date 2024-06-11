@@ -5,6 +5,7 @@ namespace App\Http\Controllers\API;
 use App\Http\Controllers\Controller;
 use App\Repositories\Notification\NotificationInterface;
 use Illuminate\Http\Request;
+use App\Events\SendNotification as EventsSendNotification;
 
 class NotificationController extends Controller
 {
@@ -49,5 +50,15 @@ class NotificationController extends Controller
         else{
             ResponseMessage('Not ok', 400);
         }
+    }
+
+    public function sendNotification(Request $request){
+
+        $notification=\App\Models\Notification::find(1);
+        $role_id=1;
+        broadcast(new EventsSendNotification($notification,$role_id));
+        return $notification;
+        // $this->send($po, $users, $data);
+
     }
 }
