@@ -428,9 +428,7 @@ class InvoiceRepository implements InvoiceRepositoryInterface
             }
 
             if (isset($data['discount_type'])) {
-                if ($data['discount_type'] == 'fix_amount') {
-                    $data['discount_type'] = 'fix_amount';
-                } else if ($data['discount_type'] == 'percentage') {
+                if ($data['discount_type'] == 'percentage') {
                     if ($data['discount_percentage'] < 0 || $data['discount_percentage'] > 100) {
                         ResponseMessage('Discount percentage should be between 0 and 100');
                     }
