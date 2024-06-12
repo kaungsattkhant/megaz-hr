@@ -1,7 +1,7 @@
 <template>
     <div>
         <p class=" text-lg font-semibold font-inter">
-            Customer Level Discounts
+            Birthday Promotions
         </p>
     </div>
     <div class="mt-4 bg-white">
@@ -36,10 +36,7 @@
                                     Name
                                 </th>
                                 <th scope="col" class="">
-                                    Amount
-                                </th>
-                                <th scope="col" class="">
-                                    Promotion Value
+                                    Discount Value
                                 </th>
                                 <th scope="col" class="">
 
@@ -57,10 +54,7 @@
                                         {{ discount.name }}
                                     </td>
                                     <td class="whitespace-nowrap  ">
-                                        {{ discount.amount }}
-                                    </td>
-                                    <td class="whitespace-nowrap  ">
-                                        {{ discount.promotion_value }}
+                                        {{ discount.discount_value }}
                                     </td>
                                     <td class="whitespace-nowrap  ">
                                         <button class="pr-2 " @click="editBtnClicked(discount.id)"
@@ -152,7 +146,7 @@
                     <!--Modal title-->
                     <h5 class="text-base text-center mt-2 font-semibold leading-normal font-inter"
                         id="create_modalLabel">
-                        Create Customer Level Discount
+                        Create Birthday Promotion
                     </h5>
                     <!--Close button-->
                     <button type="button" class="text-xs focus:shadow-none focus:outline-none" data-te-modal-dismiss
@@ -170,21 +164,14 @@
                         <label for="" class="label-form mb-3">
                             Name
                         </label>
-                        <input type="text" placeholder="Level Name" v-model="name" class="input-ui">
+                        <input type="text" placeholder="Promotion Name" v-model="name" class="input-ui">
                     </div>
 
                     <div class="mb-4">
                         <label for="" class="label-form mb-3">
-                            Amount
+                            Discount Value
                         </label>
-                        <input type="number" placeholder="Discount Amount" v-model="amount" class="input-ui">
-                    </div>
-
-                    <div class="mb-4">
-                        <label for="" class="label-form mb-3">
-                            Promotion Value
-                        </label>
-                        <input type="number" placeholder="Promotion Value" v-model="promotionValue" class="input-ui">
+                        <input type="number" placeholder="Discount Value" v-model="discountValue" class="input-ui">
                     </div>
                 </div>
 
@@ -265,7 +252,7 @@
                     <!--Modal title-->
                     <h5 class="text-base text-center mt-2 font-semibold leading-normal font-inter"
                         id="create_modalLabel">
-                        Edit Customer Level Discount
+                        Edit Birthday Promotion
                     </h5>
                     <!--Close button-->
                     <button type="button" class="text-xs focus:shadow-none focus:outline-none" data-te-modal-dismiss
@@ -283,21 +270,14 @@
                         <label for="" class="label-form mb-3">
                             Name
                         </label>
-                        <input type="text" placeholder="Level Name" v-model="name" class="input-ui">
+                        <input type="text" placeholder="Promotion Name" v-model="name" class="input-ui">
                     </div>
 
                     <div class="mb-4">
                         <label for="" class="label-form mb-3">
-                            Amount
+                            Discount Value
                         </label>
-                        <input type="number" placeholder="Discount Amount" v-model="amount" class="input-ui">
-                    </div>
-
-                    <div class="mb-4">
-                        <label for="" class="label-form mb-3">
-                            Promotion Value
-                        </label>
-                        <input type="number" placeholder="Promotion Value" v-model="promotionValue" class="input-ui">
+                        <input type="number" placeholder="Discount Value" v-model="discountValue" class="input-ui">
                     </div>
                 </div>
 
@@ -329,7 +309,7 @@ export default {
 
             name: null,
             amount: null,
-            promotionValue: null,
+            discountValue: null,
 
             deleteId: null,
 
@@ -360,7 +340,7 @@ export default {
             if (pageNumber) {
                 this.currentPage = pageNumber;
             }
-            let url = `/api/customer_level_discounts?page=${this.currentPage}`;
+            let url = `/api/birthday_promotions?page=${this.currentPage}`;
             let response = await getApiData({ url: url, token: this.getToken() });
             if (response.data) {
                 this.discountList = response.data.data;
@@ -393,34 +373,30 @@ export default {
                 this.alertValiationMessage(`name`);
                 return 1;
             }
-            if (!this.amount) {
-                this.alertValiationMessage(`discount amount`);
-                return 1;
-            }
-            if (!this.promotionValue) {
-                this.alertValiationMessage(`promotion value`);
+            if (!this.discountValue) {
+                this.alertValiationMessage(`Discount Value`);
                 return 1;
             }
             let formData = new FormData();
             formData.append('name', this.name);
-            formData.append('amount', this.amount);
-            formData.append('promotion_value', this.promotionValue);
-            let url = `/api/customer_level_discounts`;
+
+            formData.append('discount_value', this.discountValue);
+            let url = `/api/birthday_promotions`;
             let response = await postApiData({ url: url, form_data: formData, token: this.getToken() });
             if (response.success) {
                 this.$notify({
-                    text: `Create customer level discount success`,
+                    text: `Create Birthday Promotion success`,
                     type: "info"
                 });
                 this.name = null;
                 this.amount = null;
-                this.promotionValue = null;
+                this.discountValue = null;
 
                 this.getDiscountList(this.currentPage);
             }
             else {
                 this.$notify({
-                    text: `Create customer level discount error`,
+                    text: `Create Birthday Promotion error`,
                     type: "error"
                 });
             }
@@ -434,7 +410,7 @@ export default {
                 editDiscount = this.discountList[index];
                 this.name = editDiscount.name;
                 this.amount = editDiscount.amount;
-                this.promotionValue = editDiscount.promotion_value;
+                this.discountValue = editDiscount.discount_value;
             }
         },
 
@@ -443,35 +419,31 @@ export default {
                 this.alertValiationMessage(`name`);
                 return 1;
             }
-            if (!this.amount) {
-                this.alertValiationMessage(`discount amount`);
-                return 1;
-            }
-            if (!this.promotionValue) {
-                this.alertValiationMessage(`promotion value`);
+            if (!this.discountValue) {
+                this.alertValiationMessage(`Discount Value`);
                 return 1;
             }
             let formData = new FormData();
             formData.append('name', this.name);
-            formData.append('amount', this.amount);
-            formData.append('promotion_value', this.promotionValue);
-            let url = `/api/customer_level_discounts/${this.editId}`;
+
+            formData.append('discount_value', this.discountValue);
+            let url = `/api/birthday_promotions/${this.editId}`;
             let response = await postApiData({ url: url, form_data: formData, token: this.getToken() });
             if (response.success) {
                 this.$notify({
-                    text: `Customer level discount edit success`,
+                    text: `Birthday Promotion edit success`,
                     type: "info"
                 });
                 this.name = null;
                 this.amount = null;
-                this.promotionValue = null;
+                this.discountValue = null;
                 this.editId = null;
 
                 this.getDiscountList(this.currentPage);
             }
             else {
                 this.$notify({
-                    text: `Customer level discount edit error`,
+                    text: `Birthday Promotion edit error`,
                     type: "error"
                 });
             }
@@ -482,12 +454,12 @@ export default {
         },
 
         async confirmDeleteBtnClicked(){
-            let url = `/api/customer_level_discounts/${this.deleteId}`;
+            let url = `/api/birthday_promotions/${this.deleteId}`;
             let index = this.discountList.findIndex(discount => discount.id == this.deleteId);
             let response = await deleteApiData({url: url, token: this.getToken()});
             if(response.success){
                 this.$notify({
-                    text: `Customer level discount deleted`,
+                    text: `Birthday Promotion deleted`,
                     type: "info"
                 });
                 if(index != -1){
@@ -496,7 +468,7 @@ export default {
             }
             else{
                 this.$notify({
-                    text: `Customer level discount delete failed`,
+                    text: `Birthday Promotion delete failed`,
                     type: "error"
                 });
             }
