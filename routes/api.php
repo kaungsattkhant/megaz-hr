@@ -303,7 +303,6 @@ Route::get('/get_uom_conversion_by_uom',[UomAPIController::class,'getUomConversi
 // Route::post('/transfers/{id}/confirms', [TransferAPIController::class, 'confirmTransfer']);
 
 Route::get('/customers', [CustomerAPIController::class, 'getCustomerData']);
-RoutE::get('/bd_customers',[CustomerAPIController::class,'upComingBdList']);
 Route::post('/customers', [CustomerAPIController::class, 'createCustomer']);
 Route::put('/customers/{id}', [CustomerAPIController::class, 'updateCustomer']);
 Route::delete('/customers/{id}', [CustomerAPIController::class, 'deleteCustomer']);
@@ -347,6 +346,8 @@ Route::get('get_inventory',[InventoryAPIController::class, 'getInventory']);
 // feature
 Route::get('/features',[FeatureAPIController::class,'getFeatureData']);
 
+// customer upcoming birthday list
+RoutE::get('/crm/upcoming_birthdays',[CustomerAPIController::class,'upComingBdList']);
 Route::controller(BirthDayPromotionAPIController::class)->group(function ()
 {
     Route::get('/birthday_promotions','getBirthdayPromotions');
