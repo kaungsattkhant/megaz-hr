@@ -458,7 +458,6 @@ class InvoiceRepository implements InvoiceRepositoryInterface
             if (isset($data['discount_value'])) {
                 $discount_value = $data['discount_value'];
             }
-            // dd($data['total']);
             $discount_total = $discount_value + $room_discount_value;
             $data['total'] -= $discount_total;
             $data['tax'] = $tax;
