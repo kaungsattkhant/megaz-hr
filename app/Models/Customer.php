@@ -24,4 +24,9 @@ class Customer extends Model
     {
         return $this->belongsTo(Township::class);
     }
+
+    public function invoices()
+    {
+        return $this->hasMany(Invoice::class);
+    }
 }

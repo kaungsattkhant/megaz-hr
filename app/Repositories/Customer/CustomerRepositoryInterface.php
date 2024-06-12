@@ -16,4 +16,8 @@ interface CustomerRepositoryInterface
 
     public function getCustomersWithUpcomingBirthdays();
 
+    public function listOfCustomer($request);
+
+    public function customerDetail(int $id);
+
 }

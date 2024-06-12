@@ -97,4 +97,72 @@ class CustomerRepository implements CustomerRepositoryInterface
         }
         return false;
     }
+
+    public function listOfCustomer($request)
+    {
+        $customers = DB::table('invoices')
+            ->join('customers', 'invoices.customer_id', '=', 'customers.id')
+            ->join('townships', 'customers.township_id', '=', 'townships.id')
+            ->select(
+                'customers.id',
+                'customers.name',
+                'customers.phone_number',
+                'customers.birthdate',
+                'customers.email',
+                'customers.address',
+                'townships.name as township_name',
+                DB::raw('SUM(invoices.total) as total_amount')
+            )
+            ->groupBy(
+                'customers.id',
+                'customers.name',
+                'customers.phone_number',
+                'customers.birthdate',
+                'customers.email',
+                'customers.address',
+                'townships.name'
+            )
+            ->paginate();
+
+        return $customers;
+    }
+
+    public function customerDetail(int $id)
+    {
+        $customer = Customer::where('id',$id)->with(['invoices'])->first();
+        if($customer==null){
+            ResponseMessage('Customer not found',404);
+        }
+
+        $customerDetail = DB::table('invoices')
+        ->join('customers', 'invoices.customer_id', '=', 'customers.id')
+        ->join('townships', 'customers.township_id', '=', 'townships.id')
+        ->select(
+            'customers.id',
+            'customers.name',
+            'customers.rentation',
+            'customers.phone_number',
+            'customers.birthdate',
+            'customers.email',
+            'customers.address',
+            'townships.name as township_name',
+            DB::raw('SUM(invoices.total) as total_amount')
+        )
+        ->where('customers.id', '=', $id) // Adding where clause for specific customer ID
+        ->groupBy(
+            'customers.id',
+            'customers.name',
+            'customers.rentation',
+            'customers.phone_number',
+            'customers.birthdate',
+            'customers.email',
+            'customers.address',
+            'townships.name'
+        )->get();
+
+       $customerData['customer'] = $customer;
+       $customerData['customer_detail'] = $customerDetail;
+       ResponseData($customerData);
+    }
+
 }

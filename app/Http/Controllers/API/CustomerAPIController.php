@@ -51,4 +51,14 @@ class CustomerAPIController extends Controller
         $upComingBdList = $this->customerRepo->getCustomersWithUpcomingBirthdays();
         ResponseData($upComingBdList);
     }
+
+    public function listOfCustomer(Request $request){
+        $customers = $this->customerRepo->listOfCustomer($request);
+        ResponseData($customers);
+    }
+
+    public function detailCustomer(int $id)
+    {
+        $customer = $this->customerRepo->customerDetail($id);
+    }
 }

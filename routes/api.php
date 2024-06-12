@@ -306,6 +306,10 @@ Route::get('/customers', [CustomerAPIController::class, 'getCustomerData']);
 Route::post('/customers', [CustomerAPIController::class, 'createCustomer']);
 Route::put('/customers/{id}', [CustomerAPIController::class, 'updateCustomer']);
 Route::delete('/customers/{id}', [CustomerAPIController::class, 'deleteCustomer']);
+Route::controller(CustomerAPIController::class)->group(function () {
+    Route::get('customer_list','listOfCustomer');
+    Route::get('/customer_list/{id}','detailCustomer');
+});
 
 Route::get('/menus', [MenuAPIController::class, 'getMenus']);
 Route::post('/menus', [MenuAPIController::class, 'createMenu']);
