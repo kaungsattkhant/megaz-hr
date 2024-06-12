@@ -52,7 +52,7 @@ class CustomerRepository implements CustomerRepositoryInterface
             return Customer::whereBetween(
                 DB::raw('DAYOFYEAR(birthdate)'),
                 [$today->dayOfYear, $dateAfter7Days->dayOfYear]
-            )->get();
+            )->with('township')->get();
         }
     }
 
