@@ -99,37 +99,40 @@ class CustomerRepository implements CustomerRepositoryInterface
     }
 
     public function listOfCustomer($request)
-    {
-        $customers = DB::table('invoices')
-            ->join('customers', 'invoices.customer_id', '=', 'customers.id')
-            ->join('townships', 'customers.township_id', '=', 'townships.id')
-            ->select(
-                'customers.id',
-                'customers.name',
-                'customers.phone_number',
-                'customers.birthdate',
-                'customers.email',
-                'customers.address',
-                'townships.name as township_name',
-                DB::raw('SUM(invoices.total) as total_amount')
-            )
-            ->groupBy(
-                'customers.id',
-                'customers.name',
-                'customers.phone_number',
-                'customers.birthdate',
-                'customers.email',
-                'customers.address',
-                'townships.name'
-            )
-            ->paginate();
+{
+    $customers = DB::table('customers')
+        ->leftJoin('invoices', 'customers.id', '=', 'invoices.customer_id')
+        ->join('townships', 'customers.township_id', '=', 'townships.id')
+        ->select(
+            'customers.id',
+            'customers.name',
+            'customers.phone_number',
+            'customers.rentation',
+            'customers.birthdate',
+            'customers.email',
+            'customers.address',
+            'townships.name as township_name',
+            DB::raw('COALESCE(SUM(invoices.total), 0) as total_amount')
+        )
+        ->groupBy(
+            'customers.id',
+            'customers.name',
+            'customers.phone_number',
+            'customers.rentation',
+            'customers.birthdate',
+            'customers.email',
+            'customers.address',
+            'townships.name'
+        )
+        ->paginate();
 
-        return $customers;
-    }
+    return $customers;
+}
+
 
     public function customerDetail(int $id)
     {
-        $customer = Customer::where('id',$id)->with(['invoices'])->first();
+        $customer = Customer::where('id',$id)->with(['invoices.orders.orderItems.menu','invoices.sessions.entity'])->first();
         if($customer==null){
             ResponseMessage('Customer not found',404);
         }
@@ -152,6 +155,7 @@ class CustomerRepository implements CustomerRepositoryInterface
         ->groupBy(
             'customers.id',
             'customers.name',
+
             'customers.rentation',
             'customers.phone_number',
             'customers.birthdate',
