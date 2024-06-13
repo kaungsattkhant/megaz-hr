@@ -95,6 +95,7 @@ import LogoutComponentPos from './Components/Pos/Auth/LogoutComponentPos.vue';
 
 import CrmCustomerListComponent from './Components/CRM/CustomerListComponent.vue';
 import CrmCustomerBirthdaysListComponent from './Components/CRM/CustomerBirthdaysListComponent.vue';
+import CrmCustomerDetailComponent from './Components/CRM/CustomerDetailComponent.vue';
 import LevelDiscountCrudComponent from './Components/CRM/LevelDiscountCrudComponent.vue';
 import BirthdayPromotionCrudComponent from './Components/CRM/BirthdayPromotionCrudComponent.vue';
 
@@ -173,6 +174,7 @@ app.component('CrmCustomerListComponent', CrmCustomerListComponent);
 app.component('CrmCustomerBirthdaysListComponent', CrmCustomerBirthdaysListComponent);
 app.component('LevelDiscountCrudComponent', LevelDiscountCrudComponent);
 app.component('BirthdayPromotionCrudComponent', BirthdayPromotionCrudComponent);
+app.component('CrmCustomerDetailComponent', CrmCustomerDetailComponent);
 
 app.use(store);
 app.use(Notifications);

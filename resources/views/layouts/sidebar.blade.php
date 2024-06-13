@@ -371,8 +371,8 @@
                             <div class="!visible hidden text-center" id="collapseCRM" data-te-collapse-item>
                                 <ul>
                                     <li>
-                                        <a href="#"
-                                            class="flex items-center @yield('office_cash')">
+                                        <a href="{{ route('crm.customers.index') }}"
+                                            class="flex items-center @yield('crm_customer_list')">
                                             <i class="fal fa-tasks  pr-3"></i>
                                             Customers
                                         </a>

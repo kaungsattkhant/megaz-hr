@@ -33,13 +33,7 @@
                                     Phone Number
                                 </th>
                                 <th scope="col" class="">
-                                    Township
-                                </th>
-                                <th scope="col" class="">
                                     Address
-                                </th>
-                                <th scope="col" class="">
-                                    Amount
                                 </th>
                                 <th scope="col" class="">
                                     Rentation
@@ -59,14 +53,9 @@
                                     <td class="whitespace-nowrap  ">
                                         {{ customer.phone_number }}
                                     </td>
-                                    <td class="whitespace-nowrap  ">
-                                        {{ customer.township.name }}
-                                    </td>
+
                                     <td class="whitespace-nowrap  ">
                                         {{ customer.address }}
-                                    </td>
-                                    <td class="whitespace-nowrap  ">
-                                        amount
                                     </td>
                                     <td class="whitespace-nowrap  ">
                                         {{ customer.rentation }}
