@@ -6,6 +6,7 @@ use App\Models\MenuPackage;
 use App\Models\Package;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 
 class PackageRepository implements PackageRepositoryInterface
 {
@@ -28,7 +29,11 @@ class PackageRepository implements PackageRepositoryInterface
             $data['created_by'] = UserData()->id;
             $roomIds = json_decode($data['roomIds']);
             $isValid = $this->validatePackingDates($roomIds, $data['from_date'], $data['to_date']);
-
+            $imageData = $data['image'];
+            $extension = $imageData->getClientOriginalExtension();
+            $hashedName = md5(uniqid() . microtime()) . '.' . $extension;
+            $data['image_path'] = $imageData->storeAs('images', $hashedName, 'public');
+            $data['image_url'] = Storage::url($data['image_path']);
             if ($isValid==true) {
                 ResponseMessage('Package dates overlap with existing packages for the specified rooms.', 422);
             }
@@ -88,6 +93,14 @@ class PackageRepository implements PackageRepositoryInterface
     {
         DB::beginTransaction();
         try{
+           if(isset($data['image']))
+           {
+            $imageData = $data['image'];
+            $extension = $imageData->getClientOriginalExtension();
+            $hashedName = md5(uniqid() . microtime()) . '.' . $extension;
+            $data['image_path'] = $imageData->storeAs('images', $hashedName, 'public');
+            $data['image_url'] = Storage::url($data['image_path']);
+           }
             $package = Package::find($id);
             $package->update($data);
             if(isset($data['roomIds']))

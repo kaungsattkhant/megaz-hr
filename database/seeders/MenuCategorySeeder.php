@@ -16,16 +16,24 @@ class MenuCategorySeeder extends Seeder
     {
         //
         MenuCategory::create([
-            'name' => 'Fast Foods'
-        ]);
-        MenuCategory::create([  
-            'name' => 'Breakfast'
-        ]);
-        MenuCategory::create([
-            'name' => 'Dessert'
+            'name' => 'Fast Foods',
+            'image_url' => '/storage/images/3d01584cbe18d346d3b7e439c58dbb6a.jpeg',
+            'image_path' => 'images/3d01584cbe18d346d3b7e439c58dbb6a.jpeg',
         ]);
         MenuCategory::create([
-            'name' => 'Beverages'
+            'name' => 'Breakfast',
+            'image_url' => '/storage/images/3d01584cbe18d346d3b7e439c58dbb6a.jpeg',
+            'image_path' => 'images/3d01584cbe18d346d3b7e439c58dbb6a.jpeg',
+        ]);
+        MenuCategory::create([
+            'name' => 'Dessert',
+            'image_url' => '/storage/images/3d01584cbe18d346d3b7e439c58dbb6a.jpeg',
+            'image_path' => 'images/3d01584cbe18d346d3b7e439c58dbb6a.jpeg',
+        ]);
+        MenuCategory::create([
+            'name' => 'Beverages',
+            'image_url' => '/storage/images/3d01584cbe18d346d3b7e439c58dbb6a.jpeg',
+            'image_path' => 'images/3d01584cbe18d346d3b7e439c58dbb6a.jpeg',
         ]);
     }
 }

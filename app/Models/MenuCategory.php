@@ -11,7 +11,7 @@ class MenuCategory extends BaseModel
 {
     use HasFactory;
 
-    protected $fillable = ['name', 'is_active'];
+    protected $fillable = ['name', 'is_active', 'image_path', 'image_url'];
 
     public function menus()
     {

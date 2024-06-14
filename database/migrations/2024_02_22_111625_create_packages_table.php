@@ -18,6 +18,8 @@ return new class extends Migration
             $table->date('to_date');
             $table->double('price');
             $table->double('session')->nullable();
+            $table->string('image_url');
+            $table->string('image_path');
             $table->boolean('is_ktv');
             $table->boolean('is_active')->default(1);
             $table->unsignedBigInteger('created_by');

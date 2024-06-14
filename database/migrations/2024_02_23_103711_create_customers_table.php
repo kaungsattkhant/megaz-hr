@@ -15,12 +15,16 @@ return new class extends Migration
             $table->id();
             $table->foreignId('gender_id')->constrained()->onDelete('cascade');
             $table->foreignId('township_id')->constrained()->onDelete('cascade');
+            $table->string('image_url')->nullable();
+            $table->string('image_path')->nullable();
+            $table->string('password');
             $table->string('name',45);
             $table->string('phone_number')->unique();
             $table->date('birthdate');
             $table->string('email')->unique()->nullable();
             $table->string('address');
             $table->double('rentation')->default(0);
+            $table->string('otp');
             $table->boolean('is_active')->default(1);
             $table->timestamps();
         });

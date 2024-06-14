@@ -37,5 +37,5 @@ class AuthController extends Controller
         ResponseMessage("Logout success");
     }
 
-   
+
 }

@@ -36,6 +36,7 @@ use App\Http\Controllers\API\HeadAccountController;
 use App\Http\Controllers\API\TransactionController;
 use App\Http\Controllers\API\TransferAPIController;
 use App\Http\Controllers\API\ComplaintAPIController;
+use App\Http\Controllers\API\CustomerAuthController;
 use App\Http\Controllers\API\CustomerLevelDiscountAPIController;
 use App\Http\Controllers\API\InventoryAPIController;
 use App\Http\Controllers\API\NotificationController;
@@ -92,6 +93,7 @@ Route::get('/divisions', function () {
 });
 
 Route::post('/login', [AuthController::class, 'login']);
+Route::post('/customer_login',[CustomerAuthController::class,'customerLogin']);
 Route::middleware('auth:api')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout']);
     Route::get('/areas/{areaId}/tasks', [TaskController::class, 'getTasksOfRolesFromArea']);
@@ -222,14 +224,7 @@ Route::middleware('auth:api')->group(function () {
         Route::delete('/room_discounts/{id}','deleteRoomDiscount');
     });
 
-    Route::controller(PackageAPIController::class)->group(function()
-    {
-        Route::get('/packages','getPackage');
-        Route::get('/packages/{id}','detailPackage');
-        Route::post('/packages','createPackage');
-        Route::post('/packages/{id}','editPackage');
-        Route::delete('/packages/{id}','deletePackage');
-    });
+
 
     // uom conversion
     Route::post('/uom_conversions', [UomAPIController::class, 'createUomConversion']);
@@ -238,6 +233,15 @@ Route::middleware('auth:api')->group(function () {
 
 
 });
+
+Route::controller(PackageAPIController::class)->group(function()
+    {
+        Route::get('/packages','getPackage');
+        Route::get('/packages/{id}','detailPackage');
+        Route::post('/packages','createPackage');
+        Route::post('/packages/{id}','editPackage');
+        Route::delete('/packages/{id}','deletePackage');
+    });
 
 
 

@@ -6,6 +6,7 @@ use App\Models\Customer;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 
 class CustomerRepository implements CustomerRepositoryInterface
 {
@@ -60,6 +61,11 @@ class CustomerRepository implements CustomerRepositoryInterface
     {
         DB::beginTransaction();
         try {
+            $imageData = $data['image'];
+            $extension = $imageData->getClientOriginalExtension();
+            $hashedName = md5(uniqid() . microtime()) . '.' . $extension;
+            $data['image_path'] = $imageData->storeAs('images', $hashedName, 'public');
+            $data['image_url'] = Storage::url($data['image_path']);
             $customer = Customer::create($data);
             DB::commit();
             return $customer;
@@ -76,6 +82,13 @@ class CustomerRepository implements CustomerRepositoryInterface
         try {
             $customer = Customer::find($id);
             if ($customer) {
+                if (isset($data['image'])) {
+                    $imageData = $data['image'];
+                    $extension = $imageData->getClientOriginalExtension();
+                    $hashedName = md5(uniqid() . microtime()) . '.' . $extension;
+                    $data['image_path'] = $imageData->storeAs('images', $hashedName, 'public');
+                    $data['image_url'] = Storage::url($data['image_path']);
+                }
                 $customer->update($data);
             }
             DB::commit();
@@ -99,74 +112,73 @@ class CustomerRepository implements CustomerRepositoryInterface
     }
 
     public function listOfCustomer($request)
-{
-    $customers = DB::table('customers')
-        ->leftJoin('invoices', 'customers.id', '=', 'invoices.customer_id')
-        ->join('townships', 'customers.township_id', '=', 'townships.id')
-        ->select(
-            'customers.id',
-            'customers.name',
-            'customers.phone_number',
-            'customers.rentation',
-            'customers.birthdate',
-            'customers.email',
-            'customers.address',
-            'townships.name as township_name',
-            DB::raw('COALESCE(SUM(invoices.total), 0) as total_amount')
-        )
-        ->groupBy(
-            'customers.id',
-            'customers.name',
-            'customers.phone_number',
-            'customers.rentation',
-            'customers.birthdate',
-            'customers.email',
-            'customers.address',
-            'townships.name'
-        )
-        ->paginate();
+    {
+        $customers = DB::table('customers')
+            ->leftJoin('invoices', 'customers.id', '=', 'invoices.customer_id')
+            ->join('townships', 'customers.township_id', '=', 'townships.id')
+            ->select(
+                'customers.id',
+                'customers.name',
+                'customers.phone_number',
+                'customers.rentation',
+                'customers.birthdate',
+                'customers.email',
+                'customers.address',
+                'townships.name as township_name',
+                DB::raw('COALESCE(SUM(invoices.total), 0) as total_amount')
+            )
+            ->groupBy(
+                'customers.id',
+                'customers.name',
+                'customers.phone_number',
+                'customers.rentation',
+                'customers.birthdate',
+                'customers.email',
+                'customers.address',
+                'townships.name'
+            )
+            ->paginate();
 
-    return $customers;
-}
+        return $customers;
+    }
 
 
     public function customerDetail(int $id)
     {
-        $customer = Customer::where('id',$id)->with(['invoices.orders.orderItems.menu','invoices.sessions.entity'])->first();
-        if($customer==null){
-            ResponseMessage('Customer not found',404);
+        $customer = Customer::where('id', $id)->with(['invoices.orders.orderItems.menu', 'invoices.sessions.entity'])->first();
+        if ($customer == null) {
+            ResponseMessage('Customer not found', 404);
         }
 
         $customerDetail = DB::table('invoices')
-        ->join('customers', 'invoices.customer_id', '=', 'customers.id')
-        ->join('townships', 'customers.township_id', '=', 'townships.id')
-        ->select(
-            'customers.id',
-            'customers.name',
-            'customers.rentation',
-            'customers.phone_number',
-            'customers.birthdate',
-            'customers.email',
-            'customers.address',
-            'townships.name as township_name',
-            DB::raw('SUM(invoices.total) as total_amount')
-        )
-        ->where('customers.id', '=', $id) // Adding where clause for specific customer ID
-        ->groupBy(
-            'customers.id',
-            'customers.name',
+            ->join('customers', 'invoices.customer_id', '=', 'customers.id')
+            ->join('townships', 'customers.township_id', '=', 'townships.id')
+            ->select(
+                'customers.id',
+                'customers.name',
+                'customers.rentation',
+                'customers.phone_number',
+                'customers.birthdate',
+                'customers.email',
+                'customers.address',
+                'townships.name as township_name',
+                DB::raw('SUM(invoices.total) as total_amount')
+            )
+            ->where('customers.id', '=', $id) // Adding where clause for specific customer ID
+            ->groupBy(
+                'customers.id',
+                'customers.name',
 
-            'customers.rentation',
-            'customers.phone_number',
-            'customers.birthdate',
-            'customers.email',
-            'customers.address',
-            'townships.name'
-        )->get();
+                'customers.rentation',
+                'customers.phone_number',
+                'customers.birthdate',
+                'customers.email',
+                'customers.address',
+                'townships.name'
+            )->get();
 
-       $customerData['customer'] = $customer;
-       $customerData['customer_detail'] = $customerDetail;
-       ResponseData($customerData);
+        $customerData['customer'] = $customer;
+        $customerData['customer_detail'] = $customerDetail;
+        ResponseData($customerData);
     }
-
 }
