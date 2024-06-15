@@ -23,13 +23,13 @@ class CustomerAPIController extends Controller
         ResponseData($customers);
     }
 
-    public function createCustomer(CustomerCreateRequest $request)
+    public function createCustomer(Request $request)
     {
         $customer = $this->customerRepo->createData($request->all());
         ResponseData($customer);
     }
 
-    public function updateCustomer(CustomerUpdateRequest $request, int $id)
+    public function updateCustomer(Request $request, int $id)
     {
         $customer = $this->customerRepo->updateData($request->all(),$id);
         ResponseData($customer);
