@@ -25,6 +25,11 @@ class Menu extends BaseModel
         return $this->hasMany(MenuPrice::class);
     }
 
+    public function price()
+    {
+        return $this->hasOne(MenuPrice::class)->orderBy('id','desc');
+    }
+
     public function items()
     {
         return $this->belongsToMany(Item::class)->withPivot(['weight','price', 'is_make_pack','uom_id']);
@@ -35,6 +40,7 @@ class Menu extends BaseModel
         return $this->hasOne(OrderItem::class);
     }
 
+    
     public function pack()
     {
         return $this->belongsTo(Pack::class);

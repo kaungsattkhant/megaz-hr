@@ -2,10 +2,11 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
-
 use App\Models\Menu;
+use App\Models\Scopes\IsActiveScope;
+
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class MenuCategory extends BaseModel
 {
@@ -13,6 +14,11 @@ class MenuCategory extends BaseModel
 
     protected $fillable = ['name', 'is_active'];
 
+    protected static function booted()
+    {
+        static::addGlobalScope(new IsActiveScope);
+    }
+    
     public function menus()
     {
         return $this->hasMany(Menu::class);
