@@ -227,17 +227,17 @@ class OrderRepository implements OrderRepositoryInterface
             $startTime = $date . ' 00:00:00';
             $endTime = $date . ' 23:59:59';
 
-            $totalCount = OrderItem::with('menu', 'order.invoice.room')->whereBetween('created_at', [$startTime, $endTime])->count();
+            $totalCount = OrderItem::with('menu', 'order.invoice.latestSession.entity')->whereBetween('created_at', [$startTime, $endTime])->count();
             $pageNumber = 1;
             $perPage = 20;
             if ($request->page) {
                 $pageNumber = $request->page;
             }
-            if ($request->per_page) {
+            if ($request->per_page) {   
                 $perPage = $request->per_page;
             }
             $skip = ($pageNumber - 1) * $perPage;
-            $order_items = OrderItem::with('menu', 'order.invoice.room')
+            $order_items = OrderItem::with('menu', 'order.invoice.latestSession.entity')
                 ->whereBetween('date', [$startTime, $endTime])
                 ->skip($skip)
                 ->take($perPage)
@@ -250,9 +250,9 @@ class OrderRepository implements OrderRepositoryInterface
             if ($request->date) {
                 $startTime = $request->date . ' 00:00:00';
                 $endTime = $request->date . ' 23:59:59';
-                $orderItems = OrderItem::with('menu', 'order.invoice.room')->whereBetween('date', [$startTime, $endTime])->get();
+                $orderItems = OrderItem::with('menu', 'order.invoice.latestSession.entity')->whereBetween('date', [$startTime, $endTime])->get();
             } else {
-                $orderItems = OrderItem::with('menu', 'order.invoice.room')->get();
+                $orderItems = OrderItem::with('menu', 'order.invoice.latestSession.entity')->get();
             }
 
             return $orderItems;

@@ -43,7 +43,7 @@ class Invoice extends Model
 
     public function room()
     {
-        return $this->belongsTo(Entity::class,'entity_id');
+        return $this->belongsTo(Entity::class, 'entity_id');
     }
 
     public function customer()
@@ -61,4 +61,8 @@ class Invoice extends Model
         return $this->hasMany(RoomSession::class);
     }
 
+    public function latestSession()
+    {
+        return $this->hasOne(RoomSession::class)->latest();
+    }
 }
