@@ -11,4 +11,6 @@ class CustomerLevelDiscount extends Model
     protected $fillable=[
         'name','amount','promotion_value'
     ];
+
+
 }
