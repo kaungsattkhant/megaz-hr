@@ -45,4 +45,6 @@ class Customer extends Authenticatable
     {
         return $this->hasMany(Invoice::class);
     }
+
+
 }
