@@ -61,11 +61,16 @@ class CustomerRepository implements CustomerRepositoryInterface
     {
         DB::beginTransaction();
         try {
-            $imageData = $data['image'];
-            $extension = $imageData->getClientOriginalExtension();
-            $hashedName = md5(uniqid() . microtime()) . '.' . $extension;
-            $data['image_path'] = $imageData->storeAs('images', $hashedName, 'public');
-            $data['image_url'] = Storage::url($data['image_path']);
+            if(isset($data['image'])){
+                $imageData = $data['image'];
+                $extension = $imageData->getClientOriginalExtension();
+                $hashedName = md5(uniqid() . microtime()) . '.' . $extension;
+                $data['image_path'] = $imageData->storeAs('images', $hashedName, 'public');
+                $data['image_url'] = Storage::url($data['image_path']);
+            }
+            $data['password'] = 'default_password';
+            $data['otp'] = '000000';
+            $data['is_verified'] = 1;
             $customer = Customer::create($data);
             DB::commit();
             return $customer;

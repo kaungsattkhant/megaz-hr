@@ -45,7 +45,7 @@ return [
             'provider' => 'staff'
         ],
 
-        'customer' => [
+        'customer_api' => [
             'driver' => 'session',
             'provider' => 'customer',
         ],

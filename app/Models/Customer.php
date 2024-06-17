@@ -16,9 +16,27 @@ class Customer extends Authenticatable
     // use HasFactory, Notifiable;
     use HasFactory, HasApiTokens;
 
+    protected $hidden = [
+        'password',
+        'otp'
+    ];
 
     protected $fillable=[
-        'gender_id','name','phone_number','birthdate','email','address','is_active','township_id','rentation','password','otp','image_url','image_path'
+        'gender_id',
+        'name',
+        'phone_number',
+        'birthdate',
+        'email',
+        'address',
+        'is_active',
+        'township_id',
+        'rentation',
+        'password',
+        'otp',
+        'image_url',
+        'image_path',
+        'is_active',
+        'is_verified'
     ];
 
     public function setPasswordAttribute($value)
@@ -29,6 +47,16 @@ class Customer extends Authenticatable
     public function getAuthPassword()
     {
         return $this->password;
+    }
+
+    public function getOtpCode()
+    {
+        return $this->otp;
+    }
+
+    public function checkOtp($value)
+    {
+        return ($value == $this->otp);
     }
 
     public function gender()

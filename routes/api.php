@@ -36,7 +36,7 @@ use App\Http\Controllers\API\HeadAccountController;
 use App\Http\Controllers\API\TransactionController;
 use App\Http\Controllers\API\TransferAPIController;
 use App\Http\Controllers\API\ComplaintAPIController;
-use App\Http\Controllers\API\CustomerAuthController;
+// use App\Http\Controllers\API\CustomerAuthController;
 use App\Http\Controllers\API\CustomerLevelDiscountAPIController;
 use App\Http\Controllers\API\InventoryAPIController;
 use App\Http\Controllers\API\NotificationController;
@@ -52,6 +52,9 @@ use App\Http\Controllers\API\PurchaseOrderItemLeftController;
 use App\Http\Controllers\API\RoomDiscountAPIController;
 use App\Http\Controllers\API\UsedDefectedAPIController;
 use App\Models\UsedDefectedItem;
+
+use App\Http\Controllers\API\Customers\AuthController as CustomerAuthController;
+use App\Models\Customer;
 
 /*
 |--------------------------------------------------------------------------
@@ -92,8 +95,13 @@ Route::get('/divisions', function () {
     ResponseData(Division::with('townships')->get());
 });
 
+// Route::post('/customer_login',[CustomerAuthController::class,'customerLogin']);
+Route::post('/customers/initial_register', [CustomerAuthController::class, 'initialRegister']);
+Route::post('/customers/register', [CustomerAuthController::class, 'register']);
+Route::post('/customers/login', [CustomerAuthController::class, 'login']);
+
 Route::post('/login', [AuthController::class, 'login']);
-Route::post('/customer_login',[CustomerAuthController::class,'customerLogin']);
+
 Route::middleware('auth:api')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout']);
     Route::get('/areas/{areaId}/tasks', [TaskController::class, 'getTasksOfRolesFromArea']);
