@@ -36,7 +36,7 @@ class MenuRepository implements MenuRepositoryInterface
             $imageData = $data['image'];
             $extension = $imageData->getClientOriginalExtension();
             $hashedName = md5(uniqid() . microtime()) . '.' . $extension;
-            $data['image_path'] = $imageData->storeAs('images', $hashedName, 'public');
+            $data['image_path'] = $imageData->storeAs('images/menu_images', $hashedName, 'public');
             $data['image_url'] = Storage::url($data['image_path']);
             $menu = Menu::create($data);
             $this->createMenuPrice($menu->id, $data['price']);
