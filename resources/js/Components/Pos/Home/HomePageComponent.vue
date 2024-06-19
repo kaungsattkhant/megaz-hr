@@ -1050,6 +1050,7 @@
                 this.isOpenRoom.step_detail=false;
                 this.isOpenRoom.step_invoice=false;
                 this.clearOpenRoomForm();
+                this.isPackage = false;
 
             },
 
@@ -1283,6 +1284,9 @@
                     this.printInvoiceData.room = this.selectedRoom.room_sessions[0].invoice.paid_amount;
                     this.isPackage = true;
                     this.packagePrice = this.selectedRoom.room_sessions[0].invoice.paid_amount
+                }
+                else{
+                    this.isPackage = false;
                 }
 
 
