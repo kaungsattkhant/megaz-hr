@@ -275,6 +275,20 @@
                                         <option value="room_discount" :disabled="selectedRoom.room_sessions[0].invoice.invoice_type == 'package'">  Room Discount </option>
                                         <option value="fix_amount"> Fix Ammount  </option>
                                         <option value="percentage"> Percentage </option>
+                                        <option value="customer_level"> Customer Level </option>
+                                        <option value="birthday_discount" v-if="roomSessionData ? roomSessionData.is_birthday : ''"> Birthday </option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="mb-4" v-show="discount_type == 'birthday_discount'">
+                                <label for="" class="block text-sm text-black mb-3">
+                                    Birthday Disount
+                                </label>
+                                <div class="relative">
+                                    <select name="" id="" v-model="birthday_discount"
+                                        class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0"
+                                        @change="birthdayDiscountSelectChanged">
+                                        <option v-for="bd in birthdayDiscountList" :value="bd">  {{ bd.name }} </option>
                                     </select>
                                 </div>
                             </div>
@@ -290,7 +304,7 @@
                                     </select>
                                 </div>
                             </div>
-                            <div class="mb-4" v-show="discount_type != 'room_discount'">
+                            <div class="mb-4" v-show="discount_type != 'room_discount' && discount_type != 'customer_level' && discount_type != 'birthday_discount'">
                                 <!-- <div v-show="discount_type == 'fix_amount'">
                                     <label for="" class="block text-sm text-black mb-3">
                                         Discount
@@ -874,6 +888,7 @@
                     foodList:[]
                 },
                 room_discount:null,
+                birthday_discount:null,
                 orderList:[],
                 orderItemsPrice:null,
                 selectedPaymentMethod:'cash',
@@ -895,6 +910,7 @@
 
                 // doneSession
                 roomDiscountList:null,
+                birthdayDiscountList:null,
                 isPackage:false,
                 packagePrice:null,
                 discount_type: null,
@@ -1265,10 +1281,10 @@
                     console.log("success")
                 }
                 let roomChargeTotal = 0;
-                roomSessions.forEach(roomSession => {
-                    roomChargeTotal = roomSession.session_duration * roomSession.entity.price_per_hour;
+                // roomSessions.forEach(roomSession => {
+                    roomChargeTotal = roomSessions.room_sessions.price;
                     // roomChargeTotal += roomSession.price; // or roomSession.session_duration * roomSession.entity.price_per_hour;
-                });
+                // });
                 this.printInvoiceData.room = roomChargeTotal; // <== or that
 
                 if(this.purchaseMenuList.length > 0){
@@ -1346,24 +1362,53 @@
                 this.printInvoiceData.discountSession = totalSession - paidSession;
                 this.printInvoiceData.total = this.printInvoiceData.room + this.printInvoiceData.food;
             },
+            birthdayDiscountSelectChanged(){
+                this.printInvoiceData.discount = this.birthday_discount.discount_value
+                if(this.selectedRoom.room_sessions[0].invoice.invoice_type == 'package'){
+                        this.printInvoiceData.room = this.selectedRoom.room_sessions[0].invoice.paid_amount;
+                }
+                else{
+                        this.printInvoiceData.room = this.roomSessionData.room_sessions.price;
+                }
+                this.printInvoiceData.total = (this.printInvoiceData.room + this.printInvoiceData.food) - this.printInvoiceData.discount
+            },
 
             async getRoomDiscount(){
+                this.printInvoiceData.discount = 0;
                 if(this.discount_type == 'room_discount'){
                     const response = await getApiData({ url: '/api/room_discounts', token: this.getToken() });
                     if(response.data){
                         this.roomDiscountList = response.data.data;
+                        this.printInvoiceData.total = this.printInvoiceData.room + this.printInvoiceData.food;
                     }
+
+                }
+                if(this.discount_type == 'birthday_discount'){
+                    const response = await getApiData({ url: '/api/birthday_promotions', token: this.getToken() });
+                    if(response.data){
+                        this.birthdayDiscountList = response.data.data;
+                    }
+                    this.printInvoiceData.total = this.printInvoiceData.room + this.printInvoiceData.food;
+                }
+
+                if(this.discount_type == 'customer_level'){
+                    if(this.selectedRoom.room_sessions[0].invoice.invoice_type == 'package'){
+                        this.printInvoiceData.room = this.selectedRoom.room_sessions[0].invoice.paid_amount;
+                    }
+                    else{
+                        this.printInvoiceData.room = this.roomSessionData.room_sessions.price;
+                    }
+                    this.printInvoiceData.discount = this.roomSessionData.customer_level_discount_value;
+                    this.printInvoiceData.total = (this.printInvoiceData.room + this.printInvoiceData.food) - this.printInvoiceData.discount
                 }
                 else{
                     this.roomDiscountList = [];
                     this.room_discount = null;
                     let roomChargeTotal = 0;
                     let roomSessions = this.roomSessionData;
-                    roomSessions.forEach(roomSession => {
-                        roomChargeTotal = roomSession.session_duration * roomSession.entity.price_per_hour;
-                    });
-
-                    
+                    // roomSessions.forEach(roomSession => {
+                        roomChargeTotal = roomSessions.room_sessions.price;
+                    // });
                     if(this.selectedRoom.room_sessions[0].invoice.invoice_type == 'package'){
                         this.printInvoiceData.room = this.selectedRoom.room_sessions[0].invoice.paid_amount;
                     }
@@ -1372,9 +1417,8 @@
                     }
                     this.printInvoiceData.roomDiscountAmount = null;
                     this.printInvoiceData.discountSession = null;
+                    this.printInvoiceData.total = this.printInvoiceData.room + this.printInvoiceData.food;
                 }
-
-                this.printInvoiceData.total = this.printInvoiceData.room + this.printInvoiceData.food;
             },
             discountChanged(){
                 if(this.discount_type == 'percentage'){
@@ -1408,6 +1452,12 @@
                 if(this.discount_type == 'room_discount'){
                     formData.append('room_discount_id', this.room_discount.id);
                 }
+                if(this.discount_type == 'birthday_discount'){
+                    formData.append('birthday_discount_id', this.birthday_discount.id);
+                }
+                // if(this.discount_type == 'customer_level'){
+                //     formData.append('room_discount_id', this.room_discount.id);
+                // }
                 formData.append('order_categories', JSON.stringify(this.orderList));
                 // formData.append('total_session_price', this.printInvoiceData.room);
                 // formData.append('food_charge', this.printInvoiceData.food);
