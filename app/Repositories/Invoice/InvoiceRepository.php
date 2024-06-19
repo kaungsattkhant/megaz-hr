@@ -390,7 +390,7 @@ class InvoiceRepository implements InvoiceRepositoryInterface
                     $roomDoneResponse['is_birthday'] = false;
                 }
 
-                $roomDoneResponse['room_sessoins'] = $latestRoomSession;
+                $roomDoneResponse['room_sessions'] = $latestRoomSession;
             DB::commit();
             ResponseData($roomDoneResponse);
         } catch (\Exception $e) {
