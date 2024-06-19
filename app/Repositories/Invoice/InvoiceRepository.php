@@ -377,11 +377,10 @@ class InvoiceRepository implements InvoiceRepositoryInterface
                         break;
                     }
                 }
-                if ($customerLevel == null) {
-                    ResponseMessage('Customer level not found', 422);
+                if ($customerLevel !== null) {
+                    $roomDoneResponse['customer_level'] = $customerLevel->name;
+                    $roomDoneResponse['customer_level_discount_value'] = $customerLevel->promotion_value;
                 }
-                $roomDoneResponse['customer_level'] = $customerLevel->name;
-                $roomDoneResponse['customer_level_discount_value'] = $customerLevel->promotion_value;
 
                 $roomDoneResponse['customer_total']= $customerTotal;
                 if ($customer) {
@@ -391,7 +390,7 @@ class InvoiceRepository implements InvoiceRepositoryInterface
                     $roomDoneResponse['is_birthday'] = false;
                 }
 
-                $roomDoneResponse['room_sessoins'] = $latestRoomSession;
+                $roomDoneResponse['room_sessions'] = $latestRoomSession;
             DB::commit();
             ResponseData($roomDoneResponse);
         } catch (\Exception $e) {

@@ -61,8 +61,13 @@ class AuthController extends Controller
                 DB::beginTransaction();
                 $customer->update($data);
                 $customer->save();
+
+                $loginResponse = (new APILoginAction("phone_number", $request->phone_number, $request->password, "App\Models\Customer"))
+                ->run("customer_token");
+                $loginResponse['user']['login_type'] = 'customer';
                 DB::commit();
-                ResponseMessage('Customer created and verified successfully');
+
+                ResponseData($loginResponse, 201, true, 'Successfully registered and verified');
             }
             catch(Exception $e){
                 DB::rollBack();
