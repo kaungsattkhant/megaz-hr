@@ -377,11 +377,13 @@ class InvoiceRepository implements InvoiceRepositoryInterface
                         break;
                     }
                 }
-                if ($customerLevel == null) {
+                if ($customerLevel !== null) {
+                    $roomDoneResponse['customer_level'] = $customerLevel->name;
+                    $roomDoneResponse['customer_level_discount_value'] = $customerLevel->promotion_value;
+                }else{
                     ResponseMessage('Customer level not found', 422);
                 }
-                $roomDoneResponse['customer_level'] = $customerLevel->name;
-                $roomDoneResponse['customer_level_discount_value'] = $customerLevel->promotion_value;
+
 
                 $roomDoneResponse['customer_total']= $customerTotal;
                 if ($customer) {
