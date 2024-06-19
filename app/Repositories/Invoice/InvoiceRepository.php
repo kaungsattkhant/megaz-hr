@@ -432,6 +432,7 @@ class InvoiceRepository implements InvoiceRepositoryInterface
             }
 
             $invoice = Invoice::find($data['invoice_id']);
+            $invoice_id = $invoice->invoice_id;
             $customer = Customer::find($invoice->customer_id);
 
             $order = Order::where('invoice_id', $invoice->id)->first();
@@ -550,6 +551,7 @@ class InvoiceRepository implements InvoiceRepositoryInterface
             $data['complete_date'] = CurrentTime();
             $entity->is_active = 0;
             $entity->save();
+            $data['invoice_id'] = $invoice_id;
             $invoice->update($data);
             $debit_total = 0;
             DB::commit();
