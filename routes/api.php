@@ -18,6 +18,7 @@ use App\Http\Controllers\API\CommonController;
 use App\Http\Controllers\API\UomAPIController;
 use App\Http\Controllers\API\AccountController;
 use App\Http\Controllers\API\AccountPayableController;
+use App\Http\Controllers\API\BirthDayPromotionAPIController;
 use App\Http\Controllers\API\ItemAPIController;
 use App\Http\Controllers\API\MenuAPIController;
 use App\Http\Controllers\API\RoleAPIController;
@@ -35,6 +36,8 @@ use App\Http\Controllers\API\HeadAccountController;
 use App\Http\Controllers\API\TransactionController;
 use App\Http\Controllers\API\TransferAPIController;
 use App\Http\Controllers\API\ComplaintAPIController;
+// use App\Http\Controllers\API\CustomerAuthController;
+use App\Http\Controllers\API\CustomerLevelDiscountAPIController;
 use App\Http\Controllers\API\InventoryAPIController;
 use App\Http\Controllers\API\NotificationController;
 use App\Http\Controllers\API\DepartmentAPIController;
@@ -49,6 +52,9 @@ use App\Http\Controllers\API\PurchaseOrderItemLeftController;
 use App\Http\Controllers\API\RoomDiscountAPIController;
 use App\Http\Controllers\API\UsedDefectedAPIController;
 use App\Models\UsedDefectedItem;
+
+use App\Http\Controllers\API\Customers\AuthController as CustomerAuthController;
+use App\Models\Customer;
 
 /*
 |--------------------------------------------------------------------------
@@ -89,7 +95,13 @@ Route::get('/divisions', function () {
     ResponseData(Division::with('townships')->get());
 });
 
+// Route::post('/customer_login',[CustomerAuthController::class,'customerLogin']);
+Route::post('/customers/initial_register', [CustomerAuthController::class, 'initialRegister']);
+Route::post('/customers/register', [CustomerAuthController::class, 'register']);
+Route::post('/customers/login', [CustomerAuthController::class, 'login']);
+
 Route::post('/login', [AuthController::class, 'login']);
+
 Route::middleware('auth:api')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout']);
     Route::get('/areas/{areaId}/tasks', [TaskController::class, 'getTasksOfRolesFromArea']);
@@ -220,14 +232,7 @@ Route::middleware('auth:api')->group(function () {
         Route::delete('/room_discounts/{id}','deleteRoomDiscount');
     });
 
-    Route::controller(PackageAPIController::class)->group(function()
-    {
-        Route::get('/packages','getPackage');
-        Route::get('/packages/{id}','detailPackage');
-        Route::post('/packages','createPackage');
-        Route::post('/packages/{id}','editPackage');
-        Route::delete('/packages/{id}','deletePackage');
-    });
+
 
     // uom conversion
     Route::post('/uom_conversions', [UomAPIController::class, 'createUomConversion']);
@@ -236,6 +241,15 @@ Route::middleware('auth:api')->group(function () {
 
 
 });
+
+Route::controller(PackageAPIController::class)->group(function()
+    {
+        Route::get('/packages','getPackage');
+        Route::get('/packages/{id}','detailPackage');
+        Route::post('/packages','createPackage');
+        Route::post('/packages/{id}','editPackage');
+        Route::delete('/packages/{id}','deletePackage');
+    });
 
 
 
@@ -304,6 +318,10 @@ Route::get('/customers', [CustomerAPIController::class, 'getCustomerData']);
 Route::post('/customers', [CustomerAPIController::class, 'createCustomer']);
 Route::put('/customers/{id}', [CustomerAPIController::class, 'updateCustomer']);
 Route::delete('/customers/{id}', [CustomerAPIController::class, 'deleteCustomer']);
+Route::controller(CustomerAPIController::class)->group(function () {
+    Route::get('customer_list','listOfCustomer');
+    Route::get('/customer_list/{id}','detailCustomer');
+});
 
 Route::get('/menus', [MenuAPIController::class, 'getMenus']);
 Route::post('/menus', [MenuAPIController::class, 'createMenu']);
@@ -343,6 +361,24 @@ Route::post('/used_defected_items/{id}/confirm',[UsedDefectedAPIController::clas
 Route::get('get_inventory',[InventoryAPIController::class, 'getInventory']);
 // feature
 Route::get('/features',[FeatureAPIController::class,'getFeatureData']);
+
+// customer upcoming birthday list
+RoutE::get('/crm/upcoming_birthdays',[CustomerAPIController::class,'upComingBdList']);
+Route::controller(BirthDayPromotionAPIController::class)->group(function ()
+{
+    Route::get('/birthday_promotions','getBirthdayPromotions');
+    Route::post('/birthday_promotions','createBDPromotion');
+    Route::post('/birthday_promotions/{id}','updateBDPromotion');
+    Route::delete('/birthday_promotions/{id}','deleteBDPromotion');
+});
+
+Route::controller(CustomerLevelDiscountAPIController::class)->group(function ()
+{
+    Route::get('/customer_level_discounts','getCustomerLevelDiscountData');
+    Route::post('/customer_level_discounts','createCustomerLevelDiscount');
+    Route::post('/customer_level_discounts/{id}','updateCustomerLevelDiscount');
+    Route::delete('/customer_level_discounts/{id}','deleteCustomerLevelDiscount');
+});
 
 
 Route::post('send_notification', [NotificationController::class, 'sendNotification']);

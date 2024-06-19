@@ -4,6 +4,9 @@ namespace App\Repositories\Invoice;
 
 use App\Http\Action\Transaction\StoreTransactionLedger;
 use App\Models\Account;
+use App\Models\BirthdayPromotion;
+use App\Models\Customer;
+use App\Models\CustomerLevelDiscount;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
 
@@ -351,10 +354,46 @@ class InvoiceRepository implements InvoiceRepositoryInterface
             }
             $latestRoomSession->update($data);
             $invoice = Invoice::find($data['invoice_id']);
-            $latestRoomSessions = RoomSession::where('invoice_id', $invoice->id)->with('entity')->get();
+            $latestRoomSessions = RoomSession::where('invoice_id', $invoice->id)
+                ->get();
+            $today = Carbon::today();
+            $customer = Customer::find($invoice->customer_id);
 
+                $customerTotal = 0;
+                if($customer->invoices)
+                {
+                    foreach($customer->invoices as $invoice)
+                    {
+                        $customerTotal += $invoice->total;
+                    }
+                }
+
+                $levels = CustomerLevelDiscount::all();
+                $customerLevel = null;
+                foreach ($levels as $level) {
+                    if ($customerTotal  >= $level->amount) {
+                        $customerLevel = $level;
+                    } else {
+                        break;
+                    }
+                }
+                if ($customerLevel == null) {
+                    ResponseMessage('Customer level not found', 422);
+                }
+                $roomDoneResponse['customer_level'] = $customerLevel->name;
+                $roomDoneResponse['customer_level_discount_value'] = $customerLevel->promotion_value;
+
+                $roomDoneResponse['customer_total']= $customerTotal;
+                if ($customer) {
+                    $birthdate = Carbon::parse($customer->birthdate);
+                    $roomDoneResponse['is_birthday'] = $birthdate->isBirthday($today);
+                } else {
+                    $roomDoneResponse['is_birthday'] = false;
+                }
+
+                $roomDoneResponse['room_sessoins'] = $latestRoomSession;
             DB::commit();
-            ResponseData($latestRoomSessions);
+            ResponseData($roomDoneResponse);
         } catch (\Exception $e) {
             DB::rollBack();
             ResponseMessage($e->getMessage(), 422);
@@ -394,6 +433,8 @@ class InvoiceRepository implements InvoiceRepositoryInterface
             }
 
             $invoice = Invoice::find($data['invoice_id']);
+            $customer = Customer::find($invoice->customer_id);
+
             $order = Order::where('invoice_id', $invoice->id)->first();
             if ($order) {
                 $orderDiscount = $order->total_discount_price;
@@ -409,7 +450,6 @@ class InvoiceRepository implements InvoiceRepositoryInterface
             if (isset($data['service_charge'])) {
                 $service_charge = $data['service_charge'];
             }
-            // all granted,food charge,beverage charge, total_session_price, orderDiscount, service_charge, tax
 
             if ($invoice->invoice_type == 'package') {
                 $foodDrink = $foodCharge + $beverageCharge;
@@ -452,13 +492,50 @@ class InvoiceRepository implements InvoiceRepositoryInterface
                             ResponseMessage('Discount cannot be applied', 422);
                         }
                     }
+                } else if ($data['discount_type'] == 'birthday_discount') {
+
+                    if ($customer) {
+                        $birthdate = Carbon::parse($customer->birthdate);
+                        $today = Carbon::today();
+                        if ($birthdate->isBirthday($today)) {
+                            $isBirthday = true;
+                            $bdPromo = BirthdayPromotion::find($data['birthday_discount_id']);
+                            if (!$bdPromo) {
+                                ResponseMessage('Selected birthday promotion not found');
+                            }
+                            $data['discount_value'] = $bdPromo->discount_value;
+                        } else {
+                            ResponseData('Today is not your birthday', 422);
+                        }
+                    } else {
+                        $isBirthday = false;
+                    }
+                } else if ($data['discount_type'] == 'customer_level') {
+                    $total = 0;
+                    foreach ($customer->invoices as $invoice) {
+                        $total += $invoice->total;
+                    }
+
+                    $levels = CustomerLevelDiscount::all();
+                    $customerLevel = null;
+                    foreach ($levels as $level) {
+                        if ($total  >= $level->amount) {
+                            $customerLevel = $level;
+                        } else {
+                            break;
+                        }
+                    }
+                    if ($customerLevel == null) {
+                        ResponseMessage('Customer level not found', 422);
+                    }
+                    $data['discount_value'] = $customerLevel->promotion_value;
                 }
             }
+
             $data['room_discount_value'] = $room_discount_value;
             if (isset($data['discount_value'])) {
                 $discount_value = $data['discount_value'];
             }
-            // dd($data['total']);
             $discount_total = $discount_value + $room_discount_value;
             $data['total'] -= $discount_total;
             $data['tax'] = $tax;
@@ -476,9 +553,8 @@ class InvoiceRepository implements InvoiceRepositoryInterface
             $entity->save();
             $invoice->update($data);
             $debit_total = 0;
-            DB::commit(); //testign purpose need to delete
-            return $invoice; //testign purpose need to delete
-
+            DB::commit();
+            return $invoice;
         } catch (\Exception $e) {
             DB::rollBack();
             ResponseMessage($e->getMessage(), 402);

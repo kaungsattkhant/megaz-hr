@@ -1,7 +1,7 @@
 <template>
     <div>
         <p class=" text-lg font-semibold font-inter">
-            Customers
+            Upcoming Customer Bithdays
         </p>
     </div>
     <div class="mt-4 bg-white">
@@ -14,12 +14,6 @@
                 </label>
             </div>
             <div class="flex justify-end flex-col">
-
-                <!-- <button type="button"
-                    class="add-btn transition duration-150 ease-in-out focus:outline-none focus:ring-0 "
-                    data-te-toggle="modal" data-te-target="#create_modal">
-                    Add New
-                </button> -->
             </div>
         </div>
         <div class="box-container-table">
@@ -39,50 +33,35 @@
                                     Phone Number
                                 </th>
                                 <th scope="col" class="">
-                                    Township
-                                </th>
-                                <th scope="col" class="">
                                     Address
                                 </th>
                                 <th scope="col" class="">
-                                    Amount
-                                </th>
-                                <th scope="col" class="">
-                                    Retention
+                                    Rentation
                                 </th>
                             </tr>
                         </thead>
                         <tbody>
                             <!-- looping start -->
-                            <!-- <div v-for="(complain,index) in complainList" :key="index" class="contents">
+                            <div v-for="(customer,index) in customerList" :key="index" class="contents">
                                 <tr class="">
                                     <td class="  ">
-                                        {{ index+1 }}
+                                        {{ index + 1 }}
                                     </td>
                                     <td class="whitespace-nowrap  ">
-                                        <a href="#">
-                                            {{ complain.title }}
-                                        </a>
+                                        {{ customer.name }}
                                     </td>
                                     <td class="whitespace-nowrap  ">
-                                        <a href="#">
-                                            {{ complain.description }}
-                                        </a>
+                                        {{ customer.phone_number }}
                                     </td>
 
                                     <td class="whitespace-nowrap  ">
-                                        <a href="#">
-                                            {{ complain.status }}
-                                        </a>
+                                        {{ customer.address }}
                                     </td>
                                     <td class="whitespace-nowrap  ">
-                                        <a href="#">
-                                            {{ complain.complaint_category.name }}
-                                        </a>
+                                        {{ customer.rentation }}
                                     </td>
                                 </tr>
-                            </div> -->
-
+                            </div>
                             <!-- looping end -->
                         </tbody>
                     </table>
@@ -101,19 +80,23 @@ export default {
     data() {
         return {
             customerList: [],
-
-            per_page: 10,
-            pageNumbers: [],
-            currentPage: 1,
-            paginationGroupsCount: 1,
-            per_group: 10,
-            groupedPageNumbers: [],
-            currentGroup: 0,
         };
     },
 
     methods: {
         ...mapGetters(['getToken']),
+
+        async getCustomerList(){
+            let url = `/api/crm/upcoming_birthdays`;
+            let response = await getApiData({ url: url, token: this.getToken() });
+            if (response.data) {
+                this.customerList = response.data;
+            }
+        },
+    },
+
+    created(){
+        this.getCustomerList();
     },
 
     mounted() {

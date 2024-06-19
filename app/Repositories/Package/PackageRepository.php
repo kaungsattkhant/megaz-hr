@@ -6,6 +6,7 @@ use App\Models\MenuPackage;
 use App\Models\Package;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 
 class PackageRepository implements PackageRepositoryInterface
 {
@@ -26,12 +27,20 @@ class PackageRepository implements PackageRepositoryInterface
         DB::beginTransaction();
         try{
             $data['created_by'] = UserData()->id;
-            $roomIds = json_decode($data['roomIds']);
-            $isValid = $this->validatePackingDates($roomIds, $data['from_date'], $data['to_date']);
-
-            if ($isValid==true) {
+            $isValid = false;
+            if(isset($data['roomIds'])){
+                $roomIds = json_decode($data['roomIds']);
+                $isValid = $this->validatePackingDates($roomIds, $data['from_date'], $data['to_date']);
+            }
+            if ($isValid) {
                 ResponseMessage('Package dates overlap with existing packages for the specified rooms.', 422);
             }
+            $imageData = $data['image'];
+            $extension = $imageData->getClientOriginalExtension();
+            $hashedName = md5(uniqid() . microtime()) . '.' . $extension;
+            $data['image_path'] = $imageData->storeAs('images/package_images', $hashedName, 'public');
+            $data['image_url'] = Storage::url($data['image_path']);
+
             $package = Package::create($data);
             if(isset($data['menuIds']))
             {
@@ -57,7 +66,7 @@ class PackageRepository implements PackageRepositoryInterface
         }catch(\Exception $e)
         {
             DB::rollBack();
-            ResponseMessage($e->getMessage());
+            ResponseMessage($e->getMessage(), 500);
             throw $e;
         }
     }
@@ -88,6 +97,14 @@ class PackageRepository implements PackageRepositoryInterface
     {
         DB::beginTransaction();
         try{
+           if(isset($data['image']))
+           {
+            $imageData = $data['image'];
+            $extension = $imageData->getClientOriginalExtension();
+            $hashedName = md5(uniqid() . microtime()) . '.' . $extension;
+            $data['image_path'] = $imageData->storeAs('images', $hashedName, 'public');
+            $data['image_url'] = Storage::url($data['image_path']);
+           }
             $package = Package::find($id);
             $package->update($data);
             if(isset($data['roomIds']))

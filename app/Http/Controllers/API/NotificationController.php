@@ -55,7 +55,7 @@ class NotificationController extends Controller
     public function sendNotification(Request $request){
 
         $notification=\App\Models\Notification::find(1);
-        $role_id=1;
+        $role_id=3;
         broadcast(new EventsSendNotification($notification,$role_id));
         return $notification;
         // $this->send($po, $users, $data);

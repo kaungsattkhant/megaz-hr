@@ -360,6 +360,48 @@
                         </li>
                         @endif
 
+                        <li>
+                            <button class="flex items-center pl-9 my-2 text-sm" type="button" data-te-collapse-init
+                                data-te-ripple-init data-te-ripple-color="light" data-te-target="#collapseCRM"
+                                aria-expanded="false" aria-controls="collapseExample">
+                                <i class="fal fa-sack-dollar  pr-3"></i>
+                                CRM
+                            </button>
+
+                            <div class="!visible hidden text-center" id="collapseCRM" data-te-collapse-item>
+                                <ul>
+                                    <li>
+                                        <a href="{{ route('crm.customers.index') }}"
+                                            class="flex items-center @yield('crm_customer_list')">
+                                            <i class="fal fa-tasks  pr-3"></i>
+                                            Customers
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a href="{{ route('crm.customers.birthdays') }}"
+                                            class="flex items-center @yield('customer_birthdays')">
+                                            <i class="fal fa-tasks  pr-3"></i>
+                                            Customer Birthdays
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a href="{{ route('crm.level_discounts.index') }}"
+                                            class="flex items-center @yield('customer_level_discounts')">
+                                            <i class="fal fa-tasks  pr-3"></i>
+                                            Customer Level Discounts
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a href="{{ route('crm.birthday_discounts.index') }}"
+                                            class="flex items-center @yield('birthday_promotions')">
+                                            <i class="fal fa-tasks  pr-3"></i>
+                                            Birthday Promotions
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </li>
+
                     </ul>
 
                 </div>

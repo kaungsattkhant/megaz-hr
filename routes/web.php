@@ -164,7 +164,7 @@ Route::middleware(['departments:account-payables'])->group(function () {
 //pos
 Route::group(['prefix' => 'pos'], function () {
     Route::view('/login', 'pos.auth.index')->name('pos.login');
-    Route::middleware(['departments:pos'])->group(function () {
+    // Route::middleware(['departments:pos'])->group(function () {
         Route::view('/home', 'pos.home.index')->name('pos.index');
         Route::view('/customer', 'pos.customers.index')->name('pos.customers');
         Route::view('/customer/create', 'pos.customers.create')->name('pos.customers.create');
@@ -173,7 +173,7 @@ Route::group(['prefix' => 'pos'], function () {
         Route::view('/cashbook/detail', 'pos.cashbook.detail')->name('pos.cashbooks.detail');
         Route::view('/invoices', 'pos.invoices.index')->name('pos.invoices');
         Route::view('/invoices/detail', 'pos.invoices.detail')->name('pos.invoices.detail');
-    });
+    // });
 });
 
 
@@ -195,5 +195,7 @@ Route::middleware(['departments:room-discount'])->group(function () {
 
 //test
 Route::view('/crm/customers', 'CRM.customers.index')->name('crm.customers.index');
+Route::view('/crm/customers/{id}/detail', 'CRM.customers.detail')->name('crm.customers.detail');
 Route::view('/crm/customers/birthdays', 'CRM.customers.birthdays')->name('crm.customers.birthdays');
 Route::view('/crm/level_discounts', 'CRM.level_discounts.index')->name('crm.level_discounts.index');
+Route::view('/crm/birthday_promotions', 'CRM.birthday_discounts.index')->name('crm.birthday_discounts.index');

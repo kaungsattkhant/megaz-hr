@@ -23,13 +23,13 @@ class CustomerAPIController extends Controller
         ResponseData($customers);
     }
 
-    public function createCustomer(CustomerCreateRequest $request)
+    public function createCustomer(Request $request)
     {
         $customer = $this->customerRepo->createData($request->all());
         ResponseData($customer);
     }
 
-    public function updateCustomer(CustomerUpdateRequest $request, int $id)
+    public function updateCustomer(Request $request, int $id)
     {
         $customer = $this->customerRepo->updateData($request->all(),$id);
         ResponseData($customer);
@@ -44,5 +44,21 @@ class CustomerAPIController extends Controller
         }else{
             ResponseMessage('Customer not found or some error occur');
         }
+    }
+
+    public function upComingBdList()
+    {
+        $upComingBdList = $this->customerRepo->getCustomersWithUpcomingBirthdays();
+        ResponseData($upComingBdList);
+    }
+
+    public function listOfCustomer(Request $request){
+        $customers = $this->customerRepo->listOfCustomer($request);
+        ResponseData($customers);
+    }
+
+    public function detailCustomer(int $id)
+    {
+        $customer = $this->customerRepo->customerDetail($id);
     }
 }

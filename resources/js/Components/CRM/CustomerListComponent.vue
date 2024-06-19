@@ -25,7 +25,7 @@
         <div class="box-container-table">
             <div class="overflow-x-auto">
                 <!-- <div class="inline-block min-w-full py-2 sm:px-6 lg:px-8"> -->
-                <div class="table-container">
+                    <div class="table-container">
                     <table class="primary-table  ">
                         <thead class="  ">
                             <tr>
@@ -48,44 +48,98 @@
                                     Amount
                                 </th>
                                 <th scope="col" class="">
-                                    Retention
+                                    Rentation
                                 </th>
                             </tr>
                         </thead>
                         <tbody>
                             <!-- looping start -->
-                            <!-- <div v-for="(complain,index) in complainList" :key="index" class="contents">
+                            <div v-for="(customer,index) in customerList" :key="index" class="contents">
                                 <tr class="">
                                     <td class="  ">
-                                        {{ index+1 }}
+                                        {{ per_page * (currentPage - 1) + (++index) }}
                                     </td>
                                     <td class="whitespace-nowrap  ">
-                                        <a href="#">
-                                            {{ complain.title }}
+                                        <a :href="`/crm/customers/${customer.id}/detail`">
+                                            {{ customer.name }}
                                         </a>
                                     </td>
                                     <td class="whitespace-nowrap  ">
-                                        <a href="#">
-                                            {{ complain.description }}
-                                        </a>
-                                    </td>
-
-                                    <td class="whitespace-nowrap  ">
-                                        <a href="#">
-                                            {{ complain.status }}
-                                        </a>
+                                        {{ customer.phone_number }}
                                     </td>
                                     <td class="whitespace-nowrap  ">
-                                        <a href="#">
-                                            {{ complain.complaint_category.name }}
-                                        </a>
+                                        {{ customer.township_name }}
+                                    </td>
+                                    <td class="whitespace-nowrap  ">
+                                        {{ customer.address }}
+                                    </td>
+                                    <td class="whitespace-nowrap  ">
+                                        {{ (customer.total_amount).toLocaleString() }}
+                                    </td>
+                                    <td class="whitespace-nowrap  ">
+                                        {{ customer.rentation }}
                                     </td>
                                 </tr>
-                            </div> -->
-
+                            </div>
                             <!-- looping end -->
                         </tbody>
                     </table>
+                </div>
+                <div class="mt-2 ml-2">
+                    <ul v-if="paginationGroupsCount > 1" class="list-style-none flex">
+                        <li v-if="!isFirstGroup">
+                            <button class="relative block rounded bg-transparent px-3 py-1.5 text-sm text-neutral-600 transition-all duration-300
+                        hover:bg-neutral-100 dark:text-white dark:hover:bg-neutral-700 dark:hover:text-white"
+                                @click="previousPaginationGroupBtnClicked" :disabled="isFirstGroup">
+                                Previous
+                            </button>
+                        </li>
+
+                        <li v-for="(pageNumber, pageNumberIndex) in groupedPageNumbers[currentGroup]"
+                            :key="pageNumberIndex" :aria-current="(pageNumber == currentPage) ? 'page' : ''">
+                            <button v-if="pageNumber == currentPage"
+                                class="relative block rounded bg-neutral-800 px-3 py-1.5 text-sm font-medium text-neutral-50 transition-all duration-300 dark:bg-neutral-900"
+                                :id="'paginationBtn-' + pageNumberIndex" @click="pageBtnClicked(pageNumber)">
+                                {{ pageNumber }}
+                                <span
+                                    class="absolute -m-px h-px w-px overflow-hidden whitespace-nowrap border-0 p-0 [clip:rect(0,0,0,0)]">
+                                    (current)
+                                </span>
+                            </button>
+                            <button v-else
+                                class="normal-pagination relative block rounded bg-transparent px-3 py-1.5 text-sm text-neutral-600 transition-all duration-300 hover:bg-neutral-100 dark:text-white dark:hover:bg-neutral-700 dark:hover:text-white"
+                                :id="'paginationBtn-' + pageNumberIndex" @click="pageBtnClicked(pageNumber)">
+                                {{ pageNumber }}
+                            </button>
+                        </li>
+                        <li v-if="!isLastGroup">
+                            <button class="relative block rounded bg-transparent px-3 py-1.5 text-sm text-neutral-600 transition-all duration-300
+                        hover:bg-neutral-100 dark:text-white dark:hover:bg-neutral-700 dark:hover:text-white"
+                                @click="nextPaginationGroupBtnClicked" :disabled="isLastGroup">
+                                Next
+                            </button>
+                        </li>
+                    </ul>
+
+                    <ul v-else class="list-style-none flex">
+                        <li v-for="(pageNumber, pageNumberIndex) in pageNumbers" :key="pageNumberIndex"
+                            :aria-current="(pageNumber == currentPage) ? 'page' : ''">
+                            <button v-if="pageNumber == currentPage"
+                                class="relative block rounded bg-neutral-800 px-3 py-1.5 text-sm font-medium text-neutral-50 transition-all duration-300 dark:bg-neutral-900"
+                                :id="'paginationBtn-' + pageNumberIndex" @click="pageBtnClicked(pageNumber)">
+                                {{ pageNumber }}
+                                <span
+                                    class="absolute -m-px h-px w-px overflow-hidden whitespace-nowrap border-0 p-0 [clip:rect(0,0,0,0)]">
+                                    (current)
+                                </span>
+                            </button>
+                            <button v-else
+                                class="normal-pagination relative block rounded bg-transparent px-3 py-1.5 text-sm text-neutral-600 transition-all duration-300 hover:bg-neutral-100 dark:text-white dark:hover:bg-neutral-700 dark:hover:text-white"
+                                :id="'paginationBtn-' + pageNumberIndex" @click="pageBtnClicked(pageNumber)">
+                                {{ pageNumber }}
+                            </button>
+                        </li>
+                    </ul>
                 </div>
             </div>
         </div>
@@ -114,6 +168,73 @@ export default {
 
     methods: {
         ...mapGetters(['getToken']),
+
+        async getCustomerList(pageNumber){
+            if (pageNumber) {
+                this.currentPage = pageNumber;
+            }
+            let url = `/api/customer_list?page=${this.currentPage}`;
+            let response = await getApiData({ url: url, token: this.getToken() });
+            if (response.data) {
+                this.customerList = response.data.data;
+                this.per_page = response.data.per_page;
+
+                this.pageNumbers = [];
+                this.lastPageNumber = response.data.last_page;
+
+                for (let i = 1; i <= response.data.last_page; i++) {
+                    this.pageNumbers.push(i);
+                }
+
+                if (this.pageNumbers.length > 10) {
+                    this.groupedPageNumbers = [];
+                    this.paginationGroupsCount = this.pageNumbers.length % 10;
+                    for (let i = 0; i < this.pageNumbers.length; i += 10) {
+                        let chunk = this.pageNumbers.slice(i, i + 10);
+                        this.groupedPageNumbers.push(chunk);
+                    }
+
+                    let lastGroupIndex = this.groupedPageNumbers.length - 1;
+                    this.isFirstGroup = (this.currentGroup === 0);
+                    this.isLastGroup = (lastGroupIndex === this.currentGroup);
+                }
+            }
+        },
+
+        pageBtnClicked(pageNumber) {
+            this.currentPage = pageNumber;
+            this.getCustomerList(this.currentPage);
+        },
+
+        nextPaginationGroupBtnClicked() {
+            this.currentGroup += 1;
+            this.currentPage = (this.groupedPageNumbers[this.currentGroup][0]);
+            this.getCustomerList(this.currentPage);
+        },
+
+        previousPaginationGroupBtnClicked() {
+            this.currentGroup -= 1;
+            let lastIndex = this.groupedPageNumbers[this.currentGroup].length - 1;
+            this.currentPage = (this.groupedPageNumbers[this.currentGroup][lastIndex]);
+            this.getCustomerList(this.currentPage);
+        },
+
+        firstPaginationGroupBtnClicked() {
+            this.currentGroup = 0;
+            this.currentPage = (this.groupedPageNumbers[this.currentGroup][0]);
+            this.getCustomerList(this.currentPage);
+        },
+
+        lastPaginationGroupBtnClicked() {
+            this.currentGroup = this.paginationGroupsCount - 1;
+            let lastIndex = this.groupedPageNumbers[this.currentGroup].length - 1;
+            this.currentPage = (this.groupedPageNumbers[this.currentGroup][lastIndex]);
+            this.getCustomerList(this.currentPage);
+        }
+    },
+
+    created(){
+        this.getCustomerList(null);
     },
 
     mounted() {
