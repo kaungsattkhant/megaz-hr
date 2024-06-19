@@ -2,8 +2,9 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
+use App\Models\Scopes\IsActiveScope;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Category extends BaseModel
 {
@@ -13,6 +14,11 @@ class Category extends BaseModel
         'name',
         'is_active',
     ];
+
+    protected static function booted()
+    {
+        static::addGlobalScope(new IsActiveScope);
+    }
 
     public function getCreatedAt()
     {
