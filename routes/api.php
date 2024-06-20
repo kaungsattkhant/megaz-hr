@@ -96,9 +96,6 @@ Route::get('/divisions', function () {
 });
 
 // Route::post('/customer_login',[CustomerAuthController::class,'customerLogin']);
-Route::post('/customers/initial_register', [CustomerAuthController::class, 'initialRegister']);
-Route::post('/customers/register', [CustomerAuthController::class, 'register']);
-Route::post('/customers/login', [CustomerAuthController::class, 'login']);
 
 Route::post('/login', [AuthController::class, 'login']);
 
@@ -382,3 +379,11 @@ Route::controller(CustomerLevelDiscountAPIController::class)->group(function ()
 
 
 Route::post('send_notification', [NotificationController::class, 'sendNotification']);
+
+
+Route::post('/customers/initial_register', [CustomerAuthController::class, 'initialRegister']);
+Route::post('/customers/register', [CustomerAuthController::class, 'register']);
+Route::post('/customers/login', [CustomerAuthController::class, 'login']);
+Route::middleware('auth:customer_api')->group(function () {
+
+});

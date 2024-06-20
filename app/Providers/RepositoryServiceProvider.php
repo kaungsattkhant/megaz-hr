@@ -87,6 +87,8 @@ use App\Repositories\RoomDiscount\RoomDiscountRepository;
 use App\Repositories\RoomDiscount\RoomDiscountRepositoryInterface;
 use App\Repositories\UsedDefectedItem\UsedDefectedItemRepository;
 use App\Repositories\UsedDefectedItem\UsedDefectedITemRepositoryInterface;
+use App\Repositories\HomeRepository\HomeInterface;
+use App\Repositories\HomeRepository\HomeRepository;
 
 class RepositoryServiceProvider extends ServiceProvider
 {
@@ -140,5 +142,6 @@ class RepositoryServiceProvider extends ServiceProvider
         $this->app->bind(PackageRepositoryInterface::class,PackageRepository::class);
         $this->app->bind(BirthdayPromotionRepositoryInterface::class,BirthdayPromotionRepository::class);
         $this->app->bind(CustomerLevelDiscountRepositoryInterface::class,CustomerLevelDiscountRepository::class);
+        $this->app->bind(HomeInterface::class,HomeRepository::class);
     }
 }
