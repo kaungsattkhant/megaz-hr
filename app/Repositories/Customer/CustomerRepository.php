@@ -65,7 +65,7 @@ class CustomerRepository implements CustomerRepositoryInterface
                 $imageData = $data['image'];
                 $extension = $imageData->getClientOriginalExtension();
                 $hashedName = md5(uniqid() . microtime()) . '.' . $extension;
-                $data['image_path'] = $imageData->storeAs('images', $hashedName, 'public');
+                $data['image_path'] = $imageData->storeAs('images/customers', $hashedName, 'public');
                 $data['image_url'] = Storage::url($data['image_path']);
             }
             $data['password'] = 'default_password';

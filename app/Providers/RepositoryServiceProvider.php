@@ -20,6 +20,8 @@ use App\Repositories\Account\AccountInterface;
 use App\Repositories\Account\AccountRepository;
 use App\Repositories\AccountPayable\AccountPayableInterface;
 use App\Repositories\AccountPayable\AccountPayableRepository;
+use App\Repositories\Ads\AdsRepository;
+use App\Repositories\Ads\AdsRepositoryInterface;
 use App\Repositories\Invoice\InvoiceRepository;
 use App\Repositories\CashBook\CashBookInterface;
 use App\Repositories\Supplier\SupplierInterface;
@@ -89,6 +91,8 @@ use App\Repositories\UsedDefectedItem\UsedDefectedItemRepository;
 use App\Repositories\UsedDefectedItem\UsedDefectedITemRepositoryInterface;
 use App\Repositories\HomeRepository\HomeInterface;
 use App\Repositories\HomeRepository\HomeRepository;
+use App\Repositories\MenuCategory\MenuCategoryRepository;
+use App\Repositories\MenuCategory\MenuCategoryRepositoryInterface;
 
 class RepositoryServiceProvider extends ServiceProvider
 {
@@ -143,5 +147,7 @@ class RepositoryServiceProvider extends ServiceProvider
         $this->app->bind(BirthdayPromotionRepositoryInterface::class,BirthdayPromotionRepository::class);
         $this->app->bind(CustomerLevelDiscountRepositoryInterface::class,CustomerLevelDiscountRepository::class);
         $this->app->bind(HomeInterface::class,HomeRepository::class);
+        $this->app->bind(MenuCategoryRepositoryInterface::class,MenuCategoryRepository::class);
+        $this->app->bind(AdsRepositoryInterface::class,AdsRepository::class);
     }
 }

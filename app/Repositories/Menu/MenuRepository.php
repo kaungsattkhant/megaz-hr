@@ -159,4 +159,25 @@ class MenuRepository implements MenuRepositoryInterface
             }
         }
     }
+
+
+    // user app
+
+    public function listAllMenu(Request $request)
+    {
+        if ($request->per_page || $request->page) {
+            $menu_category_id = $request->menu_category_id;
+            return Menu::with(['menu_category', 'prices', 'items'])->orderBy('created_at','desc')
+                ->when($request->search_input, function ($q) use ($request) {
+                    $q->where('name', 'LIKE', '%' . $request->search_input . '%');
+                })
+                ->when($menu_category_id, function ($query) use ($menu_category_id) {
+                    $query->where('menu_category_id', $menu_category_id);
+                })
+                ->paginate(config('common.list_count'));
+        } else {
+            $menus = Menu::with(['menu_category', 'prices', 'items'])->orderBy('created_at','desc')->where('is_active', 1)->get();
+            return $menus;
+        }
+    }
 }

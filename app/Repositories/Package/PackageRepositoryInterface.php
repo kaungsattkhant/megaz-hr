@@ -15,4 +15,6 @@ interface PackageRepositoryInterface
     public function deleteData(int $id);
 
     public function detailPackage(int $id);
+
+    public function listAllPackage(Request $request);
 }

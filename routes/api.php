@@ -18,6 +18,7 @@ use App\Http\Controllers\API\CommonController;
 use App\Http\Controllers\API\UomAPIController;
 use App\Http\Controllers\API\AccountController;
 use App\Http\Controllers\API\AccountPayableController;
+use App\Http\Controllers\API\AdsAPIController;
 use App\Http\Controllers\API\BirthDayPromotionAPIController;
 use App\Http\Controllers\API\ItemAPIController;
 use App\Http\Controllers\API\MenuAPIController;
@@ -36,6 +37,8 @@ use App\Http\Controllers\API\HeadAccountController;
 use App\Http\Controllers\API\TransactionController;
 use App\Http\Controllers\API\TransferAPIController;
 use App\Http\Controllers\API\ComplaintAPIController;
+use App\Http\Controllers\API\Customer\AdsAPIController as CustomerAdsAPIController;
+use App\Http\Controllers\API\Customer\MenuCategoryAPIController as CustomerMenuCategoryAPIController;
 // use App\Http\Controllers\API\CustomerAuthController;
 use App\Http\Controllers\API\CustomerLevelDiscountAPIController;
 use App\Http\Controllers\API\InventoryAPIController;
@@ -54,6 +57,9 @@ use App\Http\Controllers\API\UsedDefectedAPIController;
 use App\Models\UsedDefectedItem;
 
 use App\Http\Controllers\API\Customers\AuthController as CustomerAuthController;
+use App\Http\Controllers\API\Customers\MenuAPIController as CustomersMenuAPIController;
+use App\Http\Controllers\API\Customers\PackageAPIController as CustomersPackageAPIController;
+use App\Http\Controllers\API\MenuCategoryAPIController;
 use App\Models\Customer;
 
 /*
@@ -87,9 +93,7 @@ Route::get('/area_types', function () {
     ResponseData(AreaType::all());
 });
 
-Route::get('/menu_categories', function () {
-    ResponseData(MenuCategory::where('is_active', 1)->get());
-});
+Route::get('/menu_categories',[MenuCategoryAPIController::class,'getMenuCategories']);
 
 Route::get('/divisions', function () {
     ResponseData(Division::with('townships')->get());
@@ -229,6 +233,13 @@ Route::middleware('auth:api')->group(function () {
         Route::delete('/room_discounts/{id}','deleteRoomDiscount');
     });
 
+    Route::controller(MenuCategoryAPIController::class)->group(function ()
+    {
+        Route::get('/menu_categories','getMenuCategories');
+        Route::post('/menu_categories','createMenuCategory');
+        Route::post('/menu_categories/{id}','editMenuCategory');
+        Route::delete('/menu_categories/{id}','deleteMenuCategory');
+    });
 
 
     // uom conversion
@@ -248,6 +259,13 @@ Route::controller(PackageAPIController::class)->group(function()
         Route::delete('/packages/{id}','deletePackage');
     });
 
+Route::controller(AdsAPIController::class)->group(function()
+{
+    Route::get('/ads','getAds');
+    Route::post('/ads','createAds');
+    Route::post('/ads/{id}','editAds');
+    Route::delete('/ads/{id}','deleteAds');
+});
 
 
 Route::controller(ExcelImportController::class)->group(function () {
@@ -380,10 +398,15 @@ Route::controller(CustomerLevelDiscountAPIController::class)->group(function ()
 
 Route::post('send_notification', [NotificationController::class, 'sendNotification']);
 
+// user app api
 
 Route::post('/customers/initial_register', [CustomerAuthController::class, 'initialRegister']);
 Route::post('/customers/register', [CustomerAuthController::class, 'register']);
 Route::post('/customers/login', [CustomerAuthController::class, 'login']);
 Route::middleware('auth:customer_api')->group(function () {
-
+    Route::get('/user_app/menu_categories',[CustomerMenuCategoryAPIController::class,'getMenuCategoriesbyUserApp']);
+    Route::get('/user_app/menus',[CustomersMenuAPIController::class,'listMenuData']);
+    Route::get('/user_app/menu_categories/{id}/menus',[CustomersMenuAPIController::class,'categoryMenuByUserApp']);
+    Route::get('/user_app/packages',[CustomersPackageAPIController::class,'getPackage']);
+    Route::get('/user_app/ads',[CustomerAdsAPIController::class,'getAdsByUserApp']);
 });

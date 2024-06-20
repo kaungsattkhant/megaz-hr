@@ -148,4 +148,13 @@ class PackageRepository implements PackageRepositoryInterface
         }
     }
 
+
+    // user app
+
+    public function listAllPackage(Request $request)
+    {
+        $packages=  Package::with('menuPackages.menu.prices','rooms')->paginate(config('common.list_count'));
+        Responsedata($packages);
+    }
+
 }

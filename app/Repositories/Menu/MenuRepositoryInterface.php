@@ -17,4 +17,7 @@ interface MenuRepositoryInterface
     public function menuDetail(int $id);
 
     public function editMenu(int $id, array $data, array $items);
+
+    // user app
+    public function listAllMenu(Request $request);
 }

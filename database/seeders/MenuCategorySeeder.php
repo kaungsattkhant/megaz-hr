@@ -16,24 +16,30 @@ class MenuCategorySeeder extends Seeder
     {
         //
         MenuCategory::create([
-            'name' => 'Fast Foods',
-            'image_url' => '/storage/images/3d01584cbe18d346d3b7e439c58dbb6a.jpeg',
-            'image_path' => 'images/3d01584cbe18d346d3b7e439c58dbb6a.jpeg',
+            'name' => 'Asian',
+            'image_url' => 'https://tinyurl.com/7sfmnzd6',
+            'image_path' => 'https://tinyurl.com/7sfmnzd6',
         ]);
         MenuCategory::create([
-            'name' => 'Breakfast',
-            'image_url' => '/storage/images/3d01584cbe18d346d3b7e439c58dbb6a.jpeg',
-            'image_path' => 'images/3d01584cbe18d346d3b7e439c58dbb6a.jpeg',
+            'name' => 'Appetiser',
+            'image_url' => 'https://tinyurl.com/58fcd76x',
+            'image_path' => 'https://tinyurl.com/58fcd76x',
         ]);
         MenuCategory::create([
-            'name' => 'Dessert',
-            'image_url' => '/storage/images/3d01584cbe18d346d3b7e439c58dbb6a.jpeg',
-            'image_path' => 'images/3d01584cbe18d346d3b7e439c58dbb6a.jpeg',
+            'name' => 'Lunch',
+            'image_url' => 'https://tinyurl.com/mrnpc7r3',
+            'image_path' => 'https://tinyurl.com/mrnpc7r3',
         ]);
         MenuCategory::create([
-            'name' => 'Beverages',
-            'image_url' => '/storage/images/3d01584cbe18d346d3b7e439c58dbb6a.jpeg',
-            'image_path' => 'images/3d01584cbe18d346d3b7e439c58dbb6a.jpeg',
+            'name' => 'Food',
+            'image_url' => 'https://tinyurl.com/3npccyut',
+            'image_path' => 'https://tinyurl.com/3npccyut',
+        ]);
+
+        MenuCategory::create([
+            'name' => 'Beverage',
+            'image_url' => 'https://tinyurl.com/3mhzx5ts',
+            'image_path' => 'https://tinyurl.com/3mhzx5ts',
         ]);
     }
 }
