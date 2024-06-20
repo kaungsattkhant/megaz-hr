@@ -149,10 +149,6 @@ import { Modal, Ripple, Select, Datepicker, initTE, Input } from "tw-elements";
             },
             async getTownShipList(){
                 this.townshipList = this.divisionList.find(x => x.id === this.selectedDivision.id).townships;
-                // const response = await getApiData( { url: '/api', token: this.getToken() } );
-                // if(response.data){
-                //     this.townshipList = response.data;
-                // }
             },
             createCustomerBtnClicked(){
                 this.createCustomer();
