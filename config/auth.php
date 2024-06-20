@@ -46,8 +46,8 @@ return [
         ],
 
         'customer_api' => [
-            'driver' => 'session',
-            'provider' => 'customer',
+            'driver' => 'sanctum',
+            'provider' => 'customers',
         ],
     ],
 
