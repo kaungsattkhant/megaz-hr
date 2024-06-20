@@ -355,23 +355,44 @@ class InvoiceRepository implements InvoiceRepositoryInterface
             $latestRoomSession->update($data);
             $invoice = Invoice::find($data['invoice_id']);
             $latestRoomSessions = RoomSession::where('invoice_id', $invoice->id)
-                ->with(['invoice.customer', 'entity'])
                 ->get();
-
             $today = Carbon::today();
-            $latestRoomSessions = $latestRoomSessions->map(function ($roomSession) use ($today) {
-                $customer = $roomSession->invoice->customer;
+            $customer = Customer::find($invoice->customer_id);
+
+                $customerTotal = 0;
+                if($customer->invoices)
+                {
+                    foreach($customer->invoices as $invoice)
+                    {
+                        $customerTotal += $invoice->total;
+                    }
+                }
+
+                $levels = CustomerLevelDiscount::all();
+                $customerLevel = null;
+                foreach ($levels as $level) {
+                    if ($customerTotal  >= $level->amount) {
+                        $customerLevel = $level;
+                    } else {
+                        break;
+                    }
+                }
+                if ($customerLevel !== null) {
+                    $roomDoneResponse['customer_level'] = $customerLevel->name;
+                    $roomDoneResponse['customer_level_discount_value'] = $customerLevel->promotion_value;
+                }
+
+                $roomDoneResponse['customer_total']= $customerTotal;
                 if ($customer) {
                     $birthdate = Carbon::parse($customer->birthdate);
-                    $roomSession->is_birthday = $birthdate->isBirthday($today);
+                    $roomDoneResponse['is_birthday'] = $birthdate->isBirthday($today);
                 } else {
-                    $roomSession->is_birthday = false;
+                    $roomDoneResponse['is_birthday'] = false;
                 }
-                return $roomSession;
-            });
 
+                $roomDoneResponse['room_sessions'] = $latestRoomSession;
             DB::commit();
-            ResponseData($latestRoomSessions);
+            ResponseData($roomDoneResponse);
         } catch (\Exception $e) {
             DB::rollBack();
             ResponseMessage($e->getMessage(), 422);
@@ -477,7 +498,7 @@ class InvoiceRepository implements InvoiceRepositoryInterface
                         $today = Carbon::today();
                         if ($birthdate->isBirthday($today)) {
                             $isBirthday = true;
-                            $bdPromo = BirthdayPromotion::find($data['birthday_promotion_id']);
+                            $bdPromo = BirthdayPromotion::find($data['birthday_discount_id']);
                             if (!$bdPromo) {
                                 ResponseMessage('Selected birthday promotion not found');
                             }
