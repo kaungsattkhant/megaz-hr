@@ -22,7 +22,6 @@ return new class extends Migration
             $table->string('phone_number')->unique();
             $table->date('birthdate')->nullable();
             $table->string('email')->unique()->nullable();
-            $table->string('address')->nullable();
             $table->double('rentation')->default(0);
             $table->string('otp');
             $table->boolean('is_verified')->default(0);

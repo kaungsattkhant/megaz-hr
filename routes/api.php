@@ -37,8 +37,8 @@ use App\Http\Controllers\API\HeadAccountController;
 use App\Http\Controllers\API\TransactionController;
 use App\Http\Controllers\API\TransferAPIController;
 use App\Http\Controllers\API\ComplaintAPIController;
-use App\Http\Controllers\API\Customer\AdsAPIController as CustomerAdsAPIController;
-use App\Http\Controllers\API\Customer\MenuCategoryAPIController as CustomerMenuCategoryAPIController;
+use App\Http\Controllers\API\Customers\AdsAPIController as CustomerAdsAPIController;
+use App\Http\Controllers\API\Customers\MenuCategoryAPIController as CustomerMenuCategoryAPIController;
 // use App\Http\Controllers\API\CustomerAuthController;
 use App\Http\Controllers\API\CustomerLevelDiscountAPIController;
 use App\Http\Controllers\API\InventoryAPIController;
@@ -57,6 +57,7 @@ use App\Http\Controllers\API\UsedDefectedAPIController;
 use App\Models\UsedDefectedItem;
 
 use App\Http\Controllers\API\Customers\AuthController as CustomerAuthController;
+use App\Http\Controllers\API\Customers\CustomerAPIController as UserAppCustomerAPIController;
 use App\Http\Controllers\API\Customers\MenuAPIController as CustomersMenuAPIController;
 use App\Http\Controllers\API\Customers\PackageAPIController as CustomersPackageAPIController;
 use App\Http\Controllers\API\MenuCategoryAPIController;
@@ -409,4 +410,14 @@ Route::middleware('auth:customer_api')->group(function () {
     Route::get('/user_app/menu_categories/{id}/menus',[CustomersMenuAPIController::class,'categoryMenuByUserApp']);
     Route::get('/user_app/packages',[CustomersPackageAPIController::class,'getPackage']);
     Route::get('/user_app/ads',[CustomerAdsAPIController::class,'getAdsByUserApp']);
+
+    Route::get('/user_app/profile',[UserAppCustomerAPIController::class,'getCustomerDataByUserApp']);
+    Route::post('/user_app/user_profile/edit',[UserAppCustomerAPIController::class,'customerProfileEdit']);
+
+    Route::get('/user_app/user_addresses',[UserAppCustomerAPIController::class,'getCustomerAddressByUserApp']);
+    Route::post('/user_app/user_addresses/{id}',[UserAppCustomerAPIController::class,'updateCustomerAddress']);
+    Route::post('/user_app/user_addresses',[UserAppCustomerAPIController::class,'createCustomerAddress']);
+    Route::post('/user_app/default_addresses/{id}',[UserAppCustomerAPIController::class,'defaultCustomerAddress']);
+    Route::delete('/user_app/user_addresses/{id}',[UserAppCustomerAPIController::class,'deleteCustomerAddress']);
+
 });

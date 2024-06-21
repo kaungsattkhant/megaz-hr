@@ -27,7 +27,6 @@ class Customer extends Authenticatable
         'phone_number',
         'birthdate',
         'email',
-        'address',
         'is_active',
         'township_id',
         'rentation',
@@ -72,6 +71,11 @@ class Customer extends Authenticatable
     public function invoices()
     {
         return $this->hasMany(Invoice::class);
+    }
+
+    public function addresses()
+    {
+        return $this->hasMany(CustomerAddress::class);
     }
 
 

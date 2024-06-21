@@ -20,4 +20,20 @@ interface CustomerRepositoryInterface
 
     public function customerDetail(int $id);
 
+    // user app
+    public function customerProfileData();
+
+    public function customerAddressUpdate(int $id, array $data);
+
+    public function createCustomerAddress(array $data);
+
+    public function defaultCustomerAddress(int $id);
+
+    public function customerProfileEdit(array $data);
+
+    public function customerAddressList();
+
+    public function deleteCustomerAddress(int $id);
+
+
 }

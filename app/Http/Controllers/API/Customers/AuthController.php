@@ -12,19 +12,20 @@ use App\Actions\Auth\APILoginAction;
 use App\Http\Controllers\Controller;
 
 use App\Models\Customer;
+use App\Models\CustomerAddress;
 
 class AuthController extends Controller
 {
     //
     public function initialRegister(Request $request)
     {
-        if(!$request->phone_number){
+        if (!$request->phone_number) {
             ResponseMessage('Phone number must be present');
         }
-        if(!$request->name){
+        if (!$request->name) {
             ResponseMessage('Name must be present');
         }
-        if(!$request->gender_id){
+        if (!$request->gender_id) {
             ResponseMessage('Gender must be selected');
         }
         $data = $request->all();
@@ -32,13 +33,12 @@ class AuthController extends Controller
         $data['otp'] = '000000';
         $data['password'] = 'default_password';
 
-        try{
+        try {
             DB::beginTransaction();
             $customer = Customer::create($data);
             DB::commit();
             ResponseMessage('OTP code sent, please check your SMS');
-        }
-        catch(Exception $e){
+        } catch (Exception $e) {
             DB::rollBack();
             ResponseMessage($e->getMessage(), 500);
         }
@@ -47,34 +47,39 @@ class AuthController extends Controller
     public function register(Request $request)
     {
         $customer = Customer::where('phone_number', $request->phone_number)->first();
-        if(!$customer){
+        if (!$customer) {
             ResponseMessage('No customer found with given phone number', 400);
         }
-        if(!$request->password){
+        if (!$request->password) {
             ResponseMessage('Password must be present');
         }
 
-        if($customer->checkOtp($request->otp)){
+        if ($customer->checkOtp($request->otp)) {
             $data = $request->all();
             $data['is_verified'] = 1;
-            try{
+            try {
                 DB::beginTransaction();
                 $customer->update($data);
+                if (isset($request->address)) {
+                    CustomerAddress::create([
+                        'customer_id' => $customer->id,
+                        'address' => 'addresss',
+                        'is_default' => 1
+                    ]);
+                }
                 $customer->save();
 
                 $loginResponse = (new APILoginAction("phone_number", $request->phone_number, $request->password, "App\Models\Customer"))
-                ->run("customer_token");
+                    ->run("customer_token");
                 $loginResponse['user']['login_type'] = 'customer';
                 DB::commit();
 
                 ResponseData($loginResponse, 201, true, 'Successfully registered and verified');
-            }
-            catch(Exception $e){
+            } catch (Exception $e) {
                 DB::rollBack();
                 ResponseMessage($e->getMessage(), 500);
             }
-        }
-        else{
+        } else {
             ResponseMessage('OTP code not match, please try again');
         }
     }
@@ -83,10 +88,9 @@ class AuthController extends Controller
     {
         $loginResponse = (new APILoginAction("phone_number", $request->phone_number, $request->password, "App\Models\Customer"))->run("customer_token");
 
-        if($loginResponse["code"] != 200){
+        if ($loginResponse["code"] != 200) {
             ResponseMessage($loginResponse["message"], 401);
-        }
-        else{
+        } else {
             $customer = Customer::find($loginResponse["user"]["id"]);
             $loginResponse["customer"] = $customer;
             ResponseData($loginResponse);

@@ -3,6 +3,8 @@
 namespace App\Repositories\Customer;
 
 use App\Models\Customer;
+use App\Models\CustomerAddress;
+use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -23,12 +25,16 @@ class CustomerRepository implements CustomerRepositoryInterface
                 $perPage = $request->per_page;
             }
             $skip = ($pageNumber - 1) * $perPage;
-            $customers = Customer::where('is_active')->skip($skip)->take($perPage)->get();
+            $customers = Customer::with(['addresses' => function ($query) {
+                $query->where('is_default', 1);
+            }])->where('is_active', 1)->skip($skip)->take($perPage)->get();
             $paginationData = MakePaginationData($request, $totalCount, 'customers');
             $paginationData['customers'] = $customers;
             return $paginationData;
         } else {
-            $customers = Customer::all();
+            $customers = Customer::where('is_active', 1)->with(['addresses' => function ($query) {
+                $query->where('is_default', 1);
+            }])->get();
 
             return $customers;
         }
@@ -43,14 +49,18 @@ class CustomerRepository implements CustomerRepositoryInterface
             $endOfYear = Carbon::create($today->year, 12, 31);
             $startOfYear = Carbon::create($dateAfter7Days->year, 1, 1);
 
-            $bdCus = Customer::where(function ($query) use ($today, $endOfYear) {
+            $bdCus = Customer::with(['addresses' => function ($query) {
+                $query->where('is_default', 1);
+            }])->where(function ($query) use ($today, $endOfYear) {
                 $query->whereBetween(DB::raw('DAYOFYEAR(birthdate)'), [$today->dayOfYear, $endOfYear->dayOfYear]);
             })->orWhere(function ($query) use ($dateAfter7Days, $startOfYear) {
                 $query->whereBetween(DB::raw('DAYOFYEAR(birthdate)'), [$startOfYear->dayOfYear, $dateAfter7Days->dayOfYear]);
             })->get();
             ResponseData($bdCus);
         } else {
-            return Customer::whereBetween(
+            return Customer::with(['addresses' => function ($query) {
+                $query->where('is_default', 1);
+            }])->whereBetween(
                 DB::raw('DAYOFYEAR(birthdate)'),
                 [$today->dayOfYear, $dateAfter7Days->dayOfYear]
             )->with('township')->get();
@@ -61,7 +71,7 @@ class CustomerRepository implements CustomerRepositoryInterface
     {
         DB::beginTransaction();
         try {
-            if(isset($data['image'])){
+            if (isset($data['image'])) {
                 $imageData = $data['image'];
                 $extension = $imageData->getClientOriginalExtension();
                 $hashedName = md5(uniqid() . microtime()) . '.' . $extension;
@@ -71,7 +81,15 @@ class CustomerRepository implements CustomerRepositoryInterface
             $data['password'] = 'default_password';
             $data['otp'] = '000000';
             $data['is_verified'] = 1;
+
             $customer = Customer::create($data);
+            if (isset($data['address'])) {
+                CustomerAddress::create([
+                    'customer_id' => $customer->id,
+                    'address' => 'addresss',
+                    'is_default' => 1
+                ]);
+            }
             DB::commit();
             return $customer;
         } catch (\Exception $e) {
@@ -150,7 +168,9 @@ class CustomerRepository implements CustomerRepositoryInterface
 
     public function customerDetail(int $id)
     {
-        $customer = Customer::where('id', $id)->with(['invoices.orders.orderItems.menu', 'invoices.sessions.entity'])->first();
+        $customer = Customer::with(['addresses' => function ($query) {
+            $query->where('is_default', 1);
+        }])->where('id', $id)->with(['invoices.orders.orderItems.menu', 'invoices.sessions.entity'])->first();
         if ($customer == null) {
             ResponseMessage('Customer not found', 404);
         }
@@ -185,5 +205,113 @@ class CustomerRepository implements CustomerRepositoryInterface
         $customerData['customer'] = $customer;
         $customerData['customer_detail'] = $customerDetail;
         ResponseData($customerData);
+    }
+
+
+    // user app
+    public function customerProfileData()
+    {
+        $customer = Customer::where('id', UserData()->id)->with(['addresses' => function ($query) {
+            $query->where('is_default', 1);
+        }])->first();
+        if ($customer == null) {
+            ResponseMessage("Customer not found", 404);
+        }
+
+        ResponseData($customer);
+    }
+
+    public function customerAddressUpdate(int $id, array $data)
+    {
+        DB::beginTransaction();
+        try {
+            $customerAddress = CustomerAddress::find($id);
+            if ($customerAddress == null) {
+                ResponseMessage("Customer address not found", 404);
+            }
+            $customerAddress->update($data);
+            DB::commit();
+            ResponseData($customerAddress, 200);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            ResponseMessage($e->getMessage(), 402);
+            throw $e;
+        }
+    }
+
+    public function createCustomerAddress(array $data)
+    {
+        DB::beginTransaction();
+        try {
+            $data['customer_id'] = UserData()->id;
+            $data['is_default'] = 0;
+            $customerAddress = CustomerAddress::create($data);
+            DB::commit();
+            ResponseData($customerAddress, 200);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            ResponseMessage($e->getMessage(), 402);
+            throw $e;
+        }
+    }
+
+    public function defaultCustomerAddress(int $id)
+    {
+        DB::beginTransaction();
+        try {
+            CustomerAddress::where('customer_id', UserData()->id)->update(['is_default' => 0]);
+            $customerAddress = CustomerAddress::find($id);
+            $customerAddress->is_default = 1;
+            $customerAddress->save();
+
+            DB::commit();
+            ResponseMessage('The selected address has been successfully set as your default address.', 200);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            ResponseMessage($e->getMessage(), 402);
+            throw $e;
+        }
+    }
+
+    public function customerProfileEdit(array $data)
+    {
+        DB::beginTransaction();
+        try{
+            $customer = Customer::find(UserData()->id);
+            $customer->update($data);
+            DB::commit();
+            ResponseData($customer);
+        }catch(\Exception $e)
+        {
+            DB::rollBack();
+            ResponseMessage($e->getMessage(), 402);
+            throw $e;
+        }
+    }
+
+    public function customerAddressList()
+    {
+        $customerAddress = CustomerAddress::where('customer_id', UserData()->id)->get();
+        ResponseData($customerAddress);
+    }
+
+    public function deleteCustomerAddress(int $id)
+    {
+        DB::beginTransaction();
+        try{
+            $customerAddress = CustomerAddress::find($id);
+            if($customerAddress == null)
+            {
+                ResponseMessage("Customer address not found", 404);
+            }
+            $customerAddress->delete();
+            DB::commit();
+            ResponseMessage('The selected address has been successfully deleted.', 200);
+        }catch(\Exception $e)
+        {
+            DB::rollBack();
+            ResponseMessage($e->getMessage(), 402);
+            throw $e;
+        }
     }
 }

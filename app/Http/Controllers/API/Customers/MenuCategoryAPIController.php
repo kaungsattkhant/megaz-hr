@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\API\Customer;
+namespace App\Http\Controllers\API\Customers;
 
 use App\Http\Controllers\Controller;
 use App\Repositories\MenuCategory\MenuCategoryRepositoryInterface;
