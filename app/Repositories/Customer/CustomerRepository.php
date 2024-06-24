@@ -26,14 +26,14 @@ class CustomerRepository implements CustomerRepositoryInterface
             }
             $skip = ($pageNumber - 1) * $perPage;
             $customers = Customer::with(['addresses' => function ($query) {
-                $query->where('is_default', 1);
+                $query->where('is_default', 1)->with('township');
             }])->where('is_active', 1)->skip($skip)->take($perPage)->get();
             $paginationData = MakePaginationData($request, $totalCount, 'customers');
             $paginationData['customers'] = $customers;
             return $paginationData;
         } else {
             $customers = Customer::where('is_active', 1)->with(['addresses' => function ($query) {
-                $query->where('is_default', 1);
+                $query->where('is_default', 1)->with('township');
             }])->get();
 
             return $customers;
@@ -50,7 +50,7 @@ class CustomerRepository implements CustomerRepositoryInterface
             $startOfYear = Carbon::create($dateAfter7Days->year, 1, 1);
 
             $bdCus = Customer::with(['addresses' => function ($query) {
-                $query->where('is_default', 1);
+                $query->where('is_default', 1)->with('township');
             }])->where(function ($query) use ($today, $endOfYear) {
                 $query->whereBetween(DB::raw('DAYOFYEAR(birthdate)'), [$today->dayOfYear, $endOfYear->dayOfYear]);
             })->orWhere(function ($query) use ($dateAfter7Days, $startOfYear) {
@@ -59,7 +59,7 @@ class CustomerRepository implements CustomerRepositoryInterface
             ResponseData($bdCus);
         } else {
             return Customer::with(['addresses' => function ($query) {
-                $query->where('is_default', 1);
+                $query->where('is_default', 1)->with('township');
             }])->whereBetween(
                 DB::raw('DAYOFYEAR(birthdate)'),
                 [$today->dayOfYear, $dateAfter7Days->dayOfYear]
@@ -139,7 +139,8 @@ class CustomerRepository implements CustomerRepositoryInterface
     {
         $customers = DB::table('customers')
             ->leftJoin('invoices', 'customers.id', '=', 'invoices.customer_id')
-            ->join('townships', 'customers.township_id', '=', 'townships.id')
+            ->leftJoin('customer_addresses', 'customers.id', '=', 'customer_addresses.customer_id')
+            ->leftJoin('townships', 'customer_addresses.township_id', '=', 'townships.id')
             ->select(
                 'customers.id',
                 'customers.name',
@@ -147,7 +148,7 @@ class CustomerRepository implements CustomerRepositoryInterface
                 'customers.rentation',
                 'customers.birthdate',
                 'customers.email',
-                'customers.address',
+                'customer_addresses.address as customer_address',
                 'townships.name as township_name',
                 DB::raw('COALESCE(SUM(invoices.total), 0) as total_amount')
             )
@@ -158,7 +159,7 @@ class CustomerRepository implements CustomerRepositoryInterface
                 'customers.rentation',
                 'customers.birthdate',
                 'customers.email',
-                'customers.address',
+                'customer_addresses.address',
                 'townships.name'
             )
             ->paginate();
@@ -167,18 +168,22 @@ class CustomerRepository implements CustomerRepositoryInterface
     }
 
 
+
     public function customerDetail(int $id)
     {
         $customer = Customer::with(['addresses' => function ($query) {
-            $query->where('is_default', 1);
-        }])->where('id', $id)->with(['invoices.orders.orderItems.menu', 'invoices.sessions.entity'])->first();
+            $query->where('is_default', 1)->with('township');
+        }, 'invoices.orders.orderItems.menu', 'invoices.sessions.entity'])
+        ->find($id);
+
         if ($customer == null) {
-            ResponseMessage('Customer not found', 404);
+            return ResponseMessage('Customer not found', 404);
         }
 
         $customerDetail = DB::table('invoices')
             ->join('customers', 'invoices.customer_id', '=', 'customers.id')
-            ->join('townships', 'customers.township_id', '=', 'townships.id')
+            ->leftJoin('customer_addresses', 'customers.id', '=', 'customer_addresses.customer_id')
+            ->leftJoin('townships', 'customer_addresses.township_id', '=', 'townships.id')
             ->select(
                 'customers.id',
                 'customers.name',
@@ -186,26 +191,29 @@ class CustomerRepository implements CustomerRepositoryInterface
                 'customers.phone_number',
                 'customers.birthdate',
                 'customers.email',
-                'customers.address',
+                'customer_addresses.address as customer_address',
                 'townships.name as township_name',
                 DB::raw('SUM(invoices.total) as total_amount')
             )
-            ->where('customers.id', '=', $id) // Adding where clause for specific customer ID
+            ->where('customers.id', $id)
             ->groupBy(
                 'customers.id',
                 'customers.name',
-
                 'customers.rentation',
                 'customers.phone_number',
                 'customers.birthdate',
                 'customers.email',
-                'customers.address',
+                'customer_addresses.address',
                 'townships.name'
-            )->get();
+            )
+            ->first();
 
-        $customerData['customer'] = $customer;
-        $customerData['customer_detail'] = $customerDetail;
-        ResponseData($customerData);
+        $customerData = [
+            'customer' => $customer,
+            'customer_detail' => $customerDetail
+        ];
+
+        return ResponseData($customerData);
     }
 
 
@@ -213,7 +221,7 @@ class CustomerRepository implements CustomerRepositoryInterface
     public function customerProfileData()
     {
         $customer = Customer::where('id', UserData()->id)->with(['addresses' => function ($query) {
-            $query->where('is_default', 1);
+            $query->where('is_default', 1)->with('township');
         }])->first();
         if ($customer == null) {
             ResponseMessage("Customer not found", 404);

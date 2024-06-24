@@ -62,11 +62,6 @@ class Customer extends Authenticatable
         return $this->belongsTo(Gender::class);
     }
 
-    // public function township()
-    // {
-    //     return $this->belongsTo(Township::class);
-    // }
-
     public function invoices()
     {
         return $this->hasMany(Invoice::class);
