@@ -46,10 +46,23 @@ class OrderRepository implements OrderRepositoryInterface
                 $data['order_id'] = $order->id;
                 $data['price'] = $data['original_price'] * $data['quantity'];
                 $order_items = OrderItem::create($data);
-
                 DB::commit();
+                $users = Staff::where('department_id',7)->with(['roles'=>function($query)
+                {
+                    $query->where('role_id',17);
+                }])->get();
+
+                $title = 'New Order Arrived';
+
+                $data = [
+                    'date' => CurrentTime(),
+                    'title' => $title,
+                    'body' => 'New Order arrived to kitchen',
+                ];
+                $this->send($order_items, $users, $data);
                 return $order;
             } else {
+
                 $data['date'] = currentTime();
                 $data['total'] = $data['original_price'] * $data['quantity'];
                 $data['total_quantity'] = $data['quantity'];
@@ -61,16 +74,19 @@ class OrderRepository implements OrderRepositoryInterface
                 $data['price'] = $data['original_price'] * $data['quantity'];
                 $order_items = OrderItem::create($data);
                 DB::commit();
-                // $users =  $this->getUserByRole('Kitchen', ['staff']);
-                // $title = 'New Order Arrived';
+                $users = Staff::where('department_id',7)->with(['roles'=>function($query)
+                {
+                    $query->where('role_id',17);
+                }])->get();
 
-                // $data = [
-                //     'date' => CurrentTime(),
-                //     'title' => $title,
-                //     'body' => 'New Order arrived to kitchen',
-                // ];
-                // $this->send($order_items, $users, $data);
+                $title = 'New Order Arrived';
 
+                $data = [
+                    'date' => CurrentTime(),
+                    'title' => $title,
+                    'body' => 'New Order arrived to kitchen',
+                ];
+                $this->send($order_items, $users, $data);
                 return $order;
             }
         } catch (\Exception $e) {
@@ -157,15 +173,18 @@ class OrderRepository implements OrderRepositoryInterface
                     $order_items = OrderItem::create($menuData);
                 }
             }
-            // $users = $this->getUserByRole('Kitchen', ['staff']);
-            // $title = 'New Order Arrived';
+            $users = Staff::where('department_id',7)->with(['roles'=>function($query)
+            {
+                $query->where('role_id',17);
+            }])->get();
+            $title = 'New Order Arrived';
 
-            // $notificationData = [
-            //     'date' => CurrentTime(),
-            //     'title' => $title,
-            //     'body' => 'New Order arrived to kitchen',
-            // ];
-            // $this->send($order_items, $users, $notificationData);
+            $notificationData = [
+                'date' => CurrentTime(),
+                'title' => $title,
+                'body' => 'New Order arrived to kitchen',
+            ];
+            $this->send($order_items, $users, $notificationData);
 
             DB::commit();
             return $order;
@@ -233,7 +252,7 @@ class OrderRepository implements OrderRepositoryInterface
             if ($request->page) {
                 $pageNumber = $request->page;
             }
-            if ($request->per_page) {   
+            if ($request->per_page) {
                 $perPage = $request->per_page;
             }
             $skip = ($pageNumber - 1) * $perPage;
