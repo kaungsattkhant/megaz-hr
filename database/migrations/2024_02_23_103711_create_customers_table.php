@@ -14,7 +14,6 @@ return new class extends Migration
         Schema::create('customers', function (Blueprint $table) {
             $table->id();
             $table->foreignId('gender_id')->constrained()->onDelete('cascade');
-            $table->unsignedBigInteger('township_id')->nullable();
             $table->string('image_url')->nullable();
             $table->string('image_path')->nullable();
             $table->string('password');

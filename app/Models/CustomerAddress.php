@@ -13,10 +13,16 @@ class CustomerAddress extends Model
         'customer_id',
         'address',
         'is_default',
+        'township_id'
     ];
 
     public function customer()
     {
         return $this->belongsTo(Customer::class);
+    }
+
+    public function township()
+    {
+        return $this->belongsTo(Township::class);
     }
 }

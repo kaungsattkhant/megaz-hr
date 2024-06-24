@@ -28,7 +28,6 @@ class Customer extends Authenticatable
         'birthdate',
         'email',
         'is_active',
-        'township_id',
         'rentation',
         'password',
         'otp',
@@ -63,10 +62,10 @@ class Customer extends Authenticatable
         return $this->belongsTo(Gender::class);
     }
 
-    public function township()
-    {
-        return $this->belongsTo(Township::class);
-    }
+    // public function township()
+    // {
+    //     return $this->belongsTo(Township::class);
+    // }
 
     public function invoices()
     {

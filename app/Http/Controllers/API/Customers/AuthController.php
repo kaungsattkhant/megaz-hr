@@ -64,7 +64,8 @@ class AuthController extends Controller
                     CustomerAddress::create([
                         'customer_id' => $customer->id,
                         'address' => 'addresss',
-                        'is_default' => 1
+                        'is_default' => 1,
+                        'township_id' => $data['township_id'] ?? null
                     ]);
                 }
                 $customer->save();
