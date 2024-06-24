@@ -404,6 +404,7 @@ class InvoiceRepository implements InvoiceRepositoryInterface
     {
         DB::beginTransaction();
         try {
+            // initial for all value
             $foodCharge = 0;
             $beverageCharge = 0;
             $total_session_price = 0;
@@ -414,7 +415,7 @@ class InvoiceRepository implements InvoiceRepositoryInterface
             $discount_value = 0;
             $room_discount_value = 0;
 
-
+            // get food and beverage
             if (isset($data['order_categories'])) {
                 $data['order_categories'] = json_decode($data['order_categories'], true);
                 foreach ($data['order_categories'] as $menu) {
@@ -425,7 +426,7 @@ class InvoiceRepository implements InvoiceRepositoryInterface
                     }
                 }
             }
-
+            // get total session price
             $roomSessions = RoomSession::where('invoice_id', $data['invoice_id'])->get();
             foreach ($roomSessions as $room) {
                 $total_session_price += $room->price;
@@ -435,6 +436,7 @@ class InvoiceRepository implements InvoiceRepositoryInterface
             $invoice_id = $invoice->invoice_id;
             $customer = Customer::find($invoice->customer_id);
 
+            // get order discount price
             $order = Order::where('invoice_id', $invoice->id)->first();
             if ($order) {
                 $orderDiscount = $order->total_discount_price;
@@ -451,6 +453,8 @@ class InvoiceRepository implements InvoiceRepositoryInterface
                 $service_charge = $data['service_charge'];
             }
 
+
+            //  caculation depending on the invoice_type
             if ($invoice->invoice_type == 'package') {
                 $foodDrink = $foodCharge + $beverageCharge;
                 $foodDrink = $foodDrink;
@@ -467,6 +471,7 @@ class InvoiceRepository implements InvoiceRepositoryInterface
                 $data['total_session_price'] = $total_session_price;
             }
 
+            // if discount contain, caculate discount value according to the discount type
             if (isset($data['discount_type'])) {
                 if ($data['discount_type'] == 'percentage') {
                     if ($data['discount_percentage'] < 0 || $data['discount_percentage'] > 100) {
@@ -532,6 +537,7 @@ class InvoiceRepository implements InvoiceRepositoryInterface
                 }
             }
 
+            // caculate all of the value that come from the invoice type and discount resul
             $data['room_discount_value'] = $room_discount_value;
             if (isset($data['discount_value'])) {
                 $discount_value = $data['discount_value'];
