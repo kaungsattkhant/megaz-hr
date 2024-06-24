@@ -427,12 +427,21 @@
                                 <!-- {{ printInvoiceData.tax ? printInvoiceData.tax.toLocaleString() : 0 }} MMKs -->
                             </p>
                         </div>
+                        <div class="text-sm text-right flex gap-x-2 justify-end pr-2 mb-2">
+                            <p>
+                                Food Discount
+                            </p>
+                            <p class="w-28">
+                               <!-- {{ purchaseMenuList.length > 0 ? '- ' : '' }} {{ purchaseMenuList[0] ? purchaseMenuList[0].total_discount_price : '0' }} MMks -->
+                               {{ foodDiscount > 0 ? '- ' : '' }} {{ foodDiscount }}
+                            </p>
+                        </div>
                         <div class=" text-sm text-right flex gap-x-2 justify-end pr-2 mb-2">
                             <p>
                                 Discount
                             </p>
                             <p class=" w-28">
-                                {{ printInvoiceData.discount }} {{ this.discount_type == 'percentage' ? '%' : 'MMKs' }}
+                                {{ printInvoiceData.discount > 0 ? '- ' : ''}} {{ printInvoiceData.discount }} {{ this.discount_type == 'percentage' ? '%' : 'MMKs' }}
                             </p>
                         </div>
                         <div class=" text-right pr-3 mb-3">
@@ -442,7 +451,8 @@
                                 <!-- {{ printInvoiceData.total ? printInvoiceData.total.toLocaleString() : 0 }} MMKs -->
                                 {{ (printInvoiceData.total ? printInvoiceData.total : 0)
                                     + (printInvoiceData.service_charge == true? (printInvoiceData.service_tax ? printInvoiceData.service_tax :0) : 0)
-                                    + (printInvoiceData.isTax == true? (printInvoiceData.tax ? printInvoiceData.tax : 0) : 0) }} MMKs
+                                    + (printInvoiceData.isTax == true? (printInvoiceData.tax ? printInvoiceData.tax : 0) : 0) - foodDiscount }} MMKs
+                                    <!-- - (purchaseMenuList ? purchaseMenuList[0].total_discount_price : 0) -->
                             </p>
                         </div>
                         <div class="">
@@ -875,6 +885,7 @@
                 female:null,
                 child:null,
                 purchaseMenuList: [],
+                foodDiscount:0,
                 selectedRoomIndex:null,
                 printInvoiceData:{
                     room:0,
@@ -1001,6 +1012,11 @@
                 if(response.data){
                     if(response.data.room_sessions.length > 0){
                         this.purchaseMenuList = response.data.room_sessions[0].invoice.orders;
+                        if(response.data.room_sessions[0].invoice.orders){
+                            if(response.data.room_sessions[0].invoice.orders[0]){
+                                this.foodDiscount = response.data.room_sessions[0].invoice.orders[0].total_discount_price
+                            }
+                        }
                     }
 
                 }
@@ -1262,7 +1278,8 @@
             
             btnClickedDoneSession(){
                 this.doneSession();
-
+                this.getPurchaseMenuList();
+                this.discount_type = null;
             },
 
             async doneSession(){

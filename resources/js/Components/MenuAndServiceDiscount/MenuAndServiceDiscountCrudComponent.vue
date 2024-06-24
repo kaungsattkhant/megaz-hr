@@ -50,7 +50,7 @@
                         </thead>
                         <tbody>
                             <div class="contents" v-for="(discount, index) in discountList" >
-                                <tr class="bg-white rounded-lg overflow-hidden shadow-lg">
+                                <tr class="">
                                     <td class=" px-6 py-4 font-medium ">
                                         {{ per_page * (currentPage - 1) + (++index) }}
                                     </td>
