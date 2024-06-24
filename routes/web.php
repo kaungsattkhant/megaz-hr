@@ -93,6 +93,7 @@ Route::middleware(['departments:uom-conversion'])->group(function () {
 });
 
 Route::middleware(['departments:menu'])->group(function () {
+    Route::view('/menu_categories', 'menu_categories.index')->name('menu_categories');
     Route::view('/menus', 'menus.index')->name('menus');
     Route::view('/menus/create', 'menus.create')->name('menus.create');
     Route::view('/menus/{id}/edit', 'menus.edit')->name('menus.edit');

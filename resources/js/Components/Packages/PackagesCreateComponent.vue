@@ -327,7 +327,7 @@
                         type: "info"
                     });
 
-                    // window.location.replace('/packages');
+                    window.location.replace('/packages');
                 }
                 else{
                     this.$notify({
