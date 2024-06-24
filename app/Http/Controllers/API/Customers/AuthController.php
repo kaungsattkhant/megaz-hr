@@ -11,17 +11,16 @@ use App\Actions\Auth\APILoginAction;
 
 use App\Http\Controllers\Controller;
 
+use App\Http\Requests\Customer\CustomerRequest;
+
 use App\Models\Customer;
 use App\Models\CustomerAddress;
 
 class AuthController extends Controller
 {
     //
-    public function initialRegister(Request $request)
+    public function initialRegister(CustomerRequest $request)
     {
-        if (!$request->phone_number) {
-            ResponseMessage('Phone number must be present');
-        }
         if (!$request->name) {
             ResponseMessage('Name must be present');
         }
@@ -35,7 +34,10 @@ class AuthController extends Controller
 
         try {
             DB::beginTransaction();
-            $customer = Customer::create($data);
+            Customer::firstOrCreate(
+                ['phone_number' => $request->phone_number, 'is_verified' => 0],
+                $data // Default values to create a new user
+            );
             DB::commit();
             ResponseMessage('OTP code sent, please check your SMS');
         } catch (Exception $e) {
