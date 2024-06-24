@@ -42,6 +42,7 @@ import InventoryReceivesListComponent from './Components/Transfers/InventoryRece
 import InventoryTransfersListComponent from './Components/Transfers/InventoryTransfersListComponent.vue';
 import InventoryTransferHistoryListComponent from './Components/Transfers/InventoryTransferHistoryListComponent.vue';
 import UsedDefectedItemsListComponent from './Components/UsedDefectedItems/UsedDefectedItemsListComponent.vue';
+import MenuCategoryCrudComponent from './Components/Menus/MenuCategoryCrudComponent.vue';
 import MenuListComponent from './Components/Menus/MenuListComponent.vue';
 import MenuCreateComponent from './Components/Menus/MenuCreateComponent.vue';
 import MenuEditComponent from './Components/Menus/MenuEditComponent.vue';
@@ -115,6 +116,7 @@ app.component('InventoryReceivesListComponent', InventoryReceivesListComponent);
 app.component('InventoryTransfersListComponent', InventoryTransfersListComponent);
 app.component('InventoryTransferHistoryListComponent', InventoryTransferHistoryListComponent);
 app.component('UsedDefectedItemsListComponent', UsedDefectedItemsListComponent);
+app.component('MenuCategoryCrudComponent', MenuCategoryCrudComponent);
 app.component('MenuListComponent', MenuListComponent);
 app.component('MenuCreateComponent', MenuCreateComponent);
 app.component('MenuEditComponent', MenuEditComponent);

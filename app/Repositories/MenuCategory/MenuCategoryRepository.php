@@ -22,7 +22,7 @@ class MenuCategoryRepository implements MenuCategoryRepositoryInterface
                 $imageData = $data['image'];
                 $extension = $imageData->getClientOriginalExtension();
                 $hashedName = md5(uniqid() . microtime()) . '.' . $extension;
-                $data['image_path'] = $imageData->storeAs('images/menu_categories', $hashedName, 'public');
+                $data['image_path'] = $imageData->storeAs('images/menu_category_images', $hashedName, 'public');
                 $data['image_url'] = Storage::url($data['image_path']);
             }
             $menuCategory = MenuCategory::create($data);
@@ -39,11 +39,11 @@ class MenuCategoryRepository implements MenuCategoryRepositoryInterface
     {
         DB::beginTransaction();
         try {
-            if ($data['image']) {
+            if (isset($data['image'])) {
                 $imageData = $data['image'];
                 $extension = $imageData->getClientOriginalExtension();
                 $hashedName = md5(uniqid() . microtime()) . '.' . $extension;
-                $data['image_path'] = $imageData->storeAs('images/menu_categories', $hashedName, 'public');
+                $data['image_path'] = $imageData->storeAs('images/menu_category_images', $hashedName, 'public');
                 $data['image_url'] = Storage::url($data['image_path']);
             }
             $menuCategory = MenuCategory::find($id);

@@ -64,6 +64,12 @@
 
                         @if (checkFeaturePermission('menu'))
                             <li>
+                                <a href="{{ route('menu_categories') }}" class="flex items-center @yield('menu_categories')">
+                                    <i class="fal fa-clipboard-list  pr-3"></i>
+                                    Menu Categories
+                                </a>
+                            </li>
+                            <li>
                                 <a href="{{ route('menus') }}" class="flex items-center @yield('menus')">
                                     <i class="fal fa-clipboard-list  pr-3"></i>
                                     Selling Menus
