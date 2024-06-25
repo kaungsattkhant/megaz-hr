@@ -56,9 +56,9 @@
                                     </td>
 
                                     <td class="whitespace-nowrap  ">
-                                        <span class="relative flex shrink-0 overflow-hidden rounded-md h-12 w-12">
-                                            <img :src="category.image_url" alt="Menu category image">
-                                        </span>
+                                        <div class="relative flex border rounded text-center shrink-0 overflow-hidden rounded-md h-12 w-12">
+                                            <img width="80" height="100" style="aspect-ratio: 4/3; object-fit: cover;" :src="category.image_url" alt="Menu image">
+                                        </div>
                                     </td>
                                     <td class="whitespace-nowrap ">
                                         <!-- <button @click="deleteBtnClicked(category.id)"

@@ -49,9 +49,14 @@
                                 <th scope="col" class="  ">
                                     Ingredients
                                 </th>
-
+                                <th scope="col" class="  ">
+                                    Image
+                                </th>
                                 <th scope="col" class="  ">
                                     Price
+                                </th>
+                                <th scope="col" class="  ">
+                                    Is featured?
                                 </th>
                                 <th scope="col" class="">
 
@@ -69,11 +74,20 @@
                                         {{ menu.name }}
                                     </td>
                                     <td class="whitespace-nowrap  ">
-                                        <p v-for="(ingredient, ingredientIndex) in menu.items"> {{ ingredient.name }}
+                                        <p v-for="(ingredient, ingredientIndex) in menu.items">
+                                            {{ ingredient.name }}
                                         </p>
                                     </td>
+                                    <td class="whitespace-nowrap  ">
+                                        <div class="relative flex border rounded text-center shrink-0 overflow-hidden rounded-md h-18 w-18">
+                                            <img width="80" height="100" style="aspect-ratio: 4/3; object-fit: cover;" :src="menu.image_url" alt="Menu image">
+                                        </div>
+                                    </td>
                                     <td class="  ">
-                                        {{ menu.prices[0].price }}
+                                        {{ (menu.prices[0].price).toLocaleString() }}
+                                    </td>
+                                    <td class="  ">
+                                        {{ (menu.is_feature == 1)?'Yes': 'No' }}
                                     </td>
                                     <td class="whitespace-nowrap ">
                                         <a :href="`/menus/${menu.id}/edit`" id="edit-btn" class="pr-1">
