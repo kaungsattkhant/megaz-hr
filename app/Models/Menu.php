@@ -13,7 +13,7 @@ class Menu extends BaseModel
 {
     use HasFactory;
 
-    protected $fillable = ['menu_category_id','name', 'is_active','image_path','image_url'];
+    protected $fillable = ['menu_category_id','name', 'is_active','image_path','image_url','is_feature'];
 
     public function menu_category()
     {
@@ -40,7 +40,7 @@ class Menu extends BaseModel
         return $this->hasOne(OrderItem::class);
     }
 
-    
+
     public function pack()
     {
         return $this->belongsTo(Pack::class);

@@ -69,4 +69,10 @@ class MenuAPIController extends Controller
         $menu = $this->menuRepo->editMenu($id, $data, $items);
         ResponseData($menu);
     }
+
+    public function featureToggleMenu(int $id)
+    {
+        $menus = $this->menuRepo->toggleMenuFeature($id);
+        ResponseData($menus);
+    }
 }

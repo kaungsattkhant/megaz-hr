@@ -20,4 +20,6 @@ interface MenuRepositoryInterface
 
     // user app
     public function listAllMenu(Request $request);
+
+    public function toggleMenuFeature($id);
 }

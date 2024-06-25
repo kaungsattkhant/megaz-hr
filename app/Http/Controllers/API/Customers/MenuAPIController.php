@@ -25,7 +25,7 @@ class MenuAPIController extends Controller
 
     public function categoryMenuByUserApp(int $id)
     {
-        $menu = Menu::where('menu_category_id',$id)->with('prices')->get();
+        $menu = Menu::where('menu_category_id',$id)->where('is_feature',1)->with('prices')->get();
         ResponseData($menu);
     }
 }

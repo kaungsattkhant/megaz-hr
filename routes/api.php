@@ -345,6 +345,7 @@ Route::post('/menus/{id}/add_price', [MenuAPIController::class, 'addPriceToMenu'
 Route::post('/menus/{id}/is_active',[MenuAPIController::class,'menuOnOff']);
 Route::get('/menus/{id}',[MenuAPIController::class,'detailMenu']);
 Route::post('/menus/{id}',[MenuAPIController::class,'menuEdit']);
+Route::post('/menu/{id}/is_feature',[MenuAPIController::class,'featureToggleMenu']);
 
 
 Route::get('/areas/{id}/entities', [EntityAPIController::class, 'getEntityWithInvoice']);
