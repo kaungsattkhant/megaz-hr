@@ -160,24 +160,34 @@ class MenuRepository implements MenuRepositoryInterface
         }
     }
 
+    public function toggleMenuFeature($id)
+    {
+        DB::beginTransaction();
+        try{
+            $menu = Menu::find($id);
+            if ($menu) {
+                $menu->is_feature = !$menu->is_feature;
+                $menu->update();
+                DB::commit();
+                ResponseMessage('Menu is feature status has been changed');
+            }else{
+                ResponseMessage('Menu not found',404);
+            }
+            DB::commit();
+        }catch(\Exception $e)
+        {
+            DB::rollback();
+            ResponseMessage($e->getMessage(), 402);
+            throw $e;
+        }
+    }
+
 
     // user app
 
     public function listAllMenu(Request $request)
     {
-        if ($request->per_page || $request->page) {
-            $menu_category_id = $request->menu_category_id;
-            return Menu::with(['menu_category', 'prices', 'items'])->orderBy('created_at','desc')
-                ->when($request->search_input, function ($q) use ($request) {
-                    $q->where('name', 'LIKE', '%' . $request->search_input . '%');
-                })
-                ->when($menu_category_id, function ($query) use ($menu_category_id) {
-                    $query->where('menu_category_id', $menu_category_id);
-                })
-                ->paginate(config('common.list_count'));
-        } else {
-            $menus = Menu::with(['menu_category', 'prices', 'items'])->orderBy('created_at','desc')->where('is_active', 1)->get();
-            return $menus;
-        }
+        $menus = Menu::with(['menu_category', 'prices', 'items'])->where('is_feature',1)->orderBy('created_at','desc')->where('is_active', 1)->paginate(config('common.list_count'));
+        return $menus;
     }
 }
