@@ -187,7 +187,7 @@ class MenuRepository implements MenuRepositoryInterface
 
     public function listAllMenu(Request $request)
     {
-        $menus = Menu::with(['menu_category', 'prices', 'items'])->where('is_feature',1)->orderBy('created_at','desc')->where('is_active', 1)->paginate(6);
+        $menus = Menu::with(['menu_category', 'prices', 'items'])->where('is_feature',1)->orderBy('created_at','desc')->where('is_active', 1)->paginate(config('common.list_count'));
         return $menus;
     }
 }
