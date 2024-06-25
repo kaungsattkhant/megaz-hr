@@ -172,11 +172,13 @@ class InvoiceRepository implements InvoiceRepositoryInterface
         return $headCount;
     }
 
+
     public function addSessionDuration(array $data)
     {
         DB::beginTransaction();
         try {
             $roomAndSession = RoomSession::where('invoice_id', $data['invoice_id'])->latest()->first();
+            dd($roomAndSession);
             $roomSessionsWithInvoice = RoomSession::where('invoice_id', $data['invoice_id'])->get();
             $originalDuration = 0;
             foreach ($roomSessionsWithInvoice as $room_session) {
@@ -189,23 +191,6 @@ class InvoiceRepository implements InvoiceRepositoryInterface
 
             $invoice->total_session_price += $data['session_duration'] * $roomAndSession->entity->price_per_hour;
 
-            // $startTime = Carbon::parse($roomAndSession->start_date);
-            // $endTime = Carbon::now();
-            // $durationInMinutes = $endTime->diffInMinutes($startTime);
-            // $durationInHours = $durationInMinutes / 60; // Convert minutes to hours
-            // $roundedDurationInHours = round($durationInHours, 3);
-            // $roomAndSession->session_duration = $roundedDurationInHours;
-
-            // how much duration left
-            // $leftDuration = $originalDuration - $roundedDurationInHours;
-            // $latestSession = $invoice->sessions->sortByDesc('created_at')->first();
-            // $originalRoom = Entity::find($latestSession->entity_id);
-            // $roomAndSession->price = $roundedDurationInHours * $originalRoom->price_per_hour;
-            // if ($roundedDurationInHours >= 1) {
-            //     $end_date = Carbon::parse(CurrentTime())->addHours($roundedDurationInHours);
-            // } else {
-            //     $end_date = Carbon::parse(CurrentTime())->addMinutes($roundedDurationInHours * 60);
-            // }
 
             if ($data['session_duration'] >= 1) {
                 $end_date = Carbon::parse($roomAndSession->end_date)->addHours($data['session_duration']);
@@ -217,23 +202,9 @@ class InvoiceRepository implements InvoiceRepositoryInterface
             $roomAndSession->session_duration += $data['session_duration'];
             $roomAndSession->save();
 
-            // $roomData['session_duration'] = $data['session_duration'] + $leftDuration;
-            // $roomData['start_date'] = CurrentTime();
-            // $roomData['invoice_id'] = $invoice->id;
-            // $roomData['entity_id'] = $latestSession->entity_id;
 
-
-            // $roomData['price'] = $originalRoom->price_per_hour * $roomData['session_duration'];
-
-            // $roomData['end_date'] = $end_date->format('Y-m-d H:i:s');
-            // $updatedDurationRoom = RoomSession::create($roomData);
             $allRooms = RoomSession::where('invoice_id', $invoice->id)->get();
-            // $total_session_price = 0;
-            // foreach ($allRooms as $room) {
-            //     $total_session_price += $room->price;
-            // }
-            // $invoice->total_session_price = $total_session_price;
-            // $invoice->save();
+
             DB::commit();
             return $roomAndSession;
         } catch (\Throwable $e) {
@@ -243,10 +214,11 @@ class InvoiceRepository implements InvoiceRepositoryInterface
         }
     }
 
-    public function invoiceEntityChange(array $data)
+    public function invoiceEntityChange($data)
     {
         DB::beginTransaction();
         try {
+
             $invoice = Invoice::find($data['invoice_id']);
             if ($invoice->invoice_type == 'package') {
                 $package = Package::find($invoice->package_id);
@@ -255,58 +227,63 @@ class InvoiceRepository implements InvoiceRepositoryInterface
                     ResponseMessage('Room cannot change because selected cannot apply package', 422);
                 }
             }
-            $lastRoomwithInvoice = RoomSession::where('invoice_id', $invoice->id)->latest()->first();
+
+            $lastRoomwithInvoice = $invoice->latestSession;
+            // caculating the possible left duration of session
             $startTime = Carbon::parse($lastRoomwithInvoice->start_date);
             $endTime = Carbon::now();
-            $durationInMinutes = $endTime->diffInMinutes($startTime);
-            $durationInHours = $durationInMinutes / 60; // Convert minutes to hours
+            $durationInMinute = $endTime->diffInMinute($startTime);
+            $durationInHours = $durationInMinute / 60; // Convert minutes to hours
             $roundedDurationInHours = round($durationInHours, 3);
-            $invoice = Invoice::find($lastRoomwithInvoice->invoice_id);
-            $latestSession = $invoice->sessions->sortByDesc('created_at')->first();
-            $latestRoomOfInvoice = Entity::find($latestSession->entity_id);
-            $entity = $latestRoomOfInvoice;
+            $lastEntity = Entity::find($lastRoomwithInvoice->entity_id);
             $leftDuration = $lastRoomwithInvoice->session_duration - $roundedDurationInHours;
             $lastRoomwithInvoice->session_duration = $roundedDurationInHours;
             $lastRoomwithInvoice->end_date = CurrentTime();
+
             if ($invoice->invoice_type == 'package') {
                 $lastRoomwithInvoice->price = 0;
             } else {
-                $lastRoomwithInvoice->price = $roundedDurationInHours * $entity->price_per_hour;
+                $lastRoomwithInvoice->price = $roundedDurationInHours * $lastEntity->price_per_hour;
             }
+
             $lastRoomwithInvoice->save();
-            $latestRoomOfInvoice->is_active = 0;
-            $latestRoomOfInvoice->save();
-            $room = Entity::find($data['entity_id']);
-            if ($room->is_active == 1) {
+            $lastEntity->is_active = 0;
+            $lastEntity->save();
+
+            $selectedEntity = Entity::find($data['entity_id']);
+            if ($selectedEntity->is_active == 1) {
                 ResponseMessage('Room is currently active. Please choose another room', 422);
             }
-            $room->is_active = 1;
-            $room->save();
-            $roomData['start_date'] = CurrentTime();
-            $roomData['invoice_id'] = $invoice->id;
-            $roomData['session_duration'] = $leftDuration;
-            $roomData['price'] = $room->price_per_hour * $leftDuration;
-            $roomData['entity_id'] = $room->id;
+
+            $selectedEntity->is_active = 1;
+            $selectedEntity->save();
+
+            $newSession['start_date'] = CurrentTime();
+            $newSession['invoice_id'] = $invoice->id;
+            $newSession['session_duration'] = $leftDuration;
+            $newSession['price'] = $selectedEntity->price_per_hour * $leftDuration;
+            $newSession['entity_id'] = $selectedEntity->id;
 
             if ($invoice->invoice_type == 'endless_time') {
-                $roomData['end_date'] = null;
-                $roomData['session_duration'] = null;
-                $roomData['price'] = 0;
+                $newSession['end_date'] = null;
+                $newSession['session_duration'] = null;
+                $newSession['price'] = 0;
             } else {
                 if ($leftDuration >= 1) {
-                    $end_date = Carbon::parse($roomData['start_date'])->addHours($leftDuration);
-                    $roomData['end_date'] = $end_date->format('Y-m-d H:i:s');
+                    $end_date = Carbon::parse($newSession['start_date'])->addHours($leftDuration * 60);
+                    $newSession['end_date'] = $end_date->format('Y-m-d H:i:s');
                 } else {
-                    $end_date = Carbon::parse($roomData['start_date'])->addMinutes($leftDuration * 60);
-                    $roomData['end_date'] = $end_date->format('Y-m-d H:i:s');
+                    $end_date = Carbon::parse($newSession['start_date'])->addMinutes($leftDuration * 60);
+                    $newSession['end_date'] = $end_date->format('Y-m-d H:i:s');
                 }
+
                 if ($invoice->invoice_type == 'package') {
-                    $roomData['price'] = 0;
+                    $newSession['price'] = 0;
                 }
             }
-            $newRoomAndSession = RoomSession::create($roomData);
 
-            $invoice->area_id = $room->area_id;
+            $newSession = RoomSession::create($newSession);
+            $invoice->area_id = $selectedEntity->area_id;
             $invoice->save();
             $allRooms = RoomSession::where('invoice_id', $invoice->id)->get();
             $total_session_price = 0;
@@ -318,7 +295,7 @@ class InvoiceRepository implements InvoiceRepositoryInterface
             DB::commit();
 
             return $room;
-        } catch (\Throwable $e) {
+        } catch (\Exception $e) {
             DB::rollback();
             ResponseMessage($e->getMessage(), 402);
             throw $e;
@@ -359,38 +336,36 @@ class InvoiceRepository implements InvoiceRepositoryInterface
             $today = Carbon::today();
             $customer = Customer::find($invoice->customer_id);
 
-                $customerTotal = 0;
-                if($customer->invoices)
-                {
-                    foreach($customer->invoices as $invoice)
-                    {
-                        $customerTotal += $invoice->total;
-                    }
+            $customerTotal = 0;
+            if ($customer->invoices) {
+                foreach ($customer->invoices as $invoice) {
+                    $customerTotal += $invoice->total;
                 }
+            }
 
-                $levels = CustomerLevelDiscount::all();
-                $customerLevel = null;
-                foreach ($levels as $level) {
-                    if ($customerTotal  >= $level->amount) {
-                        $customerLevel = $level;
-                    } else {
-                        break;
-                    }
-                }
-                if ($customerLevel !== null) {
-                    $roomDoneResponse['customer_level'] = $customerLevel->name;
-                    $roomDoneResponse['customer_level_discount_value'] = $customerLevel->promotion_value;
-                }
-
-                $roomDoneResponse['customer_total']= $customerTotal;
-                if ($customer) {
-                    $birthdate = Carbon::parse($customer->birthdate);
-                    $roomDoneResponse['is_birthday'] = $birthdate->isBirthday($today);
+            $levels = CustomerLevelDiscount::all();
+            $customerLevel = null;
+            foreach ($levels as $level) {
+                if ($customerTotal  >= $level->amount) {
+                    $customerLevel = $level;
                 } else {
-                    $roomDoneResponse['is_birthday'] = false;
+                    break;
                 }
+            }
+            if ($customerLevel !== null) {
+                $roomDoneResponse['customer_level'] = $customerLevel->name;
+                $roomDoneResponse['customer_level_discount_value'] = $customerLevel->promotion_value;
+            }
 
-                $roomDoneResponse['room_sessions'] = $latestRoomSession;
+            $roomDoneResponse['customer_total'] = $customerTotal;
+            if ($customer) {
+                $birthdate = Carbon::parse($customer->birthdate);
+                $roomDoneResponse['is_birthday'] = $birthdate->isBirthday($today);
+            } else {
+                $roomDoneResponse['is_birthday'] = false;
+            }
+
+            $roomDoneResponse['room_sessions'] = $latestRoomSession;
             DB::commit();
             ResponseData($roomDoneResponse);
         } catch (\Exception $e) {

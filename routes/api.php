@@ -379,7 +379,7 @@ Route::get('get_inventory',[InventoryAPIController::class, 'getInventory']);
 Route::get('/features',[FeatureAPIController::class,'getFeatureData']);
 
 // customer upcoming birthday list
-RoutE::get('/crm/upcoming_birthdays',[CustomerAPIController::class,'upComingBdList']);
+Route::get('/crm/upcoming_birthdays',[CustomerAPIController::class,'upComingBdList']);
 Route::controller(BirthDayPromotionAPIController::class)->group(function ()
 {
     Route::get('/birthday_promotions','getBirthdayPromotions');
