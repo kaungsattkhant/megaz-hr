@@ -62,8 +62,9 @@ class AuthController extends Controller
                 $customer->update($data);
                 if (isset($request->address)) {
                     CustomerAddress::create([
+                        'name' => $data['address_name'],
                         'customer_id' => $customer->id,
-                        'address' => 'addresss',
+                        'address' => $data['address'],
                         'is_default' => 1,
                         'township_id' => $data['township_id'] ?? null
                     ]);
