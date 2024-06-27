@@ -30,7 +30,6 @@ return new class extends Migration
             $table->dateTime('end_date')->nullable();
             $table->dateTime('cancelled_at')->nullable();
             $table->unsignedBigInteger('cancelled_by')->nullable();
-
             $table->timestamps();
         });
     }
