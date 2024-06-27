@@ -12,7 +12,7 @@ class BookingRepository implements BookingRepositoryInterface
 {
     public function listAllData()
     {
-        $booking = Booking::with(['customer', 'headCount', 'entity'])->paginate(config('common.list'));
+        $booking = Booking::where('customer_id',UserData()->id)->with(['customer', 'headCount', 'entity'])->orderBy('created_at','desc')->paginate(config('common.list'));
         ResponseData($booking);
     }
 
@@ -35,7 +35,7 @@ class BookingRepository implements BookingRepositoryInterface
                 ->first();
 
             if ($existingBookings != null) {
-                ResponseData('There is an existing booking for this entity in this time frame', 400);
+                ResponseData('There is an existing booking for this entity in this time frame', 422);
             }
             $headCount = $this->headCountCreate($data);
             $data['head_count_id'] = $headCount->id;
