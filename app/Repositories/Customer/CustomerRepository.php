@@ -301,7 +301,7 @@ class CustomerRepository implements CustomerRepositoryInterface
 
     public function customerAddressList()
     {
-        $customerAddress = CustomerAddress::where('customer_id', UserData()->id)->get();
+        $customerAddress = CustomerAddress::where('customer_id', UserData()->id)->with('township')->get();
         ResponseData($customerAddress);
     }
 
