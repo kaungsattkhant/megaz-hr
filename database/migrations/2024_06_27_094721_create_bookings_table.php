@@ -13,19 +13,20 @@ return new class extends Migration
     {
         Schema::create('bookings', function (Blueprint $table) {
             $table->id();
-            $table->string('booking_id');
+            $table->string('booking_id')->nullable();
             $table->dateTime('date_time')->default(CurrentTime());
             $table->foreignId('entity_id')->constrained()->onDelete('cascade');
             $table->foreignId('head_count_id')->constrained()->onDelete('cascade');
-            $table->foreignId('package_id')->constrained()->onDelete('cascade');
+            $table->foreignId('package_id')->nullable()->constrained()->onDelete('cascade');
             $table->double('deposit');
             $table->double('amount');
             $table->foreignId('customer_id')->constrained()->onDelete('cascade');
             $table->string('remark')->nullable();
-            $table->string('status');
+            $table->string('status')->default('pending');
             $table->dateTime('confirmed_at')->nullable();
             $table->unsignedBigInteger('confirmed_by')->nullable();
             $table->string('session');
+            $table->string('session_type');
             $table->dateTime('start_date');
             $table->dateTime('end_date')->nullable();
             $table->dateTime('cancelled_at')->nullable();

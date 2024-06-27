@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\API\Customers\AdsAPIController;
 use App\Http\Controllers\API\Customers\AuthController;
+use App\Http\Controllers\API\Customers\BookingAPIController;
 use App\Http\Controllers\API\Customers\CustomerAPIController;
 use App\Http\Controllers\API\Customers\MenuAPIController;
 use App\Http\Controllers\API\Customers\MenuCategoryAPIController;
@@ -32,6 +33,9 @@ Route::middleware('auth:customer_api')->group(function () {
     Route::post('/user_app/user_addresses',[CustomerAPIController::class,'createCustomerAddress']);
     Route::post('/user_app/default_addresses/{id}',[CustomerAPIController::class,'defaultCustomerAddress']);
     Route::delete('/user_app/user_addresses/{id}',[CustomerAPIController::class,'deleteCustomerAddress']);
+
+    Route::get('/user_app/bookings',[BookingAPIController::class,'listAllBookings']);
+    Route::post('/user_app/bookings',[BookingAPIController::class,'createBooking']);
 
 });
 // });

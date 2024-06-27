@@ -34,6 +34,8 @@ use App\Repositories\Transfer\TransferRepository;
 use App\Repositories\Area\AreaRepositoryInterface;
 use App\Repositories\BirthdayPromotion\BirthdayPromotionRepository;
 use App\Repositories\BirthdayPromotion\BirthdayPromotionRepositoryInterface;
+use App\Repositories\Booking\BookingRepository;
+use App\Repositories\Booking\BookingRepositoryInterface;
 use App\Repositories\Item\ItemRepositoryInterface;
 use App\Repositories\Menu\MenuRepositoryInterface;
 use App\Repositories\Role\RoleRepositoryInterface;
@@ -149,5 +151,6 @@ class RepositoryServiceProvider extends ServiceProvider
         $this->app->bind(HomeInterface::class,HomeRepository::class);
         $this->app->bind(MenuCategoryRepositoryInterface::class,MenuCategoryRepository::class);
         $this->app->bind(AdsRepositoryInterface::class,AdsRepository::class);
+        $this->app->bind(BookingRepositoryInterface::class,BookingRepository::class);
     }
 }
