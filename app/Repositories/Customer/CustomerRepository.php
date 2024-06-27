@@ -85,6 +85,7 @@ class CustomerRepository implements CustomerRepositoryInterface
             $customer = Customer::create($data);
             if (isset($data['address'])) {
                 CustomerAddress::create([
+                    'name' => $data['address_name'],
                     'customer_id' => $customer->id,
                     'address' => 'addresss',
                     'is_default' => 1,
