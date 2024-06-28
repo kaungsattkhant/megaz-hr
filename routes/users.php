@@ -4,6 +4,7 @@ use App\Http\Controllers\API\Customers\AdsAPIController;
 use App\Http\Controllers\API\Customers\AuthController;
 use App\Http\Controllers\API\Customers\BookingAPIController;
 use App\Http\Controllers\API\Customers\CustomerAPIController;
+use App\Http\Controllers\API\Customers\EntityAPIContorller;
 use App\Http\Controllers\API\Customers\MenuAPIController;
 use App\Http\Controllers\API\Customers\MenuCategoryAPIController;
 use App\Http\Controllers\API\Customers\PackageAPIController;
@@ -36,6 +37,7 @@ Route::middleware('auth:customer_api')->group(function () {
 
     Route::get('/user_app/bookings',[BookingAPIController::class,'listAllBookings']);
     Route::post('/user_app/bookings',[BookingAPIController::class,'createBooking']);
+    Route::get('/user_app/room_lists',[EntityAPIContorller::class,'roomList']);
 
 });
 // });

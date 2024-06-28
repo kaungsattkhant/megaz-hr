@@ -19,4 +19,7 @@ interface EntityRepositoryInterface
     public function entityDetail(array $data, int $entityId);
 
     public function inactiveEntityList(array $data);
+
+    public function roomListForUserApp();
+
 }

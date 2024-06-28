@@ -149,4 +149,12 @@ class EntityRepository implements EntityRepositoryInterface
 
         return $entities;
     }
+
+    // user app
+
+    public function roomListForUserApp()
+    {
+        $rooms = Entity::where('entity_type','room')->get();
+        ResponseData($rooms);
+    }
 }
