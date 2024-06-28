@@ -8,12 +8,13 @@ use Illuminate\Database\Eloquent\Model;
 use App\Models\Item;
 use App\Models\MenuCategory;
 use App\Models\MenuPrice;
+use Carbon\Carbon;
 
 class Menu extends BaseModel
 {
     use HasFactory;
 
-    protected $fillable = ['menu_category_id','name', 'is_active','image_path','image_url','is_feature'];
+    protected $fillable = ['menu_category_id', 'name', 'is_active', 'image_path', 'image_url', 'is_feature'];
 
     public function menu_category()
     {
@@ -27,12 +28,12 @@ class Menu extends BaseModel
 
     public function price()
     {
-        return $this->hasOne(MenuPrice::class)->orderBy('id','desc');
+        return $this->hasOne(MenuPrice::class)->orderBy('id', 'desc');
     }
 
     public function items()
     {
-        return $this->belongsToMany(Item::class)->withPivot(['weight','price', 'is_make_pack','uom_id']);
+        return $this->belongsToMany(Item::class)->withPivot(['weight', 'price', 'is_make_pack', 'uom_id']);
     }
 
     public function orderItem()
@@ -50,4 +51,6 @@ class Menu extends BaseModel
     {
         return $this->morphMany(MenuServiceDiscount::class, 'discountable');
     }
+
+
 }
