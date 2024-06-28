@@ -47,13 +47,25 @@ class BookingRepository implements BookingRepositoryInterface
             if (isset($data['menus'])) {
                 $menuData = json_decode($data['menus'], true);
                 foreach ($menuData as $menu) {
-                    BookingMenu::create([
-                        'quantity' => $menu['quantity'],
-                        'menu_id' => $menu['menu_id'],
-                        'booking_id' => $booking->id,
-                        'price' => $menu['price'],
-                        'discount_value' => $menu['discount_value']
-                    ]);
+                    if($menu['is_package'])
+                    {
+                        BookingMenu::create([
+                            'quantity' => $menu['quantity'],
+                            'menu_id' => $menu['menu_id'],
+                            'booking_id' => $booking->id,
+                            'price' => 0,
+                            'discount_value' => $menu['discount_value']
+                        ]);
+                    }else{
+                        BookingMenu::create([
+                            'quantity' => $menu['quantity'],
+                            'menu_id' => $menu['menu_id'],
+                            'booking_id' => $booking->id,
+                            'price' => $menu['price'],
+                            'discount_value' => $menu['discount_value']
+                        ]);
+                    }
+
                 }
             }
             $booking->booking_id = sprintf('%05d', $booking->id);
