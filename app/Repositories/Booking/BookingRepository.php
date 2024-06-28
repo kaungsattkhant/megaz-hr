@@ -45,11 +45,14 @@ class BookingRepository implements BookingRepositoryInterface
             $data['booking_id'] = 1;
             $booking = Booking::create($data);
             if (isset($data['menus'])) {
-                foreach ($data['menus'] as $menu) {
+                $menuData = json_decode($data['menus'], true);
+                foreach ($menuData as $menu) {
                     BookingMenu::create([
-                        'quantity' => 1,
+                        'quantity' => $menu['quantity'],
                         'menu_id' => $menu['menu_id'],
-                        'booking_id' => $booking->id
+                        'booking_id' => $booking->id,
+                        'price' => $menu['price'],
+                        'discount_value' => $menu['discount_value']
                     ]);
                 }
             }
