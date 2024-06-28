@@ -42,7 +42,7 @@
                                         {{ customer.phone_number }}
                                     </td>
                                     <td class="whitespace-nowrap px-6 py-4">
-                                        {{ customer.address }}
+                                        {{ customer.addresses[0] ? customer.addresses[0].name : '' }}
                                     </td>
                                 </tr>
 
