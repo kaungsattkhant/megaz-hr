@@ -23,6 +23,7 @@ return new class extends Migration
             $table->boolean('is_ktv');
             $table->boolean('is_active')->default(1);
             $table->unsignedBigInteger('created_by');
+            $table->boolean('is_changeable')->default(1);
             $table->timestamps();
         });
     }
