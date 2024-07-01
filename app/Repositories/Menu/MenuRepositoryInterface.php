@@ -18,8 +18,9 @@ interface MenuRepositoryInterface
 
     public function editMenu(int $id, array $data, array $items);
 
+    public function toggleMenuFeature($id);
+
     // user app
     public function listAllMenu(Request $request);
 
-    public function toggleMenuFeature($id);
 }

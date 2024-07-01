@@ -819,6 +819,13 @@
                         </div>
                         <div class="mb-4">
                             <label for="" class="block text-sm text-black mb-3">
+                                Address Name
+                            </label>
+                            <input type="text" placeholder="Address Name" v-model="address_name"
+                                class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
+                        </div>
+                        <div class="mb-4">
+                            <label for="" class="block text-sm text-black mb-3">
                                 Address
                             </label>
                             <textarea v-model="address"
@@ -871,6 +878,7 @@
                 divisionList:null,
                 selectedTownship:null,
                 townshipList:null,
+                address_name:null,
                 address:null,
                 selectedGender:null,
                 customerList:null,
@@ -1113,6 +1121,7 @@
                     formData.append('email', this.email);
                 }
                 formData.append('phone_number', this.ph_number);
+                formData.append('address_name', this.address_name);
                 formData.append('address', this.address);
                 formData.append('birthdate', this.date);
                 formData.append('township_id', this.selectedTownship.id);

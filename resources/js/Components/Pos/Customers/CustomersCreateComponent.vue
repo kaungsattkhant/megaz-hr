@@ -49,7 +49,6 @@
                             <input type="date" placeholder="2000-02-02" v-model="date"
                                 class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
                         </div>
-
                         <div class=" mb-4">
                                 <label for="" class="text-sm text-black mb-2 block">
                                     Division
@@ -76,6 +75,14 @@
                                     </option>
 
                                 </select>
+                        </div>
+
+                        <div class="mb-4">
+                            <label for="" class="block text-sm text-black mb-3">
+                                Address Name
+                            </label>
+                            <input type="text" placeholder="Address Name" v-model="address_name"
+                                class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
                         </div>
                         <div class="mb-4">
                             <label for="" class="block text-sm text-black mb-3">
@@ -125,6 +132,7 @@ import { Modal, Ripple, Select, Datepicker, initTE, Input } from "tw-elements";
                 divisionList:null,
                 selectedTownship:null,
                 townshipList:null,
+                address_name:null,
 
             };
         },
@@ -161,6 +169,7 @@ import { Modal, Ripple, Select, Datepicker, initTE, Input } from "tw-elements";
                 formData.append('name', this.name);
                 formData.append('email', this.email);
                 formData.append('phone_number', this.ph_number);
+                formData.append('address_name', this.address_name);
                 formData.append('address', this.address);
                 formData.append('birthdate', this.date);
                 formData.append('township_id', this.selectedTownship.id);

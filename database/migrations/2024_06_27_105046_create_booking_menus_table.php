@@ -16,6 +16,8 @@ return new class extends Migration
             $table->double('quantity');
             $table->foreignId('menu_id')->constrained()->onDelete('cascade');
             $table->foreignId('booking_id')->constrained()->onDelete('cascade');
+            $table->double('price');
+            $table->double('discount_value')->default(0);
             $table->timestamps();
         });
     }

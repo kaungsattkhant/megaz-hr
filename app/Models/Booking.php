@@ -10,7 +10,7 @@ class Booking extends Model
     use HasFactory;
 
     protected $fillable =[
-        'booking_id','date_time','entity_id','head_count_id','package_id','deposit','amount','customer_id','remark','status','confirmed_at','confirmed_by','session','session_type','start_date','end_date','cancelled_at','cancelled_by'
+        'booking_id','date_time','total_session_price','food_total','entity_id','head_count_id','package_id','deposit','amount','customer_id','remark','status','confirmed_at','confirmed_by','session','session_type','start_date','end_date','cancelled_at','cancelled_by'
     ];
 
     public function customer()

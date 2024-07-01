@@ -10,6 +10,6 @@ class BookingMenu extends Model
     use HasFactory;
 
     protected $fillable =[
-        'quantity','menu_id','booking_id'
+        'quantity','menu_id','booking_id','price','discount_value'
     ];
 }
