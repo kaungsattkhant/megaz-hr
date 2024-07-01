@@ -400,25 +400,4 @@ Route::controller(CustomerLevelDiscountAPIController::class)->group(function ()
 
 Route::post('send_notification', [NotificationController::class, 'sendNotification']);
 
-// user app api
 
-Route::post('/customers/initial_register', [CustomerAuthController::class, 'initialRegister']);
-Route::post('/customers/register', [CustomerAuthController::class, 'register']);
-Route::post('/customers/login', [CustomerAuthController::class, 'login']);
-Route::middleware('auth:customer_api')->group(function () {
-    Route::get('/user_app/menu_categories',[CustomerMenuCategoryAPIController::class,'getMenuCategoriesbyUserApp']);
-    Route::get('/user_app/menus',[CustomersMenuAPIController::class,'listMenuData']);
-    Route::get('/user_app/menu_categories/{id}/menus',[CustomersMenuAPIController::class,'categoryMenuByUserApp']);
-    Route::get('/user_app/packages',[CustomersPackageAPIController::class,'getPackage']);
-    Route::get('/user_app/ads',[CustomerAdsAPIController::class,'getAdsByUserApp']);
-
-    Route::get('/user_app/profile',[UserAppCustomerAPIController::class,'getCustomerDataByUserApp']);
-    Route::post('/user_app/user_profile/edit',[UserAppCustomerAPIController::class,'customerProfileEdit']);
-
-    Route::get('/user_app/user_addresses',[UserAppCustomerAPIController::class,'getCustomerAddressByUserApp']);
-    Route::post('/user_app/user_addresses/{id}',[UserAppCustomerAPIController::class,'updateCustomerAddress']);
-    Route::post('/user_app/user_addresses',[UserAppCustomerAPIController::class,'createCustomerAddress']);
-    Route::post('/user_app/default_addresses/{id}',[UserAppCustomerAPIController::class,'defaultCustomerAddress']);
-    Route::delete('/user_app/user_addresses/{id}',[UserAppCustomerAPIController::class,'deleteCustomerAddress']);
-
-});
