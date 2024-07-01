@@ -200,6 +200,7 @@ class PurchaseOrderRepository implements PurchaseOrderRepositoryInterface
 
     public function detail($purchaseOrder)
     {
+        $purchaseOrder->uom=$purchaseOrder->uom;
         $purchaseOrder->items = $purchaseOrder->items;
         $purchaseOrder->items->load('purchaseOrderItemLeft');
         $purchaseOrder->items->load('item.suppliers');
