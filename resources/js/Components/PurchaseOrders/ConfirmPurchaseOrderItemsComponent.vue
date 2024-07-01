@@ -247,7 +247,7 @@ export default {
                         text: `Item received`,
                         type: 'info'
                     });
-                    // window.location.reload();
+                    this.getItemList(this.currentPage);
                 }
             }
 
