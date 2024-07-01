@@ -254,6 +254,15 @@
                             </li>
                             <li>
                         @endif
+                        @if (checkFeaturePermission('purchase-order-confirmation'))
+                            <li>
+                                <a href="{{ route('purchase_orders.confirm_poitems') }}"
+                                    class="flex items-center @yield('confirm_purchase_order_items')">
+                                    <i class="fal fa-truck-loading  pr-3"></i>
+                                    Confirm Purchase Order Items
+                                </a>
+                            </li>
+                        @endif
                         @if (checkFeaturePermission('purchase-order-item-left'))
                             <a href="{{ route('purchase_orders.left_items_index') }}"
                                 class="flex items-center @yield('purchase_order_left_items')">
@@ -295,15 +304,6 @@
                                 Inventory Stocks
                             </a>
                         </li>
-                        @endif
-                        @if (checkFeaturePermission('purchase-order-confirmation'))
-                            <li>
-                                <a href="{{ route('purchase_orders.confirm_poitems') }}"
-                                    class="flex items-center @yield('confirm_purchase_order_items')">
-                                    <i class="fal fa-truck-loading  pr-3"></i>
-                                    Confirm Purchase Order Items
-                                </a>
-                            </li>
                         @endif
                         @if (checkFeaturePermission('inventory-transfer-list'))
                             <li>

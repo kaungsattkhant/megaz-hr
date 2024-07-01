@@ -147,7 +147,7 @@ class PurchaseOrderRepository implements PurchaseOrderRepositoryInterface
                     'title' => 'You have received a new PO to confirm',
                     'body' => 'New Purchase Order',
                 ];
-                #send old notificaiton 
+                #send old notificaiton
                 #end
                 if($users->isNotEmpty()){
                     // $department_id=$users[0]->department_id;
@@ -399,7 +399,7 @@ class PurchaseOrderRepository implements PurchaseOrderRepositoryInterface
                 }
                 ResponseMessage('Not Found', 404);
             }
-            ResponseMessage("Permission isn't access", 404);
+            ResponseMessage("Permission isn't access", 403);
         } catch (\Exception $e) {
             DB::rollback();
             ResponseMessage($e->getMessage(), 402);

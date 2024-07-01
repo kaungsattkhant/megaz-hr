@@ -16,6 +16,7 @@ class Notification extends Model
     public function notificationUsers(){
         return $this->hasMany(\App\Models\NotificationUser::class);
     }
+    
     public  function toUserMultipleDevice($tokens=null,$add_data){
         $click_action='http://127.0.0.1:8080';
         $icon=null;

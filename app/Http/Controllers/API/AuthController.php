@@ -2,16 +2,17 @@
 
 namespace App\Http\Controllers\API;
 
+use App\Models\Staff;
+
 use Illuminate\Http\Request;
 
-use App\Actions\Auth\APILoginAction;
-
-use App\Http\Controllers\Controller;
-
-use App\Http\Requests\Staff\StaffLoginRequest;
-
-use App\Models\Staff;
 use App\Models\StaffFcmToken;
+
+use App\Models\PersonFcmToken;
+
+use App\Actions\Auth\APILoginAction;
+use App\Http\Controllers\Controller;
+use App\Http\Requests\Staff\StaffLoginRequest;
 
 class AuthController extends Controller
 {

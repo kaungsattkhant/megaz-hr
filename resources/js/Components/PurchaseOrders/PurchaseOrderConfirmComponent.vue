@@ -485,7 +485,7 @@
             },
 
             confirmEditPurchaseOrderItemBtnClicked(){
-                let index = this.purchaseOrderItems.findIndex(poItem => poItem.item_id == this.editPurchaseOrderItem.item_id);
+                let index = this.purchaseOrderItems.findIndex(poItem => poItem.id == this.editPurchaseOrderItem.id);
                 if(index != -1){
                     this.purchaseOrderItems[index].quantity = this.editQuantity;
                     this.purchaseOrderItems[index].later_buy = (this.isLaterBuy)? 1: 0;
