@@ -32,7 +32,7 @@ class PurchaseOrderRepository implements PurchaseOrderRepositoryInterface
                 $q->whereIn('status', ['manager_checked', 'created'])
                     ->orWhere('manager_check_id', UserData()->id);
             })
-            ->when(checkDepartmentAndRoles('Finance', ['Staff']), function ($q) {
+            ->when(checkDepartmentAndRoles('Finance', ['Manager']), function ($q) {
                 $q->whereIn('status', ['manager_checked', 'financial_checked'])
                     ->orWhere('financial_check_id', UserData()->id);
             })
@@ -102,11 +102,11 @@ class PurchaseOrderRepository implements PurchaseOrderRepositoryInterface
                                 $column = null;
                                 if (checkDepartmentAndRoles('HR', ['Manager'])) {
                                     $column = 'quantity_by_manager';
-                                } elseif (!$po->is_md_checked && checkDepartmentAndRoles('Finance', ['Staff'])) {
+                                } elseif (!$po->is_md_checked && checkDepartmentAndRoles('Finance', ['Manager'])) {
                                     $column = 'quantity_by_financial';
                                 } elseif (checkDepartmentAndRoles('Management', ['MD'])) {
                                     $column = 'quantity_by_md';
-                                } elseif ($po->is_md_checked && checkDepartmentAndRoles('Finance', ['Staff'])) {
+                                } elseif ($po->is_md_checked && checkDepartmentAndRoles('Finance', ['Manager'])) {
                                     $column = 'quantity_after_md';
                                 }
                                 if ($column != null) {
@@ -150,10 +150,7 @@ class PurchaseOrderRepository implements PurchaseOrderRepositoryInterface
                 #send old notificaiton
                 #end
                 if($users->isNotEmpty()){
-                    // $department_id=$users[0]->department_id;
-                    // dd($role_id.$department_id);
-                    // $data['role_id']=$role_id;
-                    $this->send($po, $users, $data);
+                    // $this->send($po, $users, $data);
                 }
             }
             DB::commit();
@@ -251,7 +248,7 @@ class PurchaseOrderRepository implements PurchaseOrderRepositoryInterface
                     $column = 'manager_check';
                     $is_column = 'is_manager_checked';
                     $status = 'manager_checked';
-                } else if (checkDepartmentAndRoles('Finance', ['Staff'])) {
+                } else if (checkDepartmentAndRoles('Finance', ['Manager'])) {
                     $column = 'financial_check';
                     $is_column = 'is_financial_checked';
                     $status = 'financial_checked';
@@ -283,13 +280,13 @@ class PurchaseOrderRepository implements PurchaseOrderRepositoryInterface
                     #notification
                     $users = collect([]);
                     if (checkDepartmentAndRoles('HR', ['Manager'])) {
-                        $users = $this->getUserByRole('Finance', ['staff']);
+                        $users = $this->getUserByRole('Finance', ['Manager']);
                         $title = 'You have received a new PO to confirm';
-                    } else if (checkDepartmentAndRoles('Finance', ['Staff'])) {
+                    } else if (checkDepartmentAndRoles('Finance', ['Manager'])) {
                         $users = $this->getUserByRole('Management', ['MD']);
                         $title = 'You have received a new PO to confirm';
                     } else if (checkDepartmentAndRoles('Management', ['MD'])) {
-                        $users = $this->getUserByRole('Finance', ['Staff']);
+                        $users = $this->getUserByRole('Finance', ['Manager']);
                         $title = 'You have received a new PO to confirm From MD';
                     }
                     $data = [
@@ -297,7 +294,7 @@ class PurchaseOrderRepository implements PurchaseOrderRepositoryInterface
                         'title' => $title,
                         'body' => 'New Purchase Order',
                     ];
-                    $this->send($model, $users, $data);
+                    // $this->send($model, $users, $data);
                     #end notification
                 }
                 DB::commit();
@@ -331,7 +328,7 @@ class PurchaseOrderRepository implements PurchaseOrderRepositoryInterface
                         ResponseMessage('This Purchase Order is already checked By Manager', 419);
                     }
 
-                } else if (checkDepartmentAndRoles('Finance', ['Staff'])) {
+                } else if (checkDepartmentAndRoles('Finance', ['Manager'])) {
                     if ($model->financial_check_id != null) {
                         ResponseMessage('This Purchase Order is already checked By Financial', 422);
                     }
