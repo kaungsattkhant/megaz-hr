@@ -11,7 +11,7 @@ class PurchaseOrderItem extends BaseModel
 {
     use HasApiTokens,HasFactory;
 
-    protected $with=['item'];
+    protected $with=['item','uom'];
     protected $fillable=[
         'quantity','purchase_order_id','item_id','amount','original_quantity','is_grn','uom_id','uom_conversion_id'
     ];
