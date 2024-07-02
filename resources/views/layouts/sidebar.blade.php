@@ -264,11 +264,12 @@
                             </li>
                         @endif
                         @if (checkFeaturePermission('purchase-order-item-left'))
-                            <a href="{{ route('purchase_orders.left_items_index') }}"
-                                class="flex items-center @yield('purchase_order_left_items')">
-                                <i class="fal fa-truck-loading  pr-3"></i>
-                                Purchase Orders with Left Items
-                            </a>
+                            <li>
+                                <a href="{{ route('purchase_orders.left_items_index') }}"
+                                    class="flex items-center @yield('purchase_order_left_items')">
+                                    <i class="fal fa-truck-loading  pr-3"></i>
+                                    Purchase Orders with Left Items
+                                </a>
                             </li>
                         @endif
                         @if (checkFeaturePermission('fixed-asset'))

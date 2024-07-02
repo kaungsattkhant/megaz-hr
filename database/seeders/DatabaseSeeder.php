@@ -39,8 +39,7 @@ class DatabaseSeeder extends Seeder
             RoleSeeder::class,
             GenderSeeder::class,
             CategorySeeder::class,
-            MenuCategorySeeder::class,
-            StaffSeeder::class,
+            MenuCategorySeeder::class,        
             ServiceCategorySeeder::class,
             UomSeeder::class,
             // ItemSeeder::class,
@@ -48,6 +47,7 @@ class DatabaseSeeder extends Seeder
             SubAccountSeeder::class,
             RoomAndTableSeeder::class,
             InventorySeeder::class,
+            StaffSeeder::class,
         ]);
     }
 }

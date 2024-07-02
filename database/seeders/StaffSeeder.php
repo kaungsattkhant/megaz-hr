@@ -3,11 +3,14 @@
 namespace Database\Seeders;
 
 use App\Models\Department;
+use App\Models\Feature;
+use App\Models\Inventory;
 use App\Models\Staff;
 use Exception;
 use Faker\Factory as Faker;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
+use App\Models\Role;
 
 class StaffSeeder extends Seeder
 {
@@ -73,6 +76,32 @@ class StaffSeeder extends Seeder
                 }
             }
         }
+
+        try{
+            DB::beginTransaction();
+            $features = Feature::all();
+            $adminDept = Department::where('name', 'Admin')->first();
+            $superAdminRole = Role::create(['name' => 'Super Admin', 'department_id' => $adminDept->id]);
+            $mainInventory = Inventory::find(6);
+            $superAdmin = Staff::create([
+                'gender_id' => 1,
+                'department_id' => $adminDept->id,
+                'name' => 'Super Admin',
+                'phone_number' => '0900',
+                'password' => 'password',
+            ]);
+            $superAdmin->roles()->attach($superAdminRole);
+            $superAdmin->inventories()->attach($mainInventory);
+            foreach($features as $feature){
+                $superAdmin->features()->attach($feature);
+            }
+
+            DB::commit();
+        }catch(Exception $e){
+            DB::rollBack();
+            dd($e->getMessage());
+        }
+
         // $opDept = Department::where('name', 'Operation Department')->first();
         // $fiDept = Department::where('name', 'Finance Department')->first();
 
