@@ -19,8 +19,9 @@
                 <label for="" class="label-form mb-3">
                     Item Name
                 </label>
-                <select name="" id="" v-model="selectedItem" class="input-ui">
-                    <option :value="item" v-for="(item, itemIndex) in itemList" :key="itemIndex"> {{ item.name }}
+                <select name="" id="" v-model="selectedItem" class="input-ui" @change="itemSelectChanged">
+                    <option :value="item" v-for="(item, itemIndex) in itemList" :key="itemIndex">
+                        {{ item.name }}
                     </option>
                 </select>
 
@@ -42,7 +43,7 @@
                     <select data-te-select-init data-te-select-placeholder="Select UOM" data-te-select-filter="true"
                         name="" id="" v-model="selectedUom"
                         class="">
-                        <option :value="uom" v-for="(uom, uomIndex) in uomList" :key="uomIndex">
+                        <option :value="uom" v-for="(uom, uomIndex) in itemUoms" :key="uomIndex">
                             {{ uom.name }}
                         </option>
                     </select>
@@ -149,6 +150,7 @@
                 selectedItem: null,
 
                 uomList: [],
+                itemUoms: [],
                 selectedUom: null,
 
                 quantity: null,
@@ -172,6 +174,20 @@
                 let response = await getApiData({ url: `/api/uoms`, token: this.getToken() });
                 if (response.data) {
                     this.uomList = response.data;
+                }
+            },
+
+            itemSelectChanged(){
+                this.itemUoms = [];
+                let index = this.uomList.findIndex(uom => uom.id == this.selectedItem.base_uom_id);
+                if(index != -1){
+                    let baseUom = this.uomList[index];
+                    this.itemUoms.push(baseUom);
+                }
+                index = this.uomList.findIndex(uom => uom.id == this.selectedItem.item_prices.uom_id);
+                if(index != -1){
+                    let itemUom = this.uomList[index];
+                    this.itemUoms.push(itemUom);
                 }
             },
 

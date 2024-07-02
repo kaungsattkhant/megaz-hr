@@ -60,6 +60,9 @@
                         <th scope="col" class=" px-6 py-4 ">
                             Item
                         </th>
+                        <th scope="col" class=" px-6 py-4 ">
+                            Uom
+                        </th>
                         <th scope="col" class=" px-4 py-4 ">
                             Original Qty
                         </th>
@@ -70,7 +73,7 @@
                             Left Qty
                         </th>
                         <th scope="col" class=" px-2 py-2 ">
-
+                            Edit
                         </th>
                         <th scope="col" class=" px-6 py-4 ">
                             Amount
@@ -92,6 +95,9 @@
                         <tr class="bg-white rounded-lg overflow-hidden shadow-lg">
                             <td class=" px-6 py-4 font-medium ">
                                 {{ purchaseOrderItem.item.name }}
+                            </td>
+                            <td class=" px-6 py-4 font-medium ">
+                                {{ purchaseOrderItem.uom.name }}
                             </td>
                             <td class=" px-4 py-4 font-medium ">
                                 {{ purchaseOrderItem.original_quantity }}
@@ -331,6 +337,14 @@ export default {
     methods: {
         ...mapGetters(['getToken', 'getUser', 'getRoles', 'getDepartment']),
 
+        alertValidationMessage(field){
+            this.$notify({
+                title: 'Input validation',
+                text: `You forgot to provide ${field}, please try again`,
+                type: 'warn'
+            });
+        },
+
         async getItemList() {
             let response = await getApiData({ url: `/api/items`, token: this.getToken() });
             if (response.data) {
@@ -363,11 +377,11 @@ export default {
 
         addItemBtnClicked() {
             if (!this.selectedItem) {
-                alert('Choose an item first');
+                this.alertValidationMessage('an item');
                 return 1;
             }
             if (this.quantity < 1) {
-                alert('Input quantity');
+                this.alertValidationMessage('quantity');
                 return 1;
             }
             let existingItemIndex = this.purchaseOrderItems.findIndex(poItem => poItem.item_id == this.selectedItem.id);

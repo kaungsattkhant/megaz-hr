@@ -50,6 +50,9 @@
                                 Item
                             </th>
                             <th scope="col" class="">
+                                Uom
+                            </th>
+                            <th scope="col" class="">
                                 Original Qty
                             </th>
                             <th scope="col" class="">
@@ -83,6 +86,9 @@
                             <tr class="">
                                 <td class="">
                                     {{ purchaseOrderItem.item.name }}
+                                </td>
+                                <td class="">
+                                    {{ purchaseOrderItem.uom.name }}
                                 </td>
                                 <td class="">
                                     {{ purchaseOrderItem.original_quantity }}

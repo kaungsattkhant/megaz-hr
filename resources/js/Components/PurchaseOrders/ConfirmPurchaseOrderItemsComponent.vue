@@ -21,6 +21,9 @@
                                 Item Name
                             </th>
                             <th scope="col" class=" px-6 py-4 ">
+                                Uom
+                            </th>
+                            <th scope="col" class=" px-6 py-4 ">
                                 Quantity
                             </th>
                             <th scope="col" class=" px-6 py-4 ">
@@ -45,6 +48,9 @@
                                 </td>
                                 <td class="whitespace-nowrap px-6 py-4 ">
                                     {{ item.item.name }}
+                                </td>
+                                <td class="whitespace-nowrap px-6 py-4 ">
+                                    {{ item.uom.name }}
                                 </td>
                                 <td class="whitespace-nowrap px-6 py-4 ">
                                     {{ item.quantity }}
