@@ -76,6 +76,10 @@ class InvoiceRepository implements InvoiceRepositoryInterface
         DB::beginTransaction();
         try {
             $entity = Entity::find($data['entity_id']);
+            if($entity->is_active==1)
+            {
+                ResponseMessage('Room is not available', 422);
+            }
             $data['area_id'] = $entity->area_id;
             $headCount = $this->headCountCreate($data);
             $data['head_count_id'] = $headCount->id;
@@ -125,7 +129,14 @@ class InvoiceRepository implements InvoiceRepositoryInterface
             $invoice = Invoice::create($data);
             $invoice->invoice_id = sprintf('%05d', $invoice->id);
             $invoice->save();
-            $entity->is_active = 1;
+            if(isset($data['waiter']))
+            {
+                $entity->status = 'pending';
+                $entity->is_active = 0;
+            }else{
+                $entity->status = 'active';
+                $entity->is_active = 1;
+            }
             $entity->save();
 
             $data['invoice_id'] = $invoice->id;
@@ -178,7 +189,6 @@ class InvoiceRepository implements InvoiceRepositoryInterface
         DB::beginTransaction();
         try {
             $roomAndSession = RoomSession::where('invoice_id', $data['invoice_id'])->latest()->first();
-            dd($roomAndSession);
             $roomSessionsWithInvoice = RoomSession::where('invoice_id', $data['invoice_id'])->get();
             $originalDuration = 0;
             foreach ($roomSessionsWithInvoice as $room_session) {
@@ -248,6 +258,7 @@ class InvoiceRepository implements InvoiceRepositoryInterface
 
             $lastRoomwithInvoice->save();
             $lastEntity->is_active = 0;
+            $lastEntity->status = 'inactive';
             $lastEntity->save();
 
             $selectedEntity = Entity::find($data['entity_id']);
@@ -256,6 +267,7 @@ class InvoiceRepository implements InvoiceRepositoryInterface
             }
 
             $selectedEntity->is_active = 1;
+            $selectedEntity->status = 'active';
             $selectedEntity->save();
 
             $newSession['start_date'] = CurrentTime();
@@ -518,7 +530,6 @@ class InvoiceRepository implements InvoiceRepositoryInterface
             $data['tax'] = $tax;
             $data['service_charge'] = $service_charge;
             $data['total_session_price'] = $total_session_price;
-            // dd($data['discount_type']);
             if (!isset($data['discount_type'])) {
                 $data['discount_type'] = null;
             }
@@ -527,6 +538,7 @@ class InvoiceRepository implements InvoiceRepositoryInterface
             $data['payment_status'] = 'received';
             $data['complete_date'] = CurrentTime();
             $entity->is_active = 0;
+            $entity->status = 'inactive';
             $entity->save();
             $data['invoice_id'] = $invoice_id;
             $invoice->update($data);
