@@ -89,13 +89,17 @@ class PurchaseOrderRepository implements PurchaseOrderRepositoryInterface
                 $item_data['uom_conversion_id'] = $item->uom_conversion_id;
                 // $purchaseOrderItem=PurchaseOrderItem::find($item_data['id']);
                 if (isset($item->later_buy) && $item->later_buy) {
+                   
                     $purchaseOrderItem = $po->items()->where('id', $item_data['id'])->first();
+                    // dd($purchaseOrderItem);
+                    // dd($item);
                         if ($purchaseOrderItem) {
                             if ($item->quantity > $purchaseOrderItem->quantity) {
                                 ResponseMessage('Later Buy Quantity must be less than original quantity', 419);
                             }
                             if ($item->quantity < $purchaseOrderItem->quantity) {
                                 $quantity = $purchaseOrderItem->original_quantity - $item->quantity;
+
                                 if ($quantity < 0) {
                                     ResponseMessage('Later Buy Quantity must be less than original quantity', 419);
                                 }
@@ -150,7 +154,7 @@ class PurchaseOrderRepository implements PurchaseOrderRepositoryInterface
                 #send old notificaiton
                 #end
                 if($users->isNotEmpty()){
-                    // $this->send($po, $users, $data);
+                    $this->send($po, $users, $data);
                 }
             }
             DB::commit();
@@ -294,7 +298,7 @@ class PurchaseOrderRepository implements PurchaseOrderRepositoryInterface
                         'title' => $title,
                         'body' => 'New Purchase Order',
                     ];
-                    // $this->send($model, $users, $data);
+                    $this->send($model, $users, $data);
                     #end notification
                 }
                 DB::commit();

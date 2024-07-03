@@ -21,9 +21,10 @@ class PurchaseOrderItemLeftRepository implements PurchaseOrderItemLeftInterface
             ->join('purchase_orders', 'purchase_order_items.purchase_order_id', '=', 'purchase_orders.id')
             ->select('purchase_orders.*')
             ->groupBy('purchase_orders.id')
-            ->where('purchase_orders.is_bought',1)
+            // ->where('purchase_orders.is_bought',1)
             ->paginate(config('common.list_count'));
     }
+    
 
     public function detail($purchase_order_id)
     {
