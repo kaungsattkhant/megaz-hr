@@ -129,7 +129,7 @@ class InvoiceRepository implements InvoiceRepositoryInterface
             $invoice = Invoice::create($data);
             $invoice->invoice_id = sprintf('%05d', $invoice->id);
             $invoice->save();
-            if(isset($data['waiter']))
+            if($data['is_waiter']==1)
             {
                 $entity->status = 'pending';
                 $entity->is_active = 0;
