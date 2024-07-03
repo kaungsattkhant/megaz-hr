@@ -74,7 +74,7 @@
                 <div class="bg-white mb-0 w-full text-sm inline-block h-[34px]"
                     data-te-select-wrapper-ref>
                     <select data-te-select-init data-te-select-placeholder="Select Item" data-te-select-filter="true"
-                        name="" id="" v-model="selectedItem" class="input-ui">
+                        name="" id="" v-model="selectedItem" class="input-ui" @change="itemSelectChanged" >
                         <option :value="item" v-for="(item, itemIndex) in itemList" :key="itemIndex"> {{ item.name }}
                         </option>
                     </select>
@@ -104,7 +104,7 @@
                     data-te-select-wrapper-ref>
                     <select data-te-select-init data-te-select-placeholder="Select UOM" data-te-select-filter="true"
                         name="" id="" v-model="selectedUom" class="input-ui">
-                        <option :value="uom" v-for="(uom, uomIndex) in uomList" :key="uomIndex">
+                        <option :value="uom" v-for="(uom, uomIndex) in itemUoms" :key="uomIndex">
                             {{ uom.name }}
                         </option>
                     </select>
@@ -354,6 +354,7 @@ export default {
             itemList: [],
 
             uomList: [],
+            itemUoms: [],
             selectedUom: null,
 
             menuCategoryId: null,
@@ -416,9 +417,24 @@ export default {
         },
 
         async itemCategorySelectChanged() {
+            this.itemUoms = [];
             let response = await getApiData({ url: `/api/items?category_id=${this.selectedItemCategory.id}`, token: this.getToken() });
             if (response.data) {
                 this.itemList = response.data;
+            }
+        },
+
+        itemSelectChanged() {
+            this.itemUoms = [];
+            let index = this.uomList.findIndex(uom => uom.id == this.selectedItem.base_uom_id);
+            if (index != -1) {
+                let baseUom = this.uomList[index];
+                this.itemUoms.push(baseUom);
+            }
+            index = this.uomList.findIndex(uom => uom.id == this.selectedItem.item_prices.uom_id);
+            if (index != -1) {
+                let itemUom = this.uomList[index];
+                this.itemUoms.push(itemUom);
             }
         },
 

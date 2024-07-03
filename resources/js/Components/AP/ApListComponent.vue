@@ -25,9 +25,9 @@
                             <th scope="col" class=" px-6 py-4 ">
                                 Total Credit
                             </th>
-                            <th scope="col" class=" px-6 py-4 ">
+                            <!-- <th scope="col" class=" px-6 py-4 ">
                                 Total Debit
-                            </th>
+                            </th> -->
                             <th scope="col" class=" px-6 py-4 ">
                                 Outstanding Debt
                             </th>
@@ -44,14 +44,15 @@
                                 </td>
                                 <td class="whitespace-nowrap px-6 py-4 ">
                                     {{ ap.supplier_name }}
+                                    <a :href="`/account_payables/suppliers/${ap.supplier_id}/transactions`" class="text-blue-600 hover:underline" > Detail </a>
                                 </td>
                                 <td class="whitespace-nowrap px-6 py-4 ">
                                     {{ (ap.credit_amount).toLocaleString() }}
                                 </td>
 
-                                <td class=" px-6 py-4 ">
+                                <!-- <td class=" px-6 py-4 ">
                                     {{ (ap.debit_amount).toLocaleString() }}
-                                </td>
+                                </td> -->
 
                                 <td class=" px-6 py-4 ">
                                     {{ (ap.total_credit_amount).toLocaleString() }}

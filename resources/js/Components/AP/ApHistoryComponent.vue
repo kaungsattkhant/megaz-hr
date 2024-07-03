@@ -49,7 +49,7 @@
                                     {{ ap.supplier_name }}
                                 </td>
                                 <td class="whitespace-nowrap px-6 py-4 ">
-                                    {{ ap.account_id }}
+                                    {{ ap.account.name }} ({{ ap.account.account_code }})
                                 </td>
                                 <td class="whitespace-nowrap px-6 py-4 ">
                                     {{ (ap.amount).toLocaleString() }}
@@ -78,6 +78,7 @@
     import { getApiData, postApiData } from '../../utilities/ajax-helpers';
 
     export default {
+        props: ['supplierId'],
         data() {
             return {
                 apTransactionList: [],
@@ -110,7 +111,7 @@
                     this.currentPage = pageNumber;
                 }
 
-                let url = `/api/account_payable_transaction_list?page=${this.currentPage}&per_page=${this.per_page}`;
+                let url = `/api/account_payable_transaction_list?supplier_id=${this.supplierId}&page=${this.currentPage}&per_page=${this.per_page}`;
                 let response = await getApiData({url: url, token: this.getToken()});
                 if(response.data){
                     this.apTransactionList = response.data;
