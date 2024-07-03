@@ -1,0 +1,22 @@
+{
+  "public/img/Video_light.png": {
+    "file": "assets/Video_light-nWiE6W6S.png",
+    "src": "public/img/Video_light.png"
+  },
+  "resources/css/app.css": {
+    "file": "assets/app-Fm98VugE.css",
+    "isEntry": true,
+    "src": "resources/css/app.css"
+  },
+  "resources/js/app.js": {
+    "assets": [
+      "assets/Video_light-nWiE6W6S.png"
+    ],
+    "css": [
+      "assets/app-NxEQK1t5.css"
+    ],
+    "file": "assets/app-R9ON1Vbw.js",
+    "isEntry": true,
+    "src": "resources/js/app.js"
+  }
+}
