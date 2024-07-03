@@ -209,6 +209,7 @@
                                     </td>
                                     <td class="">
                                         {{ (ingredientItemPriceTotal).toLocaleString() }}
+                                        <span> (Profit: {{ this.profitPercentage.toLocaleString() }} %) </span>
                                     </td>
                                     <td class="">
 
@@ -357,6 +358,8 @@ export default {
             itemUoms: [],
             selectedUom: null,
 
+            profitPercentage: 0,
+
             menuCategoryId: null,
             name: null,
             price: null,
@@ -391,6 +394,12 @@ export default {
             items.forEach((item)=>{
                 this.ingredientItemPriceTotal += item.price;
             });
+        },
+
+        calculateProfitPercentage(){
+            if(this.price > 0 && this.ingredientItemPriceTotal > 0){
+                this.profitPercentage = ((this.price - this.ingredientItemPriceTotal) / this.ingredientItemPriceTotal) * 100
+            }
         },
 
         isFeaturedCheckChanged() {
@@ -547,6 +556,16 @@ export default {
                     window.location.replace(`/menus`);
                 }
             }
+        }
+    },
+
+    watch: {
+        price: function () {
+            this.calculateProfitPercentage();
+        },
+
+        ingredientItemPriceTotal: function(){
+            this.calculateProfitPercentage();
         }
     },
 

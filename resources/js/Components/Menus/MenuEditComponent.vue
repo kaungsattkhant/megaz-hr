@@ -74,7 +74,7 @@
                 <div class="text-xs text-black h-8 border-b border-black rounded-bl-[4px] rounded-br-[4px] overflow-hidden inline-block"
                     data-te-select-wrapper-ref>
                     <select data-te-select-init data-te-select-placeholder="Select Item" data-te-select-filter="true"
-                        name="" id="" v-model="selectedItem" class="input-ui">
+                        name="" id="" v-model="selectedItem" class="input-ui" @change="itemSelectChanged">
                         <option :value="item" v-for="(item, itemIndex) in itemList" :key="itemIndex"> {{ item.name }}
                         </option>
                     </select>
@@ -104,7 +104,7 @@
                     data-te-select-wrapper-ref>
                     <select data-te-select-init data-te-select-placeholder="Select UOM" data-te-select-filter="true"
                         name="" id="" v-model="selectedUom" class="input-ui">
-                        <option :value="uom" v-for="(uom, uomIndex) in uomList" :key="uomIndex">
+                        <option :value="uom" v-for="(uom, uomIndex) in itemUoms" :key="uomIndex">
                             {{ uom.name }}
                         </option>
                     </select>
@@ -208,6 +208,7 @@
                                     </td>
                                     <td class="">
                                         {{ (ingredientItemPriceTotal).toLocaleString() }}
+                                        <span> (Profit: {{ this.profitPercentage.toLocaleString() }} %) </span>
                                     </td>
                                     <td class="">
 
@@ -266,7 +267,10 @@ export default {
             itemList: [],
 
             uomList: [],
+            itemUoms: [],
             selectedUom: null,
+
+            profitPercentage: 0,
 
             selectedMenuCategory: null,
             menuCategoryId: null,
@@ -303,6 +307,12 @@ export default {
             items.forEach((item)=>{
                 this.ingredientItemPriceTotal += item.price;
             });
+        },
+
+        calculateProfitPercentage(){
+            if(this.price > 0 && this.ingredientItemPriceTotal > 0){
+                this.profitPercentage = ((this.price - this.ingredientItemPriceTotal) / this.ingredientItemPriceTotal) * 100
+            }
         },
 
         isFeaturedCheckChanged() {
@@ -384,9 +394,24 @@ export default {
         },
 
         async itemCategorySelectChanged() {
+            this.itemUoms = [];
             let response = await getApiData({ url: `/api/items?category_id=${this.selectedItemCategory.id}`, token: this.getToken() });
             if (response.data) {
                 this.itemList = response.data;
+            }
+        },
+
+        itemSelectChanged() {
+            this.itemUoms = [];
+            let index = this.uomList.findIndex(uom => uom.id == this.selectedItem.base_uom_id);
+            if (index != -1) {
+                let baseUom = this.uomList[index];
+                this.itemUoms.push(baseUom);
+            }
+            index = this.uomList.findIndex(uom => uom.id == this.selectedItem.item_prices.uom_id);
+            if (index != -1) {
+                let itemUom = this.uomList[index];
+                this.itemUoms.push(itemUom);
             }
         },
 
@@ -499,6 +524,16 @@ export default {
                     window.location.replace(`/menus`);
                 }
             }
+        }
+    },
+
+    watch: {
+        price: function () {
+            this.calculateProfitPercentage();
+        },
+
+        ingredientItemPriceTotal: function(){
+            this.calculateProfitPercentage();
         }
     },
 
