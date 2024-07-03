@@ -113,6 +113,7 @@ class AccountPayableRepository implements AccountPayableInterface
         ->join('suppliers', 'ledgers.personable_id', '=', 'suppliers.id')
         ->where('sub_accounts.head_account_id', config('common.liabilities'))
         ->where('ledgers.personable_type', 'supplier')
+        ->where('ledgers.personable_id', $request->supplier_id)
         ->whereNull('transactions.transactionable_id')
         ->select(
             // 'ledgers.created_at as date',
@@ -126,6 +127,7 @@ class AccountPayableRepository implements AccountPayableInterface
             // DB::raw('SUM(CASE WHEN ledgers.action = "credit" THEN ledgers.value ELSE 0 END) as credit_amount'),
             // DB::raw('(SUM(CASE WHEN ledgers.action = "credit" THEN ledgers.value ELSE 0 END) - SUM(CASE WHEN ledgers.action = "debit" THEN ledgers.value ELSE 0 END)) as total_credit_amount')
         )
+        ->with('account')
         // ->groupBy('ledgers.personable_id')
         ->get();
         return $ledger;

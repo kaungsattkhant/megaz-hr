@@ -213,7 +213,7 @@
                             <div class="bg-white mb-0 w-full text-sm inline-block" data-te-select-wrapper-ref>
                                 <select data-te-select-init data-te-select-placeholder="Select UOM"
                                 data-te-select-filter="true" v-model="selectedUom">
-                                    <option :value="uom" v-for="(uom, uomIndex) in uomList">
+                                    <option :value="uom" v-for="(uom, uomIndex) in itemUoms">
                                         {{ uom.name }}
                                     </option>
                                 </select>
@@ -280,7 +280,7 @@
                         <div class="bg-white mb-0 w-full text-sm inline-block" data-te-select-wrapper-ref>
                             <select data-te-select-init data-te-select-placeholder="Select UOM"
                             data-te-select-filter="true" v-model="selectedUom">
-                                <option :value="uom" v-for="(uom, uomIndex) in uomList">
+                                <option :value="uom" v-for="(uom, uomIndex) in itemUoms">
                                     {{ uom.name }}
                                 </option>
                             </select>
@@ -396,6 +396,7 @@ export default {
             type: null,
             defectQuantity: null,
             uomList: [],
+            itemUoms: [],
             selectedUom: null,
             defectRemark: null,
 
@@ -468,6 +469,18 @@ export default {
         addDefectBtnClicked(id, ledgerIndex){
             this.defectItemId = id;
             this.defectItem = this.inventoryLegderList[ledgerIndex];
+
+            this.itemUoms = [];
+            let index = this.uomList.findIndex(uom => uom.id == this.defectItem.base_unit_id);
+            if(index != -1){
+                let baseUom = this.uomList[index];
+                this.itemUoms.push(baseUom);
+            }
+            index = this.uomList.findIndex(uom => uom.id == this.defectItem.item_uom_id);
+            if(index != -1){
+                let itemUom = this.uomList[index];
+                this.itemUoms.push(itemUom);
+            }
         },
 
         async confirmAddDefectBtnClicked(){
@@ -525,6 +538,18 @@ export default {
             if (response.data) {
                 this.sourceInventories = response.data.source_inventories;
                 this.destinationInventories = response.data.destination_inventories;
+            }
+
+            this.itemUoms = [];
+            let index = this.uomList.findIndex(uom => uom.id == this.transferItem.base_unit_id);
+            if(index != -1){
+                let baseUom = this.uomList[index];
+                this.itemUoms.push(baseUom);
+            }
+            index = this.uomList.findIndex(uom => uom.id == this.transferItem.item_uom_id);
+            if(index != -1){
+                let itemUom = this.uomList[index];
+                this.itemUoms.push(itemUom);
             }
         },
 

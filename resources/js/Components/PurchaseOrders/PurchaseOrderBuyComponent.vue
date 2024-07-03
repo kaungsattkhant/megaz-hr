@@ -166,11 +166,11 @@
                             <td class=" px-6 py-4 font-medium ">
                                 &nbsp;
                             </td>
-                            <td class="px-6 py-4">
-                                {{ totalPrice.toLocaleString() }}
-                            </td>
                             <td class=" px-6 py-4 font-medium ">
                                 &nbsp;
+                            </td>
+                            <td class="px-6 py-4">
+                                {{ totalPrice.toLocaleString() }}
                             </td>
                             <td class=" px-6 py-4 font-medium ">
                                 &nbsp;
@@ -445,12 +445,13 @@ export default {
             poItems.forEach((poItem, index) => {
                 if(poItem.supplier){
                     if (poItem.invoice_amount == undefined || !poItem.invoice_amount) {
-                        this.$notify({
-                            text: `Invoice amount must be filled for ${poItem.item.name}`,
-                            type: 'error'
-                        });
-                        stop = true;
-                        return 1;
+                        // this.$notify({
+                        //     text: `Invoice amount must be filled for ${poItem.item.name}`,
+                        //     type: 'error'
+                        // });
+                        poItem.invoice_amount = 0;
+                        // stop = true;
+                        // return 1;
                     }
                     if (poItem.invoice_no == undefined || !poItem.invoice_no) {
                         this.$notify({

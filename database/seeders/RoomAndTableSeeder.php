@@ -29,6 +29,7 @@ class RoomAndTableSeeder extends Seeder
                         'name' => $entity_name,
                         'price_per_hour' => $prices[$randomIndex],
                         'entity_type' => $type,
+                        'status' => 'inactive'
                     ]);
                 }
 

@@ -24,7 +24,9 @@ class InvoiceAPIController extends Controller
 
     public function startEntity(Request $request)
     {
-        $data = $request->all();
+        $data = $request->except('waiter');
+
+        $data['is_waiter'] = ($request->waiter) ? 1:0;
 
         if(isset($data['male'])){
             $data['male'] = (int) $data['male'];
