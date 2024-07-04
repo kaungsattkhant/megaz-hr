@@ -99,4 +99,9 @@ class InvoiceAPIController extends Controller
         ResponseData($invoice);
     }
 
+    public function roomConfirm(Request $request)
+    {
+        $invoice = $this->invoiceRepo->invoiceConfirm($request->all());
+    }
+
 }

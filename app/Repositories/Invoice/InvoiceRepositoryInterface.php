@@ -21,5 +21,7 @@ interface InvoiceRepositoryInterface
     public function doneEntityWithInvoice(array $data);
 
     public function doneRoom(array $data);
+
+    public function invoiceConfirm(array $data);
 }
 

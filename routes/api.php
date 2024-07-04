@@ -358,6 +358,7 @@ Route::post('/entities/add_more_sessions', [InvoiceAPIController::class, 'addMor
 Route::post('/entities/change', [InvoiceAPIController::class, 'changeRoom']);
 Route::post('/entities/done', [InvoiceAPIController::class, 'endRoom']);
 Route::post('/room_done',[InvoiceAPIController::class,'doneRoom']);
+Route::post('/entities/confirm',[InvoiceAPIController::class,'roomConfirm']);
 
 Route::get('/order_items',[OrderAPIController::class,'getOrderItemList']);
 
