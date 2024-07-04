@@ -13,9 +13,10 @@
       "assets/Video_light-nWiE6W6S.png"
     ],
     "css": [
-      "assets/app-NxEQK1t5.css"
+      "assets/app-NSQmot0V.css",
+      "assets/app-Fm98VugE.css"
     ],
-    "file": "assets/app-QEIj5A5K.js",
+    "file": "assets/app-hLnUFKb0.js",
     "isEntry": true,
     "src": "resources/js/app.js"
   }
