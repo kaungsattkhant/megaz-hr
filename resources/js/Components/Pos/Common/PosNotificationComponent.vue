@@ -151,7 +151,7 @@
             },
 
 
-            async btnConfrimSession(){
+            async btnConfirmSession(){
                 let formData = new FormData();
                 formData.append("invoice_id", this.sessionRequests.invoice_id);
                 formData.append("is_confirm", 1);
