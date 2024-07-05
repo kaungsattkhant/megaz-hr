@@ -150,7 +150,7 @@
 
 
             let channelName = `room-notification-request.${this.department.id}`;
-            let eventName = `App\Events\RoomNotificationRequest`;
+            let eventName = `RoomNotificationRequest`;
 
             this.listenBroadCastNotifications(channelName, eventName);
 
