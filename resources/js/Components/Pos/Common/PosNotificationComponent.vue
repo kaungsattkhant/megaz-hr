@@ -183,7 +183,7 @@
 
 
             let channelName = `room-notification-request.${this.department.id}`;
-            let eventName = `SendNotification`;
+            let eventName = `RoomNotificationRequest`;
 
             this.listenBroadCastNotifications(channelName, eventName);
 
