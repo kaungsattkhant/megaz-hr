@@ -40,6 +40,7 @@
                                         <th scope="col" class="px-6 py-4">Start time</th>
                                         <th scope="col" class="px-6 py-4">End time </th>
                                         <th scope="col" class="px-6 py-4">Customer name</th>
+                                        <th scope="col" class="px-6 py-4">Action</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -60,10 +61,15 @@
                                         <td class="whitespace-nowrap px-6 py-4">
                                             {{ sessionRequest.customer_name }}
                                         </td>
+                                        <td class="whitespace-nowrap px-6 py-4">
+                                            <button @click="btnRejectSession()" class="px-3 py-2 bg-red-600 mr-2">
+                                                Reject
+                                            </button>
+                                            <button @click="btnConfirmSession()" class="px-3 py-2 bg-green-600">
+                                                Confirm
+                                            </button>
+                                        </td>
                                     </tr>
-
-
-
                                 </tbody>
                             </table>
                         </div>
@@ -142,6 +148,26 @@
                     this.notiModalOpen();
                 });
 
+            },
+
+
+            async btnConfrimSession(){
+                let formData = new FormData();
+                formData.append("invoice_id", this.sessionRequests.invoice_id);
+                formData.append("is_confirm", 1);
+                let response = await postApiData({ url: `/api/entities/confirm`, form_data: formData, token: this.getToken() });
+                if (response.data) {
+                    console.log('confirm success')
+                }
+            },
+            async btnRejectSession(){
+                let formData = new FormData();
+                formData.append("invoice_id", this.sessionRequests.invoice_id);
+                formData.append("is_confirm", 0);
+                let response = await postApiData({ url: `/api/entities/confirm`, form_data: formData, token: this.getToken() });
+                if (response.data) {
+                    console.log('reject success')
+                }
             },
         },
 
