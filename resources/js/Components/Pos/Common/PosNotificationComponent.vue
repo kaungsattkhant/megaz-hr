@@ -62,10 +62,10 @@
                                             {{ sessionRequest.customer_name }}
                                         </td>
                                         <td class="whitespace-nowrap px-6 py-4">
-                                            <button @click="btnRejectSession()" class="px-3 py-2 bg-red-600 mr-2">
+                                            <button @click="btnRejectSession(sessionRequest.id)" class="px-3 py-2 bg-red-600 mr-2">
                                                 Reject
                                             </button>
-                                            <button @click="btnConfirmSession()" class="px-3 py-2 bg-green-600">
+                                            <button @click="btnConfirmSession(sessionRequest.id)" class="px-3 py-2 bg-green-600">
                                                 Confirm
                                             </button>
                                         </td>
@@ -151,18 +151,18 @@
             },
 
 
-            async btnConfirmSession(){
+            async btnConfirmSession(id){
                 let formData = new FormData();
-                formData.append("invoice_id", this.sessionRequests.invoice_id);
+                formData.append("invoice_id", id);
                 formData.append("is_confirm", 1);
                 let response = await postApiData({ url: `/api/entities/confirm`, form_data: formData, token: this.getToken() });
                 if (response.data) {
                     console.log('confirm success')
                 }
             },
-            async btnRejectSession(){
+            async btnRejectSession(id){
                 let formData = new FormData();
-                formData.append("invoice_id", this.sessionRequests.invoice_id);
+                formData.append("invoice_id", id);
                 formData.append("is_confirm", 0);
                 let response = await postApiData({ url: `/api/entities/confirm`, form_data: formData, token: this.getToken() });
                 if (response.data) {
