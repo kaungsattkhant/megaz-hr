@@ -11,6 +11,6 @@
                 @yield('content')
             </main>
         </div>
-
+        <pos-notification-component/>
     </div>
 @endsection
