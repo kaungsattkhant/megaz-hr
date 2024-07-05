@@ -62,10 +62,10 @@
                                             {{ sessionRequest.customer_name }}
                                         </td>
                                         <td class="whitespace-nowrap px-6 py-4">
-                                            <button @click="btnRejectSession(sessionRequest.invoice_id)" class="px-3 py-2 bg-red-600 mr-2">
+                                            <button :disabled="sessionRequest.status != 'received'" @click="btnRejectSession(sessionRequest.invoice_id)" class="px-3 py-2 bg-red-600 text-white rounded-md mr-2">
                                                 Reject
                                             </button>
-                                            <button @click="btnConfirmSession(sessionRequest.invoice_id)" class="px-3 py-2 bg-green-600">
+                                            <button :disabled="sessionRequest.status != 'received'" @click="btnConfirmSession(sessionRequest.invoice_id)" class="px-3 py-2 bg-green-600 text-white rounded-md">
                                                 Confirm
                                             </button>
                                         </td>
@@ -132,7 +132,8 @@
                         room_name: response.room_name,
                         session_duration: response.room_session.session_duration,
                         start_time: convertToFriendlyDateTime(response.room_session.start_date),
-                        end_time: convertToFriendlyDateTime(response.room_session.end_date)
+                        end_time: convertToFriendlyDateTime(response.room_session.end_date),
+                        status: 'received'
                     };
 
                     let index = this.sessionRequests.findIndex(sessionRequest => sessionRequest.invoice_id == newSessionRequest.invoice_id);
@@ -159,6 +160,13 @@
                 if (response.data) {
                     console.log('confirm success')
                 }
+                let index = this.sessionRequests.findIndex(sessionRequest => sessionRequest.invoice_id == id);
+                if (index != -1) {
+                    this.sessionRequests[index].status = 'confirmed';
+                    this.sessionRequests.splice(index, 1);
+                }
+
+                this.notiModalOpen();
             },
             async btnRejectSession(id){
                 let formData = new FormData();
@@ -168,6 +176,12 @@
                 if (response.data) {
                     console.log('reject success')
                 }
+                let index = this.sessionRequests.findIndex(sessionRequest => sessionRequest.invoice_id == id);
+                if (index != -1) {
+                    this.sessionRequests[index].status = 'rejected';
+                    this.sessionRequests.splice(index, 1);
+                }
+                this.notiModalOpen();
             },
         },
 
@@ -186,15 +200,6 @@
             let eventName = `RoomNotificationRequest`;
 
             this.listenBroadCastNotifications(channelName, eventName);
-
-            // window.Echo.channel('send-notification.' + 1)
-            // .listen('SendNotification',(response)=>{
-            //     console.log(response);
-            // });
-            // .notification((notification) => {
-            //     console.log(notification.type);
-            // });
-
         },
 
         beforeDestroy() {
