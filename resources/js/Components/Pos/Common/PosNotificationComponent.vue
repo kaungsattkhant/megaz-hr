@@ -119,8 +119,8 @@
 
             listenBroadCastNotifications(channel, event){
                 window.Echo.channel(channel)
-                .listen('.' + '*',(response)=>{
-                    let sessionRequest = {
+                .listen(event,(response)=>{
+                    let newSessionRequest = {
                         invoice_id: response.invoice_id,
                         customer_name: response.customer_name,
                         room_name: response.room_name,
@@ -129,7 +129,14 @@
                         end_time: convertToFriendlyDateTime(response.room_session.end_date)
                     };
 
-                    this.sessionRequests.push(sessionRequest);
+                    let index = this.sessionRequests.findIndex(sessionRequest => sessionRequest.invoice_id == newSessionRequest.invoice_id);
+                    if(index != -1){
+                        console.log('already requested');
+                    }
+                    else{
+                        this.sessionRequests.push(newSessionRequest);
+                    }
+
                     console.log(response);
                     console.log('session request received');
                     this.notiModalOpen();
