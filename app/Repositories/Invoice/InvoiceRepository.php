@@ -145,10 +145,10 @@ class InvoiceRepository implements InvoiceRepositoryInterface
             $data['start_date'] = $data['invoice_date'];
             $roomSession = RoomSession::create($data);
             $invoice->room_session = $roomSession;
+            $customer = Customer::find($invoice->customer_id);
 
             if ($data['is_waiter'] == 1 && $invoice) {
-
-                broadcast(new RoomNotificationRequest($invoice,UserData()->department_id));
+                broadcast(new RoomNotificationRequest($customer,$entity,$roomSession,$invoice,UserData()->department_id));
             }
             DB::commit();
             return $invoice;
@@ -721,9 +721,12 @@ class InvoiceRepository implements InvoiceRepositoryInterface
                 $latestSession->delete();
 
             }
+
+            broadcast(new RoomNotificationRequest($entity,UserData()->department_id));
             $entity->save();
             DB::commit();
-            ResponseMessage('Room status updated');
+
+            Responsemessage('Room status updated');
         } catch (\Exception $e) {
             DB::rollBack();
             ResponseMessage($e->getMessage(), 422);
