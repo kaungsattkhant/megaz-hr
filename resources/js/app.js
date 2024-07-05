@@ -93,6 +93,7 @@ import UomCrudComponent from './Components/Uoms/UomCrudComponent.vue';
 
 import LoginComponentPos from './Components/Pos/Auth/LoginComponentPos.vue';
 import LogoutComponentPos from './Components/Pos/Auth/LogoutComponentPos.vue';
+import PosNotificationComponent from './Components/Pos/Common/PosNotificationComponent.vue';
 
 import CrmCustomerListComponent from './Components/CRM/CustomerListComponent.vue';
 import CrmCustomerBirthdaysListComponent from './Components/CRM/CustomerBirthdaysListComponent.vue';
@@ -159,6 +160,7 @@ app.component('FixedAssetCrudComponent', FixedAssetCrudComponent);
 
 app.component('LoginComponent', LoginComponent);
 app.component('LogoutComponent', LogoutComponent);
+app.component('PosNotificationComponent', PosNotificationComponent);
 
 app.component('CustomersListComponent', CustomersListComponent);
 app.component('CustomersCreateComponent', CustomersCreateComponent);

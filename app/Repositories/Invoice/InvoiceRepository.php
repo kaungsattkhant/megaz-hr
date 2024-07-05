@@ -9,6 +9,8 @@ use App\Models\Customer;
 use App\Models\CustomerLevelDiscount;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
+use App\Events\RoomNotificationRequest;
+
 
 use App\Models\Entity;
 use App\Models\HeadCount;
@@ -76,8 +78,7 @@ class InvoiceRepository implements InvoiceRepositoryInterface
         DB::beginTransaction();
         try {
             $entity = Entity::find($data['entity_id']);
-            if($entity->is_active==1)
-            {
+            if ($entity->is_active == 1) {
                 ResponseMessage('Room is not available', 422);
             }
             $data['area_id'] = $entity->area_id;
@@ -129,11 +130,10 @@ class InvoiceRepository implements InvoiceRepositoryInterface
             $invoice = Invoice::create($data);
             $invoice->invoice_id = sprintf('%05d', $invoice->id);
             $invoice->save();
-            if($data['is_waiter']==1)
-            {
+            if ($data['is_waiter'] == 1) {
                 $entity->status = 'pending';
                 $entity->is_active = 0;
-            }else{
+            } else {
                 $entity->status = 'active';
                 $entity->is_active = 1;
             }
@@ -145,6 +145,11 @@ class InvoiceRepository implements InvoiceRepositoryInterface
             $data['start_date'] = $data['invoice_date'];
             $roomSession = RoomSession::create($data);
             $invoice->room_session = $roomSession;
+
+            if ($data['is_waiter'] == 1 && $invoice) {
+
+                broadcast(new RoomNotificationRequest($invoice,UserData()->department_id));
+            }
             DB::commit();
             return $invoice;
         } catch (\Exception $e) {
@@ -387,176 +392,175 @@ class InvoiceRepository implements InvoiceRepositoryInterface
         }
     }
 
+    // public function entityEnd(array $data)
+    // {
+    //     DB::beginTransaction();
+    //     try {
+    //         // initial for all value
+    //         $foodCharge = 0;
+    //         $beverageCharge = 0;
+    //         $total_session_price = 0;
+    //         $orderDiscount = 0;
+    //         $service_charge = 0;
+    //         $tax = 0;
+    //         $foodDrink = 0;
+    //         $discount_value = 0;
+    //         $room_discount_value = 0;
+
+    //         // get food and beverage
+    //         if (isset($data['order_categories'])) {
+    //             $data['order_categories'] = json_decode($data['order_categories'], true);
+    //             foreach ($data['order_categories'] as $menu) {
+    //                 if ($menu['menu_category_id'] == 1 || $menu['menu_category_id'] == 2 || $menu['menu_category_id'] == 3) {
+    //                     $foodCharge += $menu['price'];
+    //                 } else {
+    //                     $beverageCharge += $menu['price'];
+    //                 }
+    //             }
+    //         }
+    //         // get total session price
+    //         $roomSessions = RoomSession::where('invoice_id', $data['invoice_id'])->get();
+    //         foreach ($roomSessions as $room) {
+    //             $total_session_price += $room->price;
+    //         }
+
+    //         $invoice = Invoice::find($data['invoice_id']);
+    //         $invoice_id = $invoice->invoice_id;
+    //         $customer = Customer::find($invoice->customer_id);
+
+    //         // get order discount price
+    //         $order = Order::where('invoice_id', $invoice->id)->first();
+    //         if ($order) {
+    //             $orderDiscount = $order->total_discount_price;
+    //         }
+
+    //         $lastRoomwithInvoice = RoomSession::where('invoice_id', $invoice->id)->latest()->first();
+    //         $entity = Entity::find($lastRoomwithInvoice->entity_id);
+
+    //         if (isset($data['tax'])) {
+    //             $tax = $data['tax'];
+    //         }
+
+    //         if (isset($data['service_charge'])) {
+    //             $service_charge = $data['service_charge'];
+    //         }
+
+
+    //         //  caculation depending on the invoice_type
+    //         if ($invoice->invoice_type == 'package') {
+    //             $foodDrink = $foodCharge + $beverageCharge;
+    //             $data['total'] = ($foodDrink + $invoice->paid_amount + $tax + $service_charge) - $orderDiscount;
+    //         } else if ($invoice->invoice_type == 'session') {
+    //             $foodDrink = $foodCharge + $beverageCharge;
+    //             $data['total'] = ($foodDrink + $total_session_price + $service_charge + $tax) - $orderDiscount;
+    //             $data['total_session_price'] = $total_session_price;
+    //         } else if ($invoice->invoice_type == 'endless_time') {
+    //             $foodDrink = $foodCharge + $beverageCharge;
+    //             $foodDrink = $foodDrink;
+    //             $data['total'] = ($foodDrink + $total_session_price + $service_charge + $tax) - $orderDiscount;
+    //             $data['total_session_price'] = $total_session_price;
+    //         }
+
+    //         // if discount contain, caculate discount value according to the discount type
+    //         if (isset($data['discount_type'])) {
+    //             if ($data['discount_type'] == 'percentage') {
+    //                 if ($data['discount_percentage'] < 0 || $data['discount_percentage'] > 100) {
+    //                     ResponseMessage('Discount percentage should be between 0 and 100');
+    //                 }
+    //                 $data['discount_value'] = ($data['total']) * ($data['discount_percentage'] / 100);
+    //                 $data['discount_type'] = 'percentage';
+    //             } else if ($data['discount_type'] == 'room_discount') {
+    //                 if ($invoice->invoice_type == 'package') {
+    //                     ResponseMessage('Room with packages can not have discount', 402);
+    //                 } else {
+    //                     $roomDiscount = RoomDiscount::find($data['room_discount_id']);
+    //                     if (!$roomDiscount->rooms->contains($entity->id)) {
+    //                         ResponseMessage('Selected discount cannot be applied', 422);
+    //                     }
+
+    //                     if ($roomDiscount->session <= $lastRoomwithInvoice->session_duration) {
+    //                         $room_discount_value = $total_session_price - $data['room_discount_amount'];
+    //                         $total_session_price = $data['room_discount_amount'];
+    //                         $lastRoomwithInvoice->discount_session = $data['discount_session'];
+    //                         $lastRoomwithInvoice->save();
+    //                     } else {
+    //                         ResponseMessage('Discount cannot be applied', 422);
+    //                     }
+    //                 }
+    //             } else if ($data['discount_type'] == 'birthday_discount') {
+
+    //                 if ($customer) {
+    //                     $birthdate = Carbon::parse($customer->birthdate);
+    //                     $today = Carbon::today();
+    //                     if ($birthdate->isBirthday($today)) {
+    //                         $isBirthday = true;
+    //                         $bdPromo = BirthdayPromotion::find($data['birthday_discount_id']);
+    //                         if (!$bdPromo) {
+    //                             ResponseMessage('Selected birthday promotion not found');
+    //                         }
+    //                         $data['discount_value'] = $bdPromo->discount_value;
+    //                     } else {
+    //                         ResponseData('Today is not your birthday', 422);
+    //                     }
+    //                 }
+    //             } else if ($data['discount_type'] == 'customer_level') {
+    //                 $total = 0;
+    //                 foreach ($customer->invoices as $invoice) {
+    //                     $total += $invoice->total;
+    //                 }
+
+    //                 $levels = CustomerLevelDiscount::all();
+    //                 $customerLevel = null;
+    //                 foreach ($levels as $level) {
+    //                     if ($total  >= $level->amount) {
+    //                         $customerLevel = $level;
+    //                     } else {
+    //                         break;
+    //                     }
+    //                 }
+    //                 if ($customerLevel == null) {
+    //                     ResponseMessage('Customer level not found', 422);
+    //                 }
+    //                 $data['discount_value'] = $customerLevel->promotion_value;
+    //             }
+    //         }
+
+    //         // caculate all of the value that come from the invoice type and discount resul
+    //         $data['room_discount_value'] = $room_discount_value;
+    //         if (isset($data['discount_value'])) {
+    //             $discount_value = $data['discount_value'];
+    //         }
+    //         $discount_total = $discount_value + $room_discount_value;
+    //         $data['total'] -= $discount_total;
+    //         $data['tax'] = $tax;
+    //         $data['service_charge'] = $service_charge;
+    //         $data['total_session_price'] = $total_session_price;
+    //         if (!isset($data['discount_type'])) {
+    //             $data['discount_type'] = null;
+    //         }
+    //         $data['order_discount_value'] = $orderDiscount;
+    //         $data['sub_total'] = ($data['total']) - ($tax + $service_charge);
+    //         $data['payment_status'] = 'received';
+    //         $data['complete_date'] = CurrentTime();
+    //         $entity->is_active = 0;
+    //         $entity->status = 'inactive';
+    //         $entity->save();
+    //         $data['invoice_id'] = $invoice_id;
+    //         $invoice->update($data);
+    //         $debit_total = 0;
+    //         DB::commit();
+    //         return $invoice;
+    //     } catch (\Exception $e) {
+    //         DB::rollBack();
+    //         ResponseMessage($e->getMessage(), 402);
+    //         throw $e;
+    //     }
+    // }
+
     public function doneEntityWithInvoice(array $data)
     {
         DB::beginTransaction();
         try {
-            // initial for all value
-            $foodCharge = 0;
-            $beverageCharge = 0;
-            $total_session_price = 0;
-            $orderDiscount = 0;
-            $service_charge = 0;
-            $tax = 0;
-            $foodDrink = 0;
-            $discount_value = 0;
-            $room_discount_value = 0;
-
-            // get food and beverage
-            if (isset($data['order_categories'])) {
-                $data['order_categories'] = json_decode($data['order_categories'], true);
-                foreach ($data['order_categories'] as $menu) {
-                    if ($menu['menu_category_id'] == 1 || $menu['menu_category_id'] == 2 || $menu['menu_category_id'] == 3) {
-                        $foodCharge += $menu['price'];
-                    } else {
-                        $beverageCharge += $menu['price'];
-                    }
-                }
-            }
-            // get total session price
-            $roomSessions = RoomSession::where('invoice_id', $data['invoice_id'])->get();
-            foreach ($roomSessions as $room) {
-                $total_session_price += $room->price;
-            }
-
-            $invoice = Invoice::find($data['invoice_id']);
-            $invoice_id = $invoice->invoice_id;
-            $customer = Customer::find($invoice->customer_id);
-
-            // get order discount price
-            $order = Order::where('invoice_id', $invoice->id)->first();
-            if ($order) {
-                $orderDiscount = $order->total_discount_price;
-            }
-
-            $lastRoomwithInvoice = RoomSession::where('invoice_id', $invoice->id)->latest()->first();
-            $entity = Entity::find($lastRoomwithInvoice->entity_id);
-
-            if (isset($data['tax'])) {
-                $tax = $data['tax'];
-            }
-
-            if (isset($data['service_charge'])) {
-                $service_charge = $data['service_charge'];
-            }
-
-
-            //  caculation depending on the invoice_type
-            if ($invoice->invoice_type == 'package') {
-                $foodDrink = $foodCharge + $beverageCharge;
-                $data['total'] = ($foodDrink + $invoice->paid_amount + $tax + $service_charge) - $orderDiscount;
-            } else if ($invoice->invoice_type == 'session') {
-                $foodDrink = $foodCharge + $beverageCharge;
-                $data['total'] = ($foodDrink + $total_session_price + $service_charge + $tax) - $orderDiscount;
-                $data['total_session_price'] = $total_session_price;
-            } else if ($invoice->invoice_type == 'endless_time') {
-                $foodDrink = $foodCharge + $beverageCharge;
-                $foodDrink = $foodDrink;
-                $data['total'] = ($foodDrink + $total_session_price + $service_charge + $tax) - $orderDiscount;
-                $data['total_session_price'] = $total_session_price;
-            }
-
-            // if discount contain, caculate discount value according to the discount type
-            if (isset($data['discount_type'])) {
-                if ($data['discount_type'] == 'percentage') {
-                    if ($data['discount_percentage'] < 0 || $data['discount_percentage'] > 100) {
-                        ResponseMessage('Discount percentage should be between 0 and 100');
-                    }
-                    $data['discount_value'] = ($data['total']) * ($data['discount_percentage'] / 100);
-                    $data['discount_type'] = 'percentage';
-                } else if ($data['discount_type'] == 'room_discount') {
-                    if ($invoice->invoice_type == 'package') {
-                        ResponseMessage('Room with packages can not have discount', 402);
-                    } else {
-                        $roomDiscount = RoomDiscount::find($data['room_discount_id']);
-                        if (!$roomDiscount->rooms->contains($entity->id)) {
-                            ResponseMessage('Selected discount cannot be applied', 422);
-                        }
-
-                        if ($roomDiscount->session <= $lastRoomwithInvoice->session_duration) {
-                            $room_discount_value = $total_session_price - $data['room_discount_amount'];
-                            $total_session_price = $data['room_discount_amount'];
-                            $lastRoomwithInvoice->discount_session = $data['discount_session'];
-                            $lastRoomwithInvoice->save();
-                        } else {
-                            ResponseMessage('Discount cannot be applied', 422);
-                        }
-                    }
-                } else if ($data['discount_type'] == 'birthday_discount') {
-
-                    if ($customer) {
-                        $birthdate = Carbon::parse($customer->birthdate);
-                        $today = Carbon::today();
-                        if ($birthdate->isBirthday($today)) {
-                            $isBirthday = true;
-                            $bdPromo = BirthdayPromotion::find($data['birthday_discount_id']);
-                            if (!$bdPromo) {
-                                ResponseMessage('Selected birthday promotion not found');
-                            }
-                            $data['discount_value'] = $bdPromo->discount_value;
-                        } else {
-                            ResponseData('Today is not your birthday', 422);
-                        }
-                    }
-                } else if ($data['discount_type'] == 'customer_level') {
-                    $total = 0;
-                    foreach ($customer->invoices as $invoice) {
-                        $total += $invoice->total;
-                    }
-
-                    $levels = CustomerLevelDiscount::all();
-                    $customerLevel = null;
-                    foreach ($levels as $level) {
-                        if ($total  >= $level->amount) {
-                            $customerLevel = $level;
-                        } else {
-                            break;
-                        }
-                    }
-                    if ($customerLevel == null) {
-                        ResponseMessage('Customer level not found', 422);
-                    }
-                    $data['discount_value'] = $customerLevel->promotion_value;
-                }
-            }
-
-            // caculate all of the value that come from the invoice type and discount resul
-            $data['room_discount_value'] = $room_discount_value;
-            if (isset($data['discount_value'])) {
-                $discount_value = $data['discount_value'];
-            }
-            $discount_total = $discount_value + $room_discount_value;
-            $data['total'] -= $discount_total;
-            $data['tax'] = $tax;
-            $data['service_charge'] = $service_charge;
-            $data['total_session_price'] = $total_session_price;
-            if (!isset($data['discount_type'])) {
-                $data['discount_type'] = null;
-            }
-            $data['order_discount_value'] = $orderDiscount;
-            $data['sub_total'] = ($data['total']) - ($tax + $service_charge);
-            $data['payment_status'] = 'received';
-            $data['complete_date'] = CurrentTime();
-            $entity->is_active = 0;
-            $entity->status = 'inactive';
-            $entity->save();
-            $data['invoice_id'] = $invoice_id;
-            $invoice->update($data);
-            $debit_total = 0;
-            DB::commit();
-            return $invoice;
-        } catch (\Exception $e) {
-            DB::rollBack();
-            ResponseMessage($e->getMessage(), 402);
-            throw $e;
-        }
-    }
-
-    public function entityEnd(array $data)
-    {
-        DB::beginTransaction();
-        try {
-
             $foodCharge = 0;
             $beverageCharge = 0;
             $total_session_price = 0;
@@ -692,6 +696,34 @@ class InvoiceRepository implements InvoiceRepositoryInterface
             $invoice->update($data);
             DB::commit();
             return $invoice;
+        } catch (\Exception $e) {
+            DB::rollBack();
+            ResponseMessage($e->getMessage(), 422);
+            throw $e;
+        }
+    }
+
+    public function invoiceConfirm(array $data)
+    {
+        DB::beginTransaction();
+        try {
+            $invoice = Invoice::find($data['invoice_id']);
+            $latestSession = RoomSession::where('invoice_id', $data['invoice_id'])->latest()->first();
+            $entity = Entity::find($latestSession->entity_id);
+
+            if ($data['is_confirm'] == 1) {
+                $entity->status = 'active';
+                $entity->is_active = 1;
+            } else {
+                $entity->status = 'inactive';
+                $entity->is_active = 0;
+                $invoice->delete();
+                $latestSession->delete();
+
+            }
+            $entity->save();
+            DB::commit();
+            ResponseMessage('Room status updated');
         } catch (\Exception $e) {
             DB::rollBack();
             ResponseMessage($e->getMessage(), 422);
