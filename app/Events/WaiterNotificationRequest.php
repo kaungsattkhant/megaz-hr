@@ -3,7 +3,6 @@
 namespace App\Events;
 
 use App\Models\Entity;
-use App\Models\Invoice;
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Broadcasting\PresenceChannel;
@@ -12,7 +11,7 @@ use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 
-class RoomNotificationRequest implements ShouldBroadcast
+class WaiterNotificationRequest implements ShouldBroadcast
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
@@ -22,11 +21,11 @@ class RoomNotificationRequest implements ShouldBroadcast
     public $department_id;
     public $entity;
 
-    public function __construct(Entity $invoice,$department_id)
+    public function __construct(Entity $entity,$department_id)
     {
         //
         $this->department_id=$department_id;
-        $this->entity = $invoice->id;
+        $this->entity = $entity;
 
     }
 
@@ -45,7 +44,7 @@ class RoomNotificationRequest implements ShouldBroadcast
     {
         return [
             'department_id' => $this->department_id,
-            'invoice_id' => $this->invoice_id,
+            'entity_id' => $this->entity,
         ];
     }
 }

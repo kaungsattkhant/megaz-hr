@@ -10,8 +10,7 @@ use App\Models\CustomerLevelDiscount;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
 use App\Events\RoomNotificationRequest;
-
-
+use App\Events\WaiterNotificationRequest;
 use App\Models\Entity;
 use App\Models\HeadCount;
 use App\Models\Invoice;
@@ -721,11 +720,9 @@ class InvoiceRepository implements InvoiceRepositoryInterface
                 $latestSession->delete();
 
             }
-
-            broadcast(new RoomNotificationRequest($entity,UserData()->department_id));
+            broadcast(new WaiterNotificationRequest($entity,UserData()->department_id));
             $entity->save();
             DB::commit();
-
             Responsemessage('Room status updated');
         } catch (\Exception $e) {
             DB::rollBack();
