@@ -14,7 +14,7 @@
             id="noti_modal" tabindex="-1" aria-labelledby="createCustomerModalLabel" aria-modal="true"
             role="dialog">
             <div data-te-modal-dialog-ref
-                class="pointer-events-none relative flex min-h-[calc(100%-1rem)] w-auto translate-y-[-50px] items-center opacity-0 transition-all duration-300 ease-in-out min-[576px]:mx-auto min-[576px]:mt-7 min-[576px]:min-h-[calc(100%-3.5rem)] min-[576px]:max-w-fit">
+                class="pointer-events-none relative flex min-h-[calc(100%-1rem)] w-auto translate-y-[-50px] items-baseline opacity-0 transition-all duration-300 ease-in-out min-[576px]:mx-auto min-[576px]:mt-7 pt-16 min-[576px]:min-h-[calc(100%-3.5rem)] min-[576px]:max-w-fit">
                 <div
                     class="pointer-events-auto relative flex w-full flex-col rounded-md border-none bg-white bg-clip-padding text-current shadow-lg outline-none">
                     <div class="relative  p-4">
@@ -30,42 +30,44 @@
                         </button>
                     </div>
 
-                    <div class="relative px-2 pb-4" data-te-modal-body-ref>
+                    <div class="relative px-6 pb-8" data-te-modal-body-ref>
                         <div>
-                            <table class="min-w-full text-left text-sm font-light">
+                            <table class="min-w-full text-left text-sm font-light border-l border-t">
                                 <thead class="border-b font-medium">
                                     <tr>
-                                        <th scope="col" class="px-6 py-4">Room Name</th>
-                                        <th scope="col" class="px-6 py-4">Session duration </th>
-                                        <th scope="col" class="px-6 py-4">Start time</th>
-                                        <th scope="col" class="px-6 py-4">End time </th>
-                                        <th scope="col" class="px-6 py-4">Customer name</th>
-                                        <th scope="col" class="px-6 py-4">Action</th>
+                                        <th scope="col" class="px-6 py-4 border-r">Room Name</th>
+                                        <th scope="col" class="px-6 py-4 border-r">Session duration </th>
+                                        <th scope="col" class="px-6 py-4 border-r">Start time</th>
+                                        <th scope="col" class="px-6 py-4 border-r">End time </th>
+                                        <th scope="col" class="px-6 py-4 border-r">Customer name</th>
+                                        <th scope="col" class="px-6 py-4 border-r text-center">Action</th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <tr class="" v-for="(sessionRequest) in sessionRequests">
+                                    <tr class="border-b" v-for="(sessionRequest) in sessionRequests">
 
-                                        <td class="whitespace-nowrap px-6 py-4">
+                                        <td class="whitespace-nowrap border-r px-6 py-4">
                                             {{ sessionRequest.room_name }}
                                         </td>
-                                        <td class="whitespace-nowrap px-6 py-4">
+                                        <td class="whitespace-nowrap border-r px-6 py-4 text-center">
                                             {{ sessionRequest.session_duration }}
                                         </td>
-                                        <td class="whitespace-nowrap px-6 py-4">
+                                        <td class="whitespace-nowrap border-r px-6 py-4">
                                             {{ sessionRequest.start_time }}
                                         </td>
-                                        <td class="whitespace-nowrap px-6 py-4">
+                                        <td class="whitespace-nowrap border-r px-6 py-4">
                                             {{ sessionRequest.end_time }}
                                         </td>
-                                        <td class="whitespace-nowrap px-6 py-4">
+                                        <td class="whitespace-nowrap border-r px-6 py-4">
                                             {{ sessionRequest.customer_name }}
                                         </td>
-                                        <td class="whitespace-nowrap px-6 py-4">
-                                            <button @click="btnRejectSession(sessionRequest.invoice_id)" class="px-3 py-2 bg-red-600 mr-2">
+                                        <td class="whitespace-nowrap border-r px-6 py-4">
+                                            <button :disabled="sessionRequest.status != 'received'" @click="btnRejectSession(sessionRequest.invoice_id)" 
+                                                class="px-3 py-2 bg-red-600 text-white rounded-md mr-2">
                                                 Reject
                                             </button>
-                                            <button @click="btnConfirmSession(sessionRequest.invoice_id)" class="px-3 py-2 bg-green-600">
+                                            <button :disabled="sessionRequest.status != 'received'" @click="btnConfirmSession(sessionRequest.invoice_id)" 
+                                                class="px-3 py-2 bg-green-600 text-white rounded-md">
                                                 Confirm
                                             </button>
                                         </td>
@@ -77,7 +79,7 @@
                     </div>
 
                     <div class="flex justify-center px-12 mb-6">
-                        <button class="pos-add-btn focus:outline-none focus:ring-0 ">
+                        <button class="pos-add-btn focus:outline-none focus:ring-0 px-8" data-te-modal-dismiss aria-label="Close">
                             OK
                         </button>
                     </div>
@@ -132,7 +134,8 @@
                         room_name: response.room_name,
                         session_duration: response.room_session.session_duration,
                         start_time: convertToFriendlyDateTime(response.room_session.start_date),
-                        end_time: convertToFriendlyDateTime(response.room_session.end_date)
+                        end_time: convertToFriendlyDateTime(response.room_session.end_date),
+                        status: 'received'
                     };
 
                     let index = this.sessionRequests.findIndex(sessionRequest => sessionRequest.invoice_id == newSessionRequest.invoice_id);
@@ -159,6 +162,13 @@
                 if (response.data) {
                     console.log('confirm success')
                 }
+                let index = this.sessionRequests.findIndex(sessionRequest => sessionRequest.invoice_id == id);
+                if (index != -1) {
+                    this.sessionRequests[index].status = 'confirmed';
+                    this.sessionRequests.splice(index, 1);
+                }
+
+                this.notiModalOpen();
             },
             async btnRejectSession(id){
                 let formData = new FormData();
@@ -168,6 +178,12 @@
                 if (response.data) {
                     console.log('reject success')
                 }
+                let index = this.sessionRequests.findIndex(sessionRequest => sessionRequest.invoice_id == id);
+                if (index != -1) {
+                    this.sessionRequests[index].status = 'rejected';
+                    this.sessionRequests.splice(index, 1);
+                }
+                this.notiModalOpen();
             },
         },
 
@@ -186,15 +202,6 @@
             let eventName = `RoomNotificationRequest`;
 
             this.listenBroadCastNotifications(channelName, eventName);
-
-            // window.Echo.channel('send-notification.' + 1)
-            // .listen('SendNotification',(response)=>{
-            //     console.log(response);
-            // });
-            // .notification((notification) => {
-            //     console.log(notification.type);
-            // });
-
         },
 
         beforeDestroy() {
