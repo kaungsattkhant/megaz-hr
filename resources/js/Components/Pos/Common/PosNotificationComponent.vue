@@ -1,12 +1,12 @@
 <template>
-    
+
     <div>
         <button
             class="bg-red-600 focus:outline-none focus:ring-0 hidden" id="open_noti_modal"
             data-te-toggle="modal" data-te-target="#noti_modal">
             +
         </button>
-        
+
 
 
         <div data-te-modal-init
@@ -44,7 +44,7 @@
                                 </thead>
                                 <tbody>
                                     <tr class="">
-    
+
                                         <td class="whitespace-nowrap px-6 py-4">
                                             Room C
                                         </td>
@@ -61,18 +61,18 @@
                                             Ko kYaw
                                         </td>
                                     </tr>
-    
-                                    
-                                    
+
+
+
                                 </tbody>
                             </table>
                         </div>
-                        
+
                     </div>
 
                     <div class="flex justify-center px-12 mb-6">
                         <button class="pos-add-btn focus:outline-none focus:ring-0 ">
-                            OK  
+                            OK
                         </button>
                     </div>
                 </div>
@@ -136,9 +136,10 @@
             listenBroadCastNotifications(channel, event){
                 // console.log(`listining notifications on ${channel} channel`);
                 window.Echo.channel(channel)
-                .listen((response)=>{
+                .listen(event,(response)=>{
 
                     console.log(response);
+                    console.log('message received');
                     // let title = response.title;
                     // let body = response.body;
                     // let notiOptions = { body: body };
@@ -151,7 +152,7 @@
                     // this.getNotifications();
                     // this.notiModalOpen();
                 });
-                
+
             },
         },
 
