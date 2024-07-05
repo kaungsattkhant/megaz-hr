@@ -689,6 +689,7 @@ class InvoiceRepository implements InvoiceRepositoryInterface
             $data['sub_total'] = ($data['total']) - ($tax + $service_charge);
             $data['payment_status'] = 'received';
             $data['complete_date'] = CurrentTime();
+            $entity->status = 'inactive';
             $entity->is_active = 0;
             $entity->save();
             $data['invoice_id'] = $invoice_id;
