@@ -62,10 +62,10 @@
                                             {{ sessionRequest.customer_name }}
                                         </td>
                                         <td class="whitespace-nowrap px-6 py-4">
-                                            <button @click="btnRejectSession(sessionRequest.id)" class="px-3 py-2 bg-red-600 mr-2">
+                                            <button @click="btnRejectSession(sessionRequest.invoice_id)" class="px-3 py-2 bg-red-600 mr-2">
                                                 Reject
                                             </button>
-                                            <button @click="btnConfirmSession(sessionRequest.id)" class="px-3 py-2 bg-green-600">
+                                            <button @click="btnConfirmSession(sessionRequest.invoice_id)" class="px-3 py-2 bg-green-600">
                                                 Confirm
                                             </button>
                                         </td>
