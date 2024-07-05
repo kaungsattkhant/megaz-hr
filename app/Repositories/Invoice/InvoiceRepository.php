@@ -720,9 +720,9 @@ class InvoiceRepository implements InvoiceRepositoryInterface
                 $latestSession->delete();
 
             }
-            broadcast(new WaiterNotificationRequest($entity,UserData()->department_id));
             $entity->save();
             DB::commit();
+            broadcast(new WaiterNotificationRequest($entity,UserData()->department_id));
             Responsemessage('Room status updated');
         } catch (\Exception $e) {
             DB::rollBack();
