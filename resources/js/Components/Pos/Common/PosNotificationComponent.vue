@@ -43,22 +43,22 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <tr class="">
+                                    <tr class="" v-for="(sessionRequest) in sessionRequests">
 
                                         <td class="whitespace-nowrap px-6 py-4">
-                                            Room C
+                                            {{ sessionRequest.room_name }}
                                         </td>
                                         <td class="whitespace-nowrap px-6 py-4">
-                                            1
+                                            {{ sessionRequest.session_duration }}
                                         </td>
                                         <td class="whitespace-nowrap px-6 py-4">
-                                            12:00 Am
+                                            {{ sessionRequest.start_time }}
                                         </td>
                                         <td class="whitespace-nowrap px-6 py-4">
-                                            1:00 PM
+                                            {{ sessionRequest.end_time }}
                                         </td>
                                         <td class="whitespace-nowrap px-6 py-4">
-                                            Ko kYaw
+                                            {{ sessionRequest.customer_name }}
                                         </td>
                                     </tr>
 
@@ -93,7 +93,7 @@
     import Pusher from 'pusher-js';
 
     import { getApiData, postApiData } from '../../../utilities/ajax-helpers';
-    import { getElapsedMoments } from '../../../utilities/datetime-helpers';
+    import { convertToFriendlyDateTime } from '../../../utilities/datetime-helpers';
 
     export default{
         data() {
@@ -105,52 +105,34 @@
                 notifications: [],
                 newNofiCount: 0,
                 intervalId: null,
+
+                sessionRequests: [],
             };
         },
 
         methods: {
             ...mapGetters(['getUser', 'getDepartment', 'getToken', 'getRoles']),
 
-            // async getNotifications(){
-            //     let url = `/api/notifications`;
-            //     let response = await getApiData({url: url, token: this.getToken()});
-            //     if(response.data){
-            //         this.notifications = response.data;
-            //         this.newNofiCount = 0;
-            //         this.notifications.forEach(notification => {
-            //             notification.notification_users.forEach((userNoti)=>{
-            //                 if((userNoti.staff_id == this.getUser().id) && userNoti.is_read == 0){
-            //                     notification.is_new = true;
-            //                 }
-            //                 if((userNoti.staff_id == this.getUser().id) && userNoti.is_read_count == 0){
-            //                     this.newNofiCount++;
-            //                 }
-            //             });
-            //         });
-            //     }
-            // },
             notiModalOpen(){
                 document.getElementById("open_noti_modal").click();
             },
 
             listenBroadCastNotifications(channel, event){
-                // console.log(`listining notifications on ${channel} channel`);
                 window.Echo.channel(channel)
-                .listen(event,(response)=>{
+                .listen('.' + '*',(response)=>{
+                    let sessionRequest = {
+                        invoice_id: response.invoice_id,
+                        customer_name: response.customer_name,
+                        room_name: response.room_name,
+                        session_duration: response.room_session.session_duration,
+                        start_time: convertToFriendlyDateTime(response.room_session.start_date),
+                        end_time: convertToFriendlyDateTime(response.room_session.end_date)
+                    };
 
+                    this.sessionRequests.push(sessionRequest);
                     console.log(response);
-                    console.log('message received');
-                    // let title = response.title;
-                    // let body = response.body;
-                    // let notiOptions = { body: body };
-                    // new Notification(title, notiOptions);
-                    // this.$notify({
-                    //     title: title,
-                    //     text: body,
-                    //     type: "info"
-                    // });
-                    // this.getNotifications();
-                    // this.notiModalOpen();
+                    console.log('session request received');
+                    this.notiModalOpen();
                 });
 
             },
