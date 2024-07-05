@@ -119,7 +119,7 @@
 
             listenBroadCastNotifications(channel, event){
                 window.Echo.channel(channel)
-                .listen('.' + '*',(response)=>{
+                .listen(event,(response)=>{
                     let sessionRequest = {
                         invoice_id: response.invoice_id,
                         customer_name: response.customer_name,
@@ -150,7 +150,7 @@
 
 
             let channelName = `room-notification-request.${this.department.id}`;
-            let eventName = `SendNotification`;
+            let eventName = `App\\Events\\RoomNotificationRequest`;
 
             this.listenBroadCastNotifications(channelName, eventName);
 
