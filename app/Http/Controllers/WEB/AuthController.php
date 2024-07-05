@@ -34,6 +34,9 @@ class AuthController extends Controller
             if(checkDepartmentPermission(['Catering'])){
                 return redirect()->route('pos.index');
             }
+            if(checkDepartmentPermission(['Kitchen'])){
+                return redirect()->route('pos.index');
+            }
             return redirect()->route('staff');
         }else{
             return redirect()->back();

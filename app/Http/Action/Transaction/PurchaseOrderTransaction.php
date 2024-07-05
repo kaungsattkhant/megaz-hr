@@ -20,7 +20,7 @@ class PurchaseOrderTransaction
         //     ->groupBy( 'items.category_id', 'categories.name')
         //     ->where('purchase_order_items.purchase_order_id', $model->id)
         //     ->get();
-
+        
         $purchaseOrderItemGroupedByCategory = PurchaseOrderItem::join('po_grns', 'purchase_order_items.id', '=', 'po_grns.purchase_order_item_id')
         ->join('items', 'purchase_order_items.item_id', '=', 'items.id')
         ->join('categories', 'items.category_id', '=', 'categories.id')

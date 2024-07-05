@@ -23,7 +23,6 @@ class PurchaseOrderItemRepository implements PurchaseOrderItemRepositoryInterfac
             $purchaseOrderItems = PurchaseOrderItem::skip($skip)->take($perPage)->get();
             $paginationData = MakePaginationData($request, $totalCount, 'purchase_order_items');
             $paginationData['purchaseOrderItems'] = $purchaseOrderItems;
-
             return $paginationData;
         }
         else{

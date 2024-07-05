@@ -135,13 +135,14 @@ class PurchaseOrderRepository implements PurchaseOrderRepositoryInterface
                         }
                     }
                     #grn store
-                    $this->storeGRN($item);
+                    $po_grn=$this->storeGRN($item);
                     #grn
                 }
                 $po_item = $po->items()->updateOrCreate(['id' => $item_data['id']], $item_data);
             }
             if ($request->is_grn && $po) {
                 $morphMapName = RelationMorphName($po);
+                // $po->po_grn_id=$po_grn->id
                 (new PurchaseOrderTransaction())->createTransaction($po, $morphMapName, $request->cash_account_id); #create transaction
             }
             if (!isset($request->id)) {

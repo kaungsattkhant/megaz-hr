@@ -11,19 +11,10 @@ class AccountPayableRepository implements AccountPayableInterface
 {
     public function list($request)
     {
-        // $ledger=Ledger::join('accounts','ledgers.account_id','accounts.id')
-        // ->join('sub_accounts','accounts.sub_account_id','sub_accounts.id')
-        // ->where('sub_accounts.head_account_id',config('common.liabilities'))
-        // ->where('ledgers.personable_type','supplier')
-        // ->select('ledgers.id','ledgers.personable_id as supplier_id',
-        // DB::raw('SUM(CASE WHEN action = "debit" THEN value ELSE 0 END) as debit_amount'),
-        // DB::raw('SUM(CASE WHEN action = "credit" THEN value ELSE 0 END) as credit_amount'),
-        // )
-        // ->groupBy('ledgers.personable_id')
-        // ->get();
         $ledger = Ledger::join('accounts', 'ledgers.account_id', '=', 'accounts.id')
             ->join('sub_accounts', 'accounts.sub_account_id', '=', 'sub_accounts.id')
             ->join('suppliers', 'ledgers.personable_id', '=', 'suppliers.id')
+            ->join('transactions', 'ledgers.transaction_id', '=', 'transactions.id')
             ->where('sub_accounts.head_account_id', config('common.liabilities'))
             ->where('ledgers.personable_type', 'supplier')
             ->select(
@@ -37,6 +28,26 @@ class AccountPayableRepository implements AccountPayableInterface
             ->groupBy('ledgers.personable_id')
             ->get();
         return $ledger;
+
+        // $ledger = Ledger::join('accounts', 'ledgers.account_id', '=', 'accounts.id')
+        //     ->join('sub_accounts', 'accounts.sub_account_id', '=', 'sub_accounts.id')
+        //     ->join('po_grns', 'ledgers.personable_id', '=', 'po_grns.id')
+        //     ->join('suppliers', 'po_grns.supplier_id', '=', 'suppliers.id')
+        //     ->join('transactions', 'ledgers.transaction_id', '=', 'transactions.id')
+        //     ->where('sub_accounts.head_account_id', config('common.liabilities'))
+        //     ->where('ledgers.personable_type', 'po_grn')
+        //     ->select(
+        //         'suppliers.id as supplier_id',
+        //         'suppliers.account_id',
+        //         'suppliers.name as supplier_name',
+        //         'po_grns.invoice_no as invoice_no',
+        //         DB::raw('SUM(CASE WHEN ledgers.action = "debit" THEN ledgers.value ELSE 0 END) as debit_amount'),
+        //         DB::raw('SUM(CASE WHEN ledgers.action = "credit" THEN ledgers.value ELSE 0 END) as credit_amount'),
+        //         DB::raw('(SUM(CASE WHEN ledgers.action = "credit" THEN ledgers.value ELSE 0 END) - SUM(CASE WHEN ledgers.action = "debit" THEN ledgers.value ELSE 0 END)) as total_credit_amount')
+        //     )
+        //     ->groupBy('suppliers.id','po_grns.invoice_no')
+        //     ->get();
+        // return $ledger;
     }
     public function createPayableAccount($request)
     {

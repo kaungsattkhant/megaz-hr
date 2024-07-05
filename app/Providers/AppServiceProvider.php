@@ -39,6 +39,7 @@ class AppServiceProvider extends ServiceProvider
             'task'=>'App\Models\Task',
             'uom'=>'App\Models\UOM',
             'invoice'=>'App\Models\Invoice',
+            'po_grn'=>'App\Models\PoGrn',
         ]);
     }
 }
