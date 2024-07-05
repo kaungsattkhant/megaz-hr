@@ -9,6 +9,8 @@ use App\Models\Customer;
 use App\Models\CustomerLevelDiscount;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
+use App\Events\RoomNotificationRequest;
+
 
 use App\Models\Entity;
 use App\Models\HeadCount;
@@ -143,6 +145,11 @@ class InvoiceRepository implements InvoiceRepositoryInterface
             $data['start_date'] = $data['invoice_date'];
             $roomSession = RoomSession::create($data);
             $invoice->room_session = $roomSession;
+
+            if ($data['is_waiter'] == 1 && $invoice) {
+
+                broadcast(new RoomNotificationRequest($invoice,UserData()->department_id));
+            }
             DB::commit();
             return $invoice;
         } catch (\Exception $e) {
@@ -700,13 +707,18 @@ class InvoiceRepository implements InvoiceRepositoryInterface
     {
         DB::beginTransaction();
         try {
-            $entity = Entity::find($data['entity_id']);
+            $invoice = Invoice::find($data['invoice_id']);
+            $latestSession = RoomSession::where('invoice_id', $data['invoice_id'])->latest()->first();
+            $entity = Entity::find($latestSession->entity_id);
+
             if ($data['is_confirm'] == 1) {
                 $entity->status = 'active';
                 $entity->is_active = 1;
             } else {
                 $entity->status = 'inactive';
                 $entity->is_active = 0;
+                $invoice->delete();
+                $latestSession->delete();
 
             }
             $entity->save();
