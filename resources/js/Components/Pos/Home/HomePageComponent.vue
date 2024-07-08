@@ -1292,11 +1292,6 @@
             },
 
             async doneSession(){
-                this.isOpenRoom.step_1=false;
-                this.isOpenRoom.step_2 = false;
-                this.isOpenRoom.step_detail = false;
-                this.isOpenRoom.step_invoice = true;
-
                 let formData = new FormData();
                 let roomSessions = [];
                 formData.append('invoice_id', this.selectedRoom.room_sessions[0].invoice.invoice_id);
@@ -1305,6 +1300,17 @@
                     this.roomSessionData = response.data;
                     roomSessions = response.data;
                     console.log("success")
+                    this.isOpenRoom.step_1=false;
+                    this.isOpenRoom.step_2 = false;
+                    this.isOpenRoom.step_detail = false;
+                    this.isOpenRoom.step_invoice = true;
+                }
+                else{
+                    this.$notify({
+                        title: `Error Done Session`,
+                        text: `Some Error Occur, please try again`,
+                        type: "warn"
+                    });
                 }
                 let roomChargeTotal = 0;
                 // roomSessions.forEach(roomSession => {
@@ -1518,6 +1524,7 @@
             },
 
 
+            
             closeModal() {
                 document.getElementById("closeModal").click();
             },
@@ -1529,6 +1536,17 @@
             },
             closeChangeRoomModal() {
                 document.getElementById("close_change_room_modal").click();
+            },
+            clearCustomerForm(){
+                this.name = null
+                this.ph_number = null
+                this.email = null
+                this.selectedGender = null
+                this.date = null
+                this.selectedDivision = null
+                this.selectedTownship = null
+                this.address_name = null
+                this.address = null
             },
             clearMenuForm() {
                 this.invoiceId = null
