@@ -729,7 +729,6 @@ class InvoiceRepository implements InvoiceRepositoryInterface
                 }
 
                 if ($beverageCharge != 0) {
-                    dd('in there');
 
                     $beverageKtvAcc = Account::where('account_code', '5-0102')->first();
 
@@ -793,11 +792,10 @@ class InvoiceRepository implements InvoiceRepositoryInterface
 
                     ]);
                 }
-
                 $debit_total += $tax;
             }
 
-            if ($data['discount_value'] != 0) {
+            if ($discount_total != 0) {
                 $discountAcc = Account::where('account_code', '6-2003')->first();
 
                 if ($discountAcc != null) {
