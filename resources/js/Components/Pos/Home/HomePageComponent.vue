@@ -1531,6 +1531,7 @@ export default {
                 this.isOpenRoom.step_invoice = false;
 
                 console.log("success")
+                window.location.reload()
             }
             else {
                 console.log('some errors occur');
