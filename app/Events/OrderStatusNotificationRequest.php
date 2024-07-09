@@ -24,13 +24,15 @@ class OrderStatusNotificationRequest implements ShouldBroadcast
      */
     public $department_id;
     public $order_item;
+    public $entity;
 
 
-    public function __construct(OrderItem $order_item,$department_id)
+    public function __construct(Entity $entity,OrderItem $order_item,$department_id)
     {
         //
         $this->order_item = $order_item;
         $this->department_id=$department_id;
+        $this->entity = $entity;
 
     }
 
@@ -47,9 +49,11 @@ class OrderStatusNotificationRequest implements ShouldBroadcast
     }
     public function broadcastWith()
     {
-        return [
+        $data = [
             'order_item' => $this->order_item,
             'department_id' => $this->department_id,
+            'entity' => $this->entity
         ];
+        return $data;
     }
 }
