@@ -193,7 +193,7 @@ class OrderRepository implements OrderRepositoryInterface
             $orderItem->status = $data['status'];
             $orderItem->update();
             $orderItem->menu = $orderItem->menu;
-            broadcast(new OrderStatusNotificationRequest($orderItem, UserData()->department_id));
+            broadcast(new OrderStatusNotificationRequest($orderItem,5));
             DB::commit();
             ResponseMessage('Order Item status is changed successfully');
         } catch (\Exception $e) {
