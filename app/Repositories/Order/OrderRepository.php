@@ -48,7 +48,7 @@ class OrderRepository implements OrderRepositoryInterface
                 $data['price'] = $data['original_price'] * $data['quantity'];
                 $order_items = OrderItem::create($data);
                 $order_items->menu = $order_items->menu;
-                broadcast(new KitchenNotificationRequest($order,null, $order_items, UserData()->department_id));
+                broadcast(new KitchenNotificationRequest($order,null, $order_items,7));
                 DB::commit();
                 return $order;
             } else {
@@ -64,7 +64,7 @@ class OrderRepository implements OrderRepositoryInterface
                 $data['price'] = $data['original_price'] * $data['quantity'];
                 $order_items = OrderItem::create($data);
                 $order_items->menu = $order_items->menu;
-                broadcast(new KitchenNotificationRequest($order,null, $order_items, UserData()->department_id));
+                broadcast(new KitchenNotificationRequest($order,null, $order_items,7));
                 DB::commit();
                 return $order;
             }
@@ -158,7 +158,7 @@ class OrderRepository implements OrderRepositoryInterface
             }
 
             // Broadcast with order items array
-            broadcast(new KitchenNotificationRequest($order, $orderItemsArray ,null, UserData()->department_id));
+            broadcast(new KitchenNotificationRequest($order, $orderItemsArray ,null,7));
 
             DB::commit();
 
