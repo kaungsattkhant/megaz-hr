@@ -8,8 +8,11 @@ use App\Models\Order;
 use App\Models\OrderItem;
 use Illuminate\Support\Facades\DB;
 use App\Http\Action\SendNotification\SendNotification;
+use App\Models\Entity;
+use App\Models\Invoice;
 use App\Models\Menu;
 use App\Models\Pack;
+use App\Models\RoomSession;
 use App\Models\Staff;
 use Illuminate\Http\Request;
 
@@ -47,8 +50,13 @@ class OrderRepository implements OrderRepositoryInterface
                 $data['order_id'] = $order->id;
                 $data['price'] = $data['original_price'] * $data['quantity'];
                 $order_items = OrderItem::create($data);
+                $orderItems = OrderItem::find($order_items->id);
                 $order_items->menu = $order_items->menu;
-                broadcast(new KitchenNotificationRequest($order,null, $order_items,7));
+
+                $invoice = Invoice::find($data['invoice_id']);
+                $latestRoomSession = RoomSession::where('invoice_id', $invoice->id)->orderBy('created_at', 'desc')->first();
+                $entity = Entity::find($latestRoomSession->entity_id);
+                broadcast(new KitchenNotificationRequest($entity,$order,null, $orderItems,7));
                 DB::commit();
                 return $order;
             } else {
@@ -63,8 +71,14 @@ class OrderRepository implements OrderRepositoryInterface
                 $data['order_id'] = $order->id;
                 $data['price'] = $data['original_price'] * $data['quantity'];
                 $order_items = OrderItem::create($data);
+                $orderItems = OrderItem::find($order_items->id);
+
                 $order_items->menu = $order_items->menu;
-                broadcast(new KitchenNotificationRequest($order,null, $order_items,7));
+
+                $invoice = Invoice::find($data['invoice_id']);
+                $latestRoomSession = RoomSession::where('invoice_id', $invoice->id)->orderBy('created_at', 'desc')->first();
+                $entity = Entity::find($latestRoomSession->entity_id);
+                broadcast(new KitchenNotificationRequest($entity,$order,null, $orderItems,7));
                 DB::commit();
                 return $order;
             }
@@ -83,6 +97,10 @@ class OrderRepository implements OrderRepositoryInterface
             $order = Order::where('invoice_id', $invoiceId)->first();
             $categorySums = [];
             $totalDiscount = 0;
+
+            $invoice = Invoice::find($data['invoice_id']);
+            $latestRoomSession = RoomSession::where('invoice_id', $invoice->id)->orderBy('created_at', 'desc')->first();
+            $entity = Entity::find($latestRoomSession->entity_id);
 
             $orderItemsArray = [];
 
@@ -135,8 +153,9 @@ class OrderRepository implements OrderRepositoryInterface
                         $menuData['price'] = 0;
                     }
                     $order_items = OrderItem::create($menuData);
-                    $order_items->menu = $order_items->menu;
-                    $orderItemsArray[] = $order_items;
+                    $orderItems = OrderItem::find($order_items->id);
+                    $orderItems->menu = $orderItems->menu;
+                    $orderItemsArray[] = $orderItems;
                 } else {
                     $menuData['date'] = CurrentTime();
                     $menuData['total'] = $menuData['original_price'] * $menuData['quantity'];
@@ -152,16 +171,15 @@ class OrderRepository implements OrderRepositoryInterface
                         $menuData['price'] = 0;
                     }
                     $order_items = OrderItem::create($menuData);
-                    $order_items->menu = $order_items->menu;
-                    $orderItemsArray[] = $order_items;
+                    $orderItems = OrderItem::find($order_items->id);
+                    $orderItems->menu = $orderItems->menu;
+                    $orderItemsArray[] = $orderItems;
                 }
             }
 
             // Broadcast with order items array
-            broadcast(new KitchenNotificationRequest($order, $orderItemsArray ,null,7));
-
+            broadcast(new KitchenNotificationRequest($entity, $order, $orderItemsArray ,null,7));
             DB::commit();
-
             return $order;
         } catch (\Exception $e) {
             DB::rollback();
@@ -178,6 +196,10 @@ class OrderRepository implements OrderRepositoryInterface
         try {
             $users = UserData();
             $orderItem = OrderItem::find($data['id']);
+            $invoice = Invoice::find($orderItem->order->invoice_id);
+            $latestRoomSession = RoomSession::where('invoice_id', $invoice->id)->orderBy('created_at', 'desc')->first();
+
+            $entity = Entity::find($latestRoomSession->entity_id);
             if ($data['status'] == 'done') {
                 $packs = Pack::where('menu_id', $orderItem->menu_id)->where('status', 'ready')->where('expired_at', '>', CurrentTime())->orderBy('expired_at', 'asc')->take($orderItem->quantity)->get();
                 if (count($packs) < $orderItem->quantity) {
@@ -193,7 +215,7 @@ class OrderRepository implements OrderRepositoryInterface
             $orderItem->status = $data['status'];
             $orderItem->update();
             $orderItem->menu = $orderItem->menu;
-            broadcast(new OrderStatusNotificationRequest($orderItem,5));
+            broadcast(new OrderStatusNotificationRequest($entity,$orderItem,5));
             DB::commit();
             ResponseMessage('Order Item status is changed successfully');
         } catch (\Exception $e) {
