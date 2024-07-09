@@ -18,26 +18,31 @@ class AuthController extends Controller
             $remember = true;
         }
         if(Auth::attempt(['phone_number'=>$request->phone_number,'password' => $request->password], $remember)){
-            $this->storeFcmToken($request->fcm_token);
-            if(checkDepartmentPermission(['HR'])){
-                return redirect()->route('staff');
+            // $this->storeFcmToken($request->fcm_token);
+            $firstFeaturePermission=UserData()->features->first();
+            if($firstFeaturePermission){
+                $routeName=config('feature_route.'.$firstFeaturePermission->slug);
+                return redirect()->route($routeName);
+                // if(checkDepartmentPermission(['HR'])){
+                //     return redirect()->route($routeName);
+                // }
+                // if(checkDepartmentPermission(['Finance'])){
+                //     return redirect()->route('financial_transactions');
+                // }
+                // if(checkDepartmentPermission(['Management'])){
+                //     return redirect()->route('purchase_orders');
+                // }
+                // if(checkDepartmentPermission(['Inventory'])){
+                //     return redirect()->route('inventories');
+                // }
+                // if(checkDepartmentPermission(['Catering'])){
+                //     return redirect()->route('pos.index');
+                // }
+                // if(checkDepartmentPermission(['Kitchen'])){
+                //     return redirect()->route('pos.index');
+                // }
             }
-            if(checkDepartmentPermission(['Finance'])){
-                return redirect()->route('financial_transactions');
-            }
-            if(checkDepartmentPermission(['Management'])){
-                return redirect()->route('purchase_orders');
-            }
-            if(checkDepartmentPermission(['Inventory'])){
-                return redirect()->route('inventories');
-            }
-            if(checkDepartmentPermission(['Catering'])){
-                return redirect()->route('pos.index');
-            }
-            if(checkDepartmentPermission(['Kitchen'])){
-                return redirect()->route('pos.index');
-            }
-            return redirect()->route('staff');
+            return redirect()->back();
         }else{
             return redirect()->back();
         }

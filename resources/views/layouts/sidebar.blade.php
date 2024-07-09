@@ -364,7 +364,7 @@
                                 </a>
                             </li>
                         @endif
-
+                        @if(checkFeaturePermission('crm'))
                         <li>
                             <button class="flex items-center pl-9 my-2 text-sm" type="button" data-te-collapse-init
                                 data-te-ripple-init data-te-ripple-color="light" data-te-target="#collapseCRM"
@@ -372,7 +372,6 @@
                                 <i class="fal fa-sack-dollar  pr-3"></i>
                                 CRM
                             </button>
-
                             <div class="!visible hidden text-center" id="collapseCRM" data-te-collapse-item>
                                 <ul>
                                     <li>
@@ -406,6 +405,7 @@
                                 </ul>
                             </div>
                         </li>
+                        @endif
 
                     </ul>
 

@@ -11,7 +11,7 @@ trait SendNotification
     public function send($model,$users,$data){
         $morphMapName=RelationMorphName($model);
         $user_ids=$users->pluck('id');
-        $tokens=$this->getTokensByStaff($user_ids);
+        // $tokens=$this->getTokensByStaff($user_ids);
         $notification=Notification::create([
             'title'=>$data['title'],
             'preview'=>$data['body'],

@@ -22,22 +22,21 @@ class DepartmentSeeder extends Seeder
             $department = Department::create([
                 'name' => $name,
             ]);
-            switch ($name) {
-                case 'HR':
-                    $department->features()->sync($hr_features);
-                    break;
-                case 'Finance':
-                    $department->features()->sync($finance_features);
-                    break;
-                case 'Inventory':
-                    $department->features()->sync($inventory_features);
-                case 'Catering':
-                    $department->features()->sync($catering_features);
-                    break;
-                default:
-                    $department->features()->sync($hr_features);
-            }
-            // $department->features()->sync($hr_features);
+            // switch ($name) {
+            //     case 'HR':
+            //         $department->features()->sync($hr_features);
+            //         break;
+            //     case 'Finance':
+            //         $department->features()->sync($finance_features);
+            //         break;
+            //     case 'Inventory':
+            //         $department->features()->sync($inventory_features);
+            //     case 'Catering':
+            //         $department->features()->sync($catering_features);
+            //         break;
+            //     default:
+            //         $department->features()->sync($hr_features);
+            // }
         }
     }
 }
