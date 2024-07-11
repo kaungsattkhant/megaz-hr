@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::table('entities', function (Blueprint $table) {
             //
-            $table->boolean('is_active')->after('is_eailable')->default(0);
+            $table->boolean('is_active')->after('is_available')->default(0);
             $table->string('status')->after('is_active')->default('inactive');
         });
     }
