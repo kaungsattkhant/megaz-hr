@@ -22,15 +22,15 @@ class PosRoomDoneNotification implements ShouldBroadcast
     /**
      * Create a new event instance.
      */
-    public $role_ids;
+    public $role_id;
     public $entity;
 
 
 
-    public function __construct(Entity $entity, $role_ids)
+    public function __construct(Entity $entity, $role_id)
     {
         //
-        $this->role_ids = $role_ids;
+        $this->role_id = $role_id;
         $this->entity = $entity;
     }
 
@@ -41,16 +41,14 @@ class PosRoomDoneNotification implements ShouldBroadcast
      */
     public function broadcastOn(): array
     {
-        $channels = [];
-        foreach ($this->role_ids as $department_id) {
-            $channels[] = new Channel("pos-roomdone-notification-request.{$department_id}");
-        }
-        return $channels;
+        return [
+            new Channel("pos-roomdone-notification-request.{$this->role_id}"),
+        ];
     }
     public function broadcastWith()
     {
         return [
-            'role_ids' => $this->role_ids,
+            'role_id' => $this->role_id,
             'entity' => $this->entity
         ];
     }
