@@ -92,14 +92,16 @@ class InvoiceAPIController extends Controller
     {
         $catering_department = Department::where('name','Catering')->first();
         $invoice = Invoice::find($request->invoice_id);
+
         $latestRoomSession = RoomSession::where('invoice_id', $invoice->id)->orderBy('created_at', 'desc')->first();
         $entity = Entity::find($latestRoomSession->entity_id);
 
         if(isset($request->waiter))
         {
-            $managerRole = Role::whereIn('name', 'Manager')
+            $managerRole = Role::where('name', 'Manager')
                         ->where('department_id', $catering_department->id)
                         ->first();
+
             $entity->status = 'done_pending';
             $entity->save();
             broadcast(new PosRoomDoneNotification($entity,$managerRole->id));
