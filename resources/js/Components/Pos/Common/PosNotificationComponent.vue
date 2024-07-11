@@ -62,11 +62,11 @@
                                             {{ sessionRequest.customer_name }}
                                         </td>
                                         <td class="whitespace-nowrap border-r px-6 py-4">
-                                            <button :disabled="sessionRequest.status != 'received'" @click="btnRejectSession(sessionRequest.invoice_id)" 
+                                            <button :disabled="sessionRequest.status != 'received'" @click="btnRejectSession(sessionRequest.invoice_id)"
                                                 class="px-3 py-2 bg-red-600 text-white rounded-md mr-2">
                                                 Reject
                                             </button>
-                                            <button :disabled="sessionRequest.status != 'received'" @click="btnConfirmSession(sessionRequest.invoice_id)" 
+                                            <button :disabled="sessionRequest.status != 'received'" @click="btnConfirmSession(sessionRequest.invoice_id)"
                                                 class="px-3 py-2 bg-green-600 text-white rounded-md">
                                                 Confirm
                                             </button>
@@ -136,7 +136,7 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <tr class="border-b" v-for="(sessionRequest2) in sessionRequests2">
+                                    <tr class="border-b" v-for="(sessionRequest2) in sessionRequests2" :key="sessionRequest2">
 
                                         <td class="whitespace-nowrap border-r px-6 py-4">
                                             {{ sessionRequest2.room_name }}
@@ -154,11 +154,11 @@
                                             {{ sessionRequest.customer_name }}
                                         </td> -->
                                         <td class="whitespace-nowrap border-r px-6 py-4">
-                                            <button :disabled="sessionRequest2.status != 'received'" @click="btnRejectSession2(sessionRequest2.invoice_id)" 
+                                            <button :disabled="sessionRequest2.status != 'received'" @click="btnRejectSession2(sessionRequest2.invoice_id)"
                                                 class="px-3 py-2 bg-red-600 text-white rounded-md mr-2">
                                                 Reject
                                             </button>
-                                            <button :disabled="sessionRequest2.status != 'received'" @click="btnConfirmSession2(sessionRequest2.invoice_id)" 
+                                            <button :disabled="sessionRequest2.status != 'received'" @click="btnConfirmSession2(sessionRequest2.invoice_id)"
                                                 class="px-3 py-2 bg-green-600 text-white rounded-md">
                                                 Confirm
                                             </button>
@@ -262,6 +262,7 @@
                     this.sessionRequests[index].status = 'confirmed';
                     this.sessionRequests.splice(index, 1);
                 }
+                window.location.reload();
 
                 this.notiModalOpen();
             },
@@ -278,6 +279,8 @@
                     this.sessionRequests[index].status = 'rejected';
                     this.sessionRequests.splice(index, 1);
                 }
+                window.location.reload();
+
                 this.notiModalOpen();
             },
 
@@ -294,8 +297,8 @@
                 window.Echo.channel(channel)
                 .listen(event,(response)=>{
                     let newSessionRequest = {
-                        room_name: response.name,
-                        price_per_hour: response.price_per_hour,
+                        room_name: response.entity.name,
+                        invoice_id: response.invoice_id,
                         status: 'received'
                     };
                     let index = this.sessionRequests2.findIndex(sessionRequest => sessionRequest.id == newSessionRequest.id);
@@ -305,14 +308,13 @@
                     else{
                         this.sessionRequests2.push(newSessionRequest);
                     }
-                    console.log(response);
-                    console.log('session request received');
                     this.notiModalOpen2();
                 });
             },
 
 
             async btnConfirmSession2(id){
+
                 let formData = new FormData();
                 formData.append("invoice_id", id);
                 let response = await postApiData({ url: `/api/entities/done?is_confirm=1`, form_data: formData, token: this.getToken() });
@@ -324,10 +326,11 @@
                     this.sessionRequests2[index].status = 'confirmed';
                     this.sessionRequests2.splice(index, 1);
                 }
-
+                window.location.reload();
                 this.notiModalOpen2();
             },
             async btnRejectSession2(id){
+
                 let formData = new FormData();
                 formData.append("invoice_id", id);
                 let response = await postApiData({ url: `/api/entities/done?is_confirm=0`, form_data: formData, token: this.getToken() });
@@ -339,7 +342,9 @@
                     this.sessionRequests2[index].status = 'rejected';
                     this.sessionRequests2.splice(index, 1);
                 }
+                window.location.reload();
                 this.notiModalOpen2();
+
             },
         },
 
@@ -360,7 +365,7 @@
             this.listenBroadCastNotifications(channelName, eventName);
 
             let doneChannelName = `pos-roomdone-notification-request.${this.role[0].id}`;
-            let doneEventName = `RoomDoneNotificationRequest`;
+            let doneEventName = `PosRoomDoneNotification`;
             this.listenBroadCastNotificationsDone(doneChannelName, doneEventName);
         },
 
