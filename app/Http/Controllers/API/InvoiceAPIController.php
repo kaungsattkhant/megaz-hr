@@ -99,7 +99,7 @@ class InvoiceAPIController extends Controller
         {
             $managerRole = Role::whereIn('name', 'Manager')
                         ->where('department_id', $catering_department->id)
-                        ->toArray();
+                        ->first();
             $entity->status = 'done_pending';
             $entity->save();
             broadcast(new PosRoomDoneNotification($entity,$managerRole->id));
