@@ -1521,7 +1521,7 @@ export default {
                 formData.append('discount_session', this.printInvoiceData.discountSession);
             }
             console.log(formData)
-            let response = await postApiData({ url: '/api/entities/done?is_confirm=1', form_data: formData, token: this.getToken() });
+            let response = await postApiData({ url: '/api/entities/done', form_data: formData, token: this.getToken() });
             if (response.success) {
                 await this.getRoomList();
                 // this.selectedRoom = await this.roomList[this.selectedRoomIndex];
