@@ -49,7 +49,6 @@ class PosRoomDoneNotification implements ShouldBroadcast
     }
     public function broadcastWith()
     {
-        dd($this->role_ids);
         return [
             'role_ids' => $this->role_ids,
             'entity' => $this->entity
