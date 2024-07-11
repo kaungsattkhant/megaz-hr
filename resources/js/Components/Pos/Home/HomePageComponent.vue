@@ -1483,7 +1483,7 @@ export default {
         },
         async EndRoom() {
             let formData = new FormData();
-            formData.append('invoice_id', this.selectedRoom.room_sessions[0].invoice.invoice_id);
+            formData.append('invoice_id', this.selectedRoom.room_sessions[0].invoice.id);
             // formData.append('change', this.change);
             // formData.append('paid_amount', this.paid_amount);
             formData.append('payment_type', this.selectedPaymentMethod);

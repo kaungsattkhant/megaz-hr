@@ -24,14 +24,16 @@ class PosRoomDoneNotification implements ShouldBroadcast
      */
     public $role_id;
     public $entity;
+    public $invoice;
 
 
 
-    public function __construct(Entity $entity, $role_id)
+    public function __construct(Invoice $invoice,Entity $entity, $role_id)
     {
         //
         $this->role_id = $role_id;
         $this->entity = $entity;
+        $this->invoice = $invoice;
     }
 
     /**
@@ -48,6 +50,7 @@ class PosRoomDoneNotification implements ShouldBroadcast
     public function broadcastWith()
     {
         return [
+            'invoice_id' => $this->invoice->id,
             'role_id' => $this->role_id,
             'entity' => $this->entity
         ];
