@@ -1,6 +1,8 @@
 <?php
+
 namespace App\Events;
 
+use App\Models\Entity;
 use App\Models\Order;
 use App\Models\OrderItem;
 use Illuminate\Broadcasting\Channel;
@@ -18,11 +20,14 @@ class KitchenNotificationRequest implements ShouldBroadcast
     public $department_id;
     public $order;
     public $orderItems;
+    public $entity;
 
-    public function __construct(Order $order, array $orderItems = null, OrderItem $orderItem = null, $department_id)
+    public function __construct(Entity $entity,Order $order, array $orderItems = null, OrderItem $orderItem = null, $department_id)
     {
         $this->department_id = $department_id;
         $this->order = $order;
+        $this->entity = $entity;
+
 
         if ($orderItems !== null) {
             $this->orderItems = $orderItems;
@@ -33,6 +38,12 @@ class KitchenNotificationRequest implements ShouldBroadcast
         }
     }
 
+
+    /**
+     * Get the channels the event should broadcast on.
+     *
+     * @return array<int, \Illuminate\Broadcasting\Channel>
+     */
     public function broadcastOn(): array
     {
         return [
@@ -42,10 +53,13 @@ class KitchenNotificationRequest implements ShouldBroadcast
 
     public function broadcastWith()
     {
-        return [
+        $data= [
             'department_id' => $this->department_id,
             'order' => $this->order,
-            'order_items' => $this->orderItems
+            'order_items' => $this->orderItems,
+            'entity' => $this->entity
         ];
+
+        return $data;
     }
 }

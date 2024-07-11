@@ -2,6 +2,7 @@
 
 namespace App\Repositories\Invoice;
 
+use App\Events\RoomDoneNotificationRequest;
 use App\Http\Action\Transaction\StoreTransactionLedger;
 use App\Models\Account;
 use App\Models\BirthdayPromotion;
@@ -11,13 +12,16 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
 use App\Events\RoomNotificationRequest;
 use App\Events\WaiterNotificationRequest;
+use App\Models\Department;
 use App\Models\Entity;
 use App\Models\HeadCount;
 use App\Models\Invoice;
 use App\Models\Order;
 use App\Models\Package;
+use App\Models\Role;
 use App\Models\RoomDiscount;
 use App\Models\RoomSession;
+use App\Models\User;
 use App\Repositories\Order\OrderRepository;
 use Carbon\Carbon;
 
@@ -147,7 +151,7 @@ class InvoiceRepository implements InvoiceRepositoryInterface
             $customer = Customer::find($invoice->customer_id);
 
             if ($data['is_waiter'] == 1 && $invoice) {
-                broadcast(new RoomNotificationRequest($customer,$entity,$roomSession,$invoice,UserData()->department_id));
+                broadcast(new RoomNotificationRequest($customer, $entity, $roomSession, $invoice, UserData()->department_id));
             }
             DB::commit();
             return $invoice;
@@ -570,6 +574,7 @@ class InvoiceRepository implements InvoiceRepositoryInterface
             $discount_value = 0;
             $room_discount_value = 0;
 
+
             if (isset($data['tax'])) {
                 $tax = $data['tax'];
             }
@@ -695,137 +700,23 @@ class InvoiceRepository implements InvoiceRepositoryInterface
             $data['invoice_id'] = $invoice_id;
             $invoice->update($data);
 
-            if ($data['payment_type'] == 'cash') {
-                $posBook = Account::where('account_code', '2-1011')->first();
-            } else {
-                $posBook = Account::where('account_code', '2-1012')->first();
-            }
 
-            $data['date'] = now();
-            $data['created_by'] = 1; //example
-            $data['transactionable_id'] = $invoice->id;
-            $data['transactionable_type'] = 'invoice';
-            $data['is_confirmed'] = 1;
-
-            $transaction = (new StoreTransactionLedger())->createTransaction($data);
-
-            $debit_total = 0;
-
-                if ($foodCharge != 0) {
-                    $foodKtvAcc = Account::where('account_code', '5-0101')->first();
-
-                    if ($foodKtvAcc != null) {
-                        $foodCreditLedger = (new StoreTransactionLedger())->storeLedger([
-                            'value' => $foodCharge,
-                            'transaction_id' => $transaction->id,
-                            'account_id' => $foodKtvAcc->id,
-                            'action' => 'credit',
-                            'is_cashier_confirmed' => 1
-
-                        ]);
-                    }
-
-                    $debit_total += $foodCharge;
-                }
-
-                if ($beverageCharge != 0) {
-
-                    $beverageKtvAcc = Account::where('account_code', '5-0102')->first();
-
-                    if ($beverageKtvAcc != null) {
-                        $beverageCreditLedger = (new StoreTransactionLedger())->storeLedger([
-                            'value' => $beverageCharge,
-                            'transaction_id' => $transaction->id,
-                            'account_id' => $beverageKtvAcc->id,
-                            'action' => 'credit',
-                            'is_cashier_confirmed' => 1
-
-                        ]);
-                    }
-
-                    $debit_total += $beverageCharge;
-                }
-
-            if ($total_session_price != 0) {
-                $ktvRoomAcc = Account::where('account_code', '5-0103')->first();
-                if ($ktvRoomAcc != null) {
-                    $ktvRoomLedger = (new StoreTransactionLedger())->storeLedger([
-                        'value' => $total_session_price,
-                        'transaction_id' => $transaction->id,
-                        'account_id' => $ktvRoomAcc->id,
-                        'action' => 'credit',
-                        'is_cashier_confirmed' => 1
-
-                    ]);
-                }
-
-                $debit_total += $total_session_price;
-            }
-
-            if ($service_charge != 0) {
-                $serviceMoneyAcc = Account::where('account_code', '6-2009')->first();
-
-                if ($serviceMoneyAcc != null) {
-                    $serviceLedger = (new StoreTransactionLedger())->storeLedger([
-                        'value' => $service_charge,
-                        'transaction_id' => $transaction->id,
-                        'account_id' => $serviceMoneyAcc->id,
-                        'action' => 'credit',
-                        'is_cashier_confirmed' => 1
-
-                    ]);
-                }
-
-                $debit_total += $service_charge;
-            }
-
-            if ($tax != 0) {
-                $taxAcc = Account::where('account_code', '6-9002')->first();
-
-                if ($data['tax'] != null) {
-                    $taxLedger = (new StoreTransactionLedger())->storeLedger([
-                        'value' => $tax,
-                        'transaction_id' => $transaction->id,
-                        'account_id' => $taxAcc->id,
-                        'action' => 'credit',
-                        'is_cashier_confirmed' => 1
-
-                    ]);
-                }
-                $debit_total += $tax;
-            }
-
-            if ($discount_total != 0) {
-                $discountAcc = Account::where('account_code', '6-2003')->first();
-
-                if ($discountAcc != null) {
-                    $debit_total += $data['discount_value'];
-
-                    $debitDiscountLedger = (new StoreTransactionLedger())->storeLedger([
-                        'value' => $discount_total,
-                        'transaction_id' => $transaction->id,
-                        'account_id' => $discountAcc->id,
-                        'action' => 'debit',
-                        'is_cashier_confirmed' => 1
-                    ]);
-
-                    $creditDiscountLedger = (new StoreTransactionLedger())->storeLedger([
-                        'value' => $discount_total,
-                        'transaction_id' => $transaction->id,
-                        'account_id' => $posBook->id,
-                        'action' => 'credit',
-                        'is_cashier_confirmed' => 1
-                    ]);
-                }
-            }
-
-            $debitLedger = (new StoreTransactionLedger())->storeLedger([
-                'value' => $debit_total,
-                'transaction_id' => $transaction->id,
-                'account_id' => $posBook->id,
-                'action' => 'debit',
-                'is_cashier_confirmed' => 1
+            $this->ledgerAndTransactionForInvoice([
+                'payment_type' => 'cash',
+                'invoice_id' => $invoice->id,
+                'food_charge' => $foodCharge,
+                'beverage_charge' => $beverageCharge,
+                'total_session_price' => $total_session_price,
+                'service_charge' => $service_charge,
+                'tax' => $tax,
+                'discount_total' => $discount_total,
             ]);
+
+            $catering_department = Department::where('name', 'Catering')->first();
+            $msg = "The {$entity->name} is now closed. Thank you.";
+
+            $role = Role::where('name','Staff')->where('department_id', $catering_department->id)->first();
+            broadcast(new RoomDoneNotificationRequest($entity, $msg, $role->id));
 
             DB::commit();
             return $invoice;
@@ -852,16 +743,156 @@ class InvoiceRepository implements InvoiceRepositoryInterface
                 $entity->is_active = 0;
                 $invoice->delete();
                 $latestSession->delete();
-
             }
             $entity->save();
             DB::commit();
-            broadcast(new WaiterNotificationRequest($entity,UserData()->department_id));
+            broadcast(new WaiterNotificationRequest($entity, UserData()->department_id));
             Responsemessage('Room status updated');
         } catch (\Exception $e) {
             DB::rollBack();
             ResponseMessage($e->getMessage(), 422);
             throw $e;
         }
+    }
+
+    public function ledgerAndTransactionForInvoice(array $data)
+    {
+        if ($data['payment_type'] == 'cash') {
+            $posBook = Account::where('account_code', '2-1011')->first();
+        } else {
+            $posBook = Account::where('account_code', '2-1012')->first();
+        }
+
+        // $data['date'] = now();
+        // $data['created_by'] = ; //example
+        // $data['transactionable_id'] = $invoice->id;
+        // $data['transactionable_type'] = 'invoice';
+        // $data['is_confirmed'] = 1;
+
+        $transaction = (new StoreTransactionLedger())->createTransaction([
+            'date' => now(),
+            'created_by' => UserData()->id,
+            'transactionable_id' => $data['invoice_id'],
+            'transactionable_type' => 'invoice',
+            'is_confirmed' => 1,
+        ]);
+
+        $debit_total = 0;
+
+        if ($data['food_charge'] != 0) {
+            $foodKtvAcc = Account::where('account_code', '5-0101')->first();
+
+            if ($foodKtvAcc != null) {
+                $foodCreditLedger = (new StoreTransactionLedger())->storeLedger([
+                    'value' => $data['food_charge'],
+                    'transaction_id' => $transaction->id,
+                    'account_id' => $foodKtvAcc->id,
+                    'action' => 'credit',
+                    'is_cashier_confirmed' => 1
+
+                ]);
+            }
+
+            $debit_total += $data['food_charge'];
+        }
+
+        if ($data['beverage_charge'] != 0) {
+
+            $beverageKtvAcc = Account::where('account_code', '5-0102')->first();
+
+            if ($beverageKtvAcc != null) {
+                $beverageCreditLedger = (new StoreTransactionLedger())->storeLedger([
+                    'value' => $data['beverage_charge'],
+                    'transaction_id' => $transaction->id,
+                    'account_id' => $beverageKtvAcc->id,
+                    'action' => 'credit',
+                    'is_cashier_confirmed' => 1
+
+                ]);
+            }
+
+            $debit_total += $data['beverage_charge'];
+        }
+
+        if ($data['total_session_price'] != 0) {
+            $ktvRoomAcc = Account::where('account_code', '5-0103')->first();
+            if ($ktvRoomAcc != null) {
+                $ktvRoomLedger = (new StoreTransactionLedger())->storeLedger([
+                    'value' => $data['total_session_price'],
+                    'transaction_id' => $transaction->id,
+                    'account_id' => $ktvRoomAcc->id,
+                    'action' => 'credit',
+                    'is_cashier_confirmed' => 1
+
+                ]);
+            }
+
+            $debit_total += $data['total_session_price'];
+        }
+
+        if ($data['service_charge'] != 0) {
+            $serviceMoneyAcc = Account::where('account_code', '6-2009')->first();
+
+            if ($serviceMoneyAcc != null) {
+                $serviceLedger = (new StoreTransactionLedger())->storeLedger([
+                    'value' => $data['service_charge'],
+                    'transaction_id' => $transaction->id,
+                    'account_id' => $serviceMoneyAcc->id,
+                    'action' => 'credit',
+                    'is_cashier_confirmed' => 1
+
+                ]);
+            }
+
+            $debit_total += $data['service_charge'];
+        }
+
+        if ($data['tax'] != 0) {
+            $taxAcc = Account::where('account_code', '6-9002')->first();
+
+            if ($data['tax'] != null) {
+                $taxLedger = (new StoreTransactionLedger())->storeLedger([
+                    'value' => $data['tax'],
+                    'transaction_id' => $transaction->id,
+                    'account_id' => $taxAcc->id,
+                    'action' => 'credit',
+                    'is_cashier_confirmed' => 1
+
+                ]);
+            }
+            $debit_total += $data['tax'];
+        }
+
+        if ($data['discount_total'] != 0) {
+            $discountAcc = Account::where('account_code', '6-2003')->first();
+
+            if ($discountAcc != null) {
+                $debit_total += $data['discount_value'];
+
+                $debitDiscountLedger = (new StoreTransactionLedger())->storeLedger([
+                    'value' => $data['discount_total'],
+                    'transaction_id' => $transaction->id,
+                    'account_id' => $discountAcc->id,
+                    'action' => 'debit',
+                    'is_cashier_confirmed' => 1
+                ]);
+
+                $creditDiscountLedger = (new StoreTransactionLedger())->storeLedger([
+                    'value' => $data['discount_total'],
+                    'transaction_id' => $transaction->id,
+                    'account_id' => $posBook->id,
+                    'action' => 'credit',
+                    'is_cashier_confirmed' => 1
+                ]);
+            }
+        }
+
+        $debitLedger = (new StoreTransactionLedger())->storeLedger([
+            'value' => $debit_total,
+            'transaction_id' => $transaction->id,
+            'account_id' => $posBook->id,
+            'action' => 'debit',
+            'is_cashier_confirmed' => 1
+        ]);
     }
 }

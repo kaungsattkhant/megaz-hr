@@ -15,25 +15,23 @@ use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 
-class OrderStatusNotificationRequest implements ShouldBroadcast
+class PosRoomDoneNotification implements ShouldBroadcast
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
     /**
      * Create a new event instance.
      */
-    public $department_id;
-    public $order_item;
+    public $role_id;
     public $entity;
 
 
-    public function __construct(Entity $entity,OrderItem $order_item,$department_id)
+
+    public function __construct(Entity $entity, $role_id)
     {
         //
-        $this->order_item = $order_item;
-        $this->department_id=$department_id;
+        $this->role_id = $role_id;
         $this->entity = $entity;
-
     }
 
     /**
@@ -44,16 +42,14 @@ class OrderStatusNotificationRequest implements ShouldBroadcast
     public function broadcastOn(): array
     {
         return [
-            new Channel("order-status-notification-request.{$this->department_id}"),
+            new Channel("pos-roomdone-notification-request.{$this->role_id}"),
         ];
     }
     public function broadcastWith()
     {
-        $data = [
-            'order_item' => $this->order_item,
-            'department_id' => $this->department_id,
+        return [
+            'role_id' => $this->role_id,
             'entity' => $this->entity
         ];
-        return $data;
     }
 }
