@@ -118,7 +118,6 @@ class InvoiceAPIController extends Controller
 
             }
         }
-        dd('stop');
         $endRoom = $this->invoiceRepo->doneEntityWithInvoice($request->all());
         ResponseData($endRoom);
     }
