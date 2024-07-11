@@ -18,6 +18,7 @@ use App\Models\HeadCount;
 use App\Models\Invoice;
 use App\Models\Order;
 use App\Models\Package;
+use App\Models\Role;
 use App\Models\RoomDiscount;
 use App\Models\RoomSession;
 use App\Models\User;
@@ -713,7 +714,9 @@ class InvoiceRepository implements InvoiceRepositoryInterface
 
             $catering_department = Department::where('name', 'Catering')->first();
             $msg = "The {$entity->name} is now closed. Thank you.";
-            broadcast(new RoomDoneNotificationRequest($entity, $msg, $catering_department->id));
+
+            $role = Role::where('name','Staff')->where('department_id', $catering_department->id)->first();
+            broadcast(new RoomDoneNotificationRequest($entity, $msg, $role->id));
 
             DB::commit();
             return $invoice;

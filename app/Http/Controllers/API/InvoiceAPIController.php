@@ -97,14 +97,13 @@ class InvoiceAPIController extends Controller
 
         if(isset($request->waiter))
         {
-            $roles = ['Manager', 'Supervisor'];
-            $pos_ids = Role::whereIn('name', $roles)
+
+            $managerRole = Role::whereIn('name', 'Manager')
                         ->where('department_id', $catering_department->id)
-                        ->pluck('id')
                         ->toArray();
             $entity->status = 'done_pending';
             $entity->save();
-            broadcast(new PosRoomDoneNotification($entity,$pos_ids));
+            broadcast(new PosRoomDoneNotification($entity,$managerRole->id));
             ResponseMessage("The request to quit the room {$entity->name} has been sent. Please wait for the confirmation from the catering department.");
 
         }else if(isset($request->is_confirm))
