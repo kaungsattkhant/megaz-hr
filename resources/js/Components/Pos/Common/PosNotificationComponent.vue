@@ -215,6 +215,7 @@
         methods: {
             ...mapGetters(['getUser', 'getDepartment', 'getToken', 'getRoles']),
 
+            // for open from waiter tablet
             notiModalOpen(){
                 document.getElementById("open_noti_modal").click();
             },
@@ -284,7 +285,7 @@
 
 
 
-
+            // for closing from waiter tablet
             notiModalOpen2(){
                 document.getElementById("open_noti_modal").click();
             },
@@ -309,20 +310,17 @@
                     else{
                         this.sessionRequests2.push(newSessionRequest);
                     }
-
                     console.log(response);
                     console.log('session request received');
                     this.notiModalOpen2();
                 });
-
             },
 
 
             async btnConfirmSession2(id){
                 let formData = new FormData();
                 formData.append("invoice_id", id);
-                formData.append("is_confirm", 1);
-                let response = await postApiData({ url: `/api/entities/confirm`, form_data: formData, token: this.getToken() });
+                let response = await postApiData({ url: `/api/entities/done?is_confirm=1`, form_data: formData, token: this.getToken() });
                 if (response.data) {
                     console.log('confirm success')
                 }
@@ -337,8 +335,7 @@
             async btnRejectSession2(id){
                 let formData = new FormData();
                 formData.append("invoice_id", id);
-                formData.append("is_confirm", 0);
-                let response = await postApiData({ url: `/api/entities/confirm`, form_data: formData, token: this.getToken() });
+                let response = await postApiData({ url: `/api/entities/done?is_confirm=0`, form_data: formData, token: this.getToken() });
                 if (response.data) {
                     console.log('reject success')
                 }
@@ -368,7 +365,7 @@
             this.listenBroadCastNotifications(channelName, eventName);
 
             let channelName2 = `roomdone-notification-request.${this.role.id}`;
-            let eventName2 = `RoomNotificationRequest`;
+            let eventName2 = `RoomDoneNotificationRequest`;
             this.listenBroadCastNotifications2(channelName2, eventName2);
         },
 
