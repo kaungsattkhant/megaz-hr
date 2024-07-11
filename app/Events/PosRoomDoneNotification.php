@@ -23,15 +23,15 @@ class PosRoomDoneNotification implements ShouldBroadcast
      * Create a new event instance.
      */
     public $department_id;
-    public $data;
+    public $entity;
 
 
 
-    public function __construct($data,$department_id)
+    public function __construct(Entity $entity,$department_id)
     {
         //
         $this->department_id=$department_id;
-        $this->data = $data;
+        $this->entity = $entity;
 
     }
 
@@ -50,7 +50,7 @@ class PosRoomDoneNotification implements ShouldBroadcast
     {
          return [
             'department_id' => $this->department_id,
-            'data' => $this->data
+            'entity' => $this->entity
         ];
     }
 }
