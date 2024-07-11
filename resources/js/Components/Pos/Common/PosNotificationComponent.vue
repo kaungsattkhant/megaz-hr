@@ -111,7 +111,7 @@
                     class="pointer-events-auto relative flex w-full flex-col rounded-md border-none bg-white bg-clip-padding text-current shadow-lg outline-none">
                     <div class="relative  p-4">
                         <p class="text-xl w-full text-center">
-                            Notifications
+                            End Room Notifications
                         </p>
                         <button type="button" class="absolute top-4 right-4 focus:shadow-none focus:outline-none
                         " id="closeNotimodal2" data-te-modal-dismiss aria-label="Close">
@@ -128,10 +128,10 @@
                                 <thead class="border-b font-medium">
                                     <tr>
                                         <th scope="col" class="px-6 py-4 border-r">Room Name</th>
-                                        <th scope="col" class="px-6 py-4 border-r">Session duration </th>
-                                        <th scope="col" class="px-6 py-4 border-r">Start time</th>
-                                        <th scope="col" class="px-6 py-4 border-r">End time </th>
-                                        <th scope="col" class="px-6 py-4 border-r">Customer name</th>
+                                        <!-- <th scope="col" class="px-6 py-4 border-r">Session duration </th> -->
+                                        <!-- <th scope="col" class="px-6 py-4 border-r">Start time</th> -->
+                                        <!-- <th scope="col" class="px-6 py-4 border-r">End time </th> -->
+                                        <!-- <th scope="col" class="px-6 py-4 border-r">Customer name</th> -->
                                         <th scope="col" class="px-6 py-4 border-r text-center">Action</th>
                                     </tr>
                                 </thead>
@@ -141,7 +141,7 @@
                                         <td class="whitespace-nowrap border-r px-6 py-4">
                                             {{ sessionRequest.room_name }}
                                         </td>
-                                        <td class="whitespace-nowrap border-r px-6 py-4 text-center">
+                                        <!-- <td class="whitespace-nowrap border-r px-6 py-4 text-center">
                                             {{ sessionRequest.session_duration }}
                                         </td>
                                         <td class="whitespace-nowrap border-r px-6 py-4">
@@ -152,7 +152,7 @@
                                         </td>
                                         <td class="whitespace-nowrap border-r px-6 py-4">
                                             {{ sessionRequest.customer_name }}
-                                        </td>
+                                        </td> -->
                                         <td class="whitespace-nowrap border-r px-6 py-4">
                                             <button :disabled="sessionRequest.status != 'received'" @click="btnRejectSession2(sessionRequest.invoice_id)" 
                                                 class="px-3 py-2 bg-red-600 text-white rounded-md mr-2">
@@ -287,23 +287,19 @@
 
             // for closing from waiter tablet
             notiModalOpen2(){
-                document.getElementById("open_noti_modal").click();
+                document.getElementById("open_noti_modal2").click();
             },
 
             listenBroadCastNotifications2(channel, event){
                 window.Echo.channel(channel)
                 .listen(event,(response)=>{
                     let newSessionRequest = {
-                        invoice_id: response.invoice_id,
-                        customer_name: response.customer_name,
-                        room_name: response.room_name,
-                        session_duration: response.room_session.session_duration,
-                        start_time: convertToFriendlyDateTime(response.room_session.start_date),
-                        end_time: convertToFriendlyDateTime(response.room_session.end_date),
+                        room_name: response.name,
+                        price_per_hour: response.price_per_hour,
                         status: 'received'
                     };
 
-                    let index = this.sessionRequests2.findIndex(sessionRequest => sessionRequest.invoice_id == newSessionRequest.invoice_id);
+                    let index = this.sessionRequests2.findIndex(sessionRequest => sessionRequest.id == newSessionRequest.id);
                     if(index != -1){
                         console.log('already requested');
                     }
