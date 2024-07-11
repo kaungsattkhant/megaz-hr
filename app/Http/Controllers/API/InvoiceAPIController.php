@@ -12,6 +12,7 @@ use App\Models\Department;
 use App\Models\Entity;
 use App\Models\Invoice;
 use App\Models\Package;
+use App\Models\Role;
 use App\Models\RoomSession;
 use App\Repositories\Invoice\InvoiceRepositoryInterface;
 use App\Repositories\Order\OrderRepositoryInterface;
@@ -96,29 +97,35 @@ class InvoiceAPIController extends Controller
 
         if(isset($request->waiter))
         {
+            $roles = ['Manager', 'Supervisor'];
+            $pos_ids = Role::whereIn('name', $roles)
+                        ->where('department_id', $catering_department->id)
+                        ->pluck('id')
+                        ->toArray();
             $entity->status = 'done_pending';
             $entity->save();
-            broadcast(new PosRoomDoneNotification($entity,$catering_department->id));
+            broadcast(new PosRoomDoneNotification($entity,$pos_ids));
             ResponseMessage("The request to quit the room {$entity->name} has been sent. Please wait for the confirmation from the catering department.");
 
         }else if(isset($request->is_confirm))
         {
+            $role = Role::where('name','Staff')->where('department_id', $catering_department->id)->first();
+
             if($request->is_confirm != 1)
             {
                 $msg = "The request to quit the room {$entity->name} has been rejected. Thank you for your understanding.";
                 $entity->status = 'active';
                 $entity->save();
-                broadcast(new RoomDoneNotificationRequest($entity,$msg,$catering_department->id));
+                broadcast(new RoomDoneNotificationRequest($entity,$msg,$role->id));
                 ResponseMessage($msg);
 
             }else{
                 $msg = "The request to quit the room {$entity->name} has been confirmed. The room will be quit and will soon close. Thank you.";
-                broadcast(new RoomDoneNotificationRequest($entity,$msg,$catering_department->id));
+                broadcast(new RoomDoneNotificationRequest($entity,$msg,$role->id));
                 ResponseMessage($msg);
 
             }
         }
-        dd('stop');
         $endRoom = $this->invoiceRepo->doneEntityWithInvoice($request->all());
         ResponseData($endRoom);
     }
