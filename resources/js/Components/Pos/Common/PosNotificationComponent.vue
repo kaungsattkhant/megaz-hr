@@ -136,10 +136,10 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <tr class="border-b" v-for="(sessionRequest) in sessionRequests2">
+                                    <tr class="border-b" v-for="(sessionRequest2) in sessionRequests2">
 
                                         <td class="whitespace-nowrap border-r px-6 py-4">
-                                            {{ sessionRequest.room_name }}
+                                            {{ sessionRequest2.room_name }}
                                         </td>
                                         <!-- <td class="whitespace-nowrap border-r px-6 py-4 text-center">
                                             {{ sessionRequest.session_duration }}
@@ -154,11 +154,11 @@
                                             {{ sessionRequest.customer_name }}
                                         </td> -->
                                         <td class="whitespace-nowrap border-r px-6 py-4">
-                                            <button :disabled="sessionRequest.status != 'received'" @click="btnRejectSession2(sessionRequest.invoice_id)" 
+                                            <button :disabled="sessionRequest2.status != 'received'" @click="btnRejectSession2(sessionRequest2.invoice_id)" 
                                                 class="px-3 py-2 bg-red-600 text-white rounded-md mr-2">
                                                 Reject
                                             </button>
-                                            <button :disabled="sessionRequest.status != 'received'" @click="btnConfirmSession2(sessionRequest.invoice_id)" 
+                                            <button :disabled="sessionRequest2.status != 'received'" @click="btnConfirmSession2(sessionRequest2.invoice_id)" 
                                                 class="px-3 py-2 bg-green-600 text-white rounded-md">
                                                 Confirm
                                             </button>
@@ -290,7 +290,7 @@
                 document.getElementById("open_noti_modal2").click();
             },
 
-            listenBroadCastNotifications2(channel, event){
+            listenBroadCastNotificationsDone(channel, event){
                 window.Echo.channel(channel)
                 .listen(event,(response)=>{
                     let newSessionRequest = {
@@ -298,7 +298,6 @@
                         price_per_hour: response.price_per_hour,
                         status: 'received'
                     };
-
                     let index = this.sessionRequests2.findIndex(sessionRequest => sessionRequest.id == newSessionRequest.id);
                     if(index != -1){
                         console.log('already requested');
@@ -360,9 +359,9 @@
             let eventName = `RoomNotificationRequest`;
             this.listenBroadCastNotifications(channelName, eventName);
 
-            let channelName2 = `pos-roomdone-notification-request.${this.role[0].id}`;
-            let eventName2 = `RoomDoneNotificationRequest`;
-            this.listenBroadCastNotifications2(channelName2, eventName2);
+            let doneChannelName = `pos-roomdone-notification-request.${this.role[0].id}`;
+            let doneEventName = `RoomDoneNotificationRequest`;
+            this.listenBroadCastNotificationsDone(doneChannelName, doneEventName);
         },
 
         beforeDestroy() {
