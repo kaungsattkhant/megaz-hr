@@ -680,11 +680,11 @@ class InvoiceRepository implements InvoiceRepositoryInterface
             } else {
                 $data['discount_type'] = null;
             }
-
             $data['room_discount_value'] = $room_discount_value;
             if (isset($data['discount_value'])) {
                 $discount_value = $data['discount_value'];
             }
+
             $discount_total = $discount_value + $room_discount_value;
             $data['total'] -= $discount_total;
             $data['tax'] = $tax;
@@ -700,7 +700,6 @@ class InvoiceRepository implements InvoiceRepositoryInterface
             $data['invoice_id'] = $invoice_id;
             $invoice->update($data);
 
-
             $this->ledgerAndTransactionForInvoice([
                 'payment_type' => 'cash',
                 'invoice_id' => $invoice->id,
@@ -711,7 +710,6 @@ class InvoiceRepository implements InvoiceRepositoryInterface
                 'tax' => $tax,
                 'discount_total' => $discount_total,
             ]);
-
             $catering_department = Department::where('name', 'Catering')->first();
             $msg = "The {$entity->name} is now closed. Thank you.";
 
@@ -867,7 +865,7 @@ class InvoiceRepository implements InvoiceRepositoryInterface
             $discountAcc = Account::where('account_code', '6-2003')->first();
 
             if ($discountAcc != null) {
-                $debit_total += $data['discount_value'];
+                $debit_total += $data['discount_total'];
 
                 $debitDiscountLedger = (new StoreTransactionLedger())->storeLedger([
                     'value' => $data['discount_total'],
