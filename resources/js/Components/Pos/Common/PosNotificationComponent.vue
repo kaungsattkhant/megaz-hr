@@ -349,7 +349,7 @@
         },
 
         created(){
-            // this.user = this.getUser();
+            this.user = this.getUser();
             this.department = this.getDepartment();
             this.role = this.getRoles();
             // this.requestPermission();
@@ -364,7 +364,7 @@
             let eventName = `RoomNotificationRequest`;
             this.listenBroadCastNotifications(channelName, eventName);
 
-            let channelName2 = `roomdone-notification-request.${this.role.id}`;
+            let channelName2 = `pos-roomdone-notification-request.${this.role[0].id}`;
             let eventName2 = `RoomDoneNotificationRequest`;
             this.listenBroadCastNotifications2(channelName2, eventName2);
         },
