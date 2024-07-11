@@ -91,13 +91,12 @@ class InvoiceAPIController extends Controller
     public function endRoom(Request $request)
     {
         $catering_department = Department::where('name','Catering')->first();
-        $invoice = Invoice::where('invoice_id',$request->invoice_id)->first();
+        $invoice = Invoice::find($request->invoice_id);
         $latestRoomSession = RoomSession::where('invoice_id', $invoice->id)->orderBy('created_at', 'desc')->first();
         $entity = Entity::find($latestRoomSession->entity_id);
 
         if(isset($request->waiter))
         {
-
             $managerRole = Role::whereIn('name', 'Manager')
                         ->where('department_id', $catering_department->id)
                         ->toArray();
