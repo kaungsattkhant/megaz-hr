@@ -6,7 +6,7 @@ use Illuminate\Http\Request;
 
 interface MenuRepositoryInterface
 {
-    public function createData(array $data, array $items);
+    public function createData(array $data, array $items,array $areas);
 
     public function createMenuPrice(int $id, float $price);
 
@@ -16,7 +16,7 @@ interface MenuRepositoryInterface
 
     public function menuDetail(int $id);
 
-    public function editMenu(int $id, array $data, array $items);
+    public function editMenu(int $id, array $data, array $items,array $areas);
 
     public function toggleMenuFeature($id);
 

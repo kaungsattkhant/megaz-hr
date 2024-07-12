@@ -26,12 +26,12 @@ class MenuAPIController extends Controller
         ResponseData($menus);
     }
 
-    public function createMenu(CreateMenuRequest $request)
+    public function createMenu(Request $request)
     {
-
         $data = $request->except('items');
         $items = json_decode($request->items, true)['items'];
-        $menu = $this->menuRepo->createData($data, $items);
+        $areas = json_decode($request->areas, true);
+        $menu = $this->menuRepo->createData($data, $items,$areas);
         ResponseData($menu);
     }
 
@@ -66,7 +66,8 @@ class MenuAPIController extends Controller
     {
         $data = $request->except('items');
         $items = json_decode($request->items, true)['items'];
-        $menu = $this->menuRepo->editMenu($id, $data, $items);
+        $areas = json_decode($request->areas, true);
+        $menu = $this->menuRepo->editMenu($id, $data, $items,$areas);
         ResponseData($menu);
     }
 
