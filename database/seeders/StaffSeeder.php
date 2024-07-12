@@ -20,7 +20,9 @@ class StaffSeeder extends Seeder
      */
     public function run(): void
     {
-        /* $departments = Department::with('roles')->get();
+
+        #ksk
+        $departments = Department::with('roles')->get();
         $hr_features = config('common.hr_features');
         $inventory_features = config('common.inventory_features');
         $finance_features = config('common.finance_features');
@@ -103,33 +105,34 @@ class StaffSeeder extends Seeder
                 }
             }
         }
-            */
+
+        //end ksk
 
         // ****pks*****
-        try{
-            DB::beginTransaction();
-            $features = Feature::all();
-            $adminDept = Department::where('name', 'Admin')->first();
-            $superAdminRole = Role::create(['name' => 'Super Admin', 'department_id' => $adminDept->id]);
-            $mainInventory = Inventory::find(6);
-            $superAdmin = Staff::create([
-                'gender_id' => 1,
-                'department_id' => $adminDept->id,
-                'name' => 'Super Admin',
-                'phone_number' => '0900',
-                'password' => 'password',
-            ]);
-            $superAdmin->roles()->attach($superAdminRole);
-            $superAdmin->inventories()->attach($mainInventory);
-            foreach($features as $feature){
-                $superAdmin->features()->attach($feature);
-            }
+        // try{
+        //     DB::beginTransaction();
+        //     $features = Feature::all();
+        //     $adminDept = Department::where('name', 'Admin')->first();
+        //     $superAdminRole = Role::create(['name' => 'Super Admin', 'department_id' => $adminDept->id]);
+        //     $mainInventory = Inventory::find(6);
+        //     $superAdmin = Staff::create([
+        //         'gender_id' => 1,
+        //         'department_id' => $adminDept->id,
+        //         'name' => 'Super Admin',
+        //         'phone_number' => '0900',
+        //         'password' => 'password',
+        //     ]);
+        //     $superAdmin->roles()->attach($superAdminRole);
+        //     $superAdmin->inventories()->attach($mainInventory);
+        //     foreach($features as $feature){
+        //         $superAdmin->features()->attach($feature);
+        //     }
 
-            DB::commit();
-        }catch(Exception $e){
-            DB::rollBack();
-            dd($e->getMessage());
-        }
+        //     DB::commit();
+        // }catch(Exception $e){
+        //     DB::rollBack();
+        //     dd($e->getMessage());
+        // }
         // *****end******
 
 
