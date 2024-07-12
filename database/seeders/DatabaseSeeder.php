@@ -47,7 +47,7 @@ class DatabaseSeeder extends Seeder
             SubAccountSeeder::class,
             RoomAndTableSeeder::class,
             InventorySeeder::class,
-            // StaffSeeder::class,
+            StaffSeeder::class,
         ]);
     }
 }
