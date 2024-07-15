@@ -122,6 +122,12 @@
                                     track-by="id" :preselect-first="false"></multiselect>
                             </div>
                             <div class="mb-4">
+                                <label class="label-form mb-3">Area Category</label>
+                                <multiselect v-model="selectedCategory" :options="categoryList" :close-on-select="true"
+                                    :clear-on-select="false" :preserve-search="true" placeholder="Select Area Category" label="name"
+                                    track-by="id" :preselect-first="false"></multiselect>
+                            </div>
+                            <div class="mb-4">
                                 <label for="" class="label-form mb-3">Area Type</label>
                                 <multiselect v-model="selectedType" :options="typeList" :close-on-select="true"
                                     :clear-on-select="false" :preserve-search="true" placeholder="Select Area Type" label="name"
@@ -221,8 +227,10 @@
                 departmentList: [],
                 areaList:[],
                 typeList:[],
+                categoryList: [],
                 name: null,
                 selectedType:null,
+                selectedCategory: null,
                 selectedDepartment: null,
                 deleteId: null,
 
@@ -254,6 +262,13 @@
                 }
             },
 
+            async getCategoryList(){
+                const response = await getApiData({ url: '/api/area_categories' , token: this.getToken()});
+                if(response.data){
+                    this.categoryList = response.data;
+                }
+            },
+
             async getTypeList(){
                 const response = await getApiData({ url: '/api/area_types' , token: this.getToken()});
                 if(response.data){
@@ -271,16 +286,17 @@
                 let formData = new FormData();
                 formData.append('name', this.name);
                 formData.append('area_type_id', this.selectedType.id);
+                formData.append('area_category_id', this.selectedCategory.id);
                 formData.append('department_id', this.selectedDepartment.id);
                 let response = await postApiData({url: '/api/areas', form_data: formData, token: this.getToken()});
                 if(response.success){
                     this.getAreasList(null);
                     this.selectedType = null;
+                    this.selectedCategory = null;
                     this.selectedDepartment = null;
-                    console.log("success")
                 }
                 else{
-                    console.log('some errors occur');
+
                 }
             },
 
@@ -318,7 +334,7 @@
         },
         mounted()
         {
-
+            this.getCategoryList();
             this.getAreasList();
             this.getDepartmentList();
             this.getTypeList();
