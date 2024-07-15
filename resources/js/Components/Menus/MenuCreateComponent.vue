@@ -43,7 +43,7 @@
                     </select>
                 </div>
             </div>
-            <div class="mb-0 col-span-3 rounded-md">
+            <div class="mb-4 col-span-3 rounded-md">
                 <label for="" class="block text-sm text-black mb-3">
                     Images
                 </label>
@@ -52,6 +52,23 @@
                 </div>
 
             </div>
+
+            <div class="mb-4 col-span-3 rounded-md">
+                <label for="" class="block text-sm text-black mb-3">
+                    Cooking Areas
+                </label>
+                <multiselect v-model="selectedAreas" :options="areaList" :multiple="true" :close-on-select="false" :clear-on-select="false"
+                :preserve-search="true" placeholder="Select Areas" label="name" track-by="id" :preselect-first="false">
+                    <template #selection="{ values, search, isOpen }">
+                        <span class="multiselect__single"
+                            v-if="values.length"
+                            v-show="!isOpen">{{ values.length }} areas selected</span>
+                    </template>
+                </multiselect>
+            </div>
+
+            <div class="col-span-9"></div>
+
             <div class="mb-0 col-span-3 rounded-md">
                 <label for="" class="label-form mb-3">
                     Category
@@ -373,7 +390,12 @@ export default {
             ingredientItems: [],
             ingredientItemPriceTotal: 0,
 
-            selectedImage: null
+            selectedImage: null,
+
+            areaList: [],
+            selectedAreas: [],
+
+            departmentId: null,
 
         };
     },
@@ -387,6 +409,13 @@ export default {
                 text: `You forgot to provide ${field}, please try again`,
                 type: "warn"
             });
+        },
+
+        async getCookingAreaList(departmentId) {
+            let response = await getApiData({ url: `/api/areas?department_id=${departmentId}`, token: this.getToken() });
+            if (response.data) {
+                this.areaList = response.data;
+            }
         },
 
         updateItemPriceTotal(items){
@@ -540,7 +569,15 @@ export default {
                 this.alertValiationMessage(`menu image`);
                 return 1;
             }
+            else if(this.selectedAreas.length < 1){
+                this.alertValiationMessage(`cooking areas`);
+                return 1;
+            }
             else {
+                let areaIds = [];
+                this.selectedAreas.forEach((area)=>{
+                    areaIds.push(area.id);
+                });
                 let menuItems = JSON.stringify({ items: this.ingredientItems });
                 let formData = new FormData();
                 formData.append('menu_category_id', this.menuCategoryId);
@@ -549,6 +586,7 @@ export default {
                 formData.append('price', this.price);
                 formData.append('items', menuItems);
                 formData.append('image',this.selectedImage);
+                formData.append('areas',JSON.stringify(areaIds));
 
                 let response = await postApiData({ url: `/api/menus`, form_data: formData, token: this.getToken() });
 
@@ -569,10 +607,19 @@ export default {
         }
     },
 
-    created() {
+    async created() {
+        let response = await getApiData({url: `/api/departments`, token: this.getToken()});
+        if(response.data){
+            response.data.forEach((department)=>{
+                if(department.name == `Kitchen`){
+                    this.departmentId = department.id;
+                }
+            });
+        }
         this.getMenuCategoryList();
         this.getItemCategoryList();
         this.getUomList();
+        this.getCookingAreaList(this.departmentId);
     },
 
     mounted() {
@@ -580,3 +627,5 @@ export default {
     }
 }
 </script>
+
+<style src="node_modules/vue-multiselect/dist/vue-multiselect.css"></style>
