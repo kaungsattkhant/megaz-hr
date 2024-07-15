@@ -50,4 +50,9 @@ class Area extends BaseModel
     {
         return $this->belongsToMany(Menu::class);
     }
+
+    public function staffs()
+    {
+        return $this->hasMany(Staff::class);
+    }
 }
