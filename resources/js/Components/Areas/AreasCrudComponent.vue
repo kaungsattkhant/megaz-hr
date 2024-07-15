@@ -113,19 +113,25 @@
                                 <label for="" class="label-form mb-3">
                                     Area Name
                                 </label>
-                                <input type="text" placeholder="Area Name" v-model="name"
-                                    class="input-ui">
+                                <input type="text" placeholder="Area Name" v-model="name" class="input-ui">
                             </div>
                             <div class="mb-4">
-                                <label for="" class="label-form mb-3">
-                                    Area Type
-                                </label>
-                                <select name="" id="" v-model="selectedType"
+                                <label class="label-form mb-3">Department</label>
+                                <multiselect v-model="selectedDepartment" :options="departmentList" :close-on-select="true"
+                                    :clear-on-select="false" :preserve-search="true" placeholder="Select Department" label="name"
+                                    track-by="id" :preselect-first="false"></multiselect>
+                            </div>
+                            <div class="mb-4">
+                                <label for="" class="label-form mb-3">Area Type</label>
+                                <multiselect v-model="selectedType" :options="typeList" :close-on-select="true"
+                                    :clear-on-select="false" :preserve-search="true" placeholder="Select Area Type" label="name"
+                                    track-by="id" :preselect-first="false"></multiselect>
+                                <!-- <select name="" id="" v-model="selectedType"
                                     class="input-ui">
-                                    <option :value="type.id" v-for="(type, index) in typeList" :key="index"> {{
-                                        type.name }}
+                                    <option :value="type.id" v-for="(type, index) in typeList" :key="index">
+                                        {{ type.name }}
                                     </option>
-                                </select>
+                                </select> -->
                             </div>
 
                         </div>
@@ -142,15 +148,6 @@
                     </div>
                 </div>
             </div>
-
-
-
-
-
-
-
-
-
 
             <!--Delete Modal -->
             <div data-te-modal-init
@@ -212,16 +209,21 @@
     import { Modal, Ripple, Select, initTE, Input } from "tw-elements";
     import { getApiData, postApiData, deleteApiData } from '../../utilities/ajax-helpers';
     import { mapGetters } from "vuex";
+    import Multiselect from 'vue-multiselect';
 
     export default {
+        components: {
+            Multiselect
+        },
         data() {
             return {
 
-
+                departmentList: [],
                 areaList:[],
                 typeList:[],
                 name: null,
                 selectedType:null,
+                selectedDepartment: null,
                 deleteId: null,
 
 
@@ -245,6 +247,13 @@
                 }
             },
 
+            async getDepartmentList(){
+                const response = await getApiData({ url: '/api/departments', token: this.getToken() });
+                if(response.data){
+                    this.departmentList = response.data;
+                }
+            },
+
             async getTypeList(){
                 const response = await getApiData({ url: '/api/area_types' , token: this.getToken()});
                 if(response.data){
@@ -261,10 +270,13 @@
             {
                 let formData = new FormData();
                 formData.append('name', this.name);
-                formData.append('area_type_id', this.selectedType);
+                formData.append('area_type_id', this.selectedType.id);
+                formData.append('department_id', this.selectedDepartment.id);
                 let response = await postApiData({url: '/api/areas', form_data: formData, token: this.getToken()});
                 if(response.success){
                     this.getAreasList(null);
+                    this.selectedType = null;
+                    this.selectedDepartment = null;
                     console.log("success")
                 }
                 else{
@@ -308,9 +320,11 @@
         {
 
             this.getAreasList();
-
+            this.getDepartmentList();
             this.getTypeList();
             initTE({ Modal,Select, Ripple });
         }
     }
 </script>
+
+<style src="node_modules/vue-multiselect/dist/vue-multiselect.css"></style>
