@@ -28,7 +28,12 @@ class AreaRepository implements AreaRepositoryInterface
 
             return $paginationData;
         } else {
-            $areas = Area::with('areaType')->where('department_id', $request->department_id)->where('is_active', 1)->get();
+            if($request->department_id){
+                $areas = Area::with('areaType')->where('department_id', $request->department_id)->where('is_active', 1)->get();
+            }
+            else{
+                $areas = Area::with('areaType')->where('is_active', 1)->get();
+            }
 
             return $areas;
         }
