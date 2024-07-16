@@ -13,7 +13,7 @@ class Area extends BaseModel
     use HasFactory;
 
     protected $fillable=[
-        'name','area_type_id','is_active','area_category_id',
+        'name','area_type_id','is_active','area_category_id','department_id'
     ];
 
     public function getCreatedAt()
@@ -36,8 +36,23 @@ class Area extends BaseModel
         return $this->belongsTo(AreaCategory::class);
     }
 
+    public function department()
+    {
+        return $this->belongsTo(Department::class);
+    }
+
     public function inventories()
     {
         return $this->morphMany(Inventory::class, 'inventoryable');
+    }
+
+    public function menus()
+    {
+        return $this->belongsToMany(Menu::class);
+    }
+
+    public function staffs()
+    {
+        return $this->hasMany(Staff::class);
     }
 }

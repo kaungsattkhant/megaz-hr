@@ -34,16 +34,19 @@
                 <label for="" class="label-form mb-3">
                     Menu Category
                 </label>
-                <div class="text-xs text-black h-8 border-b border-black rounded-bl-[4px] rounded-br-[4px] overflow-hidden inline-block"
+                <multiselect v-model="selectedMenuCategory" :options="menuCategoryList" :close-on-select="true"
+                    :clear-on-select="false" :preserve-search="true" placeholder="Select Category" label="name"
+                    track-by="id" :preselect-first="false"></multiselect>
+                <!-- <div class="text-xs text-black h-8 border-b border-black rounded-bl-[4px] rounded-br-[4px] overflow-hidden inline-block"
                     data-te-select-wrapper-ref>
                     <select data-te-select-init data-te-select-placeholder="Select Category"
                         data-te-select-filter="true" name="" id="" v-model="selectedMenuCategory" class="input-ui">
                         <option :value="menuCategory" v-for="(menuCategory, menuCategoryIndex) in menuCategoryList"
                             :key="menuCategoryIndex"> {{ menuCategory.name }} </option>
                     </select>
-                </div>
+                </div> -->
             </div>
-            <div class="mb-0 col-span-3 rounded-md">
+            <div class="mb-4 col-span-3 rounded-md">
                 <label for="" class="block text-sm text-black mb-3">
                     Images
                 </label>
@@ -52,11 +55,32 @@
                 </div>
 
             </div>
+
+            <div class="mb-4 col-span-3 rounded-md">
+                <label for="" class="block text-sm text-black mb-3">
+                    Cooking Areas
+                </label>
+                <multiselect v-model="selectedAreas" :options="areaList" :multiple="true" :close-on-select="false" :clear-on-select="false"
+                :preserve-search="true" placeholder="Select Areas" label="name" track-by="id" :preselect-first="false">
+                    <template #selection="{ values, search, isOpen }">
+                        <span class="multiselect__single"
+                            v-if="values.length"
+                            v-show="!isOpen">{{ values.length }} areas selected</span>
+                    </template>
+                </multiselect>
+            </div>
+
+            <div class="col-span-9"></div>
+
             <div class="mb-0 col-span-3 rounded-md">
                 <label for="" class="label-form mb-3">
                     Category
                 </label>
-                <div class="text-xs text-black h-8 border-b border-black rounded-bl-[4px] rounded-br-[4px] overflow-hidden inline-block"
+                <multiselect v-model="selectedItemCategory" :options="itemCategoryList" :close-on-select="true"
+                    :clear-on-select="false" :preserve-search="true" placeholder="Select Category" label="name"
+                    track-by="id" :preselect-first="false" @select="itemCategorySelectChanged"></multiselect>
+
+                <!-- <div class="text-xs text-black h-8 border-b border-black rounded-bl-[4px] rounded-br-[4px] overflow-hidden inline-block"
                     data-te-select-wrapper-ref>
                     <select data-te-select-init data-te-select-placeholder="Select Category"
                         data-te-select-filter="true" name="" id="" v-model="selectedItemCategory" class="input-ui"
@@ -64,21 +88,25 @@
                         <option :value="itemCategory" v-for="(itemCategory, itemCategoryIndex) in itemCategoryList"
                             :key="itemCategoryIndex"> {{ itemCategory.name }} </option>
                     </select>
-                </div>
+                </div> -->
             </div>
 
             <div class="mb-0 col-span-3 rounded-md">
                 <label for="" class="label-form mb-3">
                     Ingredients
                 </label>
-                <div class="text-xs text-black h-8 border-b border-black rounded-bl-[4px] rounded-br-[4px] overflow-hidden inline-block"
+                <multiselect v-model="selectedItem" :options="itemList" :close-on-select="true"
+                    :clear-on-select="false" :preserve-search="true" placeholder="Select Item" label="name"
+                    track-by="id" :preselect-first="false" @select="itemSelectChanged"></multiselect>
+
+                <!-- <div class="text-xs text-black h-8 border-b border-black rounded-bl-[4px] rounded-br-[4px] overflow-hidden inline-block"
                     data-te-select-wrapper-ref>
                     <select data-te-select-init data-te-select-placeholder="Select Item" data-te-select-filter="true"
                         name="" id="" v-model="selectedItem" class="input-ui" @change="itemSelectChanged">
                         <option :value="item" v-for="(item, itemIndex) in itemList" :key="itemIndex"> {{ item.name }}
                         </option>
                     </select>
-                </div>
+                </div> -->
             </div>
             <div class="mb-0 col-span-3 rounded-md">
                 <label for="" class="label-form mb-3">
@@ -100,7 +128,11 @@
                 <label for="" class="label-form mb-3">
                     UOM
                 </label>
-                <div class="text-xs text-black h-8 border-b border-black rounded-bl-[4px] rounded-br-[4px] overflow-hidden inline-block"
+                <multiselect v-model="selectedUom" :options="itemUoms" :close-on-select="true"
+                    :clear-on-select="false" :preserve-search="true" placeholder="Select UOM" label="name"
+                    track-by="id" :preselect-first="false" @select="itemSelectChanged"></multiselect>
+
+                <!-- <div class="text-xs text-black h-8 border-b border-black rounded-bl-[4px] rounded-br-[4px] overflow-hidden inline-block"
                     data-te-select-wrapper-ref>
                     <select data-te-select-init data-te-select-placeholder="Select UOM" data-te-select-filter="true"
                         name="" id="" v-model="selectedUom" class="input-ui">
@@ -108,7 +140,7 @@
                             {{ uom.name }}
                         </option>
                     </select>
-                </div>
+                </div> -->
 
             </div>
 
@@ -256,8 +288,12 @@
 import { Modal, Ripple, initTE, Input, Tab, Select } from "tw-elements";
 import { getApiData, postApiData, deleteApiData } from '../../utilities/ajax-helpers';
 import { mapGetters } from "vuex";
+import Multiselect from 'vue-multiselect';
 
 export default {
+    components: {
+        Multiselect
+    },
     props: ["menuId"],
     data() {
         return {
@@ -286,7 +322,12 @@ export default {
             ingredientItems: [],
             ingredientItemPriceTotal: 0,
 
-            selectedImage: null
+            selectedImage: null,
+
+            areaList: [],
+            selectedAreas: [],
+
+            departmentId: null,
 
         };
     },
@@ -300,6 +341,13 @@ export default {
                 text: `You forgot to provide ${field}, please try again`,
                 type: "warn"
             });
+        },
+
+        async getCookingAreaList(departmentId) {
+            let response = await getApiData({ url: `/api/areas?department_id=${departmentId}`, token: this.getToken() });
+            if (response.data) {
+                this.areaList = response.data;
+            }
         },
 
         updateItemPriceTotal(items){
@@ -330,6 +378,7 @@ export default {
                 setTimeout(()=>{
                     this.reconstructMenuCategory(this.menu.menu_category_id);
                     this.reconstructAttachedIngredients(this.menu.items);
+                    this.selectedAreas = this.menu.areas;
                 }, 1200);
             }
         },
@@ -504,7 +553,15 @@ export default {
                 this.alertValiationMessage(`menu items`);
                 return 1;
             }
+            else if(this.selectedAreas.length < 1){
+                this.alertValiationMessage(`cooking areas`);
+                return 1;
+            }
             else {
+                let areaIds = [];
+                this.selectedAreas.forEach((area)=>{
+                    areaIds.push(area.id);
+                });
                 let menuItems = JSON.stringify({ items: this.ingredientItems });
                 let formData = new FormData();
                 formData.append('id', this.menu.id);
@@ -513,6 +570,7 @@ export default {
                 formData.append('is_feature', (this.isFeatured)?1:0);
                 formData.append('price', this.price);
                 formData.append('items', menuItems);
+                formData.append('areas',JSON.stringify(areaIds));
                 if(this.selectedImage)
                 {
                     formData.append('image',this.selectedImage);
@@ -537,11 +595,20 @@ export default {
         }
     },
 
-    created() {
+    async created() {
+        let response = await getApiData({url: `/api/departments`, token: this.getToken()});
+        if(response.data){
+            response.data.forEach((department)=>{
+                if(department.name == `Kitchen`){
+                    this.departmentId = department.id;
+                }
+            });
+        }
         this.getUomList();
         this.getMenuCategoryList();
         this.getItemCategoryList();
         this.getMenuDetail();
+        this.getCookingAreaList(this.departmentId);
     },
 
     mounted() {
@@ -549,3 +616,5 @@ export default {
     }
 }
 </script>
+
+<style src="node_modules/vue-multiselect/dist/vue-multiselect.css"></style>

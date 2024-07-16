@@ -3,6 +3,7 @@
 use App\Models\Division;
 use App\Models\Township;
 use App\Models\Gender;
+use App\Models\AreaCategory;
 use App\Models\AreaType;
 use App\Models\Category;
 use App\Models\MenuCategory;
@@ -88,6 +89,10 @@ Route::get('genders', function () {
 
 Route::get('/service_categories', function () {
     ResponseData(ServiceCategory::all());
+});
+
+Route::get('/area_categories', function () {
+    ResponseData(AreaCategory::all());
 });
 
 Route::get('/area_types', function () {

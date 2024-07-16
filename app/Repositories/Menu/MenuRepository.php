@@ -29,7 +29,7 @@ class MenuRepository implements MenuRepositoryInterface
         }
     }
 
-    public function createData(array $data, array $items)
+    public function createData(array $data, array $items, array $areas)
     {
         DB::beginTransaction();
         try {
@@ -47,6 +47,10 @@ class MenuRepository implements MenuRepositoryInterface
                     'price' => $item['price'],
                     'is_make_pack' => $item['is_make_pack'] ? 1 : 0
                 ]);
+            }
+
+            foreach ($areas as $area) {
+                $menu->areas()->attach($area);
             }
             DB::commit();
             return $menu;
@@ -75,7 +79,7 @@ class MenuRepository implements MenuRepositoryInterface
     public function menuDetail(int $id)
     {
         // $menu = Menu::find($id)->with('items.uoms', 'prices', 'menu_category')->first();
-        $menu = Menu::with('items.uoms', 'prices', 'menu_category')->find($id);
+        $menu = Menu::with('items.uoms', 'prices', 'menu_category','areas')->find($id);
         return $menu;
     }
 
@@ -95,7 +99,7 @@ class MenuRepository implements MenuRepositoryInterface
         }
     }
 
-    public function editMenu(int $id, array $data, array $items)
+    public function editMenu(int $id, array $data, array $items, array $areas)
     {
         DB::beginTransaction();
         try {
@@ -110,6 +114,14 @@ class MenuRepository implements MenuRepositoryInterface
             }
 
             $menu->update($data);
+
+            if(isset($areas))
+            {
+                $menu->areas()->detach();
+                foreach ($areas as $area) {
+                    $menu->areas()->attach($area);
+                }
+            }
 
             if (isset($data['price'])) {
                 $this->updateMenuPrice($menu->id, $data['price']);

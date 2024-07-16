@@ -52,5 +52,9 @@ class Menu extends BaseModel
         return $this->morphMany(MenuServiceDiscount::class, 'discountable');
     }
 
+    public function areas()
+    {
+        return $this->belongsToMany(Area::class,'menu_area');
+    }
 
 }

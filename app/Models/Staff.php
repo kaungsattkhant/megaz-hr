@@ -33,6 +33,7 @@ class Staff extends Authenticatable
         'address',
         'gender_id',
         'department_id',
+        'area_id',
         'is_active',
         'password',
         'bank_account_number',
@@ -87,6 +88,11 @@ class Staff extends Authenticatable
     public function department()
     {
         return $this->belongsTo(Department::class);
+    }
+
+    public function area()
+    {
+        return $this->belongsTo(Area::class);
     }
 
     public function roles()

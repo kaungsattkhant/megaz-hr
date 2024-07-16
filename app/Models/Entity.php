@@ -50,5 +50,10 @@ class Entity extends BaseModel
         return $this->hasMany(RoomSession::class);
     }
 
+    public function latestRoomSession()
+    {
+        return $this->hasOne(RoomSession::class)->latestOfMany();
+    }
+
 
 }

@@ -31,6 +31,7 @@ import StaffListComponent from './Components/Staff/StaffListComponent.vue';
 import StaffCreateComponent from './Components/Staff/StaffCreateComponent.vue';
 import StaffEditComponent from './Components/Staff/StaffEditComponent.vue';
 import TasksCrudComponent from './Components/Tasks/TasksCrudComponent.vue';
+import TaskReportComponent from './Components/Tasks/TaskReportComponent.vue';
 import DepartmentsCrudComponent from './Components/Departments/DepartmentsCrudComponent.vue';
 import RolesCrudComponent from './Components/Roles/RolesCrudComponent.vue';
 import AreasCrudComponent from './Components/Areas/AreasCrudComponent.vue';
@@ -89,10 +90,13 @@ import PosCashbookCrudComponent from './Components/Pos/Cashbook/PosCashbookCrudC
 import CashbookDetailComponent from './Components/Pos/Cashbook/CashbookDetailComponent.vue';
 import InvoiceListComponent from './Components/Pos/Invoices/InvoiceListComponent.vue';
 import InvoiceDetailComponent from './Components/Pos/Invoices/InvoiceDetailComponent.vue';
+import PosBookingCrudComponent from './Components/Pos/Booking/PosBookingCrudComponent.vue';
+import PosMenuOrderComponent from './Components/Pos/MenuOrder/PosMenuOrderComponent.vue';
 import UomCrudComponent from './Components/Uoms/UomCrudComponent.vue';
 
 import LoginComponentPos from './Components/Pos/Auth/LoginComponentPos.vue';
 import LogoutComponentPos from './Components/Pos/Auth/LogoutComponentPos.vue';
+import PosNotificationComponent from './Components/Pos/Common/PosNotificationComponent.vue';
 
 import CrmCustomerListComponent from './Components/CRM/CustomerListComponent.vue';
 import CrmCustomerBirthdaysListComponent from './Components/CRM/CustomerBirthdaysListComponent.vue';
@@ -105,6 +109,7 @@ app.component('StaffListComponent', StaffListComponent);
 app.component('StaffCreateComponent', StaffCreateComponent);
 app.component('StaffEditComponent', StaffEditComponent);
 app.component('TasksCrudComponent', TasksCrudComponent);
+app.component('TaskReportComponent', TaskReportComponent);
 app.component('DepartmentsCrudComponent', DepartmentsCrudComponent);
 app.component('RolesCrudComponent', RolesCrudComponent);
 app.component('AreasCrudComponent', AreasCrudComponent);
@@ -159,6 +164,7 @@ app.component('FixedAssetCrudComponent', FixedAssetCrudComponent);
 
 app.component('LoginComponent', LoginComponent);
 app.component('LogoutComponent', LogoutComponent);
+app.component('PosNotificationComponent', PosNotificationComponent);
 
 app.component('CustomersListComponent', CustomersListComponent);
 app.component('CustomersCreateComponent', CustomersCreateComponent);
@@ -168,6 +174,8 @@ app.component('PosCashbookCrudComponent', PosCashbookCrudComponent);
 app.component('CashbookDetailComponent', CashbookDetailComponent);
 app.component('InvoiceListComponent', InvoiceListComponent);
 app.component('InvoiceDetailComponent', InvoiceDetailComponent);
+app.component('PosBookingCrudComponent', PosBookingCrudComponent);
+app.component('PosMenuOrderComponent', PosMenuOrderComponent);
 
 app.component('LoginComponentPos', LoginComponentPos);
 app.component('LogoutComponentPos', LogoutComponentPos);

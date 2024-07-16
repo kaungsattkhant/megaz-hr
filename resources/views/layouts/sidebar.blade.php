@@ -28,6 +28,21 @@
                                 </a>
                             </li>
                         @endif
+                        @if (checkFeaturePermission('task'))
+                            <li>
+                                <a href="{{ route('tasks') }}" class="flex items-center @yield('tasks')">
+                                    <i class="fal fa-tasks  pr-3"></i>
+                                    Tasks
+                                </a>
+                            </li>
+
+                            <li>
+                                <a href="{{ route('tasks.report') }}" class="flex items-center @yield('tasks_report')">
+                                    <i class="fal fa-tasks  pr-3"></i>
+                                    Task Reports
+                                </a>
+                            </li>
+                        @endif
                         @if (checkFeaturePermission('area'))
                             <li>
                                 <a href="{{ route('areas') }}" class="flex items-center @yield('areas')">
@@ -98,14 +113,6 @@
                                 <a href="{{ route('services') }}" class="flex items-center @yield('services')">
                                     <i class="fal fa-users-cog  pr-3"></i>
                                     Services
-                                </a>
-                            </li>
-                        @endif
-                        @if (checkFeaturePermission('task'))
-                            <li>
-                                <a href="{{ route('tasks') }}" class="flex items-center @yield('tasks')">
-                                    <i class="fal fa-tasks  pr-3"></i>
-                                    Tasks
                                 </a>
                             </li>
                         @endif

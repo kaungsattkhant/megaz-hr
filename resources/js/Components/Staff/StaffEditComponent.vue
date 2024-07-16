@@ -152,7 +152,14 @@
 
             </div>
 
-            <!-- <div class="col-span-3"></div> -->
+            <div class="col-span-3 rounded-md mb-4 pb-6">
+                <label for="" class="label-form mb-3"> Area </label>
+                <multiselect v-model="selectedArea" :options="areaList" :close-on-select="true"
+                :clear-on-select="false" :preserve-search="true" placeholder="Select Area" label="name"
+                track-by="id" :preselect-first="false"></multiselect>
+            </div>
+
+            <div class="col-span-9"></div>
 
             <div class="col-span-3 rounded-md mb-4 pb-6">
                 <div>
@@ -389,6 +396,9 @@ export default {
             departmentList: [],
             selectedDepartment: null,
 
+            areaList: [],
+            selectedArea: null,
+
             roleList: [],
             selectedRoles: [],
             roleIds: [],
@@ -494,11 +504,11 @@ export default {
                 }
                 this.selectedFeatures = this.staff.features;
 
-                // if (this.selectedDepartment.inventories.length > 0) {
-                //     this.selectedDepartment.inventories.forEach((inventoryData) => {
-                //         this.inventories.push(inventoryData.inventory);
-                //     });
-                // }
+                this.areaList = this.selectedDepartment.areas;
+                if (this.staff.area) {
+                    this.selectedArea = this.staff.area;
+                }
+
                 if(this.selectedDepartment.inventory){
                     this.inventories.push(this.selectedDepartment.inventory.inventory);
                 }
@@ -535,6 +545,8 @@ export default {
             this.selectedRoles = [];
             this.selectedFeatures = [];
             this.selectedInventories = [];
+            this.areaList = [];
+            this.selectedArea = null;
             let rolesResponse = await getApiData({ url: `/api/roles?department_id=${this.selectedDepartment.id}`, token: this.getToken() });
             if (rolesResponse.data) {
                 this.roleList = rolesResponse.data;
@@ -542,9 +554,9 @@ export default {
             if (this.selectedDepartment.features.length > 0) {
                 this.featureList = this.selectedDepartment.features;
             }
-            // this.selectedDepartment.inventories.forEach((inventoryData) => {
-            //     this.inventories.push(inventoryData.inventory);
-            // });
+
+            this.areaList = this.selectedDepartment.areas;
+
             if(this.selectedDepartment.inventory){
                 this.inventories.push(this.selectedDepartment.inventory.inventory);
             }
@@ -622,6 +634,11 @@ export default {
             this.roleIds = [];
             this.featureIds = [];
             this.inventoryIds = [];
+
+            if ((this.selectedDepartment.name == 'Catering' || this.selectedDepartment.name == 'Kitchent') && !this.selectedArea) {
+                this.alertValiationMessage('area');
+                return 1;
+            }
 
             if (this.selectedInventories.length > 0) {
                 this.selectedInventories.forEach((inventory) => {
@@ -779,6 +796,9 @@ export default {
             formData.append('city', this.city);
             formData.append('gender_id', this.selectedGender.id);
             formData.append('department_id', this.selectedDepartment.id);
+            if(this.selectedArea){
+                formData.append('area_id', this.selectedArea.id);
+            }
             if (this.inventoryIds.length > 0) {
                 formData.append('inventoryIds', JSON.stringify(this.inventoryIds));
             }

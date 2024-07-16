@@ -13,9 +13,7 @@
                             Close
                         </button> -->
                         <button class="pos-add-btn" data-te-toggle="modal" data-te-target="#create_ar_modal">
-                            
                                 Add
-                            
                         </button>
                     </div>
                 </div>

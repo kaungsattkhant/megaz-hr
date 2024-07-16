@@ -41,7 +41,15 @@
                     <a href="/pos/cashbook" class="flex items-center flex-col  rounded-lg px-6 py-12 @yield('cashbook')">
                         <i class="fas fa-users mb-1.5 text-2xl"></i>
                         <span class="">
-                            cashbook
+                            Cashbook
+                        </span>
+                    </a>
+                </li>
+                <li>
+                    <a href="/booking" class="flex items-center flex-col  rounded-lg px-6 py-12 @yield('booking')">
+                        <i class="fas fa-book mb-1.5 text-2xl"></i>
+                        <span class="">
+                            Booking
                         </span>
                     </a>
                 </li>
@@ -53,8 +61,9 @@
                         </span>
                     </a>
                 </li>
-                        
+
             </ul>
+
 
         </div>
 
@@ -68,4 +77,6 @@
             </a>
         </button>
     </div>
+
+
 </nav>

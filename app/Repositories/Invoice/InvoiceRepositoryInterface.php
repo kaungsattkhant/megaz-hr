@@ -23,5 +23,7 @@ interface InvoiceRepositoryInterface
     public function doneRoom(array $data);
 
     public function invoiceConfirm(array $data);
+
+    public function ledgerAndTransactionForInvoice(array $data);
 }
 
