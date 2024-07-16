@@ -254,6 +254,9 @@ Route::middleware('auth:api')->group(function () {
     Route::post('/uom_conversions/{id}',[UomAPIController::class,'updateUomConversion']);
     Route::get('/uom_conversions',[UomAPIController::class,'getUomConversionList']);
 
+    Route::get('/bookings',[BookingAPIController::class,'bookingList']);
+    Route::post('/bookings',[BookingAPIController::class,'createBooking']);
+
 
 });
 
@@ -403,10 +406,6 @@ Route::controller(CustomerLevelDiscountAPIController::class)->group(function ()
     Route::post('/customer_level_discounts/{id}','updateCustomerLevelDiscount');
     Route::delete('/customer_level_discounts/{id}','deleteCustomerLevelDiscount');
 });
-
-Route::get('/bookings',[BookingAPIController::class,'bookingList']);
-Route::post('/bookings',[BookingAPIController::class,'createBooking']);
-
 
 Route::post('send_notification', [NotificationController::class, 'sendNotification']);
 
