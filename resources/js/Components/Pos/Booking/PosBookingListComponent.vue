@@ -9,9 +9,9 @@
                         </button>
                     </div>
                     <div class="flex gap-x-3">
-                        <button class="pos-add-btn" data-te-toggle="modal" data-te-target="#create_cashbook_modal">
+                        <a href="/booking/create" class="pos-add-btn">
                             Add
-                            </button>
+                        </a>
                     </div>
                 </div>
 

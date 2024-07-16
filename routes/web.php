@@ -204,4 +204,5 @@ Route::view('/crm/birthday_promotions', 'CRM.birthday_discounts.index')->name('c
 
 
 Route::view('/booking', 'pos.booking.index');
+Route::view('/booking/create', 'pos.booking.create');
 Route::view('/menuorder', 'pos.menu_order.index');
