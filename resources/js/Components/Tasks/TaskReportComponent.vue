@@ -8,18 +8,25 @@
         <div class="btn-container">
             <div class=" flex gap-x-4">
                 <label for="search" class="search-input">
-                    <input type="date" class="w-48 h-18" placeholder="Search"
+                    <input type="date" class="" placeholder="Search"
                         v-model="searchInput">
                     <!-- <i class="fal fa-search"></i> -->
                 </label>
 
-                <multiselect v-model="selectedDepartment" :options="departmentList" :close-on-select="true"
-                :clear-on-select="false" :preserve-search="true" placeholder="Department" label="name"
-                track-by="id" :preselect-first="false"></multiselect>
+                <!-- <select name="" id="" class="input-ui focus:ring-0 h-8 text-xs py-0">
+                                <option value="1" > Title </option>
+                            </select> -->
+                <div class=" min-w-[212px] multi-select">
 
-                <multiselect v-model="selectedDepartment" :options="departmentList" :close-on-select="true"
-                :clear-on-select="false" :preserve-search="true" placeholder="Team" label="name"
-                track-by="id" :preselect-first="false"></multiselect>
+                    <multiselect v-model="selectedDepartment" :options="departmentList" :close-on-select="true"
+                    :clear-on-select="false" :preserve-search="true" placeholder="Department" label="name"
+                    track-by="id" :preselect-first="false"></multiselect>
+                </div>
+                <div class=" min-w-[212px] multi-select">
+                    <multiselect v-model="selectedDepartment" :options="departmentList" :close-on-select="true"
+                    :clear-on-select="false" :preserve-search="true" placeholder="Team" label="name"
+                    track-by="id" :preselect-first="false"></multiselect>
+                </div>
 
                 <!-- <div class="bg-white mb-0 w-[40%] text-xs h-8 border-b border-black rounded-bl-[4px] rounded-br-[4px] overflow-hidden inline-block"
                     data-te-select-wrapper-ref>
