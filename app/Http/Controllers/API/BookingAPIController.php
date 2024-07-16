@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\API\Customers;
+namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
 use App\Repositories\Booking\BookingRepositoryInterface;
@@ -9,20 +9,20 @@ use Illuminate\Http\Request;
 class BookingAPIController extends Controller
 {
     //
-    private $bookingRepo;
-
+    protected $bookingRepo;
     public function __construct(BookingRepositoryInterface $bookingRepo)
     {
         $this->bookingRepo = $bookingRepo;
     }
 
-    public function listAllBookings()
+    public function bookingList()
     {
-        $books = $this->bookingRepo->listAllDataUserApp();
+        $this->bookingRepo->bookingList();
     }
 
     public function createBooking(Request $request)
     {
-        $booking = $this->bookingRepo->createData($request->all());
+        $this->bookingRepo->createData($request->all());
     }
+
 }

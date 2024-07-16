@@ -12,4 +12,9 @@ class BookingMenu extends Model
     protected $fillable =[
         'quantity','menu_id','booking_id','price','discount_value'
     ];
+
+    public function booking()
+    {
+        return $this->belongsTo(Booking::class);
+    }
 }
