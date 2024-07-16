@@ -200,3 +200,7 @@ Route::view('/crm/customers/{id}/detail', 'CRM.customers.detail')->name('crm.cus
 Route::view('/crm/customers/birthdays', 'CRM.customers.birthdays')->name('crm.customers.birthdays');
 Route::view('/crm/level_discounts', 'CRM.level_discounts.index')->name('crm.level_discounts.index');
 Route::view('/crm/birthday_promotions', 'CRM.birthday_discounts.index')->name('crm.birthday_discounts.index');
+
+
+Route::view('/booking', 'pos.booking.index');
+Route::view('/menuorder', 'pos.menu_order.index');
