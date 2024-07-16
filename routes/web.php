@@ -51,6 +51,7 @@ Route::middleware(['departments:item'])->group(function () {
 
 Route::middleware(['departments:task'])->group(function () {
     Route::view('/tasks', 'tasks.index')->name('tasks');
+    Route::view('/tasks/reports', 'tasks.report')->name('tasks.report');
 });
 
 Route::middleware(['departments:department'])->group(function () {
