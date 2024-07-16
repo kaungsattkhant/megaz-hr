@@ -22,6 +22,7 @@
                     :clear-on-select="false" :preserve-search="true" placeholder="Department" label="name"
                     track-by="id" :preselect-first="false"></multiselect>
                 </div>
+                
                 <div class=" min-w-[212px] multi-select">
                     <multiselect v-model="selectedDepartment" :options="departmentList" :close-on-select="true"
                     :clear-on-select="false" :preserve-search="true" placeholder="Team" label="name"
