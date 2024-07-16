@@ -6,13 +6,23 @@ use App\Models\Booking;
 use App\Models\BookingMenu;
 use App\Models\HeadCount;
 use Carbon\Carbon;
+use GuzzleHttp\Psr7\Response;
 use Illuminate\Support\Facades\DB;
 
 class BookingRepository implements BookingRepositoryInterface
 {
-    public function listAllData()
+
+    public function bookingList()
     {
-        $booking = Booking::where('customer_id',UserData()->id)->with(['customer', 'headCount', 'entity'])->orderBy('created_at','desc')->paginate(config('common.list'));
+        $bookings = Booking::with(['customer', 'headCount', 'entity'])
+            ->orderBy('created_at', 'desc')
+            ->paginate(config('common.list'));
+        ResponseData($bookings);
+    }
+
+    public function listAllDataUserApp()
+    {
+        $booking = Booking::where('customer_id', UserData()->id)->with(['customer', 'headCount', 'entity'])->orderBy('created_at', 'desc')->paginate(config('common.list'));
         ResponseData($booking);
     }
 
@@ -47,8 +57,7 @@ class BookingRepository implements BookingRepositoryInterface
             if (isset($data['menus'])) {
                 $menuData = json_decode($data['menus'], true);
                 foreach ($menuData as $menu) {
-                    if($menu['is_package']==1)
-                    {
+                    if ($menu['is_package'] == 1) {
                         BookingMenu::create([
                             'quantity' => $menu['quantity'],
                             'menu_id' => $menu['menu_id'],
@@ -56,7 +65,7 @@ class BookingRepository implements BookingRepositoryInterface
                             'price' => 0,
                             'discount_value' => 0
                         ]);
-                    }else{
+                    } else {
                         BookingMenu::create([
                             'quantity' => $menu['quantity'],
                             'menu_id' => $menu['menu_id'],
@@ -65,7 +74,6 @@ class BookingRepository implements BookingRepositoryInterface
                             'discount_value' => $menu['discount_value']
                         ]);
                     }
-
                 }
             }
             $booking->booking_id = sprintf('%05d', $booking->id);
@@ -84,5 +92,32 @@ class BookingRepository implements BookingRepositoryInterface
         $data['total_head_count'] = $data['female'] + $data['male'] + $data['child'];
         $headCount = HeadCount::create($data);
         return $headCount;
+    }
+
+    public function bookingStatusChange($request)
+    {
+        DB::beginTransaction();
+        try {
+            $booking = Booking::find($request->id);
+            if ($booking) {
+                if ($booking->is_confirm == 1) {
+                    $booking->status = 'confirm';
+                    $booking->save();
+                } else {
+                    $booking->delete();
+                    $booking->bookingMenus()->delete();
+                }
+                DB::commit();
+            }
+        } catch (\Exception $e) {
+            DB::rollBack();
+            ResponseMessage($e->getMessage(), 422);
+            throw $e;
+        }
+    }
+
+    public function activateBooking($request)
+    {
+        DB::beginTransaction();
     }
 }

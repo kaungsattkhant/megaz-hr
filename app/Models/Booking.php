@@ -27,4 +27,9 @@ class Booking extends Model
     {
         return $this->belongsTo(HeadCount::class);
     }
+
+    public function bookingMenus()
+    {
+        return $this->hasMany(BookingMenu::class);
+    }
 }
