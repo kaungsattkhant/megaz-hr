@@ -294,6 +294,7 @@
                     this.selectedType = null;
                     this.selectedCategory = null;
                     this.selectedDepartment = null;
+                    this.name = null;
                 }
                 else{
 

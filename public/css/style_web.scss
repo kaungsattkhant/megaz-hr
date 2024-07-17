@@ -122,7 +122,24 @@
 }
 .primary-input {
   padding: 0.5rem;
-  color: black; }
+  color: black; 
+}
+
+.multi-select .multiselect__placeholder{
+  margin-bottom: 4px;
+  padding-top: 2px;
+}
+.multi-select .multiselect__tags{
+  min-height: 30px;
+  padding-top: 4px;
+}
+.multi-select .multiselect__select{
+  height: 20px;
+}
+.multi-select .multiselect{
+  min-height: fit-content;
+}
+
 
 .table-container{
   // border: 1px solid #e5e7eb;
