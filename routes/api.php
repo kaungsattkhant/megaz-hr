@@ -21,6 +21,7 @@ use App\Http\Controllers\API\AccountController;
 use App\Http\Controllers\API\AccountPayableController;
 use App\Http\Controllers\API\AdsAPIController;
 use App\Http\Controllers\API\BirthDayPromotionAPIController;
+use App\Http\Controllers\API\BookingAPIController;
 use App\Http\Controllers\API\ItemAPIController;
 use App\Http\Controllers\API\MenuAPIController;
 use App\Http\Controllers\API\RoleAPIController;
@@ -251,6 +252,9 @@ Route::middleware('auth:api')->group(function () {
     Route::post('/uom_conversions/{id}',[UomAPIController::class,'updateUomConversion']);
     Route::get('/uom_conversions',[UomAPIController::class,'getUomConversionList']);
 
+    Route::get('/bookings',[BookingAPIController::class,'bookingList']);
+    Route::post('/bookings',[BookingAPIController::class,'createBooking']);
+
 
 });
 
@@ -406,7 +410,6 @@ Route::controller(CustomerLevelDiscountAPIController::class)->group(function ()
     Route::post('/customer_level_discounts/{id}','updateCustomerLevelDiscount');
     Route::delete('/customer_level_discounts/{id}','deleteCustomerLevelDiscount');
 });
-
 
 Route::post('send_notification', [NotificationController::class, 'sendNotification']);
 
