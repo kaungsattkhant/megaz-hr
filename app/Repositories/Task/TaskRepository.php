@@ -59,8 +59,8 @@ class TaskRepository implements TaskRepositoryInterface
 
     public function createData(array $data)
     {
+        $data['created_by']=UserData()->id;
         $task = Task::create($data);
-
         return $task;
     }
 
