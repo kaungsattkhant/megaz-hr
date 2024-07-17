@@ -23,33 +23,196 @@
                             <label for="" class="block text-sm text-black mb-3">
                                 Type
                             </label>
-                            <select name="" id="" v-model="type"
+                            <select name="" id="" v-model="type" @change="typeChange()"
                                 class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
                                 <option value="package"> Package </option>
                                 <option value="session"> Session </option>
                             </select>
                         </div>
-                        <div class="mb-4 col-span-3" v-if="type == 'package'">
+                        <div class="mb-4 col-span-3" v-if="isPackage">
                             <label for="" class="block text-sm text-black mb-3">
-                                Gender
+                                Package
                             </label>
-                            <select name="" id=""
+                            <select name="" id="" v-model="selectedPackage" @change="selectedPackageChange()"
+                                class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0" >
+                                <option v-if="packageList.length > 1" v-for="(pack,index) in packageList" :value="pack" :key="index">{{ pack.name }} </option>
+                                <option v-else>no Data Found</option>
+                            </select>
+                        </div><div v-if="isPackage" class="col-span-3"></div>
+                        <div class="mb-4 col-span-3" v-if="type == 'session'">
+                            <label for="" class="block text-sm text-black mb-3">
+                                Session Duration
+                            </label>
+                            <input type="text" placeholder="Duration" v-model="session_duration" @change="sessionDurationChange()"
                                 class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
-                                <option v-for="package in packageList" > {{ package }} </option>
+                        </div><div class="col-span-3" v-if="type == 'session'"></div>
+                        
+                        <div v-if="!isPackage && type != 'session'" class="col-span-6"></div>
+                        
+                        <div class="mb-4 col-span-3">
+                            <label for="" class="block text-sm text-black mb-3">
+                                Room
+                            </label>
+                            <select name="" id="" v-model="selectedRoom" @change="selectedRoomChange()"
+                                class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
+                                <option v-for="(room,index) in roomList" :value="room" :key="index">{{ room.name }} </option>
                             </select>
                         </div>
+                        <div class="mb-4 col-span-3">
+                            <label for="" class="block text-sm text-black mb-3">
+                                Time
+                            </label>
+                            <input type="datetime-local" placeholder="Time" v-model="startTime"
+                                class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
+                        </div>
+                        <div class="mb-4 col-span-3">
+                            <label for="" class="block text-sm text-black mb-3">
+                                Deposit
+                            </label>
+                            <input type="text" placeholder="Deposit" v-model="deposit"
+                                class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
+                        </div>
+                        <div class="col-span-3"></div>
 
+
+                        <div class="mb-6 col-span-3">
+                            <label for="" class="block text-sm text-black mb-3">
+                                Male
+                            </label>
+                            <input type="text" placeholder="Male" v-model="male"
+                                class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
+                        </div>
+                        <div class="mb-6 col-span-3">
+                            <label for="" class="block text-sm text-black mb-3">
+                                Female
+                            </label>
+                            <input type="text" placeholder="Female" v-model="female"
+                                class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
+                        </div>
+                        <div class="mb-6 col-span-3">
+                            <label for="" class="block text-sm text-black mb-3">
+                                Children
+                            </label>
+                            <input type="text" placeholder="Children" v-model="children"
+                                class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
+                        </div><div class="col-span-3"></div>
+                        <div class="mb-4 col-span-3">
+                            <label for="" class="block text-sm text-black mb-3">
+                                Menu Category
+                            </label>
+                            <!-- <input type="text" placeholder="Menu Category"
+                                class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0"> -->
+                            <select name="" id="" v-model="selectedMenuCategory" @change="menuCategorySelectChanged()"
+                                class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
+                                <option v-for="(menuCategory,index) in menuCategoryList" :value="menuCategory" :key="index">{{ menuCategory.name }} </option>
+                            </select>
+                        </div>
+                        <div class="mb-4 col-span-3">
+                            <label for="" class="block text-sm text-black mb-3">
+                                Menu
+                            </label>
+                            <!-- <input type="text" placeholder="Menu"
+                                class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0"> -->
+                            <select name="" id="" v-model="selectedMenu"
+                                class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
+                                <option v-for="(menu,index) in menuList" :value="menu" :key="index">{{ menu.name }} </option>
+                            </select>
+                        </div>
+                        <div class="mb-4 col-span-3">
+                            <label for="" class="block text-sm text-black mb-3">
+                                Count
+                            </label>
+                            <input type="text" placeholder="Count" v-model="menuCount"
+                                class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
+                        </div>
+                        <div class="col-span-3">
+                            <label for="" class="block text-sm text-black mb-3">
+                                &nbsp;
+                            </label>
+                            <button @click="btnClickedAddMenu()" class="pos-add-btn focus:outline-none focus:ring-0 ">
+                                Add
+                            </button>
+                        </div>
+                    </div>
+                    <div class="relative px-8 py-4">
+                        <div class="table-container pr-16">
+                            <table class=" w-full">
+                                <thead class="">
+                                    <tr class="border-b">
+                                        <th scope="col" class=" text-left py-4">
+                                            Menu Category
+                                        </th>
+                                        <th scope="col" class="text-left   py-4">
+                                            Menu
+                                        </th>
+                                        <th scope="col" class="text-left   py-4">
+                                            Count
+                                        </th>
+                                        <th scope="col" class="text-left   py-4">
+                                            Price
+                                        </th>
+                                        <th scope="col" class="text-left   py-4">
+            
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr class="" v-for="(om,index) in orderMenuList">
+                                        <td class="text-left py-4 text-sm">
+                                            {{ om.menu_category_name }}
+                                        </td>
+                                        <td class=" py-4 text-sm  ">
+                                            {{ om.name }}
+                                        </td>
+                                        <td class=" py-4 text-sm  ">
+                                            {{ om.quantity }}
+                                        </td>
+                                        <td class=" py-4 text-sm  ">
+                                            {{ om.menu_price }}
+                                        </td>
+                                        <td class=" py-4 text-sm  text-center">
+                                            <button :disabled="!om.is_changeable" :title="!om.is_changeable ? 'Can not Change Selected Package Menu' : '' "
+                                                @click="removeMenuBtnClicked(index)">
+                                                <i class="fal fa-times  pr-3"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                    <tr class="border-t">
+                                        <td colspan="2"></td>
+                                        <td class="py-4 border-b">
+                                            Food
+                                        </td>
+                                        <td colspan="2" class="py-4 border-b">
+                                            {{ food_total }}
+                                        </td>
+                                    </tr>
+                                    <tr class="">
+                                        <td colspan="2"></td>
+                                        <td class="py-4 border-b">
+                                            Total
+                                        </td>
+                                        <td colspan="2" class="py-4 border-b">
+                                            {{  total }}
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
 
                     <div class="flex justify-center px-12 pb-8">
-                        <button class="pos-add-btn focus:outline-none focus:ring-0 ">
+                        <button @click="btnClickedCreateBooking()" class="pos-add-btn focus:outline-none focus:ring-0 ">
                             Create
                         </button>
                     </div>
+                    {{ testList }}
                 </div>
             </div>
 
         </div>
+
+
+        
 
 
 
@@ -70,7 +233,30 @@
                 name:null,
                 type:null,
                 packageList:[],
+                selectedPackage:null,
+                session_duration:0,
+                selectedRoomPrice:0,
+                roomList:[],
+                selectedRoom:null,
+                startTime:null,
+                deposit:null,
+                male:null,
+                female:null,
+                children:null,
 
+                isPackage:false,
+                orderMenuList:[],
+
+                selectedMenuCategory:null,
+                menuCategoryList:[],
+                selectedMenu:null,
+                menuList:[],
+                menuCount:null,
+
+                testList:[],
+                total:0,
+                food_total:0,
+                package_food_total:0,
             };
         },
 
@@ -83,22 +269,186 @@
                     this.packageList = response.data.data;
                 }
             
-            // if (this.type == 'package') {
-            //     const response = await getApiData({ url: '/api/packages', token: this.getToken() });
-            //     if (response.data) {
-            //         this.packageList = response.data.data;
-            //     }
-            // }
-            // else {
-            //     this.packageList = null;
-            // }
+            },
+            typeChange(){
+                if(this.type == 'package'){
+                    this.isPackage = true;
+                }
+                else{
+                    this.isPackage = false;
+                }
+                this.selectedRoom = null;
+                    this.orderMenuList = [];
+                    this.total = 0;
+                    this.food_total = 0 ;
+            },
+            async getRoomList() {
+                const response = await getApiData({ url: '/api/areas/3/entities', token: this.getToken() });
+                if (response.data) {
+                    this.roomList = response.data;
+                }
+            },
+            selectedPackageChange(){
+                this.food_total = 0 ;
+                this.orderMenuList = [];
+                this.roomList = this.selectedPackage.rooms;
+                let is_changeable = false;
+                if(this.selectedPackage.is_changeable == 1){
+                    is_changeable = true;
+                }
+                else{
+                    is_changeable = false
+                }
+                let menuOfselectedPackage = this.selectedPackage.menu_packages;
+                menuOfselectedPackage.forEach((packageMenu)=>{
+                    let menuCategorySelected = this.menuCategoryList.findIndex(menuCategory => menuCategory.id == packageMenu.menu.menu_category_id)
+                    this.orderMenuList.push({
+                        quantity : packageMenu.quantity,
+                        name : packageMenu.menu.name + ' (Package)',
+                        menu_category_name : this.menuCategoryList[menuCategorySelected].name,
+                        menu_price : packageMenu.menu.prices[0].price * packageMenu.quantity,
+                        menu_id : packageMenu.menu_id,
+                        is_package : 1,
+                        is_changeable : is_changeable
+                    });
+                    this.food_total += packageMenu.menu.prices[0].price * packageMenu.quantity;
+                    this.package_food_total += packageMenu.menu.prices[0].price * packageMenu.quantity;
+                    this.total = this.selectedPackage.price;
+                    
+                });
+                let minimunPrice = this.selectedPackage.price -this.package_food_total ;
+                console.log('food total'+this.package_food_total)
+                console.log(minimunPrice)
+            },
+            sessionDurationChange(){
+                let roomPrice = this.session_duration * this.selectedRoom.price_per_hour
+                this.selectedRoomPrice = roomPrice
+                this.total += roomPrice
 
-        },
+            },
+            selectedRoomChange(){
+                
+                if(this.type == 'session'){
+                    this.total = this.food_total
+                    let roomPrice = this.session_duration * this.selectedRoom.price_per_hour
+                    this.selectedRoomPrice = roomPrice;
+                    this.total += roomPrice
+                }
+                else{
+
+                }
+            },
+
+
+            async getMenuCategoryList(){
+                let url = `/api/menu_categories`;
+                let response = await getApiData({url: url, token: this.getToken()});
+                if(response.data){
+                    this.menuCategoryList = response.data;
+                }
+            },
+            async menuCategorySelectChanged(){
+                console.log('menu category selected');
+                let url = `/api/menu_categories/${this.selectedMenuCategory.id}/menus`;
+                let response = await getApiData({url: url, token: this.getToken()});
+                if(response.data){
+                    this.menuList = response.data;
+                }
+            },
+            btnClickedAddMenu(){
+                this.addMenu();
+            },
+            addMenu(){
+                this.orderMenuList.push({
+                    quantity: this.menuCount,
+                    name: this.selectedMenu.name,
+                    menu_category_name: this.selectedMenuCategory.name,
+                    menu_price:this.selectedMenu.prices[0].price * this.menuCount,
+                    menu_id : this.selectedMenu.prices[0].menu_id,
+                    is_package : 0,
+                    is_changeable : true,
+                });
+                this.food_total += this.selectedMenu.prices[0].price * this.menuCount;
+                console.log(this.food_total)
+                this.total += this.selectedMenu.prices[0].price * this.menuCount;
+                this.menuCount = null;
+                this.selectedMenu = null;
+                this.selectedMenuCategory = null;
+                this.menuList = []
+            },
+            removeMenuBtnClicked(index){
+                this.food_total -= this.orderMenuList[index].menu_price;
+                this.total -= this.orderMenuList[index].menu_price;
+                // if(this.type == 'package'){
+                //     let checkPackagePrice = this.selectedPackage.price + this.food;
+                //     console.log(checkPackagePrice < this.selectedPackage.price)
+                //     if(checkPackagePrice < this.selectedPackage.price){
+                //         alert('u cant')
+                //     }
+                // }
+                this.orderMenuList.splice(index, 1);
+            },
+
+
+            async btnClickedCreateBooking(){
+                // this.testList.push({
+                //     name: this.name,
+                //     type:this.type,
+                //     package_id : this.selectedPackage.id,
+                //     room:this.selectedRoom.id,
+                //     start_time : this.startTime,
+                //     male : this.male,
+                //     female : this.female,
+                //     children : this.children,
+                //     menu_list: this.orderMenuList,
+                // });
+
+
+
+                let formData = new FormData();
+                formData.append('male', this.male);
+                formData.append('female', this.female);
+                formData.append('child', this.children);
+                formData.append('session_type', this.type);
+                if(this.type == 'session'){
+                    formData.append('session', this.session_duration);
+                }
+                formData.append('amount', this.total);
+                formData.append('deposit', this.deposit);
+                formData.append('start_date', this.startTime);
+                formData.append('entity_id', this.selectedRoom.id);
+                if(this.type == 'package'){
+                    formData.append('package_id', this.invoiceId);
+                }
+                formData.append('menus', this.orderMenuList);
+
+                // if(this.type == 'package'){
+                //     if(this.total < this.selectedPackage.price){
+                //         alert('total is lower than package pricce')
+                //     }
+                // }
+
+
+
+                let response = await postApiData({ url: '/api/bookings', form_data: formData, token: this.getToken() });
+                if (response.success) {
+                    console.log("success")
+                }
+                else {
+                    console.log('some errors occur');
+                }
+            }
         
+        
+        },
+        created(){
+            this.getPackageList();
+            this.getRoomList();
+            this.getMenuCategoryList();
         },
         mounted()
         {   
-            this.getPackageList();
+            
             initTE({ Modal, Select, Ripple, Datepicker });
         }
     }
