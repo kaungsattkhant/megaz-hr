@@ -66,8 +66,8 @@ class Department extends BaseModel
         return $this->belongsToMany(Feature::class,'department_feature');
     }
 
-    public function areas()
-    {
-        return $this->hasMany(Area::class);
-    }
+    // public function areas()
+    // {
+    //     return $this->hasMany(Area::class);
+    // }
 }

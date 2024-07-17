@@ -31,11 +31,11 @@ class DatabaseSeeder extends Seeder
         $this->call([
             DivisionSeeder::class,
             TownshipSeeder::class,
-            AreaSeeder::class,
             ComplaintCategorySeeder::class,
             // InventorySeeder::class,
             FeatureSeeder::class,
             DepartmentSeeder::class,
+            AreaSeeder::class,
             RoleSeeder::class,
             GenderSeeder::class,
             CategorySeeder::class,
