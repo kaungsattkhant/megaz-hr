@@ -17,6 +17,8 @@ class Task extends BaseModel
         'role_id', 'area_id',
         'name','description','assigned_days','completed_at','completed_by',
         'is_double_checked','double_checked_by',
+        'department_id',
+        'created_by',
         'status','is_active'
     ];
 

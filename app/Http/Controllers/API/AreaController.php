@@ -65,4 +65,9 @@ class AreaController extends Controller
         }
         ResponseMessage('Area not deleted', 404);
     }
+
+    public function getAreaByDepartment($department_id){
+        $data=$this->areaRepo->getAreaByDepartment($department_id);
+        ResponseData($data);
+    }
 }
