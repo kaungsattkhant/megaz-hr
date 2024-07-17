@@ -256,8 +256,8 @@ Route::middleware('auth:api')->group(function () {
 
     Route::get('/bookings',[BookingAPIController::class,'bookingList']);
     Route::post('/bookings',[BookingAPIController::class,'createBooking']);
-
-
+    Route::post('/booking_status/{id}',[BookingAPIController::class,'bookingStatusChange']);
+    Route::post('/booking_active/{id}',[BookingAPIController::class,'bookingActivate']);
 });
 
 Route::controller(PackageAPIController::class)->group(function()

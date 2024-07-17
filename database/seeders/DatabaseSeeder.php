@@ -39,7 +39,7 @@ class DatabaseSeeder extends Seeder
             RoleSeeder::class,
             GenderSeeder::class,
             CategorySeeder::class,
-            MenuCategorySeeder::class,        
+            MenuCategorySeeder::class,
             ServiceCategorySeeder::class,
             UomSeeder::class,
             // ItemSeeder::class,

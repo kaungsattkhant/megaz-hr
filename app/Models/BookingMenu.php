@@ -17,4 +17,10 @@ class BookingMenu extends Model
     {
         return $this->belongsTo(Booking::class);
     }
+
+    public function menu()
+    {
+        return $this->belongsTo(Menu::class);
+    }
+
 }
