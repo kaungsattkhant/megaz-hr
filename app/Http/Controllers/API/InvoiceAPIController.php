@@ -58,18 +58,22 @@ class InvoiceAPIController extends Controller
         $invoice = $this->invoiceRepo->createData($data);
         if($data['type'] == 'package')
         {
-            $package= Package::where('id',$data['package_id'])->first();
-            $order['menuArray'] = $package->menuPackages->map(function($menuPackage) {
-                return [
-                    'menu_id' => $menuPackage->menu_id,
-                    'quantity' => $menuPackage->quantity,
-                    'original_price' => $menuPackage->menu->prices->first()->price ?? 0,
-                    'menu_category_id' => $menuPackage->menu->menu_category_id,
-                    'remark' => 'package order',
+            foreach($request->orderMenuArray as $order){
+                $original_price = ($order->is_package == 1) ? 0 : $order->price;
+
+                $menuArray[] = [
+                    "menu_id" => $order->menu_id,
+                    "quantity" => $order->quantity,
+                    "original_price" => $original_price,
+                    "menu_category_id" => $order->menu->menu_category_id,
+                    "remark" => $order->remark,
+                    'is_package' => $order->is_package
                 ];
-            });
+            }
+
             $order['order_type'] = 'package';
             $order['invoice_id'] = $invoice->id;
+            $order['menuArray'] = $menuArray;
             $this->orderRepo->createMultipleOrder($order);
 
         }
