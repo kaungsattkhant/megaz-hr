@@ -13,9 +13,15 @@ class MenuRepository implements MenuRepositoryInterface
 {
     public function listAllData(Request $request)
     {
+        $validateDate = $request->date ?? CurrentDate();
+
         if ($request->per_page || $request->page) {
             $menu_category_id = $request->menu_category_id;
-            return Menu::with(['menu_category', 'prices', 'items'])
+
+                return Menu::with(['menu_category', 'prices', 'items','menuServiceDiscounts' => function ($query) use ($validateDate)
+                {
+                    $query->where('from_date', '<=',$validateDate)->where('to_date', '>=',$validateDate);
+                }])
                 ->when($request->search_input, function ($q) use ($request) {
                     $q->where('name', 'LIKE', '%' . $request->search_input . '%');
                 })
@@ -24,7 +30,10 @@ class MenuRepository implements MenuRepositoryInterface
                 })
                 ->paginate(config('common.list_count'));
         } else {
-            $menus = Menu::with(['menu_category', 'prices', 'items'])->where('is_active', 1)->get();
+            $menus = Menu::with(['menu_category', 'prices', 'items','menuServiceDiscounts' => function ($query) use ($validateDate)
+            {
+                $query->where('from_date', '<=',$validateDate)->where('to_date', '>=',$validateDate);
+            }])->where('is_active', 1)->get();
             return $menus;
         }
     }
