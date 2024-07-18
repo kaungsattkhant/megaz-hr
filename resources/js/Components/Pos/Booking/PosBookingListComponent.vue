@@ -192,7 +192,7 @@
     export default {
         data() {
             return {
-                
+                bookingList:[],
 
             };
         },
@@ -200,6 +200,13 @@
         methods: {
             ...mapGetters(['getToken']),
 
+            async getBookingList() {
+                const response = await getApiData({ url: '/api/bookings', token: this.getToken() });
+                if (response.data) {
+                    this.bookingList = response.data;
+                }
+            
+            },
             
         },
         mounted()
