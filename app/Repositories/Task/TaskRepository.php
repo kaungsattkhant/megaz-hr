@@ -2,21 +2,25 @@
 
 namespace App\Repositories\Task;
 
-use Illuminate\Http\Request;
-
 use App\Models\Task;
+
+use App\Models\Staff;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
 class TaskRepository implements TaskRepositoryInterface
 {
-    public function getTasksOfRolesFromArea(int $areaId, array $roleIds)
+    public function getTasksOfRolesFromArea($areaId)
     {
         $dayName = now()->format('D');
-        $tasks = Task::where('area_id', $areaId)->whereIn('role_id', $roleIds)
+        $tasks = Task::
+             when($areaId!=null,function($q)use($areaId){
+                $q->where('area_id',$areaId);
+             })
             ->where('assigned_days', 'like', "%{$dayName}%")
             ->where('is_active', 1)
+            ->where('staff_id',UserData()->id)
             ->get();
-
         return $tasks;
     }
 
@@ -59,9 +63,30 @@ class TaskRepository implements TaskRepositoryInterface
 
     public function createData(array $data)
     {
-        $data['created_by']=UserData()->id;
-        $task = Task::create($data);
-        return $task;
+        // dd($data);
+        $staffs=Staff::staffByRole($data['role_id']);
+
+        // $data['created_by']=UserData()->id;
+        // foreach($staffs as $staff){
+        //     $data['staff']=$staff->id;
+        //     $task = Task::create($data);
+        // }
+        // $tasks = [];
+        foreach ($staffs as $staff) {   
+            $tasks[] = [
+                'staff_id' => $staff->id,
+                'area_id'  => $data['area_id'],
+                'role_id'=>$data['role_id'],
+                'name'=>$data['name'],
+                'description'=>$data['description'],
+                'assigned_days'=>$data['assigned_days'],
+                'created_by' => UserData()->id,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ];
+        }
+        Task::insert($tasks);
+        ResponseMessage('Task create successfully',200);
     }
 
     public function updateData(array $data, int $id)
@@ -89,7 +114,8 @@ class TaskRepository implements TaskRepositoryInterface
 
     public function getTasksByStaff(int $id)
     {
-        $tasks = Task::where('completed_by', $id)->where('is_active', 1)->get();
+        $tasks = Task::where('staff_id', $id)
+        ->where('is_active', 1)->get();
         return $tasks;
     }
 

@@ -14,7 +14,6 @@ return new class extends Migration
         Schema::create('tasks', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->foreignId('area_id')->nullable()->constrained()->onDelete('cascade');
-            $table->foreignId('department_id')->constrained()->onDelete('cascade');
             $table->foreignId('role_id')->constrained()->onDelete('cascade');
             $table->string('name',45);
             $table->longText('description');
@@ -24,6 +23,7 @@ return new class extends Migration
             $table->boolean('is_double_checked')->default(0);
             $table->unsignedBigInteger('double_checked_by')->nullable();
             $table->unsignedBigInteger('created_by');
+            $table->unsignedBigInteger('staff_id');
             $table->string('status')->default('assigned');
             $table->boolean('is_active')->default(1);
             $table->timestamps();
