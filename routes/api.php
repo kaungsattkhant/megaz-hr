@@ -112,7 +112,12 @@ Route::post('/login', [AuthController::class, 'login']);
 
 Route::middleware('auth:api')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout']);
-    Route::get('/areas/{areaId}/tasks', [TaskController::class, 'getTasksOfRolesFromArea']);
+    // Route::get('/areas/{areaId}/tasks', [TaskController::class, 'getTasksOfRolesFromArea']);
+    // Route::get('/api/{areaId}/tasks', [TaskController::class, 'getTasksOfRolesFromArea']);
+
+    Route::get('task_list', [TaskController::class, 'getTaskList']);
+
+
     Route::post('/tasks/{taskId}/update_status', [TaskController::class, 'updateTaskStatus']);
     Route::get('/profile', [ProfileAPIController::class, 'getProfile']);
     Route::post('/profile/change_password', [ProfileAPIController::class, 'updatePassword']);
@@ -125,6 +130,8 @@ Route::middleware('auth:api')->group(function () {
 
     Route::get('/supervisor/staff', [StaffAPIController::class, 'getStaffListBySupervisor']);
     Route::get('/supervisor/staff/{staffId}/tasks', [TaskController::class, 'getStaffTasksBySupervisor']);
+    // Route::get('/task_list', [TaskController::class, 'getStaffTasksBySupervisor']);
+
     Route::controller(TaskController::class)->group(function()
     {
         Route::post('/tasks/{id}/double_checked','taskDoubleChecked');
@@ -254,8 +261,8 @@ Route::middleware('auth:api')->group(function () {
 
     Route::get('/bookings',[BookingAPIController::class,'bookingList']);
     Route::post('/bookings',[BookingAPIController::class,'createBooking']);
-
-
+    Route::post('/booking_status/{id}',[BookingAPIController::class,'bookingStatusChange']);
+    Route::post('/booking_active/{id}',[BookingAPIController::class,'bookingActivate']);
 });
 
 Route::controller(PackageAPIController::class)->group(function()
