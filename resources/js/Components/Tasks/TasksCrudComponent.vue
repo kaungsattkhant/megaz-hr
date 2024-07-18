@@ -377,9 +377,8 @@
                 let formData = new FormData();
                 formData.append('name', this.name);
                 formData.append('description', this.tasks);
-                if(this.selectedArea){
-                    formData.append('area_id', this.selectedArea.id);
-                }
+                formData.append('area_id', this.selectedArea.id);
+
                 formData.append('role_id', this.selectedRole.id);
                 formData.append('assigned_days', this.selectedDays);
                 let response = await postApiData({url: '/api/tasks', form_data: formData, token: this.getToken()});
