@@ -88,7 +88,6 @@ class InvoiceRepository implements InvoiceRepositoryInterface
             $headCount = $this->headCountCreate($data);
             $data['head_count_id'] = $headCount->id;
             $data['created_by'] = UserData()->id;
-
             if ($data['type'] == 'package') {
                 $package = Package::find($data['package_id']);
                 if (!$package) {
@@ -133,12 +132,14 @@ class InvoiceRepository implements InvoiceRepositoryInterface
             $invoice = Invoice::create($data);
             $invoice->invoice_id = sprintf('%05d', $invoice->id);
             $invoice->save();
-            if ($data['is_waiter'] == 1) {
-                $entity->status = 'pending';
-                $entity->is_active = 0;
-            } else {
-                $entity->status = 'active';
-                $entity->is_active = 1;
+            if (isset($data['is_waiter'])) {
+                if ($data['is_waiter'] == 1) {
+                    $entity->status = 'pending';
+                    $entity->is_active = 0;
+                } else {
+                    $entity->status = 'active';
+                    $entity->is_active = 1;
+                }
             }
             $entity->save();
 
@@ -149,9 +150,10 @@ class InvoiceRepository implements InvoiceRepositoryInterface
             $roomSession = RoomSession::create($data);
             $invoice->room_session = $roomSession;
             $customer = Customer::find($invoice->customer_id);
-
-            if ($data['is_waiter'] == 1 && $invoice) {
-                broadcast(new RoomNotificationRequest($customer, $entity, $roomSession, $invoice, UserData()->department_id));
+            if (isset($data['is_waiter'])) {
+                if ($data['is_waiter'] == 1 && $invoice) {
+                    broadcast(new RoomNotificationRequest($customer, $entity, $roomSession, $invoice, UserData()->department_id));
+                }
             }
             DB::commit();
             return $invoice;
@@ -713,7 +715,7 @@ class InvoiceRepository implements InvoiceRepositoryInterface
             $catering_department = Department::where('name', 'Catering')->first();
             $msg = "The {$entity->name} is now closed. Thank you.";
 
-            $role = Role::where('name','Staff')->where('department_id', $catering_department->id)->first();
+            $role = Role::where('name', 'Staff')->where('department_id', $catering_department->id)->first();
             broadcast(new RoomDoneNotificationRequest($entity, $msg, $role->id));
 
             DB::commit();

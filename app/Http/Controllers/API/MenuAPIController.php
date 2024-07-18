@@ -31,7 +31,7 @@ class MenuAPIController extends Controller
         $data = $request->except('items');
         $items = json_decode($request->items, true)['items'];
         $areas = json_decode($request->areas, true);
-        $menu = $this->menuRepo->createData($data, $items,$areas);
+        $menu = $this->menuRepo->createData($data,$items,$areas);
         ResponseData($menu);
     }
 

@@ -14,7 +14,7 @@ class BookingRepository implements BookingRepositoryInterface
 
     public function bookingList()
     {
-        $bookings = Booking::with(['customer', 'headCount', 'entity'])
+        $bookings = Booking::where('status','!=','cancel')->with(['customer', 'headCount', 'entity'])
             ->orderBy('created_at', 'desc')
             ->paginate(config('common.list'));
         ResponseData($bookings);
@@ -94,20 +94,25 @@ class BookingRepository implements BookingRepositoryInterface
         return $headCount;
     }
 
-    public function bookingStatusChange($request)
+    public function bookingStatusChange(array $data)
     {
         DB::beginTransaction();
         try {
-            $booking = Booking::find($request->id);
+            $booking = Booking::find($data['id']);
             if ($booking) {
-                if ($booking->is_confirm == 1) {
+                if ($data['is_confirm'] == 1) {
                     $booking->status = 'confirm';
+                    $booking->confirmed_at = CurrentTime();
+                    $booking->confirmed_by = UserData()->id;
                     $booking->save();
                 } else {
-                    $booking->delete();
-                    $booking->bookingMenus()->delete();
+                    $booking->status = 'cancel';
+                    $booking->cancelled_at = CurrentTime();
+                    $booking->cancelled_by = UserData()->id;
+                    $booking->save();
                 }
                 DB::commit();
+                ResponseData($booking);
             }
         } catch (\Exception $e) {
             DB::rollBack();
@@ -119,5 +124,22 @@ class BookingRepository implements BookingRepositoryInterface
     public function activateBooking($request)
     {
         DB::beginTransaction();
+        try{
+
+            $booking = Booking::find($request->id);
+            if($booking)
+            {
+                $booking->status = 'used';
+                $booking->save();
+                DB::commit();
+                return $booking;
+            }
+
+        }catch(\Exception $e)
+        {
+            DB::rollBack();
+            ResponseMessage($e->getMessage(), 422);
+            throw $e;
+        }
     }
 }
