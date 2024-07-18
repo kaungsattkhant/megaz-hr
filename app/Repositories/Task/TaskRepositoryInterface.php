@@ -6,7 +6,7 @@ use Illuminate\Http\Request;
 
 interface TaskRepositoryInterface
 {
-    public function getTasksOfRolesFromArea(int $areaId, array $roleIds);
+    public function getTasksOfRolesFromArea($areaId);
 
     public function updateTaskStatus(array $data, int $id);
 
