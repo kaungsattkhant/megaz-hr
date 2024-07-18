@@ -114,4 +114,9 @@ class TaskController extends Controller
     {
         $task = $this->taskRepo->doubleCheckTasks($id, $request->status);
     }
+
+    public function taskReport(Request $request){
+        $data = $this->taskRepo->taskReport($request);
+        ResponseData($data);
+    }
 }

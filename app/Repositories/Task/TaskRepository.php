@@ -141,4 +141,33 @@ class TaskRepository implements TaskRepositoryInterface
             throw $e;
         }
     }
+
+    public function taskReport($request){
+        $departmentId=$request->department_id;
+        $date=convertDateFormat($request->date);
+        $staffs = Staff::select(['id','name'])
+        ->when(!is_null($departmentId),function($q)use($departmentId){
+            $q->whereHas('roles.department', function ($query) use ($departmentId) {
+                $query->where('id', $departmentId);
+            });
+        })
+        ->with(['tasks' => function($query)use($request,$date) {
+            $query->select('id', 'staff_id','role_id', 'name','status','double_checked_by','created_at')
+              ->when(isset($request->date) && !is_null($date) ,function($q)use($date){
+                    $q->whereDate('created_at', $date);
+            })
+            ->with('doubleCheckedBy:id,name');
+           
+        },'roles'])
+        // ->when(isset($request->date) && !is_null($date) ,function($q)use($date){
+        //     $q ->whereHas('tasks', function ($query) use ($date) {
+        //         $query->whereDate('created_at', $date);
+        //     });
+        // })
+        ->has('tasks')
+        ->orderBy('id','asc')
+        ->paginate(20);
+        return $staffs;
+
+    }
 }
