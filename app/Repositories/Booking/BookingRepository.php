@@ -49,7 +49,7 @@ class BookingRepository implements BookingRepositoryInterface
             }
             $headCount = $this->headCountCreate($data);
             $data['head_count_id'] = $headCount->id;
-            $data['customer_id'] = UserData()->id;
+            $data['customer_id'] = $data['customer_id'] ?? UserData()->id;
             $data['date_time'] = CurrentTime();
             $data['end_date'] = $endDate->format('Y-m-d H:i:s');
             $data['booking_id'] = 1;
