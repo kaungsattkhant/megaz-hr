@@ -12,8 +12,16 @@ class PackageRepository implements PackageRepositoryInterface
 {
     public function listAllData(Request $request)
     {
-        $packages=  Package::with('menuPackages.menu.prices','rooms')->paginate(config('common.list_count'));
-        Responsedata($packages);
+        $validateDate = $request->date ?? CurrentDate();
+        $packages = Package::where('from_date', '<=', $validateDate)
+        ->where('to_date', '>=', $validateDate)
+        ->with(['menuPackages.menu.prices', 'menuPackages.menu.menuServiceDiscounts' => function ($query) use ($validateDate) {
+            $query->where('from_date', '<=', $validateDate)
+                  ->where('to_date', '>=', $validateDate);
+        }, 'rooms'])
+        ->paginate(config('common.list_count'));
+
+        ResponseData($packages);
     }
 
     public function detailPackage(int $id)
@@ -153,8 +161,15 @@ class PackageRepository implements PackageRepositoryInterface
 
     public function listAllPackage(Request $request)
     {
-        $packages=  Package::with('menuPackages.menu.prices','rooms')->paginate(config('common.list_count'));
-        Responsedata($packages);
+        $validateDate = $request->date ?? CurrentDate();
+        $packages = Package::with(['menuPackages.menu.prices', 'menuPackages.menu.menuServiceDiscounts' => function ($query) use ($validateDate) {
+            $query->where('from_date', '<=', $validateDate)
+                  ->where('to_date', '>=', $validateDate);
+        }, 'rooms'])
+        ->paginate(config('common.list_count'));
+
+        ResponseData($packages);
+
     }
 
 }

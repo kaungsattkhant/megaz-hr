@@ -105,7 +105,7 @@ class InvoiceRepository implements InvoiceRepositoryInterface
 
                 $end_date = Carbon::parse($data['invoice_date'])->addHours($package->session);
                 $data['total_session_price'] = 0;
-                $data['paid_amount'] = $package->price;
+                $data['paid_amount'] = $data['package_price'];
                 $data['package_id'] = $package->id;
                 $data['session_duration'] = $package->session; // nullable
                 $data['price'] = $package->price;
