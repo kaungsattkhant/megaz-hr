@@ -377,7 +377,9 @@
                 let formData = new FormData();
                 formData.append('name', this.name);
                 formData.append('description', this.tasks);
-                formData.append('area_id', this.selectedArea.id);
+                if(this.selectedArea){
+                    formData.append('area_id', this.selectedArea.id);
+                }
                 formData.append('role_id', this.selectedRole.id);
                 formData.append('assigned_days', this.selectedDays);
                 let response = await postApiData({url: '/api/tasks', form_data: formData, token: this.getToken()});
@@ -385,6 +387,14 @@
                     // window.location.replace('/tasks');
                     this.getTasksList(null);
                     // alert('test');
+                    this.selectedArea = null;
+                    this.selectedDepartment = null;
+                    this.selectedRole = null;
+                    this.name = null;
+                    this.tasks = null;
+                    this.selectedDays = null;
+                    this.areaList = [];
+                    this.roleList = [];
                 }
                 else{
                     alert('some errors occur');
