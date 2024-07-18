@@ -2,22 +2,20 @@
 
 namespace App\Models;
 
-use App\Models\Role;
+use App\Models\Department;
 use App\Models\Gender;
 use App\Models\Inventory;
-
-use App\Models\Department;
-
-use Laravel\Sanctum\HasApiTokens;
-use Illuminate\Support\Facades\Hash;
+use App\Models\Role;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Support\Facades\Hash;
+use Laravel\Sanctum\HasApiTokens;
 
 class Staff extends Authenticatable
 {
     use HasFactory, HasApiTokens;
 
-    protected $fillable=[
+    protected $fillable = [
         'name',
         'phone_number',
         'alt_phone_number',
@@ -41,11 +39,11 @@ class Staff extends Authenticatable
         'nrc_back_url',
         'nrc_back_path',
         'household_registration_url',
-        'household_registration_path'
+        'household_registration_path',
     ];
 
-    protected $hidden=[
-        'password','remember_token','created_at','updated_at'
+    protected $hidden = [
+        'password', 'remember_token', 'created_at', 'updated_at',
     ];
 
     public function inventories()
@@ -95,6 +93,18 @@ class Staff extends Authenticatable
         return $this->belongsToMany(Role::class);
     }
 
+    public function tasks()
+    {
+        return $this->hasMany(Task::class, 'staff_id');
+    }
+
+    public static function staffByRole($roleId)
+    {
+        return self::whereHas('roles', function ($query) use ($roleId) {
+            $query->where('id', $roleId);
+        })->get();
+    }
+
     public function permissions()
     {
         return $this->belongsToMany(Permission::class);
@@ -105,14 +115,16 @@ class Staff extends Authenticatable
         return $this->hasMany(Task::class, 'completed_by');
     }
 
-    public function hasRoles($dept,$name){
-        if($this->roles->contains('name',$name) && $this->department->name==$dept){
+    public function hasRoles($dept, $name)
+    {
+        if ($this->roles->contains('name', $name) && $this->department->name == $dept) {
             return true;
         }
         return false;
     }
 
-    public function checkRoles($names){
+    public function checkRoles($names)
+    {
         // Convert $names to an array if it's not already one
         if (!is_array($names)) {
             $names = [$names];
@@ -128,8 +140,9 @@ class Staff extends Authenticatable
         return false;
     }
 
-    public function isDepartment($name){
-        if($this->department->name==$name){
+    public function isDepartment($name)
+    {
+        if ($this->department->name == $name) {
             return true;
         }
         return false;
@@ -137,7 +150,7 @@ class Staff extends Authenticatable
 
     public function features()
     {
-        return $this->belongsToMany(Feature::class,'feature_staff');
+        return $this->belongsToMany(Feature::class, 'feature_staff');
     }
 
     #scope

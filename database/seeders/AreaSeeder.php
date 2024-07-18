@@ -29,14 +29,17 @@ class AreaSeeder extends Seeder
 
         Area::create([
             'area_type_id' => $typeOne->id,
-
             'area_category_id' => $cat1->id,
-            'name' => 'Bar Area'
+            'department_id'=>8,
+            'name' => 'Cooking Area-1'
         ]);
+
+       
         Area::create([
             'area_type_id' => $typeOne->id,
             'area_category_id' => $cat1->id,
-            'name' => 'Kitchen Area'
+            'department_id'=>7,
+            'name' => 'Cooking Area-2'
         ]);
 
         $typeTwo = AreaType::create([
@@ -50,7 +53,8 @@ class AreaSeeder extends Seeder
         $a2=Area::create([
             'area_type_id' => $typeTwo->id,
             'area_category_id' => $cat2->id,
-            'name' => 'KTV Rooms'
+            'department_id'=>5,
+            'name' => 'Roof Top(Selling Area-1)'
         ]);
     }
 }

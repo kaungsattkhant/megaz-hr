@@ -113,7 +113,12 @@ Route::post('/login', [AuthController::class, 'login']);
 
 Route::middleware('auth:api')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout']);
-    Route::get('/areas/{areaId}/tasks', [TaskController::class, 'getTasksOfRolesFromArea']);
+    // Route::get('/areas/{areaId}/tasks', [TaskController::class, 'getTasksOfRolesFromArea']);
+    // Route::get('/api/{areaId}/tasks', [TaskController::class, 'getTasksOfRolesFromArea']);
+
+    Route::get('task_list', [TaskController::class, 'getTaskList']);
+
+
     Route::post('/tasks/{taskId}/update_status', [TaskController::class, 'updateTaskStatus']);
     Route::get('/profile', [ProfileAPIController::class, 'getProfile']);
     Route::post('/profile/change_password', [ProfileAPIController::class, 'updatePassword']);
@@ -126,6 +131,8 @@ Route::middleware('auth:api')->group(function () {
 
     Route::get('/supervisor/staff', [StaffAPIController::class, 'getStaffListBySupervisor']);
     Route::get('/supervisor/staff/{staffId}/tasks', [TaskController::class, 'getStaffTasksBySupervisor']);
+    // Route::get('/task_list', [TaskController::class, 'getStaffTasksBySupervisor']);
+
     Route::controller(TaskController::class)->group(function()
     {
         Route::post('/tasks/{id}/double_checked','taskDoubleChecked');
@@ -137,10 +144,8 @@ Route::middleware('auth:api')->group(function () {
         Route::put('/purchase_orders/{id}', 'updatePurchaseOrder');
         Route::get('/purchase_orders/{purchase_order}', 'detail');
         Route::delete('/purchase_orders/{id}', 'deletePurchaseOrder');
-
         Route::get('/purchase_orders_items', 'getPurchaseOrderItem');
         Route::post('/purchase_orders_items', 'createPurchaseOrderItem');
-
         Route::delete('/purchase_orders_items/{id}', 'deletePurchaseOrderItem');
         Route::post('purchase_orders_bought', 'boughtPurchaseOrder');
         Route::post('updateIsCheck', 'updateIsCheck');
@@ -290,6 +295,7 @@ Route::get('/area_categories/{id}/areas',[AreaController::class,'getAreaByAreaCa
 Route::post('/areas', [AreaController::class, 'createArea']);
 Route::put('/areas/{id}', [AreaController::class, 'updateArea']);
 Route::delete('/areas/{id}', [AreaController::class, 'deleteArea']);
+Route::get('areas_by_department/{department_id}',[AreaController::class,'getAreaByDepartment']);
 
 Route::get('/departments', [DepartmentAPIController::class, 'getDepartmentData']);
 Route::post('/departments', [DepartmentAPIController::class, 'createDepartment']);
@@ -310,11 +316,17 @@ Route::delete('/staffs/{staff_id}/inventories/{inventory_id}',[StaffAPIControlle
 Route::delete('/staffs/{staff_id}/features/{feature_id}',[StaffAPIController::class,'deleteFeatureStaff']);
 
 
-Route::get('/tasks', [TaskController::class, 'getTaskData']);
-Route::post('/tasks', [TaskController::class, 'createTask']);
-Route::put('/tasks/{id}', [TaskController::class, 'updateTask']);
-Route::delete('/tasks/{id}', [TaskController::class, 'deleteTask']);
-
+// Route::get('/tasks', [TaskController::class, 'getTaskData']);
+// Route::post('/tasks', [TaskController::class, 'createTask']);
+// Route::put('/tasks/{id}', [TaskController::class, 'updateTask']);
+// Route::delete('/tasks/{id}', [TaskController::class, 'deleteTask']);
+Route::controller(TaskController::class)->group(function () {
+    Route::get('/tasks', 'getTaskData');
+    Route::post('/tasks', 'createTask');
+    Route::put('/tasks/{id}', 'updateTask');
+    Route::delete('/tasks/{id}','deleteTask');
+    Route::get('task_report','taskReport');
+});
 Route::get('/complaints', [ComplaintAPIController::class, 'getComplainData']);
 
 Route::get('/entities', [EntityAPIController::class, 'getEntityData']);
