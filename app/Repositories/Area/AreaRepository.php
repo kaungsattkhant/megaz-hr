@@ -2,9 +2,8 @@
 
 namespace App\Repositories\Area;
 
-use Illuminate\Http\Request;
-
 use App\Models\Area;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
 class AreaRepository implements AreaRepositoryInterface
@@ -28,10 +27,9 @@ class AreaRepository implements AreaRepositoryInterface
 
             return $paginationData;
         } else {
-            if($request->department_id){
+            if ($request->department_id) {
                 $areas = Area::with('areaType')->where('department_id', $request->department_id)->where('is_active', 1)->get();
-            }
-            else{
+            } else {
                 $areas = Area::with('areaType')->where('is_active', 1)->get();
             }
 
@@ -55,12 +53,12 @@ class AreaRepository implements AreaRepositoryInterface
 
     public function getAreaByAreaCategory(int $id)
     {
-        $areas = Area::where('is_active',1)->where('area_category_id',$id)->get();
+        $areas = Area::where('is_active', 1)->where('area_category_id', $id)->get();
         return $areas;
     }
     public function getAreaByAreaType(int $id)
     {
-        $areas = Area::where('is_active',1)->where('area_type_id',$id)->get();
+        $areas = Area::where('is_active', 1)->where('area_type_id', $id)->get();
         return $areas;
     }
 
@@ -92,4 +90,10 @@ class AreaRepository implements AreaRepositoryInterface
         }
         return false;
     }
+
+    public function getAreaByDepartment($department_id)
+    {
+        return Area::where('department_id',$department_id)->get();      
+    }
+
 }

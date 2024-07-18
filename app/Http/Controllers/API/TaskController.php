@@ -23,7 +23,7 @@ class TaskController extends Controller
         $this->taskRepo = $repo;
     }
 
-    public function getTasksOfRolesFromArea(Request $request, int $areaId)
+    public function getTaskList(Request $request)
     {
         $staff = $request->user();
         $roles = $staff->roles()->select('id')->get();
@@ -36,11 +36,10 @@ class TaskController extends Controller
             ResponseMessage('Unauthorized, no role found', 401);
         }
 
-        $tasks = $this->taskRepo->getTasksOfRolesFromArea($areaId, $roleIds);
-        if(count($tasks) < 1){
-            ResponseMessage('No tasks found', 404);
-        }
-
+        $tasks = $this->taskRepo->getTasksOfRolesFromArea($request->area_id);
+        // if(count($tasks) < 1){
+        //     ResponseMessage('No tasks found', 404);
+        // }
         ResponseData($tasks);
     }
 
@@ -108,12 +107,16 @@ class TaskController extends Controller
         }
 
         $tasks = $this->taskRepo->getTasksByStaff($staffId);
-
         ResponseData($tasks);
     }
 
     public function taskDoubleChecked(Request $request, $id)
     {
         $task = $this->taskRepo->doubleCheckTasks($id, $request->status);
+    }
+
+    public function taskReport(Request $request){
+        $data = $this->taskRepo->taskReport($request);
+        ResponseData($data);
     }
 }

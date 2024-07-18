@@ -17,4 +17,6 @@ interface AreaRepositoryInterface
     public function getAreaByAreaType(int $id);
 
     public function getAreaByAreaCategory(int $id);
+
+    public function getAreaByDepartment($department_id);
 }

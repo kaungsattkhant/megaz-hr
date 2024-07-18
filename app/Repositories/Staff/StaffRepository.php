@@ -139,7 +139,7 @@ class StaffRepository implements StaffRepositoryInterface
 
     public function staffDetail(int $id)
     {
-        $staff = Staff::with('department', 'roles', 'inventories', 'emergencyContacts', 'gender', 'completed_tasks','features','area')->find($id);
+        $staff = Staff::with('department', 'roles', 'inventories', 'emergencyContacts', 'gender', 'completed_tasks','features')->find($id);
         if ($staff == null) {
             ResponseMessage("Staff not found or invalid id", 404);
         }
@@ -162,28 +162,31 @@ class StaffRepository implements StaffRepositoryInterface
     public function getStaffByDepartment(Request $request, int $departmentId)
     {
         if ($request->per_page || $request->page) {
-            $totalCount = Staff::where('department_id', $departmentId)->where('is_active', 1)->count();
-            $pageNumber = 1;
-            $perPage = 20;
-            if ($request->page) {
-                $pageNumber = $request->page;
-            }
-            if ($request->per_page) {
-                $perPage = $request->per_page;
-            }
-            $skip = ($pageNumber - 1) * $perPage;
-            $staffs = Staff::with('department')->where('department_id', $departmentId)
-                ->where('is_active', 1)
-                ->skip($skip)->take($perPage)
-                ->get();
-            $staffData = MakePaginationData($request, $totalCount, 'staffs', $staffs);
+            // $totalCount = Staff::where('department_id', $departmentId)->where('is_active', 1)->count();
+            // $pageNumber = 1;
+            // $perPage = 20;
+            // if ($request->page) {
+            //     $pageNumber = $request->page;
+            // }
+            // if ($request->per_page) {
+            //     $perPage = $request->per_page;
+            // }
+            // $skip = ($pageNumber - 1) * $perPage;
+            // $staffs = Staff::with('department')->where('department_id', $departmentId)
+            //     ->where('is_active', 1)
+            //     ->skip($skip)->take($perPage)
+            //     ->get();
+            // $staffData = MakePaginationData($request, $totalCount, 'staffs', $staffs);
 
-            return $staffData;
+            $staffs = Staff::with('department')->where('department_id', $departmentId)
+            ->where('is_active', 1)
+            ->paginate(20);
+            return $staffs;
         } else {
-            $staffs = Staff::with('department')->where('department_id', $departmentId)
+            $staffs = Staff::with('department')
+            ->where('department_id', $departmentId)
                 ->where('is_active', 1)
                 ->get();
-
             return $staffs;
         }
     }
