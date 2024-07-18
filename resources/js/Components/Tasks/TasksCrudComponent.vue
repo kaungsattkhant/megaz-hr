@@ -377,7 +377,6 @@
                 let formData = new FormData();
                 formData.append('name', this.name);
                 formData.append('description', this.tasks);
-                formData.append('area_id', this.selectedArea.id);
                 if(this.selectedArea){
                     formData.append('area_id', this.selectedArea.id);
                 }
