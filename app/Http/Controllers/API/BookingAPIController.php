@@ -55,7 +55,8 @@ class BookingAPIController extends Controller
                 'female' => $request->female,
                 'male' => $request->male,
                 'child' => $request->child,
-                'package_id' => $booking->package_id
+                'package_id' => $booking->package_id,
+                'package_price' => $booking->amount,
             ];
 
             if ($booking->session_type == 'package') {
