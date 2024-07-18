@@ -21,9 +21,16 @@
                         </div>
                         <div class="mb-4 col-span-3">
                             <label for="" class="block text-sm text-black mb-3">
+                                Time
+                            </label>
+                            <input type="datetime-local" placeholder="Time" v-model="startTime"
+                                class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
+                        </div>
+                        <div class="mb-4 col-span-3">
+                            <label for="" class="block text-sm text-black mb-3">
                                 Type
                             </label>
-                            <select name="" id="" v-model="type" @change="typeChange()"
+                            <select name="" id="" v-model="type" @change="typeChange()" :class="startTime == null ? '!bg-[#0001]' : 'bg-transparent'" :disabled="startTime == null"
                                 class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
                                 <option value="package"> Package </option>
                                 <option value="session"> Session </option>
@@ -38,16 +45,16 @@
                                 <option v-if="packageList.length > 1" v-for="(pack,index) in packageList" :value="pack" :key="index">{{ pack.name }} </option>
                                 <option v-else>no Data Found</option>
                             </select>
-                        </div><div v-if="isPackage" class="col-span-3"></div>
+                        </div>
                         <div class="mb-4 col-span-3" v-if="type == 'session'">
                             <label for="" class="block text-sm text-black mb-3">
                                 Session Duration
                             </label>
                             <input type="text" placeholder="Duration" v-model="session_duration" @change="sessionDurationChange()"
                                 class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
-                        </div><div class="col-span-3" v-if="type == 'session'"></div>
+                        </div>
                         
-                        <div v-if="!isPackage && type != 'session'" class="col-span-6"></div>
+                        <div v-if="!isPackage && type != 'session'" class="col-span-3"></div>
                         
                         <div class="mb-4 col-span-3">
                             <label for="" class="block text-sm text-black mb-3">
@@ -58,13 +65,7 @@
                                 <option v-for="(room,index) in roomList" :value="room" :key="index">{{ room.name }} </option>
                             </select>
                         </div>
-                        <div class="mb-4 col-span-3">
-                            <label for="" class="block text-sm text-black mb-3">
-                                Time
-                            </label>
-                            <input type="datetime-local" placeholder="Time" v-model="startTime"
-                                class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
-                        </div>
+                        
                         <div class="mb-4 col-span-3">
                             <label for="" class="block text-sm text-black mb-3">
                                 Deposit
@@ -72,7 +73,7 @@
                             <input type="text" placeholder="Deposit" v-model="deposit"
                                 class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
                         </div>
-                        <div class="col-span-3"></div>
+                        <div class="col-span-6"></div>
 
 
                         <div class="mb-6 col-span-3">
@@ -257,14 +258,15 @@
                 total:0,
                 food_total:0,
                 package_food_total:0,
+                package_total:0,
             };
         },
 
         methods: {
             ...mapGetters(['getToken']),
 
-            async getPackageList() {
-                const response = await getApiData({ url: '/api/packages', token: this.getToken() });
+            async getPackageList(time) {
+                const response = await getApiData({ url: '/api/packages'+time, token: this.getToken() });
                 if (response.data) {
                     this.packageList = response.data.data;
                 }
@@ -272,6 +274,11 @@
             },
             typeChange(){
                 if(this.type == 'package'){
+                    this.getPackageList('?date='+this.startTime)
+                    // const response = await getApiData({ url: '/api/packages?date=' + this.startTime, token: this.getToken() });
+                    // if (response.data) {
+                    //     this.packageList = response.data.data;
+                    // }
                     this.isPackage = true;
                 }
                 else{
@@ -316,9 +323,7 @@
                     this.total = this.selectedPackage.price;
                     
                 });
-                let minimunPrice = this.selectedPackage.price -this.package_food_total ;
-                console.log('food total'+this.package_food_total)
-                console.log(minimunPrice)
+                this.package_total = this.selectedPackage.price;
             },
             sessionDurationChange(){
                 let roomPrice = this.session_duration * this.selectedRoom.price_per_hour
