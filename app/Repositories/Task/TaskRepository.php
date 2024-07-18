@@ -14,7 +14,7 @@ class TaskRepository implements TaskRepositoryInterface
     {
         $dayName = now()->format('D');
         $tasks = Task::
-             when($areaId!=null,function($q)use($areaId){
+             when($areaId!=null || $areaId!="null",function($q)use($areaId){
                 $q->where('area_id',$areaId);
              })
             ->where('assigned_days', 'like', "%{$dayName}%")
