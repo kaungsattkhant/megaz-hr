@@ -162,14 +162,6 @@
                                 <textarea name="" placeholder="Tasks" v-model="tasks" class="input-ui" id="" cols="30"
                                     rows="4"></textarea>
                             </div>
-                            <div class="mb-4">
-                                <div>
-                                    <label class="label-form mb-3"> Area </label>
-                                    <multiselect v-model="selectedArea" :options="areaList" :close-on-select="true"
-                                        :clear-on-select="false" :preserve-search="true" placeholder="Select Area" label="name"
-                                        track-by="id" :preselect-first="true"></multiselect>
-                                </div>
-                            </div>
 
                             <div class="mb-4">
                                 <div>
@@ -185,6 +177,15 @@
                                     <label class="label-form mb-3"> Role </label>
                                     <multiselect v-model="selectedRole" :options="roleList" :close-on-select="true"
                                         :clear-on-select="false" :preserve-search="true" placeholder="Select Role" label="name"
+                                        track-by="id" :preselect-first="true"></multiselect>
+                                </div>
+                            </div>
+
+                            <div class="mb-4">
+                                <div>
+                                    <label class="label-form mb-3"> Area </label>
+                                    <multiselect v-model="selectedArea" :options="areaList" :close-on-select="true"
+                                        :clear-on-select="false" :preserve-search="true" placeholder="Select Area" label="name"
                                         track-by="id" :preselect-first="true"></multiselect>
                                 </div>
                             </div>
@@ -338,8 +339,8 @@
                 }
             },
 
-            async getAreaList(){
-                const response = await getApiData({ url: '/api/areas' , token: this.getToken()});
+            async getAreaList(departmentId){
+                const response = await getApiData({ url: `/api/areas_by_department/${departmentId}` , token: this.getToken()});
                 if(response.data){
                     this.areaList = response.data;
                 }
@@ -354,6 +355,10 @@
 
             departmentSelectChanged(){
                 this.getRoleList(this.selectedDepartment.id);
+                this.areaList = [];
+                if(this.selectedDepartment.name == 'Catering' || this.selectedDepartment.name == 'Kitchen' || this.selectedDepartment.name == 'Bar'){
+                    this.getAreaList(this.selectedDepartment.id);
+                }
             },
 
             async getRoleList(departmentId){
@@ -421,7 +426,7 @@
         mounted()
         {
             this.getTasksList(null);
-            this.getAreaList();
+            // this.getAreaList();
             this.getDepartmentList();
 
             initTE({ Modal,Select, Ripple });
