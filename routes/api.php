@@ -62,6 +62,7 @@ use App\Http\Controllers\API\Customers\AuthController as CustomerAuthController;
 use App\Http\Controllers\API\Customers\CustomerAPIController as UserAppCustomerAPIController;
 use App\Http\Controllers\API\Customers\MenuAPIController as CustomersMenuAPIController;
 use App\Http\Controllers\API\Customers\PackageAPIController as CustomersPackageAPIController;
+use App\Http\Controllers\API\FoodOrderAPIController;
 use App\Http\Controllers\API\MenuCategoryAPIController;
 use App\Models\Customer;
 
@@ -405,6 +406,12 @@ Route::controller(CustomerLevelDiscountAPIController::class)->group(function ()
     Route::post('/customer_level_discounts','createCustomerLevelDiscount');
     Route::post('/customer_level_discounts/{id}','updateCustomerLevelDiscount');
     Route::delete('/customer_level_discounts/{id}','deleteCustomerLevelDiscount');
+});
+
+Route::controller(FoodOrderAPIController::class)->group(function()
+{
+    Route::get('/food_orders','listAllFoodOrder');
+    Route::post('/food_orders','createFoodOrder');
 });
 
 Route::post('send_notification', [NotificationController::class, 'sendNotification']);

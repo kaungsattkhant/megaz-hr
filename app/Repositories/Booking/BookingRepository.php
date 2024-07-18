@@ -53,6 +53,7 @@ class BookingRepository implements BookingRepositoryInterface
             $data['date_time'] = CurrentTime();
             $data['end_date'] = $endDate->format('Y-m-d H:i:s');
             $data['booking_id'] = 1;
+            $data['amount'] =$data['package_price'];
             $booking = Booking::create($data);
             if (isset($data['menus'])) {
                 $menuData = json_decode($data['menus'], true);

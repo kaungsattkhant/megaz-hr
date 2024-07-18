@@ -180,7 +180,7 @@ class MenuRepository implements MenuRepositoryInterface
             }
         }
     }
-
+[]
     public function toggleMenuFeature($id)
     {
         DB::beginTransaction();
