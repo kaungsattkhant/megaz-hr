@@ -25,7 +25,6 @@ class TaskController extends Controller
 
     public function getTaskList(Request $request)
     {
-        // dd($request->area_id);
         $staff = $request->user();
         $roles = $staff->roles()->select('id')->get();
         $roleIds = [];
@@ -38,10 +37,9 @@ class TaskController extends Controller
         }
 
         $tasks = $this->taskRepo->getTasksOfRolesFromArea($request->area_id);
-        if(count($tasks) < 1){
-            ResponseMessage('No tasks found', 404);
-        }
-
+        // if(count($tasks) < 1){
+        //     ResponseMessage('No tasks found', 404);
+        // }
         ResponseData($tasks);
     }
 
