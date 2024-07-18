@@ -10,14 +10,16 @@
                             Create Booking
                         </p>
                     </div>
-
+                    {{ package_total }}
                     <div class="grid grid-cols-12 gap-x-8 relative px-8 py-4">
                         <div class="mb-4 col-span-3">
                             <label for="" class="block text-sm text-black mb-3">
                                 Customer Name
                             </label>
-                            <input type="text" placeholder="Customer Name" v-model="name"
+                            <select name="" id="" v-model="selectedCustomer"
                                 class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
+                                <option v-for="(customer,index) in customerList" :value="customer" :key="index"> {{ customer.name }} </option>
+                            </select>
                         </div>
                         <div class="mb-4 col-span-3">
                             <label for="" class="block text-sm text-black mb-3">
@@ -231,7 +233,7 @@
     export default {
         data() {
             return {
-                name:null,
+                selectedCustomer:null,
                 type:null,
                 packageList:[],
                 selectedPackage:null,
@@ -248,6 +250,7 @@
                 isPackage:false,
                 orderMenuList:[],
 
+                customerList: [],
                 selectedMenuCategory:null,
                 menuCategoryList:[],
                 selectedMenu:null,
@@ -264,6 +267,12 @@
 
         methods: {
             ...mapGetters(['getToken']),
+            async getCustomerList() {
+                const response = await getApiData({ url: '/api/customers', token: this.getToken() });
+                if (response.data) {
+                    this.customerList = response.data;
+                }
+            },
 
             async getPackageList(time) {
                 const response = await getApiData({ url: '/api/packages'+time, token: this.getToken() });
@@ -306,24 +315,32 @@
                 else{
                     is_changeable = false
                 }
+                
                 let menuOfselectedPackage = this.selectedPackage.menu_packages;
+                this.package_total = this.selectedPackage.price;
                 menuOfselectedPackage.forEach((packageMenu)=>{
                     let menuCategorySelected = this.menuCategoryList.findIndex(menuCategory => menuCategory.id == packageMenu.menu.menu_category_id)
+                    let is_dis_menu_price = 0;
+                    if(packageMenu.menu.menu_service_discounts.length>0){
+                        is_dis_menu_price = (packageMenu.menu.prices[0].price - packageMenu.menu.menu_service_discounts[0].discount_price) * packageMenu.quantity;
+                    }
+                    else{
+                        is_dis_menu_price = packageMenu.menu.prices[0].price * packageMenu.quantity;
+                    }
                     this.orderMenuList.push({
                         quantity : packageMenu.quantity,
                         name : packageMenu.menu.name + ' (Package)',
                         menu_category_name : this.menuCategoryList[menuCategorySelected].name,
-                        menu_price : packageMenu.menu.prices[0].price * packageMenu.quantity,
+                        menu_price : is_dis_menu_price,
                         menu_id : packageMenu.menu_id,
                         is_package : 1,
                         is_changeable : is_changeable
                     });
-                    this.food_total += packageMenu.menu.prices[0].price * packageMenu.quantity;
-                    this.package_food_total += packageMenu.menu.prices[0].price * packageMenu.quantity;
-                    this.total = this.selectedPackage.price;
                     
+                    this.food_total += is_dis_menu_price;
+                    this.package_food_total += is_dis_menu_price;
+                    this.total = this.selectedPackage.price;
                 });
-                this.package_total = this.selectedPackage.price;
             },
             sessionDurationChange(){
                 let roomPrice = this.session_duration * this.selectedRoom.price_per_hour
@@ -384,6 +401,9 @@
             removeMenuBtnClicked(index){
                 this.food_total -= this.orderMenuList[index].menu_price;
                 this.total -= this.orderMenuList[index].menu_price;
+                if(this.orderMenuList[index].is_package == 1){
+                    this.package_total -= this.orderMenuList[index].menu_price;
+                }
                 // if(this.type == 'package'){
                 //     let checkPackagePrice = this.selectedPackage.price + this.food;
                 //     console.log(checkPackagePrice < this.selectedPackage.price)
@@ -391,26 +411,15 @@
                 //         alert('u cant')
                 //     }
                 // }
+
                 this.orderMenuList.splice(index, 1);
+                
             },
 
 
             async btnClickedCreateBooking(){
-                // this.testList.push({
-                //     name: this.name,
-                //     type:this.type,
-                //     package_id : this.selectedPackage.id,
-                //     room:this.selectedRoom.id,
-                //     start_time : this.startTime,
-                //     male : this.male,
-                //     female : this.female,
-                //     children : this.children,
-                //     menu_list: this.orderMenuList,
-                // });
-
-
-
                 let formData = new FormData();
+                formData.append('customer_id', this.selectedCustomer.id);
                 formData.append('male', this.male);
                 formData.append('female', this.female);
                 formData.append('child', this.children);
@@ -418,35 +427,50 @@
                 if(this.type == 'session'){
                     formData.append('session', this.session_duration);
                 }
+                else{
+                    formData.append('session', this.selectedPackage.session);
+                }
                 formData.append('amount', this.total);
                 formData.append('deposit', this.deposit);
                 formData.append('start_date', this.startTime);
                 formData.append('entity_id', this.selectedRoom.id);
                 if(this.type == 'package'){
-                    formData.append('package_id', this.invoiceId);
+                    formData.append('package_id', this.selectedPackage.id);
                 }
                 formData.append('menus', this.orderMenuList);
+                formData.append('package_price', this.package_total);
 
-                // if(this.type == 'package'){
-                //     if(this.total < this.selectedPackage.price){
-                //         alert('total is lower than package pricce')
-                //     }
-                // }
-
-
-
-                let response = await postApiData({ url: '/api/bookings', form_data: formData, token: this.getToken() });
-                if (response.success) {
-                    console.log("success")
+                if(this.type == 'package'){
+                    if(this.total < this.selectedPackage.price){
+                        alert('total is lower than package pricce')
+                    }
+                    else{
+                        let response = await postApiData({ url: '/api/bookings', form_data: formData, token: this.getToken() });
+                        if (response.success) {
+                            console.log("success")
+                        }
+                        else {
+                            console.log('some errors occur');
+                        }
+                    }
                 }
-                else {
-                    console.log('some errors occur');
+                else{
+                    let response = await postApiData({ url: '/api/bookings', form_data: formData, token: this.getToken() });
+                    if (response.success) {
+                        console.log("success")
+                    }
+                    else {
+                        console.log('some errors occur');
+                    }
                 }
+
+                
             }
         
         
         },
         created(){
+            this.getCustomerList();
             this.getPackageList();
             this.getRoomList();
             this.getMenuCategoryList();
