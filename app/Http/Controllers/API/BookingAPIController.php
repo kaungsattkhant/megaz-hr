@@ -69,7 +69,7 @@ class BookingAPIController extends Controller
                 "quantity" => $bookingMenu->quantity,
                 "original_price" => $bookingMenu->price,
                 "menu_category_id" => $bookingMenu->menu->menu_category_id,
-                "remark" => $bookingMenu->remark
+                "remark" => $bookingMenu->remark,
             ];
         }
         $orderData['invoice_id'] = $invoice->id;
@@ -77,7 +77,7 @@ class BookingAPIController extends Controller
         $order = $this->orderRepo->createMultipleOrder($orderData);
         DB::commit();
 
-        ResponseMessage('Booking Activated Successfully', 200);
+        ResponseMessage('Booking activated successfully', 200);
         }catch(\Exception $e){
             DB::rollBack();
             ResponseMessage($e->getMessage(), 422);

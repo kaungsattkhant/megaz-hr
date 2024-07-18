@@ -113,7 +113,10 @@ class BookingRepository implements BookingRepositoryInterface
                 }
                 DB::commit();
                 ResponseData($booking);
+            }else{
+                ResponseMessage('Booking not found', 422);
             }
+
         } catch (\Exception $e) {
             DB::rollBack();
             ResponseMessage($e->getMessage(), 422);

@@ -108,9 +108,9 @@ class InvoiceRepository implements InvoiceRepositoryInterface
                 $data['paid_amount'] = $package->price;
                 $data['package_id'] = $package->id;
                 $data['session_duration'] = $package->session; // nullable
-                $data['price'] = 0;
+                $data['price'] = $package->price;
                 $data['invoice_type'] = 'package';
-                $data['total'] = $package->price;
+                $data['total'] =0;
             } else if ($data['type'] == 'session') {
 
                 $end_date = Carbon::parse($data['invoice_date'])->addMinutes($data['session_duration'] * 60);
@@ -132,15 +132,15 @@ class InvoiceRepository implements InvoiceRepositoryInterface
             $invoice = Invoice::create($data);
             $invoice->invoice_id = sprintf('%05d', $invoice->id);
             $invoice->save();
-            if (isset($data['is_waiter'])) {
-                if ($data['is_waiter'] == 1) {
+
+                if (isset($data['is_waiter']) && $data['is_waiter'] == 1) {
                     $entity->status = 'pending';
                     $entity->is_active = 0;
                 } else {
                     $entity->status = 'active';
                     $entity->is_active = 1;
                 }
-            }
+
             $entity->save();
 
             $data['invoice_id'] = $invoice->id;
@@ -613,16 +613,15 @@ class InvoiceRepository implements InvoiceRepositoryInterface
             }
 
             // caculating depending on invoice_type
-
             if ($invoice->invoice_type == 'package') {
                 $foodDrink = $foodCharge + $beverageCharge;
                 $data['total'] = ($foodDrink + $invoice->paid_amount + $tax + $service_charge) - $order_discount;
+                $data['paid_amount'] = $data['total'];
             } else if ($invoice->invoice_type == 'session' || $invoice->invoice_type == 'endless_time') {
                 $foodDrink = $foodCharge + $beverageCharge;
                 $data['total'] = ($foodDrink + $total_session_price + $service_charge + $tax) - $order_discount;
                 $data['total_session_price'] = $total_session_price;
             }
-
             // caculating depending on discount_type
             if (isset($data['discount_type'])) {
                 if ($data['discount_type'] == 'percentage') {
@@ -644,6 +643,7 @@ class InvoiceRepository implements InvoiceRepositoryInterface
                     } else {
                         ResponseMessage('Discount cannot be applied', 422);
                     }
+
                 } else if ($data['discount_type'] == 'birthday_discount') {
                     if ($customer) {
                         $birthdate = Carbon::parse($customer->birthdate);
@@ -659,12 +659,12 @@ class InvoiceRepository implements InvoiceRepositoryInterface
                             ResponseData('Today is not your birthday', 422);
                         }
                     }
+
                 } else if ($data['discount_type'] == 'customer_level') {
                     $total = 0;
                     foreach ($customer->invoices as $invoice) {
                         $total += $invoice->total;
                     }
-
                     $levels = CustomerLevelDiscount::all();
                     $customerLevel = null;
                     foreach ($levels as $level) {
@@ -686,7 +686,6 @@ class InvoiceRepository implements InvoiceRepositoryInterface
             if (isset($data['discount_value'])) {
                 $discount_value = $data['discount_value'];
             }
-
             $discount_total = $discount_value + $room_discount_value;
             $data['total'] -= $discount_total;
             $data['tax'] = $tax;
