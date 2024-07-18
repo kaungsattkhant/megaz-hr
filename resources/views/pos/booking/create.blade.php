@@ -4,7 +4,7 @@
 @section('booking', 'pos-active-link')
 @section('content')
 <div id="app">
-    <pos-booking-list-component>
+    <pos-booking-create-component>
 </div>
     
 
