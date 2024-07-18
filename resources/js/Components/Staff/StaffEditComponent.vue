@@ -153,15 +153,6 @@
             </div>
 
             <div class="col-span-3 rounded-md mb-4 pb-6">
-                <label for="" class="label-form mb-3"> Area </label>
-                <multiselect v-model="selectedArea" :options="areaList" :close-on-select="true"
-                :clear-on-select="false" :preserve-search="true" placeholder="Select Area" label="name"
-                track-by="id" :preselect-first="false"></multiselect>
-            </div>
-
-            <div class="col-span-9"></div>
-
-            <div class="col-span-3 rounded-md mb-4 pb-6">
                 <div>
                     <label class="label-form mb-3">State</label>
                     <multiselect v-model="selectedState" :options="stateList" :close-on-select="true"
@@ -396,9 +387,6 @@ export default {
             departmentList: [],
             selectedDepartment: null,
 
-            areaList: [],
-            selectedArea: null,
-
             roleList: [],
             selectedRoles: [],
             roleIds: [],
@@ -503,11 +491,6 @@ export default {
                     this.featureList = this.selectedDepartment.features;
                 }
                 this.selectedFeatures = this.staff.features;
-
-                this.areaList = this.selectedDepartment.areas;
-                if (this.staff.area) {
-                    this.selectedArea = this.staff.area;
-                }
 
                 if(this.selectedDepartment.inventory){
                     this.inventories.push(this.selectedDepartment.inventory.inventory);
@@ -796,9 +779,7 @@ export default {
             formData.append('city', this.city);
             formData.append('gender_id', this.selectedGender.id);
             formData.append('department_id', this.selectedDepartment.id);
-            if(this.selectedArea){
-                formData.append('area_id', this.selectedArea.id);
-            }
+
             if (this.inventoryIds.length > 0) {
                 formData.append('inventoryIds', JSON.stringify(this.inventoryIds));
             }
