@@ -324,6 +324,7 @@ Route::controller(TaskController::class)->group(function () {
     Route::post('/tasks', 'createTask');
     Route::put('/tasks/{id}', 'updateTask');
     Route::delete('/tasks/{id}','deleteTask');
+    Route::get('task_report','taskReport');
 });
 Route::get('/complaints', [ComplaintAPIController::class, 'getComplainData']);
 

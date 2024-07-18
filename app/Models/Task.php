@@ -27,6 +27,11 @@ class Task extends BaseModel
         return $this->belongsTo(Area::class);
     }
 
+    public function staff()
+    {
+        return $this->belongsTo(Staff::class, 'staff_id');
+    }
+
     public function role()
     {
         return $this->belongsTo(Role::class);

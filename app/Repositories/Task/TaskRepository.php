@@ -141,4 +141,32 @@ class TaskRepository implements TaskRepositoryInterface
             throw $e;
         }
     }
+
+    public function taskReport($request){
+        // $staffs = Staff::with('tasks:id,staff_id,name')
+        $staffs = Staff::select(['id','name'])->with(['tasks' => function($query) {
+            $query->select('id', 'staff_id', 'name','status','double_checked_by')
+            ->with('doubleCheckedBy:id,name');
+        },'roles'])
+        ->has('tasks')
+        ->orderBy('id','asc')
+        ->paginate(20);
+        return $staffs;
+
+        // $result = $staffs->map(function ($staff) {
+        //     return [
+        //         'id' => $staff->id,
+        //         'name' => $staff->name,
+        //         'tasks' => $staff->tasks->map(function ($task) {
+        //             return [
+        //                 'id' => $task->id,
+        //                 'name' => $task->name,
+        //             ];
+        //         })
+        //     ];
+        // });
+
+        return $result;
+
+    }
 }
