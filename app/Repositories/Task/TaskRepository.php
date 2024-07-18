@@ -20,7 +20,7 @@ class TaskRepository implements TaskRepositoryInterface
             ->where('assigned_days', 'like', "%{$dayName}%")
             ->where('is_active', 1)
             ->where('staff_id',UserData()->id)
-            ->paginate();
+            ->paginate(20);
         return $tasks;
     }
 
@@ -63,14 +63,8 @@ class TaskRepository implements TaskRepositoryInterface
 
     public function createData(array $data)
     {
-        // dd($data);
         $staffs=Staff::staffByRole($data['role_id']);
-        // $data['created_by']=UserData()->id;
-        // foreach($staffs as $staff){
-        //     $data['staff']=$staff->id;
-        //     $task = Task::create($data);
-        // }
-        // $tasks = [];
+        $data['area_id']=$data['area_id']==null || $data['area_id']=="null" ? null : $data['area_id'];
         foreach ($staffs as $staff) {   
             $tasks[] = [
                 'staff_id' => $staff->id,
@@ -113,7 +107,7 @@ class TaskRepository implements TaskRepositoryInterface
     public function getTasksByStaff(int $id)
     {
         $tasks = Task::where('staff_id', $id)
-        ->where('is_active', 1)->get();
+        ->where('is_active', 1)->paginate(20);
         return $tasks;
     }
 
