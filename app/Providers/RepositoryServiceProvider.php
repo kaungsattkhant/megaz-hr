@@ -81,6 +81,8 @@ use App\Repositories\PurchaseOrderItemLeft\PurchaseOrderItemLeftInterface;
 use App\Repositories\PurchaseOrderItemLeft\PurchaseOrderItemLeftRepository;
 use App\Repositories\PurchaseOrderItem\PurchaseOrderItemRepositoryInterface;
 use App\Repositories\FixedAssetPurchase\FixedAssetPurchaseRepositoryInterface;
+use App\Repositories\FoodOrder\FoodOrderRepository;
+use App\Repositories\FoodOrder\FoodOrderRepositoryInterface;
 use App\Repositories\MenuServiceDiscount\MenuServiceDiscountRepository;
 use App\Repositories\MenuServiceDiscount\MenuServiceDiscountRepositoryInterface;
 use App\Repositories\Pack\PackRepository;
@@ -152,5 +154,6 @@ class RepositoryServiceProvider extends ServiceProvider
         $this->app->bind(MenuCategoryRepositoryInterface::class,MenuCategoryRepository::class);
         $this->app->bind(AdsRepositoryInterface::class,AdsRepository::class);
         $this->app->bind(BookingRepositoryInterface::class,BookingRepository::class);
+        $this->app->bind(FoodOrderRepositoryInterface::class,FoodOrderRepository::class);
     }
 }
