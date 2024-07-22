@@ -157,13 +157,7 @@ class TaskRepository implements TaskRepositoryInterface
                     $q->whereDate('created_at', $date);
             })
             ->with('doubleCheckedBy:id,name');
-           
         },'roles'])
-        // ->when(isset($request->date) && !is_null($date) ,function($q)use($date){
-        //     $q ->whereHas('tasks', function ($query) use ($date) {
-        //         $query->whereDate('created_at', $date);
-        //     });
-        // })
         ->has('tasks')
         ->orderBy('id','asc')
         ->paginate(20);

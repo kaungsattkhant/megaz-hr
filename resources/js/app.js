@@ -90,7 +90,8 @@ import PosCashbookCrudComponent from './Components/Pos/Cashbook/PosCashbookCrudC
 import CashbookDetailComponent from './Components/Pos/Cashbook/CashbookDetailComponent.vue';
 import InvoiceListComponent from './Components/Pos/Invoices/InvoiceListComponent.vue';
 import InvoiceDetailComponent from './Components/Pos/Invoices/InvoiceDetailComponent.vue';
-import PosBookingCrudComponent from './Components/Pos/Booking/PosBookingCrudComponent.vue';
+import PosBookingListComponent from './Components/Pos/Booking/PosBookingListComponent.vue';
+import PosBookingCreateComponent from './Components/Pos/Booking/PosBookingCreateComponent.vue';
 import PosMenuOrderComponent from './Components/Pos/MenuOrder/PosMenuOrderComponent.vue';
 import UomCrudComponent from './Components/Uoms/UomCrudComponent.vue';
 
@@ -174,7 +175,8 @@ app.component('PosCashbookCrudComponent', PosCashbookCrudComponent);
 app.component('CashbookDetailComponent', CashbookDetailComponent);
 app.component('InvoiceListComponent', InvoiceListComponent);
 app.component('InvoiceDetailComponent', InvoiceDetailComponent);
-app.component('PosBookingCrudComponent', PosBookingCrudComponent);
+app.component('PosBookingListComponent', PosBookingListComponent);
+app.component('PosBookingCreateComponent', PosBookingCreateComponent);
 app.component('PosMenuOrderComponent', PosMenuOrderComponent);
 
 app.component('LoginComponentPos', LoginComponentPos);
