@@ -222,7 +222,7 @@ class CustomerRepository implements CustomerRepositoryInterface
     public function customerProfileData()
     {
         $customer = Customer::where('id', UserData()->id)->with(['addresses' => function ($query) {
-            $query->where('is_default', 1)->with('township');
+            $query->where('is_default', 1)->with('township.latestDeliveryCharge');
         }])->first();
         if ($customer == null) {
             ResponseMessage("Customer not found", 404);

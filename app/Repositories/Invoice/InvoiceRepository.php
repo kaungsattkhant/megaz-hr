@@ -603,9 +603,13 @@ class InvoiceRepository implements InvoiceRepositoryInterface
             $entity = Entity::find($lastRoomSession->entity_id);
 
             $roomSessions = RoomSession::where('invoice_id', $data['invoice_id'])->get();
-            foreach ($roomSessions as $room) {
-                $total_session_price += $room->price;
+            if($invoice->invoice_type != 'package')
+            {
+                foreach ($roomSessions as $room) {
+                    $total_session_price += $room->price;
+                }
             }
+
 
             $order = Order::where('invoice_id', $invoice->id)->first();
             if ($order) {

@@ -16,7 +16,7 @@ return new class extends Migration
             $table->foreignId('township_id')->constrained()->onDelete('cascade');
             $table->double('amount');
             $table->dateTime('date_time')->default(CurrentTime());
-            $table->boolean('is_active');
+            $table->boolean('is_active')->default(1);
             $table->timestamps();
         });
     }

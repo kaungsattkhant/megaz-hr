@@ -12,4 +12,9 @@ class DeliveryCharge extends Model
     protected $fillable=[
         'township_id','amount','date_time','is_active'
     ];
+
+    public function township()
+    {
+        return $this->belongsTo(Township::class);
+    }
 }
