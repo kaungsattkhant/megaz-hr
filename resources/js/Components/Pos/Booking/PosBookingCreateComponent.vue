@@ -437,7 +437,7 @@
                 if(this.type == 'package'){
                     formData.append('package_id', this.selectedPackage.id);
                 }
-                formData.append('menus', this.orderMenuList);
+                formData.append('menus', JSON.stringify(this.orderMenuList));
                 formData.append('package_price', this.package_total);
 
                 if(this.type == 'package'){
@@ -447,7 +447,7 @@
                     else{
                         let response = await postApiData({ url: '/api/bookings', form_data: formData, token: this.getToken() });
                         if (response.success) {
-                            console.log("success")
+                            window.location.replace('/booking');
                         }
                         else {
                             console.log('some errors occur');
@@ -457,7 +457,7 @@
                 else{
                     let response = await postApiData({ url: '/api/bookings', form_data: formData, token: this.getToken() });
                     if (response.success) {
-                        console.log("success")
+                        window.location.replace('/booking');
                     }
                     else {
                         console.log('some errors occur');
