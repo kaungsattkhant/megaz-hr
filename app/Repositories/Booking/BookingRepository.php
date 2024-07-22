@@ -33,7 +33,7 @@ class BookingRepository implements BookingRepositoryInterface
             $startDate = Carbon::parse($data['start_date']);
             $endDate = $startDate->copy()->addHours((int)$data['session']);
 
-            $existingBookings = Booking::where('entity_id', $data['entity_id'])
+            $existingBookings = Booking::where('entity_id', $data['entity_id'])->whereNot('status', 'used')
                 ->where(function ($query) use ($startDate, $endDate) {
                     $query->whereBetween('start_date', [$startDate, $endDate])
                         ->orWhereBetween('end_date', [$startDate, $endDate])
@@ -53,7 +53,8 @@ class BookingRepository implements BookingRepositoryInterface
             $data['date_time'] = CurrentTime();
             $data['end_date'] = $endDate->format('Y-m-d H:i:s');
             $data['booking_id'] = 1;
-            $data['amount'] =$data['package_price'];
+            $data['amount'] = ($data['session_type'] === 'package') ? $data['package_price'] : $data['amount'];
+
             $booking = Booking::create($data);
             if (isset($data['menus'])) {
                 $menuData = json_decode($data['menus'], true);

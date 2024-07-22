@@ -149,9 +149,6 @@ class OrderRepository implements OrderRepositoryInterface
                     $menuData['date'] = CurrentTime();
                     $menuData['order_id'] = $order->id;
                     $menuData['price'] = $menuData['original_price'] * $menuData['quantity'];
-                    if (isset($data['order_type'])) {
-                        $menuData['price'] = 0;
-                    }
                     $order_items = OrderItem::create($menuData);
                     $orderItems = OrderItem::find($order_items->id);
                     $orderItems->menu = $orderItems->menu;
@@ -167,9 +164,6 @@ class OrderRepository implements OrderRepositoryInterface
                     $menuData['order_id'] = $order->id;
                     $menuData['price'] = $menuData['original_price'] * $menuData['quantity'];
 
-                    if (isset($data['order_type'])) {
-                        $menuData['price'] = 0;
-                    }
                     $order_items = OrderItem::create($menuData);
                     $orderItems = OrderItem::find($order_items->id);
                     $orderItems->menu = $orderItems->menu;

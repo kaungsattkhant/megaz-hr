@@ -60,7 +60,6 @@ class InvoiceAPIController extends Controller
         {
             foreach($request->orderMenuArray as $order){
                 $original_price = ($order->is_package == 1) ? 0 : $order->price;
-
                 $menuArray[] = [
                     "menu_id" => $order->menu_id,
                     "quantity" => $order->quantity,
@@ -70,6 +69,7 @@ class InvoiceAPIController extends Controller
                     'is_package' => $order->is_package
                 ];
             }
+
 
             $order['order_type'] = 'package';
             $order['invoice_id'] = $invoice->id;
