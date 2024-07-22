@@ -10,8 +10,12 @@ class DeliveryChargeRepository implements DeliveryChargeRepositoryInterface
 {
     public function listAllData(Request $request)
     {
-        $deliveryCharges = DeliveryCharge::paginate(config('common.list'));
-        ResponseData($deliveryCharges);
+        $deliveryCharges = DeliveryCharge::select('delivery_charges.*')
+            ->join(DB::raw('(SELECT MAX(id) as id FROM delivery_charges GROUP BY township_id) as latest_delivery_charges'), 'delivery_charges.id', '=', 'latest_delivery_charges.id')
+            ->with('township')
+            ->paginate(config('common.list'));
+
+        return ResponseData($deliveryCharges);
     }
 
     public function createData(Request $request)
