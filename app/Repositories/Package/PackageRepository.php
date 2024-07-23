@@ -55,8 +55,9 @@ class PackageRepository implements PackageRepositoryInterface
             $data['package_discount'] = 0;
             $sessionPrice = $data['pay_session'] * $data['session_price'];
             $package = Package::create($data);
+            $menuPrice = 0;
             if (isset($data['menuIds'])) {
-                $menuPrice = 0;
+
                 $menuIds = json_decode($data['menuIds']);
                 foreach ($menuIds as $menu) {
                     $foodMenu = Menu::find($menu->menu_id);
@@ -69,13 +70,13 @@ class PackageRepository implements PackageRepositoryInterface
                     ]);
                 }
             }
-            $totalActualPrice = $menuPrice + $sessionPrice;
-            if ($totalActualPrice < $data['price']) {
-                $data['package_discount'] = $data['price'] - ($menuPrice + $sessionPrice);
+            $package_original_price = $menuPrice + $sessionPrice;
+            if ($package_original_price > $data['price']) {
+                $data['package_discount'] = $package_original_price - $data['price'] ;
                 $package->package_discount = $data['package_discount'];
                 $package->save();
             } else {
-                ResponseMessage('Package price cannot cover actual price', 422);
+                ResponseMessage('Invalid package', 422);
             }
             // if(isset($data['roomIds'])){
             //     $rooms = json_decode($data['roomIds']);
@@ -126,22 +127,32 @@ class PackageRepository implements PackageRepositoryInterface
                 $data['image_path'] = $imageData->storeAs('images', $hashedName, 'public');
                 $data['image_url'] = Storage::url($data['image_path']);
             }
+            $sessionPrice = $data['pay_session'] * $data['session_price'];
             $package = Package::find($id);
             $package->update($data);
-            if (isset($data['roomIds'])) {
-                $roomIds = json_decode($data['roomIds']);
-                $package->rooms()->sync($roomIds);
-            }
+            $menuPrice = 0;
+
             if (isset($data['menuIds'])) {
                 $menuIds = json_decode($data['menuIds']);
                 MenuPackage::where('package_id', $package->id)->delete();
                 foreach ($menuIds as $menu) {
+                    $foodMenu = Menu::find($menu->menu_id);
+                    $menuPrice += $foodMenu->price->price;
                     MenuPackage::create([
                         'menu_id' => $menu->menu_id,
                         'quantity' => $menu->quantity,
                         'package_id' => $package->id
                     ]);
                 }
+            }
+
+            $package_original_price = $sessionPrice + $menuPrice;
+            if ($package_original_price > $data['price']) {
+                $data['package_discount'] = $package_original_price - $data['price'] ;
+                $package->package_discount = $data['package_discount'];
+                $package->save();
+            } else {
+                ResponseMessage('Invalid package', 422);
             }
             DB::commit();
             ResponseMessage($package);

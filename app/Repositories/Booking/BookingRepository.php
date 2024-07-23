@@ -53,21 +53,12 @@ class BookingRepository implements BookingRepositoryInterface
             $data['date_time'] = CurrentTime();
             $data['end_date'] = $endDate->format('Y-m-d H:i:s');
             $data['booking_id'] = 1;
-            $data['amount'] = ($data['session_type'] === 'package') ? $data['package_price'] : $data['amount'];
+
 
             $booking = Booking::create($data);
             if (isset($data['menus'])) {
                 $menuData = json_decode($data['menus'], true);
                 foreach ($menuData as $menu) {
-                    if ($menu['is_package'] == 1) {
-                        BookingMenu::create([
-                            'quantity' => $menu['quantity'],
-                            'menu_id' => $menu['menu_id'],
-                            'booking_id' => $booking->id,
-                            'price' => 0,
-                            'discount_value' => 0
-                        ]);
-                    } else {
                         BookingMenu::create([
                             'quantity' => $menu['quantity'],
                             'menu_id' => $menu['menu_id'],
@@ -77,7 +68,6 @@ class BookingRepository implements BookingRepositoryInterface
                         ]);
                     }
                 }
-            }
             $booking->booking_id = sprintf('%05d', $booking->id);
             $booking->save();
             DB::commit();

@@ -105,26 +105,18 @@ class OrderRepository implements OrderRepositoryInterface
             $orderItemsArray = [];
 
             foreach ($data['menuArray'] as $menuData) {
-                $menuCategoryId = $menuData['menu_category_id'];
-                $price = $menuData['original_price'] * $menuData['quantity'];
 
-                if (!isset($categorySums[$menuCategoryId])) {
-                    $categorySums[$menuCategoryId] = 0;
-                }
-
-                $categorySums[$menuCategoryId] += $price;
                 $menuData['invoice_id'] = $invoiceId;
 
                 $menu = Menu::find($menuData['menu_id']);
-                $latestMenuServiceDiscount = null;
-                if (!isset($data['order_type'])) {
+
                     $latestMenuServiceDiscount = $menu->menuServiceDiscounts()
                         ->whereDate('from_date', '<=', CurrentDate())
                         ->whereDate('to_date', '>=', CurrentDate())
                         ->orderBy('created_at', 'desc')
                         ->where('type', 'menu')
                         ->first();
-                }
+
                 if ($latestMenuServiceDiscount) {
                     $discountAmount = $latestMenuServiceDiscount->discount_price * $menuData['quantity'];
                     $totalDiscount += $discountAmount;
@@ -137,9 +129,7 @@ class OrderRepository implements OrderRepositoryInterface
                     $order->total_quantity += $menuData['quantity'];
                     $order->total_discount_price += $discountAmount; // update total discount only for this order
                     $order->total += $menuData['original_price'] * $menuData['quantity'];
-                    if (isset($data['order_type'])) {
-                        $order->total = 0;
-                    }
+
                     $order->update($menuData);
 
                     $originalOrderItem = OrderItem::where('menu_id', $menuData['menu_id'])
