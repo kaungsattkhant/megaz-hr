@@ -30,32 +30,41 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr class="">
+                                <tr class="" v-for="(booking,index) in bookingList">
                                     <td class="whitespace-nowrap px-6 py-4 font-medium">
-                                        one
+                                        {{ index+1 }}
                                     </td>
                                     <td class="whitespace-nowrap px-6 py-4">
-                                        two
+                                        {{ booking.date_time }}
                                     </td>
                                     <td class="whitespace-nowrap px-6 py-4">
-                                        three
+                                        {{ booking.customer.name }}
                                     </td>
                                     <td class="whitespace-nowrap px-6 py-4">
-                                        four            
+                                        {{ booking.session_type }}
                                     </td>
                                     <td class="whitespace-nowrap px-6 py-4">
-                                        five
+                                        {{ booking.start_date }}
                                     </td>
                                     <td class="whitespace-nowrap px-6 py-4">
-                                        sive
+                                        {{ booking.entity.name }}
                                     </td>
                                     <td class="whitespace-nowrap px-6 py-4">
-                                        <button>
+                                        <button v-if="booking.status == 'confirm'"  @click="btnClickedPlayModal(booking)"
+                                            data-te-toggle="modal" data-te-target="#play_modal">
+                                            <i class="fal fa-play-circle text-sm mr-2"></i>
+                                        </button>
+                                        <div class="contents" v-if="booking.status == 'pending'">
+                                            <button data-te-toggle="modal" @click="btnClickedConfirmModal(booking.booking_id)"
+                                                data-te-target="#confirm_modal">
                                             <i class="fal fa-check text-sm mr-2"></i>
-                                        </button>
-                                        <button>
-                                            <i class="fal fa-times text-sm"></i>
-                                        </button>
+                                            </button>
+                                            <button @click="btnClickedRejectModal(booking.booking_id)" 
+                                                data-te-toggle="modal" data-te-target="#cancel_modal">
+                                                <i class="fal fa-times text-sm"></i>
+                                            </button>
+                                        </div>
+                                        
                                     </td>
                                 </tr>
                                 <tr class="">
@@ -81,6 +90,12 @@
                                         <button>
                                             <i class="fal fa-play-circle text-sm mr-2"></i>
                                         </button>
+                                        <button>
+                                            <i class="fal fa-check text-sm mr-2"></i>
+                                        </button>
+                                        <button>
+                                            <i class="fal fa-times text-sm"></i>
+                                        </button>
                                     </td>
                                 </tr>
                             </tbody>
@@ -94,85 +109,108 @@
 
         <div data-te-modal-init
             class="fixed left-0 top-0 z-[1055] hidden h-full w-full overflow-y-auto overflow-x-hidden outline-none"
-            id="create_cashbook_modal" tabindex="-1" aria-labelledby="createCashbookModalLabel" aria-modal="true"
+            id="confirm_modal" tabindex="-1" aria-labelledby="confirmModalLabel" aria-modal="true"
             role="dialog">
             <div data-te-modal-dialog-ref
-                class="pointer-events-none relative flex min-h-[calc(100%-1rem)] w-auto translate-y-[-50px] items-center opacity-0 transition-all duration-300 ease-in-out min-[576px]:mx-auto min-[576px]:mt-7 min-[576px]:min-h-[calc(100%-3.5rem)] min-[576px]:max-w-[500px]">
+                class="pointer-events-none relative flex min-h-[calc(100%-1rem)] w-fit translate-y-[-50px] items-center opacity-0 transition-all duration-300 ease-in-out min-[576px]:mx-auto min-[576px]:mt-7 min-[576px]:min-h-[calc(100%-3.5rem)] min-[576px]:max-w-[500px]">
+                    
                 <div
                     class="pointer-events-auto relative flex w-full flex-col rounded-md border-none bg-white bg-clip-padding text-current shadow-lg outline-none">
-                    <div class="relative  p-4">
-                        <p class="text-xl w-full text-center">
-                            Create Booking
+                    <button type="button"
+                        class="absolute -top-2 -right-2 rounded-full bg-white border-black border p-1 text-xs focus:shadow-none focus:outline-none" data-te-modal-dismiss
+                        aria-label="Close">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                            stroke="currentColor" class="h-4 w-4">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </button>
+                    <div class="pt-8 pb-4 px-8">
+                        <p class="text-lg text-center font-semibold">
+                            Confirm {{ selectedRoom }} ?
                         </p>
-                        <button type="button" class="absolute top-4 right-4 focus:shadow-none focus:outline-none
-                        " id="closeModal" data-te-modal-dismiss aria-label="Close">
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
-                                stroke="currentColor" class="h-5 w-5">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
-                            </svg>
+                    </div>
+                    <div class="flex justify-center px-24 py-6 gap-x-8 mb-2">
+                        <button type="button" class="focus:shadow-none focus:outline-none !px-16 !py-3"
+                         id="closeModal" data-te-modal-dismiss aria-label="Close">
+                            Cancel
+                        </button>
+                        <button @click="btnClickedConfirm()" class="pos-add-btn !px-16 !py-3 focus:outline-none focus:ring-0 ">
+                            Confirm
                         </button>
                     </div>
+                </div>
+            </div>
+        </div>
 
-                    <div class="relative px-16 py-4" data-te-modal-body-ref>
-                        <div class="mb-4">
-                            <label for="" class="block text-sm text-black mb-3">
-                                Customer Name
-                            </label>
-                            <input type="text" placeholder="Customer Name" class="input-ui focus:ring-0">
-                        </div>
-                        <div class="mb-4">
-                            <label for="" class="block text-sm text-black mb-3">
-                                Room
-                            </label>
-                            <input type="text" placeholder="Room" class="input-ui focus:ring-0">
-                        </div>
-                        <div class="mb-4">
-                            <label for="" class="block text-sm text-black mb-3">
-                                Type
-                            </label>
-                            <select name="" id=""
-                                class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
-                                <option value="session"> Session </option>
-                                        <option value="package"> Package </option>
-                                        <option value="endless_time"> Endless Time </option>
-                            </select>
-                        </div>
-                        <div class="mb-4">
-                            <label for="" class="block text-sm text-black mb-3">
-                                Start Time
-                            </label>
-                            <input type="datetime-local" placeholder="Time"
-                                class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
-                        </div>
+        <!-- cancel modal -->
+        <div data-te-modal-init
+            class="fixed left-0 top-0 z-[1055] hidden h-full w-full overflow-y-auto overflow-x-hidden outline-none"
+            id="cancel_modal" tabindex="-1" aria-labelledby="confirmModalLabel" aria-modal="true"
+            role="dialog">
+            <div data-te-modal-dialog-ref
+                class="pointer-events-none relative flex min-h-[calc(100%-1rem)] w-fit translate-y-[-50px] items-center opacity-0 transition-all duration-300 ease-in-out min-[576px]:mx-auto min-[576px]:mt-7 min-[576px]:min-h-[calc(100%-3.5rem)] min-[576px]:max-w-[500px]">
+                    
+                <div
+                    class="pointer-events-auto relative flex w-full flex-col rounded-md border-none bg-white bg-clip-padding text-current shadow-lg outline-none">
+                    <button type="button" class="absolute -top-2 -right-2 rounded-full bg-white border-black border p-1 text-xs focus:shadow-none focus:outline-none" data-te-modal-dismiss
+                        aria-label="Close">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                            stroke="currentColor" class="h-4 w-4">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </button>
 
-                        <div>
-                            <div class="flex justify-between border-b pb-2 mb-3">
-                                <p>Menu</p>
-                                <button>
-                                    +
-                                </button>
-                            </div>
-                            <div>
-                                <div class="flex justify-between">
-                                    <p class="text-sm">Beer</p>
-                                    <button>
-                                        <i class="fal fa-times text-sm"></i>
-                                    </button>
-                                </div>
-                                <div class="flex justify-between">
-                                    <p class="text-sm">Cola</p>
-                                    <button>
-                                        <i class="fal fa-times text-sm"></i>
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-
+                    <div class="pt-8 pb-4 px-8">
+                        <p class="text-lg text-center font-semibold">
+                            Reject {{ selectedRoom }} ?
+                        </p>
                     </div>
+                    <div class="flex justify-center px-24 py-6 gap-x-8 mb-2">
+                        <button type="button" class="focus:shadow-none focus:outline-none !px-16 !py-3
+                        " id="closeModal" data-te-modal-dismiss aria-label="Close">
+                            Cancel
+                        </button>
+                        <button @click="btnClickedReject()" class="pos-add-btn !px-16 !py-3 focus:outline-none focus:ring-0 ">
+                            Decline
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
 
-                    <div class="flex justify-center px-12 mb-6">
-                        <button @click="createBtnClicked" class="pos-add-btn !px-16 focus:outline-none focus:ring-0 ">
-                            Create
+        <!-- play modal -->
+        <div data-te-modal-init
+        class="fixed left-0 top-0 z-[1055] hidden h-full w-full overflow-y-auto overflow-x-hidden outline-none"
+        id="play_modal" tabindex="-1" aria-labelledby="confirmModalLabel" aria-modal="true"
+        role="dialog">
+            <div data-te-modal-dialog-ref
+                class="pointer-events-none relative flex min-h-[calc(100%-1rem)] w-fit translate-y-[-50px] items-center opacity-0 transition-all duration-300 ease-in-out min-[576px]:mx-auto min-[576px]:mt-7 min-[576px]:min-h-[calc(100%-3.5rem)] min-[576px]:max-w-[500px]">
+                  
+                <div
+                    class="pointer-events-auto relative flex w-full flex-col rounded-md border-none bg-white bg-clip-padding text-current shadow-lg outline-none">
+                    <button type="button" class="absolute -top-2 -right-2 rounded-full bg-white border-black border p-1 text-xs focus:shadow-none focus:outline-none" data-te-modal-dismiss
+                        aria-label="Close">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                            stroke="currentColor" class="h-4 w-4">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </button>
+                    
+                    <div class="pt-8 pb-4 px-8">
+                        <p class="text-lg text-center font-semibold">
+                            Start {{ selectedRoom }} ?
+                        </p>
+                    </div>
+                    
+                    
+                    
+                    <div class="flex justify-center px-24 py-6 gap-x-8 mb-2">
+                        <button type="button" class="focus:shadow-none focus:outline-none !px-16 !py-3
+                        " id="closeModal" data-te-modal-dismiss aria-label="Close">
+                            Cancel
+                        </button>
+                        <button @click="bookingRoomStart()" class="pos-add-btn !px-16 !py-3 focus:outline-none focus:ring-0 ">
+                            Play
                         </button>
                     </div>
                 </div>
@@ -192,7 +230,10 @@
     export default {
         data() {
             return {
-                
+                bookingList:[],
+                bookingId:null,
+                booking_staus:null,
+                selectedRoom:null,
 
             };
         },
@@ -200,15 +241,63 @@
         methods: {
             ...mapGetters(['getToken']),
 
+            async getBookingList() {
+                const response = await getApiData({ url: '/api/bookings', token: this.getToken() });
+                if (response.data) {
+                    this.bookingList = response.data.data;
+                }
+            
+            },
+
+            btnClickedConfirmModal(bookingId){
+                this.bookingId = bookingId;
+            },
+            btnClickedRejectModal(bookingId){
+                this.bookingId = bookingId;
+            },
+            btnClickedConfirm(){
+                this.bookingStatusChange(1);
+            },
+            btnClickedReject(){
+                this.bookingStatusChange(0);
+            },
+            async bookingStatusChange(bookingStauts){
+                let formData = new FormData();
+                formData.append('is_confirm', bookingStauts);
+                let response = await postApiData({ url: '/api/booking_status/' + this.bookingId, form_data: formData, token: this.getToken() });
+                if (response.success) {
+                    window.location.reload();
+                }
+                else {
+                    console.log('some errors occur');
+                }
+                // console.log('status '  + bookingStauts + ' , id = ' + this.bookingId )
+
+                
+            },
+            btnClickedPlayModal(selectedBooking){
+                this.bookingId = selectedBooking.booking_id;
+                this.selectedRoom = selectedBooking.entity.name
+            },
+            async bookingRoomStart(){
+                let response = await postApiData({ url: '/api/booking_active/' + this.bookingId, token: this.getToken() });
+                if (response.success) {
+                    window.location.reload();
+                }
+                else {
+                    console.log(response.error);
+                }
+            }
             
         },
         mounted()
         {
+
             initTE({ Modal, Select, Ripple, Datepicker });
         },
 
         created(){
-            // this.getTotalBookList();
+            this.getBookingList();
         }
     }
 </script>
