@@ -50,7 +50,7 @@
                                         {{ booking.entity.name }}
                                     </td>
                                     <td class="whitespace-nowrap px-6 py-4">
-                                        <button v-if="booking.status == 'confirm'"  @click="btnClickedPlayModal(booking.booking_id)"
+                                        <button v-if="booking.status == 'confirm'"  @click="btnClickedPlayModal(booking)"
                                             data-te-toggle="modal" data-te-target="#play_modal">
                                             <i class="fal fa-play-circle text-sm mr-2"></i>
                                         </button>
@@ -124,7 +124,12 @@
                             <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
                         </svg>
                     </button>
-                    <div class="flex justify-between px-16 py-8 gap-x-8">
+                    <div class="pt-8 pb-4 px-8">
+                        <p class="text-lg text-center font-semibold">
+                            Confirm {{ selectedRoom }} ?
+                        </p>
+                    </div>
+                    <div class="flex justify-center px-24 py-6 gap-x-8 mb-2">
                         <button type="button" class="focus:shadow-none focus:outline-none !px-16 !py-3"
                          id="closeModal" data-te-modal-dismiss aria-label="Close">
                             Cancel
@@ -154,7 +159,13 @@
                             <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
                         </svg>
                     </button>
-                    <div class="flex justify-between px-16 py-8 gap-x-8">
+
+                    <div class="pt-8 pb-4 px-8">
+                        <p class="text-lg text-center font-semibold">
+                            Reject {{ selectedRoom }} ?
+                        </p>
+                    </div>
+                    <div class="flex justify-center px-24 py-6 gap-x-8 mb-2">
                         <button type="button" class="focus:shadow-none focus:outline-none !px-16 !py-3
                         " id="closeModal" data-te-modal-dismiss aria-label="Close">
                             Cancel
@@ -174,7 +185,7 @@
         role="dialog">
             <div data-te-modal-dialog-ref
                 class="pointer-events-none relative flex min-h-[calc(100%-1rem)] w-fit translate-y-[-50px] items-center opacity-0 transition-all duration-300 ease-in-out min-[576px]:mx-auto min-[576px]:mt-7 min-[576px]:min-h-[calc(100%-3.5rem)] min-[576px]:max-w-[500px]">
-                    
+                  
                 <div
                     class="pointer-events-auto relative flex w-full flex-col rounded-md border-none bg-white bg-clip-padding text-current shadow-lg outline-none">
                     <button type="button" class="absolute -top-2 -right-2 rounded-full bg-white border-black border p-1 text-xs focus:shadow-none focus:outline-none" data-te-modal-dismiss
@@ -184,12 +195,21 @@
                             <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
                         </svg>
                     </button>
-                    <div class="flex justify-between px-16 py-8 gap-x-8">
+                    
+                    <div class="pt-8 pb-4 px-8">
+                        <p class="text-lg text-center font-semibold">
+                            Start {{ selectedRoom }} ?
+                        </p>
+                    </div>
+                    
+                    
+                    
+                    <div class="flex justify-center px-24 py-6 gap-x-8 mb-2">
                         <button type="button" class="focus:shadow-none focus:outline-none !px-16 !py-3
                         " id="closeModal" data-te-modal-dismiss aria-label="Close">
                             Cancel
                         </button>
-                        <button @click="createBtnClicked" class="pos-add-btn !px-16 !py-3 focus:outline-none focus:ring-0 ">
+                        <button @click="bookingRoomStart()" class="pos-add-btn !px-16 !py-3 focus:outline-none focus:ring-0 ">
                             Play
                         </button>
                     </div>
@@ -213,6 +233,7 @@
                 bookingList:[],
                 bookingId:null,
                 booking_staus:null,
+                selectedRoom:null,
 
             };
         },
@@ -253,6 +274,19 @@
                 // console.log('status '  + bookingStauts + ' , id = ' + this.bookingId )
 
                 
+            },
+            btnClickedPlayModal(selectedBooking){
+                this.bookingId = selectedBooking.booking_id;
+                this.selectedRoom = selectedBooking.entity.name
+            },
+            async bookingRoomStart(){
+                let response = await postApiData({ url: '/api/booking_active/' + this.bookingId, token: this.getToken() });
+                if (response.success) {
+                    window.location.reload();
+                }
+                else {
+                    console.log(response.error);
+                }
             }
             
         },

@@ -25,7 +25,7 @@
                             <label for="" class="block text-sm text-black mb-3">
                                 Time
                             </label>
-                            <input type="datetime-local" placeholder="Time" v-model="startTime"
+                            <input type="datetime-local" placeholder="Time" v-model="startTime" @change="getPackageList(startTime)"
                                 class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
                         </div>
                         <div class="mb-4 col-span-3">
@@ -44,7 +44,7 @@
                             </label>
                             <select name="" id="" v-model="selectedPackage" @change="selectedPackageChange()"
                                 class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0" >
-                                <option v-if="packageList.length > 1" v-for="(pack,index) in packageList" :value="pack" :key="index">{{ pack.name }} </option>
+                                <option v-if="packageList.length > 0" v-for="(pack,index) in packageList" :value="pack" :key="index">{{ pack.name }} </option>
                                 <option v-else>no Data Found</option>
                             </select>
                         </div>
@@ -228,6 +228,7 @@
 <script>
     import { Modal, Ripple, Select, Datepicker, initTE, Input } from "tw-elements";
     import { getApiData, postApiData, deleteApiData } from '../../../utilities/ajax-helpers';
+    import { getCurrentTime, getCurretDateTime } from '../../../utilities/datetime-helpers';
     import { mapGetters } from "vuex";
 
     export default {
@@ -262,6 +263,8 @@
                 food_total:0,
                 package_food_total:0,
                 package_total:0,
+
+                currentTime: getCurretDateTime(),
             };
         },
 
@@ -275,7 +278,7 @@
             },
 
             async getPackageList(time) {
-                const response = await getApiData({ url: '/api/packages'+time, token: this.getToken() });
+                const response = await getApiData({ url: '/api/packages?date='+time, token: this.getToken() });
                 if (response.data) {
                     this.packageList = response.data.data;
                 }
@@ -283,11 +286,12 @@
             },
             typeChange(){
                 if(this.type == 'package'){
-                    this.getPackageList('?date='+this.startTime)
+                    // this.getPackageList(this.startTime)
                     // const response = await getApiData({ url: '/api/packages?date=' + this.startTime, token: this.getToken() });
                     // if (response.data) {
                     //     this.packageList = response.data.data;
                     // }
+                    this.selectedPackage = null;
                     this.isPackage = true;
                 }
                 else{
@@ -307,7 +311,7 @@
             selectedPackageChange(){
                 this.food_total = 0 ;
                 this.orderMenuList = [];
-                this.roomList = this.selectedPackage.rooms;
+                // this.roomList = this.selectedPackage.rooms;
                 let is_changeable = false;
                 if(this.selectedPackage.is_changeable == 1){
                     is_changeable = true;
@@ -349,7 +353,6 @@
 
             },
             selectedRoomChange(){
-                
                 if(this.type == 'session'){
                     this.total = this.food_total
                     let roomPrice = this.session_duration * this.selectedRoom.price_per_hour
@@ -471,7 +474,7 @@
         },
         created(){
             this.getCustomerList();
-            this.getPackageList();
+            this.getPackageList(this.currentTime);
             this.getRoomList();
             this.getMenuCategoryList();
         },
