@@ -36,6 +36,11 @@ class Invoice extends Model
         'room_discount_value'
     ];
 
+    public function package()
+    {
+        return $this->belongsTo(Package::class);
+    }
+
     public function orders()
     {
         return $this->hasMany(Order::class);

@@ -52,11 +52,8 @@ class BookingAPIController extends Controller
                 'invoice_date' => $booking->date_time,
                 'session_duration' => $booking->session,
                 'type' => $booking->session_type,
-                'female' => $booking->headCount->female,
-                'male' => $booking->headCount->male,
-                'child' => $booking->headCount->child,
+                'head_count_id' => $booking->headCount->id,
                 'package_id' => $booking->package_id,
-                'package_price' => $booking->amount,
                 'amount' => $booking->amount
             ];
 
@@ -65,10 +62,7 @@ class BookingAPIController extends Controller
             }
 
         $invoice = $this->invoiceRepo->createData($roomOpenData);
-        if($invoice->invoice_type=='package')
-        {
-            $orderData['order_type'] = 'package';
-        }
+
         foreach($booking->bookingMenus as $bookingMenu){
             $menuArray[] = [
                 "menu_id" => $bookingMenu->menu_id,
