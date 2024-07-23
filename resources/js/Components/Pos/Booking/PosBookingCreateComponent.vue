@@ -189,13 +189,13 @@
                                             {{ food_total }}
                                         </td>
                                     </tr>
-                                    <tr class="">
+                                    <tr class="" v-if="type == 'package'">
                                         <td colspan="2"></td>
                                         <td class="py-4 border-b">
                                             Package Discount
                                         </td>
                                         <td colspan="2" class="py-4 border-b">
-                                            {{  selectedPackage.package_discount }}
+                                            {{  package_discount }}
                                         </td>
                                     </tr>
                                     <tr class="">
@@ -217,7 +217,6 @@
                             Create
                         </button>
                     </div>
-                    {{ testList }}
                 </div>
             </div>
 
@@ -272,6 +271,7 @@
                 food_total:0,
                 package_food_total:0,
                 package_total:0,
+                package_discount:0,
 
                 currentTime: getCurretDateTime(),
             };
@@ -294,6 +294,7 @@
             
             },
             typeChange(){
+                this.package_discount = 0;
                 if(this.type == 'package'){
                     // this.getPackageList(this.startTime)
                     // const response = await getApiData({ url: '/api/packages?date=' + this.startTime, token: this.getToken() });
@@ -355,6 +356,7 @@
                     // this.total = this.selectedPackage.price;
                     let room_price = this.selectedPackage.pay_session * this.selectedPackage.session_price;
                     this.total = ( this.food_total + room_price ) - this.selectedPackage.package_discount;
+                    this.package_discount = this.selectedPackage.package_discount;
                 });
             },
             sessionDurationChange(){
