@@ -139,7 +139,7 @@ class InvoiceRepository implements InvoiceRepositoryInterface
 
             $roomSessionData['invoice_id'] = $invoice->id;
             $roomSessionData['entity_id'] = $entity->id;
-            $roomSessionData['session_duration'] = $data['session_duration'];
+            $roomSessionData['session_duration'] = $data['session_duration'] ?? null;
 
             if ($end_date == null) {
                 $roomSessionData['end_date'] = null;
@@ -249,7 +249,7 @@ class InvoiceRepository implements InvoiceRepositoryInterface
             // caculating the possible left duration of session
             $startTime = Carbon::parse($lastRoomwithInvoice->start_date);
             $endTime = Carbon::now();
-            $durationInMinute = $endTime->diffInMinute($startTime);
+            $durationInMinute = $startTime->diffInMinute($endTime);
             $durationInHours = $durationInMinute / 60; // Convert minutes to hours
             $roundedDurationInHours = round($durationInHours, 3);
             $lastEntity = Entity::find($lastRoomwithInvoice->entity_id);
@@ -333,18 +333,20 @@ class InvoiceRepository implements InvoiceRepositoryInterface
             $roomSessions = RoomSession::where('invoice_id', $data['invoice_id'])->with(['entity'])->get();
             $total_duration = 0;
             $total_session_value = 0;
+
             foreach ($roomSessions as $room) {
                 $total_session_value += $room->price;
-                $total_duration += $room->sessoin_duration;
+                $total_duration += $room->session_duration ?? 0;
+
             }
             $entity = Entity::find($latestRoomSession->entity_id);
             if ($invoice->invoice_type == 'endless_time') {
-                $invoiceDate = Carbon::parse($invoice->invoice_date);
+                $invoiceDate = Carbon::parse($latestRoomSession->end_date);
                 $currentDate = Carbon::now();
                 $minutesDifference = $invoiceDate->diffInMinutes($currentDate);
                 $hoursDifference = $minutesDifference / 60;
                 $hoursDifference = number_format($hoursDifference, 2);
-                if ($hoursDifference < 3) {
+                if ($total_duration < 3) {
                     ResponseMessage("You can't end this room before 3 hours", 402);
                 }
                 $data['session_duration'] = $hoursDifference;
@@ -355,7 +357,6 @@ class InvoiceRepository implements InvoiceRepositoryInterface
 
             $today = Carbon::today();
             $customer = Customer::find($invoice->customer_id);
-
             $customerTotal = 0;
             if ($customer->invoices) {
                 foreach ($customer->invoices as $invoice) {
