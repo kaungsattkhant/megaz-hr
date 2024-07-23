@@ -192,6 +192,15 @@
                                     <tr class="">
                                         <td colspan="2"></td>
                                         <td class="py-4 border-b">
+                                            Package Discount
+                                        </td>
+                                        <td colspan="2" class="py-4 border-b">
+                                            {{  selectedPackage.package_discount }}
+                                        </td>
+                                    </tr>
+                                    <tr class="">
+                                        <td colspan="2"></td>
+                                        <td class="py-4 border-b">
                                             Total
                                         </td>
                                         <td colspan="2" class="py-4 border-b">
@@ -343,7 +352,9 @@
                     
                     this.food_total += is_dis_menu_price;
                     this.package_food_total += is_dis_menu_price;
-                    this.total = this.selectedPackage.price;
+                    // this.total = this.selectedPackage.price;
+                    let room_price = this.selectedPackage.pay_session * this.selectedPackage.session_price;
+                    this.total = ( this.food_total + room_price ) - this.selectedPackage.package_discount;
                 });
             },
             sessionDurationChange(){
