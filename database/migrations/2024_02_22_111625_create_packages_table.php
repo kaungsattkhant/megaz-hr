@@ -17,7 +17,11 @@ return new class extends Migration
             $table->date('from_date');
             $table->date('to_date');
             $table->double('price');
-            $table->double('session')->nullable();
+            $table->double('pay_session');
+            $table->double('free_session');
+            $table->double('session');
+            $table->double('session_price');
+            $table->double('package_discount');
             $table->string('image_url');
             $table->string('image_path');
             $table->boolean('is_ktv');

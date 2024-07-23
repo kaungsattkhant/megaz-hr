@@ -324,4 +324,5 @@ class CustomerRepository implements CustomerRepositoryInterface
             throw $e;
         }
     }
+
 }
