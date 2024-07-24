@@ -426,6 +426,7 @@ Route::controller(FoodOrderAPIController::class)->group(function()
 {
     Route::get('/food_orders','listAllFoodOrder');
     Route::post('/food_orders','createFoodOrder');
+    Route::get('/food_orders/{id}','confirmByFoodOrder');
 });
 
 Route::controller(DeliveryChargeAPIController::class)->group(function()
