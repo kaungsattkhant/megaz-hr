@@ -226,16 +226,19 @@
                                                 (selectedRoom.room_sessions[0].invoice.total_session_price ?
                                                     selectedRoom.room_sessions[0].invoice.total_session_price : 0)
                                                 +
-                                                (purchaseMenuList.length > 0 ? purchaseMenuList[0].total : 'a')
+                                                (purchaseMenuList.length > 0 ? purchaseMenuList[0].total : 0)
+                                                - (selectedRoom.room_sessions[0].invoice.package ? selectedRoom.room_sessions[0].invoice.package.package_discount : 0)
                                             ).toLocaleString()
                                             :
                                             (
-                                                selectedRoom.room_sessions[0].invoice.total_session_price ?
-                                                    selectedRoom.room_sessions[0].invoice.total_session_price : 0
+                                                (selectedRoom.room_sessions[0].invoice.total_session_price ?
+                                                    selectedRoom.room_sessions[0].invoice.total_session_price : 0)
+                                                - (selectedRoom.room_sessions[0].invoice.package ? selectedRoom.room_sessions[0].invoice.package.package_discount : 0)
                                             ).toLocaleString()
                                         )
                                         : 0
-                                    )
+                                    ) 
+                                   
 
                                 }}
                                 <!-- {{ printInvoiceData.room + printInvoiceData.food }} -->
