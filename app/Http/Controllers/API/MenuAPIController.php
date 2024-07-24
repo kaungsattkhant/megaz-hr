@@ -45,11 +45,23 @@ class MenuAPIController extends Controller
         ResponseData($menuPrice);
     }
 
-    public function menuByMenuCategory(int $id)
+    // public function menuByMenuCategory(int $id)
+    // {
+    //     $menu = Menu::where('menu_category_id',$id)->with(['menuServiceDiscounts' => function])->with('prices')->get();
+    //     ResponseData($menu);
+    // }
+
+    public function menuByMenuCategory(int $id,Request $request)
     {
-        $menu = Menu::where('menu_category_id',$id)->with('prices')->get();
+        $validateDate = $request->date ?? CurrentDate();
+        $menu = Menu::where('menu_category_id',$id)->where('is_feature',1)->with(['menu_category', 'prices', 'items','menuServiceDiscounts' => function ($query) use ($validateDate)
+        {
+            $query->where('from_date', '<=',$validateDate)->where('to_date', '>=',$validateDate);
+        }
+        ])->paginate(config('common.list_count'));
         ResponseData($menu);
     }
+
 
     public function menuOnOff(int $id)
     {

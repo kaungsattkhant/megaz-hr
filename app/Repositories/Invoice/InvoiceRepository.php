@@ -282,7 +282,7 @@ class InvoiceRepository implements InvoiceRepositoryInterface
             $newSession['session_duration'] = $leftDuration;
             if($invoice->invoice_type=='package')
             {
-            $newSession['price'] = $package->session_price * $leftDuration;
+            $newSession['price'] =0;
 
             }else{
             $newSession['price'] = $selectedEntity->price_per_hour * $leftDuration;
@@ -341,12 +341,13 @@ class InvoiceRepository implements InvoiceRepositoryInterface
             }
             $entity = Entity::find($latestRoomSession->entity_id);
             if ($invoice->invoice_type == 'endless_time') {
-                $invoiceDate = Carbon::parse($latestRoomSession->end_date);
+                $latestRoomSession_end_date = Carbon::parse($latestRoomSession->start_date);
                 $currentDate = Carbon::now();
-                $minutesDifference = $invoiceDate->diffInMinutes($currentDate);
+                $minutesDifference = $latestRoomSession_end_date->diffInMinutes($currentDate);
                 $hoursDifference = $minutesDifference / 60;
                 $hoursDifference = number_format($hoursDifference, 2);
-                if ($total_duration < 3) {
+
+                if (($total_duration + 1) < 3) {
                     ResponseMessage("You can't end this room before 3 hours", 402);
                 }
                 $data['session_duration'] = $hoursDifference;
@@ -456,7 +457,7 @@ class InvoiceRepository implements InvoiceRepositoryInterface
                 $package = Package::find($invoice->package_id);
                 $foodDrink = $foodCharge + $beverageCharge;
                 $data['total'] = ($foodDrink + ($package->pay_session * $package->session_price) + $tax + $service_charge) - ($order_discount + $package->package_discount);
-
+                // dd($foodDrink,($package->pay_session * $package->session_price),$order_discount,$package->package_discount);
                 $data['paid_amount'] = $data['total'];
             } else if ($invoice->invoice_type == 'session' || $invoice->invoice_type == 'endless_time') {
                 $foodDrink = $foodCharge + $beverageCharge;
