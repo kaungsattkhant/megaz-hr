@@ -257,9 +257,7 @@ class InvoiceRepository implements InvoiceRepositoryInterface
             $lastRoomwithInvoice->session_duration = $roundedDurationInHours;
             $lastRoomwithInvoice->end_date = CurrentTime();
 
-            if ($invoice->invoice_type == 'package') {
-                $lastRoomwithInvoice->price = $package->session_price * $roundedDurationInHours;
-            } else {
+            if ($invoice->invoice_type != 'package') {
                 $lastRoomwithInvoice->price = $roundedDurationInHours * $lastEntity->price_per_hour;
             }
 
@@ -413,7 +411,6 @@ class InvoiceRepository implements InvoiceRepositoryInterface
             $discount_value = 0;
             $room_discount_value = 0;
 
-
             if (isset($data['tax'])) {
                 $tax = $data['tax'];
             }
@@ -457,7 +454,7 @@ class InvoiceRepository implements InvoiceRepositoryInterface
                 $package = Package::find($invoice->package_id);
                 $foodDrink = $foodCharge + $beverageCharge;
                 $data['total'] = ($foodDrink + ($package->pay_session * $package->session_price) + $tax + $service_charge) - ($order_discount + $package->package_discount);
-                // dd($foodDrink,($package->pay_session * $package->session_price),$order_discount,$package->package_discount);
+                dd($foodDrink, ($package->pay_session * $package->session_price),$order_discount,$package->package_discount);
                 $data['paid_amount'] = $data['total'];
             } else if ($invoice->invoice_type == 'session' || $invoice->invoice_type == 'endless_time') {
                 $foodDrink = $foodCharge + $beverageCharge;
@@ -465,63 +462,63 @@ class InvoiceRepository implements InvoiceRepositoryInterface
                 $data['total_session_price'] = $total_session_price;
             }
             // caculating depending on discount_type
-            if (isset($data['discount_type'])) {
-                if ($data['discount_type'] == 'percentage') {
-                    if ($data['discount_percentage'] < 0 || $data['discount_percentage'] > 100) {
-                        ResponseMessage('Discount percentage should be between 0 and 100');
-                    }
-                    $data['discount_value'] = ($data['total']) * ($data['discount_percentage'] / 100);
-                } else if ($data['discount_type'] == 'room_discount') {
-                    $roomDiscount = RoomDiscount::find($data['room_discount_id']);
-                    if (!$roomDiscount->rooms->contains($entity->id)) {
-                        ResponseMessage('Selected discount cannot be applied', 422);
-                    }
+            // if (isset($data['discount_type'])) {
+            //     if ($data['discount_type'] == 'percentage') {
+            //         if ($data['discount_percentage'] < 0 || $data['discount_percentage'] > 100) {
+            //             ResponseMessage('Discount percentage should be between 0 and 100');
+            //         }
+            //         $data['discount_value'] = ($data['total']) * ($data['discount_percentage'] / 100);
+            //     } else if ($data['discount_type'] == 'room_discount') {
+            //         $roomDiscount = RoomDiscount::find($data['room_discount_id']);
+            //         if (!$roomDiscount->rooms->contains($entity->id)) {
+            //             ResponseMessage('Selected discount cannot be applied', 422);
+            //         }
 
-                    if ($roomDiscount->session <= $lastRoomSession->session_duration) {
-                        $room_discount_value = $total_session_price - $data['room_discount_amount'];
-                        $total_session_price = $data['room_discount_amount'];
-                        $lastRoomSession->discount_session = $data['discount_session'];
-                        $lastRoomSession->save();
-                    } else {
-                        ResponseMessage('Discount cannot be applied', 422);
-                    }
-                } else if ($data['discount_type'] == 'birthday_discount') {
-                    if ($customer) {
-                        $birthdate = Carbon::parse($customer->birthdate);
-                        $today = Carbon::today();
-                        if ($birthdate->isBirthday($today)) {
-                            $isBirthday = true;
-                            $bdPromo = BirthdayPromotion::find($data['birthday_discount_id']);
-                            if (!$bdPromo) {
-                                ResponseMessage('Selected birthday promotion not found');
-                            }
-                            $data['discount_value'] = $bdPromo->discount_value;
-                        } else {
-                            ResponseData('Today is not your birthday', 422);
-                        }
-                    }
-                } else if ($data['discount_type'] == 'customer_level') {
-                    $total = 0;
-                    foreach ($customer->invoices as $invoice) {
-                        $total += $invoice->total;
-                    }
-                    $levels = CustomerLevelDiscount::all();
-                    $customerLevel = null;
-                    foreach ($levels as $level) {
-                        if ($total  >= $level->amount) {
-                            $customerLevel = $level;
-                        } else {
-                            break;
-                        }
-                    }
-                    if ($customerLevel == null) {
-                        ResponseMessage('Customer level not found', 422);
-                    }
-                    $data['discount_value'] = $customerLevel->promotion_value;
-                }
-            } else {
-                $data['discount_type'] = null;
-            }
+            //         if ($roomDiscount->session <= $lastRoomSession->session_duration) {
+            //             $room_discount_value = $total_session_price - $data['room_discount_amount'];
+            //             $total_session_price = $data['room_discount_amount'];
+            //             $lastRoomSession->discount_session = $data['discount_session'];
+            //             $lastRoomSession->save();
+            //         } else {
+            //             ResponseMessage('Discount cannot be applied', 422);
+            //         }
+            //     } else if ($data['discount_type'] == 'birthday_discount') {
+            //         if ($customer) {
+            //             $birthdate = Carbon::parse($customer->birthdate);
+            //             $today = Carbon::today();
+            //             if ($birthdate->isBirthday($today)) {
+            //                 $isBirthday = true;
+            //                 $bdPromo = BirthdayPromotion::find($data['birthday_discount_id']);
+            //                 if (!$bdPromo) {
+            //                     ResponseMessage('Selected birthday promotion not found');
+            //                 }
+            //                 $data['discount_value'] = $bdPromo->discount_value;
+            //             } else {
+            //                 ResponseData('Today is not your birthday', 422);
+            //             }
+            //         }
+            //     } else if ($data['discount_type'] == 'customer_level') {
+            //         $total = 0;
+            //         foreach ($customer->invoices as $invoice) {
+            //             $total += $invoice->total;
+            //         }
+            //         $levels = CustomerLevelDiscount::all();
+            //         $customerLevel = null;
+            //         foreach ($levels as $level) {
+            //             if ($total  >= $level->amount) {
+            //                 $customerLevel = $level;
+            //             } else {
+            //                 break;
+            //             }
+            //         }
+            //         if ($customerLevel == null) {
+            //             ResponseMessage('Customer level not found', 422);
+            //         }
+            //         $data['discount_value'] = $customerLevel->promotion_value;
+            //     }
+            // } else {
+            //     $data['discount_type'] = null;
+            // }
             $data['room_discount_value'] = $room_discount_value;
             if (isset($data['discount_value'])) {
                 $discount_value = $data['discount_value'];

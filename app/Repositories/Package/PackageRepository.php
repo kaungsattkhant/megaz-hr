@@ -20,7 +20,7 @@ class PackageRepository implements PackageRepositoryInterface
                 $query->where('from_date', '<=', $validateDate)
                     ->where('to_date', '>=', $validateDate)
                     ->first();
-            }, 'rooms'])
+            }])
             ->paginate(config('common.list_count'));
 
         ResponseData($packages);
@@ -28,7 +28,7 @@ class PackageRepository implements PackageRepositoryInterface
 
     public function detailPackage(int $id)
     {
-        $package = Package::where('id', $id)->with('menuPackages.menu.prices', 'rooms')->first();
+        $package = Package::where('id', $id)->with('menuPackages.menu.prices')->first();
         ResponseData($package);
     }
 
@@ -62,7 +62,6 @@ class PackageRepository implements PackageRepositoryInterface
                 foreach ($menuIds as $menu) {
                     $foodMenu = Menu::find($menu->menu_id);
                     $menuPrice += $foodMenu->price->price;
-
                     $menu_package = MenuPackage::create([
                         'menu_id' => $menu->menu_id,
                         'quantity' => $menu->quantity,
@@ -76,7 +75,7 @@ class PackageRepository implements PackageRepositoryInterface
                 $package->package_discount = $data['package_discount'];
                 $package->save();
             } else {
-                ResponseMessage('Invalid package', 422);
+                ResponseMessage('Package original price  shoud be more than the package price', 422);
             }
             // if(isset($data['roomIds'])){
             //     $rooms = json_decode($data['roomIds']);
@@ -95,25 +94,25 @@ class PackageRepository implements PackageRepositoryInterface
     }
 
 
-    public function validatePackingDates(array $roomIds, $fromDate, $toDate)
-    {
-        foreach ($roomIds as $roomId) {
-            $overlappingPacking = Package::whereHas('rooms', function ($query) use ($roomId) {
-                $query->where('entities.id', $roomId);
-            })
-                ->where(function ($query) use ($fromDate, $toDate) {
-                    $query->where('from_date', '<=', $toDate)
-                        ->where('to_date', '>=', $fromDate);
-                })->first();
+    // public function validatePackingDates(array $roomIds, $fromDate, $toDate)
+    // {
+    //     foreach ($roomIds as $roomId) {
+    //         $overlappingPacking = Package::whereHas('rooms', function ($query) use ($roomId) {
+    //             $query->where('entities.id', $roomId);
+    //         })
+    //             ->where(function ($query) use ($fromDate, $toDate) {
+    //                 $query->where('from_date', '<=', $toDate)
+    //                     ->where('to_date', '>=', $fromDate);
+    //             })->first();
 
-            // dd($overlappingPacking);
-            if ($overlappingPacking == null) {
-                return false;
-            }
-        }
+    //         // dd($overlappingPacking);
+    //         if ($overlappingPacking == null) {
+    //             return false;
+    //         }
+    //     }
 
-        return true;
-    }
+    //     return true;
+    // }
 
 
     public function editData(int $id, array $data)
@@ -187,7 +186,7 @@ class PackageRepository implements PackageRepositoryInterface
         $packages = Package::with(['menuPackages.menu.prices', 'menuPackages.menu.menuServiceDiscounts' => function ($query) use ($validateDate) {
             $query->where('from_date', '<=', $validateDate)
                 ->where('to_date', '>=', $validateDate);
-        }, 'rooms'])
+        }])
             ->paginate(config('common.list_count'));
 
         ResponseData($packages);
