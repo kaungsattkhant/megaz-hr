@@ -71,7 +71,7 @@
                             <label for="" class="block text-sm text-black mb-3">
                                 Deposit
                             </label>
-                            <input type="text" placeholder="Deposit" v-model="deposit"
+                            <input type="number" placeholder="Deposit" v-model="deposit"
                                 class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
                         </div>
                         <div class="col-span-6"></div>
@@ -81,21 +81,21 @@
                             <label for="" class="block text-sm text-black mb-3">
                                 Male
                             </label>
-                            <input type="text" placeholder="Male" v-model="male"
+                            <input type="number" placeholder="Male" v-model="male"
                                 class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
                         </div>
                         <div class="mb-6 col-span-3">
                             <label for="" class="block text-sm text-black mb-3">
                                 Female
                             </label>
-                            <input type="text" placeholder="Female" v-model="female"
+                            <input type="number" placeholder="Female" v-model="female"
                                 class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
                         </div>
                         <div class="mb-6 col-span-3">
                             <label for="" class="block text-sm text-black mb-3">
                                 Children
                             </label>
-                            <input type="text" placeholder="Children" v-model="children"
+                            <input type="number" placeholder="Children" v-model="children"
                                 class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
                         </div><div class="col-span-3"></div>
                         <div class="mb-4 col-span-3">
@@ -124,7 +124,7 @@
                             <label for="" class="block text-sm text-black mb-3">
                                 Count
                             </label>
-                            <input type="text" placeholder="Count" v-model="menuCount"
+                            <input type="number" placeholder="Count" v-model="menuCount"
                                 class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
                         </div>
                         <div class="col-span-3">
@@ -398,10 +398,10 @@
             },
             async menuCategorySelectChanged(){
                 console.log('menu category selected');
-                let url = `/api/menu_categories/${this.selectedMenuCategory.id}/menus`;
+                let url = `/api/menu_categories_bookings/${this.selectedMenuCategory.id}/menus?date=${this.startTime}`;
                 let response = await getApiData({url: url, token: this.getToken()});
                 if(response.data){
-                    this.menuList = response.data;
+                    this.menuList = response.data.data;
                 }
             },
             btnClickedAddMenu(){
@@ -409,7 +409,7 @@
             },
             addMenu(){
                 if(this.selectedMenu.menu_service_discounts.length > 0){
-                    this.is_menu_discount = this.selectedMenu.menu_service_discounts.discount_price
+                    this.is_menu_discount = this.selectedMenu.menu_service_discounts[0].discount_price
                 }
                 else{
                     this.is_menu_discount = 0
