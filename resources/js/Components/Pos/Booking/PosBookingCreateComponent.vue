@@ -10,7 +10,6 @@
                             Create Booking
                         </p>
                     </div>
-                    {{ package_total }}
                     <div class="grid grid-cols-12 gap-x-8 relative px-8 py-4">
                         <div class="mb-4 col-span-3">
                             <label for="" class="block text-sm text-black mb-3">
@@ -171,7 +170,7 @@
                                             {{ om.quantity }}
                                         </td>
                                         <td class=" py-4 text-sm  ">
-                                            {{ om.menu_price }}
+                                            {{ om.price }}
                                         </td>
                                         <td class=" py-4 text-sm  text-center">
                                             <button :disabled="!om.is_changeable" :title="!om.is_changeable ? 'Can not Change Selected Package Menu' : '' "
@@ -258,6 +257,7 @@
 
                 isPackage:false,
                 orderMenuList:[],
+                is_menu_discount:0,
 
                 customerList: [],
                 selectedMenuCategory:null,
@@ -319,6 +319,9 @@
                 }
             },
             selectedPackageChange(){
+                if(this.selectedPackage){
+                    this.package_discount = this.selectedPackage.package_discount;
+                }
                 this.food_total = 0 ;
                 this.orderMenuList = [];
                 // this.roomList = this.selectedPackage.rooms;
@@ -336,27 +339,35 @@
                     let menuCategorySelected = this.menuCategoryList.findIndex(menuCategory => menuCategory.id == packageMenu.menu.menu_category_id)
                     let is_dis_menu_price = 0;
                     if(packageMenu.menu.menu_service_discounts.length>0){
-                        is_dis_menu_price = (packageMenu.menu.prices[0].price - packageMenu.menu.menu_service_discounts[0].discount_price) * packageMenu.quantity;
+                        is_dis_menu_price = packageMenu.menu.menu_service_discounts[0].discount_price;
                     }
                     else{
-                        is_dis_menu_price = packageMenu.menu.prices[0].price * packageMenu.quantity;
+                        is_dis_menu_price = 0;
                     }
                     this.orderMenuList.push({
                         quantity : packageMenu.quantity,
                         name : packageMenu.menu.name + ' (Package)',
                         menu_category_name : this.menuCategoryList[menuCategorySelected].name,
-                        menu_price : is_dis_menu_price,
+                        price : packageMenu.menu.prices[0].price,
                         menu_id : packageMenu.menu_id,
-                        is_package : 1,
-                        is_changeable : is_changeable
+                        discount_value: is_dis_menu_price,
                     });
                     
-                    this.food_total += is_dis_menu_price;
-                    this.package_food_total += is_dis_menu_price;
+                    this.food_total += packageMenu.menu.prices[0].price * packageMenu.quantity;
+                    this.package_food_total += packageMenu.menu.prices[0].price * packageMenu.quantity;
                     // this.total = this.selectedPackage.price;
                     let room_price = this.selectedPackage.pay_session * this.selectedPackage.session_price;
                     this.total = ( this.food_total + room_price ) - this.selectedPackage.package_discount;
-                    this.package_discount = this.selectedPackage.package_discount;
+                    
+
+
+                    
+                });
+            },
+            filterMenuForData(){
+                this.orderMenuList.forEach(om => {
+                    delete om.name;
+                    delete om.menu_category_name;
                 });
             },
             sessionDurationChange(){
@@ -397,14 +408,19 @@
                 this.addMenu();
             },
             addMenu(){
+                if(this.selectedMenu.menu_service_discounts.length > 0){
+                    this.is_menu_discount = this.selectedMenu.menu_service_discounts.discount_price
+                }
+                else{
+                    this.is_menu_discount = 0
+                }
                 this.orderMenuList.push({
                     quantity: this.menuCount,
                     name: this.selectedMenu.name,
                     menu_category_name: this.selectedMenuCategory.name,
-                    menu_price:this.selectedMenu.prices[0].price * this.menuCount,
+                    price:this.selectedMenu.prices[0].price,
                     menu_id : this.selectedMenu.prices[0].menu_id,
-                    is_package : 0,
-                    is_changeable : true,
+                    discount_value: this.is_menu_discount,
                 });
                 this.food_total += this.selectedMenu.prices[0].price * this.menuCount;
                 console.log(this.food_total)
@@ -413,6 +429,7 @@
                 this.selectedMenu = null;
                 this.selectedMenuCategory = null;
                 this.menuList = []
+                
             },
             removeMenuBtnClicked(index){
                 this.food_total -= this.orderMenuList[index].menu_price;
@@ -434,6 +451,7 @@
 
 
             async btnClickedCreateBooking(){
+                this.filterMenuForData();
                 let formData = new FormData();
                 formData.append('customer_id', this.selectedCustomer.id);
                 formData.append('male', this.male);

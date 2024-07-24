@@ -50,6 +50,7 @@
                             </div> -->
                         </div>
                     </div>
+
                     <!-- <div class="hidden opacity-0 transition-opacity duration-150 ease-linear data-[te-tab-active]:block"
                         id="tabs-profile" role="tabpanel" aria-labelledby="tabs-profile-tab">
                         <div class="flex flex-wrap gap-x-4 gap-y-4">
@@ -639,7 +640,7 @@
                                                 {{ pm.quantity }}
                                             </td>
                                             <td class=" py-4 text-sm  ">
-                                                {{ pm.menu_price }}
+                                                {{ pm.original_price }}
                                             </td>
                                             <td class=" py-4 text-sm  text-center">
                                                 <button :disabled="!pm.is_changeable" :title="!pm.is_changeable ? 'Can not Change Selected Package Menu' : '' "
@@ -664,7 +665,7 @@
                             </button>
                         </div>
                         <div class="">
-                            <button
+                            <button @click="createRoomForPackage()"
                                 class="bg-[#55EFC4] text-gray-700 text-center text-sm font-semibold w-full py-3">
                                 Confirm Menu
                             </button>
@@ -814,7 +815,7 @@
                     </div>
 
                     <div class="flex justify-center px-12 mb-6">
-                        <button @click="btnConfirmAddPackageMenu" class="pos-add-btn focus:outline-none focus:ring-0 ">
+                        <button @click="btnConfirmAddPackageMenu()" class="pos-add-btn focus:outline-none focus:ring-0 ">
                             Add Menu
                         </button>
                     </div>
@@ -1055,6 +1056,7 @@ export default {
             packageMenuList:[],
             selectedMenuForPackage:null,
             menuQuantityForPackage:null,
+            is_menu_discount:0,
 
             //create menu , add hour , change room
             menuList: [],
@@ -1203,18 +1205,12 @@ export default {
             this.selectedRoomIndex = index;
             await this.getSelectedRoom();
             if (this.roomList[index].is_active == 1) {
-                this.isOpenRoom.step_1 = false;
-                this.isOpenRoom.step_2 = false;
-                this.isOpenRoom.step_invoice = false;
-                this.isOpenRoom.step_detail = true;
+                this.isOpenRoomStep('step_detail');
                 this.getPurchaseMenuList();
             };
             if (this.roomList[index].is_active == 0) {
                 // alert(this.roomList[index].room_sessions.length + ' = 0 ')
-                this.isOpenRoom.step_1 = true;
-                this.isOpenRoom.step_2 = false;
-                this.isOpenRoom.step_invoice = false;
-                this.isOpenRoom.step_detail = false;
+                this.isOpenRoomStep('step_1');
                 this.getPurchaseMenuList();
             };
         },
@@ -1225,10 +1221,7 @@ export default {
             }
         },
         btnClickedOpenRoom() {
-            this.isOpenRoom.step_1 = false;
-            this.isOpenRoom.step_2 = true;
-            this.isOpenRoom.step_detail = false;
-            this.isOpenRoom.step_invoice = false;
+            this.isOpenRoomStep('step_2');
             this.clearOpenRoomForm();
             this.isPackage = false;
 
@@ -1284,48 +1277,43 @@ export default {
             this.addPackageMenu();
         },
         async addPackageMenu() {
+            if(this.selectedMenuForPackage.menu_service_discounts.length > 0){
+                this.is_menu_discount = this.selectedMenuForPackage.menu_service_discounts.discount_price
+            }
+            else{
+                this.is_menu_discount = 0
+            }
             this.packageMenuList.push({
-                quantity: this.menuCount,
-                name: this.selectedMenu.name,
-                menu_price:this.selectedMenu.prices[0].price * this.menuCount,
-                menu_id : this.selectedMenu.prices[0].menu_id,
+                quantity: this.menuQuantityForPackage,
+                name: this.selectedMenuForPackage.name,
+                original_price:this.selectedMenuForPackage.prices[0].price,
+                menu_id : this.selectedMenuForPackage.prices[0].menu_id,
+                discount_value: this.is_menu_discount
             });
         },
         removePackageMenu(index){
             this.packageMenuList.splice(index, 1);
-                
         },
         confirmRoomBtnClicked() {
             this.getPurchaseMenuList();
             if(this.type == 'package' && this.selectedPackage){
-                this.isOpenRoom.step_1 = false;
-                this.isOpenRoom.step_2 = false;
-                this.isOpenRoom.step_isPackage = true;
-                this.isOpenRoom.step_detail = false;
-                this.isOpenRoom.step_invoice = false;
-
-                let is_changeable = false;
-                if(this.selectedPackage.is_changeable == 1){
-                    is_changeable = true;
-                }
-                else{
-                    is_changeable = false
-                }
+                this.isOpenRoomStep('step_isPackage');
+                
                 let menuOfselectedPackage = this.selectedPackage.menu_packages;
                 menuOfselectedPackage.forEach((packageMenu)=>{
                     let is_dis_menu_price = 0;
                     if(packageMenu.menu.menu_service_discounts.length>0){
-                        is_dis_menu_price = (packageMenu.menu.prices[0].price - packageMenu.menu.menu_service_discounts[0].discount_price) * packageMenu.quantity;
+                        is_dis_menu_price = packageMenu.menu.menu_service_discounts[0].discount_price;
                     }
                     else{
-                        is_dis_menu_price = packageMenu.menu.prices[0].price * packageMenu.quantity;
+                        is_dis_menu_price = 0;
                     }
                     this.packageMenuList.push({
                         quantity : packageMenu.quantity,
                         name : packageMenu.menu.name,
-                        menu_price : is_dis_menu_price,
-                        is_package : 1,
-                        is_changeable : is_changeable
+                        original_price : packageMenu.menu.prices[0].price,
+                        discount_value: is_dis_menu_price,
+                        menu_id : packageMenu.menu_id,
                     });
                     
                 });
@@ -1334,6 +1322,18 @@ export default {
                 this.createRoom();
             }
         },
+        filterMenuForData(){
+            this.packageMenuList.forEach(om => {
+                delete om.name;
+                console.log('hello = ' + om.name);
+            });
+            
+        },
+        createRoomForPackage(){
+            this.filterMenuForData();
+            this.createRoom();
+        },
+
         async createRoom() {
             let formData = new FormData();
             formData.append('entity_id', this.selectedRoom.id);
@@ -1344,6 +1344,7 @@ export default {
             }
             if (this.type == 'package') {
                 formData.append('package_id', this.selectedPackage.id);
+                formData.append('orders', JSON.stringify(this.packageMenuList));
             }
             formData.append('type', this.type);
             formData.append('deposit', this.deposit);
@@ -1711,6 +1712,16 @@ export default {
 
 
 
+        isOpenRoomStep(selectedKey) {
+            for (let key in this.isOpenRoom) {
+                if (key === selectedKey) {
+                    this.isOpenRoom[key] = true;
+                }
+                else {
+                    this.isOpenRoom[key] = false;
+                }
+            }
+        },
         closeModal() {
             document.getElementById("closeModal").click();
         },

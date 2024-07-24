@@ -234,9 +234,8 @@
                 bookingId:null,
                 booking_staus:null,
                 selectedRoom:null,
-
-            };
-        },
+                };
+            },
 
         methods: {
             ...mapGetters(['getToken']),
@@ -287,8 +286,7 @@
                 else {
                     console.log(response.error);
                 }
-            }
-            
+            },
         },
         mounted()
         {
