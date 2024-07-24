@@ -399,7 +399,7 @@
                                 Package Price
                             </p>
                             <p class=" w-28">
-                                {{ packagePrice.toLocaleString() }} MMKs
+                                {{ selectedRoom.room_sessions[0].invoice.package.name }}
                             </p>
                         </div>
                         <div v-if="!isPackage" class=" text-sm text-right flex gap-x-2 justify-end pr-2 mb-2">
@@ -449,6 +449,14 @@
                             <p class="w-28">
                                 <!-- {{ purchaseMenuList.length > 0 ? '- ' : '' }} {{ purchaseMenuList[0] ? purchaseMenuList[0].total_discount_price : '0' }} MMks -->
                                 {{ foodDiscount > 0 ? '- ' : '' }} {{ foodDiscount }}
+                            </p>
+                        </div>
+                        <div v-if="isPackage" class=" text-sm text-right flex gap-x-2 justify-end pr-2 mb-2">
+                            <p>
+                                Package Discount
+                            </p>
+                            <p class=" w-28">
+                                {{ selectedRoom.room_sessions[0].invoice.package.package_discount > 0 ? '- ' : '' }}  {{ selectedRoom.room_sessions[0].invoice.package.package_discount }}
                             </p>
                         </div>
                         <div class=" text-sm text-right flex gap-x-2 justify-end pr-2 mb-2">
@@ -1517,7 +1525,7 @@ export default {
                 });
             }
             if (this.selectedRoom.room_sessions[0].invoice.invoice_type == 'package') {
-                this.printInvoiceData.room = this.selectedRoom.room_sessions[0].invoice.package.pay_session * this.selectedRoom.room_sessions[0].invoice.package.session_price;
+                this.printInvoiceData.room = this.selectedRoom.room_sessions[0].invoice.total_session_price;
                 this.printInvoiceData.package_discount = this.selectedRoom.room_sessions[0].invoice.package.package_discount;
                 this.isPackage = true;
                 this.packagePrice = this.selectedRoom.room_sessions[0].invoice.paid_amount
@@ -1525,7 +1533,7 @@ export default {
             }
             else {
                 this.isPackage = false;
-                this.printInvoiceData.total = (this.printInvoiceData.room + this.printInvoiceData.food) - this.foodDiscount;
+                this.printInvoiceData.total = (this.selectedRoom.room_sessions[0].invoice.total_session_price + this.printInvoiceData.food) - this.foodDiscount;
             }
 
 
@@ -1657,7 +1665,8 @@ export default {
             }
         },
         discountChanged() {
-            let roomTotalAmount = (this.printInvoiceData.room + this.printInvoiceData.food) - this.printInvoiceData.package_discount - this.foodDiscount
+            let roomTotalAmount = (this.selectedRoom.room_sessions[0].invoice.total_session_price + this.printInvoiceData.food) - this.printInvoiceData.package_discount - this.foodDiscount
+            console.log('room total = ' + this.printInvoiceData.room)
             if (this.discount_type == 'percentage') {
                 this.printInvoiceData.total = roomTotalAmount - (roomTotalAmount * (this.printInvoiceData.discount / 100));
             }
@@ -1737,7 +1746,7 @@ export default {
                 this.isOpenRoom.step_invoice = false;
 
                 console.log("success")
-                window.location.reload()
+                // window.location.reload()
             }
             else {
                 console.log('some errors occur');
