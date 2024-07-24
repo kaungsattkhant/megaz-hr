@@ -406,6 +406,7 @@
             },
             btnClickedAddMenu(){
                 this.addMenu();
+                
             },
             addMenu(){
                 if(this.selectedMenu.menu_service_discounts.length > 0){
