@@ -103,7 +103,7 @@ class InvoiceRepository implements InvoiceRepositoryInterface
                 }
 
                 $end_date = Carbon::parse($data['invoice_date'])->addHours($package->free_session + $package->pay_session);
-                $data['total_session_price'] = 0;
+                $data['total_session_price'] = $package->pay_session *$package->session_price;
                 $data['paid_amount'] = $package->price;
                 $data['package_id'] = $package->id;
                 $data['session_duration'] = $package->pay_session + $package->free_session; // nullable
@@ -206,25 +206,26 @@ class InvoiceRepository implements InvoiceRepositoryInterface
                 $originalDuration += $room_session->session_duration;
             }
             $invoice = Invoice::find($data['invoice_id']);
-            if ($invoice->invoice_type != 'session') {
-                ResponseMessage('Room with session duration can only be added duration', 422);
+            if ($invoice->invoice_type == 'endless_time') {
+                ResponseMessage('Room with session and package can only be added duration', 422);
             }
 
             $invoice->total_session_price += $data['session_duration'] * $roomAndSession->entity->price_per_hour;
 
-
             if ($data['session_duration'] >= 1) {
-                $end_date = Carbon::parse($roomAndSession->end_date)->addHours($data['session_duration']);
+                $sessionDuration = (float) $data['session_duration'];
+                $end_date = Carbon::parse($roomAndSession->end_date)->addHours($sessionDuration);
+
             } else {
-                $end_date = Carbon::parse($roomAndSession->end_date)->addMinutes($data['session_duration'] * 60);
+                $sessionDuration = (float) $data['session_duration'];
+                $end_date = Carbon::parse($roomAndSession->end_date)->addMinutes($sessionDuration * 60);
             }
+
             $roomAndSession->price += $data['session_duration'] * $roomAndSession->entity->price_per_hour;
             $roomAndSession->end_date = $end_date->format('Y-m-d H:i:s');
             $roomAndSession->session_duration += $data['session_duration'];
             $roomAndSession->save();
-
-
-            $allRooms = RoomSession::where('invoice_id', $invoice->id)->get();
+            $invoice->save();
 
             DB::commit();
             return $roomAndSession;
@@ -257,9 +258,7 @@ class InvoiceRepository implements InvoiceRepositoryInterface
             $lastRoomwithInvoice->session_duration = $roundedDurationInHours;
             $lastRoomwithInvoice->end_date = CurrentTime();
 
-            if ($invoice->invoice_type == 'package') {
-                $lastRoomwithInvoice->price = $package->session_price * $roundedDurationInHours;
-            } else {
+            if ($invoice->invoice_type != 'package') {
                 $lastRoomwithInvoice->price = $roundedDurationInHours * $lastEntity->price_per_hour;
             }
 
@@ -280,13 +279,10 @@ class InvoiceRepository implements InvoiceRepositoryInterface
             $newSession['start_date'] = CurrentTime();
             $newSession['invoice_id'] = $invoice->id;
             $newSession['session_duration'] = $leftDuration;
-            if($invoice->invoice_type=='package')
-            {
-            $newSession['price'] =0;
-
-            }else{
-            $newSession['price'] = $selectedEntity->price_per_hour * $leftDuration;
-
+            if ($invoice->invoice_type == 'package') {
+                $newSession['price'] = 0;
+            } else {
+                $newSession['price'] = $selectedEntity->price_per_hour * $leftDuration;
             }
             $newSession['entity_id'] = $selectedEntity->id;
 
@@ -337,7 +333,6 @@ class InvoiceRepository implements InvoiceRepositoryInterface
             foreach ($roomSessions as $room) {
                 $total_session_value += $room->price;
                 $total_duration += $room->session_duration ?? 0;
-
             }
             $entity = Entity::find($latestRoomSession->entity_id);
             if ($invoice->invoice_type == 'endless_time') {
@@ -413,13 +408,17 @@ class InvoiceRepository implements InvoiceRepositoryInterface
             $discount_value = 0;
             $room_discount_value = 0;
 
-
             if (isset($data['tax'])) {
                 $tax = $data['tax'];
             }
 
             if (isset($data['service_charge'])) {
                 $service_charge = $data['service_charge'];
+            }
+
+
+            if (isset($data['order_discount'])) {
+                $order_discount = $data['order_discount'];
             }
 
             if (isset($data['order_categories'])) {
@@ -447,31 +446,9 @@ class InvoiceRepository implements InvoiceRepositoryInterface
             }
 
 
-            $order = Order::where('invoice_id', $invoice->id)->first();
-            if ($order) {
-                $order_discount = $order->total_discount_price;
-            }
 
-            // caculating depending on invoice_type
-            if ($invoice->invoice_type == 'package') {
-                $package = Package::find($invoice->package_id);
-                $foodDrink = $foodCharge + $beverageCharge;
-                $data['total'] = ($foodDrink + ($package->pay_session * $package->session_price) + $tax + $service_charge) - ($order_discount + $package->package_discount);
-                // dd($foodDrink,($package->pay_session * $package->session_price),$order_discount,$package->package_discount);
-                $data['paid_amount'] = $data['total'];
-            } else if ($invoice->invoice_type == 'session' || $invoice->invoice_type == 'endless_time') {
-                $foodDrink = $foodCharge + $beverageCharge;
-                $data['total'] = ($foodDrink + $total_session_price + $service_charge + $tax) - $order_discount;
-                $data['total_session_price'] = $total_session_price;
-            }
-            // caculating depending on discount_type
             if (isset($data['discount_type'])) {
-                if ($data['discount_type'] == 'percentage') {
-                    if ($data['discount_percentage'] < 0 || $data['discount_percentage'] > 100) {
-                        ResponseMessage('Discount percentage should be between 0 and 100');
-                    }
-                    $data['discount_value'] = ($data['total']) * ($data['discount_percentage'] / 100);
-                } else if ($data['discount_type'] == 'room_discount') {
+                if ($data['discount_type'] == 'room_discount') {
                     $roomDiscount = RoomDiscount::find($data['room_discount_id']);
                     if (!$roomDiscount->rooms->contains($entity->id)) {
                         ResponseMessage('Selected discount cannot be applied', 422);
@@ -485,49 +462,17 @@ class InvoiceRepository implements InvoiceRepositoryInterface
                     } else {
                         ResponseMessage('Discount cannot be applied', 422);
                     }
-                } else if ($data['discount_type'] == 'birthday_discount') {
-                    if ($customer) {
-                        $birthdate = Carbon::parse($customer->birthdate);
-                        $today = Carbon::today();
-                        if ($birthdate->isBirthday($today)) {
-                            $isBirthday = true;
-                            $bdPromo = BirthdayPromotion::find($data['birthday_discount_id']);
-                            if (!$bdPromo) {
-                                ResponseMessage('Selected birthday promotion not found');
-                            }
-                            $data['discount_value'] = $bdPromo->discount_value;
-                        } else {
-                            ResponseData('Today is not your birthday', 422);
-                        }
-                    }
-                } else if ($data['discount_type'] == 'customer_level') {
-                    $total = 0;
-                    foreach ($customer->invoices as $invoice) {
-                        $total += $invoice->total;
-                    }
-                    $levels = CustomerLevelDiscount::all();
-                    $customerLevel = null;
-                    foreach ($levels as $level) {
-                        if ($total  >= $level->amount) {
-                            $customerLevel = $level;
-                        } else {
-                            break;
-                        }
-                    }
-                    if ($customerLevel == null) {
-                        ResponseMessage('Customer level not found', 422);
-                    }
-                    $data['discount_value'] = $customerLevel->promotion_value;
                 }
-            } else {
-                $data['discount_type'] = null;
             }
+
             $data['room_discount_value'] = $room_discount_value;
             if (isset($data['discount_value'])) {
                 $discount_value = $data['discount_value'];
             }
-            $discount_total = $discount_value + $room_discount_value;
-            $data['total'] -= $discount_total;
+
+
+            $data['discount_total'] += $room_discount_value;
+            $data['total'] -= $room_discount_value;
             $data['tax'] = $tax;
             $data['service_charge'] = $service_charge;
             $data['total_session_price'] = $total_session_price;
@@ -539,6 +484,7 @@ class InvoiceRepository implements InvoiceRepositoryInterface
             $entity->is_active = 0;
             $entity->save();
             $data['invoice_id'] = $invoice_id;
+
             $invoice->update($data);
 
             $this->ledgerAndTransactionForInvoice([
@@ -549,7 +495,7 @@ class InvoiceRepository implements InvoiceRepositoryInterface
                 'total_session_price' => $total_session_price,
                 'service_charge' => $service_charge,
                 'tax' => $tax,
-                'discount_total' => $discount_total,
+                'discount_total' => $data['discount_total'],
             ]);
             $catering_department = Department::where('name', 'Catering')->first();
             $msg = "The {$entity->name} is now closed. Thank you.";
