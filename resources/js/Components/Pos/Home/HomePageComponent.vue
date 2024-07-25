@@ -1328,6 +1328,7 @@ export default {
                     // else{
                     //     is_dis_menu_price = 0;
                     // }
+                    
                     this.food_total_package += (packageMenu.menu.prices[0].price - is_dis_menu_price) * packageMenu.quantity;
                     this.packageMenuList.push({
                         quantity : packageMenu.quantity,
