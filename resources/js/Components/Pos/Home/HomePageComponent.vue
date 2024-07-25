@@ -648,10 +648,10 @@
                                                 {{ pm.quantity }}
                                             </td>
                                             <td class=" py-4 text-sm  ">
-                                                {{ pm.original_price }}
+                                                {{ (pm.original_price - pm.discount_value) * pm.quantity  }}
                                             </td>
                                             <td class=" py-4 text-sm  text-center">
-                                                <button :disabled="!pm.is_changeable" :title="!pm.is_changeable ? 'Can not Change Selected Package Menu' : '' "
+                                                <button 
                                                     @click="removePackageMenu(index)">
                                                     <i class="fal fa-times  pr-3"></i>
                                                 </button>
@@ -1067,6 +1067,9 @@ export default {
             selectedMenuForPackage:null,
             menuQuantityForPackage:null,
             is_menu_discount:0,
+            food_total_package:0,
+            food_total_add_meuu:0,
+            package_total:0,
 
             //create menu , add hour , change room
             menuList: [],
@@ -1290,20 +1293,25 @@ export default {
         },
         async addPackageMenu() {
             if(this.selectedMenuForPackage.menu_service_discounts.length > 0){
-                this.is_menu_discount = this.selectedMenuForPackage.menu_service_discounts.discount_price
+                this.is_menu_discount = this.selectedMenuForPackage.menu_service_discounts[0].discount_price
             }
             else{
                 this.is_menu_discount = 0
             }
+            
             this.packageMenuList.push({
                 quantity: this.menuQuantityForPackage,
                 name: this.selectedMenuForPackage.name,
                 original_price:this.selectedMenuForPackage.prices[0].price,
                 menu_id : this.selectedMenuForPackage.prices[0].menu_id,
-                discount_value: this.is_menu_discount
+                discount_value: this.is_menu_discount,
+                is_package : 0,
             });
+            this.food_total_package += (this.selectedMenuForPackage.prices[0].price - this.is_menu_discount) * this.menuQuantityForPackage;
         },
         removePackageMenu(index){
+            
+            // this.food_total_package -= this.packageMenuList[index].original_price - this.packageMenuList[index].discount_value;
             this.packageMenuList.splice(index, 1);
         },
         confirmRoomBtnClicked() {
@@ -1314,18 +1322,20 @@ export default {
                 let menuOfselectedPackage = this.selectedPackage.menu_packages;
                 menuOfselectedPackage.forEach((packageMenu)=>{
                     let is_dis_menu_price = 0;
-                    if(packageMenu.menu.menu_service_discounts.length>0){
-                        is_dis_menu_price = packageMenu.menu.menu_service_discounts[0].discount_price;
-                    }
-                    else{
-                        is_dis_menu_price = 0;
-                    }
+                    // if(packageMenu.menu.menu_service_discounts.length>0){
+                    //     is_dis_menu_price = packageMenu.menu.menu_service_discounts[0].discount_price;
+                    // }
+                    // else{
+                    //     is_dis_menu_price = 0;
+                    // }
+                    this.food_total_package += (packageMenu.menu.prices[0].price - is_dis_menu_price) * packageMenu.quantity;
                     this.packageMenuList.push({
                         quantity : packageMenu.quantity,
                         name : packageMenu.menu.name,
                         original_price : packageMenu.menu.prices[0].price,
                         discount_value: is_dis_menu_price,
                         menu_id : packageMenu.menu_id,
+                        is_package : 1
                     });
                     
                 });
@@ -1344,6 +1354,13 @@ export default {
         createRoomForPackage(){
             this.filterMenuForData();
             this.createRoom();
+            // let packageSessionTotalPrice = this.selectedPackage.pay_session * this.selectedPackage.session_price;
+            // let packagePriceTotal = this.food_total_package + packageSessionTotalPrice;
+            // console.log('package food = ' + this.food_total_package)
+            // console.log('menu food = ' + this.food_total_add_meuu)
+            // console.log('package session price  = ' + this.selectedPackage.session_price + ', package session = ' + this.selectedPackage.pay_session)
+            // console.log('package session total price  = ' + packagePriceTotal + ', package price = ' + this.selectedPackage.price)
+            // this.package_total = packagePriceTotal
         },
 
         async createRoom() {
@@ -1391,6 +1408,7 @@ export default {
                 }
 
                 console.log("success")
+                window.location.reload()
             }
             else {
                 console.log('some errors occur')
@@ -1499,10 +1517,7 @@ export default {
                 this.roomSessionData = response.data;
                 roomSessions = response.data;
                 console.log("success")
-                this.isOpenRoom.step_1 = false;
-                this.isOpenRoom.step_2 = false;
-                this.isOpenRoom.step_detail = false;
-                this.isOpenRoom.step_invoice = true;
+                this.isOpenRoomStep('step_invoice')
             }
             else {
                 this.$notify({
@@ -1576,7 +1591,7 @@ export default {
             let totalDiscounts = originalSessions + discountSessions;
             let paidSession = 0;
             let pricePerHour = 0;
-            roomSessions.forEach(roomSession => {
+            roomSessions.rooms_sessions.forEach(roomSession => {
                 totalSession += roomSession.session_duration;
                 pricePerHour = roomSession.entity.price_per_hour;
             });
@@ -1623,11 +1638,12 @@ export default {
                 const response = await getApiData({ url: '/api/room_discounts', token: this.getToken() });
                 if (response.data) {
                     this.roomDiscountList = response.data.data;
+                    console.log('get room dis list' + response.data.data)
                     // this.printInvoiceData.total = this.printInvoiceData.room + this.printInvoiceData.food;
                 }
 
             }
-            if (this.discount_type == 'birthday_discount') {
+            else if (this.discount_type == 'birthday_discount') {
                 const response = await getApiData({ url: '/api/birthday_promotions', token: this.getToken() });
                 if (response.data) {
                     this.birthdayDiscountList = response.data.data;
@@ -1635,7 +1651,7 @@ export default {
                 // this.printInvoiceData.total = this.printInvoiceData.room + this.printInvoiceData.food;
             }
 
-            if (this.discount_type == 'customer_level') {
+            else if (this.discount_type == 'customer_level') {
                 if (this.selectedRoom.room_sessions[0].invoice.invoice_type == 'package') {
                     // this.printInvoiceData.room = this.selectedRoom.room_sessions[0].invoice.package.pay_session * this.selectedRoom.room_sessions[0].invoice.package.session_price;
                     this.printInvoiceData.customer_discount = this.roomSessionData.customer_level_discount_value + this.selectedRoom.room_sessions[0].invoice.package.package_discount + this.selectedRoom.room_sessions[0].invoice.orders[0].total_discount_price;
@@ -1643,14 +1659,14 @@ export default {
                 }
                 else {
                     // this.printInvoiceData.room = this.roomSessionData.room_sessions.price;
-                    this.printInvoiceData.customer_discount = this.roomSessionData.customer_level_discount_value + this.selectedRoom.room_sessions[0].invoice.orders.total_discount_price;
-                    this.printInvoiceData.total = ((this.printInvoiceData.room + this.printInvoiceData.food) - this.printInvoiceData.package_discount - this.foodDiscount) - this.printInvoiceData.customer_discount
+                    this.printInvoiceData.customer_discount = this.roomSessionData.customer_level_discount_value + this.selectedRoom.room_sessions[0].invoice.orders[0].total_discount_price;
+                    this.printInvoiceData.total = ((this.printInvoiceData.room + this.printInvoiceData.food) - this.printInvoiceData.package_discount - this.foodDiscount) - this.printInvoiceData.customer_discount;
                 }
                 
             }
             else {
                 this.roomDiscountList = [];
-                this.room_discount = null;
+                this.room_discount = 1599;
                 let roomChargeTotal = 0;
                 let roomSessions = this.roomSessionData;
                 // roomSessions.forEach(roomSession => {

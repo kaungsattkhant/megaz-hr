@@ -385,6 +385,7 @@ class InvoiceRepository implements InvoiceRepositoryInterface
             }
 
             $roomDoneResponse['room_sessions'] = $latestRoomSession;
+            $roomDoneResponse['rooms_sessions'] = $roomSessions;
             DB::commit();
             ResponseData($roomDoneResponse);
         } catch (\Exception $e) {
