@@ -48,6 +48,16 @@ class AccountController extends Controller
         ResponseData($sub_account);
     }
 
+    public function getSecondAccount($sub_account_id){
+        $data= $this->accountRepo->getSecondAccount($sub_account_id);
+        ResponseData($data);
+    }
+
+    public function getThirdAccount($sub_account_id){
+        $data= $this->accountRepo->getThirdAccount($sub_account_id);
+        ResponseData($data);
+    }
+
     public function createSecondAccount(Request $request){
         $data= $this->accountRepo->createSecondAccount($request);
         ResponseData($data);

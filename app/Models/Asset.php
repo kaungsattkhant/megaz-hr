@@ -8,4 +8,5 @@ use Illuminate\Database\Eloquent\Model;
 class Asset extends Model
 {
     use HasFactory;
+    protected $fillable=['name','cost','purchase_date','third_account_id','third_depreciation_account_id','useful_life'];
 }

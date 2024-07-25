@@ -17,8 +17,8 @@ return new class extends Migration
             $table->decimal('cost',15,2);
             $table->integer('useful_life');
             $table->dateTime('purchase_date');
-            $table->unsignedInteger('third_account_id');
-            $table->unsignedInteger('third_depreciation_account_id');
+            $table->unsignedInteger('third_account_id');  //fix_asset account
+            $table->unsignedInteger('third_depreciation_account_id'); //third_depreciation_account
             $table->timestamps();
         });
     }

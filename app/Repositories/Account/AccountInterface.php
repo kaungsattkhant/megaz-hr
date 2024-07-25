@@ -22,6 +22,7 @@ interface AccountInterface
 
     public function createThirdAccount($request);
 
+    public function getSecondAccount($request);
 
-
+    public function getThirdAccount($sub_account_id);
 }
