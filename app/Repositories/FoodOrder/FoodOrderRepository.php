@@ -12,26 +12,49 @@ class FoodOrderRepository implements FoodOrderRepositoryInterface
 {
     public function listAllData(Request $request)
     {
-            $validateDate= $request->date ?? CurrentDate();
-            $foodOrders=FoodOrder::with('customer','address','confirmedBy','cancelledBy')
-            ->whereBetween('date_time',[$validateDate.' 00:00:00',$validateDate.' 23:59:59'])
-            ->orderBy('created_at','desc')
+        $validateDate = $request->date ?? CurrentDate();
+        $foodOrders = FoodOrder::with(['customer', 'customer.addresses' => function ($query) {
+            $query->where('is_default', 1);
+        }, 'confirmedBy', 'cancelledBy', 'foodOrderItems.menu.areas'])
+            ->whereBetween('date_time', [$validateDate . ' 00:00:00', $validateDate . ' 23:59:59'])
+            ->orderBy('created_at', 'desc')
             ->get();
+
         ResponseData($foodOrders);
     }
 
+
+    public function confirmFoodOrderItem(int $id, Request $request)
+    {
+        DB::beginTransaction();
+        try {
+            $foodOrderItem = FoodOrderItem::find($id);
+            $foodOrderItem->area_id = $request->area_id;
+            $foodOrderItem->status = "confirmed";
+            $foodOrderItem->save();
+            DB::commit();
+
+            ResponseData($foodOrderItem);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            ResponseMessage($e->getMessage());
+            throw $e;
+        }
+    }
+
+    // user app
     public function createFoodOrder(array $data)
     {
         DB::beginTransaction();
-        try{
+        try {
+            $data['customer_id'] = UserData()->id;
             $data['date_time'] = CurrentTime();
             $foodOrder = FoodOrder::create($data);
-            $foodOrderItem = json_decode($data['food_order_items'],true);
-            foreach($foodOrderItem as $order)
-            {
+            $foodOrderItem = json_decode($data['food_order_items'], true);
+            foreach ($foodOrderItem as $order) {
                 FoodOrderItem::create([
                     'food_order_id' => $foodOrder->id,
-                    'menu_id'=>$order['menu_id'],
+                    'menu_id' => $order['menu_id'],
                     'quantity' => $order['quantity'],
                     'discount_price' => $order['discount_price'],
                     'original_price' => $order['original_price'],
@@ -41,11 +64,9 @@ class FoodOrderRepository implements FoodOrderRepositoryInterface
 
             DB::commit();
             ResponseMessage('Food Order Created Successfully');
-
-        }catch(\Exception $e)
-        {
+        } catch (\Exception $e) {
             DB::rollBack();
-            ResponseMessage($e->getMessage(),422);
+            ResponseMessage($e->getMessage(), 422);
             throw $e;
         }
     }
