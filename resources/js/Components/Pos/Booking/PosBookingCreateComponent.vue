@@ -170,7 +170,7 @@
                                             {{ om.quantity }}
                                         </td>
                                         <td class=" py-4 text-sm  ">
-                                            {{ om.price }}
+                                            {{ om.price * om.quantity }}
                                         </td>
                                         <td class=" py-4 text-sm  text-center">
                                             <button :disabled="!om.is_changeable" :title="!om.is_changeable ? 'Can not Change Selected Package Menu' : '' "
@@ -421,7 +421,7 @@
                     menu_category_name: this.selectedMenuCategory.name,
                     price:this.selectedMenu.prices[0].price,
                     menu_id : this.selectedMenu.prices[0].menu_id,
-                    discount_value: this.is_menu_discount,
+                    discount_value: this.is_menu_discount, //0 if package menu
                 });
                 this.food_total += this.selectedMenu.prices[0].price * this.menuCount;
                 console.log(this.food_total)
@@ -498,11 +498,7 @@
                         console.log('some errors occur');
                     }
                 }
-
-                
             }
-        
-        
         },
         created(){
             this.getCustomerList();
