@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use App\Models\DeliveryCharge;
 use App\Models\FixedAssetPurchase;
 use App\Models\UsedDefectedItem;
 use App\Repositories\Uom\UomRepository;
@@ -67,6 +68,8 @@ use App\Repositories\PurchaseOrder\PurchaseOrderRepository;
 use App\Repositories\Complaint\ComplaintRepositoryInterface;
 use App\Repositories\CustomerLevelDiscount\CustomerLevelDiscountRepository;
 use App\Repositories\CustomerLevelDiscount\CustomerLevelDiscountRepositoryInterface;
+use App\Repositories\DeliveryCharge\DeliveryChargeRepository;
+use App\Repositories\DeliveryCharge\DeliveryChargeRepositoryInterface;
 use App\Repositories\Inventory\InventoryRepositoryInterface;
 use App\Repositories\Department\DepartmentRepositoryInterface;
 use App\Repositories\Feature\FeatureRepository;
@@ -155,5 +158,6 @@ class RepositoryServiceProvider extends ServiceProvider
         $this->app->bind(AdsRepositoryInterface::class,AdsRepository::class);
         $this->app->bind(BookingRepositoryInterface::class,BookingRepository::class);
         $this->app->bind(FoodOrderRepositoryInterface::class,FoodOrderRepository::class);
+        $this->app->bind(DeliveryChargeRepositoryInterface::class,DeliveryChargeRepository::class);
     }
 }

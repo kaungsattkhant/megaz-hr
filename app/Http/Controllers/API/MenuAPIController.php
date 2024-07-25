@@ -51,6 +51,18 @@ class MenuAPIController extends Controller
         ResponseData($menu);
     }
 
+    public function menuByMenuCategoryBooking(int $id,Request $request)
+    {
+        $validateDate = $request->date ?? CurrentDate();
+        $menu = Menu::where('menu_category_id',$id)->where('is_feature',1)->with(['menu_category', 'prices', 'items','menuServiceDiscounts' => function ($query) use ($validateDate)
+        {
+            $query->where('from_date', '<=',$validateDate)->where('to_date', '>=',$validateDate);
+        }
+        ])->paginate(config('common.list_count'));
+        ResponseData($menu);
+    }
+
+
     public function menuOnOff(int $id)
     {
         $menu = $this->menuRepo->menuIsActive($id);

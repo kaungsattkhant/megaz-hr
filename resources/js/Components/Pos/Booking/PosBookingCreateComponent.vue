@@ -10,20 +10,28 @@
                             Create Booking
                         </p>
                     </div>
-
                     <div class="grid grid-cols-12 gap-x-8 relative px-8 py-4">
                         <div class="mb-4 col-span-3">
                             <label for="" class="block text-sm text-black mb-3">
                                 Customer Name
                             </label>
-                            <input type="text" placeholder="Customer Name" v-model="name"
+                            <select name="" id="" v-model="selectedCustomer"
+                                class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
+                                <option v-for="(customer,index) in customerList" :value="customer" :key="index"> {{ customer.name }} </option>
+                            </select>
+                        </div>
+                        <div class="mb-4 col-span-3">
+                            <label for="" class="block text-sm text-black mb-3">
+                                Time
+                            </label>
+                            <input type="datetime-local" placeholder="Time" v-model="startTime" @change="getPackageList(startTime)"
                                 class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
                         </div>
                         <div class="mb-4 col-span-3">
                             <label for="" class="block text-sm text-black mb-3">
                                 Type
                             </label>
-                            <select name="" id="" v-model="type" @change="typeChange()"
+                            <select name="" id="" v-model="type" @change="typeChange()" :class="startTime == null ? '!bg-[#0001]' : 'bg-transparent'" :disabled="startTime == null"
                                 class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
                                 <option value="package"> Package </option>
                                 <option value="session"> Session </option>
@@ -35,19 +43,19 @@
                             </label>
                             <select name="" id="" v-model="selectedPackage" @change="selectedPackageChange()"
                                 class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0" >
-                                <option v-if="packageList.length > 1" v-for="(pack,index) in packageList" :value="pack" :key="index">{{ pack.name }} </option>
+                                <option v-if="packageList.length > 0" v-for="(pack,index) in packageList" :value="pack" :key="index">{{ pack.name }} </option>
                                 <option v-else>no Data Found</option>
                             </select>
-                        </div><div v-if="isPackage" class="col-span-3"></div>
+                        </div>
                         <div class="mb-4 col-span-3" v-if="type == 'session'">
                             <label for="" class="block text-sm text-black mb-3">
                                 Session Duration
                             </label>
                             <input type="text" placeholder="Duration" v-model="session_duration" @change="sessionDurationChange()"
                                 class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
-                        </div><div class="col-span-3" v-if="type == 'session'"></div>
+                        </div>
                         
-                        <div v-if="!isPackage && type != 'session'" class="col-span-6"></div>
+                        <div v-if="!isPackage && type != 'session'" class="col-span-3"></div>
                         
                         <div class="mb-4 col-span-3">
                             <label for="" class="block text-sm text-black mb-3">
@@ -58,42 +66,36 @@
                                 <option v-for="(room,index) in roomList" :value="room" :key="index">{{ room.name }} </option>
                             </select>
                         </div>
-                        <div class="mb-4 col-span-3">
-                            <label for="" class="block text-sm text-black mb-3">
-                                Time
-                            </label>
-                            <input type="datetime-local" placeholder="Time" v-model="startTime"
-                                class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
-                        </div>
+                        
                         <div class="mb-4 col-span-3">
                             <label for="" class="block text-sm text-black mb-3">
                                 Deposit
                             </label>
-                            <input type="text" placeholder="Deposit" v-model="deposit"
+                            <input type="number" placeholder="Deposit" v-model="deposit"
                                 class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
                         </div>
-                        <div class="col-span-3"></div>
+                        <div class="col-span-6"></div>
 
 
                         <div class="mb-6 col-span-3">
                             <label for="" class="block text-sm text-black mb-3">
                                 Male
                             </label>
-                            <input type="text" placeholder="Male" v-model="male"
+                            <input type="number" placeholder="Male" v-model="male"
                                 class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
                         </div>
                         <div class="mb-6 col-span-3">
                             <label for="" class="block text-sm text-black mb-3">
                                 Female
                             </label>
-                            <input type="text" placeholder="Female" v-model="female"
+                            <input type="number" placeholder="Female" v-model="female"
                                 class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
                         </div>
                         <div class="mb-6 col-span-3">
                             <label for="" class="block text-sm text-black mb-3">
                                 Children
                             </label>
-                            <input type="text" placeholder="Children" v-model="children"
+                            <input type="number" placeholder="Children" v-model="children"
                                 class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
                         </div><div class="col-span-3"></div>
                         <div class="mb-4 col-span-3">
@@ -122,7 +124,7 @@
                             <label for="" class="block text-sm text-black mb-3">
                                 Count
                             </label>
-                            <input type="text" placeholder="Count" v-model="menuCount"
+                            <input type="number" placeholder="Count" v-model="menuCount"
                                 class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
                         </div>
                         <div class="col-span-3">
@@ -168,7 +170,7 @@
                                             {{ om.quantity }}
                                         </td>
                                         <td class=" py-4 text-sm  ">
-                                            {{ om.menu_price }}
+                                            {{ om.price }}
                                         </td>
                                         <td class=" py-4 text-sm  text-center">
                                             <button :disabled="!om.is_changeable" :title="!om.is_changeable ? 'Can not Change Selected Package Menu' : '' "
@@ -184,6 +186,15 @@
                                         </td>
                                         <td colspan="2" class="py-4 border-b">
                                             {{ food_total }}
+                                        </td>
+                                    </tr>
+                                    <tr class="" v-if="type == 'package'">
+                                        <td colspan="2"></td>
+                                        <td class="py-4 border-b">
+                                            Package Discount
+                                        </td>
+                                        <td colspan="2" class="py-4 border-b">
+                                            {{  package_discount }}
                                         </td>
                                     </tr>
                                     <tr class="">
@@ -205,7 +216,6 @@
                             Create
                         </button>
                     </div>
-                    {{ testList }}
                 </div>
             </div>
 
@@ -225,12 +235,13 @@
 <script>
     import { Modal, Ripple, Select, Datepicker, initTE, Input } from "tw-elements";
     import { getApiData, postApiData, deleteApiData } from '../../../utilities/ajax-helpers';
+    import { getCurrentTime, getCurretDateTime } from '../../../utilities/datetime-helpers';
     import { mapGetters } from "vuex";
 
     export default {
         data() {
             return {
-                name:null,
+                selectedCustomer:null,
                 type:null,
                 packageList:[],
                 selectedPackage:null,
@@ -246,7 +257,9 @@
 
                 isPackage:false,
                 orderMenuList:[],
+                is_menu_discount:0,
 
+                customerList: [],
                 selectedMenuCategory:null,
                 menuCategoryList:[],
                 selectedMenu:null,
@@ -257,21 +270,38 @@
                 total:0,
                 food_total:0,
                 package_food_total:0,
+                package_total:0,
+                package_discount:0,
+
+                currentTime: getCurretDateTime(),
             };
         },
 
         methods: {
             ...mapGetters(['getToken']),
+            async getCustomerList() {
+                const response = await getApiData({ url: '/api/customers', token: this.getToken() });
+                if (response.data) {
+                    this.customerList = response.data;
+                }
+            },
 
-            async getPackageList() {
-                const response = await getApiData({ url: '/api/packages', token: this.getToken() });
+            async getPackageList(time) {
+                const response = await getApiData({ url: '/api/packages?date='+time, token: this.getToken() });
                 if (response.data) {
                     this.packageList = response.data.data;
                 }
             
             },
             typeChange(){
+                this.package_discount = 0;
                 if(this.type == 'package'){
+                    // this.getPackageList(this.startTime)
+                    // const response = await getApiData({ url: '/api/packages?date=' + this.startTime, token: this.getToken() });
+                    // if (response.data) {
+                    //     this.packageList = response.data.data;
+                    // }
+                    this.selectedPackage = null;
                     this.isPackage = true;
                 }
                 else{
@@ -289,9 +319,12 @@
                 }
             },
             selectedPackageChange(){
+                if(this.selectedPackage){
+                    this.package_discount = this.selectedPackage.package_discount;
+                }
                 this.food_total = 0 ;
                 this.orderMenuList = [];
-                this.roomList = this.selectedPackage.rooms;
+                // this.roomList = this.selectedPackage.rooms;
                 let is_changeable = false;
                 if(this.selectedPackage.is_changeable == 1){
                     is_changeable = true;
@@ -299,26 +332,43 @@
                 else{
                     is_changeable = false
                 }
+                
                 let menuOfselectedPackage = this.selectedPackage.menu_packages;
+                this.package_total = this.selectedPackage.price;
                 menuOfselectedPackage.forEach((packageMenu)=>{
                     let menuCategorySelected = this.menuCategoryList.findIndex(menuCategory => menuCategory.id == packageMenu.menu.menu_category_id)
+                    let is_dis_menu_price = 0;
+                    if(packageMenu.menu.menu_service_discounts.length>0){
+                        is_dis_menu_price = packageMenu.menu.menu_service_discounts[0].discount_price;
+                    }
+                    else{
+                        is_dis_menu_price = 0;
+                    }
                     this.orderMenuList.push({
                         quantity : packageMenu.quantity,
                         name : packageMenu.menu.name + ' (Package)',
                         menu_category_name : this.menuCategoryList[menuCategorySelected].name,
-                        menu_price : packageMenu.menu.prices[0].price * packageMenu.quantity,
+                        price : packageMenu.menu.prices[0].price,
                         menu_id : packageMenu.menu_id,
-                        is_package : 1,
-                        is_changeable : is_changeable
+                        discount_value: is_dis_menu_price,
                     });
+                    
                     this.food_total += packageMenu.menu.prices[0].price * packageMenu.quantity;
                     this.package_food_total += packageMenu.menu.prices[0].price * packageMenu.quantity;
-                    this.total = this.selectedPackage.price;
+                    // this.total = this.selectedPackage.price;
+                    let room_price = this.selectedPackage.pay_session * this.selectedPackage.session_price;
+                    this.total = ( this.food_total + room_price ) - this.selectedPackage.package_discount;
+                    
+
+
                     
                 });
-                let minimunPrice = this.selectedPackage.price -this.package_food_total ;
-                console.log('food total'+this.package_food_total)
-                console.log(minimunPrice)
+            },
+            filterMenuForData(){
+                this.orderMenuList.forEach(om => {
+                    delete om.name;
+                    delete om.menu_category_name;
+                });
             },
             sessionDurationChange(){
                 let roomPrice = this.session_duration * this.selectedRoom.price_per_hour
@@ -327,7 +377,6 @@
 
             },
             selectedRoomChange(){
-                
                 if(this.type == 'session'){
                     this.total = this.food_total
                     let roomPrice = this.session_duration * this.selectedRoom.price_per_hour
@@ -349,24 +398,30 @@
             },
             async menuCategorySelectChanged(){
                 console.log('menu category selected');
-                let url = `/api/menu_categories/${this.selectedMenuCategory.id}/menus`;
+                let url = `/api/menu_categories_bookings/${this.selectedMenuCategory.id}/menus?date=${this.startTime}`;
                 let response = await getApiData({url: url, token: this.getToken()});
                 if(response.data){
-                    this.menuList = response.data;
+                    this.menuList = response.data.data;
                 }
             },
             btnClickedAddMenu(){
                 this.addMenu();
+                
             },
             addMenu(){
+                if(this.selectedMenu.menu_service_discounts.length > 0){
+                    this.is_menu_discount = this.selectedMenu.menu_service_discounts[0].discount_price
+                }
+                else{
+                    this.is_menu_discount = 0
+                }
                 this.orderMenuList.push({
                     quantity: this.menuCount,
                     name: this.selectedMenu.name,
                     menu_category_name: this.selectedMenuCategory.name,
-                    menu_price:this.selectedMenu.prices[0].price * this.menuCount,
+                    price:this.selectedMenu.prices[0].price,
                     menu_id : this.selectedMenu.prices[0].menu_id,
-                    is_package : 0,
-                    is_changeable : true,
+                    discount_value: this.is_menu_discount,
                 });
                 this.food_total += this.selectedMenu.prices[0].price * this.menuCount;
                 console.log(this.food_total)
@@ -375,10 +430,14 @@
                 this.selectedMenu = null;
                 this.selectedMenuCategory = null;
                 this.menuList = []
+                
             },
             removeMenuBtnClicked(index){
                 this.food_total -= this.orderMenuList[index].menu_price;
                 this.total -= this.orderMenuList[index].menu_price;
+                if(this.orderMenuList[index].is_package == 1){
+                    this.package_total -= this.orderMenuList[index].menu_price;
+                }
                 // if(this.type == 'package'){
                 //     let checkPackagePrice = this.selectedPackage.price + this.food;
                 //     console.log(checkPackagePrice < this.selectedPackage.price)
@@ -386,26 +445,16 @@
                 //         alert('u cant')
                 //     }
                 // }
+
                 this.orderMenuList.splice(index, 1);
+                
             },
 
 
             async btnClickedCreateBooking(){
-                // this.testList.push({
-                //     name: this.name,
-                //     type:this.type,
-                //     package_id : this.selectedPackage.id,
-                //     room:this.selectedRoom.id,
-                //     start_time : this.startTime,
-                //     male : this.male,
-                //     female : this.female,
-                //     children : this.children,
-                //     menu_list: this.orderMenuList,
-                // });
-
-
-
+                this.filterMenuForData();
                 let formData = new FormData();
+                formData.append('customer_id', this.selectedCustomer.id);
                 formData.append('male', this.male);
                 formData.append('female', this.female);
                 formData.append('child', this.children);
@@ -413,36 +462,51 @@
                 if(this.type == 'session'){
                     formData.append('session', this.session_duration);
                 }
+                else{
+                    formData.append('session', this.selectedPackage.session);
+                }
                 formData.append('amount', this.total);
                 formData.append('deposit', this.deposit);
                 formData.append('start_date', this.startTime);
                 formData.append('entity_id', this.selectedRoom.id);
                 if(this.type == 'package'){
-                    formData.append('package_id', this.invoiceId);
+                    formData.append('package_id', this.selectedPackage.id);
                 }
-                formData.append('menus', this.orderMenuList);
+                formData.append('menus', JSON.stringify(this.orderMenuList));
+                formData.append('package_price', this.package_total);
 
-                // if(this.type == 'package'){
-                //     if(this.total < this.selectedPackage.price){
-                //         alert('total is lower than package pricce')
-                //     }
-                // }
-
-
-
-                let response = await postApiData({ url: '/api/bookings', form_data: formData, token: this.getToken() });
-                if (response.success) {
-                    console.log("success")
+                if(this.type == 'package'){
+                    if(this.total < this.selectedPackage.price){
+                        alert('total is lower than package pricce')
+                    }
+                    else{
+                        let response = await postApiData({ url: '/api/bookings', form_data: formData, token: this.getToken() });
+                        if (response.success) {
+                            window.location.replace('/booking');
+                        }
+                        else {
+                            console.log('some errors occur');
+                        }
+                    }
                 }
-                else {
-                    console.log('some errors occur');
+                else{
+                    let response = await postApiData({ url: '/api/bookings', form_data: formData, token: this.getToken() });
+                    if (response.success) {
+                        window.location.replace('/booking');
+                    }
+                    else {
+                        console.log('some errors occur');
+                    }
                 }
+
+                
             }
         
         
         },
         created(){
-            this.getPackageList();
+            this.getCustomerList();
+            this.getPackageList(this.currentTime);
             this.getRoomList();
             this.getMenuCategoryList();
         },

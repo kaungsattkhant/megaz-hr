@@ -50,6 +50,7 @@
                             </div> -->
                         </div>
                     </div>
+
                     <!-- <div class="hidden opacity-0 transition-opacity duration-150 ease-linear data-[te-tab-active]:block"
                         id="tabs-profile" role="tabpanel" aria-labelledby="tabs-profile-tab">
                         <div class="flex flex-wrap gap-x-4 gap-y-4">
@@ -524,10 +525,17 @@
                             </div>
                             <div class="mb-4">
                                 <label for="" class="block text-sm text-black mb-3">
+                                    Time
+                                </label>
+                                <input type="datetime-local" placeholder="Time" v-model="invoice_date"
+                                    class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
+                            </div>
+                            <div class="mb-4">
+                                <label for="" class="block text-sm text-black mb-3">
                                     Type
                                 </label>
                                 <div class="relative">
-                                    <select name="" id="" v-model="type" @change="getPackageList"
+                                    <select name="" id="" v-model="type" @change="getPackageList(invoice_date)"
                                         class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
                                         <option value="session"> Session </option>
                                         <option value="package"> Package </option>
@@ -540,9 +548,9 @@
                                     Packages
                                 </label>
                                 <div class="relative">
-                                    <select name="" id="" v-model="selectedPackage"
+                                    <select name="" id="" v-model="selectedPackage" @change="getSelectedPackage()"
                                         class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
-                                        <option v-for="pack in packageList" :value="pack.id">
+                                        <option v-for="pack in packageList" :value="pack">
                                             {{ pack.name }}
                                         </option>
                                         <!-- <option v-for="(package,index) in packageList" :value="index"> {{ package }}</option> -->
@@ -554,13 +562,6 @@
                                     Deposit
                                 </label>
                                 <input type="text" placeholder="Deposit" v-model="deposit"
-                                    class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
-                            </div>
-                            <div class="mb-4">
-                                <label for="" class="block text-sm text-black mb-3">
-                                    Time
-                                </label>
-                                <input type="datetime-local" placeholder="Time" v-model="invoice_date"
                                     class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
                             </div>
                             <div class="mb-4" v-show="this.type == 'session'">
@@ -600,6 +601,80 @@
                         </div>
                     </div>
                 </div>
+
+                <div v-show="isOpenRoom.step_isPackage == true" class="relative h-full">
+                    <div class="flex justify-center padding-section ">
+                        
+                        <div>
+                            <p class="text-black text-lg">
+                                Confirm Menu
+                            </p>
+                        </div>
+                    </div>
+                    <div class="small-scrollbar overflow-y-auto" style="height:calc(100% - 329px)">
+                        <div class="padding-section ">
+                            <div class="table-container px-8">
+                                <table class=" w-full">
+                                    <thead class="">
+                                        <tr class="border-b">
+                                            <th scope="col" class="text-left   py-4">
+                                                Menu
+                                            </th>
+                                            <th scope="col" class="text-left   py-4">
+                                                Qty
+                                            </th>
+                                            <th scope="col" class="text-left   py-4">
+                                                Price
+                                            </th>
+                                            <th scope="col" class="text-left   py-4">
+                
+                                            </th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr class="" v-for="(pm,index) in packageMenuList">
+                                            <td class=" py-4 text-sm  ">
+                                                {{ pm.name }}
+                                            </td>
+                                            <td class=" py-4 text-sm  ">
+                                                {{ pm.quantity }}
+                                            </td>
+                                            <td class=" py-4 text-sm  ">
+                                                {{ pm.original_price }}
+                                            </td>
+                                            <td class=" py-4 text-sm  text-center">
+                                                <button :disabled="!pm.is_changeable" :title="!pm.is_changeable ? 'Can not Change Selected Package Menu' : '' "
+                                                    @click="removePackageMenu(index)">
+                                                    <i class="fal fa-times  pr-3"></i>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                        
+                                    </tbody>
+                                </table>
+                            </div>
+                            
+                        </div>
+                    </div>
+
+                    <div class="absolute bottom-0 border-t-2 border-gray-200 w-full padding-section !pt-3">
+                        <div>
+                            <button class="w-full text-center mb-3 font-semibold text-sm"
+                            data-te-toggle="modal" data-te-target="#add_package_menu_modal">
+                                Add More Menu
+                            </button>
+                        </div>
+                        <div class="">
+                            <button @click="createRoomForPackage()"
+                                class="bg-[#55EFC4] text-gray-700 text-center text-sm font-semibold w-full py-3">
+                                Confirm Menu
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+
+
             </div>
         </div>
 
@@ -698,6 +773,49 @@
 
                     <div class="flex justify-center px-12 mb-6">
                         <button @click="btnConfirmAddMenu" class="pos-add-btn focus:outline-none focus:ring-0 ">
+                            Add Menu
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- add Package Menu modal -->
+        <div data-te-modal-init
+            class="fixed left-0 top-0 z-[1055] hidden h-full w-full overflow-y-auto overflow-x-hidden outline-none"
+            id="add_package_menu_modal" tabindex="-1" aria-labelledby="addMenuModalLabel" aria-modal="true" role="dialog">
+            <div data-te-modal-dialog-ref
+                class="pointer-events-none relative flex min-h-[calc(100%-1rem)] w-auto translate-y-[-50px] items-center opacity-0 transition-all duration-300 ease-in-out min-[576px]:mx-auto min-[576px]:mt-7 min-[576px]:min-h-[calc(100%-3.5rem)] min-[576px]:max-w-[500px]">
+                <div
+                    class="pointer-events-auto relative flex w-full flex-col rounded-md border-none bg-white bg-clip-padding text-current shadow-lg outline-none">
+                    <div class="relative  p-4">
+                        <p class="text-xl w-full text-center">
+                            Add Package Menu
+                        </p>
+                        <button type="button" id="closeMenuModal"
+                            class="absolute top-4 right-4 focus:shadow-none focus:outline-none" data-te-modal-dismiss
+                            aria-label="Close">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                                stroke="currentColor" class="h-5 w-5">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                        </button>
+                    </div>
+
+                    <div class="relative px-16 py-4" data-te-modal-body-ref>
+                        <div class="mb-4">
+                            <select name="" id="" placeholder="Menu" v-model="selectedMenuForPackage"
+                                class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
+                                <option :value="menu" v-for="(menu, index) in menuList">{{ menu.name }}</option>
+                            </select>
+                        </div>
+                        <div class="mb-4">
+                            <input type="text" placeholder="Qty" v-model="menuQuantityForPackage"
+                                class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
+                        </div>
+                    </div>
+
+                    <div class="flex justify-center px-12 mb-6">
+                        <button @click="btnConfirmAddPackageMenu()" class="pos-add-btn focus:outline-none focus:ring-0 ">
                             Add Menu
                         </button>
                     </div>
@@ -885,7 +1003,8 @@ export default {
                 step_1: false,
                 step_2: false,
                 step_detail: false,
-                step_invoice: false
+                step_invoice: false,
+                step_isPackage:false,
             },
             value: 49650,
             name: null,
@@ -924,7 +1043,6 @@ export default {
                 isTax: false,
                 discount: 0,
                 tatalPrice: 0,
-                foodList: []
             },
             room_discount: null,
             birthday_discount: null,
@@ -934,6 +1052,11 @@ export default {
             change: null,
             paid_amount: null,
             isActive: true,
+
+            packageMenuList:[],
+            selectedMenuForPackage:null,
+            menuQuantityForPackage:null,
+            is_menu_discount:0,
 
             //create menu , add hour , change room
             menuList: [],
@@ -1064,17 +1187,16 @@ export default {
                 this.customerList = response.data;
             }
         },
-        async getPackageList() {
-            if (this.type == 'package') {
-                const response = await getApiData({ url: '/api/packages', token: this.getToken() });
+        async getPackageList(time) {
+                const response = await getApiData({ url: '/api/packages?date='+time, token: this.getToken() });
                 if (response.data) {
                     this.packageList = response.data.data;
                 }
-            }
-            else {
-                this.packageList = null;
-            }
+            
 
+        },
+        getSelectedPackage(){
+            // this.packageMenuList = this.selectedPackage;
         },
 
         async btnClickedIsOpenRoom(room, index) {
@@ -1083,18 +1205,12 @@ export default {
             this.selectedRoomIndex = index;
             await this.getSelectedRoom();
             if (this.roomList[index].is_active == 1) {
-                this.isOpenRoom.step_1 = false;
-                this.isOpenRoom.step_2 = false;
-                this.isOpenRoom.step_invoice = false;
-                this.isOpenRoom.step_detail = true;
+                this.isOpenRoomStep('step_detail');
                 this.getPurchaseMenuList();
             };
             if (this.roomList[index].is_active == 0) {
                 // alert(this.roomList[index].room_sessions.length + ' = 0 ')
-                this.isOpenRoom.step_1 = true;
-                this.isOpenRoom.step_2 = false;
-                this.isOpenRoom.step_invoice = false;
-                this.isOpenRoom.step_detail = false;
+                this.isOpenRoomStep('step_1');
                 this.getPurchaseMenuList();
             };
         },
@@ -1105,10 +1221,7 @@ export default {
             }
         },
         btnClickedOpenRoom() {
-            this.isOpenRoom.step_1 = false;
-            this.isOpenRoom.step_2 = true;
-            this.isOpenRoom.step_detail = false;
-            this.isOpenRoom.step_invoice = false;
+            this.isOpenRoomStep('step_2');
             this.clearOpenRoomForm();
             this.isPackage = false;
 
@@ -1158,13 +1271,71 @@ export default {
             }
         },
 
-        confirmRoomBtnClicked() {
-            this.createRoom();
-            this.getPurchaseMenuList();
+
+
+        btnConfirmAddPackageMenu() {
+            this.addPackageMenu();
         },
+        async addPackageMenu() {
+            if(this.selectedMenuForPackage.menu_service_discounts.length > 0){
+                this.is_menu_discount = this.selectedMenuForPackage.menu_service_discounts.discount_price
+            }
+            else{
+                this.is_menu_discount = 0
+            }
+            this.packageMenuList.push({
+                quantity: this.menuQuantityForPackage,
+                name: this.selectedMenuForPackage.name,
+                original_price:this.selectedMenuForPackage.prices[0].price,
+                menu_id : this.selectedMenuForPackage.prices[0].menu_id,
+                discount_value: this.is_menu_discount
+            });
+        },
+        removePackageMenu(index){
+            this.packageMenuList.splice(index, 1);
+        },
+        confirmRoomBtnClicked() {
+            this.getPurchaseMenuList();
+            if(this.type == 'package' && this.selectedPackage){
+                this.isOpenRoomStep('step_isPackage');
+                
+                let menuOfselectedPackage = this.selectedPackage.menu_packages;
+                menuOfselectedPackage.forEach((packageMenu)=>{
+                    let is_dis_menu_price = 0;
+                    if(packageMenu.menu.menu_service_discounts.length>0){
+                        is_dis_menu_price = packageMenu.menu.menu_service_discounts[0].discount_price;
+                    }
+                    else{
+                        is_dis_menu_price = 0;
+                    }
+                    this.packageMenuList.push({
+                        quantity : packageMenu.quantity,
+                        name : packageMenu.menu.name,
+                        original_price : packageMenu.menu.prices[0].price,
+                        discount_value: is_dis_menu_price,
+                        menu_id : packageMenu.menu_id,
+                    });
+                    
+                });
+            }
+            else{
+                this.createRoom();
+            }
+        },
+        filterMenuForData(){
+            this.packageMenuList.forEach(om => {
+                delete om.name;
+                console.log('hello = ' + om.name);
+            });
+            
+        },
+        createRoomForPackage(){
+            this.filterMenuForData();
+            this.createRoom();
+        },
+
         async createRoom() {
             let formData = new FormData();
-            // formData.append('invoice_id', this.invoice_id);
             formData.append('entity_id', this.selectedRoom.id);
             formData.append('customer_id', this.selectedCustomer.id);
             formData.append('invoice_date', this.invoice_date);
@@ -1172,8 +1343,8 @@ export default {
                 formData.append('session_duration', this.duration);
             }
             if (this.type == 'package') {
-                formData.append('package_id', this.selectedPackage);
-
+                formData.append('package_id', this.selectedPackage.id);
+                formData.append('orders', JSON.stringify(this.packageMenuList));
             }
             formData.append('type', this.type);
             formData.append('deposit', this.deposit);
@@ -1192,6 +1363,7 @@ export default {
                 await this.getSelectedRoom();
                 this.isOpenRoom.step_1 = false;
                 this.isOpenRoom.step_2 = false;
+                this.isOpenRoom.step_isPackage = false;
                 this.isOpenRoom.step_detail = true;
                 this.isOpenRoom.step_invoice = false;
 
@@ -1230,7 +1402,6 @@ export default {
             let response = await postApiData({ url: '/api/entities/orders', form_data: formData, token: this.getToken() });
             // console.log(this.invoiceId+','+this.selectedMenu.id + ','+ this.menuQuantity +','+this.selectedMenu.prices[0].price)
             if (response.success) {
-                console.log("success")
                 this.closeMenuModal();
                 this.clearMenuForm();
                 this.getPurchaseMenuList();
@@ -1239,6 +1410,12 @@ export default {
                 console.log('some errors occur');
             }
         },
+        
+
+
+
+
+
         btnAddHour() {
             this.addHour();
         },
@@ -1289,17 +1466,12 @@ export default {
                 this.changeableRoomList = response.data;
             }
         },
-
-
-
         btnBackToDetail() {
             this.isOpenRoom.step_1 = false;
             this.isOpenRoom.step_2 = false;
             this.isOpenRoom.step_detail = true;
             this.isOpenRoom.step_invoice = false;
         },
-
-
         btnClickedDoneSession() {
             this.doneSession();
             this.getPurchaseMenuList();
@@ -1540,6 +1712,16 @@ export default {
 
 
 
+        isOpenRoomStep(selectedKey) {
+            for (let key in this.isOpenRoom) {
+                if (key === selectedKey) {
+                    this.isOpenRoom[key] = true;
+                }
+                else {
+                    this.isOpenRoom[key] = false;
+                }
+            }
+        },
         closeModal() {
             document.getElementById("closeModal").click();
         },
@@ -1625,7 +1807,7 @@ export default {
         this.getDivisionList();
         this.getCustomerList();
         this.getMenuList();
-        this.getPackageList();
+        this.getPackageList(this.currentTime);
         initTE({ Modal, Select, Ripple, Tab });
 
     }

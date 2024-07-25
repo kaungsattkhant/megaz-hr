@@ -62,6 +62,7 @@ use App\Http\Controllers\API\Customers\AuthController as CustomerAuthController;
 use App\Http\Controllers\API\Customers\CustomerAPIController as UserAppCustomerAPIController;
 use App\Http\Controllers\API\Customers\MenuAPIController as CustomersMenuAPIController;
 use App\Http\Controllers\API\Customers\PackageAPIController as CustomersPackageAPIController;
+use App\Http\Controllers\API\DeliveryChargeAPIController;
 use App\Http\Controllers\API\FoodOrderAPIController;
 use App\Http\Controllers\API\MenuCategoryAPIController;
 use App\Models\Customer;
@@ -392,6 +393,7 @@ Route::get('/invoices', [InvoiceAPIController::class, 'getInvoiceData']);
 Route::get("/test", [TestController::class, "index"]);
 
 Route::get('/menu_categories/{id}/menus',[MenuAPIController::class,'menuByMenuCategory']);
+Route::get('/menu_categories_bookings/{id}/menus',[MenuAPIController::class,'menuByMenuCategoryBooking']);
 
 Route::post("/order_status_change",[OrderAPIController::class,'orderItemChangeStatus']);
 
@@ -426,6 +428,12 @@ Route::controller(FoodOrderAPIController::class)->group(function()
 {
     Route::get('/food_orders','listAllFoodOrder');
     Route::post('/food_orders','createFoodOrder');
+});
+
+Route::controller(DeliveryChargeAPIController::class)->group(function()
+{
+    Route::get('/delivery_charges','getDeliveryChargeData');
+    Route::post('/delivery_charges','createDeliveryCharge');
 });
 
 Route::post('send_notification', [NotificationController::class, 'sendNotification']);

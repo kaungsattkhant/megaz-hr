@@ -56,33 +56,53 @@
                 </div>
             </div>
 
-            <div class="mb-3 col-span-6"></div>
-
             <div class="mb-3 col-span-3 rounded-md">
-                <label for="" class="label-form mb-3">
-                    Sessions
-                </label>
-                <input type="text" class="input-ui" :disabled="!isKTVPackage" v-model="sessionDuration" placeholder="Discount Sessions" >
-            </div>
-            <div class="mb-3 col-span-3 rounded-md">
-                <label for="" class="label-form mb-3">
-                    Rooms
-                </label>
-                <multiselect v-model="selectedRooms" :options="roomList" :multiple="true"
-                :close-on-select="false" :clear-on-select="false" :preserve-search="true"
-                placeholder="Select Rooms" label="name" track-by="id" :preselect-first="true">
-                    <template #selection="{ values, search, isOpen }">
-                        <span class="multiselect__single" v-if="values.length" v-show="!isOpen">
-                            {{ values.length }} rooms selected
-                        </span>
-                    </template>
-                </multiselect>
-                <div class="flex gap-x-2 flex-wrap mt-1">
-                    <span class="font-inter after-coma" v-for="selectedRoom in selectedRooms">{{ selectedRoom.name }}</span>
+                <div class="block ps-[1.5rem]">
+                    <input
+                        class="relative float-left -ms-[1.5rem] me-[6px] mt-[0.15rem] h-[1.125rem] w-[1.125rem]
+                        appearance-none rounded-[0.25rem] border-[0.125rem] border-solid border-secondary-500 outline-none before:pointer-events-none before:absolute before:h-[0.875rem] before:w-[0.875rem] before:scale-0 before:rounded-full before:bg-transparent before:opacity-0 before:shadow-checkbox before:shadow-transparent before:content-[''] checked:border-primary checked:bg-primary checked:before:opacity-[0.16] checked:after:absolute checked:after:-mt-px checked:after:ms-[0.25rem] checked:after:block checked:after:h-[0.8125rem] checked:after:w-[0.375rem] checked:after:rotate-45 checked:after:border-[0.125rem] checked:after:border-l-0 checked:after:border-t-0 checked:after:border-solid checked:after:border-white checked:after:bg-transparent checked:after:content-[''] hover:cursor-pointer hover:before:opacity-[0.04] hover:before:shadow-black/60 focus:shadow-none focus:transition-[border-color_0.2s] focus:before:scale-100 focus:before:opacity-[0.12] focus:before:shadow-black/60 focus:before:transition-[box-shadow_0.2s,transform_0.2s] focus:after:absolute focus:after:z-[1] focus:after:block focus:after:h-[0.875rem] focus:after:w-[0.875rem] focus:after:rounded-[0.125rem] focus:after:content-[''] checked:focus:before:scale-100 checked:focus:before:shadow-checkbox checked:focus:before:transition-[box-shadow_0.2s,transform_0.2s] checked:focus:after:-mt-px checked:focus:after:ms-[0.25rem] checked:focus:after:h-[0.8125rem] checked:focus:after:w-[0.375rem] checked:focus:after:rotate-45 checked:focus:after:rounded-none checked:focus:after:border-[0.125rem] checked:focus:after:border-l-0 checked:focus:after:border-t-0 checked:focus:after:border-solid checked:focus:after:border-white checked:focus:after:bg-transparent rtl:float-right dark:border-neutral-400 dark:checked:border-primary dark:checked:bg-primary"
+                        type="checkbox"
+                        v-model="isChangeable"
+                        id="checkboxDefault2" />
+                    <label
+                        class="inline-block ps-[0.15rem] hover:cursor-pointer"
+                        for="checkboxDefault">
+                        Can changeable?
+                    </label>
                 </div>
             </div>
 
-            <div class="col-span-6"> </div>
+            <div class="mb-3 col-span-3"></div>
+
+            <!-- <div class="mb-3 col-span-3 rounded-md">
+                <label for="" class="label-form mb-3">
+                    Sessions
+                </label>
+                <input type="number" class="input-ui" :disabled="!isKTVPackage" v-model="sessionDuration" placeholder="Discount Sessions" >
+            </div> -->
+
+            <div class="mb-3 col-span-3 rounded-md">
+                <label for="" class="label-form mb-3">
+                    Paid Sessions
+                </label>
+                <input type="number" class="input-ui" :disabled="!isKTVPackage" v-model="paySession" placeholder="Paid Sessions" >
+            </div>
+
+            <div class="mb-3 col-span-3 rounded-md">
+                <label for="" class="label-form mb-3">
+                    Free Sessions
+                </label>
+                <input type="number" class="input-ui" :disabled="!isKTVPackage" v-model="freeSession" placeholder="Free Sessions" >
+            </div>
+
+            <div class="mb-3 col-span-3 rounded-md">
+                <label for="" class="label-form mb-3">
+                    Session Price
+                </label>
+                <input type="number" class="input-ui" :disabled="!isKTVPackage" v-model="sessionPrice" placeholder="Session Price" >
+            </div>
+
+            <div class="mb-3 col-span-3"></div>
 
             <div class="mb-0 col-span-3 rounded-md">
                 <div>
@@ -178,6 +198,7 @@
                 today: getCurrentDate(),
 
                 isKTVPackage: false,
+                isChangeable: false,
 
                 menuCategoryList: [],
                 selectedMenuCategory: null,
@@ -185,9 +206,10 @@
                 selectedMenu: null,
                 selectedMenus: [],
 
-                roomList: [],
                 sessionDuration: null,
-                selectedRooms: [],
+                paySession: null,
+                freeSession: null,
+                sessionPrice: null,
 
                 name: null,
                 price: null,
@@ -224,14 +246,6 @@
                 let response = await getApiData({url: url, token: this.getToken()});
                 if(response.data){
                     this.menuList = response.data;
-                }
-            },
-
-            async getRoomList(){
-                let url = `/api/entities?type=room`;
-                let response = await getApiData({url: url, token: this.getToken()});
-                if(response.data){
-                    this.roomList = response.data;
                 }
             },
 
@@ -295,23 +309,32 @@
                 formData.append('to_date', this.endDate);
                 formData.append('price', this.price);
                 formData.append('is_ktv', (this.isKTVPackage)? 1: 0);
+                formData.append('is_changeable', (this.isChangeable)? 1: 0);
                 formData.append('image',this.selectedImage);
                 if(this.isKTVPackage){
-                    if(!this.sessionDuration){
-                        this.alertValiationMessage(`session`);
+                    // if(!this.sessionDuration){
+                    //     this.alertValiationMessage(`session`);
+                    //     return 1;
+                    // }
+                    if(!this.paySession){
+                        this.alertValiationMessage(`paid session`);
                         return 1;
                     }
-                    if(this.selectedRooms.length < 1){
-                        this.alertValiationMessage(`rooms`);
+                    if(!this.freeSession){
+                        this.alertValiationMessage(`free sessions`);
                         return 1;
                     }
-                    let roomIds = [];
-                    this.selectedRooms.forEach((room)=>{
-                        roomIds.push(room.id);
-                    });
-                    formData.append('session', this.sessionDuration);
-                    formData.append('roomIds', JSON.stringify(roomIds));
+                    if(!this.sessionPrice){
+                        this.alertValiationMessage(`session price`);
+                        return 1;
+                    }
+
+                    // formData.append('session', this.sessionDuration);
+                    formData.append('pay_session', this.paySession);
+                    formData.append('free_session', this.freeSession);
+                    formData.append('session_price', this.sessionPrice);
                 }
+
                 let menuIds = [];
                 this.selectedMenus.forEach((menu)=>{
                     menuIds.push({menu_id: menu.id, quantity: menu.quantity});
@@ -336,19 +359,6 @@
                     });
                 }
             },
-        },
-
-        watch: {
-            isKTVPackage: function(){
-                if(this.isKTVPackage){
-                    this.getRoomList();
-                }
-                else{
-                    this.roomList = [];
-                    this.selectedRooms = [];
-                    this.sessionDuration = null;
-                }
-            }
         },
 
         created(){

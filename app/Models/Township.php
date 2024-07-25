@@ -14,4 +14,14 @@ class Township extends Model
     public function division(){
         return $this->belongsTo(Division::class);
     }
+
+    public function deliveryCharges()
+    {
+        return $this->hasMany(DeliveryCharge::class);
+    }
+
+    public function latestDeliveryCharge()
+    {
+        return $this->hasOne(DeliveryCharge::class)->latestOfMany();
+    }
 }

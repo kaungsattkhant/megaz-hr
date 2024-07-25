@@ -34,7 +34,6 @@ class EntityRepository implements EntityRepositoryInterface
     {
         $area = Area::find($data['area_id']);
         $currentDate = $data['current_date'];
-
         $entities = Entity::where('is_available', 1)
             ->where('area_id', $area->id)
             ->with(['roomSessions' => function ($query) {
@@ -58,7 +57,7 @@ class EntityRepository implements EntityRepositoryInterface
 
         foreach ($entity->roomSessions as $roomSession) {
             $invoice = $roomSession->invoice; // Access the invoice for the current room session
-
+            $invoice->package;
             if ($invoice) { // Check if there is an associated invoice
                 $consolidatedOrderItems = [];
 
