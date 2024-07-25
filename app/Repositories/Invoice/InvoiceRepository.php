@@ -342,12 +342,15 @@ class InvoiceRepository implements InvoiceRepositoryInterface
                 $hoursDifference = $minutesDifference / 60;
                 $hoursDifference = number_format($hoursDifference, 2);
 
-                if (($total_duration + 1) < 3) {
+                if (($total_duration + $hoursDifference) < 3) {
                     ResponseMessage("You can't end this room before 3 hours", 402);
                 }
                 $data['session_duration'] = $hoursDifference;
                 $data['end_date'] = CurrentTime();
                 $data['price'] = $hoursDifference * $entity->price_per_hour;
+
+                $invoice->total_session_price +=$hoursDifference * $entity->price_per_hour;
+                $invoice->save();
             }
             $latestRoomSession->update($data);
 
