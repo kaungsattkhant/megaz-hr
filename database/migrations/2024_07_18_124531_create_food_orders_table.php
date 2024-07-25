@@ -20,6 +20,7 @@ return new class extends Migration
             $table->double('sub_total');
             $table->double('total_discount_price');
             $table->double('total_price');
+            $table->string('status')->default('pending');
             $table->dateTime('confirmed_at')->nullable();
             $table->unsignedBigInteger('confirmed_by')->nullable();
             $table->dateTime('cancelled_at')->nullable();

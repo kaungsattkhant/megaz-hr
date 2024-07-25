@@ -12,4 +12,9 @@ class FoodOrderItem extends Model
     protected $fillable=[
         'food_order_id','menu_id','area_id','quantity','discount_price','original_price','menu_service_discount_id','status'
     ];
+
+    public function menu()
+    {
+        return $this->belongsTo(Menu::class);
+    }
 }
