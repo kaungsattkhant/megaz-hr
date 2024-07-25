@@ -4,6 +4,7 @@ namespace App\Repositories\Account;
 
 use App\Models\Account;
 use App\Models\SubAccount;
+use App\Models\SecondAccount;
 use Illuminate\Support\Facades\DB;
 
 class AccountRepository implements AccountInterface
@@ -70,7 +71,31 @@ class AccountRepository implements AccountInterface
         return Account::where('sub_account_id',$sub_account_id)->get();
     }
 
-   
+   public function createSecondAccount($request){
+    $latestAccount = SecondAccount::where('account_id', $request->account_id)
+    ->orderByRaw("CAST(SUBSTRING_INDEX(account_code, '-', -1) AS UNSIGNED) DESC")
+    ->first();
+    if ($latestAccount) {
+        $latestAccountCodeNo = explode('-', $latestAccount->account_code);
+        // dd($account_code_no[1]);
+        $new_account_code = (int) $latestAccountCodeNo[2] + 1;
+        $code = $latestAccountCodeNo[0] . '-' . $new_account_code;
+    }else{
+        $code=$request->original_account_code.'-'."1";
+    }
+    dd($code);
+
+        $account = Account::create([
+            'name' => $request->name,
+            'account_code' => $code,
+            'sub_account_id' => $request->sub_account_id,
+        ]);
+        return $account;
+   }
+
+   public function createThirdAccount($request){
+    dd($request->all());
+   }
 
     
     

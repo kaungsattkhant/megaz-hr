@@ -18,6 +18,10 @@ interface AccountInterface
 
     public function accountBySubAccount($sub_account_id);
 
-  
+    public function createSecondAccount($request);
+
+    public function createThirdAccount($request);
+
+
 
 }
