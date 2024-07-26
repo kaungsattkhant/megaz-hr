@@ -254,6 +254,7 @@ class InvoiceRepository implements InvoiceRepositoryInterface
             $roundedDurationInHours = round($durationInHours, 3);
             $lastEntity = Entity::find($lastRoomwithInvoice->entity_id);
             $leftDuration = $lastRoomwithInvoice->session_duration - $roundedDurationInHours;
+
             $lastRoomwithInvoice->session_duration = $roundedDurationInHours;
             $lastRoomwithInvoice->end_date = CurrentTime();
 
@@ -307,11 +308,12 @@ class InvoiceRepository implements InvoiceRepositoryInterface
             foreach ($allRooms as $room) {
                 $total_session_price += $room->price;
             }
-            $invoice->total_session_price = $total_session_price;
+            $invoice->total_session_price =$total_session_price;
+
             $invoice->save();
             DB::commit();
 
-            return $room;
+            return $invoice;
         } catch (\Exception $e) {
             DB::rollback();
             ResponseMessage($e->getMessage(), 402);
@@ -340,18 +342,18 @@ class InvoiceRepository implements InvoiceRepositoryInterface
                 $minutesDifference = $latestRoomSession_end_date->diffInMinutes($currentDate);
                 $hoursDifference = $minutesDifference / 60;
                 $hoursDifference = number_format($hoursDifference, 2);
-
                 if (($total_duration + $hoursDifference) < 3) {
                     ResponseMessage("You can't end this room before 3 hours", 402);
                 }
                 $data['session_duration'] = $hoursDifference;
                 $data['end_date'] = CurrentTime();
-                $data['price'] = $hoursDifference * $entity->price_per_hour;
-
-                $invoice->total_session_price += $hoursDifference * $entity->price_per_hour;
+                $data['price'] =$hoursDifference * $entity->price_per_hour;
+                // error can happen in the total session price
+                $invoice->total_session_price += ($hoursDifference - $latestRoomSession->session_duration) * $entity->price_per_hour;
                 $invoice->save();
+                $latestRoomSession->update($data);
+
             }
-            $latestRoomSession->update($data);
 
             $today = Carbon::today();
             $customer = Customer::find($invoice->customer_id);
@@ -386,6 +388,7 @@ class InvoiceRepository implements InvoiceRepositoryInterface
                 $roomDoneResponse['is_birthday'] = false;
             }
 
+            $roomDoneResponse['total_session_price'] = $invoice->total_session_price;
             $roomDoneResponse['room_sessions'] = $latestRoomSession;
             $roomDoneResponse['rooms_sessions'] = $roomSessions;
             DB::commit();
@@ -412,6 +415,11 @@ class InvoiceRepository implements InvoiceRepositoryInterface
             $room_discount_value = 0;
             $bdDiscount = 0;
             $customerLevelDiscount = 0;
+            $discount_value = 0;
+
+            if (isset($data['customer_level_discount'])) {
+                $customerLevelDiscount = $data['customer_level_discount'] ?? 0;
+            }
 
             if (isset($data['tax'])) {
                 $tax = $data['tax'];
@@ -424,6 +432,14 @@ class InvoiceRepository implements InvoiceRepositoryInterface
 
             if (isset($data['order_discount'])) {
                 $order_discount = $data['order_discount'];
+            }
+
+            if (isset($data['customer_level_discount'])) {
+                $customerLevelDiscount = $data['customer_level_discount'] ?? 0;
+            }
+
+            if (isset($data['birthday_discount'])) {
+                $bdDiscount = $data['birthday_discount'] ?? 0;
             }
 
             if (isset($data['order_categories'])) {
@@ -451,7 +467,6 @@ class InvoiceRepository implements InvoiceRepositoryInterface
             }
 
 
-
             if (isset($data['discount_type'])) {
                 if ($data['discount_type'] == 'room_discount') {
                     $roomDiscount = RoomDiscount::find($data['room_discount_id']);
@@ -468,39 +483,6 @@ class InvoiceRepository implements InvoiceRepositoryInterface
                         ResponseMessage('Discount cannot be applied', 422);
                     }
                 }
-            } else if ($data['discount_type'] == 'birthday_discount') {
-                if ($customer) {
-                    $birthdate = Carbon::parse($customer->birthdate);
-                    $today = Carbon::today();
-                    if ($birthdate->isBirthday($today)) {
-                        $isBirthday = true;
-                        $bdPromo = BirthdayPromotion::find($data['birthday_discount_id']);
-                        if (!$bdPromo) {
-                            ResponseMessage('Selected birthday promotion not found');
-                        }
-                        $bdDiscount = $bdPromo->discount_value;
-                    } else {
-                        ResponseData('Today is not your birthday', 422);
-                    }
-                }
-            } else if ($data['discount_type'] == 'customer_level') {
-                $total = 0;
-                foreach ($customer->invoices as $invoice) {
-                    $total += $invoice->total;
-                }
-                $levels = CustomerLevelDiscount::all();
-                $customerLevel = null;
-                foreach ($levels as $level) {
-                    if ($total  >= $level->amount) {
-                        $customerLevel = $level;
-                    } else {
-                        break;
-                    }
-                }
-                if ($customerLevel == null) {
-                    ResponseMessage('Customer level not found', 422);
-                }
-                $customerLevelDiscount += $customerLevel->promotion_value;
             }
 
 
@@ -508,7 +490,7 @@ class InvoiceRepository implements InvoiceRepositoryInterface
             if (isset($data['discount_value'])) {
                 $discount_value = $data['discount_value'];
             }
-
+            $data['discount_value'] = $room_discount_value + $bdDiscount + $customerLevelDiscount + $discount_value;
             $data['discount_total'] = $room_discount_value + $bdDiscount + $customerLevelDiscount;
             $data['total'] -= $room_discount_value;
             $data['tax'] = $tax;

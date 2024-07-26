@@ -1,6 +1,6 @@
 <template>
     <div>
-
+        <notifications position="top center" />
         <div class="">
             <div class="w-full pt-9 px-6">
 
@@ -489,7 +489,12 @@
 
                 if(this.type == 'package'){
                     if(this.total < this.selectedPackage.price){
-                        alert('total is lower than package pricce')
+                        // alert('total is lower than package pricce')
+                        this.$notify({
+                            title: `Not valid`,
+                            text: 'total is lower than package pricce',
+                            type: "warn"
+                        });
                     }
                     else{
                         let response = await postApiData({ url: '/api/bookings', form_data: formData, token: this.getToken() });
@@ -498,6 +503,11 @@
                         }
                         else {
                             console.log('some errors occur');
+                            this.$notify({
+                                title: `Not valid`,
+                                text: response.message,
+                                type: "warn"
+                            });
                         }
                     }
                 }
@@ -508,7 +518,11 @@
                     }
                     else {
                         console.log('some errors occur');
-                        
+                        this.$notify({
+                                title: `Not valid`,
+                                text: response.message,
+                                type: "warn"
+                            });
                     }
                 }
             }
