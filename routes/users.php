@@ -8,6 +8,7 @@ use App\Http\Controllers\API\Customers\EntityAPIContorller;
 use App\Http\Controllers\API\Customers\MenuAPIController;
 use App\Http\Controllers\API\Customers\MenuCategoryAPIController;
 use App\Http\Controllers\API\Customers\PackageAPIController;
+use App\Http\Controllers\Customers\FoodOrderAPIController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\User\HomeController;
 
@@ -38,6 +39,7 @@ Route::middleware('auth:customer_api')->group(function () {
     Route::get('/user_app/bookings',[BookingAPIController::class,'listAllBookings']);
     Route::post('/user_app/bookings',[BookingAPIController::class,'createBooking']);
     Route::get('/user_app/room_lists',[EntityAPIContorller::class,'roomList']);
+    Route::post('/user_app/food_orders',[FoodOrderAPIController::class,'createOrder']);
 
 });
 // });

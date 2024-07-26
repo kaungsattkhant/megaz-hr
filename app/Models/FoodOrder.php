@@ -10,7 +10,7 @@ class FoodOrder extends Model
     use HasFactory;
 
     protected $fillable=[
-        'date_time','customer_id','customer_address_id','delivery_charge','sub_total','total_discount_price','total_price','confirmed_at','confirmed_by','cancelled_at','cancelled_by'
+        'date_time','customer_id','customer_address_id','delivery_charge','sub_total','total_discount_price','total_price','confirmed_at','confirmed_by','cancelled_at','cancelled_by','status'
     ];
 
     public function customer()
