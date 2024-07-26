@@ -78,29 +78,23 @@ class AccountRepository implements AccountInterface
     }
 
 
-    public function getSecondAccount($sub_account_id){
-        $second_account=SecondAccount::whereHas('account',function($q)use($sub_account_id){
-            $q->where('sub_account_id',$sub_account_id);
-        })->get();
+    public function getSecondAccount($account_id){
+        $second_account=Account::where('account_id',$account_id)->where('type','is_second')->get();
         return $second_account;
     }
 
-    public function getThirdAccount($sub_account_id){
-        // $third_account = ThirdAccount::whereHas('second_account', function($query) use ($sub_account_id) {
-        //     $query->whereHas('account', function($q) use ($sub_account_id) {
-        //         dd('abc');
-        //         $q->where('sub_account_id', $sub_account_id);
-        //     });
+    public function getThirdAccount($account_id){
+        $account=Account::where('account_id',$account_id)->where('type','is_third')->get();
+        return $account;
+        // $third_account=ThirdAccount::whereHas('second_account.account',function($q)use($sub_account_id){
+        //     $q->where('sub_account_id',$sub_account_id);
         // })->get();
-        $third_account=ThirdAccount::whereHas('second_account.account',function($q)use($sub_account_id){
-            $q->where('sub_account_id',$sub_account_id);
-        })->get();
-        return $third_account;
+        // return $third_account;
     }
 
     public function createSecondAccount($request)
     {
-        $latestAccount = SecondAccount::where('account_id', $request->account_id)
+        $latestAccount = Account::where('account_id', $request->account_id)
             ->orderByRaw("CAST(SUBSTRING_INDEX(account_code, '-', -1) AS UNSIGNED) DESC")
             ->first();
         if ($latestAccount) {
@@ -114,10 +108,12 @@ class AccountRepository implements AccountInterface
         DB::beginTransaction();
         try {
 
-            $account = SecondAccount::create([
+            $account = Account::create([
                 'name' => $request->name,
                 'account_code' => $code,
                 'account_id' => $request->account_id,
+                'sub_account_id' => $request->sub_account_id,
+                'type'=>'is_second',
             ]);
             DB::commit();
             return $account;
@@ -130,24 +126,25 @@ class AccountRepository implements AccountInterface
 
     public function createThirdAccount($request)
     {
-        $latestAccount = ThirdAccount::where('second_account_id', $request->second_account_id)
+        $latestAccount = Account::where('account_id', $request->account_id)
             ->orderByRaw("CAST(SUBSTRING_INDEX(account_code, '-', -1) AS UNSIGNED) DESC")
             ->first();
         if ($latestAccount) {
             $latestAccountCodeNo = explode('-', $latestAccount->account_code);
             // dd($account_code_no[1]);
             $new_account_code = (int) $latestAccountCodeNo[3] + 1;
-            $code = $latestAccountCodeNo[0] . '-' . $latestAccountCodeNo[1] . '-'.$latestAccountCodeNo[1] . '-' . $new_account_code;
+            $code = $latestAccountCodeNo[0] . '-' . $latestAccountCodeNo[1] . '-'.$latestAccountCodeNo[2] . '-' . $new_account_code;
         } else {
             $code = $request->original_account_code . '-' . "1";
         }
         DB::beginTransaction();
         try {
-
-            $account = ThirdAccount::create([
+            $account = Account::create([
                 'name' => $request->name,
                 'account_code' => $code,
-                'second_account_id' => $request->second_account_id,
+                'account_id' => $request->account_id,
+                'sub_account_id'=>$request->sub_account_id,
+                'type'=>'is_third',
             ]);
             DB::commit();
             return $account;

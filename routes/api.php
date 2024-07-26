@@ -170,8 +170,8 @@ Route::middleware('auth:api')->group(function () {
         Route::get('account_by_sub_account/{id}', 'accountBySubAccount');
         Route::post('create_second_account','createSecondAccount');
         Route::post('create_third_account','createThirdAccount');
-        Route::get('get_second_account/{sub_account_id}','getSecondAccount');
-        Route::get('get_third_account/{sub_account_id}','getThirdAccount');
+        Route::get('get_second_account/{account_id}','getSecondAccount');
+        Route::get('get_third_account/{account_id}','getThirdAccount');
     });
     Route::controller(AssetController::class)->group(function () {
         Route::post('create_asset_item','createAssetItem');
