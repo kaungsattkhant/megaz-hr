@@ -337,7 +337,7 @@ class InvoiceRepository implements InvoiceRepositoryInterface
             }
             $entity = Entity::find($latestRoomSession->entity_id);
             if ($invoice->invoice_type == 'endless_time') {
-                $latestRoomSession_end_date = Carbon::parse($latestRoomSession->end_date);
+                $latestRoomSession_end_date = Carbon::parse($latestRoomSession->start_date);
                 $currentDate = Carbon::now();
                 $minutesDifference = $latestRoomSession_end_date->diffInMinutes($currentDate);
                 $hoursDifference = $minutesDifference / 60;
@@ -347,8 +347,9 @@ class InvoiceRepository implements InvoiceRepositoryInterface
                 }
                 $data['session_duration'] = $hoursDifference;
                 $data['end_date'] = CurrentTime();
-                $data['price'] =
-                $invoice->total_session_price += $hoursDifference * $entity->price_per_hour;
+                $data['price'] =$hoursDifference * $entity->price_per_hour;
+                // error can happen in the total session price
+                $invoice->total_session_price += ($hoursDifference - $latestRoomSession->session_duration) * $entity->price_per_hour;
                 $invoice->save();
                 $latestRoomSession->update($data);
 
@@ -414,6 +415,11 @@ class InvoiceRepository implements InvoiceRepositoryInterface
             $room_discount_value = 0;
             $bdDiscount = 0;
             $customerLevelDiscount = 0;
+            $discount_value = 0;
+
+            if (isset($data['customer_level_discount'])) {
+                $customerLevelDiscount = $data['customer_level_discount'] ?? 0;
+            }
 
             if (isset($data['tax'])) {
                 $tax = $data['tax'];
@@ -435,8 +441,6 @@ class InvoiceRepository implements InvoiceRepositoryInterface
             if (isset($data['birthday_discount'])) {
                 $bdDiscount = $data['birthday_discount'] ?? 0;
             }
-
-            dd($bdDiscount,$customerLevelDiscount);
 
             if (isset($data['order_categories'])) {
                 $data['order_categories'] = json_decode($data['order_categories'], true);
@@ -486,7 +490,7 @@ class InvoiceRepository implements InvoiceRepositoryInterface
             if (isset($data['discount_value'])) {
                 $discount_value = $data['discount_value'];
             }
-
+            $data['discount_value'] = $room_discount_value + $bdDiscount + $customerLevelDiscount + $discount_value;
             $data['discount_total'] = $room_discount_value + $bdDiscount + $customerLevelDiscount;
             $data['total'] -= $room_discount_value;
             $data['tax'] = $tax;

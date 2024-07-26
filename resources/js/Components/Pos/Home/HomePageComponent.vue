@@ -462,13 +462,21 @@
                                 {{ selectedRoom.room_sessions[0].invoice.package.package_discount > 0 ? '- ' : '' }}  {{ selectedRoom.room_sessions[0].invoice.package.package_discount }}
                             </p>
                         </div>
-                        <div class=" text-sm text-right flex gap-x-2 justify-end pr-2 mb-2">
+                        <div v-show="discount_type != 'customer_level'" class=" text-sm text-right flex gap-x-2 justify-end pr-2 mb-2">
                             <p>
                                 Discount
                             </p>
                             <p class=" w-28">
                                 {{ printInvoiceData.discount > 0 ? '- ' : '' }} {{ printInvoiceData.discount }} {{
                                     this.discount_type == 'percentage' ? '%' : 'MMKs' }}
+                            </p>
+                        </div>
+                        <div v-show="discount_type == 'customer_level'" class=" text-sm text-right flex gap-x-2 justify-end pr-2 mb-2">
+                            <p>
+                                Customer Discount
+                            </p>
+                            <p class=" w-28">
+                                {{ printInvoiceData.customer_discount > 0 ? '- ' : '' }} {{ printInvoiceData.customer_discount }} MMKs
                             </p>
                         </div>
                         <div class=" text-right pr-3 mb-3">
@@ -1053,6 +1061,7 @@ export default {
                 tatalPrice: 0,
                 package_discount:0,
                 customer_discount:0,
+                percent_discount_amount:0,
             },
             room_discount: null,
             birthday_discount: null,
@@ -1097,7 +1106,7 @@ export default {
             currentTime: getCurretDateTime(),
             roomSessionData: null,
 
-            testformdata:null,
+            roomEndTime:null,
         };
     },
 
@@ -1357,7 +1366,7 @@ export default {
             // this.packageMenuList.forEach((packageMenu)=>{
             //     this.total_package_menu_price += (packageMenu.original_price - packageMenu.discount_value ) * packageMenu.quantity;
             // });
-            let packageActualTotal = this.food_total_package + (this.selectedPackage.session_price * this.selectedPackage.pay_session);
+            let packageActualTotal = this.food_total_package + (this.selectedPackage.session_price * this.selectedPackage.pay_session) - this.selectedPackage.package_discount;
             if(packageActualTotal < this.selectedPackage.price){
                 this.$notify({
                     title: `Not valid`,
@@ -1461,7 +1470,8 @@ export default {
             if (response.success) {
                 console.log("success")
                 await this.getRoomList();
-                this.selectedRoom = await this.roomList[this.selectedRoomIndex];
+                // this.selectedRoom = await this.roomList[this.selectedRoomIndex];
+                this.getSelectedRoom();
                 this.closeModal();
                 this.clearAddHourForm();
             }
@@ -1621,7 +1631,8 @@ export default {
                 let r = totalSession % totalDiscounts;
                 paidSession = (qProdOrig + r);
             }
-
+            let test = this.roomSessionData.total_session_price - (discountSessions * pricePerHour)
+            console.log('new total = ' + test)
             roomChargeTotal = paidSession * pricePerHour;
             if (this.selectedRoom.room_sessions[0].invoice.invoice_type == 'package') {
                 this.printInvoiceData.room = this.selectedRoom.room_sessions[0].invoice.total_session_price;
@@ -1629,10 +1640,9 @@ export default {
             else {
                 this.printInvoiceData.room = roomChargeTotal;
             }
-
             this.printInvoiceData.roomDiscountAmount = roomChargeTotal;
             this.printInvoiceData.discountSession = totalSession - paidSession;
-            this.printInvoiceData.total = this.printInvoiceData.room + this.printInvoiceData.food;
+            this.printInvoiceData.total = this.printInvoiceData.room + this.printInvoiceData.food -this.foodDiscount;
         },
         birthdayDiscountSelectChanged() {
             this.printInvoiceData.discount = this.birthday_discount.discount_value
@@ -1657,6 +1667,7 @@ export default {
                     console.log('get room dis list' + response.data.data)
                     // this.printInvoiceData.total = this.printInvoiceData.room + this.printInvoiceData.food;
                 }
+                this.printInvoiceData.total = ((this.printInvoiceData.room + this.printInvoiceData.food) - this.foodDiscount);
 
             }
             else if (this.discount_type == 'birthday_discount') {
@@ -1665,6 +1676,7 @@ export default {
                     this.birthdayDiscountList = response.data.data;
                 }
                 // this.printInvoiceData.total = this.printInvoiceData.room + this.printInvoiceData.food;
+                this.printInvoiceData.total = ((this.printInvoiceData.room + this.printInvoiceData.food) - this.foodDiscount);
             }
 
             else if (this.discount_type == 'customer_level') {
@@ -1702,6 +1714,7 @@ export default {
                 }
                 this.printInvoiceData.roomDiscountAmount = null;
                 this.printInvoiceData.discountSession = null;
+                this.printInvoiceData.total = ((this.printInvoiceData.room + this.printInvoiceData.food) - this.foodDiscount);
                 // this.printInvoiceData.total = this.printInvoiceData.room + this.printInvoiceData.food;
             }
         },
@@ -1710,6 +1723,7 @@ export default {
             console.log('room total = ' + this.printInvoiceData.room)
             if (this.discount_type == 'percentage') {
                 this.printInvoiceData.total = roomTotalAmount - (roomTotalAmount * (this.printInvoiceData.discount / 100));
+                this.printInvoiceData.percent_discount_amount = roomTotalAmount * (this.printInvoiceData.discount / 100);
             }
             else {
                 this.printInvoiceData.total = roomTotalAmount - this.printInvoiceData.discount;
@@ -1736,7 +1750,7 @@ export default {
                 // totalAmount = totalAmount - this.printInvoiceData.discount;
             }
             if (this.discount_type == 'percentage') {
-                formData.append('discount_value', this.printInvoiceData.discount);
+                formData.append('discount_value', this.printInvoiceData.percent_discount_amount);
             }
             if (this.discount_type == 'room_discount') {
                 formData.append('room_discount_id', this.room_discount.id);
