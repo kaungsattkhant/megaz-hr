@@ -170,11 +170,15 @@
                                             {{ om.quantity }}
                                         </td>
                                         <td class=" py-4 text-sm  ">
-                                            {{ om.price }}
+                                            {{ (om.price - om.discount_value ) * om.quantity }}
+
                                         </td>
                                         <td class=" py-4 text-sm  text-center">
-                                            <button :disabled="!om.is_changeable" :title="!om.is_changeable ? 'Can not Change Selected Package Menu' : '' "
+                                            <!-- <button :disabled="!om.is_changeable" :title="!om.is_changeable ? 'Can not Change Selected Package Menu' : '' "
                                                 @click="removeMenuBtnClicked(index)">
+                                                <i class="fal fa-times  pr-3"></i>
+                                            </button> -->
+                                            <button @click="removeMenuBtnClicked(index)">
                                                 <i class="fal fa-times  pr-3"></i>
                                             </button>
                                         </td>
@@ -339,7 +343,8 @@
                     let menuCategorySelected = this.menuCategoryList.findIndex(menuCategory => menuCategory.id == packageMenu.menu.menu_category_id)
                     let is_dis_menu_price = 0;
                     if(packageMenu.menu.menu_service_discounts.length>0){
-                        is_dis_menu_price = packageMenu.menu.menu_service_discounts[0].discount_price;
+                        // is_dis_menu_price = packageMenu.menu.menu_service_discounts[0].discount_price;
+                        is_dis_menu_price = 0;
                     }
                     else{
                         is_dis_menu_price = 0;
@@ -351,6 +356,7 @@
                         price : packageMenu.menu.prices[0].price,
                         menu_id : packageMenu.menu_id,
                         discount_value: is_dis_menu_price,
+                        is_package: 1
                     });
                     
                     this.food_total += packageMenu.menu.prices[0].price * packageMenu.quantity;
@@ -421,11 +427,12 @@
                     menu_category_name: this.selectedMenuCategory.name,
                     price:this.selectedMenu.prices[0].price,
                     menu_id : this.selectedMenu.prices[0].menu_id,
-                    discount_value: this.is_menu_discount,
+                    discount_value: this.is_menu_discount, //0 if package menu
+                    is_package : 0,
                 });
-                this.food_total += this.selectedMenu.prices[0].price * this.menuCount;
+                this.food_total += (this.selectedMenu.prices[0].price - this.is_menu_discount) * this.menuCount;
                 console.log(this.food_total)
-                this.total += this.selectedMenu.prices[0].price * this.menuCount;
+                this.total += (this.selectedMenu.prices[0].price - this.is_menu_discount) * this.menuCount;
                 this.menuCount = null;
                 this.selectedMenu = null;
                 this.selectedMenuCategory = null;
@@ -433,10 +440,15 @@
                 
             },
             removeMenuBtnClicked(index){
-                this.food_total -= this.orderMenuList[index].menu_price;
-                this.total -= this.orderMenuList[index].menu_price;
+                
                 if(this.orderMenuList[index].is_package == 1){
-                    this.package_total -= this.orderMenuList[index].menu_price;
+                    this.package_total -= this.orderMenuList[index].price * this.orderMenuList[index].quantity;
+                    this.food_total -= this.orderMenuList[index].price * this.orderMenuList[index].quantity;
+                    this.total -= this.orderMenuList[index].price * this.orderMenuList[index].quantity;
+                }
+                else if(this.orderMenuList[index].is_package == 0){
+                    this.food_total -= (this.orderMenuList[index].price - this.orderMenuList[index].discount_value) * this.orderMenuList[index].quantity;
+                    this.total -= (this.orderMenuList[index].price - this.orderMenuList[index].discount_value) * this.orderMenuList[index].quantity;
                 }
                 // if(this.type == 'package'){
                 //     let checkPackagePrice = this.selectedPackage.price + this.food;
@@ -496,13 +508,10 @@
                     }
                     else {
                         console.log('some errors occur');
+                        
                     }
                 }
-
-                
             }
-        
-        
         },
         created(){
             this.getCustomerList();
