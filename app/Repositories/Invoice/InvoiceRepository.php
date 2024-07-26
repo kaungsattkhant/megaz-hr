@@ -326,6 +326,7 @@ class InvoiceRepository implements InvoiceRepositoryInterface
         DB::beginTransaction();
         try {
             $invoice = Invoice::find($data['invoice_id']);
+            $roomDoneResponse['total_session_price'] = $invoice->total_session_price;
             $latestRoomSession = RoomSession::where('invoice_id', $invoice->id)->orderBy('created_at', 'desc')->first();
             $roomSessions = RoomSession::where('invoice_id', $data['invoice_id'])->with(['entity'])->get();
             $total_duration = 0;
@@ -387,8 +388,6 @@ class InvoiceRepository implements InvoiceRepositoryInterface
             } else {
                 $roomDoneResponse['is_birthday'] = false;
             }
-
-            $roomDoneResponse['total_session_price'] = $invoice->total_session_price;
             $roomDoneResponse['room_sessions'] = $latestRoomSession;
             $roomDoneResponse['rooms_sessions'] = $roomSessions;
             DB::commit();
