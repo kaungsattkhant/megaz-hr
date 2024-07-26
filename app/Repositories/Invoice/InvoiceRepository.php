@@ -337,20 +337,17 @@ class InvoiceRepository implements InvoiceRepositoryInterface
             }
             $entity = Entity::find($latestRoomSession->entity_id);
             if ($invoice->invoice_type == 'endless_time') {
-                $latestRoomSession_end_date = Carbon::parse($latestRoomSession->start_date);
+                $latestRoomSession_end_date = Carbon::parse($latestRoomSession->end_date);
                 $currentDate = Carbon::now();
                 $minutesDifference = $latestRoomSession_end_date->diffInMinutes($currentDate);
                 $hoursDifference = $minutesDifference / 60;
-
                 $hoursDifference = number_format($hoursDifference, 2);
-
                 if (($total_duration + $hoursDifference) < 3) {
                     ResponseMessage("You can't end this room before 3 hours", 402);
                 }
                 $data['session_duration'] = $hoursDifference;
                 $data['end_date'] = CurrentTime();
-                $data['price'] = $hoursDifference * $entity->price_per_hour;
-
+                $data['price'] =
                 $invoice->total_session_price += $hoursDifference * $entity->price_per_hour;
                 $invoice->save();
                 $latestRoomSession->update($data);
