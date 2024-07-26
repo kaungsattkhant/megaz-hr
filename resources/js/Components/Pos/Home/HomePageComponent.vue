@@ -1719,15 +1719,24 @@ export default {
             }
         },
         discountChanged() {
-            let roomTotalAmount = (this.selectedRoom.room_sessions[0].invoice.total_session_price + this.printInvoiceData.food) - this.printInvoiceData.package_discount - this.foodDiscount
+            let roomTotalAmount = (this.roomSessionData.total_session_price + this.printInvoiceData.food) - this.printInvoiceData.package_discount - this.foodDiscount
             console.log('room total = ' + this.printInvoiceData.room)
             if (this.discount_type == 'percentage') {
                 this.printInvoiceData.total = roomTotalAmount - (roomTotalAmount * (this.printInvoiceData.discount / 100));
                 this.printInvoiceData.percent_discount_amount = roomTotalAmount * (this.printInvoiceData.discount / 100);
             }
             else {
-                this.printInvoiceData.total = roomTotalAmount - this.printInvoiceData.discount;
+                // this.printInvoiceData.total = roomTotalAmount - this.printInvoiceData.discount;
+                if(this.printInvoiceData.discount){
+                    this.printInvoiceData.total = roomTotalAmount - this.printInvoiceData.discount;
+                    console.log(this.printInvoiceData.discount)
+                }
+                else{
+                    this.printInvoiceData.total = roomTotalAmount - this.printInvoiceData.discount;
+                    console.log(this.printInvoiceData.discount)
+                }
             }
+            console.log('room total amounttt = ' + roomTotalAmount);
 
 
         },
