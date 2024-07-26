@@ -1532,10 +1532,17 @@ export default {
             }
             let roomChargeTotal = 0;
             // roomSessions.forEach(roomSession => {
-            roomChargeTotal = roomSessions.room_sessions.price;
+            
             // roomChargeTotal += roomSession.price; // or roomSession.session_duration * roomSession.entity.price_per_hour;
             // });
             this.printInvoiceData.room = roomChargeTotal; // <== or that
+
+            if(this.selectedRoom.room_sessions.invoice.invoice_type == 'endless_time'){
+                this.roomSessionData = a;
+            }
+            else{
+                roomChargeTotal = roomSessions.room_sessions.price;
+            }
 
             if (this.purchaseMenuList.length > 0) {
                 this.printInvoiceData.food = this.purchaseMenuList[0].total
