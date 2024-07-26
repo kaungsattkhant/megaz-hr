@@ -339,6 +339,7 @@ class InvoiceRepository implements InvoiceRepositoryInterface
                 $currentDate = Carbon::now();
                 $minutesDifference = $latestRoomSession_end_date->diffInMinutes($currentDate);
                 $hoursDifference = $minutesDifference / 60;
+
                 $hoursDifference = number_format($hoursDifference, 2);
 
                 if (($total_duration + $hoursDifference) < 3) {
@@ -348,7 +349,7 @@ class InvoiceRepository implements InvoiceRepositoryInterface
                 $data['end_date'] = CurrentTime();
                 $data['price'] = $hoursDifference * $entity->price_per_hour;
 
-                $invoice->total_session_price += $hoursDifference * $entity->price_per_hour;
+                $invoice->total_session_price = $hoursDifference * $entity->price_per_hour;
                 $invoice->save();
             }
             $latestRoomSession->update($data);
@@ -426,6 +427,16 @@ class InvoiceRepository implements InvoiceRepositoryInterface
                 $order_discount = $data['order_discount'];
             }
 
+            if (isset($data['customer_level_discount'])) {
+                $customerLevelDiscount = $data['customer_level_discount'] ?? 0;
+            }
+
+            if (isset($data['birthday_discount'])) {
+                $bdDiscount = $data['birthday_discount'] ?? 0;
+            }
+
+            dd($bdDiscount,$customerLevelDiscount);
+
             if (isset($data['order_categories'])) {
                 $data['order_categories'] = json_decode($data['order_categories'], true);
                 foreach ($data['order_categories'] as $menu) {
@@ -451,7 +462,6 @@ class InvoiceRepository implements InvoiceRepositoryInterface
             }
 
 
-
             if (isset($data['discount_type'])) {
                 if ($data['discount_type'] == 'room_discount') {
                     $roomDiscount = RoomDiscount::find($data['room_discount_id']);
@@ -468,39 +478,6 @@ class InvoiceRepository implements InvoiceRepositoryInterface
                         ResponseMessage('Discount cannot be applied', 422);
                     }
                 }
-            } else if ($data['discount_type'] == 'birthday_discount') {
-                if ($customer) {
-                    $birthdate = Carbon::parse($customer->birthdate);
-                    $today = Carbon::today();
-                    if ($birthdate->isBirthday($today)) {
-                        $isBirthday = true;
-                        $bdPromo = BirthdayPromotion::find($data['birthday_discount_id']);
-                        if (!$bdPromo) {
-                            ResponseMessage('Selected birthday promotion not found');
-                        }
-                        $bdDiscount = $bdPromo->discount_value;
-                    } else {
-                        ResponseData('Today is not your birthday', 422);
-                    }
-                }
-            } else if ($data['discount_type'] == 'customer_level') {
-                $total = 0;
-                foreach ($customer->invoices as $invoice) {
-                    $total += $invoice->total;
-                }
-                $levels = CustomerLevelDiscount::all();
-                $customerLevel = null;
-                foreach ($levels as $level) {
-                    if ($total  >= $level->amount) {
-                        $customerLevel = $level;
-                    } else {
-                        break;
-                    }
-                }
-                if ($customerLevel == null) {
-                    ResponseMessage('Customer level not found', 422);
-                }
-                $customerLevelDiscount += $customerLevel->promotion_value;
             }
 
 
