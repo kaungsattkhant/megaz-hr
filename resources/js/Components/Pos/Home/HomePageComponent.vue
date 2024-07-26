@@ -237,8 +237,8 @@
                                             ).toLocaleString()
                                         )
                                         : 0
-                                    ) 
-                                   
+                                    )
+
 
                                 }}
                                 <!-- {{ printInvoiceData.room + printInvoiceData.food }} -->
@@ -612,7 +612,7 @@
 
                 <div v-show="isOpenRoom.step_isPackage == true" class="relative h-full">
                     <div class="flex justify-center padding-section ">
-                        
+
                         <div>
                             <p class="text-black text-lg">
                                 Confirm Menu
@@ -635,7 +635,7 @@
                                                 Price
                                             </th>
                                             <th scope="col" class="text-left   py-4">
-                
+
                                             </th>
                                         </tr>
                                     </thead>
@@ -651,17 +651,17 @@
                                                 {{ (pm.original_price - pm.discount_value) * pm.quantity  }}
                                             </td>
                                             <td class=" py-4 text-sm  text-center">
-                                                <button 
+                                                <button
                                                     @click="removePackageMenu(index)">
                                                     <i class="fal fa-times  pr-3"></i>
                                                 </button>
                                             </td>
                                         </tr>
-                                        
+
                                     </tbody>
                                 </table>
                             </div>
-                            
+
                         </div>
                     </div>
 
@@ -1207,7 +1207,7 @@ export default {
                 if (response.data) {
                     this.packageList = response.data.data;
                 }
-            
+
 
         },
         getSelectedPackage(){
@@ -1298,7 +1298,7 @@ export default {
             else{
                 this.is_menu_discount = 0
             }
-            
+
             this.packageMenuList.push({
                 quantity: this.menuQuantityForPackage,
                 name: this.selectedMenuForPackage.name,
@@ -1318,7 +1318,7 @@ export default {
             this.getPurchaseMenuList();
             if(this.type == 'package' && this.selectedPackage){
                 this.isOpenRoomStep('step_isPackage');
-                
+
                 let menuOfselectedPackage = this.selectedPackage.menu_packages;
                 menuOfselectedPackage.forEach((packageMenu)=>{
                     let is_dis_menu_price = 0;
@@ -1338,7 +1338,7 @@ export default {
                         menu_id : packageMenu.menu_id,
                         is_package : 1
                     });
-                    
+
                 });
             }
             else{
@@ -1350,7 +1350,7 @@ export default {
                 delete om.name;
                 console.log('hello = ' + om.name);
             });
-            
+
         },
         createRoomForPackage(){
             
@@ -1444,7 +1444,7 @@ export default {
                 console.log('some errors occur');
             }
         },
-        
+
 
 
 
@@ -1555,7 +1555,7 @@ export default {
             }
             else {
                 this.isPackage = false;
-                this.printInvoiceData.total = (this.selectedRoom.room_sessions[0].invoice.total_session_price + this.printInvoiceData.food) - this.foodDiscount;
+                this.printInvoiceData.total = (roomChargeTotal + this.printInvoiceData.food) - this.foodDiscount;
             }
 
 
@@ -1566,7 +1566,7 @@ export default {
             if (this.isTax = true) {
                 this.printInvoiceData.tax = this.printInvoiceData.food * 0.05
             }
-            
+
             // this.printInvoiceData.total = this.printInvoiceData.room + this.printInvoiceData.food + this.printInvoiceData.tax +this.printInvoiceData.service_tax
 
             this.selectedPaymentMethod = null
@@ -1671,7 +1671,7 @@ export default {
                     }
                     this.printInvoiceData.total = ((this.printInvoiceData.room + this.printInvoiceData.food) - this.printInvoiceData.package_discount - this.foodDiscount) - this.printInvoiceData.customer_discount;
                 }
-                
+
             }
             else {
                 this.roomDiscountList = [];
