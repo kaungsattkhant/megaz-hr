@@ -1765,6 +1765,7 @@ export default {
             formData.append('total', totalAmount);
             formData.append('order_discount', this.foodDiscount);
             formData.append('discount_total', allTotalDiscounts);
+            
 
             console.log(formData)
             
