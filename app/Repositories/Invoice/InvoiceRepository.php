@@ -388,7 +388,6 @@ class InvoiceRepository implements InvoiceRepositoryInterface
             } else {
                 $roomDoneResponse['is_birthday'] = false;
             }
-            $roomDoneResponse['total_session_price'] = $invoice->total_session_price;
             $roomDoneResponse['room_sessions'] = $latestRoomSession;
             $roomDoneResponse['rooms_sessions'] = $roomSessions;
             DB::commit();
