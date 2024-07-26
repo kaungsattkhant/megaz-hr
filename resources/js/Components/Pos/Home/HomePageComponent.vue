@@ -1525,7 +1525,7 @@ export default {
         async doneSession() {
             let formData = new FormData();
             let roomSessions = [];
-            formData.append('invoice_id', this.selectedRoom.room_sessions[0].invoice.invoice_id);
+            formData.append('invoice_id', this.selectedRoom.room_sessions[0].invoice.id);
             let response = await postApiData({ url: '/api/room_done', form_data: formData, token: this.getToken() });
             if (response.success) {
                 this.roomSessionData = response.data;
