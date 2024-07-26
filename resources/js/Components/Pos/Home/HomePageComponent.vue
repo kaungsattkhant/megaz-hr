@@ -1546,7 +1546,7 @@ export default {
                 roomChargeTotal = this.roomSessionData.total_session_price;
             }
             else{
-                roomChargeTotal = roomSessions.room_sessions.price;
+                roomChargeTotal = roomSessions.total_session_price;
             }
             // roomChargeTotal += roomSession.price; // or roomSession.session_duration * roomSession.entity.price_per_hour;
             // });
