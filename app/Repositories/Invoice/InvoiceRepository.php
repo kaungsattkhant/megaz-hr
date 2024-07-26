@@ -254,6 +254,7 @@ class InvoiceRepository implements InvoiceRepositoryInterface
             $roundedDurationInHours = round($durationInHours, 3);
             $lastEntity = Entity::find($lastRoomwithInvoice->entity_id);
             $leftDuration = $lastRoomwithInvoice->session_duration - $roundedDurationInHours;
+
             $lastRoomwithInvoice->session_duration = $roundedDurationInHours;
             $lastRoomwithInvoice->end_date = CurrentTime();
 
@@ -307,11 +308,12 @@ class InvoiceRepository implements InvoiceRepositoryInterface
             foreach ($allRooms as $room) {
                 $total_session_price += $room->price;
             }
-            $invoice->total_session_price = $total_session_price;
+            $invoice->total_session_price =$total_session_price;
+
             $invoice->save();
             DB::commit();
 
-            return $room;
+            return $invoice;
         } catch (\Exception $e) {
             DB::rollback();
             ResponseMessage($e->getMessage(), 402);
@@ -349,10 +351,11 @@ class InvoiceRepository implements InvoiceRepositoryInterface
                 $data['end_date'] = CurrentTime();
                 $data['price'] = $hoursDifference * $entity->price_per_hour;
 
-                $invoice->total_session_price = $hoursDifference * $entity->price_per_hour;
+                $invoice->total_session_price += $hoursDifference * $entity->price_per_hour;
                 $invoice->save();
+                $latestRoomSession->update($data);
+
             }
-            $latestRoomSession->update($data);
 
             $today = Carbon::today();
             $customer = Customer::find($invoice->customer_id);
