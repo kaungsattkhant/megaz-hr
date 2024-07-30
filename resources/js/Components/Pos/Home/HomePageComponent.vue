@@ -1319,7 +1319,7 @@ export default {
             this.food_total_package += (this.selectedMenuForPackage.prices[0].price - this.is_menu_discount) * this.menuQuantityForPackage;
         },
         removePackageMenu(index){
-            
+
             this.food_total_package -= (this.packageMenuList[index].original_price - this.packageMenuList[index].discount_value) * this.packageMenuList[index].quantity;
             this.packageMenuList.splice(index, 1);
         },
@@ -1362,7 +1362,7 @@ export default {
 
         },
         createRoomForPackage(){
-            
+
             // this.packageMenuList.forEach((packageMenu)=>{
             //     this.total_package_menu_price += (packageMenu.original_price - packageMenu.discount_value ) * packageMenu.quantity;
             // });
@@ -1476,7 +1476,11 @@ export default {
                 this.clearAddHourForm();
             }
             else {
-                console.log('some errors occur');
+                this.$notify({
+                    title: `Not valid`,
+                    text: response.message,
+                    type: "warn"
+                });
             }
         },
         btnClickedChangeRoom() {
@@ -1552,7 +1556,7 @@ export default {
             // });
             this.printInvoiceData.room = roomChargeTotal; // <== or that
 
-            
+
 
             if (this.purchaseMenuList.length > 0) {
                 this.printInvoiceData.food = this.purchaseMenuList[0].total
@@ -1616,7 +1620,7 @@ export default {
                 totalSession += parseFloat(roomSession.session_duration);
                 pricePerHour = roomSession.entity.price_per_hour;
             });
-            
+
             if (totalSession <= totalDiscounts) {
                 if (totalSession > originalSessions) {
                     paidSession = originalSessions;
@@ -1647,13 +1651,13 @@ export default {
         birthdayDiscountSelectChanged() {
             this.printInvoiceData.discount = this.birthday_discount.discount_value
             if (this.selectedRoom.room_sessions[0].invoice.invoice_type == 'package') {
-                this.printInvoiceData.room = this.selectedRoom.room_sessions[0].invoice.paid_amount;
+                this.printInvoiceData.room = (this.roomSessionData.total_session_price) - this.selectedRoom.room_sessions[0].invoice.package.package_discount;
             }
             else {
                 this.printInvoiceData.room = this.roomSessionData.total_session_price;
             }
+            console.log(this.printInvoiceData.room,this.printInvoiceData.food,this.printInvoiceData.discount,this.foodDiscount);
             this.printInvoiceData.total = (this.printInvoiceData.room + this.printInvoiceData.food) - this.printInvoiceData.discount - this.foodDiscount
-            console.log(this.printInvoiceData.room + this.printInvoiceData.food - this.printInvoiceData.discount);
         },
 
         async getRoomDiscount() {
@@ -1671,29 +1675,25 @@ export default {
 
             }
             else if (this.discount_type == 'birthday_discount') {
+
                 const response = await getApiData({ url: '/api/birthday_promotions', token: this.getToken() });
                 if (response.data) {
                     this.birthdayDiscountList = response.data.data;
                 }
-                // this.printInvoiceData.total = this.printInvoiceData.room + this.printInvoiceData.food;
-                this.printInvoiceData.total = ((this.printInvoiceData.room + this.printInvoiceData.food) - this.foodDiscount);
+                this.printInvoiceData.total = (this.printInvoiceData.room + this.printInvoiceData.food) - this.foodDiscount;
             }
 
             else if (this.discount_type == 'customer_level') {
+
                 if (this.selectedRoom.room_sessions[0].invoice.invoice_type == 'package') {
                     // this.printInvoiceData.room = this.selectedRoom.room_sessions[0].invoice.package.pay_session * this.selectedRoom.room_sessions[0].invoice.package.session_price;
-                    this.printInvoiceData.customer_discount = this.roomSessionData.customer_level_discount_value + this.selectedRoom.room_sessions[0].invoice.package.package_discount + this.selectedRoom.room_sessions[0].invoice.orders[0].total_discount_price;
-                    this.printInvoiceData.total = ((this.printInvoiceData.room + this.printInvoiceData.food) - this.printInvoiceData.package_discount - this.foodDiscount) - this.printInvoiceData.customer_discount
+                    // this.printInvoiceData.customer_discount = this.roomSessionData.customer_level_discount_value + this.selectedRoom.room_sessions[0].invoice.package.package_discount + this.selectedRoom.room_sessions[0].invoice.orders[0].total_discount_price;
+                this.printInvoiceData.customer_discount = this.roomSessionData.customer_level_discount_value;
+                    this.printInvoiceData.total = (this.roomSessionData.total_session_price + this.printInvoiceData.food) - (this.printInvoiceData.package_discount + this.foodDiscount + this.printInvoiceData.customer_discount);
                 }
                 else {
-                    // this.printInvoiceData.room = this.roomSessionData.room_sessions.price;
-                    if(this.selectedRoom.room_sessions[0].invoice.orders.length > 0 ){
-                        this.printInvoiceData.customer_discount = this.roomSessionData.customer_level_discount_value + this.selectedRoom.room_sessions[0].invoice.orders[0].total_discount_price;
-                    }
-                    else{
-                        this.printInvoiceData.customer_discount = this.roomSessionData.customer_level_discount_value;
-                    }
-                    this.printInvoiceData.total = ((this.printInvoiceData.room + this.printInvoiceData.food) - this.printInvoiceData.package_discount - this.foodDiscount) - this.printInvoiceData.customer_discount;
+                this.printInvoiceData.customer_discount = this.roomSessionData.customer_level_discount_value;
+                    this.printInvoiceData.total = ((this.roomSessionData.total_session_price + this.printInvoiceData.food) - ( this.foodDiscount + this.printInvoiceData.customer_discount));
                 }
 
             }
@@ -1706,15 +1706,16 @@ export default {
                 roomChargeTotal = roomSessions.room_sessions.price;
                 // });
                 if (this.selectedRoom.room_sessions[0].invoice.invoice_type == 'package') {
-                    this.printInvoiceData.room = this.selectedRoom.room_sessions[0].invoice.package.pay_session *this.selectedRoom.room_sessions[0].invoice.package.session_price;
+                    this.printInvoiceData.room = (this.roomSessionData.total_session_price - this.selectedRoom.room_sessions[0].invoice.package.package_discount);
                 }
                 else {
                     // this.printInvoiceData.room = roomChargeTotal;
-                    this.printInvoiceData.rooom = this.roomSessionData.total_session_price;
+                    this.printInvoiceData.room = this.roomSessionData.total_session_price;
                 }
                 this.printInvoiceData.roomDiscountAmount = null;
                 this.printInvoiceData.discountSession = null;
-                this.printInvoiceData.total = ((this.printInvoiceData.room + this.printInvoiceData.food) - this.foodDiscount);
+                console.log(this.printInvoiceData.room, this.printInvoiceData.food);
+                this.printInvoiceData.total = ((this.printInvoiceData.room + this.printInvoiceData.food) - (this.foodDiscount ));
                 // this.printInvoiceData.total = this.printInvoiceData.room + this.printInvoiceData.food;
             }
         },
@@ -1801,10 +1802,10 @@ export default {
             formData.append('total', totalAmount);
             formData.append('order_discount', this.foodDiscount);
             formData.append('discount_total', allTotalDiscounts);
-            
+
 
             console.log(formData)
-            
+
             let response = await postApiData({ url: '/api/entities/done', form_data: formData, token: this.getToken() });
             if (response.success) {
                 await this.getRoomList();
