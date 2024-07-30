@@ -151,6 +151,8 @@ Route::middleware(['departments:cashbook'])->group(function () {
 });
 Route::middleware(['departments:fixed-asset'])->group(function () {
     Route::view('/fixed_assets', 'fixed_assets.index')->name('fixed_assets.index');
+    Route::view('/asset_items', 'fixed_assets.asset_items')->name('fixed_assets.asset_items');
+    Route::view('/assets', 'fixed_assets.assets')->name('fixed_assets.assets');
 });
 Route::middleware(['departments:account-payables'])->group(function () {
     Route::view('/account_payables', 'AP.index')->name('AP.index');

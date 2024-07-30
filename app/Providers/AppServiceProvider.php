@@ -40,6 +40,7 @@ class AppServiceProvider extends ServiceProvider
             'uom'=>'App\Models\UOM',
             'invoice'=>'App\Models\Invoice',
             'po_grn'=>'App\Models\PoGrn',
+            'asset'=>'App\Models\Asset',
         ]);
     }
 }

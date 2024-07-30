@@ -73,6 +73,8 @@ import SupplierListComponent from './Components/Supplier/SupplierListComponent.v
 import SupplierCreateComponent from './Components/Supplier/SupplierCreateComponent.vue';
 import SupplierUpdateComponent from './Components/Supplier/SupplierUpdateComponent.vue';
 import FixedAssetCrudComponent from './Components/FixedAssets/FixedAssetCrudComponent.vue';
+import AssetItemCrudComponent from './Components/FixedAssets/AssetItemCrudComponent.vue';
+import AssetCrudComponent from './Components/FixedAssets/AssetCrudComponent.vue';
 import TableCrudComponent from './Components/TablesAndRooms/TableCrudComponent.vue';
 import PackagesListComponent from './Components/Packages/PackagesListComponent.vue';
 import PackagesCreateComponent from './Components/Packages/PackagesCreateComponent.vue';
@@ -164,6 +166,8 @@ app.component('SupplierCreateComponent', SupplierCreateComponent);
 app.component('SupplierUpdateComponent', SupplierUpdateComponent);
 
 app.component('FixedAssetCrudComponent', FixedAssetCrudComponent);
+app.component('AssetItemCrudComponent', AssetItemCrudComponent);
+app.component('AssetCrudComponent', AssetCrudComponent);
 
 app.component('LoginComponent', LoginComponent);
 app.component('LogoutComponent', LogoutComponent);

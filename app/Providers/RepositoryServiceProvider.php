@@ -33,6 +33,8 @@ use App\Repositories\Supplier\SupplierRepository;
 
 use App\Repositories\Transfer\TransferRepository;
 use App\Repositories\Area\AreaRepositoryInterface;
+use App\Repositories\Asset\AssetInterface;
+use App\Repositories\Asset\AssetRepository;
 use App\Repositories\BirthdayPromotion\BirthdayPromotionRepository;
 use App\Repositories\BirthdayPromotion\BirthdayPromotionRepositoryInterface;
 use App\Repositories\Booking\BookingRepository;
@@ -159,5 +161,6 @@ class RepositoryServiceProvider extends ServiceProvider
         $this->app->bind(BookingRepositoryInterface::class,BookingRepository::class);
         $this->app->bind(FoodOrderRepositoryInterface::class,FoodOrderRepository::class);
         $this->app->bind(DeliveryChargeRepositoryInterface::class,DeliveryChargeRepository::class);
+        $this->app->bind(AssetInterface::class,AssetRepository::class);
     }
 }
