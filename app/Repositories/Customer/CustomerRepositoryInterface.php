@@ -35,5 +35,8 @@ interface CustomerRepositoryInterface
 
     public function deleteCustomerAddress(int $id);
 
+    public function changePhoneNumberOTP($request);
+
+    public function changePhone($request);
 
 }
