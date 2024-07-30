@@ -43,8 +43,7 @@ class OrderRepository implements OrderRepositoryInterface
                 $order->total_quantity += $data['quantity'];
                 $order->total_discount_price += $discountAmount;
                 $order->total += $data['original_price'] * $data['quantity'];
-                $order->total_discount_price += $discountAmount;
-                $order->update($data);
+                $order->save();
 
                 $data['date'] = currentTime();
                 $data['order_id'] = $order->id;
@@ -135,7 +134,6 @@ class OrderRepository implements OrderRepositoryInterface
                     $order->total_quantity += $menuData['quantity'];
                     $order->total_discount_price += $discountAmount; // update total discount only for this order
                     $order->total += $menuData['original_price'] * $menuData['quantity'];
-
                     $order->update($menuData);
 
                     $originalOrderItem = OrderItem::where('menu_id', $menuData['menu_id'])
