@@ -11,6 +11,7 @@ use App\Http\Controllers\API\Customers\PackageAPIController;
 use App\Http\Controllers\Customers\FoodOrderAPIController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\User\HomeController;
+use Illuminate\Support\Facades\Auth;
 
 // Route::middleware('auth:api')->group(function () {
     Route::controller(HomeController::class)->group(function(){
@@ -20,7 +21,18 @@ use App\Http\Controllers\User\HomeController;
     Route::post('/customers/initial_register', [AuthController::class, 'initialRegister']);
 Route::post('/customers/register', [AuthController::class, 'register']);
 Route::post('/customers/login', [AuthController::class, 'login']);
+Route::post('/customers/forgot_password', [AuthController::class, 'forgotPassword']);
+Route::post('/customers/reset_password', [AuthController::class,'changeForgetPassword']);
+
 Route::middleware('auth:customer_api')->group(function () {
+
+    Route::post('/customers/logout', [AuthController::class, 'logout']);
+    Route::post('/customers/change_password', [AuthController::class, 'changePassword']);
+
+    Route::post('/user_app/change_phone_otp',[CustomerAPIController::class,'changePhoneNumberOTP']);
+    Route::post('/user_app/change_phone_number',[CustomerAPIController::class,'changePhoneNumber']);
+
+
     Route::get('/user_app/menu_categories',[MenuCategoryAPIController::class,'getMenuCategoriesbyUserApp']);
     Route::get('/user_app/menus',[MenuAPIController::class,'listMenuData']);
     Route::get('/user_app/menu_categories/{id}/menus',[MenuAPIController::class,'categoryMenuByUserApp']);

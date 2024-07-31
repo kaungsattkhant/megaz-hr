@@ -74,7 +74,6 @@ class BookingAPIController extends Controller
             ];
         }
 
-
         $orderData['invoice_id'] = $invoice->id;
         $orderData['menuArray'] = $menuArray;
         $order = $this->orderRepo->createMultipleOrder($orderData);

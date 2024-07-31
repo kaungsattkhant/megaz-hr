@@ -15,6 +15,7 @@ use App\Http\Requests\Customer\CustomerRequest;
 
 use App\Models\Customer;
 use App\Models\CustomerAddress;
+use Illuminate\Support\Facades\Hash;
 
 class AuthController extends Controller
 {
@@ -100,4 +101,89 @@ class AuthController extends Controller
             ResponseData($loginResponse);
         }
     }
+
+    public function logout(Request $request)
+    {
+        $request->user()->currentAccessToken()->delete();
+        ResponseMessage("Logout success");
+    }
+
+    public function forgotPassword(Request $request)
+    {
+        DB::beginTransaction();
+        try {
+            $data['otp'] = '111111';
+            $customer = Customer::where('phone_number', $request->phone_number)->first();
+            if (!$customer) {
+                ResponseMessage('No customer found with given phone number', 400);
+            }
+            $customer->update($data);
+            DB::commit();
+            ResponseMessage('OTP code sent, please check your SMS');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            ResponseMessage($e->getMessage(), 500);
+            throw $e;
+        }
+    }
+
+    public function changeForgetPassword(Request $request)
+    {
+        DB::beginTransaction();
+        try {
+
+            $customer = Customer::where('phone_number', $request->phone_number)->first();
+            if (!$customer) {
+                ResponseMessage('No customer found with given phone number', 400);
+            }
+
+            if ($customer->otp == $request->otp) {
+                if ($request->password == $request->confirm_password) {
+                    $customer->password = $request->password;
+                    $customer->save();
+                    DB::commit();
+                    $this->login($request);
+                } else {
+                    ResponseMessage('Password and confirm password not match', 400);
+                }
+                ResponseMessage('Password changed successfully');
+            } else {
+                ResponseMessage('OTP code not match, please try again');
+            }
+        } catch (\Exception $e) {
+            DB::rollBack();
+            ResponseMessage($e->getMessage(), 500);
+            throw $e;
+        }
+    }
+
+
+    public function changePassword(Request $request)
+    {
+        DB::beginTransaction();
+        try {
+
+            $customer = Customer::find(UserData()->id);
+            if (!$customer) {
+                ResponseMessage('No customer found with given phone number', 400);
+            }
+            if (Hash::check($request->current_password, $customer->password)) {
+                if ($request->password == $request->confirm_password) {
+                    $customer->password = $request->password;
+                    $customer->save();
+                    DB::commit();
+                    ResponseMessage('Password changed successfully');
+                } else {
+                    ResponseMessage('Password and confirm password not match', 400);
+                }
+            } else {
+                ResponseMessage('Current password not match', 400);
+            }
+        } catch (\Exception $e) {
+            DB::rollBack();
+            ResponseMessage($e->getMessage(), 500);
+            throw $e;
+        }
+    }
+
 }
