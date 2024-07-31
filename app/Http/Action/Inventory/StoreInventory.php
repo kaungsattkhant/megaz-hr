@@ -3,6 +3,7 @@
 namespace App\Http\Action\Inventory;
 
 use App\Http\Action\Transaction\PurchaseOrderTransaction;
+use App\Models\AssetInventoryLedger;
 use App\Models\InventoryLedger;
 use App\Models\PurchaseOrderItem;
 use Illuminate\Support\Facades\DB;
@@ -56,5 +57,8 @@ class StoreInventory
     }
 
 
-
+    public function storeAssetToInventory($data,$action){
+        $data['date_time']=$data['purchase_date'];
+        return AssetInventoryLedger::create($data);
+    }
 }

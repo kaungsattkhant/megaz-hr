@@ -17,7 +17,7 @@ return new class extends Migration
             $table->string('name');
             $table->unsignedInteger('sub_account_id');
             $table->unsignedInteger('account_id')->nullable();
-            $table->enum('type',['is_first','is_second','is_third'])->default('is_first');
+            $table->enum('type',['is_first','is_second','is_second_depreciation','is_third','is_third_depreciation'])->default('is_first');
             $table->boolean('is_active')->default(1);
             $table->timestamps();
         });

@@ -8,4 +8,5 @@ interface AssetInterface
 
     public function createAsset($request);
 
+    public function getAssetItemByAccount($request);
 }

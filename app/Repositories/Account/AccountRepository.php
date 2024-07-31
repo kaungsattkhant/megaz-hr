@@ -78,13 +78,13 @@ class AccountRepository implements AccountInterface
     }
 
 
-    public function getSecondAccount($account_id){
-        $second_account=Account::where('account_id',$account_id)->where('type','is_second')->get();
+    public function getSecondAccount($type){
+        $second_account=Account::where('type',$type)->get();
         return $second_account;
     }
 
-    public function getThirdAccount($account_id){
-        $account=Account::where('account_id',$account_id)->where('type','is_third')->get();
+    public function getThirdAccount($type){
+        $account=Account::where('type',$type)->get();
         return $account;
         // $third_account=ThirdAccount::whereHas('second_account.account',function($q)use($sub_account_id){
         //     $q->where('sub_account_id',$sub_account_id);
@@ -113,7 +113,7 @@ class AccountRepository implements AccountInterface
                 'account_code' => $code,
                 'account_id' => $request->account_id,
                 'sub_account_id' => $request->sub_account_id,
-                'type'=>'is_second',
+                'type'=>$request->type,
             ]);
             DB::commit();
             return $account;
@@ -131,7 +131,6 @@ class AccountRepository implements AccountInterface
             ->first();
         if ($latestAccount) {
             $latestAccountCodeNo = explode('-', $latestAccount->account_code);
-            // dd($account_code_no[1]);
             $new_account_code = (int) $latestAccountCodeNo[3] + 1;
             $code = $latestAccountCodeNo[0] . '-' . $latestAccountCodeNo[1] . '-'.$latestAccountCodeNo[2] . '-' . $new_account_code;
         } else {
@@ -142,9 +141,10 @@ class AccountRepository implements AccountInterface
             $account = Account::create([
                 'name' => $request->name,
                 'account_code' => $code,
-                'account_id' => $request->account_id,
+                'account_id' => $request->account_id,   
                 'sub_account_id'=>$request->sub_account_id,
-                'type'=>'is_third',
+                // 'type'=>'is_third',
+                'type'=>$request->type,
             ]);
             DB::commit();
             return $account;
