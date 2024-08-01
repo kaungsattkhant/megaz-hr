@@ -24,8 +24,14 @@ interface TaskRepositoryInterface
 
     public function taskReport($request);
 
+
     // custom task
     public function customTaskCreate(Request $request);
 
     public function  listCustomTasks(Request $request);
+
+    public function customTaskUpdate(Request $request,int $id);
+
+    public function taskCustomDetail(int $id);
+
 }

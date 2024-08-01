@@ -132,4 +132,14 @@ class TaskController extends Controller
     {
         $tasks = $this->taskRepo->listCustomTasks($request);
     }
+
+    public function updateCustomTask(Request $request, int $id)
+    {
+        $task = $this->taskRepo->customTaskUpdate($request, $id);
+    }
+
+    public function customTaskDetail(int $id)
+    {
+        $task = $this->taskRepo->taskCustomDetail($id);
+    }
 }

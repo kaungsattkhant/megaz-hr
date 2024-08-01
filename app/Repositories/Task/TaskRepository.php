@@ -190,9 +190,41 @@ class TaskRepository implements TaskRepositoryInterface
         }
     }
 
+    public function customTaskUpdate(Request $request,int $id)
+    {
+        DB::beginTransaction();
+        try{
+            $data = $request->all();
+            $task = Task::find($id);
+            $data['type'] = "custom_task";
+            $staff = Staff::find($data['staff_id'])->first();
+            $role = $staff->roles->first();
+            $data['role_id'] = $role->id;
+            $task->update($data);
+            DB::commit();
+            ResponseData($task,200);
+
+        }catch(\Exception $e)
+        {
+            DB::rollBack();
+            ResponseMessage($e->getMessage(), 402);
+            throw $e;
+
+        }
+    }
+
     public function listCustomTasks(Request $request)
     {
         $tasks = Task::where('type', 'custom_task')->with(['staff','role.department'])->orderBy('created_at', 'desc')->paginate(config('common.list_count'));
         ResponseData($tasks);
+    }
+
+    public function taskCustomDetail(int $id)
+    {
+        $task = Task::where('type','custom_task')->with(['staff.department'])->find($id);
+        if (!$task) {
+            ResponseMessage('Task not found', 404);
+        }
+        ResponseData($task,200);
     }
 }

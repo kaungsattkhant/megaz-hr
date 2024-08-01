@@ -142,6 +142,9 @@ Route::middleware('auth:api')->group(function () {
         Route::post('/tasks/{id}/double_checked','taskDoubleChecked');
         Route::post('/custom_tasks','createCustomTask');
         Route::get('/custom_tasks','getCustomTasks');
+        Route::get('/custom_tasks/{id}','customTaskDetail');
+        Route::post('/custom_tasks/{id}','updateCustomTask');
+
     });
     Route::controller(PurchaseOrderAPIController::class)->group(function () {
         Route::get('/purchase_orders', 'getPurchaseOrder');
