@@ -105,24 +105,24 @@ class AuthController extends Controller
     public function logout(Request $request)
     {
         $request->user()->currentAccessToken()->delete();
-        ResponseMessage("Logout success");
+        ResponseMessage("Logout success",200);
     }
 
     public function forgotPassword(Request $request)
     {
         DB::beginTransaction();
         try {
-            $data['otp'] = '111111';
+            $data['otp'] = '000000';
             $customer = Customer::where('phone_number', $request->phone_number)->first();
             if (!$customer) {
                 ResponseMessage('No customer found with given phone number', 400);
             }
             $customer->update($data);
             DB::commit();
-            ResponseMessage('OTP code sent, please check your SMS');
+            ResponseMessage('OTP code sent, please check your SMS',200);
         } catch (\Exception $e) {
             DB::rollBack();
-            ResponseMessage($e->getMessage(), 500);
+            ResponseMessage($e->getMessage(), 422);
             throw $e;
         }
     }
@@ -146,13 +146,13 @@ class AuthController extends Controller
                 } else {
                     ResponseMessage('Password and confirm password not match', 400);
                 }
-                ResponseMessage('Password changed successfully');
+                ResponseMessage('Password changed successfully',200);
             } else {
-                ResponseMessage('OTP code not match, please try again');
+                ResponseMessage('OTP code not match, please try again', 400);
             }
         } catch (\Exception $e) {
             DB::rollBack();
-            ResponseMessage($e->getMessage(), 500);
+            ResponseMessage($e->getMessage(), 422);
             throw $e;
         }
     }
@@ -174,14 +174,14 @@ class AuthController extends Controller
                     DB::commit();
                     ResponseMessage('Password changed successfully');
                 } else {
-                    ResponseMessage('Password and confirm password not match', 400);
+                    ResponseMessage('Password and confirm password not match', 402);
                 }
             } else {
-                ResponseMessage('Current password not match', 400);
+                ResponseMessage('Current password not match', 402);
             }
         } catch (\Exception $e) {
             DB::rollBack();
-            ResponseMessage($e->getMessage(), 500);
+            ResponseMessage($e->getMessage(), 422);
             throw $e;
         }
     }
