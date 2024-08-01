@@ -1,13 +1,15 @@
 <?php
 
-use App\Models\Division;
-use App\Models\Township;
 use App\Models\Gender;
-use App\Models\AreaCategory;
 use App\Models\AreaType;
 use App\Models\Category;
+use App\Models\Customer;
+use App\Models\Division;
+use App\Models\Township;
+use App\Models\AreaCategory;
 use App\Models\MenuCategory;
 use App\Models\ServiceCategory;
+use App\Models\UsedDefectedItem;
 use App\Models\ComplaintCategory;
 use App\Models\PurchaseOrderItemLeft;
 use Illuminate\Support\Facades\Route;
@@ -15,57 +17,58 @@ use App\Http\Controllers\API\AreaController;
 use App\Http\Controllers\API\AuthController;
 use App\Http\Controllers\API\TaskController;
 use App\Http\Controllers\API\TestController;
+use App\Http\Controllers\API\AssetController;
+use App\Http\Controllers\AssetItemController;
+use App\Http\Controllers\API\AdsAPIController;
 use App\Http\Controllers\API\CommonController;
 use App\Http\Controllers\API\UomAPIController;
 use App\Http\Controllers\API\AccountController;
-use App\Http\Controllers\API\AccountPayableController;
-use App\Http\Controllers\API\AdsAPIController;
-use App\Http\Controllers\API\BirthDayPromotionAPIController;
-use App\Http\Controllers\API\BookingAPIController;
 use App\Http\Controllers\API\ItemAPIController;
 use App\Http\Controllers\API\MenuAPIController;
+use App\Http\Controllers\API\PackAPIController;
 use App\Http\Controllers\API\RoleAPIController;
 use App\Http\Controllers\API\CashbookController;
 use App\Http\Controllers\API\OrderAPIController;
 use App\Http\Controllers\API\StaffAPIController;
 use App\Http\Controllers\API\SupplierController;
 use App\Http\Controllers\API\EntityAPIController;
+use App\Http\Controllers\API\BookingAPIController;
+use App\Http\Controllers\API\FeatureAPIController;
 use App\Http\Controllers\API\InvoiceAPIController;
+use App\Http\Controllers\API\PackageAPIController;
 use App\Http\Controllers\API\ProfileAPIController;
 use App\Http\Controllers\API\SubAccountController;
 use App\Http\Controllers\API\CustomerAPIController;
 use App\Http\Controllers\API\ExcelImportController;
 use App\Http\Controllers\API\HeadAccountController;
+// use App\Http\Controllers\API\CustomerAuthController;
 use App\Http\Controllers\API\TransactionController;
 use App\Http\Controllers\API\TransferAPIController;
 use App\Http\Controllers\API\ComplaintAPIController;
-use App\Http\Controllers\API\Customers\AdsAPIController as CustomerAdsAPIController;
-use App\Http\Controllers\API\Customers\MenuCategoryAPIController as CustomerMenuCategoryAPIController;
-// use App\Http\Controllers\API\CustomerAuthController;
-use App\Http\Controllers\API\CustomerLevelDiscountAPIController;
+use App\Http\Controllers\API\FoodOrderAPIController;
 use App\Http\Controllers\API\InventoryAPIController;
 use App\Http\Controllers\API\NotificationController;
 use App\Http\Controllers\API\DepartmentAPIController;
-use App\Http\Controllers\API\FeatureAPIController;
-use App\Http\Controllers\API\FixedAssetPurchaseAPIController;
-use App\Http\Controllers\API\PurchaseOrderAPIController;
-use App\Http\Controllers\API\ItemUsageForecastController;
-use App\Http\Controllers\API\MenuServiceDiscountAPIController;
-use App\Http\Controllers\API\PackageAPIController;
-use App\Http\Controllers\API\PackAPIController;
-use App\Http\Controllers\API\PurchaseOrderItemLeftController;
+use App\Http\Controllers\API\AccountPayableController;
+use App\Http\Controllers\API\AssetInventoryLedgerController;
+use App\Http\Controllers\API\MenuCategoryAPIController;
 use App\Http\Controllers\API\RoomDiscountAPIController;
 use App\Http\Controllers\API\UsedDefectedAPIController;
-use App\Models\UsedDefectedItem;
-
-use App\Http\Controllers\API\Customers\AuthController as CustomerAuthController;
-use App\Http\Controllers\API\Customers\CustomerAPIController as UserAppCustomerAPIController;
-use App\Http\Controllers\API\Customers\MenuAPIController as CustomersMenuAPIController;
-use App\Http\Controllers\API\Customers\PackageAPIController as CustomersPackageAPIController;
+use App\Http\Controllers\API\PurchaseOrderAPIController;
 use App\Http\Controllers\API\DeliveryChargeAPIController;
-use App\Http\Controllers\API\FoodOrderAPIController;
-use App\Http\Controllers\API\MenuCategoryAPIController;
-use App\Models\Customer;
+use App\Http\Controllers\API\ItemUsageForecastController;
+use App\Http\Controllers\API\BirthDayPromotionAPIController;
+
+use App\Http\Controllers\API\FixedAssetPurchaseAPIController;
+use App\Http\Controllers\API\PurchaseOrderItemLeftController;
+use App\Http\Controllers\API\MenuServiceDiscountAPIController;
+use App\Http\Controllers\API\CustomerLevelDiscountAPIController;
+use App\Http\Controllers\API\Customers\AuthController as CustomerAuthController;
+use App\Http\Controllers\API\Customers\AdsAPIController as CustomerAdsAPIController;
+use App\Http\Controllers\API\Customers\MenuAPIController as CustomersMenuAPIController;
+use App\Http\Controllers\API\Customers\CustomerAPIController as UserAppCustomerAPIController;
+use App\Http\Controllers\API\Customers\PackageAPIController as CustomersPackageAPIController;
+use App\Http\Controllers\API\Customers\MenuCategoryAPIController as CustomerMenuCategoryAPIController;
 
 /*
 |--------------------------------------------------------------------------
@@ -166,6 +169,18 @@ Route::middleware('auth:api')->group(function () {
         Route::get('sub_account_by_head_account/{id}', 'getSubAccountByHeadAccount');
         Route::get('get_cash_account', 'getCashAccount');
         Route::get('account_by_sub_account/{id}', 'accountBySubAccount');
+        Route::post('create_second_account','createSecondAccount');
+        Route::post('create_third_account','createThirdAccount');
+        Route::get('get_second_account/{account_id}','getSecondAccount');
+        Route::get('get_third_account/{account_id}','getThirdAccount');
+    });
+    Route::controller(AssetController::class)->group(function () {
+        Route::post('create_asset_item','createAssetItem');
+        Route::post('create_asset','createAsset');
+        Route::get('get_asset_item_by_account','getAssetItemByAccount');
+    });
+    Route::controller(AssetInventoryLedgerController::class)->group(function () {
+        Route::get('asset_inventory_ledger_list','index');
     });
     Route::controller(AccountPayableController::class)->group(function () {
         Route::get('get_payable_account', 'getPayableAccount');

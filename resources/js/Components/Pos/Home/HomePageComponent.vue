@@ -25,15 +25,15 @@
                                     class="relative flex flex-col justify-between h-full w-full">
                                     <div v-if="room.is_active == 1" class=" flex justify-between flex-col h-full">
                                         <div>
-                                            <p class="text-sm text-white">Start Time : 9:00 </p>
-                                            <p class="text-sm text-white">Start Time : 9:00 </p>
+                                            <p class="text-sm text-white">Start Time : {{ room.room_sessions[0].start_date.slice(11,16) }} </p>
+                                            <p class="text-sm text-white">Start Time : {{ room.room_sessions[0].end_date.slice(11,16) }} </p>
                                         </div>
                                         <p class="text-base text-left text-white">
                                             {{ room.price_per_hour }}
                                         </p>
                                     </div>
                                     <div class="absolute bottom-0 w-full flex justify-end">
-                                        <p class="text-xl text-white">
+                                        <p class="text-base text-white font-semibold">
                                             {{ room.name }}
                                         </p>
                                     </div>
@@ -84,11 +84,24 @@
             </div>
             <div class="right-sidebar shadow-lg border-l border-gray-200">
                 <!-- secssion right sidebar -->
+                <div v-if="isOpenRoom.step_selectRoom" class="relative block h-full">
+                    <div class="w-full h-full flex justify-center flex-col">
+                        <div class="w-2/3 mx-auto">
+                            <div class="text-center">
+                                <p class="mb-4 text-black font-semibold">
+                                    Select A Room
+                                </p>
+                            </div>
+                            <img class="w-[60%] mx-auto mb-6" src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRnjfjQ0p-BZt5Vb6KhcdHPeC4hBxiKEYXxMw&s" alt="">
+                            
+                        </div>
+                    </div>
+                </div>
                 <div v-if="isOpenRoom.step_detail == true" class="relative h-full">
                     <div class="flex justify-between padding-section border-b">
                         <div>
                             <p class="text-black text-xl">
-                                Table Details
+                                {{ selectedRoom.name }}
                             </p>
                         </div>
                         <div class="flex gap-x-3">
@@ -1016,6 +1029,7 @@ export default {
             selectedRoom: null,
             selectedRoomId: null,
             isOpenRoom: {
+                step_selectRoom:true,
                 step_1: false,
                 step_2: false,
                 step_detail: false,
@@ -1152,20 +1166,20 @@ export default {
                 if (response.data[0]) {
                     this.selectedRoomId = response.data[0].id;
                     this.getSelectedRoom();
-                }
-                if (this.roomList[0]?.room_sessions.is_active == 1) {
-                    this.isOpenRoom.step_1 = false;
-                    this.isOpenRoom.step_2 = false;
-                    this.isOpenRoom.step_detail = true;
-                    this.isOpenRoom.step_invoice = false;
-                }
-                else {
-                    this.isOpenRoom.step_1 = true;
-                    this.isOpenRoom.step_2 = false;
-                    this.isOpenRoom.step_detail = false;
-                    this.isOpenRoom.step_invoice = false;
+                    // this.selectedRoom = response.data[0];
+                    // this.getPurchaseMenuList();
+                    
+                    // if(this.selectedRoom){
+                    //     if (this.selectedRoom.is_active == 1) {
+                    //         this.isOpenRoomStep('step_detail');
+                    //     }
+                    //     else {
+                    //         this.isOpenRoomStep('step_1');
 
+                    //     }
+                    // }
                 }
+                
 
             }
         },
@@ -1227,7 +1241,7 @@ export default {
 
             this.selectedRoomId = room.id;
             this.selectedRoomIndex = index;
-            await this.getSelectedRoom();
+            this.getSelectedRoom();
             if (this.roomList[index].is_active == 1) {
                 this.isOpenRoomStep('step_detail');
                 this.getPurchaseMenuList();
@@ -1743,15 +1757,23 @@ export default {
         },
 
         btnClickedEndRoom() {
-            this.EndRoom();
+            if(this.selectedPaymentMethod){
+                this.EndRoom();
+            }
+            else{
+                this.$notify({
+                    title: `Not valid`,
+                    text: 'Please Select Payment Method',
+                    type: "warn"
+                });
+            }
+            
         },
         async EndRoom() {
             let totalAmount = this.printInvoiceData.total;
             let allTotalDiscounts = 0;
             let formData = new FormData();
             formData.append('invoice_id', this.selectedRoom.room_sessions[0].invoice.id);
-            // formData.append('change', this.change);
-            // formData.append('paid_amount', this.paid_amount);
             formData.append('payment_type', this.selectedPaymentMethod);
             formData.append('discount_type', this.discount_type);
 
@@ -1772,14 +1794,7 @@ export default {
             if(this.discount_type == 'customer_level'){
                 formData.append('customer_level_discount',this.roomSessionData.customer_level_discount_value);
             }
-            // if(this.discount_type == 'customer_level'){
-            //     formData.append('room_discount_id', this.room_discount.id);
-            // }
             formData.append('order_categories', JSON.stringify(this.orderList));
-            // formData.append('total_session_price', this.printInvoiceData.room);
-            // formData.append('food_charge', this.printInvoiceData.food);
-            // formData.append('service_charge', this.printInvoiceData.service_charge);
-            // formData.append('tax', this.printInvoiceData.isTax);
             if (this.printInvoiceData.service_charge) {
                 formData.append('service_charge', this.printInvoiceData.service_tax);
                 totalAmount = totalAmount + this.printInvoiceData.service_tax
@@ -1794,10 +1809,32 @@ export default {
                 formData.append('discount_session', this.printInvoiceData.discountSession);
             }
             if (this.selectedRoom.room_sessions[0].invoice.invoice_type == 'package') {
-                allTotalDiscounts = this.foodDiscount + this.printInvoiceData.discount + this.printInvoiceData.package_discount
+                if(this.discount_type == 'percentage'){
+                    allTotalDiscounts = this.foodDiscount + this.printInvoiceData.package_discount + this.printInvoiceData.percent_discount_amount
+                }
+                else if(this.discount_type == 'customer_level'){
+                    allTotalDiscounts = this.foodDiscount + this.printInvoiceData.package_discount + this.roomSessionData.customer_level_discount_value
+                }
+                else if(this.discount_type == 'birthday_discount'){
+                    allTotalDiscounts = this.foodDiscount + this.printInvoiceData.package_discount + this.birthday_discount.discount_value
+                }
+                else{
+                    allTotalDiscounts = this.foodDiscount + this.printInvoiceData.discount + this.printInvoiceData.package_discount
+                }
             }
             else{
-                allTotalDiscounts = this.foodDiscount + this.printInvoiceData.discount
+                if(this.discount_type == 'percentage'){
+                    allTotalDiscounts = this.foodDiscount + this.printInvoiceData.percent_discount_amount
+                }
+                else if(this.discount_type == 'customer_level'){
+                    allTotalDiscounts = this.foodDiscount + this.roomSessionData.customer_level_discount_value
+                }
+                else if(this.discount_type == 'birthday_discount'){
+                    allTotalDiscounts = this.foodDiscount + this.birthday_discount.discount_value
+                }
+                else{
+                    allTotalDiscounts = this.foodDiscount + this.printInvoiceData.discount
+                }
             }
             formData.append('total', totalAmount);
             formData.append('order_discount', this.foodDiscount);
@@ -1869,7 +1906,6 @@ export default {
         clearChangeRoomForm() {
             this.change_room = null
         },
-
         clearOpenRoomForm() {
             this.selectedCustomer = null
             this.type = 'session'

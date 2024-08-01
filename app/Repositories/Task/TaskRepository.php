@@ -29,7 +29,6 @@ class TaskRepository implements TaskRepositoryInterface
         $task = Task::find($id);
         if ($task) {
             $task->update($data);
-
             return $task;
         } else {
             return null;

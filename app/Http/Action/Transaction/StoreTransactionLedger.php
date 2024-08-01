@@ -6,18 +6,20 @@ use App\Models\Transaction;
 
 class StoreTransactionLedger
 {
-    public function createTransaction($data){
+    public function createTransaction($data)
+    {
         if (!isset($data->id)) {
             $data['id'] = null;
         }
-        $data['date']=now();
+        $data['date'] = now();
         return Transaction::updateOrCreate(
             ['id' => $data['id']],
             $data
         );
     }
-   
-    public function storeLedger($data){
+
+    public function storeLedger($data)
+    {
         if (!isset($data->id)) {
             $data['id'] = null;
         }

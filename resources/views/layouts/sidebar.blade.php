@@ -281,6 +281,20 @@
                         @endif
                         @if (checkFeaturePermission('fixed-asset'))
                             <li>
+                                <a href="{{ route('fixed_assets.asset_items') }}"
+                                    class="flex items-center @yield('asset_items')">
+                                    <i class="fal fa-truck-loading  pr-3"></i>
+                                    Asset Items
+                                </a>
+                            </li>
+                            <li>
+                                <a href="{{ route('fixed_assets.assets') }}"
+                                    class="flex items-center @yield('assets')">
+                                    <i class="fal fa-truck-loading  pr-3"></i>
+                                    Assets
+                                </a>
+                            </li>
+                            <li>
                                 <a href="{{ route('fixed_assets.index') }}"
                                     class="flex items-center @yield('fixed_asset')">
                                     <i class="fal fa-truck-loading  pr-3"></i>

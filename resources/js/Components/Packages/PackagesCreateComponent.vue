@@ -74,12 +74,12 @@
 
             <div class="mb-3 col-span-3"></div>
 
-            <div class="mb-3 col-span-3 rounded-md">
+            <!-- <div class="mb-3 col-span-3 rounded-md">
                 <label for="" class="label-form mb-3">
                     Sessions
                 </label>
                 <input type="number" class="input-ui" :disabled="!isKTVPackage" v-model="sessionDuration" placeholder="Discount Sessions" >
-            </div>
+            </div> -->
 
             <div class="mb-3 col-span-3 rounded-md">
                 <label for="" class="label-form mb-3">
@@ -101,6 +101,8 @@
                 </label>
                 <input type="number" class="input-ui" :disabled="!isKTVPackage" v-model="sessionPrice" placeholder="Session Price" >
             </div>
+
+            <div class="mb-3 col-span-3"></div>
 
             <div class="mb-0 col-span-3 rounded-md">
                 <div>
@@ -310,10 +312,10 @@
                 formData.append('is_changeable', (this.isChangeable)? 1: 0);
                 formData.append('image',this.selectedImage);
                 if(this.isKTVPackage){
-                    if(!this.sessionDuration){
-                        this.alertValiationMessage(`session`);
-                        return 1;
-                    }
+                    // if(!this.sessionDuration){
+                    //     this.alertValiationMessage(`session`);
+                    //     return 1;
+                    // }
                     if(!this.paySession){
                         this.alertValiationMessage(`paid session`);
                         return 1;
@@ -327,7 +329,7 @@
                         return 1;
                     }
 
-                    formData.append('session', this.sessionDuration);
+                    // formData.append('session', this.sessionDuration);
                     formData.append('pay_session', this.paySession);
                     formData.append('free_session', this.freeSession);
                     formData.append('session_price', this.sessionPrice);
