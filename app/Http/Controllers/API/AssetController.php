@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers\API;
 
+use App\Models\Account;
+use App\Models\AssetItem;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
@@ -17,6 +19,11 @@ class AssetController extends Controller
         $this->assetRepo = $repo;
     }
 
+    public function getAssetItemByAccount(Request $request){
+        $data=$this->assetRepo->getAssetItemByAccount($request);
+        ResponseData($data);
+        
+    }
     public function createAssetItem(Request $request){
         $data=$this->assetRepo->createAssetItem($request);
         ResponseData($data);

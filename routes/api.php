@@ -50,6 +50,7 @@ use App\Http\Controllers\API\InventoryAPIController;
 use App\Http\Controllers\API\NotificationController;
 use App\Http\Controllers\API\DepartmentAPIController;
 use App\Http\Controllers\API\AccountPayableController;
+use App\Http\Controllers\API\AssetInventoryLedgerController;
 use App\Http\Controllers\API\MenuCategoryAPIController;
 use App\Http\Controllers\API\RoomDiscountAPIController;
 use App\Http\Controllers\API\UsedDefectedAPIController;
@@ -176,6 +177,10 @@ Route::middleware('auth:api')->group(function () {
     Route::controller(AssetController::class)->group(function () {
         Route::post('create_asset_item','createAssetItem');
         Route::post('create_asset','createAsset');
+        Route::get('get_asset_item_by_account','getAssetItemByAccount');
+    });
+    Route::controller(AssetInventoryLedgerController::class)->group(function () {
+        Route::get('asset_inventory_ledger_list','index');
     });
     Route::controller(AccountPayableController::class)->group(function () {
         Route::get('get_payable_account', 'getPayableAccount');
