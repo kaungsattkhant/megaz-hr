@@ -65,7 +65,7 @@ class TaskRepository implements TaskRepositoryInterface
     {
         $staffs=Staff::staffByRole($data['role_id']);
         $data['area_id']=$data['area_id']==null || $data['area_id']=="null" ? null : $data['area_id'];
-        foreach ($staffs as $staff) {   
+        foreach ($staffs as $staff) {
             $tasks[] = [
                 'staff_id' => $staff->id,
                 'area_id'  => $data['area_id'],

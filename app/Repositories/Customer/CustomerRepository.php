@@ -366,7 +366,7 @@ class CustomerRepository implements CustomerRepositoryInterface
                 DB::commit();
                 ResponseMessage('Phone number changed successfully');
             }else{
-                ResponseMessage('OTP code not match, please try again');
+                ResponseMessage('OTP code not match, please try again', 402);
             }
 
 
