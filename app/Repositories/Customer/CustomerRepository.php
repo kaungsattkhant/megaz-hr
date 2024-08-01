@@ -8,6 +8,7 @@ use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
 
 class CustomerRepository implements CustomerRepositoryInterface
@@ -335,10 +336,10 @@ class CustomerRepository implements CustomerRepositoryInterface
             {
                 ResponseMessage('Customer not found', 404);
             }
-            $customer->otp = 222222;
+            $customer->otp = 000000;
             $customer->save();
             DB::commit();
-            ResponseMessage('OTP code sent, please check your SMS');
+            ResponseMessage('OTP code sent, please check your SMS',200);
 
         }catch(\Exception $e)
         {
@@ -361,10 +362,21 @@ class CustomerRepository implements CustomerRepositoryInterface
 
             if($customer->otp == $request->otp)
             {
-                $customer->phone_number = $request->phone_number;
-                $customer->save();
+                if(Hash::check($request->password, $customer->password))
+                {
+                    $existingCustomer = Customer::where('phone_number', $request->phone_number)->first();
+                    if($existingCustomer)
+                    {
+                        ResponseMessage('Phone number already exist', 402);
+                    }
+                    $customer->phone_number = $request->phone_number;
+                    $customer->save();
+                }else{
+                    ResponseMessage('Current password not match', 402);
+                }
+
                 DB::commit();
-                ResponseMessage('Phone number changed successfully');
+                ResponseMessage('Phone number changed successfully',200);
             }else{
                 ResponseMessage('OTP code not match, please try again', 402);
             }
@@ -373,7 +385,7 @@ class CustomerRepository implements CustomerRepositoryInterface
         }catch(\Exception $e)
         {
             DB::rollBack();
-            ResponseMessage($e->getMessage(), 402);
+            ResponseMessage($e->getMessage(), 422);
             throw $e;
         }
     }

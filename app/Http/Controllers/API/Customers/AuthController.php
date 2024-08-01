@@ -112,7 +112,7 @@ class AuthController extends Controller
     {
         DB::beginTransaction();
         try {
-            $data['otp'] = '111111';
+            $data['otp'] = '000000';
             $customer = Customer::where('phone_number', $request->phone_number)->first();
             if (!$customer) {
                 ResponseMessage('No customer found with given phone number', 400);
@@ -122,7 +122,7 @@ class AuthController extends Controller
             ResponseMessage('OTP code sent, please check your SMS',200);
         } catch (\Exception $e) {
             DB::rollBack();
-            ResponseMessage($e->getMessage(), 500);
+            ResponseMessage($e->getMessage(), 422);
             throw $e;
         }
     }
@@ -152,7 +152,7 @@ class AuthController extends Controller
             }
         } catch (\Exception $e) {
             DB::rollBack();
-            ResponseMessage($e->getMessage(), 500);
+            ResponseMessage($e->getMessage(), 422);
             throw $e;
         }
     }
@@ -181,7 +181,7 @@ class AuthController extends Controller
             }
         } catch (\Exception $e) {
             DB::rollBack();
-            ResponseMessage($e->getMessage(), 500);
+            ResponseMessage($e->getMessage(), 422);
             throw $e;
         }
     }
