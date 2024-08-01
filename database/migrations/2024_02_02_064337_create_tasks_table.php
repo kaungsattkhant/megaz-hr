@@ -15,6 +15,8 @@ return new class extends Migration
             $table->bigIncrements('id');
             $table->foreignId('area_id')->nullable()->constrained()->onDelete('cascade');
             $table->foreignId('role_id')->constrained()->onDelete('cascade');
+            $table->string('type')->default('task');
+            $table->decimal('kpi')->nullable();
             $table->string('name',45);
             $table->longText('description');
             $table->set('assigned_days', ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'])->nullable();
@@ -25,6 +27,8 @@ return new class extends Migration
             $table->unsignedBigInteger('created_by');
             $table->unsignedBigInteger('staff_id');
             $table->string('status')->default('assigned');
+            $table->dateTime('start_date')->nullable();
+            $table->dateTime('due_date')->nullable();
             $table->boolean('is_active')->default(1);
             $table->timestamps();
         });

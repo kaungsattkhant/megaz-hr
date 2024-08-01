@@ -5,6 +5,7 @@ namespace App\Repositories\Task;
 use App\Models\Task;
 
 use App\Models\Staff;
+use GuzzleHttp\Psr7\Response;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -59,6 +60,7 @@ class TaskRepository implements TaskRepositoryInterface
             return $tasks;
         }
     }
+
 
     public function createData(array $data)
     {
@@ -162,5 +164,35 @@ class TaskRepository implements TaskRepositoryInterface
         ->paginate(20);
         return $staffs;
 
+    }
+
+    //  custom task
+    public function customTaskCreate(Request $request)
+    {
+        DB::beginTransaction();
+        try{
+            $data = $request->all();
+            $data['type'] = "custom_task";
+            $staff = Staff::find($data['staff_id'])->first();
+            $role = $staff->roles->first();
+            $data['role_id'] = $role->id;
+            $data['created_by'] = UserData()->id;
+            $task = Task::create($data);
+            DB::commit();
+            ResponseData($task,200);
+
+        }catch(\Exception $e)
+        {
+            DB::rollBack();
+            ResponseMessage($e->getMessage(), 402);
+            throw $e;
+
+        }
+    }
+
+    public function listCustomTasks(Request $request)
+    {
+        $tasks = Task::where('type', 'custom_task')->with(['staff','role.department'])->orderBy('created_at', 'desc')->paginate(config('common.list_count'));
+        ResponseData($tasks);
     }
 }

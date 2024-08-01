@@ -23,4 +23,9 @@ interface TaskRepositoryInterface
     public function doubleCheckTasks(int $id, string $status);
 
     public function taskReport($request);
+
+    // custom task
+    public function customTaskCreate(Request $request);
+
+    public function  listCustomTasks(Request $request);
 }

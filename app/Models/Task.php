@@ -19,7 +19,9 @@ class Task extends BaseModel
         'is_double_checked','double_checked_by',
         'department_id',
         'created_by',
-        'status','is_active'
+        'status','is_active',
+        'staff_id',
+        'type','kpi','start_date','due_date'
     ];
 
     public function area()

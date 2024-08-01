@@ -130,4 +130,10 @@ class StaffAPIController extends Controller
     {
         $staff = $this->staffRepo->deleteStaffFeature($staff_id,$feature_id);
     }
+
+    public function getStaffByDepartment(Request $request,int $department_id)
+    {
+        $staff = $this->staffRepo->getStaffByDepartment($request,$department_id);
+        ResponseData($staff);
+    }
 }
