@@ -43,8 +43,7 @@ class OrderRepository implements OrderRepositoryInterface
                 $order->total_quantity += $data['quantity'];
                 $order->total_discount_price += $discountAmount;
                 $order->total += $data['original_price'] * $data['quantity'];
-                $order->total_discount_price += $discountAmount;
-                $order->update($data);
+                $order->save();
 
                 $data['date'] = currentTime();
                 $data['order_id'] = $order->id;
@@ -56,7 +55,7 @@ class OrderRepository implements OrderRepositoryInterface
                 $invoice = Invoice::find($data['invoice_id']);
                 $latestRoomSession = RoomSession::where('invoice_id', $invoice->id)->orderBy('created_at', 'desc')->first();
                 $entity = Entity::find($latestRoomSession->entity_id);
-                broadcast(new KitchenNotificationRequest($entity,$order,null, $orderItems,7));
+                broadcast(new KitchenNotificationRequest($entity, $order, null, $orderItems, 7));
                 DB::commit();
                 return $order;
             } else {
@@ -78,7 +77,7 @@ class OrderRepository implements OrderRepositoryInterface
                 $invoice = Invoice::find($data['invoice_id']);
                 $latestRoomSession = RoomSession::where('invoice_id', $invoice->id)->orderBy('created_at', 'desc')->first();
                 $entity = Entity::find($latestRoomSession->entity_id);
-                broadcast(new KitchenNotificationRequest($entity,$order,null, $orderItems,7));
+                broadcast(new KitchenNotificationRequest($entity, $order, null, $orderItems, 7));
                 DB::commit();
                 return $order;
             }
@@ -109,7 +108,7 @@ class OrderRepository implements OrderRepositoryInterface
                 $menuData['invoice_id'] = $invoiceId;
 
                 $menu = Menu::find($menuData['menu_id']);
-
+                if (!isset($menuData['discount_value'])) {
                     $latestMenuServiceDiscount = $menu->menuServiceDiscounts()
                         ->whereDate('from_date', '<=', CurrentDate())
                         ->whereDate('to_date', '>=', CurrentDate())
@@ -117,19 +116,24 @@ class OrderRepository implements OrderRepositoryInterface
                         ->where('type', 'menu')
                         ->first();
 
-                if ($latestMenuServiceDiscount) {
-                    $discountAmount = $latestMenuServiceDiscount->discount_price * $menuData['quantity'];
-                    $totalDiscount += $discountAmount;
-                    $menuData['menu_service_discount_id'] = $latestMenuServiceDiscount->id;
-                    $menuData['discount_value'] = $latestMenuServiceDiscount->discount_price * $menuData['quantity'];
+                    if ($latestMenuServiceDiscount != null) {
+                        $discountAmount = $latestMenuServiceDiscount->discount_price * $menuData['quantity'];
+                        $totalDiscount += $discountAmount;
+                        $menuData['menu_service_discount_id'] = $latestMenuServiceDiscount->id;
+                        $menuData['discount_value'] = $discountAmount; // Store the calculated discount value
+                    } else {
+                        $discountAmount = ($menuData['discount_value'] ?? 0) * $menuData['quantity'];
+                    }
                 } else {
-                    $discountAmount = 0;
+                    $discountAmount = $menuData['discount_value'] * $menuData['quantity'];
+                    $totalDiscount += $discountAmount;
                 }
+
+
                 if ($order) {
                     $order->total_quantity += $menuData['quantity'];
                     $order->total_discount_price += $discountAmount; // update total discount only for this order
                     $order->total += $menuData['original_price'] * $menuData['quantity'];
-
                     $order->update($menuData);
 
                     $originalOrderItem = OrderItem::where('menu_id', $menuData['menu_id'])
@@ -162,7 +166,7 @@ class OrderRepository implements OrderRepositoryInterface
             }
 
             // Broadcast with order items array
-            broadcast(new KitchenNotificationRequest($entity, $order, $orderItemsArray ,null,7));
+            broadcast(new KitchenNotificationRequest($entity, $order, $orderItemsArray, null, 7));
             DB::commit();
             return $order;
         } catch (\Exception $e) {
@@ -199,7 +203,7 @@ class OrderRepository implements OrderRepositoryInterface
             $orderItem->status = $data['status'];
             $orderItem->update();
             $orderItem->menu = $orderItem->menu;
-            broadcast(new OrderStatusNotificationRequest($entity,$orderItem,5));
+            broadcast(new OrderStatusNotificationRequest($entity, $orderItem, 5));
             DB::commit();
             ResponseMessage('Order Item status is changed successfully');
         } catch (\Exception $e) {

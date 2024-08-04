@@ -70,6 +70,7 @@ class BookingAPIController extends Controller
                 "original_price" => $bookingMenu->price,
                 "menu_category_id" => $bookingMenu->menu->menu_category_id,
                 "remark" => $bookingMenu->remark,
+                "discount_value" => $bookingMenu->discount_value
             ];
         }
 

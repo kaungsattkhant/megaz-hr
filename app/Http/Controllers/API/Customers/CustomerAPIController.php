@@ -49,4 +49,14 @@ class CustomerAPIController extends Controller
     {
         $customerAddress = $this->cusRepo->deleteCustomerAddress($id);
     }
+
+    public function changePhoneNumberOTP(Request $request)
+    {
+        $customer = $this->cusRepo->changePhoneNumberOTP($request);
+    }
+
+    public function changePhoneNumber(Request $request)
+    {
+        $customer = $this->cusRepo->changePhone($request);
+    }
 }

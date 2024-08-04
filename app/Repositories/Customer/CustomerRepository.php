@@ -325,4 +325,57 @@ class CustomerRepository implements CustomerRepositoryInterface
         }
     }
 
+    public function changePhoneNumberOTP($request)
+    {
+        DB::beginTransaction();
+        try{
+
+            $customer = Customer::find(UserData()->id);
+            if(!$customer)
+            {
+                ResponseMessage('Customer not found', 404);
+            }
+            $customer->otp = 222222;
+            $customer->save();
+            DB::commit();
+            ResponseMessage('OTP code sent, please check your SMS');
+
+        }catch(\Exception $e)
+        {
+            DB::rollBack();
+            ResponseMessage($e->getMessage(), 402);
+            throw $e;
+        }
+    }
+
+    public function changePhone($request)
+    {
+        DB::beginTransaction();
+        try{
+
+            $customer = Customer::find(UserData()->id);
+            if(!$customer)
+            {
+                ResponseMessage('Customer not found', 404);
+            }
+
+            if($customer->otp == $request->otp)
+            {
+                $customer->phone_number = $request->phone_number;
+                $customer->save();
+                DB::commit();
+                ResponseMessage('Phone number changed successfully');
+            }else{
+                ResponseMessage('OTP code not match, please try again');
+            }
+
+
+        }catch(\Exception $e)
+        {
+            DB::rollBack();
+            ResponseMessage($e->getMessage(), 402);
+            throw $e;
+        }
+    }
+
 }

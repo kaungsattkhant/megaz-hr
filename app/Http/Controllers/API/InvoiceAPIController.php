@@ -60,6 +60,7 @@ class InvoiceAPIController extends Controller
             if ($data['type'] == 'package') {
                 $orderData['invoice_id'] = $invoice->id;
                 $orderData['menuArray'] = json_decode($request->orders, true);
+
                 $this->orderRepo->createMultipleOrder($orderData);
             }
             DB::commit();

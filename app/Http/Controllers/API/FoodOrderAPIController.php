@@ -25,4 +25,15 @@ class FoodOrderAPIController extends Controller
     {
         $this->foodRepo->createFoodOrder($request->all());
     }
+
+    public function confirmFoodOrderItem(int $id,Request $request)
+    {
+        $this->foodRepo->confirmFoodOrderItem($id,$request);
+    }
+
+    public function confirmFoodOrder(int $id,Request $request)
+    {
+        $this->foodRepo->confirmFoodOrder($id,$request);
+    }
+
 }

@@ -38,7 +38,7 @@ class EntityRepository implements EntityRepositoryInterface
             ->where('area_id', $area->id)
             ->with(['roomSessions' => function ($query) {
                 $query->orderBy('created_at', 'desc')->limit(1);
-            }])
+            },])
             ->get();
 
         return $entities;

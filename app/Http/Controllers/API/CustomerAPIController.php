@@ -61,4 +61,6 @@ class CustomerAPIController extends Controller
     {
         $customer = $this->customerRepo->customerDetail($id);
     }
+
+
 }
