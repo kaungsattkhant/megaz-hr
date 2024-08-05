@@ -54,7 +54,6 @@ class TaskController extends Controller
             ResponseMessage('No task found with the given id', 404);
         }
         ResponseMessage('Task status updated');
-        ResponseData($task);
     }
 
     public function getTaskData(Request $request)

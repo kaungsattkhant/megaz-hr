@@ -155,6 +155,13 @@
                                 </label>
                                 <input type="text" placeholder="Task Name" v-model="name" class="input-ui">
                             </div>
+
+                            <div class="mb-4">
+                                <label for="" class="label-form mb-3">
+                                    KPI
+                                </label>
+                                <input type="text" placeholder="KPI" v-model="kpi" class="input-ui">
+                            </div>
                             <div class="mb-4">
                                 <label for="" class="label-form mb-3">
                                     Tasks
@@ -308,6 +315,7 @@
                 per_group: 10,
                 groupedPageNumbers: [],
                 currentGroup: 0,
+                kpi:0
             };
         },
 
@@ -384,6 +392,7 @@
                     formData.append('area_id', null);
                 }
                 formData.append('role_id', this.selectedRole.id);
+                formData.append('kpi',this.kpi);
                 formData.append('assigned_days', this.selectedDays);
                 let response = await postApiData({url: '/api/tasks', form_data: formData, token: this.getToken()});
                 if(response.success){
@@ -398,6 +407,7 @@
                     this.selectedDays = null;
                     this.areaList = [];
                     this.roleList = [];
+                    this.kpi = 0;
                 }
                 else{
                     alert('some errors occur');
