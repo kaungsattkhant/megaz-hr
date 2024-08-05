@@ -2,14 +2,15 @@
 
 namespace App\Models;
 
-use App\Models\Department;
+use App\Models\Role;
 use App\Models\Gender;
 use App\Models\Inventory;
-use App\Models\Role;
+use App\Models\Department;
+use App\Models\TaskDetail;
+use Laravel\Sanctum\HasApiTokens;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
-use Illuminate\Support\Facades\Hash;
-use Laravel\Sanctum\HasApiTokens;
 
 class Staff extends Authenticatable
 {
@@ -93,10 +94,15 @@ class Staff extends Authenticatable
         return $this->belongsToMany(Role::class);
     }
 
-    public function tasks()
+      public function task_details()
     {
-        return $this->hasMany(Task::class, 'staff_id');
+        return $this->hasMany(TaskDetail::class, 'staff_id');
     }
+
+    // public function tasks()
+    // {
+    //     return $this->hasMany(Task::class, 'staff_id');
+    // }
 
     public static function staffByRole($roleId)
     {
@@ -112,7 +118,7 @@ class Staff extends Authenticatable
 
     public function completed_tasks()
     {
-        return $this->hasMany(Task::class, 'completed_by');
+        return $this->hasMany(TaskDetail::class, 'completed_by');
     }
 
     public function hasRoles($dept, $name)

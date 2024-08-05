@@ -2,26 +2,35 @@
 
 namespace App\Repositories\Task;
 
-use App\Models\Task;
-
 use App\Models\Staff;
+use App\Models\Task;
+use App\Models\TaskDetail;
+use App\Traits\TaskAssign;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
 class TaskRepository implements TaskRepositoryInterface
 {
+    use TaskAssign;
     public function getTasksOfRolesFromArea($areaId)
     {
         $dayName = now()->format('D');
-        $tasks = Task::
-             when($areaId!=null || $areaId!="null",function($q)use($areaId){
-                $q->where('area_id',$areaId);
-             })
-            ->where('assigned_days', 'like', "%{$dayName}%")
+        $role_id = UserData()->roles[0]->id;
+        //create task detail for staff
+        $this->createTaskDetailForStaff($role_id);
+        $tasks = TaskDetail::orderBy('task_details.id', 'desc')
+            ->join('tasks', 'task_details.task_id', 'tasks.id')
+            ->where('tasks.assigned_days', 'like', "%{$dayName}%")
+            ->where('task_details.staff_id', UserData()->id)
+            ->when($areaId != null || $areaId != "null", function ($q) use ($areaId) {
+                $q->where('tasks.area_id', $areaId);
+            })
             ->where('is_active', 1)
-            ->where('staff_id',UserData()->id)
+            ->select('task_details.id', 'task_details.date_time', 'task_details.completed_at', 'task_details.is_double_checked', 'task_details.double_checked_by', 'task_details.double_checked_at', 'task_details.status',
+                'tasks.area_id', 'tasks.role_id', 'tasks.name', 'tasks.description', 'tasks.assigned_days', 'tasks.start_date', 'tasks.due_date', 'tasks.type')
             ->paginate(20);
         return $tasks;
+
     }
 
     public function updateTaskStatus(array $data, int $id)
@@ -48,7 +57,7 @@ class TaskRepository implements TaskRepositoryInterface
                 $perPage = $request->per_page;
             }
             $skip = ($pageNumber - 1) * $perPage;
-            $tasks = Task::where('is_active', 1)->skip($skip)->take($perPage)->with(['role.department','completedBy','doubleCheckedBy'])->get();
+            $tasks = Task::where('is_active', 1)->skip($skip)->take($perPage)->with(['role.department', 'completedBy', 'doubleCheckedBy'])->get();
             $paginationData = MakePaginationData($request, $totalCount, 'tasks');
             $paginationData['tasks'] = $tasks;
 
@@ -62,23 +71,31 @@ class TaskRepository implements TaskRepositoryInterface
 
     public function createData(array $data)
     {
-        $staffs=Staff::staffByRole($data['role_id']);
-        $data['area_id']=$data['area_id']==null || $data['area_id']=="null" ? null : $data['area_id'];
-        foreach ($staffs as $staff) {
+        $data['area_id'] = $data['area_id'] == null || $data['area_id'] == "null" ? null : $data['area_id'];
+        DB::beginTransaction();
+        try {
+            // foreach ($staffs as $staff) {
             $tasks[] = [
-                'staff_id' => $staff->id,
-                'area_id'  => $data['area_id'],
-                'role_id'=>$data['role_id'],
-                'name'=>$data['name'],
-                'description'=>$data['description'],
-                'assigned_days'=>$data['assigned_days'],
+                'kpi' => $data['kpi'],
+                'area_id' => $data['area_id'],
+                'role_id' => $data['role_id'],
+                'name' => $data['name'],
+                'description' => $data['description'],
+                'assigned_days' => $data['assigned_days'],
                 'created_by' => UserData()->id,
                 'created_at' => now(),
                 'updated_at' => now(),
             ];
+            // }
+            Task::insert($tasks);
+            DB::commit();
+            ResponseMessage('Task create successfully', 200);
+        } catch (\Exception $e) {
+            DB::rollback();
+            ResponseMessage($e->getMessage(), 402);
+            throw $e;
         }
-        Task::insert($tasks);
-        ResponseMessage('Task create successfully',200);
+
     }
 
     public function updateData(array $data, int $id)
@@ -105,8 +122,15 @@ class TaskRepository implements TaskRepositoryInterface
 
     public function getTasksByStaff(int $id)
     {
-        $tasks = Task::where('staff_id', $id)
-        ->where('is_active', 1)->paginate(20);
+        $staff=Staff::find($id);
+        $role_id=$staff->roles[0]->id;
+        $this->createTaskDetailForStaff($role_id);
+        $tasks = TaskDetail::join('tasks', 'task_details.task_id', 'tasks.id')
+            ->where('staff_id', $id)
+            ->where('is_active', 1)
+            ->select('task_details.id', 'task_details.date_time', 'task_details.completed_at', 'task_details.is_double_checked', 'task_details.double_checked_by', 'task_details.double_checked_at', 'task_details.status',
+                'tasks.area_id', 'tasks.role_id', 'tasks.name', 'tasks.description', 'tasks.assigned_days', 'tasks.start_date', 'tasks.due_date', 'tasks.type')
+            ->paginate(20);
         return $tasks;
     }
 
@@ -116,19 +140,19 @@ class TaskRepository implements TaskRepositoryInterface
         DB::beginTransaction();
         try {
             if ($staff->checkRoles(['Supervisor'])) {
-                $task = Task::find($id);
-                if ($task->is_double_checked == 1) {
+                $taskDetail = TaskDetail::find($id);
+                if ($taskDetail->is_double_checked == 1) {
                     ResponseMessage('Task is already double checked');
                 }
 
-                if($task->completed_by==null)
-                {
-                    ResponseMessage('Please complete task first',422);
+                if ($taskDetail->completed_by == null) {
+                    ResponseMessage('Please complete task first', 422);
                 }
-                $task->double_checked_by = $staff->id;
-                $task->is_double_checked = 1;
-                $task->status = $status;
-                $task->save();
+                $taskDetail->double_checked_by = $staff->id;
+                $taskDetail->is_double_checked = 1;
+                $taskDetail->double_checked_at = CurrentTime();
+                $taskDetail->status = $status;
+                $taskDetail->save();
                 DB::commit();
                 ResponseMessage('Task double checked done');
             } else {
@@ -141,26 +165,93 @@ class TaskRepository implements TaskRepositoryInterface
         }
     }
 
-    public function taskReport($request){
-        $departmentId=$request->department_id;
-        $date=convertDateFormat($request->date);
-        $staffs = Staff::select(['id','name'])
-        ->when(!is_null($departmentId),function($q)use($departmentId){
-            $q->whereHas('roles.department', function ($query) use ($departmentId) {
-                $query->where('id', $departmentId);
-            });
-        })
-        ->with(['tasks' => function($query)use($request,$date) {
-            $query->select('id', 'staff_id','role_id', 'name','status','double_checked_by','created_at')
-              ->when(isset($request->date) && !is_null($date) ,function($q)use($date){
-                    $q->whereDate('created_at', $date);
+    public function taskReport($request)
+    {
+        $departmentId = $request->department_id;
+        $date = convertDateFormat($request->date);
+        $staffs = Staff::select(['id', 'name'])
+            ->when(!is_null($departmentId), function ($q) use ($departmentId) {
+                $q->whereHas('roles.department', function ($query) use ($departmentId) {
+                    $query->where('id', $departmentId);
+                });
             })
-            ->with('doubleCheckedBy:id,name');
-        },'roles'])
-        ->has('tasks')
-        ->orderBy('id','asc')
-        ->paginate(20);
+            ->with(['task_details' => function ($query) use ($request, $date) {
+                $query->select('id', 'staff_id','status', 'double_checked_by', 'created_at','task_id')
+                    ->when(isset($request->date) && !is_null($date), function ($q) use ($date) {
+                        $q->whereDate('created_at', $date);
+                    })
+                    ->with(['doubleCheckedBy:id,name','task:id,name,description']);
+            }, 'roles'])
+            ->has('task_details')
+            ->orderBy('id', 'asc')
+            ->paginate(20);
         return $staffs;
 
+    }
+
+    //  custom task
+    public function customTaskCreate(Request $request)
+    {
+        DB::beginTransaction();
+        try {
+            $data = $request->all();
+            $data['type'] = "custom_task";
+            $staff = Staff::find($data['staff_id'])->first();
+            $role = $staff->roles->first();
+            $data['role_id'] = $role->id;
+            $data['created_by'] = UserData()->id;
+            $data['date_time'] = CurrentTime();
+            $task = Task::create($data);
+            $data['task_id'] = $task->id;
+            $taskDetail = TaskDetail::create($data);
+            DB::commit();
+            ResponseData($task, 200);
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            ResponseMessage($e->getMessage(), 402);
+            throw $e;
+
+        }
+    }
+
+    public function customTaskUpdate(Request $request, int $id)
+    {
+        DB::beginTransaction();
+        try {
+            $data = $request->all();
+            $task = Task::find($id);
+            $data['type'] = "custom_task";
+            $staff = Staff::find($data['staff_id'])->first();
+            $role = $staff->roles->first();
+            $data['role_id'] = $role->id;
+            $task->update($data);
+            $data['task_id'] = $task->id;
+            $taskDetail = TaskDetail::where('task_id',$task->id)->first();
+            $taskDetail->update($data);
+            DB::commit();
+            ResponseData($task, 200);
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            ResponseMessage($e->getMessage(), 402);
+            throw $e;
+
+        }
+    }
+
+    public function listCustomTasks(Request $request)
+    {
+        $tasks = Task::where('type', 'custom_task')->with(['customTaskDetail.staff','role.department'])->orderBy('created_at', 'desc')->paginate(config('common.list_count'));
+        ResponseData($tasks);
+    }
+
+    public function taskCustomDetail(int $id)
+    {
+        $task = Task::where('type', 'custom_task')->with(['customTaskDetail.staff','role.department'])->find($id);
+        if (!$task) {
+            ResponseMessage('Task not found', 404);
+        }
+        ResponseData($task, 200);
     }
 }

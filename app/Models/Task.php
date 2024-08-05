@@ -2,12 +2,13 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Casts\Attribute;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
-
 use App\Models\Area;
 use App\Models\Role;
+use App\Models\TaskDetail;
+
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Casts\Attribute;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Task extends BaseModel
 {
@@ -15,22 +16,36 @@ class Task extends BaseModel
 
     protected $fillable=[
         'role_id', 'area_id',
-        'name','description','assigned_days','completed_at','completed_by',
-        'is_double_checked','double_checked_by',
+        'name','description',
+        'assigned_days',
+        'completed_at',
+        'completed_by',
+        'is_double_checked',
+        'double_checked_by',
         'department_id',
         'created_by',
-        'status','is_active'
+        'status','is_active',
+        'type',
+        'kpi',
+        'start_date',
+        'due_date'
     ];
+
+    public function task_details(){
+        return $this->hasMany(TaskDetail::class);
+    }
+
+    public function customTaskDetail()
+    {
+        return $this->hasOne(TaskDetail::class)
+                    ->latest('created_at');
+    }
 
     public function area()
     {
         return $this->belongsTo(Area::class);
     }
 
-    public function staff()
-    {
-        return $this->belongsTo(Staff::class, 'staff_id');
-    }
 
     public function role()
     {
@@ -40,13 +55,5 @@ class Task extends BaseModel
     /**
      * Get staff of completed_by.
      */
-    public function completedBy()
-    {
-        return $this->belongsTo(Staff::class, 'completed_by');
-    }
-
-    public function doubleCheckedBy()
-    {
-        return $this->belongsTo(Staff::class, 'double_checked_by');
-    }
+   
 }

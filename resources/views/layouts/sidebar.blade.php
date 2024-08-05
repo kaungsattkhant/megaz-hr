@@ -37,6 +37,13 @@
                             </li>
 
                             <li>
+                                <a href="{{ route('custom_tasks') }}" class="flex items-center @yield('custom_tasks')">
+                                    <i class="fal fa-tasks  pr-3"></i>
+                                    Custom Tasks
+                                </a>
+                            </li>
+
+                            <li>
                                 <a href="{{ route('tasks.report') }}" class="flex items-center @yield('tasks_report')">
                                     <i class="fal fa-tasks  pr-3"></i>
                                     Task Reports
