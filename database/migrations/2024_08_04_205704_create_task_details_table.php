@@ -21,6 +21,7 @@ return new class extends Migration
             $table->unsignedBigInteger('double_checked_at')->nullable();
             $table->string('status')->default('assigned');
             $table->unsignedBigInteger('task_id');
+            $table->unsignedBigInteger('staff_id');
             $table->timestamps();
         });
     }

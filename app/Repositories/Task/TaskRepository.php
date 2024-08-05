@@ -21,7 +21,7 @@ class TaskRepository implements TaskRepositoryInterface
         $tasks = TaskDetail::orderBy('task_details.id', 'desc')
             ->join('tasks', 'task_details.task_id', 'tasks.id')
             ->where('tasks.assigned_days', 'like', "%{$dayName}%")
-            ->where('staff_id', UserData()->id)
+            ->where('task_details.staff_id', UserData()->id)
             ->when($areaId != null || $areaId != "null", function ($q) use ($areaId) {
                 $q->where('tasks.area_id', $areaId);
             })
