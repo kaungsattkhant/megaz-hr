@@ -76,6 +76,7 @@ class TaskRepository implements TaskRepositoryInterface
         try {
             // foreach ($staffs as $staff) {
             $tasks[] = [
+                'kpi' => $data['kpi'],
                 'area_id' => $data['area_id'],
                 'role_id' => $data['role_id'],
                 'name' => $data['name'],
