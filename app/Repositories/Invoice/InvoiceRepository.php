@@ -546,7 +546,6 @@ class InvoiceRepository implements InvoiceRepositoryInterface
             $data['invoice_id'] = $invoice_id;
 
             $invoice->update($data);
-
             $this->ledgerAndTransactionForInvoice([
                 'payment_type' => 'cash',
                 'invoice_id' => $invoice->id,

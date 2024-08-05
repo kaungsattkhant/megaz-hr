@@ -291,7 +291,7 @@
                             </button>
                             <button data-te-modal-dismiss type="button" @click="updateTasksBtnClicked"
                                 class="add-btn focus:outline-none focus:ring-0 ">
-                                Create
+                                Update
                             </button>
                         </div>
                     </div>
