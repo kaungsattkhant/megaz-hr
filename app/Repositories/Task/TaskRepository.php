@@ -76,6 +76,7 @@ class TaskRepository implements TaskRepositoryInterface
         try {
             // foreach ($staffs as $staff) {
             $tasks[] = [
+                'kpi' => $data['kpi'],
                 'area_id' => $data['area_id'],
                 'role_id' => $data['role_id'],
                 'name' => $data['name'],
@@ -174,14 +175,14 @@ class TaskRepository implements TaskRepositoryInterface
                     $query->where('id', $departmentId);
                 });
             })
-            ->with(['tasks' => function ($query) use ($request, $date) {
-                $query->select('id', 'staff_id', 'role_id', 'name', 'status', 'double_checked_by', 'created_at')
+            ->with(['task_details' => function ($query) use ($request, $date) {
+                $query->select('id', 'staff_id','status', 'double_checked_by', 'created_at','task_id')
                     ->when(isset($request->date) && !is_null($date), function ($q) use ($date) {
                         $q->whereDate('created_at', $date);
                     })
-                    ->with('doubleCheckedBy:id,name');
+                    ->with(['doubleCheckedBy:id,name','task:id,name,description']);
             }, 'roles'])
-            ->has('tasks')
+            ->has('task_details')
             ->orderBy('id', 'asc')
             ->paginate(20);
         return $staffs;

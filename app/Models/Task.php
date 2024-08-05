@@ -55,13 +55,5 @@ class Task extends BaseModel
     /**
      * Get staff of completed_by.
      */
-    public function completedBy()
-    {
-        return $this->belongsTo(Staff::class, 'completed_by');
-    }
-
-    public function doubleCheckedBy()
-    {
-        return $this->belongsTo(Staff::class, 'double_checked_by');
-    }
+   
 }
