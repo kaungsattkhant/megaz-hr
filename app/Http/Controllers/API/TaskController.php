@@ -12,6 +12,7 @@ use App\Http\Requests\Task\TaskUpdateRequest;
 use App\Models\Staff;
 
 use App\Repositories\Task\TaskRepositoryInterface;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx\Rels;
 
 class TaskController extends Controller
 {
@@ -118,5 +119,27 @@ class TaskController extends Controller
     public function taskReport(Request $request){
         $data = $this->taskRepo->taskReport($request);
         ResponseData($data);
+    }
+
+    // custom task
+
+    public function createCustomTask(Request $request)
+    {
+        $task = $this->taskRepo->customTaskCreate($request);
+    }
+
+    public function getCustomTasks(Request $request)
+    {
+        $tasks = $this->taskRepo->listCustomTasks($request);
+    }
+
+    public function updateCustomTask(Request $request, int $id)
+    {
+        $task = $this->taskRepo->customTaskUpdate($request, $id);
+    }
+
+    public function customTaskDetail(int $id)
+    {
+        $task = $this->taskRepo->taskCustomDetail($id);
     }
 }

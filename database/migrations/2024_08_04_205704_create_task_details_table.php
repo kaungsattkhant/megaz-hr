@@ -18,7 +18,8 @@ return new class extends Migration
             $table->unsignedBigInteger('completed_by')->nullable();
             $table->boolean('is_double_checked')->default(0);
             $table->unsignedBigInteger('double_checked_by')->nullable();
-            $table->string('status');
+            $table->unsignedBigInteger('double_checked_at')->nullable();
+            $table->string('status')->default('assigned');
             $table->unsignedBigInteger('task_id');
             $table->timestamps();
         });

@@ -11,33 +11,20 @@ return new class extends Migration
      */
     public function up(): void
     {
-        // Schema::create('tasks', function (Blueprint $table) {
-        //     $table->bigIncrements('id');
-        //     $table->foreignId('area_id')->nullable()->constrained()->onDelete('cascade');
-        //     $table->foreignId('role_id')->constrained()->onDelete('cascade');
-        //     $table->string('name',45);
-        //     $table->longText('description');
-        //     $table->set('assigned_days', ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'])->nullable();
-        //     $table->dateTime('completed_at')->nullable();
-        //     $table->unsignedBigInteger('completed_by')->nullable();
-        //     $table->boolean('is_double_checked')->default(0);
-        //     $table->unsignedBigInteger('double_checked_by')->nullable();
-        //     $table->unsignedBigInteger('created_by');
-        //     $table->unsignedBigInteger('staff_id');
-        //     $table->string('status')->default('assigned');
-        //     $table->boolean('is_active')->default(1);
-        //     $table->timestamps();
-        // });
         Schema::create('tasks', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->foreignId('area_id')->nullable()->constrained()->onDelete('cascade');
             $table->foreignId('role_id')->constrained()->onDelete('cascade');
+            $table->string('type')->default('task');
+            $table->decimal('kpi')->nullable();
             $table->string('name',45);
             $table->longText('description');
             $table->set('assigned_days', ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'])->nullable();
             $table->unsignedBigInteger('created_by');
-            
+            $table->dateTime('start_date')->nullable();
+            $table->dateTime('due_date')->nullable();
             $table->boolean('is_active')->default(1);
+            $table->unsignedBigInteger('staff_id');
             $table->timestamps();
         });
     }

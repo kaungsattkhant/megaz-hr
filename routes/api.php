@@ -140,6 +140,11 @@ Route::middleware('auth:api')->group(function () {
     Route::controller(TaskController::class)->group(function()
     {
         Route::post('/tasks/{id}/double_checked','taskDoubleChecked');
+        Route::post('/custom_tasks','createCustomTask');
+        Route::get('/custom_tasks','getCustomTasks');
+        Route::get('/custom_tasks/{id}','customTaskDetail');
+        Route::post('/custom_tasks/{id}','updateCustomTask');
+
     });
     Route::controller(PurchaseOrderAPIController::class)->group(function () {
         Route::get('/purchase_orders', 'getPurchaseOrder');
@@ -330,6 +335,7 @@ Route::delete('/staffs/{id}', [StaffAPIController::class, 'deleteStaff']);
 Route::delete('/staffs/{staff_id}/roles/{role_id}',[StaffAPIController::class,'deleteRoleStaff']);
 Route::delete('/staffs/{staff_id}/inventories/{inventory_id}',[StaffAPIController::class,'deleteInventoryStaff']);
 Route::delete('/staffs/{staff_id}/features/{feature_id}',[StaffAPIController::class,'deleteFeatureStaff']);
+Route::get('/departments/{department_id}/staffs',[StaffAPIController::class,'getStaffByDepartment']);
 
 
 // Route::get('/tasks', [TaskController::class, 'getTaskData']);

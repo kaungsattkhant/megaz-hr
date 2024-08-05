@@ -2,12 +2,13 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Casts\Attribute;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
-
 use App\Models\Area;
 use App\Models\Role;
+use App\Models\TaskDetail;
+
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Casts\Attribute;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Task extends BaseModel
 {
@@ -15,13 +16,25 @@ class Task extends BaseModel
 
     protected $fillable=[
         'role_id', 'area_id',
-        'name','description','assigned_days','completed_at','completed_by',
-        'is_double_checked','double_checked_by',
+        'name','description',
+        'assigned_days',
+        'completed_at',
+        'completed_by',
+        'is_double_checked',
+        'double_checked_by',
         'department_id',
         'created_by',
-        'status','is_active'
+        'status','is_active',
+        'type',
+        'kpi',
+        'start_date',
+        'due_date'
     ];
 
+    public function task_details(){
+        return $this->hasMany(TaskDetail::class);
+    }
+    
     public function area()
     {
         return $this->belongsTo(Area::class);
