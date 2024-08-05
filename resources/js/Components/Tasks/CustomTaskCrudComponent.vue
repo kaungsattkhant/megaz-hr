@@ -65,7 +65,7 @@
                                         {{ index + 1 }}
                                     </td>
                                     <td class="whitespace-nowrap  ">
-                                        {{ task.staff.name }}
+                                        {{ task.custom_task_detail.staff.name }}
                                     </td>
                                     <td class="whitespace-nowrap  ">
                                         {{ task.role.department.name }}

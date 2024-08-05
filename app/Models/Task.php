@@ -34,16 +34,18 @@ class Task extends BaseModel
     public function task_details(){
         return $this->hasMany(TaskDetail::class);
     }
-    
+
+    public function customTaskDetail()
+    {
+        return $this->hasOne(TaskDetail::class)
+                    ->latest('created_at');
+    }
+
     public function area()
     {
         return $this->belongsTo(Area::class);
     }
 
-    public function staff()
-    {
-        return $this->belongsTo(Staff::class, 'staff_id');
-    }
 
     public function role()
     {

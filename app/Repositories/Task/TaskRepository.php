@@ -139,18 +139,19 @@ class TaskRepository implements TaskRepositoryInterface
         DB::beginTransaction();
         try {
             if ($staff->checkRoles(['Supervisor'])) {
-                $task = Task::find($id);
-                if ($task->is_double_checked == 1) {
+                $taskDetail = TaskDetail::find($id);
+                if ($taskDetail->is_double_checked == 1) {
                     ResponseMessage('Task is already double checked');
                 }
 
-                if ($task->completed_by == null) {
+                if ($taskDetail->completed_by == null) {
                     ResponseMessage('Please complete task first', 422);
                 }
-                $task->double_checked_by = $staff->id;
-                $task->is_double_checked = 1;
-                $task->status = $status;
-                $task->save();
+                $taskDetail->double_checked_by = $staff->id;
+                $taskDetail->is_double_checked = 1;
+                $taskDetail->double_checked_at = CurrentTime();
+                $taskDetail->status = $status;
+                $taskDetail->save();
                 DB::commit();
                 ResponseMessage('Task double checked done');
             } else {
@@ -198,7 +199,10 @@ class TaskRepository implements TaskRepositoryInterface
             $role = $staff->roles->first();
             $data['role_id'] = $role->id;
             $data['created_by'] = UserData()->id;
+            $data['date_time'] = CurrentTime();
             $task = Task::create($data);
+            $data['task_id'] = $task->id;
+            $taskDetail = TaskDetail::create($data);
             DB::commit();
             ResponseData($task, 200);
 
@@ -221,6 +225,9 @@ class TaskRepository implements TaskRepositoryInterface
             $role = $staff->roles->first();
             $data['role_id'] = $role->id;
             $task->update($data);
+            $data['task_id'] = $task->id;
+            $taskDetail = TaskDetail::where('task_id',$task->id)->first();
+            $taskDetail->update($data);
             DB::commit();
             ResponseData($task, 200);
 
@@ -234,13 +241,13 @@ class TaskRepository implements TaskRepositoryInterface
 
     public function listCustomTasks(Request $request)
     {
-        $tasks = Task::where('type', 'custom_task')->with(['staff', 'role.department'])->orderBy('created_at', 'desc')->paginate(config('common.list_count'));
+        $tasks = Task::where('type', 'custom_task')->with(['customTaskDetail.staff','role.department'])->orderBy('created_at', 'desc')->paginate(config('common.list_count'));
         ResponseData($tasks);
     }
 
     public function taskCustomDetail(int $id)
     {
-        $task = Task::where('type', 'custom_task')->with(['staff.department'])->find($id);
+        $task = Task::where('type', 'custom_task')->with(['customTaskDetail.staff','role.department'])->find($id);
         if (!$task) {
             ResponseMessage('Task not found', 404);
         }
