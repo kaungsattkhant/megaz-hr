@@ -273,7 +273,6 @@ class StaffRepository implements StaffRepositoryInterface
         if ($request->filled('department_id')) {
             $query->where('staff.department_id', $request->input('department_id'));
         }
-        $staffs = $query->get();
         $staffs = $query->paginate(config('common.list_count'));
 
         ResponseData($staffs);
