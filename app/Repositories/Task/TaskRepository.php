@@ -14,6 +14,7 @@ class TaskRepository implements TaskRepositoryInterface
     use TaskAssign;
     public function getTasksOfRolesFromArea($areaId)
     {
+
         $dayName = now()->format('D');
         $role_id = UserData()->roles[0]->id;
         //create task detail for staff

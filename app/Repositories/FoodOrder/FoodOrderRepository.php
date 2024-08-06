@@ -39,6 +39,7 @@ class FoodOrderRepository implements FoodOrderRepositoryInterface
         try {
             $foodOrderItem = FoodOrderItem::find($id);
             if ($request->is_confirm == 1) {
+                $foodOrderItem->area_id = $request->area_id;
                 $foodOrderItem->status = 'confirmed';
                 $foodOrderItem->save();
             } else {
@@ -72,7 +73,9 @@ class FoodOrderRepository implements FoodOrderRepositoryInterface
                 $foodOrder->cancelled_at = CurrentTime();
                 $foodOrder->save();
             }
+
             DB::commit();
+            Responsemessage('Food Order Status changed successfully',200);
 
         }catch(\Exception $e)
         {

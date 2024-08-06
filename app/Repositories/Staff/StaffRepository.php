@@ -52,8 +52,7 @@ class StaffRepository implements StaffRepositoryInterface
                 $staff->roles()->attach($data['roles']);
             }
 
-            if(isset($data['featureIds']))
-            {
+            if (isset($data['featureIds'])) {
                 $featureIds = json_decode($data['featureIds']);
                 foreach ($featureIds as $featureId) {
                     $staff->features()->attach($featureId);
@@ -87,24 +86,23 @@ class StaffRepository implements StaffRepositoryInterface
             if ($staff) {
                 $data = RemoveNullValues($data);
                 $staff->emergencyContacts()->updateOrCreate(['staff_id' => $staff->id], $data);
-                if($staff->department_id != $data['department_id'])
-                {
+                if ($staff->department_id != $data['department_id']) {
                     $staff->roles()->detach();
                 }
-                if(isset($data['nrc_front_path'])){
-                    if($staff->nrc_front_path){
+                if (isset($data['nrc_front_path'])) {
+                    if ($staff->nrc_front_path) {
                         DeleteFileFromServer($staff->nrc_front_path);
                     }
                 }
 
-                if(isset($data['nrc_back_path'])){
-                    if($staff->nrc_back_path){
+                if (isset($data['nrc_back_path'])) {
+                    if ($staff->nrc_back_path) {
                         DeleteFileFromServer($staff->nrc_back_path);
                     }
                 }
 
-                if(isset($data['household_registration_path'])){
-                    if($staff->household_registration_path){
+                if (isset($data['household_registration_path'])) {
+                    if ($staff->household_registration_path) {
                         DeleteFileFromServer($staff->household_registration_path);
                     }
                 }
@@ -118,14 +116,13 @@ class StaffRepository implements StaffRepositoryInterface
                 if (isset($data['inventoryIds']) && $data['inventoryIds'] !== null) {
                     $inventoryIds = json_decode($data['inventoryIds'], true);
                     $staff->inventories()->sync($inventoryIds);
-                }else{
+                } else {
                     $staff->inventories()->detach();
                 }
 
                 if (isset($data['featureIds']) && $data['featureIds'] !== null) {
                     $featureIds = json_decode($data['featureIds'], true);
                     $staff->features()->sync($featureIds);
-
                 }
             }
             DB::commit();
@@ -139,7 +136,7 @@ class StaffRepository implements StaffRepositoryInterface
 
     public function staffDetail(int $id)
     {
-        $staff = Staff::with('department', 'roles', 'inventories', 'emergencyContacts', 'gender', 'completed_tasks','features')->find($id);
+        $staff = Staff::with('department', 'roles', 'inventories', 'emergencyContacts', 'gender', 'completed_tasks', 'features')->find($id);
         if ($staff == null) {
             ResponseMessage("Staff not found or invalid id", 404);
         }
@@ -179,12 +176,12 @@ class StaffRepository implements StaffRepositoryInterface
             // $staffData = MakePaginationData($request, $totalCount, 'staffs', $staffs);
 
             $staffs = Staff::with('department')->where('department_id', $departmentId)
-            ->where('is_active', 1)
-            ->paginate(20);
+                ->where('is_active', 1)
+                ->paginate(20);
             return $staffs;
         } else {
             $staffs = Staff::with('department')
-            ->where('department_id', $departmentId)
+                ->where('department_id', $departmentId)
                 ->where('is_active', 1)
                 ->get();
             return $staffs;
@@ -251,5 +248,33 @@ class StaffRepository implements StaffRepositoryInterface
             ResponseMessage($e->getMessage(), 402);
             throw $e;
         }
+    }
+
+    public function staffReport(Request $request)
+    {
+        $month = $request->input('month', date('m'));
+        $year = $request->input('year', date('Y'));
+
+        $subQuery = DB::table('task_details')
+            ->join('tasks', 'task_details.task_id', '=', 'tasks.id')
+            ->where('task_details.status', 'passed')
+            ->when($month, function ($query) use ($month, $year) {
+                $query->whereYear('task_details.date_time', $year)
+                    ->whereMonth('task_details.date_time', $month);
+            })
+            ->select('task_details.staff_id', DB::raw('SUM(tasks.kpi) as kpi'))
+            ->groupBy('task_details.staff_id');
+
+        $query = Staff::leftJoinSub($subQuery, 'kpi', function ($join) {
+            $join->on('staff.id', '=', 'kpi.staff_id');
+        })
+            ->select('staff.*', 'kpi.kpi');
+
+        if ($request->filled('department_id')) {
+            $query->where('staff.department_id', $request->input('department_id'));
+        }
+        $staffs = $query->paginate(config('common.list_count'));
+
+        ResponseData($staffs);
     }
 }
