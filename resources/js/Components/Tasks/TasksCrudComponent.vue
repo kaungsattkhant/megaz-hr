@@ -82,20 +82,20 @@
                                     </td>
 
                                     <td class="  ">
-                                        {{ task.status }}
+                                        {{ task.task_details[0].status }}
                                     </td>
                                     <td class="">
-                                        <i v-if="task.is_double_checked === 1" class="fas fa-check-double"
+                                        <i v-if="task.task_details[0].is_double_checked === 1" class="fas fa-check-double"
                                             @click="doubleChecked(task.id)"></i>
                                         <i v-else class="fas fa-check" @click="doubleChecked(task.id)"></i>
                                     </td>
 
                                     <td class="  ">
-                                        <div v-if="task.completed_by"> {{ task.completed_by.name }} </div>
+                                        <div v-if="task.task_details[0].completed_by"> {{ task.task_details[0].completed_by.name }} </div>
                                     </td>
 
                                     <td class="  ">
-                                        <div v-if="task.double_checked_by"> {{ task.double_checked_by.name }} </div>
+                                        <div v-if="task.task_details[0].double_checked_by"> {{ task.task_details[0].double_checked_by.name }} </div>
                                     </td>
 
                                     <td class="whitespace-nowrap ">
