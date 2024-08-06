@@ -12,6 +12,7 @@ use App\Http\Requests\Staff\StaffUpdateRequest;
 use App\Models\Staff;
 
 use App\Repositories\Staff\StaffRepositoryInterface;
+use Psy\Readline\Hoa\_Protocol;
 
 class StaffAPIController extends Controller
 {
@@ -135,5 +136,10 @@ class StaffAPIController extends Controller
     {
         $staff = $this->staffRepo->getStaffByDepartment($request,$department_id);
         ResponseData($staff);
+    }
+
+    public function staffReport(Request $request)
+    {
+        $staff = $this->staffRepo->staffReport($request);
     }
 }
