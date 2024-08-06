@@ -15,22 +15,22 @@
                 <!-- <select name="" id="" class="input-ui focus:ring-0 h-8 text-xs py-0">
                                 <option value="1" > Title </option>
                             </select> -->
-                <div class=" min-w-[212px] multi-select">
-                    <select placeholder="Department" class='border border-gray-400 rounded-md h-8 ' v-model="selectedDepartment"
+                <!-- <div class=" min-w-[212px] multi-select">
+                    <select placeholder="Department" class='border border-gray-400 rounded-md h-8 text-xs py-1' v-model="selectedDepartment"
                         @change="searchBtnClicked">
                         <option value="" disabled>Select a department</option>
                         <option v-for="department in departmentList" :key="department.id" :value="department">
                             {{ department.name }}
                         </option>
                     </select>
-                </div>
+                </div> -->
 
-                <!-- <div class=" min-w-[212px] multi-select">
+                <div class=" min-w-[212px] multi-select">
 
-                    <multiselect v-model="selectedDepartment" @change='searchBtnClicked' :options="departmentList" :close-on-select="true"
+                    <multiselect v-model="selectedDepartment" @select='searchBtnClicked()' :options="departmentList" :close-on-select="true"
                         :clear-on-select="false" :preserve-search="true" placeholder="Department" label="name"
                         track-by="id" :preselect-first="false"></multiselect>
-                </div> -->
+                </div>
 
 
 
