@@ -327,6 +327,7 @@ Route::get('/role_by_department/{department_id}', [RoleAPIController::class, 'ge
 Route::post('/roles', [RoleAPIController::class, 'createRole']);
 Route::put('/roles/{id}', [RoleAPIController::class, 'updateRole']);
 
+Route::get('/staff_reports',[StaffAPIController::class,'staffReport']);
 Route::get('/staffs', [StaffAPIController::class, 'getStaffData']);
 Route::get('/staffs/{id}',[StaffAPIController::class,'detailStaff']);
 Route::post('/staffs', [StaffAPIController::class, 'createStaff']);

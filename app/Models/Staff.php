@@ -94,10 +94,11 @@ class Staff extends Authenticatable
         return $this->belongsToMany(Role::class);
     }
 
-      public function task_details()
+    public function task_details()
     {
         return $this->hasMany(TaskDetail::class, 'staff_id');
     }
+
 
     // public function tasks()
     // {
