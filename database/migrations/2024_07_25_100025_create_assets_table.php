@@ -20,6 +20,7 @@ return new class extends Migration
             $table->unsignedInteger('third_account_id');  //fix_asset account
             $table->unsignedInteger('third_depreciation_account_id'); //third_depreciation_account
             $table->unsignedInteger('cash_account_id');
+            $table->unsignedInteger('asset_item_id');
             $table->unsignedBigInteger('created_by');
             $table->timestamps();
         });
