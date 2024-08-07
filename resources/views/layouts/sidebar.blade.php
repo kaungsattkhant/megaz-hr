@@ -1,5 +1,5 @@
         <nav id="sidebar" class="side-bar w-fit pt-0 h-[100vh]">
-            <div class="relative pb-12 overflow-y-hidden small-scrollbar h-[100vh]"
+            <div class="relative pb-20 overflow-y-hidden small-scrollbar h-[100vh]"
                 onmouseover="this.style.overflowY='scroll'" onmouseout="this.style.overflowY='hidden'">
 
                 <div class="relative w-[15rem] pt-12">
