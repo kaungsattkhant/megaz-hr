@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('asset_items', function (Blueprint $table) {
             $table->id();
             $table->char('name',120);
+            $table->string('item_code')->unique();
             $table->unsignedInteger('second_account_id');
             $table->unsignedInteger('second_depreciation_account_id');
             $table->unsignedInteger('created_by');
