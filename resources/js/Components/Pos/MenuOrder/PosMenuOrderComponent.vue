@@ -10,12 +10,11 @@
                         </button>
                     </div>
                     <div class="flex gap-x-3">
-                        <button class="pos-add-btn" data-te-toggle="modal" data-te-target="#create_cashbook_modal">
+                        <!-- <button class="pos-add-btn" data-te-toggle="modal" data-te-target="#create_cashbook_modal">
                             Add
-                            </button>
+                            </button> -->
                     </div>
                 </div>
-
                 <div>
                     <div class="bg-white px-4 pb-4">
                         <table class="min-w-full text-left text-sm font-light">
@@ -32,34 +31,6 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <!-- <tr class="">
-                                    <td class="whitespace-nowrap px-6 py-4 font-medium">
-                                        1
-                                    </td>
-                                    <td class="whitespace-nowrap px-6 py-4">
-                                        Jul 15 3 PM
-                                    </td>
-                                    <td class="whitespace-nowrap px-6 py-4">
-                                        Khant
-                                    </td>
-                                    <td class="whitespace-nowrap px-6 py-4">
-                                        Fried Chicken Rice            
-                                    </td>
-                                    <td class="whitespace-nowrap px-6 py-4">
-                                        22nd 87 Corner Mandalay
-                                    </td>
-                                    <td class="whitespace-nowrap px-6 py-4">
-                                        0920123454
-                                    </td>
-                                    <td class="whitespace-nowrap px-6 py-4">
-                                        15,000 MMks
-                                    </td>
-                                    <td class="whitespace-nowrap px-6 py-4 text-center">
-                                        <button type="button" class="bg-green-600 px-6 py-2 text-white rounded-full"> 
-                                            Confirm
-                                        </button>
-                                    </td>
-                                </tr> -->
                                 <div class="contents" v-for="(foodOrder,index) in foodOrderlist">
                                     <tr class="">
                                         <td class="whitespace-nowrap px-6 pt-4 pb-3 font-medium">
@@ -72,14 +43,6 @@
                                             {{ foodOrder.customer.name }}
                                         </td>
                                         <td class="whitespace-nowrap px-6 pt-4 pb-3">
-                                            <!-- <div v-if="foodOrder.food_order_items">
-                                                <div v-if="foodOrder.food_order_items < 2">
-                                                    {{ foodOrder.food_order_items[0].name }}
-                                                </div> 
-                                                <div v-else>
-                                                    Food Menu
-                                                </div>
-                                            </div> -->
                                             <div v-if="foodOrder.food_order_items.length > 0" class="flex">
                                                 <div v-for="(foi,index) in foodOrder.food_order_items">
                                                     {{ foi.menu.name }} {{ index < foodOrder.food_order_items.length - 1  ? ', ' : '' }}
@@ -88,7 +51,6 @@
                                             <div v-else>
                                                  All items are Rejected
                                             </div>
-                                            
                                         </td>
                                         <td class="whitespace-nowrap px-6 pt-4 pb-3">
                                             {{ foodOrder.customer.addresses[0].address }}
@@ -100,16 +62,18 @@
                                             {{ foodOrder.total_price.toLocaleString() }} MMks
                                         </td>
                                         <td class="whitespace-nowrap px-6  text-center">
-                                            <button v-if="foodOrder.allItemStatus == 'pending'" type="button" class="bg-[#fb923c] px-6 py-2 text-white rounded-full"> 
-                                                Pending
-                                            </button>
-                                            <button v-else type="button" @click="btnClickedGetOrderId(foodOrder.id)" class="bg-green-600 px-6 py-2 text-white rounded-full"
-                                                data-te-toggle="modal" data-te-target="#confirm_modal"> 
-                                                Confirm
-                                            </button>
+                                            <div class="contents" v-if="foodOrder.status != 'confirmed'">
+                                                <button v-if="foodOrder.allItemStatus == 'pending'" type="button" class="bg-[#fb923c] px-6 py-2 text-white rounded-full"> 
+                                                    Pending
+                                                </button>
+                                                <button v-else type="button" @click="btnClickedGetOrderId(foodOrder.id)" class="bg-green-600 px-6 py-2 text-white rounded-full"
+                                                    data-te-toggle="modal" data-te-target="#confirm_modal"> 
+                                                    Confirm
+                                                </button>
+                                            </div>
                                         </td>
                                     </tr>
-                                    <div class="contents" v-if="foodOrder.food_order_items.length > 0">
+                                    <div class="contents" v-if="foodOrder.food_order_items.length > 0 && foodOrder.status != 'confirmed'">
                                         <tr class="" v-for="(menuOrder,index) in foodOrder.food_order_items">
                                             <td colspan="3" class="whitespace-nowrap px-6 py-3 font-medium">
                                             </td>
@@ -117,7 +81,7 @@
                                                 {{ menuOrder.menu.name }}         
                                             </td>
                                             <td colspan="3" class="whitespace-nowrap px-6 py-3 select-parent">
-                                                <select name="" id="" class="text-xs pl-0 border-0 focus:shadow-none focus:outline-none focus:ring-0 select-box"
+                                                <select name="" id="" :disabled="menuOrder.area_id" class="text-xs pl-0 border-0 focus:shadow-none focus:outline-none focus:ring-0 select-box"
                                                     placeholder="Select Area">
                                                     <option :selected="!menuOrder.area_id" disabled selected>Select Area</option>
                                                     <option v-for="(area,index) in menuOrder.menu.areas" :value="area.id" class="">
@@ -128,7 +92,7 @@
                                             <!-- <td colspan="2" class="whitespace-nowrap px-6 py-3"></td> -->
                                             <td class="whitespace-nowrap px-6 py-3 text-center button-parent" v-if="menuOrder.status == 'received'">
                                                 <button @click="btnClickedAcceptMenu($event,menuOrder.id)">
-                                                    <i class="fal fa-check text-sm mr-2"></i>
+                                                    <i class="fal fa-check text-sm mr-4"></i>
                                                 </button>
                                                 <button @click="btnClickedRejectMenu($event,menuOrder.id)">
                                                     <i class="fal fa-times text-sm"></i>
