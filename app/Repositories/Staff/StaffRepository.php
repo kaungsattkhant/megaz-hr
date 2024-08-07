@@ -268,13 +268,21 @@ class StaffRepository implements StaffRepositoryInterface
         $query = Staff::leftJoinSub($subQuery, 'kpi', function ($join) {
             $join->on('staff.id', '=', 'kpi.staff_id');
         })
-            ->select('staff.*', 'kpi.kpi');
+        ->select('staff.*', 'kpi.kpi')
+        ->where(function ($query) {
+            $query->whereNotNull('kpi.kpi')
+                  ->where('kpi.kpi', '>', 0);
+        });
 
         if ($request->filled('department_id')) {
             $query->where('staff.department_id', $request->input('department_id'));
         }
+
         $staffs = $query->paginate(config('common.list_count'));
 
         ResponseData($staffs);
     }
+
+
+
 }
