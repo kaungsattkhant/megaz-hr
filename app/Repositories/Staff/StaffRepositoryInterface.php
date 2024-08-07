@@ -26,4 +26,6 @@ interface StaffRepositoryInterface
 
     public function deleteStaffFeature(int $staff_id, int $feature_id);
 
+    public function staffReport(Request $request);
+
 }

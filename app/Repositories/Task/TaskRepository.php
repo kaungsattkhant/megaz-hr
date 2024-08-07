@@ -14,6 +14,7 @@ class TaskRepository implements TaskRepositoryInterface
     use TaskAssign;
     public function getTasksOfRolesFromArea($areaId)
     {
+
         $dayName = now()->format('D');
         $role_id = UserData()->roles[0]->id;
         //create task detail for staff
@@ -35,10 +36,10 @@ class TaskRepository implements TaskRepositoryInterface
 
     public function updateTaskStatus(array $data, int $id)
     {
-        $task = Task::find($id);
-        if ($task) {
-            $task->update($data);
-            return $task;
+        $taskDetail = TaskDetail::find($id);
+        if ($taskDetail) {
+            $taskDetail->update($data);
+            return $taskDetail;
         } else {
             return null;
         }
@@ -57,7 +58,7 @@ class TaskRepository implements TaskRepositoryInterface
                 $perPage = $request->per_page;
             }
             $skip = ($pageNumber - 1) * $perPage;
-            $tasks = Task::where('is_active', 1)->skip($skip)->take($perPage)->with(['role.department', 'completedBy', 'doubleCheckedBy'])->get();
+            $tasks = Task::where('is_active', 1)->skip($skip)->take($perPage)->with(['role.department', 'task_details','task_details.completedBy','task_details.doubleCheckedBy'])->get();
             $paginationData = MakePaginationData($request, $totalCount, 'tasks');
             $paginationData['tasks'] = $tasks;
 
