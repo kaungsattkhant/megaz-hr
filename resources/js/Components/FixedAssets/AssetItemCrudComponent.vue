@@ -18,9 +18,9 @@
                         </div>
 
                         <div class="my-5 flex justify-center">
-                            <select type="text" placeholder="Second Account" v-model="secondAccount"
+                            <select placeholder="Second Account" v-model="secondAccount"
                                 class="py-2 px-2 w-11/12 rounded-md border border-gray-300">
-                                <option disabled selected>Secound Account</option>
+                                <option :value="null" disabled selected>Secound Account</option>
                                 <option v-for='(secondAccount, index) in secondAccountListForAssetItem' :key=index
                                     :value=secondAccount.id>{{ secondAccount.name }}</option>
                             </select>
@@ -36,8 +36,9 @@
                         </div>
 
                         <div class="my-5">
-                            <select type="text" placeholder="Second Account Depreciation" v-model="secondAccountDepreciation"
+                            <select placeholder="Second Account Depreciation" v-model="secondAccountDepreciation"
                                 class="py-2 px-2 w-11/12 rounded-md border border-gray-300">
+                                <option :value="null" disabled selected>Second Account Depreciation</option>
                                 <option v-for='(secondAccountDepreciation, index) in secondAccountListDepreciationForAssetItem' :key=index
                                     :value=secondAccountDepreciation.id>{{ secondAccountDepreciation.name }}</option>
                             </select>
