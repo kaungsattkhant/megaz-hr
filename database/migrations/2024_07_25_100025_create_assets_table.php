@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->char('name');
             $table->decimal('cost',15,2);
+            $table->double('quantity');
             $table->integer('useful_life'); //month
             $table->dateTime('purchase_date');
             $table->unsignedInteger('third_account_id');  //fix_asset account
