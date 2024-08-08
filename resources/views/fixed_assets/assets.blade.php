@@ -1,7 +1,7 @@
 @extends('layouts.main')
 
 @section('page_title', 'Assets')
-@section('fixed_asset', 'active-link')
+@section('assets', 'active-link')
 @section('content')
 
 <div id="app">

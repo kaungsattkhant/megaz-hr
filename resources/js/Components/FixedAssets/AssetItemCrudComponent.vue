@@ -38,7 +38,7 @@
                         <div class="my-5">
                             <select placeholder="Second Account Depreciation" v-model="secondAccountDepreciation"
                                 class="py-2 px-2 w-11/12 rounded-md border border-gray-300">
-                                <option :value="null" disabled selected>Second Account Depreciation</option>
+                                <option :value="null" disabled selected >Second Account Depreciation</option>
                                 <option v-for='(secondAccountDepreciation, index) in secondAccountListDepreciationForAssetItem' :key=index
                                     :value=secondAccountDepreciation.id>{{ secondAccountDepreciation.name }}</option>
                             </select>
@@ -266,6 +266,17 @@ export default {
                 this.secondAccountName = '',
                     this.secondAccountOBJ = null;
                 this.secondAccountsForAssetItem();
+                this.$notify({
+                    title: `Input validation`,
+                    text: `Second Account created successfully`,
+                    type: "success"
+                });
+            }else{
+                this.$notify({
+                    title: `Input validation`,
+                    text: response.message,
+                    type: "warn"
+                });
             }
         },
 
@@ -283,6 +294,17 @@ export default {
                 this.secondDepreciationName = '',
                     this.secondDepreciationAccountOBJ = null;
                 this.secondAccountDepreciationForAssetItem();
+                this.$notify({
+                    title: `Input validation`,
+                    text: `Second Depreciation Account created successfully`,
+                    type: "success"
+                });
+            }else{
+                this.$notify({
+                    title: `Input validation`,
+                    text: response.message,
+                    type: "warn"
+                });
             }
         },
 
@@ -307,6 +329,12 @@ export default {
                     title: `Input validation`,
                     text: `Asset Item created successfully`,
                     type: "success"
+                });
+            }else{
+                this.$notify({
+                    title: `Input validation`,
+                    text: responseData.message,
+                    type: "warn"
                 });
             }
         }
