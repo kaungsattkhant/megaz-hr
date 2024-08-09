@@ -70,6 +70,7 @@ use App\Http\Controllers\API\Customers\CustomerAPIController as UserAppCustomerA
 use App\Http\Controllers\API\Customers\PackageAPIController as CustomersPackageAPIController;
 use App\Http\Controllers\API\Customers\MenuCategoryAPIController as CustomerMenuCategoryAPIController;
 use App\Http\Controllers\API\JournalAPIController;
+use App\Http\Controllers\API\StaffAdvanceAPIController;
 
 /*
 |--------------------------------------------------------------------------
@@ -290,6 +291,11 @@ Route::middleware('auth:api')->group(function () {
     {
         Route::get('/journals','listAllJournals');
         Route::post('/journals','createJournal');
+    });
+
+    Route::controller(StaffAdvanceAPIController::class)->group(function()
+    {
+        Route::post('/staff_advances','createStaffAdvance');
     });
 
 

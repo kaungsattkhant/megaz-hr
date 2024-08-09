@@ -106,6 +106,8 @@ use App\Repositories\Journal\JournalRepository;
 use App\Repositories\Journal\JournalRepositoryInterface;
 use App\Repositories\MenuCategory\MenuCategoryRepository;
 use App\Repositories\MenuCategory\MenuCategoryRepositoryInterface;
+use App\Repositories\StaffAdvance\StaffAdvanceRepository;
+use App\Repositories\StaffAdvance\StaffAdvanceRepositoryInterface;
 
 class RepositoryServiceProvider extends ServiceProvider
 {
@@ -168,5 +170,6 @@ class RepositoryServiceProvider extends ServiceProvider
         $this->app->bind(AssetInterface::class,AssetRepository::class);
         $this->app->bind(AssetInventoryLedgerInterface::class,AssetInventoryLedgerRepository::class);
         $this->app->bind(JournalRepositoryInterface::class,JournalRepository::class);
+        $this->app->bind(StaffAdvanceRepositoryInterface::class,StaffAdvanceRepository::class);
     }
 }
