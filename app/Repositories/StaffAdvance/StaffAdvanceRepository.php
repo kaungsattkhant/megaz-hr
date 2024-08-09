@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\DB;
 
 class StaffAdvanceRepository implements StaffAdvanceRepositoryInterface
 {
+
     public function createStaffAdvance(Request $reqeust)
     {
         DB::beginTransaction();
@@ -63,7 +64,7 @@ class StaffAdvanceRepository implements StaffAdvanceRepositoryInterface
                     'is_cashier_confirmed' => 0
                 ]);
             }
-            $totalAdditional = StaffAdvance::where('staff_id', $data['staff_id'])
+            $totalAddition = StaffAdvance::where('staff_id', $data['staff_id'])
                 ->where('type', 'addition')
                 ->sum('amount') ?? 0;
 
@@ -78,7 +79,7 @@ class StaffAdvanceRepository implements StaffAdvanceRepositoryInterface
                 ->first();
 
             if ($staffBalance) {
-                $staffBalance->closing_balance = $staffBalance->opening + ($totalAdditional - $totalSettlement);
+                $staffBalance->closing_balance = $staffBalance->opening + ($totalAddition - $totalSettlement);
                 $staffBalance->save();
                 DB::commit();
             }else{

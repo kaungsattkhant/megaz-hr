@@ -24,6 +24,16 @@ class StaffAPIController extends Controller
         $this->staffRepo = $staffRepo;
     }
 
+    public function staffBalanceList()
+    {
+        $staffBalances = $this->staffRepo->staffBalanceList();
+    }
+
+    public function detailStaffBalance(int $id)
+    {
+        $staffBalance = $this->staffRepo->staffBalanceDetail($id);
+    }
+
     public function getStaffData(Request $request)
 
     {

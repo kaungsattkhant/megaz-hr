@@ -160,6 +160,11 @@ class Staff extends Authenticatable
         return $this->belongsToMany(Feature::class, 'feature_staff');
     }
 
+    public function staffAdvances()
+    {
+        return $this->hasMany(StaffAdvance::class);
+    }
+
     #scope
 
     #end

@@ -6,6 +6,8 @@ use App\Models\Feature;
 use App\Models\Inventory;
 use App\Models\Role;
 use App\Models\Staff;
+use App\Models\StaffAdvance;
+use App\Models\StaffBalance;
 use App\Models\StaffEmergencyContact;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -30,6 +32,34 @@ class StaffRepository implements StaffRepositoryInterface
 
             return $staffs;
         }
+    }
+
+    public function staffBalanceList()
+    {
+        $staffBalances = StaffBalance::with('staff')->get();
+
+        foreach($staffBalances as $staffBalance)
+        {
+            $totalAddition = StaffAdvance::where('staff_id', $staffBalance->staff_id)
+            ->where('type', 'addition')
+            ->sum('amount') ?? 0;
+
+            $totalSettlement = StaffAdvance::where('staff_id', $staffBalance->staff_id)
+                ->where('type', 'settlement')
+                ->sum('amount') ?? 0;
+            $staffBalance->addition = $totalAddition;
+            $staffBalance->settlement = $totalSettlement;
+            $staffBalance->staff_name = $staffBalance->staff->name;
+            unset($staffBalance->staff);
+        }
+
+        ResponseData($staffBalances);
+    }
+
+    public function staffBalanceDetail(int $id)
+    {
+        $staff = Staff::with('staffAdvances')->where('id',$id)->first();
+        ResponseData($staff);
     }
 
     public function createData(array $data)
