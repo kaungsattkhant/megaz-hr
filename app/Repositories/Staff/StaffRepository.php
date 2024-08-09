@@ -58,7 +58,7 @@ class StaffRepository implements StaffRepositoryInterface
 
     public function staffBalanceDetail(int $id)
     {
-        $staff = Staff::with('staffAdvances')->where('id',$id)->first();
+        $staff = Staff::with('staffAdvances','staffBalance')->where('id',$id)->first();
         ResponseData($staff);
     }
 

@@ -165,6 +165,11 @@ class Staff extends Authenticatable
         return $this->hasMany(StaffAdvance::class);
     }
 
+    public function staffBalance()
+    {
+        return $this->hasOne(StaffBalance::class)->latest();
+    }
+
     #scope
 
     #end
