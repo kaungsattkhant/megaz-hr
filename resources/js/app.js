@@ -109,6 +109,7 @@ import LevelDiscountCrudComponent from './Components/CRM/LevelDiscountCrudCompon
 import BirthdayPromotionCrudComponent from './Components/CRM/BirthdayPromotionCrudComponent.vue';
 import CustomTaskCrudComponent from './Components/Tasks/CustomTaskCrudComponent.vue';
 import TasksReportComponent from './Components/Tasks/TasksReportComponent.vue';
+import JournalsCrudComponent from './Components/Journals/JournalsCrudComponent.vue';
 
 app.component('NavBarComponent', NavBarComponent);
 app.component('StaffListComponent', StaffListComponent);
@@ -197,6 +198,7 @@ app.component('BirthdayPromotionCrudComponent', BirthdayPromotionCrudComponent);
 app.component('CrmCustomerDetailComponent', CrmCustomerDetailComponent);
 app.component('CustomTaskCrudComponent', CustomTaskCrudComponent);
 app.component('TasksReportComponent',TasksReportComponent);
+app.component('JournalsCrudComponent',JournalsCrudComponent);
 
 app.use(store);
 app.use(Notifications);
