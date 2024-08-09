@@ -11,4 +11,9 @@ class StaffBalance extends Model
     protected $fillable =[
         'staff_id','year','month','opening_balance','closing_balance'
     ];
+
+    public function staff()
+    {
+        return $this->belongsTo(Staff::class);
+    }
 }

@@ -70,6 +70,7 @@ use App\Http\Controllers\API\Customers\CustomerAPIController as UserAppCustomerA
 use App\Http\Controllers\API\Customers\PackageAPIController as CustomersPackageAPIController;
 use App\Http\Controllers\API\Customers\MenuCategoryAPIController as CustomerMenuCategoryAPIController;
 use App\Http\Controllers\API\JournalAPIController;
+use App\Http\Controllers\API\StaffAdvanceAPIController;
 
 /*
 |--------------------------------------------------------------------------
@@ -292,6 +293,11 @@ Route::middleware('auth:api')->group(function () {
         Route::post('/journals','createJournal');
     });
 
+    Route::controller(StaffAdvanceAPIController::class)->group(function()
+    {
+        Route::post('/staff_advances','createStaffAdvance');
+    });
+
 
 });
 
@@ -347,6 +353,10 @@ Route::delete('/staffs/{staff_id}/roles/{role_id}',[StaffAPIController::class,'d
 Route::delete('/staffs/{staff_id}/inventories/{inventory_id}',[StaffAPIController::class,'deleteInventoryStaff']);
 Route::delete('/staffs/{staff_id}/features/{feature_id}',[StaffAPIController::class,'deleteFeatureStaff']);
 Route::get('/departments/{department_id}/staffs',[StaffAPIController::class,'getStaffByDepartment']);
+Route::get('/staff_balances',[StaffAPIController::class,'staffBalanceList']);
+Route::get('/staff_balances/{id}',[StaffAPIController::class,'detailStaffBalance']);
+
+
 
 
 // Route::get('/tasks', [TaskController::class, 'getTaskData']);

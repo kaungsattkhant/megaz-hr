@@ -13,11 +13,11 @@ return new class extends Migration
     {
         Schema::create('staff_advances', function (Blueprint $table) {
             $table->id();
-            $table->dateTime('date_time');
+            $table->dateTime('date_time')->default(CurrentTime());
             $table->double('amount');
             $table->foreignId('staff_id')->constrained()->onDelete('cascade');
             $table->string('type');
-            $table->foreignId('cash_account_id')->constrained()->onDelete('cascade');
+            $table->unsignedBigInteger('cash_account_id');
             $table->unsignedBigInteger('created_by');
             $table->timestamps();
         });
