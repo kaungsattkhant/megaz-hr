@@ -102,6 +102,8 @@ use App\Repositories\UsedDefectedItem\UsedDefectedItemRepository;
 use App\Repositories\UsedDefectedItem\UsedDefectedITemRepositoryInterface;
 use App\Repositories\HomeRepository\HomeInterface;
 use App\Repositories\HomeRepository\HomeRepository;
+use App\Repositories\Journal\JournalRepository;
+use App\Repositories\Journal\JournalRepositoryInterface;
 use App\Repositories\MenuCategory\MenuCategoryRepository;
 use App\Repositories\MenuCategory\MenuCategoryRepositoryInterface;
 
@@ -165,5 +167,6 @@ class RepositoryServiceProvider extends ServiceProvider
         $this->app->bind(DeliveryChargeRepositoryInterface::class,DeliveryChargeRepository::class);
         $this->app->bind(AssetInterface::class,AssetRepository::class);
         $this->app->bind(AssetInventoryLedgerInterface::class,AssetInventoryLedgerRepository::class);
+        $this->app->bind(JournalRepositoryInterface::class,JournalRepository::class);
     }
 }

@@ -69,6 +69,7 @@ use App\Http\Controllers\API\Customers\MenuAPIController as CustomersMenuAPICont
 use App\Http\Controllers\API\Customers\CustomerAPIController as UserAppCustomerAPIController;
 use App\Http\Controllers\API\Customers\PackageAPIController as CustomersPackageAPIController;
 use App\Http\Controllers\API\Customers\MenuCategoryAPIController as CustomerMenuCategoryAPIController;
+use App\Http\Controllers\API\JournalAPIController;
 
 /*
 |--------------------------------------------------------------------------
@@ -285,7 +286,16 @@ Route::middleware('auth:api')->group(function () {
     Route::post('/bookings',[BookingAPIController::class,'createBooking']);
     Route::post('/booking_status/{id}',[BookingAPIController::class,'bookingStatusChange']);
     Route::post('/booking_active/{id}',[BookingAPIController::class,'bookingActivate']);
+    Route::controller(JournalAPIController::class)->group(function()
+    {
+        Route::get('/journals','listAllJournals');
+        Route::post('/journals','createJournal');
+    });
+
+
 });
+
+
 
 Route::controller(PackageAPIController::class)->group(function()
     {
