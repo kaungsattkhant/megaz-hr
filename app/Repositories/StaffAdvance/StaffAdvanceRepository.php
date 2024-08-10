@@ -83,6 +83,10 @@ class StaffAdvanceRepository implements StaffAdvanceRepositoryInterface
                 $staffBalance->save();
                 DB::commit();
             }else{
+                if($data['type']=='additional')
+                {
+                    ResponseMessage("Invalid Data",422);
+                }
                 $addition = 0;
                 $settlement = 0;
                 if($data['type'] == 'addition'){
