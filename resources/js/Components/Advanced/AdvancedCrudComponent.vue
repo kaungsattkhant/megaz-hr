@@ -73,7 +73,7 @@
                                         </td>
                                     </tr>
                                 </a>
-                                
+
                             </div>
                         </tbody>
                     </table>
@@ -114,7 +114,7 @@
                                 </select>
                             </div>
                             <div class="mb-4">
-                                
+
                                 <label class="label-form mb-3">Staff</label>
                                 <select class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0"
                                     v-model="selectedStaff">
@@ -154,7 +154,7 @@
 
                                 </select>
                             </div>
-                            
+
 
                         </div>
                         <div class="flex justify-end gap-x-4 px-6 mb-6 pt-4">
@@ -171,7 +171,7 @@
                 </div>
             </div>
 
-            
+
 
 
         </div>
@@ -192,7 +192,7 @@
 
                 departmentList:[],
                 staffList:[],
-                typeList:['additional','settlement'],
+                typeList:['addition','settlement'],
                 cashbookList:[],
 
                 selectedDepartment:null,
@@ -200,8 +200,8 @@
                 selectedType:null,
                 selectedCashbook:null,
                 amounts:null,
-                
-                
+
+
             };
         },
 
@@ -267,7 +267,7 @@
         },
         mounted()
         {
-            
+
             initTE({ Modal,Select, Ripple });
         },
         created(){
@@ -275,9 +275,9 @@
             this.getDepartmentList();
             this.getCashbookList();
 
-            
+
         }
-        
+
     }
 </script>
 

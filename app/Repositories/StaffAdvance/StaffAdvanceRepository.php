@@ -77,6 +77,7 @@ class StaffAdvanceRepository implements StaffAdvanceRepositoryInterface
                 ->where('year', $currentYear)
                 ->where('month', $currentMonth)
                 ->first();
+
             if ($staffBalance!=null) {
                 $staffBalance->closing_balance = $staffBalance->opening + ($totalAddition - $totalSettlement);
                 $staffBalance->save();

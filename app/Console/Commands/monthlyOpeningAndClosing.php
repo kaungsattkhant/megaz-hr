@@ -3,7 +3,9 @@
 namespace App\Console\Commands;
 
 use App\Models\StaffBalance;
+use Carbon\Carbon;
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\Log;
 
 class monthlyOpeningAndClosing extends Command
 {
@@ -26,8 +28,11 @@ class monthlyOpeningAndClosing extends Command
      */
     public function handle()
     {
+        $lastMonth = Carbon::now()->subMonth();
 
-        $staffBalances = StaffBalance::all();
+        $staffBalances = StaffBalance::whereYear('created_at', $lastMonth->year)
+                            ->whereMonth('created_at', $lastMonth->month)
+                            ->get();
         foreach ($staffBalances as $staffBalance)
         {
             $currentYear = date('Y');
