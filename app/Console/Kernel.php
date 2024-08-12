@@ -13,8 +13,8 @@ class Kernel extends ConsoleKernel
     protected function schedule(Schedule $schedule): void
     {
         // $schedule->command('inspire')->hourly();
-        $schedule->command('app:monthly-opening-and-closing')->everySecond();
-        $schedule->command('app:monthly-opening-and-closing')->yearly();
+        // $schedule->command('app:monthly-opening-and-closing')->monthly();
+        // $schedule->command('app:monthly-opening-and-closing')->yearly();
 
 
     }
@@ -26,9 +26,9 @@ class Kernel extends ConsoleKernel
     {
         $this->load(__DIR__.'/Commands');
 
-        $this->commands([
-            \App\Console\Commands\monthlyOpeningAndClosing::class,
-        ]);
+        // $this->commands([
+        //     \App\Console\Commands\monthlyOpeningAndClosing::class,
+        // ]);
 
         require base_path('routes/console.php');
     }

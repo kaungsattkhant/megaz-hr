@@ -7,11 +7,12 @@
     <div class="mt-4 bg-white">
         <div class="btn-container">
             <div class=" flex">
-                <label for="search" class="search-input">
+                <!-- <label for="search" class="search-input">
                     <input type="text" class="input-search" placeholder="Search">
 
                     <i class="fal fa-search"></i>
-                </label>
+                </label> -->
+                <input type="month" class="input-ui  mr-2 h-8" v-model="selectedMonth" @change="monthChange()">
             </div>
             <div class="flex justify-end flex-col">
 
@@ -43,25 +44,28 @@
                                 <th scope="col" class="">
                                     Credit
                                 </th>
-                                <th scope="col" class="">
-
-                                </th>
                             </tr>
                         </thead>
                         <tbody>
-                            <div class="contents" v-for="(joural, index) in journalList" :key="index">
-                                <tr class="">
-                                    <td class="  ">
-                                        {{ ++index }}
+                            <div class="contents" v-for="(journal, journalIndex) in journalList" :key="index">
+                                <tr class="" v-for="acc in journal.ledgers">
+                                    <td class=" align-middle" rowspan="2" v-if="acc.action == 'credit'">
+                                        {{ journalIndex+1 }}
                                     </td>
                                     <td class="whitespace-nowrap">
-                                        {{ journal }}
+                                        {{ acc.account.name }}
                                     </td>
-
                                     <td class="whitespace-nowrap">
-                                        {{ journal }}
+                                        {{ journal.description }}
+                                    </td>
+                                    <td class="whitespace-nowrap">
+                                        {{ acc.action == 'debit' ? acc.value : '0' }}
+                                    </td>
+                                    <td class="whitespace-nowrap">
+                                        {{ acc.action == 'credit' ? acc.value : '0' }}
                                     </td>
                                 </tr>
+                                
                             </div>
                         </tbody>
                     </table>
@@ -82,7 +86,7 @@
                                 Create Journal
                             </h5>
                             <button type="button" class="text-xs focus:shadow-none focus:outline-none"
-                                data-te-modal-dismiss aria-label="Close">
+                                data-te-modal-dismiss aria-label="Close" id="close">
                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
                                     stroke-width="1.5" stroke="currentColor" class="h-4 w-4">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
@@ -122,7 +126,7 @@
                                 </select>
                             </div>
                             <div class="mb-4">
-                                <label class="label-form mb-3">Credit Sub Account</label>
+                                <label class="label-form mb-3">Debit Sub Account</label>
                                 <select class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0"
                                     v-model="selectedDebitSubAcc"
                                     @change="getDebitAccList()" >
@@ -133,7 +137,7 @@
                                 </select>
                             </div>
                             <div class="mb-4">
-                                <label class="label-form mb-3">Credit Account</label>
+                                <label class="label-form mb-3">Debit Account</label>
                                 <select class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0"
                                     v-model="selectedDebitAcc">
                                     <option class="text-sm" :value="debit" v-for="(debit,index) in debitAccList" :key="index">
@@ -171,11 +175,9 @@
     import { getApiData, postApiData, deleteApiData } from '../../utilities/ajax-helpers';
     import { mapGetters } from "vuex";
     import Multiselect from 'vue-multiselect';
+    import { getCurrentDate } from '../../utilities/datetime-helpers';
 
     export default {
-        components: {
-            Multiselect
-        },
         data() {
             return {
 
@@ -183,12 +185,14 @@
                 subAccList:[],
                 creditAccList:[],
                 debitAccList:[],
-
+                currentDate:getCurrentDate(),
                 
                 selectedCreditSubAcc:null,
                 selectedCreditAcc:null,
                 selectedDebitSubAcc:null,
                 selectedDebitAcc:null,
+                selectedMonth:null,
+                currentMonth:null,
             };
         },
 
@@ -200,6 +204,11 @@
                 if(response.data){
                     this.journalList = response.data;
                 }
+            },
+            monthChange(){
+                let selectedNewMonth = this.selectedMonth.slice(6,7);
+                console.log(selectedNewMonth)
+                this.getJournalList(selectedNewMonth)
             },
             async getSubAccList(){
                 const response = await getApiData({ url: '/api/sub_accounts', token: this.getToken() });
@@ -228,11 +237,12 @@
                 let formData = new FormData();
                 formData.append('particular', this.particular);
                 formData.append('amount', this.amount);
-                formData.append('credit_account_id', this.selectedCreditSubAcc.id);
-                formData.append('debit_account_id', this.selectedDebitSubAcc.id);
+                formData.append('credit_account_id', this.selectedCreditAcc.id);
+                formData.append('debit_account_id', this.selectedDebitAcc.id);
                 let response = await postApiData({url: '/api/journals', form_data: formData, token: this.getToken()});
                 if(response.success){
-                    // this.getJournalList();
+                    this.getJournalList();
+                    this.closeAndClearModal();
                     console.log('journal created')
                 }
                 else{
@@ -240,36 +250,15 @@
                 }
             },
 
-            // isActiveToggled(id){
-            //     let index = this.areaList.findIndex(area => area.id == id);
-            //     if(index != -1){
-            //         if(this.areaList[index].is_active == 1){
-            //             this.areaList[index].is_active = 0;
-            //         }
-            //         else{
-            //             this.areaList[index].is_active = 1;
-            //         }
-
-            //         let url = `/api/is_active`;
-            //         let formData = new FormData();
-            //         formData.append('id', id);
-            //         formData.append('type', 'area');
-            //         let response = postApiData({url: url, form_data: formData, token: this.getToken()});
-            //     }
-            // },
-
-            // deleteBtnClicked(id){
-            //     this.deleteId = id;
-            // },
-
-            // async confirmDeleteBtnClicked(){
-            //     let url = `/api/areas/${this.deleteId}`;
-            //     let response = await deleteApiData({url: url, token: this.getToken()});
-            //     if(response.success){
-            //         this.getAreasList(null);
-            //         console.log(`deleted`);
-            //     }
-            // }
+            closeAndClearModal(){
+                this.particular = null;
+                this.amount = null;
+                this.selectedCreditAcc = null;
+                this.selectedCreditSubAcc = null;
+                this.selectedDebitAcc = null;
+                this.selectedDebitSubAcc = null;
+                document.getElementById("close").click();
+            }
 
         },
         mounted()
@@ -278,9 +267,14 @@
             initTE({ Modal,Select, Ripple });
         },
         created(){
-            this.getJournalList(1);
+            const date = new Date();
+            this.currentMonth = date.getMonth() + 1;
+            this.getJournalList(this.currentMonth);
             this.getSubAccList();
+
+            
         }
+        
     }
 </script>
 
