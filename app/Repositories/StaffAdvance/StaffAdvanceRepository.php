@@ -77,13 +77,11 @@ class StaffAdvanceRepository implements StaffAdvanceRepositoryInterface
                 ->where('year', $currentYear)
                 ->where('month', $currentMonth)
                 ->first();
-
-            if ($staffBalance) {
+            if ($staffBalance!=null) {
                 $staffBalance->closing_balance = $staffBalance->opening + ($totalAddition - $totalSettlement);
                 $staffBalance->save();
-                DB::commit();
             }else{
-                if($data['type']=='additional')
+                if($data['type']=='settlement')
                 {
                     ResponseMessage("Invalid Data",422);
                 }
