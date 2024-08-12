@@ -111,6 +111,7 @@ import CustomTaskCrudComponent from './Components/Tasks/CustomTaskCrudComponent.
 import TasksReportComponent from './Components/Tasks/TasksReportComponent.vue';
 import JournalsCrudComponent from './Components/Journals/JournalsCrudComponent.vue';
 import AdvancedCrudComponent from './Components/Advanced/AdvancedCrudComponent.vue';
+import AdvancedDetailComponent from './Components/Advanced/AdvancedDetailComponent.vue';
 
 app.component('NavBarComponent', NavBarComponent);
 app.component('StaffListComponent', StaffListComponent);
@@ -201,6 +202,7 @@ app.component('CustomTaskCrudComponent', CustomTaskCrudComponent);
 app.component('TasksReportComponent',TasksReportComponent);
 app.component('JournalsCrudComponent',JournalsCrudComponent);
 app.component('AdvancedCrudComponent',AdvancedCrudComponent);
+app.component('AdvancedDetailComponent',AdvancedDetailComponent);
 
 app.use(store);
 app.use(Notifications);

@@ -212,3 +212,6 @@ Route::view('/booking/create', 'pos.booking.create');
 Route::view('/menuorder', 'pos.menu_order.index');
 Route::view('/delivery_charges', 'delivery_charges.index');
 Route::view('/journals', 'journals.index');
+Route::view('/advanced', 'advanced.index');
+
+Route::view('/advanced/{id}/detail', 'advanced.detail');
