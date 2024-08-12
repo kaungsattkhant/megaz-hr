@@ -78,20 +78,25 @@ class StaffAdvanceRepository implements StaffAdvanceRepositoryInterface
                 ->where('month', $currentMonth)
                 ->first();
 
-            if ($staffBalance!=null) {
+            if ($staffBalance != null) {
+                if ($data['type'] == 'settlement') {
+                    if ($staffBalance->closing_balance < $data['amount']) {
+                        ResponseMessage('Invalid Data', 422);
+                    }
+                }
+
                 $staffBalance->closing_balance = $staffBalance->opening + ($totalAddition - $totalSettlement);
                 $staffBalance->save();
-            }else{
-                if($data['type']=='settlement')
-                {
-                    ResponseMessage("Invalid Data",422);
+            } else {
+                if ($data['type'] == 'settlement') {
+                    ResponseMessage("Invalid Data", 422);
                 }
                 $addition = 0;
                 $settlement = 0;
-                if($data['type'] == 'addition'){
-                    $addition =$data['amount'];
-                }else{
-                    $settlement =$data['amount'];
+                if ($data['type'] == 'addition') {
+                    $addition = $data['amount'];
+                } else {
+                    $settlement = $data['amount'];
                 }
 
                 $closing_balance = $addition - $settlement;
@@ -106,7 +111,7 @@ class StaffAdvanceRepository implements StaffAdvanceRepositoryInterface
 
 
             DB::commit();
-            ResponseData($staffAdvance,200);
+            ResponseData($staffAdvance, 200);
         } catch (\Exception $e) {
             DB::rollback();
             ResponseMessage($e->getMessage(), 422);
