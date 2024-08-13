@@ -241,7 +241,7 @@
                 formData.append('debit_account_id', this.selectedDebitAcc.id);
                 let response = await postApiData({url: '/api/journals', form_data: formData, token: this.getToken()});
                 if(response.success){
-                    this.getJournalList();
+                    this.getJournalList(this.currentMonth);
                     this.closeAndClearModal();
                     console.log('journal created')
                 }
@@ -263,7 +263,7 @@
         },
         mounted()
         {
-            
+            this.currentMonth
             initTE({ Modal,Select, Ripple });
         },
         created(){
