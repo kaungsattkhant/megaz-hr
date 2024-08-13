@@ -11,16 +11,16 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('prepaids', function (Blueprint $table) {
+        Schema::create('prepaid_balances', function (Blueprint $table) {
             $table->id();
-            $table->string('title');
-            $table->foreignId('account_id')->constrained()->onDelete('cascade');
-            $table->dateTime('from_date');
-            $table->dateTime('to_date');
-            $table->decimal('total_amount');
+            $table->decimal('year');
+            $table->decimal('month');
+            $table->decimal('opening_balance');
+            $table->decimal('closing_balance');
             $table->decimal('prepaid_amount');
             $table->decimal('monthly_cost');
-            $table->unsignedBigInteger('created_by');
+            $table->decimal('cost');
+            $table->foreignId('prepaid_id')->constrained()->onDelete('cascade');
             $table->timestamps();
         });
     }
@@ -30,6 +30,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('prepaids');
+        Schema::dropIfExists('prepaid_balances');
     }
 };

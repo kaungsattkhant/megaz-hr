@@ -6,6 +6,7 @@ use App\Models\Account;
 use App\Models\SubAccount;
 use App\Models\ThirdAccount;
 use App\Models\SecondAccount;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
 class AccountRepository implements AccountInterface
@@ -141,7 +142,7 @@ class AccountRepository implements AccountInterface
             $account = Account::create([
                 'name' => $request->name,
                 'account_code' => $code,
-                'account_id' => $request->account_id,   
+                'account_id' => $request->account_id,
                 'sub_account_id'=>$request->sub_account_id,
                 // 'type'=>'is_third',
                 'type'=>$request->type,
@@ -154,5 +155,37 @@ class AccountRepository implements AccountInterface
             throw $e;
         }
     }
+
+    // public function prepaidAccountCreate(Request $request)
+    // {
+    //     $latestAccount = Account::where('account_id', $request->account_id)
+    //         ->orderByRaw("CAST(SUBSTRING_INDEX(account_code, '-', -1) AS UNSIGNED) DESC")
+    //         ->first();
+
+    //     if ($latestAccount) {
+    //         $latestAccountCodeNo = explode('-', $latestAccount->account_code);
+    //         // dd($account_code_no[1]);
+    //         $new_account_code = (int) $latestAccountCodeNo[2] + 1;
+    //         $code = $latestAccountCodeNo[0] . '-' . $latestAccountCodeNo[1] . '-' . $new_account_code;
+    //     } else {
+    //         $code = $request->original_account_code . '-' . "1";
+    //     }
+    //     DB::beginTransaction();
+    //     try {
+    //         $account = Account::create([
+    //             'name' => $request->name,
+    //             'account_code' => $code,
+    //             'account_id' => $request->account_id,
+    //             'sub_account_id' => $request->sub_account_id,
+    //             'type'=>$request->type,
+    //         ]);
+    //         DB::commit();
+    //         return $account;
+    //     } catch (\Exception $e) {
+    //         DB::rollback();
+    //         ResponseMessage($e->getMessage(), 402);
+    //         throw $e;
+    //     }
+    // }
 
 }

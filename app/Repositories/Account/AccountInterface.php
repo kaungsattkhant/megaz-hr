@@ -25,4 +25,6 @@ interface AccountInterface
     public function getSecondAccount($type);
 
     public function getThirdAccount($type);
+
+    public function prepaidAccountCreate(Request $request);
 }

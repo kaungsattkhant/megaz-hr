@@ -106,6 +106,8 @@ use App\Repositories\Journal\JournalRepository;
 use App\Repositories\Journal\JournalRepositoryInterface;
 use App\Repositories\MenuCategory\MenuCategoryRepository;
 use App\Repositories\MenuCategory\MenuCategoryRepositoryInterface;
+use App\Repositories\Prepaid\PrepaidRepository;
+use App\Repositories\Prepaid\PrepaidRepositoryInterface;
 use App\Repositories\StaffAdvance\StaffAdvanceRepository;
 use App\Repositories\StaffAdvance\StaffAdvanceRepositoryInterface;
 
@@ -171,5 +173,6 @@ class RepositoryServiceProvider extends ServiceProvider
         $this->app->bind(AssetInventoryLedgerInterface::class,AssetInventoryLedgerRepository::class);
         $this->app->bind(JournalRepositoryInterface::class,JournalRepository::class);
         $this->app->bind(StaffAdvanceRepositoryInterface::class,StaffAdvanceRepository::class);
+        $this->app->bind(PrepaidRepositoryInterface::class,PrepaidRepository::class);
     }
 }

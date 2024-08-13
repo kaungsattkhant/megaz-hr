@@ -20,9 +20,9 @@ class StaffAdvanceRepository implements StaffAdvanceRepositoryInterface
             $currentYear = date('Y');
             $currentMonth = date('m');
             // $currentMonth =7;
-            // $data['date_time'] = "2024-07-13 07:30";
-
             $data = $reqeust->all();
+
+            // $data['date_time'] = "2024-07-13 07:30";
             $data['created_by'] = UserData()->id;
             $staffAdvance = StaffAdvance::create($data);
             $transaction = (new StoreTransactionLedger())->createTransaction([
@@ -69,13 +69,16 @@ class StaffAdvanceRepository implements StaffAdvanceRepositoryInterface
                 ]);
             }
             $totalAddition = StaffAdvance::where('staff_id', $data['staff_id'])
-                ->where('type', 'addition')
-                ->sum('amount') ?? 0;
+                            ->whereYear('date_time',$currentYear)
+                            ->whereMonth('date_time',$currentMonth)
+                            ->where('type', 'addition')
+                            ->sum('amount') ?? 0;
 
             $totalSettlement = StaffAdvance::where('staff_id', $data['staff_id'])
-                ->where('type', 'settlement')
-                ->sum('amount') ?? 0;
-
+                            ->whereYear('date_time',$currentYear)
+                            ->whereMonth('date_time',$currentMonth)
+                            ->where('type', 'settlement')
+                            ->sum('amount') ?? 0;
 
             $staffBalance = StaffBalance::where('staff_id', $data['staff_id'])
                 ->where('year', $currentYear)
@@ -89,9 +92,7 @@ class StaffAdvanceRepository implements StaffAdvanceRepositoryInterface
                         ResponseMessage('Invalid Data', 422);
                     }
                 }
-                $staffBalance->closing_balance =($totalAddition - $totalSettlement);
-
-
+                $staffBalance->closing_balance = $staffBalance->opening_balance + ($totalAddition - $totalSettlement);
                 $staffBalance->save();
             } else {
                 $staffValidation = StaffBalance::where('staff_id',$data['staff_id'])->latest()->first();
@@ -106,7 +107,7 @@ class StaffAdvanceRepository implements StaffAdvanceRepositoryInterface
                                 'year' => $currentYear,
                                 'month' => $currentMonth,
                                 'opening_balance' => $staffValidation->closing_balance,
-                                'closing_balance' => ($totalAddition - $totalSettlement)
+                                'closing_balance' => $staffValidation->closing_balance + ($totalAddition - $totalSettlement)
                             ]
                         );
                     }else{
