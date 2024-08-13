@@ -51,7 +51,7 @@
                         </thead>
                         <tbody>
                             <div class="contents" v-for="(advance, index) in advancedList" :key="index">
-                                <a :href="'/advanced/' + advance.id + '/detail'" class="contents">
+                                <a :href="'/advanced/' + advance.staff_id + '/detail'" class="contents">
                                     <tr class="">
                                         <td class=" ">
                                             {{ index+1 }}

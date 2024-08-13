@@ -60,32 +60,33 @@
                                     {{ staff_name}}
                                 </td>
                                 <td class="whitespace-nowrap">
-                                    
+
                                 </td>
                                 <td class="whitespace-nowrap">
                                     {{ opening_balance }}
                                 </td>
                                 <td class="whitespace-nowrap" colspan="2">
-                                    
+
                                 </td>
                                 <td class="whitespace-nowrap">
                                     {{ closing_balance }}
                                 </td>
                             </tr>
-                            <tr class="" v-for="adv in staff_advance">
+                            <tr :key="adv.id" v-for="adv in staff_advance">
                                 <td class=" "></td>
                                 <td class="whitespace-nowrap"></td>
                                 <td class="whitespace-nowrap">
-                                    {{ adv.date_time }}
+                                    {{ formatDate(adv.date_time) }}
                                 </td>
                                 <td class="whitespace-nowrap"></td>
                                 <td class="whitespace-nowrap">
-                                    {{ adv.type == 'additional' ? adv.amount : ''}}
+                                    {{ adv.type == 'addition' ? adv.amount : ''}}
                                 </td>
                                 <td class="whitespace-nowrap" colspan="2">
                                     {{ adv.type == 'settlement' ? adv.amount : ''}}
                                 </td>
                                 <td class="whitespace-nowrap">
+
                                 </td>
                             </tr>
                         </tbody>
@@ -119,6 +120,12 @@
         methods: {
             ...mapGetters(['getToken']),
 
+            formatDate(dateTime) {
+            const date = new Date(dateTime);
+            const options = { month: 'short', day: 'numeric' };
+            return date.toLocaleDateString('en-US', options);
+            },
+
             async getStaffAdvance(){
                 const response = await getApiData({ url: '/api/staff_balances/'+this.staffId , token: this.getToken() });
                 if(response.data){
@@ -138,11 +145,11 @@
             initTE({ Modal,Select, Ripple });
         },
         created(){
-            
 
-            
+
+
         }
-        
+
     }
 </script>
 
