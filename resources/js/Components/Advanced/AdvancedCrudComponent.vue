@@ -51,7 +51,7 @@
                         </thead>
                         <tbody>
                             <div class="contents" v-for="(advance, index) in advancedList" :key="index">
-                                <a :href="'/advanced/' + advance.id + '/detail'" class="contents">
+                                <a :href="'/advanced/' + advance.staff_id + '/detail'" class="contents">
                                     <tr class="">
                                         <td class=" ">
                                             {{ index+1 }}
@@ -73,7 +73,7 @@
                                         </td>
                                     </tr>
                                 </a>
-                                
+
                             </div>
                         </tbody>
                     </table>
@@ -114,7 +114,7 @@
                                 </select>
                             </div>
                             <div class="mb-4">
-                                
+
                                 <label class="label-form mb-3">Staff</label>
                                 <select class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0"
                                     v-model="selectedStaff">
@@ -154,7 +154,7 @@
 
                                 </select>
                             </div>
-                            
+
 
                         </div>
                         <div class="flex justify-end gap-x-4 px-6 mb-6 pt-4">
@@ -171,7 +171,7 @@
                 </div>
             </div>
 
-            
+
 
 
         </div>
@@ -192,7 +192,7 @@
 
                 departmentList:[],
                 staffList:[],
-                typeList:['additional','settlement'],
+                typeList:['addition','settlement'],
                 cashbookList:[],
 
                 selectedDepartment:null,
@@ -200,16 +200,21 @@
                 selectedType:null,
                 selectedCashbook:null,
                 amounts:null,
-                
-                
+
+                selectedNewMonth:null,
+                currentMonth:null,
             };
         },
 
         methods: {
             ...mapGetters(['getToken']),
 
-            async getAdvanceList(){
-                const response = await getApiData({ url: '/api/staff_balances' , token: this.getToken() });
+            monthChange(){
+                let selectedNewMonth = this.selectedMonth.slice(5,7);
+                this.getAdvanceList(selectedNewMonth);
+            },
+            async getAdvanceList(selectedMonth){
+                const response = await getApiData({ url: '/api/staff_balances?month='+selectedMonth , token: this.getToken() });
                 if(response.data){
                     this.advancedList = response.data;
                 }
@@ -246,12 +251,15 @@
                 formData.append('cash_account_id', this.selectedCashbook.id);
                 let response = await postApiData({url: '/api/staff_advances', form_data: formData, token: this.getToken()});
                 if(response.success){
-                    this.getAdvanceList();
+                    this.getAdvanceList(this.currentMonth);
                     this.closeAndClearModal();
-                    console.log('advance created')
                 }
                 else{
-
+                    this.$notify({
+                        title: `Input validation`,
+                        text: response.message,
+                        type: "warn"
+                    });
                 }
             },
 
@@ -267,17 +275,19 @@
         },
         mounted()
         {
-            
+
             initTE({ Modal,Select, Ripple });
         },
         created(){
-            this.getAdvanceList();
+            const date = new Date();
+            this.currentMonth = date.getMonth() + 1;
+            this.getAdvanceList(this.currentMonth);
             this.getDepartmentList();
             this.getCashbookList();
 
-            
+
         }
-        
+
     }
 </script>
 

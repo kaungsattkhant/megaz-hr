@@ -24,14 +24,14 @@ class StaffAPIController extends Controller
         $this->staffRepo = $staffRepo;
     }
 
-    public function staffBalanceList()
+    public function staffBalanceList(Request $request)
     {
-        $staffBalances = $this->staffRepo->staffBalanceList();
+        $staffBalances = $this->staffRepo->staffBalanceList($request);
     }
 
-    public function detailStaffBalance(int $id)
+    public function detailStaffBalance(Request $request,int $id)
     {
-        $staffBalance = $this->staffRepo->staffBalanceDetail($id);
+        $staffBalance = $this->staffRepo->staffBalanceDetail($request,$id);
     }
 
     public function getStaffData(Request $request)

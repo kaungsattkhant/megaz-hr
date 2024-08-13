@@ -13,9 +13,7 @@ class Kernel extends ConsoleKernel
     protected function schedule(Schedule $schedule): void
     {
         // $schedule->command('inspire')->hourly();
-        // $schedule->command('app:monthly-opening-and-closing')->monthly();
-        // $schedule->command('app:monthly-opening-and-closing')->yearly();
-
+        $schedule->command('app:monthly-opening-and-closing')->everyMinute();
 
     }
 

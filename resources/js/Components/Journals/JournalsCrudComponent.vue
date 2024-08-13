@@ -65,7 +65,7 @@
                                         {{ acc.action == 'credit' ? acc.value : '0' }}
                                     </td>
                                 </tr>
-                                
+
                             </div>
                         </tbody>
                     </table>
@@ -162,7 +162,7 @@
                 </div>
             </div>
 
-            
+
 
 
         </div>
@@ -186,7 +186,7 @@
                 creditAccList:[],
                 debitAccList:[],
                 currentDate:getCurrentDate(),
-                
+
                 selectedCreditSubAcc:null,
                 selectedCreditAcc:null,
                 selectedDebitSubAcc:null,
@@ -263,7 +263,6 @@
         },
         mounted()
         {
-            this.currentMonth
             initTE({ Modal,Select, Ripple });
         },
         created(){
@@ -272,9 +271,9 @@
             this.getJournalList(this.currentMonth);
             this.getSubAccList();
 
-            
+
         }
-        
+
     }
 </script>
 
