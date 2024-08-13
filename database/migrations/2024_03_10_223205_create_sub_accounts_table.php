@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::create('sub_accounts', function (Blueprint $table) {
             $table->id();
+            $table->string('account_code')->unique();
             $table->string('name');
             $table->unsignedBigInteger('head_account_id');
             $table->boolean('is_active')->default(1);
