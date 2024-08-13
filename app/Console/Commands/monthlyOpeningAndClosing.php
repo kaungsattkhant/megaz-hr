@@ -29,10 +29,12 @@ class monthlyOpeningAndClosing extends Command
     public function handle()
     {
         $lastMonth = Carbon::now()->subMonth();
+        Log::info($lastMonth->month);
 
-        $staffBalances = StaffBalance::whereYear('created_at', $lastMonth->year)
-                            ->whereMonth('created_at', $lastMonth->month)
+        $staffBalances = StaffBalance::where('year', $lastMonth->year)
+                            ->where('month', $lastMonth->month)
                             ->get();
+        Log::info($staffBalances);
         foreach ($staffBalances as $staffBalance)
         {
             $currentYear = date('Y');
