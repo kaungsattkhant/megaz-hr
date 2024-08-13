@@ -4,7 +4,6 @@
             Staff Advanced
         </p>
     </div>
-    {{ staffAdvance }}
     <div class="mt-4 bg-white">
         <div class="btn-container">
             <div class=" flex">
@@ -13,7 +12,6 @@
 
                     <i class="fal fa-search"></i>
                 </label>
-                <!-- <input type="month" class="input-ui  mr-2 h-8" v-model="selectedMonth" @change="monthChange()"> -->
             </div>
             <div class="flex justify-end flex-col">
 
@@ -59,19 +57,35 @@
                                     1
                                 </td>
                                 <td class="whitespace-nowrap">
-                                    {{ staffAdvance}}
+                                    {{ staff_name}}
                                 </td>
                                 <td class="whitespace-nowrap">
-                                    {{ staffAdvance}}
+                                    
                                 </td>
                                 <td class="whitespace-nowrap">
-                                    {{ staffAdvance}}
+                                    {{ opening_balance }}
                                 </td>
                                 <td class="whitespace-nowrap" colspan="2">
                                     
                                 </td>
                                 <td class="whitespace-nowrap">
-                                    {{ staffAdvance}}
+                                    {{ closing_balance }}
+                                </td>
+                            </tr>
+                            <tr class="" v-for="adv in staff_advance">
+                                <td class=" "></td>
+                                <td class="whitespace-nowrap"></td>
+                                <td class="whitespace-nowrap">
+                                    {{ adv.date_time }}
+                                </td>
+                                <td class="whitespace-nowrap"></td>
+                                <td class="whitespace-nowrap">
+                                    {{ adv.type == 'additional' ? adv.amount : ''}}
+                                </td>
+                                <td class="whitespace-nowrap" colspan="2">
+                                    {{ adv.type == 'settlement' ? adv.amount : ''}}
+                                </td>
+                                <td class="whitespace-nowrap">
                                 </td>
                             </tr>
                         </tbody>
@@ -93,6 +107,12 @@
         data() {
             return {
                 staffAdvance:null,
+                staff_advance:null,
+                staff_name:null,
+                staff_balance:null,
+                advance_month : null,
+                opening_balance : null,
+                closing_balance : null,
             };
         },
 
@@ -103,24 +123,22 @@
                 const response = await getApiData({ url: '/api/staff_balances/'+this.staffId , token: this.getToken() });
                 if(response.data){
                     this.staffAdvance = response.data;
+                    this.staff_advance = response.data.staff_advances;
+                    this.staff_name = response.data.name;
+                    this.staff_balance = response.data.staff_balance;
+                    this.advance_month = response.data.staff_advances.month;
+                    this.opening_balance = response.data.staff_balance.opening_balance;
+                    this.closing_balance = response.data.staff_balance.closing_balance;
                 }
             },
-            
-
-            btnClickedCreateAdvance(){
-                this.createAdvance();
-            },
-
-            
-
         },
         mounted()
         {
-            
+            this.getStaffAdvance();
             initTE({ Modal,Select, Ripple });
         },
         created(){
-            this.getStaffAdvance();
+            
 
             
         }
