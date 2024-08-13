@@ -11,6 +11,20 @@
                                     Staff
                                 </a>
                             </li>
+
+                            <li>
+                                <a href="{{ route('journal') }}" class="flex items-center @yield('journals')">
+                                    <i class="far fa-books"></i>
+                                    Journal
+                                </a>
+                            </li>
+
+                            <li>
+                                <a href="{{ route('advance') }}" class="flex items-center @yield('advanced')">
+                                    <i class="fas fa-balance-scale-right"></i>
+                                    Staff Balance
+                                </a>
+                            </li>
                         @endif
                         @if (checkFeaturePermission('department'))
                             <li>
