@@ -201,15 +201,20 @@
                 selectedCashbook:null,
                 amounts:null,
 
-
+                selectedNewMonth:null,
+                currentMonth:null,
             };
         },
 
         methods: {
             ...mapGetters(['getToken']),
 
-            async getAdvanceList(){
-                const response = await getApiData({ url: '/api/staff_balances' , token: this.getToken() });
+            monthChange(){
+                let selectedNewMonth = this.selectedMonth.slice(5,7);
+                this.getAdvanceList(selectedNewMonth);
+            },
+            async getAdvanceList(selectedMonth){
+                const response = await getApiData({ url: '/api/staff_balances?month='+selectedMonth , token: this.getToken() });
                 if(response.data){
                     this.advancedList = response.data;
                 }
@@ -246,12 +251,15 @@
                 formData.append('cash_account_id', this.selectedCashbook.id);
                 let response = await postApiData({url: '/api/staff_advances', form_data: formData, token: this.getToken()});
                 if(response.success){
-                    this.getAdvanceList();
+                    this.getAdvanceList(this.currentMonth);
                     this.closeAndClearModal();
-                    console.log('advance created')
                 }
                 else{
-
+                    this.$notify({
+                        title: `Input validation`,
+                        text: response.message,
+                        type: "warn"
+                    });
                 }
             },
 
@@ -271,7 +279,9 @@
             initTE({ Modal,Select, Ripple });
         },
         created(){
-            this.getAdvanceList();
+            const date = new Date();
+            this.currentMonth = date.getMonth() + 1;
+            this.getAdvanceList(this.currentMonth);
             this.getDepartmentList();
             this.getCashbookList();
 

@@ -7,11 +7,12 @@
     <div class="mt-4 bg-white">
         <div class="btn-container">
             <div class=" flex">
-                <label for="search" class="search-input">
+                <!-- <label for="search" class="search-input">
                     <input type="text" class="input-search" placeholder="Search">
 
                     <i class="fal fa-search"></i>
-                </label>
+                </label> -->
+                <input type="month" class="input-ui  mr-2 h-8" v-model="selectedMonth" @change="monthChange()">
             </div>
             <div class="flex justify-end flex-col">
 
@@ -22,6 +23,8 @@
                 </button>
             </div>
         </div>
+
+        
         <div class="box-container-table">
             <div class="overflow-x-auto">
                 <div class=" table-container ">
@@ -51,25 +54,25 @@
                                 </th>
                             </tr>
                         </thead>
-                        <tbody>
+                        <tbody v-if="staffAdvance">
                             <tr class="">
                                 <td class=" ">
                                     1
                                 </td>
                                 <td class="whitespace-nowrap">
-                                    {{ staff_name}}
+                                    {{ staffAdvance.name}}
                                 </td>
                                 <td class="whitespace-nowrap">
-
+                                    {{ formatDate(currentdate).slice(0,3) }} 1
                                 </td>
                                 <td class="whitespace-nowrap">
-                                    {{ opening_balance }}
+                                    {{ staffAdvance.staff_balance ? staffAdvance.staff_balance.opening_balance : '' }}
                                 </td>
                                 <td class="whitespace-nowrap" colspan="2">
 
                                 </td>
                                 <td class="whitespace-nowrap">
-                                    {{ closing_balance }}
+                                    {{ staffAdvance.staff_balance ? staffAdvance.staff_balance.closing_balance : '' }}
                                 </td>
                             </tr>
                             <tr :key="adv.id" v-for="adv in staff_advance">
@@ -80,9 +83,9 @@
                                 </td>
                                 <td class="whitespace-nowrap"></td>
                                 <td class="whitespace-nowrap">
-                                    {{ adv.type == 'addition' ? adv.amount : ''}}
+                                    {{ adv.type == 'additional' ? adv.amount : ''}}
                                 </td>
-                                <td class="whitespace-nowrap" colspan="2">
+                                <td class="whitespace-nowrap">
                                     {{ adv.type == 'settlement' ? adv.amount : ''}}
                                 </td>
                                 <td class="whitespace-nowrap">
@@ -102,6 +105,7 @@
     import { Modal, Ripple, Select, initTE, Input } from "tw-elements";
     import { getApiData, postApiData, deleteApiData } from '../../utilities/ajax-helpers';
     import { mapGetters } from "vuex";
+    import { getCurrentDate } from "../../utilities/datetime-helpers";
 
     export default {
         props: ['staffId'],
@@ -109,11 +113,11 @@
             return {
                 staffAdvance:null,
                 staff_advance:null,
-                staff_name:null,
                 staff_balance:null,
-                advance_month : null,
-                opening_balance : null,
-                closing_balance : null,
+
+                selectedNewMonth:null,
+                currentMonth:null,
+                currentdate : getCurrentDate(),
             };
         },
 
@@ -121,27 +125,29 @@
             ...mapGetters(['getToken']),
 
             formatDate(dateTime) {
-            const date = new Date(dateTime);
-            const options = { month: 'short', day: 'numeric' };
-            return date.toLocaleDateString('en-US', options);
+                const date = new Date(dateTime);
+                const options = { month: 'short', day: 'numeric' };
+                return date.toLocaleDateString('en-US', options);
             },
 
-            async getStaffAdvance(){
-                const response = await getApiData({ url: '/api/staff_balances/'+this.staffId , token: this.getToken() });
+            monthChange(){
+                let selectedNewMonth = this.selectedMonth.slice(5,7);
+                this.getStaffAdvance(selectedNewMonth);
+            },
+            async getStaffAdvance(selectedmonth){
+                const response = await getApiData({ url: '/api/staff_balances/'+this.staffId + '?month=' + selectedmonth , token: this.getToken() });
                 if(response.data){
                     this.staffAdvance = response.data;
                     this.staff_advance = response.data.staff_advances;
-                    this.staff_name = response.data.name;
                     this.staff_balance = response.data.staff_balance;
-                    this.advance_month = response.data.staff_advances.month;
-                    this.opening_balance = response.data.staff_balance.opening_balance;
-                    this.closing_balance = response.data.staff_balance.closing_balance;
                 }
             },
         },
         mounted()
         {
-            this.getStaffAdvance();
+            const date = new Date();
+            this.currentMonth = date.getMonth() + 1;
+            this.getStaffAdvance(this.currentMonth);
             initTE({ Modal,Select, Ripple });
         },
         created(){
