@@ -17,9 +17,9 @@ return new class extends Migration
             $table->foreignId('account_id')->constrained()->onDelete('cascade');
             $table->dateTime('from_date');
             $table->dateTime('to_date');
-            $table->decimal('total_amount');
-            $table->decimal('prepaid_amount');
-            $table->decimal('monthly_cost');
+            $table->double('total_amount');
+            $table->double('prepaid_amount');
+            $table->double('monthly_cost');
             $table->unsignedBigInteger('created_by');
             $table->timestamps();
         });

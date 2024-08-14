@@ -19,4 +19,14 @@ class PrepaidAPIController extends Controller
     {
         $this->prepaidRepo->createPrepaid($request);
     }
+
+    public function createPrepaidPayment(Request $request)
+    {
+        $this->prepaidRepo->addingPrepaid($request);
+    }
+
+    public function prepaidList(Request $request)
+    {
+        $this->prepaidRepo->prepaidBalanceList($request);
+    }
 }

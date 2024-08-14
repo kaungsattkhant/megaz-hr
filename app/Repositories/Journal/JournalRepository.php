@@ -20,7 +20,7 @@ class JournalRepository implements JournalRepositoryInterface
             ->whereMonth('date', '=', $month)
             ->whereYear('date', '=', $year)
             ->with('ledgers.account')
-            ->get();
+            ->paginate(config('common.list_count'));
 
         ResponseData($journalLedger);
     }

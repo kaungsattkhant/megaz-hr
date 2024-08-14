@@ -12,4 +12,10 @@ class Prepaid extends Model
     protected $fillable=[
         'title','account_id','from_date','to_date','total_amount','prepaid_amount','monthly_cost','created_by'
     ];
+
+    public function prePaidPayments()
+    {
+        return $this->hasMany(PrepaidPayment::class);
+    }
+
 }
