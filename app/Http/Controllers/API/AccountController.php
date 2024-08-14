@@ -74,4 +74,10 @@ class AccountController extends Controller
         ResponseData($data);
     }
 
+    public function prepaidAccountList()
+    {
+        $data = $this->accountRepo->prepaidAccountList();
+        ResponseData($data);
+    }
+
 }

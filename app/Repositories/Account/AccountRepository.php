@@ -156,36 +156,43 @@ class AccountRepository implements AccountInterface
         }
     }
 
-    // public function prepaidAccountCreate(Request $request)
-    // {
-    //     $latestAccount = Account::where('account_id', $request->account_id)
-    //         ->orderByRaw("CAST(SUBSTRING_INDEX(account_code, '-', -1) AS UNSIGNED) DESC")
-    //         ->first();
+    public function prepaidAccountCreate(Request $request)
+    {
+        // $request->account_id = 49;
+        $latestAccount = Account::where('account_id', $request->account_id)
+            ->orderByRaw("CAST(SUBSTRING_INDEX(account_code, '-', -1) AS UNSIGNED) DESC")
+            ->first();
 
-    //     if ($latestAccount) {
-    //         $latestAccountCodeNo = explode('-', $latestAccount->account_code);
-    //         // dd($account_code_no[1]);
-    //         $new_account_code = (int) $latestAccountCodeNo[2] + 1;
-    //         $code = $latestAccountCodeNo[0] . '-' . $latestAccountCodeNo[1] . '-' . $new_account_code;
-    //     } else {
-    //         $code = $request->original_account_code . '-' . "1";
-    //     }
-    //     DB::beginTransaction();
-    //     try {
-    //         $account = Account::create([
-    //             'name' => $request->name,
-    //             'account_code' => $code,
-    //             'account_id' => $request->account_id,
-    //             'sub_account_id' => $request->sub_account_id,
-    //             'type'=>$request->type,
-    //         ]);
-    //         DB::commit();
-    //         return $account;
-    //     } catch (\Exception $e) {
-    //         DB::rollback();
-    //         ResponseMessage($e->getMessage(), 402);
-    //         throw $e;
-    //     }
-    // }
+        if ($latestAccount) {
+            $latestAccountCodeNo = explode('-', $latestAccount->account_code);
+            $new_account_code = (int) $latestAccountCodeNo[2] + 1;
+            $code = $latestAccountCodeNo[0] . '-' . $latestAccountCodeNo[1] . '-' . $new_account_code;
+        } else {
+            $code = $request->original_account_code . '-' . "1";
+        }
+
+        DB::beginTransaction();
+        try {
+            $account = Account::create([
+                'name' => $request->name,
+                'account_code' => $code,
+                'account_id' => $request->account_id,
+                'sub_account_id' => $request->sub_account_id,
+                'type'=>$request->type,
+            ]);
+            DB::commit();
+            return $account;
+        } catch (\Exception $e) {
+            DB::rollback();
+            ResponseMessage($e->getMessage(), 402);
+            throw $e;
+        }
+    }
+
+    public function prepaidAccountList()
+    {
+        $accounts = Account::where('sub_account_id',11)->where('type','is_second')->get();
+        return $accounts;
+    }
 
 }

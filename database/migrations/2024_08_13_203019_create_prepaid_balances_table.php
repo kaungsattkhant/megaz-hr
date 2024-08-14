@@ -13,13 +13,13 @@ return new class extends Migration
     {
         Schema::create('prepaid_balances', function (Blueprint $table) {
             $table->id();
-            $table->decimal('year');
-            $table->decimal('month');
-            $table->decimal('opening_balance');
-            $table->decimal('closing_balance');
-            $table->decimal('prepaid_amount');
-            $table->decimal('monthly_cost');
-            $table->decimal('cost');
+            $table->double('year');
+            $table->double('month');
+            $table->double('opening_balance');
+            $table->double('closing_balance');
+            $table->double('prepaid_amount');
+            $table->double('monthly_cost');
+            $table->double('cost');
             $table->foreignId('prepaid_id')->constrained()->onDelete('cascade');
             $table->timestamps();
         });
