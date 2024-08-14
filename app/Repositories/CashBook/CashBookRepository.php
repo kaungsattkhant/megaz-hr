@@ -2,9 +2,11 @@
 
 namespace App\Repositories\CashBook;
 
-use App\Http\Action\Transaction\CashBookTransaction;
-use App\Models\Transaction;
 use stdClass;
+use App\Models\Transaction;
+use App\Models\CashbookBalance;
+use Illuminate\Support\Facades\DB;
+use App\Http\Action\Transaction\CashBookTransaction;
 
 class CashBookRepository implements CashBookInterface
 {
@@ -62,20 +64,46 @@ class CashBookRepository implements CashBookInterface
 
     public function closeTransaction($request)
     {
+        DB::beginTransaction();
+        try {
         $cashAccountId = $request->cash_account_id;
-        $latestTransaction = Transaction::
-            whereHas('ledgers', function ($query) use ($cashAccountId) {
-            $query->where('account_id', $cashAccountId); #transaction close depend on transaction
-        })
-            ->isConfirmed(1)
-            ->latest()
-            ->first();
-        if ($latestTransaction) {
-            $latestTransaction->is_closing = 1;
-            $latestTransaction->closing_date = now();
-            $latestTransaction->save();
+        $openingBalance = (new CashBookTransaction())->getOpeningBalance($request);
+        $closingBalance=(new CashBookTransaction())->getClosingBalance($openingBalance->opening_balance,$request);
+        $cashbookBalance=CashbookBalance::updateOrCreate(
+            [
+                'year'=>now()->year,
+                'month'=>now()->month,
+                'cash_account_id'=>$cashAccountId,
+            ],
+            [
+            'year'=>now()->year,
+            'month'=>now()->month,
+            'opening_balance'=>$openingBalance->opening_balance,
+            'closing_balance'=>$closingBalance,
+            'cash_account_id'=>$cashAccountId,
+        ]);
+        if($cashbookBalance){
+            DB::commit();
             ResponseMessage('Transaction closing is successfully', 200);
         }
-        ResponseMessage('Transaction closing is fail', 422);
+    } catch (\Exception $e) {
+        DB::rollback();
+        ResponseMessage($e->getMessage(), 402);
+        throw $e;
+    }
+        // $latestTransaction = Transaction::
+        //     whereHas('ledgers', function ($query) use ($cashAccountId) {
+        //     $query->where('account_id', $cashAccountId); #transaction close depend on transaction
+        // })
+        //     ->isConfirmed(1)
+        //     ->latest()
+        //     ->first();
+        // if ($latestTransaction) {
+        //     $latestTransaction->is_closing = 1;
+        //     $latestTransaction->closing_date = now();
+        //     $latestTransaction->save();
+        //     ResponseMessage('Transaction closing is successfully', 200);
+        // }
+        // ResponseMessage('Transaction closing is fail', 422);
     }
 }

@@ -24,7 +24,6 @@ class TransactionRepository implements TransactionInterface
                 DB::raw("IF(action = 'debit', value, 0) AS debit_amount"),
                 DB::raw("IF(action = 'credit', value, 0) AS credit_amount")
             )->leftJoin('accounts', 'ledgers.account_id', '=', 'accounts.id');
-            
         }])
         ->when($account_id,function($q)use($account_id){
             $q->whereHas('ledgers',function($qa)use($account_id){
