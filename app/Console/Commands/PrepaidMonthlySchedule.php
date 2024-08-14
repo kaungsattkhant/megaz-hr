@@ -7,6 +7,7 @@ use App\Models\PrepaidBalance;
 use App\Models\PrepaidPayment;
 use Carbon\Carbon;
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\Log;
 
 class PrepaidMonthlySchedule extends Command
 {
@@ -34,20 +35,17 @@ class PrepaidMonthlySchedule extends Command
         $currentMonth = date('m');
         $lastMonth = Carbon::now()->subMonth();
         $prePaidBalances = PrepaidBalance::where('month',$lastMonth->month)->where('year',$lastMonth->year)->get();
-
         foreach($prePaidBalances as $prePaidBalance)
         {
             $prePaid = Prepaid::find($prePaidBalance->prepaid_id);
             $prePaidPaymentValue = PrepaidPayment::whereMonth('date_time',$lastMonth->month)->whereYear('date_time',$lastMonth->year)->where('prepaid_id',$prePaid->id)->sum('amount') ?? 0 ;
-
-            dd($prePaidPaymentValue);
             $newPrePaidBalances = PrepaidBalance::create([
                 'prepaid_id' => $prePaidBalance->prepaid_id,
                 'year' => $currentYear,
                 'month' => $currentMonth,
                 'opening_balance' => ($prePaidBalance->closing_balance + $prePaidPaymentValue),
                 'closing_balance' => (($prePaidBalance->closing_balance + $prePaidPaymentValue) - $prePaid->monthly_cost),
-                'prepaid_amount' => $prePaidBalance->prepaid_amount + $prePaidPaymentValue,
+                'prepaid_amount' => $prePaidBalance->prepaid_amount,
                 'monthly_cost' => $prePaid->monthly_cost,
                 'cost' => $prePaid->monthly_cost
             ]);

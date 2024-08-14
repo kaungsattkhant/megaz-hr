@@ -14,6 +14,7 @@ class Kernel extends ConsoleKernel
     {
         // $schedule->command('inspire')->hourly();
         $schedule->command('app:monthly-opening-and-closing')->monthly();
+        $schedule->command('app:prepaid-monthly-schedule')->everyMinute();
 
     }
 
