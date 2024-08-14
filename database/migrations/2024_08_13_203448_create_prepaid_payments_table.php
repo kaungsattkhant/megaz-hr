@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('prepaid_payments', function (Blueprint $table) {
             $table->id();
             $table->dateTime('date_time');
-            $table->decimal('amount');
+            $table->double('amount');
             $table->unsignedBigInteger('cash_account_id');
             $table->foreignId('prepaid_id')->constrained()->onDelete('cascade');
             $table->timestamps();

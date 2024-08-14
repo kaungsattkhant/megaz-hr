@@ -182,6 +182,7 @@ Route::middleware('auth:api')->group(function () {
         Route::get('get_second_account/{account_id}','getSecondAccount');
         Route::get('get_third_account/{account_id}','getThirdAccount');
         Route::post('create_prepaid_account','createPrePaidAccount');
+        Route::get('/prepaid_account_list','prepaidAccountList');
     });
     Route::controller(AssetController::class)->group(function () {
         Route::post('create_asset_item','createAssetItem');
