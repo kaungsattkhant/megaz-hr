@@ -46,7 +46,10 @@ class PrepaidRepository implements PrepaidRepositoryInterface
     {
         DB::beginTransaction();
         try {
-
+            $prepaid = Prepaid::find($request->prepaid_id);
+            $prepaidBalance = $prepaid->prepaidBalance;
+            $prepaidBalance->prepaid_amount += $request->amount;
+            $prepaidBalance->save();
             $prePaidPayment = PrepaidPayment::create([
                 'date_time' => CurrentTime(),
                 'amount' => $request->amount,
@@ -68,10 +71,11 @@ class PrepaidRepository implements PrepaidRepositoryInterface
         $currentYear = date('Y');
         $month = $request->input('month', date('m'));
 
-        $prepaid = PrepaidBalance::where('month', $month)
+        $prepaids = PrepaidBalance::where('month', $month)
             ->where('year', $currentYear)
             ->with('prepaid')
             ->paginate(config('common.list_count'));
-        ResponseData($prepaid);
+
+        ResponseData($prepaids);
     }
 }

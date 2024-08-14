@@ -13,9 +13,14 @@ class Prepaid extends Model
         'title','account_id','from_date','to_date','total_amount','prepaid_amount','monthly_cost','created_by'
     ];
 
-    public function prePaidPayments()
+    public function prepaidPayments()
     {
         return $this->hasMany(PrepaidPayment::class);
+    }
+
+    public function prepaidBalance()
+    {
+        return $this->hasOne(PrepaidBalance::class)->latest();
     }
 
 }
