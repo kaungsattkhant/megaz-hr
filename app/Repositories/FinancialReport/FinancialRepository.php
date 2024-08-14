@@ -130,14 +130,34 @@ class FinancialRepository implements FinancialInterface
         $totalDebitAmount = array_sum(array_column($debitResults, 'total_amount'));
         $totalCreditAmount = array_sum(array_column($creditResults, 'total_amount'));
 
-        $openingBalance = CashbookBalance::where('year', $previousMonth->year)
+        //cash book opening
+        $previousClosingBalance = CashbookBalance::where('year', $previousMonth->year)
         ->where('month', $previousMonth->month)
-        ->value('opening_balance') ?? 0;
-        // ->get();
-        // return $debitResults;
+        ->value('closing_balance') ?? 0;
+
+       //cashbook  closing
+
+       $totals = DB::table('ledgers')
+       ->join('accounts','ledgers.account_id','accounts.id')
+       ->join('sub_accounts','accounts.sub_account_id','sub_accounts.id')
+       ->select(
+           DB::raw('SUM(CASE WHEN action = "debit" THEN value ELSE 0 END) as total_cashbook_debit_amount'),
+           DB::raw('SUM(CASE WHEN action = "credit" THEN value ELSE 0 END) as total_cashbook_credit_amount')
+       )
+       ->whereYear('ledgers.created_at', $current->year)
+       ->whereMonth('ledgers.created_at', $current->month)
+    //    ->whereBetween('account_id',[23,34])
+       ->where('sub_accounts.account_code','2-1000')
+       ->first();
+    //    dd($totals);
+   $totalDebitAmount = (int)$totals->total_cashbook_debit_amount;
+   $totalCreditAmount = (int)$totals->total_cashbook_credit_amount;
+   $closingBalance=((int)$previousClosingBalance+$totalDebitAmount)-$totalCreditAmount;
+
         $results = array_merge($debitResults, $creditResults);
         return [
-            'opening_balance'=>$openingBalance,
+            'opening_balance'=>$previousClosingBalance,
+            'closing_balance'=>$closingBalance,
             'total_receipt_amount' => $totalDebitAmount,
             'total_payment_amount' => $totalCreditAmount,
             'cash_flow_statement' => $results,
