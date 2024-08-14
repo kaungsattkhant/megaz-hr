@@ -70,6 +70,7 @@ use App\Http\Controllers\API\Customers\CustomerAPIController as UserAppCustomerA
 use App\Http\Controllers\API\Customers\PackageAPIController as CustomersPackageAPIController;
 use App\Http\Controllers\API\Customers\MenuCategoryAPIController as CustomerMenuCategoryAPIController;
 use App\Http\Controllers\API\JournalAPIController;
+use App\Http\Controllers\API\PrepaidAPIController;
 use App\Http\Controllers\API\StaffAdvanceAPIController;
 
 /*
@@ -180,6 +181,9 @@ Route::middleware('auth:api')->group(function () {
         Route::post('create_third_account','createThirdAccount');
         Route::get('get_second_account/{account_id}','getSecondAccount');
         Route::get('get_third_account/{account_id}','getThirdAccount');
+        Route::post('create_prepaid_account','createPrePaidAccount');
+        Route::get('/prepaid_account_list','prepaidAccountList');
+
     });
     Route::controller(AssetController::class)->group(function () {
         Route::post('create_asset_item','createAssetItem');
@@ -296,6 +300,14 @@ Route::middleware('auth:api')->group(function () {
     Route::controller(StaffAdvanceAPIController::class)->group(function()
     {
         Route::post('/staff_advances','createStaffAdvance');
+    });
+
+    Route::controller(PrepaidAPIController::class)->group(function()
+    {
+        Route::get('/prepaid_lists','prepaidList');
+        Route::post('/prepaids','createPrepaid');
+        Route::post('/prepaid_payments','createPrepaidPayment');
+
     });
 
 

@@ -24,7 +24,7 @@
             </div>
         </div>
 
-        
+
         <div class="box-container-table">
             <div class="overflow-x-auto">
                 <div class=" table-container ">
@@ -83,7 +83,7 @@
                                 </td>
                                 <td class="whitespace-nowrap"></td>
                                 <td class="whitespace-nowrap">
-                                    {{ adv.type == 'additional' ? adv.amount : ''}}
+                                    {{ adv.type == 'addition' ? adv.amount : ''}}
                                 </td>
                                 <td class="whitespace-nowrap">
                                     {{ adv.type == 'settlement' ? adv.amount : ''}}
