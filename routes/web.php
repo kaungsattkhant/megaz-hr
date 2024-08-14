@@ -215,3 +215,4 @@ Route::view('/journals', 'journals.index')->name('journal');
 Route::view('/advanced', 'advanced.index')->name('advance');
 
 Route::view('/advanced/{id}/detail', 'advanced.detail');
+Route::view('prepaid', 'prepaid.index');

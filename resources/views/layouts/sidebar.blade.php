@@ -14,14 +14,14 @@
 
                             <li>
                                 <a href="{{ route('journal') }}" class="flex items-center @yield('journals')">
-                                    <i class="far fa-books"></i>
+                                    <i class="fal fa-books pr-3"></i>
                                     Journal
                                 </a>
                             </li>
 
                             <li>
                                 <a href="{{ route('advance') }}" class="flex items-center @yield('advanced')">
-                                    <i class="fas fa-balance-scale-right"></i>
+                                    <i class="fal fa-balance-scale-right pr-3"></i>
                                     Staff Balance
                                 </a>
                             </li>
