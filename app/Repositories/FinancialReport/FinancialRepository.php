@@ -11,7 +11,7 @@ class FinancialRepository implements FinancialInterface
     public function CashFlowStatement($request)
     {
         // $month = $request->month != null ? $request->month : now()->month;
-        $current=Carbon::now();
+        $current = Carbon::now();
         $previousMonth = Carbon::now()->subMonth();
         $receiptSubAccountCode = ['2-1000', '2-1050', '2-2000', '4-3000', '5-0000', '5-1010', '5-1000', '4-4000', '3-1000'];
         $receptAceiptAction = 'debit';
@@ -19,17 +19,17 @@ class FinancialRepository implements FinancialInterface
         $paymentSubAccountCode = ['1-1000', '1-1100', '2-1000', '2-1020', '2-1050', '2-3000', '2-4000', '3-2000', '4-1000', '4-2000', '4-3000', '4-4000', '6-0000', '6-2000', '6-3000', '6-4000', '6-5000', '6-6000', '6-7000', '6-8000', '6-9000', '3-1000'];
         $paymentAceiptAction = 'credit';
 
-            $totalDebitAmount = DB::table('sub_accounts')
-                ->leftJoin('accounts', 'accounts.sub_account_id', '=', 'sub_accounts.id')
-                ->leftJoin('ledgers', function ($join) use ($receptAceiptAction) {
-                    $join->on('ledgers.account_id', '=', 'accounts.id')
-                        ->where('ledgers.action', '=', $receptAceiptAction);
-                })
-                ->leftJoin('transactions', 'ledgers.transaction_id', '=', 'transactions.id')
-                ->whereIn('sub_accounts.account_code', $receiptSubAccountCode)
-                ->where('transactions.is_confirmed', 1)
-                ->whereMonth('ledgers.created_at','<=',$previousMonth)
-                ->sum('ledgers.value');
+        $totalDebitAmount = DB::table('sub_accounts')
+            ->leftJoin('accounts', 'accounts.sub_account_id', '=', 'sub_accounts.id')
+            ->leftJoin('ledgers', function ($join) use ($receptAceiptAction) {
+                $join->on('ledgers.account_id', '=', 'accounts.id')
+                    ->where('ledgers.action', '=', $receptAceiptAction);
+            })
+            ->leftJoin('transactions', 'ledgers.transaction_id', '=', 'transactions.id')
+            ->whereIn('sub_accounts.account_code', $receiptSubAccountCode)
+            ->where('transactions.is_confirmed', 1)
+            ->whereMonth('ledgers.created_at', '<=', $previousMonth)
+            ->sum('ledgers.value');
         $totalCreditAmount = DB::table('sub_accounts')
             ->leftJoin('accounts', 'accounts.sub_account_id', '=', 'sub_accounts.id')
             ->leftJoin('ledgers', function ($join) use ($paymentAceiptAction) {
@@ -39,7 +39,7 @@ class FinancialRepository implements FinancialInterface
             ->leftJoin('transactions', 'ledgers.transaction_id', '=', 'transactions.id')
             ->whereIn('sub_accounts.account_code', $paymentSubAccountCode)
             ->where('transactions.is_confirmed', 1)
-            ->whereMonth('ledgers.created_at','<=',$previousMonth)
+            ->whereMonth('ledgers.created_at', '<=', $previousMonth)
             ->sum('ledgers.value');
 
         $debitResults = DB::table('sub_accounts')
@@ -49,7 +49,7 @@ class FinancialRepository implements FinancialInterface
                 $join->on('ledgers.account_id', '=', 'accounts.id')
                     ->where('ledgers.action', '=', $receptAceiptAction);
             })
-            ->whereMonth('ledgers.created_at',$current)
+            ->whereMonth('ledgers.created_at', $current)
             ->leftJoin('transactions', 'ledgers.transaction_id', '=', 'transactions.id')
             ->whereIn('sub_accounts.account_code', $receiptSubAccountCode)
             ->groupBy('sub_accounts.id', 'sub_accounts.name', 'sub_accounts.account_code', 'accounts.id', 'accounts.name', 'accounts.account_code')
@@ -94,7 +94,7 @@ class FinancialRepository implements FinancialInterface
             })
             ->leftJoin('transactions', 'ledgers.transaction_id', '=', 'transactions.id')
             ->whereIn('sub_accounts.account_code', $paymentSubAccountCode)
-            ->whereMonth('ledgers.created_at',$current)
+            ->whereMonth('ledgers.created_at', $current)
             ->groupBy('sub_accounts.id', 'sub_accounts.name', 'sub_accounts.account_code', 'accounts.id', 'accounts.name', 'accounts.account_code')
             ->selectRaw('
         SUM(CASE WHEN transactions.is_confirmed = 1 AND ledgers.action = ? THEN ledgers.value ELSE 0 END) as total_amount,
@@ -132,32 +132,29 @@ class FinancialRepository implements FinancialInterface
 
         //cash book opening
         $previousClosingBalance = CashbookBalance::where('year', $previousMonth->year)
-        ->where('month', $previousMonth->month)
-        ->value('closing_balance') ?? 0;
+            ->where('month', $previousMonth->month)
+            ->value('closing_balance') ?? 0;
 
-       //cashbook  closing
-
-       $totals = DB::table('ledgers')
-       ->join('accounts','ledgers.account_id','accounts.id')
-       ->join('sub_accounts','accounts.sub_account_id','sub_accounts.id')
-       ->select(
-           DB::raw('SUM(CASE WHEN action = "debit" THEN value ELSE 0 END) as total_cashbook_debit_amount'),
-           DB::raw('SUM(CASE WHEN action = "credit" THEN value ELSE 0 END) as total_cashbook_credit_amount')
-       )
-       ->whereYear('ledgers.created_at', $current->year)
-       ->whereMonth('ledgers.created_at', $current->month)
-    //    ->whereBetween('account_id',[23,34])
-       ->where('sub_accounts.account_code','2-1000')
-       ->first();
-    //    dd($totals);
-   $totalDebitAmount = (int)$totals->total_cashbook_debit_amount;
-   $totalCreditAmount = (int)$totals->total_cashbook_credit_amount;
-   $closingBalance=((int)$previousClosingBalance+$totalDebitAmount)-$totalCreditAmount;
-
+        //cashbook  closing
+        $totals = DB::table('ledgers')
+            ->join('accounts', 'ledgers.account_id', 'accounts.id')
+            ->join('sub_accounts', 'accounts.sub_account_id', 'sub_accounts.id')
+            ->select(
+                DB::raw('SUM(CASE WHEN action = "debit" THEN value ELSE 0 END) as total_cashbook_debit_amount'),
+                DB::raw('SUM(CASE WHEN action = "credit" THEN value ELSE 0 END) as total_cashbook_credit_amount')
+            )
+            ->whereYear('ledgers.created_at', $current->year)
+            ->whereMonth('ledgers.created_at', $current->month)
+            ->where('sub_accounts.account_code', config('common.cash_code'))
+            ->first();
+        $totalDebitAmount = (int) $totals->total_cashbook_debit_amount;
+        $totalCreditAmount = (int) $totals->total_cashbook_credit_amount;
+        $closingBalance = ((int) $previousClosingBalance + $totalDebitAmount) - $totalCreditAmount;
+        #end cashbook
         $results = array_merge($debitResults, $creditResults);
         return [
-            'opening_balance'=>$previousClosingBalance,
-            'closing_balance'=>$closingBalance,
+            'opening_balance' => $previousClosingBalance,
+            'closing_balance' => $closingBalance,
             'total_receipt_amount' => $totalDebitAmount,
             'total_payment_amount' => $totalCreditAmount,
             'cash_flow_statement' => $results,

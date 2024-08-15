@@ -10,4 +10,5 @@ return [
     'pos_cash'=>33,
     'pos_bank'=>34,
     'liabilities'=>4,
+    'cash_code'=>"2-1000",
 ];
