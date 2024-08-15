@@ -4,6 +4,8 @@
             Prepaid
         </p>
     </div>
+    <notifications position="top center" />
+
     <div class="mt-4 bg-white">
         <div class="btn-container">
             <div class=" flex">
@@ -369,16 +371,8 @@
                 selectedMonth:null,
                 selectedNewMonth:null,
                 currentMonth:null,
-
-
-
-
                 step: 1,
 
-
-
-                // dateTimeString: '2024-08-12T14:30:00Z',
-                // formattedDate: '',
             };
         },
 
@@ -435,10 +429,19 @@
                     this.step = '1';
                     this.name = null;
                     this.selected_second_account = null;
-                    console.log('journal created')
+                    this.$notify({
+                    title: `Input validation`,
+                    text: 'Account created successfully',
+                    type: "success"
+                    });
+
                 }
                 else{
-
+                    this.$notify({
+                    title: `Input validation`,
+                    text: response.message,
+                    type: "warn"
+                    });
                 }
             },
 
@@ -463,10 +466,18 @@
                 if(response.success){
                     this.getPrepaidList(this.currentMonth);
                     this.closeAndClearPrepaidModal();
-                    console.log('prepaid created')
+                    this.$notify({
+                    title: `Input validation`,
+                    text: 'Prepaid created successfully',
+                    type: "success"
+                    });
                 }
                 else{
-
+                    this.$notify({
+                    title: `Input validation`,
+                    text: response.message,
+                    type: "warn"
+                });
                 }
             },
 
@@ -490,10 +501,18 @@
                 if(response.success){
                     this.getPrepaidList(this.currentMonth);
                     this.closeAndClearPaymentModal();
-                    console.log('prepaid created')
+                    this.$notify({
+                    title: `Input validation`,
+                    text: 'Payment added successfully',
+                    type: "success"
+                    });
                 }
                 else{
-
+                    this.$notify({
+                    title: `Input validation`,
+                    text: response.message,
+                    type: "warn"
+                });
                 }
             },
 

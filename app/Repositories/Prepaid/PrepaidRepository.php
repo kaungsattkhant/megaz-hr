@@ -2,6 +2,7 @@
 
 namespace App\Repositories\Prepaid;
 
+use App\Http\Action\Transaction\StoreTransactionLedger;
 use App\Models\Prepaid;
 use App\Models\PrepaidBalance;
 use App\Models\PrepaidPayment;
@@ -29,8 +30,33 @@ class PrepaidRepository implements PrepaidRepositoryInterface
                 'cost' => 0,
                 'monthly_cost' => 0,
                 'closing_balance' => $data['prepaid_amount'],
-                'prepaid_amount' => 0,
+                'prepaid_amount' => $data['prepaid_amount'],
                 'prepaid_id' => $prepaid->id
+            ]);
+
+            $transaction = (new StoreTransactionLedger())->createTransaction([
+                'date' => now(),
+                'created_by' => UserData()->id,
+                'description' => "prepaid",
+                'transactionable_id' =>$prepaid->id,
+                'transactionable_type' => 'prepaid',
+                'is_confirmed' => 1,
+            ]);
+
+            $creditLedger = (new StoreTransactionLedger())->storeLedger([
+                'value' => $data['prepaid_amount'],
+                'transaction_id' => $transaction->id,
+                'account_id' => $data['cash_account_id'],
+                'action' => 'credit',
+                'is_cashier_confirmed' => 0
+            ]);
+
+            $debitLedger =  (new StoreTransactionLedger())->storeLedger([
+                'value' => $data['prepaid_amount'],
+                'transaction_id' => $transaction->id,
+                'account_id' => $data['account_id'],
+                'action' => 'debit',
+                'is_cashier_confirmed' => 0
             ]);
 
             DB::commit();
@@ -47,14 +73,43 @@ class PrepaidRepository implements PrepaidRepositoryInterface
         DB::beginTransaction();
         try {
             $prepaid = Prepaid::find($request->prepaid_id);
-            $prepaidBalance = $prepaid->prepaidBalance;
-            $prepaidBalance->prepaid_amount += $request->amount;
-            $prepaidBalance->save();
+            $prePaidPaymentValue = PrepaidPayment::where('prepaid_id',$prepaid->id)->sum('amount') ?? 0 ;
+            $validationValue = $prePaidPaymentValue + $request->amount + $prepaid->prepaid_amount;
+            if($prepaid->total_amount < $validationValue)
+            {
+                ResponseMessage('Invalid Data',422);
+            }
+
             $prePaidPayment = PrepaidPayment::create([
                 'date_time' => CurrentTime(),
                 'amount' => $request->amount,
                 'cash_account_id' => $request->cash_account_id,
                 'prepaid_id' => $request->prepaid_id
+            ]);
+
+            $transaction = (new StoreTransactionLedger())->createTransaction([
+                'date' => now(),
+                'created_by' => UserData()->id,
+                'description' => "prepaid",
+                'transactionable_id' =>$prepaid->id,
+                'transactionable_type' => 'prepaid',
+                'is_confirmed' => 1,
+            ]);
+
+            $creditLedger = (new StoreTransactionLedger())->storeLedger([
+                'value' => $request->amount,
+                'transaction_id' => $transaction->id,
+                'account_id' => $request->cash_account_id,
+                'action' => 'credit',
+                'is_cashier_confirmed' => 0
+            ]);
+
+            $debitLedger =  (new StoreTransactionLedger())->storeLedger([
+                'value' => $request->amount,
+                'transaction_id' => $transaction->id,
+                'account_id' => $prepaid->account_id,
+                'action' => 'debit',
+                'is_cashier_confirmed' => 0
             ]);
 
             DB::commit();

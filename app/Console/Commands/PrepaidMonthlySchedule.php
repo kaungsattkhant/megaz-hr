@@ -34,7 +34,7 @@ class PrepaidMonthlySchedule extends Command
         $currentYear = date('Y');
         $currentMonth = date('m');
         $lastMonth = Carbon::now()->subMonth();
-        $prePaidBalances = PrepaidBalance::where('month',$lastMonth->month)->where('year',$lastMonth->year)->get();
+        $prePaidBalances = PrepaidBalance::where('month',$lastMonth->month)->where('year',$lastMonth->year)->where('closing_balance', '!=', 0)->get();
         foreach($prePaidBalances as $prePaidBalance)
         {
             $prePaid = Prepaid::find($prePaidBalance->prepaid_id);
