@@ -14,7 +14,7 @@ class Kernel extends ConsoleKernel
     {
         // $schedule->command('inspire')->hourly();
         $schedule->command('app:monthly-opening-and-closing')->monthly();
-        $schedule->command('app:prepaid-monthly-schedule')->everyMinute();
+        $schedule->command('app:prepaid-monthly-schedule')->everyThirtySeconds();
 
     }
 
@@ -25,9 +25,6 @@ class Kernel extends ConsoleKernel
     {
         $this->load(__DIR__.'/Commands');
 
-        // $this->commands([
-        //     \App\Console\Commands\monthlyOpeningAndClosing::class,
-        // ]);
 
         require base_path('routes/console.php');
     }

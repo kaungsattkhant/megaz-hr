@@ -307,13 +307,8 @@ Route::middleware('auth:api')->group(function () {
         Route::get('/prepaid_lists','prepaidList');
         Route::post('/prepaids','createPrepaid');
         Route::post('/prepaid_payments','createPrepaidPayment');
-
     });
-
-
 });
-
-
 
 Route::controller(PackageAPIController::class)->group(function()
     {

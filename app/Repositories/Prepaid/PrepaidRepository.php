@@ -29,7 +29,7 @@ class PrepaidRepository implements PrepaidRepositoryInterface
                 'cost' => 0,
                 'monthly_cost' => 0,
                 'closing_balance' => $data['prepaid_amount'],
-                'prepaid_amount' => $data['prepaid_amount'],
+                'prepaid_amount' => 0,
                 'prepaid_id' => $prepaid->id
             ]);
 
@@ -73,7 +73,12 @@ class PrepaidRepository implements PrepaidRepositoryInterface
 
         $prepaids = PrepaidBalance::where('month', $month)
             ->where('year', $currentYear)
-            ->with('prepaid')
+            ->with(['prepaid' => function ($query) use ($month, $currentYear) {
+                $query->withSum(['prepaidPayments as payment' => function ($query) use ($month, $currentYear) {
+                    $query->whereYear('date_time', $currentYear)
+                          ->whereMonth('date_time', $month);
+                }], 'amount');
+            }])
             ->paginate(config('common.list_count'));
 
         ResponseData($prepaids);

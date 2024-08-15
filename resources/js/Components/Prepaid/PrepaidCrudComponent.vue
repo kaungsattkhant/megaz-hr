@@ -98,7 +98,7 @@
                                         {{ prepaid.prepaid.total_amount }}
                                     </td>
                                     <td class=" align-middle">
-                                        {{ prepaid.prepaid.prepaid_amount }}
+                                        {{ prepaid.prepaid_amount }}
                                     </td>
                                     <td class=" align-middle">
                                         {{ prepaid.cost }}
@@ -107,22 +107,22 @@
                                         {{ prepaid.opening_balance }}
                                     </td>
                                     <td class=" align-middle">
-                                        {{ prepaid.prepaid.monthly_cost }}
+                                        {{ prepaid.monthly_cost }}
                                     </td>
                                     <td class=" align-middle">
                                         {{ prepaid.closing_balance }}
                                     </td>
-                                    <td class=" align-middle">
-                                        {{ prepaid.prepaid_amount }}
+                                    <td class="align-middle">
+                                        {{ prepaid.prepaid.payment || 0 }}
                                     </td>
                                     <td class=" align-middle">
-                                        <button 
+                                        <button
                                         data-te-toggle="modal" data-te-target="#create_payment_modal" @click="btnClickedPaymentModal(prepaid)">
                                             <i class="fal fa-plus" ></i>
                                         </button>
-                                        
+
                                     </td>
-                                    
+
                                 </tr>
 
                             </div>
@@ -184,7 +184,7 @@
                                         <label for="end_date" class="relative">
                                             <input type="date" placeholder="To" id="end_date" v-model="end_date" class="input-ui">
                                         </label>
-                                        
+
                                     </div>
                                     <div class="mb-4">
                                         <label class="label-form mb-3">Total</label>
@@ -205,7 +205,7 @@
                                             <option class="text-sm" :value="cashbook" v-for="(cashbook,index) in cashbookList" :key="index">
                                                 {{ cashbook.name }}
                                             </option>
-        
+
                                         </select>
                                     </div>
                                 </div>
@@ -230,7 +230,7 @@
                                     Create Account
                                 </h5>
                                 <div>
-                                    
+
                                 </div>
                             </div>
                             <div class="relative px-12 py-4 border-b" data-te-modal-body-ref>
@@ -249,7 +249,7 @@
                                         </option>
                                     </select>
                                 </div>
-                            
+
                             </div>
                             <div class="flex justify-end gap-x-4 px-6 mb-6 pt-4">
                                 <button type="button" class="cancel-btn focus:shadow-none focus:outline-none"
@@ -295,7 +295,7 @@
                                     <label for="" class="label-form mb-3">
                                         Payment
                                     </label>
-                                    <input type="text" placeholder="Payment" v-model="payment_amount" class="input-ui">
+                                    <input type="number" placeholder="Payment" v-model="payment_amount" class="input-ui">
                                 </div>
                                 <div class="mb-4">
                                     <label class="label-form mb-3">Cashbook</label>
@@ -306,7 +306,7 @@
                                         </option>
                                     </select>
                                 </div>
-                                
+
                             </div>
                             <div class="flex justify-end gap-x-4 px-6 mb-6 pt-4">
                                 <button type="button" class="cancel-btn focus:shadow-none focus:outline-none"
@@ -360,20 +360,20 @@
                 payment_amount:null,
                 selectedPaymentCashbook:null,
                 paymentToPrepaid:null,
-                
+
                 name:null,
                 selected_second_account:null,
                 isCreatePrepaid:false,
                 isCreateAccount:true,
 
-                
+
 
 
                 step: 1,
 
 
 
-                // dateTimeString: '2024-08-12T14:30:00Z', 
+                // dateTimeString: '2024-08-12T14:30:00Z',
                 // formattedDate: '',
             };
         },
@@ -406,7 +406,7 @@
                     this.cashbookList = response.data;
                 }
             },
-            
+
             btnClickedCreateAccount(){
                 this.createAccount();
             },
@@ -432,10 +432,9 @@
                 }
             },
 
-            
+
 
             btnClickedCreatePrepaid(){
-                this.
                 this.createPrepaid();
             },
 
@@ -476,7 +475,7 @@
                 let formData = new FormData();
                 formData.append('amount', this.payment_amount);
                 formData.append('cash_account_id', this.selectedPaymentCashbook.id);
-                formData.append('prepaid_id', this.paymentToPrepaid.id);
+                formData.append('prepaid_id', this.paymentToPrepaid.prepaid.id);
                 let response = await postApiData({url: '/api/prepaid_payments', form_data: formData, token: this.getToken()});
                 if(response.success){
                     this.getPrepaidList();
@@ -487,7 +486,7 @@
 
                 }
             },
-            
+
 
             closeAndClearPrepaidModal(){
                 this.title = null;
@@ -530,7 +529,7 @@
             this.getPrepaidList();
             // this.formattedDate = new Date(this.dateTimeString).toLocaleDateString();
             // this.formattedDate = this.dateTimeString.split('T')[0]
-            
+
 
         }
 

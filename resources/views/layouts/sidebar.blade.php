@@ -25,6 +25,13 @@
                                     Staff Balance
                                 </a>
                             </li>
+
+                            <li>
+                                <a href="{{ route('prepaid') }}" class="flex items-center @yield('prepaid')">
+                                    <i class="fas fa-dollar-sign"></i>
+                                    Prepaid
+                                </a>
+                            </li>
                         @endif
                         @if (checkFeaturePermission('department'))
                             <li>

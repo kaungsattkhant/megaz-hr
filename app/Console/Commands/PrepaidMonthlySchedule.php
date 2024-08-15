@@ -45,7 +45,7 @@ class PrepaidMonthlySchedule extends Command
                 'month' => $currentMonth,
                 'opening_balance' => ($prePaidBalance->closing_balance + $prePaidPaymentValue),
                 'closing_balance' => (($prePaidBalance->closing_balance + $prePaidPaymentValue) - $prePaid->monthly_cost),
-                'prepaid_amount' => $prePaidBalance->prepaid_amount,
+                'prepaid_amount' => $prePaidBalance->prepaid_amount + $prePaidPaymentValue,
                 'monthly_cost' => $prePaid->monthly_cost,
                 'cost' => $prePaid->monthly_cost
             ]);

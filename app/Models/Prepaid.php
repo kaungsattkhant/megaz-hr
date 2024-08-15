@@ -23,4 +23,6 @@ class Prepaid extends Model
         return $this->hasOne(PrepaidBalance::class)->latest();
     }
 
+
+
 }
