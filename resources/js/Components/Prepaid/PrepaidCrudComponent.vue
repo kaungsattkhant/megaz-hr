@@ -79,8 +79,48 @@
                         <tbody>
                             <div class="contents" v-for="(prepaid, index) in prepaidList" :key="index">
                                 <tr class="">
-                                    <td class=" align-middle" rowspan="12">
-                                        test
+                                    <td class=" align-middle">
+                                        {{ index+1 }}
+                                    </td>
+                                    <td class=" align-middle">
+                                        {{ prepaid.prepaid.title }}
+                                    </td>
+                                    <td class=" align-middle">
+                                        {{ prepaid.prepaid.from_date }}
+                                    </td>
+                                    <td class=" align-middle">
+                                        {{ prepaid.prepaid.to_date }}
+                                    </td>
+                                    <td class=" align-middle">
+                                        ....
+                                    </td>
+                                    <td class=" align-middle">
+                                        {{ prepaid.prepaid.total_amount }}
+                                    </td>
+                                    <td class=" align-middle">
+                                        {{ prepaid.prepaid.prepaid_amount }}
+                                    </td>
+                                    <td class=" align-middle">
+                                        {{ prepaid.cost }}
+                                    </td>
+                                    <td class=" align-middle">
+                                        {{ prepaid.opening_balance }}
+                                    </td>
+                                    <td class=" align-middle">
+                                        {{ prepaid.prepaid.monthly_cost }}
+                                    </td>
+                                    <td class=" align-middle">
+                                        {{ prepaid.closing_balance }}
+                                    </td>
+                                    <td class=" align-middle">
+                                        {{ prepaid.prepaid_amount }}
+                                    </td>
+                                    <td class=" align-middle">
+                                        <button 
+                                        data-te-toggle="modal" data-te-target="#create_payment_modal" @click="btnClickedPaymentModal(prepaid)">
+                                            <i class="fal fa-plus" ></i>
+                                        </button>
+                                        
                                     </td>
                                     
                                 </tr>
@@ -92,101 +132,102 @@
             </div>
 
 
-            <!-- Modal -->
+            <!-- prepaid Modal -->
             <div data-te-modal-init
                 class="fixed left-0 top-0 z-[1055] hidden h-full w-full overflow-y-auto overflow-x-hidden outline-none"
                 id="create_modal" tabindex="-1" aria-labelledby="create_modalLabel" aria-hidden="true">
                 <div data-te-modal-dialog-ref
                     class="pointer-events-none relative w-auto mb-12 translate-y-[-50px] opacity-0 transition-all duration-300 ease-in-out min-[576px]:mx-auto min-[576px]:mt-7 min-[576px]:max-w-[500px]">
                     <div class="min-[576px]:shadow-[0_0.5rem_1rem_rgba(#000, 0.15)] pointer-events-auto relative flex w-full flex-col rounded-md border-none bg-white bg-clip-padding text-current shadow-lg outline-none">
-                        <div v-show="isCreatePrepaid">
-                            <div class="relative flex justify-between py-2 px-6 border-b">
-                                <h5 class="text-base text-center mt-2 font-semibold leading-normal font-inter"
-                                    id="create_modalLabel">
-                                    Create Prepaid
-                                </h5>
-                                <button type="button" class="text-xs focus:shadow-none focus:outline-none"
-                                    data-te-modal-dismiss aria-label="Close" id="close">
-                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                                        stroke-width="1.5" stroke="currentColor" class="h-4 w-4">
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
-                                    </svg>
-                                </button>
-                            </div>
-                            <div class="relative px-12 py-4 border-b" data-te-modal-body-ref>
-                                <div class="mb-4">
-                                    <label for="" class="label-form mb-3">
-                                        Title
-                                    </label>
-                                    <input type="text" placeholder="Particular" v-model="title" class="input-ui">
-                                </div>
-                                <div class="mb-4 relative">
-                                    <label class="label-form mb-3">Account Name</label>
-                                    <select class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0"
-                                        v-model="selected_accouunt">
-                                        <option class="text-sm" :value="acc" v-for="(acc,index) in acc_list" :key="index">
-                                            {{ acc.name }}
-                                        </option>
-                                    </select>
-
-                                    <button class="text-xs absolute -right-6 top-1/2">
-                                        <i class="fal fa-plus"></i>
+                        <div v-show="step == '1'">
+                            <form @submit.prevent="btnClickedCreatePrepaid()">
+                                <div class="relative flex justify-between py-2 px-6 border-b">
+                                    <h5 class="text-base text-center mt-2 font-semibold leading-normal font-inter"
+                                        id="create_modalLabel">
+                                        Create Prepaid
+                                    </h5>
+                                    <button type="button" class="text-xs focus:shadow-none focus:outline-none"
+                                        data-te-modal-dismiss aria-label="Close" id="close">
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                            stroke-width="1.5" stroke="currentColor" class="h-4 w-4">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                                        </svg>
                                     </button>
                                 </div>
-                                <div class="mb-4">
-                                    <label class="label-form mb-3">From</label>
-                                    <label for="start_date" class="relative">
-                                        <input type="date" placeholder="From" id="start_date" v-model="selected_start_date" class="input-ui">
-                                    </label>
+                                <div class="relative px-12 py-4 border-b" data-te-modal-body-ref>
+                                    <div class="mb-4">
+                                        <label for="" class="label-form mb-3">
+                                            Title
+                                        </label>
+                                        <input type="text" placeholder="Title" v-model="title" class="input-ui">
+                                    </div>
+                                    <div class="mb-4 relative">
+                                        <label class="label-form mb-3">Account Name</label>
+                                        <select class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0"
+                                            v-model="selectedAccount">
+                                            <option class="text-sm" :value="acc" v-for="(acc,index) in accountList" :key="index">
+                                                {{ acc.name }}
+                                            </option>
+                                        </select>
+                                        <button type="button" class="text-xs absolute -right-6 top-1/2" @click="step = 2">
+                                            <i class="fal fa-plus"></i>
+                                        </button>
+                                    </div>
+                                    <div class="mb-4">
+                                        <label class="label-form block mb-3">From</label>
+                                        <label for="start_date" class="relative">
+                                            <input type="date" placeholder="From" id="start_date" v-model="start_date" class="input-ui">
+                                        </label>
+                                    </div>
+                                    <div class="mb-4">
+                                        <label class="label-form block mb-3">To</label>
+                                        <label for="end_date" class="relative">
+                                            <input type="date" placeholder="To" id="end_date" v-model="end_date" class="input-ui">
+                                        </label>
+                                        
+                                    </div>
+                                    <div class="mb-4">
+                                        <label class="label-form mb-3">Total</label>
+                                        <input type="Number" placeholder="Total" v-model="total" class="input-ui">
+                                    </div>
+                                    <div class="mb-4">
+                                        <label class="label-form mb-3">Monthly Cost</label>
+                                        <input type="Number" placeholder="Monthly Cost" v-model="monthly_cost" class="input-ui">
+                                    </div>
+                                    <div class="mb-4">
+                                        <label class="label-form mb-3">Prepaid Amount</label>
+                                        <input type="Number" placeholder="Amount" v-model="prepaid_amount" class="input-ui">
+                                    </div>
+                                    <div class="mb-4">
+                                        <label class="label-form mb-3">Cashbook</label>
+                                        <select class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0"
+                                            v-model="selected_cashbook">
+                                            <option class="text-sm" :value="cashbook" v-for="(cashbook,index) in cashbookList" :key="index">
+                                                {{ cashbook.name }}
+                                            </option>
+        
+                                        </select>
+                                    </div>
                                 </div>
-                                <div class="mb-4">
-                                    <label class="label-form mb-3">To</label>
-                                    <label for="end_date" class="relative">
-                                        <input type="date" placeholder="To" id="end_date" v-model="selected_end_date" class="input-ui">
-                                    </label>
-                                    
+                                <div class="flex justify-end gap-x-4 px-6 mb-6 pt-4">
+                                    <button type="button" class="cancel-btn focus:shadow-none focus:outline-none"
+                                        data-te-modal-dismiss aria-label="Close">
+                                        Cancel
+                                    </button>
+                                    <button type="submit"
+                                        class="add-btn focus:outline-none focus:ring-0 ">
+                                        Create
+                                    </button>
                                 </div>
-                                <div class="mb-4">
-                                    <label class="label-form mb-3">Total</label>
-                                    <input type="Number" placeholder="Total" v-model="total" class="input-ui">
-                                </div>
-                                <div class="mb-4">
-                                    <label class="label-form mb-3">Monthly Cost</label>
-                                    <input type="Number" placeholder="Monthly Cost" v-model="monthly_cost" class="input-ui">
-                                </div>
-                                <div class="mb-4">
-                                    <label class="label-form mb-3">Prepaid Amount</label>
-                                    <input type="Number" placeholder="Amount" v-model="prepaid_amount" class="input-ui">
-                                </div>
-                                <div class="mb-4">
-                                    <label class="label-form mb-3">Cashbook</label>
-                                    <select class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0"
-                                        v-model="selected_cashbook">
-                                        <option class="text-sm" :value="cashbook" v-for="(cashbook,index) in cashbookList" :key="index">
-                                            {{ cashbook.name }}
-                                        </option>
-    
-                                    </select>
-                                </div>
-                            </div>
-                            <div class="flex justify-end gap-x-4 px-6 mb-6 pt-4">
-                                <button type="button" class="cancel-btn focus:shadow-none focus:outline-none"
-                                    data-te-modal-dismiss aria-label="Close">
-                                    Cancel
-                                </button>
-                                <button type="button" @click="btnClickedCreatePrepaid()"
-                                    class="add-btn focus:outline-none focus:ring-0 ">
-                                    Create
-                                </button>
-                            </div>
+                            </form>
                         </div>
-                        <div v-show="isCreateAccount">
+                        <div v-show="step == '2'">
                             <div class="relative flex justify-between py-2 px-6 border-b">
-                                <button>
+                                <button @click="[step = 1,selected_second_account = null , name = null]">
                                     <i class="fas fa-chevron-left"></i>
                                 </button>
                                 <h5 class="text-base text-center mt-2 font-semibold leading-normal font-inter">
-                                    Create Customer
+                                    Create Account
                                 </h5>
                                 <div>
                                     
@@ -195,36 +236,31 @@
                             <div class="relative px-12 py-4 border-b" data-te-modal-body-ref>
                                 <div class="mb-4">
                                     <label for="" class="label-form mb-3">
-                                        Title
+                                        Name
                                     </label>
-                                    <input type="text" placeholder="Particular" v-model="title" class="input-ui">
+                                    <input type="text" placeholder="Name" v-model="name" class="input-ui">
                                 </div>
                                 <div class="mb-4 relative">
-                                    <label class="label-form mb-3">Account Name</label>
+                                    <label class="label-form mb-3">Account</label>
                                     <select class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0"
-                                        v-model="selected_accouunt">
-                                        <option class="text-sm" :value="acc" v-for="(acc,index) in acc_list" :key="index">
+                                        v-model="selected_second_account">
+                                        <option class="text-sm" :value="acc" v-for="(acc,index) in secondAccountList" :key="index">
                                             {{ acc.name }}
                                         </option>
                                     </select>
-
-                                    <button class="text-xs absolute -right-6 top-1/2">
-                                        <i class="fal fa-plus"></i>
-                                    </button>
                                 </div>
-                               
+                            
                             </div>
                             <div class="flex justify-end gap-x-4 px-6 mb-6 pt-4">
                                 <button type="button" class="cancel-btn focus:shadow-none focus:outline-none"
                                     data-te-modal-dismiss aria-label="Close">
                                     Cancel
                                 </button>
-                                <button type="button" @click="btnClickedCreatePrepaid()"
+                                <button type="button" @click="btnClickedCreateAccount()"
                                     class="add-btn focus:outline-none focus:ring-0 ">
                                     Create
                                 </button>
                             </div>
-                            
                         </div>
                     </div>
                 </div>
@@ -236,7 +272,7 @@
             <!-- Payment Modal -->
             <div data-te-modal-init
                 class="fixed left-0 top-0 z-[1055] hidden h-full w-full overflow-y-auto overflow-x-hidden outline-none"
-                id="create_modal" tabindex="-1" aria-labelledby="create_modalLabel" aria-hidden="true">
+                id="create_payment_modal" tabindex="-1" aria-labelledby="create_modalLabel" aria-hidden="true">
                 <div data-te-modal-dialog-ref
                     class="pointer-events-none relative w-auto mb-12 translate-y-[-50px] opacity-0 transition-all duration-300 ease-in-out min-[576px]:mx-auto min-[576px]:mt-7 min-[576px]:max-w-[500px]">
                     <div class="min-[576px]:shadow-[0_0.5rem_1rem_rgba(#000, 0.15)] pointer-events-auto relative flex w-full flex-col rounded-md border-none bg-white bg-clip-padding text-current shadow-lg outline-none">
@@ -247,7 +283,7 @@
                                     Create Payment
                                 </h5>
                                 <button type="button" class="text-xs focus:shadow-none focus:outline-none"
-                                    data-te-modal-dismiss aria-label="Close" id="close">
+                                    data-te-modal-dismiss aria-label="Close" id="close_payment">
                                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
                                         stroke-width="1.5" stroke="currentColor" class="h-4 w-4">
                                         <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
@@ -259,13 +295,13 @@
                                     <label for="" class="label-form mb-3">
                                         Payment
                                     </label>
-                                    <input type="text" placeholder="Payment" v-model="title" class="input-ui">
+                                    <input type="text" placeholder="Payment" v-model="payment_amount" class="input-ui">
                                 </div>
                                 <div class="mb-4">
                                     <label class="label-form mb-3">Cashbook</label>
                                     <select class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0"
-                                        v-model="selectedAccouunt">
-                                        <option class="text-sm" :value="sub" v-for="(cashbook,index) in cashbookList" :key="index">
+                                        v-model="selectedPaymentCashbook">
+                                        <option class="text-sm" :value="cashbook" v-for="(cashbook,index) in cashbookList" :key="index">
                                             {{ cashbook.name }}
                                         </option>
                                     </select>
@@ -309,19 +345,31 @@
 
                 prepaidList:[],
                 cashbookList:[],
+                accountList:[],
+                secondAccountList:[],
 
                 title:null,
-                selected_accouunt:null,
-                selected_start_date:null,
-                selected_end_date:null,
+                selectedAccount:null,
+                start_date:null,
+                end_date:null,
                 total:null,
                 monthly_cost:null,
                 prepaid_amount:null,
                 selected_cashbook:null,
 
+                payment_amount:null,
+                selectedPaymentCashbook:null,
+                paymentToPrepaid:null,
+                
+                name:null,
+                selected_second_account:null,
                 isCreatePrepaid:false,
                 isCreateAccount:true,
 
+                
+
+
+                step: 1,
 
 
 
@@ -334,9 +382,22 @@
             ...mapGetters(['getToken']),
 
             async getPrepaidList(){
-                const response = await getApiData({ url: '/api/' , token: this.getToken() });
+                const response = await getApiData({ url: '/api/prepaid_lists' , token: this.getToken() });
                 if(response.data){
-                    this.prepaidList = response.data;
+                    this.prepaidList = response.data.data;
+                    console.log(response)
+                }
+            },
+            async getAccountList(){
+                const response = await getApiData({ url: '/api/prepaid_account_list', token: this.getToken() });
+                if(response.data){
+                    this.accountList = response.data;
+                }
+            },
+            async getSecondAccountList(){
+                const response = await getApiData({ url: '/api/account_by_sub_account/11', token: this.getToken() });
+                if(response.data){
+                    this.secondAccountList = response.data;
                 }
             },
             async getCashbookList(){
@@ -346,21 +407,24 @@
                 }
             },
             
-            btnClickedCreateJournal(){
-                this.createJournal();
+            btnClickedCreateAccount(){
+                this.createAccount();
             },
 
-            async createJournal()
+            async createAccount()
             {
                 let formData = new FormData();
-                formData.append('particular', this.particular);
-                formData.append('amount', this.amount);
-                formData.append('credit_account_id', this.selectedCreditAcc.id);
-                formData.append('debit_account_id', this.selectedDebitAcc.id);
-                let response = await postApiData({url: '/api/journals', form_data: formData, token: this.getToken()});
+                formData.append('name', this.name);
+                formData.append('account_id', this.selected_second_account.id);
+                formData.append('original_account_code', this.selected_second_account.account_code);
+                formData.append('sub_account_id', this.selected_second_account.sub_account_id);
+                formData.append('type', 'is_second');
+                let response = await postApiData({url: '/api/create_prepaid_account', form_data: formData, token: this.getToken()});
                 if(response.success){
-                    this.getJournalList(this.currentMonth);
-                    this.closeAndClearModal();
+                    this.getAccountList();
+                    this.step = '1';
+                    this.name = null;
+                    this.selected_second_account = null;
                     console.log('journal created')
                 }
                 else{
@@ -368,14 +432,81 @@
                 }
             },
 
-            closeAndClearModal(){
-                this.particular = null;
-                this.amount = null;
-                this.selectedCreditAcc = null;
-                this.selectedCreditSubAcc = null;
-                this.selectedDebitAcc = null;
-                this.selectedDebitSubAcc = null;
+            
+
+            btnClickedCreatePrepaid(){
+                this.
+                this.createPrepaid();
+            },
+
+            async createPrepaid()
+            {
+                let formData = new FormData();
+                formData.append('title', this.title);
+                formData.append('account_id', this.selectedAccount.id);
+                formData.append('from_date', this.start_date);
+                formData.append('to_date', this.end_date);
+                formData.append('total_amount', this.total);
+                formData.append('monthly_cost', this.monthly_cost);
+                formData.append('prepaid_amount', this.prepaid_amount);
+                formData.append('cash_account_id', this.selected_cashbook.id);
+                let response = await postApiData({url: '/api/prepaids', form_data: formData, token: this.getToken()});
+                if(response.success){
+                    this.getPrepaidList();
+                    this.closeAndClearPrepaidModal();
+                    console.log('prepaid created')
+                }
+                else{
+
+                }
+            },
+
+
+
+            btnClickedPaymentModal(payment){
+                this.paymentToPrepaid = payment
+            },
+
+            btnClickedCreatePayment(){
+                this.createPayment();
+            },
+
+            async createPayment()
+            {
+                let formData = new FormData();
+                formData.append('amount', this.payment_amount);
+                formData.append('cash_account_id', this.selectedPaymentCashbook.id);
+                formData.append('prepaid_id', this.paymentToPrepaid.id);
+                let response = await postApiData({url: '/api/prepaid_payments', form_data: formData, token: this.getToken()});
+                if(response.success){
+                    this.getPrepaidList();
+                    this.closeAndClearPaymentModal();
+                    console.log('prepaid created')
+                }
+                else{
+
+                }
+            },
+            
+
+            closeAndClearPrepaidModal(){
+                this.title = null;
+                this.selectedAccount = null;
+                this.start_date = null;
+                this.end_date = null;
+                this.total = null;
+                this.monthly_cost = null;
+                this.prepaid_amount = null,
+                this.selected_cashbook = null,
                 document.getElementById("close").click();
+            },
+            closeAndClearPaymentModal(){
+                this.payment_amount = null;
+                this.selectedPaymentCashbook = null;
+                this.paymentToPrepaid = null;
+                document.getElementById("close_payment").click();
+                // 2hrs is gone ggwp hubstaff
+
             },
             // testingSomething(){
             //     const errorMsgHtml = `
@@ -394,6 +525,9 @@
         },
         created(){
             this.getCashbookList();
+            this.getSecondAccountList();
+            this.getAccountList();
+            this.getPrepaidList();
             // this.formattedDate = new Date(this.dateTimeString).toLocaleDateString();
             // this.formattedDate = this.dateTimeString.split('T')[0]
             
