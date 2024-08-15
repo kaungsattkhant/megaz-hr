@@ -367,6 +367,7 @@
                 isCreateAccount:true,
 
                 selectedMonth:null,
+                selectedNewMonth:null,
                 currentMonth:null,
 
 
@@ -385,9 +386,9 @@
             ...mapGetters(['getToken']),
 
             monthChange(){
-                let selectedNewMonth = this.selectedMonth.slice(5,7);
-                console.log(selectedNewMonth)
-                this.getPrepaidList(selectedNewMonth)
+                this.selectedNewMonth = this.selectedMonth.slice(5,7);
+                console.log(this.selectedNewMonth)
+                this.getPrepaidList(this.selectedNewMonth)
             },
 
             async getPrepaidList(selectedMonth){
@@ -460,7 +461,7 @@
                 formData.append('cash_account_id', this.selected_cashbook.id);
                 let response = await postApiData({url: '/api/prepaids', form_data: formData, token: this.getToken()});
                 if(response.success){
-                    this.getPrepaidList();
+                    this.getPrepaidList(this.currentMonth);
                     this.closeAndClearPrepaidModal();
                     console.log('prepaid created')
                 }
@@ -487,7 +488,7 @@
                 formData.append('prepaid_id', this.paymentToPrepaid.prepaid.id);
                 let response = await postApiData({url: '/api/prepaid_payments', form_data: formData, token: this.getToken()});
                 if(response.success){
-                    this.getPrepaidList();
+                    this.getPrepaidList(this.currentMonth);
                     this.closeAndClearPaymentModal();
                     console.log('prepaid created')
                 }
