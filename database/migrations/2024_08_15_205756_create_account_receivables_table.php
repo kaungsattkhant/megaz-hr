@@ -1,0 +1,33 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    /**
+     * Run the migrations.
+     */
+    public function up(): void
+    {
+        Schema::create('account_receivables', function (Blueprint $table) {
+            $table->id();
+            $table->dateTime('date_time')->default(CurrentTime());
+            $table->foreignId('account_id')->constrained()->onDelete('cascade');
+            $table->unsignedBigInteger('cash_account_id');
+            $table->double('amount');
+            $table->string('type');
+            $table->unsignedBigInteger('created_by');
+            $table->timestamps();
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     */
+    public function down(): void
+    {
+        Schema::dropIfExists('account_receivables');
+    }
+};

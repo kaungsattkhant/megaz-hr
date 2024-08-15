@@ -17,4 +17,9 @@ class Account extends Model
     public function accountByCode($code){
         return Account::where('account_code',$code)->first();
     }
+
+    public function accountReceivables()
+    {
+        return $this->hasMany(AccountReceivable::class);
+    }
 }

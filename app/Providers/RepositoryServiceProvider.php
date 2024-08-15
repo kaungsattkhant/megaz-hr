@@ -21,6 +21,8 @@ use App\Repositories\Account\AccountInterface;
 use App\Repositories\Account\AccountRepository;
 use App\Repositories\AccountPayable\AccountPayableInterface;
 use App\Repositories\AccountPayable\AccountPayableRepository;
+use App\Repositories\AccountReceivable\AccountReceivableRepository;
+use App\Repositories\AccountReceivable\AccountReceivableRepositoryInterface;
 use App\Repositories\Ads\AdsRepository;
 use App\Repositories\Ads\AdsRepositoryInterface;
 use App\Repositories\Invoice\InvoiceRepository;
@@ -174,5 +176,6 @@ class RepositoryServiceProvider extends ServiceProvider
         $this->app->bind(JournalRepositoryInterface::class,JournalRepository::class);
         $this->app->bind(StaffAdvanceRepositoryInterface::class,StaffAdvanceRepository::class);
         $this->app->bind(PrepaidRepositoryInterface::class,PrepaidRepository::class);
+        $this->app->bind(AccountReceivableRepositoryInterface::class,AccountReceivableRepository::class);
     }
 }

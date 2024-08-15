@@ -50,6 +50,7 @@ use App\Http\Controllers\API\InventoryAPIController;
 use App\Http\Controllers\API\NotificationController;
 use App\Http\Controllers\API\DepartmentAPIController;
 use App\Http\Controllers\API\AccountPayableController;
+use App\Http\Controllers\API\AccountReceivableAPIController;
 use App\Http\Controllers\API\AssetInventoryLedgerController;
 use App\Http\Controllers\API\MenuCategoryAPIController;
 use App\Http\Controllers\API\RoomDiscountAPIController;
@@ -307,6 +308,14 @@ Route::middleware('auth:api')->group(function () {
         Route::get('/prepaid_lists','prepaidList');
         Route::post('/prepaids','createPrepaid');
         Route::post('/prepaid_payments','createPrepaidPayment');
+    });
+
+    Route::controller(AccountReceivableAPIController::class)->group(function()
+    {
+        Route::post("/account_receivables",'createAccountReceivable');
+        Route::post('/paid_account_receivables','paidAccountReceivable');
+        Route::get('/account_receivable_lists','accountReceivableList');
+        Route::get('/account/{id}/account_receivable_lists','accountReceivableDetail');
     });
 });
 
