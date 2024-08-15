@@ -8,7 +8,9 @@ use App\Models\Transaction;
 use Illuminate\Support\Facades\DB;
 use stdClass;
 
-class CashBookRepository implements CashBookInterface
+
+class CashBookRepository implements CashBookInterface  
+
 {
     public function list($request)
     {
