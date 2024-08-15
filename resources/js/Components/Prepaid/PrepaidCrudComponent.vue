@@ -12,7 +12,7 @@
 
                     <i class="fal fa-search"></i>
                 </label> -->
-                <input type="date" class="input-ui  mr-2 h-8" v-model="selectedMonth" @change="monthChange()">
+                <input type="month" class="input-ui  mr-2 h-8" v-model="selectedMonth" @change="monthChange()">
             </div>
             <div class="flex justify-end flex-col">
 
@@ -366,6 +366,9 @@
                 isCreatePrepaid:false,
                 isCreateAccount:true,
 
+                selectedMonth:null,
+                currentMonth:null,
+
 
 
 
@@ -381,8 +384,14 @@
         methods: {
             ...mapGetters(['getToken']),
 
-            async getPrepaidList(){
-                const response = await getApiData({ url: '/api/prepaid_lists' , token: this.getToken() });
+            monthChange(){
+                let selectedNewMonth = this.selectedMonth.slice(5,7);
+                console.log(selectedNewMonth)
+                this.getPrepaidList(selectedNewMonth)
+            },
+
+            async getPrepaidList(selectedMonth){
+                const response = await getApiData({ url: '/api/prepaid_lists?month=' + selectedMonth , token: this.getToken() });
                 if(response.data){
                     this.prepaidList = response.data.data;
                     console.log(response)
@@ -523,10 +532,12 @@
             initTE({ Modal,Select, Ripple });
         },
         created(){
+            const date = new Date();
+            this.currentMonth = date.getMonth() + 1;
             this.getCashbookList();
             this.getSecondAccountList();
             this.getAccountList();
-            this.getPrepaidList();
+            this.getPrepaidList(this.currentMonth);
             // this.formattedDate = new Date(this.dateTimeString).toLocaleDateString();
             // this.formattedDate = this.dateTimeString.split('T')[0]
 
