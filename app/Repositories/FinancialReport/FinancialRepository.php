@@ -84,7 +84,6 @@ class FinancialRepository implements FinancialInterface
             })
             ->values()
             ->toArray();
-
         $creditResults = DB::table('sub_accounts')
             ->select('sub_accounts.id', 'sub_accounts.name', 'sub_accounts.account_code')
             ->leftJoin('accounts', 'accounts.sub_account_id', '=', 'sub_accounts.id')
