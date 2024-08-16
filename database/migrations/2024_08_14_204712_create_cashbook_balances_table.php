@@ -11,13 +11,15 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('sub_accounts', function (Blueprint $table) {
+        Schema::create('cashbook_balances', function (Blueprint $table) {
             $table->id();
-            $table->string('account_code')->unique();
-            $table->string('name');
-            $table->unsignedBigInteger('head_account_id');
-            $table->boolean('is_active')->default(1);
+            $table->integer('year');
+            $table->integer('month');
+            $table->decimal('opening_balance',15,2);
+            $table->decimal('closing_balance',15,2);
+            $table->unsignedInteger('cash_account_id');
             $table->timestamps();
+            $table->index(['year', 'month']);
         });
     }
 
@@ -26,6 +28,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('sub_accounts');
+        Schema::dropIfExists('cashbook_balances');
     }
 };

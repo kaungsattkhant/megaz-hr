@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('head_accounts', function (Blueprint $table) {
             $table->id();
             $table->string('name');
+            $table->string('account_code')->unique();
             $table->boolean('is_available')->default(1);
             $table->timestamps();
         });

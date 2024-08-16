@@ -24,6 +24,8 @@ return new class extends Migration
             $table->unsignedBigInteger('staff_id');
             $table->timestamps();
         });
+
+        
     }
 
     /**
