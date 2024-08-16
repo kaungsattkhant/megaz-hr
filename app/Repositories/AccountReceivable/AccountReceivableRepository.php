@@ -17,6 +17,7 @@ class AccountReceivableRepository implements AccountReceivableRepositoryInterfac
             $data = $request->all();
             $data['created_by'] = UserData()->id;
             $data['type'] = "ar";
+            $data['date_time'] = CurrentTime();
             $ar = AccountReceivable::create($data);
             $transaction = (new StoreTransactionLedger())->createTransaction([
                 'date' => now(),
@@ -57,6 +58,7 @@ class AccountReceivableRepository implements AccountReceivableRepositoryInterfac
         DB::beginTransaction();
         try {
             $data = $request->all();
+            $data['date_time'] = CurrentTime();
 
             $account = Account::withSum(['accountReceivables as ar_sum' => function ($query) {
                 $query->where('type', 'ar');
