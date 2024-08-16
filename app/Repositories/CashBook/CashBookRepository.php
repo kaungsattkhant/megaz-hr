@@ -66,6 +66,7 @@ class CashBookRepository implements CashBookInterface
         try {
             $cashAccountId = $request->cash_account_id;
             $openingBalance = (new CashBookTransaction())->getOpeningBalance($request);
+            dd($openingBalance);
             $closingBalance = (new CashBookTransaction())->getClosingBalance($openingBalance->opening_balance, $request);
             $cashbookBalance = CashbookBalance::updateOrCreate(
                 [
