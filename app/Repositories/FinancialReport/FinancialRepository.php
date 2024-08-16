@@ -61,8 +61,7 @@ class FinancialRepository implements FinancialInterface
         accounts.name as account_name,
         accounts.account_code as account_code,
         SUM(CASE WHEN transactions.is_confirmed = 1 THEN ledgers.value ELSE 0 END) as amount,
-        "debit" as type
-    ', [$receptAceiptAction])
+        "debit" as type', [$receptAceiptAction])
             ->orderByRaw("FIELD(sub_accounts.account_code, '" . implode("','", $receiptSubAccountCode) . "')")
             ->get()
             ->groupBy('id')
@@ -105,8 +104,7 @@ class FinancialRepository implements FinancialInterface
         accounts.name as account_name,
         accounts.account_code as account_code,
         SUM(CASE WHEN transactions.is_confirmed = 1 THEN ledgers.value ELSE 0 END) as amount,
-        "credit" as type
-    ', [$paymentAceiptAction])
+        "credit" as type', [$paymentAceiptAction])
             ->orderByRaw("FIELD(sub_accounts.account_code, '" . implode("','", $paymentSubAccountCode) . "')")
             ->get()
             ->groupBy('id')
@@ -167,9 +165,9 @@ class FinancialRepository implements FinancialInterface
 
     public function CashFlowStatement($request) //update
     {
-        $current = Carbon::now();
+        // dd($request->all());
+        $current = (isset($request->date)|| $request->date!=null) ? Carbon::parse($request->date):Carbon::now();
         $previousMonth = $current->copy()->subMonth();
-
         // Define Sub Account Codes and Actions
         $receiptSubAccountCode = ['2-1000', '2-1050', '2-2000', '4-3000', '5-0000', '5-1010', '5-1000', '4-4000', '3-1000'];
         $paymentSubAccountCode = ['1-1000', '1-1100', '2-1000', '2-1020', '2-1050', '2-3000', '2-4000', '3-2000', '4-1000', '4-2000', '4-3000', '4-4000', '6-0000', '6-2000', '6-3000', '6-4000', '6-5000', '6-6000', '6-7000', '6-8000', '6-9000', '3-1000'];
@@ -189,13 +187,13 @@ class FinancialRepository implements FinancialInterface
 
         // Merge Results and Return
         $results = array_merge($debitResults, $creditResults);
-        $cash_in_out_flow=$currentTotalDebitAmount-$currentTotalCreditAmount;
+        $cash_in_out_flow = $currentTotalDebitAmount - $currentTotalCreditAmount;
         return [
             'opening_balance' => $previousClosingBalance,
             'closing_balance' => $closingBalance,
             'total_receipt_amount' => $currentTotalDebitAmount,
             'total_payment_amount' => $currentTotalCreditAmount,
-            'cash_in_out_flow'=>$cash_in_out_flow,
+            'cash_in_out_flow' => $cash_in_out_flow,
             'cash_flow_statement' => $results,
         ];
     }
@@ -267,7 +265,7 @@ class FinancialRepository implements FinancialInterface
     {
         return CashbookBalance::where('year', $month->year)
             ->where('month', $month->month)
-            ->value('closing_balance') ?? 0;
+            ->sum('closing_balance') ?? 0;
     }
 
     private function calculateClosingBalance($current, $previousClosingBalance)
