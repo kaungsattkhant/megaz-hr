@@ -279,6 +279,22 @@ export default {
     methods: {
         ...mapGetters(['getToken', 'getUser']),
 
+        formValidate(valueArray) {
+            for (const obj of valueArray) {
+                for (const [key, value] of Object.entries(obj)) {
+                    if (value === null || value === "") {
+                        this.$notify({
+                            title: 'Input validation',
+                            text: `${key} is required`,
+                            type: 'warn'
+                        });
+                        return false;
+                    }
+                }
+            }
+            return true;
+        },
+
         async getAccountForThird() {
             let url = `/api/get_second_account/is_second`;
             let response = await getApiData({ url: url, token: this.getToken() });
@@ -306,7 +322,6 @@ export default {
         },
 
         async thirdDepreciationForAsset() {
-            console.log('work');
             let url = `/api/get_third_account/is_third_depreciation`;
             let response = await getApiData({ url: url, token: this.getToken() });
             if (response.success) {
@@ -341,6 +356,10 @@ export default {
         async createThirdAccount() {
             let url = `/api/create_third_account`;
             let formData = new FormData();
+            let validate = this.formValidate([{ "Third Account Name": this.thirdAccountName, "Account": this.thirdAccountOBJ }])
+            if (validate == false) {
+                return false;
+            }
             formData.append('name', this.thirdAccountName);
             formData.append('account_id', this.thirdAccountOBJ.id);
             formData.append('original_account_code', this.thirdAccountOBJ.account_code);
@@ -357,7 +376,7 @@ export default {
                     text: `Third Account created successfully`,
                     type: "success"
                 });
-            }else {
+            } else {
                 this.$notify({
                     title: `Input validation`,
                     text: response.message,
@@ -369,6 +388,10 @@ export default {
         async createDepreciationAccount() {
             let url = `/api/create_third_account`;
             let formData = new FormData();
+            let validate = this.formValidate([{ "Third Depreciation Name": this.thirdDepreciationName, "Account": this.thirdDepreciationOBJ }]);
+            if (validate == false) {
+                return false;
+            }
             formData.append('name', this.thirdDepreciationName);
             formData.append('account_id', this.thirdDepreciationOBJ.id);
             formData.append('original_account_code', this.thirdDepreciationOBJ.account_code);
@@ -397,6 +420,23 @@ export default {
 
         async assetCreate() {
             let formData = new FormData();
+
+            let validate = this.formValidate([{'Asset Name':this.assetName,
+                                                'Cost':this.assetCost,
+                                                "Quantity":this.assetQuantity,
+                                                'Userful Life':this.assetMonths,
+                                                "Purchase Date":this.purchaseDate,
+                                                "Third Account":this.thirdAccount,
+                                                "Third Depreciation Account":this.thirdAccountDepreciation,
+                                                "Inventory":this.inventoryId,
+                                                "Asset Item":this.itemId,
+                                                "Cash Account":this.cashAccountId
+                                            }]);
+            if(validate==false)
+            {
+                return false;
+            }
+
             formData.append('name', this.assetName);
             formData.append('cost', this.assetCost);
             formData.append('useful_life', this.assetMonths);

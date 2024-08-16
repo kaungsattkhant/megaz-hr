@@ -42,7 +42,7 @@ class AccountController extends Controller
         $sub_account= $this->accountRepo->getCashAccount();
         ResponseData($sub_account);
     }
-    
+
     public function accountBySubAccount($sub_account_id){
         $sub_account= $this->accountRepo->accountBySubAccount($sub_account_id);
         ResponseData($sub_account);
@@ -67,5 +67,17 @@ class AccountController extends Controller
         $data= $this->accountRepo->createThirdAccount($request);
         ResponseData($data);
     }
-   
+
+    public function createPrePaidAccount(Request $request)
+    {
+        $data= $this->accountRepo->prepaidAccountCreate($request);
+        ResponseData($data);
+    }
+
+    public function prepaidAccountList()
+    {
+        $data = $this->accountRepo->prepaidAccountList();
+        ResponseData($data);
+    }
+
 }

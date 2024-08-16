@@ -6,6 +6,8 @@ use App\Models\Feature;
 use App\Models\Inventory;
 use App\Models\Role;
 use App\Models\Staff;
+use App\Models\StaffAdvance;
+use App\Models\StaffBalance;
 use App\Models\StaffEmergencyContact;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -31,6 +33,55 @@ class StaffRepository implements StaffRepositoryInterface
             return $staffs;
         }
     }
+
+    public function staffBalanceList(Request $request)
+    {
+        $month = $request->input('month', date('m'));
+        $year = $request->input('year', date('Y'));
+
+        $staffBalances = StaffBalance::with('staff')->where('month', $month)->where('year', $year)->get();
+
+        foreach ($staffBalances as $staffBalance) {
+            $totalAddition = StaffAdvance::where('staff_id', $staffBalance->staff_id)
+                ->whereMonth('date_time', $month)
+                ->whereYear('date_time', $year)
+                ->where('type', 'addition')
+                ->sum('amount') ?? 0;
+
+            $totalSettlement = StaffAdvance::where('staff_id', $staffBalance->staff_id)
+                ->whereMonth('date_time', $month)
+                ->whereYear('date_time', $year)
+                ->where('type', 'settlement')
+                ->sum('amount') ?? 0;
+
+            $staffBalance->addition = $totalAddition;
+            $staffBalance->settlement = $totalSettlement;
+            $staffBalance->staff_name = $staffBalance->staff->name;
+            unset($staffBalance->staff);
+        }
+
+        ResponseData($staffBalances);
+    }
+
+    public function staffBalanceDetail(Request $request, int $id)
+    {
+        $month = $request->input('month', date('m'));
+        $year = $request->input('year', date('Y'));
+
+        $staff = Staff::with([
+            'staffAdvances' => function ($query) use ($month, $year) {
+                $query->whereMonth('date_time', $month)
+                    ->whereYear('date_time', $year);
+            },
+            'staffBalance' => function ($query) use ($month, $year) {
+                $query->where('month', $month)
+                    ->where('year', $year);
+            }
+        ])->where('id', $id)->first();
+
+        ResponseData($staff);
+    }
+
 
     public function createData(array $data)
     {
@@ -268,11 +319,11 @@ class StaffRepository implements StaffRepositoryInterface
         $query = Staff::leftJoinSub($subQuery, 'kpi', function ($join) {
             $join->on('staff.id', '=', 'kpi.staff_id');
         })
-        ->select('staff.*', 'kpi.kpi')
-        ->where(function ($query) {
-            $query->whereNotNull('kpi.kpi')
-                  ->where('kpi.kpi', '>', 0);
-        });
+            ->select('staff.*', 'kpi.kpi')
+            ->where(function ($query) {
+                $query->whereNotNull('kpi.kpi')
+                    ->where('kpi.kpi', '>', 0);
+            });
 
         if ($request->filled('department_id')) {
             $query->where('staff.department_id', $request->input('department_id'));
@@ -282,7 +333,4 @@ class StaffRepository implements StaffRepositoryInterface
 
         ResponseData($staffs);
     }
-
-
-
 }

@@ -23,8 +23,17 @@ use App\Repositories\Staff\StaffRepository;
 use App\Repositories\Entity\EntityRepository;
 use App\Repositories\Account\AccountInterface;
 use App\Repositories\Account\AccountRepository;
+// <<<<<<< HEAD
+// use App\Repositories\AccountPayable\AccountPayableInterface;
+// use App\Repositories\AccountPayable\AccountPayableRepository;
+use App\Repositories\AccountReceivable\AccountReceivableRepository;
+use App\Repositories\AccountReceivable\AccountReceivableRepositoryInterface;
+// use App\Repositories\Ads\AdsRepository;
+// use App\Repositories\Ads\AdsRepositoryInterface;
+// =======
 use App\Repositories\Booking\BookingRepository;
 use App\Repositories\Feature\FeatureRepository;
+// >>>>>>> origin/k/backend-api-main
 use App\Repositories\Invoice\InvoiceRepository;
 use App\Repositories\Package\PackageRepository;
 use App\Repositories\Ads\AdsRepositoryInterface;
@@ -104,8 +113,29 @@ use App\Repositories\BirthdayPromotion\BirthdayPromotionRepositoryInterface;
 use App\Repositories\PurchaseOrderItem\PurchaseOrderItemRepositoryInterface;
 use App\Repositories\FixedAssetPurchase\FixedAssetPurchaseRepositoryInterface;
 use App\Repositories\MenuServiceDiscount\MenuServiceDiscountRepositoryInterface;
+// <<<<<<< HEAD
+// use App\Repositories\Pack\PackRepository;
+// use App\Repositories\Pack\PackRepositoryInterface;
+// use App\Repositories\Package\PackageRepository;
+// use App\Repositories\Package\PackageRepositoryInterface;
+// use App\Repositories\RoomDiscount\RoomDiscountRepository;
+// use App\Repositories\RoomDiscount\RoomDiscountRepositoryInterface;
+// use App\Repositories\UsedDefectedItem\UsedDefectedItemRepository;
+// use App\Repositories\UsedDefectedItem\UsedDefectedITemRepositoryInterface;
+// use App\Repositories\HomeRepository\HomeInterface;
+// use App\Repositories\HomeRepository\HomeRepository;
+use App\Repositories\Journal\JournalRepository;
+use App\Repositories\Journal\JournalRepositoryInterface;
+// use App\Repositories\MenuCategory\MenuCategoryRepository;
+// use App\Repositories\MenuCategory\MenuCategoryRepositoryInterface;
+use App\Repositories\Prepaid\PrepaidRepository;
+use App\Repositories\Prepaid\PrepaidRepositoryInterface;
+use App\Repositories\StaffAdvance\StaffAdvanceRepository;
+use App\Repositories\StaffAdvance\StaffAdvanceRepositoryInterface;
+// =======
 use App\Repositories\CustomerLevelDiscount\CustomerLevelDiscountRepositoryInterface;
 use App\Repositories\FinancialReport\FinancialRepository;
+// >>>>>>> origin/k/backend-api-main
 
 class RepositoryServiceProvider extends ServiceProvider
 {
@@ -167,6 +197,13 @@ class RepositoryServiceProvider extends ServiceProvider
         $this->app->bind(DeliveryChargeRepositoryInterface::class,DeliveryChargeRepository::class);
         $this->app->bind(AssetInterface::class,AssetRepository::class);
         $this->app->bind(AssetInventoryLedgerInterface::class,AssetInventoryLedgerRepository::class);
+// <<<<<<< HEAD
+        $this->app->bind(JournalRepositoryInterface::class,JournalRepository::class);
+        $this->app->bind(StaffAdvanceRepositoryInterface::class,StaffAdvanceRepository::class);
+        $this->app->bind(PrepaidRepositoryInterface::class,PrepaidRepository::class);
+        $this->app->bind(AccountReceivableRepositoryInterface::class,AccountReceivableRepository::class);
+// =======
         $this->app->bind(FinancialInterface::class,FinancialRepository::class);
+// >>>>>>> origin/k/backend-api-main
     }
 }

@@ -50,6 +50,7 @@ use App\Http\Controllers\API\InventoryAPIController;
 use App\Http\Controllers\API\NotificationController;
 use App\Http\Controllers\API\DepartmentAPIController;
 use App\Http\Controllers\API\AccountPayableController;
+use App\Http\Controllers\API\AccountReceivableAPIController;
 use App\Http\Controllers\API\AssetInventoryLedgerController;
 use App\Http\Controllers\API\MenuCategoryAPIController;
 use App\Http\Controllers\API\RoomDiscountAPIController;
@@ -69,6 +70,9 @@ use App\Http\Controllers\API\Customers\MenuAPIController as CustomersMenuAPICont
 use App\Http\Controllers\API\Customers\CustomerAPIController as UserAppCustomerAPIController;
 use App\Http\Controllers\API\Customers\PackageAPIController as CustomersPackageAPIController;
 use App\Http\Controllers\API\Customers\MenuCategoryAPIController as CustomerMenuCategoryAPIController;
+use App\Http\Controllers\API\JournalAPIController;
+use App\Http\Controllers\API\PrepaidAPIController;
+use App\Http\Controllers\API\StaffAdvanceAPIController;
 
 /*
 |--------------------------------------------------------------------------
@@ -178,6 +182,9 @@ Route::middleware('auth:api')->group(function () {
         Route::post('create_third_account','createThirdAccount');
         Route::get('get_second_account/{account_id}','getSecondAccount');
         Route::get('get_third_account/{account_id}','getThirdAccount');
+        Route::post('create_prepaid_account','createPrePaidAccount');
+        Route::get('/prepaid_account_list','prepaidAccountList');
+
     });
     Route::controller(AssetController::class)->group(function () {
         Route::post('create_asset_item','createAssetItem');
@@ -285,6 +292,31 @@ Route::middleware('auth:api')->group(function () {
     Route::post('/bookings',[BookingAPIController::class,'createBooking']);
     Route::post('/booking_status/{id}',[BookingAPIController::class,'bookingStatusChange']);
     Route::post('/booking_active/{id}',[BookingAPIController::class,'bookingActivate']);
+    Route::controller(JournalAPIController::class)->group(function()
+    {
+        Route::get('/journals','listAllJournals');
+        Route::post('/journals','createJournal');
+    });
+
+    Route::controller(StaffAdvanceAPIController::class)->group(function()
+    {
+        Route::post('/staff_advances','createStaffAdvance');
+    });
+
+    Route::controller(PrepaidAPIController::class)->group(function()
+    {
+        Route::get('/prepaid_lists','prepaidList');
+        Route::post('/prepaids','createPrepaid');
+        Route::post('/prepaid_payments','createPrepaidPayment');
+    });
+
+    Route::controller(AccountReceivableAPIController::class)->group(function()
+    {
+        Route::post("/account_receivables",'createAccountReceivable');
+        Route::post('/paid_account_receivables','paidAccountReceivable');
+        Route::get('/account_receivable_lists','accountReceivableList');
+        Route::get('/account/{id}/account_receivable_lists','accountReceivableDetail');
+    });
 });
 
 Route::controller(PackageAPIController::class)->group(function()
@@ -337,6 +369,10 @@ Route::delete('/staffs/{staff_id}/roles/{role_id}',[StaffAPIController::class,'d
 Route::delete('/staffs/{staff_id}/inventories/{inventory_id}',[StaffAPIController::class,'deleteInventoryStaff']);
 Route::delete('/staffs/{staff_id}/features/{feature_id}',[StaffAPIController::class,'deleteFeatureStaff']);
 Route::get('/departments/{department_id}/staffs',[StaffAPIController::class,'getStaffByDepartment']);
+Route::get('/staff_balances',[StaffAPIController::class,'staffBalanceList']);
+Route::get('/staff_balances/{id}',[StaffAPIController::class,'detailStaffBalance']);
+
+
 
 
 // Route::get('/tasks', [TaskController::class, 'getTaskData']);

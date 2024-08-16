@@ -10,6 +10,10 @@ interface StaffRepositoryInterface
 {
     public function listAllData(Request $request);
 
+    public function staffBalanceList(Request $request);
+
+    public function staffBalanceDetail(Request $request,int $id);
+
     public function createData(array $data);
 
     public function updateData(array $data,int $id);
