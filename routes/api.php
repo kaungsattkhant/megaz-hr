@@ -50,6 +50,7 @@ use App\Http\Controllers\API\InventoryAPIController;
 use App\Http\Controllers\API\NotificationController;
 use App\Http\Controllers\API\DepartmentAPIController;
 use App\Http\Controllers\API\AccountPayableController;
+use App\Http\Controllers\API\AccountReceivableAPIController;
 use App\Http\Controllers\API\AssetInventoryLedgerController;
 use App\Http\Controllers\API\MenuCategoryAPIController;
 use App\Http\Controllers\API\RoomDiscountAPIController;
@@ -183,6 +184,8 @@ Route::middleware('auth:api')->group(function () {
         Route::get('get_third_account/{account_id}','getThirdAccount');
         Route::post('create_prepaid_account','createPrePaidAccount');
         Route::get('/prepaid_account_list','prepaidAccountList');
+        Route::get('/ar_sub_accounts','getSubAccountForAr');
+
     });
     Route::controller(AssetController::class)->group(function () {
         Route::post('create_asset_item','createAssetItem');
@@ -303,13 +306,19 @@ Route::middleware('auth:api')->group(function () {
 
     Route::controller(PrepaidAPIController::class)->group(function()
     {
-        Route::post('/pre_paid','createPrepaid');
+        Route::get('/prepaid_lists','prepaidList');
+        Route::post('/prepaids','createPrepaid');
+        Route::post('/prepaid_payments','createPrepaidPayment');
     });
 
-
+    Route::controller(AccountReceivableAPIController::class)->group(function()
+    {
+        Route::post("/account_receivables",'createAccountReceivable');
+        Route::post('/paid_account_receivables','paidAccountReceivable');
+        Route::get('/account_receivable_lists','accountReceivableList');
+        Route::get('/account/{id}/account_receivable_lists','accountReceivableDetail');
+    });
 });
-
-
 
 Route::controller(PackageAPIController::class)->group(function()
     {

@@ -206,7 +206,7 @@
                 }
             },
             monthChange(){
-                let selectedNewMonth = this.selectedMonth.slice(6,7);
+                let selectedNewMonth = this.selectedMonth.slice(5,7);
                 console.log(selectedNewMonth)
                 this.getJournalList(selectedNewMonth)
             },

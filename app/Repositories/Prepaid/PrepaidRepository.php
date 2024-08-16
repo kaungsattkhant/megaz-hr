@@ -2,6 +2,7 @@
 
 namespace App\Repositories\Prepaid;
 
+use App\Http\Action\Transaction\StoreTransactionLedger;
 use App\Models\Prepaid;
 use App\Models\PrepaidBalance;
 use App\Models\PrepaidPayment;
@@ -13,12 +14,12 @@ class PrepaidRepository implements PrepaidRepositoryInterface
     public function createPrepaid(Request $request)
     {
         DB::beginTransaction();
-        try
-        {
+        try {
             $currentYear = date('Y');
             $currentMonth = date('m');
 
             $data = $request->all();
+            $data['date_time'] = "2024-07-13 07:30";
             $data['created_by'] = UserData()->id;
             $prepaid = Prepaid::create($data);
 
@@ -27,72 +28,114 @@ class PrepaidRepository implements PrepaidRepositoryInterface
                 'month' => $currentMonth,
                 'opening_balance' => $data['prepaid_amount'],
                 'cost' => 0,
-                'monthly_cost' => $data['monthly_cost'],
+                'monthly_cost' => 0,
                 'closing_balance' => $data['prepaid_amount'],
                 'prepaid_amount' => $data['prepaid_amount'],
-                'payment' => 0,
                 'prepaid_id' => $prepaid->id
             ]);
 
-            $prepaidPayment = PrepaidPayment::create([
-                'date_time' => CurrentTime(),
-                'amount' => $data['prepaid_amount'],
-                'cash_account_id' => $data['cash_account_id'],
-                'prepaid_id' => $prepaid->id
+            $transaction = (new StoreTransactionLedger())->createTransaction([
+                'date' => now(),
+                'created_by' => UserData()->id,
+                'description' => "prepaid",
+                'transactionable_id' =>$prepaid->id,
+                'transactionable_type' => 'prepaid',
+                'is_confirmed' => 1,
             ]);
+
+            $creditLedger = (new StoreTransactionLedger())->storeLedger([
+                'value' => $data['prepaid_amount'],
+                'transaction_id' => $transaction->id,
+                'account_id' => $data['cash_account_id'],
+                'action' => 'credit',
+                'is_cashier_confirmed' => 0
+            ]);
+
+            $debitLedger =  (new StoreTransactionLedger())->storeLedger([
+                'value' => $data['prepaid_amount'],
+                'transaction_id' => $transaction->id,
+                'account_id' => $data['account_id'],
+                'action' => 'debit',
+                'is_cashier_confirmed' => 0
+            ]);
+
             DB::commit();
             ResponseData($prepaid);
-        }catch(\Exception $e)
-        {
+        } catch (\Exception $e) {
             DB::rollBack();
-            ResponseMessage($e->getMessage(),422);
+            ResponseMessage($e->getMessage(), 422);
             throw $e;
         }
     }
 
-    public function createPaymentPrepaid(Request $request)
+    public function addingPrepaid(Request $request)
     {
         DB::beginTransaction();
-        try{
+        try {
+            $prepaid = Prepaid::find($request->prepaid_id);
+            $prePaidPaymentValue = PrepaidPayment::where('prepaid_id',$prepaid->id)->sum('amount') ?? 0 ;
+            $validationValue = $prePaidPaymentValue + $request->amount + $prepaid->prepaid_amount;
+            if($prepaid->total_amount < $validationValue)
+            {
+                ResponseMessage('Invalid Data',422);
+            }
 
-            $prepaidPayment = PrepaidPayment::create([
-                'date_time' => CurrentTime(),
-                'amount' => $request->amount,
-                'cash_account_id' => $request->cash_account_id
-            ]);
-
-        }catch(\Exception $e)
-        {
-            DB::rollBack();
-            ResponseMessage($e->getMessage(),422);
-            throw $e;
-        }
-    }
-
-    public function addPaymentPrepaid(Request $request)
-    {
-        DB::beginTransaction();
-        try{
-
-            $prepaidBalance = PrepaidBalance::where('prepaid_id')->first();
-
-            $prepaidBalance->update([
-                'opening_balance' => $prepaidBalance->opening_balance + $request->amount,
-                ''
-            ]);
-
-            PrepaidPayment::create([
+            $prePaidPayment = PrepaidPayment::create([
                 'date_time' => CurrentTime(),
                 'amount' => $request->amount,
                 'cash_account_id' => $request->cash_account_id,
                 'prepaid_id' => $request->prepaid_id
             ]);
 
-        }catch(\Exception $e)
-        {
+            $transaction = (new StoreTransactionLedger())->createTransaction([
+                'date' => now(),
+                'created_by' => UserData()->id,
+                'description' => "prepaid",
+                'transactionable_id' =>$prepaid->id,
+                'transactionable_type' => 'prepaid',
+                'is_confirmed' => 1,
+            ]);
+
+            $creditLedger = (new StoreTransactionLedger())->storeLedger([
+                'value' => $request->amount,
+                'transaction_id' => $transaction->id,
+                'account_id' => $request->cash_account_id,
+                'action' => 'credit',
+                'is_cashier_confirmed' => 0
+            ]);
+
+            $debitLedger =  (new StoreTransactionLedger())->storeLedger([
+                'value' => $request->amount,
+                'transaction_id' => $transaction->id,
+                'account_id' => $prepaid->account_id,
+                'action' => 'debit',
+                'is_cashier_confirmed' => 0
+            ]);
+
+            DB::commit();
+            ResponseData($prePaidPayment);
+        } catch (\Exception $e) {
             DB::rollBack();
-            ResponseMessage($e->getMessage(),422);
+            ResponseMessage($e->getMessage(), 422);
             throw $e;
         }
+    }
+
+    public function prepaidBalanceList($request)
+    {
+        $currentYear = date('Y');
+        $month = $request->input('month', date('m'));
+
+        $prepaids = PrepaidBalance::where('month', $month)
+            ->where('year', $currentYear)
+            ->with(['prepaid' => function ($query) use ($month, $currentYear) {
+                $query->withSum(['prepaidPayments as payment' => function ($query) use ($month, $currentYear) {
+                    $query->whereYear('date_time', $currentYear)
+                          ->whereMonth('date_time', $month);
+                }], 'amount');
+            }])
+            ->paginate(config('common.list_count'));
+
+        ResponseData($prepaids);
     }
 }

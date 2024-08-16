@@ -12,4 +12,9 @@ class PrepaidBalance extends Model
     protected $fillable =[
         'year','month','opening_balance','closing_balance','prepaid_amount','monthly_cost','cost','prepaid_id'
     ];
+
+    public function prepaid()
+    {
+        return $this->belongsTo(Prepaid::class);
+    }
 }

@@ -80,4 +80,9 @@ class AccountController extends Controller
         ResponseData($data);
     }
 
+    public function getSubAccountForAr()
+    {
+        $data = $this->accountRepo->getSubAccountForAr();
+    }
+
 }

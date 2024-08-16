@@ -29,4 +29,6 @@ interface AccountInterface
     public function prepaidAccountCreate(Request $request);
 
     public function prepaidAccountList();
+
+    public function getSubAccountForAr();
 }
