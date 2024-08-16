@@ -51,10 +51,6 @@ class CashBookRepository implements CashBookInterface
                 }
             }
             UnsetData($transaction, ['ledgers']);
-            // if (in_array(33, $cashAccountId) || in_array(34, $cashAccountId)) {
-            //    $transaction->transaction_ledgers=$transaction->ledgers->whereNotIn('account_id',$cashAccountId)->values();
-            // }
-            // UnsetData($transaction, ['ledgers']);
         }
         $balance = (new CashBookTransaction())->getOpeningBalance($request);
         $data = new stdClass();

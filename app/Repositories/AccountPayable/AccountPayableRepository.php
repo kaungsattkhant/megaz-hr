@@ -106,7 +106,6 @@ class AccountPayableRepository implements AccountPayableInterface
                 'personable_type'=>'supplier',
                 'action' => 'debit',
             ]);
-
             DB::commit();
             return $transaction;
         } catch (\Exception $e) {
