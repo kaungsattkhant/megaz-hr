@@ -216,3 +216,6 @@ Route::view('/advanced', 'advanced.index')->name('advance');
 
 Route::view('/advanced/{id}/detail', 'advanced.detail');
 Route::view('prepaid', 'prepaid.index')->name('prepaid');
+Route::view('/account_receivable', 'AR.index')->name('account_receivable');
+Route::view('/account_receivable/{id}/detail', 'AR.detail');
+
