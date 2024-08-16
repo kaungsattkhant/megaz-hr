@@ -11,12 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('delivery_charges', function (Blueprint $table) {
+        Schema::create('available_cooking_places', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('township_id')->constrained()->onDelete('cascade');
-            $table->double('amount');
-            $table->dateTime('date_time')->default();
-            $table->boolean('is_active')->default(1);
+            $table->string('cooking_placeable_type');
+            $table->unsignedBigInteger('cooking_placeable_id');
+            $table->foreignId('cooking_place_id')->constrained()->onDelete('cascade');
             $table->timestamps();
         });
     }
@@ -26,6 +25,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('delivery_charges');
+        Schema::dropIfExists('available_cooking_places');
     }
 };

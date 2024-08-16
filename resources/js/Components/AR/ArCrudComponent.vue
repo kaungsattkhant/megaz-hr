@@ -1,5 +1,7 @@
 <template>
     <div class="flex justify-between mb-3">
+        <notifications position="top center" />
+
         <div class=" flex">
             <label for="search" class="search-input">
                 <input type="text" class="input-search" placeholder="Search">
@@ -30,7 +32,7 @@
                             <th scope="col" class="">
                                 Receivable Amount
                             </th>
-                            
+
                             <th scope="col" class="">
 
                             </th>
@@ -87,7 +89,7 @@
                     </div>
                     <form @submit.prevent="btnClickedCreateAr()">
                         <div class="relative px-12 py-4" data-te-modal-body-ref>
-                            
+
 
                             <div class="mb-4">
                                 <label class="label-form mb-3">Sub Account</label>
@@ -114,7 +116,7 @@
                                 <label for="" class="block text-sm text-black mb-3">
                                     Amount
                                 </label>
-                                <input type="text" placeholder="Amount" v-model="amount_create"
+                                <input type="number" placeholder="Amount" v-model="amount_create"
                                     class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
                             </div>
                             <div class="mb-4">
@@ -167,7 +169,7 @@
                                 <label for="" class="block text-sm text-black mb-3">
                                     Amount
                                 </label>
-                                <input type="text" placeholder="Amount" v-model="amount_paid"
+                                <input type="number" placeholder="Amount" v-model="amount_paid"
                                     class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
                             </div>
                             <div class="mb-4">
