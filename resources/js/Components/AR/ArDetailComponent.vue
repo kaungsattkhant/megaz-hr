@@ -15,12 +15,6 @@
                 <!-- <input type="month" class="input-ui  mr-2 h-8" v-model="selectedMonth" @change="monthChange()"> -->
             </div>
             <div class="flex justify-end flex-col">
-
-                <button type="button"
-                    class="add-btn transition duration-150 ease-in-out focus:outline-none focus:ring-0 "
-                    data-te-toggle="modal" data-te-target="#create_modal">
-                    Add New
-                </button>
             </div>
         </div>
 
@@ -55,7 +49,7 @@
                                         {{ index+1 }}
                                     </td>
                                     <td class="whitespace-nowrap">
-                                        {{ ar.date_time }}
+                                        {{ formatDateTime(ar.date_time) }}
                                     </td>
                                     <td class="whitespace-nowrap">
                                         {{ ar.type }}
@@ -95,7 +89,21 @@
         methods: {
             ...mapGetters(['getToken']),
 
+            formatDateTime(dateString) {
+                const date = new Date(dateString.replace(' ', 'T')); // Convert to ISO format
 
+                const options = {
+                    day: '2-digit',
+                    month: 'short',
+                    year: 'numeric',
+                    hour: 'numeric',
+                    minute: 'numeric',
+                    hour12: true
+                };
+
+                // Format the date to '16 Aug 2024, 4:10 PM'
+                return date.toLocaleString('en-US', options).replace(',', '');
+            },
             async getArDetail(){
                 const response = await getApiData({ url: '/api/account/'+this.arId + '/account_receivable_lists' , token: this.getToken() });
                 if(response.data){
