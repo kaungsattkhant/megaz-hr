@@ -13,7 +13,7 @@ class AccountReceivableRepository implements AccountReceivableRepositoryInterfac
     public function createAR(Request $request)
     {
         DB::beginTransaction();
-        try{
+        try {
             $data = $request->all();
             $data['created_by'] = UserData()->id;
             $data['type'] = "ar";
@@ -22,7 +22,7 @@ class AccountReceivableRepository implements AccountReceivableRepositoryInterfac
                 'date' => now(),
                 'created_by' => UserData()->id,
                 'description' => "account_receivable",
-                'transactionable_id' =>$ar->id,
+                'transactionable_id' => $ar->id,
                 'transactionable_type' => 'account_receivable',
                 'is_confirmed' => 1,
             ]);
@@ -45,11 +45,9 @@ class AccountReceivableRepository implements AccountReceivableRepositoryInterfac
 
             DB::commit();
             ResponseData($ar);
-
-        }catch(\Exception $e)
-        {
+        } catch (\Exception $e) {
             DB::rollBack();
-            ResponseData($e->getMessage(),422);
+            ResponseData($e->getMessage(), 422);
             throw $e;
         }
     }
@@ -57,7 +55,7 @@ class AccountReceivableRepository implements AccountReceivableRepositoryInterfac
     public function paidAr(Request $request)
     {
         DB::beginTransaction();
-        try{
+        try {
             $data = $request->all();
             $data['type'] = "ar_paid";
             $data['created_by'] = UserData()->id;
@@ -67,7 +65,7 @@ class AccountReceivableRepository implements AccountReceivableRepositoryInterfac
                 'date' => now(),
                 'created_by' => UserData()->id,
                 'description' => "account_receivable_paid",
-                'transactionable_id' =>$paidAr->id,
+                'transactionable_id' => $paidAr->id,
                 'transactionable_type' => 'account_receivable_paid',
                 'is_confirmed' => 1,
             ]);
@@ -90,20 +88,35 @@ class AccountReceivableRepository implements AccountReceivableRepositoryInterfac
 
             DB::commit();
             ResponseData($paidAr);
-
-        }catch(\Exception $e)
-        {
+        } catch (\Exception $e) {
             DB::rollBack();
-            ResponseMessage($e->getMessage(),422);
+            ResponseMessage($e->getMessage(), 422);
             throw $e;
         }
     }
 
 
-   public function accountReceivableListDetail(int $id)
-   {
-        $accountWithAr = AccountReceivable::where('account_id',$id)->get();
+    public function accountReceivableListDetail(int $id)
+    {
+        $accountWithAr = AccountReceivable::where('account_id', $id)->get();
         ResponseData($accountWithAr);
-   }
+    }
 
+    public function accountReceivableList(Request $request)
+    {
+        $accountReceivable = Account::withSum(['accountReceivables as ar_sum' => function ($query) {
+            $query->where('type', 'ar');
+        }], 'amount')
+            ->withSum(['accountReceivables as ar_paid_sum' => function ($query) {
+                $query->where('type', 'ar_paid');
+            }], 'amount')
+            ->withCount('accountReceivables')
+            ->having('account_receivables_count', '>', 0)
+            ->get(['id', 'account_code', 'name'])
+            ->map(function ($account) {
+                $account->ar_balance = $account->ar_sum - $account->ar_paid_sum;
+                return $account;
+            });
+        ResponseData($accountReceivable);
+    }
 }
