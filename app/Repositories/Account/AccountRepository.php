@@ -24,9 +24,16 @@ class AccountRepository implements AccountInterface
                     $q->where('accounts.name', 'LIKE', '%' . $request->search_input . '%')
                         ->orWhere('accounts.account_code', 'LIKE', '%' . $request->search_input . '%');
                 })
-                ->select('accounts.is_active', 'accounts.id', 'accounts.name', 'accounts.account_code', 'accounts.sub_account_id', 'sub_accounts.name as sub_account_name',
+                ->select(
+                    'accounts.is_active',
+                    'accounts.id',
+                    'accounts.name',
+                    'accounts.account_code',
+                    'accounts.sub_account_id',
+                    'sub_accounts.name as sub_account_name',
                     DB::raw('COALESCE(SUM(CASE WHEN ledgers.action = "debit" THEN ledgers.value ELSE 0 END), 0) as debit_amount'),
-                    DB::raw('COALESCE(SUM(CASE WHEN ledgers.action = "credit" THEN ledgers.value ELSE 0 END), 0) as credit_amount'))
+                    DB::raw('COALESCE(SUM(CASE WHEN ledgers.action = "credit" THEN ledgers.value ELSE 0 END), 0) as credit_amount')
+                )
                 ->groupBy('accounts.id', 'accounts.name')
                 ->paginate(config('common.list_count'));
         }
@@ -79,13 +86,15 @@ class AccountRepository implements AccountInterface
     }
 
 
-    public function getSecondAccount($type){
-        $second_account=Account::where('type',$type)->get();
+    public function getSecondAccount($type)
+    {
+        $second_account = Account::where('type', $type)->get();
         return $second_account;
     }
 
-    public function getThirdAccount($type){
-        $account=Account::where('type',$type)->get();
+    public function getThirdAccount($type)
+    {
+        $account = Account::where('type', $type)->get();
         return $account;
         // $third_account=ThirdAccount::whereHas('second_account.account',function($q)use($sub_account_id){
         //     $q->where('sub_account_id',$sub_account_id);
@@ -114,7 +123,7 @@ class AccountRepository implements AccountInterface
                 'account_code' => $code,
                 'account_id' => $request->account_id,
                 'sub_account_id' => $request->sub_account_id,
-                'type'=>$request->type,
+                'type' => $request->type,
             ]);
             DB::commit();
             return $account;
@@ -133,7 +142,7 @@ class AccountRepository implements AccountInterface
         if ($latestAccount) {
             $latestAccountCodeNo = explode('-', $latestAccount->account_code);
             $new_account_code = (int) $latestAccountCodeNo[3] + 1;
-            $code = $latestAccountCodeNo[0] . '-' . $latestAccountCodeNo[1] . '-'.$latestAccountCodeNo[2] . '-' . $new_account_code;
+            $code = $latestAccountCodeNo[0] . '-' . $latestAccountCodeNo[1] . '-' . $latestAccountCodeNo[2] . '-' . $new_account_code;
         } else {
             $code = $request->original_account_code . '-' . "1";
         }
@@ -143,9 +152,9 @@ class AccountRepository implements AccountInterface
                 'name' => $request->name,
                 'account_code' => $code,
                 'account_id' => $request->account_id,
-                'sub_account_id'=>$request->sub_account_id,
+                'sub_account_id' => $request->sub_account_id,
                 // 'type'=>'is_third',
-                'type'=>$request->type,
+                'type' => $request->type,
             ]);
             DB::commit();
             return $account;
@@ -178,7 +187,7 @@ class AccountRepository implements AccountInterface
                 'account_code' => $code,
                 'account_id' => $request->account_id,
                 'sub_account_id' => $request->sub_account_id,
-                'type'=>$request->type,
+                'type' => $request->type,
             ]);
             DB::commit();
             return $account;
@@ -191,8 +200,17 @@ class AccountRepository implements AccountInterface
 
     public function prepaidAccountList()
     {
-        $accounts = Account::where('sub_account_id',11)->where('type','is_second')->get();
+        $accounts = Account::where('sub_account_id', 11)->where('type', 'is_second')->get();
         return $accounts;
     }
 
+    public function getSubAccountForAr()
+    {
+        $specificAccountCodes = ['2-1050', '2-2000'];
+
+        $accounts = SubAccount::whereIn('account_code', $specificAccountCodes)
+            ->get();
+
+        ResponseData($accounts);
+    }
 }
