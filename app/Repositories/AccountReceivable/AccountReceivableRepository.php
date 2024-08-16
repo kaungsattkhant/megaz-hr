@@ -57,6 +57,21 @@ class AccountReceivableRepository implements AccountReceivableRepositoryInterfac
         DB::beginTransaction();
         try {
             $data = $request->all();
+
+            $account = Account::withSum(['accountReceivables as ar_sum' => function ($query) {
+                $query->where('type', 'ar');
+            }], 'amount')
+            ->withSum(['accountReceivables as ar_paid_sum' => function ($query) {
+                $query->where('type', 'ar_paid');
+            }], 'amount')
+            ->find($data['account_id']);
+
+            $ar_balance = $account->ar_sum - $account->ar_paid_sum;
+
+            if ($data['amount'] > $ar_balance) {
+                ResponseMessage('Your amount is greater than the balance');
+            }
+
             $data['type'] = "ar_paid";
             $data['created_by'] = UserData()->id;
             $paidAr = AccountReceivable::create($data);
