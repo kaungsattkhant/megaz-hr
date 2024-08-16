@@ -11,15 +11,13 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('prepaids', function (Blueprint $table) {
+        Schema::create('account_receivables', function (Blueprint $table) {
             $table->id();
-            $table->string('title');
+            $table->dateTime('date_time')->default(CurrentTime());
             $table->foreignId('account_id')->constrained()->onDelete('cascade');
-            $table->dateTime('from_date');
-            $table->dateTime('to_date');
-            $table->double('total_amount');
-            $table->double('prepaid_amount');
-            $table->double('monthly_cost');
+            $table->unsignedBigInteger('cash_account_id');
+            $table->double('amount');
+            $table->string('type');
             $table->unsignedBigInteger('created_by');
             $table->timestamps();
         });
@@ -30,6 +28,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('prepaids');
+        Schema::dropIfExists('account_receivables');
     }
 };
