@@ -332,6 +332,7 @@ Route::middleware('auth:api')->group(function () {
     {
         Route::get('/cooking_places','listAllCookingPlaces');
         Route::post('/cooking_places','createCookingPlace');
+        Route::post('/cooking_places/{id}','updateCookingPlace');
         Route::delete('/cooking_places/{id}','deleteCookingPlace');
     });
 

@@ -39,7 +39,6 @@ class SkillRepository implements SkillRepositoryInterface
     {
         DB::beginTransaction();
         try{
-
             $data = $request->all();
             $skill = Skill::find($id);
             $skill->update($data);

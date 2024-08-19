@@ -26,14 +26,43 @@ class CookingPlaceRepository implements CookingPlaceRepositoryInterface
             $availableCookingPlaces = json_decode($data['availableCookingPlaces'],true);
             foreach ($availableCookingPlaces as $availableCookingPlace) {
                 AvailableCookingPlace::create([
-                    'cooking_placeable_id' => $availableCookingPlace['id'],    // Access as an array
-                    'cooking_placeable_type' => $availableCookingPlace['type'], // Access as an array
+                    'cooking_placeable_id' => $availableCookingPlace['id'],
+                    'cooking_placeable_type' => $availableCookingPlace['type'],
                     'cooking_place_id' => $cookingPlace->id
                 ]);
             }
 
             DB::commit();
             ResponseData($cookingPlace);
+        }catch(\Exception $e)
+        {
+            DB::rollBack();
+            ResponseMessage($e->getMessage(), 422);
+            throw $e;
+        }
+    }
+
+    public function updateCookingPlace(Request $request,int $id)
+    {
+        DB::beginTransaction();
+        try{
+            $data = $request->all();
+            $cookingPlace = CookingPlace::find($id);
+            $cookingPlace->update($data);
+
+            $availableCookingPlaces = json_decode($data['availableCookingPlaces'],true);
+            $cookingPlace->availableCookingPlaces()->delete();
+            foreach ($availableCookingPlaces as $availableCookingPlace) {
+                AvailableCookingPlace::create([
+                    'cooking_placeable_id' => $availableCookingPlace['id'],
+                    'cooking_placeable_type' => $availableCookingPlace['type'],
+                    'cooking_place_id' => $cookingPlace->id
+                ]);
+            }
+
+            DB::commit();
+            ResponseData($cookingPlace);
+
         }catch(\Exception $e)
         {
             DB::rollBack();

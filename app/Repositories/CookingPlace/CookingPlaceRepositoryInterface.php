@@ -10,6 +10,8 @@ interface CookingPlaceRepositoryInterface
 
     public function createCookingPlace(Request $request);
 
+    public function updateCookingPlace(Request $request,int $id);
+
     public function deleteCookingPlace(int $id);
 
 }
