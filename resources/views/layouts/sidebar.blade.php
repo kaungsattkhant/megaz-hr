@@ -4,6 +4,25 @@
 
                 <div class="relative w-[15rem] pt-12">
                     <ul class=" mb-4">
+                        <li>
+                            <button class="flex items-center pl-9 my-2 text-sm w-full" type="button" data-te-collapse-init
+                                data-te-ripple-init data-te-ripple-color="light" data-te-target="#collapseFinanceReport"
+                                aria-expanded="false" aria-controls="collapseExample">
+                                <i class="fal fa-sack-dollar  pr-3"></i>
+                                Finance Report <i class="fas fa-angle-down absolute right-2"></i>
+                            </button>
+                            <div class="!visible hidden text-center" id="collapseFinanceReport" data-te-collapse-item>
+                                <ul>
+                                    <li>
+                                        <a href="/cash_flow_statement"
+                                            class="flex items-center text-left @yield('office_cash')">
+                                            <i class="fal fa-tasks  pr-3"></i>
+                                            Cash Flow statement
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </li>
                         @if (checkFeaturePermission('staff'))
                             <li>
                                 <a href="{{ route('staff') }}" class="flex items-center @yield('staffs')">
