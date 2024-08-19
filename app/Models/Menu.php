@@ -57,4 +57,9 @@ class Menu extends BaseModel
         return $this->belongsToMany(Area::class,'menu_area');
     }
 
+    public function availableCookingPlaces()
+    {
+        return $this->morphMany(AvailableCookingPlace::class, 'cooking_placeable');
+    }
+
 }

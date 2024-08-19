@@ -23,10 +23,10 @@ class RoleRepository implements RoleRepositoryInterface
 
             if ($request->department_id) {
                 $totalCount = Role::where('department_id', $request->department_id)->count();
-                $roles = Role::where('department_id', $request->department_id)->skip($skip)->take($perPage)->with('department')->get();
+                $roles = Role::where('department_id', $request->department_id)->skip($skip)->take($perPage)->with('department','skills')->get();
             } else {
                 $totalCount = Role::count();
-                $roles = Role::skip($skip)->take($perPage)->with('department')->get();
+                $roles = Role::skip($skip)->take($perPage)->with('department','skills')->get();
             }
 
             $paginationData = MakePaginationData($request, $totalCount, 'roles');
@@ -35,9 +35,9 @@ class RoleRepository implements RoleRepositoryInterface
             return $paginationData;
         } else {
             if ($request->department_id) {
-                $roles = Role::where('department_id', $request->department_id)->with('department')->get();
+                $roles = Role::where('department_id', $request->department_id)->with('department','skills')->get();
             } else {
-                $roles = Role::with('department')->get();
+                $roles = Role::with('department','skills')->get();
             }
             return $roles;
         }

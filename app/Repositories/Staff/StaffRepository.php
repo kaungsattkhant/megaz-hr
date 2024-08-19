@@ -110,6 +110,15 @@ class StaffRepository implements StaffRepositoryInterface
                 }
             }
 
+            if(isset($data['skills']))
+            {
+                $skills = json_decode($data['skills']);
+                foreach ($skills as $skill)
+                {
+                    $staff->skills()->attach($skill);
+                }
+            }
+
             $data['staff_id'] = $staff->id;
             $this->createEmegercyContact($data);
             DB::commit();
@@ -174,6 +183,12 @@ class StaffRepository implements StaffRepositoryInterface
                 if (isset($data['featureIds']) && $data['featureIds'] !== null) {
                     $featureIds = json_decode($data['featureIds'], true);
                     $staff->features()->sync($featureIds);
+                }
+
+                if(isset($data['skills']) && $data['skills'] !== null)
+                {
+                    $skills = json_decode($data['skills'],true);
+                    $staff->skills()->sync($skills);
                 }
             }
             DB::commit();

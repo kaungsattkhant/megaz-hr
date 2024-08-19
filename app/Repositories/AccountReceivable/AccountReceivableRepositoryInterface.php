@@ -10,7 +10,7 @@ interface AccountReceivableRepositoryInterface
 
     public function paidAr(Request $request);
 
-    // public function accountReceivableList(Request $request);
+    public function accountReceivableList(Request $request);
 
    public function accountReceivableListDetail(int $id);
 }
