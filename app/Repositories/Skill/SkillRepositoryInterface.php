@@ -13,4 +13,6 @@ interface SkillRepositoryInterface
     public function updateSkill(Request $request, int $id);
 
     public function deleteSkill(int $id);
+
+    public function skillDetail(int $id);
 }

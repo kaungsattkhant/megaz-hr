@@ -324,6 +324,7 @@ Route::middleware('auth:api')->group(function () {
     {
         Route::get('/skills','listAllSkills');
         Route::post('/skills','createSkill');
+        Route::get('/skills/{id}','skillDetail');
         Route::post('/skills/{id}','updateSkill');
         Route::delete('/skills/{id}','deleteSkill');
     });
@@ -331,6 +332,7 @@ Route::middleware('auth:api')->group(function () {
     Route::controller(CookingPlaceAPIController::class)->group(function()
     {
         Route::get('/cooking_places','listAllCookingPlaces');
+        Route::get('/cooking_places/{id}','detailCookingPlace');
         Route::post('/cooking_places','createCookingPlace');
         Route::post('/cooking_places/{id}','updateCookingPlace');
         Route::delete('/cooking_places/{id}','deleteCookingPlace');

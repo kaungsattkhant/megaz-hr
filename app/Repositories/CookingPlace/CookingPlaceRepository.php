@@ -42,6 +42,12 @@ class CookingPlaceRepository implements CookingPlaceRepositoryInterface
         }
     }
 
+    public function cookingPlaceDetail(int $id)
+    {
+        $cookingPlace = CookingPlace::with('area','availableCookingPlaces.cookingPlaceable')->find($id);
+        ResponseData($cookingPlace);
+    }
+
     public function updateCookingPlace(Request $request,int $id)
     {
         DB::beginTransaction();

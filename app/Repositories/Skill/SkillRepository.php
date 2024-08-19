@@ -53,6 +53,12 @@ class SkillRepository implements SkillRepositoryInterface
         }
     }
 
+    public function skillDetail(int $id)
+    {
+        $skill = Skill::with('role')->find($id);
+        ResponseData($skill);
+    }
+
     public function deleteSkill(int $id)
     {
         DB::beginTransaction();

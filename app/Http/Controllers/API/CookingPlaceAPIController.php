@@ -26,6 +26,11 @@ class CookingPlaceAPIController extends Controller
         $this->cookingPlaceRepo->createCookingPlace($request);
     }
 
+    public  function detailCookingPlace(int $id)
+    {
+        $this->cookingPlaceRepo->cookingPlaceDetail($id);
+    }
+
     public function updateCookingPlace(Request $request,int $id)
     {
         $this->cookingPlaceRepo->updateCookingPlace($request, $id);

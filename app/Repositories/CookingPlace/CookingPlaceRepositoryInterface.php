@@ -14,4 +14,7 @@ interface CookingPlaceRepositoryInterface
 
     public function deleteCookingPlace(int $id);
 
+    public function cookingPlaceDetail(int $id);
+
 }
+

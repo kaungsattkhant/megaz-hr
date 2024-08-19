@@ -22,4 +22,9 @@ class Skill extends Model
     {
         return $this->morphMany(AvailableCookingPlace::class, 'cooking_placeable');
     }
+
+        public function staffs()
+        {
+            return $this->belongsToMany(Staff::class,'skill_staff');
+        }
 }

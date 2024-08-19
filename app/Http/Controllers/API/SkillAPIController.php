@@ -26,6 +26,11 @@ class SkillAPIController extends Controller
         $this->skillRepo->createSkill($request);
     }
 
+    public function skillDetail(int $id)
+    {
+        $this->skillRepo->skillDetail($id);
+    }
+
     public function updateSkill(int $id,Request $request)
     {
         $this->skillRepo->updateSkill($request, $id);
