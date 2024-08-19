@@ -114,6 +114,7 @@ import JournalsCrudComponent from './Components/Journals/JournalsCrudComponent.v
 import AdvancedCrudComponent from './Components/Advanced/AdvancedCrudComponent.vue';
 import AdvancedDetailComponent from './Components/Advanced/AdvancedDetailComponent.vue';
 import PrepaidCrudComponent from './Components/Prepaid/PrepaidCrudComponent.vue';
+import CashFlowStatementComponent from './Components/CashFlowStatement/CashFlowStatementComponent.vue';
 
 app.component('NavBarComponent', NavBarComponent);
 app.component('StaffListComponent', StaffListComponent);
@@ -207,7 +208,10 @@ app.component('JournalsCrudComponent',JournalsCrudComponent);
 app.component('AdvancedCrudComponent',AdvancedCrudComponent);
 app.component('AdvancedDetailComponent',AdvancedDetailComponent);
 app.component('PrepaidCrudComponent',PrepaidCrudComponent);
+app.component('CashFlowStatementComponent',CashFlowStatementComponent);
 
 app.use(store);
 app.use(Notifications);
 app.mount('#app');
+
+

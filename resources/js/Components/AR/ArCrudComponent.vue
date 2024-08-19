@@ -227,9 +227,6 @@
         methods: {
             ...mapGetters(['getToken']),
 
-
-
-
             async getArList(){
                 const response = await getApiData({ url: '/api/account_receivable_lists', token: this.getToken() });
                 if(response.data){
