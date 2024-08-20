@@ -39,4 +39,9 @@ class Role extends BaseModel
     {
         return $this->belongsToMany(Staff::class);
     }
+
+    public function skills()
+    {
+        return $this->hasMany(Skill::class,'role_id');
+    }
 }

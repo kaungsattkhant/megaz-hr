@@ -59,7 +59,7 @@ use App\Http\Controllers\API\PurchaseOrderAPIController;
 use App\Http\Controllers\API\DeliveryChargeAPIController;
 use App\Http\Controllers\API\ItemUsageForecastController;
 use App\Http\Controllers\API\BirthDayPromotionAPIController;
-
+use App\Http\Controllers\API\CookingPlaceAPIController;
 use App\Http\Controllers\API\FixedAssetPurchaseAPIController;
 use App\Http\Controllers\API\PurchaseOrderItemLeftController;
 use App\Http\Controllers\API\MenuServiceDiscountAPIController;
@@ -72,6 +72,7 @@ use App\Http\Controllers\API\Customers\PackageAPIController as CustomersPackageA
 use App\Http\Controllers\API\Customers\MenuCategoryAPIController as CustomerMenuCategoryAPIController;
 use App\Http\Controllers\API\JournalAPIController;
 use App\Http\Controllers\API\PrepaidAPIController;
+use App\Http\Controllers\API\SkillAPIController;
 use App\Http\Controllers\API\StaffAdvanceAPIController;
 
 /*
@@ -318,6 +319,26 @@ Route::middleware('auth:api')->group(function () {
         Route::get('/account_receivable_lists','accountReceivableList');
         Route::get('/account/{id}/account_receivable_lists','accountReceivableDetail');
     });
+
+    Route::controller(SkillAPIController::class)->group(function()
+    {
+        Route::get('/skills','listAllSkills');
+        Route::post('/skills','createSkill');
+        Route::get('/skills/{id}','skillDetail');
+        Route::post('/skills/{id}','updateSkill');
+        Route::delete('/skills/{id}','deleteSkill');
+        Route::get('/roles/{role_id}/skills','skillByRole');
+    });
+
+    Route::controller(CookingPlaceAPIController::class)->group(function()
+    {
+        Route::get('/cooking_places','listAllCookingPlaces');
+        Route::get('/cooking_places/{id}','detailCookingPlace');
+        Route::post('/cooking_places','createCookingPlace');
+        Route::post('/cooking_places/{id}','updateCookingPlace');
+        Route::delete('/cooking_places/{id}','deleteCookingPlace');
+    });
+
 });
 
 Route::controller(PackageAPIController::class)->group(function()

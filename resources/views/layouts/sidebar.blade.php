@@ -48,12 +48,34 @@
                             </a>
                         </li>
 
-                        <li>
-                            <a href="{{ route('prepaid') }}" class="flex items-center @yield('prepaid')">
-                                <i class="fas fa-dollar-sign"></i>
-                                Prepaid
-                            </a>
-                        </li>
+
+                            <li>
+                                <a href="{{ route('prepaid') }}" class="flex items-center @yield('prepaid')">
+                                    <i class="fas fa-dollar-sign"></i>
+                                    Prepaid
+                                </a>
+                            </li>
+
+                            <li>
+                                <a href="{{ route('account_receivable') }}" class="flex items-center @yield('ar')">
+                                    <i class="fas fa-coins"></i>
+                                    AR
+                                </a>
+                            </li>
+
+                            <li>
+                                <a href="{{ route('skill') }}" class="flex items-center @yield('skill')">
+                                    <i class="far fa-award"></i>
+                                    Skill
+                                </a>
+                            </li>
+
+                            <li>
+                                <a href="{{ route('cookingPlace') }}" class="flex items-center @yield('cookingPlace')">
+                                    <i class="far fa-hat-chef"></i>
+                                    Cooking Place
+                                </a>
+                            </li>
                         @endif
                         @if (checkFeaturePermission('department'))
                         <li>

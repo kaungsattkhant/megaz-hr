@@ -222,3 +222,6 @@ Route::middleware(['departments:cash-flow-statement'])->group(function () {
 Route::view('/cash_flow_statement', 'cash_flow_statement.index');
 });
 
+Route::view('/skill','skill.index')->name('skill');
+Route::view('/cooking_places','cookingPlace.index')->name('cookingPlace');
+

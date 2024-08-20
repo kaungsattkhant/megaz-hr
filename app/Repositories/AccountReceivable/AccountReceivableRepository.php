@@ -71,7 +71,7 @@ class AccountReceivableRepository implements AccountReceivableRepositoryInterfac
             $ar_balance = $account->ar_sum - $account->ar_paid_sum;
 
             if ($data['amount'] > $ar_balance) {
-                ResponseMessage('Your amount is greater than the balance');
+                ResponseMessage('Your amount is greater than the balance',422);
             }
 
             $data['type'] = "ar_paid";
