@@ -114,8 +114,11 @@ import JournalsCrudComponent from './Components/Journals/JournalsCrudComponent.v
 import AdvancedCrudComponent from './Components/Advanced/AdvancedCrudComponent.vue';
 import AdvancedDetailComponent from './Components/Advanced/AdvancedDetailComponent.vue';
 import PrepaidCrudComponent from './Components/Prepaid/PrepaidCrudComponent.vue';
+import CashFlowStatementComponent from './Components/CashFlowStatement/CashFlowStatementComponent.vue';
 import SkillCrudComponent from './Components/Skill/SkillCrudComponent.vue';
 import CookingPlaceComponent from './Components/CookingPlace/CookingPlaceComponent.vue';
+import CookingPlaceCreateComponent from './Components/CookingPlace/CookingPlaceCreateComponent.vue';
+
 
 app.component('NavBarComponent', NavBarComponent);
 app.component('StaffListComponent', StaffListComponent);
@@ -209,9 +212,13 @@ app.component('JournalsCrudComponent',JournalsCrudComponent);
 app.component('AdvancedCrudComponent',AdvancedCrudComponent);
 app.component('AdvancedDetailComponent',AdvancedDetailComponent);
 app.component('PrepaidCrudComponent',PrepaidCrudComponent);
+app.component('CashFlowStatementComponent',CashFlowStatementComponent);
 app.component('SkillCrudComponent',SkillCrudComponent);
 app.component('CookingPlaceComponent',CookingPlaceComponent);
+app.component('CookingPlaceCreateComponent',CookingPlaceCreateComponent);
 
 app.use(store);
 app.use(Notifications);
 app.mount('#app');
+
+
