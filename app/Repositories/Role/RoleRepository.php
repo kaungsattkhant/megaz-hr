@@ -76,6 +76,6 @@ class RoleRepository implements RoleRepositoryInterface
     }
 
     public function getRoleByDepartment($department_id){
-        return Role::where('department_id',$department_id)->get();
+        return Role::where('department_id',$department_id)->with('skill')->get();
     }
 }

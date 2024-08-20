@@ -624,7 +624,6 @@ export default {
             this.selectedSkills.forEach((skill) => {
                 this.skillIds.push(skill.id);
             });
-            console.log(this.skillIds);
 
             this.roleIds = [this.selectedRoles.id];
 

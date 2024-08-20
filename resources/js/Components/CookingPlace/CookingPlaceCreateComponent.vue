@@ -19,7 +19,7 @@
                 <label for="" class="label-form mb-3">
                     Area
                 </label>
-                
+
                 <div class="bg-white mb-0 w-full text-sm inline-block h-[34px] dark:bg-white !text-black"
                     data-te-select-wrapper-ref>
                     <select data-te-select-init data-te-select-placeholder="Select Category"
@@ -35,7 +35,7 @@
                 </label>
                 <div class="bg-white mb-0 w-full text-sm inline-block h-[34px] dark:bg-white !text-black"
                     data-te-select-wrapper-ref>
-                    <select data-te-select-init data-te-select-placeholder="Select Type" data-te-select-filter="true" 
+                    <select data-te-select-init data-te-select-placeholder="Select Type" data-te-select-filter="true"
                         name="" id="" v-model="selectedType" class="input-ui !text-black" @change="typeChange()">
                         <option :value="type.value" v-for="(type, index) in typeList" class="!uppercase"
                             :key="index"> {{ type.name }} </option>
@@ -44,7 +44,7 @@
             </div>
             <div v-if="selectedType == 'menu'" class="mb-4 col-span-3 pb-6 rounded-md">
                 <label for="" class="label-form mb-3">
-                    Menu Category 
+                    Menu Category
                 </label>
                 <div class="bg-white mb-0 w-full text-sm inline-block h-[34px] dark:bg-white !text-black"
                     data-te-select-wrapper-ref>
@@ -57,7 +57,7 @@
             </div>
             <div v-if="selectedType == 'menu'" class="mb-4 col-span-3 pb-6 rounded-md">
                 <label for="" class="label-form mb-3">
-                    Menu Name 
+                    Menu Name
                 </label>
                 <div class="bg-white mb-0 w-full text-sm inline-block h-[34px]"
                     data-te-select-wrapper-ref>
@@ -101,7 +101,7 @@
 
 
 
-            
+
 
         </div>
 
@@ -137,7 +137,7 @@
                                     <th scope="col" class="">
                                         Type
                                     </th>
-                                    
+
                                     <th scope="col" class="">
 
                                     </th>
@@ -149,7 +149,7 @@
                                     <td class="">
                                         {{ menu.name }}
                                     </td>
-                                    
+
                                     <td class="">
                                         {{ menu.type }}
                                     </td>
@@ -165,7 +165,7 @@
                 </div>
                 <div class="hidden opacity-0 transition-opacity duration-150 ease-linear data-[te-tab-active]:block"
                     id="tabs-skill" role="tabpanel" aria-labelledby="tabs-skill-tab">
-                    
+
                     <div class="table-container">
                         <table class="primary-table">
                             <thead class="">
@@ -176,7 +176,7 @@
                                     <th scope="col" class="">
                                         Type
                                     </th>
-                                    
+
                                     <th scope="col" class="">
 
                                     </th>
@@ -188,7 +188,7 @@
                                     <td class="">
                                         {{ skill.name }}
                                     </td>
-                                    
+
                                     <td class="">
                                         {{ skill.type }}
                                     </td>
@@ -397,7 +397,7 @@ export default {
         },
         menuCategoryChange(){
             this.getMenuList();
-        },  
+        },
         async getMenuCategoryList(){
             let response = await getApiData({ url: '/api/menu_categories', token: this.getToken() });
             if (response.data) {
@@ -433,7 +433,7 @@ export default {
                 });
                 console.log(this.selectedType + ' type')
             }
-            
+
         },
 
         btnclickedCreateCookingPlace(){
@@ -462,9 +462,9 @@ export default {
                     window.location.replace('/cooking_places');
                     console.log('success')
                 }
-                
+
             },
-        
+
 
 
         // async getCookingAreaList(departmentId) {
@@ -474,7 +474,7 @@ export default {
         //     }
         // },
 
-        
+
     },
 
     watch: {
