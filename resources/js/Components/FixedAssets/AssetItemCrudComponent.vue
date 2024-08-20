@@ -1,6 +1,6 @@
 <template>
     <div class="mt-4 bg-white">
-    <notifications position="top center" />
+        <notifications position="top center" />
 
         <h1 class="font-bold text-lg text-center p-3">Asset Items</h1>
         <div class="p-3 flex justify-center">
@@ -8,13 +8,13 @@
                 <form @submit.prevent="assetItemCreate" class="flex justify-center w-3/5 ">
                     <div class="w-full">
                         <div class="my-5">
-                            <input type="text" v-model="assetItemName" class="py-2 px-2 w-full rounded-md border border-gray-300"
-                                placeholder="Name">
+                            <input type="text" v-model="assetItemName"
+                                class="py-2 px-2 w-full rounded-md border border-gray-300" placeholder="Name">
                         </div>
 
                         <div class="my-5">
-                            <input type="text" v-model="assetItemCode" class="py-2 px-2 w-full rounded-md border border-gray-300"
-                                placeholder="Item Code">
+                            <input type="text" v-model="assetItemCode"
+                                class="py-2 px-2 w-full rounded-md border border-gray-300" placeholder="Item Code">
                         </div>
 
                         <div class="my-5 flex justify-center">
@@ -38,9 +38,11 @@
                         <div class="my-5">
                             <select placeholder="Second Account Depreciation" v-model="secondAccountDepreciation"
                                 class="py-2 px-2 w-11/12 rounded-md border border-gray-300">
-                                <option :value="null" disabled selected >Second Account Depreciation</option>
-                                <option v-for='(secondAccountDepreciation, index) in secondAccountListDepreciationForAssetItem' :key=index
-                                    :value=secondAccountDepreciation.id>{{ secondAccountDepreciation.name }}</option>
+                                <option :value="null" disabled selected>Second Account Depreciation</option>
+                                <option
+                                    v-for='(secondAccountDepreciation, index) in secondAccountListDepreciationForAssetItem'
+                                    :key=index :value=secondAccountDepreciation.id>{{ secondAccountDepreciation.name }}
+                                </option>
                             </select>
                             <button type="button"
                                 class=" transition duration-150 ease-in-out focus:outline-none focus:ring-0 w-1/12 "
@@ -98,7 +100,7 @@
                             <label for="" class="label-form mb-3">
                                 Accounts
                             </label>
-                            <select type="text" placeholder="Unit" v-model="secondAccountOBJ"
+                            <select placeholder="Unit" v-model="secondAccountOBJ"
                                 class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
                                 <option v-for='(secondAccount, index) in secondAccountList' :key=index
                                     :value=secondAccount>{{ secondAccount.name }}</option>
@@ -158,7 +160,7 @@
                             <label for="" class="label-form mb-3">
                                 Accounts
                             </label>
-                            <select type="text" placeholder="Accounts" v-model="secondDepreciationAccountOBJ"
+                            <select placeholder="Accounts" v-model="secondDepreciationAccountOBJ"
                                 class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
                                 <option v-for='(secondAccountDepreciation, index) in secondAccountDepreciationList'
                                     :key=index :value=secondAccountDepreciation>{{ secondAccountDepreciation.name }}
@@ -208,16 +210,32 @@ export default {
             secondAccountDepreciationList: [],
             secondAccountListForAssetItem: [],
             secondAccountListDepreciationForAssetItem: [],
-            secondAccount:null,
-            secondAccountDepreciation:null,
-            assetItemCode:null,
-            assetItemName:null
+            secondAccount: null,
+            secondAccountDepreciation: null,
+            assetItemCode: null,
+            assetItemName: null
 
         };
     },
 
     methods: {
         ...mapGetters(['getToken', 'getUser']),
+
+        formValidate(valueArray) {
+            for (const obj of valueArray) {
+                for (const [key, value] of Object.entries(obj)) {
+                    if (value === null || value === "") {
+                        this.$notify({
+                            title: 'Input validation',
+                            text: `${key} is required`,
+                            type: 'warn'
+                        });
+                        return false;
+                    }
+                }
+            }
+            return true;
+        },
 
         async getAccountForSecond() {
             let url = `/api/account_by_sub_account/1`;
@@ -255,6 +273,10 @@ export default {
         async createSecondAccount() {
             let url = `/api/create_second_account`;
             let formData = new FormData();
+            let validate = this.formValidate([{ "Second Account Name": this.secondAccountName, "Account": this.secondAccountOBJ }]);
+            if (validate == false) {
+                return false
+            }
             formData.append('name', this.secondAccountName);
             formData.append('account_id', this.secondAccountOBJ.id);
             formData.append('original_account_code', this.secondAccountOBJ.account_code);
@@ -271,7 +293,7 @@ export default {
                     text: `Second Account created successfully`,
                     type: "success"
                 });
-            }else{
+            } else {
                 this.$notify({
                     title: `Input validation`,
                     text: response.message,
@@ -283,6 +305,11 @@ export default {
         async createDepreciationAccount() {
             let url = `/api/create_second_account`;
             let formData = new FormData();
+
+            let validate = this.formValidate([{ "Second Account Depreciation Name": this.secondDepreciationName, "Account": this.secondDepreciationAccountOBJ }]);
+            if (validate == false) {
+                return false;
+            }
             formData.append('name', this.secondDepreciationName);
             formData.append('account_id', this.secondDepreciationAccountOBJ.id);
             formData.append('original_account_code', this.secondDepreciationAccountOBJ.account_code);
@@ -299,7 +326,7 @@ export default {
                     text: `Second Depreciation Account created successfully`,
                     type: "success"
                 });
-            }else{
+            } else {
                 this.$notify({
                     title: `Input validation`,
                     text: response.message,
@@ -308,19 +335,27 @@ export default {
             }
         },
 
-        async assetItemCreate()
-        {
+        async assetItemCreate() {
             let formData = new FormData();
-            formData.append('name',this.assetItemName);
-            formData.append('item_code',this.assetItemCode);
-            formData.append('second_account_id',this.secondAccount);
-            formData.append('second_depreciation_account_id',this.secondAccountDepreciation);
+            // this.formValidate([this.assetItemName,this.assetItemCode,this.secondAccount,this.secondAccountDepreciation]);
+            let validate = this.formValidate([{
+                "Asset Item": this.assetItemName,
+                "Item Code": this.assetItemCode,
+                "Second Account": this.secondAccount,
+                "Second Account Depreciation": this.secondAccountDepreciation
+            }]);
+            if (validate == false) {
+                return false;
+            }
+            formData.append('name', this.assetItemName);
+            formData.append('item_code', this.assetItemCode);
+            formData.append('second_account_id', this.secondAccount);
+            formData.append('second_depreciation_account_id', this.secondAccountDepreciation);
 
             let url = `/api/create_asset_item`;
-            let responseData =await postApiData({url:url,token:this.getToken(),form_data:formData});
+            let responseData = await postApiData({ url: url, token: this.getToken(), form_data: formData });
 
-            if(responseData.success==true)
-            {
+            if (responseData.success == true) {
                 this.assetItemName = '';
                 this.assetItemCode = '';
                 this.secondAccount = null;
@@ -330,7 +365,7 @@ export default {
                     text: `Asset Item created successfully`,
                     type: "success"
                 });
-            }else{
+            } else {
                 this.$notify({
                     title: `Input validation`,
                     text: responseData.message,

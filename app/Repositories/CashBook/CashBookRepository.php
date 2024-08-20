@@ -51,10 +51,6 @@ class CashBookRepository implements CashBookInterface
                 }
             }
             UnsetData($transaction, ['ledgers']);
-            // if (in_array(33, $cashAccountId) || in_array(34, $cashAccountId)) {
-            //    $transaction->transaction_ledgers=$transaction->ledgers->whereNotIn('account_id',$cashAccountId)->values();
-            // }
-            // UnsetData($transaction, ['ledgers']);
         }
         $balance = (new CashBookTransaction())->getOpeningBalance($request);
         $data = new stdClass();
@@ -84,6 +80,7 @@ class CashBookRepository implements CashBookInterface
                     'closing_balance' => $closingBalance,
                     'cash_account_id' => $cashAccountId,
                 ]);
+
             $latestTransaction = Transaction::
                 whereHas('ledgers', function ($query) use ($cashAccountId) {
                 $query->where('account_id', $cashAccountId); #transaction close depend on transaction
@@ -95,12 +92,12 @@ class CashBookRepository implements CashBookInterface
                 $latestTransaction->is_closing = 1;
                 $latestTransaction->closing_date = now();
                 $latestTransaction->save();
-                ResponseMessage('Transaction closing is successfully', 200);
             }
             if ($cashbookBalance) {
                 DB::commit();
                 ResponseMessage('Transaction closing is successfully', 200);
             }
+            ResponseMessage('Something wrong', 200);
         } catch (\Exception $e) {
             DB::rollback();
             ResponseMessage($e->getMessage(), 402);
