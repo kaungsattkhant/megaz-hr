@@ -216,3 +216,12 @@ Route::view('/advanced', 'advanced.index')->name('advance');
 
 Route::view('/advanced/{id}/detail', 'advanced.detail');
 Route::view('prepaid', 'prepaid.index')->name('prepaid');
+Route::view('/account_receivable', 'AR.index')->name('account_receivable');
+Route::view('/account_receivable/{id}/detail', 'AR.detail');
+Route::middleware(['departments:cash-flow-statement'])->group(function () {
+Route::view('/cash_flow_statement', 'cash_flow_statement.index');
+});
+
+Route::view('/skill','skill.index')->name('skill');
+Route::view('/cooking_places','cookingPlace.index')->name('cookingPlace');
+

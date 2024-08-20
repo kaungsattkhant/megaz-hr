@@ -19,9 +19,8 @@ class StaffAdvanceRepository implements StaffAdvanceRepositoryInterface
         try {
             $currentYear = date('Y');
             $currentMonth = date('m');
-            // $currentMonth =7;
             $data = $reqeust->all();
-
+            $data['date_time'] = CurrentTime();
             // $data['date_time'] = "2024-07-13 07:30";
             $data['created_by'] = UserData()->id;
             $staffAdvance = StaffAdvance::create($data);

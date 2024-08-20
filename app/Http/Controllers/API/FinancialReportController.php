@@ -19,4 +19,9 @@ class FinancialReportController extends Controller
         $data=$this->financialRepo->CashFlowStatement($request);
         ResponseData($data);
     }
+
+    public function BalanceSheet(Request $request){
+        $data=$this->financialRepo->BalanceSheet($request);
+        ResponseData($data);
+    }
 }

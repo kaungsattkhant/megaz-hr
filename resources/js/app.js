@@ -66,7 +66,8 @@ import FinancialTransactionCrudComponent from './Components/FinancialTransaction
 import CashbookCrudComponent from './Components/Cashbook/CashbookCrudComponent.vue';
 import ApListComponent from './Components/AP/ApListComponent.vue';
 import ApHistoryComponent from './Components/AP/ApHistoryComponent.vue';
-import ArListComponent from './Components/AR/ArListComponent.vue';
+import ArCrudComponent from './Components/AR/ArCrudComponent.vue';
+import ArDetailComponent from './Components/AR/ArDetailComponent.vue';
 import ArHistoryComponent from './Components/AR/ArHistoryComponent.vue';
 import ArPaidComponent from './Components/AR/ArPaidComponent.vue';
 import SupplierListComponent from './Components/Supplier/SupplierListComponent.vue';
@@ -113,6 +114,12 @@ import JournalsCrudComponent from './Components/Journals/JournalsCrudComponent.v
 import AdvancedCrudComponent from './Components/Advanced/AdvancedCrudComponent.vue';
 import AdvancedDetailComponent from './Components/Advanced/AdvancedDetailComponent.vue';
 import PrepaidCrudComponent from './Components/Prepaid/PrepaidCrudComponent.vue';
+// <<<<<<< HEAD
+import CashFlowStatementComponent from './Components/CashFlowStatement/CashFlowStatementComponent.vue';
+// =======
+import SkillCrudComponent from './Components/Skill/SkillCrudComponent.vue';
+import CookingPlaceComponent from './Components/CookingPlace/CookingPlaceComponent.vue';
+// >>>>>>> origin/branch_nmh
 
 app.component('NavBarComponent', NavBarComponent);
 app.component('StaffListComponent', StaffListComponent);
@@ -141,7 +148,8 @@ app.component('FinancialTransactionCrudComponent', FinancialTransactionCrudCompo
 app.component('CashbookCrudComponent', CashbookCrudComponent);
 app.component('ApListComponent', ApListComponent);
 app.component('ApHistoryComponent', ApHistoryComponent);
-app.component('ArListComponent', ArListComponent);
+app.component('ArCrudComponent', ArCrudComponent);
+app.component('ArDetailComponent', ArDetailComponent);
 app.component('ArHistoryComponent', ArHistoryComponent);
 app.component('ArPaidComponent', ArPaidComponent);
 app.component('PackagesListComponent', PackagesListComponent);
@@ -205,7 +213,15 @@ app.component('JournalsCrudComponent',JournalsCrudComponent);
 app.component('AdvancedCrudComponent',AdvancedCrudComponent);
 app.component('AdvancedDetailComponent',AdvancedDetailComponent);
 app.component('PrepaidCrudComponent',PrepaidCrudComponent);
+// <<<<<<< HEAD
+app.component('CashFlowStatementComponent',CashFlowStatementComponent);
+// =======
+app.component('SkillCrudComponent',SkillCrudComponent);
+app.component('CookingPlaceComponent',CookingPlaceComponent);
+// >>>>>>> origin/branch_nmh
 
 app.use(store);
 app.use(Notifications);
 app.mount('#app');
+
+
