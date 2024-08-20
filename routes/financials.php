@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\Route;
 Route::middleware('auth:api')->group(function () {
     Route::controller(FinancialReportController::class)->group(function () {
         Route::get('cash_flow_statement','CashFlowStatement');
+        Route::get('indirect_cash_flow_statement','IndirectCashFlowStatement');
         Route::get('balance_sheet','BalanceSheet');
     });
 });

@@ -97,6 +97,29 @@ class CashFlowService
         return $previousClosingBalance + $totalCashbookDebitAmount - $totalCashbookCreditAmount;
     }
 
+    public function getIndirectCashFlowStatement($subAccountCodes,$action,$current){
+        return DB::table('sub_accounts')
+        ->select('sub_accounts.id', 'sub_accounts.name', 'sub_accounts.account_code')
+        ->leftJoin('accounts', 'accounts.sub_account_id', '=', 'sub_accounts.id')
+        ->leftJoin('ledgers', function ($join) use ($action, $current) {
+            $join->on('ledgers.account_id', '=', 'accounts.id')
+                ->where('ledgers.action', '=', $action)
+                ->whereMonth('ledgers.created_at', $current->month)
+                ->whereYear('ledgers.created_at', $current->year);
+        })
+        ->leftJoin('transactions', 'ledgers.transaction_id', '=', 'transactions.id')
+        ->whereIn('sub_accounts.account_code', $subAccountCodes)
+        ->groupBy('sub_accounts.id', 'sub_accounts.name', 'sub_accounts.account_code')
+        ->selectRaw('
+            SUM(CASE WHEN transactions.is_confirmed = 1 AND ledgers.action = ? THEN ledgers.value ELSE 0 END) as total_amount,
+            sub_accounts.account_code as code,
+            SUM(CASE WHEN transactions.is_confirmed = 1 THEN ledgers.value ELSE 0 END) as amount,
+            ? as type
+        ', [$action, $action])
+        ->orderByRaw("FIELD(sub_accounts.account_code, '" . implode("','", $subAccountCodes) . "')")
+        ->get();
+    }
+
 
 
      // public function CashFlowStatement($request) //update
