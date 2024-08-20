@@ -15,7 +15,7 @@
                                 <ul>
                                     <li>
                                         <a href="/cash_flow_statement"
-                                            class="flex items-center text-left @yield('office_cash')">
+                                            class="flex items-center text-left @yield('cash_flow_statement')">
                                             <i class="fal fa-tasks  pr-3"></i>
                                             Cash Flow statement
                                         </a>
@@ -67,7 +67,7 @@
                             </li>
 
                             <li>
-                                <a href="{{ route('cookingPlace') }}" class="flex items-center @yield('cookingPlace')">
+                                <a href="{{ route('cookingPlace') }}" class="flex items-center @yield('cooking_place')">
                                     <i class="far fa-hat-chef"></i>
                                     Cooking Place
                                 </a>

@@ -10,9 +10,9 @@
         </div>
         <div class="flex justify-end flex-col">
 
-            <button type="button" class="add-btn transition duration-150 ease-in-out focus:outline-none focus:ring-0 ">
+            <a href="/cooking_places/create" class="add-btn transition duration-150 ease-in-out focus:outline-none focus:ring-0 ">
                 Add New
-            </button>
+            </a>
         </div>
     </div>
     <div class="box-container-table">

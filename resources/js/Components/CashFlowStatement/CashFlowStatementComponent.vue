@@ -269,15 +269,6 @@
                 currentDate: getCurrentDate(),
                 selectedNewTime:null,
                 selectedTime:null,
-                items: [
-      { id: 1, type: 'type1', name: 'Item 1' },
-      { id: 2, type: 'type1', name: 'Item 2' },
-      { id: 3, type: 'type2', name: 'Item 3' },
-      { id: 4, type: 'type2', name: 'Item 4' },
-      { id: 5, type: 'type3', name: 'Item 5' },
-      { id: 6, type: 'type3', name: 'Item 6' },
-      // More items...
-    ]
             };
         },
 
