@@ -100,7 +100,7 @@
                 </select>
             </div>
 
-            <div class="col-span-3 rounded-md mb-4 pb-6">
+            <!-- <div class="col-span-3 rounded-md mb-4 pb-6">
                 <div>
                     <label class="label-form mb-3">Roles</label>
                     <multiselect v-model="selectedRoles" :options="roleList" :multiple="true" :close-on-select="false"
@@ -114,6 +114,29 @@
                     <div class="flex gap-x-2 flex-wrap mt-1">
                         <span class="font-inter after-coma" v-for="selectedRole in selectedRoles">{{ selectedRole.name }}</span>
                     </div>
+                </div>
+            </div> -->
+            <div class="col-span-3 rounded-md mb-4 pb-6">
+                <div>
+                    <label class="label-form mb-3">Roles</label>
+                    <!-- <multiselect v-model="selectedRoles" :options="roleList" :multiple="true" :close-on-select="false" :clear-on-select="false"
+                    :preserve-search="true" placeholder="Select Roles" label="name" track-by="id" :preselect-first="true">
+                        <template #selection="{ values, search, isOpen }">
+                            <span class="multiselect__single"
+                                v-if="values.length"
+                                v-show="!isOpen">{{ values.length }} roles selected</span>
+                        </template>
+                    </multiselect>
+                    <div class="flex gap-x-2 flex-wrap mt-1">
+                        <span class="font-inter after-coma" v-for="selectedRole in selectedRoles">{{ selectedRole.name }}</span>
+                    </div> -->
+                    <div class="bg-white mb-0 w-full text-sm inline-block h-[34px]" data-te-select-wrapper-ref>
+                    <select data-te-select-init data-te-select-placeholder="Select Role" data-te-select-filter="true"
+                        name="" id="" v-model="selectedRoles" @change="getSkillByRole(selectedRoles.id)" class="input-ui h-[34px]">
+                        <option :value="role" v-for="(role, roleIndex) in roleList"
+                        :key="roleIndex"> {{ role.name }} </option>
+                    </select>
+                </div>
                 </div>
             </div>
 
@@ -177,7 +200,33 @@
                 <input type="text" v-model="zipCode" placeholder="Zip Code" class="input-ui">
             </div>
 
-            <div class="col-span-3"></div>
+            <div class="col-span-3 rounded-md mb-4 pb-6">
+                <label for="" class="label-form mb-3">
+                    Skills
+                </label>
+
+                <multiselect v-model="selectedSkills" :options="skillList" :multiple="true" :close-on-select="false" :clear-on-select="false"
+                    :preserve-search="true" placeholder="Select Skill" label="skill" track-by="id" :preselect-first="true">
+                        <template #selection="{ values, search, isOpen }">
+                            <span class="multiselect__single"
+                                v-if="values.length"
+                                v-show="!isOpen">{{ values.length }} skills selected</span>
+                        </template>
+                    </multiselect>
+                    <div class="flex gap-x-2 flex-wrap mt-1">
+                        <span class="font-inter after-coma" v-for="skill in selectedSkills" :key=skill.id>{{ skill.skill }}</span>
+                    </div>
+
+                <!-- <div class="bg-white mb-0 w-full text-sm inline-block h-[34px]" data-te-select-wrapper-ref>
+                    <select data-te-select-init data-te-select-placeholder="Select Skill" data-te-select-filter="true"
+                        name="" id="" v-model="selectedSkill" class="input-ui h-[34px]"
+                        >
+                        <option :value="skill" v-for="(skill, skillIndex) in skillList"
+                        :key="skillIndex"> {{ skill.skill }} </option>
+                    </select>
+                </div> -->
+            </div>
+
 
             <div class="mb-4 col-span-6 pb-6 rounded-md">
                 <label for="" class="label-form mb-3">
@@ -432,11 +481,23 @@ export default {
             secondaryName: null,
             secondaryPhone: null,
             secondaryRelationship: null,
+
+            skillList:[],
+            skillIds:[],
+            selectedSkills:[]
         };
     },
 
     methods: {
         ...mapGetters(['getToken']),
+
+        async getSkillByRole(id)
+            {
+                let response = await getApiData({ url: `/api/roles/${id}/skills`, token: this.getToken() });
+                if (response.data) {
+                    this.skillList = response.data;
+                }
+            },
 
 
         async getStaffDetail() {

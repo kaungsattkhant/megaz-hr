@@ -327,6 +327,7 @@ Route::middleware('auth:api')->group(function () {
         Route::get('/skills/{id}','skillDetail');
         Route::post('/skills/{id}','updateSkill');
         Route::delete('/skills/{id}','deleteSkill');
+        Route::get('/roles/{role_id}/skills','skillByRole');
     });
 
     Route::controller(CookingPlaceAPIController::class)->group(function()

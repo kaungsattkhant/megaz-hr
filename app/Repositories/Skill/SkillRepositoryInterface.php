@@ -15,4 +15,6 @@ interface SkillRepositoryInterface
     public function deleteSkill(int $id);
 
     public function skillDetail(int $id);
+
+    public function skillByRole(int $role_id);
 }

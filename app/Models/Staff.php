@@ -162,7 +162,7 @@ class Staff extends Authenticatable
 
     public function skills()
     {
-        return $this->belongsTo(Skill::class,'skill_staff');
+        return $this->belongsToMany(Skill::class);
     }
 
     public function staffAdvances()

@@ -40,4 +40,9 @@ class SkillAPIController extends Controller
     {
         $this->skillRepo->deleteSkill($id);
     }
+
+    public function skillByRole(int $role_id)
+    {
+        $this->skillRepo->skillByRole($role_id);
+    }
 }

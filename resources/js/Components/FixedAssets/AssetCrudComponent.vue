@@ -28,7 +28,7 @@
                                 placeholder="Useful Life(Month)">
                         </div>
 
-                        <div class="my-5">
+                        <div class="my-5 relative">
                             <input type="date" v-model="purchaseDate"
                                 class="py-2 px-2 w-full rounded-md border border-gray-300" placeholder="Purchase Date">
                         </div>

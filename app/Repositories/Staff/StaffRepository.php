@@ -202,7 +202,7 @@ class StaffRepository implements StaffRepositoryInterface
 
     public function staffDetail(int $id)
     {
-        $staff = Staff::with('department', 'roles', 'inventories', 'emergencyContacts', 'gender', 'completed_tasks', 'features')->find($id);
+        $staff = Staff::with('department', 'roles', 'inventories', 'emergencyContacts', 'gender', 'completed_tasks', 'features','skills')->find($id);
         if ($staff == null) {
             ResponseMessage("Staff not found or invalid id", 404);
         }
