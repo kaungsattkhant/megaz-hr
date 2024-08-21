@@ -12,12 +12,12 @@ class FinancialRepository implements FinancialInterface
     protected $cashFlowService;
     private $receiptSubAccountCode = ['2-1000', '2-1050', '2-2000', '4-3000', '5-0000', '5-0100', '5-1000', '4-4000', '3-1000'];
     private  $paymentSubAccountCode = ['1-1000', '1-1100', '2-1000', '2-1020', '2-1050', '2-3000', '2-4000', '3-2000', '4-1000', '4-2000', '4-3000', '4-4000', '6-0000', '6-2000', '6-3000', '6-4000', '6-5000', '6-6000', '6-7000', '6-8000', '6-9000', '3-1000'];
-         
+
     public function __construct(CashFlowService $cashFlowService)
     {
         $this->cashFlowService = $cashFlowService;
     }
-    
+
     public function CashFlowStatementOriginal($request) //original
     {
         // $month = $request->month != null ? $request->month : now()->month;
@@ -104,7 +104,7 @@ class FinancialRepository implements FinancialInterface
                     ->whereYear('ledgers.created_at', $current->year);
             })
             ->leftJoin('transactions', 'ledgers.transaction_id', '=', 'transactions.id')
-        // ->whereMonth('ledgers.created_at', $current->month)
+            // ->whereMonth('ledgers.created_at', $current->month)
             ->whereIn('sub_accounts.account_code', $paymentSubAccountCode)
             ->groupBy('sub_accounts.id', 'sub_accounts.name', 'sub_accounts.account_code', 'accounts.id', 'accounts.name', 'accounts.account_code')
             ->selectRaw('
@@ -172,7 +172,7 @@ class FinancialRepository implements FinancialInterface
         // return $results;
     }
 
-   
+
 
     public function CashFlowStatement($request)
     {
@@ -202,16 +202,29 @@ class FinancialRepository implements FinancialInterface
         ];
     }
 
-    public function IndirectCashFlowStatement($request){
+    public function IndirectCashFlowStatement($request)
+    {
+        $receiptSubAccountCode = ['2-1050', '2-2000', '4-3000', '5-0000', '5-0100', '5-1000', '4-4000', '3-1000'];
+        $paymentSubAccountCode = ['2-1020', '2-1050', '2-3000', '2-4000', '3-2000', '4-1000', '4-2000', '4-3000', '4-4000', '6-0000', '6-2000', '6-3000', '6-4000', '6-5000', '6-6000', '6-7000', '6-8000', '6-9000', '3-1000'];
+        $purchaseOfFixedAsset=['1-1000','1-1100'];
         $current = (isset($request->date) || $request->date != null) ? Carbon::parse($request->date) : Carbon::now();
-        $receiptSubAccountCode=$this->receiptSubAccountCode;
-        $paymentSubAccountCode=$this->paymentSubAccountCode;
-       return  $this->cashFlowService->getIndirectCashFlowStatement($receiptSubAccountCode,'debit',$current);
+        $cashInFlows = $this->cashFlowService->getIndirectCashFlowStatement($receiptSubAccountCode, 'debit', $current);
+        $cashOutFlows = $this->cashFlowService->getIndirectCashFlowStatement($paymentSubAccountCode, 'credit_cash_out_flow', $current);
+        $purchaseOfFixedAsset = $this->cashFlowService->getIndirectCashFlowStatement($purchaseOfFixedAsset, 'credit_fixed_asset', $current);
+        $totalCashInFlow = array_sum(array_column($cashInFlows, 'amount'));
+        $totalCashOutFlow = array_sum(array_column($cashOutFlows, 'amount'));
+        return [
+            'cash_in_flow' => $cashInFlows,
+            'cash_out_flow' => $cashOutFlows,
+            'purchase_fa' => $purchaseOfFixedAsset,
+            'total_cash_in_flow' => $totalCashInFlow,
+            'total_cash_out_flow' => $totalCashOutFlow,
+        ];
     }
-   
 
-    public function BalanceSheet($request){
+
+    public function BalanceSheet($request)
+    {
         dd('abc');
     }
-
 }
