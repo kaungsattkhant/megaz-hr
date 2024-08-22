@@ -226,11 +226,6 @@ class FinancialRepository implements FinancialInterface
         return [
             'operating_activities'=>$operating_activities,
             'investing_activities'=>$investing_activities,
-            // 'cash_in_flow' => $cashInFlows,
-            // 'cash_out_flow' => $cashOutFlows,
-            // 'purchase_fa' => $purchaseOfFixedAsset,
-            // 'total_cash_in_flow' => $totalCashInFlow,
-            // 'total_cash_out_flow' => $totalCashOutFlow,
         ];
     }
 
