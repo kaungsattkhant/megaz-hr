@@ -118,6 +118,7 @@ import CashFlowStatementComponent from './Components/CashFlowStatement/CashFlowS
 import SkillCrudComponent from './Components/Skill/SkillCrudComponent.vue';
 import CookingPlaceComponent from './Components/CookingPlace/CookingPlaceComponent.vue';
 import CookingPlaceCreateComponent from './Components/CookingPlace/CookingPlaceCreateComponent.vue';
+import CookingPlaceEditComponent from './Components/CookingPlace/CookingPlaceEditComponent.vue';
 
 
 app.component('NavBarComponent', NavBarComponent);
@@ -216,6 +217,7 @@ app.component('CashFlowStatementComponent',CashFlowStatementComponent);
 app.component('SkillCrudComponent',SkillCrudComponent);
 app.component('CookingPlaceComponent',CookingPlaceComponent);
 app.component('CookingPlaceCreateComponent',CookingPlaceCreateComponent);
+app.component('CookingPlaceEditComponent',CookingPlaceEditComponent);
 
 app.use(store);
 app.use(Notifications);

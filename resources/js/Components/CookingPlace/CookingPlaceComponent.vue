@@ -63,6 +63,9 @@
                                 </td>
 
                                 <td class="whitespace-nowrap">
+                                    <a :href="'/cooking_places/' + cookingPlace.id + '/edit'">
+                                        <i class="far fa-pen cursor-pointer mr-3"></i>
+                                    </a>
                                     <i class="far fa-trash-alt cursor-pointer" @click="deleteCookingPlace(cookingPlace.id)"></i>
                                 </td>
                             </tr>

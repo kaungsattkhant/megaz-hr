@@ -2,7 +2,7 @@
     <div class="px-0">
         <div class="mb-4 ">
             <p class="text-lg font-semibold font-inter">
-                Add Cooking Place
+                Edit Cooking Place
             </p>
         </div>
 
@@ -23,8 +23,8 @@
                 <div class="bg-white mb-0 w-full text-sm inline-block h-[34px] dark:bg-white !text-black"
                     data-te-select-wrapper-ref>
                     <select data-te-select-init data-te-select-placeholder="Select Category"
-                        data-te-select-filter="true" name="" id="" v-model="selectedArea" class="input-ui !text-black">
-                        <option :value="area" v-for="(area, index) in areaList"
+                        data-te-select-filter="true" name="" id="" v-model="selectedAreaId" class="input-ui !text-black">
+                        <option :value="area.id" v-for="(area, index) in areaList"
                             :key="index"> {{ area.name }} </option>
                     </select>
                 </div>
@@ -208,7 +208,91 @@
                 Create Menu
             </button>
         </div>
-        
+
+
+        <!-- Department Modal -->
+        <!-- <div data-te-modal-init
+            class="fixed left-0 top-0 z-[1055] hidden h-full w-full overflow-y-auto overflow-x-hidden outline-none"
+            id="add_department_modal" tabindex="-1" aria-labelledby="create_modalLabel" aria-modal="true" role="dialog">
+            <div data-te-modal-dialog-ref
+                class="pointer-events-none relative flex min-h-[calc(100%-1rem)] w-auto translate-y-[-50px] items-center opacity-0 transition-all duration-300 ease-in-out min-[576px]:mx-auto min-[576px]:mt-7 min-[576px]:min-h-[calc(100%-3.5rem)] min-[576px]:max-w-[500px]">
+                <div
+                    class="pointer-events-auto relative flex w-full flex-col rounded-md border-none bg-white bg-clip-padding text-current shadow-lg outline-none">
+                    <div class="relative  p-4">
+                        <button type="button" class="absolute top-4 right-4 focus:shadow-none focus:outline-none"
+                            data-te-modal-dismiss aria-label="Close">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                                stroke="currentColor" class="h-5 w-5">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                        </button>
+                    </div>
+
+                    <div class="relative px-12 py-4" data-te-modal-body-ref>
+
+                        <div class="mb-4">
+                            <label for="" class="block text-sm text-black mb-3">
+                                Department
+                            </label>
+                            <input type="text" placeholder="Department"
+                                class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
+                        </div>
+                    </div>
+
+                    <div class="flex justify-center px-12 mb-6">
+                        <button type="button" class="add-btn focus:outline-none focus:ring-0 ">
+                            Add
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div> -->
+
+
+
+        <!-- Role Modal -->
+        <!-- <div data-te-modal-init
+            class="fixed left-0 top-0 z-[1055] hidden h-full w-full overflow-y-auto overflow-x-hidden outline-none"
+            id="add_role_modal" tabindex="-1" aria-labelledby="create_modalLabel" aria-modal="true" role="dialog">
+            <div data-te-modal-dialog-ref
+                class="pointer-events-none relative flex min-h-[calc(100%-1rem)] w-auto translate-y-[-50px] items-center opacity-0 transition-all duration-300 ease-in-out min-[576px]:mx-auto min-[576px]:mt-7 min-[576px]:min-h-[calc(100%-3.5rem)] min-[576px]:max-w-[500px]">
+                <div
+                    class="pointer-events-auto relative flex w-full flex-col rounded-md border-none bg-white bg-clip-padding text-current shadow-lg outline-none">
+                    <div class="relative  p-4">
+                        <button type="button" class="absolute top-4 right-4 focus:shadow-none focus:outline-none"
+                            data-te-modal-dismiss aria-label="Close">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                                stroke="currentColor" class="h-5 w-5">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                        </button>
+                    </div>
+
+                    <div class="relative px-12 py-4" data-te-modal-body-ref>
+                        <div class="mb-4">
+                            <label for="" class="block text-sm text-black mb-3">
+                                Role
+                            </label>
+                            <input type="text" placeholder="Role"
+                                class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
+                        </div>
+                        <div class="mb-4">
+                            <label for="" class="block text-sm text-black mb-3">
+                                Department
+                            </label>
+                            <input type="text" placeholder="Department"
+                                class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
+                        </div>
+                    </div>
+
+                    <div class="flex justify-center px-12 mb-6">
+                        <button type="button" class="add-btn focus:outline-none focus:ring-0 ">
+                            Add
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div> -->
     </div>
 </template>
 
@@ -222,6 +306,7 @@ export default {
     components: {
         Multiselect
     },
+    props: ['cpId'],
     data() {
         return {
             menuCategoryList: [],
@@ -237,7 +322,7 @@ export default {
             cookingItemList:[],
 
             name:null,
-            selectedArea:null,
+            selectedAreaId:null,
             selectedType:null,
             selectedMenuCategory:null,
             selectedMenu:null,
@@ -245,12 +330,47 @@ export default {
 
             cookingPlaceMenuList:[],
             cookingPlaceSkillList:[],
+
+
+            cookingPlaceDetail:null,
         };
     },
 
     methods: {
         ...mapGetters(['getToken']),
 
+        async getCookingPlaceDetail(){
+            let response = await getApiData({ url: '/api/cooking_places/' + this.cpId, token: this.getToken() });
+            if (response.data) {
+                this.cookingPlaceDetail = response.data;
+                this.name = response.data.name;
+                this.selectedAreaId = response.data.area_id;
+                response.data.available_cooking_places.forEach(cpItem => {
+                    console.log(cpItem)
+                    if(cpItem.cooking_placeable_type == 'menu'){
+                        this.cookingPlaceMenuList.push({
+                            name: cpItem.cooking_placeable.name,
+                            id: cpItem.cooking_placeable.id,
+                            type: cpItem.cooking_placeable_type,
+                        });
+                        console.log(cpItem.cooking_placeable_type + 'get menu')
+                    }
+                    
+                    else if(cpItem.cooking_placeable_type == 'skill'){
+                        this.cookingPlaceSkillList.push({
+                            name: cpItem.cooking_placeable.name,
+                            id: cpItem.cooking_placeable.id,
+                            type: cpItem.cooking_placeable_type,
+                        });
+                        console.log(cpItem.cooking_placeable_type + 'get skill')
+                    }
+
+
+                })
+                
+            }
+            console.log('get detail')
+        },
         async getAreaList(departmentId){
             // let response = await getApiData({ url: '/api/areas', token: this.getToken() });
             let response = await getApiData({ url: `/api/areas?department_id=${departmentId}`, token: this.getToken() });
@@ -337,8 +457,8 @@ export default {
                 let formData = new FormData();
                 formData.append('availableCookingPlaces', JSON.stringify(availableCookingPlaces));
                 formData.append('name', this.name);
-                formData.append('area_id', this.selectedArea.id);
-                let response = await postApiData({ url: '/api/cooking_places', form_data: formData, token: this.getToken() });
+                formData.append('area_id', this.selectedAreaId);
+                let response = await postApiData({ url: '/api/cooking_places/' + this.cpId, form_data: formData, token: this.getToken() });
                 if (response.success) {
                     window.location.replace('/cooking_places');
                     console.log('success')
@@ -371,6 +491,7 @@ export default {
             });
         }
         this.getAreaList(this.departmentId);
+        this.getCookingPlaceDetail();
     },
 
     mounted() {
