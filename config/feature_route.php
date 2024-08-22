@@ -66,4 +66,5 @@ return [
     'menu-service-discount' => 'menu_service_discount.index',
     'account-payables' => 'AP.index',
     'inventory-stocks' => 'inventory_stocks.index',
+    'cash-flow-statement' => 'cash_flow_statement.index',
 ];
