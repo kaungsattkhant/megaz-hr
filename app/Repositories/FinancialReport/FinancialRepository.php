@@ -213,12 +213,24 @@ class FinancialRepository implements FinancialInterface
         $purchaseOfFixedAsset = $this->cashFlowService->getIndirectCashFlowStatement($purchaseOfFixedAsset, 'credit_fixed_asset', $current);
         $totalCashInFlow = array_sum(array_column($cashInFlows, 'amount'));
         $totalCashOutFlow = array_sum(array_column($cashOutFlows, 'amount'));
-        return [
-            'cash_in_flow' => $cashInFlows,
-            'cash_out_flow' => $cashOutFlows,
-            'purchase_fa' => $purchaseOfFixedAsset,
+
+        $operating_activities=[
+            'cash_in_flow'=>$cashInFlows,
+            'cash_out_flow'=>$cashOutFlows,
             'total_cash_in_flow' => $totalCashInFlow,
             'total_cash_out_flow' => $totalCashOutFlow,
+        ];
+        $investing_activities=[
+            'purchase_of_fixed_asset'=>$purchaseOfFixedAsset,
+        ];
+        return [
+            'operating_activities'=>$operating_activities,
+            'investing_activities'=>$investing_activities,
+            // 'cash_in_flow' => $cashInFlows,
+            // 'cash_out_flow' => $cashOutFlows,
+            // 'purchase_fa' => $purchaseOfFixedAsset,
+            // 'total_cash_in_flow' => $totalCashInFlow,
+            // 'total_cash_out_flow' => $totalCashOutFlow,
         ];
     }
 
