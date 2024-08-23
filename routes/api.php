@@ -343,6 +343,7 @@ Route::middleware('auth:api')->group(function () {
     Route::controller(DutyAPIController::class)->group(function()
     {
         Route::post('/duties','createDuty');
+        Route::get('/duties','listDuties');
     });
 
 });

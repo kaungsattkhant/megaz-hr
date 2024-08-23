@@ -32,4 +32,23 @@ class DutyRepository implements DutyRepositoryInterface
         }
     }
 
+    public function listDuties(Request $request)
+    {
+        $date = $request->query('date');
+        $fromDate = $request->query('from_date') ;
+        $toDate = $request->query('to_date');
+        $query = Duty::with('staff', 'cookingPlace', 'tasks');
+
+        if ($date) {
+            $query->whereDate('date', $date);
+        } elseif ($fromDate && $toDate) {
+            $query->whereBetween('date', [$fromDate, $toDate]);
+        } else {
+            $query->whereDate('date', CurrentDate());
+        }
+        $duties = $query->orderBy('created_at', 'desc')->get();
+        ResponseData($duties);
+    }
+
+
 }

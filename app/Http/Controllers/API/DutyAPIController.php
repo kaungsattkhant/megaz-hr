@@ -19,4 +19,9 @@ class DutyAPIController extends Controller
     {
         $this->dutyRepo->createDuty($request);
     }
+
+    public function listDuties(Request $request)
+    {
+        $this->dutyRepo->listDuties($request);
+    }
 }
