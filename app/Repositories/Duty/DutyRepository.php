@@ -46,7 +46,7 @@ class DutyRepository implements DutyRepositoryInterface
         } else {
             $query->whereDate('date', CurrentDate());
         }
-        $duties = $query->orderBy('created_at', 'desc')->get();
+        $duties = $query->orderBy('created_at', 'desc')->paginate(config('common.list_count'));
         ResponseData($duties);
     }
 

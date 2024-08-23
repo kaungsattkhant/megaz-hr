@@ -193,6 +193,9 @@ Route::middleware('auth:api')->group(function () {
         Route::post('create_asset_item','createAssetItem');
         Route::post('create_asset','createAsset');
         Route::get('get_asset_item_by_account','getAssetItemByAccount');
+
+        Route::get('/assets','getAsset');
+        Route::get('/asset_items','getAssetItem');
     });
     Route::controller(AssetInventoryLedgerController::class)->group(function () {
         Route::get('asset_inventory_ledger_list','index');

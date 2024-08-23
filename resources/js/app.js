@@ -119,7 +119,8 @@ import SkillCrudComponent from './Components/Skill/SkillCrudComponent.vue';
 import CookingPlaceComponent from './Components/CookingPlace/CookingPlaceComponent.vue';
 import CookingPlaceCreateComponent from './Components/CookingPlace/CookingPlaceCreateComponent.vue';
 import CookingPlaceEditComponent from './Components/CookingPlace/CookingPlaceEditComponent.vue';
-
+import AssetItemList from './Components/FixedAssets/AssetItemList.vue'
+import AssetListCompoennt from './Components/FixedAssets/AssetListComponent.vue';
 
 app.component('NavBarComponent', NavBarComponent);
 app.component('StaffListComponent', StaffListComponent);
@@ -218,6 +219,8 @@ app.component('SkillCrudComponent',SkillCrudComponent);
 app.component('CookingPlaceComponent',CookingPlaceComponent);
 app.component('CookingPlaceCreateComponent',CookingPlaceCreateComponent);
 app.component('CookingPlaceEditComponent',CookingPlaceEditComponent);
+app.component('AssetItemList',AssetItemList);
+app.component('AssetListComponent',AssetListCompoennt);
 
 app.use(store);
 app.use(Notifications);
