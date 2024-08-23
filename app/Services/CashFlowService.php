@@ -98,8 +98,9 @@ class CashFlowService
         return $previousClosingBalance + $totalCashbookDebitAmount - $totalCashbookCreditAmount;
     }
 
-    public function getIndirectCashFlowStatement($subAccountCodes, $action, $current)
+    public function getIndirectCashFlowStatement($subAccountCodes, $type, $current)
     {
+        $action=$type=='debit' ?'debit': 'credit' ;
         $queryResult = DB::table('sub_accounts')
             ->select('sub_accounts.id', 'sub_accounts.name', 'sub_accounts.account_code')
             ->leftJoin('accounts', 'accounts.sub_account_id', '=', 'sub_accounts.id')
@@ -120,13 +121,13 @@ class CashFlowService
         ', [$action, $action])
             ->orderByRaw("FIELD(sub_accounts.account_code, '" . implode("','", $subAccountCodes) . "')")
             ->get();
-        if ($action == 'debit') {
+        if ($type == 'debit') {
             return $this->cashInFlowResult($queryResult);
         }
-        if ($action == 'credit_cash_out_flow') {
+        if ($type == 'credit_cash_out_flow') {
             return $this->cashOutFlowResult($queryResult);
         }
-        if ($action == 'credit_fixed_asset') {
+        if ($type == 'credit_fixed_asset') {
             return $this->fixedAssetResult($queryResult);
         }
     }
@@ -175,7 +176,7 @@ class CashFlowService
         $mapping = [
             '4-2000' => 'Cash Paid to Creditor',
             '2-3000' => 'Prepaid(Rent & Other)',
-            '2-3000' => 'Cash Paid to Other Receivables',
+            '2-1050' => 'Cash Paid to Other Receivables',
             '4-4000' => 'Cash Paid To Other Payable',
             '4-3000' => 'Deposit Paid',
             '6-2000' => 'Selling & Destribution',
