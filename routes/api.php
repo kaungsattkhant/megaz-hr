@@ -70,6 +70,7 @@ use App\Http\Controllers\API\Customers\MenuAPIController as CustomersMenuAPICont
 use App\Http\Controllers\API\Customers\CustomerAPIController as UserAppCustomerAPIController;
 use App\Http\Controllers\API\Customers\PackageAPIController as CustomersPackageAPIController;
 use App\Http\Controllers\API\Customers\MenuCategoryAPIController as CustomerMenuCategoryAPIController;
+use App\Http\Controllers\API\DutyAPIController;
 use App\Http\Controllers\API\JournalAPIController;
 use App\Http\Controllers\API\PrepaidAPIController;
 use App\Http\Controllers\API\SkillAPIController;
@@ -339,6 +340,11 @@ Route::middleware('auth:api')->group(function () {
         Route::delete('/cooking_places/{id}','deleteCookingPlace');
     });
 
+    Route::controller(DutyAPIController::class)->group(function()
+    {
+        Route::post('/duties','createDuty');
+    });
+
 });
 
 Route::controller(PackageAPIController::class)->group(function()
@@ -393,6 +399,7 @@ Route::delete('/staffs/{staff_id}/features/{feature_id}',[StaffAPIController::cl
 Route::get('/departments/{department_id}/staffs',[StaffAPIController::class,'getStaffByDepartment']);
 Route::get('/staff_balances',[StaffAPIController::class,'staffBalanceList']);
 Route::get('/staff_balances/{id}',[StaffAPIController::class,'detailStaffBalance']);
+Route::get('/staff/{id}/duties',[StaffAPIController::class,'getStaffWithDuties']);
 
 
 
@@ -407,6 +414,7 @@ Route::controller(TaskController::class)->group(function () {
     Route::put('/tasks/{id}', 'updateTask');
     Route::delete('/tasks/{id}','deleteTask');
     Route::get('task_report','taskReport');
+    Route::get('/task_by_role/{role_id}','getTaskByRole');
 });
 Route::get('/complaints', [ComplaintAPIController::class, 'getComplainData']);
 
