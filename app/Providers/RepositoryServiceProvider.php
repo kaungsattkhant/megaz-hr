@@ -136,6 +136,8 @@ use App\Repositories\StaffAdvance\StaffAdvanceRepository;
 use App\Repositories\StaffAdvance\StaffAdvanceRepositoryInterface;
 // =======
 use App\Repositories\CustomerLevelDiscount\CustomerLevelDiscountRepositoryInterface;
+use App\repositories\Duty\DutyRepository;
+use App\Repositories\Duty\DutyRepositoryInterface;
 use App\Repositories\FinancialReport\FinancialRepository;
 use App\Repositories\Skill\SkillRepository;
 use App\Repositories\Skill\SkillRepositoryInterface;
@@ -209,6 +211,6 @@ class RepositoryServiceProvider extends ServiceProvider
         $this->app->bind(FinancialInterface::class,FinancialRepository::class);
         $this->app->bind(SkillRepositoryInterface::class,SkillRepository::class);
         $this->app->bind(CookingPlaceRepositoryInterface::class,CookingPlaceRepository::class);
-
+        $this->app->bind(DutyRepositoryInterface::class,DutyRepository::class);
     }
 }
