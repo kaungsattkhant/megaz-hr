@@ -1,6 +1,6 @@
 <?php
 
-namespace App\repositories\Duty;
+namespace App\Repositories\Duty;
 
 use App\Models\Duty;
 use Illuminate\Http\Request;
@@ -25,6 +25,12 @@ class DutyRepository implements DutyRepositoryInterface
         }
         $duties = $query->orderBy('created_at', 'desc')->paginate(config('common.list_count'));
         ResponseData($duties);
+    }
+
+    public function dutyDetail(int $id)
+    {
+        $duty = Duty::with('staff', 'cookingPlace', 'tasks')->where('id', $id)->first();
+        ResponseData($duty);
     }
 
 

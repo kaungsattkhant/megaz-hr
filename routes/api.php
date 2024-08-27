@@ -349,6 +349,7 @@ Route::middleware('auth:api')->group(function () {
         Route::get('/duties','listDuties');
         Route::post('/duties/{id}','updateDuty');
         Route::delete('/duties/{id}','deleteDuty');
+        Route::get('/duties/{id}','dutyDetail');
     });
 
 });

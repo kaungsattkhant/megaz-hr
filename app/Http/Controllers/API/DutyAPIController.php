@@ -34,4 +34,10 @@ class DutyAPIController extends Controller
     {
         $this->dutyRepo->deleteDuty($id);
     }
+
+    public function dutyDetail(int $id)
+    {
+        $this->dutyRepo->dutyDetail($id);
+    }
+
 }

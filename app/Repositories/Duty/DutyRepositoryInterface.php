@@ -12,5 +12,7 @@ interface DutyRepositoryInterface
 
     public function listDuties(Request $request);
 
+    public function dutyDetail(int $id);
+
     public function deleteDuty(int $id);
 }

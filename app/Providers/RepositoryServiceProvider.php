@@ -136,7 +136,7 @@ use App\Repositories\StaffAdvance\StaffAdvanceRepository;
 use App\Repositories\StaffAdvance\StaffAdvanceRepositoryInterface;
 // =======
 use App\Repositories\CustomerLevelDiscount\CustomerLevelDiscountRepositoryInterface;
-use App\repositories\Duty\DutyRepository;
+use App\Repositories\Duty\DutyRepository;
 use App\Repositories\Duty\DutyRepositoryInterface;
 use App\Repositories\FinancialReport\FinancialRepository;
 use App\Repositories\Skill\SkillRepository;
