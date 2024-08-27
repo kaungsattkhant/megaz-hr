@@ -1,6 +1,6 @@
 <?php
 
-namespace App\repositories\Duty;
+namespace App\Repositories\Duty;
 
 use App\Models\Duty;
 use Illuminate\Http\Request;
