@@ -43,7 +43,7 @@
                             <!-- looping start -->
                             <div class="contents" v-for="(asset_item, index) in assetItemList" :key="index">
                                 <tr class="">
-                                    <td class=" ">
+                                    <td class="">
                                         {{ ++index }}
                                     </td>
                                     <td class="whitespace-nowrap">

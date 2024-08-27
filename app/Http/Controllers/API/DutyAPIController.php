@@ -24,4 +24,14 @@ class DutyAPIController extends Controller
     {
         $this->dutyRepo->listDuties($request);
     }
+
+    public function updateDuty(Request $request,int $id)
+    {
+        $this->dutyRepo->updateDuty($request,$id);
+    }
+
+    public function deleteDuty(int $id)
+    {
+        $this->dutyRepo->deleteDuty($id);
+    }
 }
