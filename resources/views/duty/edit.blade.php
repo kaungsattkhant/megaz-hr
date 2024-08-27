@@ -4,5 +4,5 @@
 
 @section('duty', 'active-link')
 @section('content')
-    <duty-edit-component  duty-id={{$id}}/>
+    <duty-edit-component  duty-id={{$id}} />
 @endsection

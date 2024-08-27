@@ -154,7 +154,7 @@
                         @endif
                         @if (checkFeaturePermission('uom'))
                         <li>
-                            <a href="{{ route('uoms') }}" class="flex items-center @yield('uoms')">
+                            <a href="{{ route('uoms') }}" class="flex items-center @yield('uom_conversions')">
                                 <i class="fal fa-balance-scale  pr-3"></i>
                                 UOMs
                             </a>

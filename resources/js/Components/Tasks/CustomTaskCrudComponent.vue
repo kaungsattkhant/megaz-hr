@@ -64,8 +64,10 @@
                                     <td class=" ">
                                         {{ index + 1 }}
                                     </td>
-                                    <td class="whitespace-nowrap  ">
-                                        {{ task.custom_task_detail.staff.name }}
+                                    <td class="whitespace-nowrap">
+                                        <span v-if="task.custom_task_detail">
+                                            {{ task.custom_task_detail.staff.name }}
+                                        </span>
                                     </td>
                                     <td class="whitespace-nowrap  ">
                                         {{ task.role.department.name }}

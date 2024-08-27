@@ -2,7 +2,7 @@
     <div class="px-0">
         <div class="mb-4 ">
             <p class="text-lg font-semibold font-inter">
-                Add Duty
+                Edit Duty
             </p>
         </div>
 
@@ -23,7 +23,7 @@
                     data-te-select-wrapper-ref>
                     <select data-te-select-init data-te-select-placeholder="Select Department" @change="changeDepartment(department)"
                         data-te-select-filter="true" name="" id="" v-model="selectedDepartment" class="input-ui !text-black text-sm">
-                        <option :value="department" v-for="(department, index) in departmentList"
+                        <option :value="department.id" v-for="(department, index) in departmentList"
                             :key="index"> {{ department.name }} </option>
                     </select>
                 </div>
@@ -139,7 +139,7 @@
 
         <div>
             <button class="add-btn" @click="btnClickedAddDuty()">
-                Create Duty
+                Update Duty
             </button>
         </div>
         
@@ -279,10 +279,10 @@
                             
                     </div>
                     <div class="flex justify-end gap-x-4 px-6 mb-6 pt-4">
-                            <button type="button" @click="btnClickedCreateJournal()"
+                        <button type="button" data-te-modal-dismiss
                                 class="add-btn focus:outline-none focus:ring-0 ">
                                 Create
-                            </button>
+                        </button>
                     </div>
                 </div>
             </div>
@@ -305,6 +305,7 @@ export default {
     components: {
         Multiselect
     },
+    props: ['dutyId'],
     data() {
         return {
             departmentList:[],
@@ -324,41 +325,12 @@ export default {
             sampleTaskList:[],
             selectedSampleTask:null,
             duty_array:[],
-            // testTaskList:[
-            //                 {
-            //                     staff_name: 'kaung Khant min Tun',
-            //                     cooking_place: 'Chinese Cooking Place',
-            //                     date: 'Aug 1',
-            //                     tasks:[
-            //                         {
-            //                             name:'tasks 1'
-            //                         },
-            //                         {
-            //                             name:'tasks 2'
-            //                         }
-            //                     ]
-            //                 },
-            //                 {
-            //                     staff_name: 'kaung Khant min Tun',
-            //                     cooking_place: 'Chinese Cooking Place',
-            //                     date: 'Aug 1',
-            //                     tasks:[
-            //                         {
-            //                             name:'tasks 1'
-            //                         },
-            //                         {
-            //                             name:'tasks 2'
-            //                         }
-            //                     ]
-            //                 }
-            //             ],
 
+            dutyDetail:null,
 
-
-            
         };
     },
-    
+
 
     methods: {
         ...mapGetters(['getToken']),
@@ -369,6 +341,32 @@ export default {
             return date.toLocaleDateString('en-US', options);
         },
 
+        async getDutyDetail(){
+            let response = await getApiData({ url: '/api/duties/' + this.dutyId, token: this.getToken() });
+            if (response.data) {
+                this.dutyDetail = response.data;
+                this.selectedDepartment = response.data.staff.department_id
+                this.getStaffList();
+                this.selectedDate = response.data.date.slice(0,10)
+                // this.selectedStaff = response.data.staff;
+                let taskList = []
+                response.data.tasks.forEach(task => {
+                    taskList.push({
+                        name: task.name,
+                        task_id: task.id
+                    })
+                });
+                this.staffAndTaskList.push({
+                    staff_name: response.data.staff.name,
+                    staff_id: response.data.staff_id,
+                    cooking_place: response.data.cooking_place.name,
+                    cooking_place_id: response.data.cooking_place.id,
+                    date: response.data.date,
+                    tasks:taskList,
+                })
+                
+            }
+        },
         async getDepartmentList(){
             let response = await getApiData({ url: '/api/departments', token: this.getToken() });
             if (response.data) {
@@ -380,7 +378,7 @@ export default {
             this.selectedstaff = null;
         },
         async getStaffList(){
-            let response = await getApiData({ url: '/api/departments/' + this.selectedDepartment.id + '/staffs', token: this.getToken() });
+            let response = await getApiData({ url: '/api/departments/' + this.selectedDepartment + '/staffs', token: this.getToken() });
             if (response.data) {
                 this.staffList = response.data;
             }
@@ -400,6 +398,13 @@ export default {
                 this.taskList = response.data;
             }
         },
+        async getTaskListWithListId(staffId){
+            let response = await getApiData({ url: '/api/task_by_role/' + staffId, token: this.getToken() });
+            if (response.data) {
+                this.taskList = response.data;
+                console.log('get task with id')
+            }
+        },
         addDutyStaff(){
             this.staffAndTaskList.push({
                 staff_name: this.selectedStaff.name,
@@ -416,6 +421,7 @@ export default {
         },
         btnAddTaskToStaff(index){
             this.selectedIndex = index;
+            this.getTaskListWithListId(this.staffAndTaskList[index].staff_id)
         },
         addTaskToStaff(){
             this.staffAndTaskList[this.selectedIndex].tasks.push({
@@ -456,7 +462,6 @@ export default {
 
 
         btnClickedAddDuty(){
-            
             this.staffAndTaskList.forEach(duty => {
                 let taskIds = [];
                 duty.tasks.forEach(duty_task =>{
@@ -473,10 +478,11 @@ export default {
         },
         async addDuty(){
             let formData = new FormData();
-            formData.append('duty_array',this.duty_array);
-            let response = await postApiData({url:`/api/duties`, form_data:formData, token:this.getToken()})
+            formData.append('duty_array',JSON.stringify(this.duty_array));
+            let response = await postApiData({url:`/api/duties/`+this.dutyId, form_data:formData, token:this.getToken()})
             if(response.success){
                 console.log('successed')
+                // window.location.replace(`/duty`);
             }
         }
 
@@ -496,6 +502,7 @@ export default {
     },
 
     mounted() {
+        this.getDutyDetail();
         this.getDepartmentList();
         this.getCookingPlaceList();
         initTE({ Modal, Select, Tab, Ripple });

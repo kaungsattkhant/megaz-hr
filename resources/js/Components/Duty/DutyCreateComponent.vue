@@ -288,7 +288,7 @@
 
                     </div>
                     <div class="flex justify-end gap-x-4 px-6 mb-6 pt-4">
-                            <button type="button" @click="btnClickedCreateJournal()"
+                            <button type="button" data-te-modal-dismiss
                                 class="add-btn focus:outline-none focus:ring-0 ">
                                 Create
                             </button>
@@ -408,6 +408,13 @@ export default {
                 this.taskList = response.data;
             }
         },
+        async getTaskListWithListId(staffId){
+            let response = await getApiData({ url: '/api/task_by_role/' + staffId, token: this.getToken() });
+            if (response.data) {
+                this.taskList = response.data;
+                console.log('get task with id')
+            }
+        },
         addDutyStaff(){
             this.staffAndTaskList.push({
                 staff_name: this.selectedStaff.name,
@@ -424,6 +431,7 @@ export default {
         },
         btnAddTaskToStaff(index){
             this.selectedIndex = index;
+            this.getTaskListWithListId(this.staffAndTaskList[index].staff_id)
         },
         addTaskToStaff(){
             this.staffAndTaskList[this.selectedIndex].tasks.push({
@@ -447,7 +455,7 @@ export default {
         btnClickedAddSampleTaskToList(){
             this.staffAndTaskList.push({
                 staff_name: this.selectedStaff.name,
-                staff_id: this.selectedstaff.id,
+                staff_id: this.selectedStaff.id,
                 cooking_place: this.selectedCookingPlace.name,
                 cooking_place_id: this.selectedCookingPlace.id,
                 date: this.selectedDate,
@@ -485,6 +493,7 @@ export default {
             let response = await postApiData({url:`/api/duties`, form_data:formData, token:this.getToken()})
             if(response.success){
                 console.log('successed')
+                window.location.replace(`/duty`);
             }
         }
 

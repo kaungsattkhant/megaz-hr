@@ -235,5 +235,5 @@ Route::view('/cooking_places/{id}/edit','cookingPlace.edit')->name('cookingPlace
 Route::view('/indirect_cashflow_statement','cash_flow_statement.indirect_cashflow_statement')->name('indirect_cashflow_statement');
 Route::view('/duty','duty.index')->name('duty');
 Route::view('/duty/create','duty.create')->name('dutyCreate');
-Route::view('/duty/{id}/edit','duty.create')->name('dutyCreate');
+Route::view('/duty/{id}/edit','duty.edit')->name('dutyEdit');
 
