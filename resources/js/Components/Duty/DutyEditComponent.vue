@@ -19,7 +19,6 @@
                 <label for="" class="label-form mb-3">
                     Department
                 </label>
-
                 <div class="bg-white mb-0 w-full text-sm inline-block h-[34px] dark:bg-white !text-black !text-sm"
                     data-te-select-wrapper-ref>
                     <select data-te-select-init data-te-select-placeholder="Select Department" @change="changeDepartment(department)"
@@ -28,7 +27,8 @@
                             :key="index"> {{ department.name }} </option>
                     </select>
                 </div>
-            </div><div class="col-span-6"></div>
+            </div>
+            <div class="col-span-6"></div>
             <div class="mb-4 col-span-3 pb-6 rounded-md">
                 <label for="" class="label-form mb-3">
                     Staff
@@ -56,7 +56,6 @@
                     </select>
                 </div>
             </div>
-            
             <div class="col-span-3">
                 <label for="" class="label-form mb-3">
                     &nbsp;
@@ -69,22 +68,8 @@
                     Add Task
                 </button>
             </div>
-
-
-
-
-
-
-
-
-
-
-
-
-
         </div>
-        <div class=" bg-white py-8 px-8 rounded-md shadow-md mb-8">
-            
+        <div class="bg-white py-8 px-8 rounded-md shadow-md mb-8">
             <div class="table-container w-3/4">
                 <table class="primary-table !border-none">
                     <thead class=" !border-none">

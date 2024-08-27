@@ -61,20 +61,14 @@
                 <label for="" class="label-form mb-3">
                     &nbsp;
                 </label>
-                <button class="add-btn py-[9px]" @click="addDutyStaff()">
+                <button class="add-btn py-[9px]" :disabled="!selectedCookingPlace && !selectedDate && !selectedstaff && !selectedDate" @click="addDutyStaff()">
                     Add
                 </button>
-                <button class="!bg-[#df845a] add-btn py-[9px] ml-4" :disabled="!selectedstaff && !selectedCookingPlace"
+                <button class="!bg-[#df845a] add-btn py-[9px] ml-4" :disabled="!selectedstaff && !selectedCookingPlace && !selectedDate"
                     data-te-toggle="modal" data-te-target="#add_duty_modal">
                     Add Task
                 </button>
             </div>
-
-
-
-
-
-
 
 
 
