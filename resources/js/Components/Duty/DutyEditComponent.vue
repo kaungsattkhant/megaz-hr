@@ -358,6 +358,7 @@ export default {
             
         };
     },
+    
 
     methods: {
         ...mapGetters(['getToken']),
