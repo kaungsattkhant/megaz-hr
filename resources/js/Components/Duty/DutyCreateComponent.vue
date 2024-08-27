@@ -35,7 +35,7 @@
                 </label>
                 <div class="bg-white mb-0 w-full text-sm inline-block h-[34px] dark:bg-white !text-black"
                     data-te-select-wrapper-ref>
-                    <select 
+                    <select
                         name="" id="" v-model="selectedStaff" class="input-ui !text-black" @change="changeStaff()"
                         data-te-select-init data-te-select-placeholder="Select Staff" data-te-select-filter="true">
                         <option :value="staff" v-for="(staff, index) in staffList"
@@ -56,7 +56,7 @@
                     </select>
                 </div>
             </div>
-            
+
             <div class="col-span-3">
                 <label for="" class="label-form mb-3">
                     &nbsp;
@@ -78,7 +78,7 @@
 
         </div>
         <div class=" bg-white py-8 px-8 rounded-md shadow-md mb-8">
-            
+
             <div class="table-container w-3/4">
                 <table class="primary-table !border-none">
                     <thead class=" !border-none">
@@ -138,7 +138,7 @@
                                 </tr>
                             </div>
                         </div>
-                        
+
                     </tbody>
                 </table>
             </div>
@@ -151,7 +151,7 @@
                 Create Duty
             </button>
         </div>
-        
+
 
 
 
@@ -211,7 +211,7 @@
                                 </button>
                             </div>
                         </div>
-                            
+
                     </div>
                     <div class="flex justify-end gap-x-4 px-6 mb-6 pt-4">
                             <button type="button" class="cancel-btn focus:shadow-none focus:outline-none"
@@ -285,7 +285,7 @@
                                 </button>
                             </div>
                         </div>
-                            
+
                     </div>
                     <div class="flex justify-end gap-x-4 px-6 mb-6 pt-4">
                             <button type="button" @click="btnClickedCreateJournal()"
@@ -332,7 +332,7 @@ export default {
             selectedIndex:null,
             sampleTaskList:[],
             selectedSampleTask:null,
-            duty_array:[],
+            dutyArray:[],
             // testTaskList:[
             //                 {
             //                     staff_name: 'kaung Khant min Tun',
@@ -364,7 +364,7 @@ export default {
 
 
 
-            
+
         };
     },
 
@@ -442,7 +442,7 @@ export default {
                 task_id: this.selectedSampleTask.id
             })
             this.selectedSampleTask = null;
-            
+
         },
         btnClickedAddSampleTaskToList(){
             this.staffAndTaskList.push({
@@ -464,13 +464,13 @@ export default {
 
 
         btnClickedAddDuty(){
-            
+
             this.staffAndTaskList.forEach(duty => {
                 let taskIds = [];
                 duty.tasks.forEach(duty_task =>{
                     taskIds.push(duty_task.task_id)
                 })
-                this.duty_array.push({
+                this.dutyArray.push({
                     date: duty.date,
                     cooking_place_id: duty.cooking_place_id,
                     staff_id: duty.staff_id,
@@ -481,7 +481,7 @@ export default {
         },
         async addDuty(){
             let formData = new FormData();
-            formData.append('duty_array',this.duty_array);
+            formData.append('dutyArray',JSON.stringify(this.dutyArray));
             let response = await postApiData({url:`/api/duties`, form_data:formData, token:this.getToken()})
             if(response.success){
                 console.log('successed')
@@ -492,7 +492,7 @@ export default {
 
 
 
-       
+
 
     },
 
@@ -500,7 +500,7 @@ export default {
     },
 
     async created() {
-        
+
     },
 
     mounted() {
