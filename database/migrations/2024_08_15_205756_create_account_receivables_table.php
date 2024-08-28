@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('account_receivables', function (Blueprint $table) {
             $table->id();
-            $table->dateTime('date_time')->default();
+            $table->dateTime('date_time');
             $table->foreignId('account_id')->constrained()->onDelete('cascade');
             $table->unsignedBigInteger('cash_account_id');
             $table->double('amount');
