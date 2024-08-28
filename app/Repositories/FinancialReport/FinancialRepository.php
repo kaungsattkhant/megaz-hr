@@ -268,8 +268,14 @@ class FinancialRepository implements FinancialInterface
             // '4-1000',#loan term liablilities
         ];
         $cashAndBankCode=['2-1000'];
+        $otherReceivable=['2-1050'];
         $results = $this->trialBalanceService->getTrialBalanceResults($creditBalanceCode, 'credit', $current,'credit_balance');
+        // return $results;
         $cashAndBankBalance=$this->trialBalanceService->getResultBySubAccountCode($cashAndBankCode,'credit',$current,'cash_and_bank');
+        // return $cashAndBankBalance;
+        $otherReceiveable=$this->trialBalanceService->getTotalBySubAccountCode($otherReceivable,'credit',$current,'other_receiveable');
+        $cashAndBankBalance=$cashAndBankBalance->merge($otherReceiveable);
+        // array_push($cashAndBankBalance,$otherReceiveable);
         return $cashAndBankBalance;
         $creditBalance=new \stdClass();
         $creditBalance->credit_balance=$results;
