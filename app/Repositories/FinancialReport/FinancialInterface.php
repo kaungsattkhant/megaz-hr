@@ -9,4 +9,6 @@ interface FinancialInterface
     public function IndirectCashFlowStatement($request);
 
     public function BalanceSheet($request);
+
+    public function TrialBalance($request);
 }

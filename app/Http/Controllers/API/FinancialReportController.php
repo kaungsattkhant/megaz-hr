@@ -29,4 +29,9 @@ class FinancialReportController extends Controller
         $data=$this->financialRepo->BalanceSheet($request);
         ResponseData($data);
     }
+
+    public function TrialBalance(Request $request){
+        $data=$this->financialRepo->TrialBalance($request);
+        ResponseData($data);
+    }
 }
