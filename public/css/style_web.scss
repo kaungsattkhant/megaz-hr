@@ -379,3 +379,7 @@
   .after-coma:last-child::after{
     content: ''!important;
   }
+  .select-custom div input{
+    font-size: 14px;
+    line-height: 1.7rem;
+  }
