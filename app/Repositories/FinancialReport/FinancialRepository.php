@@ -6,16 +6,19 @@ use App\Models\CashbookBalance;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use App\Services\CashFlowService;
+use App\Services\TrialBalanceService;
 
 class FinancialRepository implements FinancialInterface
 {
     protected $cashFlowService;
+    protected $trialBalanceService;
     private $receiptSubAccountCode = ['2-1000', '2-1050', '2-2000', '4-3000', '5-0000', '5-0100', '5-1000', '4-4000', '3-1000'];
-    private  $paymentSubAccountCode = ['1-1000', '1-1100', '2-1000', '2-1020', '2-1050', '2-3000', '2-4000', '3-2000', '4-1000', '4-2000', '4-3000', '4-4000', '6-0000', '6-2000', '6-3000', '6-4000', '6-5000', '6-6000', '6-7000', '6-8000', '6-9000', '3-1000'];
+    private $paymentSubAccountCode = ['1-1000', '1-1100', '2-1000', '2-1020', '2-1050', '2-3000', '2-4000', '3-2000', '4-1000', '4-2000', '4-3000', '4-4000', '6-0000', '6-2000', '6-3000', '6-4000', '6-5000', '6-6000', '6-7000', '6-8000', '6-9000', '3-1000'];
 
-    public function __construct(CashFlowService $cashFlowService)
+    public function __construct(CashFlowService $cashFlowService,TrialBalanceService $trialBalanceService)
     {
         $this->cashFlowService = $cashFlowService;
+        $this->trialBalanceService = $trialBalanceService;
     }
 
     public function CashFlowStatementOriginal($request) //original
@@ -172,8 +175,6 @@ class FinancialRepository implements FinancialInterface
         // return $results;
     }
 
-
-
     public function CashFlowStatement($request)
     {
         $current = (isset($request->date) || $request->date != null) ? Carbon::parse($request->date) : Carbon::now();
@@ -206,32 +207,79 @@ class FinancialRepository implements FinancialInterface
     {
         $receiptSubAccountCode = ['2-1050', '2-2000', '4-3000', '5-0000', '5-0100', '5-1000', '4-4000', '3-1000'];
         $paymentSubAccountCode = ['2-1020', '2-1050', '2-3000', '2-4000', '3-2000', '4-1000', '4-2000', '4-3000', '4-4000', '6-0000', '6-2000', '6-3000', '6-4000', '6-5000', '6-6000', '6-7000', '6-8000', '6-9000', '3-1000'];
-        $purchaseOfFixedAsset=['1-1000','1-1100'];
+        $purchaseOfFixedAsset = ['1-1000', '1-1100'];
         $current = (isset($request->date) || $request->date != null) ? Carbon::parse($request->date) : Carbon::now();
+        $previousMonth = $current->copy()->subMonth();
         $cashInFlows = $this->cashFlowService->getIndirectCashFlowStatement($receiptSubAccountCode, 'debit', $current);
         $cashOutFlows = $this->cashFlowService->getIndirectCashFlowStatement($paymentSubAccountCode, 'credit_cash_out_flow', $current);
         $purchaseOfFixedAsset = $this->cashFlowService->getIndirectCashFlowStatement($purchaseOfFixedAsset, 'credit_fixed_asset', $current);
         $totalCashInFlow = array_sum(array_column($cashInFlows, 'amount'));
         $totalCashOutFlow = array_sum(array_column($cashOutFlows, 'amount'));
 
-        $operating_activities=[
-            'cash_in_flow'=>$cashInFlows,
-            'cash_out_flow'=>$cashOutFlows,
+        $operating_activities = [
+            'cash_in_flow' => $cashInFlows,
+            'cash_out_flow' => $cashOutFlows,
             'total_cash_in_flow' => $totalCashInFlow,
             'total_cash_out_flow' => $totalCashOutFlow,
         ];
-        $investing_activities=[
-            'purchase_of_fixed_asset'=>$purchaseOfFixedAsset,
+        $investing_activities = [
+            'purchase_of_fixed_asset' => $purchaseOfFixedAsset,
         ];
         return [
-            'operating_activities'=>$operating_activities,
-            'investing_activities'=>$investing_activities,
+            'operating_activities' => $operating_activities,
+            'investing_activities' => $investing_activities,
         ];
     }
-
 
     public function BalanceSheet($request)
     {
-        dd('abc');
+        // $current = (isset($request->date) || $request->date != null) ? Carbon::parse($request->date) : Carbon::now();
+        // $previousMonth = $current->copy()->subMonth();
+        // $creditBalanceCode = [
+        //     '5-0001',
+        //     '5-0101',#food income
+        //     '5-0002',
+        //     '5-0102',#beverage income
+        //     '5-0003',
+        //     '5-0103', #room charges
+        //     '5-1000', #income
+        //     '3-1000',#capital
+        //     '4-1000',#loan term liablilities
+        // ];
+        // $debitResults = $this->trialBalanceService->getTrialBalanceResults($creditBalanceCode, 'credit', $current,'credit_balance');
+        // return $debitResults;
     }
+
+    public function TrialBalance($request)
+    {
+        $current = (isset($request->date) || $request->date != null) ? Carbon::parse($request->date) : Carbon::now();
+        $previousMonth = $current->copy()->subMonth();
+        $creditBalanceCode = [
+            '5-0001',
+            '5-0101',#food income
+            '5-0002',
+            '5-0102',#beverage income
+            '5-0003',
+            '5-0103', #room charges
+            // '5-1000', #income
+            '3-1010',#existing capital
+            '3-1020',#retained earning
+            '4-1001',#retained earning
+            // '4-1000',#loan term liablilities
+        ];
+        $cashAndBankCode=['2-1000'];
+        $otherReceivable=['2-1050'];
+        $results = $this->trialBalanceService->getTrialBalanceResults($creditBalanceCode, 'credit', $current,'credit_balance');
+        // return $results;
+        $cashAndBankBalance=$this->trialBalanceService->getResultBySubAccountCode($cashAndBankCode,'credit',$current,'cash_and_bank');
+        // return $cashAndBankBalance;
+        $otherReceiveable=$this->trialBalanceService->getTotalBySubAccountCode($otherReceivable,'credit',$current,'other_receiveable');
+        $cashAndBankBalance=$cashAndBankBalance->merge($otherReceiveable);
+        // array_push($cashAndBankBalance,$otherReceiveable);
+        return $cashAndBankBalance;
+        $creditBalance=new \stdClass();
+        $creditBalance->credit_balance=$results;
+        return $creditBalance;
+    }
+
 }
