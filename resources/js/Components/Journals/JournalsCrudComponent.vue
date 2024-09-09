@@ -48,7 +48,7 @@
                         </thead>
                         <tbody>
                             <div class="contents" v-for="(journal, journalIndex) in journalList" :key="index">
-                                <tr class="" v-for="acc in journal.ledgers">
+                                <tr class="" v-for="(acc,accIndex) in journal.ledgers" :key="accIndex">
                                     <td class=" align-middle" rowspan="2" v-if="acc.action == 'credit'">
                                         {{ journalIndex+1 }}
                                     </td>
@@ -202,7 +202,7 @@
             async getJournalList(selectedMonth){
                 const response = await getApiData({ url: '/api/journals?month=' + selectedMonth , token: this.getToken() });
                 if(response.data){
-                    this.journalList = response.data;
+                    this.journalList = response.data.data;
                 }
             },
             monthChange(){

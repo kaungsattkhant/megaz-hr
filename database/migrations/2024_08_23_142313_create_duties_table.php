@@ -11,13 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('account_receivables', function (Blueprint $table) {
+        Schema::create('duties', function (Blueprint $table) {
             $table->id();
-            $table->dateTime('date_time');
-            $table->foreignId('account_id')->constrained()->onDelete('cascade');
-            $table->unsignedBigInteger('cash_account_id');
-            $table->double('amount');
-            $table->string('type');
+            $table->dateTime('date');
+            $table->foreignId('staff_id')->constrained()->onDelete('cascade');
+            $table->foreignId('cooking_place_id')->constrained()->onDelete('cascade');
             $table->unsignedBigInteger('created_by');
             $table->timestamps();
         });
@@ -28,6 +26,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('account_receivables');
+        Schema::dropIfExists('duties');
     }
 };

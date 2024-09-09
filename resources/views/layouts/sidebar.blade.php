@@ -34,6 +34,12 @@
                         
                         <!-- @endif -->
 
+                        <li>
+                            <a href="{{ route('duty') }}" class="flex items-center @yield('duty')">
+                                <i class="fal fa-clipboard-list pr-3"></i>
+                                Duty
+                            </a>
+                        </li>
                         @if (checkFeaturePermission('staff'))
                         <li>
                             <a href="{{ route('staff') }}" class="flex items-center @yield('staffs')">
@@ -148,7 +154,7 @@
                         @endif
                         @if (checkFeaturePermission('uom'))
                         <li>
-                            <a href="{{ route('uoms') }}" class="flex items-center @yield('uoms')">
+                            <a href="{{ route('uoms') }}" class="flex items-center @yield('uom_conversions')">
                                 <i class="fal fa-balance-scale  pr-3"></i>
                                 UOMs
                             </a>
@@ -367,27 +373,27 @@
                         </li>
                         @endif
                         @if (checkFeaturePermission('fixed-asset'))
-                        <li>
-                            <a href="{{ route('fixed_assets.asset_items') }}"
-                                class="flex items-center @yield('asset_items')">
-                                <i class="fal fa-truck-loading  pr-3"></i>
-                                Asset Items
-                            </a>
-                        </li>
-                        <li>
-                            <a href="{{ route('fixed_assets.assets') }}"
-                                class="flex items-center @yield('assets')">
-                                <i class="fal fa-truck-loading  pr-3"></i>
-                                Assets
-                            </a>
-                        </li>
-                        <li>
-                            <a href="{{ route('fixed_assets.index') }}"
-                                class="flex items-center @yield('fixed_asset')">
-                                <i class="fal fa-truck-loading  pr-3"></i>
-                                Fixed Assets
-                            </a>
-                        </li>
+                            <li>
+                                <a href="{{ route('assetItemList') }}"
+                                    class="flex items-center @yield('asset_items')">
+                                    <i class="fal fa-truck-loading  pr-3"></i>
+                                    Asset Items
+                                </a>
+                            </li>
+                            <li>
+                                <a href="{{ route('assetList') }}"
+                                    class="flex items-center @yield('assets')">
+                                    <i class="fal fa-truck-loading  pr-3"></i>
+                                    Assets
+                                </a>
+                            </li>
+                            <li>
+                                <a href="{{ route('fixed_assets.index') }}"
+                                    class="flex items-center @yield('fixed_asset')">
+                                    <i class="fal fa-truck-loading  pr-3"></i>
+                                    Fixed Assets
+                                </a>
+                            </li>
                         @endif
                         @if (checkFeaturePermission('account-payables'))
                         <li>

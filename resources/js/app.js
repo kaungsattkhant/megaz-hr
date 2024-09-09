@@ -120,6 +120,11 @@ import SkillCrudComponent from './Components/Skill/SkillCrudComponent.vue';
 import CookingPlaceComponent from './Components/CookingPlace/CookingPlaceComponent.vue';
 import CookingPlaceCreateComponent from './Components/CookingPlace/CookingPlaceCreateComponent.vue';
 import CookingPlaceEditComponent from './Components/CookingPlace/CookingPlaceEditComponent.vue';
+import AssetItemList from './Components/FixedAssets/AssetItemList.vue'
+import AssetListCompoennt from './Components/FixedAssets/AssetListComponent.vue';
+import DutyComponent from './Components/Duty/DutyComponent.vue';
+import DutyCreateComponent from './Components/Duty/DutyCreateComponent.vue';
+import DutyEditComponent from './Components/Duty/DutyEditComponent.vue';
 
 app.component('NavBarComponent', NavBarComponent);
 app.component('StaffListComponent', StaffListComponent);
@@ -219,6 +224,11 @@ app.component('SkillCrudComponent',SkillCrudComponent);
 app.component('CookingPlaceComponent',CookingPlaceComponent);
 app.component('CookingPlaceCreateComponent',CookingPlaceCreateComponent);
 app.component('CookingPlaceEditComponent',CookingPlaceEditComponent);
+app.component('AssetItemList',AssetItemList);
+app.component('AssetListComponent',AssetListCompoennt);
+app.component('DutyComponent',DutyComponent);
+app.component('DutyCreateComponent',DutyCreateComponent);
+app.component('DutyEditComponent',DutyEditComponent);
 
 app.use(store);
 app.use(Notifications);

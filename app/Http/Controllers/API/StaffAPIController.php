@@ -152,4 +152,9 @@ class StaffAPIController extends Controller
     {
         $staff = $this->staffRepo->staffReport($request);
     }
+
+    public function getStaffWithDuties(Request $request,int $id)
+    {
+        $this->staffRepo->staffDuty($request,$id);
+    }
 }

@@ -8,12 +8,24 @@ use App\Models\Account;
 use App\Models\AssetItem;
 use Illuminate\Support\Facades\DB;
 use App\Http\Action\Transaction\StoreTransactionLedger;
-
+use Illuminate\Http\Request;
 
 class AssetRepository implements AssetInterface
 {
 
-    public function createAssetItem($request){
+    public function listAssetItems(Request $request)
+    {
+        $asset_items = AssetItem::orderBy('created_at','desc')->paginate(config('common.list_count'));
+        ResponseData($asset_items);
+    }
+
+    public function listAsset(Request $request)
+    {
+        $assets = Asset::orderBy('created_at','desc')->paginate(config('common.list_count'));
+        ResponseData($assets);
+    }
+
+    public function createAssetItem(Request $request){
         $data=$request->all();
         DB::beginTransaction();
         try {
@@ -28,7 +40,7 @@ class AssetRepository implements AssetInterface
         }
     }
 
-    public function createAsset($request){
+    public function createAsset(Request $request){
     //    dd($request->all());
         $data=$request->all();
         DB::beginTransaction();
@@ -36,7 +48,7 @@ class AssetRepository implements AssetInterface
             $data['created_by']=UserData()->id;
             $model=Asset::create($data);
             if($model){
-                #asset inventory ledger 
+                #asset inventory ledger
                 $data['asset_id']=$model->id;
                 (new StoreInventory($request->inventory_id))->storeAssetToInventory($data,'in');
                 #end asset inventory ledger

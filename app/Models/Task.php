@@ -22,7 +22,6 @@ class Task extends BaseModel
         'completed_by',
         'is_double_checked',
         'double_checked_by',
-        'department_id',
         'created_by',
         'status','is_active',
         'type',
@@ -52,8 +51,13 @@ class Task extends BaseModel
         return $this->belongsTo(Role::class);
     }
 
+    public function duties()
+    {
+        return $this->belongsToMany(Duty::class,'duty_task');
+    }
+
     /**
      * Get staff of completed_by.
      */
-   
+
 }

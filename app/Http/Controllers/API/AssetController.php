@@ -22,17 +22,27 @@ class AssetController extends Controller
     public function getAssetItemByAccount(Request $request){
         $data=$this->assetRepo->getAssetItemByAccount($request);
         ResponseData($data);
-        
+
     }
     public function createAssetItem(Request $request){
         $data=$this->assetRepo->createAssetItem($request);
         ResponseData($data);
-        
+
     }
 
     public function createAsset(Request $request){
         $data=$this->assetRepo->createAsset($request);
         ResponseData($data);
-        
+
+    }
+
+    public function getAsset(Request $request)
+    {
+        $this->assetRepo->listAsset($request);
+    }
+
+    public function getAssetItem(Request $request)
+    {
+        $this->assetRepo->listAssetItems($request);
     }
 }
