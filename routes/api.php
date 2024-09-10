@@ -73,6 +73,8 @@ use App\Http\Controllers\API\Customers\MenuCategoryAPIController as CustomerMenu
 use App\Http\Controllers\API\DutyAPIController;
 use App\Http\Controllers\API\JournalAPIController;
 use App\Http\Controllers\API\PrepaidAPIController;
+use App\Http\Controllers\API\SaleTargetMenuAPIController;
+use App\Http\Controllers\API\SaleTargetPositionAPIController;
 use App\Http\Controllers\API\SkillAPIController;
 use App\Http\Controllers\API\StaffAdvanceAPIController;
 
@@ -352,6 +354,24 @@ Route::middleware('auth:api')->group(function () {
         Route::get('/duties/{id}','dutyDetail');
     });
 
+});
+
+Route::controller(SaleTargetPositionAPIController::class)->group(function()
+{
+    Route::get('/sale_target_positions','listAllSalteTargetPosition');
+    Route::get('/sale_target_positions/{id}','saleTargetPositionDetail');
+    Route::post('/sale_target_positions','createSaleTargetPosition');
+    Route::post('/sale_target_positions/{id}','updateSaleTargetPosition');
+    Route::delete('/sale_target_positions/{id}','deleteSaleTargetPosition');
+});
+
+Route::controller(SaleTargetMenuAPIController::class)->group(function()
+{
+    Route::get('/sale_target_menus','listSaleTargetMenu');
+    Route::get('/sale_target_menus/{id}','getSaleTargetMenu');
+    Route::post('/sale_target_menus','createSaleTargetMenu');
+    Route::post('/sale_target_menus/{id}','updateSaleTargetMenu');
+    Route::delete('/sale_target_menus/{id}','deleteSaleTargetMenu');
 });
 
 Route::controller(PackageAPIController::class)->group(function()

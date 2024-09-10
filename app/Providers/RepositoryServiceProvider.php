@@ -139,6 +139,10 @@ use App\Repositories\CustomerLevelDiscount\CustomerLevelDiscountRepositoryInterf
 use App\Repositories\Duty\DutyRepository;
 use App\Repositories\Duty\DutyRepositoryInterface;
 use App\Repositories\FinancialReport\FinancialRepository;
+use App\Repositories\SaleTargetMenu\SaleTargetMenuRepository;
+use App\Repositories\SaleTargetMenu\SaleTargetMenuRepositoryInterface;
+use App\Repositories\SaleTargetPosition\SaleTargetPositionRepository;
+use App\Repositories\SaleTargetPosition\SaleTargetPositionRepositoryInterface;
 use App\Repositories\Skill\SkillRepository;
 use App\Repositories\Skill\SkillRepositoryInterface;
 
@@ -212,5 +216,7 @@ class RepositoryServiceProvider extends ServiceProvider
         $this->app->bind(SkillRepositoryInterface::class,SkillRepository::class);
         $this->app->bind(CookingPlaceRepositoryInterface::class,CookingPlaceRepository::class);
         $this->app->bind(DutyRepositoryInterface::class,DutyRepository::class);
+        $this->app->bind(SaleTargetPositionRepositoryInterface::class,SaleTargetPositionRepository::class);
+        $this->app->bind(SaleTargetMenuRepositoryInterface::class,SaleTargetMenuRepository::class);
     }
 }
