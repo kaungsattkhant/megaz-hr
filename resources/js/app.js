@@ -125,6 +125,10 @@ import AssetListCompoennt from './Components/FixedAssets/AssetListComponent.vue'
 import DutyComponent from './Components/Duty/DutyComponent.vue';
 import DutyCreateComponent from './Components/Duty/DutyCreateComponent.vue';
 import DutyEditComponent from './Components/Duty/DutyEditComponent.vue';
+import SaleTargetPositionListComponent from './Components/SaleTarget/SaleTargetPositionListComponent.vue';
+import SaleTargetPositionCreateComponent from './Components/SaleTarget/SaleTargetPositionCreateComponent.vue';
+import SaleTargetMenuListComponent from './Components/SaleTarget/SaleTargetMenuListComponent.vue';
+import SaleTargetMenuCreateComponent from './Components/SaleTarget/SaleTargetMenuCreateComponent.vue';
 
 app.component('NavBarComponent', NavBarComponent);
 app.component('StaffListComponent', StaffListComponent);
@@ -229,6 +233,10 @@ app.component('AssetListComponent',AssetListCompoennt);
 app.component('DutyComponent',DutyComponent);
 app.component('DutyCreateComponent',DutyCreateComponent);
 app.component('DutyEditComponent',DutyEditComponent);
+app.component('SaleTargetPositionListComponent',SaleTargetPositionListComponent);
+app.component('SaleTargetPositionCreateComponent',SaleTargetPositionCreateComponent);
+app.component('SaleTargetMenuListComponent',SaleTargetMenuListComponent);
+app.component('SaleTargetMenuCreateComponent',SaleTargetMenuCreateComponent);
 
 app.use(store);
 app.use(Notifications);
