@@ -11,12 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('delivery_charges', function (Blueprint $table) {
+        Schema::create('sale_target_positions', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('township_id')->constrained()->onDelete('cascade');
-            $table->double('amount');
-            $table->dateTime('date_time');
-            $table->boolean('is_active')->default(1);
+            $table->date('month');
+            $table->foreignId('department_id')->constrained()->onDelete('cascade');
+            $table->double('head_count');
             $table->timestamps();
         });
     }
@@ -26,6 +25,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('delivery_charges');
+        Schema::dropIfExists('sale_target_positions');
     }
 };

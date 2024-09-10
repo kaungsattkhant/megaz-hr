@@ -11,14 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('account_receivables', function (Blueprint $table) {
+        Schema::create('target_positions', function (Blueprint $table) {
             $table->id();
-            $table->dateTime('date_time');
-            $table->foreignId('account_id')->constrained()->onDelete('cascade');
-            $table->unsignedBigInteger('cash_account_id');
+            $table->foreignId('role_id')->constrained()->onDelete('cascade');
             $table->double('amount');
-            $table->string('type');
-            $table->unsignedBigInteger('created_by');
+            $table->foreignId('sale_target_position_id')->constrained()->onDelete('cascade');
             $table->timestamps();
         });
     }
@@ -28,6 +25,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('account_receivables');
+        Schema::dropIfExists('target_positions');
     }
 };

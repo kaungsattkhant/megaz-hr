@@ -23,10 +23,10 @@ class RoleRepository implements RoleRepositoryInterface
 
             if ($request->department_id) {
                 $totalCount = Role::where('department_id', $request->department_id)->count();
-                $roles = Role::where('department_id', $request->department_id)->skip($skip)->take($perPage)->with('department','skills')->get();
+                $roles = Role::where('department_id', $request->department_id)->skip($skip)->take($perPage)->with('department')->get();
             } else {
                 $totalCount = Role::count();
-                $roles = Role::skip($skip)->take($perPage)->with('department','skills')->get();
+                $roles = Role::skip($skip)->take($perPage)->with('department')->get();
             }
 
             $paginationData = MakePaginationData($request, $totalCount, 'roles');
@@ -37,7 +37,7 @@ class RoleRepository implements RoleRepositoryInterface
             if ($request->department_id) {
                 $roles = Role::where('department_id', $request->department_id)->with('department','skills')->get();
             } else {
-                $roles = Role::with('department','skills')->get();
+                $roles = Role::with('department')->get();
             }
             return $roles;
         }
@@ -76,6 +76,6 @@ class RoleRepository implements RoleRepositoryInterface
     }
 
     public function getRoleByDepartment($department_id){
-        return Role::where('department_id',$department_id)->with('skill')->get();
+        return Role::where('department_id',$department_id)->with('skills')->get();
     }
 }

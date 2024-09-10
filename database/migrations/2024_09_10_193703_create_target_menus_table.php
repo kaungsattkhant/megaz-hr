@@ -11,12 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('delivery_charges', function (Blueprint $table) {
+        Schema::create('target_menus', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('township_id')->constrained()->onDelete('cascade');
-            $table->double('amount');
-            $table->dateTime('date_time');
-            $table->boolean('is_active')->default(1);
+            $table->foreignId('area_id')->constrained()->onDelete('cascade');
+            $table->foreignId('menu_id')->constrained()->onDelete('cascade');
+            $table->integer('quantity');
+            $table->foreignId('sale_target_menu_id')->constrained()->onDelete('cascade');
             $table->timestamps();
         });
     }
@@ -26,6 +26,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('delivery_charges');
+        Schema::dropIfExists('target_menus');
     }
 };

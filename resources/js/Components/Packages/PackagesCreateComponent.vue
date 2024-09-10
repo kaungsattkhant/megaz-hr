@@ -24,20 +24,25 @@
                 <label for="" class="label-form mb-3">
                     From
                 </label>
-                <input type="date" class="input-ui" :min="today" v-model="startDate">
+                <div class="relative">
+                    <input type="date" class="input-ui" :min="today" v-model="startDate">
+                </div>
             </div>
             <div class="mb-3 col-span-3 rounded-md">
                 <label for="" class="label-form mb-3">
                     To
                 </label>
-                <input type="date" class="input-ui" :min="today" v-model="endDate" >
+                <div class="relative">
+                    <input type="date" class="input-ui" :min="today" v-model="endDate">
+                </div>
             </div>
 
             <div class="mb-3 col-span-3 rounded-md">
                 <label for="" class="label-form mb-3">
                     Image
                 </label>
-                <input type="file" class="input-ui" @change="handleFileChange" accept="image/png, image/gif, image/jpeg" ref="image">
+                <input type="file" class="input-ui" @change="handleFileChange" accept="image/png, image/gif, image/jpeg"
+                    ref="image">
             </div>
 
             <div class="mb-3 col-span-3 rounded-md">
@@ -45,12 +50,8 @@
                     <input
                         class="relative float-left -ms-[1.5rem] me-[6px] mt-[0.15rem] h-[1.125rem] w-[1.125rem]
                         appearance-none rounded-[0.25rem] border-[0.125rem] border-solid border-secondary-500 outline-none before:pointer-events-none before:absolute before:h-[0.875rem] before:w-[0.875rem] before:scale-0 before:rounded-full before:bg-transparent before:opacity-0 before:shadow-checkbox before:shadow-transparent before:content-[''] checked:border-primary checked:bg-primary checked:before:opacity-[0.16] checked:after:absolute checked:after:-mt-px checked:after:ms-[0.25rem] checked:after:block checked:after:h-[0.8125rem] checked:after:w-[0.375rem] checked:after:rotate-45 checked:after:border-[0.125rem] checked:after:border-l-0 checked:after:border-t-0 checked:after:border-solid checked:after:border-white checked:after:bg-transparent checked:after:content-[''] hover:cursor-pointer hover:before:opacity-[0.04] hover:before:shadow-black/60 focus:shadow-none focus:transition-[border-color_0.2s] focus:before:scale-100 focus:before:opacity-[0.12] focus:before:shadow-black/60 focus:before:transition-[box-shadow_0.2s,transform_0.2s] focus:after:absolute focus:after:z-[1] focus:after:block focus:after:h-[0.875rem] focus:after:w-[0.875rem] focus:after:rounded-[0.125rem] focus:after:content-[''] checked:focus:before:scale-100 checked:focus:before:shadow-checkbox checked:focus:before:transition-[box-shadow_0.2s,transform_0.2s] checked:focus:after:-mt-px checked:focus:after:ms-[0.25rem] checked:focus:after:h-[0.8125rem] checked:focus:after:w-[0.375rem] checked:focus:after:rotate-45 checked:focus:after:rounded-none checked:focus:after:border-[0.125rem] checked:focus:after:border-l-0 checked:focus:after:border-t-0 checked:focus:after:border-solid checked:focus:after:border-white checked:focus:after:bg-transparent rtl:float-right dark:border-neutral-400 dark:checked:border-primary dark:checked:bg-primary"
-                        type="checkbox"
-                        v-model="isKTVPackage"
-                        id="checkboxDefault" />
-                    <label
-                        class="inline-block ps-[0.15rem] hover:cursor-pointer"
-                        for="checkboxDefault">
+                        type="checkbox" v-model="isKTVPackage" id="checkboxDefault" />
+                    <label class="inline-block ps-[0.15rem] hover:cursor-pointer" for="checkboxDefault">
                         Package for KTV
                     </label>
                 </div>
@@ -61,12 +62,8 @@
                     <input
                         class="relative float-left -ms-[1.5rem] me-[6px] mt-[0.15rem] h-[1.125rem] w-[1.125rem]
                         appearance-none rounded-[0.25rem] border-[0.125rem] border-solid border-secondary-500 outline-none before:pointer-events-none before:absolute before:h-[0.875rem] before:w-[0.875rem] before:scale-0 before:rounded-full before:bg-transparent before:opacity-0 before:shadow-checkbox before:shadow-transparent before:content-[''] checked:border-primary checked:bg-primary checked:before:opacity-[0.16] checked:after:absolute checked:after:-mt-px checked:after:ms-[0.25rem] checked:after:block checked:after:h-[0.8125rem] checked:after:w-[0.375rem] checked:after:rotate-45 checked:after:border-[0.125rem] checked:after:border-l-0 checked:after:border-t-0 checked:after:border-solid checked:after:border-white checked:after:bg-transparent checked:after:content-[''] hover:cursor-pointer hover:before:opacity-[0.04] hover:before:shadow-black/60 focus:shadow-none focus:transition-[border-color_0.2s] focus:before:scale-100 focus:before:opacity-[0.12] focus:before:shadow-black/60 focus:before:transition-[box-shadow_0.2s,transform_0.2s] focus:after:absolute focus:after:z-[1] focus:after:block focus:after:h-[0.875rem] focus:after:w-[0.875rem] focus:after:rounded-[0.125rem] focus:after:content-[''] checked:focus:before:scale-100 checked:focus:before:shadow-checkbox checked:focus:before:transition-[box-shadow_0.2s,transform_0.2s] checked:focus:after:-mt-px checked:focus:after:ms-[0.25rem] checked:focus:after:h-[0.8125rem] checked:focus:after:w-[0.375rem] checked:focus:after:rotate-45 checked:focus:after:rounded-none checked:focus:after:border-[0.125rem] checked:focus:after:border-l-0 checked:focus:after:border-t-0 checked:focus:after:border-solid checked:focus:after:border-white checked:focus:after:bg-transparent rtl:float-right dark:border-neutral-400 dark:checked:border-primary dark:checked:bg-primary"
-                        type="checkbox"
-                        v-model="isChangeable"
-                        id="checkboxDefault2" />
-                    <label
-                        class="inline-block ps-[0.15rem] hover:cursor-pointer"
-                        for="checkboxDefault">
+                        type="checkbox" v-model="isChangeable" id="checkboxDefault2" />
+                    <label class="inline-block ps-[0.15rem] hover:cursor-pointer" for="checkboxDefault">
                         Can changeable?
                     </label>
                 </div>
@@ -85,21 +82,24 @@
                 <label for="" class="label-form mb-3">
                     Paid Sessions
                 </label>
-                <input type="number" class="input-ui" :disabled="!isKTVPackage" v-model="paySession" placeholder="Paid Sessions" >
+                <input type="number" class="input-ui" :disabled="!isKTVPackage" v-model="paySession"
+                    placeholder="Paid Sessions">
             </div>
 
             <div class="mb-3 col-span-3 rounded-md">
                 <label for="" class="label-form mb-3">
                     Free Sessions
                 </label>
-                <input type="number" class="input-ui" :disabled="!isKTVPackage" v-model="freeSession" placeholder="Free Sessions" >
+                <input type="number" class="input-ui" :disabled="!isKTVPackage" v-model="freeSession"
+                    placeholder="Free Sessions">
             </div>
 
             <div class="mb-3 col-span-3 rounded-md">
                 <label for="" class="label-form mb-3">
                     Session Price
                 </label>
-                <input type="number" class="input-ui" :disabled="!isKTVPackage" v-model="sessionPrice" placeholder="Session Price" >
+                <input type="number" class="input-ui" :disabled="!isKTVPackage" v-model="sessionPrice"
+                    placeholder="Session Price">
             </div>
 
             <div class="mb-3 col-span-3"></div>
@@ -154,7 +154,7 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <div class="contents" v-for="(promotionMenu, menuIndex) in selectedMenus" :key="menuIndex" >
+                        <div class="contents" v-for="(promotionMenu, menuIndex) in selectedMenus" :key="menuIndex">
                             <tr class="">
                                 <td class="text-left">
                                     {{ promotionMenu.name }}
@@ -175,7 +175,7 @@
         </div>
 
         <div>
-            <button class="add-btn" @click="createBtnClicked" >
+            <button class="add-btn" @click="createBtnClicked">
                 Create Package
             </button>
         </div>
@@ -183,190 +183,190 @@
 </template>
 
 <script>
-    import { Modal, Ripple, initTE, Input, Tab, Select } from "tw-elements";
-    import { getApiData, postApiData, deleteApiData } from '../../utilities/ajax-helpers';
-    import { getCurrentDate, getFirstDate } from "../../utilities/datetime-helpers";
-    import { mapGetters } from "vuex";
-    import Multiselect from 'vue-multiselect';
+import { Modal, Ripple, initTE, Input, Tab, Select } from "tw-elements";
+import { getApiData, postApiData, deleteApiData } from '../../utilities/ajax-helpers';
+import { getCurrentDate, getFirstDate } from "../../utilities/datetime-helpers";
+import { mapGetters } from "vuex";
+import Multiselect from 'vue-multiselect';
 
-    export default {
-        components: {
-            Multiselect
+export default {
+    components: {
+        Multiselect
+    },
+    data() {
+        return {
+            today: getCurrentDate(),
+
+            isKTVPackage: false,
+            isChangeable: false,
+
+            menuCategoryList: [],
+            selectedMenuCategory: null,
+            menuList: [],
+            selectedMenu: null,
+            selectedMenus: [],
+
+            sessionDuration: null,
+            paySession: null,
+            freeSession: null,
+            sessionPrice: null,
+
+            name: null,
+            price: null,
+            startDate: null,
+            endDate: null,
+
+            menuQty: null,
+
+            selectedImage: null,
+        };
+    },
+
+    methods: {
+        ...mapGetters(['getToken']),
+
+        alertValiationMessage(field) {
+            this.$notify({
+                title: `Input validation`,
+                text: `You forgot to provide ${field}, please try again`,
+                type: "warn"
+            });
         },
-        data() {
-            return {
-                today: getCurrentDate(),
 
-                isKTVPackage: false,
-                isChangeable: false,
-
-                menuCategoryList: [],
-                selectedMenuCategory: null,
-                menuList: [],
-                selectedMenu: null,
-                selectedMenus: [],
-
-                sessionDuration: null,
-                paySession: null,
-                freeSession: null,
-                sessionPrice: null,
-
-                name: null,
-                price: null,
-                startDate: null,
-                endDate: null,
-
-                menuQty: null,
-
-                selectedImage: null,
-            };
+        async getMenuCategoryList() {
+            let url = `/api/menu_categories`;
+            let response = await getApiData({ url: url, token: this.getToken() });
+            if (response.data) {
+                this.menuCategoryList = response.data;
+            }
         },
 
-        methods: {
-            ...mapGetters(['getToken']),
+        async menuCategorySelectChanged() {
+            let url = `/api/menu_categories/${this.selectedMenuCategory.id}/menus`;
+            let response = await getApiData({ url: url, token: this.getToken() });
+            if (response.data) {
+                this.menuList = response.data;
+            }
+        },
 
-            alertValiationMessage(field) {
+        handleFileChange(event) {
+            const selectedFile = event.target.files[0];
+            this.selectedImage = selectedFile;
+        },
+
+        addMenuBtnClicked() {
+            if (!this.selectedMenu) {
+                this.alertValiationMessage(`package menu`);
+                return 1;
+            }
+            if (!this.menuQty) {
+                this.alertValiationMessage(`package menu quantity`);
+                return 1;
+            }
+            this.selectedMenus.push({
+                id: this.selectedMenu.id,
+                name: this.selectedMenu.name,
+                quantity: this.menuQty
+            });
+            this.selectedMenu = null;
+            this.menuQty = null;
+            this.menuPrice = null;
+        },
+
+        removePackageMenuBtnClicked(menuIndex) {
+            this.selectedMenus.splice(menuIndex, 1);
+        },
+
+        async createBtnClicked() {
+            let formData = new FormData();
+            if (!this.name) {
+                this.alertValiationMessage(`package name`);
+                return 1;
+            }
+            if (!this.startDate) {
+                this.alertValiationMessage(`from date`);
+                return 1;
+            }
+            if (!this.endDate) {
+                this.alertValiationMessage(`to date`);
+                return 1;
+            }
+            if (!this.price) {
+                this.alertValiationMessage(`package price`);
+                return 1;
+            }
+            if (this.selectedMenus.length < 1) {
+                this.alertValiationMessage(`package menus`);
+                return 1;
+            }
+            if (!this.selectedImage) {
+                this.alertValiationMessage(`package image`);
+                return 1;
+            }
+
+            formData.append('name', this.name);
+            formData.append('from_date', this.startDate);
+            formData.append('to_date', this.endDate);
+            formData.append('price', this.price);
+            formData.append('is_ktv', (this.isKTVPackage) ? 1 : 0);
+            formData.append('is_changeable', (this.isChangeable) ? 1 : 0);
+            formData.append('image', this.selectedImage);
+            if (this.isKTVPackage) {
+                // if(!this.sessionDuration){
+                //     this.alertValiationMessage(`session`);
+                //     return 1;
+                // }
+                if (!this.paySession) {
+                    this.alertValiationMessage(`paid session`);
+                    return 1;
+                }
+                if (!this.freeSession) {
+                    this.alertValiationMessage(`free sessions`);
+                    return 1;
+                }
+                if (!this.sessionPrice) {
+                    this.alertValiationMessage(`session price`);
+                    return 1;
+                }
+
+                // formData.append('session', this.sessionDuration);
+                formData.append('pay_session', this.paySession);
+                formData.append('free_session', this.freeSession);
+                formData.append('session_price', this.sessionPrice);
+            }
+
+            let menuIds = [];
+            this.selectedMenus.forEach((menu) => {
+                menuIds.push({ menu_id: menu.id, quantity: menu.quantity });
+            });
+
+            formData.append('menuIds', JSON.stringify(menuIds));
+
+            let url = `/api/packages`;
+            let response = await postApiData({ url: url, form_data: formData, token: this.getToken() });
+            if (response.success) {
                 this.$notify({
-                    title: `Input validation`,
-                    text: `You forgot to provide ${field}, please try again`,
-                    type: "warn"
-                });
-            },
-
-            async getMenuCategoryList(){
-                let url = `/api/menu_categories`;
-                let response = await getApiData({url: url, token: this.getToken()});
-                if(response.data){
-                    this.menuCategoryList = response.data;
-                }
-            },
-
-            async menuCategorySelectChanged(){
-                let url = `/api/menu_categories/${this.selectedMenuCategory.id}/menus`;
-                let response = await getApiData({url: url, token: this.getToken()});
-                if(response.data){
-                    this.menuList = response.data;
-                }
-            },
-
-            handleFileChange(event) {
-                const selectedFile = event.target.files[0];
-                this.selectedImage = selectedFile;
-            },
-
-            addMenuBtnClicked(){
-                if(!this.selectedMenu){
-                    this.alertValiationMessage(`package menu`);
-                    return 1;
-                }
-                if(!this.menuQty){
-                    this.alertValiationMessage(`package menu quantity`);
-                    return 1;
-                }
-                this.selectedMenus.push({
-                        id: this.selectedMenu.id,
-                        name: this.selectedMenu.name,
-                        quantity: this.menuQty
-                    });
-                this.selectedMenu = null;
-                this.menuQty = null;
-                this.menuPrice = null;
-            },
-
-            removePackageMenuBtnClicked(menuIndex){
-                this.selectedMenus.splice(menuIndex, 1);
-            },
-
-            async createBtnClicked(){
-                let formData = new FormData();
-                if(!this.name){
-                    this.alertValiationMessage(`package name`);
-                    return 1;
-                }
-                if(!this.startDate){
-                    this.alertValiationMessage(`from date`);
-                    return 1;
-                }
-                if(!this.endDate){
-                    this.alertValiationMessage(`to date`);
-                    return 1;
-                }
-                if(!this.price){
-                    this.alertValiationMessage(`package price`);
-                    return 1;
-                }
-                if(this.selectedMenus.length < 1){
-                    this.alertValiationMessage(`package menus`);
-                    return 1;
-                }
-                if(!this.selectedImage){
-                    this.alertValiationMessage(`package image`);
-                    return 1;
-                }
-
-                formData.append('name', this.name);
-                formData.append('from_date', this.startDate);
-                formData.append('to_date', this.endDate);
-                formData.append('price', this.price);
-                formData.append('is_ktv', (this.isKTVPackage)? 1: 0);
-                formData.append('is_changeable', (this.isChangeable)? 1: 0);
-                formData.append('image',this.selectedImage);
-                if(this.isKTVPackage){
-                    // if(!this.sessionDuration){
-                    //     this.alertValiationMessage(`session`);
-                    //     return 1;
-                    // }
-                    if(!this.paySession){
-                        this.alertValiationMessage(`paid session`);
-                        return 1;
-                    }
-                    if(!this.freeSession){
-                        this.alertValiationMessage(`free sessions`);
-                        return 1;
-                    }
-                    if(!this.sessionPrice){
-                        this.alertValiationMessage(`session price`);
-                        return 1;
-                    }
-
-                    // formData.append('session', this.sessionDuration);
-                    formData.append('pay_session', this.paySession);
-                    formData.append('free_session', this.freeSession);
-                    formData.append('session_price', this.sessionPrice);
-                }
-
-                let menuIds = [];
-                this.selectedMenus.forEach((menu)=>{
-                    menuIds.push({menu_id: menu.id, quantity: menu.quantity});
+                    text: `Package created successfully`,
+                    type: "info"
                 });
 
-                formData.append('menuIds', JSON.stringify(menuIds));
-
-                let url = `/api/packages`;
-                let response = await postApiData({url: url, form_data: formData, token: this.getToken()});
-                if(response.success){
-                    this.$notify({
-                        text: `Package created successfully`,
-                        type: "info"
-                    });
-
-                    window.location.replace('/packages');
-                }
-                else{
-                    this.$notify({
-                        text: `Package create failed`,
-                        type: "error"
-                    });
-                }
-            },
+                window.location.replace('/packages');
+            }
+            else {
+                this.$notify({
+                    text: `Package create failed`,
+                    type: "error"
+                });
+            }
         },
+    },
 
-        created(){
-            this.getMenuCategoryList();
-        },
+    created() {
+        this.getMenuCategoryList();
+    },
 
-        mounted(){
-            initTE({ Modal, Select, Tab, Ripple, Input });
-        }
+    mounted() {
+        initTE({ Modal, Select, Tab, Ripple, Input });
     }
+}
 </script>
