@@ -13,9 +13,19 @@ class SaleTargetPosition extends Model
         'month','department_id','head_count',
     ];
 
+    public function getTargetPositionsAmountSumAttribute()
+    {
+        return $this->targetPositions->sum('amount');
+    }
+
     public function targetPositions()
     {
         return $this->hasMany(TargetPosition::class);
+    }
+
+    public function department()
+    {
+        return $this->belongsTo(Department::class);
     }
 
 }

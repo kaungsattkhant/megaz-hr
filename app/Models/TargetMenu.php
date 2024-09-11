@@ -12,4 +12,9 @@ class TargetMenu extends Model
     protected $fillable =[
         'menu_id','quantity','sale_target_menu_id','area_id'
     ];
+
+    // public function menu()
+    // {
+    //     return
+    // }
 }

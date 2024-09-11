@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('item_usage_forecasts', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->date('date');
+            $table->foreignId('department_id')->constrained()->onDelete('cascade');
             $table->unsignedInteger('created_by');
             $table->timestamps();
         });

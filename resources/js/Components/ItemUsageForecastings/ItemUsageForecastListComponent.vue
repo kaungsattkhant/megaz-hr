@@ -53,7 +53,7 @@
                                         {{ ++itemForecastIndex }}
                                     </td>
                                     <td class="whitespace-nowrap  ">
-                                        <!-- {{ itemForecast.name }} -->Department
+                                        {{ itemForecast.department.name }}
                                     </td>
                                     <td class="whitespace-nowrap  ">
                                         {{ itemForecast.month }}

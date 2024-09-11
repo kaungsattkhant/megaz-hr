@@ -18,7 +18,7 @@ class SaleTargetMenuRepository implements SaleTargetMenuRepositoryInterface
     public function getSaleTargetMenu(int $id)
     {
         $saleTargetMenu = SaleTargetMenu::with('targetMenus')->find($id);
-        ResponseMessage($saleTargetMenu);
+        ResponseData($saleTargetMenu);
     }
 
     public function createSaleTargetMenu(Request $request)

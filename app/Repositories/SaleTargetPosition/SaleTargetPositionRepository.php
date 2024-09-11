@@ -89,13 +89,17 @@ class SaleTargetPositionRepository implements SaleTargetPositionRepositoryInterf
 
     public function saleTargetPositionList()
     {
-        $saleTargetPositions = SaleTargetPosition::orderBy('created_at', 'desc')->paginate(config('common.list_count'));
+        $saleTargetPositions = SaleTargetPosition::orderBy('created_at', 'desc')
+        ->leftJoin(DB::raw('(SELECT sale_target_position_id, SUM(amount) as total_amount FROM target_positions GROUP BY sale_target_position_id) as target_position_sums'), 'sale_target_positions.id', '=', 'target_position_sums.sale_target_position_id')
+        ->select('sale_target_positions.*', 'target_position_sums.total_amount')
+        ->with('department')
+        ->paginate(config('common.list_count'));
         ResponseData($saleTargetPositions);
     }
 
     public function saleTargetPositionDetail(int $id)
     {
-        $saleTargetPosition = SaleTargetPosition::with('targetPositions')->find($id);
+        $saleTargetPosition = SaleTargetPosition::with('targetPositions','department')->find($id);
         ResponseData($saleTargetPosition);
     }
 }

@@ -10,10 +10,21 @@ class ItemUsageForecastRepository implements ItemUsageForecastInterface
 {
     public function list($request)
     {
-        $itemUsageForecasts=ItemUsageForecast::with(['forecast_items'])
+        $itemUsageForecasts=ItemUsageForecast::with(['forecast_items','department'])
         ->orderByDesc('id')
-        ->paginate(20);
+        ->paginate(config('app.common'));
         return $itemUsageForecasts;
+    }
+
+    public function itemUsageForecastListByMonth()
+    {
+        $itemUsageForecasts = ItemUsageForecast::selectRaw('MONTH(date) as month, SUM(forecast_items.amount) as total_amount')
+        ->join('forecast_items', 'item_usage_forecasts.id', '=', 'forecast_items.item_usage_forecast_id')
+        ->groupByRaw('MONTH(date)')
+        ->orderByRaw('MONTH(date) DESC')
+        ->get();
+
+        ResponseData($itemUsageForecasts);
     }
 
     public function updateOrCreate($request)

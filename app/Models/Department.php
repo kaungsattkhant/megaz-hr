@@ -41,6 +41,11 @@ class Department extends BaseModel
         return $this->hasMany(Role::class);
     }
 
+    public function itemUsageForecasts()
+    {
+        return $this->hasMany(ItemUsageForecast::class);
+    }
+
     // public function inventory()
     // {
     //     return $this->morphOne(Inventory::class, 'inventoryable');

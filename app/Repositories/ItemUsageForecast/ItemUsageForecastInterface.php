@@ -14,4 +14,6 @@ interface ItemUsageForecastInterface
     public function delete($id);
 
     public function  deleteForecastItem($item);
+
+    public function itemUsageForecastListByMonth();
 }
