@@ -121,6 +121,22 @@
                             <input type="text" placeholder="Inventory Name" v-model="name"
                                 class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
                         </div>
+
+                        <div class="mb-4">
+                            <label for="" class="block text-sm text-black mb-3">
+                                Start Time
+                            </label>
+                            <input type="time" placeholder="Start Time" v-model="start_time"
+                                class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
+                        </div>
+
+                        <div class="mb-4">
+                            <label for="" class="block text-sm text-black mb-3">
+                                End Time
+                            </label>
+                            <input type="time" placeholder="End Time" v-model="end_time"
+                                class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
+                        </div>
                         <div class="mb-4">
                             <label for="" class="block text-sm text-black mb-3">
                                 Department / Area
@@ -185,6 +201,22 @@
                                 Inventory Name
                             </label>
                             <input type="text" placeholder="Inventory Name" v-model="nameEdit"
+                                class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
+                        </div>
+
+                        <div class="mb-4">
+                            <label for="" class="block text-sm text-black mb-3">
+                                Start Time
+                            </label>
+                            <input type="time" placeholder="Start Time" v-model="edit_start_time"
+                                class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
+                        </div>
+
+                        <div class="mb-4">
+                            <label for="" class="block text-sm text-black mb-3">
+                                End Time
+                            </label>
+                            <input type="time" placeholder="End Time" v-model="edit_end_time"
                                 class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
                         </div>
 
@@ -324,6 +356,11 @@
                 per_group: 10,
                 groupedPageNumbers: [],
                 currentGroup: 0,
+
+                start_time:null,
+                end_time:null,
+                edit_start_time:null,
+                edit_end_time:null,
             };
         },
 
@@ -414,6 +451,8 @@
                 let formData = new FormData();
                 formData.append('name', this.name);
                 formData.append('inventoryable_type', this.selectedInventoryType);
+                formData.append('start_time',this.start_time);
+                formData.append('end_time',this.end_time);
                 this.inventoryableIds.forEach((inventoryable)=>{
                     formData.append('inventoryable_id[]', inventoryable.id);
                 });
@@ -436,6 +475,8 @@
                     this.inventoryEdit = inventory;
                     console.log(this.inventoryEdit);
                     this.nameEdit = this.inventoryEdit.name;
+                    this.edit_start_time = this.inventoryEdit.start_time;
+                    this.edit_end_time = this.inventoryEdit.end_time;
                     this.selectedInventoryTypeEdit = this.inventoryEdit.inventoryable[0].inventoryable_type;
                     console.log(this.nameEdit);
                     console.log(this.selectedInventoryTypeEdit);
@@ -452,6 +493,8 @@
                 let formData = new FormData();
                 formData.append('id', this.editId);
                 formData.append('name', this.nameEdit);
+                formData.append('start_time',this.edit_start_time);
+                formData.append('end_time',this.edit_end_time);
                 formData.append('inventoryable_type', this.selectedInventoryTypeEdit);
                 this.inventoryableIdsEdit.forEach((inventoryable)=>{
                     formData.append('inventoryable_id[]', inventoryable.id);

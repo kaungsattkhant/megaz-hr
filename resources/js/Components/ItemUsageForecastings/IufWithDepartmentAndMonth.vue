@@ -68,7 +68,6 @@
                                             <i class="far fa-bars"></i>
                                         </a>
                                     </td>
-
                                 </tr>
                             </div>
                         </tbody>

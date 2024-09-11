@@ -14,8 +14,8 @@ return new class extends Migration
         Schema::create('inventories', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            // $table->string('inventoryable_type');
-            // $table->unsignedBigInteger('inventoryable_id');
+            $table->time('start_time');
+            $table->time('end_time');
             $table->boolean('is_active')->default(1);
             $table->timestamps();
         });

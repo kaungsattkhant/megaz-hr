@@ -10,7 +10,7 @@ class Inventory extends BaseModel
     use HasFactory;
 
     protected $fillable = [
-        'area_id', 'department_id', 'name', 'is_active'
+        'area_id', 'department_id', 'name', 'is_active','start_time','end_time'
     ];
 
 
