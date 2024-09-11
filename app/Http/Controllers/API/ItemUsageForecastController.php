@@ -41,4 +41,14 @@ class ItemUsageForecastController extends Controller
     public function itemUsageForecastListByMonth(){
         $this->itemUsageForecastRepo->itemUsageForecastListByMonth();
     }
+
+    public function itemUsageForecastListByMonthwithDepartment(int $month)
+    {
+        $this->itemUsageForecastRepo->itemUsageForecastListByMonthwithDepartment($month);
+    }
+
+    public function iufWithMonthAndDepartment(int $month,int $department_id)
+    {
+        $this->itemUsageForecastRepo->iufWithMonthAndDepartment($month,$department_id);
+    }
 }

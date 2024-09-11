@@ -125,6 +125,9 @@ import AssetListCompoennt from './Components/FixedAssets/AssetListComponent.vue'
 import DutyComponent from './Components/Duty/DutyComponent.vue';
 import DutyCreateComponent from './Components/Duty/DutyCreateComponent.vue';
 import DutyEditComponent from './Components/Duty/DutyEditComponent.vue';
+import ItemUsageForecastListMonth from './Components/ItemUsageForecastings/ItemUsageForecastListMonth.vue'
+import ItemUsageForecastByMonthWithDepartment from './Components/ItemUsageForecastings/ItemUsageForecastByMonthWithDepartment.vue'
+import IufWithDepartmentAndMonth from './Components/ItemUsageForecastings/IufWithDepartmentAndMonth.vue'
 
 app.component('NavBarComponent', NavBarComponent);
 app.component('StaffListComponent', StaffListComponent);
@@ -229,6 +232,9 @@ app.component('AssetListComponent',AssetListCompoennt);
 app.component('DutyComponent',DutyComponent);
 app.component('DutyCreateComponent',DutyCreateComponent);
 app.component('DutyEditComponent',DutyEditComponent);
+app.component('ItemUsageForecastListMonth',ItemUsageForecastListMonth);
+app.component('ItemUsageForecastByMonthWithDepartment',ItemUsageForecastByMonthWithDepartment);
+app.component('IufWithDepartmentAndMonth',IufWithDepartmentAndMonth);
 
 app.use(store);
 app.use(Notifications);

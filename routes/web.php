@@ -110,8 +110,14 @@ Route::middleware(['departments:room'])->group(function () {
 
 Route::middleware(['departments:item-usage-forecast'])->group(function () {
     Route::view('/item_usage_forecasts', 'item_usage_forecastings.index')->name('item_usage_forecasts');
+    Route::view('/item_usage_forecasts_by_month', 'item_usage_forecastings.listbyMonth')->name('item_usage_forecasts_by_month');
+    Route::view('/item_usage_forecasts/{month}', 'item_usage_forecastings.listbyMonthWithDepartment')->name('item_usage_forecasts_by_month_with_department');
+    Route::view('/item_usage_forecasts_with_month/{month}/department/{department}', 'item_usage_forecastings.listByMonthAndDepartment')->name('item_usage_forecasts_by_month_and_department');
+
     Route::view('/item_usage_forecasts/{forecastId}/detail', 'item_usage_forecastings.detail')->name('item_usage_forecasts.detail');
     Route::view('/item_usage_forecasts/create', 'item_usage_forecastings.create')->name('item_usage_forecasts.create');
+    Route::view('/item_usage_forecasts/create', 'item_usage_forecastings.create')->name('item_usage_forecasts.create');
+
 });
 Route::middleware(['departments:purchase-order'])->group(function () {
     Route::view('/purchase_orders', 'purchase_orders.index')->name('purchase_orders');

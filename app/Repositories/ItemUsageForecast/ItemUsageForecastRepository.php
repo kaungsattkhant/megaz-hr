@@ -4,6 +4,7 @@ namespace App\Repositories\ItemUsageForecast;
 
 use App\Models\ForecastItem;
 use App\Models\ItemUsageForecast;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
 class ItemUsageForecastRepository implements ItemUsageForecastInterface
@@ -21,11 +22,30 @@ class ItemUsageForecastRepository implements ItemUsageForecastInterface
         $itemUsageForecasts = ItemUsageForecast::selectRaw('MONTH(date) as month, SUM(forecast_items.amount) as total_amount')
         ->join('forecast_items', 'item_usage_forecasts.id', '=', 'forecast_items.item_usage_forecast_id')
         ->groupByRaw('MONTH(date)')
-        ->orderByRaw('MONTH(date) DESC')
-        ->get();
+        ->paginate(config('commont.list_count'));
 
         ResponseData($itemUsageForecasts);
     }
+
+    public function itemUsageForecastListByMonthwithDepartment(int $month)
+    {
+        $itemUsageForecast = ItemUsageForecast::select('item_usage_forecasts.department_id', 'departments.name as department_name', DB::raw('SUM(forecast_items.amount) as total_amount'))
+            ->join('forecast_items', 'item_usage_forecasts.id', '=', 'forecast_items.item_usage_forecast_id')
+            ->join('departments', 'item_usage_forecasts.department_id', '=', 'departments.id')
+            ->whereMonth('item_usage_forecasts.date', $month)
+            ->groupBy('item_usage_forecasts.department_id', 'departments.name')
+            ->orderBy('departments.name')
+            ->paginate(config('common.list_count'));
+
+        ResponseData($itemUsageForecast);
+    }
+
+    public function iufWithMonthAndDepartment(int $month,int $department_id)
+    {
+        $itemUsageForecasts = ItemUsageForecast::whereMonth('date',$month)->where('department_id',$department_id)->with('forecast_items','department')->get();
+        ResponseData($itemUsageForecasts);
+    }
+
 
     public function updateOrCreate($request)
     {
