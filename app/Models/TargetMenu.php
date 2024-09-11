@@ -17,4 +17,14 @@ class TargetMenu extends Model
     // {
     //     return
     // }
+
+    public function menu()
+    {
+        return $this->belongsTo(Menu::class);
+    }
+
+    public function area()
+    {
+        return $this->belongsTo(Area::class);
+    }
 }
