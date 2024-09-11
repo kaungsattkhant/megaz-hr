@@ -237,7 +237,7 @@ Route::view('/duty','duty.index')->name('duty');
 Route::view('/duty/create','duty.create')->name('dutyCreate');
 Route::view('/duty/{id}/edit','duty.edit')->name('dutyEdit');
 Route::view('/sale_target_position','sale_target_position.index')->name('sale_target_position');
-Route::view('/dusale_target_position/create','sale_target_position.create')->name('sale_target_position/create');
+Route::view('/sale_target_position/create','sale_target_position.create')->name('sale_target_position/create');
 Route::view('/sale_target_menu','sale_target_menu.index')->name('sale_target_menu');
 Route::view('/sale_target_menu/create','sale_target_menu.create')->name('sale_target_menu/create');
 

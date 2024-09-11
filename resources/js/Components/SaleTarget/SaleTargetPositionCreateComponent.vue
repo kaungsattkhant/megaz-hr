@@ -1,8 +1,8 @@
-st<template>
+<template>
     <div class="px-0">
         <div class="mb-6">
             <p class="text-lg font-semibold font-inter">
-                Create Package
+                Create Sale Target (Position)
             </p>
         </div>
 
@@ -10,143 +10,70 @@ st<template>
         <div class="grid !grid-cols-12 gap-x-8 gap-y-4 bg-white p-8 rounded-md shadow-md mb-8">
             <div class="mb-3 col-span-3 rounded-md">
                 <label for="" class="label-form mb-3">
-                    Package Name
+                    Month
                 </label>
-                <input type="text" class="input-ui" v-model="name" placeholder="Package Name">
+                <input type="month" class="input-ui" v-model="selectedDate" placeholder="Package Name">
             </div>
             <div class="mb-3 col-span-3 rounded-md">
                 <label for="" class="label-form mb-3">
-                    Price
+                    Department
                 </label>
-                <input type="number" class="input-ui" v-model="price" placeholder="Package Price">
-            </div>
-            <div class="mb-3 col-span-3 rounded-md">
-                <label for="" class="label-form mb-3">
-                    From
-                </label>
-                <input type="date" class="input-ui" :min="today" v-model="startDate">
-            </div>
-            <div class="mb-3 col-span-3 rounded-md">
-                <label for="" class="label-form mb-3">
-                    To
-                </label>
-                <input type="date" class="input-ui" :min="today" v-model="endDate" >
-            </div>
-
-            <div class="mb-3 col-span-3 rounded-md">
-                <label for="" class="label-form mb-3">
-                    Image
-                </label>
-                <input type="file" class="input-ui" @change="handleFileChange" accept="image/png, image/gif, image/jpeg" ref="image">
-            </div>
-
-            <div class="mb-3 col-span-3 rounded-md">
-                <div class="block ps-[1.5rem]">
-                    <input
-                        class="relative float-left -ms-[1.5rem] me-[6px] mt-[0.15rem] h-[1.125rem] w-[1.125rem]
-                        appearance-none rounded-[0.25rem] border-[0.125rem] border-solid border-secondary-500 outline-none before:pointer-events-none before:absolute before:h-[0.875rem] before:w-[0.875rem] before:scale-0 before:rounded-full before:bg-transparent before:opacity-0 before:shadow-checkbox before:shadow-transparent before:content-[''] checked:border-primary checked:bg-primary checked:before:opacity-[0.16] checked:after:absolute checked:after:-mt-px checked:after:ms-[0.25rem] checked:after:block checked:after:h-[0.8125rem] checked:after:w-[0.375rem] checked:after:rotate-45 checked:after:border-[0.125rem] checked:after:border-l-0 checked:after:border-t-0 checked:after:border-solid checked:after:border-white checked:after:bg-transparent checked:after:content-[''] hover:cursor-pointer hover:before:opacity-[0.04] hover:before:shadow-black/60 focus:shadow-none focus:transition-[border-color_0.2s] focus:before:scale-100 focus:before:opacity-[0.12] focus:before:shadow-black/60 focus:before:transition-[box-shadow_0.2s,transform_0.2s] focus:after:absolute focus:after:z-[1] focus:after:block focus:after:h-[0.875rem] focus:after:w-[0.875rem] focus:after:rounded-[0.125rem] focus:after:content-[''] checked:focus:before:scale-100 checked:focus:before:shadow-checkbox checked:focus:before:transition-[box-shadow_0.2s,transform_0.2s] checked:focus:after:-mt-px checked:focus:after:ms-[0.25rem] checked:focus:after:h-[0.8125rem] checked:focus:after:w-[0.375rem] checked:focus:after:rotate-45 checked:focus:after:rounded-none checked:focus:after:border-[0.125rem] checked:focus:after:border-l-0 checked:focus:after:border-t-0 checked:focus:after:border-solid checked:focus:after:border-white checked:focus:after:bg-transparent rtl:float-right dark:border-neutral-400 dark:checked:border-primary dark:checked:bg-primary"
-                        type="checkbox"
-                        v-model="isKTVPackage"
-                        id="checkboxDefault" />
-                    <label
-                        class="inline-block ps-[0.15rem] hover:cursor-pointer"
-                        for="checkboxDefault">
-                        Package for KTV
-                    </label>
+                <div class="w-full select-custom2" data-te-select-wrapper-ref>
+                    <select data-te-select-init data-te-select-placeholder="Select Department" v-model="selectedDepartment"
+                    data-te-select-filter="true" @change="getRoleByDepartment()" class="input-ui w-full">
+                        <option :value="department" v-for="(department, index) in departmentList"> {{ department.name }} </option>
+                    </select>
                 </div>
             </div>
+            <div class="mb-3 col-span-3 rounded-md">
+                <label for="" class="label-form mb-3">
+                    Sale Target(Head Count)
+                </label>
+                <input type="text" class="input-ui" v-model="selectedHeadCount">
+            </div>
+            <div class="mb-3 col-span-3 rounded-md"></div>
+
 
             <div class="mb-3 col-span-3 rounded-md">
-                <div class="block ps-[1.5rem]">
-                    <input
-                        class="relative float-left -ms-[1.5rem] me-[6px] mt-[0.15rem] h-[1.125rem] w-[1.125rem]
-                        appearance-none rounded-[0.25rem] border-[0.125rem] border-solid border-secondary-500 outline-none before:pointer-events-none before:absolute before:h-[0.875rem] before:w-[0.875rem] before:scale-0 before:rounded-full before:bg-transparent before:opacity-0 before:shadow-checkbox before:shadow-transparent before:content-[''] checked:border-primary checked:bg-primary checked:before:opacity-[0.16] checked:after:absolute checked:after:-mt-px checked:after:ms-[0.25rem] checked:after:block checked:after:h-[0.8125rem] checked:after:w-[0.375rem] checked:after:rotate-45 checked:after:border-[0.125rem] checked:after:border-l-0 checked:after:border-t-0 checked:after:border-solid checked:after:border-white checked:after:bg-transparent checked:after:content-[''] hover:cursor-pointer hover:before:opacity-[0.04] hover:before:shadow-black/60 focus:shadow-none focus:transition-[border-color_0.2s] focus:before:scale-100 focus:before:opacity-[0.12] focus:before:shadow-black/60 focus:before:transition-[box-shadow_0.2s,transform_0.2s] focus:after:absolute focus:after:z-[1] focus:after:block focus:after:h-[0.875rem] focus:after:w-[0.875rem] focus:after:rounded-[0.125rem] focus:after:content-[''] checked:focus:before:scale-100 checked:focus:before:shadow-checkbox checked:focus:before:transition-[box-shadow_0.2s,transform_0.2s] checked:focus:after:-mt-px checked:focus:after:ms-[0.25rem] checked:focus:after:h-[0.8125rem] checked:focus:after:w-[0.375rem] checked:focus:after:rotate-45 checked:focus:after:rounded-none checked:focus:after:border-[0.125rem] checked:focus:after:border-l-0 checked:focus:after:border-t-0 checked:focus:after:border-solid checked:focus:after:border-white checked:focus:after:bg-transparent rtl:float-right dark:border-neutral-400 dark:checked:border-primary dark:checked:bg-primary"
-                        type="checkbox"
-                        v-model="isChangeable"
-                        id="checkboxDefault2" />
-                    <label
-                        class="inline-block ps-[0.15rem] hover:cursor-pointer"
-                        for="checkboxDefault">
-                        Can changeable?
-                    </label>
+                <label for="" class="label-form mb-3">
+                    Role
+                </label>
+                <div class="w-full select-custom2" data-te-select-wrapper-ref>
+                    <select data-te-select-init data-te-select-placeholder="Select Role" v-model="selectedRole"
+                    data-te-select-filter="true" @change="headAccountSelectChanged" class="input-ui w-full">
+                        <option :value="role" v-for="(role, index) in roleList"> {{ role.name }} </option>
+                    </select>
                 </div>
             </div>
-
-            <div class="mb-3 col-span-3"></div>
-
-            <!-- <div class="mb-3 col-span-3 rounded-md">
-                <label for="" class="label-form mb-3">
-                    Sessions
-                </label>
-                <input type="number" class="input-ui" :disabled="!isKTVPackage" v-model="sessionDuration" placeholder="Discount Sessions" >
-            </div> -->
-
             <div class="mb-3 col-span-3 rounded-md">
                 <label for="" class="label-form mb-3">
-                    Paid Sessions
+                    Sale Target(Amount)
                 </label>
-                <input type="number" class="input-ui" :disabled="!isKTVPackage" v-model="paySession" placeholder="Paid Sessions" >
+                <input type="text" class="input-ui" v-model="selectedAmount">
             </div>
 
-            <div class="mb-3 col-span-3 rounded-md">
-                <label for="" class="label-form mb-3">
-                    Free Sessions
-                </label>
-                <input type="number" class="input-ui" :disabled="!isKTVPackage" v-model="freeSession" placeholder="Free Sessions" >
-            </div>
+            
 
-            <div class="mb-3 col-span-3 rounded-md">
-                <label for="" class="label-form mb-3">
-                    Session Price
-                </label>
-                <input type="number" class="input-ui" :disabled="!isKTVPackage" v-model="sessionPrice" placeholder="Session Price" >
-            </div>
-
-            <div class="mb-3 col-span-3"></div>
-
-            <div class="mb-0 col-span-3 rounded-md">
-                <div>
-                    <label class="label-form mb-3"> Menu Category </label>
-                    <multiselect v-model="selectedMenuCategory" :options="menuCategoryList" :close-on-select="true"
-                        :clear-on-select="false" :preserve-search="true" placeholder="Select Category" label="name"
-                        track-by="id" :preselect-first="true" @select="menuCategorySelectChanged()"></multiselect>
-                </div>
-            </div>
-
-            <div class="mb-0 col-span-3 rounded-md">
-                <div>
-                    <label class="label-form mb-3"> Menu </label>
-                    <multiselect v-model="selectedMenu" :options="menuList" :close-on-select="true"
-                        :clear-on-select="false" :preserve-search="true" placeholder="Select Category" label="name"
-                        track-by="id" :preselect-first="true"></multiselect>
-                </div>
-            </div>
-
-            <div class="mb-3 col-span-3 rounded-md">
-                <label for="" class="label-form mb-3">
-                    Package Quantity
-                </label>
-                <input type="text" class="input-ui" v-model="menuQty" placeholder="Menu Package Qty">
-            </div>
-
-            <div class="col-span-12 flex justify-end pt-8">
-                <button class="add-btn" @click="addMenuBtnClicked">
+            <div class="col-span-3 flex justify-end flex-col mb-3">
+                <!-- <label for="" class="label-form mb-3"> &nbsp;</label> -->
+                <button class="add-btn h-8 w-fit mb-1" @click="btnClickedAddPosition()">
                     Add Menu
                 </button>
             </div>
+            <div class="col-span-3"></div>
 
         </div>
 
-        <div class=" bg-white py-4 px-4 rounded-md shadow-md mb-8">
+        <div class=" bg-white py-8 px-8 rounded-md shadow-md mb-8">
             <div class="table-container">
                 <table class="primary-table">
                     <thead class="">
                         <tr>
                             <th scope="col" class=" text-left ">
-                                Menu Name
+                                Position
                             </th>
                             <th scope="col" class="  ">
-                                Qty
+                                Amount
                             </th>
                             <th scope="col" class="  ">
 
@@ -154,16 +81,16 @@ st<template>
                         </tr>
                     </thead>
                     <tbody>
-                        <div class="contents" v-for="(promotionMenu, menuIndex) in selectedMenus" :key="menuIndex" >
+                        <div class="contents" v-for="(position,index) in addedPositionList" :key="index" >
                             <tr class="">
                                 <td class="text-left">
-                                    {{ promotionMenu.name }}
+                                    {{ position.name }}
                                 </td>
                                 <td class="  ">
-                                    {{ promotionMenu.quantity }}
+                                    {{ position.amount }}
                                 </td>
                                 <td class="  ">
-                                    <button @click="removePackageMenuBtnClicked(menuIndex)">
+                                    <button @click="removeAddedPosition(index)">
                                         <i class="fal fa-trash  pr-3"></i>
                                     </button>
                                 </td>
@@ -175,7 +102,7 @@ st<template>
         </div>
 
         <div>
-            <button class="add-btn" @click="createBtnClicked" >
+            <button class="add-btn" @click="createBtnClicked()" >
                 Create Package
             </button>
         </div>
@@ -195,174 +122,100 @@ st<template>
         },
         data() {
             return {
-                today: getCurrentDate(),
+                roleList:[],
+                departmentList:[],
+                addedPositionList:[],
 
-                isKTVPackage: false,
-                isChangeable: false,
+                selectedDate:null,
+                selectedHeadCount:null,
+                selectedAmount:null,
+                selectedRole:null,
+                selectedDepartment:null,
 
-                menuCategoryList: [],
-                selectedMenuCategory: null,
-                menuList: [],
-                selectedMenu: null,
-                selectedMenus: [],
-
-                sessionDuration: null,
-                paySession: null,
-                freeSession: null,
-                sessionPrice: null,
-
-                name: null,
-                price: null,
-                startDate: null,
-                endDate: null,
-
-                menuQty: null,
-
-                selectedImage: null,
+                
             };
         },
 
         methods: {
             ...mapGetters(['getToken']),
 
-            alertValiationMessage(field) {
-                this.$notify({
-                    title: `Input validation`,
-                    text: `You forgot to provide ${field}, please try again`,
-                    type: "warn"
-                });
-            },
-
-            async getMenuCategoryList(){
-                let url = `/api/menu_categories`;
-                let response = await getApiData({url: url, token: this.getToken()});
+            async getDepartmentList(){
+                const response = await getApiData({ url: '/api/departments' , token: this.getToken() });
                 if(response.data){
-                    this.menuCategoryList = response.data;
+                    this.departmentList = response.data;
                 }
             },
-
-            async menuCategorySelectChanged(){
-                let url = `/api/menu_categories/${this.selectedMenuCategory.id}/menus`;
-                let response = await getApiData({url: url, token: this.getToken()});
+            async getRoleByDepartment(departmentId)
+            {   
+                const response = await getApiData({ url: `/api/role_by_department/` + this.selectedDepartment.id, token: this.getToken() });
                 if(response.data){
-                    this.menuList = response.data;
+                    this.roleList = response.data;
                 }
             },
 
-            handleFileChange(event) {
-                const selectedFile = event.target.files[0];
-                this.selectedImage = selectedFile;
-            },
 
-            addMenuBtnClicked(){
-                if(!this.selectedMenu){
-                    this.alertValiationMessage(`package menu`);
-                    return 1;
-                }
-                if(!this.menuQty){
-                    this.alertValiationMessage(`package menu quantity`);
-                    return 1;
-                }
-                this.selectedMenus.push({
-                        id: this.selectedMenu.id,
-                        name: this.selectedMenu.name,
-                        quantity: this.menuQty
-                    });
-                this.selectedMenu = null;
-                this.menuQty = null;
-                this.menuPrice = null;
-            },
-
-            removePackageMenuBtnClicked(menuIndex){
-                this.selectedMenus.splice(menuIndex, 1);
-            },
-
-            async createBtnClicked(){
-                let formData = new FormData();
-                if(!this.name){
-                    this.alertValiationMessage(`package name`);
-                    return 1;
-                }
-                if(!this.startDate){
-                    this.alertValiationMessage(`from date`);
-                    return 1;
-                }
-                if(!this.endDate){
-                    this.alertValiationMessage(`to date`);
-                    return 1;
-                }
-                if(!this.price){
-                    this.alertValiationMessage(`package price`);
-                    return 1;
-                }
-                if(this.selectedMenus.length < 1){
-                    this.alertValiationMessage(`package menus`);
-                    return 1;
-                }
-                if(!this.selectedImage){
-                    this.alertValiationMessage(`package image`);
-                    return 1;
-                }
-
-                formData.append('name', this.name);
-                formData.append('from_date', this.startDate);
-                formData.append('to_date', this.endDate);
-                formData.append('price', this.price);
-                formData.append('is_ktv', (this.isKTVPackage)? 1: 0);
-                formData.append('is_changeable', (this.isChangeable)? 1: 0);
-                formData.append('image',this.selectedImage);
-                if(this.isKTVPackage){
-                    // if(!this.sessionDuration){
-                    //     this.alertValiationMessage(`session`);
-                    //     return 1;
-                    // }
-                    if(!this.paySession){
-                        this.alertValiationMessage(`paid session`);
-                        return 1;
-                    }
-                    if(!this.freeSession){
-                        this.alertValiationMessage(`free sessions`);
-                        return 1;
-                    }
-                    if(!this.sessionPrice){
-                        this.alertValiationMessage(`session price`);
-                        return 1;
-                    }
-
-                    // formData.append('session', this.sessionDuration);
-                    formData.append('pay_session', this.paySession);
-                    formData.append('free_session', this.freeSession);
-                    formData.append('session_price', this.sessionPrice);
-                }
-
-                let menuIds = [];
-                this.selectedMenus.forEach((menu)=>{
-                    menuIds.push({menu_id: menu.id, quantity: menu.quantity});
-                });
-
-                formData.append('menuIds', JSON.stringify(menuIds));
-
-                let url = `/api/packages`;
-                let response = await postApiData({url: url, form_data: formData, token: this.getToken()});
-                if(response.success){
+            btnClickedAddPosition() {
+                if(!this.selectedRole || !this.selectedAmount){
                     this.$notify({
-                        text: `Package created successfully`,
+                        text: `Failed`,
+                        type: "error"
+                    });
+                }
+                else{
+                     this.addPosition();
+                }
+               
+            },
+            addPosition(){
+                this.addedPositionList.push({
+                    name: this.selectedRole.name,
+                    role_id: this.selectedRole.id,
+                    amount: this.selectedAmount
+                });
+                this.selectedRole = null;
+                this.selectedAmount = null;
+            },
+
+            removeAddedPosition(index) {
+                this.addedPositionList.splice(index, 1);
+            },
+
+
+            async createBtnClicked() {
+                let selectedMonth = getFirstDate(this.selectedDate)
+                let positionListForForm = [];
+                this.addedPositionList.forEach((ap) => {
+                    positionListForForm.push({ role_id: ap.role_id, amount: ap.amount });
+                });
+                let formData = new FormData();
+                formData.append('month', selectedMonth);
+                formData.append('department_id', this.selectedDepartment.id);
+                formData.append('head_count', this.selectedHeadCount);
+                formData.append('target_positions', JSON.stringify(positionListForForm));
+
+                let url = `/api/sale_target_positions`;
+                let response = await postApiData({ url: url, form_data: formData, token: this.getToken() });
+                if (response.success) {
+                    this.$notify({
+                        text: `Sale Target Position created successfully`,
                         type: "info"
                     });
 
-                    window.location.replace('/packages');
+                    // window.location.replace('/sale_target_position');
                 }
-                else{
+                else {
                     this.$notify({
-                        text: `Package create failed`,
+                        text: `Sale Target Position create failed`,
                         type: "error"
                     });
                 }
             },
+
+            
         },
 
         created(){
-            this.getMenuCategoryList();
+            this.getDepartmentList();
         },
 
         mounted(){

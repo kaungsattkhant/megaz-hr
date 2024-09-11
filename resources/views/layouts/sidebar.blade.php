@@ -30,6 +30,32 @@
                                 </ul>
                             </div>
                         </li>
+                        <li>
+                            <button class="flex items-center pl-9 my-2 text-sm w-full" type="button" data-te-collapse-init
+                                data-te-ripple-init data-te-ripple-color="light" data-te-target="#collapseSaleTargetReport"
+                                aria-expanded="false" aria-controls="collapseExample">
+                                <i class="fal fa-chart-line  pr-3"></i>
+                                Sale Target <i class="fas fa-angle-down absolute right-2"></i>
+                            </button>
+                            <div class="!visible @yield('sale_target')hidden text-center" id="collapseSaleTargetReport" data-te-collapse-item>
+                                <ul>
+                                    <li>
+                                        <a href="/sale_target_menu"
+                                            class="flex items-center text-left @yield('sale_target_menu')">
+                                            <i class="fal fa-tasks  pr-3"></i>
+                                            Menu
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a href="/sale_target_position"
+                                            class="flex items-center text-left @yield('sale_target_position')">
+                                            <i class="fal fa-tasks  pr-3"></i>
+                                            Position
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </li>
                         <!-- @if (checkFeaturePermission('cash-flow-statement')) -->
                         
                         <!-- @endif -->

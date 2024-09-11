@@ -33,14 +33,8 @@
                                 <th scope="col" class=" text-left">
                                     Month
                                 </th>
-                                <th scope="col" class="text-center  ">
-                                    Category
-                                </th>
-                                <th scope="col" class=" text-left">
-                                    Area
-                                </th>
-                                <th scope="col" class=" ">
-                                    Target
+                                <th scope="col" class="text-left  ">
+                                    Department
                                 </th>
                                 <th scope="col" class="">
 
@@ -51,36 +45,25 @@
                         <tbody>
 
                             <!-- looping start -->
-                            <div class="contents" v-for="(promotionPackage, index) in promotionPackageList" :key="index">
+                            <div class="contents" v-for="(saleTarget, index) in saleTargetList" :key="index">
                                 <tr class="">
                                     <td class=" ">
                                         {{ ++index }}
                                     </td>
                                     <td class="whitespace-nowrap text-left  ">
-                                        {{ promotionPackage.name }}
-                                    </td>
-                                    <td class="whitespace-nowrap  ">
-                                        <div class="relative flex border rounded text-center shrink-0 overflow-hidden rounded-md h-12 w-12">
-                                            <img width="80" height="100" style="aspect-ratio: 4/3; object-fit: cover;" :src="promotionPackage.image_url" alt="Menu image">
-                                        </div>
+                                        {{ saleTarget.month }}
                                     </td>
                                     <td class="whitespace-nowrap text-left  ">
-                                        {{ (promotionPackage.price).toLocaleString() }}
-                                    </td>
-                                    <td class="   ">
-                                        <div>
-                                            Menus: <span v-for="menuPackage in promotionPackage.menu_packages"> {{ menuPackage.menu.name }},  </span>
-                                        </div>
-                                        <hr>
-                                        <div>
-                                            Rooms: <span v-for="room in promotionPackage.rooms"> {{ room.name }},  </span>
-                                        </div>
-
+                                        {{ saleTarget.department_id }}
                                     </td>
                                     <td class="whitespace-nowrap   relative">
                                         <a href="#" class="pr-2 ">
                                             <i class="fal fa-pen"></i>
                                         </a>
+                                        <button type="button">
+                                            <i class="fal fa-trash"></i>
+                                        </button>
+
                                     </td>
                                 </tr>
                             </div>
@@ -153,7 +136,7 @@
             ...mapGetters(['getToken']),
 
             async getList(){
-                let url = `/api/packages?page=${this.currentPage}&per_page=${this.per_page}`;
+                let url = `/api/sale_target_positions`;
                 let response = await getApiData({url: url, token: this.getToken()});
                 if(response.data){
                     this.saleTargetList = response.data.data;

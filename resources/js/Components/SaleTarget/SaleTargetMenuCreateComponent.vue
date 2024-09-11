@@ -16,47 +16,41 @@
             </div>
             <div class="mb-3 col-span-3 rounded-md">
                 <label for="" class="label-form mb-3">
-                    Department
+                    Area
                 </label>
                 <div class="w-full select-custom2" data-te-select-wrapper-ref>
-                    <select data-te-select-init data-te-select-placeholder="Select Department" v-model="selectedDepartment"
-                    data-te-select-filter="true" @change="headAccountSelectChanged" class="input-ui w-full">
-                        <option :value="department" v-for="(department, index) in departmentList"> {{ department.name }} </option>
+                    <select data-te-select-init data-te-select-placeholder="Select Area" v-model="selectedArea"
+                    data-te-select-filter="true" @change="getMenuList()" class="input-ui w-full">
+                        <option :value="area" v-for="(area, index) in areaList"> {{ area.name }} </option>
+                    </select>
+                </div>
+            </div>
+            <div class="mb-3 col-span-6 rounded-md"></div>
+
+
+            <div class="mb-3 col-span-3 rounded-md">
+                <label for="" class="label-form mb-3">
+                    Menu
+                </label>
+                <div class="w-full select-custom2" data-te-select-wrapper-ref>
+                    <select data-te-select-init data-te-select-placeholder="Select Menu" v-model="selectedMenu"
+                    data-te-select-filter="true" class="input-ui w-full">
+                        <option :value="menu" v-for="(menu, index) in menuList"> {{ menu.name }} </option>
                     </select>
                 </div>
             </div>
             <div class="mb-3 col-span-3 rounded-md">
                 <label for="" class="label-form mb-3">
-                    Sale Target(Head Count)
+                    Quantity
                 </label>
-                <input type="text" class="input-ui" :min="today" v-model="selectedHeadCount">
-            </div>
-            <div class="mb-3 col-span-3 rounded-md"></div>
-
-
-            <div class="mb-3 col-span-3 rounded-md">
-                <label for="" class="label-form mb-3">
-                    Role
-                </label>
-                <div class="w-full select-custom2" data-te-select-wrapper-ref>
-                    <select data-te-select-init data-te-select-placeholder="Select Role" v-model="selectedRole"
-                    data-te-select-filter="true" @change="headAccountSelectChanged" class="input-ui w-full">
-                        <option :value="role" v-for="(role, index) in roleList"> {{ role.name }} </option>
-                    </select>
-                </div>
-            </div>
-            <div class="mb-3 col-span-3 rounded-md">
-                <label for="" class="label-form mb-3">
-                    Sale Target(Amount)
-                </label>
-                <input type="text" class="input-ui" v-model="selectedAmount">
+                <input type="text" placeholder="Quantity" class="input-ui" v-model="selectedQuantity">
             </div>
 
             
 
-            <div class="col-span-3">
-                <label for="" class="label-form mb-3"> &nbsp;</label>
-                <button class="add-btn h-10" >
+            <div class="col-span-3 flex justify-end flex-col mb-3">
+                <!-- <label for="" class="label-form mb-3"> &nbsp;</label> -->
+                <button class="add-btn h-8 w-fit mb-1" @click="btnClickedAddMenu()">
                     Add Menu
                 </button>
             </div>
@@ -64,16 +58,16 @@
 
         </div>
 
-        <div class=" bg-white py-4 px-4 rounded-md shadow-md mb-8">
+        <div class=" bg-white py-8 px-8 rounded-md shadow-md mb-8">
             <div class="table-container">
                 <table class="primary-table">
                     <thead class="">
                         <tr>
                             <th scope="col" class=" text-left ">
-                                Menu Name
+                                Position
                             </th>
                             <th scope="col" class="  ">
-                                Qty
+                                Amount
                             </th>
                             <th scope="col" class="  ">
 
@@ -81,16 +75,16 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <div class="contents" v-for="(promotionMenu, menuIndex) in selectedMenus" :key="menuIndex" >
+                        <div class="contents" v-for="(menu,index) in addedMenuList" :key="index" >
                             <tr class="">
                                 <td class="text-left">
-                                    {{ promotionMenu.name }}
+                                    {{ menu.name }}
                                 </td>
                                 <td class="  ">
-                                    {{ promotionMenu.quantity }}
+                                    {{ menu.quantity }}
                                 </td>
                                 <td class="  ">
-                                    <button @click="removePackageMenuBtnClicked(menuIndex)">
+                                    <button @click="removeAddedMenu(index)">
                                         <i class="fal fa-trash  pr-3"></i>
                                     </button>
                                 </td>
@@ -102,8 +96,8 @@
         </div>
 
         <div>
-            <button class="add-btn" @click="createBtnClicked" >
-                Create Package
+            <button class="add-btn" @click="createBtnClicked()" >
+                Create
             </button>
         </div>
     </div>
@@ -122,12 +116,15 @@
         },
         data() {
             return {
-                roleList:[],
-                departmentList:[],
+                menuList:[],
+                areaList:[],
+                addedMenuList:[],
 
-
-                selectedRole:null,
-                selectedDepartment:null,
+                selectedDate:null,
+                
+                selectedArea:null,
+                selectedMenu:null,
+                selectedQuantity:null,
 
                 
             };
@@ -136,11 +133,76 @@
         methods: {
             ...mapGetters(['getToken']),
 
-            async getMenuCategoryList(){
-                let url = `/api/menu_categories`;
-                let response = await getApiData({url: url, token: this.getToken()});
+            async getAreaList(){
+                const response = await getApiData({ url: '/api/areas' , token: this.getToken() });
                 if(response.data){
-                    this.menuCategoryList = response.data;
+                    this.areaList = response.data;
+                }
+            },
+            async getMenuList()
+            {   
+                const response = await getApiData({ url: `/api/menus`, token: this.getToken() });
+                if(response.data){
+                    this.menuList = response.data;
+                }
+            },
+
+
+            btnClickedAddMenu() {
+                if(!this.selectedMenu || !this.selectedQuantity){
+                    this.$notify({
+                        text: `Failed`,
+                        type: "error"
+                    });
+                }
+                else{
+                     this.addMenu();
+                }
+               
+            },
+            addMenu(){
+                this.addedMenuList.push({
+                    name: this.selectedMenu.name,
+                    menu_id: this.selectedMenu.id,
+                    quantity: this.selectedQuantity,
+                    area_id:this.selectedArea.id
+                });
+                this.selectedMenu = null;
+                this.selectedQuantity = null;
+                this.selectedArea = null;
+            },
+
+            removeAddedMenu(index) {
+                this.addedMenuList.splice(index, 1);
+            },
+
+
+            async createBtnClicked() {
+                let selectedMonth = getFirstDate(this.selectedDate)
+                let menuListForForm = [];
+                this.addedMenuList.forEach((ap) => {
+                    menuListForForm.push({ menu_id: ap.menu_id,area_id: ap.area_id, quantity: ap.quantity });
+                });
+                let formData = new FormData();
+                formData.append('month', selectedMonth);
+                // formData.append('area_id', this.selectedArea.id);
+                formData.append('target_menus', JSON.stringify(menuListForForm));
+
+                let url = `/api/sale_target_menus`;
+                let response = await postApiData({ url: url, form_data: formData, token: this.getToken() });
+                if (response.success) {
+                    this.$notify({
+                        text: `Menu created successfully`,
+                        type: "info"
+                    });
+
+                    window.location.replace('/sale_target_menu');
+                }
+                else {
+                    this.$notify({
+                        text: `Menu create failed`,
+                        type: "error"
+                    });
                 }
             },
 
@@ -148,7 +210,8 @@
         },
 
         created(){
-            this.getMenuCategoryList();
+            this.getAreaList();
+            this.getMenuList();
         },
 
         mounted(){
