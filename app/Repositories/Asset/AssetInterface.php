@@ -15,4 +15,9 @@ interface AssetInterface
     public function createAsset(Request $request);
 
     public function getAssetItemByAccount(Request $request);
+
+    public function addDepreciation($request);
+    public function getDepreciationBalance($request);
+    public function addDepreciationBalance($request);
+
 }

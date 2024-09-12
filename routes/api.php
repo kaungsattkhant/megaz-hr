@@ -187,15 +187,16 @@ Route::middleware('auth:api')->group(function () {
         Route::post('create_prepaid_account','createPrePaidAccount');
         Route::get('/prepaid_account_list','prepaidAccountList');
         Route::get('/ar_sub_accounts','getSubAccountForAr');
-
     });
     Route::controller(AssetController::class)->group(function () {
         Route::post('create_asset_item','createAssetItem');
         Route::post('create_asset','createAsset');
         Route::get('get_asset_item_by_account','getAssetItemByAccount');
-
         Route::get('/assets','getAsset');
         Route::get('/asset_items','getAssetItem');
+        Route::post('/add_depreciation','addDepreciation');
+        Route::get('/get_depreciation_balance','getDepreciationBalance');
+        Route::get('/add_depreciation_balance','addDepreciationBalance');
     });
     Route::controller(AssetInventoryLedgerController::class)->group(function () {
         Route::get('asset_inventory_ledger_list','index');

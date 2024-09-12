@@ -45,4 +45,16 @@ class AssetController extends Controller
     {
         $this->assetRepo->listAssetItems($request);
     }
+
+    public function getDepreciationBalance(Request $request){
+        return $this->assetRepo->getDepreciationBalance($request);
+    }
+
+    public function addDepreciation(Request $request){
+        return $this->assetRepo->addDepreciation($request);
+    }
+
+    public function addDepreciationBalance(Request $request){
+        return $this->assetRepo->addDepreciationBalance($request);
+    }
 }
