@@ -19,7 +19,9 @@ class InventorySeeder extends Seeder
         foreach($departments as $department){
             $inventory = Inventory::create([
                 'name' => ($department->name == 'Inventory')?'Main Inventory': $department->name . ' Inventory',
-                'is_active' => 1
+                'is_active' => 1,
+                'start_time' => '08:00:00',
+                'end_time' => '17:00:00',
             ]);
 
             $inventory->inventoryable()->create([

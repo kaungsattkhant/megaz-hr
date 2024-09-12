@@ -32,7 +32,7 @@
                                 <th scope="col" class=" text-left">
                                     Month
                                 </th>
-                                <th scope="col" class="text-center">
+                                <!-- <th scope="col" class="text-center">
                                     Category
                                 </th>
                                 <th scope="col" class=" text-left">
@@ -40,6 +40,9 @@
                                 </th>
                                 <th scope="col" class=" ">
                                     Target
+                                </th> -->
+                                <th scope="col" class=" ">
+                                    Quantity
                                 </th>
                                 <th scope="col" class="">
 
@@ -58,12 +61,24 @@
                                     <td class="whitespace-nowrap text-left  ">
                                         {{ saleTarget.month }}
                                     </td>
+                                    <!-- <td class="whitespace-nowrap text-left  ">
+                                    </td>
                                     <td class="whitespace-nowrap text-left  ">
                                     </td>
+                                    <td class="whitespace-nowrap text-left  ">
+                                    </td> -->
+
+                                    <td class="whitespace-nowrap text-center  ">
+                                        {{ saleTarget.total_quantity }}
+                                    </td>
                                     <td class="whitespace-nowrap   relative">
-                                        <a href="#" class="pr-2 ">
+                                        <a :href="'/sale_target_menu/'+ saleTarget.id +'/edit'" class="pr-3">
                                             <i class="fal fa-pen"></i>
                                         </a>
+                                        <button @click="deleteBtnClicked(saleTarget.id)"
+                                            data-te-toggle="modal" data-te-target="#deleteModal" id="delete-btn" class="pr-1">
+                                            <i class="fas fa-trash-alt"></i>
+                                        </button>
                                     </td>
                                 </tr>
                             </div>
@@ -73,7 +88,7 @@
             </div>
 
             <!--Delete Modal -->
-            <!-- <div data-te-modal-init
+            <div data-te-modal-init
                 class="fixed left-0 top-0 z-[1055] hidden h-full w-full overflow-y-auto overflow-x-hidden outline-none"
                 id="deleteModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
                 <div data-te-modal-dialog-ref
@@ -106,7 +121,7 @@
                                 data-te-modal-dismiss>
                                 Close
                             </button>
-                            <button @click="confirmDeleteBtnClicked" type="button" data-te-toggle="modal"
+                            <button @click="confirmDeleteBtnClicked()" type="button" data-te-toggle="modal"
                                 data-te-target="#deleteModal"
                                 class="ml-1 inline-block rounded bg-red-600 px-6 pb-2 pt-2.5 text-xs  text-white   focus:outline-none focus:ring-0 ">
                                 Delete
@@ -114,7 +129,7 @@
                         </div>
                     </div>
                 </div>
-            </div> -->
+            </div>
         </div>
 
     </div>
@@ -129,6 +144,7 @@
         data() {
             return {
                 saleTargetList:[],
+                deleteId:null,
             };
         },
 
@@ -142,6 +158,19 @@
                     this.saleTargetList = response.data.data;
                 }
             },
+            deleteBtnClicked(id){
+                this.deleteId = id;
+            },
+
+            async confirmDeleteBtnClicked(){
+                let url = `/api/sale_target_menus/${this.deleteId}`;
+                let response = await deleteApiData({url: url, token: this.getToken()});
+                if(response.success){
+                    this.getList();
+                    this.deleteId = null;
+                    console.log(`deleted`);
+                }
+            }
 
 
             

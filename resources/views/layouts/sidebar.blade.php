@@ -57,7 +57,7 @@
                             </div>
                         </li>
                         <!-- @if (checkFeaturePermission('cash-flow-statement')) -->
-                        
+
                         <!-- @endif -->
 
                         <li>
@@ -192,6 +192,14 @@
                                 class="flex items-center @yield('item_usage_forecasts')">
                                 <i class="fal fa-truck-loading  pr-3"></i>
                                 Item Usage Forecasts
+                            </a>
+                        </li>
+
+                        <li>
+                            <a href="{{ route('item_usage_forecasts_by_month') }}"
+                                class="flex items-center @yield('item_usage_forecasts_month')">
+                                <i class="fal fa-truck-loading  pr-3"></i>
+                                Item Usage Forecasts By Month
                             </a>
                         </li>
                         @endif

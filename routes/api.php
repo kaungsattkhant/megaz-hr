@@ -174,6 +174,10 @@ Route::middleware('auth:api')->group(function () {
     Route::resource('item_usage_forecasts', ItemUsageForecastController::class)->only(['index', 'store', 'show', 'destroy']);
     Route::controller(ItemUsageForecastController::class)->group(function () {
         Route::delete('forecast_item/{id}', 'deleteForecastItem');
+        Route::get('/item_usage_forecast_items_by_month','itemUsageForecastListByMonth');
+        Route::get('/item_usage_forecast_items_with_month/{month}','itemUsageForecastListByMonthwithDepartment');
+        Route::get('/item_usage_forecast_items_with_month/{month}/department/{department_id}','iufWithMonthAndDepartment');
+
     });
     Route::resource('head_accounts', HeadAccountController::class)->only(['index', 'store', 'show', 'destroy']);
     Route::resource('sub_accounts', SubAccountController::class)->only(['index', 'store', 'show', 'destroy']);

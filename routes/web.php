@@ -110,8 +110,14 @@ Route::middleware(['departments:room'])->group(function () {
 
 Route::middleware(['departments:item-usage-forecast'])->group(function () {
     Route::view('/item_usage_forecasts', 'item_usage_forecastings.index')->name('item_usage_forecasts');
+    Route::view('/item_usage_forecasts_by_month', 'item_usage_forecastings.listbyMonth')->name('item_usage_forecasts_by_month');
+    Route::view('/item_usage_forecasts/{month}', 'item_usage_forecastings.listbyMonthWithDepartment')->name('item_usage_forecasts_by_month_with_department');
+    Route::view('/item_usage_forecasts_with_month/{month}/department/{department}', 'item_usage_forecastings.listByMonthAndDepartment')->name('item_usage_forecasts_by_month_and_department');
+
     Route::view('/item_usage_forecasts/{forecastId}/detail', 'item_usage_forecastings.detail')->name('item_usage_forecasts.detail');
     Route::view('/item_usage_forecasts/create', 'item_usage_forecastings.create')->name('item_usage_forecasts.create');
+    Route::view('/item_usage_forecasts/create', 'item_usage_forecastings.create')->name('item_usage_forecasts.create');
+
 });
 Route::middleware(['departments:purchase-order'])->group(function () {
     Route::view('/purchase_orders', 'purchase_orders.index')->name('purchase_orders');
@@ -238,6 +244,8 @@ Route::view('/duty/create','duty.create')->name('dutyCreate');
 Route::view('/duty/{id}/edit','duty.edit')->name('dutyEdit');
 Route::view('/sale_target_position','sale_target_position.index')->name('sale_target_position');
 Route::view('/sale_target_position/create','sale_target_position.create')->name('sale_target_position/create');
+Route::view('/sale_target_position/{id}/edit','sale_target_position.edit')->name('sale_target_position/edit');
 Route::view('/sale_target_menu','sale_target_menu.index')->name('sale_target_menu');
 Route::view('/sale_target_menu/create','sale_target_menu.create')->name('sale_target_menu/create');
+Route::view('/sale_target_menu/{id}/edit','sale_target_menu.edit')->name('sale_target_menu/edit');
 

@@ -15,7 +15,7 @@
                 <button class="add-btn h-8 text-[13px] font-inter">Search</button>
             </div>
             <div class="flex justify-end flex-col">
-                <a href="/packages/create" class="add-btn text-[13px] font-inter">
+                <a href="/sale_target_position/create" class="add-btn text-[13px] font-inter">
                     Add New
                 </a>
 
@@ -36,6 +36,12 @@
                                 <th scope="col" class="text-left  ">
                                     Department
                                 </th>
+                                <th scope="col" class="text-left  ">
+                                    Head Count
+                                </th>
+                                <th scope="col" class="text-left  ">
+                                    Quantity
+                                </th>
                                 <th scope="col" class="">
 
                                 </th>
@@ -54,14 +60,21 @@
                                         {{ saleTarget.month }}
                                     </td>
                                     <td class="whitespace-nowrap text-left  ">
-                                        {{ saleTarget.department_id }}
+                                        {{ saleTarget.department.name }}
+                                    </td>
+                                    <td class="whitespace-nowrap text-left  ">
+                                        {{ saleTarget.head_count }}
+                                    </td>
+                                    <td class="whitespace-nowrap text-left  ">
+                                        {{ saleTarget.total_amount }}
                                     </td>
                                     <td class="whitespace-nowrap   relative">
-                                        <a href="#" class="pr-2 ">
+                                        <a :href="'/sale_target_position/'+saleTarget.id+'/edit'" class="pr-2 ">
                                             <i class="fal fa-pen"></i>
                                         </a>
-                                        <button type="button">
-                                            <i class="fal fa-trash"></i>
+                                        <button @click="deleteBtnClicked(saleTarget.id)"
+                                            data-te-toggle="modal" data-te-target="#deleteModal" id="delete-btn" class="pr-1">
+                                            <i class="fas fa-trash-alt"></i>
                                         </button>
 
                                     </td>
@@ -73,7 +86,7 @@
             </div>
 
             <!--Delete Modal -->
-            <!-- <div data-te-modal-init
+            <div data-te-modal-init
                 class="fixed left-0 top-0 z-[1055] hidden h-full w-full overflow-y-auto overflow-x-hidden outline-none"
                 id="deleteModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
                 <div data-te-modal-dialog-ref
@@ -114,7 +127,7 @@
                         </div>
                     </div>
                 </div>
-            </div> -->
+            </div>
         </div>
 
     </div>
@@ -129,6 +142,7 @@
         data() {
             return {
                 saleTargetList:[],
+                deleteId:null,
             };
         },
 
@@ -142,6 +156,19 @@
                     this.saleTargetList = response.data.data;
                 }
             },
+            deleteBtnClicked(id){
+                this.deleteId = id;
+            },
+
+            async confirmDeleteBtnClicked(){
+                let url = `/api/sale_target_positions/${this.deleteId}`;
+                let response = await deleteApiData({url: url, token: this.getToken()});
+                if(response.success){
+                    this.getList();
+                    this.deleteId = null;
+                    console.log(`deleted`);
+                }
+            }
         },
 
         created(){

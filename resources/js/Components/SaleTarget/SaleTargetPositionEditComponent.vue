@@ -20,8 +20,8 @@
                 </label>
                 <div class="w-full select-custom2" data-te-select-wrapper-ref>
                     <select data-te-select-init data-te-select-placeholder="Select Department" v-model="selectedDepartment"
-                    data-te-select-filter="true" @change="changedDepartment()" class="input-ui w-full">
-                        <option :value="department" v-for="(department, index) in departmentList"> {{ department.name }} </option>
+                    data-te-select-filter="true" @change="getRoleByDepartment()" class="input-ui w-full">
+                        <option :value="department.id" v-for="(department, index) in departmentList"> {{ department.name }} </option>
                     </select>
                 </div>
             </div>
@@ -120,6 +120,7 @@
         components: {
             Multiselect
         },
+        props:['positionId'],
         data() {
             return {
                 roleList:[],
@@ -132,27 +133,51 @@
                 selectedRole:null,
                 selectedDepartment:null,
 
-                
+                saleTargetPositionDetail:null,
             };
         },
 
         methods: {
             ...mapGetters(['getToken']),
 
+            async getSaleTargetPositionDetail(){
+                console.log(this.positionId)
+                const response = await getApiData({ url: '/api/sale_target_positions/'+this.positionId , token: this.getToken() });
+                if(response.data){
+                    this.selectedDepartment = response.data.department.id
+                    this.getRoleByDepartment();
+                    this.saleTargetPositionDetail = response.data;
+                    let month = response.data.month.slice(0,7)
+                    this.selectedDate = month;
+                    this.selectedHeadCount = response.data.head_count
+                    this.getRoleForDetail();
+                }
+            },
+            async getRoleForDetail()
+            {   
+                const response = await getApiData({ url: `/api/role_by_department/` + this.selectedDepartment, token: this.getToken() });
+                if(response.data){
+                    this.roleList = response.data;
+                    this.saleTargetPositionDetail.target_positions.forEach((position)=>{
+                        let role_name = this.roleList.find(role => role.id == position.role_id ).name;
+                        console.log('role'+role_name)
+                        this.addedPositionList.push({
+                            name: role_name,
+                            role_id: position.role_id,
+                            amount: position.amount,
+                        });
+                    });
+                }
+            },
             async getDepartmentList(){
                 const response = await getApiData({ url: '/api/departments' , token: this.getToken() });
                 if(response.data){
                     this.departmentList = response.data;
                 }
             },
-            changedDepartment(){
-                this.selectedRole = null;
-                this.addedPositionList = [];
-                this.getRoleByDepartment();
-            },
             async getRoleByDepartment(departmentId)
             {   
-                const response = await getApiData({ url: `/api/role_by_department/` + this.selectedDepartment.id, token: this.getToken() });
+                const response = await getApiData({ url: `/api/role_by_department/` + this.selectedDepartment, token: this.getToken() });
                 if(response.data){
                     this.roleList = response.data;
                 }
@@ -194,11 +219,11 @@
                 });
                 let formData = new FormData();
                 formData.append('month', selectedMonth);
-                formData.append('department_id', this.selectedDepartment.id);
+                formData.append('department_id', this.selectedDepartment);
                 formData.append('head_count', this.selectedHeadCount);
                 formData.append('target_positions', JSON.stringify(positionListForForm));
 
-                let url = `/api/sale_target_positions`;
+                let url = `/api/sale_target_positions/`+this.positionId;
                 let response = await postApiData({ url: url, form_data: formData, token: this.getToken() });
                 if (response.success) {
                     this.$notify({
@@ -220,7 +245,9 @@
         },
 
         created(){
+            
             this.getDepartmentList();
+            this.getSaleTargetPositionDetail();
         },
 
         mounted(){

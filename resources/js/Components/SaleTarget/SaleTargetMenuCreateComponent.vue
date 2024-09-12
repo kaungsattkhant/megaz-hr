@@ -169,7 +169,7 @@
                 });
                 this.selectedMenu = null;
                 this.selectedQuantity = null;
-                this.selectedArea = null;
+                // this.selectedArea = null;
             },
 
             removeAddedMenu(index) {

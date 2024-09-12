@@ -11,14 +11,19 @@ class SaleTargetMenuRepository implements SaleTargetMenuRepositoryInterface
 {
     public function listSaleTargetMenu()
     {
-        $saleTargetMenu = SaleTargetMenu::with('targetMenus')->orderBy('created_at', 'desc')->paginate(config('common.list_count'));
-        Responsedata($saleTargetMenu);
+        $saleTargetMenu = SaleTargetMenu::with('targetMenus')
+        ->leftJoin(DB::raw('(SELECT sale_target_menu_id, SUM(quantity) as total_quantity FROM target_menus GROUP BY sale_target_menu_id) as target_menu_sums'), 'sale_target_menus.id', '=', 'target_menu_sums.sale_target_menu_id')
+        ->select('sale_target_menus.*', 'target_menu_sums.total_quantity')
+        ->orderBy('created_at', 'desc')
+        ->paginate(config('common.list_count'));
+
+        ResponseData($saleTargetMenu);
     }
 
     public function getSaleTargetMenu(int $id)
     {
-        $saleTargetMenu = SaleTargetMenu::with('targetMenus')->find($id);
-        ResponseMessage($saleTargetMenu);
+        $saleTargetMenu = SaleTargetMenu::with('targetMenus.menu','targetMenus.area')->find($id);
+        ResponseData($saleTargetMenu);
     }
 
     public function createSaleTargetMenu(Request $request)
