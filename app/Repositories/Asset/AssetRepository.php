@@ -85,7 +85,7 @@ class AssetRepository implements AssetInterface
                 #end transaction
                 #add depreciation for next month
                 // $assetDepreciation = (new DepreciationBalance())->addDepreciationBalance($model->id);
-                #end 
+                #end
             }
             DB::commit();
             return $model;
@@ -367,7 +367,7 @@ class AssetRepository implements AssetInterface
         ->join('accounts','asset_depreciation_balances.third_account_id','accounts.id')
         ->select('asset_depreciation_balances.*','accounts.name')
         ->get();
-        return $depreciationBalance;
+        ResponseData($depreciationBalance);
     }
 
 

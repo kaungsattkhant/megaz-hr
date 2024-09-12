@@ -63,7 +63,6 @@
                                         {{ itemForecast.total_amount }}
                                     </td>
 
-
                                 </tr>
                             </div>
                         </tbody>

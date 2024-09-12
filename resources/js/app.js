@@ -128,6 +128,7 @@ import DutyEditComponent from './Components/Duty/DutyEditComponent.vue';
 import ItemUsageForecastListMonth from './Components/ItemUsageForecastings/ItemUsageForecastListMonth.vue'
 import ItemUsageForecastByMonthWithDepartment from './Components/ItemUsageForecastings/ItemUsageForecastByMonthWithDepartment.vue'
 import IufWithDepartmentAndMonth from './Components/ItemUsageForecastings/IufWithDepartmentAndMonth.vue'
+import AssetDepreciationBalanceList from './Components/AssetDepreciationBalance/AssetDepreciationBalanceList.vue';
 
 app.component('NavBarComponent', NavBarComponent);
 app.component('StaffListComponent', StaffListComponent);
@@ -235,6 +236,7 @@ app.component('DutyEditComponent',DutyEditComponent);
 app.component('ItemUsageForecastListMonth',ItemUsageForecastListMonth);
 app.component('ItemUsageForecastByMonthWithDepartment',ItemUsageForecastByMonthWithDepartment);
 app.component('IufWithDepartmentAndMonth',IufWithDepartmentAndMonth);
+app.component('AssetDepreciationBalanceList',AssetDepreciationBalanceList);
 
 app.use(store);
 app.use(Notifications);

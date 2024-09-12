@@ -232,6 +232,8 @@ Route::middleware(['departments:cash-flow-statement'])->group(function () {
     Route::view('/cash_flow_statement', 'cash_flow_statement.index');
 });
 
+Route::view('/asset_depreciation_balance_list','asset_depreciation_balance.index')->name('asset_list');
+
 
 // test
 Route::view('/skill','skill.index')->name('skill');

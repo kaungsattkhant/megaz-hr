@@ -33,6 +33,12 @@
                         <!-- @if (checkFeaturePermission('cash-flow-statement')) -->
 
                         <!-- @endif -->
+                        <li>
+                            <a href="{{ route('asset_list') }}" class="flex items-center @yield('asset_depreciation_balance_list')">
+                                <i class="fal fa-clipboard-list pr-3"></i>
+                                Asset Depreciation Balance List
+                            </a>
+                        </li>
 
                         <li>
                             <a href="{{ route('duty') }}" class="flex items-center @yield('duty')">
