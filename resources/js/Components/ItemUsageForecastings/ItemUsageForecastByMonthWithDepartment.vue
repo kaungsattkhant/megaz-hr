@@ -62,12 +62,7 @@
                                     <td class="whitespace-nowrap  ">
                                         {{ itemForecast.total_amount }}
                                     </td>
-                                    <td class="whitespace-nowrap  ">
-                                        <a :href="'/item_usage_forecasts/'+itemForecast.id+'/detail'" id=""
-                                            class="pr-4">
-                                            <i class="far fa-bars"></i>
-                                        </a>
-                                    </td>
+
 
                                 </tr>
                             </div>
