@@ -227,7 +227,7 @@ class AssetRepository implements AssetInterface
                     $original_cost = $currentAssetDepreciation->original_cost;
                     $addition_year_cost = $asset->total_asset_cost;
                     $total_cost = $original_cost + $addition_year_cost;
-                    $current_month_depreciation = round($total_cost / 12);
+                    $current_month_depreciation =    round($total_cost / 12);
                     $addition_year_depreciation = round($original_cost / 12);
                     $total_depreciation = $current_month_depreciation + $addition_year_depreciation;
                     $book_value = $total_cost - $total_depreciation;
