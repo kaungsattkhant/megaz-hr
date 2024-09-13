@@ -125,10 +125,16 @@ import AssetListCompoennt from './Components/FixedAssets/AssetListComponent.vue'
 import DutyComponent from './Components/Duty/DutyComponent.vue';
 import DutyCreateComponent from './Components/Duty/DutyCreateComponent.vue';
 import DutyEditComponent from './Components/Duty/DutyEditComponent.vue';
-import ItemUsageForecastListMonth from './Components/ItemUsageForecastings/ItemUsageForecastListMonth.vue'
-import ItemUsageForecastByMonthWithDepartment from './Components/ItemUsageForecastings/ItemUsageForecastByMonthWithDepartment.vue'
-import IufWithDepartmentAndMonth from './Components/ItemUsageForecastings/IufWithDepartmentAndMonth.vue'
 import AssetDepreciationBalanceList from './Components/AssetDepreciationBalance/AssetDepreciationBalanceList.vue';
+import ItemUsageForecastListMonth from './Components/ItemUsageForecastings/ItemUsageForecastListMonth.vue';
+import ItemUsageForecastByMonthWithDepartment from './Components/ItemUsageForecastings/ItemUsageForecastByMonthWithDepartment.vue';
+import IufWithDepartmentAndMonth from './Components/ItemUsageForecastings/IufWithDepartmentAndMonth.vue';
+import SaleTargetPositionListComponent from './Components/SaleTarget/SaleTargetPositionListComponent.vue';
+import SaleTargetPositionCreateComponent from './Components/SaleTarget/SaleTargetPositionCreateComponent.vue';
+import SaleTargetPositionEditComponent from './Components/SaleTarget/SaleTargetPositionEditComponent.vue';
+import SaleTargetMenuListComponent from './Components/SaleTarget/SaleTargetMenuListComponent.vue';
+import SaleTargetMenuCreateComponent from './Components/SaleTarget/SaleTargetMenuCreateComponent.vue';
+import SaleTargetMenuEditComponent from './Components/SaleTarget/SaleTargetMenuEditComponent.vue';
 
 app.component('NavBarComponent', NavBarComponent);
 app.component('StaffListComponent', StaffListComponent);
@@ -237,6 +243,13 @@ app.component('ItemUsageForecastListMonth',ItemUsageForecastListMonth);
 app.component('ItemUsageForecastByMonthWithDepartment',ItemUsageForecastByMonthWithDepartment);
 app.component('IufWithDepartmentAndMonth',IufWithDepartmentAndMonth);
 app.component('AssetDepreciationBalanceList',AssetDepreciationBalanceList);
+app.component('SaleTargetPositionListComponent',SaleTargetPositionListComponent);
+app.component('SaleTargetPositionCreateComponent',SaleTargetPositionCreateComponent);
+app.component('SaleTargetPositionCreateComponent',SaleTargetPositionCreateComponent);
+app.component('SaleTargetPositionEditComponent',SaleTargetPositionEditComponent);
+app.component('SaleTargetMenuListComponent',SaleTargetMenuListComponent);
+app.component('SaleTargetMenuCreateComponent',SaleTargetMenuCreateComponent);
+app.component('SaleTargetMenuEditComponent',SaleTargetMenuEditComponent);
 
 app.use(store);
 app.use(Notifications);

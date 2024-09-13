@@ -244,4 +244,10 @@ Route::view('/indirect_cashflow_statement','cash_flow_statement.indirect_cashflo
 Route::view('/duty','duty.index')->name('duty');
 Route::view('/duty/create','duty.create')->name('dutyCreate');
 Route::view('/duty/{id}/edit','duty.edit')->name('dutyEdit');
+Route::view('/sale_target_position','sale_target_position.index')->name('sale_target_position');
+Route::view('/sale_target_position/create','sale_target_position.create')->name('sale_target_position/create');
+Route::view('/sale_target_position/{id}/edit','sale_target_position.edit')->name('sale_target_position/edit');
+Route::view('/sale_target_menu','sale_target_menu.index')->name('sale_target_menu');
+Route::view('/sale_target_menu/create','sale_target_menu.create')->name('sale_target_menu/create');
+Route::view('/sale_target_menu/{id}/edit','sale_target_menu.edit')->name('sale_target_menu/edit');
 
