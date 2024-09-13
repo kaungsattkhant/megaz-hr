@@ -10,7 +10,7 @@ class SaleTargetMenu extends Model
     use HasFactory;
 
     protected $fillable=[
-        'month',
+        'month'
     ];
 
     public function targetMenus()

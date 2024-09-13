@@ -12,4 +12,9 @@ class TargetMenuResult extends Model
     protected $fillable=[
         'date_time','invoice_id','area_id','menu_id','quantity'
     ];
+
+    public function menu()
+    {
+        return $this->belongsTo(Menu::class);
+    }
 }

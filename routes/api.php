@@ -368,6 +368,7 @@ Route::controller(SaleTargetPositionAPIController::class)->group(function()
     Route::post('/sale_target_positions','createSaleTargetPosition');
     Route::post('/sale_target_positions/{id}','updateSaleTargetPosition');
     Route::delete('/sale_target_positions/{id}','deleteSaleTargetPosition');
+
 });
 
 Route::controller(SaleTargetMenuAPIController::class)->group(function()
@@ -377,6 +378,9 @@ Route::controller(SaleTargetMenuAPIController::class)->group(function()
     Route::post('/sale_target_menus','createSaleTargetMenu');
     Route::post('/sale_target_menus/{id}','updateSaleTargetMenu');
     Route::delete('/sale_target_menus/{id}','deleteSaleTargetMenu');
+
+    Route::get('/sale_target_results','getSaleTargetResult');
+
 });
 
 Route::controller(PackageAPIController::class)->group(function()
