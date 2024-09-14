@@ -236,7 +236,22 @@ class AssetRepository implements AssetInterface
         $assetDepreciations = AssetDepreciationBalance::where('month', $previousMonth)
             ->where('year', $previousYear)
             ->join('assets', 'asset_depreciation_balances.asset_id', 'assets.id')
-            ->select('asset_depreciation_balances.*', 'assets.useful_life')
+            ->select('asasset_depreciation_balances.*', 'assets.useful_life')
+            // ->select(
+            //     DB::raw('SUM(asset_depreciation_balances.original_cost) as original_cost'),
+            //     DB::raw('SUM(asset_depreciation_balances.addition_year_cost) as addition_year_cost'),
+            //     DB::raw('SUM(asset_depreciation_balances.addition_year_depreciation) as addition_year_depreciation'),
+            //     DB::raw('SUM(asset_depreciation_balances.total_cost) as total_cost'),
+            //     DB::raw('SUM(asset_depreciation_balances.current_month_depreciation) as current_month_depreciation'),
+            //     DB::raw('SUM(asset_depreciation_balances.total_depreciation) as total_depreciation'),
+            //     DB::raw('SUM(asset_depreciation_balances.book_value) as book_value'),
+            //     'assets.useful_life',
+            //     'asset_depreciation_balances.asset_id',
+            //     'asset_depreciation_balances.year',
+            //     'asset_depreciation_balances.month',
+            //     'asset_depreciation_balances.date',
+            // )
+            // ->groupBy('assets.id','asset_depreciation_balances.year','asset_depreciation_balances.month','asset_depreciation_balances.date')
             ->get();
         DB::beginTransaction();
         try {
@@ -244,7 +259,7 @@ class AssetRepository implements AssetInterface
                 $original_cost = $depreciation->total_cost;
                 $addition_year_cost = 0;  //for current month
                 $total_cost = $original_cost + $addition_year_cost;
-                $current_month_depreciation = round($total_cost / 12);
+                $current_month_depreciation = round($total_cost / $depreciation->useful_life);
                 $addition_year_depreciation = $depreciation->total_depreciation;
                 $total_depreciation = $current_month_depreciation + $addition_year_depreciation;
                 $book_value = $total_cost - $total_depreciation;
@@ -361,16 +376,6 @@ class AssetRepository implements AssetInterface
         $date = Carbon::parse($request->date);
         $month = Carbon::parse($request->date)->format('n');
         $year = Carbon::parse($request->date)->format('Y');
-        // return [$month,$year];
-        // $depreciationBalance = AssetDepreciationBalance::orderBy('asset_depreciation_balances.id', 'desc')
-        //     ->jon('assets', 'asset_depreciation_balances.asset_id', 'asset.id')
-        //     ->jon('accounts as main_account', 'assets.third_account_id', 'accounts.id')
-        //     ->jon('accounts as account_depreciation', 'assets.third_depreciation_account_id', 'accounts.id')
-        //     ->where('month', $month)
-        //     ->where('year', $year)
-        //     ->select(DB::raw('SUM(asset_depreciation_balances.cost)'))
-        //     ->groupBy('main_account.id','account_depreciation')
-        //     ->get();
         $depreciationBalance = AssetDepreciationBalance::join('assets', 'asset_depreciation_balances.asset_id', '=', 'assets.id')
             ->join('accounts as main_account', 'assets.third_account_id', '=', 'main_account.id')
             ->join('accounts as account_depreciation', 'assets.third_depreciation_account_id', '=', 'account_depreciation.id')
