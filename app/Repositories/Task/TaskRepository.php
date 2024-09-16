@@ -190,6 +190,13 @@ class TaskRepository implements TaskRepositoryInterface
 
     }
 
+
+    public function taskByRoleId(int $roleId)
+    {
+        $task = Task::where('role_id',$roleId)->get();
+        ResponseData($task);
+    }
+
     //  custom task
     public function customTaskCreate(Request $request)
     {
@@ -255,4 +262,5 @@ class TaskRepository implements TaskRepositoryInterface
         }
         ResponseData($task, 200);
     }
+
 }

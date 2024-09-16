@@ -160,6 +160,11 @@ class Staff extends Authenticatable
         return $this->belongsToMany(Feature::class, 'feature_staff');
     }
 
+    public function skills()
+    {
+        return $this->belongsToMany(Skill::class);
+    }
+
     public function staffAdvances()
     {
         return $this->hasMany(StaffAdvance::class);
@@ -168,6 +173,11 @@ class Staff extends Authenticatable
     public function staffBalance()
     {
         return $this->hasOne(StaffBalance::class)->latest();
+    }
+
+    public function duties()
+    {
+        return $this->hasMany(Duty::class);
     }
 
     #scope

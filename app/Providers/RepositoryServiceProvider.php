@@ -110,6 +110,8 @@ use App\Repositories\UsedDefectedItem\UsedDefectedITemRepositoryInterface;
 use App\Repositories\CustomerLevelDiscount\CustomerLevelDiscountRepository;
 use App\Repositories\PurchaseOrderItemLeft\PurchaseOrderItemLeftRepository;
 use App\Repositories\BirthdayPromotion\BirthdayPromotionRepositoryInterface;
+use App\Repositories\CookingPlace\CookingPlaceRepository;
+use App\Repositories\CookingPlace\CookingPlaceRepositoryInterface;
 use App\Repositories\PurchaseOrderItem\PurchaseOrderItemRepositoryInterface;
 use App\Repositories\FixedAssetPurchase\FixedAssetPurchaseRepositoryInterface;
 use App\Repositories\MenuServiceDiscount\MenuServiceDiscountRepositoryInterface;
@@ -134,7 +136,16 @@ use App\Repositories\StaffAdvance\StaffAdvanceRepository;
 use App\Repositories\StaffAdvance\StaffAdvanceRepositoryInterface;
 // =======
 use App\Repositories\CustomerLevelDiscount\CustomerLevelDiscountRepositoryInterface;
+use App\Repositories\Duty\DutyRepository;
+use App\Repositories\Duty\DutyRepositoryInterface;
 use App\Repositories\FinancialReport\FinancialRepository;
+use App\Repositories\SaleTargetMenu\SaleTargetMenuRepository;
+use App\Repositories\SaleTargetMenu\SaleTargetMenuRepositoryInterface;
+use App\Repositories\SaleTargetPosition\SaleTargetPositionRepository;
+use App\Repositories\SaleTargetPosition\SaleTargetPositionRepositoryInterface;
+use App\Repositories\Skill\SkillRepository;
+use App\Repositories\Skill\SkillRepositoryInterface;
+
 // >>>>>>> origin/k/backend-api-main
 
 class RepositoryServiceProvider extends ServiceProvider
@@ -197,13 +208,15 @@ class RepositoryServiceProvider extends ServiceProvider
         $this->app->bind(DeliveryChargeRepositoryInterface::class,DeliveryChargeRepository::class);
         $this->app->bind(AssetInterface::class,AssetRepository::class);
         $this->app->bind(AssetInventoryLedgerInterface::class,AssetInventoryLedgerRepository::class);
-// <<<<<<< HEAD
         $this->app->bind(JournalRepositoryInterface::class,JournalRepository::class);
         $this->app->bind(StaffAdvanceRepositoryInterface::class,StaffAdvanceRepository::class);
         $this->app->bind(PrepaidRepositoryInterface::class,PrepaidRepository::class);
         $this->app->bind(AccountReceivableRepositoryInterface::class,AccountReceivableRepository::class);
-// =======
         $this->app->bind(FinancialInterface::class,FinancialRepository::class);
-// >>>>>>> origin/k/backend-api-main
+        $this->app->bind(SkillRepositoryInterface::class,SkillRepository::class);
+        $this->app->bind(CookingPlaceRepositoryInterface::class,CookingPlaceRepository::class);
+        $this->app->bind(DutyRepositoryInterface::class,DutyRepository::class);
+        $this->app->bind(SaleTargetPositionRepositoryInterface::class,SaleTargetPositionRepository::class);
+        $this->app->bind(SaleTargetMenuRepositoryInterface::class,SaleTargetMenuRepository::class);
     }
 }

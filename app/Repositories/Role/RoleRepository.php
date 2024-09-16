@@ -35,7 +35,7 @@ class RoleRepository implements RoleRepositoryInterface
             return $paginationData;
         } else {
             if ($request->department_id) {
-                $roles = Role::where('department_id', $request->department_id)->with('department')->get();
+                $roles = Role::where('department_id', $request->department_id)->with('department','skills')->get();
             } else {
                 $roles = Role::with('department')->get();
             }
@@ -76,6 +76,6 @@ class RoleRepository implements RoleRepositoryInterface
     }
 
     public function getRoleByDepartment($department_id){
-        return Role::where('department_id',$department_id)->get();
+        return Role::where('department_id',$department_id)->with('skills')->get();
     }
 }

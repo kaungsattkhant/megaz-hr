@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('staff_advances', function (Blueprint $table) {
             $table->id();
-            $table->dateTime('date_time')->default(CurrentTime());
+            $table->dateTime('date_time');
             $table->double('amount');
             $table->foreignId('staff_id')->constrained()->onDelete('cascade');
             $table->string('type');

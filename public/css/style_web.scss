@@ -57,7 +57,7 @@
 
 .side-bar ul li a i {
   width: 2rem;
-  text-align: center; }
+  text-align: left; }
 
 .main-container {
   background-color: rgb(243,244,246);
@@ -378,4 +378,12 @@
   }
   .after-coma:last-child::after{
     content: ''!important;
+  }
+  .select-custom div input{
+    font-size: 14px;
+    line-height: 1.7rem;
+  }
+  .select-custom2 div input{
+    font-size: 14px;
+    line-height: 1.9rem;
   }

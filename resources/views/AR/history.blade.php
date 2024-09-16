@@ -5,7 +5,6 @@
 @section('content')
     <div id="app">
         <ar-history-component/>
-
     </div>
 
 @endsection

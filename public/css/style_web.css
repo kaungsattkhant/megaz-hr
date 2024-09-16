@@ -53,7 +53,7 @@
 
 .side-bar ul li a i {
   width: 2rem;
-  text-align: center; }
+  text-align: left; }
 
 .main-container {
   background-color: #f3f4f6;
@@ -183,7 +183,19 @@
   scrollbar-width: none;
   /* Firefox */ }
 
-input[type="date"]::-webkit-calendar-picker-indicator {
+#start_date input[type="date"]::-webkit-calendar-picker-indicator {
+  background: transparent;
+  bottom: 0;
+  color: transparent;
+  cursor: pointer;
+  height: auto;
+  left: 0;
+  position: absolute;
+  right: 0;
+  top: 0;
+  width: auto; }
+
+#end_date input[type="date"]::-webkit-calendar-picker-indicator {
   background: transparent;
   bottom: 0;
   color: transparent;
@@ -332,5 +344,13 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 
 .after-coma:last-child::after {
   content: "" !important; }
+
+.select-custom div input {
+  font-size: 14px;
+  line-height: 1.7rem; }
+
+.select-custom2 div input {
+  font-size: 14px;
+  line-height: 1.9rem; }
 
 /*# sourceMappingURL=style_web.css.map */

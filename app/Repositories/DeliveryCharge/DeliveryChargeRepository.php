@@ -22,6 +22,8 @@ class DeliveryChargeRepository implements DeliveryChargeRepositoryInterface
     {
         DB::beginTransaction();
         try{
+            $data = $request->all();
+            $data['date_time'] = CurrentTime();
             $deliveryCharges = DeliveryCharge::create($request->all());
             DB::commit();
             ResponseData($deliveryCharges);

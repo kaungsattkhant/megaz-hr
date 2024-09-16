@@ -93,7 +93,7 @@ class AreaRepository implements AreaRepositoryInterface
 
     public function getAreaByDepartment($department_id)
     {
-        return Area::where('department_id',$department_id)->get();      
+        return Area::where('department_id',$department_id)->get();
     }
 
 }

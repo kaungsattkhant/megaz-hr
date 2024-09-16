@@ -59,6 +59,20 @@
                     class="input-ui">
             </div>
 
+            <div class="mb-0 col-span-3 rounded-md">
+                <label for="" class="label-form mb-3">
+                    Departments
+                </label>
+                <div class="text-sm w-full bg-transparent rounded-lg focus:ring-0" data-te-select-wrapper-ref>
+                    <select data-te-select-init data-te-select-placeholder="Select Item" data-te-select-filter="true"
+                        name="" id="" v-model="selectedDepartment"
+                        class="input-ui">
+                        <option :value="department" v-for="(department, departmentIndex) in departmentList" :key="departmentIndex"> {{ department.name }}
+                        </option>
+                    </select>
+                </div>
+            </div>
+
             <div class="col-span-3">
                 <label for="" class="label-form mb-3">
                     &nbsp;
@@ -134,10 +148,13 @@
                 date: getFirstDate(getCurrentDate()),
                 selectedItem: null,
 
+                departmentList:[],
+
                 amount: null,
                 quantity: null,
                 weight: null,
                 forecastItems: [],
+                selectedDepartment:null,
             };
         },
 
@@ -147,6 +164,14 @@
                 let response = await getApiData({url: `/api/items`, token: this.getToken()});
                 if(response.data){
                     this.itemList = response.data;
+                }
+            },
+
+            async getDepartmentList()
+            {
+                let response = await getApiData({url: '/api/departments', token: this.getToken()});
+                if(response.data){
+                    this.departmentList = response.data;
                 }
             },
 
@@ -192,7 +217,8 @@
                     formData.append('date', this.date);
                     formData.append('id', null);
                     formData.append('items', JSON.stringify(this.forecastItems));
-
+                    formData.append('department_id',this.selectedDepartment.id);
+                    // console.log(this.selectedDepartment.id);
                     let response = await postApiData({url: `/api/item_usage_forecasts`, form_data: formData, token: this.getToken()});
 
                     if(response.success){
@@ -204,6 +230,7 @@
 
         created(){
             this.getItemList();
+            this.getDepartmentList();
             // this.dateInputChanged();
         },
 

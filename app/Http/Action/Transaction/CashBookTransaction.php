@@ -7,13 +7,14 @@ use App\Models\Ledger;
 use App\Models\Account;
 use App\Models\Transaction;
 use Illuminate\Support\Carbon;
+use App\Models\CashbookBalance;
 use App\Models\PurchaseOrderItem;
 use Illuminate\Support\Facades\DB;
 use App\Http\Action\Transaction\StoreTransactionLedger;
 
 class CashBookTransaction
 {
-    public function getOpeningBalance($data){
+    public function getOpeningBalanceOriginal($data){
         $cashAccountId=$data->cash_account_id;
         $latestClosedTransaction =$this->getLatestClosedTransaction($data,$cashAccountId);
         if($latestClosedTransaction){
@@ -43,6 +44,19 @@ class CashBookTransaction
         return $balance;
     }
 
+    public function getOpeningBalance($data){
+        $cashAccountId=$data->cash_account_id;
+        $month=Carbon::now()->subMonth();
+        // $latestClosedTransaction =$this->getLatestClosedTransaction($data,$cashAccountId);
+        $balance= CashbookBalance::where('year', $month->year)
+        ->where('month', $month->month)
+        ->where('cash_account_id',$cashAccountId)
+        ->value('closing_balance') ?? 0;
+        $openingBalance=new stdClass;
+        $openingBalance->opening_balance=$balance;
+        return $openingBalance;
+    }
+
     public function getClosingBalance($openingBalance,$data){
 
         $cash_account_id=$data->cash_account_id;
@@ -69,7 +83,7 @@ class CashBookTransaction
         ->withoutGlobalScope('dateFilter')
         ->select(['id', 'date', 'description'])
         ->whereHas('ledgers', function ($query) use ($cashAccountId) {
-            $query->whereIn('account_id', $cashAccountId);    #transaction close depend on transaction
+            $query->where('account_id', $cashAccountId);    #transaction close depend on transaction
         })->where('is_closing', 1)
         ->orderByDesc('date')
         ->isConfirmed(1)

@@ -24,6 +24,8 @@ interface TaskRepositoryInterface
 
     public function taskReport($request);
 
+    public function taskByRoleId(int $departmentId);
+
 
     // custom task
     public function customTaskCreate(Request $request);

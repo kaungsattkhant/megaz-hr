@@ -120,6 +120,11 @@ class TaskController extends Controller
         ResponseData($data);
     }
 
+    public function getTaskByRole(int $roleId)
+    {
+        $this->taskRepo->taskByRoleId($roleId);
+    }
+
     // custom task
 
     public function createCustomTask(Request $request)
