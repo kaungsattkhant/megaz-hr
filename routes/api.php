@@ -75,6 +75,7 @@ use App\Http\Controllers\API\JournalAPIController;
 use App\Http\Controllers\API\PrepaidAPIController;
 use App\Http\Controllers\API\SaleTargetMenuAPIController;
 use App\Http\Controllers\API\SaleTargetPositionAPIController;
+use App\Http\Controllers\API\SaleTargetResultAPIController;
 use App\Http\Controllers\API\SkillAPIController;
 use App\Http\Controllers\API\StaffAdvanceAPIController;
 
@@ -379,9 +380,9 @@ Route::controller(SaleTargetMenuAPIController::class)->group(function()
     Route::post('/sale_target_menus/{id}','updateSaleTargetMenu');
     Route::delete('/sale_target_menus/{id}','deleteSaleTargetMenu');
 
-    Route::get('/sale_target_results','getSaleTargetResult');
-
 });
+
+Route::get('/sale_target_results',[SaleTargetResultAPIController::class,'getSaleTargetResult']);
 
 Route::controller(PackageAPIController::class)->group(function()
     {
