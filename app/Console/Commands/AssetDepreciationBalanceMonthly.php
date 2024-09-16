@@ -33,7 +33,7 @@ class AssetDepreciationBalanceMonthly extends Command
         //
         // $date = convertDateFormat(now());
         Log::info('depreciation reach');
-        $date = convertDateFormat('2024-09-1');
+        $date = convertDateFormat('2024-08-1');
         // $date=now();
         $now = Carbon::parse($date);
         $previousMonth = Carbon::parse($date)->subMonth()->format('n');
@@ -48,6 +48,7 @@ class AssetDepreciationBalanceMonthly extends Command
             ->join('assets', 'asset_depreciation_balances.asset_id', 'assets.id')
             ->select('asset_depreciation_balances.*', 'assets.useful_life')
             ->get();
+        Log::info('Asset Data: ', ['assets' => $assets->toArray()]);
         DB::beginTransaction();
         try {
             foreach ($assetDepreciations as $depreciation) {
