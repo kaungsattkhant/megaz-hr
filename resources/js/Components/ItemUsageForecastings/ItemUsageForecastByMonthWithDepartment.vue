@@ -38,10 +38,6 @@
                                     Department
                                 </th>
 
-                                <th scope="col" class="  ">
-                                    Forecasting Amount
-                                </th>
-
                             </tr>
                         </thead>
                         <tbody>
@@ -58,9 +54,6 @@
 
                                     <td class="whitespace-nowrap  ">
                                         <span class="cursor-pointer" @click="iufWithMonthAndDepartment(itemForecast.department_id)">{{ itemForecast.department_name }}</span>
-                                    </td>
-                                    <td class="whitespace-nowrap  ">
-                                        {{ itemForecast.total_amount }}
                                     </td>
 
                                 </tr>

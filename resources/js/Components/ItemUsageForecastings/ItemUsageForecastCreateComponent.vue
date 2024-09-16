@@ -45,33 +45,12 @@
 
             <div class="mb-0 col-span-3 rounded-md">
                 <label for="" class="label-form mb-3">
-                    Amount
-                </label>
-                <input type="number" v-model="amount"
-                    class="input-ui">
-            </div>
-
-            <div class="mb-0 col-span-3 rounded-md">
-                <label for="" class="label-form mb-3">
                     Quantity
                 </label>
                 <input type="number" v-model="quantity"
                     class="input-ui">
             </div>
 
-            <div class="mb-0 col-span-3 rounded-md">
-                <label for="" class="label-form mb-3">
-                    Departments
-                </label>
-                <div class="text-sm w-full bg-transparent rounded-lg focus:ring-0" data-te-select-wrapper-ref>
-                    <select data-te-select-init data-te-select-placeholder="Select Item" data-te-select-filter="true"
-                        name="" id="" v-model="selectedDepartment"
-                        class="input-ui">
-                        <option :value="department" v-for="(department, departmentIndex) in departmentList" :key="departmentIndex"> {{ department.name }}
-                        </option>
-                    </select>
-                </div>
-            </div>
 
             <div class="col-span-3">
                 <label for="" class="label-form mb-3">
@@ -147,14 +126,10 @@
                 itemList: [],
                 date: getFirstDate(getCurrentDate()),
                 selectedItem: null,
-
-                departmentList:[],
-
                 amount: null,
                 quantity: null,
                 weight: null,
                 forecastItems: [],
-                selectedDepartment:null,
             };
         },
 
@@ -167,13 +142,6 @@
                 }
             },
 
-            async getDepartmentList()
-            {
-                let response = await getApiData({url: '/api/departments', token: this.getToken()});
-                if(response.data){
-                    this.departmentList = response.data;
-                }
-            },
 
             dateInputChanged(){
                 let date = new Date(this.date);
@@ -182,10 +150,7 @@
             },
 
             addItemBtnClicked(){
-                if(!this.amount){
-                    alert('You forgot to specify amount');
-                }
-                else if(!this.quantity){
+                 if(!this.quantity){
                     alert('You forgot to specify quantity');
                 }
                 else if(!this.selectedItem){
@@ -195,11 +160,9 @@
                     this.forecastItems.push({
                         item_id: this.selectedItem.id,
                         name: this.selectedItem.name,
-                        amount: this.amount,
                         quantity: this.quantity
                     });
                 }
-                this.amount = null;
                 this.quantity = null;
                 this.selectedItem = null;
             },
@@ -217,8 +180,7 @@
                     formData.append('date', this.date);
                     formData.append('id', null);
                     formData.append('items', JSON.stringify(this.forecastItems));
-                    formData.append('department_id',this.selectedDepartment.id);
-                    // console.log(this.selectedDepartment.id);
+                    console.log(this.forecastItems);
                     let response = await postApiData({url: `/api/item_usage_forecasts`, form_data: formData, token: this.getToken()});
 
                     if(response.success){
@@ -230,7 +192,6 @@
 
         created(){
             this.getItemList();
-            this.getDepartmentList();
             // this.dateInputChanged();
         },
 

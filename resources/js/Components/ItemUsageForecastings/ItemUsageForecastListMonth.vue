@@ -33,11 +33,6 @@
                                 <th scope="col" class="  ">
                                     Month
                                 </th>
-
-                                <th scope="col" class="  ">
-                                    Forecasting Amount
-                                </th>
-
                             </tr>
                         </thead>
                         <tbody>
@@ -52,10 +47,6 @@
                                         <span class="cursor-pointer" @click="monthItemForecastWithDepartment(itemForecast.month)">
                                         {{ getMonthName(itemForecast.month) }}
                                         </span>
-                                    </td>
-
-                                    <td class="whitespace-nowrap  ">
-                                        {{ itemForecast.total_amount }}
                                     </td>
 
                                 </tr>
