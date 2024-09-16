@@ -33,14 +33,15 @@ class AssetDepreciationBalanceMonthly extends Command
         //
         // $date = convertDateFormat(now());
         Log::info('depreciation reach');
-        $date = convertDateFormat('2024-08-1');
-        // $date=now();
+        // $date = convertDateFormat('2024-08-1');
+        $date=now();
+        $previousMonthDate=Carbon::parse($date)->subMonth();
         $now = Carbon::parse($date);
         $previousMonth = Carbon::parse($date)->subMonth()->format('n');
         $previousYear = Carbon::parse($date)->subMonth()->format('Y');
         $currentYear = Carbon::parse($date)->subMonth()->format('Y');
         $currentMonth = Carbon::parse($date)->format('n');
-        $assets = Asset::whereMonth('purchase_date', $now)
+        $assets = Asset::whereMonth('purchase_date', $previousMonthDate)
             ->select('id', 'asset_item_id', 'third_account_id', 'third_depreciation_account_id', 'cost', 'useful_life')
             ->get();
         $assetDepreciations = AssetDepreciationBalance::where('month', $previousMonth)
