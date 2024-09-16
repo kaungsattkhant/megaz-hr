@@ -115,8 +115,7 @@ Route::middleware(['departments:item-usage-forecast'])->group(function () {
     Route::view('/item_usage_forecasts_with_month/{month}/department/{department}', 'item_usage_forecastings.listByMonthAndDepartment')->name('item_usage_forecasts_by_month_and_department');
 
     Route::view('/item_usage_forecasts/{forecastId}/detail', 'item_usage_forecastings.detail')->name('item_usage_forecasts.detail');
-    Route::view('/item_usage_forecasts/create', 'item_usage_forecastings.create')->name('item_usage_forecasts.create');
-    Route::view('/item_usage_forecasts/create', 'item_usage_forecastings.create')->name('item_usage_forecasts.create');
+    Route::view('/create_item_usage_forecasts', 'item_usage_forecastings.create');
 
 });
 Route::middleware(['departments:purchase-order'])->group(function () {

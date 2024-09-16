@@ -13,7 +13,7 @@
                 </label>
             </div>
             <div class="flex justify-end flex-col">
-                <a href="/item_usage_forecasts/create" class="add-btn ">
+                <a href="/create_item_usage_forecasts" class="add-btn ">
                     Add New
                 </a>
 
