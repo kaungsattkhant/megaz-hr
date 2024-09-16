@@ -5,16 +5,11 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class SaleTargetMenu extends Model
+class TargetPositionResult extends Model
 {
     use HasFactory;
 
     protected $fillable=[
-        'month'
+        'date_time','invoice_id','role_id','amount'
     ];
-
-    public function targetMenus()
-    {
-        return $this->hasMany(TargetMenu::class);
-    }
 }
