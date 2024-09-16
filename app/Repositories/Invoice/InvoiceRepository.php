@@ -21,6 +21,10 @@ use App\Models\Package;
 use App\Models\Role;
 use App\Models\RoomDiscount;
 use App\Models\RoomSession;
+use App\Models\Staff;
+use App\Models\TargetMenuResult;
+use App\Models\TargetPosition;
+use App\Models\TargetPositionResult;
 use App\Models\User;
 use App\Repositories\Order\OrderRepository;
 use Carbon\Carbon;
@@ -506,6 +510,8 @@ class InvoiceRepository implements InvoiceRepositoryInterface
                 }
             }
 
+            $order = Order::where('invoice_id',$invoice->id)->first();
+            $orderItems = $order->orderItems;
 
             if (isset($data['discount_type'])) {
                 if ($data['discount_type'] == 'room_discount') {
@@ -546,6 +552,30 @@ class InvoiceRepository implements InvoiceRepositoryInterface
             $data['invoice_id'] = $invoice_id;
 
             $invoice->update($data);
+
+            $soldStaff = Staff::find($invoice->created_by);
+            $firstRole = $soldStaff->roles->first();
+
+            TargetPositionResult::create([
+                'role_id' => $firstRole->id,
+                'date_time'=>CurrentTime(),
+                'invoice_id' => $invoice->id,
+                'amount' => $data['total']
+            ]);
+
+            $groupedOrderItems = $orderItems->groupBy('menu_id')->map(function ($items) {
+                return $items->sum('quantity');
+            });
+            foreach($groupedOrderItems as $menu_id => $totalQuantity) {
+                TargetMenuResult::create([
+                    'date_time' => CurrentTime(),
+                    'invoice_id' => $invoice->id,
+                    'area_id' => $entity->area_id,
+                    'menu_id' => $menu_id,
+                    'quantity' => $totalQuantity,
+                ]);
+            }
+
             $this->ledgerAndTransactionForInvoice([
                 'payment_type' => 'cash',
                 'invoice_id' => $invoice->id,
@@ -556,6 +586,7 @@ class InvoiceRepository implements InvoiceRepositoryInterface
                 'tax' => $tax,
                 'discount_total' => $data['discount_total'],
             ]);
+
             $catering_department = Department::where('name', 'Catering')->first();
             $msg = "The {$entity->name} is now closed. Thank you.";
 
