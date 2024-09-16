@@ -33,7 +33,8 @@ class AssetDepreciationBalanceMonthly extends Command
         //
         // $date = convertDateFormat(now());
         Log::info('depreciation reach');
-        $date = convertDateFormat('2024-04-1');
+        // $date = convertDateFormat('2024-04-1');
+        $date=now();
         $now = Carbon::parse($date);
         $previousMonth = Carbon::parse($date)->subMonth()->format('n');
         $previousYear = Carbon::parse($date)->subMonth()->format('Y');
@@ -70,7 +71,6 @@ class AssetDepreciationBalanceMonthly extends Command
                 $depreciationData['book_value'] = $book_value;
                 $createDepreciation = AssetDepreciationBalance::create($depreciationData);
                 Log::info('Balance Reach reach');
-
             }
             foreach ($assets as $asset) {
                 $data['asset_id'] = $asset->id;
