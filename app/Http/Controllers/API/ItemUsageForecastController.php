@@ -37,4 +37,18 @@ class ItemUsageForecastController extends Controller
     public function  deleteForecastItem($id){
         return $this->itemUsageForecastRepo->deleteForecastItem($id);
     }
+
+    public function itemUsageForecastListByMonth(){
+        $this->itemUsageForecastRepo->itemUsageForecastListByMonth();
+    }
+
+    public function itemUsageForecastListByMonthwithDepartment(int $month)
+    {
+        $this->itemUsageForecastRepo->itemUsageForecastListByMonthwithDepartment($month);
+    }
+
+    public function iufWithMonthAndDepartment(int $month,int $department_id)
+    {
+        $this->itemUsageForecastRepo->iufWithMonthAndDepartment($month,$department_id);
+    }
 }

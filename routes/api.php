@@ -59,7 +59,7 @@ use App\Http\Controllers\API\PurchaseOrderAPIController;
 use App\Http\Controllers\API\DeliveryChargeAPIController;
 use App\Http\Controllers\API\ItemUsageForecastController;
 use App\Http\Controllers\API\BirthDayPromotionAPIController;
-
+use App\Http\Controllers\API\CookingPlaceAPIController;
 use App\Http\Controllers\API\FixedAssetPurchaseAPIController;
 use App\Http\Controllers\API\PurchaseOrderItemLeftController;
 use App\Http\Controllers\API\MenuServiceDiscountAPIController;
@@ -70,8 +70,13 @@ use App\Http\Controllers\API\Customers\MenuAPIController as CustomersMenuAPICont
 use App\Http\Controllers\API\Customers\CustomerAPIController as UserAppCustomerAPIController;
 use App\Http\Controllers\API\Customers\PackageAPIController as CustomersPackageAPIController;
 use App\Http\Controllers\API\Customers\MenuCategoryAPIController as CustomerMenuCategoryAPIController;
+use App\Http\Controllers\API\DutyAPIController;
 use App\Http\Controllers\API\JournalAPIController;
 use App\Http\Controllers\API\PrepaidAPIController;
+use App\Http\Controllers\API\SaleTargetMenuAPIController;
+use App\Http\Controllers\API\SaleTargetPositionAPIController;
+use App\Http\Controllers\API\SaleTargetResultAPIController;
+use App\Http\Controllers\API\SkillAPIController;
 use App\Http\Controllers\API\StaffAdvanceAPIController;
 
 /*
@@ -170,6 +175,10 @@ Route::middleware('auth:api')->group(function () {
     Route::resource('item_usage_forecasts', ItemUsageForecastController::class)->only(['index', 'store', 'show', 'destroy']);
     Route::controller(ItemUsageForecastController::class)->group(function () {
         Route::delete('forecast_item/{id}', 'deleteForecastItem');
+        Route::get('/item_usage_forecast_items_by_month','itemUsageForecastListByMonth');
+        Route::get('/item_usage_forecast_items_with_month/{month}','itemUsageForecastListByMonthwithDepartment');
+        Route::get('/item_usage_forecast_items_with_month/{month}/department/{department_id}','iufWithMonthAndDepartment');
+
     });
     Route::resource('head_accounts', HeadAccountController::class)->only(['index', 'store', 'show', 'destroy']);
     Route::resource('sub_accounts', SubAccountController::class)->only(['index', 'store', 'show', 'destroy']);
@@ -185,12 +194,16 @@ Route::middleware('auth:api')->group(function () {
         Route::post('create_prepaid_account','createPrePaidAccount');
         Route::get('/prepaid_account_list','prepaidAccountList');
         Route::get('/ar_sub_accounts','getSubAccountForAr');
-
     });
     Route::controller(AssetController::class)->group(function () {
         Route::post('create_asset_item','createAssetItem');
         Route::post('create_asset','createAsset');
         Route::get('get_asset_item_by_account','getAssetItemByAccount');
+        Route::get('/assets','getAsset');
+        Route::get('/asset_items','getAssetItem');
+        Route::post('/add_depreciation','addDepreciation');
+        Route::get('/get_depreciation_balance','getDepreciationBalance');
+        Route::get('/add_depreciation_balance','addDepreciationBalance');
     });
     Route::controller(AssetInventoryLedgerController::class)->group(function () {
         Route::get('asset_inventory_ledger_list','index');
@@ -318,7 +331,58 @@ Route::middleware('auth:api')->group(function () {
         Route::get('/account_receivable_lists','accountReceivableList');
         Route::get('/account/{id}/account_receivable_lists','accountReceivableDetail');
     });
+
+    Route::controller(SkillAPIController::class)->group(function()
+    {
+        Route::get('/skills','listAllSkills');
+        Route::post('/skills','createSkill');
+        Route::get('/skills/{id}','skillDetail');
+        Route::post('/skills/{id}','updateSkill');
+        Route::delete('/skills/{id}','deleteSkill');
+        Route::get('/roles/{role_id}/skills','skillByRole');
+    });
+
+    Route::controller(CookingPlaceAPIController::class)->group(function()
+    {
+        Route::get('/cooking_places','listAllCookingPlaces');
+        Route::get('/cooking_places/{id}','detailCookingPlace');
+        Route::post('/cooking_places','createCookingPlace');
+        Route::post('/cooking_places/{id}','updateCookingPlace');
+        Route::delete('/cooking_places/{id}','deleteCookingPlace');
+    });
+
+    Route::controller(DutyAPIController::class)->group(function()
+    {
+        Route::post('/duties','createDuty');
+        Route::get('/duties','listDuties');
+        Route::post('/duties/{id}','updateDuty');
+        Route::delete('/duties/{id}','deleteDuty');
+        Route::get('/duties/{id}','dutyDetail');
+    });
+
 });
+
+Route::controller(SaleTargetPositionAPIController::class)->group(function()
+{
+    Route::get('/sale_target_positions','listAllSalteTargetPosition');
+    Route::get('/sale_target_positions/{id}','saleTargetPositionDetail');
+    Route::post('/sale_target_positions','createSaleTargetPosition');
+    Route::post('/sale_target_positions/{id}','updateSaleTargetPosition');
+    Route::delete('/sale_target_positions/{id}','deleteSaleTargetPosition');
+
+});
+
+Route::controller(SaleTargetMenuAPIController::class)->group(function()
+{
+    Route::get('/sale_target_menus','listSaleTargetMenu');
+    Route::get('/sale_target_menus/{id}','getSaleTargetMenu');
+    Route::post('/sale_target_menus','createSaleTargetMenu');
+    Route::post('/sale_target_menus/{id}','updateSaleTargetMenu');
+    Route::delete('/sale_target_menus/{id}','deleteSaleTargetMenu');
+
+});
+
+Route::get('/sale_target_results',[SaleTargetResultAPIController::class,'getSaleTargetResult']);
 
 Route::controller(PackageAPIController::class)->group(function()
     {
@@ -372,6 +436,7 @@ Route::delete('/staffs/{staff_id}/features/{feature_id}',[StaffAPIController::cl
 Route::get('/departments/{department_id}/staffs',[StaffAPIController::class,'getStaffByDepartment']);
 Route::get('/staff_balances',[StaffAPIController::class,'staffBalanceList']);
 Route::get('/staff_balances/{id}',[StaffAPIController::class,'detailStaffBalance']);
+Route::get('/staff/{id}/duties',[StaffAPIController::class,'getStaffWithDuties']);
 
 
 
@@ -386,6 +451,7 @@ Route::controller(TaskController::class)->group(function () {
     Route::put('/tasks/{id}', 'updateTask');
     Route::delete('/tasks/{id}','deleteTask');
     Route::get('task_report','taskReport');
+    Route::get('/task_by_role/{role_id}','getTaskByRole');
 });
 Route::get('/complaints', [ComplaintAPIController::class, 'getComplainData']);
 

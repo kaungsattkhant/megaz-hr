@@ -2,7 +2,7 @@
     <div class="mt-4 bg-white">
         <notifications position="top center" />
 
-        <h1 class="font-bold text-lg text-center p-3">Asset Items</h1>
+        <h1 class="font-bold text-lg text-center p-3">Asset</h1>
         <div class="p-3 flex justify-center">
             <div class="w-full p-1 justify-center flex">
                 <form @submit.prevent="assetCreate" class="flex justify-center w-3/5 ">
@@ -28,7 +28,7 @@
                                 placeholder="Useful Life(Month)">
                         </div>
 
-                        <div class="my-5">
+                        <div class="my-5 relative">
                             <input type="date" v-model="purchaseDate"
                                 class="py-2 px-2 w-full rounded-md border border-gray-300" placeholder="Purchase Date">
                         </div>

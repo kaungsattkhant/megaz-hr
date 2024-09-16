@@ -110,8 +110,14 @@ Route::middleware(['departments:room'])->group(function () {
 
 Route::middleware(['departments:item-usage-forecast'])->group(function () {
     Route::view('/item_usage_forecasts', 'item_usage_forecastings.index')->name('item_usage_forecasts');
+    Route::view('/item_usage_forecasts_by_month', 'item_usage_forecastings.listbyMonth')->name('item_usage_forecasts_by_month');
+    Route::view('/item_usage_forecasts/{month}', 'item_usage_forecastings.listbyMonthWithDepartment')->name('item_usage_forecasts_by_month_with_department');
+    Route::view('/item_usage_forecasts_with_month/{month}/department/{department}', 'item_usage_forecastings.listByMonthAndDepartment')->name('item_usage_forecasts_by_month_and_department');
+
     Route::view('/item_usage_forecasts/{forecastId}/detail', 'item_usage_forecastings.detail')->name('item_usage_forecasts.detail');
     Route::view('/item_usage_forecasts/create', 'item_usage_forecastings.create')->name('item_usage_forecasts.create');
+    Route::view('/item_usage_forecasts/create', 'item_usage_forecastings.create')->name('item_usage_forecasts.create');
+
 });
 Route::middleware(['departments:purchase-order'])->group(function () {
     Route::view('/purchase_orders', 'purchase_orders.index')->name('purchase_orders');
@@ -153,8 +159,12 @@ Route::middleware(['departments:cashbook'])->group(function () {
 });
 Route::middleware(['departments:fixed-asset'])->group(function () {
     Route::view('/fixed_assets', 'fixed_assets.index')->name('fixed_assets.index');
-    Route::view('/asset_items', 'fixed_assets.asset_items')->name('fixed_assets.asset_items');
-    Route::view('/assets', 'fixed_assets.assets')->name('fixed_assets.assets');
+    Route::view('/asset_items/create', 'fixed_assets.asset_items')->name('fixed_assets.asset_items');
+    Route::view('/assets/create', 'fixed_assets.assets')->name('fixed_assets.assets');
+    Route::view('/asset/list','fixed_assets.asset_list')->name('assetList');
+    Route::view('/asset_items/list','fixed_assets.asset_item_list')->name('assetItemList');
+
+
 });
 Route::middleware(['departments:account-payables'])->group(function () {
     Route::view('/account_payables', 'AP.index')->name('AP.index');
@@ -216,3 +226,28 @@ Route::view('/advanced', 'advanced.index')->name('advance');
 
 Route::view('/advanced/{id}/detail', 'advanced.detail');
 Route::view('prepaid', 'prepaid.index')->name('prepaid');
+Route::view('/account_receivable', 'AR.index')->name('account_receivable');
+Route::view('/account_receivable/{id}/detail', 'AR.detail');
+Route::middleware(['departments:cash-flow-statement'])->group(function () {
+    Route::view('/cash_flow_statement', 'cash_flow_statement.index');
+});
+
+Route::view('/asset_depreciation_balance_list','asset_depreciation_balance.index')->name('asset_list');
+
+
+// test
+Route::view('/skill','skill.index')->name('skill');
+Route::view('/cooking_places','cookingPlace.index')->name('cookingPlace');
+Route::view('/cooking_places/create','cookingPlace.create')->name('cookingPlaceCreate');
+Route::view('/cooking_places/{id}/edit','cookingPlace.edit')->name('cookingPlaceCreate');
+Route::view('/indirect_cashflow_statement','cash_flow_statement.indirect_cashflow_statement')->name('indirect_cashflow_statement');
+Route::view('/duty','duty.index')->name('duty');
+Route::view('/duty/create','duty.create')->name('dutyCreate');
+Route::view('/duty/{id}/edit','duty.edit')->name('dutyEdit');
+Route::view('/sale_target_position','sale_target_position.index')->name('sale_target_position');
+Route::view('/sale_target_position/create','sale_target_position.create')->name('sale_target_position/create');
+Route::view('/sale_target_position/{id}/edit','sale_target_position.edit')->name('sale_target_position/edit');
+Route::view('/sale_target_menu','sale_target_menu.index')->name('sale_target_menu');
+Route::view('/sale_target_menu/create','sale_target_menu.create')->name('sale_target_menu/create');
+Route::view('/sale_target_menu/{id}/edit','sale_target_menu.edit')->name('sale_target_menu/edit');
+

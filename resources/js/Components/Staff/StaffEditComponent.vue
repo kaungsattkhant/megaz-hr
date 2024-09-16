@@ -100,7 +100,7 @@
                 </select>
             </div>
 
-            <div class="col-span-3 rounded-md mb-4 pb-6">
+            <!-- <div class="col-span-3 rounded-md mb-4 pb-6">
                 <div>
                     <label class="label-form mb-3">Roles</label>
                     <multiselect v-model="selectedRoles" :options="roleList" :multiple="true" :close-on-select="false"
@@ -114,6 +114,36 @@
                     <div class="flex gap-x-2 flex-wrap mt-1">
                         <span class="font-inter after-coma" v-for="selectedRole in selectedRoles">{{ selectedRole.name }}</span>
                     </div>
+                </div>
+            </div> -->
+            <div class="col-span-3 rounded-md mb-4 pb-6">
+                <div>
+                    <label class="label-form mb-3">Roles {{ selectedRole }}</label>
+                    <!-- <multiselect v-model="selectedRoles" :options="roleList" :multiple="true" :close-on-select="false" :clear-on-select="false"
+                    :preserve-search="true" placeholder="Select Roles" label="name" track-by="id" :preselect-first="true">
+                        <template #selection="{ values, search, isOpen }">
+                            <span class="multiselect__single"
+                                v-if="values.length"
+                                v-show="!isOpen">{{ values.length }} roles selected</span>
+                        </template>
+                    </multiselect>
+                    <div class="flex gap-x-2 flex-wrap mt-1">
+                        <span class="font-inter after-coma" v-for="selectedRole in selectedRoles">{{ selectedRole.name }}</span>
+                    </div> -->
+                    <div class="bg-white mb-0 w-full text-sm inline-block h-[34px]" data-te-select-wrapper-ref>
+                    <!-- <select data-te-select-init data-te-select-placeholder="Select Rolsdfdafe" data-te-select-filter="true"
+                        name="" id="" v-model="selectedRoles" @change="getSkillByRole(selectedRoles.id)" class="input-ui h-[34px]">
+                        <option :value="role" v-for="(role, roleIndex) in roleList"
+                        :key="roleIndex"> {{ role.name }} </option>
+                    </select> -->
+
+                    <select name="" id="" v-model="selectedRole" class="input-ui" @change="getSkillByRole(selectedRole)">
+                        <option :value="role.id" v-for="(role, roleIndex) in roleList"
+                            :key="roleIndex">
+                            {{ role.name }}
+                        </option>
+                    </select>
+                </div>
                 </div>
             </div>
 
@@ -177,7 +207,33 @@
                 <input type="text" v-model="zipCode" placeholder="Zip Code" class="input-ui">
             </div>
 
-            <div class="col-span-3"></div>
+            <div class="col-span-3 rounded-md mb-4 pb-6">
+                <label for="" class="label-form mb-3">
+                    Skills
+                </label>
+
+                <multiselect v-model="selectedSkills" :options="skillList" :multiple="true" :close-on-select="false" :clear-on-select="false"
+                    :preserve-search="true" placeholder="Select Skill" label="skill" track-by="id" :preselect-first="true">
+                        <template #selection="{ values, search, isOpen }">
+                            <span class="multiselect__single"
+                                v-if="values.length"
+                                v-show="!isOpen">{{ values.length }} skills selected</span>
+                        </template>
+                    </multiselect>
+                    <div class="flex gap-x-2 flex-wrap mt-1">
+                        <span class="font-inter after-coma" v-for="skill in selectedSkills" :key=skill.id>{{ skill.skill }}</span>
+                    </div>
+
+                <!-- <div class="bg-white mb-0 w-full text-sm inline-block h-[34px]" data-te-select-wrapper-ref>
+                    <select data-te-select-init data-te-select-placeholder="Select Skill" data-te-select-filter="true"
+                        name="" id="" v-model="selectedSkill" class="input-ui h-[34px]"
+                        >
+                        <option :value="skill" v-for="(skill, skillIndex) in skillList"
+                        :key="skillIndex"> {{ skill.skill }} </option>
+                    </select>
+                </div> -->
+            </div>
+
 
             <div class="mb-4 col-span-6 pb-6 rounded-md">
                 <label for="" class="label-form mb-3">
@@ -432,11 +488,25 @@ export default {
             secondaryName: null,
             secondaryPhone: null,
             secondaryRelationship: null,
+
+            skillList:[],
+            skillIds:[],
+            selectedSkills:[],
+            selectedRole:null
         };
     },
 
     methods: {
         ...mapGetters(['getToken']),
+
+        async getSkillByRole(id)
+            {
+                let response = await getApiData({ url: `/api/roles/${id}/skills`, token: this.getToken() });
+                if (response.data) {
+                    this.skillList = response.data;
+                    this.selectedSkills =[]
+                }
+            },
 
 
         async getStaffDetail() {
@@ -457,6 +527,7 @@ export default {
                 this.zipCode = this.staff.zip_code;
                 this.address = this.staff.address;
                 this.bankAccountNumber = this.staff.bank_account_number;
+
                 if (this.staff.emergency_contacts.length > 0) {
                     this.primaryName = this.staff.emergency_contacts[0].primary_name;
                     this.primaryPhone = this.staff.emergency_contacts[0].primary_phone;
@@ -480,12 +551,18 @@ export default {
                         this.selectedDepartment = department;
                     }
                 });
-
                 let response = await getApiData({ url: `/api/roles?department_id=${this.selectedDepartment.id}`, token: this.getToken() });
                 if (response.data) {
                     this.roleList = response.data;
                 }
-                this.selectedRoles = this.staff.roles;
+
+                this.selectedRole = this.staff.roles[0].id;
+
+                let responseSkill = await getApiData({url:`/api/roles/${this.staff.roles[0].id}/skills`, token: this.getToken()});
+                if(response.data){
+                    this.skillList = responseSkill.data;
+                }
+                this.selectedSkills = this.staff.skills;
 
                 if (this.selectedDepartment.features.length > 0) {
                     this.featureList = this.selectedDepartment.features;
@@ -495,7 +572,6 @@ export default {
                 if(this.selectedDepartment.inventory){
                     this.inventories.push(this.selectedDepartment.inventory.inventory);
                 }
-
 
                 if (this.staff.inventories.length > 0) {
                     this.selectedInventories = this.staff.inventories;
@@ -618,6 +694,8 @@ export default {
             this.featureIds = [];
             this.inventoryIds = [];
 
+            this.roleIds = [this.selectedRole];
+
             if ((this.selectedDepartment.name == 'Catering' || this.selectedDepartment.name == 'Kitchent') && !this.selectedArea) {
                 this.alertValiationMessage('area');
                 return 1;
@@ -629,11 +707,20 @@ export default {
                 });
             }
 
+            this.selectedSkills.forEach((skill) => {
+                this.skillIds.push(skill.id);
+            });
+
+            console.log(this.skillIds);
+
+
             if (this.selectedRoles.length > 0) {
                 this.selectedRoles.forEach((item) => {
                     this.roleIds.push(item.id);
                 });
             }
+
+            console.log(this.selectedRoles);
 
             if (this.selectedFeatures.length > 0) {
                 this.selectedFeatures.forEach((feature) => {
@@ -791,6 +878,9 @@ export default {
                     formData.append('roles[]', roleId);
                 });
             }
+
+            formData.append('skills',JSON.stringify(this.skillIds));
+
             if (this.password) {
                 formData.append('password', this.password);
             }

@@ -80,6 +80,7 @@ class CashBookRepository implements CashBookInterface
                     'closing_balance' => $closingBalance,
                     'cash_account_id' => $cashAccountId,
                 ]);
+
             $latestTransaction = Transaction::
                 whereHas('ledgers', function ($query) use ($cashAccountId) {
                 $query->where('account_id', $cashAccountId); #transaction close depend on transaction
@@ -91,12 +92,12 @@ class CashBookRepository implements CashBookInterface
                 $latestTransaction->is_closing = 1;
                 $latestTransaction->closing_date = now();
                 $latestTransaction->save();
-                ResponseMessage('Transaction closing is successfully', 200);
             }
             if ($cashbookBalance) {
                 DB::commit();
                 ResponseMessage('Transaction closing is successfully', 200);
             }
+            ResponseMessage('Something wrong', 200);
         } catch (\Exception $e) {
             DB::rollback();
             ResponseMessage($e->getMessage(), 402);

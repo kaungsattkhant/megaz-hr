@@ -110,6 +110,13 @@ class StaffRepository implements StaffRepositoryInterface
                 }
             }
 
+            if (isset($data['skills'])) {
+                $skills = json_decode($data['skills']);
+                foreach ($skills as $skill) {
+                    $staff->skills()->attach($skill);
+                }
+            }
+
             $data['staff_id'] = $staff->id;
             $this->createEmegercyContact($data);
             DB::commit();
@@ -175,6 +182,11 @@ class StaffRepository implements StaffRepositoryInterface
                     $featureIds = json_decode($data['featureIds'], true);
                     $staff->features()->sync($featureIds);
                 }
+
+                if (isset($data['skills']) && $data['skills'] !== null) {
+                    $skills = json_decode($data['skills'], true);
+                    $staff->skills()->sync($skills);
+                }
             }
             DB::commit();
             return  $staff;
@@ -187,7 +199,7 @@ class StaffRepository implements StaffRepositoryInterface
 
     public function staffDetail(int $id)
     {
-        $staff = Staff::with('department', 'roles', 'inventories', 'emergencyContacts', 'gender', 'completed_tasks', 'features')->find($id);
+        $staff = Staff::with('department', 'roles', 'inventories', 'emergencyContacts', 'gender', 'completed_tasks', 'features', 'skills')->find($id);
         if ($staff == null) {
             ResponseMessage("Staff not found or invalid id", 404);
         }
@@ -332,5 +344,30 @@ class StaffRepository implements StaffRepositoryInterface
         $staffs = $query->paginate(config('common.list_count'));
 
         ResponseData($staffs);
+    }
+
+    public function staffDuty(Request $request, int $id)
+    {
+        $date = $request->query('date');
+        $fromDate = $request->query('from_date');
+        $toDate = $request->query('to_date');
+
+        $fromDate = $fromDate ? \Carbon\Carbon::parse($fromDate)->startOfDay() : null;
+        $toDate = $toDate ? \Carbon\Carbon::parse($toDate)->endOfDay() : null;
+
+        $staff = Staff::with([
+            'duties' => function ($query) use ($date, $fromDate, $toDate) {
+                if ($date) {
+                    $query->whereDate('date', $date);
+                } elseif ($fromDate && $toDate) {
+                    $query->whereBetween('date', [$fromDate, $toDate]);
+                } else {
+                    $query->whereDate('date', CurrentDate());
+                }
+                $query->with('cookingPlace', 'tasks');
+            }
+        ])->find($id);
+
+        ResponseData($staff);
     }
 }

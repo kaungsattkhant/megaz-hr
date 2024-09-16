@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('bookings', function (Blueprint $table) {
             $table->id();
             $table->string('booking_id')->nullable();
-            $table->dateTime('date_time')->default(CurrentTime());
+            $table->dateTime('date_time');
             $table->foreignId('entity_id')->constrained()->onDelete('cascade');
             $table->foreignId('head_count_id')->constrained()->onDelete('cascade');
             $table->foreignId('package_id')->nullable()->constrained()->onDelete('cascade');

@@ -81,20 +81,20 @@
                                         {{ task.role.name }}
                                     </td>
 
-                                    <td class="  ">
+                                    <td class="  " v-if="task.task_details.length > 0">
                                         {{ task.task_details[0].status }}
                                     </td>
-                                    <td class="">
+                                    <td class="" v-if="task.task_details.length > 0">
                                         <i v-if="task.task_details[0].is_double_checked === 1" class="fas fa-check-double"
                                             @click="doubleChecked(task.id)"></i>
                                         <i v-else class="fas fa-check" @click="doubleChecked(task.id)"></i>
                                     </td>
 
-                                    <td class="  ">
+                                    <td class="  " v-if="task.task_details.length > 0">
                                         <div v-if="task.task_details[0].completed_by"> {{ task.task_details[0].completed_by.name }} </div>
                                     </td>
 
-                                    <td class="  ">
+                                    <td class="  " v-if="task.task_details.length > 0">
                                         <div v-if="task.task_details[0].double_checked_by"> {{ task.task_details[0].double_checked_by.name }} </div>
                                     </td>
 

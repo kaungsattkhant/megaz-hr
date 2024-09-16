@@ -66,7 +66,8 @@ import FinancialTransactionCrudComponent from './Components/FinancialTransaction
 import CashbookCrudComponent from './Components/Cashbook/CashbookCrudComponent.vue';
 import ApListComponent from './Components/AP/ApListComponent.vue';
 import ApHistoryComponent from './Components/AP/ApHistoryComponent.vue';
-import ArListComponent from './Components/AR/ArListComponent.vue';
+import ArCrudComponent from './Components/AR/ArCrudComponent.vue';
+import ArDetailComponent from './Components/AR/ArDetailComponent.vue';
 import ArHistoryComponent from './Components/AR/ArHistoryComponent.vue';
 import ArPaidComponent from './Components/AR/ArPaidComponent.vue';
 import SupplierListComponent from './Components/Supplier/SupplierListComponent.vue';
@@ -113,6 +114,27 @@ import JournalsCrudComponent from './Components/Journals/JournalsCrudComponent.v
 import AdvancedCrudComponent from './Components/Advanced/AdvancedCrudComponent.vue';
 import AdvancedDetailComponent from './Components/Advanced/AdvancedDetailComponent.vue';
 import PrepaidCrudComponent from './Components/Prepaid/PrepaidCrudComponent.vue';
+import CashFlowStatementComponent from './Components/CashFlowStatement/CashFlowStatementComponent.vue';
+import IndirectCashFlowStatementComponent from './Components/CashFlowStatement/IndirectCashFlowStatementComponent.vue';
+import SkillCrudComponent from './Components/Skill/SkillCrudComponent.vue';
+import CookingPlaceComponent from './Components/CookingPlace/CookingPlaceComponent.vue';
+import CookingPlaceCreateComponent from './Components/CookingPlace/CookingPlaceCreateComponent.vue';
+import CookingPlaceEditComponent from './Components/CookingPlace/CookingPlaceEditComponent.vue';
+import AssetItemList from './Components/FixedAssets/AssetItemList.vue'
+import AssetListCompoennt from './Components/FixedAssets/AssetListComponent.vue';
+import DutyComponent from './Components/Duty/DutyComponent.vue';
+import DutyCreateComponent from './Components/Duty/DutyCreateComponent.vue';
+import DutyEditComponent from './Components/Duty/DutyEditComponent.vue';
+import AssetDepreciationBalanceList from './Components/AssetDepreciationBalance/AssetDepreciationBalanceList.vue';
+import ItemUsageForecastListMonth from './Components/ItemUsageForecastings/ItemUsageForecastListMonth.vue';
+import ItemUsageForecastByMonthWithDepartment from './Components/ItemUsageForecastings/ItemUsageForecastByMonthWithDepartment.vue';
+import IufWithDepartmentAndMonth from './Components/ItemUsageForecastings/IufWithDepartmentAndMonth.vue';
+import SaleTargetPositionListComponent from './Components/SaleTarget/SaleTargetPositionListComponent.vue';
+import SaleTargetPositionCreateComponent from './Components/SaleTarget/SaleTargetPositionCreateComponent.vue';
+import SaleTargetPositionEditComponent from './Components/SaleTarget/SaleTargetPositionEditComponent.vue';
+import SaleTargetMenuListComponent from './Components/SaleTarget/SaleTargetMenuListComponent.vue';
+import SaleTargetMenuCreateComponent from './Components/SaleTarget/SaleTargetMenuCreateComponent.vue';
+import SaleTargetMenuEditComponent from './Components/SaleTarget/SaleTargetMenuEditComponent.vue';
 
 app.component('NavBarComponent', NavBarComponent);
 app.component('StaffListComponent', StaffListComponent);
@@ -141,7 +163,8 @@ app.component('FinancialTransactionCrudComponent', FinancialTransactionCrudCompo
 app.component('CashbookCrudComponent', CashbookCrudComponent);
 app.component('ApListComponent', ApListComponent);
 app.component('ApHistoryComponent', ApHistoryComponent);
-app.component('ArListComponent', ArListComponent);
+app.component('ArCrudComponent', ArCrudComponent);
+app.component('ArDetailComponent', ArDetailComponent);
 app.component('ArHistoryComponent', ArHistoryComponent);
 app.component('ArPaidComponent', ArPaidComponent);
 app.component('PackagesListComponent', PackagesListComponent);
@@ -205,7 +228,31 @@ app.component('JournalsCrudComponent',JournalsCrudComponent);
 app.component('AdvancedCrudComponent',AdvancedCrudComponent);
 app.component('AdvancedDetailComponent',AdvancedDetailComponent);
 app.component('PrepaidCrudComponent',PrepaidCrudComponent);
+app.component('CashFlowStatementComponent',CashFlowStatementComponent);
+app.component('IndirectCashFlowStatementComponent',IndirectCashFlowStatementComponent);
+app.component('SkillCrudComponent',SkillCrudComponent);
+app.component('CookingPlaceComponent',CookingPlaceComponent);
+app.component('CookingPlaceCreateComponent',CookingPlaceCreateComponent);
+app.component('CookingPlaceEditComponent',CookingPlaceEditComponent);
+app.component('AssetItemList',AssetItemList);
+app.component('AssetListComponent',AssetListCompoennt);
+app.component('DutyComponent',DutyComponent);
+app.component('DutyCreateComponent',DutyCreateComponent);
+app.component('DutyEditComponent',DutyEditComponent);
+app.component('ItemUsageForecastListMonth',ItemUsageForecastListMonth);
+app.component('ItemUsageForecastByMonthWithDepartment',ItemUsageForecastByMonthWithDepartment);
+app.component('IufWithDepartmentAndMonth',IufWithDepartmentAndMonth);
+app.component('AssetDepreciationBalanceList',AssetDepreciationBalanceList);
+app.component('SaleTargetPositionListComponent',SaleTargetPositionListComponent);
+app.component('SaleTargetPositionCreateComponent',SaleTargetPositionCreateComponent);
+app.component('SaleTargetPositionCreateComponent',SaleTargetPositionCreateComponent);
+app.component('SaleTargetPositionEditComponent',SaleTargetPositionEditComponent);
+app.component('SaleTargetMenuListComponent',SaleTargetMenuListComponent);
+app.component('SaleTargetMenuCreateComponent',SaleTargetMenuCreateComponent);
+app.component('SaleTargetMenuEditComponent',SaleTargetMenuEditComponent);
 
 app.use(store);
 app.use(Notifications);
 app.mount('#app');
+
+
