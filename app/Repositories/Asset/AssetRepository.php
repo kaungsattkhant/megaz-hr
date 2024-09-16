@@ -230,7 +230,7 @@ class AssetRepository implements AssetInterface
         $previousYear = Carbon::parse($date)->subMonth()->format('Y');
         $currentYear = Carbon::parse($date)->format('Y');
         $currentMonth = Carbon::parse($date)->format('n');
-        $assets = Asset::whereMonth('purchase_date', $now)
+        $assets = Asset::whereMonth('purchase_date', operator: $now)
             ->select('id', 'asset_item_id', 'third_account_id', 'third_depreciation_account_id', 'cost', 'useful_life')
             ->get();
         $assetDepreciations = AssetDepreciationBalance::where('month', $previousMonth)
