@@ -33,8 +33,8 @@ class AssetDepreciationBalanceMonthly extends Command
         //
         // $date = convertDateFormat(now());
         Log::info('depreciation reach');
-        // $date = convertDateFormat('2024-04-1');
-        $date=now();
+        $date = convertDateFormat('2024-09-1');
+        // $date=now();
         $now = Carbon::parse($date);
         $previousMonth = Carbon::parse($date)->subMonth()->format('n');
         $previousYear = Carbon::parse($date)->subMonth()->format('Y');
