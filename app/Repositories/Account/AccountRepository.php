@@ -158,7 +158,7 @@ class AccountRepository implements AccountInterface
             ->first();
         if ($latestAccount) {
             $latestAccountCodeNo = explode('-', $latestAccount->account_code);
-            $new_account_code = (int) $latestAccountCodeNo[3] + 1;
+            $new_account_code = (int) $latestAccountCodeNo[2] + 1;
             $code = $latestAccountCodeNo[0] . '-' . $latestAccountCodeNo[1] . '-' . $latestAccountCodeNo[2] . '-' . $new_account_code;
         } else {
             $code = $request->original_account_code . '-' . "1";
