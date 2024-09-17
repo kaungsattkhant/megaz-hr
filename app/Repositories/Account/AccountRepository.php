@@ -78,27 +78,40 @@ class AccountRepository implements AccountInterface
             $q->where('name', 'Cash & Bank');
         })
 
-        ->get();
+            ->get();
         return $sub_account;
     }
 
     public function accountBySubAccount($sub_account_id)
     {
         return Account::where('sub_account_id', $sub_account_id)
-        ->where('type','is_first')
-        ->get();
+            ->where('type', 'is_first')
+            ->get();
     }
 
-
-    public function getSecondAccount($type)
+    public function getDepreciationAccount($request)
     {
-        $second_account = Account::where('type', $type)->get();
+        //depreciaiton accounts
+        $account_codes = ['1-1000', '1-1100',  '2-1020'];
+        $depreciation_account_codes = ['1-1200', '1-1300', '1-1350'];
+        $codes= $request->is_depreciation!=1 || $request->is_depreciation!="1" ?$account_codes : $depreciation_account_codes;
+        return SubAccount::whereIn('account_code', $codes)
+            ->get();
+    }
+
+    public function getSecondAccount($request)
+    {
+        $second_account = Account::where('type', $request->type)
+        ->where('sub_account_id',$request->sub_account_id)
+        ->get();
         return $second_account;
     }
 
-    public function getThirdAccount($type)
+    public function getThirdAccount($request)
     {
-        $account = Account::where('type', $type)->get();
+        $account = Account::where('type', $request->type)
+        ->where('sub_account_id',$request->sub_account_id)
+        ->get();
         return $account;
         // $third_account=ThirdAccount::whereHas('second_account.account',function($q)use($sub_account_id){
         //     $q->where('sub_account_id',$sub_account_id);
