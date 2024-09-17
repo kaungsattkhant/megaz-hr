@@ -2,73 +2,115 @@
     <div class="mt-4 bg-white">
         <notifications position="top center" />
 
-        <h1 class="font-bold text-lg text-center p-3">Asset</h1>
-        <div class="p-3 flex justify-center">
-            <div class="w-full p-1 justify-center flex">
-                <form @submit.prevent="assetCreate" class="flex justify-center w-3/5 ">
-                    <div class="w-full">
-                        <div class="my-5">
+        <h1 class="font-bold text-lg text-left px-8 pt-8 mb-4">Asset</h1>
+        <div class=" px-8 pt-3 pb-8 flex justify-center">
+            <div class="w-full justify-center flex">
+                <form @submit.prevent="assetCreate" class="flex justify-center w-full ">
+                    <div class="w-full grid grid-cols-11 gap-x-6">
+                        <div class="mb-5 col-span-5">
+                            <label for="" class="label-form mb-3">
+                                Name
+                            </label>
                             <input type="text" v-model="assetName"
                                 class="py-2 px-2 w-full rounded-md border border-gray-300" placeholder="Name">
                         </div>
 
-                        <div class="my-5">
+                        <div class="mb-5 col-span-5">
+                            <label for="" class="label-form mb-3">
+                                Cost
+                            </label>
                             <input type="number" v-model="assetCost"
                                 class="py-2 px-2 w-full rounded-md border border-gray-300" placeholder="Cost">
-                        </div>
+                        </div><div></div>
 
-                        <div class="my-5">
+                        <div class="mb-5 col-span-5">
+                            <label for="" class="label-form mb-3">
+                                Quantity
+                            </label>
                             <input type="number" v-model="assetQuantity"
                                 class="py-2 px-2 w-full rounded-md border border-gray-300" placeholder="Quantity">
                         </div>
 
-                        <div class="my-5">
+                        <div class="mb-5 col-span-5">
+                            <label for="" class="label-form mb-3">
+                                Useful Life (Month)
+                            </label>
                             <input type="number" v-model="assetMonths"
                                 class="py-2 px-2 w-full rounded-md border border-gray-300"
                                 placeholder="Useful Life(Month)">
-                        </div>
+                        </div><div></div>
 
-                        <div class="my-5 relative">
-                            <input type="date" v-model="purchaseDate"
-                                class="py-2 px-2 w-full rounded-md border border-gray-300" placeholder="Purchase Date">
-                        </div>
+                        
 
-                        <div class="my-5 flex justify-center">
-                            <select placeholder="Third Account" v-model="thirdAccount" @change="getAssetItemList()"
-                                class="py-2 px-2 w-11/12 rounded-md border border-gray-300">
-                                <option :value="null" disabled selected>Third Account</option>
-                                <option v-for='(thirdAccount, index) in thirdAccountListForAsset' :key=index
-                                    :value=thirdAccount.id>{{ thirdAccount.name }}</option>
+                        <div class="mb-5 col-span-5">
+                            <label for="" class="label-form mb-3">
+                                Sub Account
+                            </label>
+                            <select placeholder="Unit" v-model="selectedSubAccForAssetItem" @change="subAccForAssetItemChange()"
+                                class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
+                                <option v-for='(subAcc, index) in subAccountList' :key=index
+                                    :value=subAcc>{{ subAcc.name }}</option>
                             </select>
-                            <!-- <input type="text" class="py-2 px-2 w-11/12 rounded-md border border-gray-300" placeholder="Second Account"> -->
-
-                            <button type="button"
-                                class=" transition duration-150 ease-in-out focus:outline-none focus:ring-0 w-1/12 "
-                                data-te-toggle="modal" data-te-target="#createSecond">
-                                <i class="far fa-plus-circle text-xl"></i>
-
-                            </button>
-
                         </div>
+                        <div class="mb-5 col-span-5">
+                            <label for="" class="label-form mb-3">
+                                Third Account
+                            </label>
+                            <div class=" flex justify-center relative">
+                                <select placeholder="Third Account" v-model="thirdAccount" @change="getAssetItemList()"
+                                    class="py-2 px-2 w-full rounded-md border border-gray-300">
+                                    <option :value="null" disabled selected>Third Account</option>
+                                    <option v-for='(thirdAccount, index) in thirdAccountListForAsset' :key=index
+                                        :value=thirdAccount.id>{{ thirdAccount.name }}</option>
+                                </select>
+                                <!-- <input type="text" class="py-2 px-2 w-11/12 rounded-md border border-gray-300" placeholder="Second Account"> -->
 
-                        <div class="my-5">
-                            <select placeholder="Second Account Depreciation" v-model="thirdAccountDepreciation"
-                                @change="getAssetItemList()"
-                                class="py-2 px-2 w-11/12 rounded-md border border-gray-300">
-                                <option :value="null" disabled selected>Third Account Depreciation</option>
-                                <option v-for='(thirdAccountDepreciation, index) in thirdAccountDepreciationForAsset'
-                                    :key=index :value=thirdAccountDepreciation.id>{{ thirdAccountDepreciation.name }}
-                                </option>
+                                <button type="button"
+                                    class="absolute -right-20 transition duration-150 ease-in-out focus:outline-none focus:ring-0 w-1/12 "
+                                    data-te-toggle="modal" data-te-target="#createSecond">
+                                    <i class="far fa-plus-circle text-xl"></i>
+
+                                </button>
+                            </div>
+
+                        </div><div></div>
+
+                        <div class="mb-5 col-span-5">
+                            <label for="" class="label-form mb-3">
+                                Sub Account
+                            </label>
+                            <select placeholder="Unit" v-model="selectedSubDepreciationAccForAssetItem" @change="subDepreciationAccForAssetItemChange()"
+                                class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
+                                <option v-for='(subDeAcc, index) in subDepreciationAccountList' :key=index
+                                    :value=subDeAcc>{{ subDeAcc.name }}</option>
                             </select>
-                            <button type="button"
-                                class=" transition duration-150 ease-in-out focus:outline-none focus:ring-0 w-1/12 "
-                                data-te-toggle="modal" data-te-target="#createSecondDepreciation">
-                                <i class="far fa-plus-circle text-xl"></i>
-
-                            </button>
                         </div>
+                        <div class="mb-5 col-span-5">
+                            <label for="" class="label-form mb-3">
+                                Third Account Depreciation
+                            </label>
+                            <div class="relative">
+                                <select placeholder="Second Account Depreciation" v-model="thirdAccountDepreciation"
+                                    @change="getAssetItemList()"
+                                    class="py-2 px-2 w-full rounded-md border border-gray-300">
+                                    <option :value="null" disabled selected>Third Account Depreciation</option>
+                                    <option v-for='(thirdAccountDepreciation, index) in thirdAccountDepreciationForAsset'
+                                        :key=index :value=thirdAccountDepreciation.id>{{ thirdAccountDepreciation.name }}
+                                    </option>
+                                </select>
+                                <button type="button"
+                                    class="absolute -right-20 transition duration-150 ease-in-out focus:outline-none focus:ring-0 w-1/12 "
+                                    data-te-toggle="modal" data-te-target="#createSecondDepreciation">
+                                    <i class="far fa-plus-circle text-xl"></i>
 
-                        <div class="my-5">
+                                </button>
+                            </div>
+                        </div><div></div>
+
+                        <div class="mb-5 col-span-5">
+                            <label for="" class="label-form mb-3">
+                                Item
+                            </label>
                             <select placeholder="Item" v-model="itemId"
                                 class="py-2 px-2 w-full rounded-md border border-gray-300">
                                 <option :value="null" disabled selected>Item</option>
@@ -78,7 +120,10 @@
 
                         </div>
 
-                        <div class="my-5">
+                        <div class="mb-5 col-span-5">
+                            <label for="" class="label-form mb-3">
+                                Inventory
+                            </label>
                             <select placeholder="Inventory" v-model="inventoryId"
                                 class="py-2 px-2 w-full rounded-md border border-gray-300">
                                 <option :value="null" disabled selected>Inventory</option>
@@ -87,8 +132,17 @@
                             </select>
 
                         </div>
-
-                        <div class="my-5">
+                        <div class="mb-5 relative col-span-5">
+                            <label for="" class="label-form mb-3">
+                                Purchase Date
+                            </label>
+                            <input type="date" v-model="purchaseDate"
+                                class="py-2 px-2 w-full rounded-md border border-gray-300" placeholder="Purchase Date">
+                        </div>
+                        <div class="mb-5 col-span-5">
+                            <label for="" class="label-form mb-3">
+                                Cash Account
+                            </label>
                             <select placeholder="Cash Account " v-model="cashAccountId"
                                 class="py-2 px-2 w-full rounded-md border border-gray-300">
                                 <option :value="null" disabled selected>Cash Account</option>
@@ -96,10 +150,10 @@
                                     :value=cashAccount.id>{{ cashAccount.name }}</option>
                             </select>
 
-                        </div>
+                        </div><div></div>
 
-                        <div class="w-full flex justify-center">
-                            <button type="submit" class="py-2 px-4 add-btn rounded-md text-white ">Confirm</button>
+                        <div class="w-full flex justify-end col-span-10 pt-4">
+                            <button type="submit" class="py-2 px-8 add-btn rounded-md text-white ">Confirm</button>
                         </div>
                     </div>
                 </form>
@@ -141,6 +195,16 @@
                             </label>
                             <input type="text" placeholder="Third Account Name" v-model="thirdAccountName"
                                 class="input-ui">
+                        </div>
+                        <div class="mb-4">
+                            <label for="" class="label-form mb-3">
+                                Sub Account
+                            </label>
+                            <select placeholder="Unit" v-model="selectedSubAccount" @change="subAccountForThirdChange()"
+                                class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
+                                <option v-for='(subAcc, index) in subAccountList' :key=index
+                                    :value=subAcc>{{ subAcc.name }}</option>
+                            </select>
                         </div>
                         <div class="mb-4">
                             <label for="" class="label-form mb-3">
@@ -201,6 +265,16 @@
                             </label>
                             <input type="text" placeholder="Third Account Depreciation Name"
                                 v-model="thirdDepreciationName" class="input-ui">
+                        </div>
+                        <div class="mb-4">
+                            <label for="" class="label-form mb-3">
+                                Sub Account
+                            </label>
+                            <select placeholder="Unit" v-model="selectedSubDepreciationAccount" @change="subAccountForDepreciationChange()"
+                                class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
+                                <option v-for='(subDeAcc, index) in subDepreciationAccountList' :key=index
+                                    :value=subDeAcc>{{ subDeAcc.name }}</option>
+                            </select>
                         </div>
                         <div class="mb-4">
                             <label for="" class="label-form mb-3">
@@ -272,7 +346,15 @@ export default {
             thirdDepreciationList: [],
             thirdAccountDepreciationForAsset: [],
             cashAccountList: [],
-            cashAccountId: null
+            cashAccountId: null,
+
+
+            subAccountList:[],
+            selectedSubAccount:null,
+            subDepreciationAccountList:[],
+            selectedSubDepreciationAccount:null,
+            selectedSubAccForAssetItem:null,
+            selectedSubDepreciationAccForAssetItem:null,
         };
     },
 
@@ -295,16 +377,36 @@ export default {
             return true;
         },
 
+        async getSubAccountForThird() {
+            let url = `/api/get_depreciation_account_list?is_depreciation=0`;
+            let response = await getApiData({ url: url, token: this.getToken() });
+            if (response.success) {
+                this.subAccountList = response.data;
+            }
+        },
+        subAccountForThirdChange(){
+            this.getAccountForThird();
+        },
         async getAccountForThird() {
-            let url = `/api/get_second_account/is_second`;
+            let url = `/api/account_by_sub_account/` + this.selectedSubAccount.id;
             let response = await getApiData({ url: url, token: this.getToken() });
             if (response.success) {
                 this.thirdAccountList = response.data;
             }
         },
 
+        async getSubAccountForDepreciation() {
+            let url = `/api/get_depreciation_account_list?is_depreciation=1`;
+            let response = await getApiData({ url: url, token: this.getToken() });
+            if (response.success) {
+                this.subDepreciationAccountList = response.data;
+            }
+        },
+        subAccountForDepreciationChange(){
+            this.getAccountForThirdDepreciation();
+        },
         async getAccountForThirdDepreciation() {
-            let url = `/api/get_second_account/is_second_depreciation`;
+            let url = `/api/account_by_sub_account/` + this.selectedSubDepreciationAccount.id;
             let response = await getApiData({ url: url, token: this.getToken() });
             if (response.success) {
                 this.thirdDepreciationList = response.data;
@@ -313,16 +415,22 @@ export default {
         },
 
 
+        subAccForAssetItemChange(){
+            this.getThirdAccountList();
+        },
         async getThirdAccountList() {
-            let url = `/api/get_third_account/is_third`;
+            let url = `/api/get_third_account?type=is_third&sub_account_id=` + this.selectedSubAccForAssetItem.id;
             let response = await getApiData({ url: url, token: this.getToken() });
             if (response.success) {
                 this.thirdAccountListForAsset = response.data;
             }
         },
 
+        subDepreciationAccForAssetItemChange(){
+            this.thirdDepreciationForAsset()
+        },
         async thirdDepreciationForAsset() {
-            let url = `/api/get_third_account/is_third_depreciation`;
+            let url = `/api/get_third_account?type=is_third_depreciation&sub_account_id=` + this.selectedSubDepreciationAccForAssetItem.id;
             let response = await getApiData({ url: url, token: this.getToken() });
             if (response.success) {
                 this.thirdAccountDepreciationForAsset = response.data;
@@ -481,10 +589,12 @@ export default {
     },
 
     created() {
-        this.getAccountForThird();
-        this.getAccountForThirdDepreciation();
-        this.getThirdAccountList();
-        this.thirdDepreciationForAsset();
+        this.getSubAccountForDepreciation();
+        this.getSubAccountForThird();
+        // this.getAccountForThird();
+        // this.getAccountForThirdDepreciation();
+        // this.getThirdAccountList();
+        // this.thirdDepreciationForAsset();
         this.getInventoryList();
         this.getCashAccount();
     },
