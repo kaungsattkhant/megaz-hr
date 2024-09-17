@@ -388,7 +388,7 @@ export default {
             this.getAccountForThird();
         },
         async getAccountForThird() {
-            let url = `/api/account_by_sub_account/` + this.selectedSubAccount.id;
+            let url = `/api/get_second_account?type=is_second&sub_account_id=` + this.selectedSubAccount.id;
             let response = await getApiData({ url: url, token: this.getToken() });
             if (response.success) {
                 this.thirdAccountList = response.data;
@@ -406,7 +406,7 @@ export default {
             this.getAccountForThirdDepreciation();
         },
         async getAccountForThirdDepreciation() {
-            let url = `/api/account_by_sub_account/` + this.selectedSubDepreciationAccount.id;
+            let url = `/api/get_second_account?type=is_second_depreciation&sub_account_id=` + this.selectedSubDepreciationAccount.id;
             let response = await getApiData({ url: url, token: this.getToken() });
             if (response.success) {
                 this.thirdDepreciationList = response.data;
