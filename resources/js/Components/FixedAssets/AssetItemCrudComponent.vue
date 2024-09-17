@@ -59,7 +59,7 @@
                         </div>
                         <div class="my-5">
                             <label for="" class="label-form mb-3">
-                                Sub Account d
+                                Sub Account
                             </label>
                             <select placeholder="Unit" v-model="selectedSubDepreciationAccForAssetItem" @change="subDepreciationAccForAssetItemChange()"
                                 class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
