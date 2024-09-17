@@ -31,15 +31,11 @@
                                 </th>
 
                                 <th scope="col" class="  ">
-                                    Month
+                                    Date
                                 </th>
 
                                 <th scope="col" class="  ">
                                     Department
-                                </th>
-
-                                <th scope="col" class="  ">
-                                    Forecasting Amount
                                 </th>
 
                             </tr>
@@ -53,15 +49,13 @@
                                         {{ ++itemForecastIndex }}
                                     </td>
                                     <td class="whitespace-nowrap  ">
-                                        {{ getMonthName(path_month) }}
+                                        {{ itemForecast.date }}
                                     </td>
 
                                     <td class="whitespace-nowrap  ">
                                         {{ itemForecast.department.name }}
                                     </td>
-                                    <td class="whitespace-nowrap  ">
-                                        {{ sumForecastItems(itemForecast.forecast_items) }}
-                                    </td>
+
                                     <td class="whitespace-nowrap  ">
                                         <a :href="'/item_usage_forecasts/'+itemForecast.id+'/detail'" id=""
                                             class="pr-4">
@@ -123,11 +117,6 @@ export default {
 
         },
 
-        sumForecastItems(items) {
-            return Array.isArray(items)
-                ? items.reduce((total, item) => total + (item.amount || 0), 0)
-                : 0;
-        },
 
         extractParams() {
             const path = window.location.pathname;
