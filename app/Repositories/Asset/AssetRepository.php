@@ -376,11 +376,13 @@ class AssetRepository implements AssetInterface
         $date = Carbon::parse($request->date);
         $month = Carbon::parse($request->date)->format('n');
         $year = Carbon::parse($request->date)->format('Y');
+        $subAccountIds=$request->sub_account_id;
         $depreciationBalance = AssetDepreciationBalance::join('assets', 'asset_depreciation_balances.asset_id', '=', 'assets.id')
             ->join('accounts as main_account', 'assets.third_account_id', '=', 'main_account.id')
             ->join('accounts as account_depreciation', 'assets.third_depreciation_account_id', '=', 'account_depreciation.id')
             ->where('month', $month)
             ->where('year', $year)
+            ->whereIn('main_account.sub_account_id',$subAccountIds)
             ->select(
                 DB::raw('SUM(asset_depreciation_balances.original_cost) as original_cost'),
                 DB::raw('SUM(asset_depreciation_balances.addition_year_cost) as addition_year_cost'),
@@ -395,9 +397,5 @@ class AssetRepository implements AssetInterface
             ->get();
         ResponseData($depreciationBalance);
     }
-
-
-
-
 
 }
