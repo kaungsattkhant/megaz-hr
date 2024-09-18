@@ -22,6 +22,8 @@ interface AccountInterface
 
     public function createThirdAccount($request);
 
+    public function getDepreciationAccount($request);
+
     public function getSecondAccount($type);
 
     public function getThirdAccount($type);
