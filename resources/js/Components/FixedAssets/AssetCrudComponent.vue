@@ -57,7 +57,7 @@
                                 Third Account
                             </label>
                             <div class=" flex justify-center relative">
-                                <select placeholder="Third Account" v-model="thirdAccount" @change="getAssetItemList()"
+                                <select placeholder="Third Account" v-model="thirdAccount"
                                     class="py-2 px-2 w-full rounded-md border border-gray-300">
                                     <option :value="null" disabled selected>Third Account</option>
                                     <option v-for='(thirdAccount, index) in thirdAccountListForAsset' :key=index
@@ -388,7 +388,7 @@ export default {
             this.getAccountForThird();
         },
         async getAccountForThird() {
-            let url = `/api/account_by_sub_account/` + this.selectedSubAccount.id;
+            let url = `/api/get_second_account?type=is_second&sub_account_id=` + this.selectedSubAccount.id;
             let response = await getApiData({ url: url, token: this.getToken() });
             if (response.success) {
                 this.thirdAccountList = response.data;
@@ -406,7 +406,7 @@ export default {
             this.getAccountForThirdDepreciation();
         },
         async getAccountForThirdDepreciation() {
-            let url = `/api/account_by_sub_account/` + this.selectedSubDepreciationAccount.id;
+            let url = `/api/get_second_account?type=is_second_depreciation&sub_account_id=` + this.selectedSubDepreciationAccount.id;
             let response = await getApiData({ url: url, token: this.getToken() });
             if (response.success) {
                 this.thirdDepreciationList = response.data;
@@ -438,7 +438,8 @@ export default {
         },
 
         async getAssetItemList() {
-            let url = `/api/get_asset_item_by_account?third_account_id=${this.thirdAccount}&third_depreciation_id=${this.thirdAccountDepreciation}`;
+            console.log(this.thirdAccountDepreciation)
+            let url = `/api/get_asset_item_by_account?third_account_id=${this.thirdAccount}&third_depreciation_id=` + this.thirdAccountDepreciation;
             let response = await getApiData({ url: url, token: this.getToken() });
             if (response.success) {
                 this.itemList = response.data;
