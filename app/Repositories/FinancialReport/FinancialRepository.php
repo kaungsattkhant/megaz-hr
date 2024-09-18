@@ -268,17 +268,27 @@ class FinancialRepository implements FinancialInterface
             // '4-1000',#loan term liablilities
         ];
         $cashAndBankCode=['2-1000'];
-        $otherReceivable=['2-1050'];
+        $otherReceivableCode=['2-1050'];
         $results = $this->trialBalanceService->getTrialBalanceResults($creditBalanceCode, 'credit', $current,'credit_balance');
         // return $results;
         $cashAndBankBalance=$this->trialBalanceService->getResultBySubAccountCode($cashAndBankCode,'credit',$current,'cash_and_bank');
         // return $cashAndBankBalance;
-        $otherReceiveable=$this->trialBalanceService->getTotalBySubAccountCode($otherReceivable,'credit',$current,'other_receiveable');
+        $otherReceiveable=$this->trialBalanceService->getTotalBySubAccountCode($otherReceivableCode,'credit',$current,'other_receiveable');
+        //book value of current asset and fixed asset
+        $fix_asset_tangiable = '1-1000';
+        $fix_asset_untangible = '1-1100';
+        $inventory_held = '2-1020';
+
+        $fix_asset_tangiable=$this->trialBalanceService->getAssetBookValue($current,$fix_asset_tangiable,'Fix Asset (Tangible)');
+        $fix_asset_untangible=$this->trialBalanceService->getAssetBookValue($current,$fix_asset_untangible,'Fix Asset (Intangible)');
+        $inventory_held=$this->trialBalanceService->getAssetBookValue($current,$inventory_held,'Schedule Of Inventory Held');
         $cashAndBankBalance=$cashAndBankBalance->merge($otherReceiveable);
+        $cashAndBankBalance=$cashAndBankBalance->push($inventory_held);
         // array_push($cashAndBankBalance,$otherReceiveable);
         return $cashAndBankBalance;
         $creditBalance=new \stdClass();
         $creditBalance->credit_balance=$results;
+        $creditBalance->debit_balance=$fix_asset_tangiable ? $fix_asset_tangiable : null;
         return $creditBalance;
     }
 

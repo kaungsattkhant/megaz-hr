@@ -3,7 +3,9 @@
 namespace App\Services;
 
 use Carbon\Carbon;
+use App\Models\SubAccount;
 use Illuminate\Support\Facades\DB;
+use App\Models\AssetDepreciationBalance;
 
 class TrialBalanceService
 {
@@ -110,4 +112,37 @@ class TrialBalanceService
         return $finalResult;
     }
 
+    public function getAssetBookValue($date, $account_code, $account_name)
+    {
+        $date = Carbon::parse($date);
+        $month = Carbon::parse($date)->format('n');
+        $year = Carbon::parse($date)->format('Y');
+
+        $book_value = AssetDepreciationBalance::join('assets', 'asset_depreciation_balances.asset_id', '=', 'assets.id')
+            ->join('accounts as main_account', 'assets.third_account_id', '=', 'main_account.id')
+            ->join('accounts as account_depreciation', 'assets.third_depreciation_account_id', '=', 'account_depreciation.id')
+            ->join('sub_accounts', 'main_account.sub_account_id', '=', 'sub_accounts.id')
+            ->where('month', $month)
+            ->where('year', $year)
+            ->where('sub_accounts.account_code', $account_code)
+            // ->select(
+            //     'sub_accounts.name',
+            //     'sub_accounts.account_code',
+            //     // DB::raw('SUM(asset_depreciation_balances.book_value) as book_value'),
+            //     DB::raw('COALESCE(SUM(asset_depreciation_balances.book_value), 0) as book_value') // Use COALESCE here
+            // )
+            ->selectRaw('sub_accounts.name, sub_accounts.account_code, COALESCE(SUM(asset_depreciation_balances.book_value), 0) as book_value')
+            ->groupBy('sub_accounts.account_code')
+            ->first();
+        if (!$book_value) {
+            // Return default structure if no data is found
+            $book_value = (object) [
+                'name' =>$account_name, // Fallback name if no data is found
+                'account_code' => $account_code,        // Use the provided account_code
+                'book_value' => 0,
+                'type'=>'credit',
+            ];
+        }
+        return $book_value;
+    }
 }

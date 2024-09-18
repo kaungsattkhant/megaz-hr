@@ -163,7 +163,6 @@ class AccountRepository implements AccountInterface
         } else {
             $code = $request->original_account_code . '-' . "1";
         }
-        dd($code);
         DB::beginTransaction();
         try {
             $account = Account::create([

@@ -8,12 +8,13 @@ use App\Models\AssetItem;
 use Illuminate\Http\Request;
 use GuzzleHttp\Promise\Create;
 use Illuminate\Support\Carbon;
+use PhpParser\Node\Stmt\TryCatch;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use App\Models\AssetDepreciationBalance;
 use App\Http\Action\Inventory\StoreInventory;
 use App\Http\Action\Depreciation\DepreciationBalance;
 use App\Http\Action\Transaction\StoreTransactionLedger;
-use PhpParser\Node\Stmt\TryCatch;
 
 class AssetRepository implements AssetInterface
 {
@@ -226,17 +227,18 @@ class AssetRepository implements AssetInterface
         $month = $request->month;    // The month you want to filter by
         $date = convertDateFormat($request->date);
         $now = Carbon::parse($date);
+        $prevMonth = Carbon::parse($date)->subMonth();
         $previousMonth = Carbon::parse($date)->subMonth()->format('n');
         $previousYear = Carbon::parse($date)->subMonth()->format('Y');
         $currentYear = Carbon::parse($date)->format('Y');
         $currentMonth = Carbon::parse($date)->format('n');
-        $assets = Asset::whereMonth('purchase_date', operator: $now)
+        $assets = Asset::whereMonth('purchase_date', operator: $prevMonth)
             ->select('id', 'asset_item_id', 'third_account_id', 'third_depreciation_account_id', 'cost', 'useful_life')
             ->get();
         $assetDepreciations = AssetDepreciationBalance::where('month', $previousMonth)
             ->where('year', $previousYear)
             ->join('assets', 'asset_depreciation_balances.asset_id', 'assets.id')
-            ->select('asasset_depreciation_balances.*', 'assets.useful_life')
+            ->select('asset_depreciation_balances.*', 'assets.useful_life')
             // ->select(
             //     DB::raw('SUM(asset_depreciation_balances.original_cost) as original_cost'),
             //     DB::raw('SUM(asset_depreciation_balances.addition_year_cost) as addition_year_cost'),
@@ -275,6 +277,7 @@ class AssetRepository implements AssetInterface
                 $depreciationData['total_depreciation'] = $total_depreciation;
                 $depreciationData['book_value'] = $book_value;
                 $createDepreciation = AssetDepreciationBalance::create($depreciationData);
+                Log::info('Balance Reach reach');
             }
             foreach ($assets as $asset) {
                 $data['asset_id'] = $asset->id;
@@ -297,8 +300,11 @@ class AssetRepository implements AssetInterface
                 $data['total_depreciation'] = $total_depreciation;
                 $data['book_value'] = $book_value;
                 $result = $this->updateOrCreateDepreciationBalance($data);
+                Log::info('New Asset  reach');
             }
+            Log::info('Db Commit Successfully');
             DB::commit();
+            Log::info('Db Commit Successfully');
             ResponseMessage('Depreciation Balance updated successfully');
         } catch (\Exception $e) {
             DB::rollback();
@@ -373,16 +379,40 @@ class AssetRepository implements AssetInterface
 
     public function getDepreciationBalance($request)
     {
+        // $account_code= $request->type=='current_asset' ? []
+        $fix_asset_tangiable = '1-1000';
+        $fix_asset_untangible = '1-1100';
+        $inventory_held = '2-1020';
         $date = Carbon::parse($request->date);
         $month = Carbon::parse($request->date)->format('n');
         $year = Carbon::parse($request->date)->format('Y');
-        $subAccountIds=$request->sub_account_id;
+        $subAccountIds = $request->sub_account_id;
+        $deptBalance= new \stdClass();
+        if($request->type=='current_asset'){
+            $current_asset=$this->depreciationBalanceQuery($inventory_held,$month,$year);
+            $deptBalance->current_asset=$current_asset;
+        }
+        if($request->type=='fix_asset')
+        {
+            $fix_asset_tangiable=$this->depreciationBalanceQuery($fix_asset_tangiable,$month,$year);
+            $fix_asset_untangible=$this->depreciationBalanceQuery($fix_asset_untangible,$month,$year);
+            $deptBalance->fix_asset_tangiable=$fix_asset_tangiable;
+            $deptBalance->fix_asset_untangible=$fix_asset_untangible;
+        }
+        // ->groupBy('main_account.sub_account_id');
+        ResponseData($deptBalance);
+    }
+
+    public function depreciationBalanceQuery($account_code, $month, $year)
+    {
         $depreciationBalance = AssetDepreciationBalance::join('assets', 'asset_depreciation_balances.asset_id', '=', 'assets.id')
             ->join('accounts as main_account', 'assets.third_account_id', '=', 'main_account.id')
             ->join('accounts as account_depreciation', 'assets.third_depreciation_account_id', '=', 'account_depreciation.id')
+            // ->join('accounts as main_account', 'assets.third_account_id', '=', 'main_account.id')
+            ->join('sub_accounts', 'main_account.sub_account_id', '=', 'sub_accounts.id')
             ->where('month', $month)
             ->where('year', $year)
-            ->whereIn('main_account.sub_account_id',$subAccountIds)
+            ->where('sub_accounts.account_code', $account_code)
             ->select(
                 DB::raw('SUM(asset_depreciation_balances.original_cost) as original_cost'),
                 DB::raw('SUM(asset_depreciation_balances.addition_year_cost) as addition_year_cost'),
@@ -395,7 +425,7 @@ class AssetRepository implements AssetInterface
             )
             ->groupBy('main_account.id', 'account_depreciation.id')
             ->get();
-        ResponseData($depreciationBalance);
+        return $depreciationBalance;
     }
 
 }

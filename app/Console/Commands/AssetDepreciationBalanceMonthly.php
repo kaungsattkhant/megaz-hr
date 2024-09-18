@@ -95,6 +95,7 @@ class AssetDepreciationBalanceMonthly extends Command
                 $data['total_depreciation'] = $total_depreciation;
                 $data['book_value'] = $book_value;
                 $result = $this->updateOrCreateDepreciationBalance($data);
+                return $result;
                 Log::info('New Asset  reach');
             }
             Log::info('Successfully');
