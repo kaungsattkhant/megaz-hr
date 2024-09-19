@@ -156,5 +156,10 @@ class TaskController extends Controller
     {
         $task = $this->taskRepo->getTaskImages($task_id);
     }
+
+    public function deleteTaskImage(int $id)
+    {
+        $task = $this->taskRepo->deleteTaskImage($id);
+    }
 }
 

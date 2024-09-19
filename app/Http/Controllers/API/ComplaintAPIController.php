@@ -40,6 +40,9 @@ class ComplaintAPIController extends Controller
     public function createComplain(ComplaintCreateRequest $request)
     {
         $data = $request->all();
+        $request->validate([
+            'complaintImages.*' => 'required|image|mimes:jpeg,png,jpg,gif',
+        ]);
         $data['posted_by'] = $request->user()->id;
         $complaint = $this->complaintRepo->createData($data);
 
@@ -80,6 +83,32 @@ class ComplaintAPIController extends Controller
 
     public function complaintResponsiblesByStaff()
     {
-        $complaint = $this->complaintRepo->responsiblesStaff();
+        $this->complaintRepo->complaintResponsiblesStaff();
     }
+
+    public function complaintCarbonCopiesByStaff()
+    {
+        $this->complaintRepo->complaintCarbonCopiesStaff();
+    }
+
+    public function complaintDetail(int $id)
+    {
+        $complaint = $this->complaintRepo->complaintDetail($id);
+    }
+
+    public function deleteComplaintImage($id)
+    {
+        $this->complaintRepo->deleteComplaintImage($id);
+    }
+
+    public function deleteComplaintResponsible($id)
+    {
+        $this->complaintRepo->deleteComplaintResponsible($id);
+    }
+
+    public function deleteComplaintCarbonCopy($id)
+    {
+        $this->complaintRepo->deleteComplaintCarbonCopy($id);
+    }
+
 }

@@ -4,10 +4,13 @@ namespace App\Repositories\Complaint;
 
 
 use App\Models\Complaint;
+use App\Models\ComplaintCarbonCopy;
+use App\Models\ComplaintImage;
 use App\Models\ComplaintResponsible;
 use App\Repositories\Complaint\ComplaintRepositoryInterface;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 
 class ComplaintRepository implements ComplaintRepositoryInterface
 {
@@ -37,6 +40,11 @@ class ComplaintRepository implements ComplaintRepositoryInterface
         }
     }
 
+    public function complaintDetail(int $complainId)
+    {
+        $complaint = Complaint::where('id', $complainId)->with('complaint_category','postedBy','complaintResponsibles','complaintCarbonCopies','complaintImages')->first();
+        ResponseData($complaint);
+    }
 
     public function listComplaintsByStaff(Request $request, int $staffId)
     {
@@ -63,10 +71,16 @@ class ComplaintRepository implements ComplaintRepositoryInterface
         }
     }
 
-    public function responsiblesStaff()
+    public function complaintResponsiblesStaff()
     {
-        $responsibles = ComplaintResponsible::where('staff_id',UserData()->id)->with('staff','complaint')->get();
-        ResponseData($responsibles);
+        $complaintResponsibles = ComplaintResponsible::where('staff_id',UserData()->id)->with('staff','complaint')->get();
+        ResponseData($complaintResponsibles);
+    }
+
+    public function complaintCarbonCopiesStaff()
+    {
+        $carbonCopiesComplaints = ComplaintCarbonCopy::where('staff_id',UserData()->id)->with('staff','complaint')->get();
+        ResponseData($carbonCopiesComplaints);
     }
 
     public function createData(array $data)
@@ -75,6 +89,61 @@ class ComplaintRepository implements ComplaintRepositoryInterface
         try {
             $data['posted_by'] = UserData()->id;
             $complaint = Complaint::create($data);
+            if ($complaint) {
+                $complaintResponsibles = json_decode($data['complaintResponsibles'], true);
+                $complaintCarbonCopies = json_decode($data['complaintCarbonCopies'], true);
+                if (!empty($complaintCarbonCopies)) {
+                    foreach ($complaintResponsibles as $responsible) {
+                        $complaint->complaintResponsibles()->create([
+                            'staff_id' => $responsible,
+                            'complaint_id' => $complaint->id
+                        ]);
+                    }
+                }
+
+                if(!empty($complaintCarbonCopies)) {
+                    foreach ($complaintCarbonCopies as $carbonCopy) {
+                        $complaint->complaintCarbonCopies()->create([
+                            'staff_id' => $carbonCopy,
+                            'complaint_id' => $complaint->id
+                        ]);
+                    }
+                }
+
+                if(!empty($data['complaintImages']))
+                {
+                    if (is_string($data['complaintImages'])) {
+                        $data['complaintImages'] = json_decode($data['complaintImages'], true);
+                    }
+
+                    foreach($data['complaintImages'] as $image)
+                    {
+                        $extension = $image->getClientOriginalExtension();
+                        $hashedName = md5(uniqid() . microtime()) . '.' . $extension;
+                        $data['image_path'] = $image->storeAs('images/complaint_images', $hashedName, 'public');
+                        $data['image_url'] = Storage::url($data['image_path']);
+                        $data['complaint_id'] = $complaint->id;
+                        ComplaintImage::create($data);
+                    }
+                }
+            }
+
+            DB::commit();
+            ResponseData($complaint);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            ResponseMessage($e->getMessage(), 422);
+            throw $e;
+        }
+    }
+
+
+    public function updateData(array $data, int $id)
+    {
+        $complaint = Complaint::find($id);
+        if ($complaint) {
+            $data = RemoveNullValues($data);
+            $complaint->update($data);
 
             if ($complaint) {
                 $complaintResponsibles = json_decode($data['complaintResponsibles'], true);
@@ -96,24 +165,24 @@ class ComplaintRepository implements ComplaintRepositoryInterface
                         ]);
                     }
                 }
+
+                if(!empty($data['complaintImages']))
+                {
+                    if (is_string($data['complaintImages'])) {
+                        $data['complaintImages'] = json_decode($data['complaintImages'], true);
+                    }
+
+                    foreach($data['complaintImages'] as $image)
+                    {
+                        $extension = $image->getClientOriginalExtension();
+                        $hashedName = md5(uniqid() . microtime()) . '.' . $extension;
+                        $data['image_path'] = $image->storeAs('images/complaint_images', $hashedName, 'public');
+                        $data['image_url'] = Storage::url($data['image_path']);
+                        $data['complaint_id'] = $complaint->id;
+                        ComplaintImage::create($data);
+                    }
+                }
             }
-
-            DB::commit();
-            ResponseData($complaint);
-        } catch (\Exception $e) {
-            DB::rollBack();
-            ResponseMessage($e->getMessage(), 422);
-            throw $e;
-        }
-    }
-
-
-    public function updateData(array $data, int $id)
-    {
-        $complaint = Complaint::find($id);
-        if ($complaint) {
-            $data = RemoveNullValues($data);
-            $complaint->update($data);
         }
 
         return $complaint;
@@ -145,4 +214,29 @@ class ComplaintRepository implements ComplaintRepositoryInterface
         }
         return $complaint;
     }
+
+
+    public function deleteComplaintResponsible($id)
+    {
+        $complaintResponsible = ComplaintResponsible::find($id);
+        $complaintResponsible->delete();
+        ResponseMessage('Complaint responsible deleted',200);
+
+    }
+
+    public function deleteComplaintCarbonCopy($id)
+    {
+        $complaintCarbonCopy = ComplaintCarbonCopy::find($id);
+        $complaintCarbonCopy->delete();
+        ResponseMessage('Complaint carbon copy deleted');
+    }
+
+    public function deleteComplaintImage($id)
+    {
+        $complaintImage = ComplaintImage::find($id);
+        $complaintImage->delete();
+        ResponseMessage('Complaint image deleted');
+    }
+
+
 }

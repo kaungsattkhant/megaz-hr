@@ -12,4 +12,12 @@ class ComplaintCarbonCopy extends Model
     protected $fillable=[
         'staff_id','complaint_id'
     ];
+
+    public function staff(){
+        return $this->belongsTo(Staff::class);
+    }
+
+    public function complaint(){
+        return $this->belongsTo(Complaint::class);
+    }
 }

@@ -42,5 +42,7 @@ interface TaskRepositoryInterface
 
     public function getTaskImages(int $task_id);
 
+    public function deleteTaskImage(int $image_id);
+
 
 }

@@ -45,4 +45,9 @@ class Complaint extends BaseModel
         return $this->hasMany(ComplaintCarbonCopy::class);
     }
 
+    public function complaintImages()
+    {
+        return $this->hasMany(ComplaintImage::class);
+    }
+
 }
