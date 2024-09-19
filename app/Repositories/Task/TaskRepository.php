@@ -279,17 +279,22 @@ class TaskRepository implements TaskRepositoryInterface
             $task = Task::find($taskId);
             $data['task_id'] = $task->id;
             $imageData = $data['task_images'];
-            if (is_string($imageData)) {
-                $imageData = json_decode($imageData, true); // Decode only if it's a JSON string
-            }
-            foreach($imageData as $image)
+            if(!empty($imageData))
             {
-                $extension = $image->getClientOriginalExtension();
-                $hashedName = md5(uniqid() . microtime()) . '.' . $extension;
-                $data['image_path'] = $image->storeAs('images/task_images', $hashedName, 'public');
-                $data['image_url'] = Storage::url($data['image_path']);
-                TaskImage::create($data);
+                if (is_string($imageData)) {
+                    $imageData = json_decode($imageData, true); // Decode only if it's a JSON string
+                }
+                foreach($imageData as $image)
+                {
+                    $extension = $image->getClientOriginalExtension();
+                    $hashedName = md5(uniqid() . microtime()) . '.' . $extension;
+                    $data['image_path'] = $image->storeAs('images/task_images', $hashedName, 'public');
+                    $data['image_url'] = Storage::url($data['image_path']);
+                    $data['task_id'] = $task->id;
+                    TaskImage::create($data);
+                }
             }
+
             DB::commit();
             ResponseMessage("Images uploaded successfully",200);
 
@@ -306,5 +311,13 @@ class TaskRepository implements TaskRepositoryInterface
         $task = Task::with('taskImages')->find($task_id);
         ResponseData($task);
     }
+
+    public function deleteTaskImage(int $image_id)
+    {
+        $taskImage = TaskImage::find($image_id);
+        $taskImage->delete();
+        ResponseMessage("Image deleted successfully",200);
+    }
+
 
 }

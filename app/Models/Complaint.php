@@ -35,4 +35,19 @@ class Complaint extends BaseModel
         return $this->belongsTo(Staff::class, 'posted_by');
     }
 
+    public function complaintResponsibles()
+    {
+        return $this->hasMany(ComplaintResponsible::class);
+    }
+
+    public function complaintCarbonCopies()
+    {
+        return $this->hasMany(ComplaintCarbonCopy::class);
+    }
+
+    public function complaintImages()
+    {
+        return $this->hasMany(ComplaintImage::class);
+    }
+
 }
