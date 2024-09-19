@@ -154,6 +154,10 @@ Route::middleware('auth:api')->group(function () {
         Route::get('/custom_tasks/{id}','customTaskDetail');
         Route::post('/custom_tasks/{id}','updateCustomTask');
 
+        // add image
+        Route::post('/tasks/{id}/add_images','addTaskImage');
+        Route::get('/tasks/{id}/images','getTaskImages');
+
     });
     Route::controller(PurchaseOrderAPIController::class)->group(function () {
         Route::get('/purchase_orders', 'getPurchaseOrder');

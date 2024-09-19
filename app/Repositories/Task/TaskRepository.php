@@ -5,9 +5,11 @@ namespace App\Repositories\Task;
 use App\Models\Staff;
 use App\Models\Task;
 use App\Models\TaskDetail;
+use App\Models\TaskImage;
 use App\Traits\TaskAssign;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 
 class TaskRepository implements TaskRepositoryInterface
 {
@@ -197,6 +199,7 @@ class TaskRepository implements TaskRepositoryInterface
         ResponseData($task);
     }
 
+
     //  custom task
     public function customTaskCreate(Request $request)
     {
@@ -261,6 +264,47 @@ class TaskRepository implements TaskRepositoryInterface
             ResponseMessage('Task not found', 404);
         }
         ResponseData($task, 200);
+    }
+
+    // add images
+    public function addTaskImages(int $taskId,Request $request)
+    {
+        DB::beginTransaction();
+        try{
+            $data = $request->all();
+            $request->validate([
+                'task_images.*' => 'required|image|mimes:jpeg,png,jpg,gif',
+            ]);
+
+            $task = Task::find($taskId);
+            $data['task_id'] = $task->id;
+            $imageData = $data['task_images'];
+            if (is_string($imageData)) {
+                $imageData = json_decode($imageData, true); // Decode only if it's a JSON string
+            }
+            foreach($imageData as $image)
+            {
+                $extension = $image->getClientOriginalExtension();
+                $hashedName = md5(uniqid() . microtime()) . '.' . $extension;
+                $data['image_path'] = $image->storeAs('images/task_images', $hashedName, 'public');
+                $data['image_url'] = Storage::url($data['image_path']);
+                TaskImage::create($data);
+            }
+            DB::commit();
+            ResponseMessage("Images uploaded successfully",200);
+
+        }catch(\Exception $e)
+        {
+            DB::rollBack();
+            ResponseMessage($e->getMessage(), 402);
+            throw $e;
+        }
+    }
+
+    public function getTaskImages(int $task_id)
+    {
+        $task = Task::with('taskImages')->find($task_id);
+        ResponseData($task);
     }
 
 }
