@@ -141,6 +141,7 @@ Route::middleware('auth:api')->group(function () {
     Route::put('/complaints/{id}', [ComplaintAPIController::class, 'updateComplain']);
     Route::delete('/complaints/{id}', [ComplaintAPIController::class, 'deleteComplain']);
     Route::post('/complaints/{id}/update_status', [ComplaintAPIController::class, 'complainStatusChange']);
+    Route::get('/complaints/responsibles',[ComplaintAPIController::class,'complaintResponsiblesByStaff']);
 
     Route::get('/supervisor/staff', [StaffAPIController::class, 'getStaffListBySupervisor']);
     Route::get('/supervisor/staff/{staffId}/tasks', [TaskController::class, 'getStaffTasksBySupervisor']);

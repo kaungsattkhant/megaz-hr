@@ -11,6 +11,7 @@ use App\Http\Requests\Complaint\ComplaintCreateRequest;
 use App\Http\Requests\Complaint\ComplaintUpdateRequest;
 
 use App\Repositories\Complaint\ComplaintRepositoryInterface;
+use Psy\Readline\Hoa\_Protocol;
 
 class ComplaintAPIController extends Controller
 {
@@ -75,5 +76,10 @@ class ComplaintAPIController extends Controller
         }else{
             ResponseMessage('Complaint not found or some error occur');
         }
+    }
+
+    public function complaintResponsiblesByStaff()
+    {
+        $complaint = $this->complaintRepo->responsiblesStaff();
     }
 }

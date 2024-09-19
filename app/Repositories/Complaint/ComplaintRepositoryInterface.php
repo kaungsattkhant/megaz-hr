@@ -17,4 +17,6 @@ interface ComplaintRepositoryInterface
     public function statusChange(string $data,int $id);
 
     public function deleteData($id);
+
+    public function responsiblesStaff();
 }
