@@ -51,23 +51,22 @@ class FoodOrderRepository implements FoodOrderRepositoryInterface
             ResponseData($foodOrderItem);
         } catch (\Exception $e) {
             DB::rollBack();
-            ResponseMessage($e->getMessage(),422);
+            ResponseMessage($e->getMessage(), 422);
             throw $e;
         }
     }
 
-    public function confirmFoodOrder(int $id,Request $request)
+    public function confirmFoodOrder(int $id, Request $request)
     {
         DB::beginTransaction();
-        try{
+        try {
             $foodOrder = FoodOrder::find($id);
-            if($request->is_confirm == 1)
-            {
+            if ($request->is_confirm == 1) {
                 $foodOrder->status = 'confirmed';
                 $foodOrder->confirmed_by = UserData()->id;
                 $foodOrder->confirmed_at = CurrentTime();
                 $foodOrder->save();
-            }else{
+            } else {
                 $foodOrder->status = 'cancelled';
                 $foodOrder->cancelled_by = UserData()->id;
                 $foodOrder->cancelled_at = CurrentTime();
@@ -75,12 +74,68 @@ class FoodOrderRepository implements FoodOrderRepositoryInterface
             }
 
             DB::commit();
-            Responsemessage('Food Order Status changed successfully',200);
-
-        }catch(\Exception $e)
-        {
+            Responsemessage('Food Order Status changed successfully', 200);
+        } catch (\Exception $e) {
             DB::rollBack();
-            ResponseMessage($e->getMessage(),422);
+            ResponseMessage($e->getMessage(), 422);
+            throw $e;
+        }
+    }
+
+    public function createConfirmFoodOrder(Request $request)
+    {
+        DB::beginTransaction();
+        try {
+            $data = $request->all();
+            $data['date_time'] = CurrentTime();
+            $data['confirmed_time'] = CurrentTime();
+            $data['status'] = 'confirmed';
+            $foodOrder = FoodOrder::create($data);
+            $foodOrderItem = json_decode($data['food_order_items'], true);
+            foreach ($foodOrderItem as $order) {
+                FoodOrderItem::create([
+                    'food_order_id' => $foodOrder->id,
+                    'menu_id' => $order['menu_id'],
+                    'quantity' => $order['quantity'],
+                    'discount_price' => $order['discount_price'],
+                    'original_price' => $order['original_price'],
+                    'status' => 'confirmed',
+                    'area_id' => $order['area_id'],
+                    'menu_service_discount_id' => $order['menu_service_discount_id'] ?? null,
+                ]);
+            }
+
+            DB::commit();
+            ResponseData($foodOrder);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            ResponseMessage($e->getMessage(), 422);
+            throw $e;
+        }
+    }
+
+    public function updateFoodOrderStatus(int $id,string $status)
+    {
+        DB::beginTranscation();
+        try{
+            $foodOrder = FoodOrder::find($id);
+            if($status == 'kitchen_confirmed')
+            {
+                $foodOrder->status = 'kitchen_confirmed';
+                $foodOrder->kitchen_confirmed_at = CurrentTime();
+                $foodOrder->save();
+            }else if($status == 'in_progress_time'){
+                $foodOrder->status = 'in_progress_time';
+                $foodOrder->in_progress_time = CurrentTime();
+            }else if($status == 'done')
+            {
+                $foodOrder->status = 'done';
+                $foodOrder->done_at = CurrentTime();
+            }
+            DB::commit();
+        }catch(\Exception $e){
+            DB::rollBack();
+            ResponseMessage($e->getMessage(), 422);
             throw $e;
         }
     }

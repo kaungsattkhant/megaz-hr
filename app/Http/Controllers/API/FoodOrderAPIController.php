@@ -36,4 +36,9 @@ class FoodOrderAPIController extends Controller
         $this->foodRepo->confirmFoodOrder($id,$request);
     }
 
+    public function createConfirmFoodOrder(Request $request)
+    {
+        $this->foodRepo->createConfirmFoodOrder($request);
+    }
+
 }

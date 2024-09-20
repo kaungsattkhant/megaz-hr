@@ -14,4 +14,6 @@ interface FoodOrderRepositoryInterface
     public function confirmFoodOrder(int $id,Request $request);
 
     public function confirmFoodOrderItem(int $id, Request $request);
+
+    public function createConfirmFoodOrder(Request $request);
 }

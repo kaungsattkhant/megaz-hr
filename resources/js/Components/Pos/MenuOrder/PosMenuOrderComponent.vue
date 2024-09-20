@@ -63,11 +63,11 @@
                                         </td>
                                         <td class="whitespace-nowrap px-6  text-center">
                                             <div class="contents" v-if="foodOrder.status != 'confirmed'">
-                                                <button v-if="foodOrder.allItemStatus == 'pending'" type="button" class="bg-[#fb923c] px-6 py-2 text-white rounded-full"> 
+                                                <button v-if="foodOrder.allItemStatus == 'pending'" type="button" class="bg-[#fb923c] px-6 py-2 text-white rounded-full">
                                                     Pending
                                                 </button>
                                                 <button v-else type="button" @click="btnClickedGetOrderId(foodOrder.id)" class="bg-green-600 px-6 py-2 text-white rounded-full"
-                                                    data-te-toggle="modal" data-te-target="#confirm_modal"> 
+                                                    data-te-toggle="modal" data-te-target="#confirm_modal">
                                                     Confirm
                                                 </button>
                                             </div>
@@ -78,7 +78,7 @@
                                             <td colspan="3" class="whitespace-nowrap px-6 py-3 font-medium">
                                             </td>
                                             <td class="whitespace-nowrap px-6 py-3">
-                                                {{ menuOrder.menu.name }}         
+                                                {{ menuOrder.menu.name }}
                                             </td>
                                             <td colspan="3" class="whitespace-nowrap px-6 py-3 select-parent">
                                                 <select name="" id="" :disabled="menuOrder.area_id" class="text-xs pl-0 border-0 focus:shadow-none focus:outline-none focus:ring-0 select-box"
@@ -87,7 +87,7 @@
                                                     <option v-for="(area,index) in menuOrder.menu.areas" :value="area.id" class="">
                                                         {{ area.name }}
                                                     </option>
-                                                </select>       
+                                                </select>
                                             </td>
                                             <!-- <td colspan="2" class="whitespace-nowrap px-6 py-3"></td> -->
                                             <td class="whitespace-nowrap px-6 py-3 text-center button-parent" v-if="menuOrder.status == 'received'">
@@ -104,7 +104,7 @@
                                         </tr>
                                     </div>
                                 </div>
-                                
+
                             </tbody>
                         </table>
                     </div>
@@ -120,7 +120,7 @@
             role="dialog">
             <div data-te-modal-dialog-ref
                 class="pointer-events-none relative flex min-h-[calc(100%-1rem)] w-fit translate-y-[-50px] items-center opacity-0 transition-all duration-300 ease-in-out min-[576px]:mx-auto min-[576px]:mt-7 min-[576px]:min-h-[calc(100%-3.5rem)] min-[576px]:max-w-[500px]">
-                    
+
                 <div
                     class="pointer-events-auto relative flex w-full flex-col rounded-md border-none bg-white bg-clip-padding text-current shadow-lg outline-none">
                     <button type="button"
@@ -197,7 +197,7 @@
                 else{
                     this.acceptMenu(id);
                 }
-                
+
             },
             async acceptMenu(id){
                 let formData = new FormData();
@@ -217,7 +217,7 @@
                 const selectParent = buttonParent.prev('.select-parent');
                 const selectElement = selectParent.find('.select-box');
                 this.selectedAreaId = selectElement.val();
-                
+
                 this.rejectMenu(id);
             },
             async rejectMenu(id){
