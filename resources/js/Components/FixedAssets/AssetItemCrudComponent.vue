@@ -115,7 +115,7 @@
                         Create Second Account
                     </h5>
                     <!--Close button-->
-                    <button type="button" class="text-xs focus:shadow-none focus:outline-none" data-te-modal-dismiss
+                    <button type="button" class="text-xs focus:shadow-none focus:outline-none" data-te-modal-dismiss id="close_second_account"
                         aria-label="Close">
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
                             stroke="currentColor" class="h-4 w-4">
@@ -161,7 +161,7 @@
                             data-te-modal-dismiss aria-label="Close">
                             Cancel
                         </button>
-                        <button type="submit" class="add-btn focus:outline-none focus:ring-0 " data-te-modal-dismiss>
+                        <button type="submit" class="add-btn focus:outline-none focus:ring-0 ">
                             Create
                         </button>
                     </div>
@@ -185,7 +185,7 @@
                         Create Second Depreciation Account
                     </h5>
                     <!--Close button-->
-                    <button type="button" class="text-xs focus:shadow-none focus:outline-none" data-te-modal-dismiss
+                    <button type="button" class="text-xs focus:shadow-none focus:outline-none" data-te-modal-dismiss id="close_depreciation"
                         aria-label="Close">
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
                             stroke="currentColor" class="h-4 w-4">
@@ -233,7 +233,7 @@
                             Cancel
                         </button>
                         <button type="submit" class="add-btn focus:outline-none focus:ring-0 "
-                            @click="confirmCreateBtnClicked" data-te-modal-dismiss>
+                            @click="confirmCreateBtnClicked">
                             Create
                         </button>
                     </div>
@@ -385,6 +385,7 @@ export default {
                     text: `Second Account created successfully`,
                     type: "success"
                 });
+                document.getElementById('close_second_account').click;
             } else {
                 this.$notify({
                     title: `Input validation`,
@@ -418,6 +419,7 @@ export default {
                     text: `Second Depreciation Account created successfully`,
                     type: "success"
                 });
+                document.getElementById('close_depreciation').click;
             } else {
                 this.$notify({
                     title: `Input validation`,
@@ -457,6 +459,7 @@ export default {
                     text: `Asset Item created successfully`,
                     type: "success"
                 });
+                window.location.replace('/asset_item/list');
             } else {
                 this.$notify({
                     title: `Input validation`,
