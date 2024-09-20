@@ -18,6 +18,7 @@ return new class extends Migration
             $table->string('description');
             $table->string('posted_by');
             $table->string('status')->default('Not Yet'); // Not Yet/Done
+            $table->string('remark')->nullable();
             $table->timestamps();
         });
     }

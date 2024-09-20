@@ -11,11 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('forecast_items', function (Blueprint $table) {
-            $table->bigIncrements('id');
-            $table->integer('quantity');
-            $table->foreignId('item_id')->constrained()->onDelete('cascade');
-            $table->foreignId('item_usage_forecast_id')->constrained()->onDelete('cascade');
+        Schema::create('task_images', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('task_id')->constrained()->onDelete('cascade');
+            $table->string('image_url')->nullable();
+            $table->string('image_path')->nullable();
             $table->timestamps();
         });
     }
@@ -25,6 +25,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('forecast_items');
+        Schema::dropIfExists('task_images');
     }
 };

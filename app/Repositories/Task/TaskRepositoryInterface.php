@@ -36,4 +36,13 @@ interface TaskRepositoryInterface
 
     public function taskCustomDetail(int $id);
 
+    // add image
+
+    public function addTaskImages(int $taskId,Request $request);
+
+    public function getTaskImages(int $task_id);
+
+    public function deleteTaskImage(int $image_id);
+
+
 }

@@ -5,9 +5,11 @@ namespace App\Repositories\Task;
 use App\Models\Staff;
 use App\Models\Task;
 use App\Models\TaskDetail;
+use App\Models\TaskImage;
 use App\Traits\TaskAssign;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 
 class TaskRepository implements TaskRepositoryInterface
 {
@@ -27,11 +29,25 @@ class TaskRepository implements TaskRepositoryInterface
                 $q->where('tasks.area_id', $areaId);
             })
             ->where('is_active', 1)
-            ->select('task_details.id', 'task_details.date_time', 'task_details.completed_at', 'task_details.is_double_checked', 'task_details.double_checked_by', 'task_details.double_checked_at', 'task_details.status',
-                'tasks.area_id', 'tasks.role_id', 'tasks.name', 'tasks.description', 'tasks.assigned_days', 'tasks.start_date', 'tasks.due_date', 'tasks.type')
+            ->select(
+                'task_details.id',
+                'task_details.date_time',
+                'task_details.completed_at',
+                'task_details.is_double_checked',
+                'task_details.double_checked_by',
+                'task_details.double_checked_at',
+                'task_details.status',
+                'tasks.area_id',
+                'tasks.role_id',
+                'tasks.name',
+                'tasks.description',
+                'tasks.assigned_days',
+                'tasks.start_date',
+                'tasks.due_date',
+                'tasks.type'
+            )
             ->paginate(20);
         return $tasks;
-
     }
 
     public function updateTaskStatus(array $data, int $id)
@@ -58,7 +74,7 @@ class TaskRepository implements TaskRepositoryInterface
                 $perPage = $request->per_page;
             }
             $skip = ($pageNumber - 1) * $perPage;
-            $tasks = Task::where('is_active', 1)->skip($skip)->take($perPage)->with(['role.department', 'task_details','task_details.completedBy','task_details.doubleCheckedBy'])->get();
+            $tasks = Task::where('is_active', 1)->skip($skip)->take($perPage)->with(['role.department', 'task_details', 'task_details.completedBy', 'task_details.doubleCheckedBy'])->get();
             $paginationData = MakePaginationData($request, $totalCount, 'tasks');
             $paginationData['tasks'] = $tasks;
 
@@ -96,7 +112,6 @@ class TaskRepository implements TaskRepositoryInterface
             ResponseMessage($e->getMessage(), 402);
             throw $e;
         }
-
     }
 
     public function updateData(array $data, int $id)
@@ -123,14 +138,29 @@ class TaskRepository implements TaskRepositoryInterface
 
     public function getTasksByStaff(int $id)
     {
-        $staff=Staff::find($id);
-        $role_id=$staff->roles[0]->id;
+        $staff = Staff::find($id);
+        $role_id = $staff->roles[0]->id;
         $this->createTaskDetailForStaff($role_id);
         $tasks = TaskDetail::join('tasks', 'task_details.task_id', 'tasks.id')
             ->where('staff_id', $id)
             ->where('is_active', 1)
-            ->select('task_details.id', 'task_details.date_time', 'task_details.completed_at', 'task_details.is_double_checked', 'task_details.double_checked_by', 'task_details.double_checked_at', 'task_details.status',
-                'tasks.area_id', 'tasks.role_id', 'tasks.name', 'tasks.description', 'tasks.assigned_days', 'tasks.start_date', 'tasks.due_date', 'tasks.type')
+            ->select(
+                'task_details.id',
+                'task_details.date_time',
+                'task_details.completed_at',
+                'task_details.is_double_checked',
+                'task_details.double_checked_by',
+                'task_details.double_checked_at',
+                'task_details.status',
+                'tasks.area_id',
+                'tasks.role_id',
+                'tasks.name',
+                'tasks.description',
+                'tasks.assigned_days',
+                'tasks.start_date',
+                'tasks.due_date',
+                'tasks.type'
+            )
             ->paginate(20);
         return $tasks;
     }
@@ -177,25 +207,25 @@ class TaskRepository implements TaskRepositoryInterface
                 });
             })
             ->with(['task_details' => function ($query) use ($request, $date) {
-                $query->select('id', 'staff_id','status', 'double_checked_by', 'created_at','task_id')
+                $query->select('id', 'staff_id', 'status', 'double_checked_by', 'created_at', 'task_id')
                     ->when(isset($request->date) && !is_null($date), function ($q) use ($date) {
                         $q->whereDate('created_at', $date);
                     })
-                    ->with(['doubleCheckedBy:id,name','task:id,name,description']);
+                    ->with(['doubleCheckedBy:id,name', 'task:id,name,description']);
             }, 'roles'])
             ->has('task_details')
             ->orderBy('id', 'asc')
             ->paginate(20);
         return $staffs;
-
     }
 
 
     public function taskByRoleId(int $roleId)
     {
-        $task = Task::where('role_id',$roleId)->get();
+        $task = Task::where('role_id', $roleId)->get();
         ResponseData($task);
     }
+
 
     //  custom task
     public function customTaskCreate(Request $request)
@@ -214,12 +244,10 @@ class TaskRepository implements TaskRepositoryInterface
             $taskDetail = TaskDetail::create($data);
             DB::commit();
             ResponseData($task, 200);
-
         } catch (\Exception $e) {
             DB::rollBack();
             ResponseMessage($e->getMessage(), 402);
             throw $e;
-
         }
     }
 
@@ -235,32 +263,80 @@ class TaskRepository implements TaskRepositoryInterface
             $data['role_id'] = $role->id;
             $task->update($data);
             $data['task_id'] = $task->id;
-            $taskDetail = TaskDetail::where('task_id',$task->id)->first();
+            $taskDetail = TaskDetail::where('task_id', $task->id)->first();
             $taskDetail->update($data);
             DB::commit();
             ResponseData($task, 200);
-
         } catch (\Exception $e) {
             DB::rollBack();
             ResponseMessage($e->getMessage(), 402);
             throw $e;
-
         }
     }
 
     public function listCustomTasks(Request $request)
     {
-        $tasks = Task::where('type', 'custom_task')->with(['customTaskDetail.staff','role.department'])->orderBy('created_at', 'desc')->paginate(config('common.list_count'));
+        $tasks = Task::where('type', 'custom_task')->with(['customTaskDetail.staff', 'role.department'])->orderBy('created_at', 'desc')->paginate(config('common.list_count'));
         ResponseData($tasks);
     }
 
     public function taskCustomDetail(int $id)
     {
-        $task = Task::where('type', 'custom_task')->with(['customTaskDetail.staff','role.department'])->find($id);
+        $task = Task::where('type', 'custom_task')->with(['customTaskDetail.staff', 'role.department'])->find($id);
         if (!$task) {
             ResponseMessage('Task not found', 404);
         }
         ResponseData($task, 200);
     }
 
+    // add images
+    public function addTaskImages(int $taskId, Request $request)
+    {
+        DB::beginTransaction();
+        try {
+            $data = $request->all();
+            $request->validate([
+                'task_images.*' => 'required|image|mimes:jpeg,png,jpg,gif',
+            ]);
+
+            $task = Task::find($taskId);
+            $data['task_id'] = $task->id;
+            $imageData = $request->file('task_images');
+            if (!empty($imageData)) {
+                if (is_string($imageData)) {
+                    $imageData = json_decode($imageData, true); // Decode only if it's a JSON string
+                }
+                foreach ($imageData as $image) {
+                    $extension = $image->getClientOriginalExtension();
+                    $hashedName = md5(uniqid() . microtime()) . '.' . $extension;
+                    $data['image_path'] = $image->storeAs('images/task_images', $hashedName, 'public');
+                    $data['image_url'] = Storage::url($data['image_path']);
+                    $data['task_id'] = $task->id;
+                    TaskImage::create($data);
+                }
+            } else {
+                ResponseMessage("no images found", 404);
+            }
+
+            DB::commit();
+            ResponseMessage("Images uploaded successfully", 200);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            ResponseMessage($e->getMessage(), 402);
+            throw $e;
+        }
+    }
+
+    public function getTaskImages(int $task_id)
+    {
+        $task = Task::with('taskImages')->find($task_id);
+        ResponseData($task);
+    }
+
+    public function deleteTaskImage(int $image_id)
+    {
+        $taskImage = TaskImage::find($image_id);
+        $taskImage->delete();
+        ResponseMessage("Image deleted successfully", 200);
+    }
 }
