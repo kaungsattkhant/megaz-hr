@@ -533,6 +533,7 @@ Route::get("/test", [TestController::class, "index"]);
 
 Route::get('/menu_categories/{id}/menus',[MenuAPIController::class,'menuByMenuCategory']);
 Route::get('/menu_categories_bookings/{id}/menus',[MenuAPIController::class,'menuByMenuCategoryBooking']);
+Route::get('/menus/{menu_id}/areas',[MenuAPIController::class,'areaByMenu']);
 
 Route::post("/order_status_change",[OrderAPIController::class,'orderItemChangeStatus']);
 
@@ -566,9 +567,10 @@ Route::controller(CustomerLevelDiscountAPIController::class)->group(function ()
 Route::controller(FoodOrderAPIController::class)->group(function()
 {
     Route::get('/food_orders','listAllFoodOrder');
-    Route::post('/food_orders','createFoodOrder');
+    // Route::post('/food_orders','createFoodOrder');
     Route::post('/food_order_items/{id}','confirmFoodOrderItem');
     Route::post('/food_orders/{id}','confirmFoodOrder');
+    Route::post('/create_food_orders','createConfirmFoodOrder');
 });
 
 Route::controller(DeliveryChargeAPIController::class)->group(function()

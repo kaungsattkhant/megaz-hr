@@ -15,7 +15,7 @@ class DeliveryChargeRepository implements DeliveryChargeRepositoryInterface
             ->with('township')
             ->paginate(config('common.list'));
 
-        return ResponseData($deliveryCharges);
+        ResponseData($deliveryCharges);
     }
 
     public function createData(Request $request)
@@ -24,7 +24,7 @@ class DeliveryChargeRepository implements DeliveryChargeRepositoryInterface
         try{
             $data = $request->all();
             $data['date_time'] = CurrentTime();
-            $deliveryCharges = DeliveryCharge::create($request->all());
+            $deliveryCharges = DeliveryCharge::create($data);
             DB::commit();
             ResponseData($deliveryCharges);
         }catch(\Exception $e)

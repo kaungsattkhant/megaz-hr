@@ -51,6 +51,9 @@ class ComplaintAPIController extends Controller
 
     public function updateComplain(ComplaintUpdateRequest $request,$id)
     {
+        $request->validate([
+            'complaintImages.*' => 'required|image|mimes:jpeg,png,jpg,gif',
+        ]);
         $complaint = $this->complaintRepo->updateData($request->all(),$id);
         if(!$complaint)
         {

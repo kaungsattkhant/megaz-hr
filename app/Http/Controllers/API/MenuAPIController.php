@@ -88,4 +88,9 @@ class MenuAPIController extends Controller
         $menus = $this->menuRepo->toggleMenuFeature($id);
         ResponseData($menus);
     }
+
+    public function areaByMenu(int $id)
+    {
+        $areas = $this->menuRepo->menuAreaList($id);
+    }
 }

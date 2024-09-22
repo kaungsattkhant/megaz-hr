@@ -53,6 +53,15 @@
                         </span>
                     </a>
                 </li>
+
+                <li>
+                    <a href="/food_orders" class="flex items-center flex-col  rounded-lg px-6 py-12 @yield('foodOrders')">
+                        <i class="fas fa-burger-soda mb-1.5 text-2xl"></i>
+                        <span class="">
+                            Menu Order
+                        </span>
+                    </a>
+                </li>
                 <li>
                     <a href="/pos/ar" class="flex items-center flex-col  rounded-lg px-6 py-12 @yield('ar')">
                         <i class="fas fa-users mb-1.5 text-2xl"></i>

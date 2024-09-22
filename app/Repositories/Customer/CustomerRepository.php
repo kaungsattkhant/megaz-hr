@@ -27,14 +27,14 @@ class CustomerRepository implements CustomerRepositoryInterface
             }
             $skip = ($pageNumber - 1) * $perPage;
             $customers = Customer::with(['addresses' => function ($query) {
-                $query->where('is_default', 1)->with('township');
+                $query->where('is_default', 1)->with('township.latestDeliveryCharge');
             }])->where('is_active', 1)->skip($skip)->take($perPage)->get();
             $paginationData = MakePaginationData($request, $totalCount, 'customers');
             $paginationData['customers'] = $customers;
             return $paginationData;
         } else {
             $customers = Customer::where('is_active', 1)->with(['addresses' => function ($query) {
-                $query->where('is_default', 1)->with('township');
+                $query->where('is_default', 1)->with('township.latestDeliveryCharge');
             }])->get();
 
             return $customers;
