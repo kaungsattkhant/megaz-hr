@@ -25,6 +25,8 @@ return new class extends Migration
             $table->unsignedBigInteger('confirmed_by')->nullable();
             $table->dateTime('cancelled_at')->nullable();
             $table->unsignedBigInteger('cancelled_by')->nullable();
+            $table->dateTime('kitchen_confirmed_at')->nullable();
+            $table->dateTime('done_at')->nullable();
             $table->timestamps();
         });
     }

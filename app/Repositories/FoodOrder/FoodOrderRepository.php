@@ -144,15 +144,13 @@ class FoodOrderRepository implements FoodOrderRepositoryInterface
             if($request->status == 'kitchen_confirmed')
             {
                 $foodOrder->status = 'kitchen_confirmed';
-                // $foodOrder->kitchen_confirmed_at = CurrentTime();
+                $foodOrder->kitchen_confirmed_at = CurrentTime();
                 $foodOrder->save();
-            }else if($request->status == 'in_progress_time'){
-                $foodOrder->status = 'in_progress_time';
-                // $foodOrder->in_progress_time = CurrentTime();
             }else if($request->status == 'done')
             {
                 $foodOrder->status = 'done';
-                // $foodOrder->done_at = CurrentTime();
+                $foodOrder->done_at = CurrentTime();
+                $foodOrder->save();
             }else{
                 ResponseMessage('Invalid Status', 422);
             }

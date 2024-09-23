@@ -137,11 +137,11 @@
                         </p>
                     </div>
                     <div class="flex justify-center px-24 py-6 gap-x-8 mb-2">
-                        <button type="button" class="focus:shadow-none focus:outline-none !px-16 !py-3"
+                        <button data-te-modal-dismiss="" type="button" class="focus:shadow-none focus:outline-none !px-16 !py-3 hover:text-red-500 duration-500  "
                             @click="confirmFoodOrder('0')">
-                            Cancel
+                            Reject
                         </button>
-                        <button @click="confirmFoodOrder('1')" class="pos-add-btn !px-16 !py-3 focus:outline-none focus:ring-0 ">
+                        <button data-te-modal-dismiss @click="confirmFoodOrder('1')" class="pos-add-btn !px-16 !py-3 focus:outline-none focus:ring-0 ">
                             Confirm
                         </button>
                     </div>
