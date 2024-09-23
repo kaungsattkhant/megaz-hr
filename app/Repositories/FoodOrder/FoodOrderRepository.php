@@ -32,6 +32,28 @@ class FoodOrderRepository implements FoodOrderRepositoryInterface
         ResponseData($foodOrders);
     }
 
+    public function foodOrderListForKitchen(Request $request)
+    {
+        $validateDate = $request->date ?? CurrentDate();
+        $foodOrders = FoodOrder::where('status', '=', 'confirmed')->with([
+            'customer',
+            'customer.addresses' => function ($query) {
+                $query->where('is_default', 1);
+            },
+            'confirmedBy',
+            'cancelledBy',
+            'foodOrderItems' => function ($query) {
+                $query->where('status', '=', 'confirmed')
+                    ->with('menu.areas');
+            }
+        ])
+            ->whereBetween('date_time', [$validateDate . ' 00:00:00', $validateDate . ' 23:59:59'])
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        ResponseData($foodOrders);
+    }
+
 
     public function confirmFoodOrderItem(int $id, Request $request)
     {
@@ -114,25 +136,28 @@ class FoodOrderRepository implements FoodOrderRepositoryInterface
         }
     }
 
-    public function updateFoodOrderStatus(int $id,string $status)
+    public function updateFoodOrderStatus(int $id,Request $request)
     {
-        DB::beginTranscation();
+        DB::beginTransaction();
         try{
             $foodOrder = FoodOrder::find($id);
-            if($status == 'kitchen_confirmed')
+            if($request->status == 'kitchen_confirmed')
             {
                 $foodOrder->status = 'kitchen_confirmed';
-                $foodOrder->kitchen_confirmed_at = CurrentTime();
+                // $foodOrder->kitchen_confirmed_at = CurrentTime();
                 $foodOrder->save();
-            }else if($status == 'in_progress_time'){
+            }else if($request->status == 'in_progress_time'){
                 $foodOrder->status = 'in_progress_time';
-                $foodOrder->in_progress_time = CurrentTime();
-            }else if($status == 'done')
+                // $foodOrder->in_progress_time = CurrentTime();
+            }else if($request->status == 'done')
             {
                 $foodOrder->status = 'done';
-                $foodOrder->done_at = CurrentTime();
+                // $foodOrder->done_at = CurrentTime();
+            }else{
+                ResponseMessage('Invalid Status', 422);
             }
             DB::commit();
+            ResponseData($foodOrder);
         }catch(\Exception $e){
             DB::rollBack();
             ResponseMessage($e->getMessage(), 422);

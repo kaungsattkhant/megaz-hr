@@ -566,10 +566,11 @@ Route::controller(CustomerLevelDiscountAPIController::class)->group(function ()
 Route::controller(FoodOrderAPIController::class)->group(function()
 {
     Route::get('/food_orders','listAllFoodOrder');
-    // Route::post('/food_orders','createFoodOrder');
     Route::post('/food_order_items/{id}','confirmFoodOrderItem');
     Route::post('/food_orders/{id}','confirmFoodOrder');
     Route::post('/create_food_orders','createConfirmFoodOrder');
+    Route::post('/food_order_status/{id}','updateFoodTimeAndStatus');
+    Route::get('/food_order_lists','foodOrderListForKitchen');
 });
 
 Route::controller(DeliveryChargeAPIController::class)->group(function()
