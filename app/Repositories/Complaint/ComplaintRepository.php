@@ -42,7 +42,7 @@ class ComplaintRepository implements ComplaintRepositoryInterface
 
     public function complaintDetail(int $complainId)
     {
-        $complaint = Complaint::where('id', $complainId)->with('complaint_category', 'postedBy', 'complaintResponsibles', 'complaintCarbonCopies', 'complaintImages')->first();
+        $complaint = Complaint::where('id', $complainId)->with('complaint_category', 'postedBy', 'complaintResponsibles.staff', 'complaintCarbonCopies.staff', 'complaintImages')->first();
         ResponseData($complaint);
     }
 
