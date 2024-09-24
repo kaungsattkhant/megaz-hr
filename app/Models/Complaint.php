@@ -12,7 +12,7 @@ class Complaint extends BaseModel
     use HasFactory;
 
     protected $fillable = [
-        'complaint_category_id','title','description','posted_by','status'
+        'complaint_category_id','title','description','posted_by','status','remark'
     ];
 
     public function getCreatedAt()
