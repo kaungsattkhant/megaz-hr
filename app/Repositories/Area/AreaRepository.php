@@ -10,31 +10,39 @@ class AreaRepository implements AreaRepositoryInterface
 {
     public function getAreas(Request $request)
     {
-        if ($request->per_page || $request->page) {
-            $totalCount = Area::where('is_active', 1)->count();
-            $pageNumber = 1;
-            $perPage = 20;
-            if ($request->page) {
-                $pageNumber = $request->page;
-            }
-            if ($request->per_page) {
-                $perPage = $request->per_page;
-            }
-            $skip = ($pageNumber - 1) * $perPage;
-            $areas = Area::where('is_active', 1)->skip($skip)->take($perPage)->get();
-            $paginationData = MakePaginationData($request, $totalCount, 'areas');
-            $paginationData['areas'] = $areas;
+        // if ($request->per_page || $request->page) {
+        //     $totalCount = Area::where('is_active', 1)->count();
+        //     $pageNumber = 1;
+        //     $perPage = 20;
+        //     if ($request->page) {
+        //         $pageNumber = $request->page;
+        //     }
+        //     if ($request->per_page) {
+        //         $perPage = $request->per_page;
+        //     }
+        //     $skip = ($pageNumber - 1) * $perPage;
+        //     $areas = Area::where('is_active', 1)->skip($skip)->take($perPage)->get();
+        //     $paginationData = MakePaginationData($request, $totalCount, 'areas');
+        //     $paginationData['areas'] = $areas;
 
-            return $paginationData;
-        } else {
-            if ($request->department_id) {
-                $areas = Area::with('areaType')->where('department_id', $request->department_id)->where('is_active', 1)->get();
-            } else {
-                $areas = Area::with('areaType')->where('is_active', 1)->get();
-            }
+        //     return $paginationData;
+        // } else {
+        //     if ($request->department_id) {
+        //         $areas = Area::with('areaType')->where('department_id', $request->department_id)->where('is_active', 1)->get();
+        //     } else {
+        //         $areas = Area::with('areaType')->where('is_active', 1)->get();
+        //     }
 
-            return $areas;
+        //     return $areas;
+        // }
+
+        if($request->department_id)
+        {
+            $areas = Area::with('areaType')->where('department_id', $request->department_id)->where('is_active', 1)->paginate(config('common.list_count'));
+        }else{
+            $areas = Area::with('areaType')->where('is_active',1)->paginate(config('common.list_count'));
         }
+        return $areas;
     }
 
     public function createData(array $data)
