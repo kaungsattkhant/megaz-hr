@@ -247,7 +247,6 @@ app.component('IufWithDepartmentAndMonth',IufWithDepartmentAndMonth);
 app.component('AssetDepreciationBalanceList',AssetDepreciationBalanceList);
 app.component('SaleTargetPositionListComponent',SaleTargetPositionListComponent);
 app.component('SaleTargetPositionCreateComponent',SaleTargetPositionCreateComponent);
-app.component('SaleTargetPositionCreateComponent',SaleTargetPositionCreateComponent);
 app.component('SaleTargetPositionEditComponent',SaleTargetPositionEditComponent);
 app.component('SaleTargetMenuListComponent',SaleTargetMenuListComponent);
 app.component('SaleTargetMenuCreateComponent',SaleTargetMenuCreateComponent);

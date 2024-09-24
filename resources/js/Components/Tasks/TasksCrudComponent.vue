@@ -69,7 +69,7 @@
                             <div class="contents" v-for="(task, index) in tasksList" :key="index">
                                 <tr class="">
                                     <td class=" ">
-                                        {{ ++index }}
+                                        {{ perPage * (currentPage - 1) + (++index) }}
                                     </td>
                                     <td class="whitespace-nowrap  ">
                                         {{ task.name }}
@@ -85,17 +85,19 @@
                                         {{ task.task_details[0].status }}
                                     </td>
                                     <td class="" v-if="task.task_details.length > 0">
-                                        <i v-if="task.task_details[0].is_double_checked === 1" class="fas fa-check-double"
-                                            @click="doubleChecked(task.id)"></i>
+                                        <i v-if="task.task_details[0].is_double_checked === 1"
+                                            class="fas fa-check-double" @click="doubleChecked(task.id)"></i>
                                         <i v-else class="fas fa-check" @click="doubleChecked(task.id)"></i>
                                     </td>
 
                                     <td class="  " v-if="task.task_details.length > 0">
-                                        <div v-if="task.task_details[0].completed_by"> {{ task.task_details[0].completed_by.name }} </div>
+                                        <div v-if="task.task_details[0].completed_by"> {{
+                                            task.task_details[0].completed_by.name }} </div>
                                     </td>
 
                                     <td class="  " v-if="task.task_details.length > 0">
-                                        <div v-if="task.task_details[0].double_checked_by"> {{ task.task_details[0].double_checked_by.name }} </div>
+                                        <div v-if="task.task_details[0].double_checked_by"> {{
+                                            task.task_details[0].double_checked_by.name }} </div>
                                     </td>
 
                                     <td class="whitespace-nowrap ">
@@ -118,6 +120,24 @@
                             <!-- looping end -->
                         </tbody>
                     </table>
+
+                    <!-- pagination -->
+                    <div class="flex justify-center">
+
+                        <div v-if="totalData != 0" class=" bg-white  flex justify-center mt-5 py-3">
+                            <button class="rounded px-6 py-1 border  hover:bg-slate-200" :disabled="currentPage === 1"
+                                @click="getTasksList(currentPage - 1)">«</button>
+
+                            <button class=" text-sm px-5 border">
+                                Page <span @dblclick="showInput">{{ currentPage }}</span> / <span
+                                    class="text-gray-400">{{ lastPage }}</span>
+                            </button>
+
+                            <button class=" rounded px-6  py-1 border  hover:bg-slate-200"
+                                :disabled="currentPage === lastPage" @click="getTasksList(currentPage + 1)">
+                                »</button>
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -173,9 +193,10 @@
                             <div class="mb-4">
                                 <div>
                                     <label class="label-form mb-3"> Department </label>
-                                    <multiselect v-model="selectedDepartment" :options="departmentList" :close-on-select="true"
-                                        :clear-on-select="false" :preserve-search="true" placeholder="Select Department" label="name"
-                                        track-by="id" :preselect-first="true" @select="departmentSelectChanged()"></multiselect>
+                                    <multiselect v-model="selectedDepartment" :options="departmentList"
+                                        :close-on-select="true" :clear-on-select="false" :preserve-search="true"
+                                        placeholder="Select Department" label="name" track-by="id"
+                                        :preselect-first="true" @select="departmentSelectChanged()"></multiselect>
                                 </div>
                             </div>
 
@@ -183,8 +204,8 @@
                                 <div>
                                     <label class="label-form mb-3"> Role </label>
                                     <multiselect v-model="selectedRole" :options="roleList" :close-on-select="true"
-                                        :clear-on-select="false" :preserve-search="true" placeholder="Select Role" label="name"
-                                        track-by="id" :preselect-first="true"></multiselect>
+                                        :clear-on-select="false" :preserve-search="true" placeholder="Select Role"
+                                        label="name" track-by="id" :preselect-first="true"></multiselect>
                                 </div>
                             </div>
 
@@ -192,8 +213,8 @@
                                 <div>
                                     <label class="label-form mb-3"> Area </label>
                                     <multiselect v-model="selectedArea" :options="areaList" :close-on-select="true"
-                                        :clear-on-select="false" :preserve-search="true" placeholder="Select Area" label="name"
-                                        track-by="id" :preselect-first="true"></multiselect>
+                                        :clear-on-select="false" :preserve-search="true" placeholder="Select Area"
+                                        label="name" track-by="id" :preselect-first="true"></multiselect>
                                 </div>
                             </div>
 
@@ -284,177 +305,175 @@
 </template>
 
 <script>
-    import { mapGetters } from "vuex";
-    import { Modal, Ripple, Select, initTE, Input } from "tw-elements";
-    import Multiselect from 'vue-multiselect';
-    import { getApiData, postApiData, deleteApiData } from '../../utilities/ajax-helpers';
+import { mapGetters } from "vuex";
+import { Modal, Ripple, Select, initTE, Input } from "tw-elements";
+import Multiselect from 'vue-multiselect';
+import { getApiData, postApiData, deleteApiData } from '../../utilities/ajax-helpers';
 
 
-    export default {
-        components: {
-            Multiselect
-        },
-        data() {
-            return {
-                tasksList: [],
-                areaList: [],
-                departmentList: [],
-                roleList: [],
-                deleteId: null,
-                name: null,
-                tasks: null,
-                selectedArea: null,
-                selectedRole: null,
-                selectedDepartment: null,
-                dayList: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'],
-                selectedDays: [],
-                per_page: 10,
-                pageNumbers: [],
-                currentPage: 1,
-                paginationGroupsCount: 1,
-                per_group: 10,
-                groupedPageNumbers: [],
-                currentGroup: 0,
-                kpi:0
-            };
-        },
+export default {
+    components: {
+        Multiselect
+    },
+    data() {
+        return {
+            tasksList: [],
+            areaList: [],
+            departmentList: [],
+            roleList: [],
+            deleteId: null,
+            name: null,
+            tasks: null,
+            selectedArea: null,
+            selectedRole: null,
+            selectedDepartment: null,
+            dayList: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'],
+            selectedDays: [],
 
-        methods: {
-            ...mapGetters(['getToken']),
+            currentPage: 0,
+            perPage: 0,
+            lastPage: 0,
+            totalData: 0,
 
-            async doubleChecked(id)
-            {
-                let url = `/api/tasks/${id}/double_checked`;
-                let response = await postApiData({url:url,token:this.getToken()});
+            currentGroup: 0,
+            kpi: 0
+        };
+    },
 
-                if(response.success==true)
-                {
-                    this.getTasksList(null);
-                }else{
-                    alert(response.message);
-                }
+    methods: {
+        ...mapGetters(['getToken']),
 
-            },
+        async doubleChecked(id) {
+            let url = `/api/tasks/${id}/double_checked`;
+            let response = await postApiData({ url: url, token: this.getToken() });
 
-            async getTasksList(pageNumber){
-                let url = `/api/tasks?per_page=${this.per_page}`;
-                if(pageNumber){
-                    url = `${url}&page=${pageNumber}`
-                }
-                let response = await getApiData({ url: url, token: this.getToken() });
-                if(response.data){
-                    this.tasksList = response.data.tasks;
-                }
-            },
-
-            async getAreaList(departmentId){
-                const response = await getApiData({ url: `/api/areas_by_department/${departmentId}` , token: this.getToken()});
-                if(response.data){
-                    this.areaList = response.data;
-                }
-            },
-
-            async getDepartmentList(){
-                const response = await getApiData({ url: '/api/departments', token: this.getToken() });
-                if(response.data){
-                    this.departmentList = response.data;
-                }
-            },
-
-            departmentSelectChanged(){
-                this.getRoleList(this.selectedDepartment.id);
-                this.areaList = [];
-                if(this.selectedDepartment.name == 'Catering' || this.selectedDepartment.name == 'Kitchen' || this.selectedDepartment.name == 'Bar'){
-                    this.getAreaList(this.selectedDepartment.id);
-                }
-            },
-
-            async getRoleList(departmentId){
-                const response = await getApiData({ url: `/api/role_by_department/${departmentId}`, token: this.getToken() });
-                if(response.data){
-                    this.roleList = response.data;
-                }
-            },
-
-            createTasksBtnClicked(){
-                this.createTasks();
-            },
-
-            async createTasks()
-            {
-                let formData = new FormData();
-                formData.append('name', this.name);
-                formData.append('description', this.tasks);
-                if(this.selectedArea){
-                    formData.append('area_id', this.selectedArea.id);
-                }
-                else{
-                    formData.append('area_id', null);
-                }
-                formData.append('role_id', this.selectedRole.id);
-                formData.append('kpi',this.kpi);
-                formData.append('assigned_days', this.selectedDays);
-                let response = await postApiData({url: '/api/tasks', form_data: formData, token: this.getToken()});
-                if(response.success){
-                    // window.location.replace('/tasks');
-                    this.getTasksList(null);
-                    // alert('test');
-                    this.selectedArea = null;
-                    this.selectedDepartment = null;
-                    this.selectedRole = null;
-                    this.name = null;
-                    this.tasks = null;
-                    this.selectedDays = null;
-                    this.areaList = [];
-                    this.roleList = [];
-                    this.kpi = 0;
-                }
-                else{
-                    alert('some errors occur');
-                }
-            },
-
-            isActiveToggled(id){
-                let index = this.tasksList.findIndex(task => task.id == id);
-                if(index != -1){
-                    if(this.tasksList[index].is_active == 1){
-                        this.tasksList[index].is_active = 0;
-                    }
-                    else{
-                        this.tasksList[index].is_active = 1;
-                    }
-
-                    let url = `/api/is_active`;
-                    let formData = new FormData();
-                    formData.append('id', id);
-                    formData.append('type', 'task');
-                    let response = postApiData({url: url, form_data: formData, token: this.getToken()});
-                }
-            },
-
-            deleteBtnClicked(id){
-                this.deleteId = id;
-            },
-
-            async confirmDeleteBtnClicked(){
-                let url = `/api/tasks/${this.deleteId}`;
-                let response = await deleteApiData({url: url, token: this.getToken()});
-                if(response.success){
-                    this.getTasksList(null);
-                    console.log(`deleted`);
-                }
+            if (response.success == true) {
+                this.getTasksList(1);
+            } else {
+                alert(response.message);
             }
 
         },
-        mounted()
-        {
-            this.getTasksList(null);
-            // this.getAreaList();
-            this.getDepartmentList();
 
-            initTE({ Modal,Select, Ripple });
+        async getTasksList(pageNumber) {
+            let url = `/api/tasks?page=${pageNumber}`;
+
+            let response = await getApiData({ url: url, token: this.getToken() });
+            if (response.data) {
+                this.tasksList = response.data.data;
+                this.lastPage = response.data.last_page;
+                this.currentPage = pageNumber;
+                this.perPage = response.data.per_page;
+                this.totalData = response.data.total;
+            }
+        },
+
+        async getAreaList(departmentId) {
+            const response = await getApiData({ url: `/api/areas_by_department/${departmentId}`, token: this.getToken() });
+            if (response.data) {
+                this.areaList = response.data;
+            }
+        },
+
+        async getDepartmentList() {
+            const response = await getApiData({ url: '/api/departments', token: this.getToken() });
+            if (response.data) {
+                this.departmentList = response.data;
+            }
+        },
+
+        departmentSelectChanged() {
+            this.getRoleList(this.selectedDepartment.id);
+            this.areaList = [];
+            if (this.selectedDepartment.name == 'Catering' || this.selectedDepartment.name == 'Kitchen' || this.selectedDepartment.name == 'Bar') {
+                this.getAreaList(this.selectedDepartment.id);
+            }
+        },
+
+        async getRoleList(departmentId) {
+            const response = await getApiData({ url: `/api/role_by_department/${departmentId}`, token: this.getToken() });
+            if (response.data) {
+                this.roleList = response.data;
+            }
+        },
+
+        createTasksBtnClicked() {
+            this.createTasks();
+        },
+
+        async createTasks() {
+            let formData = new FormData();
+            formData.append('name', this.name);
+            formData.append('description', this.tasks);
+            if (this.selectedArea) {
+                formData.append('area_id', this.selectedArea.id);
+            }
+            else {
+                formData.append('area_id', null);
+            }
+            formData.append('role_id', this.selectedRole.id);
+            formData.append('kpi', this.kpi);
+            formData.append('assigned_days', this.selectedDays);
+            let response = await postApiData({ url: '/api/tasks', form_data: formData, token: this.getToken() });
+            if (response.success) {
+                // window.location.replace('/tasks');
+                this.getTasksList(1);
+                // alert('test');
+                this.selectedArea = null;
+                this.selectedDepartment = null;
+                this.selectedRole = null;
+                this.name = null;
+                this.tasks = null;
+                this.selectedDays = null;
+                this.areaList = [];
+                this.roleList = [];
+                this.kpi = 0;
+            }
+            else {
+                alert('some errors occur');
+            }
+        },
+
+        isActiveToggled(id) {
+            let index = this.tasksList.findIndex(task => task.id == id);
+            if (index != -1) {
+                if (this.tasksList[index].is_active == 1) {
+                    this.tasksList[index].is_active = 0;
+                }
+                else {
+                    this.tasksList[index].is_active = 1;
+                }
+
+                let url = `/api/is_active`;
+                let formData = new FormData();
+                formData.append('id', id);
+                formData.append('type', 'task');
+                let response = postApiData({ url: url, form_data: formData, token: this.getToken() });
+            }
+        },
+
+        deleteBtnClicked(id) {
+            this.deleteId = id;
+        },
+
+        async confirmDeleteBtnClicked() {
+            let url = `/api/tasks/${this.deleteId}`;
+            let response = await deleteApiData({ url: url, token: this.getToken() });
+            if (response.success) {
+                this.getTasksList(1);
+                console.log(`deleted`);
+            }
         }
+
+    },
+    mounted() {
+        this.getTasksList(1);
+        // this.getAreaList();
+        this.getDepartmentList();
+
+        initTE({ Modal, Select, Ripple });
     }
+}
 </script>
 
 <style src="node_modules/vue-multiselect/dist/vue-multiselect.css"></style>

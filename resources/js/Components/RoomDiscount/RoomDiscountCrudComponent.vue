@@ -49,10 +49,10 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <div class="contents" v-for="(discount, index) in discountList" >
+                            <div class="contents" v-for="(discount, index) in discountList" :key="index">
                                 <tr class="bg-white rounded-lg overflow-hidden shadow-lg">
                                     <td class=" px-6 py-4 font-medium ">
-                                        {{ per_page * (currentPage - 1) + (++index) }}
+                                        {{ perPage * (currentPage - 1) + (++index) }}
                                     </td>
                                     <td class="whitespace-nowrap px-6 py-4 ">
                                         {{ discount.name }}
@@ -75,72 +75,35 @@
                                             <i class="fas fa-pen"></i>
                                         </button> -->
 
-                                        <button data-te-toggle="modal" data-te-target="#deleteModal"
-                                        class="pr-1" @click="deleteBtnClicked(discount.id)">
-                                        <i class="fas fa-trash-alt"></i>
-                                    </button>
+                                        <button data-te-toggle="modal" data-te-target="#deleteModal" class="pr-1"
+                                            @click="deleteBtnClicked(discount.id)">
+                                            <i class="fas fa-trash-alt"></i>
+                                        </button>
                                     </td>
                                 </tr>
                             </div>
                         </tbody>
                     </table>
-                </div>
-                <div class="mt-2 ml-2">
-                    <ul v-if="paginationGroupsCount > 1" class="list-style-none flex">
-                        <li v-if="!isFirstGroup">
-                            <button class="relative block rounded bg-transparent px-3 py-1.5 text-sm text-neutral-600 transition-all duration-300
-                        hover:bg-neutral-100 dark:text-white dark:hover:bg-neutral-700 dark:hover:text-white"
-                                @click="previousPaginationGroupBtnClicked" :disabled="isFirstGroup">
-                                Previous
-                            </button>
-                        </li>
 
-                        <li v-for="(pageNumber, pageNumberIndex) in groupedPageNumbers[currentGroup]"
-                            :key="pageNumberIndex" :aria-current="(pageNumber == currentPage) ? 'page' : ''">
-                            <button v-if="pageNumber == currentPage"
-                                class="relative block rounded bg-neutral-800 px-3 py-1.5 text-sm font-medium text-neutral-50 transition-all duration-300 dark:bg-neutral-900"
-                                :id="'paginationBtn-' + pageNumberIndex" @click="pageBtnClicked(pageNumber)">
-                                {{ pageNumber }}
-                                <span
-                                    class="absolute -m-px h-px w-px overflow-hidden whitespace-nowrap border-0 p-0 [clip:rect(0,0,0,0)]">
-                                    (current)
-                                </span>
-                            </button>
-                            <button v-else
-                                class="normal-pagination relative block rounded bg-transparent px-3 py-1.5 text-sm text-neutral-600 transition-all duration-300 hover:bg-neutral-100 dark:text-white dark:hover:bg-neutral-700 dark:hover:text-white"
-                                :id="'paginationBtn-' + pageNumberIndex" @click="pageBtnClicked(pageNumber)">
-                                {{ pageNumber }}
-                            </button>
-                        </li>
-                        <li v-if="!isLastGroup">
-                            <button class="relative block rounded bg-transparent px-3 py-1.5 text-sm text-neutral-600 transition-all duration-300
-                        hover:bg-neutral-100 dark:text-white dark:hover:bg-neutral-700 dark:hover:text-white"
-                                @click="nextPaginationGroupBtnClicked" :disabled="isLastGroup">
-                                Next
-                            </button>
-                        </li>
-                    </ul>
+                    <!-- pagination -->
+                    <div class="flex justify-center">
 
-                    <ul v-else class="list-style-none flex">
-                        <li v-for="(pageNumber, pageNumberIndex) in pageNumbers" :key="pageNumberIndex"
-                            :aria-current="(pageNumber == currentPage) ? 'page' : ''">
-                            <button v-if="pageNumber == currentPage"
-                                class="relative block rounded bg-neutral-800 px-3 py-1.5 text-sm font-medium text-neutral-50 transition-all duration-300 dark:bg-neutral-900"
-                                :id="'paginationBtn-' + pageNumberIndex" @click="pageBtnClicked(pageNumber)">
-                                {{ pageNumber }}
-                                <span
-                                    class="absolute -m-px h-px w-px overflow-hidden whitespace-nowrap border-0 p-0 [clip:rect(0,0,0,0)]">
-                                    (current)
-                                </span>
+                        <div v-if="totalData != 0" class=" bg-white  flex justify-center mt-5 py-3">
+                            <button class="rounded px-6 py-1 border  hover:bg-slate-200" :disabled="currentPage === 1"
+                                @click="getMenuList(currentPage - 1)">«</button>
+
+                            <button class=" text-sm px-5 border">
+                                Page <span @dblclick="showInput">{{ currentPage }}</span> / <span
+                                    class="text-gray-400">{{
+                                    lastPage }}</span>
                             </button>
-                            <button v-else
-                                class="normal-pagination relative block rounded bg-transparent px-3 py-1.5 text-sm text-neutral-600 transition-all duration-300 hover:bg-neutral-100 dark:text-white dark:hover:bg-neutral-700 dark:hover:text-white"
-                                :id="'paginationBtn-' + pageNumberIndex" @click="pageBtnClicked(pageNumber)">
-                                {{ pageNumber }}
-                            </button>
-                        </li>
-                    </ul>
+
+                            <button class=" rounded px-6  py-1 border  hover:bg-slate-200"
+                                :disabled="currentPage === lastPage" @click="getMenuList(currentPage + 1)"> »</button>
+                        </div>
+                    </div>
                 </div>
+
             </div>
         </div>
 
@@ -172,7 +135,7 @@
                             <label for="" class="label-form mb-3">
                                 Name
                             </label>
-                            <input type="text" v-model="name" placeholder="Discount Name"  class="input-ui">
+                            <input type="text" v-model="name" placeholder="Discount Name" class="input-ui">
                         </div>
 
                         <div class="mb-4">
@@ -195,7 +158,9 @@
                                     </template>
                                 </multiselect>
                                 <div class="flex gap-x-2 flex-wrap mt-1">
-                                    <span class="font-inter after-coma" v-for="selectedRoom in selectedRooms">{{ selectedRoom.name }}</span>
+                                    <span class="font-inter after-coma" v-for="selectedRoom in selectedRooms"
+                                        :key="selectedRoom">{{ selectedRoom.name
+                                        }}</span>
                                 </div>
                             </div>
                         </div>
@@ -235,8 +200,8 @@
                             data-te-modal-dismiss aria-label="Close">
                             Cancel
                         </button>
-                        <button type="button" @click="createBtnClicked"
-                            class="add-btn focus:outline-none focus:ring-0 " data-te-modal-dismiss>
+                        <button type="button" @click="createBtnClicked" class="add-btn focus:outline-none focus:ring-0 "
+                            data-te-modal-dismiss>
                             Create
                         </button>
                     </div>
@@ -245,15 +210,16 @@
         </div>
 
         <!-- Delete Modal -->
-        <div data-te-modal-init class="fixed left-0 top-0 z-[1055] hidden h-full w-full overflow-y-auto overflow-x-hidden outline-none"
-        id="deleteModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div data-te-modal-init
+            class="fixed left-0 top-0 z-[1055] hidden h-full w-full overflow-y-auto overflow-x-hidden outline-none"
+            id="deleteModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
             <div data-te-modal-dialog-ref
                 class="pointer-events-none relative flex min-h-[calc(100%-1rem)] w-auto translate-y-[-50px] items-center opacity-0 transition-all duration-300 ease-in-out min-[576px]:mx-auto min-[576px]:mt-7 min-[576px]:min-h-[calc(100%-3.5rem)] min-[576px]:max-w-[500px]">
                 <div
                     class="min-[576px]:shadow-[0_0.5rem_1rem_rgba(#000, 0.15)] pointer-events-auto relative flex w-full flex-col rounded-md border-none bg-white bg-clip-padding text-current shadow-lg outline-none ">
                     <div
                         class="flex flex-shrink-0 items-center justify-between rounded-t-md border-b-2 border-neutral-100 border-opacity-100 p-4 ">
-                            <!--Modal title-->
+                        <!--Modal title-->
                         <h5 class="text-xl font-medium leading-normal text-neutral-800 " id="exampleModalLabel">
                             Delete ?
                         </h5>
@@ -261,8 +227,8 @@
                         <button type="button"
                             class="box-content rounded-none border-none hover:no-underline hover:opacity-75 focus:opacity-100 focus:shadow-none focus:outline-none"
                             data-te-modal-dismiss aria-label="Close">
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                                stroke-width="1.5" stroke="currentColor" class="h-6 w-6">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                                stroke="currentColor" class="h-6 w-6">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
                             </svg>
                         </button>
@@ -297,188 +263,166 @@
 </template>
 
 <script>
-    import { Modal, Ripple, Select, initTE, Input } from "tw-elements";
-    import { getApiData, postApiData, deleteApiData } from '../../utilities/ajax-helpers';
-    import { getCurrentDate } from '../../utilities/datetime-helpers';
-    import { mapGetters } from "vuex";
-    import Multiselect from 'vue-multiselect';
+import { Modal, Ripple, Select, initTE, Input } from "tw-elements";
+import { getApiData, postApiData, deleteApiData } from '../../utilities/ajax-helpers';
+import { getCurrentDate } from '../../utilities/datetime-helpers';
+import { mapGetters } from "vuex";
+import Multiselect from 'vue-multiselect';
 
-    export default {
-        components: {
-            Multiselect
+export default {
+    components: {
+        Multiselect
+    },
+    data() {
+        return {
+            today: getCurrentDate(),
+
+            discountList: [],
+
+            roomList: [],
+            selectedRooms: [],
+            selectedRoom: null,
+
+            name: null,
+            session: null,
+            freeSession: null,
+            startDate: null,
+            endDate: null,
+
+            deleteId: null,
+
+            currentPage: 0,
+            perPage: 0,
+            lastPage: 0,
+            totalData:0,
+        }
+    },
+
+    methods: {
+        ...mapGetters(['getToken']),
+
+        alertValiationMessage(field) {
+            this.$notify({
+                title: `Input validation`,
+                text: `You forgot to provide ${field}, please try again`,
+                type: "warn"
+            });
         },
-        data() {
-            return {
-                today: getCurrentDate(),
 
-                discountList: [],
-
-                roomList: [],
-                selectedRooms: [],
-                selectedRoom: null,
-
-                name: null,
-                session: null,
-                freeSession: null,
-                startDate: null,
-                endDate: null,
-
-                deleteId: null,
-
-                per_page: 20,
-                pageNumbers: [],
-                currentPage: 1,
-                paginationGroupsCount: 1,
-                per_group: 10,
-                groupedPageNumbers: [],
-                currentGroup: 0,
-                isFirstGroup: true,
-                isLastGroup: false,
+        async getDiscountList(pageNumber) {
+            if (pageNumber) {
+                this.currentPage = pageNumber;
+            }
+            let url = `/api/room_discounts?page=${pageNumber}`;
+            let response = await getApiData({ url: url, token: this.getToken() });
+            if (response.data) {
+                this.discountList = response.data.data;
+                this.lastPage = response.data.last_page;
+                this.currentPage = pageNumber;
+                this.perPage = response.data.per_page;
+                this.totalData = response.data.total;
             }
         },
 
-        methods: {
-            ...mapGetters(['getToken']),
+        async getRoomList() {
+            let url = `/api/entities?type=room`;
+            let response = await getApiData({ url: url, token: this.getToken() });
+            if (response.data) {
+                this.roomList = response.data;
+            }
+        },
 
-            alertValiationMessage(field) {
+        async createBtnClicked() {
+            if (!this.name) {
+                this.alertValiationMessage(`discount name`);
+                return 1;
+            }
+            if (this.selectedRooms.length < 1) {
+                this.alertValiationMessage(`discount applicable rooms`);
+                return 1;
+            }
+            if (!this.session) {
+                this.alertValiationMessage(`used session`);
+                return 1;
+            }
+            if (!this.freeSession) {
+                this.alertValiationMessage(`free session`);
+                return 1;
+            }
+            if (!this.startDate) {
+                this.alertValiationMessage(`discount start date`);
+                return 1;
+            }
+            if (!this.endDate) {
+                this.alertValiationMessage(`discount end date`);
+                return 1;
+            }
+
+            let roomIds = [];
+            this.selectedRooms.forEach((room) => {
+                roomIds.push(room.id);
+            });
+
+            let formData = new FormData();
+            formData.append('name', this.name);
+            formData.append('from_date', this.startDate);
+            formData.append('to_date', this.endDate);
+            formData.append('session', this.session);
+            formData.append('free_session', this.freeSession);
+            formData.append('roomIds', JSON.stringify(roomIds));
+            let url = `/api/room_discounts`;
+            let response = await postApiData({ url: url, form_data: formData, token: this.getToken() });
+            if (response.success) {
                 this.$notify({
-                    title: `Input validation`,
-                    text: `You forgot to provide ${field}, please try again`,
-                    type: "warn"
+                    text: `Discount created successfully`,
+                    type: "info"
                 });
-            },
-
-            async getDiscountList(pageNumber){
-                if(pageNumber){
-                    this.currentPage = pageNumber;
-                }
-                let url = `/api/room_discounts?page=${this.currentPage}&per_page=${this.per_page}`;
-                let response = await getApiData({url: url, token: this.getToken()});
-                if(response.data){
-                    this.discountList = response.data.data;
-                    this.per_page = response.data.per_page;
-
-                    this.pageNumbers = [];
-                    this.lastPageNumber = response.data.last_page;
-
-                    for(let i=1; i<=response.data.last_page; i++){
-                        this.pageNumbers.push(i);
-                    }
-
-                    if(this.pageNumbers.length > 10){
-                        this.groupedPageNumbers = [];
-                        this.paginationGroupsCount = this.pageNumbers.length % 10;
-                        for(let i=0; i<this.pageNumbers.length; i+=10){
-                            let chunk = this.pageNumbers.slice(i, i+10);
-                            this.groupedPageNumbers.push(chunk);
-                        }
-
-                        let lastGroupIndex = this.groupedPageNumbers.length - 1;
-                        this.isFirstGroup = (this.currentGroup === 0);
-                        this.isLastGroup = (lastGroupIndex === this.currentGroup);
-                    }
-                }
-            },
-
-            async getRoomList(){
-                let url = `/api/entities?type=room`;
-                let response = await getApiData({url: url, token: this.getToken()});
-                if(response.data){
-                    this.roomList = response.data;
-                }
-            },
-
-            async createBtnClicked(){
-                if(!this.name){
-                    this.alertValiationMessage(`discount name`);
-                    return 1;
-                }
-                if(this.selectedRooms.length < 1){
-                    this.alertValiationMessage(`discount applicable rooms`);
-                    return 1;
-                }
-                if(!this.session){
-                    this.alertValiationMessage(`used session`);
-                    return 1;
-                }
-                if(!this.freeSession){
-                    this.alertValiationMessage(`free session`);
-                    return 1;
-                }
-                if(!this.startDate){
-                    this.alertValiationMessage(`discount start date`);
-                    return 1;
-                }
-                if(!this.endDate){
-                    this.alertValiationMessage(`discount end date`);
-                    return 1;
-                }
-
-                let roomIds = [];
-                this.selectedRooms.forEach((room)=>{
-                    roomIds.push(room.id);
+            }
+            else {
+                this.$notify({
+                    text: `Discount create failed`,
+                    type: "error"
                 });
+            }
 
-                let formData = new FormData();
-                formData.append('name', this.name);
-                formData.append('from_date', this.startDate);
-                formData.append('to_date', this.endDate);
-                formData.append('session', this.session);
-                formData.append('free_session', this.freeSession);
-                formData.append('roomIds', JSON.stringify(roomIds));
-                let url = `/api/room_discounts`;
-                let response = await postApiData({url: url, form_data: formData, token: this.getToken()});
-                if(response.success){
-                    this.$notify({
-                        text: `Discount created successfully`,
-                        type: "info"
-                    });
-                }
-                else{
-                    this.$notify({
-                        text: `Discount create failed`,
-                        type: "error"
-                    });
-                }
-
-                this.selectedRooms = [];
-                this.getDiscountList(this.currentPage);
-            },
-
-            deleteBtnClicked(id){
-                this.deleteId = id;
-            },
-
-            async confirmDeleteBtnClicked(){
-                let url = `/api/room_discounts/${this.deleteId}`;
-                let response = await deleteApiData({url: url, token: this.getToken()});
-                if(response.success){
-                    this.$notify({
-                        text: `Discount deleted successfully`,
-                        type: "info"
-                    });
-                }
-                else{
-                    this.$notify({
-                        text: `Discount delete failed`,
-                        type: "error"
-                    });
-                }
-
-                this.deleteId = null;
-                this.getDiscountList(this.currentPage);
-            },
+            this.selectedRooms = [];
+            this.getDiscountList(1);
         },
 
-        created(){
-            this.getRoomList();
-            this.getDiscountList(null);
+        deleteBtnClicked(id) {
+            this.deleteId = id;
         },
 
-        mounted(){
+        async confirmDeleteBtnClicked() {
+            let url = `/api/room_discounts/${this.deleteId}`;
+            let response = await deleteApiData({ url: url, token: this.getToken() });
+            if (response.success) {
+                this.$notify({
+                    text: `Discount deleted successfully`,
+                    type: "info"
+                });
+            }
+            else {
+                this.$notify({
+                    text: `Discount delete failed`,
+                    type: "error"
+                });
+            }
 
+            this.deleteId = null;
+            this.getDiscountList(1);
         },
-    }
+    },
+
+    created() {
+        this.getRoomList();
+        this.getDiscountList(1);
+    },
+
+    mounted() {
+
+    },
+}
 </script>
 
 <style src="node_modules/vue-multiselect/dist/vue-multiselect.css"></style>

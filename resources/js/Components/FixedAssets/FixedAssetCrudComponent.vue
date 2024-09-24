@@ -69,10 +69,12 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <div class="contents" v-for="(fixedAsset, fixedAssetIndex) in fixedAssetPurchases" :key="fixedAssetIndex">
+                        <div class="contents" v-for="(fixedAsset, fixedAssetIndex) in fixedAssetPurchases"
+                            :key="fixedAssetIndex">
                             <tr class="bg-white rounded-lg overflow-hidden shadow-lg">
                                 <td class=" px-6 py-4 font-medium ">
-                                    {{ ++fixedAssetIndex }}
+                                    {{ perPage * (currentPage - 1) + (++fixedAssetIndex) }}
+
                                 </td>
 
                                 <td class=" px-6 py-4 font-medium ">
@@ -117,16 +119,15 @@
 
                                 <td class=" px-6 py-4 font-medium ">
                                     <button data-te-toggle="modal" data-te-target="#checkModal"
-                                    v-if="fixedAsset.is_md_checked != 1"
-                                    @click="checkBtnClicked(fixedAsset.id)">
+                                        v-if="fixedAsset.is_md_checked != 1" @click="checkBtnClicked(fixedAsset.id)">
                                         <i class="fal fa-check  pr-3"></i>
                                     </button>
                                 </td>
 
                                 <td class="whitespace-nowrap  space-x-4">
                                     <button class="pr-1" data-te-toggle="modal" data-te-target="#buyModal"
-                                    v-if="(fixedAsset.is_md_checked == 1) && (fixedAsset.is_bought == 0) && getDepartment().name == 'Finance'"
-                                    @click="fixedAssetBuyBtnClicked(fixedAsset.id)">
+                                        v-if="(fixedAsset.is_md_checked == 1) && (fixedAsset.is_bought == 0) && getDepartment().name == 'Finance'"
+                                        @click="fixedAssetBuyBtnClicked(fixedAsset.id)">
                                         <i class="far fa-shopping-basket"></i>
                                     </button>
                                 </td>
@@ -138,75 +139,26 @@
                         </div>
                     </tbody>
                 </table>
+
+                <!-- pagination -->
+                <div class="flex justify-center">
+
+                    <div v-if="totalData != 0" class=" bg-white  flex justify-center mt-5 py-3">
+                        <button class="rounded px-6 py-1 border  hover:bg-slate-200" :disabled="currentPage === 1"
+                            @click="getFixedAssetPurchases(currentPage - 1)">«</button>
+
+                        <button class=" text-sm px-5 border">
+                            Page <span @dblclick="showInput">{{ currentPage }}</span> / <span class="text-gray-400">{{
+                                lastPage }}</span>
+                        </button>
+
+                        <button class=" rounded px-6  py-1 border  hover:bg-slate-200"
+                            :disabled="currentPage === lastPage" @click="getFixedAssetPurchases(currentPage + 1)"> »</button>
+                    </div>
+                </div>
             </div>
 
-            <div class="mt-2 ml-2">
-                <ul v-if="paginationGroupsCount > 1" class="list-style-none flex">
-                    <!-- <li>
-                        <button class="relative block rounded bg-transparent px-3 py-1.5 text-sm text-neutral-600 transition-all duration-300
-                        hover:bg-neutral-100 dark:text-white dark:hover:bg-neutral-700 dark:hover:text-white" @click="firstPaginationGroupBtnClicked">
-                            First
-                        </button>
-                    </li> -->
-                    <li v-if="!isFirstGroup">
-                        <button class="relative block rounded bg-transparent px-3 py-1.5 text-sm text-neutral-600 transition-all duration-300
-                        hover:bg-neutral-100 dark:text-white dark:hover:bg-neutral-700 dark:hover:text-white" @click="previousPaginationGroupBtnClicked"
-                        :disabled="isFirstGroup">
-                            Previous
-                        </button>
-                    </li>
 
-                    <!-- loop link 1 , 2 ,3  ... replace normal-pagination with active-pagination for active pagination page-->
-                    <li v-for="(pageNumber, pageNumberIndex) in groupedPageNumbers[currentGroup]" :key="pageNumberIndex"
-                        :aria-current="(pageNumber == currentPage) ? 'page' : ''">
-                        <button v-if="pageNumber == currentPage"
-                            class="relative block rounded bg-neutral-800 px-3 py-1.5 text-sm font-medium text-neutral-50 transition-all duration-300 dark:bg-neutral-900"
-                            :id="'paginationBtn-' + pageNumberIndex" @click="pageBtnClicked(pageNumber)">
-                            {{ pageNumber }}
-                            <span class="absolute -m-px h-px w-px overflow-hidden whitespace-nowrap border-0 p-0 [clip:rect(0,0,0,0)]">
-                                (current)
-                            </span>
-                        </button>
-                        <button v-else
-                            class="normal-pagination relative block rounded bg-transparent px-3 py-1.5 text-sm text-neutral-600 transition-all duration-300 hover:bg-neutral-100 dark:text-white dark:hover:bg-neutral-700 dark:hover:text-white"
-                            :id="'paginationBtn-' + pageNumberIndex" @click="pageBtnClicked(pageNumber)">
-                            {{ pageNumber }}
-                        </button>
-                    </li>
-                    <li v-if="!isLastGroup">
-                        <button class="relative block rounded bg-transparent px-3 py-1.5 text-sm text-neutral-600 transition-all duration-300
-                        hover:bg-neutral-100 dark:text-white dark:hover:bg-neutral-700 dark:hover:text-white" @click="nextPaginationGroupBtnClicked"
-                        :disabled="isLastGroup">
-                            Next
-                        </button>
-                    </li>
-                    <!-- <li>
-                        <button class="relative block rounded bg-transparent px-3 py-1.5 text-sm text-neutral-600 transition-all duration-300
-                        hover:bg-neutral-100 dark:text-white dark:hover:bg-neutral-700 dark:hover:text-white" @click="lastPaginationGroupBtnClicked">
-                            Last
-                        </button>
-                    </li> -->
-                </ul>
-
-                <ul v-else class="list-style-none flex">
-                    <li v-for="(pageNumber, pageNumberIndex) in pageNumbers" :key="pageNumberIndex"
-                        :aria-current="(pageNumber == currentPage) ? 'page' : ''">
-                        <button v-if="pageNumber == currentPage"
-                            class="relative block rounded bg-neutral-800 px-3 py-1.5 text-sm font-medium text-neutral-50 transition-all duration-300 dark:bg-neutral-900"
-                            :id="'paginationBtn-' + pageNumberIndex" @click="pageBtnClicked(pageNumber)">
-                            {{ pageNumber }}
-                            <span class="absolute -m-px h-px w-px overflow-hidden whitespace-nowrap border-0 p-0 [clip:rect(0,0,0,0)]">
-                                (current)
-                            </span>
-                        </button>
-                        <button v-else
-                            class="normal-pagination relative block rounded bg-transparent px-3 py-1.5 text-sm text-neutral-600 transition-all duration-300 hover:bg-neutral-100 dark:text-white dark:hover:bg-neutral-700 dark:hover:text-white"
-                            :id="'paginationBtn-' + pageNumberIndex" @click="pageBtnClicked(pageNumber)">
-                            {{ pageNumber }}
-                        </button>
-                    </li>
-                </ul>
-            </div>
 
         </div>
     </div>
@@ -295,24 +247,26 @@
     </div>
 
     <!--Check Modal -->
-    <div data-te-modal-init class="fixed left-0 top-0 z-[1055] hidden h-full w-full overflow-y-auto overflow-x-hidden outline-none"
-        id="checkModal"
-        tabindex="-1"
-        aria-labelledby="exampleModalLabel"
-        aria-hidden="true">
+    <div data-te-modal-init
+        class="fixed left-0 top-0 z-[1055] hidden h-full w-full overflow-y-auto overflow-x-hidden outline-none"
+        id="checkModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
         <div data-te-modal-dialog-ref class="pointer-events-none relative flex min-h-[calc(100%-1rem)] w-auto translate-y-[-50px]
             items-center opacity-0 transition-all duration-300 ease-in-out min-[576px]:mx-auto min-[576px]:mt-7
             min-[576px]:min-h-[calc(100%-3.5rem)] min-[576px]:max-w-[500px]">
             <div class="min-[576px]:shadow-[0_0.5rem_1rem_rgba(#000, 0.15)] pointer-events-auto relative flex w-full flex-col
                 rounded-md border-none bg-white bg-clip-padding text-current shadow-lg outline-none ">
-                <div class="flex flex-shrink-0 items-center justify-between rounded-t-md border-b-2 border-neutral-100 border-opacity-100 p-4 ">
+                <div
+                    class="flex flex-shrink-0 items-center justify-between rounded-t-md border-b-2 border-neutral-100 border-opacity-100 p-4 ">
                     <!--Modal title-->
                     <h5 class="text-xl font-medium leading-normal text-neutral-800 " id="exampleModalLabel">
                         Check Fixed Asset Purchase
                     </h5>
                     <!--Close button-->
-                    <button type="button" class="box-content rounded-none border-none hover:no-underline hover:opacity-75 focus:opacity-100 focus:shadow-none focus:outline-none" data-te-modal-dismiss aria-label="Close">
-                        <svg class="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                    <button type="button"
+                        class="box-content rounded-none border-none hover:no-underline hover:opacity-75 focus:opacity-100 focus:shadow-none focus:outline-none"
+                        data-te-modal-dismiss aria-label="Close">
+                        <svg class="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                            stroke-width="1.5" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
                         </svg>
                     </button>
@@ -326,12 +280,15 @@
                 </div>
 
                 <!--Modal footer-->
-                <div class="flex flex-shrink-0 flex-wrap items-center justify-end rounded-b-md border-t-2 border-neutral-100 border-opacity-100 p-4 ">
-                    <button type="button" class="inline-block px-6 pb-2 pt-2.5 text-xs focus:outline-none focus:ring-0 " data-te-modal-dismiss>
+                <div
+                    class="flex flex-shrink-0 flex-wrap items-center justify-end rounded-b-md border-t-2 border-neutral-100 border-opacity-100 p-4 ">
+                    <button type="button" class="inline-block px-6 pb-2 pt-2.5 text-xs focus:outline-none focus:ring-0 "
+                        data-te-modal-dismiss>
                         Close
                     </button>
-                    <button @click="confirmCheckBtnClicked" type="button" data-te-toggle="modal" data-te-target="#checkModal"
-                    class="ml-1 inline-block rounded bg-blue-600 px-6 pb-2 pt-2.5 text-xs  text-white   focus:outline-none focus:ring-0 ">
+                    <button @click="confirmCheckBtnClicked" type="button" data-te-toggle="modal"
+                        data-te-target="#checkModal"
+                        class="ml-1 inline-block rounded bg-blue-600 px-6 pb-2 pt-2.5 text-xs  text-white   focus:outline-none focus:ring-0 ">
                         Confirm
                     </button>
                 </div>
@@ -372,7 +329,8 @@
                             Cash Account
                         </label>
                         <select name="" id="" v-model="selectedCashAccount" class="input-ui">
-                            <option :value="cashAccount" v-for="(cashAccount, cashAccountIndex) in cashAccountList" :key="cashAccountIndex">
+                            <option :value="cashAccount" v-for="(cashAccount, cashAccountIndex) in cashAccountList"
+                                :key="cashAccountIndex">
                                 {{ cashAccount.name }}
                             </option>
                         </select>
@@ -419,14 +377,10 @@ export default {
             total_duration: null,
             start_date: null,
 
-            per_page: 20,
-            currentPage: 1,
-            pageNumbers: [],
-            paginationGroupsCount: 1,
-            groupedPageNumbers: [],
-            currentGroup: 0,
-            isFirstGroup: true,
-            isLastGroup: false,
+            currentPage: 0,
+            perPage: 0,
+            lastPage: 0,
+            totalData:0,
 
             isManager: false,
             isStaff: false,
@@ -451,10 +405,15 @@ export default {
             }
         },
 
-        async getFixedAssetPurchases() {
-            let response = await getApiData({ url: `/api/fixed_asset_purchases?page=1`, token: this.getToken() });
+        async getFixedAssetPurchases(pageNumber) {
+            let response = await getApiData({ url: `/api/fixed_asset_purchases?page=${pageNumber}`, token: this.getToken() });
             if (response.data) {
-                this.fixedAssetPurchases = response.data.fixedAssetPurchase;
+                this.fixedAssetPurchases = response.data.data;
+
+                this.lastPage = response.data.last_page;
+                this.currentPage = pageNumber;
+                this.perPage = response.data.per_page;
+                this.totalData = response.data.total;
             }
         },
 
@@ -483,26 +442,26 @@ export default {
             }
         },
 
-        checkBtnClicked(fixedAssetId){
+        checkBtnClicked(fixedAssetId) {
             this.checkId = fixedAssetId;
         },
 
-        async confirmCheckBtnClicked(){
+        async confirmCheckBtnClicked() {
             let url = `/api/fixed_asset_purchases/is_update_checked`;
             let formData = new FormData();
             formData.append('id', this.checkId);
-            let response = await postApiData({url: url, form_data: formData, token: this.getToken()});
-            if(response.success){
+            let response = await postApiData({ url: url, form_data: formData, token: this.getToken() });
+            if (response.success) {
                 this.$notify({
                     text: 'Fixed asset checked',
                     type: 'info'
                 });
 
-                setTimeout(()=>{
+                setTimeout(() => {
                     window.location.reload();
                 }, 900);
             }
-            else{
+            else {
                 this.$notify({
                     text: response.message,
                     type: 'error'
@@ -511,12 +470,12 @@ export default {
             // console.log(response);
         },
 
-        fixedAssetBuyBtnClicked(id){
+        fixedAssetBuyBtnClicked(id) {
             this.buyFixedAssetId = id;
         },
 
-        async confirmBuyFixedAssetBtnClicked(){
-            if(!this.selectedCashAccount){
+        async confirmBuyFixedAssetBtnClicked() {
+            if (!this.selectedCashAccount) {
                 this.$notify({
                     text: 'No cash account selected',
                     type: 'warn'
@@ -528,39 +487,39 @@ export default {
             let formData = new FormData();
             formData.append('id', this.buyFixedAssetId);
             formData.append('cash_account_id', this.selectedCashAccount.id);
-            let response = await postApiData({url: url, form_data: formData, token: this.getToken()});
-            if(response.success){
+            let response = await postApiData({ url: url, form_data: formData, token: this.getToken() });
+            if (response.success) {
                 this.$notify({
                     text: `Fixed asset bought successuflly`,
                     type: 'info'
                 });
             }
-            else{
+            else {
                 this.$notify({
                     text: `Fixed asset buy not success`,
                     type: 'error'
                 });
             }
 
-            setTimeout(()=>{
+            setTimeout(() => {
                 window.location.reload();
             }, 900);
         },
     },
 
     created() {
-        this.getRoles().forEach((role)=>{
-            if(role.name == 'Manager'){
+        this.getRoles().forEach((role) => {
+            if (role.name == 'Manager') {
                 this.isManager = true;
             }
-            if(role.name == 'MD'){
+            if (role.name == 'MD') {
                 this.isMD = true;
             }
-            if(role.name == 'Staff'){
+            if (role.name == 'Staff') {
                 this.isStaff = true;
             }
         });
-        this.getFixedAssetPurchases();
+        this.getFixedAssetPurchases(1);
         this.getCashAccountList();
     },
 

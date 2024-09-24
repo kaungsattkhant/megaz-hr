@@ -49,10 +49,10 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <div class="contents" v-for="(discount, index) in discountList">
+                            <div class="contents" v-for="(discount, index) in discountList" :key="index">
                                 <tr class="">
                                     <td class=" px-6 py-4 font-medium ">
-                                        {{ per_page * (currentPage - 1) + (++index) }}
+                                        {{ perPage * (currentPage - 1) + (++index) }}
                                     </td>
                                     <td class="whitespace-nowrap px-6 py-4 ">
                                         {{ discount.name }}
@@ -92,9 +92,9 @@
                     <!-- pagination -->
                     <div class="flex justify-center">
 
-                        <div v-if="lastPage != -1" class=" bg-white  flex justify-center mt-5 py-3">
+                        <div v-if="totalData != 0" class=" bg-white  flex justify-center mt-5 py-3">
                             <button class="rounded px-6 py-1 border  hover:bg-slate-200"
-                                :disabled="currentPage === 1" @click="getAreasList(currentPage - 1)">«</button>
+                                :disabled="currentPage === 1" @click="getDiscountList(currentPage - 1)">«</button>
 
                             <button class=" text-sm px-5 border">
                                 Page <span @dblclick="showInput">{{ currentPage }}</span> / <span
@@ -103,7 +103,7 @@
                             </button>
 
                             <button class=" rounded px-6  py-1 border  hover:bg-slate-200"
-                                :disabled="currentPage === lastPage" @click="getAreasList(currentPage + 1)"> »</button>
+                                :disabled="currentPage === lastPage" @click="getDiscountList(currentPage + 1)"> »</button>
                         </div>
                     </div>
                 </div>
@@ -161,7 +161,7 @@
                                     v-model="selectedMenuCategory" data-te-select-filter="true" name="" id=""
                                     class="input-ui" @change="menuCategorySelectChanged">
                                     <option v-for="(menuCategory, menuCategoryIndex) in menuCategoryList"
-                                        :value="menuCategory"> {{ menuCategory.name }}</option>
+                                        :value="menuCategory" :key="menuCategoryIndex"> {{ menuCategory.name }}</option>
                                 </select>
                             </div>
                         </div>
@@ -173,7 +173,7 @@
                                 <select data-te-select-init data-te-select-placeholder="Select Menu"
                                     v-model="selectedMenu" data-te-select-filter="true" name="" id="" class="input-ui"
                                     @change="menuSelectChanged">
-                                    <option v-for="(menu, menuIndex) in menuList" :value="menu"> {{ menu.name }}
+                                    <option v-for="(menu, menuIndex) in menuList" :value="menu" :key="menuIndex"> {{ menu.name }}
                                     </option>
                                 </select>
                             </div>
@@ -186,7 +186,7 @@
                                 <select data-te-select-init data-te-select-placeholder="Select Service"
                                     v-model="selectedService" data-te-select-filter="true" name="" id=""
                                     class="input-ui" @change="serviceSelectChanged">
-                                    <option v-for="(service, serviceIndex) in serviceList" :value="service"> {{
+                                    <option v-for="(service, serviceIndex) in serviceList" :value="service" :key="serviceIndex"> {{
                                         service.name }}</option>
                                 </select>
                             </div>
@@ -327,15 +327,10 @@ export default {
 
             deleteId: null,
 
-            per_page: 20,
-            pageNumbers: [],
-            currentPage: 1,
-            paginationGroupsCount: 1,
-            per_group: 10,
-            groupedPageNumbers: [],
-            currentGroup: 0,
-            isFirstGroup: true,
-            isLastGroup: false,
+            currentPage: 0,
+            perPage: 0,
+            lastPage: 0,
+            totalData:0,
         }
 
     },
@@ -352,34 +347,16 @@ export default {
         },
 
         async getDiscountList(pageNumber) {
-            if (pageNumber) {
-                this.currentPage = pageNumber;
-            }
-            let url = `/api/menu_service_discounts?page=${this.currentPage}&per_page=${this.per_page}`;
+
+            let url = `/api/menu_service_discounts?page=${pageNumber}`;
             let response = await getApiData({ url: url, token: this.getToken() });
             if (response.data) {
                 this.discountList = response.data.data;
-                this.per_page = response.data.per_page;
+                this.lastPage = response.data.last_page;
+                this.currentPage = pageNumber;
+                this.perPage = response.data.per_page;
+                this.totalData = response.data.total;
 
-                this.pageNumbers = [];
-                this.lastPageNumber = response.data.last_page;
-
-                for (let i = 1; i <= response.data.last_page; i++) {
-                    this.pageNumbers.push(i);
-                }
-
-                if (this.pageNumbers.length > 10) {
-                    this.groupedPageNumbers = [];
-                    this.paginationGroupsCount = this.pageNumbers.length % 10;
-                    for (let i = 0; i < this.pageNumbers.length; i += 10) {
-                        let chunk = this.pageNumbers.slice(i, i + 10);
-                        this.groupedPageNumbers.push(chunk);
-                    }
-
-                    let lastGroupIndex = this.groupedPageNumbers.length - 1;
-                    this.isFirstGroup = (this.currentGroup === 0);
-                    this.isLastGroup = (lastGroupIndex === this.currentGroup);
-                }
             }
         },
 
@@ -495,7 +472,7 @@ export default {
             this.discountType = null;
             this.discountTypeSelectChanged();
 
-            this.getDiscountList(this.currentPage);
+            this.getDiscountList(1);
         },
 
         deleteBtnClicked(id) {
@@ -519,43 +496,14 @@ export default {
             }
 
             this.deleteId = null;
-            this.getDiscountList(this.currentPage);
+            this.getDiscountList(1);
         },
 
-        pageBtnClicked(pageNumber) {
-            this.currentPage = pageNumber;
-            this.getDiscountList(this.currentPage);
-        },
 
-        nextPaginationGroupBtnClicked() {
-            this.currentGroup += 1;
-            this.currentPage = (this.groupedPageNumbers[this.currentGroup][0]);
-            this.getDiscountList(this.currentPage);
-        },
-
-        previousPaginationGroupBtnClicked() {
-            this.currentGroup -= 1;
-            let lastIndex = this.groupedPageNumbers[this.currentGroup].length - 1;
-            this.currentPage = (this.groupedPageNumbers[this.currentGroup][lastIndex]);
-            this.getDiscountList(this.currentPage);
-        },
-
-        firstPaginationGroupBtnClicked() {
-            this.currentGroup = 0;
-            this.currentPage = (this.groupedPageNumbers[this.currentGroup][0]);
-            this.getDiscountList(this.currentPage);
-        },
-
-        lastPaginationGroupBtnClicked() {
-            this.currentGroup = this.paginationGroupsCount - 1;
-            let lastIndex = this.groupedPageNumbers[this.currentGroup].length - 1;
-            this.currentPage = (this.groupedPageNumbers[this.currentGroup][lastIndex]);
-            this.getDiscountList(this.currentPage);
-        }
     },
 
     created() {
-        this.getDiscountList(null);
+        this.getDiscountList(1);
     },
 
     mounted() {

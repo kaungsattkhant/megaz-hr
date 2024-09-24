@@ -46,7 +46,7 @@
                         <div class="contents" v-for="(cookingPlace, index) in cookingPlaces" :key="index">
                             <tr class="">
                                 <td class=" font-medium ">
-                                    {{ index + 1 }}
+                                    {{ perPage * (currentPage - 1) + (++index) }}
                                 </td>
                                 <td class="whitespace-nowrap">
                                     {{ cookingPlace.name }}
@@ -55,23 +55,44 @@
                                     {{ cookingPlace.area.name }}
                                 </td>
                                 <td class="whitespace-nowrap">
-                                    {{ cookingPlace.available_cooking_places.find(place => place.cooking_placeable_type=== 'menu')?.cooking_placeable.name }}
+                                    {{ cookingPlace.available_cooking_places.find(place =>
+                                        place.cooking_placeable_type === 'menu')?.cooking_placeable.name }}
                                 </td>
 
                                 <td class="whitespace-nowrap">
-                                    {{ cookingPlace.available_cooking_places.find(place => place.cooking_placeable_type=== 'skill')?.cooking_placeable.skill }}
+                                    {{ cookingPlace.available_cooking_places.find(place =>
+                                        place.cooking_placeable_type === 'skill')?.cooking_placeable.skill }}
                                 </td>
 
                                 <td class="whitespace-nowrap">
                                     <a :href="'/cooking_places/' + cookingPlace.id + '/edit'">
                                         <i class="far fa-pen cursor-pointer mr-3"></i>
                                     </a>
-                                    <i class="far fa-trash-alt cursor-pointer" @click="deleteCookingPlace(cookingPlace.id)"></i>
+                                    <i class="far fa-trash-alt cursor-pointer"
+                                        @click="deleteCookingPlace(cookingPlace.id)"></i>
                                 </td>
                             </tr>
                         </div>
                     </tbody>
                 </table>
+
+                <!-- pagination -->
+                <div class="flex justify-center">
+
+                    <div v-if="totalData != 0" class=" bg-white  flex justify-center mt-5 py-3">
+                        <button class="rounded px-6 py-1 border  hover:bg-slate-200" :disabled="currentPage === 1"
+                            @click="getCookingPlaces(currentPage - 1)">«</button>
+
+                        <button class=" text-sm px-5 border">
+                            Page <span @dblclick="showInput">{{ currentPage }}</span> / <span class="text-gray-400">{{
+                                lastPage }}</span>
+                        </button>
+
+                        <button class=" rounded px-6  py-1 border  hover:bg-slate-200"
+                            :disabled="currentPage === lastPage" @click="getCookingPlaces(currentPage + 1)">
+                            »</button>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -87,23 +108,33 @@ export default {
     data() {
         return {
             cookingPlaces: [],
+
+            currentPage: 0,
+            perPage: 0,
+            lastPage: 0,
+            totalData: 0,
         };
     },
 
     methods: {
         ...mapGetters(['getToken']),
 
-        async getCookingPlaces() {
-            const response = await getApiData({ url: '/api/cooking_places', token: this.getToken() });
+        async getCookingPlaces(pageNumber) {
+            const response = await getApiData({ url: `/api/cooking_places?page=${pageNumber}`, token: this.getToken() });
             if (response.data) {
                 this.cookingPlaces = response.data.data;
+
+                this.lastPage = response.data.last_page;
+                this.currentPage = pageNumber;
+                this.perPage = response.data.per_page;
+                this.totalData = response.data.total;
             }
         },
 
         async deleteCookingPlace(id) {
             let response = await deleteApiData({ url: `/api/cooking_places/` + id, token: this.getToken() });
             if (response.success) {
-                this.getCookingPlaces();
+                this.getCookingPlaces(1);
             }
             else {
                 this.$notify({
@@ -119,7 +150,7 @@ export default {
         initTE({ Modal, Select, Ripple });
     },
     created() {
-        this.getCookingPlaces();
+        this.getCookingPlaces(1);
     }
 }
 </script>

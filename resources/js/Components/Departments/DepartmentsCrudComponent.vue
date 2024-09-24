@@ -275,13 +275,7 @@
                 featureList: [],
                 selectedFeatures: [],
 
-                per_page: 10,
-                pageNumbers: [],
-                currentPage: 1,
-                paginationGroupsCount: 1,
-                per_group: 10,
-                groupedPageNumbers: [],
-                currentGroup: 0,
+
             };
         },
 

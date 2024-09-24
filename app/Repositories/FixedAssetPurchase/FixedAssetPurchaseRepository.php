@@ -30,29 +30,12 @@ class FixedAssetPurchaseRepository implements FixedAssetPurchaseRepositoryInterf
         })
         ->when(checkDepartmentAndRoles('Management', ['MD']), function ($q) {
             $q->whereIn('status', ['md_checked', 'financial_checked','bought']);
-        })
-        ->paginate(config('common.list_count'));
+        });
 
-        if ($request->per_page || $request->page) {
-            $totalCount = $query->count();
-            $pageNumber = 1;
-            $perPage = 20;
-            if ($request->page) {
-                $pageNumber = $request->page;
-            }
-            if ($request->per_page) {
-                $perPage = $request->per_page;
-            }
-            $skip = ($pageNumber - 1) * $perPage;
-            $fixedAssetPurchase = $query->skip($skip)
-                ->take($perPage)
-                ->get();
-            $fixedAssetPurchase = MakePaginationData($request, $totalCount, 'fixedAssetPurchase', $fixedAssetPurchase);
+
+            $fixedAssetPurchase = $query->paginate(config('common.list_count'));
             return $fixedAssetPurchase;
-        } else {
-            $fixedAssetPurchase = $query->get();
-            return $fixedAssetPurchase;
-        }
+
     }
 
     public function createData(array $data)
