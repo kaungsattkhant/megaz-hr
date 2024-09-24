@@ -29,7 +29,7 @@
                                     #
                                 </th>
                                 <th scope="col" class="  ">
-                                    Date
+                                    Date 
                                 </th>
                                 <th scope="col" class="  ">
                                     Purchase Order Id

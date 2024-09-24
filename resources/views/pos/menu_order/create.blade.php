@@ -1,11 +1,11 @@
 @extends('pos.layouts.main')
 
 @section('page_title', 'Order')
-@section('foodOrders', 'pos-active-link')
+@section('order', 'pos-active-link')
 @section('content')
 <div id="app">
-    <pos-menu-order-component>
+    <pos-menu-order-create-component>
 </div>
-
+    
 
 @endsection

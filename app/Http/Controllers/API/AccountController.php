@@ -48,13 +48,17 @@ class AccountController extends Controller
         ResponseData($sub_account);
     }
 
-    public function getSecondAccount($type){
-        $data= $this->accountRepo->getSecondAccount($type);
+    public function getDepreciationAccountList(Request $request){
+        $account= $this->accountRepo->getDepreciationAccount($request);
+        ResponseData($account);
+    }
+    public function getSecondAccount(Request $request){
+        $data= $this->accountRepo->getSecondAccount($request);
         ResponseData($data);
     }
 
-    public function getThirdAccount($type){
-        $data= $this->accountRepo->getThirdAccount($type);
+    public function getThirdAccount(Request $request){
+        $data= $this->accountRepo->getThirdAccount($request);
         ResponseData($data);
     }
 
