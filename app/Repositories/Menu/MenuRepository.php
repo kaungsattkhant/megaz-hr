@@ -203,6 +203,12 @@ class MenuRepository implements MenuRepositoryInterface
         }
     }
 
+    public function menuAreaList($id)
+    {
+        $menus = Menu::with('areas')->find($id);
+        ResponseData($menus);
+    }
+
 
     // user app
 
