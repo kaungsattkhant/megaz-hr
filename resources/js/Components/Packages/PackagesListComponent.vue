@@ -95,10 +95,10 @@
                             <!-- looping end -->
                         </tbody>
                     </table>
-                    <div class="flex justify-center">
+                    <div class="flex justify-start">
 
-                        <div v-if="totalData != 0" class=" ms-4 bg-white  flex justify-center mt-5 py-3">
-                            <button class="rounded-s-xl px-6 py-1 border  hover:bg-slate-200"
+                        <div v-if="totalData != 0" class=" bg-white  flex justify-center mt-2 py-3">
+                            <button class="rounded px-6 py-1 border  hover:bg-slate-100"
                                 :disabled="currentPage === 1" @click="getPromotionPackageList(currentPage - 1)">«</button>
 
                             <button class=" text-sm px-5 border">
@@ -107,7 +107,7 @@
                                     lastPage }}</span>
                             </button>
 
-                            <button class=" rounded-e-xl px-6  py-1 border  hover:bg-slate-200"
+                            <button class=" rounded px-6  py-1 border  hover:bg-slate-100"
                                 :disabled="currentPage === lastPage" @click="getPromotionPackageList(currentPage + 1)"> »</button>
                         </div>
                     </div>
