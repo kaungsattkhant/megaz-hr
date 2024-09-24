@@ -48,7 +48,9 @@
                             <!-- looping start -->
                             <div class="contents" v-for="(area, index) in areaList" :key="index">
                                 <tr class="">
-                                    <td>{{ (currentPage - 1) * perPage + index + 1 }}</td>
+                                    <td>
+                                        {{ (currentPage - 1) * perPage + index + 1 }}
+                                    </td>
                                     <td class="whitespace-nowrap  ">
                                         {{ area.name }}
                                     </td>
@@ -80,21 +82,22 @@
                             <!-- looping end -->
                         </tbody>
                     </table>
+                    <!-- pagination -->
                     <div class="flex justify-center">
 
-                    <div v-if="lastPage != -1"
-                        class=" ms-4 bg-white  flex justify-center mt-5 py-3">
-                        <button class="rounded-s-xl px-6 py-1 border  hover:bg-slate-200" :disabled="currentPage === 1"
-                            @click="getAreasList(currentPage - 1)">«</button>
+                        <div v-if="totalData != 0" class=" ms-4 bg-white  flex justify-center mt-5 py-3">
+                            <button class="rounded-s-xl px-6 py-1 border  hover:bg-slate-200"
+                                :disabled="currentPage === 1" @click="getAreasList(currentPage - 1)">«</button>
 
-                        <button class=" text-sm px-5 border">
-                            Page <span @dblclick="showInput">{{ currentPage }}</span> / <span class="text-gray-400">{{
-                                lastPage }}</span>
-                        </button>
+                            <button class=" text-sm px-5 border">
+                                Page <span @dblclick="showInput">{{ currentPage }}</span> / <span
+                                    class="text-gray-400">{{
+                                        lastPage }}</span>
+                            </button>
 
-                        <button class=" rounded-e-xl px-6  py-1 border  hover:bg-slate-200"
-                            :disabled="currentPage === lastPage" @click="getAreasList(currentPage + 1)"> »</button>
-                    </div>
+                            <button class=" rounded-e-xl px-6  py-1 border  hover:bg-slate-200"
+                                :disabled="currentPage === lastPage" @click="getAreasList(currentPage + 1)"> »</button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -250,7 +253,10 @@ export default {
             deleteId: null,
 
             currentPage: 0,
-            perPage: 0
+            perPage: 0,
+            lastPage: 0,
+            totalData:0
+
         };
     },
 
@@ -265,6 +271,7 @@ export default {
                 this.lastPage = response.data.last_page;
                 this.currentPage = pageNumber;
                 this.perPage = response.data.per_page;
+                this.totalData = response.data.total;
             }
         },
 
