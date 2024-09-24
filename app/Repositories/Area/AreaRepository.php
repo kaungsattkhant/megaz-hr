@@ -38,9 +38,9 @@ class AreaRepository implements AreaRepositoryInterface
 
         if($request->department_id)
         {
-            $areas = Area::with('areaType')->where('department_id', $request->department_id)->where('is_active', 1)->paginate(config('common.list_count'));
+            $areas = Area::with('areaType')->where('department_id', $request->department_id)->orderBy('created_at','desc')->where('is_active', 1)->paginate(config('common.list_count'));
         }else{
-            $areas = Area::with('areaType')->where('is_active',1)->paginate(config('common.list_count'));
+            $areas = Area::with('areaType')->where('is_active',1)->orderBy('created_at','desc')->paginate(config('common.list_count'));
         }
         return $areas;
     }

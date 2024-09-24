@@ -48,9 +48,7 @@
                             <!-- looping start -->
                             <div class="contents" v-for="(area, index) in areaList" :key="index">
                                 <tr class="">
-                                    <td class="  ">
-                                        {{ ++index }}
-                                    </td>
+                                    <td>{{ (currentPage - 1) * perPage + index + 1 }}</td>
                                     <td class="whitespace-nowrap  ">
                                         {{ area.name }}
                                     </td>
@@ -82,6 +80,22 @@
                             <!-- looping end -->
                         </tbody>
                     </table>
+                    <div class="flex justify-center">
+
+                    <div v-if="lastPage != -1"
+                        class=" ms-4 bg-white  flex justify-center mt-5 py-3">
+                        <button class="rounded-s-xl px-6 py-1 border  hover:bg-slate-200" :disabled="currentPage === 1"
+                            @click="getAreasList(currentPage - 1)">«</button>
+
+                        <button class=" text-sm px-5 border">
+                            Page <span @dblclick="showInput">{{ currentPage }}</span> / <span class="text-gray-400">{{
+                                lastPage }}</span>
+                        </button>
+
+                        <button class=" rounded-e-xl px-6  py-1 border  hover:bg-slate-200"
+                            :disabled="currentPage === lastPage" @click="getAreasList(currentPage + 1)"> »</button>
+                    </div>
+                    </div>
                 </div>
             </div>
 
@@ -117,21 +131,22 @@
                             </div>
                             <div class="mb-4">
                                 <label class="label-form mb-3">Department</label>
-                                <multiselect v-model="selectedDepartment" :options="departmentList" :close-on-select="true"
-                                    :clear-on-select="false" :preserve-search="true" placeholder="Select Department" label="name"
-                                    track-by="id" :preselect-first="false"></multiselect>
+                                <multiselect v-model="selectedDepartment" :options="departmentList"
+                                    :close-on-select="true" :clear-on-select="false" :preserve-search="true"
+                                    placeholder="Select Department" label="name" track-by="id" :preselect-first="false">
+                                </multiselect>
                             </div>
                             <div class="mb-4">
                                 <label class="label-form mb-3">Area Category</label>
                                 <multiselect v-model="selectedCategory" :options="categoryList" :close-on-select="true"
-                                    :clear-on-select="false" :preserve-search="true" placeholder="Select Area Category" label="name"
-                                    track-by="id" :preselect-first="false"></multiselect>
+                                    :clear-on-select="false" :preserve-search="true" placeholder="Select Area Category"
+                                    label="name" track-by="id" :preselect-first="false"></multiselect>
                             </div>
                             <div class="mb-4">
                                 <label for="" class="label-form mb-3">Area Type</label>
                                 <multiselect v-model="selectedType" :options="typeList" :close-on-select="true"
-                                    :clear-on-select="false" :preserve-search="true" placeholder="Select Area Type" label="name"
-                                    track-by="id" :preselect-first="false"></multiselect>
+                                    :clear-on-select="false" :preserve-search="true" placeholder="Select Area Type"
+                                    label="name" track-by="id" :preselect-first="false"></multiselect>
                                 <!-- <select name="" id="" v-model="selectedType"
                                     class="input-ui">
                                     <option :value="type.id" v-for="(type, index) in typeList" :key="index">
@@ -212,136 +227,132 @@
 </template>
 
 <script>
-    import { Modal, Ripple, Select, initTE, Input } from "tw-elements";
-    import { getApiData, postApiData, deleteApiData } from '../../utilities/ajax-helpers';
-    import { mapGetters } from "vuex";
-    import Multiselect from 'vue-multiselect';
+import { Modal, Ripple, Select, initTE, Input } from "tw-elements";
+import { getApiData, postApiData, deleteApiData } from '../../utilities/ajax-helpers';
+import { mapGetters } from "vuex";
+import Multiselect from 'vue-multiselect';
 
-    export default {
-        components: {
-            Multiselect
-        },
-        data() {
-            return {
+export default {
+    components: {
+        Multiselect
+    },
+    data() {
+        return {
 
-                departmentList: [],
-                areaList:[],
-                typeList:[],
-                categoryList: [],
-                name: null,
-                selectedType:null,
-                selectedCategory: null,
-                selectedDepartment: null,
-                deleteId: null,
+            departmentList: [],
+            areaList: [],
+            typeList: [],
+            categoryList: [],
+            name: null,
+            selectedType: null,
+            selectedCategory: null,
+            selectedDepartment: null,
+            deleteId: null,
 
+            currentPage: 0,
+            perPage: 0
+        };
+    },
 
-                per_page: 10,
-                pageNumbers: [],
-                currentPage: 1,
-                paginationGroupsCount: 1,
-                per_group: 10,
-                groupedPageNumbers: [],
-                currentGroup: 0,
-            };
-        },
+    methods: {
+        ...mapGetters(['getToken']),
 
-        methods: {
-            ...mapGetters(['getToken']),
-
-            async getAreasList(){
-                const response = await getApiData({ url: '/api/areas', token: this.getToken() });
-                if(response.data){
-                    this.areaList = response.data;
-                }
-            },
-
-            async getDepartmentList(){
-                const response = await getApiData({ url: '/api/departments', token: this.getToken() });
-                if(response.data){
-                    this.departmentList = response.data;
-                }
-            },
-
-            async getCategoryList(){
-                const response = await getApiData({ url: '/api/area_categories' , token: this.getToken()});
-                if(response.data){
-                    this.categoryList = response.data;
-                }
-            },
-
-            async getTypeList(){
-                const response = await getApiData({ url: '/api/area_types' , token: this.getToken()});
-                if(response.data){
-                    this.typeList = response.data;
-                }
-            },
-
-            createAreasBtnClicked(){
-
-                this.createArea();
-            },
-
-            async createArea()
-            {
-                let formData = new FormData();
-                formData.append('name', this.name);
-                formData.append('area_type_id', this.selectedType.id);
-                formData.append('area_category_id', this.selectedCategory.id);
-                formData.append('department_id', this.selectedDepartment.id);
-                let response = await postApiData({url: '/api/areas', form_data: formData, token: this.getToken()});
-                if(response.success){
-                    this.getAreasList(null);
-                    this.selectedType = null;
-                    this.selectedCategory = null;
-                    this.selectedDepartment = null;
-                    this.name = null;
-                }
-                else{
-
-                }
-            },
-
-            isActiveToggled(id){
-                let index = this.areaList.findIndex(area => area.id == id);
-                if(index != -1){
-                    if(this.areaList[index].is_active == 1){
-                        this.areaList[index].is_active = 0;
-                    }
-                    else{
-                        this.areaList[index].is_active = 1;
-                    }
-
-                    let url = `/api/is_active`;
-                    let formData = new FormData();
-                    formData.append('id', id);
-                    formData.append('type', 'area');
-                    let response = postApiData({url: url, form_data: formData, token: this.getToken()});
-                }
-            },
-
-            deleteBtnClicked(id){
-                this.deleteId = id;
-            },
-
-            async confirmDeleteBtnClicked(){
-                let url = `/api/areas/${this.deleteId}`;
-                let response = await deleteApiData({url: url, token: this.getToken()});
-                if(response.success){
-                    this.getAreasList(null);
-                    console.log(`deleted`);
-                }
+        async getAreasList(pageNumber) {
+            let url = `/api/areas?page=${pageNumber}`
+            const response = await getApiData({ url: url, token: this.getToken() });
+            if (response.data) {
+                this.areaList = response.data.data;
+                this.lastPage = response.data.last_page;
+                this.currentPage = pageNumber;
+                this.perPage = response.data.per_page;
             }
-
         },
-        mounted()
-        {
-            this.getCategoryList();
-            this.getAreasList();
-            this.getDepartmentList();
-            this.getTypeList();
-            initTE({ Modal,Select, Ripple });
+
+        async getDepartmentList() {
+            const response = await getApiData({ url: '/api/departments', token: this.getToken() });
+            if (response.data) {
+                this.departmentList = response.data;
+            }
+        },
+
+        async getCategoryList() {
+            const response = await getApiData({ url: '/api/area_categories', token: this.getToken() });
+            if (response.data) {
+                this.categoryList = response.data;
+            }
+        },
+
+        async getTypeList() {
+            const response = await getApiData({ url: '/api/area_types', token: this.getToken() });
+            if (response.data) {
+                this.typeList = response.data;
+            }
+        },
+
+        createAreasBtnClicked() {
+
+            this.createArea();
+        },
+
+        async createArea() {
+            let formData = new FormData();
+            formData.append('name', this.name);
+            formData.append('area_type_id', this.selectedType.id);
+            formData.append('area_category_id', this.selectedCategory.id);
+            formData.append('department_id', this.selectedDepartment.id);
+            let response = await postApiData({ url: '/api/areas', form_data: formData, token: this.getToken() });
+            if (response.success) {
+                this.getAreasList(1);
+                this.selectedType = null;
+                this.selectedCategory = null;
+                this.selectedDepartment = null;
+                this.name = null;
+            }
+            else {
+
+            }
+        },
+
+        isActiveToggled(id) {
+            let index = this.areaList.findIndex(area => area.id == id);
+            if (index != -1) {
+                if (this.areaList[index].is_active == 1) {
+                    this.areaList[index].is_active = 0;
+                }
+                else {
+                    this.areaList[index].is_active = 1;
+                }
+
+                let url = `/api/is_active`;
+                let formData = new FormData();
+                formData.append('id', id);
+                formData.append('type', 'area');
+                let response = postApiData({ url: url, form_data: formData, token: this.getToken() });
+            }
+        },
+
+        deleteBtnClicked(id) {
+            this.deleteId = id;
+        },
+
+        async confirmDeleteBtnClicked() {
+            let url = `/api/areas/${this.deleteId}`;
+            let response = await deleteApiData({ url: url, token: this.getToken() });
+            if (response.success) {
+                this.getAreasList(1);
+                console.log(`deleted`);
+            }
         }
+
+    },
+    mounted() {
+        this.getCategoryList();
+        this.getAreasList(1);
+        this.getDepartmentList();
+        this.getTypeList();
+        initTE({ Modal, Select, Ripple });
     }
+}
 </script>
 
 <style src="node_modules/vue-multiselect/dist/vue-multiselect.css"></style>
