@@ -28,7 +28,14 @@
                             </select>
                         </div>
                         <div class="col-span-6">
-
+                            <label for="" class="block text-sm text-black mb-3">
+                                &nbsp;
+                            </label>
+                            <button
+                                class=" transition duration-150 ease-in-out focus:outline-none focus:ring-0"
+                                data-te-toggle="modal" data-te-target="#create_customer_modal">
+                                <i class="fal fa-plus"></i>
+                            </button>
                         </div>
                         
                        
@@ -185,7 +192,122 @@
         
 
 
+        <!-- Create Customer modal -->
+        <div data-te-modal-init
+            class="fixed left-0 top-0 z-[1055] hidden h-full w-full overflow-y-auto overflow-x-hidden outline-none"
+            id="create_customer_modal" tabindex="-1" aria-labelledby="createCustomerModalLabel" aria-modal="true"
+            role="dialog">
+            <div data-te-modal-dialog-ref
+                class="pointer-events-none relative flex min-h-[calc(100%-1rem)] w-auto translate-y-[-50px] items-center opacity-0 transition-all duration-300 ease-in-out min-[576px]:mx-auto min-[576px]:mt-7 min-[576px]:min-h-[calc(100%-3.5rem)] min-[576px]:max-w-[500px]">
+                <div
+                    class="pointer-events-auto relative flex w-full flex-col rounded-md border-none bg-white bg-clip-padding text-current shadow-lg outline-none">
+                    <div class="relative  p-4">
+                        <p class="text-xl w-full text-center">
+                            Create Customer
+                        </p>
+                        <button type="button" class="absolute top-4 right-4 focus:shadow-none focus:outline-none
+                        " id="closeCustomerModal" data-te-modal-dismiss aria-label="Close">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                                stroke="currentColor" class="h-5 w-5">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                        </button>
+                    </div>
 
+                    <div class="relative px-16 py-4" data-te-modal-body-ref>
+                        <div class="mb-4">
+                            <label for="" class="block text-sm text-black mb-3">
+                                Customer Name
+                            </label>
+                            <input type="text" placeholder="Customer Name" v-model="name" ref="name"
+                                class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
+                        </div>
+                        <div class="mb-4">
+                            <label for="" class="block text-sm text-black mb-3">
+                                Phone Number
+                            </label>
+                            <input type="text" placeholder="Phone Number" v-model="ph_number" ref="phone"
+                                class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
+                        </div>
+                        <div class="mb-4">
+                            <label for="" class="block text-sm text-black mb-3">
+                                Email
+                            </label>
+                            <input type="text" placeholder="Email" v-model="email" ref="email"
+                                class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
+                        </div>
+                        <div class="mb-4">
+                            <label for="" class="block text-sm text-black mb-3">
+                                Gender
+                            </label>
+                            <select name="" id="" v-model="selectedGender" ref="gender"
+                                class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
+                                <option :value="gender.id" v-for="(gender, genderIndex) in genderList"
+                                    :key="genderIndex"> {{ gender.name }} </option>
+                            </select>
+                        </div>
+                        <div class="mb-4">
+                            <label for="" class="block text-sm text-black mb-3">
+                                Birthdate
+                            </label>
+                            <input type="date" placeholder="Birthdate" v-model="date" ref="date"
+                                class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
+                        </div>
+                        <div class=" mb-4">
+                            <label for="" class="text-sm text-black mb-2 block">
+                                Division
+                            </label>
+                            <select
+                                class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0"
+                                v-model="selectedDivision" @change="divisionSelectChanged"  ref="division">
+                                <option class="text-sm" :value="division"
+                                    v-for="(division, divisionIndex) in divisionList" :key="divisionIndex">
+                                    {{ division.name }}
+                                </option>
+
+                            </select>
+                        </div>
+
+                        <div class=" mb-4">
+                            <label for="" class="text-sm text-black mb-2 block">
+                                Township
+                            </label>
+                            <select
+                                class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0"
+                                v-model="selectedTownship" @change="townshipSelectChanged"  ref="township">
+                                <option class="text-sm" :value="township" v-for="(township, index) in townshipList"
+                                    :key="index">
+                                    {{ township.name }}
+                                </option>
+
+                            </select>
+                        </div>
+                        <div class="mb-4">
+                            <label for="" class="block text-sm text-black mb-3">
+                                Address Name
+                            </label>
+                            <input type="text" placeholder="Address Name" v-model="address_name" ref="address_name"
+                                class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
+                        </div>
+                        <div class="mb-4">
+                            <label for="" class="block text-sm text-black mb-3">
+                                Address
+                            </label>
+                            <textarea v-model="address" ref="address"
+                                class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0"
+                                name="" id="" cols="30" rows="10"></textarea>
+                        </div>
+
+                    </div>
+
+                    <div class="flex justify-center px-12 mb-6">
+                        <button @click="createCustomerBtnClicked" class="pos-add-btn focus:outline-none focus:ring-0 ">
+                            Create
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
 
 
 
@@ -227,6 +349,19 @@
 
                 orderMenuListForCreate:[],
 
+                genderList:[],
+                divisionList:[],
+                townshipList:[],
+                name:null,
+                ph_number:null,
+                email:null,
+                selectedGender:null,
+                date:null,
+                selectedDivision:null,
+                selectedTownship:null,
+                address_name:null,
+                address:null,
+
                 currentTime: getCurretDateTime(),
 
 
@@ -239,6 +374,17 @@
                 createOrderFields: [
                     { label: 'Date',ref: 'date' },
                     { label: 'Customer',ref: 'customer' },
+                ],
+                createCustomerFields: [
+                    { label: 'Customer Name',ref: 'name' },
+                    { label: 'Phone Number',ref: 'phone' },
+                    { label: 'Email',ref: 'email' },
+                    { label: 'Gender',ref: 'gender' },
+                    { label: 'Date',ref: 'date' },
+                    { label: 'Division',ref: 'division' },
+                    { label: 'Township',ref: 'township' },
+                    { label: 'Address Name',ref: 'address_name' },
+                    { label: 'Address',ref: 'address' },
                 ],
             };
         },
@@ -438,6 +584,105 @@
                 //     delete om.menu_category_name;
                 // });
             },
+
+
+
+
+            // create customer
+            async getGendersList() {
+                const response = await getApiData({ url: '/api/genders', token: this.getToken() });
+                if (response.data) {
+                    this.genderList = response.data;
+                }
+            },
+            async getDivisionList() {
+                const response = await getApiData({ url: '/api/divisions', token: this.getToken() });
+                if (response.data) {
+                    this.divisionList = response.data;
+                }
+            },
+            divisionSelectChanged() {
+                this.getTownShipList();
+            },
+            async getTownShipList() {
+                this.townshipList = this.divisionList.find(x => x.id === this.selectedDivision.id).townships;
+            },
+
+            createCustomerBtnClicked() {
+                this.clearErrors();
+                let isValid = true;
+                const errors = [];
+                this.createCustomerFields.forEach((field) => {
+                    const value = this.$refs[field.ref].value; 
+                    if (!value) {
+                        errors.push({
+                            text: `${field.label} is required.`,
+                            isActive: false,
+                        });
+                        isValid = false;
+                    }
+                    else{
+                        errors.push({
+                            text: `${field.label} is required.`,
+                            isActive: true,
+                        });
+                        isValid = true;
+                    }
+                });
+                if (!isValid) {
+                    this.displayErrors(errors,this.createCustomerFields);
+                }
+                else {
+                    this.createCustomer();
+                }
+                
+            },
+            async createCustomer() {
+                let formData = new FormData();
+                formData.append('gender_id', this.selectedGender);
+                formData.append('name', this.name);
+                if (this.email != null) {
+                    formData.append('email', this.email);
+                }
+                formData.append('phone_number', this.ph_number);
+                formData.append('address_name', this.address_name);
+                formData.append('address', this.address);
+                formData.append('birthdate', this.date);
+                formData.append('township_id', this.selectedTownship.id);
+                let response = await postApiData({ url: '/api/customers', form_data: formData, token: this.getToken() });
+                if (response.success) {
+                    this.customerList.push(response.data);
+                    this.selectedCustomer = response.data;
+                    console.log("success customer")
+                    this.closeCustomerModal();
+                    this.clearCustomerForm();
+                }
+                else {
+                    console.log('some errors occur');
+                }
+            },
+            clearCustomerForm() {
+                this.name = null
+                this.ph_number = null
+                this.email = null
+                this.selectedGender = null
+                this.date = null
+                this.selectedDivision = null
+                this.selectedTownship = null
+                this.address_name = null
+                this.address = null
+            },
+
+            closeCustomerModal() {
+                document.getElementById("closeCustomerModal").click();
+            },
+
+
+
+
+
+
+
             validationMessage(text){
                 this.$notify({
                     title: `Not valid`,
@@ -468,6 +713,8 @@
         created(){
             this.getCustomerList();
             this.getMenuCategoryList();
+            this.getGendersList();
+            this.getDivisionList();
         },
         mounted()
         {   
