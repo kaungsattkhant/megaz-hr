@@ -15,6 +15,7 @@ class PackageRepository implements PackageRepositoryInterface
     {
         $validateDate = $request->date ?? CurrentDate();
         $packages = Package::where('from_date', '<=', $validateDate)
+            ->orderBy('created_at','desc')
             ->where('to_date', '>=', $validateDate)
             ->with(['menuPackages.menu.prices', 'menuPackages.menu.menuServiceDiscounts' => function ($query) use ($validateDate) {
                 $query->where('from_date', '<=', $validateDate)
