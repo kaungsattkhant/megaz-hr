@@ -247,7 +247,6 @@ export default {
                 this.staffList = response.data.data;
                 this.lastPage = response.data.last_page;
                 this.currentPage = pageNumber;
-                console.log(this.currentPage);
                 this.perPage = response.data.per_page;
                 this.totalData = response.data.total;
             }
