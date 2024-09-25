@@ -174,6 +174,7 @@
                 let response = await getApiData({ url: `/api/uoms`, token: this.getToken() });
                 if (response.data) {
                     this.uomList = response.data;
+                    console.log(response.data);
                 }
             },
 

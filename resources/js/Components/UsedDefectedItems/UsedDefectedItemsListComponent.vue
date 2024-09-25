@@ -70,7 +70,7 @@
                             <div class="contents" v-for="(item, itemIndex) in itemList" :key="itemIndex">
                                 <tr class="">
                                     <td class="  ">
-                                        {{ per_page * (currentPage - 1) + (++itemIndex) }}
+                                        {{ perPage * (currentPage - 1) + (++itemIndex) }}
                                     </td>
                                     <td class="whitespace-nowrap  ">
                                         {{ item.date }}
@@ -93,12 +93,12 @@
                                     </td>
 
                                     <td class="whitespace-nowrap  ">
-                                        <div v-if="item.is_confirmed == 1" >Yes</div>
-                                        <div v-else >No</div>
+                                        <div v-if="item.is_confirmed == 1">Yes</div>
+                                        <div v-else>No</div>
                                     </td>
 
                                     <td class="whitespace-nowrap ">
-                                        <button id="edit-btn" class="pr-1" :disabled="item.is_confirmed == 1" >
+                                        <button id="edit-btn" class="pr-1" :disabled="item.is_confirmed == 1">
                                             <i class="fas fa-check" @click="checkBtnClicked(item)"
                                                 data-te-toggle="modal" data-te-target="#checkModal"></i>
                                         </button>
@@ -109,62 +109,24 @@
                             <!-- looping end -->
                         </tbody>
                     </table>
-                </div>
-                <div class="mt-2 ml-2">
-                    <ul v-if="paginationGroupsCount > 1" class="list-style-none flex">
-                        <li v-if="!isFirstGroup">
-                            <button class="relative block rounded bg-transparent px-3 py-1.5 text-sm text-neutral-600 transition-all duration-300
-                        hover:bg-neutral-100 dark:text-white dark:hover:bg-neutral-700 dark:hover:text-white"
-                                @click="previousPaginationGroupBtnClicked" :disabled="isFirstGroup">
-                                Previous
-                            </button>
-                        </li>
+                    <!-- pagination -->
+                    <div class="flex justify-center">
 
-                        <li v-for="(pageNumber, pageNumberIndex) in groupedPageNumbers[currentGroup]"
-                            :key="pageNumberIndex" :aria-current="(pageNumber == currentPage) ? 'page' : ''">
-                            <button v-if="pageNumber == currentPage"
-                                class="relative block rounded bg-neutral-800 px-3 py-1.5 text-sm font-medium text-neutral-50 transition-all duration-300 dark:bg-neutral-900"
-                                :id="'paginationBtn-' + pageNumberIndex" @click="pageBtnClicked(pageNumber)">
-                                {{ pageNumber }}
-                                <span
-                                    class="absolute -m-px h-px w-px overflow-hidden whitespace-nowrap border-0 p-0 [clip:rect(0,0,0,0)]">
-                                    (current)
-                                </span>
-                            </button>
-                            <button v-else
-                                class="normal-pagination relative block rounded bg-transparent px-3 py-1.5 text-sm text-neutral-600 transition-all duration-300 hover:bg-neutral-100 dark:text-white dark:hover:bg-neutral-700 dark:hover:text-white"
-                                :id="'paginationBtn-' + pageNumberIndex" @click="pageBtnClicked(pageNumber)">
-                                {{ pageNumber }}
-                            </button>
-                        </li>
-                        <li v-if="!isLastGroup">
-                            <button class="relative block rounded bg-transparent px-3 py-1.5 text-sm text-neutral-600 transition-all duration-300
-                        hover:bg-neutral-100 dark:text-white dark:hover:bg-neutral-700 dark:hover:text-white"
-                                @click="nextPaginationGroupBtnClicked" :disabled="isLastGroup">
-                                Next
-                            </button>
-                        </li>
-                    </ul>
+                        <div v-if="totalData != 0" class=" bg-white  flex justify-center mt-5 py-3">
+                            <button class="rounded px-6 py-1 border  hover:bg-slate-200" :disabled="currentPage === 1"
+                                @click="getItemList(currentPage - 1)">«</button>
 
-                    <ul v-else class="list-style-none flex">
-                        <li v-for="(pageNumber, pageNumberIndex) in pageNumbers" :key="pageNumberIndex"
-                            :aria-current="(pageNumber == currentPage) ? 'page' : ''">
-                            <button v-if="pageNumber == currentPage"
-                                class="relative block rounded bg-neutral-800 px-3 py-1.5 text-sm font-medium text-neutral-50 transition-all duration-300 dark:bg-neutral-900"
-                                :id="'paginationBtn-' + pageNumberIndex" @click="pageBtnClicked(pageNumber)">
-                                {{ pageNumber }}
-                                <span
-                                    class="absolute -m-px h-px w-px overflow-hidden whitespace-nowrap border-0 p-0 [clip:rect(0,0,0,0)]">
-                                    (current)
-                                </span>
+                            <button class=" text-sm px-5 border">
+                                Page <span @dblclick="showInput">{{ currentPage }}</span> / <span
+                                    class="text-gray-400">{{
+                                    lastPage }}</span>
                             </button>
-                            <button v-else
-                                class="normal-pagination relative block rounded bg-transparent px-3 py-1.5 text-sm text-neutral-600 transition-all duration-300 hover:bg-neutral-100 dark:text-white dark:hover:bg-neutral-700 dark:hover:text-white"
-                                :id="'paginationBtn-' + pageNumberIndex" @click="pageBtnClicked(pageNumber)">
-                                {{ pageNumber }}
-                            </button>
-                        </li>
-                    </ul>
+
+                            <button class=" rounded px-6  py-1 border  hover:bg-slate-200"
+                                :disabled="currentPage === lastPage" @click="getItemList(currentPage + 1)">
+                                »</button>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -204,12 +166,15 @@
                 </div>
 
                 <!--Modal footer-->
-                <div class="flex flex-shrink-0 flex-wrap items-center justify-end rounded-b-md border-t-2 border-neutral-100 border-opacity-100 p-4 ">
-                    <button type="button" class="inline-block px-6 pb-2 pt-2.5 text-xs focus:outline-none focus:ring-0 " data-te-modal-dismiss>
+                <div
+                    class="flex flex-shrink-0 flex-wrap items-center justify-end rounded-b-md border-t-2 border-neutral-100 border-opacity-100 p-4 ">
+                    <button type="button" class="inline-block px-6 pb-2 pt-2.5 text-xs focus:outline-none focus:ring-0 "
+                        data-te-modal-dismiss>
                         Close
                     </button>
-                    <button @click="confirmCheckBtnClicked" type="button" data-te-toggle="modal" data-te-target="#checkModal"
-                    class="ml-1 inline-block rounded bg-blue-600 px-6 pb-2 pt-2.5 text-xs  text-white   focus:outline-none focus:ring-0 " >
+                    <button @click="confirmCheckBtnClicked" type="button" data-te-toggle="modal"
+                        data-te-target="#checkModal"
+                        class="ml-1 inline-block rounded bg-blue-600 px-6 pb-2 pt-2.5 text-xs  text-white   focus:outline-none focus:ring-0 ">
                         Confirm
                     </button>
                 </div>
@@ -230,15 +195,10 @@ export default {
             itemList: [],
             confirmItem: null,
             confirmItemId: null,
-
-            per_page: 20,
-            currentPage: 1,
-            pageNumbers: [],
-            paginationGroupsCount: 1,
-            groupedPageNumbers: [],
-            currentGroup: 0,
-            isFirstGroup: true,
-            isLastGroup: false,
+            currentPage: 0,
+            perPage: 0,
+            lastPage: 0,
+            totalData: 0,
         };
     },
 
@@ -246,37 +206,19 @@ export default {
         ...mapGetters(['getToken']),
 
         async getItemList(pageNumber) {
-            if (pageNumber) {
-                this.currentPage = pageNumber;
-            }
-            let url = `/api/used_defected_items?page=${this.currentPage}`;
+
+            let url = `/api/used_defected_items?page=${pageNumber}`;
             let response = await getApiData({ url: url, token: this.getToken() });
             if (response.data) {
-                this.itemList = response.data.used_defected_items;
-                this.itemList.forEach((item)=>{
+                this.itemList = response.data.data;
+                this.lastPage = response.data.last_page;
+                this.currentPage = pageNumber;
+                this.perPage = response.data.per_page;
+                this.totalData = response.data.total;
+                this.itemList.forEach((item) => {
                     item.date = convertToFriendlyDate(item.date);
                 });
-                this.per_page = response.data.per_page;
 
-                this.pageNumbers = [];
-                this.lastPageNumber = response.data.last_page;
-
-                for (let i = 1; i <= response.data.last_page; i++) {
-                    this.pageNumbers.push(i);
-                }
-
-                if (this.pageNumbers.length > 10) {
-                    this.groupedPageNumbers = [];
-                    this.paginationGroupsCount = this.pageNumbers.length % 10;
-                    for (let i = 0; i < this.pageNumbers.length; i += 10) {
-                        let chunk = this.pageNumbers.slice(i, i + 10);
-                        this.groupedPageNumbers.push(chunk);
-                    }
-
-                    let lastGroupIndex = this.groupedPageNumbers.length - 1;
-                    this.isFirstGroup = (this.currentGroup === 0);
-                    this.isLastGroup = (lastGroupIndex === this.currentGroup);
-                }
             }
         },
 
@@ -288,21 +230,21 @@ export default {
             });
         },
 
-        checkBtnClicked(item){
+        checkBtnClicked(item) {
             this.confirmItem = item;
             this.confirmItemId = item.id;
         },
 
-        async confirmCheckBtnClicked(){
+        async confirmCheckBtnClicked() {
             let url = `/api/used_defected_items/${this.confirmItemId}/confirm`;
-            let response = await postApiData({url: url, token: this.getToken()});
-            if(response.success){
+            let response = await postApiData({ url: url, token: this.getToken() });
+            if (response.success) {
                 this.$notify({
                     text: `Used defected item confirmed`,
                     type: "info"
                 });
             }
-            else{
+            else {
                 this.$notify({
                     text: `Used defected item confirmation error`,
                     type: "error"
@@ -313,43 +255,14 @@ export default {
         clearSearchBtnClicked() {
             this.searchInput = null;
             this.searchCategory = null;
-            this.getItemList(null);
+            this.getItemList(1);
         },
 
-        pageBtnClicked(pageNumber) {
-            this.currentPage = pageNumber;
-            this.getItemList(this.currentPage);
-        },
 
-        nextPaginationGroupBtnClicked() {
-            this.currentGroup += 1;
-            this.currentPage = (this.groupedPageNumbers[this.currentGroup][0]);
-            this.getItemList(this.currentPage);
-        },
-
-        previousPaginationGroupBtnClicked() {
-            this.currentGroup -= 1;
-            let lastIndex = this.groupedPageNumbers[this.currentGroup].length - 1;
-            this.currentPage = (this.groupedPageNumbers[this.currentGroup][lastIndex]);
-            this.getItemList(this.currentPage);
-        },
-
-        firstPaginationGroupBtnClicked() {
-            this.currentGroup = 0;
-            this.currentPage = (this.groupedPageNumbers[this.currentGroup][0]);
-            this.getItemList(this.currentPage);
-        },
-
-        lastPaginationGroupBtnClicked() {
-            this.currentGroup = this.paginationGroupsCount - 1;
-            let lastIndex = this.groupedPageNumbers[this.currentGroup].length - 1;
-            this.currentPage = (this.groupedPageNumbers[this.currentGroup][lastIndex]);
-            this.getItemList(this.currentPage);
-        }
     },
 
     created() {
-        this.getItemList(null);
+        this.getItemList(1);
     },
 
     mounted() {

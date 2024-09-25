@@ -51,10 +51,10 @@
                         <tbody>
 
                             <!-- looping start -->
-                            <div v-for="(complain,index) in complainList" :key="index" class="contents">
+                            <div v-for="(complain, index) in complainList" :key="index" class="contents">
                                 <tr class="">
                                     <td class="  ">
-                                        {{ index+1 }}
+                                        {{ perPage * (currentPage - 1) + (++index) }}
                                     </td>
                                     <td class="whitespace-nowrap  ">
                                         <a href="#">
@@ -91,7 +91,7 @@
                                         </button>
 
 
-                                        <button id="edit-btn" class="pr-1" @click="deleteBtnClicked( complain.id)"
+                                        <button id="edit-btn" class="pr-1" @click="deleteBtnClicked(complain.id)"
                                             data-te-toggle="modal" data-te-target="#deleteModal">
                                             <i class="fas fa-trash-alt"></i>
                                         </button>
@@ -104,6 +104,25 @@
                             <!-- looping end -->
                         </tbody>
                     </table>
+
+                    <!-- pagination -->
+                    <div class="flex justify-center">
+
+                        <div v-if="totalData != 0" class=" bg-white  flex justify-center mt-5 py-3">
+                            <button class="rounded px-6 py-1 border  hover:bg-slate-200" :disabled="currentPage === 1"
+                                @click="getComplain(currentPage - 1)">«</button>
+
+                            <button class=" text-sm px-5 border">
+                                Page <span @dblclick="showInput">{{ currentPage }}</span> / <span
+                                    class="text-gray-400">{{
+                                    lastPage }}</span>
+                            </button>
+
+                            <button class=" rounded px-6  py-1 border  hover:bg-slate-200"
+                                :disabled="currentPage === lastPage" @click="getComplain(currentPage + 1)">
+                                »</button>
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -142,9 +161,9 @@
                                     Category
                                 </label>
                                 <select name="" id="" v-model="selectedCategory" class="input-ui">
-                                    <option v-for="(category,index) in complainCategory" :key="index"
+                                    <option v-for="(category, index) in complainCategory" :key="index"
                                         :value=category.id>{{
-                                        category.name }}</option>
+                                            category.name }}</option>
 
                                 </select>
                             </div>
@@ -197,8 +216,7 @@
                             <div class="mb-4">
                                 <select type="text" placeholder="Complain Title" v-model="change_status"
                                     data-te-select-init data-te-select-placeholder="Select Roles"
-                                    data-te-select-filter="true"
-                                    class="input-ui">
+                                    data-te-select-filter="true" class="input-ui">
                                     <option value="In Progress">In Progress</option>
                                     <option value="Done">Done</option>
 
@@ -271,122 +289,121 @@
 </template>
 
 <script>
-    import { Modal, Ripple, Select, initTE, Input } from "tw-elements";
-    import { getApiData, postApiData, deleteApiData } from '../../utilities/ajax-helpers';
-    import { mapGetters } from "vuex";
+import { Modal, Ripple, Select, initTE, Input } from "tw-elements";
+import { getApiData, postApiData, deleteApiData } from '../../utilities/ajax-helpers';
+import { mapGetters } from "vuex";
 
-    export default {
-        data() {
-            return {
-                complainList:[],
-                typeList:[],
-                areaList:[],
-                departmentList:[],
-                name: null,
-                deleteId: null,
-                per_page: 10,
-                pageNumbers: [],
-                currentPage: 1,
-                paginationGroupsCount: 1,
-                per_group: 10,
-                groupedPageNumbers: [],
-                currentGroup: 0,
-                complainCategory:[],
-                title:null,
-                selectedCategory:null,
-                description:null,
-                statusChange_id:null,
-                change_status:null
-            };
+export default {
+    data() {
+        return {
+            complainList: [],
+            typeList: [],
+            areaList: [],
+            departmentList: [],
+            name: null,
+            deleteId: null,
+
+            complainCategory: [],
+            title: null,
+            selectedCategory: null,
+            description: null,
+            statusChange_id: null,
+            change_status: null,
+
+            currentPage: 0,
+            perPage: 0,
+            lastPage: 0,
+            totalData: 0,
+        };
+    },
+
+    methods: {
+        ...mapGetters(['getToken']),
+
+        async getComplain(pageNumber) {
+
+            let url = `/api/complaints?page=${pageNumber}`
+            const response = await getApiData({ url: url, token: this.getToken() });
+            if (response.data) {
+                this.complainList = response.data.data;
+                this.lastPage = response.data.last_page;
+                this.currentPage = pageNumber;
+                this.perPage = response.data.per_page;
+                this.totalData = response.data.total;
+            }
         },
 
-        methods: {
-            ...mapGetters(['getToken']),
+        createBtnClicked() {
+            this.createComplain();
+        },
 
-            async getComplain(){
-                const response = await getApiData({ url: '/api/complaints', token: this.getToken() });
-                if(response.data){
-                    this.complainList = response.data;
-                }
-            },
+        async getComplainCategory() {
+            let response = await getApiData({ url: '/api/complaint_categories' });
+            this.complainCategory = response.data;
 
-            createBtnClicked(){
-                this.createComplain();
-            },
+        },
 
-            async getComplainCategory()
-            {
-                let response = await getApiData({url:'/api/complaint_categories'});
-                this.complainCategory = response.data;
+        async createComplain() {
+            let formData = new FormData();
+            formData.append('title', this.title);
+            formData.append('description', this.description);
+            formData.append('complaint_category_id', this.selectedCategory);
+            let response = await postApiData({ url: '/api/complaints', form_data: formData, token: this.getToken() });
+            if (response.success) {
+                this.getComplain(1);
+                this.closeModal();
+                this.clearForm();
+            }
+            else {
+                alert('some errors occur');
+            }
+        },
 
-            },
+        statusChangeClick(id) {
+            this.statusChange_id = id;
+        },
 
-            async createComplain()
-            {
-                let formData = new FormData();
-                formData.append('title', this.title);
-                formData.append('description', this.description);
-                formData.append('complaint_category_id', this.selectedCategory);
-                let response = await postApiData({url: '/api/complaints', form_data: formData, token: this.getToken()});
-                if(response.success){
-                    this.getComplain(null);
-                    this.closeModal();
-                    this.clearForm();
-                }
-                else{
-                    alert('some errors occur');
-                }
-            },
+        async statusChange() {
+            if (!this.change_status) {
+                alert('Please select the status');
+            }
+            let formData = new FormData();
+            formData.append('status', this.change_status);
+            let response = await postApiData({ url: `/api/complaints/${this.statusChange_id}/update_status`, form_data: formData, token: this.getToken() })
+            this.change_status == "";
+            if (response.success == true) {
+                this.getComplain(1);
+            } else {
+                alert(response.message);
+            }
+        },
 
-            statusChangeClick(id)
-            {
-                this.statusChange_id = id;
-            },
-
-            async statusChange()
-            {
-                if(!this.change_status){
-                    alert('Please select the status');
-                }
-                let formData = new FormData();
-                formData.append('status',this.change_status);
-                let response = await postApiData({url:`/api/complaints/${this.statusChange_id}/update_status`,form_data:formData,token:this.getToken()})
-                this.change_status == "";
-                if(response.success==true)
-                {
-                    this.getComplain(null);
-                }else{
-                    alert(response.message);
-                }
-            },
-
-            closeModal() {
-                document.getElementById("close").click();
-            },
-            clearForm() {
-                this.title = null,
+        closeModal() {
+            document.getElementById("close").click();
+        },
+        clearForm() {
+            this.title = null,
                 this.selectedCategory = null,
                 this.description = null
-            },
-            deleteBtnClicked(id){
-                this.deleteId = id;
-            },
-            async confirmDeleteBtnClicked(){
-                let url = `/api/complaints/${this.deleteId}`;
-                let response = await deleteApiData({url: url, token: this.getToken()});
-                if(response.success){
-                    alert(`deleted`);
-                }
-            }
-
         },
-        mounted()
-        {
-
-            this.getComplain();
-            this.getComplainCategory();
-
-            initTE({ Modal,Select, Ripple });
+        deleteBtnClicked(id) {
+            this.deleteId = id;
+        },
+        async confirmDeleteBtnClicked() {
+            let url = `/api/complaints/${this.deleteId}`;
+            let response = await deleteApiData({ url: url, token: this.getToken() });
+            if (response.success) {
+                alert(`deleted`);
+            }
         }
+
+    },
+    mounted() {
+
+        this.getComplain(1);
+        this.getComplainCategory();
+
+        initTE({ Modal, Select, Ripple });
     }
+}
 </script>

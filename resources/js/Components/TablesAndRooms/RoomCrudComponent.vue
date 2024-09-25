@@ -55,7 +55,7 @@
                             <div class="contents" v-for="(room, index) in roomList" :key="index">
                                 <tr class="">
                                     <td class="  ">
-                                        {{ ++index }}
+                                        {{ perPage * (currentPage - 1) + (++index) }}
                                     </td>
                                     <td class="whitespace-nowrap  ">
                                         {{ room.name }}
@@ -90,64 +90,27 @@
                             <!-- looping end -->
                         </tbody>
                     </table>
+
+                    <!-- pagination -->
+                    <div class="flex justify-center">
+
+                        <div v-if="totalData != 0" class=" bg-white  flex justify-center mt-5 py-3">
+                            <button class="rounded px-6 py-1 border  hover:bg-slate-200" :disabled="currentPage === 1"
+                                @click="getRoomList(currentPage - 1)">«</button>
+
+                            <button class=" text-sm px-5 border">
+                                Page <span >{{ currentPage }}</span> / <span
+                                    class="text-gray-400">{{
+                                    lastPage }}</span>
+                            </button>
+
+                            <button class=" rounded px-6  py-1 border  hover:bg-slate-200"
+                                :disabled="currentPage === lastPage" @click="getRoomList(currentPage + 1)">
+                                »</button>
+                        </div>
+                    </div>
                 </div>
 
-                <div class="mt-2 ml-2">
-                    <ul v-if="paginationGroupsCount > 1" class="list-style-none flex">
-                        <li v-if="!isFirstGroup">
-                            <button class="relative block rounded bg-transparent px-3 py-1.5 text-sm text-neutral-600 transition-all duration-300
-                        hover:bg-neutral-100 dark:text-white dark:hover:bg-neutral-700 dark:hover:text-white"
-                                @click="previousPaginationGroupBtnClicked" :disabled="isFirstGroup">
-                                Previous
-                            </button>
-                        </li>
-
-                        <li v-for="(pageNumber, pageNumberIndex) in groupedPageNumbers[currentGroup]"
-                            :key="pageNumberIndex" :aria-current="(pageNumber == currentPage) ? 'page' : ''">
-                            <button v-if="pageNumber == currentPage"
-                                class="relative block rounded bg-neutral-800 px-3 py-1.5 text-sm font-medium text-neutral-50 transition-all duration-300 dark:bg-neutral-900"
-                                :id="'paginationBtn-' + pageNumberIndex" @click="pageBtnClicked(pageNumber)">
-                                {{ pageNumber }}
-                                <span
-                                    class="absolute -m-px h-px w-px overflow-hidden whitespace-nowrap border-0 p-0 [clip:rect(0,0,0,0)]">
-                                    (current)
-                                </span>
-                            </button>
-                            <button v-else
-                                class="normal-pagination relative block rounded bg-transparent px-3 py-1.5 text-sm text-neutral-600 transition-all duration-300 hover:bg-neutral-100 dark:text-white dark:hover:bg-neutral-700 dark:hover:text-white"
-                                :id="'paginationBtn-' + pageNumberIndex" @click="pageBtnClicked(pageNumber)">
-                                {{ pageNumber }}
-                            </button>
-                        </li>
-                        <li v-if="!isLastGroup">
-                            <button class="relative block rounded bg-transparent px-3 py-1.5 text-sm text-neutral-600 transition-all duration-300
-                        hover:bg-neutral-100 dark:text-white dark:hover:bg-neutral-700 dark:hover:text-white"
-                                @click="nextPaginationGroupBtnClicked" :disabled="isLastGroup">
-                                Next
-                            </button>
-                        </li>
-                    </ul>
-
-                    <ul v-else class="list-style-none flex">
-                        <li v-for="(pageNumber, pageNumberIndex) in pageNumbers" :key="pageNumberIndex"
-                            :aria-current="(pageNumber == currentPage) ? 'page' : ''">
-                            <button v-if="pageNumber == currentPage"
-                                class="relative block rounded bg-neutral-800 px-3 py-1.5 text-sm font-medium text-neutral-50 transition-all duration-300 dark:bg-neutral-900"
-                                :id="'paginationBtn-' + pageNumberIndex" @click="pageBtnClicked(pageNumber)">
-                                {{ pageNumber }}
-                                <span
-                                    class="absolute -m-px h-px w-px overflow-hidden whitespace-nowrap border-0 p-0 [clip:rect(0,0,0,0)]">
-                                    (current)
-                                </span>
-                            </button>
-                            <button v-else
-                                class="normal-pagination relative block rounded bg-transparent px-3 py-1.5 text-sm text-neutral-600 transition-all duration-300 hover:bg-neutral-100 dark:text-white dark:hover:bg-neutral-700 dark:hover:text-white"
-                                :id="'paginationBtn-' + pageNumberIndex" @click="pageBtnClicked(pageNumber)">
-                                {{ pageNumber }}
-                            </button>
-                        </li>
-                    </ul>
-                </div>
             </div>
 
 
@@ -200,7 +163,7 @@
                                     Selling Area
                                 </label>
                                 <select name="" id="" v-model="area_id" class="input-ui">
-                                    <option :value="area.id" v-for="(area,index) in areaList">{{ area.name }}</option>
+                                    <option :value="area.id" v-for="(area, index) in areaList" :key="index">{{ area.name }}</option>
                                 </select>
                             </div>
                         </div>
@@ -273,196 +236,161 @@
 </template>
 
 <script>
-    import { Modal, Ripple, Select, initTE, Input, Dropdown } from "tw-elements";
-    import { getApiData, postApiData, deleteApiData } from '../../utilities/ajax-helpers';
-    import { mapGetters } from "vuex";
+import { Modal, Ripple, Select, initTE, Input, Dropdown } from "tw-elements";
+import { getApiData, postApiData, deleteApiData } from '../../utilities/ajax-helpers';
+import { mapGetters } from "vuex";
 
-    export default {
-        data() {
-            return {
-                roomList:[],
-                entityTypeList:['Room','Table'],
-                serviceCategoryList:[],
-                areaList:[],
+export default {
+    data() {
+        return {
+            roomList: [],
+            entityTypeList: ['Room', 'Table'],
+            serviceCategoryList: [],
+            areaList: [],
 
-                name: null,
-                pricePerHour:null,
-                entityType:'room',
-                area_id:null,
-                service_category_id:null,
-                deleteId: null,
+            name: null,
+            pricePerHour: null,
+            entityType: 'room',
+            area_id: null,
+            service_category_id: null,
+            deleteId: null,
 
-                searchInput: null,
+            searchInput: null,
+            currentPage: 0,
+            perPage: 0,
+            lastPage: 0,
+            totalData: 0,
+        };
+    },
 
-                per_page: 20,
-                pageNumbers: [],
-                currentPage: 1,
-                paginationGroupsCount: 1,
-                per_group: 10,
-                groupedPageNumbers: [],
-                currentGroup: 0,
-                isFirstGroup: true,
-                isLastGroup: false,
-            };
-        },
+    methods: {
+        ...mapGetters(['getToken']),
 
-        methods: {
-            ...mapGetters(['getToken']),
+        async getRoomList(pageNumber) {
 
-            async getRoomList(pageNumber){
-                const response = await getApiData({ url: '/api/entities?type=room', token: this.getToken() });
-                if(response.data){
-                    this.roomList = response.data;
-                }
-            },
-
-            async getAreaList(){
-                const response = await getApiData({ url: '/api/areas', token: this.getToken() });
-                if(response.data){
-                    this.areaList = response.data;
-                }
-            },
-            async getServiceCategoryList(){
-                const response = await getApiData({ url: '/api/service_categories', token: this.getToken() });
-                if(response.data){
-                    this.serviceCategoryList = response.data;
-                }
-            },
-
-            // inventoryableTypeChanged(){
-            //     if(this.selectedInventoryType == 'area'){
-            //         this.getAreaList();
-            //     }
-            //     if(this.selectedInventoryType == 'department'){
-            //         this.getDepartmentList();
-            //     }
-            // },
-
-            createBtnClicked(){
-                this.createTableAndRoom();
-            },
-
-            async createTableAndRoom()
-            {
-                let formData = new FormData();
-                formData.append('name', this.name);
-                formData.append('price_per_hour', this.pricePerHour);
-                formData.append('entity_type', this.entityType);
-                formData.append('area_id', this.area_id);
-                // formData.append('service_category_id', this.service_category_id);
-                let response = await postApiData({url: '/api/entities', form_data: formData, token: this.getToken()});
-                if(response.success){
-                    this.getRoomList(null);
-                    this.closeModal();
-                    this.clearForm();
-                }
-                else{
-                    alert('some errors occur');
-                }
-            },
-
-            closeModal() {
-                document.getElementById("close").click();
-            },
-
-            clearForm() {
-                this.name = null,
-                this.selectedInventoryType = null,
-                this.inventoryable_id = null,
-                this.typeList = []
-            },
-
-            isActiveToggled(id){
-                let index = this.roomList.findIndex(room => room.id == id);
-                if(index != -1){
-                    if(this.roomList[index].is_available == 1){
-                        this.roomList[index].is_available = 0;
-                    }
-                    else{
-                        this.roomList[index].is_available = 1;
-                    }
-
-                    let url = `/api/is_active`;
-                    let formData = new FormData();
-                    formData.append('id', id);
-                    formData.append('type', 'entity');
-                    let response = postApiData({url: url, form_data: formData, token: this.getToken()});
-                }
-            },
-
-            deleteBtnClicked(id){
-                this.deleteId = id;
-            },
-
-            async confirmDeleteBtnClicked(){
-                let url = `/api/entities/${this.deleteId}`;
-                let response = await deleteApiData({url: url, token: this.getToken()});
-                if(response.success){
-                    this.getRoomList(null);
-                }
-                else{
-                    alert('some errors occur');
-                }
-            },
-
-            async searchBtnClicked(){
-                let url = null;
-                if(this.searchInput){
-                    url = `/api/entities?type=room&search_input=${this.searchInput}&page=1`;
-                }
-                let response = await getApiData({url: url, token: this.getToken()});
-                if(response.data){
-                    this.roomList = response.data.data;
-                }
-            },
-
-            clearSearchBtnClicked(){
-                this.searchInput = null;
-                this.searchCategory = null;
-                this.getRoomList(null);
-            },
-
-            pageBtnClicked(pageNumber){
+            let url = `/api/entities?type=room&page=${pageNumber}`;
+            if (this.searchInput) {
+                url = `/api/entities?type=room&search_input=${this.searchInput}&page=${pageNumber}`;
+            }
+            const response = await getApiData({ url: url, token: this.getToken() });
+            if (response.data) {
+                this.roomList = response.data.data;
+                this.lastPage = response.data.last_page;
                 this.currentPage = pageNumber;
-                this.getRoomList(this.currentPage);
-            },
-
-            nextPaginationGroupBtnClicked(){
-                this.currentGroup += 1;
-                this.currentPage = (this.groupedPageNumbers[this.currentGroup][0]);
-                this.getRoomList(this.currentPage);
-            },
-
-            previousPaginationGroupBtnClicked(){
-                this.currentGroup -= 1;
-                let lastIndex = this.groupedPageNumbers[this.currentGroup].length - 1;
-                this.currentPage = (this.groupedPageNumbers[this.currentGroup][lastIndex]);
-                this.getRoomList(this.currentPage);
-            },
-
-            firstPaginationGroupBtnClicked(){
-                this.currentGroup = 0;
-                this.currentPage = (this.groupedPageNumbers[this.currentGroup][0]);
-                this.getRoomList(this.currentPage);
-            },
-
-            lastPaginationGroupBtnClicked(){
-                this.currentGroup = this.paginationGroupsCount - 1;
-                let lastIndex = this.groupedPageNumbers[this.currentGroup].length - 1;
-                this.currentPage = (this.groupedPageNumbers[this.currentGroup][lastIndex]);
-                this.getRoomList(this.currentPage);
+                this.perPage = response.data.per_page;
+                this.totalData = response.data.total;
             }
         },
 
-        created(){
-            this.getRoomList(null);
-            this.getAreaList();
-            this.getServiceCategoryList();
+        async getAreaList() {
+            const response = await getApiData({ url: '/api/areas', token: this.getToken() });
+            if (response.data) {
+                this.areaList = response.data;
+            }
+        },
+        async getServiceCategoryList() {
+            const response = await getApiData({ url: '/api/service_categories', token: this.getToken() });
+            if (response.data) {
+                this.serviceCategoryList = response.data;
+            }
         },
 
-        mounted()
-        {
-            initTE({ Modal,Select, Ripple, Dropdown });
-        }
+        // inventoryableTypeChanged(){
+        //     if(this.selectedInventoryType == 'area'){
+        //         this.getAreaList();
+        //     }
+        //     if(this.selectedInventoryType == 'department'){
+        //         this.getDepartmentList();
+        //     }
+        // },
+
+        createBtnClicked() {
+            this.createTableAndRoom();
+        },
+
+        async createTableAndRoom() {
+            let formData = new FormData();
+            formData.append('name', this.name);
+            formData.append('price_per_hour', this.pricePerHour);
+            formData.append('entity_type', this.entityType);
+            formData.append('area_id', this.area_id);
+            // formData.append('service_category_id', this.service_category_id);
+            let response = await postApiData({ url: '/api/entities', form_data: formData, token: this.getToken() });
+            if (response.success) {
+                this.getRoomList(1);
+                this.closeModal();
+                this.clearForm();
+            }
+            else {
+                alert('some errors occur');
+            }
+        },
+
+        closeModal() {
+            document.getElementById("close").click();
+        },
+
+        clearForm() {
+            this.name = null,
+                this.selectedInventoryType = null,
+                this.inventoryable_id = null,
+                this.typeList = []
+        },
+
+        isActiveToggled(id) {
+            let index = this.roomList.findIndex(room => room.id == id);
+            if (index != -1) {
+                if (this.roomList[index].is_available == 1) {
+                    this.roomList[index].is_available = 0;
+                }
+                else {
+                    this.roomList[index].is_available = 1;
+                }
+
+                let url = `/api/is_active`;
+                let formData = new FormData();
+                formData.append('id', id);
+                formData.append('type', 'entity');
+                let response = postApiData({ url: url, form_data: formData, token: this.getToken() });
+            }
+        },
+
+        deleteBtnClicked(id) {
+            this.deleteId = id;
+        },
+
+        async confirmDeleteBtnClicked() {
+            let url = `/api/entities/${this.deleteId}`;
+            let response = await deleteApiData({ url: url, token: this.getToken() });
+            if (response.success) {
+                this.getRoomList(1);
+            }
+            else {
+                alert('some errors occur');
+            }
+        },
+
+        async searchBtnClicked() {
+           this.getRoomList(1);
+        },
+
+        clearSearchBtnClicked() {
+            this.searchInput = null;
+            this.searchCategory = null;
+            this.getRoomList(1);
+        },
+
+
+    },
+
+    created() {
+        this.getRoomList(1);
+        this.getAreaList();
+        this.getServiceCategoryList();
+    },
+
+    mounted() {
+        initTE({ Modal, Select, Ripple, Dropdown });
     }
+}
 </script>

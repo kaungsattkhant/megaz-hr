@@ -14,26 +14,14 @@ class InventoryRepository implements InventoryRepositoryInterface
     {
         $inventory_ids=UserData()->inventories->pluck('id')->toArray();
         if ($request->per_page || $request->page) {
-            // $totalCount = Inventory::where('is_active', 1)->count();
-            // $pageNumber = 1;
-            // $perPage = 20;
-            // if ($request->page) {
-            //     $pageNumber = $request->page;
-            // }
-            // if ($request->per_page) {
-            //     $perPage = $request->per_page;
-            // }
-            // $skip = ($pageNumber - 1) * $perPage;
-            // $inventories = Inventory::where('is_active', 1)->skip($skip)->take($perPage)->get();
-            // $paginationData = MakePaginationData($request, $totalCount, 'inventories');
-            // $paginationData['inventories'] = $inventories;
-            // return $paginationData;
-            return Inventory::orderBy('id','desc')
-            ->whereHas('inventories',function($query)use($inventory_ids){
-                $query->whereIn('id',$inventory_ids);
+            $inventories = Inventory::where('is_active', 1)
+            ->whereHas('staff',function($query){
+                $query->where('id',UserData()->id);
             })
+            ->whereIn('id',$inventory_ids)
             ->with(['inventoryable'])
             ->paginate(config('common.list_count'));
+            return $inventories;
         } else {
             $inventories = Inventory::where('is_active', 1)
             ->whereHas('staff',function($query){
