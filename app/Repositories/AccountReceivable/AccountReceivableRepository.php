@@ -121,6 +121,7 @@ class AccountReceivableRepository implements AccountReceivableRepositoryInterfac
 
     public function accountReceivableList(Request $request)
     {
+        // nmh
         $accountReceivable = Account::withSum(['accountReceivables as ar_sum' => function ($query) {
                 $query->where('type', 'ar');
             }], 'amount')
