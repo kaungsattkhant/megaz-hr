@@ -129,7 +129,7 @@ class AccountReceivableRepository implements AccountReceivableRepositoryInterfac
             }], 'amount')
             ->withCount('accountReceivables')
             ->having('account_receivables_count', '>', 0)
-            ->get(['id', 'account_code', 'name'])
+            ->paginate(config('common.list_count'), ['id', 'account_code', 'name'])
             ->map(function ($account) {
                 $account->ar_balance = $account->ar_sum - $account->ar_paid_sum;
                 return $account;
