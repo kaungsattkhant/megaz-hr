@@ -693,7 +693,7 @@
             },
 
 
-            // use in add menu
+            // use in create validation
             displayErrors(errors,list) {
                 errors.forEach((errorMessage, index) => {
                     const errorElement = document.createElement('small');
