@@ -284,11 +284,17 @@ class FinancialRepository implements FinancialInterface
         $retainEarning = $this->trialBalanceService->getTrialBalanceResults($retainEarningCode, 'credit', $current, 'credit_balance');
         $longTerm = $this->trialBalanceService->getTrialBalanceResults($longTermCode, 'credit', $current, 'credit_balance');
 
+
         $creditBalance = [];
         $creditBalance[] = $income;
         $creditBalance[] = $capital;
         $creditBalance[] = $retainEarning;
         $creditBalance[] = $longTerm;
+        $creditTotalBalance = 0;
+        $creditTotalBalance += collect($income)->sum('amount');
+        $creditTotalBalance += collect($capital)->sum('amount');
+        $creditTotalBalance += collect($retainEarning)->sum('amount');
+        $creditTotalBalance += collect($longTerm)->sum('amount');
         #end credit balance
 
 
@@ -324,12 +330,12 @@ class FinancialRepository implements FinancialInterface
 
         #fixed overhead
         // $fixedOverHead=[];
-        $financeCostCode = ['6-8000'];
+        $financeCostCode = ['6-8000']; //finance cost
         $financeCost = $this->trialBalanceService->getTotalBySubAccountCode($financeCostCode, 'debit', $current, 'finance_cost');
         $fixExpenseCodes = [
-            '6-7001',
-            '6-7002',
-            '6-7004',
+            '6-7001', //rental 
+            '6-7002', //depreciaion
+            '6-7004', //replacement
         ];
         $fixExpense = $this->trialBalanceService->getTrialBalanceResults($fixExpenseCodes, 'debit', $current, 'fix_expense');
 
@@ -343,16 +349,28 @@ class FinancialRepository implements FinancialInterface
         $debitBalance[] = $costAndExpense;
         $debitBalance[] = $fixedOverHead;
 
+        $debitTotalBalance = 0;
+        $debitTotalBalance += collect(value: [$fix_asset_tangiable])->sum('amount');
+        $debitTotalBalance += collect([$fix_asset_intangible])->sum('amount');
+        $debitTotalBalance += collect($cashAndBankBalance)->sum('amount');
+        $debitTotalBalance += collect($costAndExpense)->sum('amount');
+        $debitTotalBalance += collect($fixedOverHead)->sum('amount');
         #end debit balance
+        // $creditBalanceResult = new \stdClass();
+        // $creditBalanceResult->credit_balance = $creditBalance;
 
-        $creditBalanceResult = new \stdClass();
-        $creditBalanceResult->credit_balance = $creditBalance;
+        // $debitBalanceResult = new \stdClass();
+        // $debitBalanceResult->debit_balance = $debitBalance;
 
-        $debitBalanceResult = new \stdClass();
-        $debitBalanceResult->debit_balance = $debitBalance;
+        // $finalResults = [$creditBalanceResult, $debitBalanceResult];
 
-        $finalResults = [$creditBalanceResult, $debitBalanceResult];
-        return $finalResults;
+        return [
+            'credit_balance' => $creditBalance,
+            'credit_total_balance' => $creditTotalBalance,
+            'debit_total_balance' => $debitTotalBalance,
+            'debit_balance' => $debitBalance
+        ];
+        // return $finalResults;
     }
 
 }
