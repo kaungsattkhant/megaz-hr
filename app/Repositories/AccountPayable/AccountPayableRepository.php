@@ -73,10 +73,14 @@ class AccountPayableRepository implements AccountPayableInterface
 
     public function getPayableAccount()
     {
-        return Account::whereHas('sub_account.head_account', function ($q) {
-            $q->where('head_account_id', config('common.liabilities'));
+        return Account::orderBy('accounts.id','asc')
+        ->whereHas('sub_account', function ($q) {
+            $q->where('account_code', config('common.payable_account_code'));
         })
-            ->get();
+        // whereHas('sub_account.head_account', function ($q) {
+        //     $q->where('head_account_id', config('common.liabilities'));
+        // })
+        ->get();
     }
 
     public function createPayableTransaction($request)
