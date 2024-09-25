@@ -358,12 +358,9 @@ class FinancialRepository implements FinancialInterface
         #end debit balance
         // $creditBalanceResult = new \stdClass();
         // $creditBalanceResult->credit_balance = $creditBalance;
-
         // $debitBalanceResult = new \stdClass();
         // $debitBalanceResult->debit_balance = $debitBalance;
-
         // $finalResults = [$creditBalanceResult, $debitBalanceResult];
-
         return [
             'credit_balance' => $creditBalance,
             'credit_total_balance' => $creditTotalBalance,
