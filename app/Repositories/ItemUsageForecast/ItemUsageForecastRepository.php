@@ -31,6 +31,7 @@ class ItemUsageForecastRepository implements ItemUsageForecastInterface
 
     public function itemUsageForecastListByMonthwithDepartment(int $month)
     {
+
         $loginUserDepartment = UserData()->department_id;
         if($loginUserDepartment == 2)
         {
@@ -58,7 +59,7 @@ class ItemUsageForecastRepository implements ItemUsageForecastInterface
 
     public function iufWithMonthAndDepartment(int $month,int $department_id)
     {
-        $itemUsageForecasts = ItemUsageForecast::whereMonth('date',$month)->where('department_id',$department_id)->with('forecast_items','department')->get();
+        $itemUsageForecasts = ItemUsageForecast::whereMonth('date',$month)->where('department_id',$department_id)->with('forecast_items','department')->paginate(config('common.list_count'));
         ResponseData($itemUsageForecasts);
     }
 

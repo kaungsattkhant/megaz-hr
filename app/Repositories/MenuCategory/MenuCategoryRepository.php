@@ -10,7 +10,12 @@ class MenuCategoryRepository implements MenuCategoryRepositoryInterface
 {
     public function listAllData()
     {
-        $menuCategories = MenuCategory::all();
+        if(request()->page)
+        {
+            $menuCategories = MenuCategory::orderBy('created_at','desc')->paginate(config('common.list_count'));
+        }else{
+            $menuCategories = MenuCategory::all();
+        }
         ResponseData($menuCategories);
     }
 

@@ -20,11 +20,13 @@ class EntityRepository implements EntityRepositoryInterface
                     $q->where('name', 'LIKE', '%' . $request->search_input . '%');
                 })
                 ->whereEntityType($type)
+                ->orderBy('created_at','desc')
                 ->paginate(config('common.list_count'));
         } else {
             $entities = Entity::where('is_available', 1)
                 ->whereEntityType($type)
                 ->with('service_category')
+                ->orderBy('created_at','desc')
                 ->get();
             return $entities;
         }

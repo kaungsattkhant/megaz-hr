@@ -4,7 +4,7 @@
             Inventory Transfer
         </p>
     </div>
-    <div class="mt-4 bg-white" >
+    <div class="mt-4 bg-white">
 
         <div class="btn-container">
             <div class=" flex">
@@ -19,7 +19,8 @@
                 </div>
                 <div class="ml-2 px-2">
                     <button class="mx-1 add-btn h-8 text-[13px] font-inter" @click="searchBtnClicked">Filter</button>
-                    <button class="mx-1 add-btn h-8 text-[13px] font-inter" @click="clearSearchBtnClicked">Clear</button>
+                    <button class="mx-1 add-btn h-8 text-[13px] font-inter"
+                        @click="clearSearchBtnClicked">Clear</button>
                 </div>
             </div>
             <div class="flex justify-end flex-col">
@@ -73,7 +74,7 @@
                             <div class="contents" v-for="(transfer, index) in transfersList" :key="index">
                                 <tr class="">
                                     <td class="  ">
-                                        {{ per_page * (currentPage - 1) + (++index) }}
+                                        {{ perPage * (currentPage - 1) + (++index) }}
                                     </td>
                                     <td class="whitespace-nowrap  ">
                                         {{ transfer.transfer_id }}
@@ -116,63 +117,27 @@
                             <!-- looping end -->
                         </tbody>
                     </table>
-                </div>
-                <div class="mt-2 ml-2">
-                    <ul v-if="paginationGroupsCount > 1" class="list-style-none flex">
-                        <li v-if="!isFirstGroup">
-                            <button class="relative block rounded bg-transparent px-3 py-1.5 text-sm text-neutral-600 transition-all duration-300
-                        hover:bg-neutral-100 dark:text-white dark:hover:bg-neutral-700 dark:hover:text-white"
-                                @click="previousPaginationGroupBtnClicked" :disabled="isFirstGroup">
-                                Previous
-                            </button>
-                        </li>
 
-                        <li v-for="(pageNumber, pageNumberIndex) in groupedPageNumbers[currentGroup]"
-                            :key="pageNumberIndex" :aria-current="(pageNumber == currentPage) ? 'page' : ''">
-                            <button v-if="pageNumber == currentPage"
-                                class="relative block rounded bg-neutral-800 px-3 py-1.5 text-sm font-medium text-neutral-50 transition-all duration-300 dark:bg-neutral-900"
-                                :id="'paginationBtn-' + pageNumberIndex" @click="pageBtnClicked(pageNumber)">
-                                {{ pageNumber }}
-                                <span
-                                    class="absolute -m-px h-px w-px overflow-hidden whitespace-nowrap border-0 p-0 [clip:rect(0,0,0,0)]">
-                                    (current)
-                                </span>
-                            </button>
-                            <button v-else
-                                class="normal-pagination relative block rounded bg-transparent px-3 py-1.5 text-sm text-neutral-600 transition-all duration-300 hover:bg-neutral-100 dark:text-white dark:hover:bg-neutral-700 dark:hover:text-white"
-                                :id="'paginationBtn-' + pageNumberIndex" @click="pageBtnClicked(pageNumber)">
-                                {{ pageNumber }}
-                            </button>
-                        </li>
-                        <li v-if="!isLastGroup">
-                            <button class="relative block rounded bg-transparent px-3 py-1.5 text-sm text-neutral-600 transition-all duration-300
-                        hover:bg-neutral-100 dark:text-white dark:hover:bg-neutral-700 dark:hover:text-white"
-                                @click="nextPaginationGroupBtnClicked" :disabled="isLastGroup">
-                                Next
-                            </button>
-                        </li>
-                    </ul>
+                    <!-- pagination -->
+                    <div class="flex justify-center">
 
-                    <ul v-else class="list-style-none flex">
-                        <li v-for="(pageNumber, pageNumberIndex) in pageNumbers" :key="pageNumberIndex"
-                            :aria-current="(pageNumber == currentPage) ? 'page' : ''">
-                            <button v-if="pageNumber == currentPage"
-                                class="relative block rounded bg-neutral-800 px-3 py-1.5 text-sm font-medium text-neutral-50 transition-all duration-300 dark:bg-neutral-900"
-                                :id="'paginationBtn-' + pageNumberIndex" @click="pageBtnClicked(pageNumber)">
-                                {{ pageNumber }}
-                                <span
-                                    class="absolute -m-px h-px w-px overflow-hidden whitespace-nowrap border-0 p-0 [clip:rect(0,0,0,0)]">
-                                    (current)
-                                </span>
+                        <div v-if="totalData != 0" class=" bg-white  flex justify-center mt-5 py-3">
+                            <button class="rounded px-6 py-1 border  hover:bg-slate-200" :disabled="currentPage === 1"
+                                @click="getInventoryTransfersList(currentPage - 1)">«</button>
+
+                            <button class=" text-sm px-5 border">
+                                Page <span @dblclick="showInput">{{ currentPage }}</span> / <span
+                                    class="text-gray-400">{{
+                                    lastPage }}</span>
                             </button>
-                            <button v-else
-                                class="normal-pagination relative block rounded bg-transparent px-3 py-1.5 text-sm text-neutral-600 transition-all duration-300 hover:bg-neutral-100 dark:text-white dark:hover:bg-neutral-700 dark:hover:text-white"
-                                :id="'paginationBtn-' + pageNumberIndex" @click="pageBtnClicked(pageNumber)">
-                                {{ pageNumber }}
-                            </button>
-                        </li>
-                    </ul>
+
+                            <button class=" rounded px-6  py-1 border  hover:bg-slate-200"
+                                :disabled="currentPage === lastPage" @click="getInventoryTransfersList(currentPage + 1)">
+                                »</button>
+                        </div>
+                    </div>
                 </div>
+
             </div>
         </div>
     </div>
@@ -193,15 +158,10 @@ export default {
             fromDate: null,
             toDate: null,
 
-            per_page: 20,
-            pageNumbers: [],
-            currentPage: 1,
-            paginationGroupsCount: 1,
-            per_group: 10,
-            groupedPageNumbers: [],
-            currentGroup: 0,
-            isFirstGroup: true,
-            isLastGroup: false,
+            currentPage: 0,
+            perPage: 0,
+            lastPage: 0,
+            totalData: 0,
         };
     },
 
@@ -209,87 +169,41 @@ export default {
         ...mapGetters(['getToken']),
 
         async getInventoryTransfersList(pageNumber) {
-            if (pageNumber) {
-                this.currentPage = pageNumber;
-            }
-            let url = `/api/transfers?page=${this.currentPage}`;
-            if(this.fromDate && this.toDate){
+
+            let url = `/api/transfers?page=${pageNumber}`;
+            if (this.fromDate && this.toDate) {
                 url = `${url}&from_date=${this.fromDate}&to_date=${this.toDate}`;
             }
             let response = await getApiData({ url: url, token: this.getToken() });
             if (response.data) {
                 this.transfersList = response.data.data;
+
+                this.lastPage = response.data.last_page;
+                this.currentPage = pageNumber;
+                this.perPage = response.data.per_page;
+                this.totalData = response.data.total;
+
                 this.transfersList.forEach((transfer) => {
                     transfer.date = convertToFriendlyDate(transfer.date);
                 });
-                this.per_page = response.data.per_page;
 
-                this.pageNumbers = [];
-                this.lastPageNumber = response.data.last_page;
-
-                for (let i = 1; i <= response.data.last_page; i++) {
-                    this.pageNumbers.push(i);
-                }
-
-                if (this.pageNumbers.length > 10) {
-                    this.groupedPageNumbers = [];
-                    this.paginationGroupsCount = this.pageNumbers.length % 10;
-                    for (let i = 0; i < this.pageNumbers.length; i += 10) {
-                        let chunk = this.pageNumbers.slice(i, i + 10);
-                        this.groupedPageNumbers.push(chunk);
-                    }
-
-                    let lastGroupIndex = this.groupedPageNumbers.length - 1;
-                    this.isFirstGroup = (this.currentGroup === 0);
-                    this.isLastGroup = (lastGroupIndex === this.currentGroup);
-                }
             }
         },
 
-        searchBtnClicked(){
-            this.getInventoryTransfersList(this.currentPage);
+        searchBtnClicked() {
+            this.getInventoryTransfersList(1);
         },
 
-        clearSearchBtnClicked(){
+        clearSearchBtnClicked() {
             this.fromDate = null;
             this.toDate = null;
-            this.getInventoryTransfersList(this.currentPage);
+            this.getInventoryTransfersList(1);
         },
 
-        pageBtnClicked(pageNumber) {
-            this.currentPage = pageNumber;
-            this.getInventoryTransfersList(this.currentPage);
-        },
-
-        nextPaginationGroupBtnClicked() {
-            this.currentGroup += 1;
-            this.currentPage = (this.groupedPageNumbers[this.currentGroup][0]);
-            this.getInventoryTransfersList(this.currentPage);
-        },
-
-        previousPaginationGroupBtnClicked() {
-            this.currentGroup -= 1;
-            let lastIndex = this.groupedPageNumbers[this.currentGroup].length - 1;
-            this.currentPage = (this.groupedPageNumbers[this.currentGroup][lastIndex]);
-            this.getInventoryTransfersList(this.currentPage);
-        },
-
-        firstPaginationGroupBtnClicked() {
-            this.currentGroup = 0;
-            this.currentPage = (this.groupedPageNumbers[this.currentGroup][0]);
-            this.getInventoryTransfersList(this.currentPage);
-        },
-
-        lastPaginationGroupBtnClicked() {
-            this.currentGroup = this.paginationGroupsCount - 1;
-            let lastIndex = this.groupedPageNumbers[this.currentGroup].length - 1;
-            this.currentPage = (this.groupedPageNumbers[this.currentGroup][lastIndex]);
-            this.getInventoryTransfersList(this.currentPage);
-        }
     },
 
     created() {
-        this.getInventoryTransfersList(null);
+        this.getInventoryTransfersList(1);
     },
 
     mounted() {

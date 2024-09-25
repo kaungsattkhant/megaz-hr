@@ -18,7 +18,8 @@
                 </div>
                 <div class="ml-2 px-2">
                     <button class="mx-1 add-btn h-8 text-[13px] font-inter" @click="searchBtnClicked">Filter</button>
-                    <button class="mx-1 add-btn h-8 text-[13px] font-inter" @click="clearSearchBtnClicked">Clear</button>
+                    <button class="mx-1 add-btn h-8 text-[13px] font-inter"
+                        @click="clearSearchBtnClicked">Clear</button>
                 </div>
             </div>
             <div class="flex justify-end flex-col">
@@ -72,7 +73,7 @@
                             <div class="contents" v-for="(receive, index) in receivesList" :key="index">
                                 <tr class="">
                                     <td class="  ">
-                                        {{ per_page * (currentPage - 1) + (++index) }}
+                                        {{ perPage * (currentPage - 1) + (++index) }}
                                     </td>
                                     <td class="whitespace-nowrap  ">
                                         {{ receive.transfer_id }}
@@ -103,12 +104,12 @@
                                     </td>
                                     <td class="whitespace-nowrap">
                                         <button class="mx-1" data-te-toggle="modal" data-te-target="#confirmModal"
-                                            :disabled=" receive.status != 'pending'"
+                                            :disabled="receive.status != 'pending'"
                                             @click="receiveBtnClicked(receive.id)">
                                             <i class="fal fa-check"></i>
                                         </button>
                                         <button class="mx-1" data-te-toggle="modal" data-te-target="#cancelModal"
-                                            :disabled=" receive.status != 'pending'"
+                                            :disabled="receive.status != 'pending'"
                                             @click="cancelReceiveBtnClicked(receive.id)">
                                             <i class="fal fa-times"></i>
                                         </button>
@@ -119,63 +120,27 @@
                             <!-- looping end -->
                         </tbody>
                     </table>
-                </div>
-                <div class="mt-2 ml-2">
-                    <ul v-if="paginationGroupsCount > 1" class="list-style-none flex">
-                        <li v-if="!isFirstGroup">
-                            <button class="relative block rounded bg-transparent px-3 py-1.5 text-sm text-neutral-600 transition-all duration-300
-                        hover:bg-neutral-100 dark:text-white dark:hover:bg-neutral-700 dark:hover:text-white"
-                                @click="previousPaginationGroupBtnClicked" :disabled="isFirstGroup">
-                                Previous
-                            </button>
-                        </li>
 
-                        <li v-for="(pageNumber, pageNumberIndex) in groupedPageNumbers[currentGroup]"
-                            :key="pageNumberIndex" :aria-current="(pageNumber == currentPage) ? 'page' : ''">
-                            <button v-if="pageNumber == currentPage"
-                                class="relative block rounded bg-neutral-800 px-3 py-1.5 text-sm font-medium text-neutral-50 transition-all duration-300 dark:bg-neutral-900"
-                                :id="'paginationBtn-' + pageNumberIndex" @click="pageBtnClicked(pageNumber)">
-                                {{ pageNumber }}
-                                <span
-                                    class="absolute -m-px h-px w-px overflow-hidden whitespace-nowrap border-0 p-0 [clip:rect(0,0,0,0)]">
-                                    (current)
-                                </span>
-                            </button>
-                            <button v-else
-                                class="normal-pagination relative block rounded bg-transparent px-3 py-1.5 text-sm text-neutral-600 transition-all duration-300 hover:bg-neutral-100 dark:text-white dark:hover:bg-neutral-700 dark:hover:text-white"
-                                :id="'paginationBtn-' + pageNumberIndex" @click="pageBtnClicked(pageNumber)">
-                                {{ pageNumber }}
-                            </button>
-                        </li>
-                        <li v-if="!isLastGroup">
-                            <button class="relative block rounded bg-transparent px-3 py-1.5 text-sm text-neutral-600 transition-all duration-300
-                        hover:bg-neutral-100 dark:text-white dark:hover:bg-neutral-700 dark:hover:text-white"
-                                @click="nextPaginationGroupBtnClicked" :disabled="isLastGroup">
-                                Next
-                            </button>
-                        </li>
-                    </ul>
+                    <!-- pagination -->
+                    <div class="flex justify-center">
 
-                    <ul v-else class="list-style-none flex">
-                        <li v-for="(pageNumber, pageNumberIndex) in pageNumbers" :key="pageNumberIndex"
-                            :aria-current="(pageNumber == currentPage) ? 'page' : ''">
-                            <button v-if="pageNumber == currentPage"
-                                class="relative block rounded bg-neutral-800 px-3 py-1.5 text-sm font-medium text-neutral-50 transition-all duration-300 dark:bg-neutral-900"
-                                :id="'paginationBtn-' + pageNumberIndex" @click="pageBtnClicked(pageNumber)">
-                                {{ pageNumber }}
-                                <span
-                                    class="absolute -m-px h-px w-px overflow-hidden whitespace-nowrap border-0 p-0 [clip:rect(0,0,0,0)]">
-                                    (current)
-                                </span>
+                        <div v-if="totalData != 0" class=" bg-white  flex justify-center mt-5 py-3">
+                            <button class="rounded px-6 py-1 border  hover:bg-slate-200" :disabled="currentPage === 1"
+                                @click="getInventoryReceivesList(currentPage - 1)">«</button>
+
+                            <button class=" text-sm px-5 border">
+                                Page <span @dblclick="showInput">{{ currentPage }}</span> / <span
+                                    class="text-gray-400">{{
+                                    lastPage }}</span>
                             </button>
-                            <button v-else
-                                class="normal-pagination relative block rounded bg-transparent px-3 py-1.5 text-sm text-neutral-600 transition-all duration-300 hover:bg-neutral-100 dark:text-white dark:hover:bg-neutral-700 dark:hover:text-white"
-                                :id="'paginationBtn-' + pageNumberIndex" @click="pageBtnClicked(pageNumber)">
-                                {{ pageNumber }}
-                            </button>
-                        </li>
-                    </ul>
+
+                            <button class=" rounded px-6  py-1 border  hover:bg-slate-200"
+                                :disabled="currentPage === lastPage" @click="getInventoryReceivesList(currentPage + 1)">
+                                »</button>
+                        </div>
+                    </div>
                 </div>
+
             </div>
         </div>
     </div>
@@ -295,16 +260,10 @@ export default {
 
             fromDate: null,
             toDate: null,
-
-            per_page: 20,
-            pageNumbers: [],
-            currentPage: 1,
-            paginationGroupsCount: 1,
-            per_group: 10,
-            groupedPageNumbers: [],
-            currentGroup: 0,
-            isFirstGroup: true,
-            isLastGroup: false,
+            currentPage: 0,
+            perPage: 0,
+            lastPage: 0,
+            totalData: 0,
         };
     },
 
@@ -315,110 +274,63 @@ export default {
             if (pageNumber) {
                 this.currentPage = pageNumber;
             }
-            let url = `/api/transfer_confirmation_list?page=${this.currentPage}`;
-            if(this.fromDate && this.toDate){
+            let url = `/api/transfer_confirmation_list?page=${pageNumber}`;
+            if (this.fromDate && this.toDate) {
                 url = `${url}&from_date=${this.fromDate}&to_date=${this.toDate}`;
             }
             let response = await getApiData({ url: url, token: this.getToken() });
             if (response.data) {
                 this.receivesList = response.data.data;
-                this.receivesList.forEach((receive) => {
-                    receive.date = convertToFriendlyDate(receive.date);
-                });
-                this.per_page = response.data.per_page;
 
-                this.pageNumbers = [];
-                this.lastPageNumber = response.data.last_page;
+                this.lastPage = response.data.last_page;
+                this.currentPage = pageNumber;
+                this.perPage = response.data.per_page;
+                this.totalData = response.data.total;
 
-                for (let i = 1; i <= response.data.last_page; i++) {
-                    this.pageNumbers.push(i);
-                }
-
-                if (this.pageNumbers.length > 10) {
-                    this.groupedPageNumbers = [];
-                    this.paginationGroupsCount = this.pageNumbers.length % 10;
-                    for (let i = 0; i < this.pageNumbers.length; i += 10) {
-                        let chunk = this.pageNumbers.slice(i, i + 10);
-                        this.groupedPageNumbers.push(chunk);
-                    }
-
-                    let lastGroupIndex = this.groupedPageNumbers.length - 1;
-                    this.isFirstGroup = (this.currentGroup === 0);
-                    this.isLastGroup = (lastGroupIndex === this.currentGroup);
-                }
             }
         },
 
-        receiveBtnClicked(id){
+        receiveBtnClicked(id) {
             this.receiveId = id;
         },
 
-        async confirmReceiveBtnClicked(){
+        async confirmReceiveBtnClicked() {
             let url = `/api/confirm_transfer_item?id=${this.receiveId}`;
-            let response = await getApiData({url: url, token: this.getToken()});
-            if(response.success){
+            let response = await getApiData({ url: url, token: this.getToken() });
+            if (response.success) {
                 this.receivesList = [];
-                this.getInventoryReceivesList(this.currentPage);
+                this.getInventoryReceivesList(1);
             }
         },
 
-        cancelReceiveBtnClicked(id){
+        cancelReceiveBtnClicked(id) {
             this.receiveId = id;
         },
 
-        async confirmCancelReceiveBtnClicked(){
+        async confirmCancelReceiveBtnClicked() {
             let url = `/api/cancel_transfer_item?id=${this.receiveId}`;
-            let response = await getApiData({url: url, token: this.getToken()});
-            if(response.success){
+            let response = await getApiData({ url: url, token: this.getToken() });
+            if (response.success) {
                 this.receivesList = [];
-                this.getInventoryReceivesList(this.currentPage);
+                this.getInventoryReceivesList(1);
             }
         },
 
-        searchBtnClicked(){
-            this.getInventoryReceivesList(this.currentPage);
+        searchBtnClicked() {
+            this.getInventoryReceivesList(1);
         },
 
-        clearSearchBtnClicked(){
+        clearSearchBtnClicked() {
             this.fromDate = null;
             this.toDate = null;
-            this.getInventoryReceivesList(this.currentPage);
+            this.getInventoryReceivesList(1);
         },
 
-        pageBtnClicked(pageNumber) {
-            this.currentPage = pageNumber;
-            this.getInventoryReceivesList(this.currentPage);
-        },
 
-        nextPaginationGroupBtnClicked() {
-            this.currentGroup += 1;
-            this.currentPage = (this.groupedPageNumbers[this.currentGroup][0]);
-            this.getInventoryReceivesList(this.currentPage);
-        },
-
-        previousPaginationGroupBtnClicked() {
-            this.currentGroup -= 1;
-            let lastIndex = this.groupedPageNumbers[this.currentGroup].length - 1;
-            this.currentPage = (this.groupedPageNumbers[this.currentGroup][lastIndex]);
-            this.getInventoryReceivesList(this.currentPage);
-        },
-
-        firstPaginationGroupBtnClicked() {
-            this.currentGroup = 0;
-            this.currentPage = (this.groupedPageNumbers[this.currentGroup][0]);
-            this.getInventoryReceivesList(this.currentPage);
-        },
-
-        lastPaginationGroupBtnClicked() {
-            this.currentGroup = this.paginationGroupsCount - 1;
-            let lastIndex = this.groupedPageNumbers[this.currentGroup].length - 1;
-            this.currentPage = (this.groupedPageNumbers[this.currentGroup][lastIndex]);
-            this.getInventoryReceivesList(this.currentPage);
-        }
     },
 
     created() {
-        this.getInventoryReceivesList(null);
+        this.getInventoryReceivesList(1);
     },
 
     mounted() {

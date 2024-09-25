@@ -122,18 +122,20 @@ class AccountReceivableRepository implements AccountReceivableRepositoryInterfac
     public function accountReceivableList(Request $request)
     {
         $accountReceivable = Account::withSum(['accountReceivables as ar_sum' => function ($query) {
-            $query->where('type', 'ar');
-        }], 'amount')
+                $query->where('type', 'ar');
+            }], 'amount')
             ->withSum(['accountReceivables as ar_paid_sum' => function ($query) {
                 $query->where('type', 'ar_paid');
             }], 'amount')
             ->withCount('accountReceivables')
             ->having('account_receivables_count', '>', 0)
             ->paginate(config('common.list_count'), ['id', 'account_code', 'name'])
-            ->map(function ($account) {
+            ->through(function ($account) {
                 $account->ar_balance = $account->ar_sum - $account->ar_paid_sum;
                 return $account;
             });
-        ResponseData($accountReceivable);
+
+       ResponseData($accountReceivable);
     }
+
 }
