@@ -12,21 +12,8 @@ class UomRepository implements UomRepositoryInterface
     public function listAllData(Request $request)
     {
         if ($request->per_page || $request->page) {
-            $totalCount = Uom::count();
-            $pageNumber = 1;
-            $perPage = 20;
-            if ($request->page) {
-                $pageNumber = $request->page;
-            }
-            if ($request->per_page) {
-                $perPage = $request->per_page;
-            }
-            $skip = ($pageNumber - 1) * $perPage;
-            $uoms = Uom::skip($skip)->take($perPage)->get();
-            $paginationData = MakePaginationData($request, $totalCount, 'uoms');
-            $paginationData['uoms'] = $uoms;
-
-            return $paginationData;
+            $uoms = Uom::orderBy('created_at','desc')->paginate(config('common.list_count'));
+            return $uoms;
         } else {
             $uoms = Uom::all();
             return $uoms;

@@ -16,7 +16,7 @@
                     data-te-select-wrapper-ref>
                     <select data-te-select-init data-te-select-placeholder="Filter by department"
                         data-te-select-filter="true" v-model="searchCategory" class="h-full">
-                        <option :value="department" v-for="department in departmentList">
+                        <option :value="department" v-for="department in departmentList" :key="department.id">
                             {{ department.name }}
                         </option>
                     </select>
@@ -82,7 +82,7 @@
                                         {{ staff.address }}
                                     </td>
                                     <td class="whitespace-nowrap   ">
-                                        <div v-for="role in staff.roles">
+                                        <div v-for="role in staff.roles" :key="role.id">
                                             {{ role.name }}
                                         </div>
                                     </td>
@@ -115,7 +115,7 @@
                     </table>
                     <div class="flex justify-center">
 
-                        <div v-if="lastPage != 0" class=" bg-white  flex justify-center mt-5 py-3">
+                        <div v-if="totalData != 0" class=" bg-white  flex justify-center mt-5 py-3">
                             <button class="rounded px-6 py-1 border  hover:bg-slate-200"
                                 :disabled="currentPage === 1"
                                 @click="getStaffsList(currentPage - 1)">«</button>
@@ -214,6 +214,7 @@ export default {
             currentPage: 0,
             perPage: 0,
             lastPage: 0,
+            totalData:0,
         };
     },
 
@@ -231,12 +232,23 @@ export default {
         async getStaffsList(pageNumber) {
 
             let url = `/api/staffs?page=${pageNumber}`;
+            if (this.searchInput && this.searchCategory) {
+                url = `/api/staffs?search_input=${this.searchInput}&department_id=${this.searchCategory.id}&page=${pageNumber}`;
+            }
+            if (this.searchInput && !this.searchCategory) {
+                url = `/api/staffs?search_input=${this.searchInput}&page=${pageNumber}`;
+            }
+            if ((!this.searchInput) && this.searchCategory) {
+                url = `/api/staffs?department_id=${this.searchCategory.id}&page=${pageNumber}`;
+            }
             const response = await getApiData({ url: url, token: this.getToken() });
             if (response.data != null) {
+
                 this.staffList = response.data.data;
                 this.lastPage = response.data.last_page;
                 this.currentPage = pageNumber;
                 this.perPage = response.data.per_page;
+                this.totalData = response.data.total;
             }
         },
 
@@ -267,20 +279,7 @@ export default {
         },
 
         async searchBtnClicked() {
-            let url = null;
-            if (this.searchInput && this.searchCategory) {
-                url = `/api/staffs?search_input=${this.searchInput}&department_id=${this.searchCategory.id}&page=1`;
-            }
-            if (this.searchInput && !this.searchCategory) {
-                url = `/api/staffs?search_input=${this.searchInput}&page=1`;
-            }
-            if ((!this.searchInput) && this.searchCategory) {
-                url = `/api/staffs?department_id=${this.searchCategory.id}&page=1`;
-            }
-            let response = await getApiData({ url: url, token: this.getToken() });
-            if (response.data) {
-                this.staffList = response.data.data;
-            }
+            this.getStaffsList(1);
         },
 
         clearSearchBtnClicked() {

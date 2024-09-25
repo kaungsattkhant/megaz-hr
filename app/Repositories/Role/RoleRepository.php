@@ -11,28 +11,14 @@ class RoleRepository implements RoleRepositoryInterface
     public function listAllData(Request $request)
     {
         if ($request->per_page || $request->page) {
-            $pageNumber = 1;
-            $perPage = 20;
-            if ($request->page) {
-                $pageNumber = $request->page;
-            }
-            if ($request->per_page) {
-                $perPage = $request->per_page;
-            }
-            $skip = ($pageNumber - 1) * $perPage;
+            $query = Role::orderBy('created_at', 'desc')->with('department', 'skills');
 
             if ($request->department_id) {
-                $totalCount = Role::where('department_id', $request->department_id)->count();
-                $roles = Role::where('department_id', $request->department_id)->skip($skip)->take($perPage)->with('department')->get();
-            } else {
-                $totalCount = Role::count();
-                $roles = Role::skip($skip)->take($perPage)->with('department')->get();
+                $query->where('department_id', $request->department_id);
             }
 
-            $paginationData = MakePaginationData($request, $totalCount, 'roles');
-            $paginationData['roles'] = $roles;
-
-            return $paginationData;
+            $paginatedRoles = $query->paginate(config('common.list_count'));
+            return $paginatedRoles;
         } else {
             if ($request->department_id) {
                 $roles = Role::where('department_id', $request->department_id)->with('department','skills')->get();

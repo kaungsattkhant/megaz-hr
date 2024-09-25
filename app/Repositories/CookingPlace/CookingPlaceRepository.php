@@ -12,7 +12,6 @@ class CookingPlaceRepository implements CookingPlaceRepositoryInterface
     public function listAllCookingPlaces()
     {
         $cookingPlaces = CookingPlace::with('area','availableCookingPlaces.cookingPlaceable')->orderBy('created_at','desc')->paginate(config('common.list_count'));
-
         ResponseData($cookingPlaces);
     }
 

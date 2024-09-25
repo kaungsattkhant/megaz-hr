@@ -15,10 +15,10 @@ class JournalRepository implements JournalRepositoryInterface
     {
         $month = $request->input('month', date('m'));
         $year = $request->input('year', date('Y'));
-
         $journalLedger = Transaction::where('transactionable_type', 'journal')
             ->whereMonth('date', '=', $month)
             ->whereYear('date', '=', $year)
+            ->orderBy('created_at','desc')
             ->with('ledgers.account')
             ->paginate(config('common.list_count'));
 
