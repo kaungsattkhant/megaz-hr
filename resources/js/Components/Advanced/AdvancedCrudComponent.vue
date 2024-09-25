@@ -77,6 +77,23 @@
                             </div>
                         </tbody>
                     </table>
+                    <div class="flex justify-center">
+                        <div v-if="totalData != 0" class=" bg-white  flex justify-center mt-5 py-3">
+                            <button class="rounded px-6 py-1 border  hover:bg-slate-200"
+                                :disabled="currentPage === 1"
+                                @click="getArList(currentPage - 1)">«</button>
+
+                            <button class=" text-sm px-5 border">
+                                Page <span @dblclick="showInput">{{ currentPage }}</span> / <span
+                                    class="text-gray-400">{{
+                                    lastPage }}</span>
+                            </button>
+
+                            <button class=" rounded px-6  py-1 border  hover:bg-slate-200"
+                                :disabled="currentPage === lastPage"
+                                @click="getArList(currentPage + 1)"> »</button>
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -203,6 +220,11 @@
 
                 selectedNewMonth:null,
                 currentMonth:null,
+
+                currentPage: 0,
+                perPage: 0,
+                lastPage: 0,
+                totalData:0,
             };
         },
 
@@ -213,16 +235,21 @@
                 let selectedNewMonth = this.selectedMonth.slice(5,7);
                 this.getAdvanceList(selectedNewMonth);
             },
-            async getAdvanceList(selectedMonth){
-                const response = await getApiData({ url: '/api/staff_balances?month='+selectedMonth , token: this.getToken() });
+            async getAdvanceList(pageNumber){
+                const response = await getApiData({ url: '/api/staff_balances?month='+this.selectedNewMonth + '&page='+pageNumber, token: this.getToken() });
                 if(response.data){
                     this.advancedList = response.data;
+                    this.lastPage = response.data.last_page;
+                    this.currentPage = pageNumber;
+                    this.perPage = response.data.per_page;
+                    this.totalData = response.data.total;
                 }
             },
             async getDepartmentList(){
                 const response = await getApiData({ url: '/api/departments' , token: this.getToken() });
                 if(response.data){
                     this.departmentList = response.data;
+                    console.log('department')
                 }
             },
             async getStaffList(){
@@ -251,7 +278,7 @@
                 formData.append('cash_account_id', this.selectedCashbook.id);
                 let response = await postApiData({url: '/api/staff_advances', form_data: formData, token: this.getToken()});
                 if(response.success){
-                    this.getAdvanceList(this.currentMonth);
+                    this.getAdvanceList(1);
                     this.closeAndClearModal();
                 }
                 else{
@@ -280,8 +307,8 @@
         },
         created(){
             const date = new Date();
-            this.currentMonth = date.getMonth() + 1;
-            this.getAdvanceList(this.currentMonth);
+            this.selectedNewMonth = date.getMonth() + 1;
+            this.getAdvanceList(1);
             this.getDepartmentList();
             this.getCashbookList();
 

@@ -41,19 +41,19 @@
                         </thead>
                         <tbody>
                             <div class="contents" v-for="(department, index) in departmentList" :key="index">
-                                <tr class="bg-white rounded-lg overflow-hidden shadow-lg">
-                                    <td class=" px-6 py-4 font-medium ">
+                                <tr class="">
+                                    <td class="">
                                         {{ ++index }}
                                     </td>
-                                    <td class="whitespace-nowrap px-6 py-4 ">
+                                    <td class="whitespace-nowrap">
                                         {{ department.name }}
                                     </td>
-                                    <td class="whitespace-nowrap px-6 py-4 ">
+                                    <td class="whitespace-nowrap">
                                         <div v-for="feature in department.features">
                                             {{ feature.name }},
                                         </div>
                                     </td>
-                                    <td class="whitespace-nowrap px-6 py-4">
+                                    <td class="whitespace-nowrap">
                                         <button @click="editBtnClicked(department.id)" data-te-toggle="modal"
                                             data-te-target="#editModal" id="edit-btn" class="pr-1">
                                             <i class="fas fa-pen"></i>
@@ -69,6 +69,24 @@
                             </div>
                         </tbody>
                     </table>
+                    <div class="flex justify-center">
+
+                        <div v-if="totalData != 0" class=" bg-white  flex justify-center mt-4 py-3">
+                            <button class="rounded px-6 py-1 border  hover:bg-slate-200"
+                                :disabled="currentPage === 1"
+                                @click="getDepartmentList(currentPage - 1)">«</button>
+
+                            <button class=" text-sm px-5 border">
+                                Page <span @dblclick="showInput">{{ currentPage }}</span> / <span
+                                    class="text-gray-400">{{
+                                    lastPage }}</span>
+                            </button>
+
+                            <button class=" rounded px-6  py-1 border  hover:bg-slate-200"
+                                :disabled="currentPage === lastPage"
+                                @click="getDepartmentList(currentPage + 1)"> »</button>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -276,16 +294,24 @@
                 selectedFeatures: [],
 
 
+                currentPage: 0,
+                perPage: 0,
+                lastPage: 0,
+                totalData:0,
             };
         },
 
         methods: {
             ...mapGetters(['getToken']),
 
-            async getDepartmentList(){
-                const response = await getApiData({ url: '/api/departments', token: this.getToken() });
+            async getDepartmentList(pageNumber){
+                const response = await getApiData({ url: '/api/departments?page=${pageNumber}', token: this.getToken() });
                 if(response.data){
-                    this.departmentList = response.data;
+                    this.departmentList = response.data.data;
+                    this.lastPage = response.data.last_page;
+                    this.currentPage = pageNumber;
+                    this.perPage = response.data.per_page;
+                    this.totalData = response.data.total;
                 }
             },
 
@@ -333,7 +359,7 @@
                 let url = `/api/departments/${this.editId}`;
                 let response = await postApiData({url: url, form_data: formData, token: this.getToken()});
                 if(response.success){
-                    this.getDepartmentList(null);
+                    this.getDepartmentList(1);
                 }
 
                 this.selectedFeatures = [];
@@ -370,7 +396,7 @@
 
                 let response = await postApiData({url: '/api/departments', form_data: formData, token: this.getToken()});
                 if(response.success){
-                    this.getDepartmentList(null);
+                    this.getDepartmentList(1);
                     this.selectedFeatures = [];
                 }
                 else{
@@ -398,7 +424,7 @@
         },
         mounted()
         {
-            this.getDepartmentList();
+            this.getDepartmentList(1);
             this.getFeatureList();
             initTE({ Modal,Select, Ripple });
         }
