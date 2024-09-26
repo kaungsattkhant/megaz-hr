@@ -52,17 +52,20 @@
                         <tbody>
 
                             <!-- looping start -->
-                            <div class="contents" v-for="(promotionPackage, index) in promotionPackageList" :key="index">
+                            <div class="contents" v-for="(promotionPackage, index) in promotionPackageList"
+                                :key="index">
                                 <tr class="">
                                     <td class=" ">
-                                        {{ ++index }}
+                                        {{ (currentPage - 1) * perPage + index + 1 }}
                                     </td>
                                     <td class="whitespace-nowrap text-left  ">
                                         {{ promotionPackage.name }}
                                     </td>
                                     <td class="whitespace-nowrap  ">
-                                        <div class="relative flex border rounded text-center shrink-0 overflow-hidden rounded-md h-12 w-12">
-                                            <img width="80" height="100" style="aspect-ratio: 4/3; object-fit: cover;" :src="promotionPackage.image_url" alt="Menu image">
+                                        <div
+                                            class="relative flex border  text-center shrink-0 overflow-hidden rounded-md h-12 w-12">
+                                            <img width="80" height="100" style="aspect-ratio: 4/3; object-fit: cover;"
+                                                :src="promotionPackage.image_url" alt="Menu image">
                                         </div>
                                     </td>
                                     <td class="whitespace-nowrap text-left  ">
@@ -70,11 +73,13 @@
                                     </td>
                                     <td class="   ">
                                         <div>
-                                            Menus: <span v-for="menuPackage in promotionPackage.menu_packages"> {{ menuPackage.menu.name }},  </span>
+                                            Menus: <span v-for="menuPackage in promotionPackage.menu_packages"> {{
+                                                menuPackage.menu.name }}, </span>
                                         </div>
                                         <hr>
                                         <div>
-                                            Rooms: <span v-for="room in promotionPackage.rooms"> {{ room.name }},  </span>
+                                            Rooms: <span v-for="room in promotionPackage.rooms"> {{ room.name }},
+                                            </span>
                                         </div>
 
                                     </td>
@@ -90,6 +95,22 @@
                             <!-- looping end -->
                         </tbody>
                     </table>
+                    <div class="flex justify-center">
+
+                        <div v-if="totalData != 0" class=" bg-white  flex justify-center mt-5 py-3">
+                            <button class="rounded px-6 py-1 border  hover:bg-slate-200"
+                                :disabled="currentPage === 1" @click="getPromotionPackageList(currentPage - 1)">«</button>
+
+                            <button class=" text-sm px-5 border">
+                                Page <span @dblclick="showInput">{{ currentPage }}</span> / <span
+                                    class="text-gray-400">{{
+                                    lastPage }}</span>
+                            </button>
+
+                            <button class=" rounded px-6  py-1 border  hover:bg-slate-200"
+                                :disabled="currentPage === lastPage" @click="getPromotionPackageList(currentPage + 1)"> »</button>
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -148,49 +169,48 @@
 </template>
 
 <script>
-    import { Modal, Ripple, initTE, Input, Select, Dropdown } from "tw-elements";
-    import { mapGetters } from "vuex";
-    import { getApiData, postApiData, deleteApiData } from '../../utilities/ajax-helpers';
+import { Modal, Ripple, initTE, Input, Select, Dropdown } from "tw-elements";
+import { mapGetters } from "vuex";
+import { getApiData, postApiData, deleteApiData } from '../../utilities/ajax-helpers';
 
-    export default {
-        data() {
-            return {
-                promotionPackageList: [],
+export default {
+    data() {
+        return {
+            promotionPackageList: [],
 
-                per_page: 20,
-                pageNumbers: [],
-                currentPage: 1,
-                paginationGroupsCount: 1,
-                per_group: 10,
-                groupedPageNumbers: [],
-                currentGroup: 0,
-                isFirstGroup: true,
-                isLastGroup: false,
-            };
+            currentPage: 0,
+            perPage: 0,
+            lastPage: 0,
+            totalData:0
+
+        };
+    },
+
+    methods: {
+        ...mapGetters(['getToken']),
+
+        async getPromotionPackageList(pageNumber) {
+
+
+            let url = `/api/packages?page=${pageNumber}`;
+            let response = await getApiData({ url: url, token: this.getToken() });
+            if (response.data) {
+                this.promotionPackageList = response.data.data;
+                this.lastPage = response.data.last_page;
+
+                this.currentPage = pageNumber;
+                this.perPage = response.data.per_page;
+                this.totalData = response.data.total
+            }
         },
+    },
 
-        methods: {
-            ...mapGetters(['getToken']),
+    created() {
+        this.getPromotionPackageList(1);
+    },
 
-            async getPromotionPackageList(pageNumber){
-                if(pageNumber){
-                    this.currentPage = pageNumber;
-                }
-
-                let url = `/api/packages?page=${this.currentPage}&per_page=${this.per_page}`;
-                let response = await getApiData({url: url, token: this.getToken()});
-                if(response.data){
-                    this.promotionPackageList = response.data.data;
-                }
-            },
-        },
-
-        created(){
-            this.getPromotionPackageList();
-        },
-
-        mounted(){
-            initTE({ Modal, Ripple, Input, Select, Dropdown })
-        }
+    mounted() {
+        initTE({ Modal, Ripple, Input, Select, Dropdown })
     }
+}
 </script>

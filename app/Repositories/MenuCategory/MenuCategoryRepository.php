@@ -3,14 +3,24 @@
 namespace App\Repositories\MenuCategory;
 
 use App\Models\MenuCategory;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 
 class MenuCategoryRepository implements MenuCategoryRepositoryInterface
 {
-    public function listAllData()
+    public function listAllData(Request $request)
     {
-        $menuCategories = MenuCategory::all();
+
+        $menuCategories = MenuCategory::orderBy('created_at','desc')->when($request->search, function($q) use ($request)
+        {
+            $q->where('name','LIKE','%'.$request->search.'%');
+        });
+
+        $menuCategories = $request->has('page')
+        ? $menuCategories->paginate(config('common.list_count'))
+        : $menuCategories->get();
+
         ResponseData($menuCategories);
     }
 

@@ -134,6 +134,7 @@ class PrepaidRepository implements PrepaidRepositoryInterface
                           ->whereMonth('date_time', $month);
                 }], 'amount');
             }])
+            ->orderBy('created_at','desc')
             ->paginate(config('common.list_count'));
 
         ResponseData($prepaids);

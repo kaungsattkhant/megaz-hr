@@ -24,22 +24,7 @@ class UsedDefectedItemRepository implements UsedDefectedItemRepositoryInterface
             $startTime = $date . ' 00:00:00';
             $endTime = $date . ' 23:59:59';
 
-            $totalCount = UsedDefectedItem::with('item', 'uom')->whereBetween('created_at', [$startTime, $endTime])->count();
-            $pageNumber = 1;
-            $perPage = 20;
-            if ($request->page) {
-                $pageNumber = $request->page;
-            }
-            if ($request->per_page) {
-                $perPage = $request->per_page;
-            }
-            $skip = ($pageNumber - 1) * $perPage;
-            $used_defected_items = UsedDefectedItem::with('item', 'uom')->whereBetween('date', [$startTime, $endTime])
-                ->skip($skip)
-                ->take($perPage)
-                ->get();
-            $paginationData = MakePaginationData($request, $totalCount, 'used_defected_items');
-            $paginationData['used_defected_items'] = $used_defected_items;
+            $paginationData = UsedDefectedItem::with('item', 'uom')->whereBetween('created_at', [$startTime, $endTime])->paginate(config('common.list_count'));
 
             return $paginationData;
         } else {

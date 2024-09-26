@@ -17,22 +17,9 @@ class ComplaintRepository implements ComplaintRepositoryInterface
     public function listAllData(Request $request)
     {
         if ($request->per_page || $request->page) {
-            $totalCount = Complaint::count();
-            $pageNumber = 1;
-            $perPage = 20;
-            if ($request->page) {
-                $pageNumber = $request->page;
-            }
-            if ($request->per_page) {
-                $perPage = $request->per_page;
-            }
-            $skip = ($pageNumber - 1) * $perPage;
             $complaints = Complaint::orderBy('id', 'desc')
                 ->with('complaint_category')
-                ->skip($skip)
-                ->take($perPage)
-                ->get();
-            $complaints = MakePaginationData($request, $totalCount, 'complaints', $complaints);
+                ->paginate(config('common.list_count'));
             return $complaints;
         } else {
             $complaints = Complaint::orderBy('id', 'desc')->with('complaint_category')->get();
@@ -49,20 +36,7 @@ class ComplaintRepository implements ComplaintRepositoryInterface
     public function listComplaintsByStaff(Request $request, int $staffId)
     {
         if ($request->per_page || $request->page) {
-            $totalCount = Complaint::where('posted_by', $staffId)->count();
-            $pageNumber = 1;
-            $perPage = 20;
-            if ($request->page) {
-                $pageNumber = $request->page;
-            }
-            if ($request->per_page) {
-                $perPage = $request->per_page;
-            }
-            $skip = ($pageNumber - 1) * $perPage;
-            $complaints = Complaint::where('posted_by', $staffId)->orderBy('id', 'desc')
-                ->skip($skip)->take($perPage)->with('complaint_category')->get();
-            $complaints = MakePaginationData($request, $totalCount, 'complaints', $complaints);
-
+            $complaints = Complaint::where('posted_by', $staffId)->orderBy('id', 'desc')->with('complaint_category')->paginate(config('common.list_count'));
             return $complaints;
         } else {
             $complaints = Complaint::where('posted_by', $staffId)->with('complaint_category')->orderBy('id', 'desc')->get();

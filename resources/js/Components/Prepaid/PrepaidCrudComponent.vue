@@ -82,7 +82,7 @@
                             <div class="contents" v-for="(prepaid, index) in prepaidList" :key="index">
                                 <tr class="">
                                     <td class=" align-middle">
-                                        {{ index+1 }}
+                                        {{ perPage * (currentPage - 1) + (++index) }}
                                     </td>
                                     <td class=" align-middle">
                                         {{ prepaid.prepaid.title }}
@@ -130,6 +130,24 @@
                             </div>
                         </tbody>
                     </table>
+                    <div class="flex justify-center">
+
+                        <div v-if="totalData != 0" class=" bg-white  flex justify-center mt-5 py-3">
+                            <button class="rounded px-6 py-1 border  hover:bg-slate-200"
+                                :disabled="currentPage === 1"
+                                @click="getPrepaidList(currentPage - 1)">«</button>
+
+                            <button class=" text-sm px-5 border">
+                                Page <span @dblclick="showInput">{{ currentPage }}</span> / <span
+                                    class="text-gray-400">{{
+                                    lastPage }}</span>
+                            </button>
+
+                            <button class=" rounded px-6  py-1 border  hover:bg-slate-200"
+                                :disabled="currentPage === lastPage"
+                                @click="getPrepaidList(currentPage + 1)"> »</button>
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -373,6 +391,11 @@
                 currentMonth:null,
                 step: 1,
 
+                currentPage: 0,
+                perPage: 0,
+                lastPage: 0,
+                totalData:0,
+
             };
         },
 
@@ -382,13 +405,17 @@
             monthChange(){
                 this.selectedNewMonth = this.selectedMonth.slice(5,7);
                 console.log(this.selectedNewMonth)
-                this.getPrepaidList(this.selectedNewMonth)
+                this.getPrepaidList(1)
             },
 
-            async getPrepaidList(selectedMonth){
-                const response = await getApiData({ url: '/api/prepaid_lists?month=' + selectedMonth , token: this.getToken() });
+            async getPrepaidList(pageNumber){
+                const response = await getApiData({ url: '/api/prepaid_lists?month=' + this.selectedNewMonth+'&page=' + pageNumber , token: this.getToken() });
                 if(response.data){
                     this.prepaidList = response.data.data;
+                    this.lastPage = response.data.last_page;
+                    this.currentPage = pageNumber;
+                    this.perPage = response.data.per_page;
+                    this.totalData = response.data.total;
                     console.log(response)
                 }
             },
@@ -464,7 +491,7 @@
                 formData.append('cash_account_id', this.selected_cashbook.id);
                 let response = await postApiData({url: '/api/prepaids', form_data: formData, token: this.getToken()});
                 if(response.success){
-                    this.getPrepaidList(this.currentMonth);
+                    this.getPrepaidList(1);
                     this.closeAndClearPrepaidModal();
                     this.$notify({
                     title: `Input validation`,
@@ -499,7 +526,7 @@
                 formData.append('prepaid_id', this.paymentToPrepaid.prepaid.id);
                 let response = await postApiData({url: '/api/prepaid_payments', form_data: formData, token: this.getToken()});
                 if(response.success){
-                    this.getPrepaidList(this.currentMonth);
+                    this.getPrepaidList(1);
                     this.closeAndClearPaymentModal();
                     this.$notify({
                     title: `Input validation`,
@@ -553,11 +580,11 @@
         },
         created(){
             const date = new Date();
-            this.currentMonth = date.getMonth() + 1;
+            this.selectedNewMonth = date.getMonth() + 1;
             this.getCashbookList();
             this.getSecondAccountList();
             this.getAccountList();
-            this.getPrepaidList(this.currentMonth);
+            this.getPrepaidList(1);
             // this.formattedDate = new Date(this.dateTimeString).toLocaleDateString();
             // this.formattedDate = this.dateTimeString.split('T')[0]
 

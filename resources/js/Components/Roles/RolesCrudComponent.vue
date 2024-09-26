@@ -48,7 +48,7 @@
                             <div class="contents" v-for="(role, index) in roleList" :key="index">
                                 <tr class="">
                                     <td class="">
-                                        {{ ++index }}
+                                        {{ perPage * (currentPage - 1) + (++index) }}
                                     </td>
                                     <td class="whitespace-nowrap ">
                                         {{ role.name }}
@@ -69,6 +69,24 @@
                             <!-- looping end -->
                         </tbody>
                     </table>
+                    <!-- pagination -->
+                    <div class="flex justify-center">
+
+                        <div v-if="totalData != 0" class=" bg-white  flex justify-center mt-5 py-3">
+                            <button class="rounded px-6 py-1 border  hover:bg-slate-200" :disabled="currentPage === 1"
+                                @click="getRolesList(currentPage - 1)">«</button>
+
+                            <button class=" text-sm px-5 border">
+                                Page <span @dblclick="showInput">{{ currentPage }}</span> / <span
+                                    class="text-gray-400">{{
+                                    lastPage }}</span>
+                            </button>
+
+                            <button class=" rounded px-6  py-1 border  hover:bg-slate-200"
+                                :disabled="currentPage === lastPage" @click="getRolesList(currentPage + 1)">
+                                »</button>
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -188,89 +206,89 @@
 </template>
 
 <script>
-    import { Modal, Ripple, Select, initTE, Input } from "tw-elements";
-    import { getApiData, postApiData, deleteApiData } from '../../utilities/ajax-helpers';
-    import { mapGetters } from "vuex";
+import { Modal, Ripple, Select, initTE, Input } from "tw-elements";
+import { getApiData, postApiData, deleteApiData } from '../../utilities/ajax-helpers';
+import { mapGetters } from "vuex";
 
-    export default {
-        data() {
-            return {
-
-
-                departmentList: [],
-                roleList: [],
-                name: null,
-                selectedDepartment:null,
-                deleteId: null,
+export default {
+    data() {
+        return {
 
 
-                per_page: 10,
-                pageNumbers: [],
-                currentPage: 1,
-                paginationGroupsCount: 1,
-                per_group: 10,
-                groupedPageNumbers: [],
-                currentGroup: 0,
-            };
-        },
+            departmentList: [],
+            roleList: [],
+            name: null,
+            selectedDepartment: null,
+            deleteId: null,
 
-        methods: {
-            ...mapGetters(['getToken']),
+            currentPage: 0,
+            perPage: 0,
+            lastPage: 0,
+            totalData: 0,
 
-            async getDepartmentList(){
-                const response = await getApiData({ url: '/api/departments', token: this.getToken() });
-                if(response.data){
-                    this.departmentList = response.data;
-                }
-            },
+        };
+    },
 
-            async getRolesList(){
-                const response = await getApiData({ url: '/api/roles', token: this.getToken() });
-                if(response.data){
-                    this.roleList = response.data;
-                }
-            },
+    methods: {
+        ...mapGetters(['getToken']),
 
-            createRolesBtnClicked(){
-
-                this.createRole();
-            },
-
-            async createRole()
-            {
-                let formData = new FormData();
-                formData.append('name', this.name);
-                formData.append('department_id', this.selectedDepartment);
-                let response = await postApiData({url: '/api/roles', form_data: formData, token: this.getToken()});
-                if(response.success){
-                    this.getRolesList(null);
-                    console.log("success")
-                }
-                else{
-                    alert('some errors occur');
-                }
-            },
-
-            deleteBtnClicked(id){
-                this.deleteId = id;
-            },
-
-            async confirmDeleteBtnClicked(){
-                let url = `/api/roles/${this.deleteId}`;
-                let response = await deleteApiData({url: url, token: this.getToken()});
-                if(response.success){
-                    alert(`deleted`);
-                }
+        async getDepartmentList() {
+            const response = await getApiData({ url: '/api/departments', token: this.getToken() });
+            if (response.data) {
+                this.departmentList = response.data;
             }
-
         },
-        mounted()
-        {
 
-            this.getRolesList();
+        async getRolesList(pageNumber) {
+            const response = await getApiData({ url: `/api/roles?page=${pageNumber}`, token: this.getToken() });
+            if (response.data) {
+                this.roleList = response.data.data;
 
-            this.getDepartmentList();
-            initTE({ Modal,Select, Ripple });
+                this.lastPage = response.data.last_page;
+                this.currentPage = pageNumber;
+                this.perPage = response.data.per_page;
+                this.totalData = response.data.total;
+            }
+        },
+
+        createRolesBtnClicked() {
+
+            this.createRole();
+        },
+
+        async createRole() {
+            let formData = new FormData();
+            formData.append('name', this.name);
+            formData.append('department_id', this.selectedDepartment);
+            let response = await postApiData({ url: '/api/roles', form_data: formData, token: this.getToken() });
+            if (response.success) {
+                this.getRolesList(1);
+                console.log("success")
+            }
+            else {
+                alert('some errors occur');
+            }
+        },
+
+        deleteBtnClicked(id) {
+            this.deleteId = id;
+        },
+
+        async confirmDeleteBtnClicked() {
+            let url = `/api/roles/${this.deleteId}`;
+            let response = await deleteApiData({ url: url, token: this.getToken() });
+            if (response.success) {
+                alert(`deleted`);
+            }
         }
+
+    },
+    mounted() {
+
+        this.getRolesList(1);
+
+        this.getDepartmentList();
+        initTE({ Modal, Select, Ripple });
     }
+}
 </script>

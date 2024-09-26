@@ -161,12 +161,6 @@
                             </a>
                         </li>
 
-                        <li>
-                            <a href="{{ route('tasks.report') }}" class="flex items-center @yield('tasks_report')">
-                                <i class="fal fa-tasks  pr-3"></i>
-                                Task Reports
-                            </a>
-                        </li>
                         @endif
                         @if (checkFeaturePermission('area'))
                         <li>
@@ -571,3 +565,6 @@
                 <logout-component />
             </div>
         </nav>
+
+
+

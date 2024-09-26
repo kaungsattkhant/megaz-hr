@@ -49,15 +49,18 @@
                             <div class="contents" v-for="(category, index) in categoryList" :key="index">
                                 <tr class="">
                                     <td class="  ">
-                                        {{ ++index }}
+                                        {{ perPage * (currentPage - 1) + (++index) }}
+
                                     </td>
                                     <td class="whitespace-nowrap  ">
                                         {{ category.name }}
                                     </td>
 
                                     <td class="whitespace-nowrap  ">
-                                        <div class="relative flex border rounded text-center shrink-0 overflow-hidden rounded-md h-12 w-12">
-                                            <img width="80" height="100" style="aspect-ratio: 4/3; object-fit: cover;" :src="category.image_url" alt="Menu image">
+                                        <div
+                                            class="relative flex border rounded text-center shrink-0 overflow-hidden rounded-md h-12 w-12">
+                                            <img width="80" height="100" style="aspect-ratio: 4/3; object-fit: cover;"
+                                                :src="category.image_url" alt="Menu image">
                                         </div>
                                     </td>
                                     <td class="whitespace-nowrap ">
@@ -65,8 +68,8 @@
                                         data-te-toggle="modal" data-te-target="#deleteModal" id="edit-btn" class="pr-1">
                                             <i class="fas fa-trash-alt"></i>
                                         </button> -->
-                                        <button @click="editBtnClicked(category.id)"
-                                        data-te-toggle="modal" data-te-target="#edit_modal" id="edit-btn" class="pr-2">
+                                        <button @click="editBtnClicked(category.id)" data-te-toggle="modal"
+                                            data-te-target="#edit_modal" id="edit-btn" class="pr-2">
                                             <i class="fal fa-pen"></i>
                                         </button>
                                         <input :checked="category.is_active == 1" @change="isActiveToggled(category.id)"
@@ -89,6 +92,25 @@
                             <!-- looping end -->
                         </tbody>
                     </table>
+
+                    <!-- pagination -->
+                    <div class="flex justify-center">
+
+                        <div v-if="totalData != 0" class=" bg-white  flex justify-center mt-5 py-3">
+                            <button class="rounded px-6 py-1 border  hover:bg-slate-200" :disabled="currentPage === 1"
+                                @click="getMenuCategoryList(currentPage - 1)">«</button>
+
+                            <button class=" text-sm px-5 border">
+                                Page <span @dblclick="showInput">{{ currentPage }}</span> / <span
+                                    class="text-gray-400">{{
+                                    lastPage }}</span>
+                            </button>
+
+                            <button class=" rounded px-6  py-1 border  hover:bg-slate-200"
+                                :disabled="currentPage === lastPage" @click="getMenuCategoryList(currentPage + 1)">
+                                »</button>
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -127,7 +149,8 @@
                                 <label for="" class="label-form mb-3">
                                     Image
                                 </label>
-                                <input type="file" class="input-ui" @change="handleFileChange" accept="image/png, image/gif, image/jpeg" ref="image">
+                                <input type="file" class="input-ui" @change="handleFileChange"
+                                    accept="image/png, image/gif, image/jpeg" ref="image">
                             </div>
                         </div>
                         <div class="flex justify-end gap-x-4 px-6 mb-6 pt-4">
@@ -177,7 +200,8 @@
                                 <label for="" class="label-form mb-3">
                                     Image
                                 </label>
-                                <input type="file" class="input-ui" @change="handleFileChange" accept="image/png, image/gif, image/jpeg" ref="image">
+                                <input type="file" class="input-ui" @change="handleFileChange"
+                                    accept="image/png, image/gif, image/jpeg" ref="image">
                             </div>
                         </div>
                         <div class="flex justify-end gap-x-4 px-6 mb-6 pt-4">
@@ -252,156 +276,157 @@
 
 <script>
 import { Modal, Ripple, Select, initTE, Input } from "tw-elements";
-    import { getApiData, postApiData, deleteApiData } from '../../utilities/ajax-helpers';
-    import { mapGetters } from "vuex";
+import { getApiData, postApiData, deleteApiData } from '../../utilities/ajax-helpers';
+import { mapGetters } from "vuex";
 
-    export default {
-        data() {
-            return {
-                categoryList: [],
-                editId: null,
-                deleteId: null,
+export default {
+    data() {
+        return {
+            categoryList: [],
+            editId: null,
+            deleteId: null,
 
-                name: null,
-                selectedImage: null,
+            name: null,
+            selectedImage: null,
 
-                per_page: 10,
-                pageNumbers: [],
-                currentPage: 1,
-                paginationGroupsCount: 1,
-                per_group: 10,
-                groupedPageNumbers: [],
-                currentGroup: 0,
-            };
+            currentPage: 0,
+            perPage: 0,
+            lastPage: 0,
+            totalData: 0,
+        };
+    },
+
+    methods: {
+        ...mapGetters(['getToken']),
+
+        alertValiationMessage(field) {
+            this.$notify({
+                title: `Input validation`,
+                text: `You forgot to provide ${field}, please try again`,
+                type: "warn"
+            });
         },
 
-        methods: {
-            ...mapGetters(['getToken']),
-
-            alertValiationMessage(field) {
-                this.$notify({
-                    title: `Input validation`,
-                    text: `You forgot to provide ${field}, please try again`,
-                    type: "warn"
-                });
-            },
-
-            async getMenuCategoryList(){
-                const response = await getApiData({ url: '/api/menu_categories', token: this.getToken() });
-                if(response.data){
-                    this.categoryList = response.data;
-                }
-            },
-
-            handleFileChange(event) {
-                const selectedFile = event.target.files[0];
-                this.selectedImage = selectedFile;
-            },
-
-            createBtnClicked(){
-                if(!this.name){
-                    this.alertValiationMessage(`category name`);
-                    return 1;
-                }
-                if(!this.selectedImage){
-                    this.alertValiationMessage(`category image`);
-                    return 1;
-                }
-                this.createMenuCategory();
-            },
-
-            async createMenuCategory(){
-                let formData = new FormData();
-                formData.append('name', this.name);
-                formData.append('image',this.selectedImage);
-                let response = await postApiData({url: '/api/menu_categories', form_data: formData, token: this.getToken()});
-                if(response.success){
-                    this.$notify({
-                        text: `Menu category created successfully`,
-                        type: "info"
-                    });
-                    this.getMenuCategoryList();
-                    this.name = null;
-                    this.selectedImage = null;
-                }
-                else{
-                    this.$notify({
-                        text: `Menu category create failed`,
-                        type: "error"
-                    });
-                }
-            },
-
-            editBtnClicked(id){
-                this.editId = id;
-                let index = this.categoryList.findIndex(category => category.id == id);
-                if(index != -1){
-                    this.name = this.categoryList[index].name;
-                }
-            },
-
-            async confirmEditBtnClicked(){
-                let formData = new FormData();
-                formData.append('name', this.name);
-                if(this.selectedImage){
-                    formData.append('image',this.selectedImage);
-                }
-                let response = await postApiData({url: `/api/menu_categories/${this.editId}`, form_data: formData, token: this.getToken()});
-                if(response.success){
-                    this.$notify({
-                        text: `Menu category edited successfully`,
-                        type: "info"
-                    });
-                    this.getMenuCategoryList();
-                    this.name = null;
-                    this.selectedImage = null;
-                }
-                else{
-                    this.$notify({
-                        text: `Menu category edit failed`,
-                        type: "error"
-                    });
-                }
-            },
-
-            isActiveToggled(id){
-                let index = this.categoryList.findIndex(category => category.id == id);
-                if(index != -1){
-                    if(this.categoryList[index].is_active == 1){
-                        this.categoryList[index].is_active = 0;
-                    }
-                    else{
-                        this.categoryList[index].is_active = 1;
-                    }
-
-                    let url = `/api/is_active`;
-                    let formData = new FormData();
-                    formData.append('id', id);
-                    formData.append('type', 'menu_category');
-                    let response = postApiData({url: url, form_data: formData, token: this.getToken()});
-                }
-            },
-
-            deleteBtnClicked(id){
-                this.deleteId = id;
-            },
-
-            async confirmDeleteBtnClicked(){
-                let url = `/api/menu_categories/${this.deleteId}`;
-                let response = await deleteApiData({url: url, token: this.getToken()});
-                if(response.success){
-                    this.getMenuCategoryList();
-                }
+        async getMenuCategoryList(pageNumber) {
+            const response = await getApiData({ url: `/api/menu_categories?page=${pageNumber}`, token: this.getToken() });
+            if (response.data) {
+                this.categoryList = response.data.data;
+                this.lastPage = response.data.last_page;
+                this.currentPage = pageNumber;
+                this.perPage = response.data.per_page;
+                this.totalData = response.data.total;
             }
-
         },
 
-        created(){
-            this.getMenuCategoryList();
+        handleFileChange(event) {
+            const selectedFile = event.target.files[0];
+            this.selectedImage = selectedFile;
         },
 
-        mounted(){
-            initTE({ Modal,Select, Ripple });
+        createBtnClicked() {
+            if (!this.name) {
+                this.alertValiationMessage(`category name`);
+                return 1;
+            }
+            if (!this.selectedImage) {
+                this.alertValiationMessage(`category image`);
+                return 1;
+            }
+            this.createMenuCategory();
+        },
+
+        async createMenuCategory() {
+            let formData = new FormData();
+            formData.append('name', this.name);
+            formData.append('image', this.selectedImage);
+            let response = await postApiData({ url: '/api/menu_categories', form_data: formData, token: this.getToken() });
+            if (response.success) {
+                this.$notify({
+                    text: `Menu category created successfully`,
+                    type: "info"
+                });
+                this.getMenuCategoryList(1);
+                this.name = null;
+                this.selectedImage = null;
+            }
+            else {
+                this.$notify({
+                    text: `Menu category create failed`,
+                    type: "error"
+                });
+            }
+        },
+
+        editBtnClicked(id) {
+            this.editId = id;
+            let index = this.categoryList.findIndex(category => category.id == id);
+            if (index != -1) {
+                this.name = this.categoryList[index].name;
+            }
+        },
+
+        async confirmEditBtnClicked() {
+            let formData = new FormData();
+            formData.append('name', this.name);
+            if (this.selectedImage) {
+                formData.append('image', this.selectedImage);
+            }
+            let response = await postApiData({ url: `/api/menu_categories/${this.editId}`, form_data: formData, token: this.getToken() });
+            if (response.success) {
+                this.$notify({
+                    text: `Menu category edited successfully`,
+                    type: "info"
+                });
+                this.getMenuCategoryList(1);
+                this.name = null;
+                this.selectedImage = null;
+            }
+            else {
+                this.$notify({
+                    text: `Menu category edit failed`,
+                    type: "error"
+                });
+            }
+        },
+
+        isActiveToggled(id) {
+            let index = this.categoryList.findIndex(category => category.id == id);
+            if (index != -1) {
+                if (this.categoryList[index].is_active == 1) {
+                    this.categoryList[index].is_active = 0;
+                }
+                else {
+                    this.categoryList[index].is_active = 1;
+                }
+
+                let url = `/api/is_active`;
+                let formData = new FormData();
+                formData.append('id', id);
+                formData.append('type', 'menu_category');
+                let response = postApiData({ url: url, form_data: formData, token: this.getToken() });
+            }
+        },
+
+        deleteBtnClicked(id) {
+            this.deleteId = id;
+        },
+
+        async confirmDeleteBtnClicked() {
+            let url = `/api/menu_categories/${this.deleteId}`;
+            let response = await deleteApiData({ url: url, token: this.getToken() });
+            if (response.success) {
+                this.getMenuCategoryList(1);
+            }
         }
+
+    },
+
+    created() {
+        this.getMenuCategoryList(1);
+    },
+
+    mounted() {
+        initTE({ Modal, Select, Ripple });
     }
+}
 </script>

@@ -47,10 +47,10 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <div class="contents" v-for="(journal, journalIndex) in journalList" :key="index">
+                            <div class="contents" v-for="(journal, journalIndex) in journalList" :key="journalIndex" >
                                 <tr class="" v-for="(acc,accIndex) in journal.ledgers" :key="accIndex">
                                     <td class=" align-middle" rowspan="2" v-if="acc.action == 'credit'">
-                                        {{ journalIndex+1 }}
+                                        {{ perPage * (currentPage - 1) + (++index) }}
                                     </td>
                                     <td class="whitespace-nowrap">
                                         {{ acc.account.name }}
@@ -69,6 +69,26 @@
                             </div>
                         </tbody>
                     </table>
+                    <div class="flex justify-center">
+                        <div v-if="totalData != 0" class=" bg-white  flex justify-center mt-5 py-3">
+                            <button class="rounded px-6 py-1 border  hover:bg-slate-200"
+                                :disabled="currentPage === 1"
+                                @click="getJournalList(currentPage - 1)">«</button>
+
+                            <button class=" text-sm px-5 border">
+                                Page <span @dblclick="showInput">{{ currentPage }}</span> / <span
+                                    class="text-gray-400">{{
+                                    lastPage }}</span>
+                            </button>
+
+                            <button class=" rounded px-6  py-1 border  hover:bg-slate-200"
+                                :disabled="currentPage === lastPage"
+                                @click="getJournalList(currentPage + 1)"> »</button>
+                        </div>
+                    </div>
+
+
+
                 </div>
             </div>
 
@@ -192,23 +212,33 @@
                 selectedDebitSubAcc:null,
                 selectedDebitAcc:null,
                 selectedMonth:null,
+                selectedNewMonth:null,
                 currentMonth:null,
+
+                currentPage: 0,
+                perPage: 0,
+                lastPage: 0,
+                totalData:0,
             };
         },
 
         methods: {
             ...mapGetters(['getToken']),
 
-            async getJournalList(selectedMonth){
-                const response = await getApiData({ url: '/api/journals?month=' + selectedMonth , token: this.getToken() });
+            async getJournalList(pageNumber){
+                const response = await getApiData({ url: '/api/journals?month=' + this.selectedNewMonth + '&page=' + pageNumber , token: this.getToken() });
                 if(response.data){
                     this.journalList = response.data.data;
+                    this.lastPage = response.data.last_page;
+                    this.currentPage = pageNumber;
+                    this.perPage = response.data.per_page;
+                    this.totalData = response.data.total;
                 }
             },
             monthChange(){
-                let selectedNewMonth = this.selectedMonth.slice(5,7);
-                console.log(selectedNewMonth)
-                this.getJournalList(selectedNewMonth)
+                this.selectedNewMonth = this.selectedMonth.slice(5,7);
+                console.log(this.selectedNewMonth)
+                this.getJournalList(1)
             },
             async getSubAccList(){
                 const response = await getApiData({ url: '/api/sub_accounts', token: this.getToken() });
@@ -241,7 +271,7 @@
                 formData.append('debit_account_id', this.selectedDebitAcc.id);
                 let response = await postApiData({url: '/api/journals', form_data: formData, token: this.getToken()});
                 if(response.success){
-                    this.getJournalList(this.currentMonth);
+                    this.getJournalList(1);
                     this.closeAndClearModal();
                     console.log('journal created')
                 }
@@ -267,8 +297,8 @@
         },
         created(){
             const date = new Date();
-            this.currentMonth = date.getMonth() + 1;
-            this.getJournalList(this.currentMonth);
+            this.selectedNewMonth = date.getMonth() + 1;
+            this.getJournalList(1);
             this.getSubAccList();
 
 

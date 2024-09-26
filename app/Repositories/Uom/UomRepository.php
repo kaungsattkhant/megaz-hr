@@ -12,21 +12,8 @@ class UomRepository implements UomRepositoryInterface
     public function listAllData(Request $request)
     {
         if ($request->per_page || $request->page) {
-            $totalCount = Uom::count();
-            $pageNumber = 1;
-            $perPage = 20;
-            if ($request->page) {
-                $pageNumber = $request->page;
-            }
-            if ($request->per_page) {
-                $perPage = $request->per_page;
-            }
-            $skip = ($pageNumber - 1) * $perPage;
-            $uoms = Uom::skip($skip)->take($perPage)->get();
-            $paginationData = MakePaginationData($request, $totalCount, 'uoms');
-            $paginationData['uoms'] = $uoms;
-
-            return $paginationData;
+            $uoms = Uom::orderBy('created_at', 'desc')->paginate(config('common.list_count'));
+            return $uoms;
         } else {
             $uoms = Uom::all();
             return $uoms;
@@ -45,13 +32,14 @@ class UomRepository implements UomRepositoryInterface
                     [
                         'base_unit_id' => $uom->id,
                         'conversion_unit_id' => $uom->id,
-                        'conversion'=>1,
-                    ], [
+                        'conversion' => 1,
+                    ],
+                    [
                         'base_unit_id' => $uom->id,
                         'conversion_unit_id' => $uom->id,
-                        'conversion'=>1,
-                        'created_by'=>UserData()->id,
-                        'is_show'=>0
+                        'conversion' => 1,
+                        'created_by' => UserData()->id,
+                        'is_show' => 0
                     ]
                 );
             }
@@ -100,26 +88,31 @@ class UomRepository implements UomRepositoryInterface
 
     public function uomConversaionList(Request $request)
     {
+        $uomsQuery = UomConversion::with('baseUnit', 'conversionUnit')
+            ->orderBy('created_at', 'desc')
+            ->where('is_show', 1);
+
+        if ($request->has('search')) {
+            $searchTerm = $request->input('search');
+
+            $uomsQuery->where(function ($query) use ($searchTerm) {
+                $query->where('conversion', 'LIKE', '%' . $searchTerm . '%')
+                    ->orWhereHas('baseUnit', function ($subQuery) use ($searchTerm) {
+                        $subQuery->where('name', 'LIKE', '%' . $searchTerm . '%');
+                    })
+                    ->orWhereHas('conversionUnit', function ($subQuery) use ($searchTerm) {
+                        $subQuery->where('name', 'LIKE', '%' . $searchTerm . '%');
+                    });
+            });
+        }
+
         if ($request->per_page || $request->page) {
-            $totalCount = UomConversion::with('baseUnit', 'conversionUnit')->where('is_show',1)->count();
-            $pageNumber = 1;
-            $perPage = 20;
-            if ($request->page) {
-                $pageNumber = $request->page;
-            }
-            if ($request->per_page) {
-                $perPage = $request->per_page;
-            }
-            $skip = ($pageNumber - 1) * $perPage;
-            $uoms = UomConversion::with('baseUnit', 'conversionUnit')->skip($skip)->take($perPage)->where('is_show',1)->get();
-            $paginationData = MakePaginationData($request, $totalCount, 'uoms');
-            $paginationData['uoms'] = $uoms;
-            return $paginationData;
+            return $uomsQuery->paginate(config('common.list_count'));
         } else {
-            $uoms = UomConversion::with('baseUnit', 'conversionUnit')->get();
-            return $uoms;
+            return $uomsQuery->get();
         }
     }
+
 
     public function createUomConversion(array $data)
     {

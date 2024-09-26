@@ -55,9 +55,10 @@
                             <!-- looping start -->
                             <div class="contents" v-for="(saleTarget, index) in saleTargetList" :key="index">
                                 <tr class="">
-                                    <td class=" ">
-                                        {{ ++index }}
+                                    <td>
+                                        {{ (currentPage - 1) * perPage + index + 1 }}
                                     </td>
+
                                     <td class="whitespace-nowrap text-left  ">
                                         {{ saleTarget.month }}
                                     </td>
@@ -72,11 +73,11 @@
                                         {{ saleTarget.total_quantity }}
                                     </td>
                                     <td class="whitespace-nowrap   relative">
-                                        <a :href="'/sale_target_menu/'+ saleTarget.id +'/edit'" class="pr-3">
+                                        <a :href="'/sale_target_menu/' + saleTarget.id + '/edit'" class="pr-3">
                                             <i class="fal fa-pen"></i>
                                         </a>
-                                        <button @click="deleteBtnClicked(saleTarget.id)"
-                                            data-te-toggle="modal" data-te-target="#deleteModal" id="delete-btn" class="pr-1">
+                                        <button @click="deleteBtnClicked(saleTarget.id)" data-te-toggle="modal"
+                                            data-te-target="#deleteModal" id="delete-btn" class="pr-1">
                                             <i class="fas fa-trash-alt"></i>
                                         </button>
                                     </td>
@@ -84,6 +85,22 @@
                             </div>
                         </tbody>
                     </table>
+                    <div class="flex justify-center">
+
+                        <div v-if="totalData != 0" class=" bg-white  flex justify-center mt-5 py-3">
+                            <button class="rounded px-6 py-1 border  hover:bg-slate-200"
+                                :disabled="currentPage === 1" @click="getSaleTargetMenuList(currentPage - 1)">«</button>
+
+                            <button class=" text-sm px-5 border">
+                                Page <span @dblclick="showInput">{{ currentPage }}</span> / <span
+                                    class="text-gray-400">{{
+                                    lastPage }}</span>
+                            </button>
+
+                            <button class=" rounded px-6  py-1 border  hover:bg-slate-200"
+                                :disabled="currentPage === lastPage" @click="getSaleTargetMenuList(currentPage + 1)"> »</button>
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -136,52 +153,60 @@
 </template>
 
 <script>
-    import { Modal, Ripple, initTE, Input, Select, Dropdown } from "tw-elements";
-    import { mapGetters } from "vuex";
-    import { getApiData, postApiData, deleteApiData } from '../../utilities/ajax-helpers';
+import { Modal, Ripple, initTE, Input, Select, Dropdown } from "tw-elements";
+import { mapGetters } from "vuex";
+import { getApiData, postApiData, deleteApiData } from '../../utilities/ajax-helpers';
 
-    export default {
-        data() {
-            return {
-                saleTargetList:[],
-                deleteId:null,
-            };
-        },
+export default {
+    data() {
+        return {
+            saleTargetList: [],
+            deleteId: null,
 
-        methods: {
-            ...mapGetters(['getToken']),
+            currentPage: 0,
+            perPage: 0,
+            lastPage: 0,
+            totalData:0
+        };
+    },
 
-            async getList(){
-                let url = `/api/sale_target_menus`;
-                let response = await getApiData({url: url, token: this.getToken()});
-                if(response.data){
-                    this.saleTargetList = response.data.data;
-                }
-            },
-            deleteBtnClicked(id){
-                this.deleteId = id;
-            },
+    methods: {
+        ...mapGetters(['getToken']),
 
-            async confirmDeleteBtnClicked(){
-                let url = `/api/sale_target_menus/${this.deleteId}`;
-                let response = await deleteApiData({url: url, token: this.getToken()});
-                if(response.success){
-                    this.getList();
-                    this.deleteId = null;
-                    console.log(`deleted`);
-                }
+        async getSaleTargetMenuList(pageNumber) {
+            let url = `/api/sale_target_menus?page=${pageNumber}`;
+            let response = await getApiData({ url: url, token: this.getToken() });
+            if (response.data) {
+                this.saleTargetList = response.data.data;
+                this.lastPage = response.data.last_page;
+                this.currentPage = pageNumber;
+                this.perPage = response.data.per_page;
+                this.totalData = response.data.total
             }
-
-
-            
+        },
+        deleteBtnClicked(id) {
+            this.deleteId = id;
         },
 
-        created(){
-            this.getList();
-        },
-
-        mounted(){
-            initTE({ Modal, Ripple, Input, Select, Dropdown })
+        async confirmDeleteBtnClicked() {
+            let url = `/api/sale_target_menus/${this.deleteId}`;
+            let response = await deleteApiData({ url: url, token: this.getToken() });
+            if (response.success) {
+                this.getSaleTargetMenuList(1);
+                this.deleteId = null;
+            }
         }
+
+
+
+    },
+
+    created() {
+        this.getSaleTargetMenuList(1);
+    },
+
+    mounted() {
+        initTE({ Modal, Ripple, Input, Select, Dropdown })
     }
+}
 </script>

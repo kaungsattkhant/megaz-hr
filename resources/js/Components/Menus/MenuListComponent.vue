@@ -16,7 +16,7 @@
                     data-te-select-wrapper-ref>
                     <select data-te-select-init data-te-select-placeholder="Filter by category"
                         data-te-select-filter="true" v-model="searchCategory">
-                        <option :value="category" v-for="category in menuCategoryList">
+                        <option :value="category" v-for="category in menuCategoryList" :key="category.id">
                             {{ category.name }}
                         </option>
                     </select>
@@ -68,26 +68,28 @@
                             <div class="contents" v-for="(menu, index) in menuList" :key="index">
                                 <tr class="">
                                     <td class="  ">
-                                        {{ per_page * (currentPage - 1) + (++index) }}
+                                        {{ perPage * (currentPage - 1) + (++index) }}
                                     </td>
                                     <td class="whitespace-nowrap  ">
                                         {{ menu.name }}
                                     </td>
                                     <td class="whitespace-nowrap  ">
-                                        <p v-for="(ingredient, ingredientIndex) in menu.items">
+                                        <p v-for="(ingredient, ingredientIndex) in menu.items" :key="ingredientIndex">
                                             {{ ingredient.name }}
                                         </p>
                                     </td>
                                     <td class="whitespace-nowrap  ">
-                                        <div class="relative flex border rounded text-center shrink-0 overflow-hidden rounded-md h-18 w-18">
-                                            <img width="80" height="100" style="aspect-ratio: 4/3; object-fit: cover;" :src="menu.image_url" alt="Menu image">
+                                        <div
+                                            class="relative flex border rounded text-center shrink-0 overflow-hidden rounded-md h-18 w-18">
+                                            <img width="80" height="100" style="aspect-ratio: 4/3; object-fit: cover;"
+                                                :src="menu.image_url" alt="Menu image">
                                         </div>
                                     </td>
                                     <td class="  ">
                                         {{ (menu.prices[0].price).toLocaleString() }}
                                     </td>
                                     <td class="  ">
-                                        {{ (menu.is_feature == 1)?'Yes': 'No' }}
+                                        {{ (menu.is_feature == 1) ? 'Yes' : 'No' }}
                                     </td>
                                     <td class="whitespace-nowrap ">
                                         <a :href="`/menus/${menu.id}/edit`" id="edit-btn" class="pr-1">
@@ -111,295 +113,137 @@
                         </tbody>
                     </table>
                 </div>
+                <!-- pagination -->
+                <div class="flex justify-center">
 
-                <div class="mt-2 ml-2">
-                    <ul v-if="paginationGroupsCount > 1" class="list-style-none flex">
-                        <li v-if="!isFirstGroup">
-                            <button class="relative block rounded bg-transparent px-3 py-1.5 text-sm text-neutral-600 transition-all duration-300
-                        hover:bg-neutral-100 dark:text-white dark:hover:bg-neutral-700 dark:hover:text-white"
-                                @click="previousPaginationGroupBtnClicked" :disabled="isFirstGroup">
-                                Previous
-                            </button>
-                        </li>
+                    <div v-if="totalData != 0" class=" bg-white  flex justify-center mt-5 py-3">
+                        <button class="rounded px-6 py-1 border  hover:bg-slate-200" :disabled="currentPage === 1"
+                            @click="getMenuList(currentPage - 1)">«</button>
 
-                        <li v-for="(pageNumber, pageNumberIndex) in groupedPageNumbers[currentGroup]"
-                            :key="pageNumberIndex" :aria-current="(pageNumber == currentPage) ? 'page' : ''">
-                            <button v-if="pageNumber == currentPage"
-                                class="relative block rounded bg-neutral-800 px-3 py-1.5 text-sm font-medium text-neutral-50 transition-all duration-300 dark:bg-neutral-900"
-                                :id="'paginationBtn-' + pageNumberIndex" @click="pageBtnClicked(pageNumber)">
-                                {{ pageNumber }}
-                                <span
-                                    class="absolute -m-px h-px w-px overflow-hidden whitespace-nowrap border-0 p-0 [clip:rect(0,0,0,0)]">
-                                    (current)
-                                </span>
-                            </button>
-                            <button v-else
-                                class="normal-pagination relative block rounded bg-transparent px-3 py-1.5 text-sm text-neutral-600 transition-all duration-300 hover:bg-neutral-100 dark:text-white dark:hover:bg-neutral-700 dark:hover:text-white"
-                                :id="'paginationBtn-' + pageNumberIndex" @click="pageBtnClicked(pageNumber)">
-                                {{ pageNumber }}
-                            </button>
-                        </li>
-                        <li v-if="!isLastGroup">
-                            <button class="relative block rounded bg-transparent px-3 py-1.5 text-sm text-neutral-600 transition-all duration-300
-                        hover:bg-neutral-100 dark:text-white dark:hover:bg-neutral-700 dark:hover:text-white"
-                                @click="nextPaginationGroupBtnClicked" :disabled="isLastGroup">
-                                Next
-                            </button>
-                        </li>
-                    </ul>
+                        <button class=" text-sm px-5 border">
+                            Page <span @dblclick="showInput">{{ currentPage }}</span> / <span class="text-gray-400">{{
+                                lastPage }}</span>
+                        </button>
 
-                    <ul v-else class="list-style-none flex">
-                        <li v-for="(pageNumber, pageNumberIndex) in pageNumbers" :key="pageNumberIndex"
-                            :aria-current="(pageNumber == currentPage) ? 'page' : ''">
-                            <button v-if="pageNumber == currentPage"
-                                class="relative block rounded bg-neutral-800 px-3 py-1.5 text-sm font-medium text-neutral-50 transition-all duration-300 dark:bg-neutral-900"
-                                :id="'paginationBtn-' + pageNumberIndex" @click="pageBtnClicked(pageNumber)">
-                                {{ pageNumber }}
-                                <span
-                                    class="absolute -m-px h-px w-px overflow-hidden whitespace-nowrap border-0 p-0 [clip:rect(0,0,0,0)]">
-                                    (current)
-                                </span>
-                            </button>
-                            <button v-else
-                                class="normal-pagination relative block rounded bg-transparent px-3 py-1.5 text-sm text-neutral-600 transition-all duration-300 hover:bg-neutral-100 dark:text-white dark:hover:bg-neutral-700 dark:hover:text-white"
-                                :id="'paginationBtn-' + pageNumberIndex" @click="pageBtnClicked(pageNumber)">
-                                {{ pageNumber }}
-                            </button>
-                        </li>
-                    </ul>
+                        <button class=" rounded px-6  py-1 border  hover:bg-slate-200"
+                            :disabled="currentPage === lastPage" @click="getMenuList(currentPage + 1)"> »</button>
+                    </div>
                 </div>
             </div>
 
-            <!--Delete Modal -->
-            <!-- <div
-        data-te-modal-init
-        class="fixed left-0 top-0 z-[1055] hidden h-full w-full overflow-y-auto overflow-x-hidden outline-none"
-        id="deleteModal"
-        tabindex="-1"
-        aria-labelledby="exampleModalLabel"
-        aria-hidden="true">
-        <div
-            data-te-modal-dialog-ref
-            class="pointer-events-none relative flex min-h-[calc(100%-1rem)] w-auto translate-y-[-50px] items-center opacity-0 transition-all duration-300 ease-in-out min-[576px]:mx-auto min-[576px]:mt-7 min-[576px]:min-h-[calc(100%-3.5rem)] min-[576px]:max-w-[500px]">
-                <div
-                class="min-[576px]:shadow-[0_0.5rem_1rem_rgba(#000, 0.15)] pointer-events-auto relative flex w-full flex-col rounded-md border-none bg-white bg-clip-padding text-current shadow-lg outline-none ">
-                <div
-                    class="flex flex-shrink-0 items-center justify-between rounded-t-md border-b-2 border-neutral-100 border-opacity-100 p-4 ">
-                    <h5
-                    class="text-xl font-medium leading-normal text-neutral-800 "
-                    id="exampleModalLabel">
-                    Delete ?
-                    </h5>
-                    <button
-                    type="button"
-                    class="box-content rounded-none border-none hover:no-underline hover:opacity-75 focus:opacity-100 focus:shadow-none focus:outline-none"
-                    data-te-modal-dismiss
-                    aria-label="Close">
-                    <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke-width="1.5"
-                        stroke="currentColor"
-                        class="h-6 w-6">
-                        <path
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        d="M6 18L18 6M6 6l12 12" />
-                    </svg>
-                    </button>
-                </div>
-                <div class="relative flex-auto p-4" data-te-modal-body-ref>
-                    <p>Are you sure ?</p>
-                </div>
-                <div
-                    class="flex flex-shrink-0 flex-wrap items-center justify-end rounded-b-md border-t-2 border-neutral-100 border-opacity-100 p-4 ">
-                    <button
-                    type="button"
-                    class="inline-block px-6 pb-2 pt-2.5 text-xs focus:outline-none focus:ring-0 "
-                    data-te-modal-dismiss
-                    >
-                        Close
-                    </button>
-                    <button @click="confirmDeleteBtnClicked"
-                    type="button" data-te-toggle="modal" data-te-target="#deleteModal"
-                    class="ml-1 inline-block rounded bg-red-600 px-6 pb-2 pt-2.5 text-xs  text-white   focus:outline-none focus:ring-0 "
-                    >
-                        Delete
-                    </button>
-                </div>
-                </div>
-            </div>
-        </div> -->
+
         </div>
     </div>
 </template>
 
 <script>
-    import { Modal, Ripple, initTE, Input, Select, Dropdown } from "tw-elements";
-    import { getApiData, postApiData, deleteApiData } from '../../utilities/ajax-helpers';
-    import { mapGetters } from "vuex";
+import { Modal, Ripple, initTE, Input, Select, Dropdown } from "tw-elements";
+import { getApiData, postApiData, deleteApiData } from '../../utilities/ajax-helpers';
+import { mapGetters } from "vuex";
 
-    export default {
-        data() {
-            return {
-                menuCategoryList: [],
-                menuList: [],
-                deleteId: null,
+export default {
+    data() {
+        return {
+            menuCategoryList: [],
+            menuList: [],
+            deleteId: null,
 
-                searchInput: null,
-                searchCategory: null,
+            searchInput: null,
+            searchCategory: null,
 
-                per_page: 20,
-                currentPage: 1,
-                pageNumbers: [],
-                paginationGroupsCount: 1,
-                groupedPageNumbers: [],
-                currentGroup: 0,
-                isFirstGroup: true,
-                isLastGroup: false,
+            currentPage: 0,
+            perPage: 0,
+            lastPage: 0,
+            totalData:0,
+        };
+    },
 
-            };
+    methods: {
+        ...mapGetters(['getToken']),
+
+        async getMenuCategoryList() {
+            let url = `/api/menu_categories`;
+            let response = await getApiData({ url: url, token: this.getToken() });
+            if (response.data) {
+                this.menuCategoryList = response.data;
+            }
         },
 
-        methods: {
-            ...mapGetters(['getToken']),
+        async getMenuList(pageNumber) {
 
-            async getMenuCategoryList(){
-                let url = `/api/menu_categories`;
-                let response = await getApiData({ url: url, token: this.getToken() });
-                if(response.data){
-                    this.menuCategoryList = response.data;
-                }
-            },
-
-            async getMenuList(pageNumber){
-                if(pageNumber){
-                    this.currentPage = pageNumber;
-                }
-                let url = `/api/menus?page=${this.currentPage}`;
-                let response = await getApiData({url: url, token: this.getToken()});
-                if(response.data){
-                    this.menuList = response.data.data;
-                    this.per_page = response.data.per_page;
-
-                    this.pageNumbers = [];
-                    this.lastPageNumber = response.data.last_page;
-
-                    for(let i=1; i<=response.data.last_page; i++){
-                        this.pageNumbers.push(i);
-                    }
-
-                    if(this.pageNumbers.length > 10){
-                        this.groupedPageNumbers = [];
-                        this.paginationGroupsCount = this.pageNumbers.length % 10;
-                        for(let i=0; i<this.pageNumbers.length; i+=10){
-                            let chunk = this.pageNumbers.slice(i, i+10);
-                            this.groupedPageNumbers.push(chunk);
-                        }
-
-                        let lastGroupIndex = this.groupedPageNumbers.length - 1;
-                        this.isFirstGroup = (this.currentGroup === 0);
-                        this.isLastGroup = (lastGroupIndex === this.currentGroup);
-                    }
-                }
-            },
-
-            isActiveToggled(id){
-                let index = this.menuList.findIndex(menu => menu.id == id);
-                if(index != -1){
-                    if(this.menuList[index].is_active == 1){
-                        this.menuList[index].is_active = 0;
-                    }
-                    else{
-                        this.menuList[index].is_active = 1;
-                    }
-
-                    let url = `/api/is_active`;
-                    let formData = new FormData();
-                    formData.append('id', id);
-                    formData.append('type', 'menu');
-                    let response = postApiData({url: url, form_data: formData, token: this.getToken()});
-                }
-            },
-
-            deleteBtnClicked(id){
-                this.deleteId = id;
-            },
-
-            async confirmDeleteBtnClicked(){
-                // let url = `/api/staff/${this.deleteId}`;
-                let response = await deleteApiData({url: url, token: this.getToken()});
-                if(response.success){
-                    alert(`deleted`);
-                }
-            },
-
-            async searchBtnClicked(){
-                let url = null;
-                if(this.searchInput && this.searchCategory){
-                    url = `/api/menus?search_input=${this.searchInput}&menu_category_id=${this.searchCategory.id}&page=1`;
-                }
-                if(this.searchInput && !this.searchCategory){
-                    url = `/api/menus?search_input=${this.searchInput}&page=1`;
-                }
-                if((!this.searchInput) && this.searchCategory){
-                    url = `/api/menus?menu_category_id=${this.searchCategory.id}&page=1`;
-                }
-                let response = await getApiData({url: url, token: this.getToken()});
-                if(response.data){
-                    this.menuList = response.data.data;
-                }
-            },
-
-            clearSearchBtnClicked(){
-                this.searchInput = null;
-                this.searchCategory = null;
-                this.getMenuList(null);
-            },
-
-            pageBtnClicked(pageNumber){
-                this.currentPage = pageNumber;
-                this.getMenuList(this.currentPage);
-            },
-
-            nextPaginationGroupBtnClicked(){
-                this.currentGroup += 1;
-                this.currentPage = (this.groupedPageNumbers[this.currentGroup][0]);
-                this.getMenuList(this.currentPage);
-            },
-
-            previousPaginationGroupBtnClicked(){
-                this.currentGroup -= 1;
-                let lastIndex = this.groupedPageNumbers[this.currentGroup].length - 1;
-                this.currentPage = (this.groupedPageNumbers[this.currentGroup][lastIndex]);
-                this.getMenuList(this.currentPage);
-            },
-
-            firstPaginationGroupBtnClicked(){
-                this.currentGroup = 0;
-                this.currentPage = (this.groupedPageNumbers[this.currentGroup][0]);
-                this.getMenuList(this.currentPage);
-            },
-
-            lastPaginationGroupBtnClicked(){
-                this.currentGroup = this.paginationGroupsCount - 1;
-                let lastIndex = this.groupedPageNumbers[this.currentGroup].length - 1;
-                this.currentPage = (this.groupedPageNumbers[this.currentGroup][lastIndex]);
-                this.getMenuList(this.currentPage);
+            let url = `/api/menus?page=${pageNumber}`;
+            if (this.searchInput && this.searchCategory) {
+                url = `/api/menus?search_input=${this.searchInput}&menu_category_id=${this.searchCategory.id}&page=${pageNumber}`;
+            }
+            if (this.searchInput && !this.searchCategory) {
+                url = `/api/menus?search_input=${this.searchInput}&page=${pageNumber}`;
+            }
+            if ((!this.searchInput) && this.searchCategory) {
+                url = `/api/menus?menu_category_id=${this.searchCategory.id}&page=${pageNumber}`;
             }
 
+            let response = await getApiData({ url: url, token: this.getToken() });
+            if (response.data) {
+                this.menuList = response.data.data;
+                this.lastPage = response.data.last_page;
+                this.currentPage = pageNumber;
+                this.perPage = response.data.per_page;
+                this.totalData = response.data.total;
+            }
         },
 
-        created()
-        {
-            this.getMenuCategoryList();
-            this.getMenuList(null);
+        isActiveToggled(id) {
+            let index = this.menuList.findIndex(menu => menu.id == id);
+            if (index != -1) {
+                if (this.menuList[index].is_active == 1) {
+                    this.menuList[index].is_active = 0;
+                }
+                else {
+                    this.menuList[index].is_active = 1;
+                }
+
+                let url = `/api/is_active`;
+                let formData = new FormData();
+                formData.append('id', id);
+                formData.append('type', 'menu');
+                let response = postApiData({ url: url, form_data: formData, token: this.getToken() });
+            }
         },
 
-        mounted()
-        {
-            initTE({Modal, Ripple, Input, Select, Dropdown});
-        }
+        deleteBtnClicked(id) {
+            this.deleteId = id;
+        },
+
+        async confirmDeleteBtnClicked() {
+            // let url = `/api/staff/${this.deleteId}`;
+            let response = await deleteApiData({ url: url, token: this.getToken() });
+            if (response.success) {
+                alert(`deleted`);
+            }
+        },
+
+        async searchBtnClicked() {
+
+            this.getMenuList(1);
+        },
+
+        clearSearchBtnClicked() {
+            this.searchInput = null;
+            this.searchCategory = null;
+            this.getMenuList(1);
+        },
+
+
+
+    },
+
+    created() {
+        this.getMenuCategoryList();
+        this.getMenuList(1);
+    },
+
+    mounted() {
+        initTE({ Modal, Ripple, Input, Select, Dropdown });
     }
+}
 </script>

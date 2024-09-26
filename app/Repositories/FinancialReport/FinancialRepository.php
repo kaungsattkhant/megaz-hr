@@ -15,7 +15,7 @@ class FinancialRepository implements FinancialInterface
     private $receiptSubAccountCode = ['2-1000', '2-1050', '2-2000', '4-3000', '5-0000', '5-0100', '5-1000', '4-4000', '3-1000'];
     private $paymentSubAccountCode = ['1-1000', '1-1100', '2-1000', '2-1020', '2-1050', '2-3000', '2-4000', '3-2000', '4-1000', '4-2000', '4-3000', '4-4000', '6-0000', '6-2000', '6-3000', '6-4000', '6-5000', '6-6000', '6-7000', '6-8000', '6-9000', '3-1000'];
 
-    public function __construct(CashFlowService $cashFlowService,TrialBalanceService $trialBalanceService)
+    public function __construct(CashFlowService $cashFlowService, TrialBalanceService $trialBalanceService)
     {
         $this->cashFlowService = $cashFlowService;
         $this->trialBalanceService = $trialBalanceService;
@@ -254,32 +254,123 @@ class FinancialRepository implements FinancialInterface
     {
         $current = (isset($request->date) || $request->date != null) ? Carbon::parse($request->date) : Carbon::now();
         $previousMonth = $current->copy()->subMonth();
-        $creditBalanceCode = [
+        $incomeCode = [
             '5-0001',
             '5-0101',#food income
             '5-0002',
             '5-0102',#beverage income
             '5-0003',
             '5-0103', #room charges
+
             // '5-1000', #income
-            '3-1010',#existing capital
-            '3-1020',#retained earning
-            '4-1001',#retained earning
+
+            // '3-1010',#existing capital
+            // '3-1020',#retained earning
+            // '4-1001',#loan
             // '4-1000',#loan term liablilities
         ];
-        $cashAndBankCode=['2-1000'];
-        $otherReceivable=['2-1050'];
-        $results = $this->trialBalanceService->getTrialBalanceResults($creditBalanceCode, 'credit', $current,'credit_balance');
-        // return $results;
-        $cashAndBankBalance=$this->trialBalanceService->getResultBySubAccountCode($cashAndBankCode,'credit',$current,'cash_and_bank');
-        // return $cashAndBankBalance;
-        $otherReceiveable=$this->trialBalanceService->getTotalBySubAccountCode($otherReceivable,'credit',$current,'other_receiveable');
-        $cashAndBankBalance=$cashAndBankBalance->merge($otherReceiveable);
-        // array_push($cashAndBankBalance,$otherReceiveable);
-        return $cashAndBankBalance;
-        $creditBalance=new \stdClass();
-        $creditBalance->credit_balance=$results;
-        return $creditBalance;
+        $otherIncomeCode = ['5-1000'];
+        $capitalCode = ['3-1010'];
+        $retainEarningCode = ['3-1020'];
+        $longTermCode = ['4-1001'];
+
+        $cashAndBankCode = ['2-1000'];
+        $otherReceivableCode = ['2-1050'];
+
+        #credit balance
+        $income = $this->trialBalanceService->getTrialBalanceResults($incomeCode, 'credit', $current, 'credit_balance');
+        // $otherIncome = $this->trialBalanceService->getTrialBalanceResults($otherIncomeCode, 'credit', $current,'credit_balance');
+        $capital = $this->trialBalanceService->getTrialBalanceResults($capitalCode, 'credit', $current, 'credit_balance');
+        $retainEarning = $this->trialBalanceService->getTrialBalanceResults($retainEarningCode, 'credit', $current, 'credit_balance');
+        $longTerm = $this->trialBalanceService->getTrialBalanceResults($longTermCode, 'credit', $current, 'credit_balance');
+
+
+        $creditBalance = [];
+        $creditBalance[] = $income;
+        $creditBalance[] = $capital;
+        $creditBalance[] = $retainEarning;
+        $creditBalance[] = $longTerm;
+        $creditTotalBalance = 0;
+        $creditTotalBalance += collect($income)->sum('amount');
+        $creditTotalBalance += collect($capital)->sum('amount');
+        $creditTotalBalance += collect($retainEarning)->sum('amount');
+        $creditTotalBalance += collect($longTerm)->sum('amount');
+        #end credit balance
+
+
+        #debit balance
+
+
+        $cashAndBankBalance = $this->trialBalanceService->getResultBySubAccountCode($cashAndBankCode, 'credit', $current, 'cash_and_bank');
+        $otherReceiveable = $this->trialBalanceService->getTotalBySubAccountCode($otherReceivableCode, 'credit', $current, 'other_receiveable');
+        //book value of current asset and fixed asset
+        $fix_asset_tangiable = '1-1000';
+        $fix_asset_untangible = '1-1100';
+        $inventory_held = '2-1020';
+
+        $fix_asset_tangiable = $this->trialBalanceService->getAssetBookValue($current, $fix_asset_tangiable, 'Fix Asset (Tangible)');
+        $fix_asset_intangible = $this->trialBalanceService->getAssetBookValue($current, $fix_asset_untangible, 'Fix Asset (Intangible)');
+        $inventory_held = $this->trialBalanceService->getAssetBookValue($current, $inventory_held, 'Schedule Of Inventory Held');
+        $cashAndBankBalance = $cashAndBankBalance->merge($otherReceiveable);
+        $cashAndBankBalance = $cashAndBankBalance->push($inventory_held);
+
+        //cost & expense
+        $costAndExpense = [
+            '6-0000',
+            '6-2000',
+            '6-3000',
+            '6-4000',
+            '6-5000',
+            '6-6000',
+            '6-9000',
+            '3-2000',
+        ];
+        $costAndExpense = $this->trialBalanceService->getTotalBySubAccountCode($costAndExpense, 'debit', $current, 'cost_and_expense');
+        #end cost & expense
+
+        #fixed overhead
+        // $fixedOverHead=[];
+        $financeCostCode = ['6-8000']; //finance cost
+        $financeCost = $this->trialBalanceService->getTotalBySubAccountCode($financeCostCode, 'debit', $current, 'finance_cost');
+        $fixExpenseCodes = [
+            '6-7001', //rental 
+            '6-7002', //depreciaion
+            '6-7004', //replacement
+        ];
+        $fixExpense = $this->trialBalanceService->getTrialBalanceResults($fixExpenseCodes, 'debit', $current, 'fix_expense');
+
+        $fixedOverHead = $financeCost->merge($fixExpense);
+        #end fixed overhead
+
+        $debitBalance = [];
+        $debitBalance[] = [$fix_asset_tangiable];
+        $debitBalance[] = [$fix_asset_intangible];
+        $debitBalance[] = $cashAndBankBalance;
+        $debitBalance[] = $costAndExpense;
+        $debitBalance[] = $fixedOverHead;
+
+        $debitTotalBalance = 0;
+        $debitTotalBalance += collect(value: [$fix_asset_tangiable])->sum('amount');
+        $debitTotalBalance += collect([$fix_asset_intangible])->sum('amount');
+        $debitTotalBalance += collect($cashAndBankBalance)->sum('amount');
+        $debitTotalBalance += collect($costAndExpense)->sum('amount');
+        $debitTotalBalance += collect($fixedOverHead)->sum('amount');
+        #end debit balance
+        // $creditBalanceResult = new \stdClass();
+        // $creditBalanceResult->credit_balance = $creditBalance;
+
+        // $debitBalanceResult = new \stdClass();
+        // $debitBalanceResult->debit_balance = $debitBalance;
+
+        // $finalResults = [$creditBalanceResult, $debitBalanceResult];
+
+        return [
+            'credit_balance' => $creditBalance,
+            'credit_total_balance' => $creditTotalBalance,
+            'debit_total_balance' => $debitTotalBalance,
+            'debit_balance' => $debitBalance
+        ];
+        // return $finalResults;
     }
 
 }
