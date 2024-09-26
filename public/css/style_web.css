@@ -86,7 +86,7 @@
 .add-btn {
   font-size: 13px;
   padding: 6px 16px;
-  border-radius: 3px;
+  border-radius: 4px;
   background-color: #845adf !important;
   color: white; }
 
@@ -211,7 +211,7 @@
   position: relative;
   border: 1px solid #c7c9cd;
   height: 2rem;
-  border-radius: 0.35rem;
+  border-radius: 0.25rem;
   background-color: white; }
 
 .search-input input {

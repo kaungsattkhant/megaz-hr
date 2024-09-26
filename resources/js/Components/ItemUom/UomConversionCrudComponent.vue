@@ -6,11 +6,14 @@
     </div>
     <div class="mt-4 bg-white">
         <div class="btn-container">
-            <div class=" flex">
+            <div class=" flex gap-x-4">
                 <label for="search" class="search-input">
-                    <input type="text" class="input-search" placeholder="Search">
+                    <input type="text" class="input-search !pr-[22px]" placeholder="Search" v-model="searchInput">
                     <i class="fal fa-search"></i>
+                    <!-- <i class="far fa-times !left-auto !right-2 !text-red-400 hover:cursor-pointer" @click="clearSearchBtnClicked"></i> -->
                 </label>
+                <button class="add-btn h-8 text-[13px] font-inter" @click="searchBtnClicked">Search</button>
+                <button class="add-btn h-8 text-[13px] font-inter" @click="clearSearchBtnClicked">Clear</button>
 
                 <!-- <button class="add-btn h-8 mx-2 " @click="searchBtnClicked">Search</button>
             <button class="add-btn h-8 mx-2 " @click="clearSearchBtnClicked">Clear</button> -->
@@ -382,6 +385,8 @@ export default {
             conversionUnitedit: null,
             editUomConversionId: null,
 
+            searchInput:null,
+
 
             currentPage: 0,
             perPage: 0,
@@ -395,6 +400,9 @@ export default {
 
         async getUomConversionList(pageNumber) {
             let url = `/api/uom_conversions?page=${pageNumber}`;
+            if(this.searchInput){
+                url = '/api/uom_conversions?page=' + pageNumber + '&search=' + this.searchInput;
+            }
             let response = await getApiData({ url: url, token: this.getToken() });
             if (response.data) {
                 this.uomConversionList = response.data.data;
@@ -511,10 +519,11 @@ export default {
             }
         },
 
-
+        async searchBtnClicked() {
+            this.getUomConversionList(1);
+        },
         clearSearchBtnClicked() {
             this.searchInput = null;
-            this.searchCategory = null;
             this.getUomConversionList(1);
         },
 

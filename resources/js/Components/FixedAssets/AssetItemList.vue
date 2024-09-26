@@ -7,7 +7,12 @@
     <div class="mt-4 bg-white">
         <div class="btn-container">
             <div class=" flex gap-x-4">
-
+                <label for="search" class="search-input">
+                    <input type="text" class="input-search" placeholder="Search" v-model="searchInput">
+                    <i class="fal fa-search"></i>
+                </label>
+                <button class="add-btn h-8 text-[13px] font-inter" @click="searchBtnClicked()">Search</button>
+                <button class="add-btn h-8 text-[13px] font-inter" @click="clearSearchBtnClicked()">Clear</button>
             </div>
             <div class="flex justify-end flex-col">
                 <a href="/asset_items/create" class="add-btn text-[13px] font-inter">
@@ -95,6 +100,9 @@ export default {
     data() {
         return {
             assetItemList: [],
+
+            searchInput:null,
+
             currentPage: 0,
             perPage: 0,
             lastPage: 0,
@@ -109,6 +117,9 @@ export default {
 
 
             let url = `/api/asset_items?page=${pageNumber}`;
+            if(this.searchInput){
+                url = '/api/asset_items?page=' + pageNumber + '&search=' + this.searchInput;
+            }
             let response = await getApiData({ url: url, token: this.getToken() });
             if (response.data) {
                 this.assetItemList = response.data.data;
@@ -117,6 +128,13 @@ export default {
                 this.perPage = response.data.per_page;
                 this.totalData = response.data.total;
             }
+        },
+        async searchBtnClicked() {
+            this.getAssetItemList(1);
+        },
+        clearSearchBtnClicked() {
+            this.searchInput = null;
+            this.getAssetItemList(1);
         },
     },
 
