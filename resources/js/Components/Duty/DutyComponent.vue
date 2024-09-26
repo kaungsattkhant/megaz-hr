@@ -51,7 +51,7 @@
                                     Tasks
                                 </th>
                                 <th scope="col" class="">
-                                    
+
                                 </th>
                             </tr>
                         </thead>
@@ -59,7 +59,7 @@
                             <div class="contents" v-for="(listItem, dutyIndex) in dutyList" :key="dutyIndex">
                                 <tr class="">
                                     <td class="">
-                                        {{ dutyIndex+1 }}
+                                        {{ perPage * (currentPage - 1) + (++index) }}
                                     </td>
                                     <td class="whitespace-nowrap">
                                         {{ listItem.date }}
@@ -72,7 +72,7 @@
                                     </td>
                                     <td class="whitespace-nowrap">
                                         <span v-for="(taskItem,listTaskIndex) in listItem.tasks" :key="listTaskIndex" class="group">
-                                            {{ taskItem.name }} 
+                                            {{ taskItem.name }}
                                             <span class="group-last:hidden">, </span>
                                         </span>
                                         <!-- <ul>
@@ -85,9 +85,9 @@
                                         <!-- <a :href="'/duty/' + duty.id + '/edit'">
                                             <i class="far fa-pen cursor-pointer mr-3"></i>
                                         </a> -->
-                                        
+
                                         <button @click="btnClickedEditModal(listItem)" class="mr-3"
-                                            data-te-toggle="modal" data-te-target="#create_payment_modal" 
+                                            data-te-toggle="modal" data-te-target="#create_payment_modal"
                                             >
                                             <i class="fal fa-pen" ></i>
                                         </button>
@@ -95,7 +95,7 @@
                                             data-te-target="#deleteModal" id="edit-btn" class="pl-1">
                                             <i class="fas fa-trash-alt"></i>
                                         </button>
-                                        
+
                                     </td>
                                 </tr>
 
@@ -154,7 +154,7 @@
                                     <label for="" class="label-form mb-3">
                                         Department
                                     </label>
-                    
+
                                     <div class="bg-white mb-0 w-full inline-block h-[34px] dark:bg-white !text-black select-custom"
                                         data-te-select-wrapper-ref>
                                         <select data-te-select-init data-te-select-placeholder="Select Department" @change="changeDepartment(department)"
@@ -207,7 +207,7 @@
                                                 <option class="text-sm" :value="task" v-for="(task,index) in taskList" :key="index">
                                                     {{ task.name }}
                                                 </option>
-        
+
                                         </select>
                                     </div>
                                     <div class="col-span-2 text-right">
@@ -227,7 +227,7 @@
                                         </button>
                                     </div>
                                 </div>
-        
+
                             </div>
                             <div class="flex justify-end gap-x-4 px-6 mb-6 pt-4">
                                 <button type="button" class="cancel-btn focus:shadow-none focus:outline-none"
@@ -352,7 +352,7 @@
                     this.taskList = response.data;
                 }
             },
-            
+
 
             async getInitDutyList(selectedDate) {
                 const response = await getApiData({ url: '/api/duties?date=' + selectedDate + '&page=1', token: this.getToken() });
@@ -398,7 +398,7 @@
                 // this.selectedStaff = this.selectedDutyDetail.staff;
                 // this.selectedCookingPlace = this.selectedDutyDetail.cooking_place
                 this.getDataForEditModal()
-                
+
             },
             getDataForEditModal(){
                 this.selectedDutyDetail.tasks.forEach(item =>{
@@ -428,7 +428,7 @@
             btnClickedEditDuty(){
                 this.sampleTaskList.forEach(duty => {
                     this.taskIds.push(duty.id)
-                    
+
                 });
                 console.log(this.taskIds)
                 this.updateDuty();

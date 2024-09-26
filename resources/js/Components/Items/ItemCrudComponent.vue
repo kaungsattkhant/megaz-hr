@@ -53,7 +53,7 @@
                             <div class="contents" v-for="(item, itemIndex) in itemList" :key="itemIndex">
                                 <tr class="">
                                     <td class="">
-                                        {{ per_page * (currentPage - 1) + (++itemIndex) }}
+                                        {{ perPage * (currentPage - 1) + (++itemIndex) }}
                                     </td>
                                     <td class="whitespace-nowrap">
                                         {{ item.name }}
@@ -384,7 +384,7 @@ export default {
             updatePriceItem: null,
             updatedPrice: null,
 
-            
+
             isFirstGroup: true,
             isLastGroup: false,
             selectedBaseUom:null,

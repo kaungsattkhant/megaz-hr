@@ -43,7 +43,7 @@
                             <div class="contents" v-for="(department, index) in departmentList" :key="index">
                                 <tr class="">
                                     <td class="">
-                                        {{ ++index }}
+                                        {{ perPage * (currentPage - 1) + (++index) }}
                                     </td>
                                     <td class="whitespace-nowrap">
                                         {{ department.name }}

@@ -45,7 +45,7 @@
                         <div class="contents" v-for="(supplier, supplierIndex) in supplierList" :key="supplierIndex">
                             <tr class="bg-white rounded-lg overflow-hidden shadow-lg">
                                 <td class=" px-6 py-4 font-medium ">
-                                    {{ perPage * (currentPage - 1) + (++index) }}
+                                    {{ perPage * (currentPage - 1) + (++supplierIndex) }}
 
                                 </td>
                                 <td class="whitespace-nowrap px-6 py-4 ">
@@ -126,7 +126,7 @@ export default {
             let url = `/api/suppliers?page=${pageNumber}`;
             let response = await getApiData({ url: url, token: this.getToken() });
             if (response.data) {
-                this.supplierList = response.data;
+                this.supplierList = response.data.data;
                 this.lastPage = response.data.last_page;
                 this.currentPage = pageNumber;
                 this.perPage = response.data.per_page;

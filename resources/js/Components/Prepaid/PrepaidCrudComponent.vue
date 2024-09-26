@@ -82,7 +82,7 @@
                             <div class="contents" v-for="(prepaid, index) in prepaidList" :key="index">
                                 <tr class="">
                                     <td class=" align-middle">
-                                        {{ index+1 }}
+                                        {{ perPage * (currentPage - 1) + (++index) }}
                                     </td>
                                     <td class=" align-middle">
                                         {{ prepaid.prepaid.title }}
@@ -390,7 +390,7 @@
                 selectedNewMonth:null,
                 currentMonth:null,
                 step: 1,
-                
+
                 currentPage: 0,
                 perPage: 0,
                 lastPage: 0,

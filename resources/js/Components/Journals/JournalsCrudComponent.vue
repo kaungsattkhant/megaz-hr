@@ -47,10 +47,10 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <div class="contents" v-for="(journal, journalIndex) in journalList" :key="index">
+                            <div class="contents" v-for="(journal, journalIndex) in journalList" :key="journalIndex" >
                                 <tr class="" v-for="(acc,accIndex) in journal.ledgers" :key="accIndex">
                                     <td class=" align-middle" rowspan="2" v-if="acc.action == 'credit'">
-                                        {{ journalIndex+1 }}
+                                        {{ perPage * (currentPage - 1) + (++index) }}
                                     </td>
                                     <td class="whitespace-nowrap">
                                         {{ acc.account.name }}

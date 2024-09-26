@@ -7,16 +7,16 @@
     <div class="mt-4 bg-white">
         <div class="btn-container">
             <notifications position="top center" />
-    
+
             <div class=" flex">
                 <label for="search" class="search-input">
                     <input type="text" class="input-search" placeholder="Search">
-    
+
                     <i class="fal fa-search"></i>
                 </label>
             </div>
             <div class="flex justify-end flex-col">
-    
+
                 <button type="button" class="add-btn transition duration-150 ease-in-out focus:outline-none focus:ring-0 "
                     data-te-toggle="modal" data-te-target="#create_modal">
                     Add New
@@ -38,9 +38,9 @@
                                 <th scope="col" class="">
                                     Receivable Amount
                                 </th>
-    
+
                                 <th scope="col" class="">
-    
+
                                 </th>
                             </tr>
                         </thead>
@@ -49,7 +49,7 @@
                             <div class="contents" v-for="(ar,index) in arList" :key="index">
                                 <tr class="">
                                     <td class=" font-medium ">
-                                        {{ index+1 }}
+                                        {{ perPage * (currentPage - 1) + (++index) }}
                                     </td>
                                     <td class="whitespace-nowrap">
                                         <a :href="'/account_receivable/' + ar.id + '/detail'"  class="contents">{{ ar.name }}</a>
@@ -219,8 +219,8 @@
 
 
     </div>
-    
-    
+
+
 
 </template>
 

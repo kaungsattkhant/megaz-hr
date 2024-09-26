@@ -1,7 +1,6 @@
 <template>
     <div class="mt-4 bg-white">
         <notifications position="top center" />
-
         <h1 class="font-bold text-lg text-center p-3">Asset Items</h1>
         <div class="p-3 flex justify-center">
             <div class="w-full p-1 justify-center flex">
@@ -34,7 +33,7 @@
                                     :value=subAcc>{{ subAcc.name }}</option>
                             </select>
                         </div>
-                        
+
                         <div class="my-5">
                             <label for="" class="label-form mb-3">
                                 Second Account
@@ -459,7 +458,7 @@ export default {
                     text: `Asset Item created successfully`,
                     type: "success"
                 });
-                window.location.replace('/asset_item/list');
+                window.location.replace('/asset_items/list');
             } else {
                 this.$notify({
                     title: `Input validation`,
@@ -473,10 +472,6 @@ export default {
     created() {
         this.getSubAccountForSecond();
         this.getSubAccountForDepreciation();
-        this.getAccountForSecond();
-        this.getAccountForSecondDepreciation();
-        this.secondAccountsForAssetItem();
-        this.secondAccountDepreciationForAssetItem();
     },
 
     mounted() {

@@ -74,7 +74,7 @@
                             <div class="contents" v-for="(staff, index) in staffReportList" :key="index">
                                 <tr class="">
                                     <td class=" ">
-                                        {{ per_page * (currentPage - 1) + (++index) }}
+                                        {{ perPage * (currentPage - 1) + (++index) }}
                                     </td>
                                     <td class="whitespace-nowrap text-left  ">
                                         {{ staff.name }}
@@ -200,7 +200,7 @@ export default {
             teamList: [],
             selectedTeam: null,
 
-            
+
             isFirstGroup: true,
             isLastGroup: false,
             staffReportList: [],
@@ -232,7 +232,7 @@ export default {
                 this.currentPage = pageNumber;
                 this.perPage = response.data.per_page;
                 this.totalData = response.data.total;
-                
+
             }
         },
 

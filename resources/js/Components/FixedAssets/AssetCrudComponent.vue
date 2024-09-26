@@ -1,7 +1,7 @@
 <template>
     <div class="mt-4 bg-white">
         <notifications position="top center" />
-
+asdfafasdf
         <h1 class="font-bold text-lg text-left px-8 pt-8 mb-4">Asset</h1>
         <div class=" px-8 pt-3 pb-8 flex justify-center">
             <div class="w-full justify-center flex">
@@ -40,7 +40,7 @@
                                 placeholder="Useful Life(Month)">
                         </div><div></div>
 
-                        
+
 
                         <div class="mb-6 col-span-5">
                             <label for="" class="label-form mb-3">

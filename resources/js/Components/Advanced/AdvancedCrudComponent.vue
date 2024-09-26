@@ -54,7 +54,7 @@
                                 <a :href="'/advanced/' + advance.staff_id + '/detail'" class="contents">
                                     <tr class="">
                                         <td class=" ">
-                                            {{ index+1 }}
+                                            {{ perPage * (currentPage - 1) + (++index) }}
                                         </td>
                                         <td class="whitespace-nowrap">
                                             {{ advance.staff_name }}

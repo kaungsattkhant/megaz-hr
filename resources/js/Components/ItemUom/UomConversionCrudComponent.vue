@@ -60,7 +60,7 @@
                             <div class="contents" v-for="(uom, itemIndex) in uomConversionList" :key="itemIndex">
                                 <tr class="">
                                     <td class=" ">
-                                        {{ per_page * (currentPage - 1) + (++itemIndex) }}
+                                        {{ perPage * (currentPage - 1) + (++itemIndex) }}
                                     </td>
                                     <td class="whitespace-nowrap  ">
                                         {{ uom.base_unit.name }}
@@ -397,7 +397,7 @@ export default {
             let url = `/api/uom_conversions?page=${pageNumber}`;
             let response = await getApiData({ url: url, token: this.getToken() });
             if (response.data) {
-                this.uomConversionList = response.data.uoms;
+                this.uomConversionList = response.data.data;
                 this.lastPage = response.data.last_page;
                 this.currentPage = pageNumber;
                 this.perPage = response.data.per_page;
@@ -517,7 +517,7 @@ export default {
             this.searchCategory = null;
             this.getUomConversionList(1);
         },
-        
+
     },
 
     created() {

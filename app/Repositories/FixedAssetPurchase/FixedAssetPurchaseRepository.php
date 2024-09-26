@@ -20,22 +20,28 @@ class FixedAssetPurchaseRepository implements FixedAssetPurchaseRepositoryInterf
         $query->when(checkDepartmentAndRoles('HR', ['Staff']), function ($q) use ($staff) {
             $q->where('created_by', $staff->id);
         })
-        ->when(checkDepartmentAndRoles('HR', ['Manager']), function ($q) {
-            $q->whereIn('status', ['manager_checked', 'created','bought'])
-                ->orWhere('manager_check_id', UserData()->id);
-        })
-        ->when(checkDepartmentAndRoles('Finance', ['Staff']), function ($q) {
-            $q->whereIn('status', ['manager_checked', 'financial_checked','bought'])
-                ->orWhere('finance_check_id', UserData()->id);
-        })
-        ->when(checkDepartmentAndRoles('Management', ['MD']), function ($q) {
-            $q->whereIn('status', ['md_checked', 'financial_checked','bought']);
-        });
+            ->when(checkDepartmentAndRoles('HR', ['Manager']), function ($q) {
+                $q->whereIn('status', ['manager_checked', 'created', 'bought'])
+                    ->orWhere('manager_check_id', UserData()->id);
+            })
+            ->when(checkDepartmentAndRoles('Finance', ['Staff']), function ($q) {
+                $q->whereIn('status', ['manager_checked', 'financial_checked', 'bought'])
+                    ->orWhere('finance_check_id', UserData()->id);
+            })
+            ->when(checkDepartmentAndRoles('Management', ['MD']), function ($q) {
+                $q->whereIn('status', ['md_checked', 'financial_checked', 'bought']);
+            });
+
+        if ($request->has('search')) {
+            $query->where('name', 'LIKE', '%' . $request->search . '%')
+                ->orWhere('description', 'LIKE', '%' . $request->search . '%')
+                ->orWhere('total_price', 'LIKE', '%' . $request->search . '%')
+                ->orWhere('fixed_asset_id', 'LIKE', '%' . $request->search . '%');
+        }
 
 
-            $fixedAssetPurchase = $query->paginate(config('common.list_count'));
-            return $fixedAssetPurchase;
-
+        $fixedAssetPurchase = $query->paginate(config('common.list_count'));
+        return $fixedAssetPurchase;
     }
 
     public function createData(array $data)
@@ -66,12 +72,11 @@ class FixedAssetPurchaseRepository implements FixedAssetPurchaseRepositoryInterf
             $fixedAssetPurchase = FixedAssetPurchase::find($request->id);
             $this->validateModel($fixedAssetPurchase, $staff, 'fixed_asset_purchase');
 
-            if (checkDepartmentAndRoles('HR',['Manager'])) {
+            if (checkDepartmentAndRoles('HR', ['Manager'])) {
                 $fixedAssetPurchase->manager_check_id = $staff->id;
                 $fixedAssetPurchase->manager_check_time = CurrentTime();
                 $fixedAssetPurchase->status = 'manager_checked';
-            }
-            else if (checkDepartmentAndRoles('Finance',['Staff'])) {
+            } else if (checkDepartmentAndRoles('Finance', ['Staff'])) {
                 if ($fixedAssetPurchase->manager_check_id !== null) {
                     $fixedAssetPurchase->finance_check_id = $staff->id;
                     $fixedAssetPurchase->finance_check_time = CurrentTime();
@@ -79,8 +84,7 @@ class FixedAssetPurchaseRepository implements FixedAssetPurchaseRepositoryInterf
                 } else {
                     ResponseMessage('Invalid User checked');
                 }
-            }
-            else if (checkDepartmentAndRoles('Management',['MD'])) {
+            } else if (checkDepartmentAndRoles('Management', ['MD'])) {
                 if ($fixedAssetPurchase->manager_check_id !== null) {
                     $fixedAssetPurchase->md_check_time = CurrentTime();
                     $fixedAssetPurchase->is_md_checked = 1;
@@ -88,8 +92,8 @@ class FixedAssetPurchaseRepository implements FixedAssetPurchaseRepositoryInterf
                 } else {
                     ResponseMessage('Invalid User check');
                 }
-            }else{
-                ResponseMessage('Login User is not allowed to check',403);
+            } else {
+                ResponseMessage('Login User is not allowed to check', 403);
             }
             $fixedAssetPurchase->save();
             DB::commit();
@@ -181,18 +185,14 @@ class FixedAssetPurchaseRepository implements FixedAssetPurchaseRepositoryInterf
                     if ($model->manager_check_id != null) {
                         ResponseMessage('This Fixed Asset is already checked By Manager', 419);
                     }
-
                 } else if (checkDepartmentAndRoles('Finance', ['Staff'])) {
                     if ($model->finance_check_id != null) {
                         ResponseMessage('This Fixed Asset is already checked By Financial', 422);
                     }
-
                 } else if (checkDepartmentAndRoles('Management', ['MD'])) {
                     if ($model->is_md_checked) {
                         ResponseMessage('This Fixed Asset is already checked By MD', 422);
                     }
-
-
                 }
             }
         }

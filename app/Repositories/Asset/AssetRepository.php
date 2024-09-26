@@ -21,15 +21,23 @@ class AssetRepository implements AssetInterface
 
     public function listAssetItems(Request $request)
     {
-        $asset_items = AssetItem::orderBy('created_at', 'desc')->paginate(config('common.list_count'));
+        $asset_items = AssetItem::orderBy('created_at', 'desc')->when($request->has('search'), function ($q) use ($request) {
+            $q->where('name', 'LIKE', '%' . $request->search . '%')
+              ->orWhere('item_code','LIKE','%'.$request->search.'%');
+        })->paginate(config('common.list_count'));
         ResponseData($asset_items);
     }
 
     public function listAsset(Request $request)
     {
-        $assets = Asset::orderBy('created_at', 'desc')->paginate(config('common.list_count'));
-        ResponseData($assets);
+        $asset_items = Asset::orderBy('created_at', 'desc')->when($request->has('search'), function ($q) use ($request) {
+            $q->where('name', 'LIKE', '%' . $request->search . '%')
+                ->orWhere('cost', 'LIKE', '%' . $request->search . '%')
+                ->orwhere('quantity', 'LIKE', '%', $request->search . '%');
+        })->paginate(config('common.list_count'));
+        ResponseData($asset_items);
     }
+
 
     public function createAssetItem(Request $request)
     {
