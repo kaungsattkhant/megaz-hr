@@ -1,165 +1,172 @@
 <template>
-    <div class="flex justify-between mb-3">
-        <div class=" flex">
-            <label for="search" class="search-input">
-                <input type="text" class="input-search" placeholder="Search">
-                <i class="fal fa-search"></i>
-            </label>
-        </div>
-        <div class="flex justify-end flex-col">
-            <button type="button" class="add-btn transition duration-150 ease-in-out focus:outline-none focus:ring-0 "
-                data-te-toggle="modal" data-te-target="#create_modal">
-                Add New
-            </button>
-        </div>
+    <div>
+        <p class=" text-lg font-semibold font-inter">
+            Skill
+        </p>
     </div>
-    <div class="block rounded-xl">
-        <div class="overflow-x-auto">
-            <div class="overflow-hidden ">
-                <table class="min-w-full primary-table rounded-xl text-center text-sm font-light ">
-                    <thead class="border-b font-medium ">
-                        <tr>
-                            <th scope="col" class=" px-6 py-4 ">
-                                #
-                            </th>
-
-                            <th scope="col" class=" px-6 py-4 ">
-                                Date
-                            </th>
-
-                            <th scope="col" class=" px-6 py-4 ">
-                                Fixed Asset Id
-                            </th>
-
-                            <th scope="col" class=" px-6 py-4 ">
-                                Name
-                            </th>
-
-                            <th scope="col" class=" px-6 py-4 ">
-                                Description
-                            </th>
-
-                            <th scope="col" class=" px-6 py-4 ">
-                                Total Price
-                            </th>
-
-                            <th scope="col" class=" px-6 py-4 ">
-                                Depreciation Amount
-                            </th>
-
-                            <th scope="col" class=" px-6 py-4 ">
-                                Status
-                            </th>
-
-                            <th scope="col" class=" px-6 py-4 ">
-                                Manager Checked
-                            </th>
-
-                            <th scope="col" class=" px-6 py-4 ">
-                                Financial Checked
-                            </th>
-
-                            <th scope="col" class=" px-6 py-4 ">
-                                MD Check
-                            </th>
-
-                            <th scope="col" class="px-6 py-4 col-span-3">
-
-                            </th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <div class="contents" v-for="(fixedAsset, fixedAssetIndex) in fixedAssetPurchases"
-                            :key="fixedAssetIndex">
-                            <tr class="bg-white rounded-lg overflow-hidden shadow-lg">
-                                <td class=" px-6 py-4 font-medium ">
-                                    {{ perPage * (currentPage - 1) + (++fixedAssetIndex) }}
-
-                                </td>
-
-                                <td class=" px-6 py-4 font-medium ">
-                                    {{ fixedAsset.date }}
-                                </td>
-
-                                <td class=" px-6 py-4 font-medium ">
-                                    {{ fixedAsset.fixed_asset_id }}
-                                </td>
-
-                                <td class=" px-6 py-4 font-medium ">
-                                    {{ fixedAsset.name }}
-                                </td>
-
-                                <td class=" px-6 py-4 font-medium ">
-                                    {{ fixedAsset.description }}
-                                </td>
-
-                                <td class=" px-6 py-4 font-medium ">
-                                    {{ (fixedAsset.total_price).toLocaleString() }}
-                                </td>
-
-                                <td class=" px-6 py-4 font-medium ">
-                                    {{ (fixedAsset.depreciation_amount).toLocaleString() }}
-                                </td>
-
-                                <td class=" px-6 py-4 font-medium ">
-                                    {{ fixedAsset.status }}
-                                </td>
-
-                                <td class="px-6 py-4">
-                                    {{ fixedAsset.manager_check_id == null ? 'No' : 'Yes' }}
-                                </td>
-
-                                <td class="px-6 py-4">
-                                    {{ fixedAsset.finance_check_id == null ? 'No' : 'Yes' }}
-                                </td>
-
-                                <td class="px-6 py-4">
-                                    {{ fixedAsset.is_md_checked == 0 ? 'No' : 'Yes' }}
-                                </td>
-
-                                <td class=" px-6 py-4 font-medium ">
-                                    <button data-te-toggle="modal" data-te-target="#checkModal"
-                                        v-if="fixedAsset.is_md_checked != 1" @click="checkBtnClicked(fixedAsset.id)">
-                                        <i class="fal fa-check  pr-3"></i>
-                                    </button>
-                                </td>
-
-                                <td class="whitespace-nowrap  space-x-4">
-                                    <button class="pr-1" data-te-toggle="modal" data-te-target="#buyModal"
-                                        v-if="(fixedAsset.is_md_checked == 1) && (fixedAsset.is_bought == 0) && getDepartment().name == 'Finance'"
-                                        @click="fixedAssetBuyBtnClicked(fixedAsset.id)">
-                                        <i class="far fa-shopping-basket"></i>
-                                    </button>
-                                </td>
+    <div class="mt-4 bg-white">
+        <div class="btn-container">
+            <div class=" flex">
+                <label for="search" class="search-input">
+                    <input type="text" class="input-search" placeholder="Search">
+                    <i class="fal fa-search"></i>
+                </label>
+            </div>
+            <div class="flex justify-end flex-col">
+                <button type="button" class="add-btn transition duration-150 ease-in-out focus:outline-none focus:ring-0 "
+                    data-te-toggle="modal" data-te-target="#create_modal">
+                    Add New
+                </button>
+            </div>
+        </div>
+        <div class="block rounded-xl">
+            <div class="overflow-x-auto">
+                <div class="overflow-hidden ">
+                    <table class="min-w-full primary-table rounded-xl text-center text-sm font-light ">
+                        <thead class="border-b font-medium ">
+                            <tr>
+                                <th scope="col" class="">
+                                    #
+                                </th>
+    
+                                <th scope="col" class="">
+                                    Date
+                                </th>
+    
+                                <th scope="col" class="">
+                                    Fixed Asset Id
+                                </th>
+    
+                                <th scope="col" class="">
+                                    Name
+                                </th>
+    
+                                <th scope="col" class="">
+                                    Description
+                                </th>
+    
+                                <th scope="col" class="">
+                                    Total Price
+                                </th>
+    
+                                <th scope="col" class="">
+                                    Depreciation Amount
+                                </th>
+    
+                                <th scope="col" class="">
+                                    Status
+                                </th>
+    
+                                <th scope="col" class="">
+                                    Manager Checked
+                                </th>
+    
+                                <th scope="col" class="">
+                                    Financial Checked
+                                </th>
+    
+                                <th scope="col" class="">
+                                    MD Check
+                                </th>
+    
+                                <th scope="col" class="px-6 py-4 col-span-3">
+    
+                                </th>
                             </tr>
-
-                            <tr class="">
-                                <td class=" py-2 "></td>
-                            </tr>
+                        </thead>
+                        <tbody>
+                            <div class="contents" v-for="(fixedAsset, fixedAssetIndex) in fixedAssetPurchases"
+                                :key="fixedAssetIndex">
+                                <tr class="">
+                                    <td class="font-medium ">
+                                        {{ perPage * (currentPage - 1) + (++fixedAssetIndex) }}
+    
+                                    </td>
+    
+                                    <td class="font-medium ">
+                                        {{ fixedAsset.date }}
+                                    </td>
+    
+                                    <td class="font-medium ">
+                                        {{ fixedAsset.fixed_asset_id }}
+                                    </td>
+    
+                                    <td class="font-medium ">
+                                        {{ fixedAsset.name }}
+                                    </td>
+    
+                                    <td class="font-medium ">
+                                        {{ fixedAsset.description }}
+                                    </td>
+    
+                                    <td class="font-medium ">
+                                        {{ (fixedAsset.total_price).toLocaleString() }}
+                                    </td>
+    
+                                    <td class="font-medium ">
+                                        {{ (fixedAsset.depreciation_amount).toLocaleString() }}
+                                    </td>
+    
+                                    <td class="font-medium ">
+                                        {{ fixedAsset.status }}
+                                    </td>
+    
+                                    <td class="">
+                                        {{ fixedAsset.manager_check_id == null ? 'No' : 'Yes' }}
+                                    </td>
+    
+                                    <td class="">
+                                        {{ fixedAsset.finance_check_id == null ? 'No' : 'Yes' }}
+                                    </td>
+    
+                                    <td class="">
+                                        {{ fixedAsset.is_md_checked == 0 ? 'No' : 'Yes' }}
+                                    </td>
+    
+                                    <td class="  font-medium ">
+                                        <button data-te-toggle="modal" data-te-target="#checkModal"
+                                            v-if="fixedAsset.is_md_checked != 1" @click="checkBtnClicked(fixedAsset.id)">
+                                            <i class="fal fa-check  pr-3"></i>
+                                        </button>
+                                    </td>
+    
+                                    <td class="whitespace-nowrap  space-x-4">
+                                        <button class="pr-1" data-te-toggle="modal" data-te-target="#buyModal"
+                                            v-if="(fixedAsset.is_md_checked == 1) && (fixedAsset.is_bought == 0) && getDepartment().name == 'Finance'"
+                                            @click="fixedAssetBuyBtnClicked(fixedAsset.id)">
+                                            <i class="far fa-shopping-basket"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+    
+                                <tr class="">
+                                    <td class=" py-2 "></td>
+                                </tr>
+                            </div>
+                        </tbody>
+                    </table>
+    
+                    <!-- pagination -->
+                    <div class="flex justify-center">
+    
+                        <div v-if="totalData != 0" class=" bg-white  flex justify-center mt-5 py-3">
+                            <button class="rounded px-6 py-1 border  hover:bg-slate-200" :disabled="currentPage === 1"
+                                @click="getFixedAssetPurchases(currentPage - 1)">«</button>
+    
+                            <button class=" text-sm px-5 border">
+                                Page <span @dblclick="showInput">{{ currentPage }}</span> / <span class="text-gray-400">{{
+                                    lastPage }}</span>
+                            </button>
+    
+                            <button class=" rounded px-6  py-1 border  hover:bg-slate-200"
+                                :disabled="currentPage === lastPage" @click="getFixedAssetPurchases(currentPage + 1)"> »</button>
                         </div>
-                    </tbody>
-                </table>
-
-                <!-- pagination -->
-                <div class="flex justify-center">
-
-                    <div v-if="totalData != 0" class=" bg-white  flex justify-center mt-5 py-3">
-                        <button class="rounded px-6 py-1 border  hover:bg-slate-200" :disabled="currentPage === 1"
-                            @click="getFixedAssetPurchases(currentPage - 1)">«</button>
-
-                        <button class=" text-sm px-5 border">
-                            Page <span @dblclick="showInput">{{ currentPage }}</span> / <span class="text-gray-400">{{
-                                lastPage }}</span>
-                        </button>
-
-                        <button class=" rounded px-6  py-1 border  hover:bg-slate-200"
-                            :disabled="currentPage === lastPage" @click="getFixedAssetPurchases(currentPage + 1)"> »</button>
                     </div>
                 </div>
+    
+    
+    
             </div>
-
-
-
         </div>
     </div>
 

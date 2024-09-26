@@ -102,6 +102,23 @@
                             </div>
                         </tbody>
                     </table>
+                    <div class="flex justify-center">
+                        <div v-if="totalData != 0" class=" bg-white  flex justify-center mt-5 py-3">
+                            <button class="rounded px-6 py-1 border  hover:bg-slate-200"
+                                :disabled="currentPage === 1"
+                                @click="getDutyList(currentPage - 1)">«</button>
+
+                            <button class=" text-sm px-5 border">
+                                Page <span @dblclick="showInput">{{ currentPage }}</span> / <span
+                                    class="text-gray-400">{{
+                                    lastPage }}</span>
+                            </button>
+
+                            <button class=" rounded px-6  py-1 border  hover:bg-slate-200"
+                                :disabled="currentPage === lastPage"
+                                @click="getDutyList(currentPage + 1)"> »</button>
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -304,6 +321,11 @@
             selectedDutyDate:null,
             selectedDutyDetail:null,
             deletedId:null,
+
+            currentPage: 0,
+            perPage: 0,
+            lastPage: 0,
+            totalData:0,
         };
     },
 
@@ -311,14 +333,18 @@
         methods: {
             ...mapGetters(['getToken']),
 
-            async getDutyList() {
-                const response = await getApiData({ url: '/api/duties?date=' + this.selectedDate, token: this.getToken() });
+            async getDutyList(pageNumber) {
+                const response = await getApiData({ url: '/api/duties?date=' + this.selectedDate + '&page=' + pageNumber, token: this.getToken() });
                 if (response.data) {
                     this.dutyList = response.data.data;
+                    this.lastPage = response.data.last_page;
+                    this.currentPage = pageNumber;
+                    this.perPage = response.data.per_page;
+                    this.totalData = response.data.total;
                 }
             },
             dateChange(){
-                this.getDutyList();
+                this.getDutyList(1);
             },
             async getTaskList(id){
                 let response = await getApiData({ url: '/api/task_by_role/' + id, token: this.getToken() });
@@ -329,9 +355,13 @@
             
 
             async getInitDutyList(selectedDate) {
-                const response = await getApiData({ url: '/api/duties?date=' + selectedDate, token: this.getToken() });
+                const response = await getApiData({ url: '/api/duties?date=' + selectedDate + '&page=1', token: this.getToken() });
                 if (response.data) {
                     this.dutyList = response.data.data;
+                    this.lastPage = response.data.last_page;
+                    this.currentPage = pageNumber;
+                    this.perPage = response.data.per_page;
+                    this.totalData = response.data.total;
                 }
             },
 

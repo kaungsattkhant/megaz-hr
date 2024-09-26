@@ -120,12 +120,12 @@
                         </div>
                         <div class="relative px-6 py-4 border-b" data-te-modal-body-ref>
                             <div class="mb-4">
-                                <label class="label-form mb-3">Department {{ departmentList }}</label>
+                                <label class="label-form mb-3">Department</label>
                                 <select class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0"
                                     v-model="selectedDepartment"
                                     @change="getStaffList()" >
                                     <option class="text-sm" :value="department" v-for="(department,index) in departmentList" :key="index">
-                                        {{ department }}
+                                        {{ department.name }}
                                     </option>
 
                                 </select>
@@ -238,7 +238,7 @@
             async getAdvanceList(pageNumber){
                 const response = await getApiData({ url: '/api/staff_balances?month='+this.selectedNewMonth + '&page='+pageNumber, token: this.getToken() });
                 if(response.data){
-                    this.advancedList = response.data;
+                    this.advancedList = response.data.data;
                     this.lastPage = response.data.last_page;
                     this.currentPage = pageNumber;
                     this.perPage = response.data.per_page;
