@@ -19,11 +19,11 @@
                 </button>
             </div>
         </div>
-        <div class="block rounded-xl">
+        <div class="box-container-table">
             <div class="overflow-x-auto">
-                <div class="overflow-hidden ">
-                    <table class="min-w-full primary-table rounded-xl text-center text-sm font-light ">
-                        <thead class="border-b font-medium ">
+                <div class="table-container">
+                    <table class="primary-table ">
+                        <thead class="">
                             <tr>
                                 <th scope="col" class="">
                                     #
@@ -80,7 +80,6 @@
                                 <tr class="">
                                     <td class="font-medium ">
                                         {{ perPage * (currentPage - 1) + (++fixedAssetIndex) }}
-    
                                     </td>
     
                                     <td class="font-medium ">
@@ -128,9 +127,7 @@
                                             v-if="fixedAsset.is_md_checked != 1" @click="checkBtnClicked(fixedAsset.id)">
                                             <i class="fal fa-check  pr-3"></i>
                                         </button>
-                                    </td>
-    
-                                    <td class="whitespace-nowrap  space-x-4">
+                                    
                                         <button class="pr-1" data-te-toggle="modal" data-te-target="#buyModal"
                                             v-if="(fixedAsset.is_md_checked == 1) && (fixedAsset.is_bought == 0) && getDepartment().name == 'Finance'"
                                             @click="fixedAssetBuyBtnClicked(fixedAsset.id)">
@@ -139,9 +136,7 @@
                                     </td>
                                 </tr>
     
-                                <tr class="">
-                                    <td class=" py-2 "></td>
-                                </tr>
+                                
                             </div>
                         </tbody>
                     </table>
