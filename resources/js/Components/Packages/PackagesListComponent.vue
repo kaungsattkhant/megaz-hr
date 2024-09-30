@@ -8,11 +8,11 @@
         <div class="btn-container">
             <div class=" flex gap-x-4">
                 <label for="search" class="search-input">
-                    <input type="text" class="input-search" placeholder="Search">
+                    <input type="text" class="input-search" placeholder="Search" v-model="searchInput">
                     <i class="fal fa-search"></i>
                 </label>
-
-                <button class="add-btn h-8 text-[13px] font-inter">Search</button>
+                <button class="add-btn h-8 text-[13px] font-inter" @click="searchBtnClicked()">Search</button>
+                <button class="add-btn h-8 text-[13px] font-inter" @click="clearSearchBtnClicked()">Clear</button>
             </div>
             <div class="flex justify-end flex-col">
                 <a href="/packages/create" class="add-btn text-[13px] font-inter">
@@ -178,6 +178,8 @@ export default {
         return {
             promotionPackageList: [],
 
+            searchInput:null,
+
             currentPage: 0,
             perPage: 0,
             lastPage: 0,
@@ -190,9 +192,10 @@ export default {
         ...mapGetters(['getToken']),
 
         async getPromotionPackageList(pageNumber) {
-
-
             let url = `/api/packages?page=${pageNumber}`;
+            if(this.searchInput){
+                url = '/api/packages?page=' + pageNumber + '&search=' + this.searchInput;
+            }
             let response = await getApiData({ url: url, token: this.getToken() });
             if (response.data) {
                 this.promotionPackageList = response.data.data;
@@ -202,6 +205,13 @@ export default {
                 this.perPage = response.data.per_page;
                 this.totalData = response.data.total
             }
+        },
+        async searchBtnClicked() {
+            this.getPromotionPackageList(1);
+        },
+        clearSearchBtnClicked() {
+            this.searchInput = null;
+            this.getPromotionPackageList(1);
         },
     },
 

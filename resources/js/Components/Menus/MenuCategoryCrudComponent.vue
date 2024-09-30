@@ -6,12 +6,13 @@
     </div>
     <div class="mt-4 bg-white">
         <div class="btn-container">
-            <div class=" flex">
+            <div class=" flex gap-x-4">
                 <label for="search" class="search-input">
-                    <input type="text" class="input-search" placeholder="Search">
-
+                    <input type="text" class="input-search" placeholder="Search" v-model="searchInput">
                     <i class="fal fa-search"></i>
                 </label>
+                <button class="add-btn h-8 text-[13px] font-inter" @click="searchBtnClicked()">Search</button>
+                <button class="add-btn h-8 text-[13px] font-inter" @click="clearSearchBtnClicked()">Clear</button>
             </div>
             <div class="flex justify-end flex-col">
 
@@ -289,6 +290,8 @@ export default {
             name: null,
             selectedImage: null,
 
+            searchInput:null,
+
             currentPage: 0,
             perPage: 0,
             lastPage: 0,
@@ -308,7 +311,12 @@ export default {
         },
 
         async getMenuCategoryList(pageNumber) {
-            const response = await getApiData({ url: `/api/menu_categories?page=${pageNumber}`, token: this.getToken() });
+            let url = `/api/menu_categories?page=${pageNumber}`;
+            if(this.searchInput){
+                url = '/api/menu_categories?page=' + pageNumber + '&search=' + this.searchInput;
+            }
+            const response = await getApiData({ url: url, token: this.getToken() });
+            // const response = await getApiData({ url: `/api/menu_categories?page=${pageNumber}`, token: this.getToken() });
             if (response.data) {
                 this.categoryList = response.data.data;
                 this.lastPage = response.data.last_page;
@@ -417,7 +425,15 @@ export default {
             if (response.success) {
                 this.getMenuCategoryList(1);
             }
-        }
+        },
+
+        async searchBtnClicked() {
+            this.getMenuCategoryList(1);
+        },
+        clearSearchBtnClicked() {
+            this.searchInput = null;
+            this.getMenuCategoryList(1);
+        },
 
     },
 

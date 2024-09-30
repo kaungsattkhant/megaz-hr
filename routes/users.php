@@ -33,12 +33,6 @@ Route::middleware('auth:customer_api')->group(function () {
     Route::post('/user_app/change_phone_number',[CustomerAPIController::class,'changePhoneNumber']);
 
 
-    Route::get('/user_app/menu_categories',[MenuCategoryAPIController::class,'getMenuCategoriesbyUserApp']);
-    Route::get('/user_app/menus',[MenuAPIController::class,'listMenuData']);
-    Route::get('/user_app/menu_categories/{id}/menus',[MenuAPIController::class,'categoryMenuByUserApp']);
-    Route::get('/user_app/packages',[PackageAPIController::class,'getPackage']);
-    Route::get('/user_app/ads',[AdsAPIController::class,'getAdsByUserApp']);
-
     Route::get('/user_app/profile',[CustomerAPIController::class,'getCustomerDataByUserApp']);
     Route::post('/user_app/user_profile/edit',[CustomerAPIController::class,'customerProfileEdit']);
 
@@ -54,4 +48,12 @@ Route::middleware('auth:customer_api')->group(function () {
     Route::post('/user_app/food_orders',[FoodOrderAPIController::class,'createOrder']);
 
 });
+
+Route::get('/user_app/ads',[AdsAPIController::class,'getAdsByUserApp']);
+Route::get('/user_app/menu_categories',[MenuCategoryAPIController::class,'getMenuCategoriesbyUserApp']);
+Route::get('/user_app/menus',[MenuAPIController::class,'listMenuData']);
+Route::get('/user_app/menu_categories/{id}/menus',[MenuAPIController::class,'categoryMenuByUserApp']);
+Route::get('/user_app/packages',[PackageAPIController::class,'getPackage']);
+
+
 // });

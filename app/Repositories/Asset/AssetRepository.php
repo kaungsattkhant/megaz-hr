@@ -33,7 +33,7 @@ class AssetRepository implements AssetInterface
         $asset_items = Asset::orderBy('created_at', 'desc')->when($request->has('search'), function ($q) use ($request) {
             $q->where('name', 'LIKE', '%' . $request->search . '%')
                 ->orWhere('cost', 'LIKE', '%' . $request->search . '%')
-                ->orwhere('quantity', 'LIKE', '%', $request->search . '%');
+                ->orwhere('quantity', 'LIKE', '%'. $request->search . '%');
         })->paginate(config('common.list_count'));
         ResponseData($asset_items);
     }
