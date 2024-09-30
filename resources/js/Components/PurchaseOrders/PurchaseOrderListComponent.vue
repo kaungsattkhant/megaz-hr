@@ -1,7 +1,7 @@
 <template>
     <div>
         <p class=" text-lg font-semibold font-inter">
-            Purchase Order
+            Purchase Orders
         </p>
     </div>
     <div class="mt-4 bg-white">
@@ -29,7 +29,7 @@
                                     #
                                 </th>
                                 <th scope="col" class="  ">
-                                    Date 
+                                    Date
                                 </th>
                                 <th scope="col" class="  ">
                                     Purchase Order Id
@@ -60,7 +60,7 @@
                             <div class="contents" v-for="(purchaseOrder, index) in purchaseOrderList" :key="index">
                                 <tr class="">
                                     <td class=" ">
-                                        {{ ++index }}
+                                        {{ perPage * (currentPage - 1) + (++index) }}
                                     </td>
                                     <td class="whitespace-nowrap  ">
                                         {{ purchaseOrder.date }}
@@ -95,8 +95,8 @@
                                         <!-- <button v-if="(purchaseOrder.is_md_checked == 1) && (purchaseOrder.is_bought == 0) && getDepartment().name == 'Finance'" class="pr-1" @click="buyPurchaseOrderBtnClicked(purchaseOrder.id)" data-te-toggle="modal" data-te-target="#buyModal">
                                         <i class="far fa-shopping-basket"></i>
                                     </button> -->
-                                    
-                                        <a :href="'/purchase_orders/'+purchaseOrder.id+'/buy'"
+
+                                        <a :href="'/purchase_orders/' + purchaseOrder.id + '/buy'"
                                             v-if="(purchaseOrder.is_md_checked == 1) && (purchaseOrder.is_bought == 0) && getDepartment().name == 'Finance'"
                                             id="" class="pr-1">
                                             <i class="far fa-shopping-basket"></i>
@@ -104,7 +104,7 @@
                                     </td>
 
                                     <td class="whitespace-nowrap  space-x-4">
-                                        <a :href="'/purchase_orders/'+purchaseOrder.id+'/confirm'" id="" class="pr-1">
+                                        <a :href="'/purchase_orders/' + purchaseOrder.id + '/confirm'" id="" class="pr-1">
                                             <i class="far fa-bars"></i>
                                         </a>
                                     </td>
@@ -112,6 +112,25 @@
                             </div>
                         </tbody>
                     </table>
+
+                    <!-- pagination -->
+                    <div class="flex justify-center">
+
+                        <div v-if="totalData != 0" class=" bg-white  flex justify-center mt-5 py-3">
+                            <button class="rounded px-6 py-1 border  hover:bg-slate-200" :disabled="currentPage === 1"
+                                @click="getPurhaseOrderList(currentPage - 1)">«</button>
+
+                            <button class=" text-sm px-5 border">
+                                Page <span @dblclick="showInput">{{ currentPage }}</span> / <span
+                                    class="text-gray-400">{{
+                                    lastPage }}</span>
+                            </button>
+
+                            <button class=" rounded px-6  py-1 border  hover:bg-slate-200"
+                                :disabled="currentPage === lastPage" @click="getPurhaseOrderList(currentPage + 1)">
+                                »</button>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -218,125 +237,130 @@
 </template>
 
 <script>
-    import { Modal, initTE } from "tw-elements";
+import { Modal, initTE } from "tw-elements";
 
-    import { mapGetters } from 'vuex';
-    import { getApiData, postApiData } from '../../utilities/ajax-helpers';
-    import { convertToFriendlyDate } from '../../utilities/datetime-helpers';
+import { mapGetters } from 'vuex';
+import { getApiData, postApiData } from '../../utilities/ajax-helpers';
+import { convertToFriendlyDate } from '../../utilities/datetime-helpers';
 
 
-    export default {
-        data() {
-            return {
-                purchaseOrderList: [],
-                checkId: null,
-                buyId: null,
-                isManager: false,
-                isMD: false,
-                isFinance: false,
-            };
+export default {
+    data() {
+        return {
+            purchaseOrderList: [],
+            checkId: null,
+            buyId: null,
+            isManager: false,
+            isMD: false,
+            isFinance: false,
+
+            currentPage: 0,
+            perPage: 0,
+            lastPage: 0,
+            totalData: 0,
+        };
+    },
+
+    methods: {
+        ...mapGetters(['getToken', 'getUser', 'getRoles', 'getDepartment']),
+
+        async getPurhaseOrderList(pageNumber) {
+            let url = `/api/purchase_orders?page=${pageNumber}`;
+
+            let response = await getApiData({ url: url, token: this.getToken() });
+            if (response.data) {
+                this.purchaseOrderList = response.data.data;
+                this.lastPage = response.data.last_page;
+                this.currentPage = pageNumber;
+                this.perPage = response.data.per_page;
+                this.totalData = response.data.total;
+                this.purchaseOrderList.forEach((po) => {
+                    po.date = convertToFriendlyDate(po.date);
+                });
+            }
         },
 
-        methods: {
-            ...mapGetters(['getToken','getUser', 'getRoles', 'getDepartment']),
+        checkPurchaseOrderBtnClicked(purchaseOrderId) {
+            this.checkId = purchaseOrderId;
+        },
 
-            async getPurhaseOrderList(pageNumber){
-                let url = `/api/purchase_orders`;
-                if(pageNumber){
-                    url = `${url}?page=${pageNumber}`;
+        async confirmCheckPurchaseOrderBtnClicked() {
+            if (this.checkId) {
+                let url = `/api/updateIsCheck`;
+                let formData = new FormData();
+                formData.append('type', 'purchase_order');
+                formData.append('id', this.checkId);
+                formData.append('value', 1);
+                let response = await postApiData({ url: url, form_data: formData, token: this.getToken() });
+                if (response.success) {
+                    this.$notify({
+                        text: `PO Checked`,
+                        type: 'info'
+                    });
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 200);
                 }
-                let response = await getApiData({url: url, token: this.getToken()});
-                if(response.data){
-                    this.purchaseOrderList = response.data.data;
-                    this.purchaseOrderList.forEach((po)=>{
-                        po.date = convertToFriendlyDate(po.date);
+                else {
+                    this.$notify({
+                        text: response.message,
+                        type: 'error'
                     });
                 }
-            },
+            }
 
-            checkPurchaseOrderBtnClicked(purchaseOrderId){
-                this.checkId = purchaseOrderId;
-            },
-
-            async confirmCheckPurchaseOrderBtnClicked(){
-                if(this.checkId){
-                    let url = `/api/updateIsCheck`;
-                    let formData = new FormData();
-                    formData.append('type', 'purchase_order');
-                    formData.append('id',this.checkId);
-                    formData.append('value', 1);
-                    let response = await postApiData({url: url, form_data: formData, token: this.getToken()});
-                    if(response.success){
-                        this.$notify({
-                            text: `PO Checked`,
-                            type: 'info'
-                        });
-                        setTimeout(()=>{
-                            window.location.reload();
-                        }, 200);
-                    }
-                    else{
-                        this.$notify({
-                            text: response.message,
-                            type: 'error'
-                        });
-                    }
-                }
-
-                this.checkId = null;
-            },
-
-            buyPurchaseOrderBtnClicked(purchaseOrderId){
-                this.buyId = purchaseOrderId;
-            },
-
-            async confirmBuyPurchaseOrderBtnClicked(){
-                if(this.buyId){
-                    let url = `/api/purchase_orders_bought`;
-                    let formData = new FormData();
-                    formData.append('ids[]', this.buyId);
-                    formData.append('value', 1);
-                    let response = await postApiData({url: url, form_data: formData, token: this.getToken()});
-                    if(response.success){
-                        this.$notify({
-                            text: `PO Checked`,
-                            type: 'info'
-                        });
-                        // setTimeout(()=>{
-                        //     window.location.reload();
-                        // }, 3000);
-                    }
-                    else{
-                        this.$notify({
-                            text: response.message,
-                            type: 'error'
-                        });
-                    }
-                }
-
-                this.checkId = null;
-            },
+            this.checkId = null;
         },
 
-        created()
-        {
-            this.getRoles().forEach((role)=>{
-                if(role.name == 'Manager'){
-                    this.isManager = true;
-                }
-                if(role.name == 'MD'){
-                    this.isMD = true;
-                }
-                if(role.name == 'Finance'){
-                    this.isFinance = true;
-                }
-            });
-            this.getPurhaseOrderList(null);
+        buyPurchaseOrderBtnClicked(purchaseOrderId) {
+            this.buyId = purchaseOrderId;
         },
 
-        mounted()
-        {
-            initTE({Modal});
-        }
+        async confirmBuyPurchaseOrderBtnClicked() {
+            if (this.buyId) {
+                let url = `/api/purchase_orders_bought`;
+                let formData = new FormData();
+                formData.append('ids[]', this.buyId);
+                formData.append('value', 1);
+                let response = await postApiData({ url: url, form_data: formData, token: this.getToken() });
+                if (response.success) {
+                    this.$notify({
+                        text: `PO Checked`,
+                        type: 'info'
+                    });
+                    // setTimeout(()=>{
+                    //     window.location.reload();
+                    // }, 3000);
+                }
+                else {
+                    this.$notify({
+                        text: response.message,
+                        type: 'error'
+                    });
+                }
+            }
+
+            this.checkId = null;
+        },
+    },
+
+    created() {
+        this.getRoles().forEach((role) => {
+            if (role.name == 'Manager') {
+                this.isManager = true;
+            }
+            if (role.name == 'MD') {
+                this.isMD = true;
+            }
+            if (role.name == 'Finance') {
+                this.isFinance = true;
+            }
+        });
+        this.getPurhaseOrderList(1);
+    },
+
+    mounted() {
+        initTE({ Modal });
     }
+}
 </script>

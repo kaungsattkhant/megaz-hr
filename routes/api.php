@@ -78,6 +78,7 @@ use App\Http\Controllers\API\SaleTargetPositionAPIController;
 use App\Http\Controllers\API\SaleTargetResultAPIController;
 use App\Http\Controllers\API\SkillAPIController;
 use App\Http\Controllers\API\StaffAdvanceAPIController;
+use App\Models\Complaint;
 
 /*
 |--------------------------------------------------------------------------
@@ -138,9 +139,18 @@ Route::middleware('auth:api')->group(function () {
 
     Route::get('/staff/complaints', [ComplaintAPIController::class, 'getStaffComplaints']);
     Route::post('/complaints', [ComplaintAPIController::class, 'createComplain']);
-    Route::put('/complaints/{id}', [ComplaintAPIController::class, 'updateComplain']);
+    Route::get('/complaints/{id}',[ComplaintAPIController::class,'complaintDetail']);
+    Route::post('/complaints/{id}', [ComplaintAPIController::class, 'updateComplain']);
     Route::delete('/complaints/{id}', [ComplaintAPIController::class, 'deleteComplain']);
     Route::post('/complaints/{id}/update_status', [ComplaintAPIController::class, 'complainStatusChange']);
+    Route::get('/complaints_responsibles',[ComplaintAPIController::class,'complaintResponsiblesByStaff']);
+    Route::get('/complaints_carbon_copies',[ComplaintAPIController::class,'complaintCarbonCopiesByStaff']);
+
+    // deleted related complaint
+    Route::delete('/complaints_images/{id}',[ComplaintAPIController::class,'deleteComplaintImage']);
+    Route::delete('/complaints_responsibles/{id}',[ComplaintAPIController::class,'deleteComplaintResponsible']);
+    Route::delete('/complaints_carbon_copies/{id}',[ComplaintAPIController::class,'deleteComplaintCarbonCopy']);
+
 
     Route::get('/supervisor/staff', [StaffAPIController::class, 'getStaffListBySupervisor']);
     Route::get('/supervisor/staff/{staffId}/tasks', [TaskController::class, 'getStaffTasksBySupervisor']);
@@ -153,6 +163,11 @@ Route::middleware('auth:api')->group(function () {
         Route::get('/custom_tasks','getCustomTasks');
         Route::get('/custom_tasks/{id}','customTaskDetail');
         Route::post('/custom_tasks/{id}','updateCustomTask');
+
+        // add image
+        Route::post('/tasks/{id}/add_images','addTaskImage');
+        Route::get('/tasks/{id}/images','getTaskImages');
+        Route::delete('/tasks_images/{id}','deleteTaskImage');
 
     });
     Route::controller(PurchaseOrderAPIController::class)->group(function () {
@@ -518,6 +533,7 @@ Route::get("/test", [TestController::class, "index"]);
 
 Route::get('/menu_categories/{id}/menus',[MenuAPIController::class,'menuByMenuCategory']);
 Route::get('/menu_categories_bookings/{id}/menus',[MenuAPIController::class,'menuByMenuCategoryBooking']);
+Route::get('/menus/{menu_id}/areas',[MenuAPIController::class,'areaByMenu']);
 
 Route::post("/order_status_change",[OrderAPIController::class,'orderItemChangeStatus']);
 
@@ -551,9 +567,11 @@ Route::controller(CustomerLevelDiscountAPIController::class)->group(function ()
 Route::controller(FoodOrderAPIController::class)->group(function()
 {
     Route::get('/food_orders','listAllFoodOrder');
-    Route::post('/food_orders','createFoodOrder');
     Route::post('/food_order_items/{id}','confirmFoodOrderItem');
     Route::post('/food_orders/{id}','confirmFoodOrder');
+    Route::post('/create_food_orders','createConfirmFoodOrder');
+    Route::post('/food_order_status/{id}','updateFoodTimeAndStatus');
+    Route::get('/food_order_lists','foodOrderListForKitchen');
 });
 
 Route::controller(DeliveryChargeAPIController::class)->group(function()

@@ -12,7 +12,7 @@ class Complaint extends BaseModel
     use HasFactory;
 
     protected $fillable = [
-        'complaint_category_id','title','description','posted_by','status'
+        'complaint_category_id','title','description','posted_by','status','remark'
     ];
 
     public function getCreatedAt()
@@ -33,6 +33,21 @@ class Complaint extends BaseModel
     public function postedBy()
     {
         return $this->belongsTo(Staff::class, 'posted_by');
+    }
+
+    public function complaintResponsibles()
+    {
+        return $this->hasMany(ComplaintResponsible::class);
+    }
+
+    public function complaintCarbonCopies()
+    {
+        return $this->hasMany(ComplaintCarbonCopy::class);
+    }
+
+    public function complaintImages()
+    {
+        return $this->hasMany(ComplaintImage::class);
     }
 
 }

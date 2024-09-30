@@ -38,10 +38,6 @@
                                     Department
                                 </th>
 
-                                <th scope="col" class="  ">
-                                    Forecasting Amount
-                                </th>
-
                             </tr>
                         </thead>
                         <tbody>
@@ -50,23 +46,43 @@
                                 :key="itemForecastIndex">
                                 <tr class="">
                                     <td class="  font-medium ">
-                                        {{ ++itemForecastIndex }}
+                                        {{ perPage * (currentPage - 1) + (++itemForecastIndex) }}
+
                                     </td>
                                     <td class="whitespace-nowrap  ">
                                         {{ getMonthName(month) }}
                                     </td>
 
                                     <td class="whitespace-nowrap  ">
-                                        <span class="cursor-pointer" @click="iufWithMonthAndDepartment(itemForecast.department_id)">{{ itemForecast.department_name }}</span>
-                                    </td>
-                                    <td class="whitespace-nowrap  ">
-                                        {{ itemForecast.total_amount }}
+                                        <span class="cursor-pointer"
+                                            @click="iufWithMonthAndDepartment(itemForecast.department_id)">{{
+                                                itemForecast.department_name }}</span>
                                     </td>
 
                                 </tr>
                             </div>
                         </tbody>
                     </table>
+
+
+                    <!-- pagination -->
+                    <div class="flex justify-center">
+
+                        <div v-if="totalData != 0" class=" bg-white  flex justify-center mt-5 py-3">
+                            <button class="rounded px-6 py-1 border  hover:bg-slate-200" :disabled="currentPage === 1"
+                                @click="getItemForecastsList(currentPage - 1)">«</button>
+
+                            <button class=" text-sm px-5 border">
+                                Page <span @dblclick="showInput">{{ currentPage }}</span> / <span
+                                    class="text-gray-400">{{
+                                        lastPage }}</span>
+                            </button>
+
+                            <button class=" rounded px-6  py-1 border  hover:bg-slate-200"
+                                :disabled="currentPage === lastPage" @click="getItemForecastsList(currentPage + 1)">
+                                »</button>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -84,7 +100,11 @@ export default {
     data() {
         return {
             itemForecastList: [],
-            month:this.getMonthFromUrl(),
+            month: this.getMonthFromUrl(),
+            currentPage: 0,
+            perPage: 0,
+            lastPage: 0,
+            totalData: 0,
         };
     },
 
@@ -96,20 +116,24 @@ export default {
         },
 
         getMonthName(monthNumber) {
-      const monthIndex = parseInt(monthNumber, 10) - 1;
+            const monthIndex = parseInt(monthNumber, 10) - 1;
 
-      const monthNames = [
-        'January', 'February', 'March', 'April', 'May', 'June',
-        'July', 'August', 'September', 'October', 'November', 'December'
-      ];
+            const monthNames = [
+                'January', 'February', 'March', 'April', 'May', 'June',
+                'July', 'August', 'September', 'October', 'November', 'December'
+            ];
 
-      return monthNames[monthIndex] || 'Invalid month';
-    },
+            return monthNames[monthIndex] || 'Invalid month';
+        },
 
-        async getItemForecastsList() {
-            let response = await getApiData({ url: `/api/item_usage_forecast_items_with_month/${this.month}`, token: this.getToken() });
+        async getItemForecastsList(pageNumber) {
+            let response = await getApiData({ url: `/api/item_usage_forecast_items_with_month/${this.month}?page=${pageNumber}`, token: this.getToken() });
             console.log(response.data.data);
             this.itemForecastList = response.data.data;
+            this.lastPage = response.data.last_page;
+            this.currentPage = pageNumber;
+            this.perPage = response.data.per_page;
+            this.totalData = response.data.total;
         },
 
         getMonthFromUrl() {
@@ -119,14 +143,13 @@ export default {
             return pathParts[pathParts.length - 1];
         },
 
-        iufWithMonthAndDepartment(department_id)
-        {
+        iufWithMonthAndDepartment(department_id) {
             window.location.href = `/item_usage_forecasts_with_month/${this.month}/department/${department_id}`;
         }
     },
 
     created() {
-        this.getItemForecastsList();
+        this.getItemForecastsList(1);
     },
 
     mounted() {

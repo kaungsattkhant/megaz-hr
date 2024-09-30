@@ -22,7 +22,7 @@
 
                 <div class="bg-white mb-0 w-full text-sm inline-block h-[34px] dark:bg-white !text-black"
                     data-te-select-wrapper-ref>
-                    <select data-te-select-init data-te-select-placeholder="Select Category"
+                    <select data-te-select-init data-te-select-placeholder="Select Area"
                         data-te-select-filter="true" name="" id="" v-model="selectedArea" class="input-ui !text-black">
                         <option :value="area" v-for="(area, index) in areaList"
                             :key="index"> {{ area.name }} </option>
@@ -255,7 +255,7 @@ export default {
             // let response = await getApiData({ url: '/api/areas', token: this.getToken() });
             let response = await getApiData({ url: `/api/areas?department_id=${departmentId}`, token: this.getToken() });
             if (response.data) {
-                this.areaList = response.data;
+                this.areaList = response.data.data;
             }
         },
         typeChange(){

@@ -14,7 +14,6 @@ return new class extends Migration
         Schema::create('forecast_items', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->integer('quantity');
-            $table->integer('amount');
             $table->foreignId('item_id')->constrained()->onDelete('cascade');
             $table->foreignId('item_usage_forecast_id')->constrained()->onDelete('cascade');
             $table->timestamps();

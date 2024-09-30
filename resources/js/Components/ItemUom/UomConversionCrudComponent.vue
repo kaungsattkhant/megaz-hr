@@ -6,11 +6,14 @@
     </div>
     <div class="mt-4 bg-white">
         <div class="btn-container">
-            <div class=" flex">
+            <div class=" flex gap-x-4">
                 <label for="search" class="search-input">
-                    <input type="text" class="input-search" placeholder="Search">
+                    <input type="text" class="input-search !pr-[22px]" placeholder="Search" v-model="searchInput">
                     <i class="fal fa-search"></i>
+                    <!-- <i class="far fa-times !left-auto !right-2 !text-red-400 hover:cursor-pointer" @click="clearSearchBtnClicked"></i> -->
                 </label>
+                <button class="add-btn h-8 text-[13px] font-inter" @click="searchBtnClicked">Search</button>
+                <button class="add-btn h-8 text-[13px] font-inter" @click="clearSearchBtnClicked">Clear</button>
 
                 <!-- <button class="add-btn h-8 mx-2 " @click="searchBtnClicked">Search</button>
             <button class="add-btn h-8 mx-2 " @click="clearSearchBtnClicked">Clear</button> -->
@@ -60,7 +63,7 @@
                             <div class="contents" v-for="(uom, itemIndex) in uomConversionList" :key="itemIndex">
                                 <tr class="">
                                     <td class=" ">
-                                        {{ per_page * (currentPage - 1) + (++itemIndex) }}
+                                        {{ perPage * (currentPage - 1) + (++itemIndex) }}
                                     </td>
                                     <td class="whitespace-nowrap  ">
                                         {{ uom.base_unit.name }}
@@ -98,8 +101,26 @@
                             <!-- looping end -->
                         </tbody>
                     </table>
+                    <div class="flex justify-center">
+
+                        <div v-if="totalData != 0" class=" bg-white  flex justify-center mt-5 py-3">
+                            <button class="rounded px-6 py-1 border  hover:bg-slate-200"
+                                :disabled="currentPage === 1"
+                                @click="getUomConversionList(currentPage - 1)">«</button>
+
+                            <button class=" text-sm px-5 border">
+                                Page <span @dblclick="showInput">{{ currentPage }}</span> / <span
+                                    class="text-gray-400">{{
+                                    lastPage }}</span>
+                            </button>
+
+                            <button class=" rounded px-6  py-1 border  hover:bg-slate-200"
+                                :disabled="currentPage === lastPage"
+                                @click="getUomConversionList(currentPage + 1)"> »</button>
+                        </div>
+                    </div>
                 </div>
-                <div class="mt-2 ml-2">
+                <!-- <div class="mt-2 ml-2">
                     <ul v-if="paginationGroupsCount > 1" class="list-style-none flex">
                         <li v-if="!isFirstGroup">
                             <button class="relative block rounded bg-transparent px-3 py-1.5 text-sm text-neutral-600 transition-all duration-300
@@ -154,7 +175,7 @@
                             </button>
                         </li>
                     </ul>
-                </div>
+                </div> -->
             </div>
         </div>
     </div>
@@ -357,20 +378,20 @@ export default {
             baseUnitId: null,
             conversionUnitId: null,
 
-            per_page: 20,
-            currentPage: 1,
-            pageNumbers: [],
-            paginationGroupsCount: 1,
-            groupedPageNumbers: [],
-            currentGroup: 0,
-            isFirstGroup: true,
-            isLastGroup: false,
             uom_name: null,
             uomList: [],
 
             baseUnitedit: null,
             conversionUnitedit: null,
-            editUomConversionId: null
+            editUomConversionId: null,
+
+            searchInput:null,
+
+
+            currentPage: 0,
+            perPage: 0,
+            lastPage: 0,
+            totalData:0,
         };
     },
 
@@ -378,34 +399,17 @@ export default {
         ...mapGetters(['getToken']),
 
         async getUomConversionList(pageNumber) {
-            if (pageNumber) {
-                this.currentPage = pageNumber;
+            let url = `/api/uom_conversions?page=${pageNumber}`;
+            if(this.searchInput){
+                url = '/api/uom_conversions?page=' + pageNumber + '&search=' + this.searchInput;
             }
-            let url = `/api/uom_conversions?page=${this.currentPage}`;
             let response = await getApiData({ url: url, token: this.getToken() });
             if (response.data) {
-                this.uomConversionList = response.data.uoms;
-                this.per_page = response.data.per_page;
-
-                this.pageNumbers = [];
-                this.lastPageNumber = response.data.last_page;
-
-                for (let i = 1; i <= response.data.last_page; i++) {
-                    this.pageNumbers.push(i);
-                }
-
-                if (this.pageNumbers.length > 10) {
-                    this.groupedPageNumbers = [];
-                    this.paginationGroupsCount = this.pageNumbers.length % 10;
-                    for (let i = 0; i < this.pageNumbers.length; i += 10) {
-                        let chunk = this.pageNumbers.slice(i, i + 10);
-                        this.groupedPageNumbers.push(chunk);
-                    }
-
-                    let lastGroupIndex = this.groupedPageNumbers.length - 1;
-                    this.isFirstGroup = (this.currentGroup === 0);
-                    this.isLastGroup = (lastGroupIndex === this.currentGroup);
-                }
+                this.uomConversionList = response.data.data;
+                this.lastPage = response.data.last_page;
+                this.currentPage = pageNumber;
+                this.perPage = response.data.per_page;
+                this.totalData = response.data.total;
             }
         },
 
@@ -473,7 +477,7 @@ export default {
 
             let response = await postApiData({ url: url, form_data: formData, token: this.getToken() });
             if (response.success) {
-                this.getUomConversionList(this.currentPage);
+                this.getUomConversionList(1);
                 this.baseUnit = null;
                 this.conversionUnit = null;
                 this.conversionRate = null;
@@ -507,7 +511,7 @@ export default {
 
             let response = await postApiData({ url: url, form_data: formData, token: this.getToken() });
             if (response.success) {
-                this.getUomConversionList(this.currentPage);
+                this.getUomConversionList(1);
                 this.baseUnitedit = null;
                 this.conversionUnitedit = null;
                 this.conversionRate = null;
@@ -515,47 +519,18 @@ export default {
             }
         },
 
-
+        async searchBtnClicked() {
+            this.getUomConversionList(1);
+        },
         clearSearchBtnClicked() {
             this.searchInput = null;
-            this.searchCategory = null;
-            this.getUomConversionList(null);
+            this.getUomConversionList(1);
         },
 
-        pageBtnClicked(pageNumber) {
-            this.currentPage = pageNumber;
-            this.getUomConversionList(this.currentPage);
-        },
-
-        nextPaginationGroupBtnClicked() {
-            this.currentGroup += 1;
-            this.currentPage = (this.groupedPageNumbers[this.currentGroup][0]);
-            this.getUomConversionList(this.currentPage);
-        },
-
-        previousPaginationGroupBtnClicked() {
-            this.currentGroup -= 1;
-            let lastIndex = this.groupedPageNumbers[this.currentGroup].length - 1;
-            this.currentPage = (this.groupedPageNumbers[this.currentGroup][lastIndex]);
-            this.getUomConversionList(this.currentPage);
-        },
-
-        firstPaginationGroupBtnClicked() {
-            this.currentGroup = 0;
-            this.currentPage = (this.groupedPageNumbers[this.currentGroup][0]);
-            this.getUomConversionList(this.currentPage);
-        },
-
-        lastPaginationGroupBtnClicked() {
-            this.currentGroup = this.paginationGroupsCount - 1;
-            let lastIndex = this.groupedPageNumbers[this.currentGroup].length - 1;
-            this.currentPage = (this.groupedPageNumbers[this.currentGroup][lastIndex]);
-            this.getUomConversionList(this.currentPage);
-        }
     },
 
     created() {
-        this.getUomConversionList(null);
+        this.getUomConversionList(1);
         this.getUom();
 
     },

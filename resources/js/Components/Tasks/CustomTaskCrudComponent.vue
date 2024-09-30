@@ -98,6 +98,24 @@
                             <!-- looping end -->
                         </tbody>
                     </table>
+
+                    <!-- pagination -->
+                    <div class="flex justify-center">
+
+                        <div v-if="totalData != 0" class=" bg-white  flex justify-center mt-5 py-3">
+                            <button class="rounded px-6 py-1 border  hover:bg-slate-200" :disabled="currentPage === 1"
+                                @click="getCustomTasks(currentPage - 1)">«</button>
+
+                            <button class=" text-sm px-5 border">
+                                Page <span @dblclick="showInput">{{ currentPage }}</span> / <span
+                                    class="text-gray-400">{{ lastPage }}</span>
+                            </button>
+
+                            <button class=" rounded px-6  py-1 border  hover:bg-slate-200"
+                                :disabled="currentPage === lastPage" @click="getCustomTasks(currentPage + 1)">
+                                »</button>
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -383,13 +401,7 @@ export default {
             due_date: null,
             selectedDepartment: null,
             dayList: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'],
-            per_page: 10,
-            pageNumbers: [],
-            currentPage: 1,
-            paginationGroupsCount: 1,
-            per_group: 10,
-            groupedPageNumbers: [],
-            currentGroup: 0,
+
             name_edit: null,
             tasks_edit: null,
             kpi_edit: null,
@@ -397,7 +409,12 @@ export default {
             start_date_edit: null,
             due_date_edit: null,
             selectedDepartmentedit: null,
-            editId: null
+            editId: null,
+
+            currentPage: 0,
+            perPage: 0,
+            lastPage: 0,
+            totalData: 0,
         };
     },
 
@@ -409,21 +426,24 @@ export default {
             let response = await postApiData({ url: url, token: this.getToken() });
 
             if (response.success == true) {
-                this.getTasksList(null);
+                this.getCustomTasks(1);
             } else {
                 alert(response.message);
             }
 
         },
 
-        async getTasksList(pageNumber) {
-            let url = `/api/custom_tasks?per_page=${this.per_page}`;
-            if (pageNumber) {
-                url = `${url}&page=${pageNumber}`
-            }
+        async getCustomTasks(pageNumber) {
+            let url = `/api/custom_tasks?page=${pageNumber}`;
+
             let response = await getApiData({ url: url, token: this.getToken() });
             if (response.data) {
                 this.tasksList = response.data.data;
+
+                this.lastPage = response.data.last_page;
+                this.currentPage = pageNumber;
+                this.perPage = response.data.per_page;
+                this.totalData = response.data.total;
             }
         },
 
@@ -495,7 +515,7 @@ export default {
             let response = await postApiData({ url: '/api/custom_tasks', form_data: formData, token: this.getToken() });
             if (response.success) {
                 // window.location.replace('/tasks');
-                this.getTasksList(null);
+                this.getCustomTasks(1);
                 // alert('test');
                 this.kpi = null;
                 this.tasks = null;
@@ -523,7 +543,7 @@ export default {
             formData.append('due_date', this.due_date_edit);
             let response = await postApiData({ url: `/api/custom_tasks/${this.editId}`, form_data: formData, token: this.getToken() });
             if (response.success) {
-                this.getTasksList(null);
+                this.getCustomTasks(1);
                 // alert('test');
                 this.kpi = null;
                 this.tasks = null;
@@ -565,13 +585,13 @@ export default {
             let url = `/api/tasks/${this.deleteId}`;
             let response = await deleteApiData({ url: url, token: this.getToken() });
             if (response.success) {
-                this.getTasksList(null);
+                this.getCustomTasks(1);
             }
         }
 
     },
     mounted() {
-        this.getTasksList(null);
+        this.getCustomTasks(1);
         // this.getAreaList();
         this.getDepartmentList();
 

@@ -19,30 +19,47 @@ class ItemUsageForecastRepository implements ItemUsageForecastInterface
 
     public function itemUsageForecastListByMonth()
     {
-        $itemUsageForecasts = ItemUsageForecast::selectRaw('MONTH(date) as month, SUM(forecast_items.amount) as total_amount')
-        ->join('forecast_items', 'item_usage_forecasts.id', '=', 'forecast_items.item_usage_forecast_id')
-        ->groupByRaw('MONTH(date)')
-        ->paginate(config('commont.list_count'));
+        $itemUsageForecasts = ItemUsageForecast::selectRaw('MONTH(date) as month')
+            ->join('forecast_items', 'item_usage_forecasts.id', '=', 'forecast_items.item_usage_forecast_id')
+            ->groupByRaw('MONTH(date)')
+            ->paginate(config('commont.list_count'));
 
         ResponseData($itemUsageForecasts);
     }
 
+
+
     public function itemUsageForecastListByMonthwithDepartment(int $month)
     {
-        $itemUsageForecast = ItemUsageForecast::select('item_usage_forecasts.department_id', 'departments.name as department_name', DB::raw('SUM(forecast_items.amount) as total_amount'))
+
+        $loginUserDepartment = UserData()->department_id;
+        if($loginUserDepartment == 2)
+        {
+            $itemUsageForecast = ItemUsageForecast::select('item_usage_forecasts.department_id', 'departments.name as department_name')
             ->join('forecast_items', 'item_usage_forecasts.id', '=', 'forecast_items.item_usage_forecast_id')
             ->join('departments', 'item_usage_forecasts.department_id', '=', 'departments.id')
             ->whereMonth('item_usage_forecasts.date', $month)
             ->groupBy('item_usage_forecasts.department_id', 'departments.name')
             ->orderBy('departments.name')
             ->paginate(config('common.list_count'));
+        }else{
+            $itemUsageForecast = ItemUsageForecast::select('item_usage_forecasts.department_id', 'departments.name as department_name')
+            ->join('forecast_items', 'item_usage_forecasts.id', '=', 'forecast_items.item_usage_forecast_id')
+            ->join('departments', 'item_usage_forecasts.department_id', '=', 'departments.id')
+            ->whereMonth('item_usage_forecasts.date', $month)
+            ->where('item_usage_forecasts.department_id', $loginUserDepartment)
+            ->groupBy('item_usage_forecasts.department_id', 'departments.name')
+            ->orderBy('departments.name')
+            ->paginate(config('common.list_count'));
+        }
 
         ResponseData($itemUsageForecast);
     }
 
+
     public function iufWithMonthAndDepartment(int $month,int $department_id)
     {
-        $itemUsageForecasts = ItemUsageForecast::whereMonth('date',$month)->where('department_id',$department_id)->with('forecast_items','department')->get();
+        $itemUsageForecasts = ItemUsageForecast::whereMonth('date',$month)->where('department_id',$department_id)->with('forecast_items','department')->paginate(config('common.list_count'));
         ResponseData($itemUsageForecasts);
     }
 
@@ -58,6 +75,7 @@ class ItemUsageForecastRepository implements ItemUsageForecastInterface
                 $data['id'] = null;
             }
             $data['created_by']=$staff->id;
+            $data['department_id'] = $staff->department_id;
             $itemUsageForecast = ItemUsageForecast::updateOrCreate(
                 ['id' => $data['id']],
                 $data
@@ -72,7 +90,6 @@ class ItemUsageForecastRepository implements ItemUsageForecastInterface
                 $item_data['quantity'] = $item->quantity;
                 $item_data['item_usage_forecast_id'] = $itemUsageForecast->id;
                 $item_data['item_id'] = $item->item_id;
-                $item_data['amount'] = $item->amount;
                 $itemUsageForecast->forecast_items()->updateOrCreate(['id' => $item_data['id']], $item_data);
             }
             DB::commit();

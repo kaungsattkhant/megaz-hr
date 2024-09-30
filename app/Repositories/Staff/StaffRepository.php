@@ -39,7 +39,7 @@ class StaffRepository implements StaffRepositoryInterface
         $month = $request->input('month', date('m'));
         $year = $request->input('year', date('Y'));
 
-        $staffBalances = StaffBalance::with('staff')->where('month', $month)->where('year', $year)->get();
+        $staffBalances = StaffBalance::with('staff')->where('month', $month)->where('year', $year)->orderBy('created_at','desc')->paginate(config('common.list_count'));
 
         foreach ($staffBalances as $staffBalance) {
             $totalAddition = StaffAdvance::where('staff_id', $staffBalance->staff_id)
@@ -341,7 +341,7 @@ class StaffRepository implements StaffRepositoryInterface
             $query->where('staff.department_id', $request->input('department_id'));
         }
 
-        $staffs = $query->paginate(config('common.list_count'));
+        $staffs = $query->orderBy('created_at','desc')->paginate(config('common.list_count'));
 
         ResponseData($staffs);
     }

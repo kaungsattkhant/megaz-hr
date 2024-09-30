@@ -10,7 +10,7 @@ class RoomDiscountRepository implements RoomDiscountRepositoryInterface
 {
     public function listAllData(Request $request)
     {
-        $roomDiscounts = RoomDiscount::with('rooms')->paginate(config('common.list_count'));
+        $roomDiscounts = RoomDiscount::with('rooms')->orderBy('created_at','desc')->paginate(config('common.list_count'));
         ResponseData($roomDiscounts);
     }
 

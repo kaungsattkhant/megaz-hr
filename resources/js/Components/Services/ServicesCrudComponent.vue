@@ -55,7 +55,7 @@
                             <div class="contents" v-for="(room, index) in serviceList" :key="index">
                                 <tr class="">
                                     <td class="  ">
-                                        {{ ++index }}
+                                        {{ perPage * (currentPage - 1) + (++index) }}
                                     </td>
                                     <td class="whitespace-nowrap  ">
                                         {{ room.name }}
@@ -90,6 +90,25 @@
                             <!-- looping end -->
                         </tbody>
                     </table>
+
+                    <!-- pagination -->
+                    <div class="flex justify-center">
+
+                        <div v-if="totalData != 0" class=" bg-white  flex justify-center mt-5 py-3">
+                            <button class="rounded px-6 py-1 border  hover:bg-slate-200" :disabled="currentPage === 1"
+                                @click="getServiceList(currentPage - 1)">«</button>
+
+                            <button class=" text-sm px-5 border">
+                                Page <span @dblclick="showInput">{{ currentPage }}</span> / <span
+                                    class="text-gray-400">{{
+                                    lastPage }}</span>
+                            </button>
+
+                            <button class=" rounded px-6  py-1 border  hover:bg-slate-200"
+                                :disabled="currentPage === lastPage" @click="getServiceList(currentPage + 1)">
+                                »</button>
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -128,8 +147,9 @@
                                     Category
                                 </label>
                                 <select name="" id="" v-model="service_category_id" class="input-ui">
-                                    <option :value="service.id" v-for="(service,index) in serviceCategoryList">{{
-                                        service.name }}</option>
+                                    <option :value="service.id" v-for="(service, index) in serviceCategoryList"
+                                        :key="index">{{
+                                            service.name }}</option>
                                 </select>
                             </div>
                             <div class="mb-4">
@@ -143,7 +163,8 @@
                                     Selling Area
                                 </label>
                                 <select name="" id="" v-model="area_id" class="input-ui">
-                                    <option :value="area.id" v-for="(area,index) in areaList">{{ area.name }}</option>
+                                    <option :value="area.id" v-for="(area, index) in areaList" :key="index">{{ area.name
+                                        }}</option>
                                 </select>
                             </div>
 
@@ -222,167 +243,162 @@
 </template>
 
 <script>
-    import { Modal, Ripple, Select, initTE, Input } from "tw-elements";
-    import { getApiData, postApiData, deleteApiData } from '../../utilities/ajax-helpers';
-    import { mapGetters } from "vuex";
+import { Modal, Ripple, Select, initTE, Input } from "tw-elements";
+import { getApiData, postApiData, deleteApiData } from '../../utilities/ajax-helpers';
+import { mapGetters } from "vuex";
 
-    export default {
-        data() {
-            return {
-                serviceList:[],
-                entityTypeList:['Room','Table'],
-                serviceCategoryList:[],
-                areaList:[],
+export default {
+    data() {
+        return {
+            serviceList: [],
+            entityTypeList: ['Room', 'Table'],
+            serviceCategoryList: [],
+            areaList: [],
 
-                name: null,
-                pricePerHour:null,
-                entityType:'service',
-                area_id:null,
-                service_category_id:null,
-                deleteId: null,
+            name: null,
+            pricePerHour: null,
+            entityType: 'service',
+            area_id: null,
+            service_category_id: null,
+            deleteId: null,
 
-                searchInput: null,
+            searchInput: null,
+            currentPage: 0,
+            perPage: 0,
+            lastPage: 0,
+            totalData: 0,
 
-                per_page: 10,
-                pageNumbers: [],
-                currentPage: 1,
-                paginationGroupsCount: 1,
-                per_group: 10,
-                groupedPageNumbers: [],
-                currentGroup: 0,
-            };
+        };
+    },
+
+    methods: {
+        ...mapGetters(['getToken']),
+
+        async getServiceList(pageNumber) {
+            let url = `/api/entities?type=service&page=${pageNumber}`;
+            if (this.searchInput) {
+                url = `/api/entities?type=service&search_input=${this.searchInput}&page=${pageNumber}`;
+            }
+            const response = await getApiData({ url: url, token: this.getToken() });
+            if (response.data) {
+                this.serviceList = response.data.data;
+                this.lastPage = response.data.last_page;
+                this.currentPage = pageNumber;
+                this.perPage = response.data.per_page;
+                this.totalData = response.data.total;
+            }
         },
 
-        methods: {
-            ...mapGetters(['getToken']),
+        async getAreaList() {
+            const response = await getApiData({ url: '/api/areas', token: this.getToken() });
+            if (response.data) {
+                this.areaList = response.data;
 
-            async getServiceList(pageNumber){
-                const response = await getApiData({ url: '/api/entities?type=service', token: this.getToken() });
-                if(response.data){
-                    this.serviceList = response.data;
-                    console.log(this.serviceList)
-                }
-            },
+            }
+        },
 
-            async getAreaList(){
-                const response = await getApiData({ url: '/api/areas', token: this.getToken() });
-                if(response.data){
-                    this.areaList = response.data;
-                    console.log(this.areaList)
-                }
-            },
+        async getServiceCategoryList() {
+            const response = await getApiData({ url: '/api/service_categories', token: this.getToken() });
+            if (response.data) {
+                this.serviceCategoryList = response.data;
+            }
+        },
 
-            async getServiceCategoryList(){
-                const response = await getApiData({ url: '/api/service_categories', token: this.getToken() });
-                if(response.data){
-                    this.serviceCategoryList = response.data;
-                }
-            },
+        // inventoryableTypeChanged(){
+        //     if(this.selectedInventoryType == 'area'){
+        //         this.getAreaList();
+        //     }
+        //     if(this.selectedInventoryType == 'department'){
+        //         this.getDepartmentList();
+        //     }
+        // },
 
-            // inventoryableTypeChanged(){
-            //     if(this.selectedInventoryType == 'area'){
-            //         this.getAreaList();
-            //     }
-            //     if(this.selectedInventoryType == 'department'){
-            //         this.getDepartmentList();
-            //     }
-            // },
+        createBtnClicked() {
+            this.createTableAndRoom();
+        },
 
-            createBtnClicked(){
-                this.createTableAndRoom();
-            },
+        async createTableAndRoom() {
+            let formData = new FormData();
+            formData.append('name', this.name);
+            formData.append('price_per_hour', this.pricePerHour);
+            formData.append('entity_type', this.entityType);
+            formData.append('area_id', this.area_id);
+            formData.append('service_category_id', this.service_category_id);
+            let response = await postApiData({ url: '/api/entities', form_data: formData, token: this.getToken() });
+            if (response.success) {
+                this.getServiceList(1);
+                console.log("success")
+                this.closeModal();
+                this.clearForm();
+            }
+            else {
+                alert('some errors occur');
+            }
+        },
 
-            async createTableAndRoom()
-            {
-                let formData = new FormData();
-                formData.append('name', this.name);
-                formData.append('price_per_hour', this.pricePerHour);
-                formData.append('entity_type', this.entityType);
-                formData.append('area_id', this.area_id);
-                formData.append('service_category_id', this.service_category_id);
-                let response = await postApiData({url: '/api/entities', form_data: formData, token: this.getToken()});
-                if(response.success){
-                    this.getServiceList(null);
-                    console.log("success")
-                    this.closeModal();
-                    this.clearForm();
-                }
-                else{
-                    alert('some errors occur');
-                }
-            },
+        closeModal() {
+            document.getElementById("close").click();
+        },
 
-            closeModal() {
-                document.getElementById("close").click();
-            },
-
-            clearForm() {
-                this.name = null,
+        clearForm() {
+            this.name = null,
                 this.selectedInventoryType = null,
                 this.inventoryable_id = null,
                 this.typeList = []
-            },
-
-            isActiveToggled(id){
-                let index = this.serviceList.findIndex(table => table.id == id);
-                if(index != -1){
-                    if(this.serviceList[index].is_available == 1){
-                        this.serviceList[index].is_available = 0;
-                    }
-                    else{
-                        this.serviceList[index].is_available = 1;
-                    }
-
-                    let url = `/api/is_active`;
-                    let formData = new FormData();
-                    formData.append('id', id);
-                    formData.append('type', 'entity');
-                    let response = postApiData({url: url, form_data: formData, token: this.getToken()});
-                }
-            },
-
-            deleteBtnClicked(id){
-                this.deleteId = id;
-            },
-
-            async confirmDeleteBtnClicked(){
-                let url = `/api/entities/${this.deleteId}`;
-                let response = await deleteApiData({url: url, token: this.getToken()});
-                if(response.success){
-                    this.getServiceList();
-                }
-                else{
-                    alert('some errors occur');
-                }
-            },
-
-            async searchBtnClicked(){
-                let url = null;
-                if(this.searchInput){
-                    url = `/api/entities?type=service&search_input=${this.searchInput}&page=1`;
-                }
-                let response = await getApiData({url: url, token: this.getToken()});
-                if(response.data){
-                    this.serviceList = response.data.data;
-                }
-            },
-
-            clearSearchBtnClicked(){
-                this.searchInput = null;
-                this.getServiceList(null);
-            },
-
         },
 
-        created(){
-            this.getServiceList(null);
-            this.getAreaList();
-            this.getServiceCategoryList();
+        isActiveToggled(id) {
+            let index = this.serviceList.findIndex(table => table.id == id);
+            if (index != -1) {
+                if (this.serviceList[index].is_available == 1) {
+                    this.serviceList[index].is_available = 0;
+                }
+                else {
+                    this.serviceList[index].is_available = 1;
+                }
+
+                let url = `/api/is_active`;
+                let formData = new FormData();
+                formData.append('id', id);
+                formData.append('type', 'entity');
+                let response = postApiData({ url: url, form_data: formData, token: this.getToken() });
+            }
         },
 
-        mounted()
-        {
-            initTE({ Modal,Select, Ripple });
-        }
+        deleteBtnClicked(id) {
+            this.deleteId = id;
+        },
+
+        async confirmDeleteBtnClicked() {
+            let url = `/api/entities/${this.deleteId}`;
+            let response = await deleteApiData({ url: url, token: this.getToken() });
+            if (response.success) {
+                this.getServiceList(1);
+            }
+            else {
+                alert('some errors occur');
+            }
+        },
+
+        async searchBtnClicked() {
+            this.getServiceList(1);
+        },
+
+        clearSearchBtnClicked() {
+            this.searchInput = null;
+            this.getServiceList(1);
+        },
+
+    },
+
+    created() {
+        this.getServiceList(1);
+        this.getAreaList();
+        this.getServiceCategoryList();
+    },
+
+    mounted() {
+        initTE({ Modal, Select, Ripple });
     }
+}
 </script>

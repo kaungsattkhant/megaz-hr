@@ -1,70 +1,93 @@
 <template>
-    <div class="flex justify-between mb-3">
-        <notifications position="top center" />
-
-        <div class=" flex">
-            <label for="search" class="search-input">
-                <input type="text" class="input-search" placeholder="Search">
-
-                <i class="fal fa-search"></i>
-            </label>
-        </div>
-        <div class="flex justify-end flex-col">
-
-            <button type="button" class="add-btn transition duration-150 ease-in-out focus:outline-none focus:ring-0 "
-                data-te-toggle="modal" data-te-target="#create_modal">
-                Add New
-            </button>
-        </div>
+    <div>
+        <p class=" text-lg font-semibold font-inter">
+            AR
+        </p>
     </div>
-    <div class="box-container-table">
-        <div class="overflow-x-auto">
-            <div class="table-container">
-                <table class="primary-table">
-                    <thead>
-                        <tr>
-                            <th scope="col" class="">
-                                #
-                            </th>
-                            <th scope="col" class="">
-                                Name
-                            </th>
-                            <th scope="col" class="">
-                                Receivable Amount
-                            </th>
+    <div class="mt-4 bg-white">
+        <div class="btn-container">
+            <notifications position="top center" />
 
-                            <th scope="col" class="">
+            <div class=" flex">
+                <label for="search" class="search-input">
+                    <input type="text" class="input-search" placeholder="Search">
 
-                            </th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <!-- looping start -->
-                        <div class="contents" v-for="(ar,index) in arList" :key="index">
-                            <tr class="">
-                                <td class=" font-medium ">
-                                    {{ index+1 }}
-                                </td>
-                                <td class="whitespace-nowrap">
-                                    <a :href="'/account_receivable/' + ar.id + '/detail'"  class="contents">{{ ar.name }}</a>
-                                </td>
-                                <td class="whitespace-nowrap">
-                                    {{ ar.ar_balance }}
-                                </td>
-                                <td class="whitespace-nowrap">
-                                    <button id="edit-btn" class="pr-3 transition duration-150 ease-in-out"
-                                    @click="btnClickedPaidModal(ar)"
-                                    data-te-toggle="modal" data-te-target="#paid_modal">
-                                        <i class="fal fa-plus"></i>
-                                    </button>
-                                </td>
-                            </tr>
-                        </div>
-                    </tbody>
-                </table>
+                    <i class="fal fa-search"></i>
+                </label>
+            </div>
+            <div class="flex justify-end flex-col">
+
+                <button type="button" class="add-btn transition duration-150 ease-in-out focus:outline-none focus:ring-0 "
+                    data-te-toggle="modal" data-te-target="#create_modal">
+                    Add New
+                </button>
             </div>
         </div>
+        <div class="box-container-table">
+            <div class="overflow-x-auto">
+                <div class="table-container">
+                    <table class="primary-table">
+                        <thead>
+                            <tr>
+                                <th scope="col" class="">
+                                    #
+                                </th>
+                                <th scope="col" class="">
+                                    Name
+                                </th>
+                                <th scope="col" class="">
+                                    Receivable Amount
+                                </th>
 
+                                <th scope="col" class="">
+
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- looping start -->
+                            <div class="contents" v-for="(ar,index) in arList" :key="index">
+                                <tr class="">
+                                    <td class=" font-medium ">
+                                        {{ perPage * (currentPage - 1) + (++index) }}
+                                    </td>
+                                    <td class="whitespace-nowrap">
+                                        <a :href="'/account_receivable/' + ar.id + '/detail'"  class="contents">{{ ar.name }}</a>
+                                    </td>
+                                    <td class="whitespace-nowrap">
+                                        {{ ar.ar_balance }}
+                                    </td>
+                                    <td class="whitespace-nowrap">
+                                        <button id="edit-btn" class="pr-3 transition duration-150 ease-in-out"
+                                        @click="btnClickedPaidModal(ar)"
+                                        data-te-toggle="modal" data-te-target="#paid_modal">
+                                            <i class="fal fa-plus"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                            </div>
+                        </tbody>
+                    </table>
+                    <div class="flex justify-center">
+                        <div v-if="totalData != 0" class=" bg-white  flex justify-center mt-5 py-3">
+                            <button class="rounded px-6 py-1 border  hover:bg-slate-200"
+                                :disabled="currentPage === 1"
+                                @click="getArList(currentPage - 1)">«</button>
+
+                            <button class=" text-sm px-5 border">
+                                Page <span @dblclick="showInput">{{ currentPage }}</span> / <span
+                                    class="text-gray-400">{{
+                                    lastPage }}</span>
+                            </button>
+
+                            <button class=" rounded px-6  py-1 border  hover:bg-slate-200"
+                                :disabled="currentPage === lastPage"
+                                @click="getArList(currentPage + 1)"> »</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
 
         <!-- Modal -->
         <div data-te-modal-init
@@ -197,6 +220,8 @@
 
     </div>
 
+
+
 </template>
 
 <script>
@@ -221,7 +246,10 @@
                 selectedCashbookCreate:null,
                 selectedCashbookPaid:null,
 
-
+                currentPage: 0,
+                perPage: 0,
+                lastPage: 0,
+                totalData:0,
 
             };
         },
@@ -229,10 +257,14 @@
         methods: {
             ...mapGetters(['getToken']),
 
-            async getArList(){
-                const response = await getApiData({ url: '/api/account_receivable_lists', token: this.getToken() });
+            async getArList(pageNumber){
+                const response = await getApiData({ url: '/api/account_receivable_lists?page='+pageNumber, token: this.getToken() });
                 if(response.data){
-                    this.arList = response.data;
+                    this.arList = response.data.data;
+                    this.lastPage = response.data.last_page;
+                    this.currentPage = pageNumber;
+                    this.perPage = response.data.per_page;
+                    this.totalData = response.data.total;
                 }
             },
             async getSubAccountList(){
@@ -267,7 +299,7 @@
                 formData.append('cash_account_id', this.selectedCashbookCreate.id);
                 let response = await postApiData({url: '/api/account_receivables', form_data: formData, token: this.getToken()});
                 if(response.success){
-                    this.getArList();
+                    this.getArList(1);
                     this.closeAndClearCreateModal();
                 }
                 else{
@@ -293,7 +325,7 @@
                 formData.append('cash_account_id', this.selectedCashbookPaid.id);
                 let response = await postApiData({url: '/api/paid_account_receivables', form_data: formData, token: this.getToken()});
                 if(response.success){
-                    this.getArList();
+                    this.getArList(1);
                     this.closeAndClearPaidModal();
                 }
                 else{
@@ -325,7 +357,7 @@
             initTE({ Modal,Select, Ripple });
         },
         created(){
-            this.getArList();
+            this.getArList(1);
             this.getSubAccountList();
             this.getCashbookList();
         }

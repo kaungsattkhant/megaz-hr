@@ -161,12 +161,6 @@
                             </a>
                         </li>
 
-                        <li>
-                            <a href="{{ route('tasks.report') }}" class="flex items-center @yield('tasks_report')">
-                                <i class="fal fa-tasks  pr-3"></i>
-                                Task Reports
-                            </a>
-                        </li>
                         @endif
                         @if (checkFeaturePermission('area'))
                         <li>
@@ -193,13 +187,13 @@
                         </li>
                         @endif
                         @if (checkFeaturePermission('item-usage-forecast'))
-                        <li>
+                        {{--  <li>
                             <a href="{{ route('item_usage_forecasts') }}"
                                 class="flex items-center @yield('item_usage_forecasts')">
                                 <i class="fal fa-truck-loading  pr-3"></i>
                                 Item Usage Forecasts
                             </a>
-                        </li>
+                        </li>  --}}
 
                         <li>
                             <a href="{{ route('item_usage_forecasts_by_month') }}"
@@ -571,3 +565,6 @@
                 <logout-component />
             </div>
         </nav>
+
+
+

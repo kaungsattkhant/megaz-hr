@@ -16,9 +16,14 @@ class SaleTargetResultAPIController extends Controller
     {
         $role = UserData()->roles->first();
         $roleId = $role->id;
-        $currentMonth = $request->has('month') ? request()->month : Carbon::now()->month;
 
-        $targetAmount = SaleTargetPosition::whereMonth('month', $currentMonth)
+        $currentMonth = $request->get('month', Carbon::now()->format('Y-m'));
+        $parsedMonth = Carbon::createFromFormat('Y-m', $currentMonth);
+        $year = $parsedMonth->year;
+        $month = $parsedMonth->month;
+
+        $targetAmount = SaleTargetPosition::whereYear('month', $year)
+            ->whereMonth('month', $month)
             ->whereHas('targetPositions', function ($query) use ($roleId) {
                 $query->where('role_id', $roleId);
             })
@@ -30,12 +35,14 @@ class SaleTargetResultAPIController extends Controller
             ->collapse()
             ->sum('amount');
 
-        $totalAmount = TargetPositionResult::whereMonth('date_time', $currentMonth)
+        $totalAmount = TargetPositionResult::whereYear('date_time', $year)
+            ->whereMonth('date_time', $month)
             ->where('role_id', $roleId)
             ->sum('amount');
 
         if (in_array(UserData()->department_id, [5, 7, 8])) {
-            $targetMenus = SaleTargetMenu::whereMonth('month', $currentMonth)
+            $targetMenus = SaleTargetMenu::whereYear('month', $year)
+                ->whereMonth('month', $month)
                 ->with(['targetMenus' => function ($query) {
                     $query->select('id', 'sale_target_menu_id', 'menu_id', 'quantity');
                 }])
@@ -44,7 +51,8 @@ class SaleTargetResultAPIController extends Controller
                 ->collapse()
                 ->keyBy('menu_id');
 
-            $soldMenus = TargetMenuResult::whereMonth('date_time', $currentMonth)
+            $soldMenus = TargetMenuResult::whereYear('date_time', $year)
+                ->whereMonth('date_time', $month)
                 ->with('menu')
                 ->get()
                 ->keyBy('menu_id');
@@ -60,7 +68,6 @@ class SaleTargetResultAPIController extends Controller
             $allMenus = collect();
         }
 
-
         $responseData = [
             'target_position_result' => [
                 'target_amount' => $targetAmount,
@@ -73,5 +80,6 @@ class SaleTargetResultAPIController extends Controller
 
         ResponseData($responseData);
     }
+
 
 }

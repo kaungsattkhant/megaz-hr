@@ -9,6 +9,7 @@ use App\Models\TaskDetail;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Psy\Readline\Hoa\_Protocol;
 
 class Task extends BaseModel
 {
@@ -54,6 +55,11 @@ class Task extends BaseModel
     public function duties()
     {
         return $this->belongsToMany(Duty::class,'duty_task');
+    }
+
+    public function taskImages()
+    {
+        return $this->hasMany(TaskImage::class);
     }
 
     /**

@@ -97,6 +97,7 @@ import InvoiceDetailComponent from './Components/Pos/Invoices/InvoiceDetailCompo
 import PosBookingListComponent from './Components/Pos/Booking/PosBookingListComponent.vue';
 import PosBookingCreateComponent from './Components/Pos/Booking/PosBookingCreateComponent.vue';
 import PosMenuOrderComponent from './Components/Pos/MenuOrder/PosMenuOrderComponent.vue';
+import PosMenuOrderCreateComponent from './Components/Pos/MenuOrder/PosMenuOrderCreateComponent.vue';
 import UomCrudComponent from './Components/Uoms/UomCrudComponent.vue';
 
 import LoginComponentPos from './Components/Pos/Auth/LoginComponentPos.vue';
@@ -213,6 +214,7 @@ app.component('InvoiceDetailComponent', InvoiceDetailComponent);
 app.component('PosBookingListComponent', PosBookingListComponent);
 app.component('PosBookingCreateComponent', PosBookingCreateComponent);
 app.component('PosMenuOrderComponent', PosMenuOrderComponent);
+app.component('PosMenuOrderCreateComponent', PosMenuOrderCreateComponent);
 
 app.component('LoginComponentPos', LoginComponentPos);
 app.component('LogoutComponentPos', LogoutComponentPos);
@@ -244,7 +246,6 @@ app.component('ItemUsageForecastByMonthWithDepartment',ItemUsageForecastByMonthW
 app.component('IufWithDepartmentAndMonth',IufWithDepartmentAndMonth);
 app.component('AssetDepreciationBalanceList',AssetDepreciationBalanceList);
 app.component('SaleTargetPositionListComponent',SaleTargetPositionListComponent);
-app.component('SaleTargetPositionCreateComponent',SaleTargetPositionCreateComponent);
 app.component('SaleTargetPositionCreateComponent',SaleTargetPositionCreateComponent);
 app.component('SaleTargetPositionEditComponent',SaleTargetPositionEditComponent);
 app.component('SaleTargetMenuListComponent',SaleTargetMenuListComponent);

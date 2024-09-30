@@ -47,7 +47,8 @@ class MenuAPIController extends Controller
 
     public function menuByMenuCategory(int $id)
     {
-        $menu = Menu::where('menu_category_id',$id)->with('prices')->get();
+        $menu = Menu::where('menu_category_id',$id)->with('prices','menuServiceDiscounts')->get();
+        // $menu = Menu::where('menu_category_id',$id)->with('prices')->get();
         ResponseData($menu);
     }
 
@@ -87,5 +88,10 @@ class MenuAPIController extends Controller
     {
         $menus = $this->menuRepo->toggleMenuFeature($id);
         ResponseData($menus);
+    }
+
+    public function areaByMenu(int $id)
+    {
+        $areas = $this->menuRepo->menuAreaList($id);
     }
 }

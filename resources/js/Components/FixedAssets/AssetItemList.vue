@@ -7,7 +7,12 @@
     <div class="mt-4 bg-white">
         <div class="btn-container">
             <div class=" flex gap-x-4">
-
+                <label for="search" class="search-input">
+                    <input type="text" class="input-search" placeholder="Search" v-model="searchInput">
+                    <i class="fal fa-search"></i>
+                </label>
+                <button class="add-btn h-8 text-[13px] font-inter" @click="searchBtnClicked()">Search</button>
+                <button class="add-btn h-8 text-[13px] font-inter" @click="clearSearchBtnClicked()">Clear</button>
             </div>
             <div class="flex justify-end flex-col">
                 <a href="/asset_items/create" class="add-btn text-[13px] font-inter">
@@ -44,14 +49,14 @@
                             <div class="contents" v-for="(asset_item, index) in assetItemList" :key="index">
                                 <tr class="">
                                     <td class="">
-                                        {{ ++index }}
+                                        {{ perPage * (currentPage - 1) + (++index) }}
                                     </td>
                                     <td class="whitespace-nowrap">
                                         {{ asset_item.name }}
                                     </td>
 
                                     <td class="whitespace-nowrap">
-                                        {{asset_item.item_code}}
+                                        {{ asset_item.item_code }}
                                     </td>
 
                                 </tr>
@@ -61,6 +66,24 @@
                             <!-- looping end -->
                         </tbody>
                     </table>
+
+                    <!-- pagination -->
+                    <div class="flex justify-center">
+
+                        <div v-if="totalData != 0" class=" bg-white  flex justify-center mt-5 py-3">
+                            <button class="rounded px-6 py-1 border  hover:bg-slate-200" :disabled="currentPage === 1"
+                                @click="getAssetItemList(currentPage - 1)">«</button>
+
+                            <button class=" text-sm px-5 border">
+                                Page <span @dblclick="showInput">{{ currentPage }}</span> / <span
+                                    class="text-gray-400">{{
+                                    lastPage }}</span>
+                            </button>
+
+                            <button class=" rounded px-6  py-1 border  hover:bg-slate-200"
+                                :disabled="currentPage === lastPage" @click="getAssetItemList(currentPage + 1)"> »</button>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -69,49 +92,58 @@
 </template>
 
 <script>
-    import { Modal, Ripple, initTE, Input, Select, Dropdown } from "tw-elements";
-    import { mapGetters } from "vuex";
-    import { getApiData, postApiData, deleteApiData } from '../../utilities/ajax-helpers';
+import { Modal, Ripple, initTE, Input, Select, Dropdown } from "tw-elements";
+import { mapGetters } from "vuex";
+import { getApiData, postApiData, deleteApiData } from '../../utilities/ajax-helpers';
 
-    export default {
-        data() {
-            return {
-                assetItemList: [],
+export default {
+    data() {
+        return {
+            assetItemList: [],
 
-                per_page: 20,
-                pageNumbers: [],
-                currentPage: 1,
-                paginationGroupsCount: 1,
-                per_group: 10,
-                groupedPageNumbers: [],
-                currentGroup: 0,
-                isFirstGroup: true,
-                isLastGroup: false,
-            };
+            searchInput:null,
+
+            currentPage: 0,
+            perPage: 0,
+            lastPage: 0,
+            totalData: 0,
+        };
+    },
+
+    methods: {
+        ...mapGetters(['getToken']),
+
+        async getAssetItemList(pageNumber) {
+
+
+            let url = `/api/asset_items?page=${pageNumber}`;
+            if(this.searchInput){
+                url = '/api/asset_items?page=' + pageNumber + '&search=' + this.searchInput;
+            }
+            let response = await getApiData({ url: url, token: this.getToken() });
+            if (response.data) {
+                this.assetItemList = response.data.data;
+                this.lastPage = response.data.last_page;
+                this.currentPage = pageNumber;
+                this.perPage = response.data.per_page;
+                this.totalData = response.data.total;
+            }
         },
-
-        methods: {
-            ...mapGetters(['getToken']),
-
-            async getAssetItemList(pageNumber){
-                if(pageNumber){
-                    this.currentPage = pageNumber;
-                }
-
-                let url = `/api/asset_items?page=${this.currentPage}&per_page=${this.per_page}`;
-                let response = await getApiData({url: url, token: this.getToken()});
-                if(response.data){
-                    this.assetItemList = response.data.data;
-                }
-            },
+        async searchBtnClicked() {
+            this.getAssetItemList(1);
         },
-
-        created(){
-            this.getAssetItemList();
+        clearSearchBtnClicked() {
+            this.searchInput = null;
+            this.getAssetItemList(1);
         },
+    },
 
-        mounted(){
-            initTE({ Modal, Ripple, Input, Select, Dropdown })
-        }
+    created() {
+        this.getAssetItemList(1);
+    },
+
+    mounted() {
+        initTE({ Modal, Ripple, Input, Select, Dropdown })
     }
+}
 </script>

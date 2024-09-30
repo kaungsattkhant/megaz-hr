@@ -1,13 +1,13 @@
 <template>
     <div class="mt-4 bg-white">
         <notifications position="top center" />
-
+asdfafasdf
         <h1 class="font-bold text-lg text-left px-8 pt-8 mb-4">Asset</h1>
         <div class=" px-8 pt-3 pb-8 flex justify-center">
             <div class="w-full justify-center flex">
                 <form @submit.prevent="assetCreate" class="flex justify-center w-full ">
                     <div class="w-full grid grid-cols-11 gap-x-6">
-                        <div class="mb-5 col-span-5">
+                        <div class="mb-6 col-span-5">
                             <label for="" class="label-form mb-3">
                                 Name
                             </label>
@@ -15,7 +15,7 @@
                                 class="py-2 px-2 w-full rounded-md border border-gray-300" placeholder="Name">
                         </div>
 
-                        <div class="mb-5 col-span-5">
+                        <div class="mb-6 col-span-5">
                             <label for="" class="label-form mb-3">
                                 Cost
                             </label>
@@ -23,7 +23,7 @@
                                 class="py-2 px-2 w-full rounded-md border border-gray-300" placeholder="Cost">
                         </div><div></div>
 
-                        <div class="mb-5 col-span-5">
+                        <div class="mb-6 col-span-5">
                             <label for="" class="label-form mb-3">
                                 Quantity
                             </label>
@@ -31,7 +31,7 @@
                                 class="py-2 px-2 w-full rounded-md border border-gray-300" placeholder="Quantity">
                         </div>
 
-                        <div class="mb-5 col-span-5">
+                        <div class="mb-6 col-span-5">
                             <label for="" class="label-form mb-3">
                                 Useful Life (Month)
                             </label>
@@ -40,26 +40,26 @@
                                 placeholder="Useful Life(Month)">
                         </div><div></div>
 
-                        
 
-                        <div class="mb-5 col-span-5">
+
+                        <div class="mb-6 col-span-5">
                             <label for="" class="label-form mb-3">
                                 Sub Account
                             </label>
-                            <select placeholder="Unit" v-model="selectedSubAccForAssetItem" @change="subAccForAssetItemChange()"
+                            <select placeholder="Sub Account" v-model="selectedSubAccForAssetItem" @change="subAccForAssetItemChange()"
                                 class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
                                 <option v-for='(subAcc, index) in subAccountList' :key=index
                                     :value=subAcc>{{ subAcc.name }}</option>
                             </select>
                         </div>
-                        <div class="mb-5 col-span-5">
+                        <div class="mb-6 col-span-5">
                             <label for="" class="label-form mb-3">
                                 Third Account
                             </label>
                             <div class=" flex justify-center relative">
                                 <select placeholder="Third Account" v-model="thirdAccount"
-                                    class="py-2 px-2 w-full rounded-md border border-gray-300">
-                                    <option :value="null" disabled selected>Third Account</option>
+                                    class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0 select-placeholder">
+                                    <!-- <option value="" disabled selected>Third Account</option> -->
                                     <option v-for='(thirdAccount, index) in thirdAccountListForAsset' :key=index
                                         :value=thirdAccount.id>{{ thirdAccount.name }}</option>
                                 </select>
@@ -75,7 +75,7 @@
 
                         </div><div></div>
 
-                        <div class="mb-5 col-span-5">
+                        <div class="mb-6 col-span-5">
                             <label for="" class="label-form mb-3">
                                 Sub Account
                             </label>
@@ -85,15 +85,15 @@
                                     :value=subDeAcc>{{ subDeAcc.name }}</option>
                             </select>
                         </div>
-                        <div class="mb-5 col-span-5">
+                        <div class="mb-6 col-span-5">
                             <label for="" class="label-form mb-3">
                                 Third Account Depreciation
                             </label>
                             <div class="relative">
                                 <select placeholder="Second Account Depreciation" v-model="thirdAccountDepreciation"
                                     @change="getAssetItemList()"
-                                    class="py-2 px-2 w-full rounded-md border border-gray-300">
-                                    <option :value="null" disabled selected>Third Account Depreciation</option>
+                                    class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
+                                    <!-- <option :value="null" disabled selected>Third Account Depreciation</option> -->
                                     <option v-for='(thirdAccountDepreciation, index) in thirdAccountDepreciationForAsset'
                                         :key=index :value=thirdAccountDepreciation.id>{{ thirdAccountDepreciation.name }}
                                     </option>
@@ -107,45 +107,45 @@
                             </div>
                         </div><div></div>
 
-                        <div class="mb-5 col-span-5">
+                        <div class="mb-6 col-span-5">
                             <label for="" class="label-form mb-3">
                                 Item
                             </label>
                             <select placeholder="Item" v-model="itemId"
-                                class="py-2 px-2 w-full rounded-md border border-gray-300">
-                                <option :value="null" disabled selected>Item</option>
+                                class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
+                                <!-- <option :value="null" disabled selected>Item</option> -->
                                 <option v-for='(item, index) in itemList' :key=index :value=item.id>{{ item.name }}
                                 </option>
                             </select>
 
                         </div>
 
-                        <div class="mb-5 col-span-5">
+                        <div class="mb-6 col-span-5">
                             <label for="" class="label-form mb-3">
                                 Inventory
                             </label>
                             <select placeholder="Inventory" v-model="inventoryId"
-                                class="py-2 px-2 w-full rounded-md border border-gray-300">
-                                <option :value="null" disabled selected>Inventory</option>
+                                class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
+                                <!-- <option :value="null" disabled selected>Inventory</option> -->
                                 <option v-for='(inventory, index) in inventoryList' :key=index :value=inventory.id>{{
                                     inventory.name }}</option>
                             </select>
 
                         </div>
-                        <div class="mb-5 relative col-span-5">
+                        <div class="mb-6 relative col-span-5">
                             <label for="" class="label-form mb-3">
                                 Purchase Date
                             </label>
                             <input type="date" v-model="purchaseDate"
-                                class="py-2 px-2 w-full rounded-md border border-gray-300" placeholder="Purchase Date">
+                                class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0" placeholder="Purchase Date">
                         </div>
-                        <div class="mb-5 col-span-5">
+                        <div class="mb-6 col-span-5">
                             <label for="" class="label-form mb-3">
                                 Cash Account
                             </label>
                             <select placeholder="Cash Account " v-model="cashAccountId"
-                                class="py-2 px-2 w-full rounded-md border border-gray-300">
-                                <option :value="null" disabled selected>Cash Account</option>
+                                class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
+                                <!-- <option :value="null" disabled selected>Cash Account</option> -->
                                 <option v-for='(cashAccount, index) in cashAccountList' :key=index
                                     :value=cashAccount.id>{{ cashAccount.name }}</option>
                             </select>
@@ -177,7 +177,7 @@
                         Create Third Account
                     </h5>
                     <!--Close button-->
-                    <button type="button" class="text-xs focus:shadow-none focus:outline-none" data-te-modal-dismiss
+                    <button type="button" class="text-xs focus:shadow-none focus:outline-none" data-te-modal-dismiss id="close_third_acc"
                         aria-label="Close">
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
                             stroke="currentColor" class="h-4 w-4">
@@ -223,7 +223,7 @@
                             data-te-modal-dismiss aria-label="Close">
                             Cancel
                         </button>
-                        <button type="submit" class="add-btn focus:outline-none focus:ring-0 " data-te-modal-dismiss>
+                        <button type="submit" class="add-btn focus:outline-none focus:ring-0">
                             Create
                         </button>
                     </div>
@@ -247,7 +247,7 @@
                         Create Third Depreciation Account
                     </h5>
                     <!--Close button-->
-                    <button type="button" class="text-xs focus:shadow-none focus:outline-none" data-te-modal-dismiss
+                    <button type="button" class="text-xs focus:shadow-none focus:outline-none" data-te-modal-dismiss id="close_third_depreciation"
                         aria-label="Close">
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
                             stroke="currentColor" class="h-4 w-4">
@@ -295,7 +295,7 @@
                             Cancel
                         </button>
                         <button type="submit" class="add-btn focus:outline-none focus:ring-0 "
-                            @click="confirmCreateBtnClicked" data-te-modal-dismiss>
+                            @click="confirmCreateBtnClicked">
                             Create
                         </button>
                     </div>
@@ -485,6 +485,7 @@ export default {
                     text: `Third Account created successfully`,
                     type: "success"
                 });
+                document.getElementById("close_third_acc").click();
             } else {
                 this.$notify({
                     title: `Input validation`,
@@ -518,6 +519,7 @@ export default {
                     text: `Third Account Depreciation created successfully`,
                     type: "success"
                 });
+                document.getElementById("close_third_depreciation").click();
             } else {
                 this.$notify({
                     title: `Input validation`,
@@ -579,6 +581,7 @@ export default {
                     text: `Asset created successfully`,
                     type: "success"
                 });
+                window.location.replace('/asset/list')
             } else {
                 this.$notify({
                     title: `Input validation`,
