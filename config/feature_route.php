@@ -51,7 +51,6 @@ return [
     'purchase-order' => 'purchase_orders',
     'purchase-order-confirmation' => 'purchase_orders.confirm_poitems',
     'inventory' => 'inventories',
-    // 'inventory-confirmation'=>
     'inventory-transfer-list' => 'transfers.transfers',
     'inventory-receive-list' => 'transfers.receives',
     'supplier' => 'suppliers.index',
