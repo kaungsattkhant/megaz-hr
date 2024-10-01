@@ -509,9 +509,16 @@ class InvoiceRepository implements InvoiceRepositoryInterface
                     $total_session_price += $room->price;
                 }
             }
-
-            $order = Order::where('invoice_id',$invoice->id)->first();
-            $orderItems = $order->orderItems;
+            $order = Order::where('invoice_id', $invoice->id)->first();
+            if ($order) {
+                $allSold = $order->orderItems->every(function ($item) {
+                    return $item->status === 'sold';
+                });
+                if($allSold==false){
+                    ResponseMessage('Not all order items are sold',422);
+                }
+            }
+            dd('in here');
 
             if (isset($data['discount_type'])) {
                 if ($data['discount_type'] == 'room_discount') {

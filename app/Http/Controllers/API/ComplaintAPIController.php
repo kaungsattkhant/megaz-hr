@@ -45,8 +45,6 @@ class ComplaintAPIController extends Controller
         ]);
         $data['posted_by'] = $request->user()->id;
         $complaint = $this->complaintRepo->createData($data);
-
-        ResponseData($complaint);
     }
 
     public function updateComplain(ComplaintUpdateRequest $request,$id)

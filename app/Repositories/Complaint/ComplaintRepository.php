@@ -2,11 +2,13 @@
 
 namespace App\Repositories\Complaint;
 
-
+use App\Events\ComplaintNotificationRequest;
+use App\Http\Action\SendNotification\SendNotification;
 use App\Models\Complaint;
 use App\Models\ComplaintCarbonCopy;
 use App\Models\ComplaintImage;
 use App\Models\ComplaintResponsible;
+use App\Models\Staff;
 use App\Repositories\Complaint\ComplaintRepositoryInterface;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -14,6 +16,8 @@ use Illuminate\Support\Facades\Storage;
 
 class ComplaintRepository implements ComplaintRepositoryInterface
 {
+    use SendNotification;
+
     public function listAllData(Request $request)
     {
         if ($request->per_page || $request->page) {
@@ -67,12 +71,29 @@ class ComplaintRepository implements ComplaintRepositoryInterface
                 $complaintResponsibles = json_decode($data['complaintResponsibles'], true);
                 $complaintCarbonCopies = json_decode($data['complaintCarbonCopies'], true);
                 if (!empty($complaintCarbonCopies)) {
+
                     foreach ($complaintResponsibles as $responsible) {
                         $complaint->complaintResponsibles()->create([
                             'staff_id' => $responsible,
                             'complaint_id' => $complaint->id
                         ]);
+
+
+                        $msg = 'You are responsible. Please Check';
+                        broadcast(new ComplaintNotificationRequest($complaint, $msg, $responsible));
                     }
+
+                    // $staffs = Staff::whereIn('id', $complaintResponsibles)->get();
+
+                    // $data = [
+                    //     'date' => $complaint->created_at,
+                    //     'title' => 'You have received a new PO to confirm',
+                    //     'body' => 'You need To Check',
+                    // ];
+
+                    // if($staffs->isNotEmpty()){
+                    //     $this->send($complaint, $staffs, $data);
+                    // }
                 }
 
                 if (!empty($complaintCarbonCopies)) {
@@ -81,6 +102,11 @@ class ComplaintRepository implements ComplaintRepositoryInterface
                             'staff_id' => $carbonCopy,
                             'complaint_id' => $complaint->id
                         ]);
+
+
+
+                    $msg = 'You need to check.';
+                    broadcast(new ComplaintNotificationRequest($complaint, $msg, $carbonCopy));
                     }
                 }
 
@@ -99,7 +125,6 @@ class ComplaintRepository implements ComplaintRepositoryInterface
                     }
                 }
             }
-
             DB::commit();
             ResponseData($complaint);
         } catch (\Exception $e) {
@@ -119,7 +144,14 @@ class ComplaintRepository implements ComplaintRepositoryInterface
                 return;
             }
 
+            $oldComplaint = $complaint->status;
+
             $data['posted_by'] = UserData()->id;
+            if($oldComplaint != $data['status'])
+            {
+                $msg = `You need to check`;
+                broadcast(new ComplaintNotificationRequest($complaint, $msg, UserData()->id));
+            }
             $complaint->update($data);
 
             $newResponsibles = json_decode($data['complaintResponsibles'], true);
@@ -132,6 +164,8 @@ class ComplaintRepository implements ComplaintRepositoryInterface
                         'staff_id' => $responsible,
                         'complaint_id' => $complaint->id
                     ]);
+
+
                 }
 
                 $responsiblesToRemove = array_diff($currentResponsibles, $newResponsibles);
@@ -230,3 +264,4 @@ class ComplaintRepository implements ComplaintRepositoryInterface
         ResponseMessage('Complaint image deleted');
     }
 }
+

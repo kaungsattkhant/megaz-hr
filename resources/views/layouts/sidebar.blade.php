@@ -1,28 +1,23 @@
         <nav id="sidebar" class="side-bar w-fit pt-0 h-[100vh]">
-            <div class="relative pb-20 overflow-y-hidden small-scrollbar h-[100vh]"
-                onmouseover="this.style.overflowY='scroll'" onmouseout="this.style.overflowY='hidden'">
+            <div class="relative pb-20 overflow-y-hidden small-scrollbar h-[100vh]" onmouseover="this.style.overflowY='scroll'" onmouseout="this.style.overflowY='hidden'">
 
                 <div class="relative w-[15rem] pt-12">
                     <ul class=" mb-4">
                         <li>
-                            <button class="flex items-center pl-9 my-2 text-sm w-full" type="button" data-te-collapse-init
-                                data-te-ripple-init data-te-ripple-color="light" data-te-target="#collapseFinanceReport"
-                                aria-expanded="false" aria-controls="collapseExample">
+                            <button class="flex items-center pl-9 my-2 text-sm w-full" type="button" data-te-collapse-init data-te-ripple-init data-te-ripple-color="light" data-te-target="#collapseFinanceReport" aria-expanded="false" aria-controls="collapseExample">
                                 <i class="fal fa-chart-line  pr-3"></i>
                                 Finance Report <i class="fas fa-angle-down absolute right-2"></i>
                             </button>
                             <div class="!visible @yield('cash_flow_collapse')hidden text-center" id="collapseFinanceReport" data-te-collapse-item>
                                 <ul>
                                     <li>
-                                        <a href="/cash_flow_statement"
-                                            class="flex items-center text-left @yield('cash_flow_statement')">
+                                        <a href="/cash_flow_statement" class="flex items-center text-left @yield('cash_flow_statement')">
                                             <i class="fal fa-tasks  pr-3"></i>
                                             Cash Flow
                                         </a>
                                     </li>
                                     <li>
-                                        <a href="/indirect_cashflow_statement"
-                                            class="flex items-center text-left @yield('indirect_cashflow_statement')">
+                                        <a href="/indirect_cashflow_statement" class="flex items-center text-left @yield('indirect_cashflow_statement')">
                                             <i class="fal fa-tasks  pr-3"></i>
                                             Indirect Cash Flow
                                         </a>
@@ -30,25 +25,23 @@
                                 </ul>
                             </div>
                         </li>
+
+                        @if(checkFeaturePermission('sale-target'))
                         <li>
-                            <button class="flex items-center pl-9 my-2 text-sm w-full" type="button" data-te-collapse-init
-                                data-te-ripple-init data-te-ripple-color="light" data-te-target="#collapseSaleTargetReport"
-                                aria-expanded="false" aria-controls="collapseExample">
+                            <button class="flex items-center pl-9 my-2 text-sm w-full" type="button" data-te-collapse-init data-te-ripple-init data-te-ripple-color="light" data-te-target="#collapseSaleTargetReport" aria-expanded="false" aria-controls="collapseExample">
                                 <i class="fal fa-chart-line  pr-3"></i>
                                 Sale Target <i class="fas fa-angle-down absolute right-2"></i>
                             </button>
                             <div class="!visible @yield('sale_target')hidden text-center" id="collapseSaleTargetReport" data-te-collapse-item>
                                 <ul>
                                     <li>
-                                        <a href="/sale_target_menu"
-                                            class="flex items-center text-left @yield('sale_target_menu')">
+                                        <a href="/sale_target_menu" class="flex items-center text-left @yield('sale_target_menu')">
                                             <i class="fal fa-tasks  pr-3"></i>
                                             Menu
                                         </a>
                                     </li>
                                     <li>
-                                        <a href="/sale_target_position"
-                                            class="flex items-center text-left @yield('sale_target_position')">
+                                        <a href="/sale_target_position" class="flex items-center text-left @yield('sale_target_position')">
                                             <i class="fal fa-tasks  pr-3"></i>
                                             Position
                                         </a>
@@ -56,22 +49,31 @@
                                 </ul>
                             </div>
                         </li>
+                        @endif
+
                         <!-- @if (checkFeaturePermission('cash-flow-statement')) -->
 
                         <!-- @endif -->
+
+
+                        @if(checkFeaturePermission('asset-depreciation-balance'))
                         <li>
                             <a href="{{ route('asset_list') }}" class="flex items-center @yield('asset_depreciation_balance_list')">
                                 <i class="fal fa-clipboard-list pr-3"></i>
                                 Asset Depreciation Balance List
                             </a>
                         </li>
+                        @endif
 
+                        @if(checkFeaturePermission('duty'))
                         <li>
                             <a href="{{ route('duty') }}" class="flex items-center @yield('duty')">
                                 <i class="fal fa-clipboard-list pr-3"></i>
                                 Duty
                             </a>
                         </li>
+                        @endif
+
                         @if (checkFeaturePermission('staff'))
                         <li>
                             <a href="{{ route('staff') }}" class="flex items-center @yield('staffs')">
@@ -79,50 +81,62 @@
                                 Staff
                             </a>
                         </li>
+                        @endif
 
+                        @if(checkFeaturePermission('journal'))
                         <li>
                             <a href="{{ route('journal') }}" class="flex items-center @yield('journals')">
                                 <i class="fal fa-books pr-3"></i>
                                 Journal
                             </a>
                         </li>
+                        @endif
 
+                        @if(checkFeaturePermission('staff-balance'))
                         <li>
                             <a href="{{ route('advance') }}" class="flex items-center @yield('advanced')">
                                 <i class="fal fa-balance-scale-right pr-3"></i>
                                 Staff Balance
                             </a>
                         </li>
-
-
-                            <li>
-                                <a href="{{ route('prepaid') }}" class="flex items-center @yield('prepaid')">
-                                    <i class="fas fa-dollar-sign"></i>
-                                    Prepaid
-                                </a>
-                            </li>
-
-                            <li>
-                                <a href="{{ route('account_receivable') }}" class="flex items-center @yield('ar')">
-                                    <i class="fas fa-coins"></i>
-                                    AR
-                                </a>
-                            </li>
-
-                            <li>
-                                <a href="{{ route('skill') }}" class="flex items-center @yield('skill')">
-                                    <i class="far fa-award"></i>
-                                    Skill
-                                </a>
-                            </li>
-
-                            <li>
-                                <a href="{{ route('cookingPlace') }}" class="flex items-center @yield('cooking_place')">
-                                    <i class="far fa-hat-chef"></i>
-                                    Cooking Place
-                                </a>
-                            </li>
                         @endif
+
+                        @if(checkFeaturePermission('prepaid'))
+                        <li>
+                            <a href="{{ route('prepaid') }}" class="flex items-center @yield('prepaid')">
+                                <i class="fas fa-dollar-sign"></i>
+                                Prepaid
+                            </a>
+                        </li>
+                        @endif
+
+                        @if(checkFeaturePermission('ar'))
+                        <li>
+                            <a href="{{ route('account_receivable') }}" class="flex items-center @yield('ar')">
+                                <i class="fas fa-coins"></i>
+                                AR
+                            </a>
+                        </li>
+                        @endif
+
+                        @if(checkFeaturePermission('skill'))
+                        <li>
+                            <a href="{{ route('skill') }}" class="flex items-center @yield('skill')">
+                                <i class="far fa-award"></i>
+                                Skill
+                            </a>
+                        </li>
+                        @endif
+
+                        @if(checkFeaturePermission('cooking-place'))
+                        <li>
+                            <a href="{{ route('cookingPlace') }}" class="flex items-center @yield('cooking_place')">
+                                <i class="far fa-hat-chef"></i>
+                                Cooking Place
+                            </a>
+                        </li>
+                        @endif
+
                         @if (checkFeaturePermission('department'))
                         <li>
                             <a href="{{ route('departments') }}" class="flex items-center @yield('departments')">
@@ -187,17 +201,16 @@
                         </li>
                         @endif
                         @if (checkFeaturePermission('item-usage-forecast'))
-                        {{--  <li>
+                        {{-- <li>
                             <a href="{{ route('item_usage_forecasts') }}"
-                                class="flex items-center @yield('item_usage_forecasts')">
-                                <i class="fal fa-truck-loading  pr-3"></i>
-                                Item Usage Forecasts
-                            </a>
-                        </li>  --}}
+                        class="flex items-center @yield('item_usage_forecasts')">
+                        <i class="fal fa-truck-loading  pr-3"></i>
+                        Item Usage Forecasts
+                        </a>
+                        </li> --}}
 
                         <li>
-                            <a href="{{ route('item_usage_forecasts_by_month') }}"
-                                class="flex items-center @yield('item_usage_forecasts_month')">
+                            <a href="{{ route('item_usage_forecasts_by_month') }}" class="flex items-center @yield('item_usage_forecasts_month')">
                                 <i class="fal fa-truck-loading  pr-3"></i>
                                 Item Usage Forecasts By Month
                             </a>
@@ -275,16 +288,13 @@
                             </a>
                         </li>
                         <li>
-                            <a href="{{ route('financial_transactions') }}"
-                                class="flex items-center @yield('financial_transactions')">
+                            <a href="{{ route('financial_transactions') }}" class="flex items-center @yield('financial_transactions')">
                                 <i class="fal fa-tasks  pr-3"></i>
                                 Financial Transactions
                             </a>
                         </li>
                         <li>
-                            <button class="flex items-center pl-9 my-2 text-sm" type="button" data-te-collapse-init
-                                data-te-ripple-init data-te-ripple-color="light" data-te-target="#collapseCashbooks"
-                                aria-expanded="false" aria-controls="collapseExample">
+                            <button class="flex items-center pl-9 my-2 text-sm" type="button" data-te-collapse-init data-te-ripple-init data-te-ripple-color="light" data-te-target="#collapseCashbooks" aria-expanded="false" aria-controls="collapseExample">
                                 <i class="fal fa-sack-dollar  pr-3"></i>
                                 Cash Book
                             </button>
@@ -292,50 +302,43 @@
                             <div class="!visible hidden text-center" id="collapseCashbooks" data-te-collapse-item>
                                 <ul>
                                     <li>
-                                        <a href="{{ route('office_cash') }}"
-                                            class="flex items-center @yield('office_cash')">
+                                        <a href="{{ route('office_cash') }}" class="flex items-center @yield('office_cash')">
                                             <i class="fal fa-tasks  pr-3"></i>
                                             Office Cash Book
                                         </a>
                                     </li>
                                     <li>
-                                        <a href="{{ route('owner_cash') }}"
-                                            class="flex items-center @yield('owner_cash')">
+                                        <a href="{{ route('owner_cash') }}" class="flex items-center @yield('owner_cash')">
                                             <i class="fal fa-tasks  pr-3"></i>
                                             Owner Cash Book
                                         </a>
                                     </li>
                                     <li>
-                                        <a href="{{ route('service_cash') }}"
-                                            class="flex items-center @yield('service_cash')">
+                                        <a href="{{ route('service_cash') }}" class="flex items-center @yield('service_cash')">
                                             <i class="fal fa-tasks  pr-3"></i>
                                             Service Cash Book
                                         </a>
                                     </li>
                                     <li>
-                                        <a href="{{ route('advance_cash') }}"
-                                            class="flex items-center @yield('advance_cash')">
+                                        <a href="{{ route('advance_cash') }}" class="flex items-center @yield('advance_cash')">
                                             <i class="fal fa-tasks  pr-3"></i>
                                             Advance Cash Book
                                         </a>
                                     </li>
                                     <li>
-                                        <a href="{{ route('agm_cash') }}"
-                                            class="flex items-center @yield('agm_cash')">
+                                        <a href="{{ route('agm_cash') }}" class="flex items-center @yield('agm_cash')">
                                             <i class="fal fa-tasks  pr-3"></i>
                                             AGM Cash Book
                                         </a>
                                     </li>
                                     <li>
-                                        <a href="{{ route('gm_cash') }}"
-                                            class="flex items-center @yield('gm_cash')">
+                                        <a href="{{ route('gm_cash') }}" class="flex items-center @yield('gm_cash')">
                                             <i class="fal fa-tasks  pr-3"></i>
                                             GM Cash Book
                                         </a>
                                     </li>
                                     <li>
-                                        <a href="{{ route('ktv_project_cash') }}"
-                                            class="flex items-center @yield('ktv_project_cash')">
+                                        <a href="{{ route('ktv_project_cash') }}" class="flex items-center @yield('ktv_project_cash')">
                                             <i class="fal fa-tasks  pr-3"></i>
                                             KTV Project Cash Book
                                         </a>
@@ -344,9 +347,7 @@
                             </div>
                         </li>
                         <li>
-                            <button class="flex items-center pl-9 my-2 text-sm" type="button" data-te-collapse-init
-                                data-te-ripple-init data-te-ripple-color="light" data-te-target="#collapseBankbooks"
-                                aria-expanded="false" aria-controls="collapseExample">
+                            <button class="flex items-center pl-9 my-2 text-sm" type="button" data-te-collapse-init data-te-ripple-init data-te-ripple-color="light" data-te-target="#collapseBankbooks" aria-expanded="false" aria-controls="collapseExample">
                                 <i class="fal fa-money-check-alt  pr-3"></i>
                                 Bank Book
                             </button>
@@ -354,22 +355,19 @@
                             <div class="!visible hidden text-center" id="collapseBankbooks" data-te-collapse-item>
                                 <ul>
                                     <li>
-                                        <a href="{{ route('kbz_special_bank') }}"
-                                            class="flex items-center @yield('kbz_special_bank')">
+                                        <a href="{{ route('kbz_special_bank') }}" class="flex items-center @yield('kbz_special_bank')">
                                             <i class="fal fa-tasks  pr-3"></i>
                                             KBZ Special Account
                                         </a>
                                     </li>
                                     <li>
-                                        <a href="{{ route('kbz_old_gm_bank') }}"
-                                            class="flex items-center @yield('kbz_old_gm_bank')">
+                                        <a href="{{ route('kbz_old_gm_bank') }}" class="flex items-center @yield('kbz_old_gm_bank')">
                                             <i class="fal fa-tasks  pr-3"></i>
                                             KBZ Old Account (GM)
                                         </a>
                                     </li>
                                     <li>
-                                        <a href="{{ route('kpay_bank') }}"
-                                            class="flex items-center @yield('kpay_bank')">
+                                        <a href="{{ route('kpay_bank') }}" class="flex items-center @yield('kpay_bank')">
                                             <i class="fal fa-tasks  pr-3"></i>
                                             KPay
                                         </a>
@@ -380,8 +378,7 @@
                         @endif
                         @if (checkFeaturePermission('purchase-order'))
                         <li>
-                            <a href="{{ route('purchase_orders') }}"
-                                class="flex items-center @yield('purchase_orders')">
+                            <a href="{{ route('purchase_orders') }}" class="flex items-center @yield('purchase_orders')">
                                 <i class="fal fa-truck-loading  pr-3"></i>
                                 Purchase Orders
                             </a>
@@ -390,8 +387,7 @@
                             @endif
                             @if (checkFeaturePermission('purchase-order-confirmation'))
                         <li>
-                            <a href="{{ route('purchase_orders.confirm_poitems') }}"
-                                class="flex items-center @yield('confirm_purchase_order_items')">
+                            <a href="{{ route('purchase_orders.confirm_poitems') }}" class="flex items-center @yield('confirm_purchase_order_items')">
                                 <i class="fal fa-truck-loading  pr-3"></i>
                                 Confirm Purchase Order Items
                             </a>
@@ -399,35 +395,31 @@
                         @endif
                         @if (checkFeaturePermission('purchase-order-item-left'))
                         <li>
-                            <a href="{{ route('purchase_orders.left_items_index') }}"
-                                class="flex items-center @yield('purchase_order_left_items')">
+                            <a href="{{ route('purchase_orders.left_items_index') }}" class="flex items-center @yield('purchase_order_left_items')">
                                 <i class="fal fa-truck-loading  pr-3"></i>
                                 Purchase Orders with Left Items
                             </a>
                         </li>
                         @endif
                         @if (checkFeaturePermission('fixed-asset'))
-                            <li>
-                                <a href="{{ route('assetItemList') }}"
-                                    class="flex items-center @yield('asset_items')">
-                                    <i class="fal fa-truck-loading  pr-3"></i>
-                                    Asset Items
-                                </a>
-                            </li>
-                            <li>
-                                <a href="{{ route('assetList') }}"
-                                    class="flex items-center @yield('assets')">
-                                    <i class="fal fa-truck-loading  pr-3"></i>
-                                    Assets
-                                </a>
-                            </li>
-                            <li>
-                                <a href="{{ route('fixed_assets.index') }}"
-                                    class="flex items-center @yield('fixed_asset')">
-                                    <i class="fal fa-truck-loading  pr-3"></i>
-                                    Fixed Assets
-                                </a>
-                            </li>
+                        <li>
+                            <a href="{{ route('assetItemList') }}" class="flex items-center @yield('asset_items')">
+                                <i class="fal fa-truck-loading  pr-3"></i>
+                                Asset Items
+                            </a>
+                        </li>
+                        <li>
+                            <a href="{{ route('assetList') }}" class="flex items-center @yield('assets')">
+                                <i class="fal fa-truck-loading  pr-3"></i>
+                                Assets
+                            </a>
+                        </li>
+                        <li>
+                            <a href="{{ route('fixed_assets.index') }}" class="flex items-center @yield('fixed_asset')">
+                                <i class="fal fa-truck-loading  pr-3"></i>
+                                Fixed Assets
+                            </a>
+                        </li>
                         @endif
                         @if (checkFeaturePermission('account-payables'))
                         <li>
@@ -446,8 +438,7 @@
                         @endif
                         @if (checkFeaturePermission('inventory-stocks'))
                         <li>
-                            <a href="{{ route('inventory_stocks.index') }}"
-                                class="flex items-center @yield('inventory_stocks')">
+                            <a href="{{ route('inventory_stocks.index') }}" class="flex items-center @yield('inventory_stocks')">
                                 <i class="fal fa-truck-loading  pr-3"></i>
                                 Inventory Stocks
                             </a>
@@ -455,29 +446,25 @@
                         @endif
                         @if (checkFeaturePermission('inventory-transfer-list'))
                         <li>
-                            <a href="{{ route('transfers.index') }}"
-                                class="flex items-center @yield('inventory_histories')">
+                            <a href="{{ route('transfers.index') }}" class="flex items-center @yield('inventory_histories')">
                                 <i class="fal fa-user  pr-3"></i>
                                 Inventory Transfer Histories
                             </a>
                         </li>
                         <li>
-                            <a href="{{ route('transfers.receives') }}"
-                                class="flex items-center @yield('inventory_receives')">
+                            <a href="{{ route('transfers.receives') }}" class="flex items-center @yield('inventory_receives')">
                                 <i class="fal fa-user  pr-3"></i>
                                 Inventory Receives List
                             </a>
                         </li>
                         <li>
-                            <a href="{{ route('transfers.transfers') }}"
-                                class="flex items-center @yield('inventory_transfers')">
+                            <a href="{{ route('transfers.transfers') }}" class="flex items-center @yield('inventory_transfers')">
                                 <i class="fal fa-user  pr-3"></i>
                                 Inventory Transfers List
                             </a>
                         </li>
                         <li>
-                            <a href="{{ route('used_defected_items.index') }}"
-                                class="flex items-center @yield('used_defected_items')">
+                            <a href="{{ route('used_defected_items.index') }}" class="flex items-center @yield('used_defected_items')">
                                 <i class="fal fa-user  pr-3"></i>
                                 Used Defected Items
                             </a>
@@ -486,8 +473,7 @@
 
                         @if (checkFeaturePermission('room-discount'))
                         <li>
-                            <a href="{{ route('room_discount.index') }}"
-                                class="flex items-center @yield('room_discount')">
+                            <a href="{{ route('room_discount.index') }}" class="flex items-center @yield('room_discount')">
                                 <i class="fal fa-truck-loading  pr-3"></i>
                                 Room Discount
                             </a>
@@ -496,8 +482,7 @@
 
                         @if (checkFeaturePermission('menu-service-discount'))
                         <li>
-                            <a href="{{ route('menu_service_discount.index') }}"
-                                class="flex items-center @yield('menu&service_discount')">
+                            <a href="{{ route('menu_service_discount.index') }}" class="flex items-center @yield('menu&service_discount')">
                                 <i class="fal fa-truck-loading  pr-3"></i>
                                 Menu Service Discount
                             </a>
@@ -514,38 +499,32 @@
                         @endif
                         @if(checkFeaturePermission('crm'))
                         <li>
-                            <button class="flex items-center pl-9 my-2 text-sm" type="button" data-te-collapse-init
-                                data-te-ripple-init data-te-ripple-color="light" data-te-target="#collapseCRM"
-                                aria-expanded="false" aria-controls="collapseExample">
+                            <button class="flex items-center pl-9 my-2 text-sm" type="button" data-te-collapse-init data-te-ripple-init data-te-ripple-color="light" data-te-target="#collapseCRM" aria-expanded="false" aria-controls="collapseExample">
                                 <i class="fal fa-sack-dollar  pr-3"></i>
                                 CRM
                             </button>
                             <div class="!visible hidden text-center" id="collapseCRM" data-te-collapse-item>
                                 <ul>
                                     <li>
-                                        <a href="{{ route('crm.customers.index') }}"
-                                            class="flex items-center @yield('crm_customer_list')">
+                                        <a href="{{ route('crm.customers.index') }}" class="flex items-center @yield('crm_customer_list')">
                                             <i class="fal fa-tasks  pr-3"></i>
                                             Customers
                                         </a>
                                     </li>
                                     <li>
-                                        <a href="{{ route('crm.customers.birthdays') }}"
-                                            class="flex items-center @yield('customer_birthdays')">
+                                        <a href="{{ route('crm.customers.birthdays') }}" class="flex items-center @yield('customer_birthdays')">
                                             <i class="fal fa-tasks  pr-3"></i>
                                             Customer Birthdays
                                         </a>
                                     </li>
                                     <li>
-                                        <a href="{{ route('crm.level_discounts.index') }}"
-                                            class="flex items-center @yield('customer_level_discounts')">
+                                        <a href="{{ route('crm.level_discounts.index') }}" class="flex items-center @yield('customer_level_discounts')">
                                             <i class="fal fa-tasks  pr-3"></i>
                                             Customer Level Discounts
                                         </a>
                                     </li>
                                     <li>
-                                        <a href="{{ route('crm.birthday_discounts.index') }}"
-                                            class="flex items-center @yield('birthday_promotions')">
+                                        <a href="{{ route('crm.birthday_discounts.index') }}" class="flex items-center @yield('birthday_promotions')">
                                             <i class="fal fa-tasks  pr-3"></i>
                                             Birthday Promotions
                                         </a>
@@ -560,11 +539,7 @@
                 </div>
 
             </div>
-            <div id="app"
-                class="absolute bottom-0 left-0 w-[15rem] h-14 bg-[#111c43] border-t border-[#0002] flex items-center justify-start">
+            <div id="app" class="absolute bottom-0 left-0 w-[15rem] h-14 bg-[#111c43] border-t border-[#0002] flex items-center justify-start">
                 <logout-component />
             </div>
         </nav>
-
-
-
