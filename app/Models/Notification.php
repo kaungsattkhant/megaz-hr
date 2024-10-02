@@ -16,7 +16,7 @@ class Notification extends Model
     public function notificationUsers(){
         return $this->hasMany(\App\Models\NotificationUser::class);
     }
-    
+
     public  function toUserMultipleDevice($tokens=null,$add_data){
         $click_action='http://127.0.0.1:8080';
         $icon=null;
@@ -28,10 +28,10 @@ class Notification extends Model
                             ->setBadge(1)
                             ->setIcon($icon)
                             ->setClickAction($click_action);
-                            
+
         $dataBuilder = new PayloadDataBuilder();
         $dataBuilder->addData($add_data);
-    
+
         $option = $optionBuilder->build();
         $notification = $notificationBuilder->build();
         $data = $dataBuilder->build();

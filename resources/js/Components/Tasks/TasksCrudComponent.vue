@@ -359,6 +359,7 @@ export default {
             let url = `/api/tasks?page=${pageNumber}`;
 
             let response = await getApiData({ url: url, token: this.getToken() });
+
             if (response.data) {
                 this.tasksList = response.data.data;
                 this.lastPage = response.data.last_page;

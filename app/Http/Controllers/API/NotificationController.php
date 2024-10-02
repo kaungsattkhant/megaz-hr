@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Repositories\Notification\NotificationInterface;
 use Illuminate\Http\Request;
 use App\Events\SendNotification as EventsSendNotification;
+use App\Models\NotificationUser;
 
 class NotificationController extends Controller
 {
@@ -35,6 +36,12 @@ class NotificationController extends Controller
         else{
             ResponseMessage('Not ok', 400);
         }
+    }
+
+    public function notificationUsersData()
+    {
+        $notificationUser = NotificationUser::where('staff_id',UserData()->id)->get();
+        ResponseData($notificationUser);
     }
 
     public function markReadNotification(Request $request, $notificationId)

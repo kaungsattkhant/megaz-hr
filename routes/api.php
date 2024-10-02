@@ -257,8 +257,11 @@ Route::middleware('auth:api')->group(function () {
 
     Route::resource('suppliers', SupplierController::class)->only(['index', 'store', 'show', 'destroy']);
     Route::resource('notifications',NotificationController::class)->only(['index']);
+    Route::get('notification_by_user',[NotificationController::class,'notificationUsersData']);
+
     Route::post('notifications/set_seen', [NotificationController::class, 'setSeenNotifications']);
     Route::post('notifications/{notificationId}/mark_read', [NotificationController::class, 'markReadNotification']);
+
 
     #po itemleft
     Route::resource('purchase_order_item_lefts', PurchaseOrderItemLeftController::class)->only(['index', 'show',]);

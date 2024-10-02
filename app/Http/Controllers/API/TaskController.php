@@ -49,6 +49,7 @@ class TaskController extends Controller
         $data['completed_at'] = CurrentTime();
         $data['completed_by'] = $request->user()->id;
         $data['status'] = $request->status;
+
         $task = $this->taskRepo->updateTaskStatus($data, $taskId);
         if(!$task){
             ResponseMessage('No task found with the given id', 404);
