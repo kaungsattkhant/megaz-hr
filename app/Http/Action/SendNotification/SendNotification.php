@@ -5,6 +5,7 @@ namespace App\Http\Action\SendNotification;
 use App\Models\Notification;
 use App\Models\StaffFcmToken;
 use App\Events\SendNotification as EventsSendNotification;
+use App\Models\Staff;
 
 trait SendNotification
 {
@@ -51,5 +52,44 @@ trait SendNotification
             $query->where('name',$department_name);
         })
         ->get();
+    }
+
+    public function sendNoti($model,$notiDatas,$data){
+        $morphMapName=RelationMorphName($model);
+        $notiDatas = collect($notiDatas);
+
+        $notification = Notification::firstOrCreate(
+            [
+                'notificationable_id' => $model->id,
+                'notificationable_type' => 'complaint',
+            ],
+            [
+                'title' => $data['title'],
+                'preview' => $data['body'],
+                'date_time' => now(),
+                'created_by' => UserData()->id,
+            ]
+        );
+
+        foreach($notiDatas as $notidata){
+            $notification->notificationUsers()->create([
+                'staff_id'=>$notidata['id'],
+                'title' => $notidata['title'],
+                'preview' => $notidata['preview']
+            ]);
+        }
+        // if (count($tokens) > 0) {
+            // $data['notification_id']=$notification->id;
+            // $data['notificationable_type']=$notification->notificationable_type;
+            // $data['notificationable_id']=$notification->notificationable_id;
+            // (new Notification())->toUserMultipleDevice($tokens,$data);
+        // }]
+        $userIds = $notiDatas->pluck('id');
+        $users = Staff::whereIn('id',$userIds)->get();
+
+        if ($notiDatas->isNotEmpty()) {
+            $role_id=$users->pluck('roles.*.id')->flatten()[0];
+            broadcast(new EventsSendNotification($notification,$role_id));
+        }
     }
 }
