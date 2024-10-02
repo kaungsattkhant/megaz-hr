@@ -40,7 +40,7 @@ class NotificationController extends Controller
 
     public function notificationUsersData()
     {
-        $notificationUser = NotificationUser::where('staff_id',UserData()->id)->get();
+        $notificationUser = NotificationUser::where('staff_id',UserData()->id)->with('notification')->get();
         ResponseData($notificationUser);
     }
 
