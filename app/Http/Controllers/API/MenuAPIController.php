@@ -99,4 +99,9 @@ class MenuAPIController extends Controller
     {
         $this->menuRepo->menuReport($request);
     }
+
+    public function costingMenu(Request $request)
+    {
+        $this->menuRepo->costingMenu($request);
+    }
 }
