@@ -235,6 +235,7 @@ class ComplaintRepository implements ComplaintRepositoryInterface
                         'id' => $complaint->postedBy->id,
                         'title' => UserData()->name . ' ' . $data['status'].' ' . $complaint->postedBy->name. "'s complaints",
                         'preview' => 'You need to check',
+                        'type' => 'my_complaint'
                     ];
                 })->toArray();
 
