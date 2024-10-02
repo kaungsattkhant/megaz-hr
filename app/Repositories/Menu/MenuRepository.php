@@ -6,6 +6,8 @@ use Illuminate\Http\Request;
 
 use App\Models\Menu;
 use App\Models\MenuPrice;
+use App\Models\OrderItem;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 
@@ -208,6 +210,38 @@ class MenuRepository implements MenuRepositoryInterface
         $menus = Menu::with('areas')->find($id);
         ResponseData($menus);
     }
+
+    public function menuReport(Request $request)
+    {
+        $fromMonth = $request->input('from_month', Carbon::now()->startOfMonth()->month);
+        $toMonth = $request->input('to_month', Carbon::now()->endOfMonth()->month);
+
+        $year = Carbon::now()->year;
+        $order = OrderItem::whereBetween(\DB::raw('MONTH(created_at)'), [$fromMonth, $toMonth])->get();
+
+        $orderSummary = $order->groupBy('menu_id')->map(function ($items, $key) use ($fromMonth, $toMonth, $year) {
+            $summary = [
+                'menu_id' => $key,
+                'total_quantity' => $items->sum('quantity'),
+            ];
+
+            for ($month = $fromMonth; $month <= $toMonth; $month++) {
+                $monthName = Carbon::createFromDate($year, $month, 1)->format('F');
+
+                $monthlyQuantity = $items->filter(function ($item) use ($month) {
+                    return Carbon::parse($item->created_at)->month == $month;
+                })->sum('quantity');
+
+                $summary[$monthName] = $monthlyQuantity;
+            }
+
+            return $summary;
+        })->values();
+
+        ResponseData($orderSummary);
+    }
+
+
 
 
     // user app

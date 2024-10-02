@@ -37,12 +37,27 @@ class NotificationController extends Controller
             ResponseMessage('Not ok', 400);
         }
     }
-
     public function notificationUsersData()
     {
-        $notificationUser = NotificationUser::where('staff_id',UserData()->id)->with('notification')->get();
+        $notificationUser = NotificationUser::where('staff_id', UserData()->id)
+            ->with('notification')
+            ->get();
+
+        $notificationUser = $notificationUser->map(function ($notificationUser) {
+            if ($notificationUser->notification->notificationable_type == 'complaint') {
+                if ($notificationUser->preview == "You are responsible, Please check") {
+                    $notificationUser->complaint_type = 'responsible';
+                } else {
+                    $notificationUser->complaint_type = 'cc';
+                }
+            }
+
+            return $notificationUser;
+        });
+
         ResponseData($notificationUser);
     }
+
 
     public function markReadNotification(Request $request, $notificationId)
     {
