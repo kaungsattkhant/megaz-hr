@@ -82,18 +82,24 @@ class ComplaintRepository implements ComplaintRepositoryInterface
                         $msg = 'You are responsible. Please Check';
                         broadcast(new ComplaintNotificationRequest($complaint, $msg, $responsible));
                     }
+                    $staffs = Staff::whereIn('id', $complaintResponsibles)->get();
+                    $notificationsArray = $staffs->map(function($staff) {
+                        return [
+                            'id' => $staff->id,
+                            'title' => UserData()->name . ' added a new complaint', // Assuming UserData()->name gives the current user's name
+                            'preview' => 'You are responsible, Please check',
+                        ];
+                    })->toArray();
 
-                    // $staffs = Staff::whereIn('id', $complaintResponsibles)->get();
+                    $data = [
+                        'date' => $complaint->created_at,
+                        'title' => 'Complaints',
+                        'body' => 'You need To Check',
+                    ];
 
-                    // $data = [
-                    //     'date' => $complaint->created_at,
-                    //     'title' => 'You have received a new PO to confirm',
-                    //     'body' => 'You need To Check',
-                    // ];
-
-                    // if($staffs->isNotEmpty()){
-                    //     $this->send($complaint, $staffs, $data);
-                    // }
+                    if($staffs->isNotEmpty()){
+                        $this->sendNoti($complaint, $notificationsArray, $data);
+                    }
                 }
 
                 if (!empty($complaintCarbonCopies)) {
@@ -103,10 +109,25 @@ class ComplaintRepository implements ComplaintRepositoryInterface
                             'complaint_id' => $complaint->id
                         ]);
 
-
-
                     $msg = 'You need to check.';
                     broadcast(new ComplaintNotificationRequest($complaint, $msg, $carbonCopy));
+                    }
+                    $staffs = Staff::whereIn('id', $complaintCarbonCopies)->get();
+                    $notificationsCarbonCopy = $staffs->map(function($staff) {
+                        return [
+                            'id' => $staff->id,
+                            'title' => UserData()->name . ' added a new complaint', // Assuming UserData()->name gives the current user's name
+                            'preview' => 'You need to check',
+                        ];
+                    })->toArray();
+
+                    $data = [
+                        'date' => $complaint->created_at,
+                        'title' => 'Complaints',
+                        'body' => 'You need To Check',
+                    ];
+                    if($staffs->isNotEmpty()){
+                        $this->sendNoti($complaint, $notificationsCarbonCopy, $data);
                     }
                 }
 
@@ -146,14 +167,8 @@ class ComplaintRepository implements ComplaintRepositoryInterface
 
             $oldComplaint = $complaint->status;
 
-            $data['posted_by'] = UserData()->id;
-            if($oldComplaint != $data['status'])
-            {
-                $msg = `You need to check`;
-                broadcast(new ComplaintNotificationRequest($complaint, $msg, UserData()->id));
-            }
-            $complaint->update($data);
 
+            $complaint->update($data);
             $newResponsibles = json_decode($data['complaintResponsibles'], true);
             if (!empty($newResponsibles)) {
                 $currentResponsibles = $complaint->complaintResponsibles()->pluck('staff_id')->toArray();
@@ -204,6 +219,33 @@ class ComplaintRepository implements ComplaintRepositoryInterface
                         'image_url' => $imageUrl,
                     ]);
                 }
+            }
+
+            $data['posted_by'] = UserData()->id;
+            if($oldComplaint != $data['status'])
+            {
+                $msg = `You need to check`;
+                broadcast(new ComplaintNotificationRequest($complaint, $msg, UserData()->id));
+
+                $staffs = Staff::where('id', UserData()->id)->get();
+                $notificationUser = $staffs->map(function($staff) use ($data,$complaint) {
+                    return [
+                        'id' => $complaint->postedBy->id,
+                        'title' => UserData()->name . ' ' . $data['status'].' ' . $complaint->postedBy->name. "'s complaints",
+                        'preview' => 'You need to check',
+                    ];
+                })->toArray();
+
+                $data = [
+                    'date' => $complaint->created_at,
+                    'title' => 'Complaints',
+                    'body' => 'You need To Check',
+                ];
+
+                if($staffs->isNotEmpty()){
+                    $this->sendNoti($complaint, $notificationUser, $data);
+                }
+
             }
 
             DB::commit();
