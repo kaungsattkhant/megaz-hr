@@ -18,6 +18,7 @@ return new class extends Migration
             $table->dateTime('read_at')->nullable();
             $table->string('title')->nullable();
             $table->string('preview')->nullable();
+            $table->string('type')->nullable();
             $table->unsignedInteger('staff_id');
             $table->unsignedInteger('notification_id');
             $table->timestamps();

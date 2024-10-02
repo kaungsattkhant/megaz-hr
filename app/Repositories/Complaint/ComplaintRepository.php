@@ -88,6 +88,7 @@ class ComplaintRepository implements ComplaintRepositoryInterface
                             'id' => $staff->id,
                             'title' => UserData()->name . ' added a new complaint', // Assuming UserData()->name gives the current user's name
                             'preview' => 'You are responsible, Please check',
+                            'type' => 'complaint_responsible'
                         ];
                     })->toArray();
 
@@ -118,6 +119,7 @@ class ComplaintRepository implements ComplaintRepositoryInterface
                             'id' => $staff->id,
                             'title' => UserData()->name . ' added a new complaint', // Assuming UserData()->name gives the current user's name
                             'preview' => 'You need to check',
+                            'type' => 'complaint_cc'
                         ];
                     })->toArray();
 

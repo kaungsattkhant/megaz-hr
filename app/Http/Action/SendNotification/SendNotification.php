@@ -75,7 +75,8 @@ trait SendNotification
             $notification->notificationUsers()->create([
                 'staff_id'=>$notidata['id'],
                 'title' => $notidata['title'],
-                'preview' => $notidata['preview']
+                'preview' => $notidata['preview'],
+                'type' => $notidata['type']
             ]);
         }
         // if (count($tokens) > 0) {

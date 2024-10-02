@@ -94,4 +94,9 @@ class MenuAPIController extends Controller
     {
         $areas = $this->menuRepo->menuAreaList($id);
     }
+
+    public function menuReport(Request $request)
+    {
+        $this->menuRepo->menuReport($request);
+    }
 }
