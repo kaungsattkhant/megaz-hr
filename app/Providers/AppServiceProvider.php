@@ -41,7 +41,8 @@ class AppServiceProvider extends ServiceProvider
             'invoice'=>'App\Models\Invoice',
             'po_grn'=>'App\Models\PoGrn',
             'asset'=>'App\Models\Asset',
-            'skill'=>'App\Models\Skill'
+            'skill'=>'App\Models\Skill',
+            'complaint' => 'App\Models\Complaint'
         ]);
     }
 }

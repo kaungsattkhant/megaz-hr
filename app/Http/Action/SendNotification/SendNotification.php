@@ -61,7 +61,7 @@ trait SendNotification
         $notification = Notification::firstOrCreate(
             [
                 'notificationable_id' => $model->id,
-                'notificationable_type' => 'complaint',
+                'notificationable_type' => $morphMapName,
             ],
             [
                 'title' => $data['title'],
