@@ -32,7 +32,7 @@ return [
     // 'package' => 'packages.index',
     // 'menu-service-discount' => 'menu_service_discount.index',
     // 'account-payables' => 'AP.index',
-    // 'inventory-stocks' => 'inventory_stocks.index',  
+    // 'inventory-stocks' => 'inventory_stocks.index',
 
     'staff' => 'staff',
     'role' => 'roles',
@@ -66,4 +66,14 @@ return [
     'account-payables' => 'AP.index',
     'inventory-stocks' => 'inventory_stocks.index',
     'cash-flow-statement' => 'cash_flow_statement.index',
+    'sale-target' => 'sale_target_position.index',
+    'duty' => 'duty.index',
+    'asset-depreciation-balance' => 'asset_depreciation_balance.index',
+    'journal' => 'journals.index',
+    'staff_balance' => 'advanced.index',
+    'prepaid' => 'prepaid.index',
+    'ar' => 'AR.index',
+    'skill' => 'skill.index',
+    'cooking-place' => 'cookingPlace.index',
+    'custom-task' => 'tasks.customtask'
 ];

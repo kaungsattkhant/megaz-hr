@@ -47,7 +47,16 @@ class FeatureSeeder extends Seeder
             'account payables',
             'inventory stocks',
             'crm',
-            'sale target position',
+            'sale target',
+            'duty',
+            'asset depreciation balance',
+            'journal',
+            'staff balance',
+            'prepaid',
+            'ar',
+            'skill',
+            'cooking place',
+            'custom task'
         ];
         foreach ($features as $feature) {
             Feature::create([

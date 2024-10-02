@@ -2,6 +2,8 @@
 
 namespace App\Repositories\Task;
 
+use App\Events\TaskDoneNotificationRequest;
+use App\Models\Role;
 use App\Models\Staff;
 use App\Models\Task;
 use App\Models\TaskDetail;
@@ -53,6 +55,15 @@ class TaskRepository implements TaskRepositoryInterface
     {
         $taskDetail = TaskDetail::find($id);
         if ($taskDetail) {
+            if($data['status']=='done')
+            {
+                $department = $taskDetail->task->role->department;
+                $supervisorRole = Role::where('department_id', $department->id)->where('name', 'Supervisor')->first();
+
+                $msg = 'Task done by '. UserData()->name;
+                broadcast(new TaskDoneNotificationRequest($taskDetail->task,$msg, $supervisorRole->id));
+            }
+
             $taskDetail->update($data);
             return $taskDetail;
         } else {
