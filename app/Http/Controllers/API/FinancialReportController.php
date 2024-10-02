@@ -34,4 +34,9 @@ class FinancialReportController extends Controller
         $data=$this->financialRepo->TrialBalance($request);
         ResponseData($data);
     }
+
+    public function getProfitAndLoss(Request $request){
+        $data=$this->financialRepo->getProfitAndLoss($request);
+        ResponseData($data);
+    }
 }

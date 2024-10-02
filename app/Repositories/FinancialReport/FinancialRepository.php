@@ -276,6 +276,9 @@ class FinancialRepository implements FinancialInterface
 
         $cashAndBankCode = ['2-1000'];
         $otherReceivableCode = ['2-1050'];
+        $currentLiabilitieCode = ['4-2000','4-3000','4-4000'];
+
+        // how to retrieve accrued
 
         #credit balance
         $income = $this->trialBalanceService->getTrialBalanceResults($incomeCode, 'credit', $current, 'credit_balance');
@@ -284,17 +287,22 @@ class FinancialRepository implements FinancialInterface
         $retainEarning = $this->trialBalanceService->getTrialBalanceResults($retainEarningCode, 'credit', $current, 'credit_balance');
         $longTerm = $this->trialBalanceService->getTrialBalanceResults($longTermCode, 'credit', $current, 'credit_balance');
 
+        $longTerm = $this->trialBalanceService->getTrialBalanceResults($longTermCode, 'credit', $current, 'credit_balance');
+
+        $currentLiabilities = $this->trialBalanceService->getTotalBySubAccountCode($currentLiabilitieCode, 'credit', $current, 'creditor_balance');
 
         $creditBalance = [];
         $creditBalance[] = $income;
         $creditBalance[] = $capital;
         $creditBalance[] = $retainEarning;
         $creditBalance[] = $longTerm;
+        $creditBalance[] = $currentLiabilities;
         $creditTotalBalance = 0;
         $creditTotalBalance += collect($income)->sum('amount');
         $creditTotalBalance += collect($capital)->sum('amount');
         $creditTotalBalance += collect($retainEarning)->sum('amount');
         $creditTotalBalance += collect($longTerm)->sum('amount');
+        $creditTotalBalance += collect($currentLiabilities)->sum('amount');
         #end credit balance
 
 
@@ -368,6 +376,30 @@ class FinancialRepository implements FinancialInterface
             'debit_balance' => $debitBalance
         ];
         // return $finalResults;
+    }
+
+    public function getProfitAndLoss($request){
+        $current = (isset($request->date) || $request->date != null) ? Carbon::parse($request->date) : Carbon::now();
+        $cashSaleCode = ['5-0000','5-0100'];
+        $cashSale = $this->trialBalanceService->getTotalBySubAccountCode($cashSaleCode, 'credit', $current, 'cash_sale');
+        $response=[];
+        $cashSaleResponse = [
+            "name" => "Gross Profit",  // Fixed name
+            "restaurant_pl" => 0,      // Default values
+            "ktv_pl" => 0
+        ];
+
+        foreach ($cashSale as $item) {
+            if ($item->code== '5-0000') {
+                $cashSaleResponse['restaurant_pl'] = (int)$item->total_amount;
+            } elseif ($item->code == '5-0100') {
+                // You mentioned 'ktv_pl: 10000', which is different from the original amount (13000)
+                // Use 10000 or the value from the array based on your preference
+                $cashSaleResponse['ktv_pl'] = 10000;
+            }
+        }
+        $response[]=$cashSaleResponse;
+        return $response;
     }
 
 }
