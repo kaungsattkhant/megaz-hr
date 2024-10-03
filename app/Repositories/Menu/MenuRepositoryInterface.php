@@ -24,6 +24,8 @@ interface MenuRepositoryInterface
 
     public function menuReport(Request $request);
 
+    public function costingMenu(Request $request);
+
     // user app
     public function listAllMenu(Request $request);
 

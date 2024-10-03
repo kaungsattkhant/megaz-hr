@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::create('menus', function (Blueprint $table) {
             $table->id();
+            $table->string('code')->unique();
             $table->foreignId('menu_category_id')->constrained()->onDelete('cascade');
             $table->string('name');
             $table->string('image_url');
