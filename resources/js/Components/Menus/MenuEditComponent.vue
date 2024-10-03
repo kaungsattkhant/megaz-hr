@@ -69,9 +69,15 @@
                     </template>
                 </multiselect>
             </div>
+            <div class="mb-4 col-span-3 rounded-md">
+                <label for="" class="block text-sm text-black mb-3">
+                    Code
+                </label>
+                <div class="">
+                    <input type='text' v-model='code' class="input-ui w-full !p-1 text-xs" placeholder="Code" />
+                </div>
 
-            <div class="col-span-9"></div>
-
+            </div>
             <div class="mb-0 col-span-3 rounded-md">
                 <label for="" class="label-form mb-3">
                     Category
@@ -328,6 +334,7 @@ export default {
             selectedAreas: [],
 
             departmentId: null,
+            code:null
 
         };
     },
@@ -373,6 +380,7 @@ export default {
             if(response.data){
                 this.menu = response.data;
                 this.name = this.menu.name;
+                this.code = this.menu.code;
                 this.price = this.menu.prices[this.menu.prices.length - 1].price;
                 this.isFeatured = (this.menu.is_feature == 1)? true: false;
                 setTimeout(()=>{
@@ -571,6 +579,7 @@ export default {
                 formData.append('price', this.price);
                 formData.append('items', menuItems);
                 formData.append('areas',JSON.stringify(areaIds));
+                formData.append('code',this.code);
                 if(this.selectedImage)
                 {
                     formData.append('image',this.selectedImage);
