@@ -21,7 +21,7 @@ return new class extends Migration
             $table->integer('price');
             $table->unsignedBigInteger('order_id');
             $table->string('status')->default('not yet');
-            $table->boolean('is_complete')->default(0);
+            $table->boolean('is_complete')->default(value: 0);
             $table->foreignId('menu_service_discount_id')->nullable()->foreignId()->constrained()->onDelete('cascade');
             $table->string('remark')->nullable();
             $table->timestamps();

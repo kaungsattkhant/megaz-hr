@@ -408,23 +408,52 @@ class FinancialRepository implements FinancialInterface
     public function getInventorySchedule($request)
     {
         $current = (isset($request->date) || $request->date != null) ? Carbon::parse($request->date) : Carbon::now();
+        // $orders = PurchaseOrderItem::
+        //     join('po_grns', 'purchase_order_items.id', '=', 'po_grns.purchase_order_item_id')
+        //     ->join('purchase_orders', 'purchase_order_items.purchase_order_id', 'purchase_orders.id')
+        //     ->join('items', 'purchase_order_items.item_id', 'items.id')
+        //     ->join('categories', 'items.category_id', 'categories.id')
+        //     ->join('item_types', 'items.item_type_id', 'item_types.id')
+        //     ->select(
+        //         'categories.name as category_name',
+        //         'item_types.name as item_type_name',
+        //         DB::raw('SUM(purchase_order_items.quantity * purchase_order_items.amount) as total_amount'),
+        //         DB::raw('SUM(po_grns.invoice_amount) as cash_purchase_amount'),
+        //         DB::raw('SUM(purchase_order_items.quantity * purchase_order_items.amount) - SUM(po_grns.invoice_amount) as credit_purchase_amount')
+        //     )
+        //     ->where('purchase_orders.is_bought', 1)
+        //     ->whereMonth('purchase_orders.purchased_date_time', $current)
+        //     ->groupBy('items.category_id', 'items.item_type_id')
+        //     ->get();
+
         $orders = PurchaseOrderItem::
-            join('po_grns', 'purchase_order_items.id', '=', 'po_grns.purchase_order_item_id')
-            ->join('purchase_orders', 'purchase_order_items.purchase_order_id', 'purchase_orders.id')
-            ->join('items', 'purchase_order_items.item_id', 'items.id')
-            ->join('categories', 'items.category_id', 'categories.id')
-            ->join('item_types', 'items.item_type_id', 'item_types.id')
-            ->select(
-                'categories.name as category_name',
-                'item_types.name as item_type_name',
-                DB::raw('SUM(purchase_order_items.quantity * purchase_order_items.amount) as total_amount'),
-                DB::raw('SUM(po_grns.invoice_amount) as cash_purchase_amount'),
-                DB::raw('SUM(purchase_order_items.quantity * purchase_order_items.amount) - SUM(po_grns.invoice_amount) as credit_purchase_amount')
-            )
-            ->where('purchase_orders.is_bought',1)
-            ->whereDate('purchase_orders.date',$current)
-            ->groupBy('items.category_id', 'items.item_type_id')
-            ->get();
+        join('po_grns', 'purchase_order_items.id', '=', 'po_grns.purchase_order_item_id')
+        ->join('purchase_orders', 'purchase_order_items.purchase_order_id', '=', 'purchase_orders.id')
+        ->join('items', 'purchase_order_items.item_id', '=', 'items.id')
+        ->join('categories', 'items.category_id', '=', 'categories.id')
+        ->join('item_types', 'items.item_type_id', '=', 'item_types.id')
+    
+        // Join with item_menu to get the relationship between menu and item
+        ->join('item_menu', 'item_menu.item_id', '=', 'purchase_order_items.item_id')
+    
+        // Join with order_items to get the completed orders
+        ->join('order_items', 'order_items.menu_id', '=', 'item_menu.menu_id')
+    
+        ->select(
+            'categories.name as category_name',
+            'item_types.name as item_type_name',
+            DB::raw('SUM(purchase_order_items.quantity * purchase_order_items.amount) as total_amount'),
+            DB::raw('SUM(po_grns.invoice_amount) as cash_purchase_amount'),
+            DB::raw('SUM(purchase_order_items.quantity * purchase_order_items.amount) - SUM(po_grns.invoice_amount) as credit_purchase_amount'),
+    
+            // Calculate total item consumption for items included in 'done' orders
+            DB::raw('SUM(order_items.quantity * item_menu.weight) as total_item_consumption')  // Calculating item usage based on the weight from item_menu
+        )
+        ->where('purchase_orders.is_bought', 1)
+        ->where('order_items.status', 'done')  // Only include items from orders where status is 'done'
+        ->whereMonth('purchase_orders.purchased_date_time', $current)
+        ->groupBy('items.category_id', 'items.item_type_id')
+        ->get();
         return $orders;
     }
 

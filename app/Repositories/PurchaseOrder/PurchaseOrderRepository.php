@@ -61,6 +61,7 @@ class PurchaseOrderRepository implements PurchaseOrderRepositoryInterface
 
             if (isset($request->is_grn) && ($request->is_grn || $request->is_grn == "1")) {
                 $data['is_bought'] = 1;
+                $data['purchased_date_time'] = now();
             }
 
             if (!$request->id) {
