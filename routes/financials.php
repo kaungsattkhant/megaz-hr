@@ -10,5 +10,6 @@ Route::middleware('auth:api')->group(function () {
         Route::get('balance_sheet', 'BalanceSheet');
         Route::get('trial_balance', 'TrialBalance');
         Route::get('profit_and_loss', 'getProfitAndLoss');
+        Route::get('inventory_schedule', 'getInventorySchedule');
     });
 });

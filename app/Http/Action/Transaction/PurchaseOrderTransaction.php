@@ -37,6 +37,7 @@ class PurchaseOrderTransaction
         ->where('purchase_order_items.purchase_order_id', $model->id)
         ->groupBy('suppliers.id', 'suppliers.name', 'categories.id', 'categories.name')
         ->get();
+        // dd($purchaseOrderItemGroupedByCategory);
         $data['date'] = now();
         $data['created_by'] = UserData()->id;
         $data['transactionable_id'] = $model->id;

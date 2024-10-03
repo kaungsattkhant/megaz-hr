@@ -142,7 +142,7 @@ class PurchaseOrderRepository implements PurchaseOrderRepositoryInterface
             }
             if ($request->is_grn && $po) {
                 $morphMapName = RelationMorphName($po);
-                // $po->po_grn_id=$po_grn->id
+                // $po->po_grn_id=$po_grn->ids
                 (new PurchaseOrderTransaction())->createTransaction($po, $morphMapName, $request->cash_account_id); #create transaction
             }
             if (!isset($request->id)) {
@@ -326,7 +326,8 @@ class PurchaseOrderRepository implements PurchaseOrderRepositoryInterface
             if (checkDepartmentAndRoles('HR', ['Staff'])) {
                 ResponseMessage("Permission isn't allowed", 422);
             }
-
+            $departmentName = UserData()->department->name;
+            $roles = UserData()->roles;
             if ($type == 'purchase_order') {
                 if (checkDepartmentAndRoles('HR', ['Manager'])) {
                     if ($model->manager_check_id != null) {

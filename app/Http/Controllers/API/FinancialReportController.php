@@ -39,4 +39,9 @@ class FinancialReportController extends Controller
         $data=$this->financialRepo->getProfitAndLoss($request);
         ResponseData($data);
     }
+
+    public function getInventorySchedule(Request $request){
+        $data=$this->financialRepo->getInventorySchedule($request);
+        ResponseData($data);
+    }
 }

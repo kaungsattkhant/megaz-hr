@@ -2,10 +2,12 @@
 
 namespace App\Repositories\FinancialReport;
 
-use App\Models\CashbookBalance;
 use Carbon\Carbon;
-use Illuminate\Support\Facades\DB;
+use App\Models\OrderItem;
+use App\Models\CashbookBalance;
+use App\Models\PurchaseOrderItem;
 use App\Services\CashFlowService;
+use Illuminate\Support\Facades\DB;
 use App\Services\TrialBalanceService;
 
 class FinancialRepository implements FinancialInterface
@@ -276,7 +278,7 @@ class FinancialRepository implements FinancialInterface
 
         $cashAndBankCode = ['2-1000'];
         $otherReceivableCode = ['2-1050'];
-        $currentLiabilitieCode = ['4-2000','4-3000','4-4000'];
+        $currentLiabilitieCode = ['4-2000', '4-3000', '4-4000'];
 
         // how to retrieve accrued
 
@@ -378,11 +380,12 @@ class FinancialRepository implements FinancialInterface
         // return $finalResults;
     }
 
-    public function getProfitAndLoss($request){
+    public function getProfitAndLoss($request)
+    {
         $current = (isset($request->date) || $request->date != null) ? Carbon::parse($request->date) : Carbon::now();
-        $cashSaleCode = ['5-0000','5-0100'];
+        $cashSaleCode = ['5-0000', '5-0100'];
         $cashSale = $this->trialBalanceService->getTotalBySubAccountCode($cashSaleCode, 'credit', $current, 'cash_sale');
-        $response=[];
+        $response = [];
         $cashSaleResponse = [
             "name" => "Gross Profit",  // Fixed name
             "restaurant_pl" => 0,      // Default values
@@ -390,16 +393,39 @@ class FinancialRepository implements FinancialInterface
         ];
 
         foreach ($cashSale as $item) {
-            if ($item->code== '5-0000') {
-                $cashSaleResponse['restaurant_pl'] = (int)$item->total_amount;
+            if ($item->code == '5-0000') {
+                $cashSaleResponse['restaurant_pl'] = (int) $item->total_amount;
             } elseif ($item->code == '5-0100') {
                 // You mentioned 'ktv_pl: 10000', which is different from the original amount (13000)
                 // Use 10000 or the value from the array based on your preference
                 $cashSaleResponse['ktv_pl'] = 10000;
             }
         }
-        $response[]=$cashSaleResponse;
+        $response[] = $cashSaleResponse;
         return $response;
+    }
+
+    public function getInventorySchedule($request)
+    {
+        $current = (isset($request->date) || $request->date != null) ? Carbon::parse($request->date) : Carbon::now();
+        $orders = PurchaseOrderItem::
+            join('po_grns', 'purchase_order_items.id', '=', 'po_grns.purchase_order_item_id')
+            ->join('purchase_orders', 'purchase_order_items.purchase_order_id', 'purchase_orders.id')
+            ->join('items', 'purchase_order_items.item_id', 'items.id')
+            ->join('categories', 'items.category_id', 'categories.id')
+            ->join('item_types', 'items.item_type_id', 'item_types.id')
+            ->select(
+                'categories.name as category_name',
+                'item_types.name as item_type_name',
+                DB::raw('SUM(purchase_order_items.quantity * purchase_order_items.amount) as total_amount'),
+                DB::raw('SUM(po_grns.invoice_amount) as cash_purchase_amount'),
+                DB::raw('SUM(purchase_order_items.quantity * purchase_order_items.amount) - SUM(po_grns.invoice_amount) as credit_purchase_amount')
+            )
+            ->where('purchase_orders.is_bought',1)
+            ->whereDate('purchase_orders.date',$current)
+            ->groupBy('items.category_id', 'items.item_type_id')
+            ->get();
+        return $orders;
     }
 
 }
