@@ -41,6 +41,7 @@ class NotificationController extends Controller
     {
         $notificationUser = NotificationUser::where('staff_id', UserData()->id)
             ->with('notification')
+            ->orderBy('created_at','desc')
             ->get();
         ResponseData($notificationUser);
     }
