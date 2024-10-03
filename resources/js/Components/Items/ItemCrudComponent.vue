@@ -260,6 +260,13 @@
                         </label>
                         <input type="text" placeholder="Item Name" v-model="name" class="input-ui">
                     </div>
+
+                    <div class="mb-4">
+                        <label for="" class="label-form mb-3">
+                            Code
+                        </label>
+                        <input type="text" placeholder="Code" v-model="code" class="input-ui">
+                    </div>
                     <div class="mb-4">
                         <label for="" class="label-form mb-3">
                             Price
@@ -383,6 +390,7 @@ export default {
 
             updatePriceItem: null,
             updatedPrice: null,
+            code:null,
 
 
             isFirstGroup: true,
@@ -456,6 +464,7 @@ export default {
             let formData = new FormData();
             formData.append('uom_id', this.selectedUOM.id);
             formData.append('name', this.name);
+            formData.append('code',this.code);
             formData.append('price', this.price);
             formData.append('category_id', this.selectedCategory.id);
             formData.append('base_uom_id',this.selectedBaseUom.id);

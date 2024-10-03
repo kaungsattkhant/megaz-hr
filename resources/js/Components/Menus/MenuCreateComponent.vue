@@ -67,7 +67,16 @@
                 </multiselect>
             </div>
 
-            <div class="col-span-9"></div>
+
+            <div class="mb-4 col-span-3 rounded-md">
+                <label for="" class="block text-sm text-black mb-3">
+                    Code
+                </label>
+                <div class="">
+                    <input type='text' v-model='code' class="input-ui w-full !p-1 text-xs" placeholder="Code" />
+                </div>
+
+            </div>
 
             <div class="mb-0 col-span-3 rounded-md">
                 <label for="" class="label-form mb-3">
@@ -396,6 +405,7 @@ export default {
             selectedAreas: [],
 
             departmentId: null,
+            code:null,
 
         };
     },
@@ -587,6 +597,7 @@ export default {
                 formData.append('items', menuItems);
                 formData.append('image',this.selectedImage);
                 formData.append('areas',JSON.stringify(areaIds));
+                formData.append('code',this.code);
 
                 let response = await postApiData({ url: `/api/menus`, form_data: formData, token: this.getToken() });
 
