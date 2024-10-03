@@ -513,6 +513,10 @@ Route::post('/menus/{id}/is_active',[MenuAPIController::class,'menuOnOff']);
 Route::get('/menus/{id}',[MenuAPIController::class,'detailMenu']);
 Route::post('/menus/{id}',[MenuAPIController::class,'menuEdit']);
 Route::post('/menu/{id}/is_feature',[MenuAPIController::class,'featureToggleMenu']);
+Route::get('/menu_report',[MenuAPIController::class,'menuReport']);
+Route::get('/menu_costing',[MenuAPIController::class,'costingMenu']);
+
+
 
 
 Route::get('/areas/{id}/entities', [EntityAPIController::class, 'getEntityWithInvoice']);
