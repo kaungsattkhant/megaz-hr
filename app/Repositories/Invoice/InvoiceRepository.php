@@ -596,7 +596,6 @@ class InvoiceRepository implements InvoiceRepositoryInterface
 
             $role = Role::where('name', 'Staff')->where('department_id', $catering_department->id)->first();
             broadcast(new RoomDoneNotificationRequest($entity, $msg, $role->id));
-            dd('stop');
             DB::commit();
             return $invoice;
         } catch (\Exception $e) {
@@ -655,7 +654,6 @@ class InvoiceRepository implements InvoiceRepositoryInterface
             'is_confirmed' => 1,
         ]);
 
-
         $debit_total = 0;
 
         if ($data['food_charge'] != 0) {
@@ -674,7 +672,6 @@ class InvoiceRepository implements InvoiceRepositoryInterface
 
             $debit_total += $data['food_charge'];
         }
-        dd('in there');
 
         if ($data['beverage_charge'] != 0) {
 
@@ -693,7 +690,6 @@ class InvoiceRepository implements InvoiceRepositoryInterface
 
             $debit_total += $data['beverage_charge'];
         }
-        dd('in there');
 
 
         if ($data['total_session_price'] != 0) {
@@ -711,7 +707,6 @@ class InvoiceRepository implements InvoiceRepositoryInterface
 
             $debit_total += $data['total_session_price'];
         }
-        dd('in there');
 
 
         if ($data['service_charge'] != 0) {
@@ -731,7 +726,6 @@ class InvoiceRepository implements InvoiceRepositoryInterface
             $debit_total += $data['service_charge'];
         }
 
-        dd('in there');
 
 
         if ($data['tax'] != 0) {
@@ -750,7 +744,6 @@ class InvoiceRepository implements InvoiceRepositoryInterface
             $debit_total += $data['tax'];
         }
 
-        dd('in there');
 
 
         if ($data['discount_total'] != 0) {
@@ -777,7 +770,6 @@ class InvoiceRepository implements InvoiceRepositoryInterface
             }
         }
 
-        dd('in there');
 
         $debitLedger = (new StoreTransactionLedger())->storeLedger([
             'value' => $debit_total,
