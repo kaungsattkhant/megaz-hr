@@ -224,7 +224,7 @@ class OrderRepository implements OrderRepositoryInterface
             $startTime = $date . ' 00:00:00';
             $endTime = $date . ' 23:59:59';
 
-            $order_items = OrderItem::where('status','pos_confirmed')->with('menu', 'order.invoice.latestSession.entity')
+            $order_items = OrderItem::where('status','pos_confirmed')->with('menu', 'order.invoice.latestSession.entity','area')
                 ->whereBetween('date', [$startTime, $endTime])
                 ->paginate(config('common.list_count'));
 
@@ -233,9 +233,9 @@ class OrderRepository implements OrderRepositoryInterface
             if ($request->date) {
                 $startTime = $request->date . ' 00:00:00';
                 $endTime = $request->date . ' 23:59:59';
-                $orderItems = OrderItem::where('status','pos_confirmed')->with('menu', 'order.invoice.latestSession.entity')->whereBetween('date', [$startTime, $endTime])->get();
+                $orderItems = OrderItem::where('status','pos_confirmed')->with('menu', 'order.invoice.latestSession.entity','area')->whereBetween('date', [$startTime, $endTime])->get();
             } else {
-                $orderItems = OrderItem::where('status','pos_confirmed')->with('menu', 'order.invoice.latestSession.entity')->get();
+                $orderItems = OrderItem::where('status','pos_confirmed')->with('menu', 'order.invoice.latestSession.entity','area')->get();
             }
 
             return $orderItems;
