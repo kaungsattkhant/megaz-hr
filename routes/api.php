@@ -532,6 +532,8 @@ Route::post('/room_done',[InvoiceAPIController::class,'doneRoom']);
 Route::post('/entities/confirm',[InvoiceAPIController::class,'roomConfirm']);
 
 Route::get('/order_items',[OrderAPIController::class,'getOrderItemList']);
+Route::get('/pos_order_items',[OrderAPIController::class,'getOrderItemForPOS']);
+Route::post('/pos_order_items/{order_item_id}/status',[OrderAPIController::class,'orderItemAreaConfirm']);
 
 Route::get('/invoices', [InvoiceAPIController::class, 'getInvoiceData']);
 

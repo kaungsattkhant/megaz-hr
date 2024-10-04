@@ -561,7 +561,6 @@ class InvoiceRepository implements InvoiceRepositoryInterface
 
             $soldStaff = Staff::find($invoice->created_by);
             $firstRole = $soldStaff->roles->first();
-
             TargetPositionResult::create([
                 'role_id' => $firstRole->id,
                 'date_time'=>CurrentTime(),
@@ -569,28 +568,43 @@ class InvoiceRepository implements InvoiceRepositoryInterface
                 'amount' => $data['total']
             ]);
             $orderItems = $order->orderItems;
-            $groupedOrderItems = $orderItems->groupBy('menu_id')->map(function ($items) {
-                return $items->sum('quantity');
-            });
-            foreach($groupedOrderItems as $menu_id => $totalQuantity) {
-                TargetMenuResult::create([
+            // $groupedOrderItems = $orderItems->groupBy('menu_id')->map(function ($items) {
+            //     return $items->sum('quantity');
+            // });
+            // dd($groupedOrderItems);
+            $groupedOrderItems = $orderItems
+            ->groupBy(function ($item) {
+                return $item['menu_id'] . '-' . $item['area_id'];
+            })
+            ->map(function ($items) {
+                return [
+                    'menu_id' => $items->first()->menu_id, // Access as an object
+                    'area_id' => $items->first()->area_id, // Access as an object
+                    'quantity' => $items->sum('quantity'),  // Sum the quantities
+                ];
+            })
+            ->values();
+
+            foreach($groupedOrderItems as $orderItem) {
+                    TargetMenuResult::create([
                     'date_time' => CurrentTime(),
                     'invoice_id' => $invoice->id,
-                    'area_id' => $entity->area_id,
-                    'menu_id' => $menu_id,
-                    'quantity' => $totalQuantity,
+                    'area_id' => $orderItem['area_id'],
+                    'menu_id' => $orderItem['menu_id'],
+                    'quantity' =>$orderItem['quantity'],
                 ]);
             }
-            $this->ledgerAndTransactionForInvoice([
-                'payment_type' => 'cash',
-                'invoice_id' => $invoice->id,
-                'food_charge' => $foodCharge,
-                'beverage_charge' => $beverageCharge,
-                'total_session_price' => $total_session_price,
-                'service_charge' => $service_charge,
-                'tax' => $tax,
-                'discount_total' => $data['discount_total'],
-            ]);
+
+            // $this->ledgerAndTransactionForInvoice([
+            //     'payment_type' => 'cash',
+            //     'invoice_id' => $invoice->id,
+            //     'food_charge' => $foodCharge,
+            //     'beverage_charge' => $beverageCharge,
+            //     'total_session_price' => $total_session_price,
+            //     'service_charge' => $service_charge,
+            //     'tax' => $tax,
+            //     'discount_total' => $data['discount_total'],
+            // ]);
             $catering_department = Department::where('name', 'Catering')->first();
             $msg = "The {$entity->name} is now closed. Thank you.";
 

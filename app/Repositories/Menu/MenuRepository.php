@@ -207,7 +207,6 @@ class MenuRepository implements MenuRepositoryInterface
         ResponseData($menus);
     }
 
-
     public function menuReport(Request $request)
     {
         // Get from_month and to_month as YYYY-MM
@@ -218,17 +217,17 @@ class MenuRepository implements MenuRepositoryInterface
         [$fromYear, $fromMonth] = explode('-', $fromMonthInput);
         [$toYear, $toMonth] = explode('-', $toMonthInput);
 
-        // Capture the search term and filter for menu name and category ID
-        $searchTerm = $request->input('search', null); // Search for menu_name
-        $menuCategoryId = $request->input('menu_category_id', null); // Filter by menu_category_id
+        // Capture search term and filter parameters
+        $searchTerm = $request->input('search', null);
+        $menuCategoryId = $request->input('menu_category_id', null);
 
-        // Build the query
+        // Build the main query
         $orderSummaryQuery = DB::table('order_items')
             ->join('menus', 'order_items.menu_id', '=', 'menus.id')
             ->join('menu_categories', 'menus.menu_category_id', '=', 'menu_categories.id')
             ->select(
                 'order_items.menu_id',
-                'menus.code as menu_code', // Include menu code in the select
+                'menus.code as menu_code',
                 'menus.name as menu_name',
                 'menu_categories.name as menu_category',
                 DB::raw('SUM(order_items.quantity) as total_quantity'),
@@ -236,129 +235,125 @@ class MenuRepository implements MenuRepositoryInterface
                 DB::raw('YEAR(order_items.created_at) as year')
             );
 
-
-        // Apply search filter if searchTerm exists (on menu_name)
+        // Apply filters
         if (!empty($searchTerm)) {
             $orderSummaryQuery->where('menus.name', 'LIKE', "%{$searchTerm}%");
         }
-
-        // Apply category filter if menu_category_id exists
         if (!empty($menuCategoryId)) {
             $orderSummaryQuery->where('menus.menu_category_id', '=', $menuCategoryId);
         }
 
-        // Apply month and year filters
+        // Apply date range filter
         $orderSummaryQuery->whereBetween('order_items.created_at', [
             Carbon::createFromFormat('Y-m', $fromYear . '-' . $fromMonth)->startOfMonth(),
             Carbon::createFromFormat('Y-m', $toYear . '-' . $toMonth)->endOfMonth()
         ]);
 
-        // Group the results by menu_id, menu_code, menu_name, menu_category, month, and year
-        $orderSummary = $orderSummaryQuery
-            ->groupBy('order_items.menu_id', 'menus.code', 'menus.name', 'menu_categories.name', 'month', 'year')
-            ->get();
+        // Group by columns
+        $orderSummaryQuery->groupBy('order_items.menu_id', 'menus.code', 'menus.name', 'menu_categories.name', 'month', 'year');
 
-        ResponseData($orderSummary);
+        // Paginate the main query
+        $orderSummary = $orderSummaryQuery->paginate(config('common.list_count'));
 
-        // Post-process the query result to structure the data by menu_id
-        $summaryData = collect($orderSummary)->groupBy('menu_id')->map(function ($items, $key) use ($fromMonthInput, $toMonthInput) {
+        // Post-process each item within the paginated data
+        $summaryData = $orderSummary->getCollection()->groupBy('menu_id')->map(function ($items) use ($fromMonthInput, $toMonthInput) {
             $firstItem = $items->first();
 
-            // Start with basic details
+            // Structure the summary data
             $summary = [
                 'menu_id' => $firstItem->menu_id,
-                'menu_code' => $firstItem->menu_code, // Include menu code in the summary
+                'menu_code' => $firstItem->menu_code,
                 'menu_name' => $firstItem->menu_name,
                 'menu_category' => $firstItem->menu_category,
-                'total_quantity' => $items->sum('total_quantity'), // Sum across all months
+                'total_quantity' => $items->sum('total_quantity'),
             ];
 
-            // Generate the month range
+            // Add monthly quantities
             $start = Carbon::createFromFormat('Y-m', $fromMonthInput);
             $end = Carbon::createFromFormat('Y-m', $toMonthInput);
 
-            // Loop through the months and add monthly quantities
             while ($start->lte($end)) {
                 $monthName = $start->format('F');
                 $monthlyQuantity = $items->where('month', $start->month)->sum('total_quantity');
-
-                // Add the monthly quantity to the summary
                 $summary[$monthName] = $monthlyQuantity;
-
-                // Move to the next month
                 $start->addMonth();
             }
 
             return $summary;
-        })->values();
+        });
 
-        // Return the response data
-        ResponseData($summaryData);
+        // Replace the paginated collection with the formatted summary data
+        $orderSummary->setCollection($summaryData->values());
+
+         ResponseData($orderSummary);
     }
+
 
 
     public function costingMenu(Request $request)
     {
-        // Capture the date parameter for filtering
+        // Capture the date parameter, menu category, and search term for filtering
         $date = $request->input('date', Carbon::now()->format('Y-m-d'));
         $menuCategoryId = $request->input('menu_category_id', null);
+        $searchTerm = $request->input('search', null);
 
         // Build the query
         $orderSummaryQuery = DB::table('order_items')
             ->join('menus', 'order_items.menu_id', '=', 'menus.id')
             ->join('menu_categories', 'menus.menu_category_id', '=', 'menu_categories.id')
-            ->join('menu_prices', 'menus.id', '=', 'menu_prices.menu_id') // Join to get menu prices
-            ->join('item_menu', 'menus.id', '=', 'item_menu.menu_id') // Join to get item prices
-            ->join('items', 'item_menu.item_id', '=', 'items.id') // Join to get items
+            ->join('menu_prices', 'menus.id', '=', 'menu_prices.menu_id')
+            ->join('item_menu', 'menus.id', '=', 'item_menu.menu_id')
+            ->join('items', 'item_menu.item_id', '=', 'items.id')
             ->select(
                 'order_items.menu_id',
-                'menus.code as menu_code', // Include menu code in the select
+                'menus.code as menu_code',
                 'menus.name as menu_name',
                 'menu_categories.name as menu_category',
                 DB::raw('SUM(order_items.quantity) as total_quantity'),
-                DB::raw('SUM(order_items.quantity * menu_prices.price) as total_price'), // Total price calculation for menu
-                DB::raw('SUM(item_menu.price * order_items.quantity) as items_total_price') // Total price calculation for items
+                DB::raw('SUM(order_items.quantity * menu_prices.price) as total_price'),
+                DB::raw('SUM(item_menu.price * order_items.quantity) as items_total_price')
             );
 
-        // Apply category filter if menu_category_id exists
+        // Apply filters
         if (!empty($menuCategoryId)) {
             $orderSummaryQuery->where('menus.menu_category_id', '=', $menuCategoryId);
         }
-
-        // Apply date filter if provided
         if ($date) {
-            $orderSummaryQuery->whereDate('order_items.created_at', '=', $date); // Filter by specific date
+            $orderSummaryQuery->whereDate('order_items.created_at', '=', $date);
+        }
+        if (!empty($searchTerm)) {
+            $orderSummaryQuery->where('menus.name', 'LIKE', '%' . $searchTerm . '%');
         }
 
-        // Group the results by menu_id, menu_name, and menu_category
+        // Group and paginate
         $orderSummary = $orderSummaryQuery
-            ->groupBy('order_items.menu_id', 'menus.code', 'menus.name', 'menu_categories.name') // Group by menu code
-            ->get();
+            ->groupBy('order_items.menu_id', 'menus.code', 'menus.name', 'menu_categories.name')
+            ->paginate(config('common.list_count'));
 
-        // Check if any results are returned
-        if ($orderSummary->isEmpty()) {
-            Response('No data found', 404);
-        }
-
-        // Format the response
-        $summaryData = collect($orderSummary)->map(function ($item) {
-
+        // Map the items within the paginated data
+        $summaryData = $orderSummary->getCollection()->map(function ($item) {
             return [
-                'menu_id' => $item->menu_id,
-                'menu_code' => $item->menu_code, // Add menu code to response
-                'menu_name' => $item->menu_name,
-                'menu_category' => $item->menu_category,
-                'total_quantity' => $item->total_quantity,
-                'total_sale_price' => $item->total_price, // Total price of the menu based on price and quantity
-                'total_cost_price' => $item->items_total_price, // Total price of items associated with the menu
-                'total_gp' => $item->total_price - $item->items_total_price, // Gross Profit
-                'total_gp_percentage' => ($item->total_price - $item->items_total_price) / $item->total_price * 100, // Gross Profit Percentage
-
+                'menu_id' => $item->menu_id ?? null,
+                'menu_code' => $item->menu_code ?? null,
+                'menu_name' => $item->menu_name ?? null,
+                'menu_category' => $item->menu_category ?? null,
+                'total_quantity' => $item->total_quantity ?? 0,
+                'total_sale_price' => $item->total_price ?? 0,
+                'total_cost_price' => $item->items_total_price ?? 0,
+                'total_gp' => ($item->total_price ?? 0) - ($item->items_total_price ?? 0),
+                'total_gp_percentage' => ($item->total_price && $item->total_price > 0)
+                    ? (($item->total_price - $item->items_total_price) / $item->total_price * 100)
+                    : 0,
             ];
         });
 
-        ResponseData($summaryData);
+        // Replace the paginated collection with the mapped data
+        $orderSummary->setCollection($summaryData);
+
+         ResponseData($orderSummary); // Now returns paginated data with metadata
     }
+
+
 
     // user app
 
