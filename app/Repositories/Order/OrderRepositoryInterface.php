@@ -13,4 +13,9 @@ interface OrderRepositoryInterface
     public function orderItemStatusChange(array $data);
 
     public function getOrderItemData(Request $request);
+
+    public function getOrderItemByPos();
+
+    public function orderItemAreaConfirm(int $id, Request $request);
+
 }
