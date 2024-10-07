@@ -11,15 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('items', function (Blueprint $table) {
-            $table->bigIncrements('id');
-            $table->string('name',45);
-            $table->string('code');
-            $table->foreignId('category_id')->constrained();
-            $table->unsignedInteger(column: 'item_type_id');
-            $table->unsignedBigInteger('base_uom_id')->constrained();
+        Schema::create('item_types', function (Blueprint $table) {
+            $table->id();
+            $table->name('name');
             $table->boolean('is_active')->default(1);
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 
@@ -28,6 +25,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('items');
+        Schema::dropIfExists('item_types');
     }
 };

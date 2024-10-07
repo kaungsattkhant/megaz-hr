@@ -490,7 +490,7 @@ Route::put('/items/{id}', [ItemAPIController::class, 'updateItem']);
 Route::delete('/items/{id}', [ItemAPIController::class, 'deleteItem']);
 Route::post('/item_prices/{id}',[ItemAPIController::class,'addItemPrice']);
 Route::get('/get_uom_conversion_by_uom',[UomAPIController::class,'getUomConversionByUom']);
-
+Route::get('/get_item_type',[ItemAPIController::class,'getItemType']);
 // Route::get('/transfers', [TransferAPIController::class, 'getTransferData']);
 // Route::post('/transfers', [TransferAPIController::class, 'createTransfer']);
 // Route::put('/transfers/{id}', [TransferAPIController::class, 'updateTransfer']);

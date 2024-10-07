@@ -43,6 +43,7 @@ class DatabaseSeeder extends Seeder
             ServiceCategorySeeder::class,
             UomSeeder::class,
             // ItemSeeder::class,
+            ItemTypeSeeder::class,
             HeadAccountSeeder::class,
             SubAccountSeeder::class,
             RoomAndTableSeeder::class,
