@@ -43,8 +43,11 @@ class SaleTargetResultAPIController extends Controller
         if (in_array(UserData()->department_id, [5, 7, 8])) {
             $targetMenus = SaleTargetMenu::whereYear('month', $year)
                 ->whereMonth('month', $month)
-                ->with(['targetMenus' => function ($query) {
+                ->with(['targetMenus' => function ($query) use ($request) {
                     $query->select('id', 'sale_target_menu_id', 'menu_id', 'quantity');
+                    if ($request->area_id) {
+                        $query->where('area_id', $request->area_id);
+                    }
                 }])
                 ->get()
                 ->pluck('targetMenus')
@@ -53,6 +56,10 @@ class SaleTargetResultAPIController extends Controller
 
             $soldMenus = TargetMenuResult::whereYear('date_time', $year)
                 ->whereMonth('date_time', $month)
+                ->when($request->area_id, function($query) use ($request)
+                {
+                    return $query->where('area_id',$request->area_id);
+                })
                 ->with('menu')
                 ->get()
                 ->keyBy('menu_id');
