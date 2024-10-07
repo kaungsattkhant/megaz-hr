@@ -388,41 +388,72 @@ class FinancialRepository implements FinancialInterface
     public function getProfitAndLoss($request)
     {
         $current = (isset($request->date) || $request->date != null) ? Carbon::parse($request->date) : Carbon::now();
-        $currentMonth=$current->month;
+        $currentMonth = $current->month;
         $cashSaleCode = ['5-0000', '5-0100'];
-
         $rt_sale = ['5-0001', '5-0002'];
         $ktv_sale = ['5-0101', '5-0102'];
 
-        //total consumption for food and beverage 
-        $name=['Inventory Food','Inventory Beverage'];
-        $catetoryIds=Category::whereIn('name',$name)->pluck('id')->toArray();
-        $totalConsumption= $this->inventoryFinancialService->inventoryScheduleTotalWithTotalByMonth($catetoryIds,$currentMonth);
-        // return $totalConsumption;
-        $rtTotalSaleByAccount = $this->trialBalanceService->getTrialBalanceResults($rt_sale, 'credit', $current, 'sale');
-        $ktvTotalSaleByAccount = $this->trialBalanceService->getTrialBalanceResults($ktv_sale, 'credit', $current, 'sale');
-        $rtTotalSale = $this->getSum($rtTotalSaleByAccount);
-        $ktvTotalSale = $this->getSum($ktvTotalSaleByAccount);
-        $totalSale=$ktvTotalSale+$rtTotalSale;
-        $ratio=($totalConsumption->total_consumption/$totalSale)*100;
-        $rt_cos=($rtTotalSale*$ratio)/100;
-        $ktv_cos=($ktvTotalSale*$ratio)/100;
+        // //total consumption for food and beverage 
+        // $name=['Inventory Food','Inventory Beverage'];
+        // $catetoryIds=Category::whereIn('name',$name)->pluck('id')->toArray();
 
-        $cashSale = $this->trialBalanceService->getTotalBySubAccountCode($cashSaleCode, 'credit', $current, 'cash_sale');
-        $saleTotal = 0;
-        $rtCashSale=0;
-        $ktvCashSale=0;
-        foreach ($cashSale as $sale) {
-            if($sale->code=='5-0000'){
-                $rtCashSale += $sale->total_amount;
-            }
-            if($sale->code=='5-0100'){
-                $ktvCashSale += $sale->total_amount;
-            }
-        }
-        $rtGP=$rtCashSale-$rt_cos;
-        $ktvGp=$ktvCashSale-$ktv_cos;
-        return [$rtGP,$ktvGp];
+        // //total consumption 
+        // $totalConsumption= $this->inventoryFinancialService->inventoryScheduleTotalWithTotalByMonth($catetoryIds,$currentMonth);
+
+        // $rtTotalSaleByAccount = $this->trialBalanceService->getTrialBalanceResults($rt_sale, 'credit', $current, 'sale');
+        // $ktvTotalSaleByAccount = $this->trialBalanceService->getTrialBalanceResults($ktv_sale, 'credit', $current, 'sale');
+        // $rtTotalSale = $this->getSum($rtTotalSaleByAccount);
+        // $ktvTotalSale = $this->getSum($ktvTotalSaleByAccount);
+        // $totalRevenue=$ktvTotalSale+$rtTotalSale;   //total sale revenue
+
+        // $ratio=($totalConsumption->total_consumption/$totalRevenue)*100;
+        // $rt_cos=($rtTotalSale*$ratio)/100;
+        // $ktv_cos=($ktvTotalSale*$ratio)/100;
+
+        // $cashSale = $this->trialBalanceService->getTotalBySubAccountCode($cashSaleCode, 'credit', $current, 'cash_sale');
+        // $rtCashSale=0;
+        // $ktvCashSale=0;
+        // foreach ($cashSale as $sale) {
+        //     if($sale->code=='5-0000'){
+        //         $rtCashSale += $sale->total_amount;
+        //     }
+        //     if($sale->code=='5-0100'){
+        //         $ktvCashSale += $sale->total_amount;
+        //     }
+        // }
+        // $rtGP=$rtCashSale-$rt_cos;
+        // $ktvGp=$ktvCashSale-$ktv_cos;
+        // return [$rtGP,$ktvGp];
+        // Total consumption for food and beverage 
+        $categoryNames = ['Inventory Food', 'Inventory Beverage'];
+        $categoryIds = Category::whereIn('name', $categoryNames)->pluck('id')->toArray();
+
+        // Total consumption 
+        $totalConsumption = $this->inventoryFinancialService->inventoryScheduleTotalWithTotalByMonth($categoryIds, $currentMonth);
+
+        // Total sale revenue for RT and KTV
+        $rtTotalSale = $this->getSum($this->trialBalanceService->getTrialBalanceResults($rt_sale, 'credit', $current, 'sale'));
+        $ktvTotalSale = $this->getSum($this->trialBalanceService->getTrialBalanceResults($ktv_sale, 'credit', $current, 'sale'));
+        $totalRevenue = $rtTotalSale + $ktvTotalSale;
+
+        $ratio = ($totalConsumption->total_consumption / $totalRevenue) * 100;
+        $rt_cos = ($rtTotalSale * $ratio) / 100;
+        $ktv_cos = ($ktvTotalSale * $ratio) / 100;
+
+        // $rt_expense = (22850612.93 * 9.71898444) / 100;
+        // return $rt_expense;
+        // Cash Sale Processing
+        $cashSales = $this->trialBalanceService->getTotalBySubAccountCode($cashSaleCode, 'credit', $current, 'cash_sale');
+
+        $rtCashSale = $cashSales->where('code', '5-0000')->sum('total_amount');
+        $ktvCashSale = $cashSales->where('code', '5-0100')->sum('total_amount');
+
+        $rtGP = $rtCashSale - $rt_cos;
+        $ktvGP = $ktvCashSale - $ktv_cos;
+
+        return [$rtGP, $ktvGP];
+
+
         $response = [];
         $cashSaleResponse = [
             "name" => "Gross Profit",  // Fixed name
@@ -447,7 +478,7 @@ class FinancialRepository implements FinancialInterface
     {
         // $current = (isset($request->date) || $request->date != null) ? Carbon::parse($request->date) : Carbon::now();
         $currentMonth = Carbon::now()->month;
-      
+
         // return $this->inventoryFinancialService->inventoryScheduleWithTypeByMonth($currentMonth);
         return $this->inventoryFinancialService->inventoryScheduleWithCategoryByMonth($currentMonth);
         // $purchaseOrder = PurchaseOrderItem::
