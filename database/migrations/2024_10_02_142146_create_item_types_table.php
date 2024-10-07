@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('item_types', function (Blueprint $table) {
             $table->id();
-            $table->name('name');
+            $table->string('name');
             $table->boolean('is_active')->default(1);
             $table->timestamps();
             $table->softDeletes();
