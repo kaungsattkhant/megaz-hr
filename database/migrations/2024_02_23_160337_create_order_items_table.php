@@ -16,6 +16,7 @@ return new class extends Migration
             $table->dateTime('date');
             $table->unsignedBigInteger('menu_id');
             $table->integer('quantity');
+            $table->foreignId('area_id')->nullable()->constrained()->onDelete('cascade');
             $table->integer('original_price');
             $table->integer("discount_value")->default(0);
             $table->integer('price');

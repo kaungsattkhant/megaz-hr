@@ -208,7 +208,7 @@
                 Create Menu
             </button>
         </div>
-        
+
     </div>
 </template>
 
@@ -255,7 +255,7 @@ export default {
             // let response = await getApiData({ url: '/api/areas', token: this.getToken() });
             let response = await getApiData({ url: `/api/areas?department_id=${departmentId}`, token: this.getToken() });
             if (response.data) {
-                this.areaList = response.data.data;
+                this.areaList = response.data;
             }
         },
         typeChange(){
