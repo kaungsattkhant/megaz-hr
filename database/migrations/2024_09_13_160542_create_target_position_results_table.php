@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('target_position_results', function (Blueprint $table) {
             $table->id();
             $table->dateTime('date_time');
-            $table->foreignId('invoice_id')->constrained()->onDelete('cascade');
+            $table->foreignId('invoice_id')->constrain                                              ed()->onDelete('cascade');
             $table->foreignId('role_id')->constrained()->onDelete('cascade');
             $table->double('amount');
             $table->timestamps();

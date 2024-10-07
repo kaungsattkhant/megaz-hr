@@ -7,7 +7,7 @@
     <div class="mt-4 bg-white">
         <div class="btn-container">
             <notifications position="top center" />
-    
+
             <div class=" flex">
                 <label for="search" class="search-input">
                     <input type="text" class="input-search" placeholder="Search">
@@ -15,7 +15,7 @@
                 </label>
             </div>
             <div class="flex justify-end flex-col">
-    
+
                 <a href="/cooking_places/create"
                     class="add-btn transition duration-150 ease-in-out focus:outline-none focus:ring-0 ">
                     Add New
@@ -37,11 +37,11 @@
                                 <th scope="col" class="">
                                     Cooking Area
                                 </th>
-    
+
                                 <th scope="col" class="">
                                     Menu
                                 </th>
-    
+
                                 <th scope="col" class="">
                                     Skill
                                 </th>
@@ -61,15 +61,18 @@
                                         {{ cookingPlace.area.name }}
                                     </td>
                                     <td class="whitespace-nowrap">
-                                        {{ cookingPlace.available_cooking_places.find(place =>
-                                            place.cooking_placeable_type === 'menu')?.cooking_placeable.name }}
+                                        <!-- hein htet aung -->
+                                        <!-- <span v-for="avaplaces as cookingPlace.available_cooking_places" >
+                                        {{ cookingPlace.available_cooking_places.find(place=>place.cooking_placeable_type='menu')?.cooking_placeable }}
+
+                                        </span> -->
                                     </td>
-    
+
                                     <td class="whitespace-nowrap">
                                         {{ cookingPlace.available_cooking_places.find(place =>
                                             place.cooking_placeable_type === 'skill')?.cooking_placeable.skill }}
                                     </td>
-    
+
                                     <td class="whitespace-nowrap">
                                         <a :href="'/cooking_places/' + cookingPlace.id + '/edit'">
                                             <i class="far fa-pen cursor-pointer mr-3"></i>
@@ -81,7 +84,7 @@
                             </div>
                         </tbody>
                     </table>
-    
+
                     <!-- pagination -->
                     <div class="flex justify-center">
                         <div v-if="totalData != 0" class=" bg-white  flex justify-center mt-5 py-3">
@@ -100,7 +103,7 @@
             </div>
         </div>
     </div>
-    
+
 
 </template>
 

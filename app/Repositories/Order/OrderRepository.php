@@ -176,8 +176,6 @@ class OrderRepository implements OrderRepositoryInterface
         }
     }
 
-
-
     public function orderItemStatusChange(array $data)
     {
         DB::beginTransaction();
@@ -224,35 +222,50 @@ class OrderRepository implements OrderRepositoryInterface
             $startTime = $date . ' 00:00:00';
             $endTime = $date . ' 23:59:59';
 
-            $totalCount = OrderItem::with('menu', 'order.invoice.latestSession.entity')->whereBetween('created_at', [$startTime, $endTime])->count();
-            $pageNumber = 1;
-            $perPage = 20;
-            if ($request->page) {
-                $pageNumber = $request->page;
-            }
-            if ($request->per_page) {
-                $perPage = $request->per_page;
-            }
-            $skip = ($pageNumber - 1) * $perPage;
-            $order_items = OrderItem::with('menu', 'order.invoice.latestSession.entity')
+            $order_items = OrderItem::where('status','pos_confirmed')->with('menu', 'order.invoice.latestSession.entity','area')
                 ->whereBetween('date', [$startTime, $endTime])
-                ->skip($skip)
-                ->take($perPage)
-                ->get();
-            $paginationData = MakePaginationData($request, $totalCount, 'order_items');
-            $paginationData['order_items'] = $order_items;
+                ->paginate(config('common.list_count'));
 
-            return $paginationData;
+            return $order_items;
         } else {
             if ($request->date) {
                 $startTime = $request->date . ' 00:00:00';
                 $endTime = $request->date . ' 23:59:59';
-                $orderItems = OrderItem::with('menu', 'order.invoice.latestSession.entity')->whereBetween('date', [$startTime, $endTime])->get();
+                $orderItems = OrderItem::where('status','pos_confirmed')->with('menu', 'order.invoice.latestSession.entity','area')->whereBetween('date', [$startTime, $endTime])->get();
             } else {
-                $orderItems = OrderItem::with('menu', 'order.invoice.latestSession.entity')->get();
+                $orderItems = OrderItem::where('status','pos_confirmed')->with('menu', 'order.invoice.latestSession.entity','area')->get();
             }
 
             return $orderItems;
+        }
+    }
+
+
+    // for pos
+    public function getOrderItemByPos()
+    {
+        $orderItems = OrderItem::with('area','menu')->orderBy('created_at','desc')->paginate(config('common.list_count'));
+        ResponseData($orderItems);
+    }
+
+    public function orderItemAreaConfirm(int $id, Request $request)
+    {
+        DB::beginTransaction();
+        try{
+            $orderItem = OrderItem::find($id);
+            $orderItem->update([
+                'area_id' => $request->area_id,
+                'status' => $request->status,
+            ]);
+
+            DB::commit();
+            ResponseData($orderItem);
+
+        }catch(\Exception $e)
+        {
+            DB::rollBack();
+            ResponseMessage($e->getMessage(),422);
+            throw $e;
         }
     }
 }

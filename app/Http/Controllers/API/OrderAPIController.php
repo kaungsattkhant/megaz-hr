@@ -38,4 +38,15 @@ class OrderAPIController extends Controller
         $orderItems = $this->orderRepo->getOrderItemData($request);
         ResponseData($orderItems);
     }
+
+// pos
+    public function getOrderItemForPOS()
+    {
+        $this->orderRepo->getOrderItemByPos();
+    }
+
+    public function orderItemAreaConfirm(int $id, Request $request)
+    {
+        $this->orderRepo->orderItemAreaConfirm($id, $request);
+    }
 }

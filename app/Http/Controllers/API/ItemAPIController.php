@@ -56,5 +56,10 @@ class ItemAPIController extends Controller
         ResponseData($item);
     }
 
+    public function getItemType(){
+        $item = $this->itemRepo->getItemType();
+        ResponseData($item);
+    }
+
    
 }
