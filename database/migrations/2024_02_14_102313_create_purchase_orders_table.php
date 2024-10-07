@@ -24,7 +24,7 @@ return new class extends Migration
             $table->dateTime('financial_check_time')->nullable();
             $table->dateTime('md_check_time')->nullable();
             $table->boolean('is_md_checked')->default(0);
-            $table->boolean('purchased_date_time')->nullable();
+            $table->boolean(column: 'purchased_date_time')->nullable();
             $table->enum('status', ['created', 'manager_checked', 'financial_checked', 'md_checked'])->default('created');
             $table->timestamps();
         });

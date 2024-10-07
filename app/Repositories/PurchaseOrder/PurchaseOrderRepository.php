@@ -28,7 +28,7 @@ class PurchaseOrderRepository implements PurchaseOrderRepositoryInterface
             ->when(checkDepartmentAndRoles('HR', ['Staff']), function ($q) use ($staff) {
                 $q->where('created_by', $staff->id);
             })
-            ->when((checkDepartmentAndRoles('HR', ['Manager']) || checkDepartmentAndRoles('Procurement', ['Manager'])), function ($q) {
+            ->when((checkDepartmentAndRoles('HR', ['Manager']) || checkRoles(['Manager'])), function ($q) {
                 $q->whereIn('status', ['manager_checked', 'created'])
                     ->orWhere('manager_check_id', UserData()->id);
             })

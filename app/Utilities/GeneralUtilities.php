@@ -319,6 +319,19 @@ if (!function_exists('checkDepartmentAndRoles')) {
         return false;
     }
 }
+if (!function_exists('checkRoles')) {
+    function checkRoles($names)
+    {
+        // $departmentName = UserData()->department->name;
+        $roles = UserData()->roles;
+        foreach ($names as $name) {
+            if ($roles->contains('name', $name)) {
+                return true;
+            }
+        }
+        return false;
+    }
+}
 
 if (!function_exists('checkFeaturePermission')) {
     function checkFeaturePermission($name)
