@@ -600,16 +600,16 @@ class InvoiceRepository implements InvoiceRepositoryInterface
 
 
 
-            // $this->ledgerAndTransactionForInvoice([
-            //     'payment_type' => 'cash',
-            //     'invoice_id' => $invoice->id,
-            //     'food_charge' => $foodCharge,
-            //     'beverage_charge' => $beverageCharge,
-            //     'total_session_price' => $total_session_price,
-            //     'service_charge' => $service_charge,
-            //     'tax' => $tax,
-            //     'discount_total' => $data['discount_total'],
-            // ]);
+            $this->ledgerAndTransactionForInvoice([
+                'payment_type' => 'cash',
+                'invoice_id' => $invoice->id,
+                'food_charge' => $foodCharge,
+                'beverage_charge' => $beverageCharge,
+                'total_session_price' => $total_session_price,
+                'service_charge' => $service_charge,
+                'tax' => $tax,
+                'discount_total' => $data['discount_total'],
+            ]);
             $catering_department = Department::where('name', 'Catering')->first();
             $msg = "The {$entity->name} is now closed. Thank you.";
 
