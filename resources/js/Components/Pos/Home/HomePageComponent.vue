@@ -143,7 +143,7 @@
                                     <!-- {{ selectedRoom.room_sessions.length > 0 ? selectedRoom.room_sessions[0].invoice.total_session_price :
                                     0 }} -->
 
-                                    {{ selectedRoom.room_sessions[0].length > 0 ?
+                                    {{ selectedRoom.room_sessions[0] ?
                                         (selectedRoom.room_sessions[0].invoice.total_session_price ?
                                             selectedRoom.room_sessions[0].invoice.total_session_price : '' )
                                     : '' }}
@@ -1163,9 +1163,11 @@ export default {
             const response = await getApiData({ url: '/api/areas/' + id + '/entities', token: this.getToken() });
             if (response.data) {
                 this.roomList = response.data;
+                this.isOpenRoomStep('step_selectRoom');
                 if (response.data[0]) {
                     this.selectedRoomId = response.data[0].id;
-                    this.getSelectedRoom();
+                    // this.getSelectedRoom();
+                    
                     // this.selectedRoom = response.data[0];
                     // this.getPurchaseMenuList();
                     
@@ -1179,8 +1181,6 @@ export default {
                     //     }
                     // }
                 }
-                
-
             }
         },
 
