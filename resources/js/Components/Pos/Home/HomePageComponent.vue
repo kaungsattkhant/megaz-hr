@@ -25,8 +25,8 @@
                                     class="relative flex flex-col justify-between h-full w-full">
                                     <div v-if="room.is_active == 1" class=" flex justify-between flex-col h-full">
                                         <div>
-                                            <p class="text-sm text-white">Start Time : {{ room.room_sessions[0].start_date.slice(11,16) }} </p>
-                                            <p class="text-sm text-white">Start Time : {{ room.room_sessions[0].end_date.slice(11,16) }} </p>
+                                            <p class="text-sm text-white">Start Time : {{ room.room_sessions[0].start_date ? room.room_sessions[0].start_date.slice(11,16) : '' }} </p>
+                                            <p class="text-sm text-white">Start Time : {{ room.room_sessions[0].end_date ? room.room_sessions[0].end_date.slice(11,16) : '' }} </p>
                                         </div>
                                         <p class="text-base text-left text-white">
                                             {{ room.price_per_hour }}
