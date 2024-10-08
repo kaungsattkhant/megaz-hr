@@ -25,8 +25,8 @@
                                     class="relative flex flex-col justify-between h-full w-full">
                                     <div v-if="room.is_active == 1" class=" flex justify-between flex-col h-full">
                                         <div>
-                                            <p class="text-sm text-white">Start Time : {{ room.room_sessions[0].start_date.slice(11,16) }} </p>
-                                            <p class="text-sm text-white">Start Time : {{ room.room_sessions[0].end_date.slice(11,16) }} </p>
+                                            <p class="text-sm text-white">Start Time : {{ room.room_sessions[0].start_date ? room.room_sessions[0].start_date.slice(11,16) : '' }} </p>
+                                            <p class="text-sm text-white">Start Time : {{ room.room_sessions[0].end_date ? room.room_sessions[0].end_date.slice(11,16) : '' }} </p>
                                         </div>
                                         <p class="text-base text-left text-white">
                                             {{ room.price_per_hour }}
@@ -93,7 +93,7 @@
                                 </p>
                             </div>
                             <img class="w-[60%] mx-auto mb-6" src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRnjfjQ0p-BZt5Vb6KhcdHPeC4hBxiKEYXxMw&s" alt="">
-                            
+
                         </div>
                     </div>
                 </div>
@@ -1168,7 +1168,7 @@ export default {
                     this.getSelectedRoom();
                     // this.selectedRoom = response.data[0];
                     // this.getPurchaseMenuList();
-                    
+
                     // if(this.selectedRoom){
                     //     if (this.selectedRoom.is_active == 1) {
                     //         this.isOpenRoomStep('step_detail');
@@ -1179,7 +1179,7 @@ export default {
                     //     }
                     // }
                 }
-                
+
 
             }
         },
@@ -1767,7 +1767,7 @@ export default {
                     type: "warn"
                 });
             }
-            
+
         },
         async EndRoom() {
             let totalAmount = this.printInvoiceData.total;
