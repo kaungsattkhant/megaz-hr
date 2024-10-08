@@ -512,10 +512,10 @@ class InvoiceRepository implements InvoiceRepositoryInterface
             $order = Order::where('invoice_id', $invoice->id)->first();
             if ($order) {
                 $allSold = $order->orderItems->every(function ($item) {
-                    return $item->status === 'sold';
+                    return $item->status === 'done';
                 });
                 if ($allSold == false) {
-                    ResponseMessage('Not all order items are sold', 422);
+                    ResponseMessage('Not all order items are done', 422);
                 }
             }
 

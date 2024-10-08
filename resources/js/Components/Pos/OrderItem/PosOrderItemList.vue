@@ -45,10 +45,8 @@
                                             {{ foodOrder.status }}
                                         </td>
 
-
-
                                         <td colspan="3" class="whitespace-nowrap px-6 py-3 select-parent">
-                                            <select name="" v-model="area_value"
+                                            <select name=""
                                                 class="text-xs pl-0 border-0 focus:shadow-none focus:outline-none focus:ring-0 select-box area-select-box"
                                                 placeholder="Select Area">
                                                 <option disabled selected>Select Area</option>
@@ -165,11 +163,10 @@ export default {
         },
         btnClickedAcceptMenu(event, id) {
             const button = $(event.target);
-            const buttonParent = button.closest('.button-parent');
-            const selectParent = buttonParent.prev('.select-parent');
-            const selectElement = selectParent.find('.area-select-box');
-            this.selectedAreaId = this.area_value;
-            console.log('Selected Value:', this.selectedAreaId);
+            const row = button.closest('tr');
+            const selectElement = row.find('.select-box');
+            const selectedValue = selectElement.val();
+            this.selectedAreaId = selectedValue;
             if (!this.selectedAreaId) {
                 this.$notify({
                     title: `Not valid`,
@@ -211,13 +208,20 @@ export default {
 
         btnClickedRejectMenu(event, id) {
             const button = $(event.target);
-            const buttonParent = button.closest('.button-parent');
-            const selectParent = buttonParent.prev('.select-parent');
-            const selectElement = selectParent.find('.select-box');
-            this.selectedAreaId = this.area_value;
-            console.log('Selected Value:', this.selectedAreaId);
+            const row = button.closest('tr');
+            const selectElement = row.find('.select-box');
+            const selectedValue = selectElement.val();
+            this.selectedAreaId = selectedValue;
+            if (!this.selectedAreaId) {
+                this.$notify({
+                    title: `Not valid`,
+                    text: 'Select Area First Please',
+                    type: "warn"
+                });
+            }
             this.rejectMenu(id);
         },
+
         async rejectMenu(id) {
             let formData = new FormData();
             formData.append('status', 'rejected');
@@ -230,7 +234,6 @@ export default {
                 });
                 return;
             }
-            console.log(this.selectedAreaId);
             let response = await postApiData({ url: '/api/pos_order_items/' + id + '/status', form_data: formData, token: this.getToken() });
             if (response.success) {
                 console.log('ok')
