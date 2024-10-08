@@ -260,9 +260,9 @@ class InvoiceRepository implements InvoiceRepositoryInterface
 
             if ($invoice->invoice_type == "endless_time") {
                 $leftDuration = null;
-            } else if($invoice->invoice_type == 'session') {
+            } else if ($invoice->invoice_type == 'session') {
                 $leftDuration = $lastRoomwithInvoice->session_duration - ceil($roundedDurationInHours);
-            }else{
+            } else {
                 $leftDuration = $lastRoomwithInvoice->session_duration - $roundedDurationInHours;
             }
 
@@ -278,7 +278,7 @@ class InvoiceRepository implements InvoiceRepositoryInterface
                 } else {
                     $lastRoomwithInvoice->session_duration = $roundedDurationInHours;
                 }
-                    $lastRoomwithInvoice->end_date = CurrentTime();
+                $lastRoomwithInvoice->end_date = CurrentTime();
                 $lastRoomwithInvoice->save();
             }
 
@@ -514,8 +514,8 @@ class InvoiceRepository implements InvoiceRepositoryInterface
                 $allSold = $order->orderItems->every(function ($item) {
                     return $item->status === 'sold';
                 });
-                if($allSold==false){
-                    ResponseMessage('Not all order items are sold',422);
+                if ($allSold == false) {
+                    ResponseMessage('Not all order items are sold', 422);
                 }
             }
 
@@ -563,37 +563,42 @@ class InvoiceRepository implements InvoiceRepositoryInterface
             $firstRole = $soldStaff->roles->first();
             TargetPositionResult::create([
                 'role_id' => $firstRole->id,
-                'date_time'=>CurrentTime(),
+                'date_time' => CurrentTime(),
                 'invoice_id' => $invoice->id,
                 'amount' => $data['total']
             ]);
-            $orderItems = $order->orderItems;
-            // $groupedOrderItems = $orderItems->groupBy('menu_id')->map(function ($items) {
-            //     return $items->sum('quantity');
-            // });
-            // dd($groupedOrderItems);
-            $groupedOrderItems = $orderItems
-            ->groupBy(function ($item) {
-                return $item['menu_id'] . '-' . $item['area_id'];
-            })
-            ->map(function ($items) {
-                return [
-                    'menu_id' => $items->first()->menu_id, // Access as an object
-                    'area_id' => $items->first()->area_id, // Access as an object
-                    'quantity' => $items->sum('quantity'),  // Sum the quantities
-                ];
-            })
-            ->values();
 
-            foreach($groupedOrderItems as $orderItem) {
+            if ($order != null) {
+                $orderItems = $order->orderItems;
+                // $groupedOrderItems = $orderItems->groupBy('menu_id')->map(function ($items) {
+                //     return $items->sum('quantity');
+                // });
+                // dd($groupedOrderItems);
+                $groupedOrderItems = $orderItems
+                    ->groupBy(function ($item) {
+                        return $item['menu_id'] . '-' . $item['area_id'];
+                    })
+                    ->map(function ($items) {
+                        return [
+                            'menu_id' => $items->first()->menu_id, // Access as an object
+                            'area_id' => $items->first()->area_id, // Access as an object
+                            'quantity' => $items->sum('quantity'),  // Sum the quantities
+                        ];
+                    })
+                    ->values();
+
+                foreach ($groupedOrderItems as $orderItem) {
                     TargetMenuResult::create([
-                    'date_time' => CurrentTime(),
-                    'invoice_id' => $invoice->id,
-                    'area_id' => $orderItem['area_id'],
-                    'menu_id' => $orderItem['menu_id'],
-                    'quantity' =>$orderItem['quantity'],
-                ]);
+                        'date_time' => CurrentTime(),
+                        'invoice_id' => $invoice->id,
+                        'area_id' => $orderItem['area_id'],
+                        'menu_id' => $orderItem['menu_id'],
+                        'quantity' => $orderItem['quantity'],
+                    ]);
+                }
             }
+
+
 
             // $this->ledgerAndTransactionForInvoice([
             //     'payment_type' => 'cash',
