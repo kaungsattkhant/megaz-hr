@@ -12,7 +12,7 @@ class Item extends BaseModel
     use HasFactory;
 
     protected $fillable=[
-        'name','category_id','is_active','base_uom_id','code'
+        'name','category_id','is_active','base_uom_id','code','item_type_id'
     ];
 
     protected $with=['item_prices'];

@@ -58,11 +58,12 @@
                                     <td class="whitespace-nowrap  ">
                                         {{ itemForecast.month }}
                                     </td>
-                                    <td class="whitespace-nowrap  ">
-                                        {{ itemForecast.amount }}
+                                    <td class="whitespace-nowrap">
+                                        {{ itemForecast.forecast_items.reduce((total, item) => total + item.quantity, 0)}}
                                     </td>
+
                                     <td class="whitespace-nowrap ">
-                                        <a :href="'/item_usage_forecasts/'+itemForecast.id+'/detail'" id=""
+                                        <a :href="'/item_usage_forecasts/' + itemForecast.id + '/detail'" id=""
                                             class="pr-4">
                                             <i class="far fa-bars"></i>
                                         </a>
@@ -132,58 +133,58 @@
 </template>
 
 <script>
-    import { Modal, Ripple, initTE, Input, Tab, Select } from "tw-elements";
-    import { getApiData, postApiData, deleteApiData } from '../../utilities/ajax-helpers';
-    import { convertToMonth } from "../../utilities/datetime-helpers";
-    import { mapGetters } from "vuex";
+import { Modal, Ripple, initTE, Input, Tab, Select } from "tw-elements";
+import { getApiData, postApiData, deleteApiData } from '../../utilities/ajax-helpers';
+import { convertToMonth } from "../../utilities/datetime-helpers";
+import { mapGetters } from "vuex";
 
-    export default {
-        data() {
-            return {
-                itemForecastList: [],
-                deleteId: null,
-            };
+export default {
+    data() {
+        return {
+            itemForecastList: [],
+            deleteId: null,
+        };
+    },
+
+    methods: {
+        ...mapGetters(['getToken']),
+
+        deleteBtnClicked(id) {
+            this.deleteId = id;
         },
 
-        methods: {
-            ...mapGetters(['getToken']),
+        async confirmDeleteBtnClicked() {
+            let url = `/api/item_usage_forecasts/${this.deleteId}`;
+            let response = await deleteApiData({ url: url, token: this.getToken() });
+            if (response.success) {
+                let index = this.itemForecastList.findIndex(itemForecast => itemForecast.id === this.deleteId);
+                this.itemForecastList.splice(index, 1);
+            }
+        },
 
-            deleteBtnClicked(id){
-                this.deleteId = id;
-            },
-
-            async confirmDeleteBtnClicked(){
-                let url = `/api/item_usage_forecasts/${this.deleteId}`;
-                let response = await deleteApiData({url: url, token: this.getToken()});
-                if(response.success){
-                    let index = this.itemForecastList.findIndex(itemForecast => itemForecast.id === this.deleteId);
-                    this.itemForecastList.splice(index, 1);
-                }
-            },
-
-            async getItemForecastsList(){
-                let response = await getApiData({url: `/api/item_usage_forecasts`, token: this.getToken()});
-                if(response.data){
-                    this.itemForecastList = response.data.data;
-                    this.itemForecastList.forEach((forecast)=>{
-                        forecast.month = convertToMonth(forecast.date);
-                        forecast.amount = 0;
-                        forecast.quantity = 0;
-                        forecast.forecast_items.forEach((forecastItem)=>{
-                            forecast.amount += forecastItem.amount;
-                            forecast.quantity += forecastItem.quantity;
-                        });
+        async getItemForecastsList() {
+            let response = await getApiData({ url: `/api/item_usage_forecasts`, token: this.getToken() });
+            if (response.data) {
+                this.itemForecastList = response.data.data;
+                this.itemForecastList.forEach((forecast) => {
+                    forecast.month = convertToMonth(forecast.date);
+                    forecast.amount = 0;
+                    forecast.quantity = 0;
+                    forecast.forecast_items.forEach((forecastItem) => {
+                        forecast.amount += forecastItem.amount;
+                        forecast.quantity += forecastItem.quantity;
                     });
-                }
-            },
+                });
+            }
         },
+    },
 
-        created(){
-            this.getItemForecastsList();
-        },
+    created() {
+        this.getItemForecastsList();
+    },
 
-        mounted(){
-            initTE({ Modal, Select, Tab, Ripple });
-        }
+    mounted() {
+        initTE({ Modal, Select, Tab, Ripple });
     }
+}
 </script>

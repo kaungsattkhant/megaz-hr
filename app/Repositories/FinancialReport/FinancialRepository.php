@@ -2,23 +2,30 @@
 
 namespace App\Repositories\FinancialReport;
 
-use App\Models\CashbookBalance;
 use Carbon\Carbon;
-use Illuminate\Support\Facades\DB;
+use App\Models\Category;
+use App\Models\OrderItem;
+use App\Models\CashbookBalance;
+use App\Models\PurchaseOrderItem;
 use App\Services\CashFlowService;
+use Illuminate\Support\Facades\DB;
 use App\Services\TrialBalanceService;
+use App\Services\InventoryFinancialService;
 
 class FinancialRepository implements FinancialInterface
 {
     protected $cashFlowService;
     protected $trialBalanceService;
+
+    protected $inventoryFinancialService;
     private $receiptSubAccountCode = ['2-1000', '2-1050', '2-2000', '4-3000', '5-0000', '5-0100', '5-1000', '4-4000', '3-1000'];
     private $paymentSubAccountCode = ['1-1000', '1-1100', '2-1000', '2-1020', '2-1050', '2-3000', '2-4000', '3-2000', '4-1000', '4-2000', '4-3000', '4-4000', '6-0000', '6-2000', '6-3000', '6-4000', '6-5000', '6-6000', '6-7000', '6-8000', '6-9000', '3-1000'];
 
-    public function __construct(CashFlowService $cashFlowService, TrialBalanceService $trialBalanceService)
+    public function __construct(CashFlowService $cashFlowService, TrialBalanceService $trialBalanceService, InventoryFinancialService $inventoryFinancialService)
     {
         $this->cashFlowService = $cashFlowService;
         $this->trialBalanceService = $trialBalanceService;
+        $this->inventoryFinancialService = $inventoryFinancialService;
     }
 
     public function CashFlowStatementOriginal($request) //original
@@ -276,6 +283,9 @@ class FinancialRepository implements FinancialInterface
 
         $cashAndBankCode = ['2-1000'];
         $otherReceivableCode = ['2-1050'];
+        $currentLiabilitieCode = ['4-2000', '4-3000', '4-4000'];
+
+        // how to retrieve accrued
 
         #credit balance
         $income = $this->trialBalanceService->getTrialBalanceResults($incomeCode, 'credit', $current, 'credit_balance');
@@ -284,17 +294,22 @@ class FinancialRepository implements FinancialInterface
         $retainEarning = $this->trialBalanceService->getTrialBalanceResults($retainEarningCode, 'credit', $current, 'credit_balance');
         $longTerm = $this->trialBalanceService->getTrialBalanceResults($longTermCode, 'credit', $current, 'credit_balance');
 
+        $longTerm = $this->trialBalanceService->getTrialBalanceResults($longTermCode, 'credit', $current, 'credit_balance');
+
+        $currentLiabilities = $this->trialBalanceService->getTotalBySubAccountCode($currentLiabilitieCode, 'credit', $current, 'creditor_balance');
 
         $creditBalance = [];
         $creditBalance[] = $income;
         $creditBalance[] = $capital;
         $creditBalance[] = $retainEarning;
         $creditBalance[] = $longTerm;
+        $creditBalance[] = $currentLiabilities;
         $creditTotalBalance = 0;
         $creditTotalBalance += collect($income)->sum('amount');
         $creditTotalBalance += collect($capital)->sum('amount');
         $creditTotalBalance += collect($retainEarning)->sum('amount');
         $creditTotalBalance += collect($longTerm)->sum('amount');
+        $creditTotalBalance += collect($currentLiabilities)->sum('amount');
         #end credit balance
 
 
@@ -358,12 +373,9 @@ class FinancialRepository implements FinancialInterface
         #end debit balance
         // $creditBalanceResult = new \stdClass();
         // $creditBalanceResult->credit_balance = $creditBalance;
-
         // $debitBalanceResult = new \stdClass();
         // $debitBalanceResult->debit_balance = $debitBalance;
-
         // $finalResults = [$creditBalanceResult, $debitBalanceResult];
-
         return [
             'credit_balance' => $creditBalance,
             'credit_total_balance' => $creditTotalBalance,
@@ -371,6 +383,202 @@ class FinancialRepository implements FinancialInterface
             'debit_balance' => $debitBalance
         ];
         // return $finalResults;
+    }
+
+    public function getProfitAndLoss($request)
+    {
+        $current = (isset($request->date) || $request->date != null) ? Carbon::parse($request->date) : Carbon::now();
+        $currentMonth = $current->month;
+        $cashSaleCode = ['5-0000', '5-0100'];
+        $rt_sale = ['5-0001', '5-0002'];
+        $ktv_sale = ['5-0101', '5-0102'];
+
+        // //total consumption for food and beverage 
+        // $name=['Inventory Food','Inventory Beverage'];
+        // $catetoryIds=Category::whereIn('name',$name)->pluck('id')->toArray();
+
+        // //total consumption 
+        // $totalConsumption= $this->inventoryFinancialService->inventoryScheduleTotalWithTotalByMonth($catetoryIds,$currentMonth);
+
+        // $rtTotalSaleByAccount = $this->trialBalanceService->getTrialBalanceResults($rt_sale, 'credit', $current, 'sale');
+        // $ktvTotalSaleByAccount = $this->trialBalanceService->getTrialBalanceResults($ktv_sale, 'credit', $current, 'sale');
+        // $rtTotalSale = $this->getSum($rtTotalSaleByAccount);
+        // $ktvTotalSale = $this->getSum($ktvTotalSaleByAccount);
+        // $totalRevenue=$ktvTotalSale+$rtTotalSale;   //total sale revenue
+
+        // $ratio=($totalConsumption->total_consumption/$totalRevenue)*100;
+        // $rt_cos=($rtTotalSale*$ratio)/100;
+        // $ktv_cos=($ktvTotalSale*$ratio)/100;
+
+        // $cashSale = $this->trialBalanceService->getTotalBySubAccountCode($cashSaleCode, 'credit', $current, 'cash_sale');
+        // $rtCashSale=0;
+        // $ktvCashSale=0;
+        // foreach ($cashSale as $sale) {
+        //     if($sale->code=='5-0000'){
+        //         $rtCashSale += $sale->total_amount;
+        //     }
+        //     if($sale->code=='5-0100'){
+        //         $ktvCashSale += $sale->total_amount;
+        //     }
+        // }
+        // $rtGP=$rtCashSale-$rt_cos;
+        // $ktvGp=$ktvCashSale-$ktv_cos;
+        // return [$rtGP,$ktvGp];
+        // Total consumption for food and beverage 
+        $categoryNames = ['Inventory Food', 'Inventory Beverage'];
+        $categoryIds = Category::whereIn('name', $categoryNames)->pluck('id')->toArray();
+
+        // Total consumption 
+        $totalConsumption = $this->inventoryFinancialService->inventoryScheduleTotalWithTotalByMonth($categoryIds, $currentMonth);
+
+        // Total sale revenue for RT and KTV
+        $rtTotalSale = $this->getSum($this->trialBalanceService->getTrialBalanceResults($rt_sale, 'credit', $current, 'sale'));
+        $ktvTotalSale = $this->getSum($this->trialBalanceService->getTrialBalanceResults($ktv_sale, 'credit', $current, 'sale'));
+        $totalRevenue = $rtTotalSale + $ktvTotalSale;
+
+        $ratio = ($totalConsumption->total_consumption / $totalRevenue) * 100;
+        $rt_cos = ($rtTotalSale * $ratio) / 100;
+        $ktv_cos = ($ktvTotalSale * $ratio) / 100;
+
+        // $rt_expense = (22850612.93 * 9.71898444) / 100;
+        // return $rt_expense;
+        // Cash Sale Processing
+        $cashSales = $this->trialBalanceService->getTotalBySubAccountCode($cashSaleCode, 'credit', $current, 'cash_sale');
+
+        $rtCashSale = $cashSales->where('code', '5-0000')->sum('total_amount');
+        $ktvCashSale = $cashSales->where('code', '5-0100')->sum('total_amount');
+
+        $rtGP = $rtCashSale - $rt_cos;
+        $ktvGP = $ktvCashSale - $ktv_cos;
+
+        return [$rtGP, $ktvGP];
+
+
+        $response = [];
+        $cashSaleResponse = [
+            "name" => "Gross Profit",  // Fixed name
+            "restaurant_pl" => 0,      // Default values
+            "ktv_pl" => 0
+        ];
+
+        foreach ($cashSale as $item) {
+            if ($item->code == '5-0000') {
+                $cashSaleResponse['restaurant_pl'] = (int) $item->total_amount;
+            } elseif ($item->code == '5-0100') {
+                // You mentioned 'ktv_pl: 10000', which is different from the original amount (13000)
+                // Use 10000 or the value from the array based on your preference
+                $cashSaleResponse['ktv_pl'] = 10000;
+            }
+        }
+        $response[] = $cashSaleResponse;
+        return $response;
+    }
+
+    public function getInventorySchedule($request)
+    {
+        // $current = (isset($request->date) || $request->date != null) ? Carbon::parse($request->date) : Carbon::now();
+        $currentMonth = Carbon::now()->month;
+
+        // return $this->inventoryFinancialService->inventoryScheduleWithTypeByMonth($currentMonth);
+        return $this->inventoryFinancialService->inventoryScheduleWithCategoryByMonth($currentMonth);
+        // $purchaseOrder = PurchaseOrderItem::
+        //     join('po_grns', 'purchase_order_items.id', '=', 'po_grns.purchase_order_item_id')
+        //     ->join('purchase_orders', 'purchase_order_items.purchase_order_id', 'purchase_orders.id')
+        //     ->join('items', 'purchase_order_items.item_id', 'items.id')
+        //     ->join('categories', 'items.category_id', 'categories.id')
+        //     ->join('item_types', 'items.item_type_id', 'item_types.id')
+        //     ->select(
+        //         'categories.id as category_id',
+        //         'item_types.id as item_type_id',
+        //         'categories.name as category_name',
+        //         'item_types.name as item_type_name',
+        //         DB::raw('SUM(purchase_order_items.quantity * purchase_order_items.amount) as total_amount'),
+        //         DB::raw('SUM(po_grns.invoice_amount) as cash_purchase_amount'),
+        //         DB::raw('SUM(purchase_order_items.quantity * purchase_order_items.amount) - SUM(po_grns.invoice_amount) as credit_purchase_amount')
+        //     )
+        //     ->where('purchase_orders.is_bought', 1)
+        //     ->whereMonth('purchase_orders.purchased_date_time', $current)
+        //     ->groupBy('items.category_id', 'items.item_type_id','categories.id', 'item_types.id')
+        //     ->get();
+
+        // $itemConsumption = DB::table('order_items')
+        //     ->join('menus', 'order_items.menu_id', '=', 'menus.id')
+        //     ->join('item_menu', 'order_items.menu_id', '=', 'item_menu.menu_id')
+        //     ->join('items', 'item_menu.item_id', '=', 'items.id')
+        //     ->join('categories', 'items.category_id', '=', 'categories.id')
+        //     ->join('item_types', 'items.item_type_id', '=', 'item_types.id')
+        //     ->select(
+        //         'categories.id as category_id',
+        //         'item_types.id as item_type_id',
+        //         'categories.name as category_name',
+        //         'item_types.name as item_type_name',
+        //         DB::raw('SUM((item_menu.price * item_menu.weight) * order_items.quantity) as consumption'),
+        //         'items.name as item',
+        //         'item_menu.uom_id as uom'
+        //     )
+        //     ->groupBy('categories.name', 'item_types.name', 'items.name', 'item_menu.uom_id', 'categories.id', 'item_types.id')  // Group by category, item type, and optionally item and uom.
+        //     ->get();
+        // return $itemConsumption;
+
+        // $itemSummary = DB::table('items')
+        //     ->join('categories', 'items.category_id', '=', 'categories.id')
+        //     ->join('item_types', 'items.item_type_id', '=', 'item_types.id')
+        //     // Subquery for Purchase Order Data
+        //     ->leftJoin(DB::raw('(SELECT 
+        //                 items.category_id,
+        //                 items.item_type_id,
+        //                 SUM(purchase_order_items.quantity * purchase_order_items.amount) as total_amount,
+        //                 SUM(po_grns.invoice_amount) as cash_purchase_amount,
+        //                 SUM(purchase_order_items.quantity * purchase_order_items.amount) - SUM(po_grns.invoice_amount) as credit_purchase_amount
+        //             FROM purchase_order_items
+        //             JOIN po_grns ON purchase_order_items.id = po_grns.purchase_order_item_id
+        //             JOIN purchase_orders ON purchase_order_items.purchase_order_id = purchase_orders.id
+        //             JOIN items ON purchase_order_items.item_id = items.id
+        //             WHERE purchase_orders.is_bought = 1
+        //             AND MONTH(purchase_orders.purchased_date_time) = ' . $currentMonth . '
+        //             GROUP BY items.category_id, items.item_type_id) as purchase_orders_summary'), function ($join) {
+        //         $join->on('items.category_id', '=', 'purchase_orders_summary.category_id')
+        //             ->on('items.item_type_id', '=', 'purchase_orders_summary.item_type_id');
+        //     })
+        //     // Subquery for Item Consumption Datax  
+        //     ->leftJoin(DB::raw('(SELECT 
+        //                 items.category_id,
+        //                 items.item_type_id,
+        //                 SUM((item_menu.price * item_menu.weight) * order_items.quantity) as consumption
+        //             FROM order_items
+        //             JOIN item_menu ON order_items.menu_id = item_menu.menu_id
+        //             JOIN items ON item_menu.item_id = items.id
+        //             WHERE order_items.status = "sold"
+        //             GROUP BY items.category_id, items.item_type_id) as item_consumption_summary'), function ($join) {
+        //         $join->on('items.category_id', '=', 'item_consumption_summary.category_id')
+        //             ->on('items.item_type_id', '=', 'item_consumption_summary.item_type_id');
+        //     })
+        //     // Select Required Fields
+        //     ->select(
+        //         'categories.name as category_name',
+        //         'item_types.name as item_type_name',
+        //         DB::raw('COALESCE(purchase_orders_summary.total_amount, 0) as total_amount'),
+        //         DB::raw('COALESCE(purchase_orders_summary.cash_purchase_amount, 0) as cash_purchase_amount'),
+        //         DB::raw('COALESCE(purchase_orders_summary.credit_purchase_amount, 0) as credit_purchase_amount'),
+        //         DB::raw('COALESCE(item_consumption_summary.consumption, 0) as consumption'),
+        //         DB::raw('(COALESCE(purchase_orders_summary.total_amount, 0) - COALESCE(item_consumption_summary.consumption, 0)) as closing_balance') // Closing balance calculation
+        //     )
+        //     ->groupBy('categories.name', 'item_types.name', 'items.category_id', 'items.item_type_id')
+        //     ->get();
+        // return $itemSummary;
+
+        // $previousMonth = $currentMonth - 1 ?: 12; // Handles the case when the current month is January
+
+        //groupBy category_id and item type
+    }
+
+    protected function getSum($data)
+    {
+        $sum = 0;
+        foreach ($data as $d) {
+            $sum += $d->amount;
+        }
+        return $sum;
     }
 
 }

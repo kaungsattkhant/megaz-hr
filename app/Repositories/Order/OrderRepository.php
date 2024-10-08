@@ -176,8 +176,6 @@ class OrderRepository implements OrderRepositoryInterface
         }
     }
 
-
-
     public function orderItemStatusChange(array $data)
     {
         DB::beginTransaction();
