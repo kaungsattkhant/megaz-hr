@@ -389,9 +389,9 @@ class InvoiceRepository implements InvoiceRepositoryInterface
 
                 $hoursDifference = $final_hour;
 
-                if (($total_duration + $hoursDifference) < 1) {
-                    ResponseMessage("You can't end this room before 1 hours", 402);
-                }
+                // if (($total_duration + $hoursDifference) < 1) {
+                //     ResponseMessage("You can't end this room before 1 hours", 402);
+                // }
                 $data['session_duration'] = $hoursDifference;
                 $data['end_date'] = CurrentTime();
                 $data['price'] = $hoursDifference * $entity->price_per_hour;
