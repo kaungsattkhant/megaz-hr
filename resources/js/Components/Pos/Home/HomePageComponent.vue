@@ -129,7 +129,7 @@
                                     <!-- {{ selectedRoom.room_sessions[0].invoice.invoice_id ? selectedRoom.room_sessions[0].invoice.invoice_id
                                     : '' }} -->
 
-                                    {{ selectedRoom.room_sessions ? (selectedRoom.room_sessions[0].invoice ?
+                                    {{ selectedRoom.room_sessions[0] ? (selectedRoom.room_sessions[0].invoice ?
                                         selectedRoom.room_sessions[0].invoice.invoice_id : '')
                                     : '' }}
 
@@ -1149,10 +1149,10 @@ export default {
                 if (this.roomList[0]?.room_sessions.length > 0) {
                     this.isOpenRoom.step_1 = false;
                     this.isOpenRoom.step_2 = false;
-                    this.isOpenRoom.step_detail = true;
+                    this.isOpenRoom.step_detail = false;
                 }
                 if (this.roomList[0]?.room_sessions.length < 1) {
-                    this.isOpenRoom.step_1 = true;
+                    this.isOpenRoom.step_1 = false;
                     this.isOpenRoom.step_2 = false;
                     this.isOpenRoom.step_detail = false;
                 }
