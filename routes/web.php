@@ -278,3 +278,7 @@ Route::middleware(['departments:sale-target'])->group(function () {
     Route::view('/sale_target_menu/create', 'sale_target_menu.create')->name('sale_target_menu/create');
     Route::view('/sale_target_menu/{id}/edit', 'sale_target_menu.edit')->name('sale_target_menu/edit');
 });
+
+
+Route::view('/menu_sale_report', 'menu_sale_report.index')->name('menu_sale_report.index');
+Route::view('/menu_costing', 'menu_costing.index')->name('menu_costing.index');
