@@ -11,9 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('item_menu', function (Blueprint $table) {
-            //
-            $table->decimal('price')->after('weight');
+        Schema::create('item_types', function (Blueprint $table) {
+            $table->id();
+            $table->string('name');
+            $table->boolean('is_active')->default(1);
+            $table->timestamps();
+            $table->softDeletes();
         });
     }
 
@@ -22,8 +25,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('item_menu', function (Blueprint $table) {
-            //
-        });
+        Schema::dropIfExists('item_types');
     }
 };

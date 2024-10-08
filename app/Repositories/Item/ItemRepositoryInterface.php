@@ -18,4 +18,6 @@ interface ItemRepositoryInterface
 
     public function getItemPriceListByItem($item_id);
 
+    public function getItemType();
+
 }

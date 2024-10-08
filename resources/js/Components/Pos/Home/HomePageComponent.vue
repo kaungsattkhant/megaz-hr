@@ -93,7 +93,7 @@
                                 </p>
                             </div>
                             <img class="w-[60%] mx-auto mb-6" src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRnjfjQ0p-BZt5Vb6KhcdHPeC4hBxiKEYXxMw&s" alt="">
-                            
+
                         </div>
                     </div>
                 </div>
@@ -1094,7 +1094,7 @@ export default {
             total_package_menu_price:0,
             package_total:0,
 
-            //create menu , add hour , change room
+            // create menu , add hour , change room
             menuList: [],
             invoiceId: null,
             selectedMenu: null,
@@ -1114,7 +1114,7 @@ export default {
             discount_type: null,
             isShowDiscount: true,
 
-            //rooftop
+            // rooftop
             tableList: [],
 
             currentTime: getCurretDateTime(),
@@ -1170,7 +1170,7 @@ export default {
                     
                     // this.selectedRoom = response.data[0];
                     // this.getPurchaseMenuList();
-                    
+
                     // if(this.selectedRoom){
                     //     if (this.selectedRoom.is_active == 1) {
                     //         this.isOpenRoomStep('step_detail');
@@ -1181,6 +1181,8 @@ export default {
                     //     }
                     // }
                 }
+
+
             }
         },
 
@@ -1767,7 +1769,7 @@ export default {
                     type: "warn"
                 });
             }
-            
+
         },
         async EndRoom() {
             let totalAmount = this.printInvoiceData.total;

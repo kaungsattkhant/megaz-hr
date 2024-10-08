@@ -21,6 +21,8 @@
                     </select>
                 </div>
 
+
+
                 <button class="add-btn h-8 mx-2 " @click="searchBtnClicked">Search</button>
                 <button class="add-btn h-8 mx-2 " @click="clearSearchBtnClicked">Clear</button>
 
@@ -273,6 +275,16 @@
                         </label>
                         <input type="number" placeholder="Item Price" v-model="price" class="input-ui">
                     </div>
+
+                    <div class="mb-4">
+                        <label for="" class="label-form mb-3">
+                            Item Type
+                        </label>
+                        <select name="" id="" v-model="itemType" class="input-ui">
+                            <option :value="item_type" v-for="(item_type, index) in itemTypeList" :key="index"> {{ item_type.name }}
+                            </option>
+                        </select>
+                    </div>
                     <div class="mb-4">
                         <label for="" class="label-form mb-3">
                             UOM
@@ -381,6 +393,7 @@ export default {
             itemCategoryList: [],
             itemList: [],
             uomList: [],
+            itemTypeList:[],
             name: '',
             price: null,
             selectedUOM: null,
@@ -391,6 +404,7 @@ export default {
             updatePriceItem: null,
             updatedPrice: null,
             code:null,
+            itemType:null,
 
 
             isFirstGroup: true,
@@ -435,6 +449,17 @@ export default {
             }
         },
 
+
+        async getItemTypeList()
+        {
+            let url = `/api/get_item_type`;
+            let response = await getApiData({url:url, token: this.getToken()});
+            if(response.data){
+                this.itemTypeList = response.data;
+            }
+        },
+
+
         async getUomList() {
             let url = `/api/uoms`;
             let response = await getApiData({ url: url, token: this.getToken() });
@@ -468,6 +493,7 @@ export default {
             formData.append('price', this.price);
             formData.append('category_id', this.selectedCategory.id);
             formData.append('base_uom_id',this.selectedBaseUom.id);
+            formData.append('item_type_id',this.itemType.id);
             let response = await postApiData({ url: url, form_data: formData, token: this.getToken() });
             if (response.success) {
                 // this.getItemList(this.currentPage);
@@ -521,6 +547,7 @@ export default {
         this.getItemCategoryList();
         this.getUomList();
         this.getItemList(1);
+        this.getItemTypeList();
     },
 
     mounted() {

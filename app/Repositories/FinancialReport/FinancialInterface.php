@@ -11,4 +11,8 @@ interface FinancialInterface
     public function BalanceSheet($request);
 
     public function TrialBalance($request);
+
+    public function getProfitAndLoss($request);
+
+    public function getInventorySchedule($request);
 }

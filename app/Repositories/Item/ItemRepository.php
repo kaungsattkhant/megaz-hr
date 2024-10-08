@@ -3,6 +3,7 @@
 namespace App\Repositories\Item;
 
 use App\Models\Item;
+use App\Models\ItemType;
 use App\Models\ItemPrice;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -101,5 +102,10 @@ class ItemRepository implements ItemRepositoryInterface
     public function getItemPriceListByItem($item_id){
         return ItemPrice::with('uom')->orderBy('id','desc')->where('item_id',$item_id)->paginate(20);
     }
+
+    public function getItemType(){
+        return ItemType::all();
+    }
+
 
 }

@@ -138,6 +138,7 @@ import SaleTargetMenuCreateComponent from './Components/SaleTarget/SaleTargetMen
 import SaleTargetMenuEditComponent from './Components/SaleTarget/SaleTargetMenuEditComponent.vue';
 import MenuSaleReportComponent from './Components/Menus/MenuSaleReportComponent.vue';
 import MenuCostingComponent from './Components/Menus/MenuCostingComponent.vue';
+import PosOrderItemList from './Components/Pos/OrderItem/PosOrderItemList.vue';
 
 app.component('NavBarComponent', NavBarComponent);
 app.component('StaffListComponent', StaffListComponent);
@@ -255,6 +256,7 @@ app.component('SaleTargetMenuCreateComponent',SaleTargetMenuCreateComponent);
 app.component('SaleTargetMenuEditComponent',SaleTargetMenuEditComponent);
 app.component('MenuSaleReportComponent',MenuSaleReportComponent);
 app.component('MenuCostingComponent',MenuCostingComponent);
+app.component('PosOrderItemList',PosOrderItemList);
 
 app.use(store);
 app.use(Notifications);

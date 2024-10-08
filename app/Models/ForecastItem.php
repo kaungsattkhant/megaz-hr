@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class ForecastItem extends Model
 {
     use HasFactory;
-    protected $fillable=['item_id','quantity','item_usage_forecast_id'];
+    protected $fillable=['item_id','quantity','item_usage_forecast_id','uom_id'];
     protected $with=['item'];
     public function item(){
         return $this->belongsTo(\App\Models\Item::class);
