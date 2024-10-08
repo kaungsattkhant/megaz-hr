@@ -81,7 +81,7 @@
                                                 {{ menuOrder.menu.name }}
                                             </td>
                                             <td colspan="3" class="whitespace-nowrap px-6 py-3 select-parent">
-                                                <select name="" id="" :disabled="menuOrder.area_id" class=" select-box text-xs pl-0 border-0 focus:shadow-none focus:outline-none focus:ring-0 select-box"
+                                                <select name="" id="" :disabled="menuOrder.area_id" class="text-xs pl-0 border-0 focus:shadow-none focus:outline-none focus:ring-0 select-box"
                                                     placeholder="Select Area">
                                                     <option :selected="!menuOrder.area_id" disabled selected>Select Area</option>
                                                     <option v-for="(area,index) in menuOrder.menu.areas" :value="area.id" class="">
@@ -186,7 +186,7 @@
                 const selectElement = selectParent.find('.select-box');
                 this.selectedAreaId = selectElement.val();
                 console.log('Selected Value:', this.selectedAreaId);
-
+                console.log('area = ' , id)
                 if(!this.selectedAreaId){
                     this.$notify({
                         title: `Not valid`,

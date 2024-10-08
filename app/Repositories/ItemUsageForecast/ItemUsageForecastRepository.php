@@ -81,6 +81,7 @@ class ItemUsageForecastRepository implements ItemUsageForecastInterface
 
     public function updateOrCreate($request)
     {
+
         $data = $request->all();
         $staff=UserData();
         $items = json_decode($request->items);
@@ -105,6 +106,7 @@ class ItemUsageForecastRepository implements ItemUsageForecastInterface
                 $item_data['quantity'] = $item->quantity;
                 $item_data['item_usage_forecast_id'] = $itemUsageForecast->id;
                 $item_data['item_id'] = $item->item_id;
+                $item_data['uom_id'] = $item->uom_id;
                 $itemUsageForecast->forecast_items()->updateOrCreate(['id' => $item_data['id']], $item_data);
             }
             DB::commit();
