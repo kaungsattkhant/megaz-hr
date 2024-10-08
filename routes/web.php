@@ -282,3 +282,5 @@ Route::middleware(['departments:sale-target'])->group(function () {
 
 Route::view('/menu_sale_report', 'menu_sale_report.index')->name('menu_sale_report.index');
 Route::view('/menu_costing', 'menu_costing.index')->name('menu_costing.index');
+
+Route::view('/pos_order_items','pos.orderItem.index');

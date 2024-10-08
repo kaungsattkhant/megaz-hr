@@ -244,7 +244,7 @@ class OrderRepository implements OrderRepositoryInterface
     // for pos
     public function getOrderItemByPos()
     {
-        $orderItems = OrderItem::with('area','menu')->orderBy('created_at','desc')->paginate(config('common.list_count'));
+        $orderItems = OrderItem::with('area','menu.areas')->orderBy('created_at','desc')->paginate(config('common.list_count'));
         ResponseData($orderItems);
     }
 
@@ -252,6 +252,7 @@ class OrderRepository implements OrderRepositoryInterface
     {
         DB::beginTransaction();
         try{
+
             $orderItem = OrderItem::find($id);
             $orderItem->update([
                 'area_id' => $request->area_id,
