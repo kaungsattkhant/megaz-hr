@@ -16,6 +16,7 @@ return new class extends Migration
             $table->string('name',45);
             $table->string('code');
             $table->foreignId('category_id')->constrained();
+            $table->unsignedInteger(column: 'item_type_id');
             $table->unsignedBigInteger('base_uom_id')->constrained();
             $table->boolean('is_active')->default(1);
             $table->timestamps();

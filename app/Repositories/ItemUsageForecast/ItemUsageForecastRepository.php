@@ -4,6 +4,7 @@ namespace App\Repositories\ItemUsageForecast;
 
 use App\Models\ForecastItem;
 use App\Models\ItemUsageForecast;
+use App\Models\Staff;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -11,16 +12,30 @@ class ItemUsageForecastRepository implements ItemUsageForecastInterface
 {
     public function list($request)
     {
-        $itemUsageForecasts=ItemUsageForecast::with(['forecast_items','department'])
-        ->orderByDesc('id')
-        ->paginate(config('app.common'));
-        return $itemUsageForecasts;
+        $staff = Staff::find(UserData()->id);
+        $isStaff = $staff->checkRoles('Staff');
+
+        if($isStaff==true)
+        {
+            $itemUsageForecasts=ItemUsageForecast::with(['forecast_items','department'])
+            ->orderByDesc('id')
+            ->where('created_by',UserData()->id)
+            ->paginate(config('app.common'));
+            return $itemUsageForecasts;
+        }else{
+            $itemUsageForecasts=ItemUsageForecast::with(['forecast_items','department'])
+            ->orderByDesc('id')
+            ->paginate(config('app.common'));
+            return $itemUsageForecasts;
+        }
+
     }
 
     public function itemUsageForecastListByMonth()
     {
         $itemUsageForecasts = ItemUsageForecast::selectRaw('MONTH(date) as month')
             ->join('forecast_items', 'item_usage_forecasts.id', '=', 'forecast_items.item_usage_forecast_id')
+            ->selectRaw('SUM(forecast_items.quantity) as total_quantity')
             ->groupByRaw('MONTH(date)')
             ->paginate(config('commont.list_count'));
 

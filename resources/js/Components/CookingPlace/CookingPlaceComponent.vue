@@ -61,6 +61,7 @@
                                         {{ cookingPlace.area.name }}
                                     </td>
                                     <td class="whitespace-nowrap">
+                                        <!-- hein htet aung -->
                                         <!-- <span v-for="avaplaces as cookingPlace.available_cooking_places" >
                                         {{ cookingPlace.available_cooking_places.find(place=>place.cooking_placeable_type='menu')?.cooking_placeable }}
 
