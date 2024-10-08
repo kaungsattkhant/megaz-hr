@@ -93,7 +93,7 @@
                                 </p>
                             </div>
                             <img class="w-[60%] mx-auto mb-6" src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRnjfjQ0p-BZt5Vb6KhcdHPeC4hBxiKEYXxMw&s" alt="">
-                            
+
                         </div>
                     </div>
                 </div>
@@ -1168,7 +1168,7 @@ export default {
                     this.getSelectedRoom();
                     // this.selectedRoom = response.data[0];
                     // this.getPurchaseMenuList();
-                    
+
                     // if(this.selectedRoom){
                     //     if (this.selectedRoom.is_active == 1) {
                     //         this.isOpenRoomStep('step_detail');
@@ -1179,7 +1179,7 @@ export default {
                     //     }
                     // }
                 }
-                
+
 
             }
         },
@@ -1767,7 +1767,7 @@ export default {
                     type: "warn"
                 });
             }
-            
+
         },
         async EndRoom() {
             let totalAmount = this.printInvoiceData.total;
