@@ -74,14 +74,14 @@
                                         {{ (cashbook.balance).toLocaleString() }}
                                     </td>
                                 </tr>
-                                <tr class="">
+                                <!-- <tr class="">
                                     <td colspan="5" class="whitespace-nowrap px-6 py-4">
-
+                                        dsfadsfsasdffdafa
                                     </td>
                                     <td class="whitespace-nowrap px-6 py-4">
                                         {{ remainingBalance.toLocaleString() }}
                                     </td>
-                                </tr>
+                                </tr> -->
                             </tbody>
                         </table>
                     </div>
