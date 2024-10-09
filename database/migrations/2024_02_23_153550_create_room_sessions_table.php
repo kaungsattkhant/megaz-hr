@@ -17,7 +17,7 @@ return new class extends Migration
             $table->dateTime('end_date')->nullable();
             $table->decimal('session_duration')->nullable();
             $table->unsignedBigInteger('invoice_id');
-            $table->unsignedBigInteger('entity_id');
+            $table->unsignedBigInteger('entity_session_id');
             $table->double('price')->default(0);
             // $table->string('status')->default('running');
             $table->double('discount_session')->nullable();
