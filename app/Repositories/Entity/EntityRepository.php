@@ -102,6 +102,7 @@ class EntityRepository implements EntityRepositoryInterface
     {
         DB::beginTransaction();
         try {
+            dd('stop');
             $entity = Entity::create($data);
             DB::commit();
             return $entity;

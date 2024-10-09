@@ -283,7 +283,7 @@ export default {
         },
 
         async getCategoryList() {
-            const response = await getApiData({ url: '/api/area_categories', token: this.getToken() });
+            const response = await getApiData({ url: '/api/area_categories?area_type=Selling Area', token: this.getToken() });
             if (response.data) {
                 this.categoryList = response.data;
             }

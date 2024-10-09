@@ -79,6 +79,7 @@ use App\Http\Controllers\API\SaleTargetResultAPIController;
 use App\Http\Controllers\API\SkillAPIController;
 use App\Http\Controllers\API\StaffAdvanceAPIController;
 use App\Models\Complaint;
+use Illuminate\Http\Request;
 
 /*
 |--------------------------------------------------------------------------
@@ -107,8 +108,12 @@ Route::get('/service_categories', function () {
     ResponseData(ServiceCategory::all());
 });
 
-Route::get('/area_categories', function () {
-    ResponseData(AreaCategory::all());
+Route::get('/area_categories', function (Request $request) {
+    ResponseData(
+        AreaCategory::when($request->area_type, function ($query, $areaType) {
+            $query->where('name', $areaType);
+        })->get()
+    );
 });
 
 Route::get('/area_types', function () {

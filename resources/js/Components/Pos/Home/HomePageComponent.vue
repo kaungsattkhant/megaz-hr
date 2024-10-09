@@ -5,7 +5,7 @@
         <div class="">
             <div class="w-[67%] pt-9 px-6">
                 <ul class="mb-5 flex list-none flex-row flex-wrap border-b-0 pl-0" role="tablist" data-te-nav-ref>
-                    <li v-for="(area, index) in areaList" role="presentation" @click="btnGetAreaItemList(area.id)">
+                    <li v-for="(area, index) in areaList" :key="index" role="presentation" @click="btnGetAreaItemList(area.id)">
                         <a href="#tabs-profile" class="my-2 mr-3 text-white block  px-7 pb-2.5 rounded-full
                             pt-3 text-xs  hover:isolate bg-[#F0C094]
                             hover:bg-[#f7a559] focus:isolate data-[te-nav-active]:bg-[#F19E51]"
@@ -18,7 +18,7 @@
                 <div class="mb-6">
                     <div class="opacity-100 transition-opacity duration-150 ease-linear">
                         <div class="flex flex-wrap gap-x-4 gap-y-4">
-                            <div v-for="(room, index) in roomList"
+                            <div v-for="(room, index) in roomList" :key="index"
                                 :class="room.is_active == 0 ? 'bg-[#55EFC4]' : 'bg-[#FF7675]'"
                                 class=" flex-shrink-0 flex-grow p-6 w-40 max-w-44 h-40">
                                 <button @click="btnClickedIsOpenRoom(room, index)"
@@ -179,8 +179,8 @@
                                 </p>
                             </div>
                             <div class=" grid grid-cols-10 gap-x-2 gap-y-3">
-                                <div v-for="(menu, index) in purchaseMenuList" class="contents">
-                                    <div v-for="menu2 in menu.order_items" class="contents">
+                                <div v-for="(menu, index) in purchaseMenuList" class="contents" :key="index">
+                                    <div v-for="menu2 in menu.order_items" class="contents" :key="menu2">
                                         <p class=" col-span-4 text-sm">
                                             {{ menu2.menu.name }}
                                         </p>
@@ -265,7 +265,7 @@
                                 </span> -->
                             </p>
                         </div>
-                        <div class="">
+                        <div class="" >
                             <button @click="btnClickedDoneSession()"
                                 class="bg-[#55EFC4] text-black text-center text-sm font-semibold w-full py-3">
                                 Done Session
@@ -315,7 +315,7 @@
                                     <select name="" id="" v-model="birthday_discount"
                                         class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0"
                                         @change="birthdayDiscountSelectChanged">
-                                        <option v-for="bd in birthdayDiscountList" :value="bd"> {{ bd.name }} </option>
+                                        <option v-for="bd in birthdayDiscountList" :value="bd" :key="bd"> {{ bd.name }} </option>
                                     </select>
                                 </div>
                             </div>
@@ -327,7 +327,7 @@
                                     <select name="" id="" v-model="room_discount"
                                         class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0"
                                         @change="roomDiscountSelectChanged">
-                                        <option v-for="rd in roomDiscountList" :value="rd"> {{ rd.name }} </option>
+                                        <option v-for="rd in roomDiscountList" :value="rd" :key="rd"> {{ rd.name }} </option>
                                     </select>
                                 </div>
                             </div>
@@ -579,7 +579,7 @@
                                 <div class="relative">
                                     <select name="" id="" v-model="selectedPackage" @change="getSelectedPackage()"
                                         class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
-                                        <option v-for="pack in packageList" :value="pack">
+                                        <option v-for="pack in packageList" :value="pack" :key="pack">
                                             {{ pack.name }}
                                         </option>
                                         <!-- <option v-for="(package,index) in packageList" :value="index"> {{ package }}</option> -->
@@ -661,7 +661,7 @@
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        <tr class="" v-for="(pm,index) in packageMenuList">
+                                        <tr class="" v-for="(pm,index) in packageMenuList" :key=index>
                                             <td class=" py-4 text-sm  ">
                                                 {{ pm.name }}
                                             </td>
@@ -783,7 +783,7 @@
                         <div class="mb-4">
                             <select name="" id="" placeholder="Menu" v-model="selectedMenu"
                                 class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
-                                <option :value="menu" v-for="(menu, index) in menuList">{{ menu.name }}</option>
+                                <option :value="menu" v-for="(menu, index) in menuList" :key="index">{{ menu.name }}</option>
                             </select>
                         </div>
                         <div class="mb-4">
@@ -834,7 +834,7 @@
                         <div class="mb-4">
                             <select name="" id="" placeholder="Menu" v-model="selectedMenuForPackage"
                                 class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
-                                <option :value="menu" v-for="(menu, index) in menuList">{{ menu.name }}</option>
+                                <option :value="menu" v-for="(menu, index) in menuList" :key="index">{{ menu.name }}</option>
                             </select>
                         </div>
                         <div class="mb-4">
@@ -1121,13 +1121,28 @@ export default {
             roomSessionData: null,
 
             roomEndTime:null,
+            authUser:null,
+            isCashier :false
         };
     },
 
     methods: {
-        ...mapGetters(['getToken']),
+        ...mapGetters(['getToken','getUser','getDepartment','getRoles']),
+
+        async getAuthUser()
+        {
+            this.authUser = this.getUser();
+            this.authUser.department = this.getDepartment();
+            this.authUser.roles = this.getRoles();
+
+            if(this.authUser.department.name == "Finance" && this.authUser.roles[0].name=='Cashier')
+            {
+                isCashier = true;
+            }
+        },
+
         async getAreaList() {
-            let url = '/api/areas'
+            let url = '/api/areas?area_category_id=2'
             const response = await getApiData({ url: url, token: this.getToken() });
             if (response.data) {
                 this.areaList = response.data;
@@ -1959,6 +1974,7 @@ export default {
         this.getCustomerList();
         this.getMenuList();
         this.getPackageList(this.currentTime);
+        this.getAuthUser();
         initTE({ Modal, Select, Ripple, Tab });
 
     }
