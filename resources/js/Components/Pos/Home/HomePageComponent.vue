@@ -1121,13 +1121,28 @@ export default {
             roomSessionData: null,
 
             roomEndTime:null,
+            authUser:null,
+            isCashier :false
         };
     },
 
     methods: {
-        ...mapGetters(['getToken']),
+        ...mapGetters(['getToken','getUser','getDepartment','getRoles']),
+
+        async getAuthUser()
+        {
+            this.authUser = this.getUser();
+            this.authUser.department = this.getDepartment();
+            this.authUser.roles = this.getRoles();
+            
+            if(this.authUser.department.name == "Finance" && this.authUser.roles[0].name=='Cashier')
+            {
+                isCashier = true;
+            }
+        },
+
         async getAreaList() {
-            let url = '/api/areas'
+            let url = '/api/areas?area_category_id=2'
             const response = await getApiData({ url: url, token: this.getToken() });
             if (response.data) {
                 this.areaList = response.data;
@@ -1957,6 +1972,7 @@ export default {
         this.getCustomerList();
         this.getMenuList();
         this.getPackageList(this.currentTime);
+        this.getAuthUser();
         initTE({ Modal, Select, Ripple, Tab });
 
     }
