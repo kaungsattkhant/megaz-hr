@@ -40,25 +40,25 @@
                                 <th scope="col" class="">
                                     Code
                                 </th>
-                                <th scope="col" class="text-left">
+                                <th scope="col" class="">
                                     Menu Name
                                 </th>
-                                <th scope="col" class="text-left">
+                                <th scope="col" class="">
                                     Category
                                 </th>
-                                <th scope="col" class="text-left">
+                                <th scope="col" class="">
                                     Sale Price
                                 </th>
-                                <th scope="col" class="text-left">
+                                <th scope="col" class="">
                                     Quantity
                                 </th>
-                                <th scope="col" class="text-left">
+                                <th scope="col" class="">
                                     Cost
                                 </th>
-                                <th scope="col" class="text-left">
+                                <th scope="col" class="">
                                     GP
                                 </th>
-                                <th scope="col" class="text-left">
+                                <th scope="col" class="">
                                     GP
                                 </th>
                             </tr>
@@ -107,7 +107,7 @@
                     <div class="flex justify-center">
 
                         <div v-if="totalData != 0" class=" bg-white  flex justify-center mt-5 py-3">
-                            <button class="rounded px-6 py-1 border  hover:bg-slate-200" :disabled="currentPage === 1"
+                            <button class="rounded px-6 py-1 border  hover:bg-slate-200" :disabled="currentPage === 1" :class="currentPage === 1 ? 'cursor-not-allowed' : ''"
                                 @click="getMenuCostingList(currentPage - 1)">«</button>
 
                             <button class=" text-sm px-5 border">
@@ -115,7 +115,7 @@
                                 / <span class="text-gray-400">{{ lastPage ? lastPage : '1' }}</span>
                             </button>
 
-                            <button class=" rounded px-6  py-1 border  hover:bg-slate-200"
+                            <button class=" rounded px-6  py-1 border  hover:bg-slate-200" :class="currentPage === lastPage ? 'cursor-not-allowed' : ''"
                                 :disabled="currentPage === lastPage" @click="getMenuCostingList(currentPage + 1)">
                                 »</button>
                         </div>
@@ -143,7 +143,7 @@ import { getCurrentDate } from '../../utilities/datetime-helpers';
 export default {
     data() {
         return {
-            saleReportList: [],
+            menuCostingList: [],
             menuCategoryList:[],
             searchInput:null,
             selectedMenuCategory:null,
@@ -157,6 +157,7 @@ export default {
 
             perPage:null,
             currentPage:null,
+            lastPage:null,
 
             
         };
@@ -168,9 +169,10 @@ export default {
             let url = this.url + pageNumber + this.url_search + this.url_category + this.url_month;
             let response = await getApiData({ url: url, token: this.getToken() });
             if (response.data) {
-                this.saleReportList = response.data.data;
+                this.menuCostingList = response.data.data;
                 this.currentPage = pageNumber;
                 this.perPage = response.data.per_page;
+                this.lastPage = response.data.last_page;
             }
         },
         async searchBtnClicked() {
@@ -224,7 +226,7 @@ export default {
         //     }
         //     let response = await getApiData({ url: url, token: this.getToken() });
         //     if (response.data) {
-        //         this.saleReportList = response.data.data;
+        //         this.menuCostingList = response.data.data;
         //         this.currentPage = pageNumber;
         //         this.perPage = response.data.per_page;
         //     }
