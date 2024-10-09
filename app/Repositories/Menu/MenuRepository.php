@@ -233,7 +233,8 @@ class MenuRepository implements MenuRepositoryInterface
                 DB::raw('SUM(order_items.quantity) as total_quantity'),
                 DB::raw('MONTH(order_items.created_at) as month'),
                 DB::raw('YEAR(order_items.created_at) as year')
-            );
+            )
+            ->where('order_items.status', 'done');
 
         // Apply filters
         if (!empty($searchTerm)) {
