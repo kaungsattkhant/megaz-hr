@@ -28,6 +28,12 @@
                 <button class="add-btn h-8" @click="monthChanged()">Done</button>
             </div>
         </div>
+
+
+
+        
+
+
         <div class="block mx-4 mt-4 pb-4">
             <div class="overflow-x-auto">
                 <div class="table-container">
@@ -46,7 +52,13 @@
                                 <th scope="col" class="text-left">
                                     Category
                                 </th>
-                                <th>test</th>
+
+                                <th scope="col" class="text-left">
+                                    Total Quantity
+                                </th>
+                                <th v-for="(value,month) in monthOrder">
+                                    {{ value }}
+                                </th>
                             </tr>
                         </thead>
                         <tbody>
@@ -70,6 +82,9 @@
                                     <td class="font-medium ">
                                         {{ saleReport.total_quantity }}
                                     </td>
+                                    <td class="font-medium " v-for="month in saleReport.month">
+                                        {{ month }}
+                                    </td>
                                     
                                     
                                 </tr>
@@ -82,7 +97,7 @@
 
                         <div v-if="totalData != 0" class=" bg-white  flex justify-center mt-5 py-3">
                             <button class="rounded px-6 py-1 border  hover:bg-slate-200" :disabled="currentPage === 1"
-                                @click="getTransactionList(currentPage - 1)">«</button>
+                                @click="getSaleReportList(currentPage - 1)">«</button>
 
                             <button class=" text-sm px-5 border">
                                 Page <span @dblclick="showInput">{{ currentPage }}</span> / <span
@@ -91,7 +106,7 @@
                             </button>
 
                             <button class=" rounded px-6  py-1 border  hover:bg-slate-200"
-                                :disabled="currentPage === lastPage" @click="getTransactionList(currentPage + 1)">
+                                :disabled="currentPage === lastPage" @click="getSaleReportList(currentPage + 1)">
                                 »</button>
                         </div>
                     </div>
@@ -133,6 +148,53 @@ export default {
             perPage:null,
             currentPage:null,
 
+            menuItems:[
+                {
+                    "menu_id": 1,
+                    "menu_code": "888",
+                    "menu_name": "Menu 1",
+                    "menu_category": "Asian",
+
+                    "total_quantity": 8,
+
+                    "January": 0,
+                    "February": 0,
+                    "March": 0,
+                    "April": 0,
+                    "May": 0,
+                    "June": 0,
+                    "July": 0,
+                    "August": 0,
+                    "September": 6,
+                    "October": 2,
+                    "November": 0,
+                    "December": 0
+                },
+                {
+                    "menu_id": 2,
+                    "menu_code": "999",
+                    "menu_name": "Menu 2",
+                    "menu_category": "Appetiser",
+                    "total_quantity": 3,
+
+                    "January": 1,
+                    "February": 2,
+                    "March": 3,
+                    "April": 4,
+                    "May": 5,
+                    "June": 6,
+                    "July": 7,
+                    "August": 8,
+                    "September": 9,
+                }
+            ],
+            testMenu:[],
+            newTest:[],
+            monthOrder : [
+            "January", "February", "March", "April", "May", 
+            "June", "July", "August", "September", "October", 
+            "November", "December"
+            ],
             
         };
     },
@@ -143,7 +205,7 @@ export default {
             let url = this.url + pageNumber + this.url_search + this.url_category + this.url_month;
             let response = await getApiData({ url: url, token: this.getToken() });
             if (response.data) {
-                this.saleReportList = response.data.data;
+                // this.saleReportList = response.data.data;
                 this.currentPage = pageNumber;
                 this.perPage = response.data.per_page;
             }
@@ -166,6 +228,61 @@ export default {
         monthChanged(){
             this.url_month = '&from_date=' + this.fromDate + '&to_date=' + this.toDate
             this.getSaleReportList(1)
+        },
+
+
+        test(){
+            // this.menuItems.forEach(menu => {
+            //     this.newTest.push(
+            //         {
+            //             test : menu[1]
+            //         }
+            //     );
+            // });
+        },
+        processMenu() {
+            let transformedMenu = this.menuItems.map(item => {
+                const { menu_id, menu_code, menu_name, menu_category, total_quantity, ...rest } = item;
+                
+                return {
+                    menu_id, 
+                    menu_code, 
+                    menu_name, 
+                    menu_category, 
+                    total_quantity,
+                    month: { ...rest }
+                    
+                };
+            });
+            this.saleReportList = transformedMenu
+
+            // transformedMenu.forEach(menu => {
+            //     let month = {
+            //         April:0,
+            //         August:0,
+            //         December:0,
+            //         February:0,
+            //         January:0,
+            //         July:0,
+            //         June:0,
+            //         March:0,
+            //         May:0,
+            //         November:0,
+            //         October:2,
+            //         September:6,
+            //     }
+            //     let sortedMonth = {};
+            //     this.monthOrder.forEach(key => {
+            //         if (menu.month.hasOwnProperty(key)) {
+            //             sortedMonth[key] = menu.month[key];
+            //         }
+            //     });
+            //     console.log(sortedMonth)
+            //     this.newTest.push({
+            //         months: sortedMonth
+            //     })
+                
+            // });
         },
         
 
@@ -222,9 +339,12 @@ export default {
 
     },
 
+    
     created() {
         this.getSaleReportList(1);
         this.getMenuCategoryList();
+        this.processMenu();
+        this.test();
     },
     
 

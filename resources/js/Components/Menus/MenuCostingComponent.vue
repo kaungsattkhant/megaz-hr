@@ -23,7 +23,9 @@
                     <option v-for="(category,index) in menuCategoryList" :key="index"> {{ category.name }} </option>
                     </select>
                 </div>
-                <input type="date" class="input-ui h-8" v-model="selectedDate" @change="selectedDateChange()">
+                <input type="date" class="input-ui h-8" v-model="fromDate">
+                <input type="date" class="input-ui h-8" v-model="toDate">
+                <button class="add-btn h-8" @click="monthChanged()">Done</button>
             </div>
         </div>
         <div class="block mx-4 mt-4 pb-4">
@@ -44,29 +46,55 @@
                                 <th scope="col" class="text-left">
                                     Category
                                 </th>
-                                <th>test</th>
+                                <th scope="col" class="text-left">
+                                    Sale Price
+                                </th>
+                                <th scope="col" class="text-left">
+                                    Quantity
+                                </th>
+                                <th scope="col" class="text-left">
+                                    Cost
+                                </th>
+                                <th scope="col" class="text-left">
+                                    GP
+                                </th>
+                                <th scope="col" class="text-left">
+                                    GP
+                                </th>
                             </tr>
                         </thead>
                         <tbody>
 
                             <!-- looping start -->
-                            <div class="contents" v-for="(saleReport, index) in saleReportList"
+                            <div class="contents" v-for="(menuCosting, index) in menuCostingList"
                                 :key="index">
                                 <tr class="">
                                     <td class="font-medium ">
                                         {{ perPage * (currentPage - 1) + (++index) }}
                                     </td>
                                     <td class="font-medium ">
-                                        {{ saleReport.menu_code }}
+                                        {{ menuCosting.menu_code }}
                                     </td>
                                     <td class="font-medium ">
-                                        {{ saleReport.menu_name }}
+                                        {{ menuCosting.menu_name }}
                                     </td>
                                     <td class="font-medium ">
-                                        {{ saleReport.menu_category }}
+                                        {{ menuCosting.menu_category }}
                                     </td>
                                     <td class="font-medium ">
-                                        {{ saleReport.total_quantity }}
+                                        {{ menuCosting.total_sale_price }}
+                                    </td>
+                                    <td class="font-medium ">
+                                        {{ menuCosting.total_quantity }}
+                                    </td>
+                                    <td class="font-medium ">
+                                        {{ menuCosting.total_cost_price }}
+                                    </td>
+                                    <td class="font-medium ">
+                                        {{ menuCosting.total_gp }}
+                                    </td>
+                                    <td class="font-medium ">
+                                        {{ menuCosting.total_gp_percentage }}
                                     </td>
                                     
                                     
@@ -80,16 +108,15 @@
 
                         <div v-if="totalData != 0" class=" bg-white  flex justify-center mt-5 py-3">
                             <button class="rounded px-6 py-1 border  hover:bg-slate-200" :disabled="currentPage === 1"
-                                @click="getTransactionList(currentPage - 1)">«</button>
+                                @click="getMenuCostingList(currentPage - 1)">«</button>
 
                             <button class=" text-sm px-5 border">
-                                Page <span @dblclick="showInput">{{ currentPage }}</span> / <span
-                                    class="text-gray-400">{{
-                                    lastPage }}</span>
+                                Page <span @dblclick="showInput">{{ currentPage }}</span> 
+                                / <span class="text-gray-400">{{ lastPage ? lastPage : '1' }}</span>
                             </button>
 
                             <button class=" rounded px-6  py-1 border  hover:bg-slate-200"
-                                :disabled="currentPage === lastPage" @click="getTransactionList(currentPage + 1)">
+                                :disabled="currentPage === lastPage" @click="getMenuCostingList(currentPage + 1)">
                                 »</button>
                         </div>
                     </div>
@@ -123,7 +150,7 @@ export default {
             fromDate:null,
             toDate:null,
 
-            url:'/api/menu_report?page=',
+            url:'/api/menu_costing?page=',
             url_search:'',
             url_category:'',
             url_month:'',
@@ -137,7 +164,7 @@ export default {
 
     methods: {
         ...mapGetters(['getToken']),
-        async getSaleReportList(pageNumber) {
+        async getMenuCostingList(pageNumber) {
             let url = this.url + pageNumber + this.url_search + this.url_category + this.url_month;
             let response = await getApiData({ url: url, token: this.getToken() });
             if (response.data) {
@@ -148,7 +175,7 @@ export default {
         },
         async searchBtnClicked() {
             this.url_search = '&search=' + this.searchInput
-            this.getSaleReportList(1);
+            this.getMenuCostingList(1);
         },
         menuCategoryChanged(){
             this.url_search = '';
@@ -159,11 +186,11 @@ export default {
             else{
                 this.url_category = '&menu_category_id=' + this.selectedMenuCategory;
             }
-            this.getSaleReportList(1)
+            this.getMenuCostingList(1)
         },
         monthChanged(){
             this.url_month = '&from_date=' + this.fromDate + '&to_date=' + this.toDate
-            this.getSaleReportList(1)
+            this.getMenuCostingList(1)
         },
         
 
@@ -184,7 +211,7 @@ export default {
 
 
 
-        // async getSaleReportList(pageNumber) {
+        // async getMenuCostingList(pageNumber) {
         //     let url = `/api/menu_report?page=${pageNumber}`;
         //     if (this.fromDate && this.toDate) {
         //         url = `${url}&from_date=${this.fromDate}&to_date=${this.toDate}`;
@@ -212,7 +239,7 @@ export default {
         clearSearchBtnClicked() {
             this.searchInput = null;
             this.url_search = '';
-            this.getSaleReportList(1);
+            this.getMenuCostingList(1);
         },
 
         
@@ -221,7 +248,7 @@ export default {
     },
 
     created() {
-        this.getSaleReportList(1);
+        this.getMenuCostingList(1);
         this.getMenuCategoryList();
     },
     
