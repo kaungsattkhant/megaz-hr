@@ -273,7 +273,7 @@ class InvoiceRepository implements InvoiceRepositoryInterface
     }
 
 
-    public function addSessionDuration(array $data)
+    public function addSessionDurations(array $data)
     {
         DB::beginTransaction();
         try {
@@ -313,10 +313,34 @@ class InvoiceRepository implements InvoiceRepositoryInterface
         }
     }
 
-    // public function addSessionDurationNewVersion()
-    // {
+    public function addSessionDuration(array $data)
+    {
+        DB::beginTransaction();
+        try{
+            $invoice = Invoice::find($data['invoice_id']);
 
-    // }
+        if ($invoice->invoice_type == 'endless_time') {
+            ResponseMessage('Room with session and package can only be added duration', 422);
+        }
+
+        $roomSession = $invoice->latestSession;
+        $invoice->total_session_price += $data['session_duration'] * $roomSession->entitySession->entity->price_per_hour;
+        $latestRoomFreeTime = 1 - $roomSession->session_duration;
+
+        $latestRoomTimeToFill = 1 - $latestRoomFreeTime;
+
+        $additionDuration = $data['sessoin_duration'] - $latestRoomTimeToFill;
+        dd($additionDuration,$latestRoomTimeToFill);
+
+        }catch(\Exception $e)
+        {
+            DB::rollBack();
+            ResponseMessage($e->getMessage(),402);
+            throw $e;
+        }
+
+
+    }
 
     public function invoiceEntityChange($data)
     {
