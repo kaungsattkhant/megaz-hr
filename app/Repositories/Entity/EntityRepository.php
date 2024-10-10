@@ -4,7 +4,9 @@ namespace App\Repositories\Entity;
 
 use App\Models\Area;
 use App\Models\Entity;
+use App\Models\EntitySession;
 use App\Models\OrderItem;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -20,13 +22,13 @@ class EntityRepository implements EntityRepositoryInterface
                     $q->where('name', 'LIKE', '%' . $request->search_input . '%');
                 })
                 ->whereEntityType($type)
-                ->orderBy('created_at','desc')
+                ->orderBy('created_at', 'desc')
                 ->paginate(config('common.list_count'));
         } else {
             $entities = Entity::where('is_available', 1)
                 ->whereEntityType($type)
                 ->with('service_category')
-                ->orderBy('created_at','desc')
+                ->orderBy('created_at', 'desc')
                 ->get();
             return $entities;
         }
@@ -35,27 +37,26 @@ class EntityRepository implements EntityRepositoryInterface
     public function entityWithInvoice(array $data)
     {
         $area = Area::find($data['area_id']);
-        $currentDate = $data['current_date'];
+
         $entities = Entity::where('is_available', 1)
             ->where('area_id', $area->id)
-            ->with(['roomSessions' => function ($query) {
-                $query->orderBy('created_at', 'desc')->limit(1);
-            },])
+            ->with(['entitySessions' => function ($query) {
+                $query->where('is_active', 1)
+                    ->with('roomSession.invoice');
+            }])
             ->get();
 
         return $entities;
     }
 
 
-
-
-    public function entityDetail(array $data, int $entityId)
+    public function entityDetail(array $data, int $entitySessionId)
     {
-        $entity = Entity::where('is_available', 1)
+        $entity = EntitySession::where('is_available', 1)
             ->with(['roomSessions' => function ($query) {
                 $query->latest()->first();
             }])
-            ->find($entityId);
+            ->find($entitySessionId);
 
         foreach ($entity->roomSessions as $roomSession) {
             $invoice = $roomSession->invoice; // Access the invoice for the current room session
@@ -102,8 +103,22 @@ class EntityRepository implements EntityRepositoryInterface
     {
         DB::beginTransaction();
         try {
-            dd('stop');
+
             $entity = Entity::create($data);
+            if ($data['entity_type'] == 'room') {
+                for ($hour = 0; $hour < 24; $hour++) {
+                    $startTime = Carbon::createFromTime($hour, 1)->format('H:i');
+                    $endTime = Carbon::createFromTime(($hour + 1) % 24, 0)->format('H:i');
+                    EntitySession::create([
+                        'start_time' => $startTime,
+                        'end_time' => $endTime,
+                        'is_available' => 1,
+                        'is_active' => 0,
+                        'entity_id' => $entity->id,
+                    ]);
+                }
+            }
+
             DB::commit();
             return $entity;
         } catch (\Exception $e) {

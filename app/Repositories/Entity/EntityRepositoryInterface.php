@@ -16,7 +16,7 @@ interface EntityRepositoryInterface
 
     public function entityWithInvoice(array $data);
 
-    public function entityDetail(array $data, int $entityId);
+    public function entityDetail(array $data, int $entitySessionId);
 
     public function inactiveEntityList(array $data);
 

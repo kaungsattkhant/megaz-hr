@@ -525,7 +525,7 @@ Route::get('/menu_costing',[MenuAPIController::class,'costingMenu']);
 
 
 Route::get('/areas/{id}/entities', [EntityAPIController::class, 'getEntityWithInvoice']);
-Route::get('/entities/{id}', [EntityAPIController::class, 'getEntityDetail']);
+Route::get('/entities_sessions/{id}', [EntityAPIController::class, 'getEntitySessionDetail']);
 Route::get('/areas/{id}/inactive_entities', [EntityAPIController::class, 'getOnlyInactiveEntities']);
 
 Route::post('/entities/start', [InvoiceAPIController::class, 'startEntity']);
