@@ -40,10 +40,7 @@ class EntityRepository implements EntityRepositoryInterface
 
         $entities = Entity::where('is_available', 1)
             ->where('area_id', $area->id)
-            ->with(['entitySessions' => function ($query) {
-                $query->where('is_active', 1)
-                    ->with('roomSession.invoice');
-            }])
+            ->with('entitySessions.roomSession.invoice')
             ->get();
 
         return $entities;
