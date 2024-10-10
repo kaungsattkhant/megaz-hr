@@ -234,6 +234,7 @@
                 bookingId:null,
                 booking_staus:null,
                 selectedRoom:null,
+                testList:[],
                 };
             },
 
@@ -287,6 +288,16 @@
                     console.log(response.error);
                 }
             },
+
+
+
+            async test() {
+                const response = await getApiData({ url: '/api/areas/3/entities', token: this.getToken() });
+                if (response.data) {
+                    this.testList = response.data.data;
+                }
+            
+            },
         },
         mounted()
         {
@@ -296,6 +307,7 @@
 
         created(){
             this.getBookingList();
+            this.test();
         }
     }
 </script>
