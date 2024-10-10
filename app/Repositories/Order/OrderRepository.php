@@ -59,7 +59,6 @@ class OrderRepository implements OrderRepositoryInterface
                 DB::commit();
                 return $order;
             } else {
-
                 $data['date'] = currentTime();
                 $data['total'] = $data['original_price'] * $data['quantity'];
                 $data['total_quantity'] = $data['quantity'];
@@ -76,7 +75,7 @@ class OrderRepository implements OrderRepositoryInterface
 
                 $invoice = Invoice::find($data['invoice_id']);
                 $latestRoomSession = RoomSession::where('invoice_id', $invoice->id)->orderBy('created_at', 'desc')->first();
-                $entity = Entity::find($latestRoomSession->entity_id);
+                $entity = Entity::find($latestRoomSession->entitySession->entity_id);
                 broadcast(new KitchenNotificationRequest($entity, $order, null, $orderItems, 7));
                 DB::commit();
                 return $order;
@@ -99,7 +98,7 @@ class OrderRepository implements OrderRepositoryInterface
 
             $invoice = Invoice::find($data['invoice_id']);
             $latestRoomSession = RoomSession::where('invoice_id', $invoice->id)->orderBy('created_at', 'desc')->first();
-            $entity = Entity::find($latestRoomSession->entity_id);
+            $entity = Entity::find($latestRoomSession->entitySession->entity_id);
 
             $orderItemsArray = [];
 
@@ -166,6 +165,7 @@ class OrderRepository implements OrderRepositoryInterface
             }
 
             // Broadcast with order items array
+
             broadcast(new KitchenNotificationRequest($entity, $order, $orderItemsArray, null, 7));
             DB::commit();
             return $order;

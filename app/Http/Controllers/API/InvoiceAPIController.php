@@ -54,8 +54,6 @@ class InvoiceAPIController extends Controller
             } else {
                 $data['child'] = 0;
             }
-
-            $data['created_by'] = UserData()->id;
             $invoice = $this->invoiceRepo->createData($data);
             if ($data['type'] == 'package') {
                 $orderData['invoice_id'] = $invoice->id;

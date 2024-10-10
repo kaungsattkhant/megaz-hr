@@ -12,4 +12,22 @@ class EntitySession extends Model
     protected $fillable =[
         'start_time','end_time','is_available','is_active','entity_id',
     ];
+
+    public function entity()
+    {
+        return $this->belongsTo(Entity::class);
+    }
+
+    public function roomSessions()
+    {
+        return $this->hasMany(RoomSession::class);
+    }
+
+    public function roomSession()
+    {
+        return $this->hasOne(RoomSession::class)->latestOfMany();
+    }
+
+
+
 }

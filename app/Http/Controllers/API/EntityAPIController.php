@@ -64,7 +64,7 @@ class EntityAPIController extends Controller
         ResponseData($entity);
     }
 
-    public function getEntityDetail(Request $request, int $id)
+    public function getEntitySessionDetail(Request $request, int $id)
     {
         $data = $request->all();
         $entity = $this->entityRepo->entityDetail($data, $id);

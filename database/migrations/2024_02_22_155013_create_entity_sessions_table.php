@@ -13,8 +13,8 @@ return new class extends Migration
     {
         Schema::create('entity_sessions', function (Blueprint $table) {
             $table->id();
-            $table->string('start_time');
-            $table->string('end_time');
+            $table->time('start_time');
+            $table->time('end_time');
             $table->boolean('is_available')->default(1);
             $table->boolean('is_active')->default(1);
             $table->foreignId('entity_id')->constrained()->onDelete('cascade');
