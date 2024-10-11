@@ -31,7 +31,6 @@ class Invoice extends Model
         'room_discount_id',
         'invoice_type',
         'discount_type',
-        'invoice_type',
         'order_discount_value',
         'room_discount_value'
     ];
@@ -61,7 +60,7 @@ class Invoice extends Model
     //     return $this->hasMany(RoomSession::class);
     // }
 
-    public function sessions()
+    public function roomSession()
     {
         return $this->hasMany(RoomSession::class);
     }
