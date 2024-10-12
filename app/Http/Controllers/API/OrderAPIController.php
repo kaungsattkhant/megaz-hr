@@ -49,4 +49,9 @@ class OrderAPIController extends Controller
     {
         $this->orderRepo->orderItemAreaConfirm($id, $request);
     }
+
+    public function orderByInvoiceId(int $invoiceId)
+    {
+        $this->orderRepo->orderByInvoiceId($invoiceId);
+    }
 }

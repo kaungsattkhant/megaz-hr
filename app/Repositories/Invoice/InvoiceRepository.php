@@ -206,7 +206,14 @@ class InvoiceRepository implements InvoiceRepositoryInterface
 
                     // Ensure $index exists in $durations
                     if (isset($durations[$index])) {
+                        if($invoice->type=='package')
+                        {
+                        $roomSession['price'] = $durations[$index] * $package->session_price;
+
+                        }else{
                         $roomSession['price'] = $durations[$index] * $entity->price_per_hour;
+
+                        }
                         $roomSession['invoice_id'] = $invoice->id;
                         $roomSession['entity_session_id'] = $session->id;
 
@@ -225,9 +232,10 @@ class InvoiceRepository implements InvoiceRepositoryInterface
             }
             $invoice->room_session = $roomSession;
             $customer = Customer::find($invoice->customer_id);
+
             if (isset($data['is_waiter'])) {
                 if ($data['is_waiter'] == 1 && $invoice) {
-                    broadcast(new RoomNotificationRequest($customer, $entity, $roomSession, $invoice, UserData()->department_id));
+                    // broadcast(new RoomNotificationRequest($customer, $entity, $roomSession, $invoice, UserData()->department_id));
                 }
             }
             DB::commit();
@@ -419,7 +427,6 @@ class InvoiceRepository implements InvoiceRepositoryInterface
             $newEntity = Entity::find($data['entity_id']);
             $loopEndTime = 0;
 
-
             foreach ($leftSession as $index => $session) {
                 $session = (float)$session;
                 $newRoomSession['invoice_id'] = $data['invoice_id'];
@@ -453,7 +460,7 @@ class InvoiceRepository implements InvoiceRepositoryInterface
             $invoice = Invoice::find($data['invoice_id']);
 
             $latestRoomSession = RoomSession::where('invoice_id', $invoice->id)->orderBy('created_at', 'desc')->first();
-            $roomSessions = RoomSession::where('invoice_id', $data['invoice_id'])->with(['entity'])->get();
+            $roomSessions = RoomSession::where('invoice_id', $data['invoice_id'])->with(['entitySession.entity'])->get();
             $total_duration = 0;
             $total_session_value = 0;
 
@@ -461,7 +468,7 @@ class InvoiceRepository implements InvoiceRepositoryInterface
                 $total_session_value += $room->price;
                 $total_duration += $room->session_duration ?? 0;
             }
-            $entity = Entity::find($latestRoomSession->entity_id);
+            $entity = Entity::find($latestRoomSession->entitySession->entity_id);
             if ($invoice->invoice_type == 'endless_time') {
                 $latestRoomSession_end_date = Carbon::parse($latestRoomSession->start_date);
                 $currentDate = Carbon::now();
@@ -586,7 +593,7 @@ class InvoiceRepository implements InvoiceRepositoryInterface
             $customer = Customer::find($invoice->customer_id);
             $invoice_id = $invoice->invoice_id;
             $lastRoomSession = $invoice->latestSession;
-            $entity = Entity::find($lastRoomSession->entity_id);
+            $entity = Entity::find($lastRoomSession->entitySession->entity_id);
 
             $roomSessions = RoomSession::where('invoice_id', $data['invoice_id'])->get();
             if ($invoice->invoice_type != 'package') {
@@ -637,16 +644,18 @@ class InvoiceRepository implements InvoiceRepositoryInterface
             $data['sub_total'] = ($data['total']) - ($tax + $service_charge);
             $data['payment_status'] = 'received';
             $data['complete_date'] = CurrentTime();
-            $entity->status = 'inactive';
-            $entity->is_active = 0;
             $entity->save();
             $data['invoice_id'] = $invoice_id;
 
             $invoice->update($data);
 
             foreach ($roomSessions as $session) {
-                $session->entitySession->is_active = 0;
-                $session->entitySession->save();
+                $entitySession = $session->entitySession;
+                if ($entitySession) {
+                    $entitySession->is_active = 0;
+                    $entitySession->save();
+                    Log::info('it working on '.$entitySession->id);
+                }
             }
 
             $soldStaff = Staff::find($invoice->created_by);
@@ -689,17 +698,16 @@ class InvoiceRepository implements InvoiceRepositoryInterface
             }
 
 
-
-            $this->ledgerAndTransactionForInvoice([
-                'payment_type' => 'cash',
-                'invoice_id' => $invoice->id,
-                'food_charge' => $foodCharge,
-                'beverage_charge' => $beverageCharge,
-                'total_session_price' => $total_session_price,
-                'service_charge' => $service_charge,
-                'tax' => $tax,
-                'discount_total' => $data['discount_total'],
-            ]);
+            // $this->ledgerAndTransactionForInvoice([
+            //     'payment_type' => 'cash',
+            //     'invoice_id' => $invoice->id,
+            //     'food_charge' => $foodCharge,
+            //     'beverage_charge' => $beverageCharge,
+            //     'total_session_price' => $total_session_price,
+            //     'service_charge' => $service_charge,
+            //     'tax' => $tax,
+            //     'discount_total' => $data['discount_total'],
+            // ]);
             $catering_department = Department::where('name', 'Catering')->first();
             $msg = "The {$entity->name} is now closed. Thank you.";
 
