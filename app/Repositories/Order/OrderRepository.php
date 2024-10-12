@@ -101,7 +101,7 @@ class OrderRepository implements OrderRepositoryInterface
             $entity = Entity::find($latestRoomSession->entitySession->entity_id);
 
             $orderItemsArray = [];
-
+            $focTotal = 0;
             foreach ($data['menuArray'] as $menuData) {
 
                 $menuData['invoice_id'] = $invoiceId;
@@ -142,10 +142,10 @@ class OrderRepository implements OrderRepositoryInterface
                     $menuData['date'] = CurrentTime();
                     $menuData['order_id'] = $order->id;
                     $menuData['price'] = $menuData['original_price'] * $menuData['quantity'];
-                    $order_items = OrderItem::create($menuData);
-                    $orderItems = OrderItem::find($order_items->id);
-                    $orderItems->menu = $orderItems->menu;
-                    $orderItemsArray[] = $orderItems;
+                    // $order_items = OrderItem::create($menuData);
+                    // $orderItems = OrderItem::find($order_items->id);
+                    // $orderItems->menu = $orderItems->menu;
+                    // $orderItemsArray[] = $orderItems;
                 } else {
                     $menuData['date'] = CurrentTime();
                     $menuData['total'] = $menuData['original_price'] * $menuData['quantity'];
@@ -157,12 +157,22 @@ class OrderRepository implements OrderRepositoryInterface
                     $menuData['order_id'] = $order->id;
                     $menuData['price'] = $menuData['original_price'] * $menuData['quantity'];
 
-                    $order_items = OrderItem::create($menuData);
-                    $orderItems = OrderItem::find($order_items->id);
-                    $orderItems->menu = $orderItems->menu;
-                    $orderItemsArray[] = $orderItems;
+                    // $order_items = OrderItem::create($menuData);
+                    // $orderItems = OrderItem::find($order_items->id);
+                    // $orderItems->menu = $orderItems->menu;
+                    // $orderItemsArray[] = $orderItems;
                 }
+
+                $order_item = OrderItem::create($menuData);
+                if($order_item->is_foc == 1){
+                    $focTotal += $order_item->price;
+                }
+                $order_item->menu = $order_item->menu;
+                array_push($orderItemsArray, $order_item);
             }
+
+            $order->foc_total += $focTotal;
+            $order->save();
 
             // Broadcast with order items array
 
