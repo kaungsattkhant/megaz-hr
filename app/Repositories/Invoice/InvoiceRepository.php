@@ -206,7 +206,14 @@ class InvoiceRepository implements InvoiceRepositoryInterface
 
                     // Ensure $index exists in $durations
                     if (isset($durations[$index])) {
+                        if($invoice->type=='package')
+                        {
+                        $roomSession['price'] = $durations[$index] * $package->session_price;
+
+                        }else{
                         $roomSession['price'] = $durations[$index] * $entity->price_per_hour;
+
+                        }
                         $roomSession['invoice_id'] = $invoice->id;
                         $roomSession['entity_session_id'] = $session->id;
 
@@ -418,7 +425,6 @@ class InvoiceRepository implements InvoiceRepositoryInterface
 
             $newEntity = Entity::find($data['entity_id']);
             $loopEndTime = 0;
-
 
             foreach ($leftSession as $index => $session) {
                 $session = (float)$session;

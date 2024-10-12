@@ -54,7 +54,7 @@ class OrderRepository implements OrderRepositoryInterface
 
                 $invoice = Invoice::find($data['invoice_id']);
                 $latestRoomSession = RoomSession::where('invoice_id', $invoice->id)->orderBy('created_at', 'desc')->first();
-                $entity = Entity::find($latestRoomSession->entity_id);
+                $entity = Entity::find($latestRoomSession->entitySession->entity_id);
                 broadcast(new KitchenNotificationRequest($entity, $order, null, $orderItems, 7));
                 DB::commit();
                 return $order;
@@ -182,10 +182,19 @@ class OrderRepository implements OrderRepositoryInterface
         try {
             $users = UserData();
             $orderItem = OrderItem::find($data['id']);
+            if ($orderItem->status == 'in_progress') {
+                ResponseMessage("Order item can't be canceled because it is already in progress.", 422);
+            } else if ($orderItem->status == 'in progress') {
+                ResponseMessage("Order item can't be canceled because it is already in progress.", 422);
+            } elseif ($orderItem->status == 'done') {
+                ResponseMessage("Order item can't be canceled because it is already done.", 422);
+            } elseif ($orderItem->status == 'confirmed') {
+                ResponseMessage("Order item can't be canceled because it is already confirmed.", 422);
+            }
             $invoice = Invoice::find($orderItem->order->invoice_id);
             $latestRoomSession = RoomSession::where('invoice_id', $invoice->id)->orderBy('created_at', 'desc')->first();
 
-            $entity = Entity::find($latestRoomSession->entity_id);
+            $entity = Entity::find($latestRoomSession->entitySession->entity_id);
             if ($data['status'] == 'done') {
                 $packs = Pack::where('menu_id', $orderItem->menu_id)->where('status', 'ready')->where('expired_at', '>', CurrentTime())->orderBy('expired_at', 'asc')->take($orderItem->quantity)->get();
                 if (count($packs) < $orderItem->quantity) {
@@ -222,7 +231,7 @@ class OrderRepository implements OrderRepositoryInterface
             $startTime = $date . ' 00:00:00';
             $endTime = $date . ' 23:59:59';
 
-            $order_items = OrderItem::where('status','pos_confirmed')->with('menu', 'order.invoice.latestSession.entity','area')
+            $order_items = OrderItem::where('status', 'pos_confirmed')->with('menu', 'order.invoice.latestSession.entity', 'area')
                 ->whereBetween('date', [$startTime, $endTime])
                 ->paginate(config('common.list_count'));
 
@@ -231,9 +240,9 @@ class OrderRepository implements OrderRepositoryInterface
             if ($request->date) {
                 $startTime = $request->date . ' 00:00:00';
                 $endTime = $request->date . ' 23:59:59';
-                $orderItems = OrderItem::where('status','pos_confirmed')->with('menu', 'order.invoice.latestSession.entity','area')->whereBetween('date', [$startTime, $endTime])->get();
+                $orderItems = OrderItem::where('status', 'pos_confirmed')->with('menu', 'order.invoice.latestSession.entity', 'area')->whereBetween('date', [$startTime, $endTime])->get();
             } else {
-                $orderItems = OrderItem::where('status','pos_confirmed')->with('menu', 'order.invoice.latestSession.entity','area')->get();
+                $orderItems = OrderItem::where('status', 'pos_confirmed')->with('menu', 'order.invoice.latestSession.entity', 'area')->get();
             }
 
             return $orderItems;
@@ -244,14 +253,14 @@ class OrderRepository implements OrderRepositoryInterface
     // for pos
     public function getOrderItemByPos()
     {
-        $orderItems = OrderItem::with('area','menu.areas')->orderBy('created_at','desc')->paginate(config('common.list_count'));
+        $orderItems = OrderItem::with('area', 'menu.areas')->orderBy('created_at', 'desc')->paginate(config('common.list_count'));
         ResponseData($orderItems);
     }
 
     public function orderItemAreaConfirm(int $id, Request $request)
     {
         DB::beginTransaction();
-        try{
+        try {
 
             $orderItem = OrderItem::find($id);
             $orderItem->update([
@@ -261,11 +270,9 @@ class OrderRepository implements OrderRepositoryInterface
 
             DB::commit();
             ResponseData($orderItem);
-
-        }catch(\Exception $e)
-        {
+        } catch (\Exception $e) {
             DB::rollBack();
-            ResponseMessage($e->getMessage(),422);
+            ResponseMessage($e->getMessage(), 422);
             throw $e;
         }
     }
