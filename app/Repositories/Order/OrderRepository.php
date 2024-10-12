@@ -164,8 +164,6 @@ class OrderRepository implements OrderRepositoryInterface
                 }
             }
 
-            // Broadcast with order items array
-
             broadcast(new KitchenNotificationRequest($entity, $order, $orderItemsArray, null, 7));
             DB::commit();
             return $order;
@@ -275,5 +273,11 @@ class OrderRepository implements OrderRepositoryInterface
             ResponseMessage($e->getMessage(), 422);
             throw $e;
         }
+    }
+
+    public function orderByInvoiceId(int $invoiceId)
+    {
+        $order = Order::where('invoice_id',$invoiceId)->with('orderItems.menu')->get();
+        ResponseData($order);
     }
 }

@@ -18,4 +18,6 @@ interface OrderRepositoryInterface
 
     public function orderItemAreaConfirm(int $id, Request $request);
 
+    public function orderByInvoiceId(int $invoiceId);
+
 }
