@@ -2,19 +2,24 @@
 
 namespace App\Repositories\Order;
 
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
+
+use App\Http\Action\SendNotification\SendNotification;
+
 use App\Events\KitchenNotificationRequest;
 use App\Events\OrderStatusNotificationRequest;
+
 use App\Models\Order;
 use App\Models\OrderItem;
-use Illuminate\Support\Facades\DB;
-use App\Http\Action\SendNotification\SendNotification;
 use App\Models\Entity;
 use App\Models\Invoice;
 use App\Models\Menu;
 use App\Models\Pack;
 use App\Models\RoomSession;
 use App\Models\Staff;
-use Illuminate\Http\Request;
+use App\Models\Department;
 
 class OrderRepository implements OrderRepositoryInterface
 {
@@ -284,6 +289,26 @@ class OrderRepository implements OrderRepositoryInterface
             DB::rollBack();
             ResponseMessage($e->getMessage(), 422);
             throw $e;
+        }
+    }
+
+    public function checkFocSupervision(Request $request)
+    {
+        $supervisor = Staff::whereHas('department',function($query){
+            $query->where('name', 'Catering');
+        })
+        ->whereHas('roles', function($query){
+            $query->whereIn('name', ['Supervisor', 'Manager']);
+        })
+        ->where('phone_number', $request->phone_number)->first();
+
+        if(!$supervisor){
+            ResponseMessage('No supervisor found', 404);
+        }
+        if(Hash::check($request->password,$supervisor->getAuthPassword())){
+            ResponseMessage('Supervisor confirmed');
+        }else{
+            ResponseMessage('Supervisor authorization failed', 403);
         }
     }
 }
