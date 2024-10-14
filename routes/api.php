@@ -521,9 +521,6 @@ Route::post('/menu/{id}/is_feature',[MenuAPIController::class,'featureToggleMenu
 Route::get('/menu_report',[MenuAPIController::class,'menuReport']);
 Route::get('/menu_costing',[MenuAPIController::class,'costingMenu']);
 
-
-
-
 Route::get('/areas/{id}/entities', [EntityAPIController::class, 'getEntityWithInvoice']);
 Route::get('/entities_sessions/{id}', [EntityAPIController::class, 'getEntitySessionDetail']);
 Route::get('/entities/{id}', [EntityAPIController::class, 'entitySessionWithInvoiceDetail']);
