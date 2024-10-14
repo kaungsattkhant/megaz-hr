@@ -230,6 +230,18 @@
                                 Selling Menus
                             </a>
                         </li>
+                        <li>
+                            <a href="{{ route('menu_sale_report.index') }}" class="flex items-center @yield('menu_sale_report')">
+                                <i class="fal fa-clipboard-list  pr-3"></i>
+                                Menu Sale Report
+                            </a>
+                        </li>
+                        <li>
+                            <a href="{{ route('menu_costing.index') }}" class="flex items-center @yield('menu_costing')">
+                                <i class="fal fa-clipboard-list  pr-3"></i>
+                                Menu Costing
+                            </a>
+                        </li>
                         @endif
                         @if (checkFeaturePermission('room'))
                         <li>

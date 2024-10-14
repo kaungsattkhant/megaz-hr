@@ -19,15 +19,21 @@
                 <div class="w-full" data-te-select-wrapper-ref>
                     <select data-te-select-init data-te-select-placeholder="Select Category" v-model="selectedMenuCategory"
                     data-te-select-filter="true" @change="menuCategoryChanged()" class="input-ui w-full">
-                    <option value="all">All</option>
-                    <option v-for="(category,index) in menuCategoryList" :key="index"> {{ category.name }} </option>
+                        <option value="all">All</option>
+                        <option v-for="(category,index) in menuCategoryList" :key="index" :value="category"> {{ category.name }} </option>
                     </select>
                 </div>
-                <input type="date" class="input-ui h-8" v-model="fromDate">
-                <input type="date" class="input-ui h-8" v-model="toDate">
+                <input type="month" class="input-ui h-8" v-model="fromDate">
+                <input type="month" class="input-ui h-8" v-model="toDate">
                 <button class="add-btn h-8" @click="monthChanged()">Done</button>
             </div>
         </div>
+
+
+
+        
+
+
         <div class="block mx-4 mt-4 pb-4">
             <div class="overflow-x-auto">
                 <div class="table-container">
@@ -40,13 +46,19 @@
                                 <th scope="col" class="">
                                     Code
                                 </th>
-                                <th scope="col" class="text-left">
+                                <th scope="col" class="text-center">
                                     Menu Name
                                 </th>
-                                <th scope="col" class="text-left">
+                                <th scope="col" class="text-center">
                                     Category
                                 </th>
-                                <th>test</th>
+
+                                <th scope="col" class="text-center">
+                                    Total Quantity
+                                </th>
+                                <th v-if="saleReportList[0]" v-for="(month, index) in saleReportList[0].report_months">
+                                    {{ month }}
+                                </th>
                             </tr>
                         </thead>
                         <tbody>
@@ -70,6 +82,9 @@
                                     <td class="font-medium ">
                                         {{ saleReport.total_quantity }}
                                     </td>
+                                    <td class="font-medium " v-for="month in saleReport.monthly_totals">
+                                        {{ month.total }}
+                                    </td>
                                     
                                     
                                 </tr>
@@ -81,8 +96,8 @@
                     <div class="flex justify-center">
 
                         <div v-if="totalData != 0" class=" bg-white  flex justify-center mt-5 py-3">
-                            <button class="rounded px-6 py-1 border  hover:bg-slate-200" :disabled="currentPage === 1"
-                                @click="getTransactionList(currentPage - 1)">«</button>
+                            <button class="rounded px-6 py-1 border  hover:bg-slate-200" :disabled="currentPage === 1" :class="currentPage === 1 ? 'cursor-not-allowed' : ''"
+                                @click="getSaleReportList(currentPage - 1)">«</button>
 
                             <button class=" text-sm px-5 border">
                                 Page <span @dblclick="showInput">{{ currentPage }}</span> / <span
@@ -90,8 +105,8 @@
                                     lastPage }}</span>
                             </button>
 
-                            <button class=" rounded px-6  py-1 border  hover:bg-slate-200"
-                                :disabled="currentPage === lastPage" @click="getTransactionList(currentPage + 1)">
+                            <button class=" rounded px-6  py-1 border  hover:bg-slate-200 " :class="currentPage === lastPage ? 'cursor-not-allowed' : ''"
+                                :disabled="currentPage === lastPage" @click="getSaleReportList(currentPage + 1)">
                                 »</button>
                         </div>
                     </div>
@@ -132,8 +147,7 @@ export default {
 
             perPage:null,
             currentPage:null,
-
-            
+            lastPage:null,
         };
     },
 
@@ -143,9 +157,10 @@ export default {
             let url = this.url + pageNumber + this.url_search + this.url_category + this.url_month;
             let response = await getApiData({ url: url, token: this.getToken() });
             if (response.data) {
-                this.saleReportList = response.data.data;
+                this.saleReportList = response.data.pagination.data;
                 this.currentPage = pageNumber;
-                this.perPage = response.data.per_page;
+                this.perPage = response.data.pagination.per_page;
+                this.lastPage = response.data.pagination.last_page
             }
         },
         async searchBtnClicked() {
@@ -159,7 +174,7 @@ export default {
                 this.url_category = ''
             }
             else{
-                this.url_category = '&menu_category_id=' + this.selectedMenuCategory;
+                this.url_category = '&menu_category_id=' + this.selectedMenuCategory.id;
             }
             this.getSaleReportList(1)
         },
@@ -167,23 +182,6 @@ export default {
             this.url_month = '&from_date=' + this.fromDate + '&to_date=' + this.toDate
             this.getSaleReportList(1)
         },
-        
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
         // async getSaleReportList(pageNumber) {
@@ -222,6 +220,7 @@ export default {
 
     },
 
+    
     created() {
         this.getSaleReportList(1);
         this.getMenuCategoryList();

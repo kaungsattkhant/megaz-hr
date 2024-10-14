@@ -143,7 +143,7 @@
                                     <!-- {{ selectedRoom.room_sessions.length > 0 ? selectedRoom.room_sessions[0].invoice.total_session_price :
                                     0 }} -->
 
-                                    {{ selectedRoom.room_sessions[0].length > 0 ?
+                                    {{ selectedRoom.room_sessions[0] ?
                                         (selectedRoom.room_sessions[0].invoice.total_session_price ?
                                             selectedRoom.room_sessions[0].invoice.total_session_price : '' )
                                     : '' }}
@@ -1094,7 +1094,7 @@ export default {
             total_package_menu_price:0,
             package_total:0,
 
-            //create menu , add hour , change room
+            // create menu , add hour , change room
             menuList: [],
             invoiceId: null,
             selectedMenu: null,
@@ -1114,7 +1114,7 @@ export default {
             discount_type: null,
             isShowDiscount: true,
 
-            //rooftop
+            // rooftop
             tableList: [],
 
             currentTime: getCurretDateTime(),
@@ -1178,9 +1178,11 @@ export default {
             const response = await getApiData({ url: '/api/areas/' + id + '/entities', token: this.getToken() });
             if (response.data) {
                 this.roomList = response.data;
+                this.isOpenRoomStep('step_selectRoom');
                 if (response.data[0]) {
                     this.selectedRoomId = response.data[0].id;
-                    this.getSelectedRoom();
+                    // this.getSelectedRoom();
+                    
                     // this.selectedRoom = response.data[0];
                     // this.getPurchaseMenuList();
 
