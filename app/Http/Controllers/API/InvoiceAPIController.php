@@ -102,7 +102,7 @@ class InvoiceAPIController extends Controller
         $invoice = Invoice::find($request->invoice_id);
 
         $latestRoomSession = RoomSession::where('invoice_id', $invoice->id)->orderBy('created_at', 'desc')->first();
-        $entity = Entity::find($latestRoomSession->entity_id);
+        $entity = Entity::find($latestRoomSession->entitySession->entity_id);
 
         if (isset($request->waiter)) {
             $managerRole = Role::where('name', 'Manager')
