@@ -188,7 +188,9 @@ class OrderRepository implements OrderRepositoryInterface
             }
             broadcast(new KitchenNotificationRequest($entity, $order, $orderItemsArray, null, 7));
             DB::commit();
-            return $order;
+             $data['order'] = $order;
+             $data['orderItems'] = $orderItemsArray;
+            return $data;
         } catch (\Exception $e) {
             DB::rollback();
             ResponseMessage($e->getMessage(), 402);

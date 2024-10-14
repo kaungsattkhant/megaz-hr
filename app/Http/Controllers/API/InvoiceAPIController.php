@@ -60,11 +60,11 @@ class InvoiceAPIController extends Controller
             if ($data['type'] == 'package') {
                 $orderData['invoice_id'] = $returnData['invoice']->id;
                 $orderData['menuArray'] = json_decode($request->orders, true);
-                $this->orderRepo->createMultipleOrder($orderData);
+                $order = $this->orderRepo->createMultipleOrder($orderData);
             }
              if (isset($data['is_waiter'])) {
                 if ($data['is_waiter'] == 1) {
-                    broadcast(new RoomNotificationRequest($returnData['customer'], $returnData['entity'], $returnData['invoice'], UserData()->department_id));
+                    broadcast(new RoomNotificationRequest($returnData['customer'], $returnData['entity'], $returnData['invoice'], UserData()->department_id,$order['order'], $order['orderItems']));
                 }
             }
             // DB::commit();
