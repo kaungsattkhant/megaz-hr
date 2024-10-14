@@ -74,7 +74,6 @@ class InvoiceAPIController extends Controller
                     }
                 }
             }
-
             DB::commit();
             ResponseData($returnData);
         } catch (\Exception $e) {
