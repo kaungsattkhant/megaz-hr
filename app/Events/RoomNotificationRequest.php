@@ -28,14 +28,13 @@ class RoomNotificationRequest implements ShouldBroadcast
     public $roomSession;
     public $order;
 
-    public function __construct(Customer $customer,Entity $entity, RoomSession $roomSession, Invoice $invoice,$department_id)
+    public function __construct(Customer $customer,Entity $entity, Invoice $invoice,$department_id)
     {
         //
         $this->department_id=$department_id;
         $this->invoice_id = $invoice->id;
         $this->customerName = $customer->name;
         $this->roomName = $entity->name;
-        $this->roomSession = $roomSession;
 
 
     }
@@ -58,7 +57,6 @@ class RoomNotificationRequest implements ShouldBroadcast
             'invoice_id' => $this->invoice_id,
             'customer_name' => $this->customerName,
             'room_name' => $this->roomName,
-            'room_session' => $this->roomSession,
         ];
     }
 }

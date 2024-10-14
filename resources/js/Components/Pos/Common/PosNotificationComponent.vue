@@ -8,7 +8,6 @@
         </button>
 
 
-
         <div data-te-modal-init
             class="fixed left-0 top-0 z-[1055] hidden h-full w-full overflow-y-auto overflow-x-hidden outline-none"
             id="noti_modal" tabindex="-1" aria-labelledby="createCustomerModalLabel" aria-modal="true"
@@ -310,8 +309,10 @@
             },
 
             listenBroadCastNotifications(channel, event){
+                console.log('it work');
                 window.Echo.channel(channel)
                 .listen(event,(response)=>{
+                    console.log(response);
                     let newSessionRequest = {
                         invoice_id: response.invoice_id,
                         customer_name: response.customer_name,

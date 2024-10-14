@@ -4,6 +4,7 @@ namespace App\Http\Controllers\API;
 
 use App\Events\PosRoomDoneNotification;
 use App\Events\RoomDoneNotificationRequest;
+use App\Events\RoomNotificationRequest;
 use Illuminate\Http\Request;
 
 use App\Http\Controllers\Controller;
@@ -35,6 +36,7 @@ class InvoiceAPIController extends Controller
 
         DB::beginTransaction();
         try {
+            $data = $request->all();
             $data['is_waiter'] = ($request->waiter) ? 1 : 0;
 
             if (isset($data['male'])) {
@@ -54,14 +56,19 @@ class InvoiceAPIController extends Controller
             }
 
             $data['entity_id'] = $request->entity_id;
-            $invoice = $this->invoiceRepo->createData($data);
+            $returnData = $this->invoiceRepo->createData($data);
             if ($data['type'] == 'package') {
-                $orderData['invoice_id'] = $invoice->id;
+                $orderData['invoice_id'] = $returnData['invoice']->id;
                 $orderData['menuArray'] = json_decode($request->orders, true);
                 $this->orderRepo->createMultipleOrder($orderData);
             }
-            DB::commit();
-            ResponseData($invoice);
+             if (isset($data['is_waiter'])) {
+                if ($data['is_waiter'] == 1) {
+                    broadcast(new RoomNotificationRequest($returnData['customer'], $returnData['entity'], $returnData['invoice'], UserData()->department_id));
+                }
+            }
+            // DB::commit();
+            ResponseData($returnData);
         } catch (\Exception $e) {
             DB::rollBack();
             ResponseMessage($e->getMessage(), 422);

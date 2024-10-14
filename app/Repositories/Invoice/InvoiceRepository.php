@@ -103,26 +103,22 @@ class InvoiceRepository implements InvoiceRepositoryInterface
 
         DB::beginTransaction();
         try {
-            if (isset($data['is_waiter'])) {
-                if ($data['is_waiter'] == 1) {
-                    $current_time = Carbon::now()->format('H:i');
-                    $entitySession = EntitySession::where('entity_id', $data['entity_id'])
-                        ->whereTime('start_time', '<=', $current_time) // Check if start_time is less than or equal to current time
-                        ->whereTime('end_time', '>=', $current_time) // Check if end_time is greater than or equal to current time
-                        ->get();
-                    $entity = Entity::find($data['entity_id']);
-
-                }
-            } else {
+            $entitySession = null;
+            if ($data['is_waiter'] === 1) {
+                $current_time = Carbon::now()->format('H:i');
+                $entitySession = EntitySession::where('entity_id', $data['entity_id'])
+                    ->whereTime('start_time', '<=', $current_time) // Check if start_time is less than or equal to current time
+                    ->whereTime('end_time', '>=', $current_time) // Check if end_time is greater than or equal to current time
+                    ->first();
+                $entity = Entity::find($data['entity_id']);
+            } else if (isset($data['entity_session_id'])) {
                 $entitySession = EntitySession::find($data['entity_session_id']);
                 $entity = Entity::find($entitySession->entity_id);
-
             }
             if (!isset($data['head_count_id'])) {
                 $headCount = $this->headCountCreate($data);
                 $data['head_count_id'] = $headCount->id;
             }
-            dd()
             $leftEntitySession = $this->entitySessionLeftTime($entitySession->id);
             if ($data['type'] == 'package') {
                 $package = Package::find($data['package_id']);
@@ -169,7 +165,6 @@ class InvoiceRepository implements InvoiceRepositoryInterface
             $roomSessionData['end_date'] = $end_date->format('Y-m-d H:i:s');
             $roomSessionData['start_date'] = Carbon::now();
 
-
             if ($leftEntitySession > 0) {
                 $leftDuration = $data['session_duration'] - $leftEntitySession;
 
@@ -195,7 +190,7 @@ class InvoiceRepository implements InvoiceRepositoryInterface
                     $sessionsToDeactivate += 1;
                 }
 
-                $nextSessions = EntitySession::where('id', '>=', $data['entity_session_id'])
+                $nextSessions = EntitySession::where('id', '>=', $entitySession->id)
                     ->orderBy('id')
                     ->take($sessionsToDeactivate)
                     ->get();
@@ -240,13 +235,18 @@ class InvoiceRepository implements InvoiceRepositoryInterface
             $invoice->room_session = $roomSession;
             $customer = Customer::find($invoice->customer_id);
 
-            if (isset($data['is_waiter'])) {
-                if ($data['is_waiter'] == 1 && $invoice) {
-                    broadcast(new RoomNotificationRequest($customer, $entity, $roomSession, $invoice, UserData()->department_id));
-                }
-            }
+            // if (isset($data['is_waiter'])) {
+            //     if ($data['is_waiter'] == 1 && $invoice) {
+            //         broadcast(new RoomNotificationRequest($customer, $entity, $invoice, UserData()->department_id));
+            //     }
+            // }
             DB::commit();
-            return $invoice;
+            $returnData = [
+                'customer' => $customer,
+                'invoice' => $invoice,
+                'entity' => $entity,
+            ];
+            return $returnData;
         } catch (\Throwable $e) {
             DB::rollback();
             ResponseMessage($e->getMessage(), 402);
