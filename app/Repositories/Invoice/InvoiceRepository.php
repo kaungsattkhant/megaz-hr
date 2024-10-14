@@ -349,7 +349,7 @@ class InvoiceRepository implements InvoiceRepositoryInterface
 
             foreach ($nextSessions as $session) {
                 if ($session->is_active==1) {
-                    return ResponseMessage('Session is not available', 422);
+                    ResponseMessage('Session is not available', 422);
                 }
                 $session->update(['is_active' => 1]);
             }
