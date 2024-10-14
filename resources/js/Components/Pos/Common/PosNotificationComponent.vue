@@ -180,6 +180,93 @@
         </div>
 
 
+        <!-- order notification modal -->
+
+        <button
+            class="bg-red-600 focus:outline-none focus:ring-0 hidden" id="order_noti_btn"
+            data-te-toggle="modal" data-te-target="#order_noti">
+            +
+        </button>
+        <div data-te-modal-init
+            class="fixed left-0 top-0 z-[1055] hidden h-full w-full overflow-y-auto overflow-x-hidden outline-none"
+            id="order_noti" tabindex="-1" aria-labelledby="createCustomerModalLabel" aria-modal="true"
+            role="dialog">
+            <div data-te-modal-dialog-ref
+                class="pointer-events-none relative flex min-h-[calc(100%-1rem)] w-auto translate-y-[-50px] items-baseline opacity-0 transition-all duration-300 ease-in-out min-[576px]:mx-auto min-[576px]:mt-7 pt-16 min-[576px]:min-h-[calc(100%-3.5rem)] min-[576px]:max-w-fit">
+                <div
+                    class="pointer-events-auto relative flex w-full flex-col rounded-md border-none bg-white bg-clip-padding text-current shadow-lg outline-none">
+                    <div class="relative  p-4">
+                        <p class="text-xl w-full text-center">
+                            Notifications
+                        </p>
+                        <button type="button" class="absolute top-4 right-4 focus:shadow-none focus:outline-none
+                        " id="closeCustomerModal" data-te-modal-dismiss aria-label="Close">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                                stroke="currentColor" class="h-5 w-5">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                        </button>
+                    </div>
+
+                    <div class="relative px-6 pb-8" data-te-modal-body-ref>
+                        <div>
+                            {{ orderItems }} {{ roomName }}
+                            <!-- <table class="min-w-full text-left text-sm font-light border-l border-t">
+                                <thead class="border-b font-medium">
+                                    <tr>
+                                        <th scope="col" class="px-6 py-4 border-r">Room Name</th>
+                                        <th scope="col" class="px-6 py-4 border-r">Session duration </th>
+                                        <th scope="col" class="px-6 py-4 border-r">Start time</th>
+                                        <th scope="col" class="px-6 py-4 border-r">End time </th>
+                                        <th scope="col" class="px-6 py-4 border-r">Customer name</th>
+                                        <th scope="col" class="px-6 py-4 border-r text-center">Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr class="border-b" v-for="(sessionRequest) in sessionRequests">
+
+                                        <td class="whitespace-nowrap border-r px-6 py-4">
+                                            {{ sessionRequest.room_name }}
+                                        </td>
+                                        <td class="whitespace-nowrap border-r px-6 py-4 text-center">
+                                            {{ sessionRequest.session_duration }}
+                                        </td>
+                                        <td class="whitespace-nowrap border-r px-6 py-4">
+                                            {{ sessionRequest.start_time }}
+                                        </td>
+                                        <td class="whitespace-nowrap border-r px-6 py-4">
+                                            {{ sessionRequest.end_time }}
+                                        </td>
+                                        <td class="whitespace-nowrap border-r px-6 py-4">
+                                            {{ sessionRequest.customer_name }}
+                                        </td>
+                                        <td class="whitespace-nowrap border-r px-6 py-4">
+                                            <button :disabled="sessionRequest.status != 'received'" @click="btnRejectSession(sessionRequest.invoice_id)"
+                                                class="px-3 py-2 bg-red-600 text-white rounded-md mr-2">
+                                                Reject
+                                            </button>
+                                            <button :disabled="sessionRequest.status != 'received'" @click="btnConfirmSession(sessionRequest.invoice_id)"
+                                                class="px-3 py-2 bg-green-600 text-white rounded-md">
+                                                Confirm
+                                            </button>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table> -->
+                        </div>
+
+                    </div>
+
+                    <div class="flex justify-center px-12 mb-6">
+                        <button class="pos-add-btn focus:outline-none focus:ring-0 px-8" data-te-modal-dismiss aria-label="Close">
+                            OK
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
     </div>
 </template>
 
@@ -209,6 +296,8 @@
 
                 sessionRequests: [],
                 sessionRequests2: [],
+                orderItems:[],
+                roomName:null
             };
         },
 
@@ -313,11 +402,15 @@
             },
 
             listenBroadCastNotificationsOrder(channel, event){
+
                 window.Echo.channel(channel)
                 .listen(event, (response)=>{
-                    console.log(`new pos order items received`);
 
                     console.log(response);
+                    this.orderItems = response.order_items;
+                    this.roomName = response.entity.name;
+                    document.getElementById("order_noti_btn").click();
+
                 });
             },
 
@@ -377,7 +470,7 @@
             this.listenBroadCastNotificationsDone(doneChannelName, doneEventName);
 
             let waiterOrderChannelName = `waiter-order-notification.${this.department.id}`;
-            let waiterOrderEventName = `WaiterOrderNotificationRequest`;
+            let waiterOrderEventName = `WaiterOrderConfirmNotificationRequest`;
             this.listenBroadCastNotificationsOrder(waiterOrderChannelName, waiterOrderEventName);
         },
 

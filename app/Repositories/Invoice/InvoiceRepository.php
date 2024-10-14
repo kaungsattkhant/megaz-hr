@@ -103,17 +103,27 @@ class InvoiceRepository implements InvoiceRepositoryInterface
 
         DB::beginTransaction();
         try {
+            if (isset($data['is_waiter'])) {
+                if ($data['is_waiter'] == 1) {
+                    $current_time = Carbon::now()->format('H:i');
+                    $entitySession = EntitySession::where('entity_id', $data['entity_id'])
+                        ->whereTime('start_time', '<=', $current_time) // Check if start_time is less than or equal to current time
+                        ->whereTime('end_time', '>=', $current_time) // Check if end_time is greater than or equal to current time
+                        ->get();
+                    $entity = Entity::find($data['entity_id']);
 
-            $entitySession = EntitySession::find($data['entity_session_id']);
-            $entity = Entity::find($entitySession->entity_id);
+                }
+            } else {
+                $entitySession = EntitySession::find($data['entity_session_id']);
+                $entity = Entity::find($entitySession->entity_id);
 
+            }
             if (!isset($data['head_count_id'])) {
                 $headCount = $this->headCountCreate($data);
                 $data['head_count_id'] = $headCount->id;
             }
-
+            dd()
             $leftEntitySession = $this->entitySessionLeftTime($entitySession->id);
-
             if ($data['type'] == 'package') {
                 $package = Package::find($data['package_id']);
                 if (!$package) {
@@ -206,13 +216,10 @@ class InvoiceRepository implements InvoiceRepositoryInterface
 
                     // Ensure $index exists in $durations
                     if (isset($durations[$index])) {
-                        if($invoice->type=='package')
-                        {
-                        $roomSession['price'] = $durations[$index] * $package->session_price;
-
-                        }else{
-                        $roomSession['price'] = $durations[$index] * $entity->price_per_hour;
-
+                        if ($invoice->type == 'package') {
+                            $roomSession['price'] = $durations[$index] * $package->session_price;
+                        } else {
+                            $roomSession['price'] = $durations[$index] * $entity->price_per_hour;
                         }
                         $roomSession['invoice_id'] = $invoice->id;
                         $roomSession['entity_session_id'] = $session->id;
@@ -654,7 +661,7 @@ class InvoiceRepository implements InvoiceRepositoryInterface
                 if ($entitySession) {
                     $entitySession->is_active = 0;
                     $entitySession->save();
-                    Log::info('it working on '.$entitySession->id);
+                    Log::info('it working on ' . $entitySession->id);
                 }
             }
 

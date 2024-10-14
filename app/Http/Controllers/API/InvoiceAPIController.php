@@ -35,8 +35,6 @@ class InvoiceAPIController extends Controller
 
         DB::beginTransaction();
         try {
-            $data = $request->except('waiter');
-
             $data['is_waiter'] = ($request->waiter) ? 1 : 0;
 
             if (isset($data['male'])) {
@@ -54,11 +52,12 @@ class InvoiceAPIController extends Controller
             } else {
                 $data['child'] = 0;
             }
+
+            $data['entity_id'] = $request->entity_id;
             $invoice = $this->invoiceRepo->createData($data);
             if ($data['type'] == 'package') {
                 $orderData['invoice_id'] = $invoice->id;
                 $orderData['menuArray'] = json_decode($request->orders, true);
-
                 $this->orderRepo->createMultipleOrder($orderData);
             }
             DB::commit();
