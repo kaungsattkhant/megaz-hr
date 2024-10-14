@@ -735,16 +735,22 @@ class InvoiceRepository implements InvoiceRepositoryInterface
         try {
             $invoice = Invoice::find($data['invoice_id']);
             $latestSession = RoomSession::where('invoice_id', $data['invoice_id'])->latest()->first();
-            $entity = Entity::find($latestSession->entity_id);
+            $entity = Entity::find($latestSession->entitySession->entity_id);
+
+            $roomSession = RoomSession::find($data['invoice_id']);
+
+
 
             if ($data['is_confirm'] == 1) {
-                $entity->status = 'active';
-                $entity->is_active = 1;
+                foreach($roomSession->entitySession as $session){
+                    $session->is_active = 1;
+                    $session->save();
+                }
             } else {
-                $entity->status = 'inactive';
-                $entity->is_active = 0;
-                $invoice->delete();
-                $latestSession->delete();
+                foreach($roomSession->entitySession as $session){
+                    $session->is_active = 0;
+                    $session->save();
+                }
             }
             $entity->save();
             DB::commit();
