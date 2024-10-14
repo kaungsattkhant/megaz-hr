@@ -49,16 +49,17 @@ class EntityRepository implements EntityRepositoryInterface
 
     public function entityDetail(array $data, int $entitySessionId)
     {
-        $entity = EntitySession::where('is_available', 1)
+        $entitySession = EntitySession::where('is_available', 1)
             ->with(['roomSessions' => function ($query) {
                 $query->latest()->first();
             }])
             ->find($entitySessionId);
 
-        foreach ($entity->roomSessions as $roomSession) {
-            $invoice = $roomSession->invoice; // Access the invoice for the current room session
+
+        foreach ($entitySession->roomSessions as $roomSession) {
+            $invoice = $roomSession->invoice;
             $invoice->package;
-            if ($invoice) { // Check if there is an associated invoice
+            if ($invoice) {
                 $consolidatedOrderItems = [];
 
                 foreach ($invoice->orders as $order) {
@@ -91,7 +92,7 @@ class EntityRepository implements EntityRepositoryInterface
             }
         }
 
-        return $entity;
+        return $entitySession;
     }
 
 
@@ -104,7 +105,7 @@ class EntityRepository implements EntityRepositoryInterface
             ->where('entity_id', $entity->id)
             ->whereTime('start_time', '<=', $current_time) // Filter by current time within start and end
             ->whereTime('end_time', '>=', $current_time)
-            ->with(['roomSessions' => function ($query) {
+            ->with(['entity','roomSessions' => function ($query) {
                 $query->orderBy('created_at', 'desc')->limit(1); // Get the most recent room session
             }])
             ->first();
