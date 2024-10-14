@@ -62,13 +62,20 @@ class InvoiceAPIController extends Controller
                 $orderData['menuArray'] = json_decode($request->orders, true);
                 $order = $this->orderRepo->createMultipleOrder($orderData);
 
-            }
-             if (isset($data['is_waiter'])) {
-                if ($data['is_waiter'] == 1) {
-                    broadcast(new RoomNotificationRequest($returnData['customer'], $returnData['entity'], $returnData['invoice'], UserData()->department_id,null, []));
+                if (isset($data['is_waiter'])) {
+                    if ($data['is_waiter'] == 1) {
+                        broadcast(new RoomNotificationRequest($returnData['customer'], $returnData['entity'], $returnData['invoice'], UserData()->department_id,$order['order'], $order['orderItems']));
+                    }
+                }
+            }else{
+                if (isset($data['is_waiter'])) {
+                    if ($data['is_waiter'] == 1) {
+                        broadcast(new RoomNotificationRequest($returnData['customer'], $returnData['entity'], $returnData['invoice'], UserData()->department_id,null, []));
+                    }
                 }
             }
-            // DB::commit();
+
+            DB::commit();
             ResponseData($returnData);
         } catch (\Exception $e) {
             DB::rollBack();
