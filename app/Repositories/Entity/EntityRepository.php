@@ -109,6 +109,10 @@ class EntityRepository implements EntityRepositoryInterface
                 $query->orderBy('created_at', 'desc')->limit(1); // Get the most recent room session
             }])
             ->first();
+
+
+        $entityStartTime = EntitySession::where('is_available',1)->where('entity_id',$entity->id)->where('is_active',1)->first()->start_time;
+        $entityEndTime = EntitySession::where('is_available',1)->where('entity_id',$entity->id)->where('is_active',1)->last()->end_time;
         foreach ($entity->roomSessions as $roomSession) {
             $invoice = $roomSession->invoice; // Access the invoice for the current room session
             $invoice->package;
