@@ -1195,6 +1195,7 @@ import { getCurrentTime } from "../../../utilities/datetime-helpers";
                     menu_id : this.selectedMenuForPackage.prices[0].menu_id,
                     discount_value: this.is_menu_discount,
                     is_package : 0,
+                    area_id: 6
                 });
                 this.food_total_package += (this.selectedMenuForPackage.prices[0].price - this.is_menu_discount) * this.menuQuantityForPackage;
             },
@@ -1341,7 +1342,6 @@ import { getCurrentTime } from "../../../utilities/datetime-helpers";
                 // roomChargeTotal += roomSession.price; // or roomSession.session_duration * roomSession.entity.price_per_hour;
                 // });
                 this.printInvoiceData.room = roomChargeTotal; // <== or that
-
 
 
                 if (this.purchaseMenuList.length > 0) {
