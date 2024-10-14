@@ -2,19 +2,24 @@
 
 namespace App\Repositories\Order;
 
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
+
+use App\Http\Action\SendNotification\SendNotification;
+
 use App\Events\KitchenNotificationRequest;
 use App\Events\OrderStatusNotificationRequest;
+
 use App\Models\Order;
 use App\Models\OrderItem;
-use Illuminate\Support\Facades\DB;
-use App\Http\Action\SendNotification\SendNotification;
 use App\Models\Entity;
 use App\Models\Invoice;
 use App\Models\Menu;
 use App\Models\Pack;
 use App\Models\RoomSession;
 use App\Models\Staff;
-use Illuminate\Http\Request;
+use App\Models\Department;
 
 class OrderRepository implements OrderRepositoryInterface
 {
@@ -101,7 +106,7 @@ class OrderRepository implements OrderRepositoryInterface
             $entity = Entity::find($latestRoomSession->entitySession->entity_id);
 
             $orderItemsArray = [];
-
+            $focTotal = 0;
             foreach ($data['menuArray'] as $menuData) {
 
                 $menuData['invoice_id'] = $invoiceId;
@@ -142,10 +147,10 @@ class OrderRepository implements OrderRepositoryInterface
                     $menuData['date'] = CurrentTime();
                     $menuData['order_id'] = $order->id;
                     $menuData['price'] = $menuData['original_price'] * $menuData['quantity'];
-                    $order_items = OrderItem::create($menuData);
-                    $orderItems = OrderItem::find($order_items->id);
-                    $orderItems->menu = $orderItems->menu;
-                    $orderItemsArray[] = $orderItems;
+                    // $order_items = OrderItem::create($menuData);
+                    // $orderItems = OrderItem::find($order_items->id);
+                    // $orderItems->menu = $orderItems->menu;
+                    // $orderItemsArray[] = $orderItems;
                 } else {
                     $menuData['date'] = CurrentTime();
                     $menuData['total'] = $menuData['original_price'] * $menuData['quantity'];
@@ -157,13 +162,28 @@ class OrderRepository implements OrderRepositoryInterface
                     $menuData['order_id'] = $order->id;
                     $menuData['price'] = $menuData['original_price'] * $menuData['quantity'];
 
-                    $order_items = OrderItem::create($menuData);
-                    $orderItems = OrderItem::find($order_items->id);
-                    $orderItems->menu = $orderItems->menu;
-                    $orderItemsArray[] = $orderItems;
+                    // $order_items = OrderItem::create($menuData);
+                    // $orderItems = OrderItem::find($order_items->id);
+                    // $orderItems->menu = $orderItems->menu;
+                    // $orderItemsArray[] = $orderItems;
                 }
+
+                $order_item = OrderItem::create($menuData);
+                if($order_item->is_foc == 1){
+                    $focTotal += $order_item->price;
+                }
+                $order_item->menu = $order_item->menu;
+                array_push($orderItemsArray, $order_item);
             }
 
+<<<<<<< HEAD
+=======
+            $order->foc_total += $focTotal;
+            $order->save();
+
+            // Broadcast with order items array
+
+>>>>>>> origin/pks_version
             broadcast(new KitchenNotificationRequest($entity, $order, $orderItemsArray, null, 7));
             DB::commit();
             return $order;
@@ -275,9 +295,30 @@ class OrderRepository implements OrderRepositoryInterface
         }
     }
 
+<<<<<<< HEAD
     public function orderByInvoiceId(int $invoiceId)
     {
         $order = Order::where('invoice_id',$invoiceId)->with('orderItems.menu')->get();
         ResponseData($order);
+=======
+    public function checkFocSupervision(Request $request)
+    {
+        $supervisor = Staff::whereHas('department',function($query){
+            $query->where('name', 'Catering');
+        })
+        ->whereHas('roles', function($query){
+            $query->whereIn('name', ['Supervisor', 'Manager']);
+        })
+        ->where('phone_number', $request->phone_number)->first();
+
+        if(!$supervisor){
+            ResponseMessage('No supervisor found', 404);
+        }
+        if(Hash::check($request->password,$supervisor->getAuthPassword())){
+            ResponseMessage('Supervisor confirmed');
+        }else{
+            ResponseMessage('Supervisor authorization failed', 403);
+        }
+>>>>>>> origin/pks_version
     }
 }

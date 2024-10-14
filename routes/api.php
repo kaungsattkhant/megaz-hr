@@ -540,6 +540,7 @@ Route::get('/order_items',[OrderAPIController::class,'getOrderItemList']);
 Route::get('/order_items/{invoiceId}/invoice',[OrderAPIController::class,'getOrderItemByInvoice']);
 Route::get('/pos_order_items',[OrderAPIController::class,'getOrderItemForPOS']);
 Route::post('/pos_order_items/{order_item_id}/status',[OrderAPIController::class,'orderItemAreaConfirm']);
+Route::post('/pos_orders/check_foc_supervision',[OrderAPIController::class,'checkFocSupervision']);
 
 Route::get('/invoices', [InvoiceAPIController::class, 'getInvoiceData']);
 
