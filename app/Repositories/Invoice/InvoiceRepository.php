@@ -341,11 +341,6 @@ class InvoiceRepository implements InvoiceRepositoryInterface
             }
 
             $roomSession = $invoice->latestSession;
-            $latestRoomFreeTime = 1 - $roomSession->session_duration;
-            $additionDuration = $data['session_duration'] - (1 - $latestRoomFreeTime);
-            if ($additionDuration > 1) {
-                ResponseMessage('Something is wrong', 422);
-            }
 
             $nextSessions = EntitySession::where('id', '>', $roomSession->entity_session_id)
                 ->orderBy('id')
