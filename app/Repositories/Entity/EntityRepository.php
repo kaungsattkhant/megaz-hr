@@ -6,6 +6,7 @@ use App\Models\Area;
 use App\Models\Entity;
 use App\Models\EntitySession;
 use App\Models\OrderItem;
+use App\Models\RoomSession;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -103,16 +104,18 @@ class EntityRepository implements EntityRepositoryInterface
         $current_time = Carbon::now()->format('H:i');
         $entity = EntitySession::where('is_available', 1)
             ->where('entity_id', $entity->id)
-            ->whereTime('start_time', '<=', $current_time) // Filter by current time within start and end
-            ->whereTime('end_time', '>=', $current_time)
-            ->with(['entity','roomSessions' => function ($query) {
+            ->with(['entity', 'roomSessions' => function ($query) {
                 $query->orderBy('created_at', 'desc')->limit(1); // Get the most recent room session
             }])
             ->first();
 
+        $invoiceId = $entity->roomSession->invoice_id;
 
-        $entityStartTime = EntitySession::where('is_available',1)->where('entity_id',$entity->id)->where('is_active',1)->get();
-        $entityEndTime = EntitySession::where('is_available',1)->where('entity_id',$entity->id)->where('is_active',1)->get();
+        $roomSessions = RoomSession::where('invoice_id',$invoiceId)
+            ->orderBy('created_at')
+            ->get();
+        $firstRoomSession = $roomSessions->first();
+        $lastRoomSession = $roomSessions->last();
 
         foreach ($entity->roomSessions as $roomSession) {
             $invoice = $roomSession->invoice; // Access the invoice for the current room session
@@ -149,7 +152,8 @@ class EntityRepository implements EntityRepositoryInterface
                 }
             }
         }
-
+        $entity['start_time'] = $firstRoomSession->start_date;
+        $entity['end_time'] = $lastRoomSession->end_date;
         return $entity;
     }
 
