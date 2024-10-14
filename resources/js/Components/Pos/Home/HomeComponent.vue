@@ -1,7 +1,7 @@
 <template>
-    <div class="overflow-x-auto hidden-scrollbar">
-        <div class=" bg-gray-100 w-max min-h-screen flex" >
-            <div class="w-fit pt-9 px-6 small-scrollbar">
+    <div class="">
+        <div class=" bg-gray-100 w-max min-h-screen flex overflow-x-auto hidden-scrollbar" :style="isShowSidebar == true ? 'width:calc(100% - 410px)' : 'width:100%' ">
+            <div class="w-fit pt-9 px-6 ">
                 <ul class="mb-5 flex list-none flex-row flex-wrap border-b-0 pl-0" role="tablist" data-te-nav-ref>
                     <li v-for="(area, index) in areaList" :key="index" role="presentation" @click="btnClickedArea(area.id)">
                         <a href="#tabs-profile" class="my-2 mr-3 text-white block  px-7 pb-2.5 rounded-full
@@ -55,7 +55,7 @@
 
                 </div>
             </div>
-            <div class="sticky right-0 top-0 bottom-0 bg-white shadow-md ease-in-out duration-300 transition delay-100 pt-12 right-sidebar-2" :class="isShowSidebar == true ? 'translate-x-0 opacity-100 w-[400px]' : 'translate-x-full opacity-0 w-0' ">
+            <div class="fixed right-0 top-0 bottom-0 bg-white shadow-md ease-in-out duration-300 transition delay-100 pt-12 right-sidebar-2" :class="isShowSidebar == true ? 'translate-x-0 opacity-100 w-[400px]' : 'translate-x-full opacity-0 w-0' ">
                 <div class="relative h-full w-full">
                     <div class="fixed right-4 top-4 z-40" :class="isShowSidebar == true ? 'block' : 'hidden' ">
                         <button @click="isShowSidebar = false"><i class="far fa-times"></i></button>
@@ -113,7 +113,7 @@
                                     <label for="" class="block text-sm text-black mb-3">
                                         Time
                                     </label>
-                                    <input type="datetime-local" placeholder="Time" v-model="invoice_date"
+                                    <input type="datetime-local" placeholder="Time" v-model="invoice_date" @change="getPackageList(invoice_date)"
                                         class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
                                 </div>
                                 <div class="mb-4">
@@ -121,10 +121,10 @@
                                         Type
                                     </label>
                                     <div class="relative">
-                                        <select name="" id="" v-model="type" @change="getPackageList(invoice_date)"
+                                        <select name="" id="" v-model="type" 
                                             class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
                                             <option value="session"> Session </option>
-                                            <option value="package" disabled> Package </option>
+                                            <option value="package"> Package </option>
                                             <option value="endless_time"> Endless Time </option>
                                         </select>
                                     </div>
@@ -549,7 +549,7 @@
                     </div>
                     
     
-                    <!-- <div v-show="isOpenRoom.step_isPackage == true" class="relative h-full">
+                    <div v-if="isOpenRoom.is_package == true" class="relative h-full">
                         <div class="flex justify-center padding-section ">
     
                             <div>
@@ -618,7 +618,7 @@
                                 </button>
                             </div>
                         </div>
-                    </div> -->
+                    </div>
     
                     <!-- <div class="relative block h-full">
                         <div class="w-full h-full flex justify-center flex-col">
@@ -999,7 +999,7 @@ import { getCurrentTime } from "../../../utilities/datetime-helpers";
 
                 selectedCustomer:null,
                 invoice_date:null,
-                type:null,
+                type:'session',
                 selectedPackage:null,
                 deposit:null,
                 duration:null,
@@ -1152,30 +1152,76 @@ import { getCurrentTime } from "../../../utilities/datetime-helpers";
                 // this.packageMenuList = this.selectedPackage;
             },
             confirmRoomBtnClicked() {
-                // this.getPurchaseMenuList();
-                // if(this.type == 'package' && this.selectedPackage){
-                //     this.isOpenRoomStep('step_isPackage');
-                //     let menuOfselectedPackage = this.selectedPackage.menu_packages;
-                //     menuOfselectedPackage.forEach((packageMenu)=>{
-                //         let is_dis_menu_price = 0;
-                //         this.food_total_package += (packageMenu.menu.prices[0].price - is_dis_menu_price) * packageMenu.quantity;
-                //         this.packageMenuList.push({
-                //             quantity : packageMenu.quantity,
-                //             name : packageMenu.menu.name,
-                //             original_price : packageMenu.menu.prices[0].price,
-                //             discount_value: is_dis_menu_price,
-                //             menu_id : packageMenu.menu_id,
-                //             is_package : 1
-                //         });
+                this.getPurchaseMenuList();
+                if(this.type == 'package' && this.selectedPackage){
+                    this.isOpenRoomStep('is_package');
+                    let menuOfselectedPackage = this.selectedPackage.menu_packages;
+                    menuOfselectedPackage.forEach((packageMenu)=>{
+                        let is_dis_menu_price = 0;
+                        this.food_total_package += (packageMenu.menu.prices[0].price - is_dis_menu_price) * packageMenu.quantity;
+                        this.packageMenuList.push({
+                            quantity : packageMenu.quantity,
+                            name : packageMenu.menu.name,
+                            original_price : packageMenu.menu.prices[0].price,
+                            discount_value: is_dis_menu_price,
+                            menu_id : packageMenu.menu_id,
+                            is_package : 1
+                        });
 
-                //     });
-                // }
-                // else{
-                //     this.createRoom();
-                // }
-                this.createRoom();
+                    });
+
+                    console.log('package')
+                }
+                else{
+                    this.createRoom();
+                }
             },
 
+            btnConfirmAddPackageMenu() {
+                this.addPackageMenu();
+            },
+            async addPackageMenu() {
+                if(this.selectedMenuForPackage.menu_service_discounts.length > 0){
+                    this.is_menu_discount = this.selectedMenuForPackage.menu_service_discounts[0].discount_price
+                }
+                else{
+                    this.is_menu_discount = 0
+                }
+
+                this.packageMenuList.push({
+                    quantity: this.menuQuantityForPackage,
+                    name: this.selectedMenuForPackage.name,
+                    original_price:this.selectedMenuForPackage.prices[0].price,
+                    menu_id : this.selectedMenuForPackage.prices[0].menu_id,
+                    discount_value: this.is_menu_discount,
+                    is_package : 0,
+                });
+                this.food_total_package += (this.selectedMenuForPackage.prices[0].price - this.is_menu_discount) * this.menuQuantityForPackage;
+            },
+            removePackageMenu(index){
+
+                this.food_total_package -= (this.packageMenuList[index].original_price - this.packageMenuList[index].discount_value) * this.packageMenuList[index].quantity;
+                this.packageMenuList.splice(index, 1);
+            },
+            
+            createRoomForPackage(){
+
+                // this.packageMenuList.forEach((packageMenu)=>{
+                //     this.total_package_menu_price += (packageMenu.original_price - packageMenu.discount_value ) * packageMenu.quantity;
+                // });
+                let packageActualTotal = this.food_total_package + (this.selectedPackage.session_price * this.selectedPackage.pay_session) - this.selectedPackage.package_discount;
+                if(packageActualTotal < this.selectedPackage.price){
+                    this.$notify({
+                        title: `Not valid`,
+                        text: 'Your Total is Lower than Package Price',
+                        type: "warn"
+                    });
+                }
+                else{
+                    this.filterMenuForData();
+                    this.createRoom();
+                }
+            },
 
             async createRoom() {
                 let formData = new FormData();
@@ -1226,7 +1272,7 @@ import { getCurrentTime } from "../../../utilities/datetime-helpers";
                 }
             },
             async getPurchaseMenuList() {
-                const response = await getApiData({ url: '/api/entities/' + this.selectedRoomId, token: this.getToken() });
+                const response = await getApiData({ url: '/api/entities_sessions/'+ this.selectedTime.id, token: this.getToken() });
                 if (response.data) {
                     if (response.data.room_sessions.length > 0) {
                         this.purchaseMenuList = response.data.room_sessions[0].invoice.orders;
@@ -1255,10 +1301,17 @@ import { getCurrentTime } from "../../../utilities/datetime-helpers";
             },
             btnClickedDoneSession() {
                 this.doneSession();
-                // this.getPurchaseMenuList();
-                // this.discount_type = null;
+                this.getPurchaseMenuList();
+                this.discount_type = null;
             },
 
+            filterMenuForData(){
+                this.packageMenuList.forEach(om => {
+                    delete om.name;
+                    console.log('hello = ' + om.name);
+                });
+
+            },
             async doneSession() {
                 let formData = new FormData();
                 let roomSessions = [];
@@ -1580,6 +1633,7 @@ import { getCurrentTime } from "../../../utilities/datetime-helpers";
             },
 
 
+            
 
             // async getSelectedRoom() {
             //     const response = await getApiData({ url: '/api/entities/' + this.selectedRoomId, token: this.getToken() });
@@ -1633,7 +1687,7 @@ import { getCurrentTime } from "../../../utilities/datetime-helpers";
                     this.customerList.push(response.data);
                     this.selectedCustomer = response.data;
                     console.log("success customer")
-                    this.closeCustomerModal();
+                    this.closeModal('closeCustomerModal');
                     this.clearCustomerForm();
                 }
                 else {
@@ -1673,7 +1727,7 @@ import { getCurrentTime } from "../../../utilities/datetime-helpers";
                 let response = await postApiData({ url: '/api/entities/orders', form_data: formData, token: this.getToken() });
                 // console.log(this.invoiceId+','+this.selectedMenu.id + ','+ this.menuQuantity +','+this.selectedMenu.prices[0].price)
                 if (response.success) {
-                    this.closeModal('closeAddMenuModal');
+                    this.closeModal('closeMenuModal');
                     this.clearMenuForm();
                     this.getPurchaseMenuList();
                 }
@@ -1720,7 +1774,7 @@ import { getCurrentTime } from "../../../utilities/datetime-helpers";
                     // this.selectedRoom = this.roomList.find(x => x.id === this.change_room.id);
                     this.selectedRoomId = this.change_room.id;
                     this.getSelectedRoom();
-                    this.closeChangeRoomModal();
+                    this.closeModal('close_change_room_modal');
                     this.clearChangeRoomForm();
                 }
                 else {
@@ -1744,6 +1798,39 @@ import { getCurrentTime } from "../../../utilities/datetime-helpers";
 
             closeModal(modalId) {
                 document.getElementById(modalId).click();
+            },
+            clearCustomerForm() {
+                this.name = null
+                this.ph_number = null
+                this.email = null
+                this.selectedGender = null
+                this.date = null
+                this.selectedDivision = null
+                this.selectedTownship = null
+                this.address_name = null
+                this.address = null
+            },
+            clearMenuForm() {
+                this.invoiceId = null
+                this.menuQuantity = null
+                this.selectedMenu = null
+            },
+            clearAddHourForm() {
+                this.sessionDuration = null
+            },
+            clearChangeRoomForm() {
+                this.change_room = null
+            },
+            clearOpenRoomForm() {
+                this.selectedCustomer = null
+                this.type = 'session'
+                this.selectedPackage = null
+                this.deposit = null
+                this.invoice_date = null
+                this.duration = null
+                this.male = null
+                this.female = null
+                this.child = null
             },
             showSidebar(){
                 if(this.isShowSidebar){
@@ -1784,6 +1871,12 @@ import { getCurrentTime } from "../../../utilities/datetime-helpers";
                 console.log(test_time)
 
             }
+        },
+
+        watch: {
+            selectedRoom(val, oldVal) {
+                console.log(`new: ${val}, old: ${oldVal}`)
+            },
         },
         created(){
             this.getAreaList();
