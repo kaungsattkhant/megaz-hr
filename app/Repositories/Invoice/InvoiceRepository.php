@@ -739,8 +739,6 @@ class InvoiceRepository implements InvoiceRepositoryInterface
 
             $roomSession = RoomSession::find($data['invoice_id']);
 
-
-
             if ($data['is_confirm'] == 1) {
                 foreach($roomSession->entitySession as $session){
                     $session->is_active = 1;
