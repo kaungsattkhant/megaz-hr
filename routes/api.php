@@ -526,6 +526,7 @@ Route::get('/menu_costing',[MenuAPIController::class,'costingMenu']);
 
 Route::get('/areas/{id}/entities', [EntityAPIController::class, 'getEntityWithInvoice']);
 Route::get('/entities_sessions/{id}', [EntityAPIController::class, 'getEntitySessionDetail']);
+Route::get('/entities/{id}', [EntityAPIController::class, 'entitySessionWithInvoiceDetail']);
 Route::get('/areas/{id}/inactive_entities', [EntityAPIController::class, 'getOnlyInactiveEntities']);
 
 Route::post('/entities/start', [InvoiceAPIController::class, 'startEntity']);
@@ -540,6 +541,7 @@ Route::get('/order_items',[OrderAPIController::class,'getOrderItemList']);
 Route::get('/order_items/{invoiceId}/invoice',[OrderAPIController::class,'getOrderItemByInvoice']);
 Route::get('/pos_order_items',[OrderAPIController::class,'getOrderItemForPOS']);
 Route::post('/pos_order_items/{order_item_id}/status',[OrderAPIController::class,'orderItemAreaConfirm']);
+Route::post('/pos_orders/check_foc_supervision',[OrderAPIController::class,'checkFocSupervision']);
 
 Route::get('/invoices', [InvoiceAPIController::class, 'getInvoiceData']);
 

@@ -90,7 +90,8 @@ class InvoiceRepository implements InvoiceRepositoryInterface
         $now = Carbon::now();
 
         $remainingTime = $now->diff($endTime);
-        if ($remainingTime->h > 0) {
+
+        if ($remainingTime->h > 1) {
             ResponseMessage("Selected Session is not available because selected session time is not available", 422);
         }
         $totalRemainingMinutes = ($remainingTime->h * 60) + $remainingTime->i;
@@ -103,17 +104,23 @@ class InvoiceRepository implements InvoiceRepositoryInterface
 
         DB::beginTransaction();
         try {
-
-            $entitySession = EntitySession::find($data['entity_session_id']);
-            $entity = Entity::find($entitySession->entity_id);
-
+            $entitySession = null;
+            if ($data['is_waiter'] === 1) {
+                $current_time = Carbon::now()->format('H:i');
+                $entitySession = EntitySession::where('entity_id', $data['entity_id'])
+                    ->whereTime('start_time', '<=', $current_time) // Check if start_time is less than or equal to current time
+                    ->whereTime('end_time', '>=', $current_time) // Check if end_time is greater than or equal to current time
+                    ->first();
+                $entity = Entity::find($data['entity_id']);
+            } else if (isset($data['entity_session_id'])) {
+                $entitySession = EntitySession::find($data['entity_session_id']);
+                $entity = Entity::find($entitySession->entity_id);
+            }
             if (!isset($data['head_count_id'])) {
                 $headCount = $this->headCountCreate($data);
                 $data['head_count_id'] = $headCount->id;
             }
-
             $leftEntitySession = $this->entitySessionLeftTime($entitySession->id);
-
             if ($data['type'] == 'package') {
                 $package = Package::find($data['package_id']);
                 if (!$package) {
@@ -159,10 +166,8 @@ class InvoiceRepository implements InvoiceRepositoryInterface
             $roomSessionData['end_date'] = $end_date->format('Y-m-d H:i:s');
             $roomSessionData['start_date'] = Carbon::now();
 
-
-            if ($leftEntitySession > 0) {
+            if ($leftEntitySession >= 0 ) {
                 $leftDuration = $data['session_duration'] - $leftEntitySession;
-
                 $sessionsToDeactivate = ceil($leftDuration);
 
                 $wholeHours = floor($leftDuration);
@@ -185,7 +190,7 @@ class InvoiceRepository implements InvoiceRepositoryInterface
                     $sessionsToDeactivate += 1;
                 }
 
-                $nextSessions = EntitySession::where('id', '>=', $data['entity_session_id'])
+                $nextSessions = EntitySession::where('id', '>=', $entitySession->id)
                     ->orderBy('id')
                     ->take($sessionsToDeactivate)
                     ->get();
@@ -206,13 +211,10 @@ class InvoiceRepository implements InvoiceRepositoryInterface
 
                     // Ensure $index exists in $durations
                     if (isset($durations[$index])) {
-                        if($invoice->type=='package')
-                        {
-                        $roomSession['price'] = $durations[$index] * $package->session_price;
-
-                        }else{
-                        $roomSession['price'] = $durations[$index] * $entity->price_per_hour;
-
+                        if ($invoice->type == 'package') {
+                            $roomSession['price'] = $durations[$index] * $package->session_price;
+                        } else {
+                            $roomSession['price'] = $durations[$index] * $entity->price_per_hour;
                         }
                         $roomSession['invoice_id'] = $invoice->id;
                         $roomSession['entity_session_id'] = $session->id;
@@ -230,16 +232,27 @@ class InvoiceRepository implements InvoiceRepositoryInterface
             } else {
                 ResponseMessage('Room is not available', 422);
             }
+            if($data['is_waiter']==1)
+            {
+                $entity->is_active = 0;
+                $entity->status = 'pending';
+                $entity->save();
+
+            }else{
+                $entity->is_active = 0;
+                $entity->status = 'active';
+                $entity->save();
+            }
             $invoice->room_session = $roomSession;
             $customer = Customer::find($invoice->customer_id);
 
-            if (isset($data['is_waiter'])) {
-                if ($data['is_waiter'] == 1 && $invoice) {
-                    // broadcast(new RoomNotificationRequest($customer, $entity, $roomSession, $invoice, UserData()->department_id));
-                }
-            }
             DB::commit();
-            return $invoice;
+            $returnData = [
+                'customer' => $customer,
+                'invoice' => $invoice,
+                'entity' => $entity,
+            ];
+            return $returnData;
         } catch (\Throwable $e) {
             DB::rollback();
             ResponseMessage($e->getMessage(), 402);
@@ -252,7 +265,7 @@ class InvoiceRepository implements InvoiceRepositoryInterface
     {
         $invoice = Invoice::find($id);
         if ($invoice) {
-            $invoice->updaet($data);
+            $invoice->update($data);
             return $invoice;
         }
 
@@ -373,7 +386,18 @@ class InvoiceRepository implements InvoiceRepositoryInterface
             $invoice = Invoice::find($data['invoice_id']);
             $roomSessions = RoomSession::where('invoice_id', $invoice->id)->get();
 
-            $entitySession = EntitySession::find($data['entity_session_id']);
+            $latestRoomSession= $roomSessions->last();
+
+            if ($data['waiter'] == 1) {
+                $current_time = Carbon::now()->format('H:i');
+                $entitySession = EntitySession::where('entity_id', $latestRoomSession->entitySession->entity_id)
+                    ->whereTime('start_time', '<=', $current_time)
+                    ->whereTime('end_time', '>=', $current_time)
+                    ->first();
+            } else if (isset($data['entity_session_id'])) {
+                $entitySession = EntitySession::find($data['entity_session_id']);
+            }
+            $previousEntity = Entity::find($entitySession->entity_id);
             $firstRoomSession = $roomSessions->first();
             $lastRoomSession = $roomSessions->last();
             $endTime = Carbon::parse($lastRoomSession->end_date);
@@ -387,12 +411,14 @@ class InvoiceRepository implements InvoiceRepositoryInterface
                 ->where('is_active', 1)
                 ->get();
 
+
             $firstStartTime = $remainingEntitySessions->pluck('start_time')->first();
 
-            $matchingSessions = EntitySession::whereBetween('start_time', [$firstStartTime, $endTime])
-                ->where('entity_id', $data['entity_id'])
-                ->take(ceil($leftDuration))
-                ->get();
+            $matchingSessions = EntitySession::where('start_time', '>', $firstStartTime) // Start time after the specified time
+            ->where('entity_id', $data['entity_id'])
+            ->take(ceil($leftDuration))
+            ->get();
+
 
             foreach ($matchingSessions as $nextSession) {
                 if ($nextSession->is_active == 1) {
@@ -402,11 +428,13 @@ class InvoiceRepository implements InvoiceRepositoryInterface
                 $nextSession->save();
             }
 
-            foreach ($matchingSessions as $nextSession) {
-                $nextSession->is_active = 1;
-                $nextSession->save();
+            foreach ($remainingEntitySessions as $leftSession) {
+                $leftSession->is_active = 0;
+                $leftSession->save();
             }
+
             $selectedRoomSession = $entitySession->roomSession;
+
             $selectedRoomSession->session_duration = 1 - $selectedRoomSession->session_duration;
             $selectedRoomSession->price = $selectedRoomSession->session_duratoin * $entitySession->entity->price_per_hour;
             $selectedRoomSession->end_date = Carbon::parse($selectedRoomSession->start_date)->addHours($selectedRoomSession->session_duartion);
@@ -426,7 +454,6 @@ class InvoiceRepository implements InvoiceRepositoryInterface
 
             $newEntity = Entity::find($data['entity_id']);
             $loopEndTime = 0;
-
             foreach ($leftSession as $index => $session) {
                 $session = (float)$session;
                 $newRoomSession['invoice_id'] = $data['invoice_id'];
@@ -442,6 +469,13 @@ class InvoiceRepository implements InvoiceRepositoryInterface
             foreach ($remainingEntitySessions as $remainingEntity) {
                 $remainingEntity->roomSession->delete();
             }
+            $newEntity->status='active';
+            $newEntity->is_active =1;
+            $newEntity->save();
+
+            $previousEntity->status='inactive';
+            $previousEntity->is_active = 0;
+            $previousEntity->save();
 
             DB::commit();
             ResponseData($remainingEntitySessions);
@@ -468,6 +502,7 @@ class InvoiceRepository implements InvoiceRepositoryInterface
                 $total_session_value += $room->price;
                 $total_duration += $room->session_duration ?? 0;
             }
+
             $entity = Entity::find($latestRoomSession->entitySession->entity_id);
             if ($invoice->invoice_type == 'endless_time') {
                 $latestRoomSession_end_date = Carbon::parse($latestRoomSession->start_date);
@@ -527,6 +562,10 @@ class InvoiceRepository implements InvoiceRepositoryInterface
             }
             $roomDoneResponse['room_sessions'] = $latestRoomSession;
             $roomDoneResponse['rooms_sessions'] = $roomSessions;
+
+            $entity->status='done_pending';
+            $entity->save();
+
             DB::commit();
             ResponseData($roomDoneResponse);
         } catch (\Exception $e) {
@@ -654,7 +693,7 @@ class InvoiceRepository implements InvoiceRepositoryInterface
                 if ($entitySession) {
                     $entitySession->is_active = 0;
                     $entitySession->save();
-                    Log::info('it working on '.$entitySession->id);
+                    Log::info('it working on ' . $entitySession->id);
                 }
             }
 
@@ -713,6 +752,11 @@ class InvoiceRepository implements InvoiceRepositoryInterface
 
             $role = Role::where('name', 'Staff')->where('department_id', $catering_department->id)->first();
             broadcast(new RoomDoneNotificationRequest($entity, $msg, $role->id));
+
+            $entity->is_active =0;
+            $entity->status = 'inactive';
+            $entity->save();
+
             DB::commit();
             return $invoice;
         } catch (\Exception $e) {
@@ -728,17 +772,25 @@ class InvoiceRepository implements InvoiceRepositoryInterface
         try {
             $invoice = Invoice::find($data['invoice_id']);
             $latestSession = RoomSession::where('invoice_id', $data['invoice_id'])->latest()->first();
-            $entity = Entity::find($latestSession->entity_id);
+            $entity = Entity::find($latestSession->entitySession->entity_id);
+            $roomSession = RoomSession::where('invoice_id',$data['invoice_id'])->get();
 
             if ($data['is_confirm'] == 1) {
-                $entity->status = 'active';
-                $entity->is_active = 1;
+                foreach($roomSession as $session){
+                    $session->entitySession->is_active = 1;
+                    $session->save();
+                }
+              $entity->is_active = 1;
+              $entity->status = 'active';
             } else {
-                $entity->status = 'inactive';
+                foreach($roomSession as $session){
+                    $session->entitySession->is_active = 0;
+                    $session->save();
+                }
                 $entity->is_active = 0;
-                $invoice->delete();
-                $latestSession->delete();
+                $entity->status = 'inactive';
             }
+
             $entity->save();
             DB::commit();
             broadcast(new WaiterNotificationRequest($entity, UserData()->department_id));

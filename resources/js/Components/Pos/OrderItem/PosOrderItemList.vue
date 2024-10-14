@@ -249,7 +249,7 @@ export default {
             }
         },
 
-        // for pending or confirm button
+        // for pending or confirm buttoncl
         // getOrderStatus() {
         //     this.PosOrderItemList.forEach((fo) => {
         //         const allConfirmed = fo.food_order_items.every(item => item.status === 'confirmed');

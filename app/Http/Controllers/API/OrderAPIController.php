@@ -54,4 +54,12 @@ class OrderAPIController extends Controller
     {
         $this->orderRepo->orderByInvoiceId($invoiceId);
     }
+
+    public function checkFocSupervision(Request $request)
+    {
+        if(!$request->phone_number || !$request->password){
+            ResponseMessage('Phone number and password must be present', 400);
+        }
+        $this->orderRepo->checkFocSupervision($request);
+    }
 }

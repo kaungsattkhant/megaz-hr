@@ -95,6 +95,59 @@ class EntityRepository implements EntityRepositoryInterface
     }
 
 
+    public function entitySessionWithInvoice(array $data, int $entityId)
+    {
+        $entity = Entity::find($entityId);
+
+        $current_time = Carbon::now()->format('H:i');
+        $entity = EntitySession::where('is_available', 1)
+            ->where('entity_id', $entity->id)
+            ->whereTime('start_time', '<=', $current_time) // Filter by current time within start and end
+            ->whereTime('end_time', '>=', $current_time)
+            ->with(['roomSessions' => function ($query) {
+                $query->orderBy('created_at', 'desc')->limit(1); // Get the most recent room session
+            }])
+            ->first();
+        foreach ($entity->roomSessions as $roomSession) {
+            $invoice = $roomSession->invoice; // Access the invoice for the current room session
+            $invoice->package;
+            if ($invoice) { // Check if there is an associated invoice
+                $consolidatedOrderItems = [];
+
+                foreach ($invoice->orders as $order) {
+                    $orderItems = OrderItem::where('order_id', $order->id)->get();
+
+                    foreach ($orderItems as $orderItem) {
+                        $menuId = $orderItem->menu_id;
+                        $status = $orderItem->status;
+
+                        if (isset($consolidatedOrderItems[$menuId][$status])) {
+                            $consolidatedOrderItems[$menuId][$status]->quantity += $orderItem->quantity;
+                            $consolidatedOrderItems[$menuId][$status]->price += $orderItem->price;
+                            $consolidatedOrderItems[$menuId][$status]->discount_price += $orderItem->discount_price;
+                        } else {
+                            $consolidatedOrderItems[$menuId][$status] = $orderItem;
+                        }
+                    }
+                }
+
+                foreach ($invoice->orders as $order) {
+                    $order->order_items = collect();
+
+                    foreach ($consolidatedOrderItems as $menuId => $itemsByStatus) {
+                        foreach ($itemsByStatus as $status => $order_items) {
+                            $order_items->menu;
+                            $order->order_items->push($order_items);
+                        }
+                    }
+                }
+            }
+        }
+
+        return $entity;
+    }
+
+
 
     public function createData(array $data)
     {

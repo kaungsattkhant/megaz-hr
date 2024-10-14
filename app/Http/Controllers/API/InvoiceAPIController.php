@@ -4,6 +4,7 @@ namespace App\Http\Controllers\API;
 
 use App\Events\PosRoomDoneNotification;
 use App\Events\RoomDoneNotificationRequest;
+use App\Events\RoomNotificationRequest;
 use Illuminate\Http\Request;
 
 use App\Http\Controllers\Controller;
@@ -35,8 +36,7 @@ class InvoiceAPIController extends Controller
 
         DB::beginTransaction();
         try {
-            $data = $request->except('waiter');
-
+            $data = $request->all();
             $data['is_waiter'] = ($request->waiter) ? 1 : 0;
 
             if (isset($data['male'])) {
@@ -54,15 +54,28 @@ class InvoiceAPIController extends Controller
             } else {
                 $data['child'] = 0;
             }
-            $invoice = $this->invoiceRepo->createData($data);
-            if ($data['type'] == 'package') {
-                $orderData['invoice_id'] = $invoice->id;
-                $orderData['menuArray'] = json_decode($request->orders, true);
 
-                $this->orderRepo->createMultipleOrder($orderData);
+            $data['entity_id'] = $request->entity_id;
+            $returnData = $this->invoiceRepo->createData($data);
+            if ($data['type'] == 'package') {
+                $orderData['invoice_id'] = $returnData['invoice']->id;
+                $orderData['menuArray'] = json_decode($request->orders, true);
+                $order = $this->orderRepo->createMultipleOrder($orderData);
+
+                if (isset($data['is_waiter'])) {
+                    if ($data['is_waiter'] == 1) {
+                        broadcast(new RoomNotificationRequest($returnData['customer'], $returnData['entity'], $returnData['invoice'], UserData()->department_id,$order['order'], $order['orderItems']));
+                    }
+                }
+            }else{
+                if (isset($data['is_waiter'])) {
+                    if ($data['is_waiter'] == 1) {
+                        broadcast(new RoomNotificationRequest($returnData['customer'], $returnData['entity'], $returnData['invoice'], UserData()->department_id,null, []));
+                    }
+                }
             }
             DB::commit();
-            ResponseData($invoice);
+            ResponseData($returnData);
         } catch (\Exception $e) {
             DB::rollBack();
             ResponseMessage($e->getMessage(), 422);

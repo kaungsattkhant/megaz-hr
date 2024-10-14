@@ -20,4 +20,5 @@ interface OrderRepositoryInterface
 
     public function orderByInvoiceId(int $invoiceId);
 
+    public function checkFocSupervision(Request $request);
 }
