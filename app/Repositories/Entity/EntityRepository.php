@@ -100,13 +100,15 @@ class EntityRepository implements EntityRepositoryInterface
     {
         $entity = Entity::find($entityId);
         $entitySession = EntitySession::where('is_active', 1)
-            ->with(['entity','roomSessions'])->where('entity_id', $entityId)->first();
+            ->with(['entity', 'roomSessions'])->where('entity_id', $entityId)->first();
 
-            // $roomSessions = RoomSession::where('invoice_id',$invoiceId)
-            //         ->orderBy('created_at')
-            //         ->get();
-            //     $firstRoomSession = $roomSessions->first();
-            //     $lastRoomSession = $roomSessions->last();
+        $invoiceId = $entitySession->roomSession->invoice_id;
+        $roomSessions = RoomSession::where('invoice_id', $invoiceId)
+            ->orderBy('created_at')
+            ->get();
+
+        $firstRoomSession = $roomSessions->first();
+        $lastRoomSession = $roomSessions->last();
 
         foreach ($entitySession->roomSessions as $roomSession) {
             $invoice = $roomSession->invoice;
@@ -143,8 +145,8 @@ class EntityRepository implements EntityRepositoryInterface
                 }
             }
         }
-        // $entitySession['start_date'] = $firstRoomSession->start_date;
-        // $entitySession['end_date'] = $lastRoomSession->end_date;
+        $entitySession['start_date'] = $firstRoomSession->start_date;
+        $entitySession['end_date'] = $lastRoomSession->end_date;
         return $entitySession;
     }
 
