@@ -539,8 +539,6 @@ class InvoiceRepository implements InvoiceRepositoryInterface
             $roomDoneResponse['room_sessions'] = $latestRoomSession;
             $roomDoneResponse['rooms_sessions'] = $roomSessions;
 
-            $entity->status='done_pending';
-            $entity->save();
             DB::commit();
             ResponseData($roomDoneResponse);
         } catch (\Exception $e) {

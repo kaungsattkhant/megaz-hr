@@ -48,15 +48,15 @@
                                         <td class="whitespace-nowrap border-r px-6 py-4">
                                             {{ sessionRequest.room_name }}
                                         </td>
-                                        <td class="whitespace-nowrap border-r px-6 py-4 text-center">
+                                        <!-- <td class="whitespace-nowrap border-r px-6 py-4 text-center">
                                             {{ sessionRequest.session_duration }}
-                                        </td>
-                                        <td class="whitespace-nowrap border-r px-6 py-4">
+                                        </td> -->
+                                        <!-- <td class="whitespace-nowrap border-r px-6 py-4">
                                             {{ sessionRequest.start_time }}
                                         </td>
                                         <td class="whitespace-nowrap border-r px-6 py-4">
                                             {{ sessionRequest.end_time }}
-                                        </td>
+                                        </td> -->
                                         <td class="whitespace-nowrap border-r px-6 py-4">
                                             {{ sessionRequest.customer_name }}
                                         </td>
