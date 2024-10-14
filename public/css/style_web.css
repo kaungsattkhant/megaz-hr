@@ -295,6 +295,9 @@
 .right-sidebar .padding-section {
   padding: 1.25rem; }
 
+.right-sidebar-2 .padding-section {
+  padding: 1.25rem; }
+
 .pos-active-link {
   background: #FEEFDC;
   color: #D67816 !important; }
@@ -352,5 +355,19 @@
 .select-custom2 div input {
   font-size: 14px;
   line-height: 1.9rem; }
+
+.hidden-scrollbar::-webkit-scrollbar {
+  display: none;
+  /* Hides the scrollbar */ }
+
+/* For Firefox */
+.hidden-scrollbar {
+  scrollbar-width: 0;
+  /* Hides the scrollbar */ }
+
+/* For IE and Edge */
+.hidden-scrollbar {
+  -ms-overflow-style: none;
+  /* Hides the scrollbar */ }
 
 /*# sourceMappingURL=style_web.css.map */
