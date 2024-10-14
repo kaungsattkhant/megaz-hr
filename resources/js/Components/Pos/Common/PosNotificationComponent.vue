@@ -312,6 +312,14 @@
                 });
             },
 
+            listenBroadCastNotificationsOrder(channel, event){
+                window.Echo.channel(channel)
+                .listen(event, (response)=>{
+                    console.log(`new pos order items received`);
+
+                    console.log(response);
+                });
+            },
 
             async btnConfirmSession2(id){
 
@@ -367,6 +375,10 @@
             let doneChannelName = `pos-roomdone-notification-request.${this.role[0].id}`;
             let doneEventName = `PosRoomDoneNotification`;
             this.listenBroadCastNotificationsDone(doneChannelName, doneEventName);
+
+            let waiterOrderChannelName = `waiter-order-notification.${this.department.id}`;
+            let waiterOrderEventName = `WaiterOrderNotificationRequest`;
+            this.listenBroadCastNotificationsOrder(waiterOrderChannelName, waiterOrderEventName);
         },
 
         beforeDestroy() {
