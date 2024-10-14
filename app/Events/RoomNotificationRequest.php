@@ -31,7 +31,7 @@ class RoomNotificationRequest implements ShouldBroadcast
     public $order;
     public $orderItem;
 
-    public function __construct(Customer $customer,Entity $entity, Invoice $invoice,$department_id,Order $order, array $orderItem)
+    public function __construct(Customer $customer,Entity $entity, Invoice $invoice,$department_id,Order $order=null, array $orderItem)
     {
         //
         $this->department_id=$department_id;

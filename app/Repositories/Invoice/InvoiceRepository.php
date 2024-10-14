@@ -91,7 +91,7 @@ class InvoiceRepository implements InvoiceRepositoryInterface
 
         $remainingTime = $now->diff($endTime);
 
-        if ($remainingTime->h > 0) {
+        if ($remainingTime->h > 1) {
             ResponseMessage("Selected Session is not available because selected session time is not available", 422);
         }
         $totalRemainingMinutes = ($remainingTime->h * 60) + $remainingTime->i;
