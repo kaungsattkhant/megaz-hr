@@ -317,9 +317,9 @@
                         invoice_id: response.invoice_id,
                         customer_name: response.customer_name,
                         room_name: response.room_name,
-                        session_duration: response.room_session.session_duration,
-                        start_time: convertToFriendlyDateTime(response.room_session.start_date),
-                        end_time: convertToFriendlyDateTime(response.room_session.end_date),
+                        // session_duration: response.room_session.session_duration,
+                        // start_time: convertToFriendlyDateTime(response.room_session.start_date),
+                        // end_time: convertToFriendlyDateTime(response.room_session.end_date),
                         status: 'received'
                     };
 
