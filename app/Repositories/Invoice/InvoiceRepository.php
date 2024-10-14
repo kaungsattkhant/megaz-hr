@@ -87,11 +87,11 @@ class InvoiceRepository implements InvoiceRepositoryInterface
         $entitySession = EntitySession::find($entity_session_id);
         $startTime = Carbon::parse($entitySession->start_time);
         $endTime = Carbon::parse($entitySession->end_time);
-        $now = Carbon::parse("2024-10-14 15:00:00");
+        $now = Carbon::now();
 
         $remainingTime = $now->diff($endTime);
 
-        if ($remainingTime->h > 1) {
+        if ($remainingTime->h > 0) {
             ResponseMessage("Selected Session is not available because selected session time is not available", 422);
         }
         $totalRemainingMinutes = ($remainingTime->h * 60) + $remainingTime->i;
