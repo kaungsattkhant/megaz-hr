@@ -18,7 +18,7 @@ return new class extends Migration
             $table->decimal('session_duration')->nullable();
             $table->unsignedBigInteger('invoice_id');
             $table->unsignedBigInteger('entity_id');
-            $table->double('price')->default(0);
+            $table->double(column: 'price')->default(0);
             // $table->string('status')->default('running');
             $table->double('discount_session')->nullable();
             $table->timestamps();

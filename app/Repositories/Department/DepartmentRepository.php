@@ -15,6 +15,9 @@ class DepartmentRepository implements DepartmentRepositoryInterface
             return $departments;
         } else {
             $departments = Department::with('inventory.inventory','features')->get();
+            foreach($departments as $department){
+                // return $department;
+            }
             return $departments;
         }
     }
@@ -25,7 +28,7 @@ class DepartmentRepository implements DepartmentRepositoryInterface
         try {
             $department = Department::create($data);
             $featureIds = json_decode($data['featureIds'], true);
-            foreach ($featureIds as $feature) {
+            foreach ($featureIds as $feature) { 
                 $department->features()->attach($feature);
             }
             DB::commit();

@@ -9,6 +9,7 @@ use App\Models\CashbookBalance;
 use App\Models\PurchaseOrderItem;
 use App\Services\CashFlowService;
 use Illuminate\Support\Facades\DB;
+use App\Services\DepreciationService;
 use App\Services\TrialBalanceService;
 use App\Services\InventoryFinancialService;
 
@@ -17,15 +18,19 @@ class FinancialRepository implements FinancialInterface
     protected $cashFlowService;
     protected $trialBalanceService;
 
+    protected $depreciationService;
+
     protected $inventoryFinancialService;
     private $receiptSubAccountCode = ['2-1000', '2-1050', '2-2000', '4-3000', '5-0000', '5-0100', '5-1000', '4-4000', '3-1000'];
     private $paymentSubAccountCode = ['1-1000', '1-1100', '2-1000', '2-1020', '2-1050', '2-3000', '2-4000', '3-2000', '4-1000', '4-2000', '4-3000', '4-4000', '6-0000', '6-2000', '6-3000', '6-4000', '6-5000', '6-6000', '6-7000', '6-8000', '6-9000', '3-1000'];
 
-    public function __construct(CashFlowService $cashFlowService, TrialBalanceService $trialBalanceService, InventoryFinancialService $inventoryFinancialService)
+    public function __construct(CashFlowService $cashFlowService, TrialBalanceService $trialBalanceService, InventoryFinancialService $inventoryFinancialService, DepreciationService $depreciationService)
     {
         $this->cashFlowService = $cashFlowService;
         $this->trialBalanceService = $trialBalanceService;
         $this->inventoryFinancialService = $inventoryFinancialService;
+        $this->depreciationService = $depreciationService;
+
     }
 
     public function CashFlowStatementOriginal($request) //original
@@ -393,6 +398,21 @@ class FinancialRepository implements FinancialInterface
         $rt_sale = ['5-0001', '5-0002'];
         $ktv_sale = ['5-0101', '5-0102'];
 
+        $incomeCode = ['5-1000'];
+
+        //overhead code
+        $overheadCode = [
+            '6-3000', //operating expense
+            '6-4000', //admin & general 
+            '6-5000' // gov affairs
+        ];
+
+        //fix cost
+        $rentalAccountCode = ['6-7001'];
+        //finaance cost code
+        $financeCostCode = ['6-8000'];
+        //year tax cost
+        $yearTaxCode = ['6-9000'];
         // //total consumption for food and beverage 
         // $name=['Inventory Food','Inventory Beverage'];
         // $catetoryIds=Category::whereIn('name',$name)->pluck('id')->toArray();
@@ -436,42 +456,200 @@ class FinancialRepository implements FinancialInterface
         $ktvTotalSale = $this->getSum($this->trialBalanceService->getTrialBalanceResults($ktv_sale, 'credit', $current, 'sale'));
         $totalRevenue = $rtTotalSale + $ktvTotalSale;
 
-        $ratio = ($totalConsumption->total_consumption / $totalRevenue) * 100;
-        $rt_cos = ($rtTotalSale * $ratio) / 100;
-        $ktv_cos = ($ktvTotalSale * $ratio) / 100;
+        $rt_cos = $ktv_cos = 0;
+        if ($totalRevenue > 0) {
+            $ratio = ($totalConsumption->total_consumption / $totalRevenue) * 100;
+            $rt_cos = ($rtTotalSale * $ratio) / 100;
+            $ktv_cos = ($ktvTotalSale * $ratio) / 100;
+        }
 
         // $rt_expense = (22850612.93 * 9.71898444) / 100;
         // return $rt_expense;
         // Cash Sale Processing
+
         $cashSales = $this->trialBalanceService->getTotalBySubAccountCode($cashSaleCode, 'credit', $current, 'cash_sale');
 
         $rtCashSale = $cashSales->where('code', '5-0000')->sum('total_amount');
         $ktvCashSale = $cashSales->where('code', '5-0100')->sum('total_amount');
-
         $rtGP = $rtCashSale - $rt_cos;
         $ktvGP = $ktvCashSale - $ktv_cos;
 
-        return [$rtGP, $ktvGP];
+        //other income
+        $otherIncome = $this->trialBalanceService->getTotalResultBySubAccountCode($incomeCode, 'credit', $current, 'cash_sale');
+        $otherIncomeTotalAmount = $otherIncome[0]->total_amount;
+        $otherIncomePL = $this->calRTAndKTVPL($rtTotalSale, $ktvTotalSale, $otherIncomeTotalAmount, $totalRevenue);
+
+        $total_rt_operating_income = $rtGP + $otherIncomePL[0];
+        $total_ktv_operating_income = $ktvGP + $otherIncomePL[1];
+        $total_operating_income = $total_rt_operating_income + $total_ktv_operating_income;
+        // return $total_operating_income;
+        //end operating income 
+
+        //overhead
+        // $overheadCode = [
+        //     '6-3000', //operating expense
+        //     '6-4000', //admin & general 
+        //     '6-5000' // gov affairs
+        // ];
+
+        $operating_expense_code = ['6-4000'];
+        $adminstrative_code = ['6-4000'];
+        $pay_and_related_code = ['6-5000'];
+
+        $operatingExpense = $this->trialBalanceService->getTotalBySubAccountCode($operating_expense_code, 'debit', $current, 'operating_expense');
+        $operatingExpensePL = $this->calRTAndKTVPL($rtTotalSale, $ktvTotalSale, $operatingExpense[0]->total_amount, $totalRevenue);
+
+        // adminstrative cost
+        $adminstrativeCost = $this->trialBalanceService->getTotalBySubAccountCode($adminstrative_code, 'debit', $current, 'adminstrative_cost');
+        $adminstrativeCostPL = $this->calRTAndKTVPL($rtTotalSale, $ktvTotalSale, $adminstrativeCost[0]->total_amount, $totalRevenue);
+        //pay and related cost
+        $payAndRelatedCost = $this->trialBalanceService->getTotalBySubAccountCode($pay_and_related_code, 'debit', $current, 'pay_and_related');
+        $payAndRelatedCostPL = $this->calRTAndKTVPL($rtTotalSale, $ktvTotalSale, $payAndRelatedCost[0]->total_amount, $totalRevenue);
+
+        $total_rt_over_head = $operatingExpensePL[0] + $adminstrativeCostPL[0] + $operatingExpensePL[0];
+        $total_ktv_over_head = $operatingExpensePL[1] + $adminstrativeCostPL[1] + $operatingExpensePL[1];
+        $total_over_head = $total_rt_over_head + $total_ktv_over_head;
+
+        //end overhead
+
+        //fix cost
+        $rentalCost = $this->trialBalanceService->getTrialBalanceResults($rentalAccountCode, 'debit', $current, 'cash_sale');
+        $rentalPL = $this->calRTAndKTVPL($rtTotalSale, $ktvTotalSale, $rentalCost[0]->amount, $totalRevenue);
+
+        $fix_asset_tangiable = '1-1000';
+        $fix_asset_untangible = '1-1100';
+        $inventory_held = '2-1020';
+        $month = Carbon::parse($request->date)->format('n');
+        $year = Carbon::parse($request->date)->format('Y');
+        $fix_asset_tangiable = $this->depreciationService->depreciationBalanceQuery($fix_asset_tangiable, $month, $year);
+        $fix_asset_untangible = $this->depreciationService->depreciationBalanceQuery($fix_asset_untangible, $month, $year);
+        $total_fix_asset_tangiable = $fix_asset_tangiable->sum('current_month_depreciation');
+        $total_fix_asset_untangiable = $fix_asset_untangible->sum('current_month_depreciation');
+        $total_fix_asset = $total_fix_asset_tangiable + $total_fix_asset_untangiable;
+        $fixAssetPL = $this->calRTAndKTVPL($rtTotalSale, $ktvTotalSale, $total_fix_asset, $totalRevenue);
+
+        $current_asset = $this->depreciationService->depreciationBalanceQuery($inventory_held, $month, $year);
+        $total_current_asset = $current_asset->sum('current_month_depreciation');
+        $currentAssetPL = $this->calRTAndKTVPL($rtTotalSale, $ktvTotalSale, $total_current_asset, $totalRevenue);
+
+        $total_rt_fix_cost = $rentalPL[0] + $fixAssetPL[0] + $currentAssetPL[0];
+        $total_ktv_fix_cost = $rentalPL[1] + $fixAssetPL[1] + $currentAssetPL[1];
+        $total_fix_cost = $total_rt_fix_cost + $total_ktv_fix_cost;
 
 
-        $response = [];
+        $net_profit=$total_operating_income-($total_over_head+$total_fix_cost);
+        //finance cost
+        $financeCost = $this->trialBalanceService->getTotalResultBySubAccountCode($financeCostCode, 'debit', $current, 'cash_sale');
+        $financeCostPL = $this->calRTAndKTVPL($rtTotalSale, $ktvTotalSale, $financeCost[0]->total_amount, $totalRevenue);
+
+        //year teax
+        $yearText = $this->trialBalanceService->getTotalResultBySubAccountCode($yearTaxCode, 'debit', $current, 'cash_sale');
+        $yearTaxPL = $this->calRTAndKTVPL($rtTotalSale, $ktvTotalSale, $yearText[0]->total_amount, $totalRevenue);
+        $total_rt_interest_and_tax=$financeCostPL[0]+$yearTaxPL[0];
+        $total_ktv_interest_and_tax=$financeCostPL[1]+$yearTaxPL[1];
+        $total_interest_and_tax=$total_rt_interest_and_tax+$total_ktv_interest_and_tax;
+
+        $rt_net_profit=$total_rt_operating_income-($total_rt_over_head+$total_rt_fix_cost);
+        $ktv_net_profit=$total_ktv_operating_income-($total_ktv_over_head+$total_ktv_fix_cost);
+        $total_net_profit=$rt_net_profit+$ktv_net_profit;
+
+
+
+        $rt_net_profit_after_tax=$rt_net_profit-$total_rt_interest_and_tax;
+        $ktv_net_profit_after_tax=$ktv_net_profit-$total_ktv_interest_and_tax;
+        $total_net_profit_after_tax=$rt_net_profit_after_tax+$ktv_net_profit_after_tax;
+
+        $response=[];
+
+        $operating_income = [];
         $cashSaleResponse = [
             "name" => "Gross Profit",  // Fixed name
-            "restaurant_pl" => 0,      // Default values
-            "ktv_pl" => 0
+            "restaurant_pl" => $rtGP,      // Default values
+            "ktv_pl" => $ktvGP,
+            "total" => $rtGP + $ktvGP,
         ];
+        $operating_income[] = $cashSaleResponse;
+        $operating_income[]=$this->setResponseFormat('Other Income ',$otherIncomePL);
+        $operating_income_response=$this->setTotalResponseFormat('Total Operating Income',$total_rt_operating_income,$total_ktv_operating_income,$total_operating_income);
+    
+        // $otherIncomeResponse = [
+        //     "name" => "Other Income ",  // Fixed name
+        //     "restaurant_pl" => $otherIncomePL[0],      // Default values
+        //     "ktv_pl" => $otherIncomePL[1],
+        //     "total" => $otherIncomePL[0] + $otherIncomePL[1],
+        // ];
+        // $operating_income[] = $otherIncomeResponse;
+        // return $total_operating_income;
 
-        foreach ($cashSale as $item) {
-            if ($item->code == '5-0000') {
-                $cashSaleResponse['restaurant_pl'] = (int) $item->total_amount;
-            } elseif ($item->code == '5-0100') {
-                // You mentioned 'ktv_pl: 10000', which is different from the original amount (13000)
-                // Use 10000 or the value from the array based on your preference
-                $cashSaleResponse['ktv_pl'] = 10000;
-            }
+        $overhead=[];
+        $overhead[]=$this->setResponseFormat('Operating Expense',$operatingExpensePL);
+        $overhead[]=$this->setResponseFormat('Adminstrative Cost',$adminstrativeCostPL);
+        $overhead[]=$this->setResponseFormat('Pay & Related Expenses',$payAndRelatedCostPL);
+        $total_overhead_response=$this->setTotalResponseFormat('Total Operating Income',$total_rt_over_head,$total_ktv_over_head,$total_over_head);
+        // return $operatingExpenseResponse;
+
+        $fixedCost[]=$this->setResponseFormat('Rental Fee',$rentalPL);
+        $fixedCost[]=$this->setResponseFormat('CA-Deprciation',$currentAssetPL);
+        $fixedCost[]=$this->setResponseFormat('FA-Depreciation',$fixAssetPL);
+        $total_fixed_cost_response=$this->setTotalResponseFormat('Total Fixed Cost',$total_rt_fix_cost,$total_ktv_fix_cost,$total_fix_cost);
+
+        // $net_profit_before=$this->setTotalResponseFormat('Net Profit (Earning Before Interest & Taxes)',,$total_ktv_interest_and_tax,$total_interest_and_tax);
+
+        $interestAndTax[]=$this->setResponseFormat('Finance Cost',$financeCostPL);
+        $interestAndTax[]=$this->setResponseFormat('Year Tax',$yearTaxPL);
+        $total_interest_and_tax_response=$this->setTotalResponseFormat('Total Interest And Tax',$total_rt_interest_and_tax,$total_ktv_interest_and_tax,$total_interest_and_tax);
+        $net_profit=$this->setTotalResponseFormat('Net Profit (Earning Before Interest & Taxes)',$rt_net_profit,$ktv_net_profit,$total_net_profit);
+        $net_profit_after_tax=$this->setTotalResponseFormat('Net Profit After Inerest &Tax',$rt_net_profit_after_tax,$ktv_net_profit_after_tax,$total_net_profit_after_tax);
+
+        $responseOperating['data']=$operating_income;
+        $responseOperating['total']=$operating_income_response;
+
+        $responseOverhead['data']=$overhead;
+        $responseOverhead['total']=$total_overhead_response;
+
+        $responseFixedCost['data']=$fixedCost;
+        $responseFixedCost['total']=$total_fixed_cost_response;
+
+        $responseNetProfit['total']=$net_profit;
+
+        $responseInterestAndTax['data']=$interestAndTax;
+        $responseInterestAndTax['total']=$total_interest_and_tax_response;
+
+        $responseNetProfitAfterTax['total']=$net_profit_after_tax;
+
+        $data[]=$responseOperating;
+        $data[]=$responseOverhead;
+        $data[]=$responseFixedCost;
+        $data[]=$responseNetProfit;
+        $data[]=$responseInterestAndTax;
+        $data[]=$responseNetProfitAfterTax;
+        return $data;
+    }
+    public function setResponseFormat($name,$plData){
+        return  [
+            "name" => $name,  // Fixed name
+            "restaurant_pl" => $plData[0],      // Default values
+            "ktv_pl" => $plData[1],
+            "total" => $plData[0] + $plData[1],
+        ];
+    }
+    public function setTotalResponseFormat($name,$total_rt,$total_ktv,$total){
+        return  [
+            "name" => $name,  // Fixed name
+            "total_restaurant_pl" => $total_rt,      // Default values
+            "total_ktv_pl" => $total_ktv,
+            "total" => $total,
+        ];
+    }
+    public function calRTAndKTVPL($rtTotalSale, $ktvTotalSale, $total, $totalRevenue)
+    {
+        $rt_pl = $ktv_pl = 0;
+        if ($totalRevenue > 0) {
+            $ratio = ($total / $totalRevenue) * 100;
+            $rt_pl = ($rtTotalSale * $ratio) / 100;
+            $ktv_pl = ($ktvTotalSale * $ratio) / 100;
         }
-        $response[] = $cashSaleResponse;
-        return $response;
+        return [$rt_pl, $ktv_pl];
     }
 
     public function getInventorySchedule($request)

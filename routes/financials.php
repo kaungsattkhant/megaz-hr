@@ -9,7 +9,10 @@ Route::middleware('auth:api')->group(function () {
         Route::get('indirect_cash_flow_statement', 'IndirectCashFlowStatement');
         Route::get('balance_sheet', 'BalanceSheet');
         Route::get('trial_balance', 'TrialBalance');
-        Route::get('profit_and_loss', 'getProfitAndLoss');
         Route::get('inventory_schedule', 'getInventorySchedule');
+        Route::get('profit_and_loss', 'getProfitAndLoss');
     });
+});
+Route::controller(FinancialReportController::class)->group(function () {
+    // Route::get('profit_and_loss', 'getProfitAndLoss');
 });
