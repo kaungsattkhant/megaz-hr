@@ -50,17 +50,16 @@ class OrderAPIController extends Controller
         $this->orderRepo->orderItemAreaConfirm($id, $request);
     }
 
-<<<<<<< HEAD
     public function orderByInvoiceId(int $invoiceId)
     {
         $this->orderRepo->orderByInvoiceId($invoiceId);
-=======
+    }
+
     public function checkFocSupervision(Request $request)
     {
         if(!$request->phone_number || !$request->password){
             ResponseMessage('Phone number and password must be present', 400);
         }
         $this->orderRepo->checkFocSupervision($request);
->>>>>>> origin/pks_version
     }
 }

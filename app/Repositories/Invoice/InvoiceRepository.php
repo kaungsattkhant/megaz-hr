@@ -235,7 +235,7 @@ class InvoiceRepository implements InvoiceRepositoryInterface
 
             if (isset($data['is_waiter'])) {
                 if ($data['is_waiter'] == 1 && $invoice) {
-                    // broadcast(new RoomNotificationRequest($customer, $entity, $roomSession, $invoice, UserData()->department_id));
+                    broadcast(new RoomNotificationRequest($customer, $entity, $roomSession, $invoice, UserData()->department_id));
                 }
             }
             DB::commit();

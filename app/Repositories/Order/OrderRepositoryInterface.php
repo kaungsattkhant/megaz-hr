@@ -18,10 +18,7 @@ interface OrderRepositoryInterface
 
     public function orderItemAreaConfirm(int $id, Request $request);
 
-<<<<<<< HEAD
     public function orderByInvoiceId(int $invoiceId);
 
-=======
     public function checkFocSupervision(Request $request);
->>>>>>> origin/pks_version
 }

@@ -10,7 +10,8 @@ use App\Http\Action\SendNotification\SendNotification;
 
 use App\Events\KitchenNotificationRequest;
 use App\Events\OrderStatusNotificationRequest;
-
+use App\Events\WaiterNotificationRequest;
+use App\Events\WaiterOrderConfirmNotificationRequest;
 use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\Entity;
@@ -176,14 +177,15 @@ class OrderRepository implements OrderRepositoryInterface
                 array_push($orderItemsArray, $order_item);
             }
 
-<<<<<<< HEAD
-=======
             $order->foc_total += $focTotal;
             $order->save();
-
-            // Broadcast with order items array
-
->>>>>>> origin/pks_version
+            if(isset($data['is_waiter']))
+            {
+                if($data['is_waiter']==1)
+                {
+                    broadcast(new WaiterOrderConfirmNotificationRequest($entity, $order, $orderItemsArray, null, 5));
+                }
+            }
             broadcast(new KitchenNotificationRequest($entity, $order, $orderItemsArray, null, 7));
             DB::commit();
             return $order;
@@ -295,12 +297,12 @@ class OrderRepository implements OrderRepositoryInterface
         }
     }
 
-<<<<<<< HEAD
     public function orderByInvoiceId(int $invoiceId)
     {
         $order = Order::where('invoice_id',$invoiceId)->with('orderItems.menu')->get();
         ResponseData($order);
-=======
+
+    }
     public function checkFocSupervision(Request $request)
     {
         $supervisor = Staff::whereHas('department',function($query){
@@ -319,6 +321,5 @@ class OrderRepository implements OrderRepositoryInterface
         }else{
             ResponseMessage('Supervisor authorization failed', 403);
         }
->>>>>>> origin/pks_version
     }
 }
