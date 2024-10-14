@@ -373,9 +373,9 @@
                                     <div class="relative">
                                         <select name="" id="" v-model="discount_type" @change="getRoomDiscount"
                                             class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
-                                            <option value="room_discount"
+                                            <!-- <option value="room_discount"
                                                 :disabled="selectedRoom.room_sessions[0].invoice.invoice_type == 'package'">
-                                                Room Discount </option>
+                                                Room Discount </option> -->
                                             <option value="fix_amount"> Fix Ammount </option>
                                             <option value="percentage"> Percentage </option>
                                             <option value="customer_level" :disabled="roomSessionData.customer_level == 'no customer level'"> Customer Level </option>
