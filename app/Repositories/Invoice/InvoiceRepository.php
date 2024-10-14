@@ -346,8 +346,9 @@ class InvoiceRepository implements InvoiceRepositoryInterface
                 ->orderBy('id')
                 ->take($data['session_duration'])
                 ->get();
+
             foreach ($nextSessions as $session) {
-                if ($session->is_active) {
+                if ($session->is_active==1) {
                     return ResponseMessage('Session is not available', 422);
                 }
                 $session->update(['is_active' => 1]);
