@@ -105,7 +105,7 @@ class InvoiceAPIController extends Controller
         $entity = Entity::find($latestRoomSession->entitySession->entity_id);
 
         if (isset($request->waiter)) {
-            $managerRole = Role::where('name', 'Manager')
+            $managerRole = Role::where('name', 'Staff')
                 ->where('department_id', $catering_department->id)
                 ->first();
 
