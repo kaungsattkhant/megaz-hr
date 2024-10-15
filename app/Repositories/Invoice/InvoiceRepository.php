@@ -540,11 +540,6 @@ class InvoiceRepository implements InvoiceRepositoryInterface
             $roomDoneResponse['rooms_sessions'] = $roomSessions;
 
             DB::commit();
-
-            $catering_department = Department::where('name', 'Catering')->first();
-            $role = Role::where('name', 'Staff')->where('department_id', $catering_department->id)->first();
-            $msg = "The request to quit the room {$entity->name} has been confirmed. The room will be quit and will soon close. Thank you.";
-            broadcast(new RoomDoneNotificationRequest($entity, $msg, $role->id));
             ResponseData($roomDoneResponse);
         } catch (\Exception $e) {
             DB::rollBack();
