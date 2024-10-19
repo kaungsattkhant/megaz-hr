@@ -1943,7 +1943,11 @@ export default {
             if (response.data) {
                 this.tableList = response.data;
             }
-        }
+        },
+
+        updateRoomList(){
+            this.getRoomList();
+        },
 
         // async initialSidebarShow(){
         //     alert(this.roomList[0].invoices.length)

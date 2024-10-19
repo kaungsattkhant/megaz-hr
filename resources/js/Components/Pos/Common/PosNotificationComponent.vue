@@ -381,6 +381,10 @@
         methods: {
             ...mapGetters(['getUser', 'getDepartment', 'getToken', 'getRoles']),
 
+            emitRoomListUpdate(){
+                this.$emit(`updateRoomList`);
+            },
+
             // for open from waiter tablet
             notiModalOpen(){
                 document.getElementById("open_noti_modal").click();
@@ -427,6 +431,7 @@
                     this.sessionRequests.splice(index, 1);
                 }
                 // window.location.reload();
+                this.emitRoomListUpdate();
 
                 this.notiModalOpen();
             },
@@ -445,6 +450,7 @@
                     this.sessionRequests.splice(index, 1);
                 }
                 // window.location.reload();
+                this.emitRoomListUpdate();
 
                 this.notiModalOpen();
             },
@@ -487,6 +493,8 @@
                     this.sessionRequests2.splice(index, 1);
                 }
                 // window.location.reload();
+                this.emitRoomListUpdate();
+
                 this.notiModalOpen2();
             },
 
@@ -503,6 +511,8 @@
                     this.sessionRequests2.splice(index, 1);
                 }
                 // window.location.reload();
+                this.emitRoomListUpdate();
+
                 this.notiModalOpen2();
 
             },
