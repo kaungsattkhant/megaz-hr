@@ -8,7 +8,7 @@
         </button>
 
 
-        <div data-te-modal-init
+        <div data-te-modal-init data-te-backdrop="static" data-te-keyboard="false"
             class="fixed left-0 top-0 z-[1055] hidden h-full w-full overflow-y-auto overflow-x-hidden outline-none"
             id="noti_modal" tabindex="-1" aria-labelledby="createCustomerModalLabel" aria-modal="true"
             role="dialog">
@@ -21,7 +21,7 @@
                             Notifications
                         </p>
                         <button type="button" class="absolute top-4 right-4 focus:shadow-none focus:outline-none
-                        " id="closeCustomerModal" data-te-modal-dismiss aria-label="Close">
+                        " id="closeCustomerModal" data-te-modal-dismiss aria-label="Close" @click="reloadUi()">
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
                                 stroke="currentColor" class="h-5 w-5">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
@@ -100,7 +100,7 @@
 
 
 
-        <div data-te-modal-init
+        <div data-te-modal-init data-te-backdrop="static" data-te-keyboard="false"
             class="fixed left-0 top-0 z-[1055] hidden h-full w-full overflow-y-auto overflow-x-hidden outline-none"
             id="noti_modal2" tabindex="-1" aria-labelledby="createCustomerModalLabel" aria-modal="true"
             role="dialog">
@@ -113,7 +113,7 @@
                             End Room Notifications
                         </p>
                         <button type="button" class="absolute top-4 right-4 focus:shadow-none focus:outline-none
-                        " id="closeNotimodal2" data-te-modal-dismiss aria-label="Close">
+                        " id="closeNotimodal2" data-te-modal-dismiss aria-label="Close" @click="reloadUi()">
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
                                 stroke="currentColor" class="h-5 w-5">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
@@ -186,7 +186,7 @@
             data-te-toggle="modal" data-te-target="#order_noti">
             +
         </button>
-        <div data-te-modal-init
+        <div data-te-modal-init data-te-backdrop="static" data-te-keyboard="false"
             class="fixed left-0 top-0 z-[1055] hidden h-full w-full overflow-y-auto overflow-x-hidden outline-none"
             id="order_noti" tabindex="-1" aria-labelledby="createCustomerModalLabel" aria-modal="true"
             role="dialog">
@@ -199,7 +199,7 @@
                             Notifications
                         </p>
                         <button type="button" class="absolute top-4 right-4 focus:shadow-none focus:outline-none
-                        " id="closeCustomerModal" data-te-modal-dismiss aria-label="Close">
+                        " id="closeCustomerModal" data-te-modal-dismiss aria-label="Close" @click="reloadUi()">
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
                                 stroke="currentColor" class="h-5 w-5">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
@@ -592,6 +592,9 @@
                 this.orderNotiModalOpen();
 
             },
+            reloadUi(){
+                window.location.reload();
+            }
         },
 
         created(){
