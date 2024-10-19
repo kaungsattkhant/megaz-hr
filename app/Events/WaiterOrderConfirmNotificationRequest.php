@@ -57,7 +57,6 @@ class WaiterOrderConfirmNotificationRequest implements ShouldBroadcast
             return $orderItem->load('menu.areas');
         });
 
-        ResponseData($orderItemsWithMenu);
         $data= [
             'department_id' => $this->department_id,
             'order' => $this->order,
