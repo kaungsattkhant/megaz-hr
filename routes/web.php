@@ -175,7 +175,7 @@ Route::middleware(['departments:account-payables'])->group(function () {
 Route::group(['prefix' => 'pos'], function () {
     Route::view('/login', 'pos.auth.index')->name('pos.login');
     // Route::middleware(['departments:pos'])->group(function () {
-    Route::view('/home', 'pos.home.index')->name('pos.index');
+    Route::view('/home', 'pos.home.home')->name('pos.index');
     Route::view('/home_new', 'pos.home.home')->name('pos.home');
     Route::view('/customer', 'pos.customers.index')->name('pos.customers');
     Route::view('/customer/create', 'pos.customers.create')->name('pos.customers.create');

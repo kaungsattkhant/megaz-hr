@@ -304,7 +304,7 @@
                 orderItems:[],
                 orderRequest:[],
                 areaListForOrderRequst:[],
-                orederRequestTest:[ 
+                orederRequestTest:[
                     {
                         'menu_id': 1,
                         'menu_name':'Menu 1',
@@ -373,7 +373,7 @@
                         ]
 
                     },
-                ],                
+                ],
                 roomName:null,
             };
         },
@@ -386,12 +386,10 @@
                 document.getElementById("open_noti_modal").click();
             },
 
-            listenBroadCastNotifications(channel, event){
-
+            listenRoomOpenNotifications(channel, event){
                 window.Echo.channel(channel)
                 .listen(event,(response)=>{
-                    console.log('noti entering');
-                    console.log(response);
+                    console.log(`room open data`, response);
                     let newSessionRequest = {
                         invoice_id: response.invoice_id,
                         customer_name: response.customer_name,
@@ -409,14 +407,11 @@
                     else{
                         this.sessionRequests.push(newSessionRequest);
                     }
-
-                    console.log(response);
                     console.log('session request received');
                     this.notiModalOpen();
                 });
 
             },
-
 
             async btnConfirmSession(id){
                 let formData = new FormData();
@@ -431,10 +426,11 @@
                     this.sessionRequests[index].status = 'confirmed';
                     this.sessionRequests.splice(index, 1);
                 }
-                window.location.reload();
+                // window.location.reload();
 
                 this.notiModalOpen();
             },
+
             async btnRejectSession(id){
                 let formData = new FormData();
                 formData.append("invoice_id", id);
@@ -448,23 +444,20 @@
                     this.sessionRequests[index].status = 'rejected';
                     this.sessionRequests.splice(index, 1);
                 }
-                window.location.reload();
+                // window.location.reload();
 
                 this.notiModalOpen();
             },
-
-
-
-
 
             // for closing from waiter tablet
             notiModalOpen2(){
                 document.getElementById("open_noti_modal2").click();
             },
 
-            listenBroadCastNotificationsDone(channel, event){
+            listenRoomDoneNotifications(channel, event){
                 window.Echo.channel(channel)
                 .listen(event,(response)=>{
+                    console.log(`room done data`, response);
                     let newSessionRequest = {
                         room_name: response.entity.name,
                         invoice_id: response.invoice_id,
@@ -479,10 +472,9 @@
                     }
                     this.notiModalOpen2();
                 });
-            },           
+            },
 
             async btnConfirmSession2(id){
-
                 let formData = new FormData();
                 formData.append("invoice_id", id);
                 let response = await postApiData({ url: `/api/entities/done?is_confirm=1`, form_data: formData, token: this.getToken() });
@@ -494,11 +486,11 @@
                     this.sessionRequests2[index].status = 'confirmed';
                     this.sessionRequests2.splice(index, 1);
                 }
-                window.location.reload();
+                // window.location.reload();
                 this.notiModalOpen2();
             },
-            async btnRejectSession2(id){
 
+            async btnRejectSession2(id){
                 let formData = new FormData();
                 formData.append("invoice_id", id);
                 let response = await postApiData({ url: `/api/entities/done?is_confirm=0`, form_data: formData, token: this.getToken() });
@@ -510,7 +502,7 @@
                     this.sessionRequests2[index].status = 'rejected';
                     this.sessionRequests2.splice(index, 1);
                 }
-                window.location.reload();
+                // window.location.reload();
                 this.notiModalOpen2();
 
             },
@@ -518,9 +510,11 @@
             orderNotiModalOpen(){
                 document.getElementById("order_noti_btn").click();
             },
-            listenBroadCastNotificationsOrder(channel, event){
+
+            listenNewOrderNotifications(channel, event){
                 window.Echo.channel(channel)
                     .listen(event, (response)=>{
+                        console.log(`new order data`, response);
                         this.areaListForOrderRequst = [];
                         this.getAreaByMenu(response.menu_id)
                         let newOrderRequest = {
@@ -540,20 +534,20 @@
                         }
                         this.orderNotiModalOpen();
 
-
                         console.log(response);
                         this.orderItems = response.order_items;
                         this.roomName = response.entity.name;
                         document.getElementById("order_noti_btn").click();
-
                     });
             },
+
             async getAreaByMenu(){
                 const response1 = await getApiData({ url: '/api/menus/' + response.menu_id + '/areas', token: this.getToken() });
                 if (response1.data) {
                     newRequestArea = response1.data.areas;
                 }
             },
+
             async btnConfirmOrder(id){
 
                 let formData = new FormData();
@@ -567,9 +561,10 @@
                     this.orderRequest[index].status = 'confirmed';
                     this.orderRequest.splice(index, 1);
                 }
-                window.location.reload();
+                // window.location.reload();
                 this.orderNotiModalOpen();
             },
+
             async btnRejectOrder(id){
 
                 let formData = new FormData();
@@ -583,7 +578,7 @@
                     this.orderRequest[index].status = 'rejected';
                     this.orderRequest.splice(index, 1);
                 }
-                window.location.reload();
+                // window.location.reload();
                 this.orderNotiModalOpen();
 
             },
@@ -599,19 +594,17 @@
 
         mounted(){
             initTE({ Dropdown, Modal, Select, Ripple });
-
-
             let channelName = `room-notification-request.${this.department.id}`;
             let eventName = `RoomNotificationRequest`;
-            this.listenBroadCastNotifications(channelName, eventName);
+            this.listenRoomOpenNotifications(channelName, eventName);
 
             let doneChannelName = `pos-roomdone-notification-request.${this.role[0].id}`;
             let doneEventName = `PosRoomDoneNotification`;
-            this.listenBroadCastNotificationsDone(doneChannelName, doneEventName);
+            this.listenRoomDoneNotifications(doneChannelName, doneEventName);
 
             let waiterOrderChannelName = `waiter-order-notification.${this.department.id}`;
             let waiterOrderEventName = `WaiterOrderConfirmNotificationRequest`;
-            this.listenBroadCastNotificationsOrder(waiterOrderChannelName, waiterOrderEventName);
+            this.listenNewOrderNotifications(waiterOrderChannelName, waiterOrderEventName);
         },
 
         beforeDestroy() {
