@@ -182,7 +182,7 @@
         <!-- order notification modal -->
 
         <button
-            class="bg-red-600 focus:outline-none focus:ring-0 hidden" id="order_noti_btn"
+            class="bg-red-600 focus:outline-none focus:ring-0 block fixed right-20 top-20 z-50" id="order_noti_btn"
             data-te-toggle="modal" data-te-target="#order_noti">
             +
         </button>
@@ -209,49 +209,55 @@
 
                     <div class="relative px-6 pb-8" data-te-modal-body-ref>
                         <div>
-                            {{ orderItems }} {{ roomName }}
-                            <!-- <table class="min-w-full text-left text-sm font-light border-l border-t">
+                            <table class="min-w-full text-left text-sm font-light border-l border-t">
                                 <thead class="border-b font-medium">
                                     <tr>
-                                        <th scope="col" class="px-6 py-4 border-r">Room Name</th>
-                                        <th scope="col" class="px-6 py-4 border-r">Session duration </th>
-                                        <th scope="col" class="px-6 py-4 border-r">Start time</th>
-                                        <th scope="col" class="px-6 py-4 border-r">End time </th>
-                                        <th scope="col" class="px-6 py-4 border-r">Customer name</th>
+                                        <th scope="col" class="px-6 py-4 border-r">Menu</th>
+                                        <th scope="col" class="px-6 py-4 border-r">Quantity </th>
+                                        <th scope="col" class="px-6 py-4 border-r">Area</th>
+                                        <th scope="col" class="px-6 py-4 border-r">Total </th>
                                         <th scope="col" class="px-6 py-4 border-r text-center">Action</th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <tr class="border-b" v-for="(sessionRequest) in sessionRequests">
+                                    <tr class="border-b" v-for="(orderRequest) in orederRequestTest">
 
                                         <td class="whitespace-nowrap border-r px-6 py-4">
-                                            {{ sessionRequest.room_name }}
+                                            {{ orderRequest.menu_name }}
                                         </td>
-                                        <td class="whitespace-nowrap border-r px-6 py-4 text-center">
-                                            {{ sessionRequest.session_duration }}
+                                        <!-- <td class="whitespace-nowrap border-r px-6 py-4 text-center">
+                                            {{ orderRequest.date }}
+                                        </td> -->
+                                        <td class="whitespace-nowrap border-r px-6 py-4">
+                                            {{ orderRequest.quantity }}
                                         </td>
                                         <td class="whitespace-nowrap border-r px-6 py-4">
-                                            {{ sessionRequest.start_time }}
+                                            <select name=""
+                                                class="text-xs pl-0 border-0 focus:shadow-none focus:outline-none focus:ring-0 select-box area-select-box"
+                                                placeholder="Select Area">
+                                                <option disabled selected>Select Area</option>
+                                                <option v-for="(area, index) in orderRequest.areas" :key="index"
+                                                    :value="area.id" class="">
+                                                    {{ area.name }}
+                                                </option>
+                                            </select>
                                         </td>
                                         <td class="whitespace-nowrap border-r px-6 py-4">
-                                            {{ sessionRequest.end_time }}
+                                            {{ orderRequest.price }}
                                         </td>
                                         <td class="whitespace-nowrap border-r px-6 py-4">
-                                            {{ sessionRequest.customer_name }}
-                                        </td>
-                                        <td class="whitespace-nowrap border-r px-6 py-4">
-                                            <button :disabled="sessionRequest.status != 'received'" @click="btnRejectSession(sessionRequest.invoice_id)"
+                                            <button :disabled="orderRequest.status != 'received'" @click="btnRejectOrder(orderRequest.id)"
                                                 class="px-3 py-2 bg-red-600 text-white rounded-md mr-2">
                                                 Reject
                                             </button>
-                                            <button :disabled="sessionRequest.status != 'received'" @click="btnConfirmSession(sessionRequest.invoice_id)"
+                                            <button :disabled="orderRequest.status != 'received'" @click="btnConfirmOrder(orderRequest.id)"
                                                 class="px-3 py-2 bg-green-600 text-white rounded-md">
                                                 Confirm
                                             </button>
                                         </td>
                                     </tr>
                                 </tbody>
-                            </table> -->
+                            </table>
                         </div>
 
                     </div>
@@ -296,7 +302,79 @@
                 sessionRequests: [],
                 sessionRequests2: [],
                 orderItems:[],
-                roomName:null
+                orderRequest:[],
+                areaListForOrderRequst:[],
+                orederRequestTest:[ 
+                    {
+                        'menu_id': 1,
+                        'menu_name':'Menu 1',
+                        'quantity': 5,
+                        'price':17500,
+                        'id':71,
+                        'areas':[
+                            {
+                                "id": 2,
+                                "area_type_id": 1,
+                                "area_category_id": 1,
+                                "department_id": 7,
+                                "name": "Cooking Area-2",
+                                "is_active": 1,
+                                "pivot": {
+                                    "menu_id": 1,
+                                    "area_id": 2
+                                }
+                            },
+                            {
+                                "id": 5,
+                                "area_type_id": 1,
+                                "area_category_id": 1,
+                                "department_id": 1,
+                                "name": "Area",
+                                "is_active": 1,
+                                "pivot": {
+                                    "menu_id": 1,
+                                    "area_id": 5
+                                }
+                            },
+                        ]
+
+                    },
+                    {
+                        'menu_id': 2,
+                        'menu_name':'Menu 2',
+                        'quantity': 3,
+                        'price':17500,
+                        'id':72,
+                        'areas':[
+                            {
+                                "id": 2,
+                                "area_type_id": 1,
+                                "area_category_id": 1,
+                                "department_id": 7,
+                                "name": "Cooking Area-2",
+                                "is_active": 1,
+                                "pivot": {
+                                    "menu_id": 1,
+                                    "area_id": 2
+                                }
+                            },
+                            {
+                                "id": 5,
+                                "area_type_id": 1,
+                                "area_category_id": 1,
+                                "department_id": 1,
+                                "name": "Area",
+                                "is_active": 1,
+                                "pivot": {
+                                    "menu_id": 1,
+                                    "area_id": 5
+                                }
+                            },
+                        ]
+
+                    },
+                ],                
+                roomName:null,
             };
         },
 
@@ -400,20 +478,7 @@
                     }
                     this.notiModalOpen2();
                 });
-            },
-
-            listenBroadCastNotificationsOrder(channel, event){
-
-                window.Echo.channel(channel)
-                .listen(event, (response)=>{
-
-                    console.log(response);
-                    this.orderItems = response.order_items;
-                    this.roomName = response.entity.name;
-                    document.getElementById("order_noti_btn").click();
-
-                });
-            },
+            },           
 
             async btnConfirmSession2(id){
 
@@ -446,6 +511,79 @@
                 }
                 window.location.reload();
                 this.notiModalOpen2();
+
+            },
+
+            orderNotiModalOpen(){
+                document.getElementById("order_noti_btn").click();
+            },
+            listenBroadCastNotificationsOrder(channel, event){
+                window.Echo.channel(channel)
+                    .listen(event, (response)=>{
+                        this.areaListForOrderRequst = [];
+                        this.getAreaByMenu(response.menu_id)
+                        let newOrderRequest = {
+                            menu_id: response.menu_id,
+                            menu_name: response.menu[0].name,
+                            quantity: response.quantity,
+                            price: response.price,
+                            id: response.id,
+                            areas: this.areaListForOrderRequst,
+                        };
+                        let index = this.orderRequest.findIndex(sessionRequest => sessionRequest.id == newOrderRequest.id);
+                        if(index != -1){
+                            console.log('already requested');
+                        }
+                        else{
+                            this.orderRequest.push(newOrderRequest);
+                        }
+                        this.orderNotiModalOpen();
+
+
+                        console.log(response);
+                        this.orderItems = response.order_items;
+                        this.roomName = response.entity.name;
+                        document.getElementById("order_noti_btn").click();
+
+                    });
+            },
+            async getAreaByMenu(){
+                const response1 = await getApiData({ url: '/api/menus/' + response.menu_id + '/areas', token: this.getToken() });
+                if (response1.data) {
+                    newRequestArea = response1.data.areas;
+                }
+            },
+            async btnConfirmOrder(id){
+
+                let formData = new FormData();
+                formData.append("invoice_id", id);
+                let response = await postApiData({ url: `/api/entities/done?is_confirm=1`, form_data: formData, token: this.getToken() });
+                if (response.data) {
+                    console.log('confirm success')
+                }
+                let index = this.orderRequest.findIndex(sessionRequest => sessionRequest.invoice_id == id);
+                if (index != -1) {
+                    this.orderRequest[index].status = 'confirmed';
+                    this.orderRequest.splice(index, 1);
+                }
+                window.location.reload();
+                this.orderNotiModalOpen();
+            },
+            async btnRejectOrder(id){
+
+                let formData = new FormData();
+                formData.append("invoice_id", id);
+                let response = await postApiData({ url: `/api/entities/done?is_confirm=0`, form_data: formData, token: this.getToken() });
+                if (response.data) {
+                    console.log('reject success')
+                }
+                let index = this.orderRequest.findIndex(sessionRequest => sessionRequest.invoice_id == id);
+                if (index != -1) {
+                    this.orderRequest[index].status = 'rejected';
+                    this.orderRequest.splice(index, 1);
+                }
+                window.location.reload();
+                this.orderNotiModalOpen();
 
             },
         },
