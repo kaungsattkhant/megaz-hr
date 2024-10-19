@@ -23,7 +23,6 @@ class OrderAPIController extends Controller
             $orders = $this->orderRepo->createMultipleOrder($request->all());
         }else{
             $orders = $this->orderRepo->createOrder($request->all());
-
         }
         ResponseData($orders);
     }
