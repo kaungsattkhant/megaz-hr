@@ -43,20 +43,20 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <tr class="border-b" v-for="(sessionRequest) in sessionRequests">
+                                    <tr class="border-b" v-for="(sessionRequest) in sessionRequests" :key="sessionRequest.id">
 
                                         <td class="whitespace-nowrap border-r px-6 py-4">
                                             {{ sessionRequest.room_name }}
                                         </td>
-                                        <!-- <td class="whitespace-nowrap border-r px-6 py-4 text-center">
+                                        <td class="whitespace-nowrap border-r px-6 py-4 text-center">
                                             {{ sessionRequest.session_duration }}
-                                        </td> -->
-                                        <!-- <td class="whitespace-nowrap border-r px-6 py-4">
+                                        </td>
+                                        <td class="whitespace-nowrap border-r px-6 py-4">
                                             {{ sessionRequest.start_time }}
                                         </td>
                                         <td class="whitespace-nowrap border-r px-6 py-4">
                                             {{ sessionRequest.end_time }}
-                                        </td> -->
+                                        </td>
                                         <td class="whitespace-nowrap border-r px-6 py-4">
                                             {{ sessionRequest.customer_name }}
                                         </td>
@@ -309,17 +309,18 @@
             },
 
             listenBroadCastNotifications(channel, event){
-                console.log('it work');
+
                 window.Echo.channel(channel)
                 .listen(event,(response)=>{
+                    console.log('noti entering');
                     console.log(response);
                     let newSessionRequest = {
                         invoice_id: response.invoice_id,
                         customer_name: response.customer_name,
                         room_name: response.room_name,
-                        // session_duration: response.room_session.session_duration,
-                        // start_time: convertToFriendlyDateTime(response.room_session.start_date),
-                        // end_time: convertToFriendlyDateTime(response.room_session.end_date),
+                        session_duration: response.session_duration,
+                        start_time: response.start_time,
+                        end_time: response.end_time,
                         status: 'received'
                     };
 
