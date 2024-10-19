@@ -2,7 +2,7 @@
 
     <div>
         <button
-            class="bg-red-600 focus:outline-none focus:ring-0 hidden" id="open_noti_modal"
+            class=" focus:outline-none focus:ring-0 hidden" id="open_noti_modal"
             data-te-toggle="modal" data-te-target="#noti_modal">
             +
         </button>
@@ -93,7 +93,7 @@
 
         <!-- 2nd -->
         <button
-            class="bg-red-600 focus:outline-none focus:ring-0 hidden" id="open_noti_modal2"
+            class=" focus:outline-none focus:ring-0 hidden" id="open_noti_modal2"
             data-te-toggle="modal" data-te-target="#noti_modal2">
             +
         </button>
@@ -182,7 +182,7 @@
         <!-- order notification modal -->
 
         <button
-            class="bg-red-600 focus:outline-none focus:ring-0 block fixed right-20 top-20 z-50" id="order_noti_btn"
+            class=" focus:outline-none focus:ring-0 hidden" id="order_noti_btn"
             data-te-toggle="modal" data-te-target="#order_noti">
             +
         </button>
