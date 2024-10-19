@@ -53,10 +53,15 @@ class WaiterOrderConfirmNotificationRequest implements ShouldBroadcast
 
     public function broadcastWith()
     {
+        $orderItemsWithMenu = collect($this->orderItems)->map(function ($orderItem) {
+            return $orderItem->load('menu.areas');
+        });
+
+        ResponseData($orderItemsWithMenu);
         $data= [
             'department_id' => $this->department_id,
             'order' => $this->order,
-            'order_items' => $this->orderItems,
+            'order_items' => $orderItemsWithMenu,
             'entity' => $this->entity
         ];
         return $data;
