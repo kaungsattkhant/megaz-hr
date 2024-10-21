@@ -12,7 +12,8 @@ class AreaType extends BaseModel
     use HasFactory;
 
     protected $fillable=[
-        'name'
+        'name',
+        'type',
     ];
 
     public function getCreatedAt()

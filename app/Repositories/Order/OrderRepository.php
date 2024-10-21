@@ -254,7 +254,6 @@ class OrderRepository implements OrderRepositoryInterface
             $order_items = OrderItem::where('status', 'pos_confirmed')->with('menu', 'order.invoice.latestSession.entity', 'area')
                 ->whereBetween('date', [$startTime, $endTime])
                 ->paginate(config('common.list_count'));
-
             return $order_items;
         } else {
             if ($request->date) {
