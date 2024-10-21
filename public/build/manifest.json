@@ -4,11 +4,7 @@
     "src": "public/img/Video_light.png"
   },
   "resources/css/app.css": {
-<<<<<<< HEAD
-    "file": "assets/app-Se-lmqwe.css",
-=======
     "file": "assets/app-SHYSUDOq.css",
->>>>>>> dca0f165d56441fb3212b51823cbfc88284fae11
     "isEntry": true,
     "src": "resources/css/app.css"
   },
@@ -18,15 +14,9 @@
     ],
     "css": [
       "assets/app-NSQmot0V.css",
-<<<<<<< HEAD
-      "assets/app-Se-lmqwe.css"
-    ],
-    "file": "assets/app-4JOVIWdw.js",
-=======
       "assets/app-SHYSUDOq.css"
     ],
     "file": "assets/app-jkz1Byl6.js",
->>>>>>> dca0f165d56441fb3212b51823cbfc88284fae11
     "isEntry": true,
     "src": "resources/js/app.js"
   }
