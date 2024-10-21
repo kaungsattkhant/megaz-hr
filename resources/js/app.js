@@ -89,6 +89,7 @@ import LogoutComponent from './Components/Auth/LogoutComponent.vue';
 import CustomersListComponent from './Components/Pos/Customers/CustomersListComponent.vue';
 import CustomersCreateComponent from './Components/Pos/Customers/CustomersCreateComponent.vue';
 import HomePageComponent from './Components/Pos/Home/HomePageComponent.vue';
+import HomeComponent from './Components/Pos/Home/HomeComponent.vue';
 import PosArCrudComponent from './Components/Pos/AR/PosArCrudComponent.vue';
 import PosCashbookCrudComponent from './Components/Pos/Cashbook/PosCashbookCrudComponent.vue';
 import CashbookDetailComponent from './Components/Pos/Cashbook/CashbookDetailComponent.vue';
@@ -138,6 +139,7 @@ import SaleTargetMenuCreateComponent from './Components/SaleTarget/SaleTargetMen
 import SaleTargetMenuEditComponent from './Components/SaleTarget/SaleTargetMenuEditComponent.vue';
 import MenuSaleReportComponent from './Components/Menus/MenuSaleReportComponent.vue';
 import MenuCostingComponent from './Components/Menus/MenuCostingComponent.vue';
+import PosOrderItemList from './Components/Pos/OrderItem/PosOrderItemList.vue';
 
 app.component('NavBarComponent', NavBarComponent);
 app.component('StaffListComponent', StaffListComponent);
@@ -208,6 +210,7 @@ app.component('PosNotificationComponent', PosNotificationComponent);
 app.component('CustomersListComponent', CustomersListComponent);
 app.component('CustomersCreateComponent', CustomersCreateComponent);
 app.component('HomePageComponent', HomePageComponent);
+app.component('HomeComponent', HomeComponent);
 app.component('PosArCrudComponent', PosArCrudComponent);
 app.component('PosCashbookCrudComponent', PosCashbookCrudComponent);
 app.component('CashbookDetailComponent', CashbookDetailComponent);
@@ -255,6 +258,7 @@ app.component('SaleTargetMenuCreateComponent',SaleTargetMenuCreateComponent);
 app.component('SaleTargetMenuEditComponent',SaleTargetMenuEditComponent);
 app.component('MenuSaleReportComponent',MenuSaleReportComponent);
 app.component('MenuCostingComponent',MenuCostingComponent);
+app.component('PosOrderItemList',PosOrderItemList);
 
 app.use(store);
 app.use(Notifications);

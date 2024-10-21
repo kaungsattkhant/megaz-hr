@@ -128,7 +128,7 @@
                                 id="create_modalLabel">
                                 Create Room / Table
                             </h5>
-                            <button type="button" class="text-xs focus:shadow-none focus:outline-none"
+                            <button type="button" class="text-xs focus:shadow-none focus:outline-none" id="close"
                                 data-te-modal-dismiss aria-label="Close">
                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
                                     stroke-width="1.5" stroke="currentColor" class="h-4 w-4">
@@ -320,6 +320,8 @@ export default {
                 this.getRoomList(1);
                 this.closeModal();
                 this.clearForm();
+                // window.location.reload();
+                console.log('reload?');
             }
             else {
                 alert('some errors occur');

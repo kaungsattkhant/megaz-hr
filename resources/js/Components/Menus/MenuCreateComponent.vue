@@ -138,6 +138,17 @@
 
             </div>
 
+            <div class="mb-0 col-span-3 rounded-md">
+                <label for="" class="label-form mb-3">
+                    Description
+                </label>
+                <div class="bg-white mb-0 w-full text-sm inline-block h-[34px]"
+                    data-te-select-wrapper-ref>
+                    <textarea type='text' v-model='description' class="input-ui w-full !p-1 text-xs" placeholder="Description" ></textarea>
+                </div>
+
+            </div>
+
             <div class="col-span-3">
                 <label for="" class="label-form mb-3">
                     &nbsp;
@@ -406,6 +417,7 @@ export default {
 
             departmentId: null,
             code:null,
+            description:null,
 
         };
     },
@@ -598,6 +610,7 @@ export default {
                 formData.append('image',this.selectedImage);
                 formData.append('areas',JSON.stringify(areaIds));
                 formData.append('code',this.code);
+                formData.append('description',this.description);
 
                 let response = await postApiData({ url: `/api/menus`, form_data: formData, token: this.getToken() });
 

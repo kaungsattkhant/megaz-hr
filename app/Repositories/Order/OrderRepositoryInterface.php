@@ -18,4 +18,7 @@ interface OrderRepositoryInterface
 
     public function orderItemAreaConfirm(int $id, Request $request);
 
+    public function orderByInvoiceId(int $invoiceId);
+
+    public function checkFocSupervision(Request $request);
 }

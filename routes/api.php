@@ -80,6 +80,7 @@ use App\Http\Controllers\API\SaleTargetResultAPIController;
 use App\Http\Controllers\API\SkillAPIController;
 use App\Http\Controllers\API\StaffAdvanceAPIController;
 use App\Models\Complaint;
+use Illuminate\Http\Request;
 
 /*
 |--------------------------------------------------------------------------
@@ -108,8 +109,12 @@ Route::get('/service_categories', function () {
     ResponseData(ServiceCategory::all());
 });
 
-Route::get('/area_categories', function () {
-    ResponseData(AreaCategory::all());
+Route::get('/area_categories', function (Request $request) {
+    ResponseData(
+        AreaCategory::when($request->area_type, function ($query, $areaType) {
+            $query->where('name', $areaType);
+        })->get()
+    );
 });
 
 Route::get('/area_types', function () {
@@ -517,11 +522,9 @@ Route::post('/menu/{id}/is_feature',[MenuAPIController::class,'featureToggleMenu
 Route::get('/menu_report',[MenuAPIController::class,'menuReport']);
 Route::get('/menu_costing',[MenuAPIController::class,'costingMenu']);
 
-
-
-
 Route::get('/areas/{id}/entities', [EntityAPIController::class, 'getEntityWithInvoice']);
-Route::get('/entities/{id}', [EntityAPIController::class, 'getEntityDetail']);
+Route::get('/entities_sessions/{id}', [EntityAPIController::class, 'getEntitySessionDetail']);
+Route::get('/entities/{id}', [EntityAPIController::class, 'entitySessionWithInvoiceDetail']);
 Route::get('/areas/{id}/inactive_entities', [EntityAPIController::class, 'getOnlyInactiveEntities']);
 
 Route::post('/entities/start', [InvoiceAPIController::class, 'startEntity']);
@@ -533,8 +536,10 @@ Route::post('/room_done',[InvoiceAPIController::class,'doneRoom']);
 Route::post('/entities/confirm',[InvoiceAPIController::class,'roomConfirm']);
 
 Route::get('/order_items',[OrderAPIController::class,'getOrderItemList']);
+Route::get('/order_items/{invoiceId}/invoice',[OrderAPIController::class,'getOrderItemByInvoice']);
 Route::get('/pos_order_items',[OrderAPIController::class,'getOrderItemForPOS']);
 Route::post('/pos_order_items/{order_item_id}/status',[OrderAPIController::class,'orderItemAreaConfirm']);
+Route::post('/pos_orders/check_foc_supervision',[OrderAPIController::class,'checkFocSupervision']);
 
 Route::get('/invoices', [InvoiceAPIController::class, 'getInvoiceData']);
 

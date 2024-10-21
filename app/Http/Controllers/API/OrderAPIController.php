@@ -23,7 +23,6 @@ class OrderAPIController extends Controller
             $orders = $this->orderRepo->createMultipleOrder($request->all());
         }else{
             $orders = $this->orderRepo->createOrder($request->all());
-
         }
         ResponseData($orders);
     }
@@ -48,5 +47,18 @@ class OrderAPIController extends Controller
     public function orderItemAreaConfirm(int $id, Request $request)
     {
         $this->orderRepo->orderItemAreaConfirm($id, $request);
+    }
+
+    public function orderByInvoiceId(int $invoiceId)
+    {
+        $this->orderRepo->orderByInvoiceId($invoiceId);
+    }
+
+    public function checkFocSupervision(Request $request)
+    {
+        if(!$request->phone_number || !$request->password){
+            ResponseMessage('Phone number and password must be present', 400);
+        }
+        $this->orderRepo->checkFocSupervision($request);
     }
 }

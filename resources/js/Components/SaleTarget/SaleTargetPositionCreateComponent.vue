@@ -52,7 +52,7 @@
                 <input type="text" class="input-ui" v-model="selectedAmount">
             </div>
 
-            
+
 
             <div class="col-span-3 flex justify-end flex-col mb-3">
                 <!-- <label for="" class="label-form mb-3"> &nbsp;</label> -->
@@ -132,7 +132,7 @@
                 selectedRole:null,
                 selectedDepartment:null,
 
-                
+
             };
         },
 
@@ -151,7 +151,7 @@
                 this.getRoleByDepartment();
             },
             async getRoleByDepartment(departmentId)
-            {   
+            {
                 const response = await getApiData({ url: `/api/role_by_department/` + this.selectedDepartment.id, token: this.getToken() });
                 if(response.data){
                     this.roleList = response.data;
@@ -169,7 +169,7 @@
                 else{
                      this.addPosition();
                 }
-               
+
             },
             addPosition(){
                 this.addedPositionList.push({
@@ -205,8 +205,7 @@
                         text: `Sale Target Position created successfully`,
                         type: "info"
                     });
-
-                    // window.location.replace('/sale_target_position');
+                    window.location.replace('/sale_target_position');
                 }
                 else {
                     this.$notify({
@@ -216,7 +215,7 @@
                 }
             },
 
-            
+
         },
 
         created(){

@@ -150,6 +150,17 @@
 
             </div>
 
+            <div class="mb-0 col-span-3 rounded-md">
+                <label for="" class="label-form mb-3">
+                    Description
+                </label>
+                <div class="bg-white mb-0 w-full text-sm inline-block h-[34px]"
+                    data-te-select-wrapper-ref>
+                    <textarea type='text' v-model='description' class="input-ui w-full !p-1 text-xs" placeholder="Description" ></textarea>
+                </div>
+
+            </div>
+
             <div class="col-span-3">
                 <label for="" class="label-form mb-3">
                     &nbsp;
@@ -319,6 +330,7 @@ export default {
             name: null,
             price: null,
             isFeatured: false,
+            description:null,
 
             selectedItemCategory: null,
             selectedItem: null,
@@ -382,6 +394,7 @@ export default {
                 this.name = this.menu.name;
                 this.code = this.menu.code;
                 this.price = this.menu.prices[this.menu.prices.length - 1].price;
+                this.description = this.menu.description;
                 this.isFeatured = (this.menu.is_feature == 1)? true: false;
                 setTimeout(()=>{
                     this.reconstructMenuCategory(this.menu.menu_category_id);
@@ -580,6 +593,7 @@ export default {
                 formData.append('items', menuItems);
                 formData.append('areas',JSON.stringify(areaIds));
                 formData.append('code',this.code);
+                formData.append('description',this.description);
                 if(this.selectedImage)
                 {
                     formData.append('image',this.selectedImage);

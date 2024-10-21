@@ -73,7 +73,7 @@ class PackRepository implements PackRepositoryInterface
                     }
                     $stockInInventory = $enterInventoryValue - $outInventroyValue;
                     if ($stockInInventory < $item->pivot->weight) {
-                        ResponseMessage('Stock is not enough', 402);
+                        ResponseMessage('Stock is not enough', 422);
                     }
                     $packItem = PackItem::create([
                         'pack_id' => $pack->id,

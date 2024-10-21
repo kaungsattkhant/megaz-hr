@@ -233,7 +233,8 @@ class MenuRepository implements MenuRepositoryInterface
                 DB::raw('SUM(order_items.quantity) as total_quantity'),
                 DB::raw('MONTH(order_items.created_at) as month'),
                 DB::raw('YEAR(order_items.created_at) as year')
-            );
+            )
+            ->where('order_items.status', 'done');
 
         // Apply filters
         if (!empty($searchTerm)) {
@@ -252,42 +253,65 @@ class MenuRepository implements MenuRepositoryInterface
         // Group by columns
         $orderSummaryQuery->groupBy('order_items.menu_id', 'menus.code', 'menus.name', 'menu_categories.name', 'month', 'year');
 
-        // Paginate the main query
+        // Execute query and paginate results
         $orderSummary = $orderSummaryQuery->paginate(config('common.list_count'));
 
-        // Post-process each item within the paginated data
-        $summaryData = $orderSummary->getCollection()->groupBy('menu_id')->map(function ($items) use ($fromMonthInput, $toMonthInput) {
+        // Initialize the report_months array and monthly totals
+        $start = Carbon::createFromFormat('Y-m', $fromMonthInput);
+        $end = Carbon::createFromFormat('Y-m', $toMonthInput);
+
+        $reportMonths = [];
+        $monthlyTotals = [];
+
+        while ($start->lte($end)) {
+            $shortMonth = $start->format('M');
+            $fullMonthYear = $start->format('F Y');
+            $reportMonths[] = $shortMonth;
+            $monthlyTotals[] = [
+                'month' => $fullMonthYear,
+                'total' => 0,  // default to 0, will be updated per menu item
+            ];
+            $start->addMonth();
+        }
+
+        // Process the results, adding dynamic months and totals per menu item
+        $summaryData = $orderSummary->getCollection()->groupBy('menu_id')->map(function ($items) use ($reportMonths, $monthlyTotals) {
             $firstItem = $items->first();
 
-            // Structure the summary data
-            $summary = [
+            // Calculate total quantity for all months
+            $menuTotals = collect($monthlyTotals)->map(function ($monthData) use ($items) {
+                $monthYear = explode(' ', $monthData['month']);
+                $month = Carbon::parse($monthYear[0])->month;
+                $year = $monthYear[1];
+                $total = $items->where('month', $month)->where('year', $year)->sum('total_quantity');
+                return [
+                    'month' => $monthData['month'],
+                    'total' => $total,
+                ];
+            });
+
+            return [
                 'menu_id' => $firstItem->menu_id,
                 'menu_code' => $firstItem->menu_code,
                 'menu_name' => $firstItem->menu_name,
                 'menu_category' => $firstItem->menu_category,
                 'total_quantity' => $items->sum('total_quantity'),
+                'report_months' => $reportMonths,
+                'monthly_totals' => $menuTotals,
             ];
-
-            // Add monthly quantities
-            $start = Carbon::createFromFormat('Y-m', $fromMonthInput);
-            $end = Carbon::createFromFormat('Y-m', $toMonthInput);
-
-            while ($start->lte($end)) {
-                $monthName = $start->format('F');
-                $monthlyQuantity = $items->where('month', $start->month)->sum('total_quantity');
-                $summary[$monthName] = $monthlyQuantity;
-                $start->addMonth();
-            }
-
-            return $summary;
         });
 
-        // Replace the paginated collection with the formatted summary data
+        // Replace the collection with the formatted data
         $orderSummary->setCollection($summaryData->values());
 
-         ResponseData($orderSummary);
-    }
+        // Prepare the final response
+        $responseData = [
+            'pagination' => $orderSummary,
+        ];
 
+        // Send the response
+        ResponseData($responseData);
+    }
 
 
     public function costingMenu(Request $request)
@@ -350,7 +374,7 @@ class MenuRepository implements MenuRepositoryInterface
         // Replace the paginated collection with the mapped data
         $orderSummary->setCollection($summaryData);
 
-         ResponseData($orderSummary); // Now returns paginated data with metadata
+        ResponseData($orderSummary); // Now returns paginated data with metadata
     }
 
 
