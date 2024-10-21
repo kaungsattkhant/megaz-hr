@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Models\Entity;
+use App\Models\Invoice;
 use App\Models\EntitySession;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
