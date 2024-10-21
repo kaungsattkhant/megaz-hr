@@ -134,10 +134,12 @@ class CanteenRepository implements CanteenInterface
         $data = $request->all();
         $jsonDecoded = json_decode($request->items);
         // $inventoryId = UserData()->inventories[0]->id;
-        // $inventoryId=UserData()->department->inventory->inventory_id;
-        $inventoryId = 14;
-
+        $inventoryId=UserData()->department->inventory->inventory_id;
+        // $inventoryId = 14;
         // dd($inventoryId);
+        if(!$inventoryId){
+            ResponseMessage('Inventory is require',419);
+        }
         DB::beginTransaction();
         try {
             if (!isset($request->id)) {
