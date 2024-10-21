@@ -20,7 +20,7 @@ return new class extends Migration
             $table->unsignedBigInteger('entity_session_id');
             $table->double('price')->default(0);
             // $table->string('status')->default('running');
-            $table->double('discount_session')->nullable();
+            $table->double('discount_session')->nullable(); 
             $table->timestamps();
         });
     }

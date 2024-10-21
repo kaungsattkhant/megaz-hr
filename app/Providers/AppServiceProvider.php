@@ -42,7 +42,9 @@ class AppServiceProvider extends ServiceProvider
             'po_grn'=>'App\Models\PoGrn',
             'asset'=>'App\Models\Asset',
             'skill'=>'App\Models\Skill',
-            'complaint' => 'App\Models\Complaint'
+            'complaint' => 'App\Models\Complaint',
+            'canteen' => 'App\Models\Canteen',
+            'canteen_item' => 'App\Models\CanteenItem',
         ]);
     }
 }

@@ -111,7 +111,6 @@ class OrderRepository implements OrderRepositoryInterface
             foreach ($data['menuArray'] as $menuData) {
 
                 $menuData['invoice_id'] = $invoiceId;
-
                 $menu = Menu::find($menuData['menu_id']);
                 if (!isset($menuData['discount_value'])) {
                     $latestMenuServiceDiscount = $menu->menuServiceDiscounts()
@@ -133,7 +132,6 @@ class OrderRepository implements OrderRepositoryInterface
                     $discountAmount = $menuData['discount_value'] * $menuData['quantity'];
                     $totalDiscount += $discountAmount;
                 }
-
 
                 if ($order) {
                     $order->total_quantity += $menuData['quantity'];

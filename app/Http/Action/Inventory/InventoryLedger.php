@@ -30,7 +30,6 @@ class InventoryLedger
             // ->where('inventory_ledgers.action', 'in')
             // ->sum('inventory_ledger_items.quantity');
             ->first();
-       
         $ledgerQuantity = $balanceQuantity ? $balanceQuantity->quantity : 0;
         if ($ledgerQuantity < (int)$quantity) {
             ResponseMessage('Quantity is not enought', 419);

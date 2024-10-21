@@ -59,6 +59,7 @@ use App\Http\Controllers\API\PurchaseOrderAPIController;
 use App\Http\Controllers\API\DeliveryChargeAPIController;
 use App\Http\Controllers\API\ItemUsageForecastController;
 use App\Http\Controllers\API\BirthDayPromotionAPIController;
+use App\Http\Controllers\API\CanteenController;
 use App\Http\Controllers\API\CookingPlaceAPIController;
 use App\Http\Controllers\API\FixedAssetPurchaseAPIController;
 use App\Http\Controllers\API\PurchaseOrderItemLeftController;
@@ -120,7 +121,7 @@ Route::get('/area_types', function () {
     ResponseData(AreaType::all());
 });
 
-Route::get('/menu_categories',[MenuCategoryAPIController::class,'getMenuCategories']);
+Route::get('/menu_categories', [MenuCategoryAPIController::class, 'getMenuCategories']);
 
 Route::get('/divisions', function () {
     ResponseData(Division::with('townships')->get());
@@ -144,35 +145,34 @@ Route::middleware('auth:api')->group(function () {
 
     Route::get('/staff/complaints', [ComplaintAPIController::class, 'getStaffComplaints']);
     Route::post('/complaints', [ComplaintAPIController::class, 'createComplain']);
-    Route::get('/complaints/{id}',[ComplaintAPIController::class,'complaintDetail']);
+    Route::get('/complaints/{id}', [ComplaintAPIController::class, 'complaintDetail']);
     Route::post('/complaints/{id}', [ComplaintAPIController::class, 'updateComplain']);
     Route::delete('/complaints/{id}', [ComplaintAPIController::class, 'deleteComplain']);
     Route::post('/complaints/{id}/update_status', [ComplaintAPIController::class, 'complainStatusChange']);
-    Route::get('/complaints_responsibles',[ComplaintAPIController::class,'complaintResponsiblesByStaff']);
-    Route::get('/complaints_carbon_copies',[ComplaintAPIController::class,'complaintCarbonCopiesByStaff']);
+    Route::get('/complaints_responsibles', [ComplaintAPIController::class, 'complaintResponsiblesByStaff']);
+    Route::get('/complaints_carbon_copies', [ComplaintAPIController::class, 'complaintCarbonCopiesByStaff']);
 
     // deleted related complaint
-    Route::delete('/complaints_images/{id}',[ComplaintAPIController::class,'deleteComplaintImage']);
-    Route::delete('/complaints_responsibles/{id}',[ComplaintAPIController::class,'deleteComplaintResponsible']);
-    Route::delete('/complaints_carbon_copies/{id}',[ComplaintAPIController::class,'deleteComplaintCarbonCopy']);
+    Route::delete('/complaints_images/{id}', [ComplaintAPIController::class, 'deleteComplaintImage']);
+    Route::delete('/complaints_responsibles/{id}', [ComplaintAPIController::class, 'deleteComplaintResponsible']);
+    Route::delete('/complaints_carbon_copies/{id}', [ComplaintAPIController::class, 'deleteComplaintCarbonCopy']);
 
 
     Route::get('/supervisor/staff', [StaffAPIController::class, 'getStaffListBySupervisor']);
     Route::get('/supervisor/staff/{staffId}/tasks', [TaskController::class, 'getStaffTasksBySupervisor']);
     // Route::get('/task_list', [TaskController::class, 'getStaffTasksBySupervisor']);
 
-    Route::controller(TaskController::class)->group(function()
-    {
-        Route::post('/tasks/{id}/double_checked','taskDoubleChecked');
-        Route::post('/custom_tasks','createCustomTask');
-        Route::get('/custom_tasks','getCustomTasks');
-        Route::get('/custom_tasks/{id}','customTaskDetail');
-        Route::post('/custom_tasks/{id}','updateCustomTask');
+    Route::controller(TaskController::class)->group(function () {
+        Route::post('/tasks/{id}/double_checked', 'taskDoubleChecked');
+        Route::post('/custom_tasks', 'createCustomTask');
+        Route::get('/custom_tasks', 'getCustomTasks');
+        Route::get('/custom_tasks/{id}', 'customTaskDetail');
+        Route::post('/custom_tasks/{id}', 'updateCustomTask');
 
         // add image
-        Route::post('/tasks/{id}/add_images','addTaskImage');
-        Route::get('/tasks/{id}/images','getTaskImages');
-        Route::delete('/tasks_images/{id}','deleteTaskImage');
+        Route::post('/tasks/{id}/add_images', 'addTaskImage');
+        Route::get('/tasks/{id}/images', 'getTaskImages');
+        Route::delete('/tasks_images/{id}', 'deleteTaskImage');
 
     });
     Route::controller(PurchaseOrderAPIController::class)->group(function () {
@@ -195,9 +195,9 @@ Route::middleware('auth:api')->group(function () {
     Route::resource('item_usage_forecasts', ItemUsageForecastController::class)->only(['index', 'store', 'show', 'destroy']);
     Route::controller(ItemUsageForecastController::class)->group(function () {
         Route::delete('forecast_item/{id}', 'deleteForecastItem');
-        Route::get('/item_usage_forecast_items_by_month','itemUsageForecastListByMonth');
-        Route::get('/item_usage_forecast_items_with_month/{month}','itemUsageForecastListByMonthwithDepartment');
-        Route::get('/item_usage_forecast_items_with_month/{month}/department/{department_id}','iufWithMonthAndDepartment');
+        Route::get('/item_usage_forecast_items_by_month', 'itemUsageForecastListByMonth');
+        Route::get('/item_usage_forecast_items_with_month/{month}', 'itemUsageForecastListByMonthwithDepartment');
+        Route::get('/item_usage_forecast_items_with_month/{month}/department/{department_id}', 'iufWithMonthAndDepartment');
 
     });
     Route::resource('head_accounts', HeadAccountController::class)->only(['index', 'store', 'show', 'destroy']);
@@ -207,34 +207,34 @@ Route::middleware('auth:api')->group(function () {
         Route::get('sub_account_by_head_account/{id}', 'getSubAccountByHeadAccount');
         Route::get('get_cash_account', 'getCashAccount');
         Route::get('account_by_sub_account/{id}', 'accountBySubAccount');
-        Route::post('create_second_account','createSecondAccount');
-        Route::post('create_third_account','createThirdAccount');
-        Route::get('get_second_account','getSecondAccount');
-        Route::get('get_third_account','getThirdAccount');
-        Route::get('get_depreciation_account_list','getDepreciationAccountList');
-        Route::post('create_prepaid_account','createPrePaidAccount');
-        Route::get('/prepaid_account_list','prepaidAccountList');
-        Route::get('/ar_sub_accounts','getSubAccountForAr');
+        Route::post('create_second_account', 'createSecondAccount');
+        Route::post('create_third_account', 'createThirdAccount');
+        Route::get('get_second_account', 'getSecondAccount');
+        Route::get('get_third_account', 'getThirdAccount');
+        Route::get('get_depreciation_account_list', 'getDepreciationAccountList');
+        Route::post('create_prepaid_account', 'createPrePaidAccount');
+        Route::get('/prepaid_account_list', 'prepaidAccountList');
+        Route::get('/ar_sub_accounts', 'getSubAccountForAr');
     });
     Route::controller(AssetController::class)->group(function () {
-        Route::post('create_asset_item','createAssetItem');
-        Route::post('create_asset','createAsset');
-        Route::get('get_asset_item_by_account','getAssetItemByAccount');
-        Route::get('/assets','getAsset');
-        Route::get('/asset_items','getAssetItem');
-        Route::post('/add_depreciation','addDepreciation');
-        Route::get('/get_depreciation_balance','getDepreciationBalance');
-        Route::get('/add_depreciation_balance','addDepreciationBalance');
+        Route::post('create_asset_item', 'createAssetItem');
+        Route::post('create_asset', 'createAsset');
+        Route::get('get_asset_item_by_account', 'getAssetItemByAccount');
+        Route::get('/assets', 'getAsset');
+        Route::get('/asset_items', 'getAssetItem');
+        Route::post('/add_depreciation', 'addDepreciation');
+        Route::get('/get_depreciation_balance', 'getDepreciationBalance');
+        Route::get('/add_depreciation_balance', 'addDepreciationBalance');
     });
     Route::controller(AssetInventoryLedgerController::class)->group(function () {
-        Route::get('asset_inventory_ledger_list','index');
+        Route::get('asset_inventory_ledger_list', 'index');
     });
     Route::controller(AccountPayableController::class)->group(function () {
         Route::get('get_payable_account', 'getPayableAccount');
-        Route::get('account_payables','index');
-        Route::post('create_payable_account','createPayableAccount');
-        Route::get('account_payable_transaction_list','listOfAccountPayableTransaction');
-        Route::post('create_payable_transaction','createPayableTransaction');
+        Route::get('account_payables', 'index');
+        Route::post('create_payable_account', 'createPayableAccount');
+        Route::get('account_payable_transaction_list', 'listOfAccountPayableTransaction');
+        Route::post('create_payable_transaction', 'createPayableTransaction');
     });
 
     Route::resource('transactions', TransactionController::class)->only(['index', 'store', 'show', 'destroy']);
@@ -252,17 +252,17 @@ Route::middleware('auth:api')->group(function () {
 
     Route::controller(FixedAssetPurchaseAPIController::class)->group(function () {
         Route::get('/fixed_asset_purchases', 'getFixedAssetPurchaseData');
-        Route::post('/fixed_asset_purchases','createFixedAssetPurchaseData');
-        Route::post('/fixed_asset_purchases/is_update_checked','updateIsCheck');
-        Route::post('/fixed_asset_purchases/bought','boughtFixedAsset');
+        Route::post('/fixed_asset_purchases', 'createFixedAssetPurchaseData');
+        Route::post('/fixed_asset_purchases/is_update_checked', 'updateIsCheck');
+        Route::post('/fixed_asset_purchases/bought', 'boughtFixedAsset');
     });
 
-    Route::post('/packs',[PackAPIController::class,'createPack']);
-    Route::get('/packs',[PackAPIController::class,'getPacksData']);
+    Route::post('/packs', [PackAPIController::class, 'createPack']);
+    Route::get('/packs', [PackAPIController::class, 'getPacksData']);
 
     Route::resource('suppliers', SupplierController::class)->only(['index', 'store', 'show', 'destroy']);
-    Route::resource('notifications',NotificationController::class)->only(['index']);
-    Route::get('notification_by_user',[NotificationController::class,'notificationUsersData']);
+    Route::resource('notifications', NotificationController::class)->only(['index']);
+    Route::get('notification_by_user', [NotificationController::class, 'notificationUsersData']);
 
     Route::post('notifications/set_seen', [NotificationController::class, 'setSeenNotifications']);
     Route::post('notifications/{notificationId}/mark_read', [NotificationController::class, 'markReadNotification']);
@@ -286,143 +286,133 @@ Route::middleware('auth:api')->group(function () {
     Route::put('/inventories/{id}', [InventoryAPIController::class, 'updateInventory']);
     Route::delete('/inventories/{id}', [InventoryAPIController::class, 'deleteInventory']);
     Route::get('/inventories/{inventoryId}/ledgers', [InventoryAPIController::class, 'getInventoryLedgers']);
-    Route::get('inventory_list',[InventoryAPIController::class, 'inventoryList']);
+    Route::get('inventory_list', [InventoryAPIController::class, 'inventoryList']);
     Route::controller(InventoryAPIController::class)->group(function () {
-        Route::get('inventory_ledger_list','getInventoryLedgerList');
+        Route::get('inventory_ledger_list', 'getInventoryLedgerList');
     });
 
     Route::get('/uoms', [UomAPIController::class, 'getUomData']);
-    Route::post('/uoms',[UomAPIController::class,'createUom']);
-    Route::post('/uoms/{id}',[UomAPIController::class,'updateUom']);
+    Route::post('/uoms', [UomAPIController::class, 'createUom']);
+    Route::post('/uoms/{id}', [UomAPIController::class, 'updateUom']);
     Route::delete('/uoms/{id}', [UomAPIController::class, 'deleteUom']);
 
 
     Route::controller(MenuServiceDiscountAPIController::class)->group(function () {
         Route::get('/menu_service_discounts', 'getMenuServiceDiscountData');
         Route::post('/menu_service_discounts', 'createMenuServiceDiscount');
-        Route::post('/menu_service_discounts/{id}','editMenuServiceDiscount');
-        Route::delete('/menu_service_discounts/{id}','deleteMenuServiceDiscount');
+        Route::post('/menu_service_discounts/{id}', 'editMenuServiceDiscount');
+        Route::delete('/menu_service_discounts/{id}', 'deleteMenuServiceDiscount');
     });
 
-    Route::controller(RoomDiscountAPIController::class)->group(function ()
-    {
-        Route::get('/room_discounts','getRoomDiscount');
-        Route::post('/room_discounts','createRoomDiscount');
-        Route::post('/room_discounts/{id}','editRoomDiscount');
-        Route::delete('/room_discounts/{id}','deleteRoomDiscount');
+    Route::controller(RoomDiscountAPIController::class)->group(function () {
+        Route::get('/room_discounts', 'getRoomDiscount');
+        Route::post('/room_discounts', 'createRoomDiscount');
+        Route::post('/room_discounts/{id}', 'editRoomDiscount');
+        Route::delete('/room_discounts/{id}', 'deleteRoomDiscount');
     });
 
-    Route::controller(MenuCategoryAPIController::class)->group(function ()
-    {
-        Route::get('/menu_categories','getMenuCategories');
-        Route::post('/menu_categories','createMenuCategory');
-        Route::post('/menu_categories/{id}','editMenuCategory');
-        Route::delete('/menu_categories/{id}','deleteMenuCategory');
+    Route::controller(MenuCategoryAPIController::class)->group(function () {
+        Route::get('/menu_categories', 'getMenuCategories');
+        Route::post('/menu_categories', 'createMenuCategory');
+        Route::post('/menu_categories/{id}', 'editMenuCategory');
+        Route::delete('/menu_categories/{id}', 'deleteMenuCategory');
     });
 
 
     // uom conversion
     Route::post('/uom_conversions', [UomAPIController::class, 'createUomConversion']);
-    Route::post('/uom_conversions/{id}',[UomAPIController::class,'updateUomConversion']);
-    Route::get('/uom_conversions',[UomAPIController::class,'getUomConversionList']);
+    Route::post('/uom_conversions/{id}', [UomAPIController::class, 'updateUomConversion']);
+    Route::get('/uom_conversions', [UomAPIController::class, 'getUomConversionList']);
 
-    Route::get('/bookings',[BookingAPIController::class,'bookingList']);
-    Route::post('/bookings',[BookingAPIController::class,'createBooking']);
-    Route::post('/booking_status/{id}',[BookingAPIController::class,'bookingStatusChange']);
-    Route::post('/booking_active/{id}',[BookingAPIController::class,'bookingActivate']);
-    Route::controller(JournalAPIController::class)->group(function()
-    {
-        Route::get('/journals','listAllJournals');
-        Route::post('/journals','createJournal');
+    Route::get('/bookings', [BookingAPIController::class, 'bookingList']);
+    Route::post('/bookings', [BookingAPIController::class, 'createBooking']);
+    Route::post('/booking_status/{id}', [BookingAPIController::class, 'bookingStatusChange']);
+    Route::post('/booking_active/{id}', [BookingAPIController::class, 'bookingActivate']);
+    Route::controller(JournalAPIController::class)->group(function () {
+        Route::get('/journals', 'listAllJournals');
+        Route::post('/journals', 'createJournal');
     });
 
-    Route::controller(StaffAdvanceAPIController::class)->group(function()
-    {
-        Route::post('/staff_advances','createStaffAdvance');
+    Route::controller(StaffAdvanceAPIController::class)->group(function () {
+        Route::post('/staff_advances', 'createStaffAdvance');
     });
 
-    Route::controller(PrepaidAPIController::class)->group(function()
-    {
-        Route::get('/prepaid_lists','prepaidList');
-        Route::post('/prepaids','createPrepaid');
-        Route::post('/prepaid_payments','createPrepaidPayment');
+    Route::controller(PrepaidAPIController::class)->group(function () {
+        Route::get('/prepaid_lists', 'prepaidList');
+        Route::post('/prepaids', 'createPrepaid');
+        Route::post('/prepaid_payments', 'createPrepaidPayment');
     });
 
-    Route::controller(AccountReceivableAPIController::class)->group(function()
-    {
-        Route::post("/account_receivables",'createAccountReceivable');
-        Route::post('/paid_account_receivables','paidAccountReceivable');
-        Route::get('/account_receivable_lists','accountReceivableList');
-        Route::get('/account/{id}/account_receivable_lists','accountReceivableDetail');
+    Route::controller(AccountReceivableAPIController::class)->group(function () {
+        Route::post("/account_receivables", 'createAccountReceivable');
+        Route::post('/paid_account_receivables', 'paidAccountReceivable');
+        Route::get('/account_receivable_lists', 'accountReceivableList');
+        Route::get('/account/{id}/account_receivable_lists', 'accountReceivableDetail');
     });
 
-    Route::controller(SkillAPIController::class)->group(function()
-    {
-        Route::get('/skills','listAllSkills');
-        Route::post('/skills','createSkill');
-        Route::get('/skills/{id}','skillDetail');
-        Route::post('/skills/{id}','updateSkill');
-        Route::delete('/skills/{id}','deleteSkill');
-        Route::get('/roles/{role_id}/skills','skillByRole');
+    Route::controller(SkillAPIController::class)->group(function () {
+        Route::get('/skills', 'listAllSkills');
+        Route::post('/skills', 'createSkill');
+        Route::get('/skills/{id}', 'skillDetail');
+        Route::post('/skills/{id}', 'updateSkill');
+        Route::delete('/skills/{id}', 'deleteSkill');
+        Route::get('/roles/{role_id}/skills', 'skillByRole');
     });
 
-    Route::controller(CookingPlaceAPIController::class)->group(function()
-    {
-        Route::get('/cooking_places','listAllCookingPlaces');
-        Route::get('/cooking_places/{id}','detailCookingPlace');
-        Route::post('/cooking_places','createCookingPlace');
-        Route::post('/cooking_places/{id}','updateCookingPlace');
-        Route::delete('/cooking_places/{id}','deleteCookingPlace');
+    Route::controller(CookingPlaceAPIController::class)->group(function () {
+        Route::get('/cooking_places', 'listAllCookingPlaces');
+        Route::get('/cooking_places/{id}', 'detailCookingPlace');
+        Route::post('/cooking_places', 'createCookingPlace');
+        Route::post('/cooking_places/{id}', 'updateCookingPlace');
+        Route::delete('/cooking_places/{id}', 'deleteCookingPlace');
     });
 
-    Route::controller(DutyAPIController::class)->group(function()
-    {
-        Route::post('/duties','createDuty');
-        Route::get('/duties','listDuties');
-        Route::post('/duties/{id}','updateDuty');
-        Route::delete('/duties/{id}','deleteDuty');
-        Route::get('/duties/{id}','dutyDetail');
+    Route::controller(DutyAPIController::class)->group(function () {
+        Route::post('/duties', 'createDuty');
+        Route::get('/duties', 'listDuties');
+        Route::post('/duties/{id}', 'updateDuty');
+        Route::delete('/duties/{id}', 'deleteDuty');
+        Route::get('/duties/{id}', 'dutyDetail');
+    });
+    Route::resource('canteens', CanteenController::class)->only(['index', 'store', 'show']);
+    Route::controller(CanteenController::class)->group(function () {
     });
 
 });
 
-Route::controller(SaleTargetPositionAPIController::class)->group(function()
-{
-    Route::get('/sale_target_positions','listAllSalteTargetPosition');
-    Route::get('/sale_target_positions/{id}','saleTargetPositionDetail');
-    Route::post('/sale_target_positions','createSaleTargetPosition');
-    Route::post('/sale_target_positions/{id}','updateSaleTargetPosition');
-    Route::delete('/sale_target_positions/{id}','deleteSaleTargetPosition');
+Route::controller(SaleTargetPositionAPIController::class)->group(function () {
+    Route::get('/sale_target_positions', 'listAllSalteTargetPosition');
+    Route::get('/sale_target_positions/{id}', 'saleTargetPositionDetail');
+    Route::post('/sale_target_positions', 'createSaleTargetPosition');
+    Route::post('/sale_target_positions/{id}', 'updateSaleTargetPosition');
+    Route::delete('/sale_target_positions/{id}', 'deleteSaleTargetPosition');
 
 });
 
-Route::controller(SaleTargetMenuAPIController::class)->group(function()
-{
-    Route::get('/sale_target_menus','listSaleTargetMenu');
-    Route::get('/sale_target_menus/{id}','getSaleTargetMenu');
-    Route::post('/sale_target_menus','createSaleTargetMenu');
-    Route::post('/sale_target_menus/{id}','updateSaleTargetMenu');
-    Route::delete('/sale_target_menus/{id}','deleteSaleTargetMenu');
+Route::controller(SaleTargetMenuAPIController::class)->group(function () {
+    Route::get('/sale_target_menus', 'listSaleTargetMenu');
+    Route::get('/sale_target_menus/{id}', 'getSaleTargetMenu');
+    Route::post('/sale_target_menus', 'createSaleTargetMenu');
+    Route::post('/sale_target_menus/{id}', 'updateSaleTargetMenu');
+    Route::delete('/sale_target_menus/{id}', 'deleteSaleTargetMenu');
 
 });
 
-Route::get('/sale_target_results',[SaleTargetResultAPIController::class,'getSaleTargetResult']);
+Route::get('/sale_target_results', [SaleTargetResultAPIController::class, 'getSaleTargetResult']);
 
-Route::controller(PackageAPIController::class)->group(function()
-    {
-        Route::get('/packages','getPackage');
-        Route::get('/packages/{id}','detailPackage');
-        Route::post('/packages','createPackage');
-        Route::post('/packages/{id}','editPackage');
-        Route::delete('/packages/{id}','deletePackage');
-    });
+Route::controller(PackageAPIController::class)->group(function () {
+    Route::get('/packages', 'getPackage');
+    Route::get('/packages/{id}', 'detailPackage');
+    Route::post('/packages', 'createPackage');
+    Route::post('/packages/{id}', 'editPackage');
+    Route::delete('/packages/{id}', 'deletePackage');
+});
 
-Route::controller(AdsAPIController::class)->group(function()
-{
-    Route::get('/ads','getAds');
-    Route::post('/ads','createAds');
-    Route::post('/ads/{id}','editAds');
-    Route::delete('/ads/{id}','deleteAds');
+Route::controller(AdsAPIController::class)->group(function () {
+    Route::get('/ads', 'getAds');
+    Route::post('/ads', 'createAds');
+    Route::post('/ads/{id}', 'editAds');
+    Route::delete('/ads/{id}', 'deleteAds');
 });
 
 
@@ -432,12 +422,12 @@ Route::controller(ExcelImportController::class)->group(function () {
 
 // Route::post('purchase_orders', [PurchaseOrderAPIController::class, 'createPurchaseOrder']);
 Route::get('/areas', [AreaController::class, 'getAreas']);
-Route::get('/area_types/{id}/areas',[AreaController::class,'getAreaByAreaType']);
-Route::get('/area_categories/{id}/areas',[AreaController::class,'getAreaByAreaCategory']);
+Route::get('/area_types/{id}/areas', [AreaController::class, 'getAreaByAreaType']);
+Route::get('/area_categories/{id}/areas', [AreaController::class, 'getAreaByAreaCategory']);
 Route::post('/areas', [AreaController::class, 'createArea']);
 Route::put('/areas/{id}', [AreaController::class, 'updateArea']);
 Route::delete('/areas/{id}', [AreaController::class, 'deleteArea']);
-Route::get('areas_by_department/{department_id}',[AreaController::class,'getAreaByDepartment']);
+Route::get('areas_by_department/{department_id}', [AreaController::class, 'getAreaByDepartment']);
 
 Route::get('/departments', [DepartmentAPIController::class, 'getDepartmentData']);
 Route::post('/departments', [DepartmentAPIController::class, 'createDepartment']);
@@ -448,19 +438,19 @@ Route::get('/role_by_department/{department_id}', [RoleAPIController::class, 'ge
 Route::post('/roles', [RoleAPIController::class, 'createRole']);
 Route::put('/roles/{id}', [RoleAPIController::class, 'updateRole']);
 
-Route::get('/staff_reports',[StaffAPIController::class,'staffReport']);
+Route::get('/staff_reports', [StaffAPIController::class, 'staffReport']);
 Route::get('/staffs', [StaffAPIController::class, 'getStaffData']);
-Route::get('/staffs/{id}',[StaffAPIController::class,'detailStaff']);
+Route::get('/staffs/{id}', [StaffAPIController::class, 'detailStaff']);
 Route::post('/staffs', [StaffAPIController::class, 'createStaff']);
 Route::post('/staffs/{id}', [StaffAPIController::class, 'updateStaff']);
 Route::delete('/staffs/{id}', [StaffAPIController::class, 'deleteStaff']);
-Route::delete('/staffs/{staff_id}/roles/{role_id}',[StaffAPIController::class,'deleteRoleStaff']);
-Route::delete('/staffs/{staff_id}/inventories/{inventory_id}',[StaffAPIController::class,'deleteInventoryStaff']);
-Route::delete('/staffs/{staff_id}/features/{feature_id}',[StaffAPIController::class,'deleteFeatureStaff']);
-Route::get('/departments/{department_id}/staffs',[StaffAPIController::class,'getStaffByDepartment']);
-Route::get('/staff_balances',[StaffAPIController::class,'staffBalanceList']);
-Route::get('/staff_balances/{id}',[StaffAPIController::class,'detailStaffBalance']);
-Route::get('/staff/{id}/duties',[StaffAPIController::class,'getStaffWithDuties']);
+Route::delete('/staffs/{staff_id}/roles/{role_id}', [StaffAPIController::class, 'deleteRoleStaff']);
+Route::delete('/staffs/{staff_id}/inventories/{inventory_id}', [StaffAPIController::class, 'deleteInventoryStaff']);
+Route::delete('/staffs/{staff_id}/features/{feature_id}', [StaffAPIController::class, 'deleteFeatureStaff']);
+Route::get('/departments/{department_id}/staffs', [StaffAPIController::class, 'getStaffByDepartment']);
+Route::get('/staff_balances', [StaffAPIController::class, 'staffBalanceList']);
+Route::get('/staff_balances/{id}', [StaffAPIController::class, 'detailStaffBalance']);
+Route::get('/staff/{id}/duties', [StaffAPIController::class, 'getStaffWithDuties']);
 
 
 
@@ -473,9 +463,9 @@ Route::controller(TaskController::class)->group(function () {
     Route::get('/tasks', 'getTaskData');
     Route::post('/tasks', 'createTask');
     Route::put('/tasks/{id}', 'updateTask');
-    Route::delete('/tasks/{id}','deleteTask');
-    Route::get('task_report','taskReport');
-    Route::get('/task_by_role/{role_id}','getTaskByRole');
+    Route::delete('/tasks/{id}', 'deleteTask');
+    Route::get('task_report', 'taskReport');
+    Route::get('/task_by_role/{role_id}', 'getTaskByRole');
 });
 Route::get('/complaints', [ComplaintAPIController::class, 'getComplainData']);
 
@@ -487,15 +477,15 @@ Route::delete('/entities/{id}', [EntityAPIController::class, 'deleteEntity']);
 
 
 Route::controller(ItemAPIController::class)->group(function () {
-    Route::get('item_price_list_by_item/{item_id}','getItemPriceListByItem');
+    Route::get('item_price_list_by_item/{item_id}', 'getItemPriceListByItem');
 });
 Route::get('/items', [ItemAPIController::class, 'getItemData']);
 Route::post('/items', [ItemAPIController::class, 'createItem']);
 Route::put('/items/{id}', [ItemAPIController::class, 'updateItem']);
 Route::delete('/items/{id}', [ItemAPIController::class, 'deleteItem']);
-Route::post('/item_prices/{id}',[ItemAPIController::class,'addItemPrice']);
-Route::get('/get_uom_conversion_by_uom',[UomAPIController::class,'getUomConversionByUom']);
-Route::get('/get_item_type',[ItemAPIController::class,'getItemType']);
+Route::post('/item_prices/{id}', [ItemAPIController::class, 'addItemPrice']);
+Route::get('/get_uom_conversion_by_uom', [UomAPIController::class, 'getUomConversionByUom']);
+Route::get('/get_item_type', [ItemAPIController::class, 'getItemType']);
 // Route::get('/transfers', [TransferAPIController::class, 'getTransferData']);
 // Route::post('/transfers', [TransferAPIController::class, 'createTransfer']);
 // Route::put('/transfers/{id}', [TransferAPIController::class, 'updateTransfer']);
@@ -507,19 +497,19 @@ Route::post('/customers', [CustomerAPIController::class, 'createCustomer']);
 Route::put('/customers/{id}', [CustomerAPIController::class, 'updateCustomer']);
 Route::delete('/customers/{id}', [CustomerAPIController::class, 'deleteCustomer']);
 Route::controller(CustomerAPIController::class)->group(function () {
-    Route::get('customer_list','listOfCustomer');
-    Route::get('/customer_list/{id}','detailCustomer');
+    Route::get('customer_list', 'listOfCustomer');
+    Route::get('/customer_list/{id}', 'detailCustomer');
 });
 
 Route::get('/menus', [MenuAPIController::class, 'getMenus']);
 Route::post('/menus', [MenuAPIController::class, 'createMenu']);
 Route::post('/menus/{id}/add_price', [MenuAPIController::class, 'addPriceToMenu']);
-Route::post('/menus/{id}/is_active',[MenuAPIController::class,'menuOnOff']);
-Route::get('/menus/{id}',[MenuAPIController::class,'detailMenu']);
-Route::post('/menus/{id}',[MenuAPIController::class,'menuEdit']);
-Route::post('/menu/{id}/is_feature',[MenuAPIController::class,'featureToggleMenu']);
-Route::get('/menu_report',[MenuAPIController::class,'menuReport']);
-Route::get('/menu_costing',[MenuAPIController::class,'costingMenu']);
+Route::post('/menus/{id}/is_active', [MenuAPIController::class, 'menuOnOff']);
+Route::get('/menus/{id}', [MenuAPIController::class, 'detailMenu']);
+Route::post('/menus/{id}', [MenuAPIController::class, 'menuEdit']);
+Route::post('/menu/{id}/is_feature', [MenuAPIController::class, 'featureToggleMenu']);
+Route::get('/menu_report', [MenuAPIController::class, 'menuReport']);
+Route::get('/menu_costing', [MenuAPIController::class, 'costingMenu']);
 
 Route::get('/areas/{id}/entities', [EntityAPIController::class, 'getEntityWithInvoice']);
 Route::get('/entities_sessions/{id}', [EntityAPIController::class, 'getEntitySessionDetail']);
@@ -531,69 +521,67 @@ Route::post('/entities/orders', [OrderAPIController::class, 'addOrder']);
 Route::post('/entities/add_more_sessions', [InvoiceAPIController::class, 'addMoreSessions']);
 Route::post('/entities/change', [InvoiceAPIController::class, 'changeRoom']);
 Route::post('/entities/done', [InvoiceAPIController::class, 'endRoom']);
-Route::post('/room_done',[InvoiceAPIController::class,'doneRoom']);
-Route::post('/entities/confirm',[InvoiceAPIController::class,'roomConfirm']);
+Route::post('/room_done', [InvoiceAPIController::class, 'doneRoom']);
+Route::post('/entities/confirm', [InvoiceAPIController::class, 'roomConfirm']);
 
-Route::get('/order_items',[OrderAPIController::class,'getOrderItemList']);
-Route::get('/order_items/{invoiceId}/invoice',[OrderAPIController::class,'getOrderItemByInvoice']);
-Route::get('/pos_order_items',[OrderAPIController::class,'getOrderItemForPOS']);
-Route::post('/pos_order_items/{order_item_id}/status',[OrderAPIController::class,'orderItemAreaConfirm']);
-Route::post('/pos_orders/check_foc_supervision',[OrderAPIController::class,'checkFocSupervision']);
+Route::get('/order_items', [OrderAPIController::class, 'getOrderItemList']);
+Route::get('/order_items/{invoiceId}/invoice', [OrderAPIController::class, 'getOrderItemByInvoice']);
+Route::get('/pos_order_items', [OrderAPIController::class, 'getOrderItemForPOS']);
+Route::post('/pos_order_items/{order_item_id}/status', [OrderAPIController::class, 'orderItemAreaConfirm']);
+Route::post('/pos_orders/check_foc_supervision', [OrderAPIController::class, 'checkFocSupervision']);
 
 Route::get('/invoices', [InvoiceAPIController::class, 'getInvoiceData']);
 
 // Route::group(['prefix' => 'management'], function () {});
 Route::get("/test", [TestController::class, "index"]);
 
-Route::get('/menu_categories/{id}/menus',[MenuAPIController::class,'menuByMenuCategory']);
-Route::get('/menu_categories_bookings/{id}/menus',[MenuAPIController::class,'menuByMenuCategoryBooking']);
-Route::get('/menus/{menu_id}/areas',[MenuAPIController::class,'areaByMenu']);
+Route::get('/menu_categories/{id}/menus', [MenuAPIController::class, 'menuByMenuCategory']);
+Route::get('/menu_categories_bookings/{id}/menus', [MenuAPIController::class, 'menuByMenuCategoryBooking']);
+Route::get('/menus/{menu_id}/areas', [MenuAPIController::class, 'areaByMenu']);
 
-Route::post("/order_status_change",[OrderAPIController::class,'orderItemChangeStatus']);
+Route::post("/order_status_change", [OrderAPIController::class, 'orderItemChangeStatus']);
 
-Route::get('/used_defected_items',[UsedDefectedAPIController::class,'lisltUsedDefectedItem']);
-Route::post('/used_defected_items',[UsedDefectedAPIController::class,'createUsedDefected']);
-Route::post('/used_defected_items/{id}/confirm',[UsedDefectedAPIController::class,'usedDefectConfirm']);
+Route::get('/used_defected_items', [UsedDefectedAPIController::class, 'lisltUsedDefectedItem']);
+Route::post('/used_defected_items', [UsedDefectedAPIController::class, 'createUsedDefected']);
+Route::post('/used_defected_items/{id}/confirm', [UsedDefectedAPIController::class, 'usedDefectConfirm']);
 
 
-Route::get('get_inventory',[InventoryAPIController::class, 'getInventory']);
+Route::get('get_inventory', [InventoryAPIController::class, 'getInventory']);
 // feature
-Route::get('/features',[FeatureAPIController::class,'getFeatureData']);
+Route::get('/features', [FeatureAPIController::class, 'getFeatureData']);
 
 // customer upcoming birthday list
-Route::get('/crm/upcoming_birthdays',[CustomerAPIController::class,'upComingBdList']);
-Route::controller(BirthDayPromotionAPIController::class)->group(function ()
-{
-    Route::get('/birthday_promotions','getBirthdayPromotions');
-    Route::post('/birthday_promotions','createBDPromotion');
-    Route::post('/birthday_promotions/{id}','updateBDPromotion');
-    Route::delete('/birthday_promotions/{id}','deleteBDPromotion');
+Route::get('/crm/upcoming_birthdays', [CustomerAPIController::class, 'upComingBdList']);
+Route::controller(BirthDayPromotionAPIController::class)->group(function () {
+    Route::get('/birthday_promotions', 'getBirthdayPromotions');
+    Route::post('/birthday_promotions', 'createBDPromotion');
+    Route::post('/birthday_promotions/{id}', 'updateBDPromotion');
+    Route::delete('/birthday_promotions/{id}', 'deleteBDPromotion');
 });
 
-Route::controller(CustomerLevelDiscountAPIController::class)->group(function ()
-{
-    Route::get('/customer_level_discounts','getCustomerLevelDiscountData');
-    Route::post('/customer_level_discounts','createCustomerLevelDiscount');
-    Route::post('/customer_level_discounts/{id}','updateCustomerLevelDiscount');
-    Route::delete('/customer_level_discounts/{id}','deleteCustomerLevelDiscount');
+Route::controller(CustomerLevelDiscountAPIController::class)->group(function () {
+    Route::get('/customer_level_discounts', 'getCustomerLevelDiscountData');
+    Route::post('/customer_level_discounts', 'createCustomerLevelDiscount');
+    Route::post('/customer_level_discounts/{id}', 'updateCustomerLevelDiscount');
+    Route::delete('/customer_level_discounts/{id}', 'deleteCustomerLevelDiscount');
 });
 
-Route::controller(FoodOrderAPIController::class)->group(function()
-{
-    Route::get('/food_orders','listAllFoodOrder');
-    Route::post('/food_order_items/{id}','confirmFoodOrderItem');
-    Route::post('/food_orders/{id}','confirmFoodOrder');
-    Route::post('/create_food_orders','createConfirmFoodOrder');
-    Route::post('/food_order_status/{id}','updateFoodTimeAndStatus');
-    Route::get('/food_order_lists','foodOrderListForKitchen');
+Route::controller(FoodOrderAPIController::class)->group(function () {
+    Route::get('/food_orders', 'listAllFoodOrder');
+    Route::post('/food_order_items/{id}', 'confirmFoodOrderItem');
+    Route::post('/food_orders/{id}', 'confirmFoodOrder');
+    Route::post('/create_food_orders', 'createConfirmFoodOrder');
+    Route::post('/food_order_status/{id}', 'updateFoodTimeAndStatus');
+    Route::get('/food_order_lists', 'foodOrderListForKitchen');
 });
 
-Route::controller(DeliveryChargeAPIController::class)->group(function()
-{
-    Route::get('/delivery_charges','getDeliveryChargeData');
-    Route::post('/delivery_charges','createDeliveryCharge');
+Route::controller(DeliveryChargeAPIController::class)->group(function () {
+    Route::get('/delivery_charges', 'getDeliveryChargeData');
+    Route::post('/delivery_charges', 'createDeliveryCharge');
 });
 
 Route::post('send_notification', [NotificationController::class, 'sendNotification']);
+
+
 
 

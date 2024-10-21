@@ -23,7 +23,6 @@ class InventorySeeder extends Seeder
                 'start_time' => '08:00:00',
                 'end_time' => '17:00:00',
             ]);
-
             $inventory->inventoryable()->create([
                 'inventoryable_type' => 'department',
                 'inventoryable_id' => $department->id,

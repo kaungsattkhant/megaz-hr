@@ -1,7 +1,6 @@
 <template>
     <div>
     <notifications position="top center" />
-
         <div class="">
             <div class="w-[67%] pt-9 px-6">
                 <ul class="mb-5 flex list-none flex-row flex-wrap border-b-0 pl-0" role="tablist" data-te-nav-ref>
@@ -1182,7 +1181,7 @@ export default {
                 if (response.data[0]) {
                     this.selectedRoomId = response.data[0].id;
                     // this.getSelectedRoom();
-                    
+
                     // this.selectedRoom = response.data[0];
                     // this.getPurchaseMenuList();
 
@@ -1944,7 +1943,11 @@ export default {
             if (response.data) {
                 this.tableList = response.data;
             }
-        }
+        },
+
+        updateRoomList(){
+            this.getRoomList();
+        },
 
         // async initialSidebarShow(){
         //     alert(this.roomList[0].invoices.length)

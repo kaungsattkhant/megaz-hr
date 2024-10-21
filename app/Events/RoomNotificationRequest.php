@@ -57,13 +57,24 @@ class RoomNotificationRequest implements ShouldBroadcast
     }
     public function broadcastWith()
     {
-        return [
+        $roomSession = RoomSession::where('invoice_id',$this->invoice_id)->get();
+
+        $totalDuration = $roomSession->sum('session_duration');
+        $firstRoomSession = $roomSession->first();
+        $lastRoomSession = $roomSession->last();
+        $data= [
             'department_id' => $this->department_id,
             'invoice_id' => $this->invoice_id,
             'customer_name' => $this->customerName,
             'room_name' => $this->roomName,
             'order' => $this->order,
             'orderItem' => $this->orderItem,
+            'start_time' => $firstRoomSession->start_date,
+            'end_time' => $lastRoomSession->end_date,
+            'session_duration' => $totalDuration
         ];
+
+        return $data;
+
     }
 }
