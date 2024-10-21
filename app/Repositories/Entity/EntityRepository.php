@@ -44,6 +44,46 @@ class EntityRepository implements EntityRepositoryInterface
             ->with('entitySessions.roomSession.invoice')
             ->get();
 
+        foreach($entities as $entity){
+            if($entity->entity_type == 'room' && $entity->is_active == 1){
+                $roomSessions = collect();
+                $startTimes = collect();
+                $endTimes = collect();
+                foreach($entity->entitySessions()->where('is_active',1)->get() as $entitySession){
+                    foreach($entitySession->roomSessions()->get() as $roomSession){
+                        $roomSessions->push($roomSession);
+                        $startTimes->push($roomSession->start_date);
+                        $endTimes->push($roomSession->end_date);
+                    }
+                }
+
+                $entity->start_time = CurrentTime();
+                $entity->end_time = CurrentTime();
+
+                $totalSessionDuration = (float) number_format($roomSessions->sum('session_duration'), 2);
+                $startTimes = $startTimes->sortBy(function ($timestamp) {
+                    return strtotime($timestamp);
+                })->values(); // Re-index the collection
+
+                $endTimes = $endTimes->sortByDesc(function ($timestamp) {
+                    return strtotime($timestamp);
+                })->values(); // Re-index the collection
+
+                $firstStartTime = $startTimes[0];
+                $calculatedEndTime = Carbon::parse($firstStartTime)->addHours($totalSessionDuration)->format('Y-m-d H:i:s');
+                $lastEndTime = $endTimes[0];
+
+                $entity->start_time = $firstStartTime;
+                $entity->end_time = $calculatedEndTime;
+                // dd($startTimes);
+            }else{
+                $entity->start_time = null;
+                $entity->end_time = null;
+            }
+
+            // ResponseData($roomSessions);
+        }
+
         return $entities;
     }
 
