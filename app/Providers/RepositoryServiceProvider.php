@@ -110,6 +110,8 @@ use App\Repositories\UsedDefectedItem\UsedDefectedITemRepositoryInterface;
 use App\Repositories\CustomerLevelDiscount\CustomerLevelDiscountRepository;
 use App\Repositories\PurchaseOrderItemLeft\PurchaseOrderItemLeftRepository;
 use App\Repositories\BirthdayPromotion\BirthdayPromotionRepositoryInterface;
+use App\Repositories\Canteen\CanteenInterface;
+use App\Repositories\Canteen\CanteenRepository;
 use App\Repositories\CookingPlace\CookingPlaceRepository;
 use App\Repositories\CookingPlace\CookingPlaceRepositoryInterface;
 use App\Repositories\PurchaseOrderItem\PurchaseOrderItemRepositoryInterface;
@@ -218,5 +220,6 @@ class RepositoryServiceProvider extends ServiceProvider
         $this->app->bind(DutyRepositoryInterface::class,DutyRepository::class);
         $this->app->bind(SaleTargetPositionRepositoryInterface::class,SaleTargetPositionRepository::class);
         $this->app->bind(SaleTargetMenuRepositoryInterface::class,SaleTargetMenuRepository::class);
+        $this->app->bind(CanteenInterface::class,CanteenRepository::class);
     }
 }

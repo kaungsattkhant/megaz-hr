@@ -10,9 +10,9 @@ Route::middleware('auth:api')->group(function () {
         Route::get('balance_sheet', 'BalanceSheet');
         Route::get('trial_balance', 'TrialBalance');
         Route::get('inventory_schedule', 'getInventorySchedule');
-        Route::get('profit_and_loss', 'getProfitAndLoss');
+        // Route::get('profit_and_loss', 'getProfitAndLoss');
     });
 });
 Route::controller(FinancialReportController::class)->group(function () {
-    // Route::get('profit_and_loss', 'getProfitAndLoss');
+    Route::get('profit_and_loss', 'getProfitAndLoss');
 });

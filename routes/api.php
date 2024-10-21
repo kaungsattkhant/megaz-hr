@@ -59,6 +59,7 @@ use App\Http\Controllers\API\PurchaseOrderAPIController;
 use App\Http\Controllers\API\DeliveryChargeAPIController;
 use App\Http\Controllers\API\ItemUsageForecastController;
 use App\Http\Controllers\API\BirthDayPromotionAPIController;
+use App\Http\Controllers\API\CanteenController;
 use App\Http\Controllers\API\CookingPlaceAPIController;
 use App\Http\Controllers\API\FixedAssetPurchaseAPIController;
 use App\Http\Controllers\API\PurchaseOrderItemLeftController;
@@ -590,5 +591,11 @@ Route::controller(DeliveryChargeAPIController::class)->group(function()
 });
 
 Route::post('send_notification', [NotificationController::class, 'sendNotification']);
+
+Route::resource('canteens', CanteenController::class)->only(['index', 'store', 'show']);
+Route::controller(CanteenController::class)->group(function()
+{
+    
+});
 
 

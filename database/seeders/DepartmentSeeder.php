@@ -13,7 +13,7 @@ class DepartmentSeeder extends Seeder
     public function run(): void
     {
         //
-        $names = ['HR', 'Finance', 'Admin', 'Management', 'Catering', 'Inventory', 'Kitchen','Bar'];
+        $names = ['HR', 'Finance', 'Admin', 'Management', 'Catering', 'Inventory', 'Kitchen','Bar','Procurement','Canteen'];
         $hr_features = config('common.hr_features');
         $inventory_features = config('common.inventory_features');
         $finance_features = config('common.finance_features');
