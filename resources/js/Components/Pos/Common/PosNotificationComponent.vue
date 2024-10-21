@@ -182,12 +182,12 @@
         <!-- order notification modal -->
 
         <button
-            class=" focus:outline-none focus:ring-0 hidden" id="order_noti_btn"
+            class="bg-red-600 focus:outline-none focus:ring-0 block fixed right-20 top-20 z-50" id="order_noti_btn"
             data-te-toggle="modal" data-te-target="#order_noti">
             +
         </button>
         <div data-te-modal-init data-te-backdrop="static" data-te-keyboard="false"
-            class="fixed left-0 top-0 z-[1055] hidden h-full w-full overflow-y-auto overflow-x-hidden outline-none"
+            class="fixed left-0 top-0 z-[1055] h-full w-full overflow-y-auto overflow-x-hidden outline-none"
             id="order_noti" tabindex="-1" aria-labelledby="createCustomerModalLabel" aria-modal="true"
             role="dialog">
             <div data-te-modal-dialog-ref
