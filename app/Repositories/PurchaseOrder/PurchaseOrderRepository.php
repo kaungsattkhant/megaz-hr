@@ -25,10 +25,11 @@ class PurchaseOrderRepository implements PurchaseOrderRepositoryInterface
         $staff = UserData();
         $purchaseOrders = PurchaseOrder::with(['items.item', 'createdBy', 'managerCheckedBy', 'financialCheckedBy'])
             ->orderBy('id', 'desc')
-            ->when(checkDepartmentAndRoles('HR', ['Staff']), function ($q) use ($staff) {
+            ->when(checkRoles(['Staff']), function ($q) use ($staff) {
+                // ->when(checkDepartmentAndRoles('HR', ['Staff']), function ($q) use ($staff) {
                 $q->where('created_by', $staff->id);
             })
-            ->when((checkDepartmentAndRoles('HR', ['Manager']) || checkRoles(['Manager'])), function ($q) {
+            ->when((checkRoles(['Manager'])), function ($q) {
                 $q->whereIn('status', ['manager_checked', 'created'])
                     ->orWhere('manager_check_id', UserData()->id);
             })
@@ -55,7 +56,7 @@ class PurchaseOrderRepository implements PurchaseOrderRepositoryInterface
             }
             $latest = PurchaseOrder::orderBy('created_at', 'desc')->first();
             $count = 4;
-            $no = (new CommonPurchaseOrder())->getUniqueId($latest,'po_id',$count);
+            $no = (new CommonPurchaseOrder())->getUniqueId($latest, 'po_id', $count);
             $po_id = "PO" . '-' . str_pad($no, $count, "0", STR_PAD_LEFT) . '-' . now()->timestamp;
             $data['po_id'] = $po_id;
 
@@ -66,6 +67,11 @@ class PurchaseOrderRepository implements PurchaseOrderRepositoryInterface
 
             if (!$request->id) {
                 $data['created_by'] = $staff->id;
+                if (checkRoles(['Manager'])) {
+                    $data['manager_check_id'] = $staff->id;
+                    $data['manager_check_time'] = now();
+                    $data['status'] = 'manager_checked';
+                }
             }
             $po = PurchaseOrder::updateOrCreate(
                 ['id' => $data['id']],
@@ -78,10 +84,12 @@ class PurchaseOrderRepository implements PurchaseOrderRepositoryInterface
                     $item_data['id'] = null;
                 }
                 $item_data['quantity'] = $item->quantity;
-                if (checkDepartmentAndRoles('HR', ['Staff'])) {
+                // if (checkDepartmentAndRoles('HR', ['Staff'])) {
+                if (checkRoles(['Staff'])) {
+
                     $item_data['original_quantity'] = $item->quantity;
                 } else {
-                    $item_data['original_quantity'] = (isset($item->later_buy) && $item->later_buy)?$item->original_quantity :$item->quantity;
+                    $item_data['original_quantity'] = (isset($item->later_buy) && $item->later_buy) ? $item->original_quantity : $item->quantity;
                 }
                 $item_data['purchase_order_id'] = $po->id;
                 $item_data['item_id'] = $item->item_id;
@@ -94,49 +102,51 @@ class PurchaseOrderRepository implements PurchaseOrderRepositoryInterface
                     $purchaseOrderItem = $po->items()->where('id', $item_data['id'])->first();
                     // dd($purchaseOrderItem);
                     // dd($item);
-                        if ($purchaseOrderItem) {
-                            if ($item->quantity > $purchaseOrderItem->quantity) {
+                    if ($purchaseOrderItem) {
+                        if ($item->quantity > $purchaseOrderItem->quantity) {
+                            ResponseMessage('Later Buy Quantity must be less than original quantity', 419);
+                        }
+                        if ($item->quantity < $purchaseOrderItem->quantity) {
+                            $quantity = $purchaseOrderItem->original_quantity - $item->quantity;
+
+                            if ($quantity < 0) {
                                 ResponseMessage('Later Buy Quantity must be less than original quantity', 419);
                             }
-                            if ($item->quantity < $purchaseOrderItem->quantity) {
-                                $quantity = $purchaseOrderItem->original_quantity - $item->quantity;
-
-                                if ($quantity < 0) {
-                                    ResponseMessage('Later Buy Quantity must be less than original quantity', 419);
-                                }
-                                $column = null;
-                                if (checkDepartmentAndRoles('HR', ['Manager'])) {
-                                    $column = 'quantity_by_manager';
-                                } elseif (!$po->is_md_checked && checkDepartmentAndRoles('Finance', ['Manager'])) {
-                                    $column = 'quantity_by_financial';
-                                } elseif (checkDepartmentAndRoles('Management', ['MD'])) {
-                                    $column = 'quantity_by_md';
-                                } elseif ($po->is_md_checked && checkDepartmentAndRoles('Finance', ['Manager'])) {
-                                    $column = 'quantity_after_md';
-                                }
-                                if ($column != null) {
-                                    $po_left = PurchaseOrderItemLeft::updateOrCreate(
-                                        [
-                                            'purchase_order_item_id' => $item->id,
-                                        ],
-                                        [
-                                            'purchase_order_item_id' => $item->id,
-                                            'quantity' => $quantity,
-                                            $column => $item->quantity,
-                                        ]);
-                                }
+                            $column = null;
+                            if (checkRoles(['Manager'])) {
+                                // if (checkDepartmentAndRoles('HR', ['Manager'])) {
+                                $column = 'quantity_by_manager';
+                            } elseif (!$po->is_md_checked && checkDepartmentAndRoles('Finance', ['Manager'])) {
+                                $column = 'quantity_by_financial';
+                            } elseif (checkDepartmentAndRoles('Management', ['MD'])) {
+                                $column = 'quantity_by_md';
+                            } elseif ($po->is_md_checked && checkDepartmentAndRoles('Finance', ['Manager'])) {
+                                $column = 'quantity_after_md';
+                            }
+                            if ($column != null) {
+                                $po_left = PurchaseOrderItemLeft::updateOrCreate(
+                                    [
+                                        'purchase_order_item_id' => $item->id,
+                                    ],
+                                    [
+                                        'purchase_order_item_id' => $item->id,
+                                        'quantity' => $quantity,
+                                        $column => $item->quantity,
+                                    ]
+                                );
                             }
                         }
+                    }
                 }
                 if ($request->is_grn) {
                     if ($item->supplier_id != null && $item->invoice_amount != null && $item->invoice_no != null) {
                         $item_data['is_grn'] = 1;
-                        if($item->invoice_amount<$item->quantity*$item->amount){
+                        if ($item->invoice_amount < $item->quantity * $item->amount) {
                             // (new PurchaseOrderTransaction())->createTransaction($po, $morphMapName, $request->cash_account_id); #create transaction
                         }
                     }
                     #grn store
-                    $po_grn=$this->storeGRN($item);
+                    $po_grn = $this->storeGRN($item);
                     #grn
                 }
                 $po_item = $po->items()->updateOrCreate(['id' => $item_data['id']], $item_data);
@@ -147,7 +157,9 @@ class PurchaseOrderRepository implements PurchaseOrderRepositoryInterface
                 (new PurchaseOrderTransaction())->createTransaction($po, $morphMapName, $request->cash_account_id); #create transaction
             }
             if (!isset($request->id)) {
-                $users = $this->getUserByRole('HR', ['Manager']);
+                // $users = $this->getUserByRole('HR', ['Manager']);
+                $departmentId = $staff->department_id;
+                $users = $this->getUserByDepartment($departmentId, ['Manager']);
                 $data = [
                     'date' => $po->created_at,
                     'title' => 'You have received a new PO to confirm',
@@ -155,7 +167,7 @@ class PurchaseOrderRepository implements PurchaseOrderRepositoryInterface
                 ];
                 #send old notificaiton
                 #end
-                if($users->isNotEmpty()){
+                if ($users->isNotEmpty()) {
                     $this->send($po, $users, $data);
                 }
             }
@@ -203,7 +215,7 @@ class PurchaseOrderRepository implements PurchaseOrderRepositoryInterface
 
     public function detail($purchaseOrder)
     {
-        $purchaseOrder->uom=$purchaseOrder->uom;
+        $purchaseOrder->uom = $purchaseOrder->uom;
         $purchaseOrder->items = $purchaseOrder->items;
         $purchaseOrder->items->load('purchaseOrderItemLeft');
         $purchaseOrder->items->load('item.suppliers');
@@ -245,12 +257,14 @@ class PurchaseOrderRepository implements PurchaseOrderRepositoryInterface
     public function updateIsCheck($request)
     {
         $staff = UserData();
+        // dd($staff->roles);
         DB::beginTransaction();
         try {
             $model = Model($request->type)::find($request->id);
             $this->validateModel($model, $staff, $request->type);
             if ($model) {
-                if (checkDepartmentAndRoles('HR', ['Manager'])) {
+                // if (checkDepartmentAndRoles('HR', ['Manager'])) {
+                if (!checkDepartmentAndRoles('Finance', ['Manager']) && checkRoles(['Manager'])) {
                     $column = 'manager_check';
                     $is_column = 'is_manager_checked';
                     $status = 'manager_checked';
@@ -277,7 +291,7 @@ class PurchaseOrderRepository implements PurchaseOrderRepositoryInterface
                     //     ResponseMessage('Some items are left to check', 422);
                     // }
                     checkDepartmentAndRoles('Management', ['MD']) ?
-                    $model->$is_column = 1 : $model->$column_id = $staff->id;
+                        $model->$is_column = 1 : $model->$column_id = $staff->id;
                     $model->$column_time = now();
                     $model->status = $status;
                     $model->save();
@@ -285,7 +299,8 @@ class PurchaseOrderRepository implements PurchaseOrderRepositoryInterface
                     #send notification by specific role
                     #notification
                     $users = collect([]);
-                    if (checkDepartmentAndRoles('HR', ['Manager'])) {
+                    // if (checkDepartmentAndRoles('HR', ['Manager'])) {
+                    if (checkRoles(['Manager'])) {
                         $users = $this->getUserByRole('Finance', ['Manager']);
                         $title = 'You have received a new PO to confirm';
                     } else if (checkDepartmentAndRoles('Finance', ['Manager'])) {
@@ -392,10 +407,10 @@ class PurchaseOrderRepository implements PurchaseOrderRepositoryInterface
                     $po_item->is_confirmed = 1;
                     $po_item->save();
                     #store inventory
-                    if(!UserData()->department->inventory){
-                        ResponseMessage("Inventory is required",419);
+                    if (!UserData()->department->inventory) {
+                        ResponseMessage("Inventory is required", 419);
                     }
-                    $inventoryId=UserData()->department->inventory->inventory_id;
+                    $inventoryId = UserData()->department->inventory->inventory_id;
                     $inventoryLedger = (new StoreInventory($inventoryId))->storeToInventoryLedger($po_item->purchase_order, 'purchase_order', 'in');
                     (new StoreInventory($inventoryId))->storeItemToInventory($inventoryLedger, $po_item);
                     #store inventory

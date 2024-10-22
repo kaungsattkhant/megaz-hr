@@ -129,7 +129,7 @@ class InventoryRepository implements InventoryRepositoryInterface
     }
 
     public function inventoryList(){
-        $toInventory=Inventory::where('is_active',1)
+        $toInventory=Inventory::where('is_active', 1)
         ->whereNotIn('id',InventoryIds())
         ->get();
         return [

@@ -79,10 +79,11 @@ class TrialBalanceService
             ->groupBy('sub_accounts.id', 'sub_accounts.name', 'sub_accounts.account_code')
             ->selectRaw('
             sub_accounts.name,
-                SUM(CASE WHEN transactions.is_confirmed = 1 AND ledgers.action = ? THEN ledgers.value ELSE 0 END) as total_amount,
+                    CAST(SUM(CASE WHEN transactions.is_confirmed = 1 AND ledgers.action = ? THEN ledgers.value ELSE 0 END) AS SIGNED INTEGER) as total_amount,
                 sub_accounts.account_code as code,
                 ? as type
             ', [$action, $action])
+            // SUM(CASE WHEN transactions.is_confirmed = 1 AND ledgers.action = ? THEN ledgers.value ELSE 0 END) as total_amount,
             ->orderByRaw("FIELD(sub_accounts.account_code, '" . implode("','", $subAccountCodes) . "')")
             ->get();
     }
@@ -141,7 +142,7 @@ class TrialBalanceService
                 'amount' => $results->whereIn('account_code', $foodIncomeCodes)->sum('amount')
             ];
         }
-       
+
 
         if ($results->whereIn('account_code', $beverageIncomeCodes)->isNotEmpty()) {
             $finalResult[] = [
@@ -149,7 +150,7 @@ class TrialBalanceService
                 'amount' => $results->whereIn('account_code', $beverageIncomeCodes)->sum('amount')
             ];
         }
-       
+
 
         if ($results->whereIn('account_code', $roomChargeCodes)->isNotEmpty()) {
             $finalResult[] = [
@@ -157,7 +158,7 @@ class TrialBalanceService
                 'amount' => $results->whereIn('account_code', $roomChargeCodes)->sum('amount')
             ];
         }
-       
+
         if ($results->whereIn('account_code', $retainedEarningsCodes)->isNotEmpty()) {
             $finalResult[] = [
                 'name' => 'Retained Earnings',
@@ -172,15 +173,15 @@ class TrialBalanceService
                 'amount' => $results->whereIn('account_code', $existingCapitalCodes)->sum('amount')
             ];
         }
-       
+
         if ($results->whereIn('account_code', $loanCode)->isNotEmpty()) {
             $finalResult[] = [
-                'title'=>'Long Term Liabilities',
+                'title' => 'Long Term Liabilities',
                 'name' => 'Loan',
                 'amount' => $results->whereIn('account_code', $loanCode)->sum('amount')
             ];
         }
-      
+
 
         return $finalResult;
     }

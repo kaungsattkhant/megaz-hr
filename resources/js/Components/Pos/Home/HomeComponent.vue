@@ -15,14 +15,14 @@
 
                 <div class="mb-6">
                     <div class="opacity-100 transition-opacity duration-150 ease-linear">
-                        <div class="flex flex-col mb-4" v-for="(room, roomIndex) in roomList" :key="index">
+                        <div class="flex flex-col mb-4" v-for="(room, roomIndex) in roomList" :key="roomIndex">
                             <div class="flex flex-row gap-x-4">
                                 <div :class="room.is_active == 0 ? 'bg-[#4fe0b7]' : 'bg-[#FF7675]'"
                                     class=" flex-shrink-0 flex-grow p-6 w-40 max-w-44 h-40">
-                                    <button 
+                                    <button
                                         class="relative flex flex-col justify-between h-full w-full">
                                         <div class=" flex justify-between flex-col h-full">
-                                            
+
                                             <p class="text-base text-left text-white">
                                                 {{ room.price_per_hour }}
                                             </p>
@@ -36,12 +36,12 @@
                                 </div>
                                 <!-- <div :class="[time.is_active == 0 ? 'bg-[#4fe0b7]' : 'bg-[#FF7675]', parseInt(time.start_time.split(':')) < currentTime ? 'opacity-70' : 'opacity-100' ]" v-for="(time,timeIndex) in room.entity_sessions" :key="index"
                                     class=" flex-shrink-0 flex-grow w-40 max-w-44 h-40"> -->
-                                <div :class="time.is_active == 0 ? 'bg-[#4fe0b7]' : 'bg-[#FF7675]'" v-for="(time,timeIndex) in room.entity_sessions" :key="index"
+                                <div :class="time.is_active == 0 ? 'bg-[#4fe0b7]' : 'bg-[#FF7675]'" v-for="(time,timeIndex) in room.entity_sessions" :key="timeIndex"
                                     class=" flex-shrink-0 flex-grow w-40 max-w-44 h-40">
                                     <!-- <button @click="btnClickedSession(time, timeIndex, room, roomIndex)" :disabled="parseInt(time.start_time.split(':')) < currentTime" :class="parseInt(time.start_time.split(':')) < currentTime ? ' cursor-not-allowed' : ''"
                                         class="relative flex flex-col justify-between h-full w-full p-6"> -->
-                                    <button @click="btnClickedSession(time, timeIndex, room, roomIndex)" 
-                                        class="relative flex flex-col justify-between h-full w-full p-6">    
+                                    <button @click="btnClickedSession(time, timeIndex, room, roomIndex)"
+                                        class="relative flex flex-col justify-between h-full w-full p-6">
                                         <div  class=" flex justify-center flex-col h-full gap-y-4">
                                             <p class="text-sm text-white">Start Time : <span class="font-semibold">{{ time.start_time ? time.start_time.slice(0,5) : '' }} </span></p>
                                             <p class="text-sm text-white">End Time : <span class="font-semibold">{{ time.end_time ? time.end_time.slice(0,5) : '' }}</span> </p>
@@ -49,8 +49,10 @@
                                     </button>
                                 </div>
                             </div>
+
+                            
                         </div>
-                        
+
                     </div>
 
                 </div>
@@ -63,9 +65,9 @@
                     <!-- aa
                         </div>  :class="isShowSidebar == true ? 'w-[400px] block opacity-100' : 'w-0 hidden opacity-0'"
                         <div class="right-sidebar shadow-lg border-l border-gray-200"> -->
-                    
-                    
-    
+
+
+
                     <div class="relative h-full " v-if="isOpenRoom.open_1 == true"  id="open_room_1">
                         <div class="w-full h-full flex justify-center flex-col">
                             <div class="w-2/3 mx-auto">
@@ -91,7 +93,7 @@
                     <div class="relative h-full" v-if="isOpenRoom.open_2 == true" id="open_room_2">
                         <div class="small-scrollbar overflow-y-auto h-[100vh] pt-8">
                             <div class="padding-section w-2/3 mx-auto ">
-    
+
                                 <div class="mb-4">
                                     <label for="" class="block text-sm text-black mb-3">
                                         Customer Name
@@ -121,7 +123,7 @@
                                         Type
                                     </label>
                                     <div class="relative">
-                                        <select name="" id="" v-model="type" 
+                                        <select name="" id="" v-model="type"
                                             class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
                                             <option value="session"> Session </option>
                                             <option value="package"> Package </option>
@@ -186,7 +188,7 @@
                             </div>
                         </div>
                     </div>
-    
+
                     <div v-if="isOpenRoom.detail == true" class="relative h-full">
                         <div class="flex justify-between padding-section border-b">
                             <div>
@@ -219,14 +221,14 @@
                                         {{ selectedRoom.room_sessions[0] ? (selectedRoom.room_sessions[0].invoice ?
                                             selectedRoom.room_sessions[0].invoice.invoice_id : '')
                                         : '' }}
-    
+
                                     </p>
                                     <p class="text-sm text-black font-semibold" v-if="selectedRoom">
                                         {{ selectedRoom.room_sessions[0] ?
                                             (selectedRoom.room_sessions[0].invoice.total_session_price ?
                                                 selectedRoom.room_sessions[0].invoice.total_session_price : '' )
                                         : '' }}
-    
+
                                         MMKs
                                     </p>
                                 </div>
@@ -247,7 +249,7 @@
                                     </p>
                                 </div>
                             </div>
-    
+
                             <div class="padding-section border-b    ">
                                 <div class="flex justify-between font-semibold mb-3">
                                     <p class="px-2 py-0.5 bg-[#F19E51] text-white text-xs w-fit">
@@ -267,7 +269,7 @@
                                             <p class=" col-span-1 text-center text-sm">
                                                 {{ menu2.quantity }}
                                             </p>
-    
+
                                             <!-- <select name="" id="" class="w-12  col-span-2">
                                                 <option value="test">
                                                     {{ menu2.status }}
@@ -313,7 +315,7 @@
                                 </div>
                             </div>
                         </div>
-    
+
                         <div class="absolute bottom-0 border-t-2 border-gray-200 w-full padding-section">
                             <div class=" text-right pr-3 mb-3">
                                 <p class="">
@@ -337,8 +339,8 @@
                                             )
                                             : 0
                                         )
-    
-    
+
+
                                     }}
                                     MMKs
                                 </p>
@@ -450,7 +452,7 @@
                                 </div>
                             </div>
                         </div>
-    
+
                         <div class="absolute bottom-0 border-t-2 border-gray-200 w-full padding-section !pt-3">
                             <div v-if="isPackage" class=" text-sm text-right flex gap-x-2 justify-end pr-2 mb-2">
                                 <p>
@@ -547,11 +549,11 @@
                             </div>
                         </div>
                     </div>
-                    
-    
+
+
                     <div v-if="isOpenRoom.is_package == true" class="relative h-full">
                         <div class="flex justify-center padding-section ">
-    
+
                             <div>
                                 <p class="text-black text-lg">
                                     Confirm Menu
@@ -574,7 +576,7 @@
                                                     Price
                                                 </th>
                                                 <th scope="col" class="text-left   py-4">
-    
+
                                                 </th>
                                             </tr>
                                         </thead>
@@ -596,14 +598,14 @@
                                                     </button>
                                                 </td>
                                             </tr>
-    
+
                                         </tbody>
                                     </table>
                                 </div>
-    
+
                             </div>
                         </div>
-    
+
                         <div class="absolute bottom-0 border-t-2 border-gray-200 w-full padding-section !pt-3">
                             <div>
                                 <button class="w-full text-center mb-3 font-semibold text-sm"
@@ -619,7 +621,7 @@
                             </div>
                         </div>
                     </div>
-    
+
                     <!-- <div class="relative block h-full">
                         <div class="w-full h-full flex justify-center flex-col">
                             <div class="w-2/3 mx-auto">
@@ -629,7 +631,7 @@
                                     </p>
                                 </div>
                                 <img class="w-[60%] mx-auto mb-6" src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRnjfjQ0p-BZt5Vb6KhcdHPeC4hBxiKEYXxMw&s" alt="">
-    
+
                             </div>
                         </div>
                     </div> -->
@@ -948,7 +950,7 @@
                 </div>
             </div>
         </div>
-        
+
 
 
     </div>
@@ -1120,7 +1122,7 @@ import { getCurrentTime } from "../../../utilities/datetime-helpers";
                     }
                 }
                 else {
-                    
+
                     this.selectedRoom = this.roomList[roomIndex];
                     this.isOpenRoomStep('open_1');
                 };
@@ -1204,7 +1206,7 @@ import { getCurrentTime } from "../../../utilities/datetime-helpers";
                 this.food_total_package -= (this.packageMenuList[index].original_price - this.packageMenuList[index].discount_value) * this.packageMenuList[index].quantity;
                 this.packageMenuList.splice(index, 1);
             },
-            
+
             createRoomForPackage(){
 
                 // this.packageMenuList.forEach((packageMenu)=>{
@@ -1633,7 +1635,7 @@ import { getCurrentTime } from "../../../utilities/datetime-helpers";
             },
 
 
-            
+
 
             // async getSelectedRoom() {
             //     const response = await getApiData({ url: '/api/entities/' + this.selectedRoomId, token: this.getToken() });
@@ -1650,7 +1652,7 @@ import { getCurrentTime } from "../../../utilities/datetime-helpers";
                     this.genderList = response.data;
                 }
             },
-            
+
             async getDivisionList() {
                 const response = await getApiData({ url: '/api/divisions', token: this.getToken() });
                 if (response.data) {
@@ -1834,7 +1836,7 @@ import { getCurrentTime } from "../../../utilities/datetime-helpers";
             },
             showSidebar(){
                 if(this.isShowSidebar){
-                    
+
                     this.isOpenRoom.open_1 = false;
                     this.isOpenRoom.open_2 = false;
                     this.isOpenRoom.detail = true;
@@ -1884,7 +1886,7 @@ import { getCurrentTime } from "../../../utilities/datetime-helpers";
             this.getGendersList();
             this.getMenuList();
             this.getDivisionList();
-            this.testtime();
+            // this.testtime();
         },
         mounted()
         {

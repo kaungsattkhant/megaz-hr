@@ -182,12 +182,12 @@
         <!-- order notification modal -->
 
         <button
-            class="bg-red-600 focus:outline-none focus:ring-0 block fixed right-20 top-20 z-50" id="order_noti_btn"
+            class=" bg-red-600 focus:outline-none focus:ring-0 fixed right-20 top-20 z-50 hidden" id="order_noti_btn"
             data-te-toggle="modal" data-te-target="#order_noti">
             +
         </button>
         <div data-te-modal-init data-te-backdrop="static" data-te-keyboard="false"
-            class="fixed left-0 top-0 z-[1055] h-full w-full overflow-y-auto overflow-x-hidden outline-none"
+            class="fixed left-0 top-0 z-[1055] hidden h-full w-full overflow-y-auto overflow-x-hidden outline-none"
             id="order_noti" tabindex="-1" aria-labelledby="createCustomerModalLabel" aria-modal="true"
             role="dialog">
             <div data-te-modal-dialog-ref
@@ -196,7 +196,7 @@
                     class="pointer-events-auto relative flex w-full flex-col rounded-md border-none bg-white bg-clip-padding text-current shadow-lg outline-none">
                     <div class="relative  p-4">
                         <p class="text-xl w-full text-center">
-                            Notifications
+                            New Orders
                         </p>
                         <button type="button" class="absolute top-4 right-4 focus:shadow-none focus:outline-none
                         " id="closeCustomerModal" data-te-modal-dismiss aria-label="Close" @click="reloadUi()">
@@ -220,7 +220,7 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <tr class="border-b" v-for="(orderRequest) in orederRequestTest">
+                                    <tr class="border-b" v-for="(orderRequest, index) in orderedMenus">
 
                                         <td class="whitespace-nowrap border-r px-6 py-4">
                                             {{ orderRequest.menu_name }}
@@ -234,23 +234,23 @@
                                         <td class="whitespace-nowrap border-r px-6 py-4">
                                             <select name=""
                                                 class="text-xs pl-0 border-0 focus:shadow-none focus:outline-none focus:ring-0 select-box area-select-box"
-                                                placeholder="Select Area">
+                                                placeholder="Select Area" v-model="orderRequest.selectedArea">
                                                 <option disabled selected>Select Area</option>
-                                                <option v-for="(area, index) in orderRequest.areas" :key="index"
-                                                    :value="area.id" class="">
+                                                <option v-for="(area, index) in orderRequest.cooking_areas" :key="index"
+                                                    :value="area" class="">
                                                     {{ area.name }}
                                                 </option>
                                             </select>
                                         </td>
                                         <td class="whitespace-nowrap border-r px-6 py-4">
-                                            {{ orderRequest.price }}
+                                            {{ orderRequest.total }}
                                         </td>
                                         <td class="whitespace-nowrap border-r px-6 py-4">
-                                            <button :disabled="orderRequest.status != 'received'" @click="btnRejectOrder(orderRequest.id)"
+                                            <button :disabled="orderRequest.status != 'received'" @click="btnRejectOrder(orderRequest)"
                                                 class="px-3 py-2 bg-red-600 text-white rounded-md mr-2">
                                                 Reject
                                             </button>
-                                            <button :disabled="orderRequest.status != 'received'" @click="btnConfirmOrder(orderRequest.id)"
+                                            <button :disabled="orderRequest.status != 'received'" @click="btnConfirmOrder(orderRequest)"
                                                 class="px-3 py-2 bg-green-600 text-white rounded-md">
                                                 Confirm
                                             </button>
@@ -263,7 +263,8 @@
                     </div>
 
                     <div class="flex justify-center px-12 mb-6">
-                        <button class="pos-add-btn focus:outline-none focus:ring-0 px-8" data-te-modal-dismiss aria-label="Close">
+                        <button class="pos-add-btn focus:outline-none focus:ring-0 px-8" data-te-modal-dismiss aria-label="Close"
+                        @click="reloadUi">
                             OK
                         </button>
                     </div>
@@ -374,6 +375,9 @@
 
                     },
                 ],
+
+                orderedMenus: [],
+                newOrderShown: false,
                 roomName:null,
             };
         },
@@ -518,6 +522,7 @@
             },
 
             orderNotiModalOpen(){
+                this.newOrderShown = true;
                 document.getElementById("order_noti_btn").click();
             },
 
@@ -525,29 +530,42 @@
                 window.Echo.channel(channel)
                     .listen(event, (response)=>{
                         console.log(`new order data`, response);
-                        this.areaListForOrderRequst = [];
-                        this.getAreaByMenu(response.menu_id)
-                        let newOrderRequest = {
-                            menu_id: response.menu_id,
-                            menu_name: response.menu[0].name,
-                            quantity: response.quantity,
-                            price: response.price,
-                            id: response.id,
-                            areas: this.areaListForOrderRequst,
-                        };
-                        let index = this.orderRequest.findIndex(sessionRequest => sessionRequest.id == newOrderRequest.id);
-                        if(index != -1){
-                            console.log('already requested');
-                        }
-                        else{
-                            this.orderRequest.push(newOrderRequest);
-                        }
-                        this.orderNotiModalOpen();
+                        response.order_items.forEach((orderItem)=>{
+                            let newOrder = {
+                                id: orderItem.id,
+                                menu_name: orderItem.menu.name,
+                                menu_id: orderItem.menu.id,
+                                quantity: orderItem.quantity,
+                                cooking_areas: orderItem.menu.areas,
+                                total: orderItem.price,
+                                status: 'received'
+                            };
 
-                        console.log(response);
-                        this.orderItems = response.order_items;
-                        this.roomName = response.entity.name;
-                        document.getElementById("order_noti_btn").click();
+                            this.orderedMenus.push(newOrder);
+                        });
+                        // this.areaListForOrderRequst = [];
+                        // this.getAreaByMenu(response.menu_id)
+                        // let newOrderRequest = {
+                        //     menu_id: response.menu_id,
+                        //     menu_name: response.menu[0].name,
+                        //     quantity: response.quantity,
+                        //     price: response.price,
+                        //     id: response.id,
+                        //     areas: this.areaListForOrderRequst,
+                        // };
+                        // let index = this.orderRequest.findIndex(sessionRequest => sessionRequest.id == newOrderRequest.id);
+                        // if(index != -1){
+                        //     console.log('already requested');
+                        // }
+                        // else{
+                        //     this.orderRequest.push(newOrderRequest);
+                        // }
+                        if(!this.newOrderShown){
+                            this.orderNotiModalOpen();
+                        }
+                        // this.orderItems = response.order_items;
+                        // this.roomName = response.entity.name;
+                        // document.getElementById("order_noti_btn").click();
                     });
             },
 
@@ -558,40 +576,59 @@
                 }
             },
 
-            async btnConfirmOrder(id){
-
-                let formData = new FormData();
-                formData.append("invoice_id", id);
-                let response = await postApiData({ url: `/api/entities/done?is_confirm=1`, form_data: formData, token: this.getToken() });
-                if (response.data) {
-                    console.log('confirm success')
+            async btnConfirmOrder(orderItem){
+                console.log(orderItem);
+                if(orderItem.selectedArea){
+                    let url = `/api/pos_order_items/${orderItem.id}/status`;
+                    let formData = new FormData();
+                    formData.append("area_id", orderItem.selectedArea.id);
+                    formData.append("status", "pos_confirmed");
+                    let response = await postApiData({url: url, form_data: formData, token: this.getToken()});
+                    if(response.success){
+                        this.$notify({
+                            text: 'OK, order item confirmed',
+                            type: "info"
+                        });
+                        orderItem.status = "confirmed";
+                        let index = this.orderedMenus.findIndex(orderedMenu => orderedMenu.id == orderItem.id);
+                        if(index != -1){
+                            this.orderedMenus.splice(index, 1);
+                        }
+                    }else{
+                        this.$notify({
+                            text: 'Error',
+                            type: "error"
+                        });
+                    }
                 }
-                let index = this.orderRequest.findIndex(sessionRequest => sessionRequest.invoice_id == id);
-                if (index != -1) {
-                    this.orderRequest[index].status = 'confirmed';
-                    this.orderRequest.splice(index, 1);
+                else{
+                    alert("Cooking area must be selected");
                 }
-                // window.location.reload();
-                this.orderNotiModalOpen();
             },
 
-            async btnRejectOrder(id){
-
+            async btnRejectOrder(orderItem){
+                let url = `/api/pos_order_items/${orderItem.id}/status`;
                 let formData = new FormData();
-                formData.append("invoice_id", id);
-                let response = await postApiData({ url: `/api/entities/done?is_confirm=0`, form_data: formData, token: this.getToken() });
-                if (response.data) {
-                    console.log('reject success')
+                formData.append("status", "cancelled");
+                let response = await postApiData({ url: url, form_data: formData, token: this.getToken() });
+                if (response.success) {
+                    this.$notify({
+                        text: 'OK, order item rejected',
+                        type: "info"
+                    });
+                    orderItem.status = "confirmed";
+                    let index = this.orderedMenus.findIndex(orderedMenu => orderedMenu.id == orderItem.id);
+                    if (index != -1) {
+                        this.orderedMenus.splice(index, 1);
+                    }
+                } else {
+                    this.$notify({
+                        text: 'Error',
+                        type: "error"
+                    });
                 }
-                let index = this.orderRequest.findIndex(sessionRequest => sessionRequest.invoice_id == id);
-                if (index != -1) {
-                    this.orderRequest[index].status = 'rejected';
-                    this.orderRequest.splice(index, 1);
-                }
-                // window.location.reload();
-                this.orderNotiModalOpen();
-
             },
+
             reloadUi(){
                 window.location.reload();
             }

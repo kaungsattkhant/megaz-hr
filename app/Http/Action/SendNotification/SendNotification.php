@@ -53,6 +53,18 @@ trait SendNotification
         })
         ->get();
     }
+    public function getUserByDepartment($departmentId,$roles){
+        // $staffs=Staff::whereHas('roles',function(query)use($roles){
+        //     $query->whereIn('id',$roles);
+        // })->get();
+        return \App\Models\Staff::with(['roles'])->whereHas('roles', function($query) use ($roles) {
+            $query->whereIn('name', $roles);
+        })
+        ->whereHas('department',function($query)use($departmentId){
+            $query->where('id',$departmentId);
+        })
+        ->get();
+    }
 
     public function sendNoti($model,$notiDatas,$data){
         $morphMapName=RelationMorphName($model);
