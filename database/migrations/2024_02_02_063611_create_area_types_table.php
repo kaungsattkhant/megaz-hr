@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('area_types', function (Blueprint $table) {
             $table->id();
             $table->string('name',45);
+            $table->string('type',120);
             $table->timestamps();
         });
     }

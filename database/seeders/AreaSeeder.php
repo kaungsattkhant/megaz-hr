@@ -20,7 +20,8 @@ class AreaSeeder extends Seeder
 
 
         $typeOne = AreaType::create([
-            'name' => 'Bar and Restaurant'
+            'name' => 'Bar and Restaurant',
+            'type'=> 'bar_and_restaurant',
         ]);
 
         $cat1 = AreaCategory::create([
@@ -43,7 +44,8 @@ class AreaSeeder extends Seeder
         ]);
 
         $typeTwo = AreaType::create([
-            'name' => 'KTV'
+            'name' => 'KTV',
+            'type'=> 'ktv',
         ]);
 
         $cat2 = AreaCategory::create([

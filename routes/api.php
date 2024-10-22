@@ -376,6 +376,7 @@ Route::middleware('auth:api')->group(function () {
     });
     Route::resource('canteens', CanteenController::class)->only(['index', 'store', 'show']);
     Route::controller(CanteenController::class)->group(function () {
+
     });
 
 });
