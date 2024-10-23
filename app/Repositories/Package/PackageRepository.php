@@ -67,7 +67,7 @@ class PackageRepository implements PackageRepositoryInterface
                 $menuIds = json_decode($data['menuIds']);
                 foreach ($menuIds as $menu) {
                     $foodMenu = Menu::find($menu->menu_id);
-                    $menuPrice += $foodMenu->price->price;
+                    $menuPrice += $foodMenu->price->price * $menu->quantity;
                     $menu_package = MenuPackage::create([
                         'menu_id' => $menu->menu_id,
                         'quantity' => $menu->quantity,
