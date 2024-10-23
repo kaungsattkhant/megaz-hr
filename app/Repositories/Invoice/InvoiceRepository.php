@@ -28,11 +28,16 @@ use App\Models\TargetPosition;
 use App\Models\TargetPositionResult;
 use App\Models\User;
 use App\Repositories\Order\OrderRepository;
+use App\Services\OrderService;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Log;
 
 class InvoiceRepository implements InvoiceRepositoryInterface
 {
+    private $orderService;
+    public function __construct(OrderService $orderService){
+        $this->orderService=$orderService;
+    }
     public function listAllData(Request $request)
     {
         if ($request->per_page || $request->page) {
@@ -85,12 +90,14 @@ class InvoiceRepository implements InvoiceRepositoryInterface
     public function entitySessionLeftTime($entity_session_id)
     {
         $entitySession = EntitySession::find($entity_session_id);
+        if (!$entitySession) {
+            ResponseMessage('Entity is invalid', 419);
+        }
         $startTime = Carbon::parse($entitySession->start_time);
         $endTime = Carbon::parse($entitySession->end_time);
         $now = Carbon::now();
 
         $remainingTime = $now->diff($endTime);
-
         if ($remainingTime->h > 1) {
             ResponseMessage("Selected Session is not available because selected session time is not available", 422);
         }
@@ -101,9 +108,12 @@ class InvoiceRepository implements InvoiceRepositoryInterface
 
     public function createData(array $data)
     {
-
         DB::beginTransaction();
         try {
+            if($data['entity_id']!=null){
+                $tableInvoice=$this->createInvoiceForTable($data);
+            }
+            
             $entitySession = null;
             if ($data['is_waiter'] === 1) {
                 $current_time = Carbon::now()->format('H:i');
@@ -155,8 +165,6 @@ class InvoiceRepository implements InvoiceRepositoryInterface
             $data['created_by'] = UserData()->id;
             $data['invoice_date'] = Carbon::now();
             $invoice = Invoice::create($data);
-
-
             $invoice->invoice_id = sprintf('%05d', $invoice->id);
             $invoice->save();
 
@@ -243,7 +251,18 @@ class InvoiceRepository implements InvoiceRepositoryInterface
             }
             $invoice->room_session = $roomSession;
             $customer = Customer::find($invoice->customer_id);
-
+            //change ksk
+            if ($data['type'] == 'package' && $invoice) {
+                $orderData['invoice_id'] = $invoice->id;
+                $orderData['menuArray'] = json_decode($data['orders'], true);
+                $order = $this->orderService->createMultipleOrder($orderData);
+                 if (isset($data['is_waiter'])) {
+                    if ($data['is_waiter'] == 1) {
+                        broadcast(new RoomNotificationRequest($customer, $entity, $invoice, UserData()->department_id,$order['order'], $order['orderItems']));
+                    }
+                }
+            }
+            //change
             DB::commit();
             $returnData = [
                 'customer' => $customer,
@@ -256,6 +275,10 @@ class InvoiceRepository implements InvoiceRepositoryInterface
             ResponseMessage($e->getMessage(), 402);
             throw $e;
         }
+    }
+
+    public function createInvoiceForTable($data){
+        dd($data);
     }
 
 
@@ -469,12 +492,11 @@ class InvoiceRepository implements InvoiceRepositoryInterface
             // ]);
 
             foreach ($leftSession as $index => $session) {
-                $session = (float)$session;
+                $session = (float) $session;
                 $newRoomSession['invoice_id'] = $data['invoice_id'];
-                if($index==0)
-                {
+                if ($index == 0) {
                     $newRoomSession['start_date'] = $selectedRoomSession->end_date;
-                }else{
+                } else {
                     $newRoomSession['start_date'] = $loopEndTime;
                 }
                 $newRoomSession['end_date'] = Carbon::parse($newRoomSession['start_date'])->addHours((float) $session);
@@ -538,7 +560,7 @@ class InvoiceRepository implements InvoiceRepositoryInterface
             $levels = CustomerLevelDiscount::all();
             $customerLevel = null;
             foreach ($levels as $level) {
-                if ($customerTotal  >= $level->amount) {
+                if ($customerTotal >= $level->amount) {
                     $customerLevel = $level;
                 } else {
                     break;
@@ -622,7 +644,7 @@ class InvoiceRepository implements InvoiceRepositoryInterface
                     }
                 }
             }
-            $invoice  = Invoice::find($data['invoice_id']);
+            $invoice = Invoice::find($data['invoice_id']);
             $customer = Customer::find($invoice->customer_id);
             $invoice_id = $invoice->invoice_id;
             $lastRoomSession = $invoice->latestSession;

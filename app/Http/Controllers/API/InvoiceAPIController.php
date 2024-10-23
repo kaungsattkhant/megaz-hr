@@ -33,7 +33,6 @@ class InvoiceAPIController extends Controller
 
     public function startEntity(Request $request)
     {
-
         DB::beginTransaction();
         try {
             $data = $request->all();
@@ -58,15 +57,15 @@ class InvoiceAPIController extends Controller
             $data['entity_id'] = $request->entity_id;
             $returnData = $this->invoiceRepo->createData($data);
             if ($data['type'] == 'package') {
-                $orderData['invoice_id'] = $returnData['invoice']->id;
-                $orderData['menuArray'] = json_decode($request->orders, true);
-                $order = $this->orderRepo->createMultipleOrder($orderData);
+                // $orderData['invoice_id'] = $returnData['invoice']->id;
+                // $orderData['menuArray'] = json_decode($request->orders, true);
+                // $order = $this->orderRepo->createMultipleOrder($orderData);
 
-                if (isset($data['is_waiter'])) {
-                    if ($data['is_waiter'] == 1) {
-                        broadcast(new RoomNotificationRequest($returnData['customer'], $returnData['entity'], $returnData['invoice'], UserData()->department_id,$order['order'], $order['orderItems']));
-                    }
-                }
+                // if (isset($data['is_waiter'])) {
+                //     if ($data['is_waiter'] == 1) {
+                //         broadcast(new RoomNotificationRequest($returnData['customer'], $returnData['entity'], $returnData['invoice'], UserData()->department_id,$order['order'], $order['orderItems']));
+                //     }
+                // }
             }else{
                 if (isset($data['is_waiter'])) {
                     if ($data['is_waiter'] == 1) {
