@@ -35,6 +35,11 @@ class Entity extends BaseModel
         return $this->hasMany(Invoice::class);
     }
 
+    public function latestInvoice()
+    {
+        return $this->hasOne(Invoice::class)->orderBy('id', 'desc');
+    }
+
     public function menuServiceDiscounts()
     {
         return $this->morphMany(MenuServiceDiscount::class, 'discountable');

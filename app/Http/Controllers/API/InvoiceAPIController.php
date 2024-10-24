@@ -56,7 +56,7 @@ class InvoiceAPIController extends Controller
 
             $data['entity_id'] = $request->entity_id;
             $returnData = $this->invoiceRepo->createData($data);
-            if ($data['type'] == 'package') {
+            if (isset($data['type']) && $data['type'] == 'package') {
                 // $orderData['invoice_id'] = $returnData['invoice']->id;
                 // $orderData['menuArray'] = json_decode($request->orders, true);
                 // $order = $this->orderRepo->createMultipleOrder($orderData);
@@ -73,7 +73,6 @@ class InvoiceAPIController extends Controller
                     }
                 }
             }
-            // dd('success');
             DB::commit();
             ResponseData($returnData);
         } catch (\Exception $e) {

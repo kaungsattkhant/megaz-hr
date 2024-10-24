@@ -285,18 +285,31 @@ class InvoiceRepository implements InvoiceRepositoryInterface
     public function createInvoiceForTable($data)
     {
         // $data['area_id'] = $entity->area_id;
-        $entity=Entity::find($data['entity_id']);
-        $entity->is_active=1;
-        $entity->status='active';
+        $entity = Entity::find($data['entity_id']);
+        $entity->is_active = 1;
+        $entity->status = 'active';
         $entity->save();
-        
+        if (!isset($data['head_count_id'])) {
+            $headCount = $this->headCountCreate($data);
+            $data['head_count_id'] = $headCount->id;
+        }
         $data['created_by'] = UserData()->id;
-        $data['entity_id']=$data['entity_id'];
+        $data['entity_id'] = $data['entity_id'];
         $data['invoice_date'] = Carbon::now();
         $invoice = Invoice::create($data);
         $invoice->invoice_id = sprintf('%05d', $invoice->id);
         $invoice->save();
-        return $invoice;
+        $customer=null;
+        if(isset($data['customer_id'])){
+            $customer=$invoice->customer;
+        }
+        $returnData = [
+            'customer' => $customer,
+            'invoice' => $invoice,
+            'entity' => $entity,
+        ];
+        return $returnData;
+        // return $invoice;
     }
 
 

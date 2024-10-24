@@ -23,5 +23,6 @@ interface EntityRepositoryInterface
     public function roomListForUserApp();
 
     public function entitySessionWithInvoice(array $data, int $entityId);
-
+    public function tableWithInvoiceDetail(array $data, int $entityId);
+    
 }
