@@ -14,7 +14,7 @@ class PackageRepository implements PackageRepositoryInterface
     public function listAllData(Request $request)
     {
         $validateDate = $request->date ?? CurrentDate();
-        $packages = Package::where('from_date', '<=', $validateDate)
+        $packages = Package::with(['menuPackages.menu.areas'])->where('from_date', '<=', $validateDate)
             ->orderBy('created_at','desc')
             ->when($request->has('search'), function($q) use ($request)
             {
