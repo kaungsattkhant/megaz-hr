@@ -2,12 +2,12 @@
     <div>
         <div class="">
             <div class="w-full pt-9 px-6">
-                
-                <div v-if="isList == true">
-                    
-                    <div class="bg-white px-4 min-h-[20vh] mb-8">
 
-                    </div>
+                <div v-if="isList == true">
+
+                    <!-- <div class="bg-white px-4 min-h-[20vh] mb-8">
+
+                    </div> -->
                     <div class="bg-white px-4">
                         <div class="px-4 pt-6 mb-3">
                             <span class="datepicker-toggle">
@@ -29,11 +29,12 @@
                                     <th scope="col" class="px-6 py-4">Food</th>
                                     <th scope="col" class="px-6 py-4">Services</th>
                                     <th scope="col" class="px-6 py-4">Amount</th>
+                                    <th scope="col" class="px-6 py-4">Action</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr @click="btnClickedInvoice(invoice)" class="" v-for="(invoice,index) in invoiceList">
-                                        <td class="whitespace-nowrap px-6 py-4 font-medium">
+                                <tr class="" v-for="(invoice,index) in invoiceList">
+                                        <td class="whitespace-nowrap px-6 py-4 font-medium" @click="btnClickedInvoice(invoice)">
                                             {{ invoice.invoice_id }}
                                         </td>
                                         <td class="whitespace-nowrap px-6 py-4">
@@ -57,7 +58,16 @@
                                         <td class="whitespace-nowrap px-6 py-4">
                                             {{ invoice.total }}
                                         </td>
-
+                                        <td class="whitespace-nowrap px-6 py-4">
+                                            <select name=""
+                                                class="text-xs pl-0 border-0 focus:shadow-none focus:outline-none focus:ring-0 select-box area-select-box"
+                                                placeholder="Select Area">
+                                                <option disabled selected>Select Payment</option>
+                                                <option>Cash</option>
+                                                <option>Bank</option>
+                                            </select>
+                                            <button>Confirm</button>
+                                        </td>
                                 </tr>
 
                             </tbody>
@@ -195,7 +205,7 @@
         },
 
         methods: {
-            ...mapGetters(['getToken']),
+            ...mapGetters(['getToken', 'getDepartment','getRoles']),
 
             async getCustomerList(){
                 const response = await getApiData({ url: '/api/customers' , token: this.getToken()});
@@ -237,6 +247,12 @@
                 }
             },
 
+            isCateringCashier(){
+                let isCashier = false;
+                isCashier = this.getRoles().find((role)=>role.name == 'Cashier');
+                console.log(isCashier);
+                // if(this.getDepartment().name == 'Catering');
+            },
         },
         mounted()
         {
@@ -244,6 +260,7 @@
             this.getInvoiceList();
             this.getRoomList();
             initTE({ Modal, Select, Ripple, Datepicker });
+            this.isCateringCashier();
         }
     }
 </script>

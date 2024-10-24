@@ -607,10 +607,10 @@ export default {
                 return 1;
             }
 
-            if ((this.selectedDepartment.name == 'Catering' || this.selectedDepartment.name == 'Kitchent') && !this.selectedArea) {
-                this.alertValiationMessage('area');
-                return 1;
-            }
+            // if ((this.selectedDepartment.name == 'Catering' || this.selectedDepartment.name == 'Kitchen') && !this.selectedArea) {
+            //     this.alertValiationMessage('area');
+            //     return 1;
+            // }
 
             if (this.selectedInventories.length > 0) {
                 this.selectedInventories.forEach((inventory) => {

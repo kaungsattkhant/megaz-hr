@@ -48,14 +48,14 @@ class InvoiceRepository implements InvoiceRepositoryInterface
             $skip = ($pageNumber - 1) * $perPage;
 
             if ($request->date) {
-                $invoices = Invoice::with('customer', 'room')
+                $invoices = Invoice::with(['customer'])
                     ->whereBetween('created_at', [$request->date . ' 00:00:00', $request->date . ' 23:59:59'])
                     ->orderBy('created_at', 'desc')
                     ->skip($skip)
                     ->take($perPage)
                     ->get();
             } else {
-                $invoices = Invoice::with('customer', 'room')
+                $invoices = Invoice::with(['customer'])
                     ->orderBy('created_at', 'desc')
                     ->skip($skip)
                     ->take($perPage)
@@ -69,12 +69,18 @@ class InvoiceRepository implements InvoiceRepositoryInterface
             return $paginationData;
         } else {
             if ($request->date) {
-                $invoices = Invoice::with('customer', 'room')
+                $invoices = Invoice::with(['customer'])
                     ->whereBetween('created_at', [$request->date . ' 00:00:00', $request->date . ' 23:59:59'])
                     ->orderBy('created_at', 'desc')
                     ->get();
             } else {
-                $invoices = Invoice::with('customer', 'room')->get();
+                $invoices = Invoice::with(['customer'])->get();
+            }
+
+            foreach($invoices as $invoice){
+                $lastRoomSession = $invoice->roomSession()->get()->last();
+                $lastRoom = $lastRoomSession->entitySession->entity;
+                $invoice->room = $lastRoom;
             }
 
             return $invoices;
