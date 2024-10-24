@@ -1942,7 +1942,7 @@
 
             }
         },
-        
+
 
         // watch: {
         //     selectedRoom(val, oldVal) {
@@ -1950,7 +1950,7 @@
         //     },
         // },
         created(){
-            
+            this.getAreaList();
             // this.getCustomerList();
             // this.getGendersList();
             // this.getMenuList();
@@ -1959,7 +1959,7 @@
         },
         mounted()
         {
-            this.getAreaList();
+            
             initTE({ Modal, Select, Ripple, Datepicker });
         }
     }
