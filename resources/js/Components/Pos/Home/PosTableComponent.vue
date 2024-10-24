@@ -40,9 +40,6 @@
                     <div class="fixed right-4 top-4 z-40" :class="isShowSidebar == true ? 'block' : 'hidden' ">
                         <button @click="isShowSidebar = false"><i class="far fa-times"></i></button>
                     </div>
-                    <!-- aa
-                        </div>  :class="isShowSidebar == true ? 'w-[400px] block opacity-100' : 'w-0 hidden opacity-0'"
-                        <div class="right-sidebar shadow-lg border-l border-gray-200"> -->
                     <div class="relative h-full " v-if="isOpenRoom.open_1 == true"  id="open_room_1">
                         <div class="w-full h-full flex justify-center flex-col">
                             <div class="w-2/3 mx-auto">
@@ -89,19 +86,12 @@
                                 </div>
                                 <div class="mb-4">
                                     <label for="" class="block text-sm text-black mb-3">
-                                        Time
-                                    </label>
-                                    <input type="datetime-local" placeholder="Time" v-model="invoice_date" @change="getPackageList(invoice_date)"
-                                        class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
-                                </div>
-                                <div class="mb-4">
-                                    <label for="" class="block text-sm text-black mb-3">
                                         Type
                                     </label>
                                     <div class="relative">
                                         <select name="" id="" v-model="type"
                                             class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
-                                            <option value="session"> Session </option>
+                                            <option value="null"> Free </option>
                                             <option value="package"> Package </option>
                                             <option value="endless_time"> Endless Time </option>
                                         </select>
@@ -125,15 +115,6 @@
                                         Deposit
                                     </label>
                                     <input type="text" placeholder="Deposit" v-model="deposit"
-                                        class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
-                                </div>
-                                <div class="mb-4" v-show="this.type == 'session'">
-                                    <label for="" class="block text-sm text-black mb-3">
-                                        Duration
-                                    </label>
-                                    <input type="text" placeholder="" v-model="duration"
-                                        :disabled="this.type == 'package' || this.type == 'endless_time'"
-                                        :class="this.type == 'package' || this.type == 'endless_time' ? ' cursor-not-allowed ' : ''"
                                         class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
                                 </div>
                                 <div class="mb-4">
@@ -626,16 +607,6 @@
             </div>
         </div>
 
-
-
-
-        
-        
-        
-
-
-
-
     </div>
 
 </template>
@@ -780,7 +751,7 @@
                 this.isShowSidebar = true;
                 this.selectedRoom = null;
                 this.selectedRoomId = room.id;
-                this.getSelectedRoom();
+                // this.getSelectedRoom();
                 if (this.roomList[roomIndex].is_active == 1) {
                     this.isOpenRoomStep('detail');
                     // this.getPurchaseMenuList();
@@ -837,9 +808,7 @@
                             area_id: null,
                             areas : packageMenu.menu.areas
                         });
-
                     });
-
                     console.log('package')
                 }
                 else{
@@ -913,10 +882,6 @@
                 // formData.append('entity_id', this.selectedRoom.id);
                 formData.append('entity_id', this.selectedRoom.id);
                 formData.append('customer_id', this.selectedCustomer.id);
-                formData.append('start_time', this.invoice_date);
-                if (this.type == 'session') {
-                    formData.append('session_duration', this.duration);
-                }
                 if (this.type == 'package') {
                     formData.append('package_id', this.selectedPackage.id);
                     formData.append('orders', JSON.stringify(this.packageMenuList));
@@ -1546,6 +1511,10 @@
         computed(){
         },
         created(){
+            this.getCustomerList();
+            this.getGendersList();
+            this.getMenuList();
+            this.getDivisionList();
         },
         mounted()
         {
