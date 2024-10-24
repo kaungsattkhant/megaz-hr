@@ -8,6 +8,7 @@ use App\Models\Account;
 use App\Models\BirthdayPromotion;
 use App\Models\Customer;
 use App\Models\CustomerLevelDiscount;
+use App\Traits\CustomerTrait;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
 use App\Events\RoomNotificationRequest;
@@ -34,6 +35,7 @@ use Illuminate\Support\Facades\Log;
 
 class InvoiceRepository implements InvoiceRepositoryInterface
 {
+    use CustomerTrait;
     private $orderService;
     public function __construct(OrderService $orderService)
     {
@@ -295,14 +297,14 @@ class InvoiceRepository implements InvoiceRepositoryInterface
         }
         $data['created_by'] = UserData()->id;
         $data['entity_id'] = $data['entity_id'];
-        $data['area_id']=$entity->area_id;
+        $data['area_id'] = $entity->area_id;
         $data['invoice_date'] = Carbon::now();
         $invoice = Invoice::create($data);
         $invoice->invoice_id = sprintf('%05d', $invoice->id);
         $invoice->save();
-        $customer=null;
-        if(isset($data['customer_id'])){
-            $customer=$invoice->customer;
+        $customer = null;
+        if (isset($data['customer_id'])) {
+            $customer = $invoice->customer;
         }
         $returnData = [
             'customer' => $customer,
@@ -564,8 +566,13 @@ class InvoiceRepository implements InvoiceRepositoryInterface
     {
         DB::beginTransaction();
         try {
+
             $invoice = Invoice::find($data['invoice_id']);
 
+            if ($invoice->entity_id != null) {
+                $tableResponseData = $this->doneInvoiceForTable($invoice);
+                ResponseData($tableResponseData);
+            }
             $latestRoomSession = RoomSession::where('invoice_id', $invoice->id)->orderBy('created_at', 'desc')->first();
             $roomSessions = RoomSession::where('invoice_id', $data['invoice_id'])->with(['entitySession.entity'])->get();
             $total_duration = 0;
@@ -622,6 +629,27 @@ class InvoiceRepository implements InvoiceRepositoryInterface
             ResponseMessage($e->getMessage(), 422);
             throw $e;
         }
+    }
+
+    public function doneInvoiceForTable($invoice)
+    {
+        // dd($invoice);
+        $customerTotal = $this->getCustomerTotal($invoice->customer_id);
+        $total = 0;
+        $totalDiscount = 0;
+        foreach ($invoice->orders as $order) {
+            $total += $order->total;
+            $totalDiscount += $order->total_discount_price;
+        }
+        $responseData=[];
+        $responseData=$this->getCustomerLevel($customerTotal,$responseData);
+        $responseData['invoice_id'] = $invoice->id;
+        $responseData['entity_id'] = $invoice->entity_id;
+        $responseData['food_discount'] = $totalDiscount;
+        $responseData['total'] = $total;
+        $responseData['customer_total'] = $customerTotal;
+        return $responseData;
+        // dd($totalDiscount);
     }
 
     public function doneEntityWithInvoice(array $data)
