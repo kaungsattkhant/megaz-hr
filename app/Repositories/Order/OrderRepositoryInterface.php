@@ -16,7 +16,7 @@ interface OrderRepositoryInterface
 
     public function getOrderItemByPos();
 
-    public function orderItemAreaConfirm(int $id, Request $request);
+    public function orderItemAreaConfirm(int $id, $request);
 
     public function orderByInvoiceId(int $invoiceId);
 

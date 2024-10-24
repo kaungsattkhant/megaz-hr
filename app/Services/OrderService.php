@@ -15,6 +15,80 @@ use App\Events\WaiterOrderConfirmNotificationRequest;
 
 class OrderService
 {
+    public function createOrder(array $data)
+    {
+        // DB::beginTransaction();
+        // try {
+            $price = $data['original_price'] * $data['quantity'];
+            // $data['invoice'] must be unsigned integer format , not 000023
+            $order = Order::where('invoice_id', $data['invoice_id'])->first();
+            if(!$order){
+                ResponseMessage('Order not found',404);
+            }
+            $menu = Menu::find($data['menu_id']);
+            if(!$menu){
+                ResponseMessage('Menu not found',404);
+            }
+            $latestMenuServiceDiscount = $menu->menuServiceDiscounts()
+                ->whereDate('from_date', '<=', CurrentDate())
+                ->whereDate('to_date', '>=', CurrentDate())
+                ->orderBy('created_at', 'desc')
+                ->where('type', 'menu')
+                ->first();
+            if ($latestMenuServiceDiscount) {
+                $discountAmount = $latestMenuServiceDiscount->discount_price * $data['quantity'];
+                $data['menu_service_discount_id'] = $latestMenuServiceDiscount->id;
+                $data['discount_value'] = $latestMenuServiceDiscount->discount_price * $data['quantity'];
+            } else {
+                $discountAmount = 0;
+            }
+            if ($order) {
+                $order->total_quantity += $data['quantity'];
+                $order->total_discount_price += $discountAmount;
+                $order->total += $data['original_price'] * $data['quantity'];
+                $order->save();
+
+                $data['date'] = currentTime();
+                $data['order_id'] = $order->id;
+                $data['price'] = $data['original_price'] * $data['quantity'];
+                $order_items = OrderItem::create($data);
+                $orderItems = OrderItem::find($order_items->id);
+                $order_items->menu = $order_items->menu;
+
+                $invoice = Invoice::find($data['invoice_id']);
+                $latestRoomSession = RoomSession::where('invoice_id', $invoice->id)->orderBy('created_at', 'desc')->first();
+                $entity = Entity::find($latestRoomSession->entitySession->entity_id);
+                broadcast(new KitchenNotificationRequest($entity, $order, null, $orderItems, 7));
+                DB::commit();
+                return $order;
+            } else {
+                $data['date'] = currentTime();
+                $data['total'] = $data['original_price'] * $data['quantity'];
+                $data['total_quantity'] = $data['quantity'];
+                $data['total_discount_price'] = $discountAmount;
+                $order = Order::create($data);
+                $order->update(['order_id' => sprintf('%05d', $order->id)]);
+
+                $data['order_id'] = $order->id;
+                $data['price'] = $data['original_price'] * $data['quantity'];
+                $order_items = OrderItem::create($data);
+                $orderItems = OrderItem::find($order_items->id);
+
+                $order_items->menu = $order_items->menu;
+
+                $invoice = Invoice::find($data['invoice_id']);
+                $latestRoomSession = RoomSession::where('invoice_id', $invoice->id)->orderBy('created_at', 'desc')->first();
+                $entity = Entity::find($latestRoomSession->entitySession->entity_id);
+                broadcast(new KitchenNotificationRequest($entity, $order, null, $orderItems, 7));
+                // DB::commit();
+                return $order;
+            }
+        // } catch (\Exception $e) {
+        //     DB::rollback();
+        //     ResponseMessage($e->getMessage(), 402);
+        //     throw $e;
+        // }
+    }
     public function createMultipleOrder(array $data)
     {
         $invoiceId = $data['invoice_id'];
