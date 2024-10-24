@@ -30,8 +30,12 @@ class OrderRepository implements OrderRepositoryInterface
         DB::beginTransaction();
         try {
             $price = $data['original_price'] * $data['quantity'];
-            $order = Order::where('invoice_id', $data['invoice_id'])->get()->first();
+            // $data['invoice'] must be unsigned integer format , not 000023
+            $order = Order::where('invoice_id', $data['invoice_id'])->first();
             $menu = Menu::find($data['menu_id']);
+            if(!$menu){
+                ResponseMessage('Menu not found',404);
+            }
             $latestMenuServiceDiscount = $menu->menuServiceDiscounts()
                 ->whereDate('from_date', '<=', CurrentDate())
                 ->whereDate('to_date', '>=', CurrentDate())
@@ -46,6 +50,7 @@ class OrderRepository implements OrderRepositoryInterface
                 $discountAmount = 0;
             }
             if ($order) {
+                //add menu for existing order
                 $order->total_quantity += $data['quantity'];
                 $order->total_discount_price += $discountAmount;
                 $order->total += $data['original_price'] * $data['quantity'];
@@ -55,34 +60,49 @@ class OrderRepository implements OrderRepositoryInterface
                 $data['order_id'] = $order->id;
                 $data['price'] = $data['original_price'] * $data['quantity'];
                 $order_items = OrderItem::create($data);
-                $orderItems = OrderItem::find($order_items->id);
-                $order_items->menu = $order_items->menu;
+                //don't need to find
+                // $orderItems = OrderItem::find($order_items->id);
+                // $order_items->menu = $order_items->menu;
 
-                $invoice = Invoice::find($data['invoice_id']);
-                $latestRoomSession = RoomSession::where('invoice_id', $invoice->id)->orderBy('created_at', 'desc')->first();
-                $entity = Entity::find($latestRoomSession->entitySession->entity_id);
-                broadcast(new KitchenNotificationRequest($entity, $order, null, $orderItems, 7));
+                // $invoice = Invoice::find($data['invoice_id']);
+                if($order->invoice->entity_id==null){
+                    $latestRoomSession = RoomSession::where('invoice_id', $order->invoice_id)->orderBy('created_at', 'desc')->first();
+                    $entity = Entity::find($latestRoomSession->entitySession->entity_id);
+                }else{
+                    $entity=$order->invoice->table;
+                }
+                // broadcast(new KitchenNotificationRequest($entity, $order, null, $order_items, 7));
                 DB::commit();
                 return $order;
             } else {
+                //new order
                 $data['date'] = currentTime();
                 $data['total'] = $data['original_price'] * $data['quantity'];
                 $data['total_quantity'] = $data['quantity'];
                 $data['total_discount_price'] = $discountAmount;
                 $order = Order::create($data);
                 $order->update(['order_id' => sprintf('%05d', $order->id)]);
-
                 $data['order_id'] = $order->id;
                 $data['price'] = $data['original_price'] * $data['quantity'];
                 $order_items = OrderItem::create($data);
-                $orderItems = OrderItem::find($order_items->id);
 
-                $order_items->menu = $order_items->menu;
+                // dd($order_items->menu);
+                //don't need
+                // $orderItems = OrderItem::find($order_items->id);
+                // $order_items->menu = $order_items->menu;
+                //end
+                // $invoice = Invoice::find($data['invoice_id']); //you can call data['invoice_id']
 
-                $invoice = Invoice::find($data['invoice_id']);
-                $latestRoomSession = RoomSession::where('invoice_id', $invoice->id)->orderBy('created_at', 'desc')->first();
-                $entity = Entity::find($latestRoomSession->entitySession->entity_id);
-                broadcast(new KitchenNotificationRequest($entity, $order, null, $orderItems, 7));
+                // validate table or room
+                // dd($order->invoice->entity==null);
+                // dd($order->invoice->table);
+                if($order->invoice->entity_id==null){
+                    $latestRoomSession = RoomSession::where('invoice_id', $data['invoice_id'])->orderBy('created_at', 'desc')->first();
+                    $entity = Entity::find($latestRoomSession->entitySession->entity_id);
+                }else{
+                    $entity=$order->invoice->table;
+                }
+                // broadcast(new KitchenNotificationRequest($entity, $order, null, $order_items, 7));
                 DB::commit();
                 return $order;
             }
@@ -213,7 +233,6 @@ class OrderRepository implements OrderRepositoryInterface
             }
             $invoice = Invoice::find($orderItem->order->invoice_id);
             $latestRoomSession = RoomSession::where('invoice_id', $invoice->id)->orderBy('created_at', 'desc')->first();
-
             $entity = Entity::find($latestRoomSession->entitySession->entity_id);
             if ($data['status'] == 'done') {
                 $packs = Pack::where('menu_id', $orderItem->menu_id)->where('status', 'ready')->where('expired_at', '>', CurrentTime())->orderBy('expired_at', 'asc')->take($orderItem->quantity)->get();
@@ -276,18 +295,37 @@ class OrderRepository implements OrderRepositoryInterface
         ResponseData($orderItems);
     }
 
-    public function orderItemAreaConfirm(int $id, Request $request)
+    public function orderItemAreaConfirm(int $id,$request)
     {
         DB::beginTransaction();
         try {
 
             $orderItem = OrderItem::find($id);
+            if(!$orderItem){
+                ResponseMessage('Order Item not found',404);
+            }
+            $order=$orderItem->order;
+            
+            // dd($orderItem->order->invoice->entity_id);
+            $entity=null;
+            if($orderItem->order->invoice->entity_id!=null){
+                $entity=$orderItem->order->invoice->table;
+            }else{
+                $entity=$orderItem->order->invoice->latestSession->entitySession->entity;
+                // dd($orderItem->order->invoice->latestSession->entitySession->entity);
+                // $latestRoomSession = RoomSession::where('invoice_id', $invoice->id)->orderBy('created_at', 'desc')->first();
+                // $entity = Entity::find($latestRoomSession->entitySession->entity_id);
+            }
+            if(!$entity){
+                ResponseMessage('Entity not found',404);
+            }
             $orderItem->update([
                 'area_id' => $request->area_id,
                 'status' => $request->status,
             ]);
-
+            broadcast(new KitchenNotificationRequest($entity, $order, null, $orderItem, 7));
             DB::commit();
+            dd('abc');
             ResponseData($orderItem);
         } catch (\Exception $e) {
             DB::rollBack();

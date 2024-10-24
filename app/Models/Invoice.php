@@ -25,6 +25,7 @@ class Invoice extends Model
         'total_session_price',
         'change',
         'area_id',
+        'entity_id',
         'service_charge',
         'head_count_id',
         'payment_status',
@@ -50,6 +51,11 @@ class Invoice extends Model
     }
 
     public function room()
+    {
+        return $this->belongsTo(Entity::class, 'entity_id');
+    }
+
+    public function table()
     {
         return $this->belongsTo(Entity::class, 'entity_id');
     }
