@@ -1,40 +1,32 @@
 <template>
     <div class="">
-        <div class=" bg-gray-100 w-max min-h-screen flex overflow-x-auto hidden-scrollbar" :style="isShowSidebar == true ? 'width:calc(100% - 410px)' : 'width:100%' ">
-            <div class="w-fit pt-9 px-6 ">
-                <div class="mb-6">
-                    <div class="opacity-100 transition-opacity duration-150 ease-linear">
-                        <div class="flex flex-wrap gap-x-4 gap-y-4">
-                            <div v-for="(room, roomIndex) in roomList" :key="roomIndex"
-                                :class="room.is_active == 0 ? 'bg-[#55EFC4]' : 'bg-[#FF7675]'"
-                                class=" flex-shrink-0 flex-grow p-6 w-40 max-w-44 h-40">
-                                <button @click="btnClickedIsOpenRoom(room, roomIndex)"
-                                    class="relative flex flex-col justify-between h-full w-full">
-                                    <div v-if="room.is_active == 1" class=" flex justify-between flex-col h-full">
-                                        <div>
-                                            <p class="text-sm text-white">Start Time : {{ room.room_sessions[0].start_date ? room.room_sessions[0].start_date.slice(11,16) : '' }} </p>
-                                            <p class="text-sm text-white">Start Time : {{ room.room_sessions[0].end_date ? room.room_sessions[0].end_date.slice(11,16) : '' }} </p>
-                                        </div>
-                                        <p class="text-base text-left text-white">
-                                            {{ room.price_per_hour }}
-                                        </p>
-                                    </div>
-                                    <div class="absolute bottom-0 w-full flex justify-end">
-                                        <p class="text-base text-white font-semibold">
-                                            {{ room.name }}
-                                        </p>
-                                    </div>
-                                </button>
-                            </div>                            
-                        </div>
-                    </div>
+        <div class="mb-6">
+            <div class="opacity-100 transition-opacity duration-150 ease-linear">
+                <div class="flex flex-wrap gap-x-4 gap-y-4">
+                    <div v-for="(room, roomIndex) in roomList" :key="roomIndex"
+                        :class="room.is_active == 0 ? 'bg-[#55EFC4]' : 'bg-[#FF7675]'"
+                        class=" flex-shrink-0 flex-grow p-6 w-40 max-w-44 h-40">
+                        <button @click="btnClickedIsOpenRoom(room, roomIndex)"
+                            class="relative flex flex-col justify-between h-full w-full">
+                            <div v-if="room.is_active == 1" class=" flex justify-between flex-col h-full">
+                                <!-- <div>
+                                    <p class="text-sm text-white">Start Time : {{ room.room_sessions[0].start_date ? room.room_sessions[0].start_date.slice(11,16) : '' }} </p>
+                                    <p class="text-sm text-white">Start Time : {{ room.room_sessions[0].end_date ? room.room_sessions[0].end_date.slice(11,16) : '' }} </p>
+                                </div> -->
+                                <p class="text-base text-left text-white">
+                                    {{ room.price_per_hour }}
+                                </p>
+                            </div>
+                            <div class="absolute bottom-0 w-full flex justify-end">
+                                <p class="text-base text-white font-semibold">
+                                    {{ room.name }}
+                                </p>
+                            </div>
+                        </button>
+                    </div>                            
                 </div>
             </div>
 
-
-
-
-            
             <div class="fixed right-0 top-0 bottom-0 bg-white shadow-md ease-in-out duration-300 transition delay-100 pt-12 right-sidebar-2" :class="isShowSidebar == true ? 'translate-x-0 opacity-100 w-[400px]' : 'translate-x-full opacity-0 w-0' ">
                 <div class="relative h-full w-full">
                     <div class="fixed right-4 top-4 z-40" :class="isShowSidebar == true ? 'block' : 'hidden' ">
@@ -149,41 +141,41 @@
                     <div v-if="isOpenRoom.detail == true" class="relative h-full">
                         <div class="flex justify-between padding-section border-b">
                             <div>
-                                <p class="text-black text-xl">
-                                    <!-- {{ selectedRoom.name }} --> error
+                                <p class="text-black text-xl" v-if="selectedRoom">
+                                    {{ selectedRoom.room_sessions ? selectedRoom.room_sessions.name : '' }} 
                                 </p>
                             </div>
                             <div class="flex gap-x-3">
                                 <button class="transition duration-150 ease-in-out focus:outline-none focus:ring-0"
                                     @click="btnClickedGetChangeableRoomList()" data-te-toggle="modal"
-                                    data-te-target="#change_modal">
+                                    data-te-target="#change_table_modal">
                                     <i class="far fa-random"></i>
                                 </button>
                                 <button @click="btnClickAddMenu()"
                                     class="transition duration-150 ease-in-out focus:outline-none focus:ring-0"
-                                    data-te-toggle="modal" data-te-target="#add_menu_modal">
+                                    data-te-toggle="modal" data-te-target="#add_menu_table_modal">
                                     <i class="far fa-cocktail"></i>
                                 </button>
-                                <button class="transition duration-150 ease-in-out focus:outline-none focus:ring-0"
+                                <!-- <button class="transition duration-150 ease-in-out focus:outline-none focus:ring-0"
                                     data-te-toggle="modal" data-te-target="#add_hour_modal">
                                     <i class="far fa-hourglass-half"></i>
-                                </button>
+                                </button> -->
                             </div>
                         </div>
                         <div class="small-scrollbar overflow-y-auto" style="height:calc(100% - 195px)">
                             <div class="padding-section border-b    " v-if="selectedRoom">
                                 <div class="flex justify-between font-semibold mb-2">
-                                    <p class="text-sm text-black" v-if="selectedRoom.room_sessions.length > 0">
+                                    <p class="text-sm text-black" v-if="selectedRoom.room_sessions">
                                         Invoice Id
-                                        {{ selectedRoom.room_sessions[0] ? (selectedRoom.room_sessions[0].invoice ?
-                                            selectedRoom.room_sessions[0].invoice.invoice_id : '')
+                                        {{ selectedRoom.room_sessions ? (selectedRoom.room_sessions.latest_invoice ?
+                                            selectedRoom.room_sessions.latest_invoice.invoice_id : '')
                                         : '' }}
 
                                     </p>
                                     <p class="text-sm text-black font-semibold" v-if="selectedRoom">
-                                        {{ selectedRoom.room_sessions[0] ?
-                                            (selectedRoom.room_sessions[0].invoice.total_session_price ?
-                                                selectedRoom.room_sessions[0].invoice.total_session_price : '' )
+                                        {{ selectedRoom.room_sessions ?
+                                            (selectedRoom.room_sessions.latest_invoice.total_session_price ?
+                                                selectedRoom.room_sessions.latest_invoice.total_session_price : '' )
                                         : '' }}
 
                                         MMKs
@@ -191,19 +183,19 @@
                                 </div>
                                 <div class="mb-2">
                                     <p class="px-2 py-0.5 bg-[#F19E51] text-white text-xs w-fit">
-                                        Room Err0r
-                                        <!-- {{ selectedRoom.name }} -->
+                                        
+                                        {{ selectedRoom.room_sessions.name }}
                                     </p>
                                 </div>
                                 <div class="">
-                                    <p class="text-sm text-black mb-2">
+                                    <!-- <p class="text-sm text-black mb-2">
                                         Start Time : {{ selectedRoom.room_sessions.length > 0 ?
                                             selectedRoom.room_sessions[0].start_date : '' }}
                                     </p>
                                     <p class="text-sm text-black">
                                         End Time : {{ selectedRoom.room_sessions.length > 0 ?
                                             selectedRoom.room_sessions[0].end_date : '' }}
-                                    </p>
+                                    </p> -->
                                 </div>
                             </div>
 
@@ -281,17 +273,17 @@
                                         (selectedRoom ?
                                             (purchaseMenuList.length > 0 ?
                                                 (
-                                                    (selectedRoom.room_sessions[0].invoice.total_session_price ?
-                                                        selectedRoom.room_sessions[0].invoice.total_session_price : 0)
+                                                    (selectedRoom.room_sessions.latest_invoice.total_session_price ?
+                                                        selectedRoom.room_sessions.latest_invoice.total_session_price : 0)
                                                     +
                                                     (purchaseMenuList.length > 0 ? purchaseMenuList[0].total : 0)
-                                                    - (selectedRoom.room_sessions[0].invoice.package ? selectedRoom.room_sessions[0].invoice.package.package_discount : 0)
+                                                    - (selectedRoom.room_sessions.latest_invoice.package ? selectedRoom.room_sessions[0].latest_invoice.package.package_discount : 0)
                                                 ).toLocaleString()
                                                 :
                                                 (
-                                                    (selectedRoom.room_sessions[0].invoice.total_session_price ?
-                                                        selectedRoom.room_sessions[0].invoice.total_session_price : 0)
-                                                    - (selectedRoom.room_sessions[0].invoice.package ? selectedRoom.room_sessions[0].invoice.package.package_discount : 0)
+                                                    (selectedRoom.room_sessions.latest_invoice.total_session_price ?
+                                                        selectedRoom.room_sessions.latest_invoice.total_session_price : 0)
+                                                    - (selectedRoom.room_sessions.latest_invoice.package ? selectedRoom.room_sessions[0].latest_invoice.package.package_discount : 0)
                                                 ).toLocaleString()
                                             )
                                             : 0
@@ -311,7 +303,7 @@
                         </div>
                     </div>
                     <!-- invoice right sidebar -->
-                    <!-- <div v-if="isOpenRoom.invoice == true" class="relative h-full">
+                    <div v-if="isOpenRoom.invoice == true" class="relative h-full">
                         <div class="flex justify-between padding-section border-b">
                             <button @click="btnBackToDetail()">
                                 <i class="far fa-chevron-left"></i>
@@ -502,7 +494,7 @@
                                 </button>
                             </div>
                         </div>
-                    </div> -->
+                    </div>
 
 
                     <!-- <div v-if="isOpenRoom.is_package == true" class="relative h-full">
@@ -605,7 +597,163 @@
                     </div> -->
                 </div>
             </div>
+
+
+
         </div>
+
+
+        <!-- add Menu modal -->
+        <div data-te-modal-init
+            class="fixed left-0 top-0 z-[1055] hidden h-full w-full overflow-y-auto overflow-x-hidden outline-none"
+            id="add_menu_table_modal" tabindex="-1" aria-labelledby="addMenuModalLabel" aria-modal="true" role="dialog">
+            <div data-te-modal-dialog-ref
+                class="pointer-events-none relative flex min-h-[calc(100%-1rem)] w-auto translate-y-[-50px] items-center opacity-0 transition-all duration-300 ease-in-out min-[576px]:mx-auto min-[576px]:mt-7 min-[576px]:min-h-[calc(100%-3.5rem)] min-[576px]:max-w-[500px]">
+                <div
+                    class="pointer-events-auto relative flex w-full flex-col rounded-md border-none bg-white bg-clip-padding text-current shadow-lg outline-none">
+                    <div class="relative  p-4">
+                        <p class="text-xl w-full text-center">
+                            Add Menu
+                        </p>
+                        <button type="button" id="closeAddMenuTableModal"
+                            class="absolute top-4 right-4 focus:shadow-none focus:outline-none" data-te-modal-dismiss
+                            aria-label="Close">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                                stroke="currentColor" class="h-5 w-5">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                        </button>
+                    </div>
+
+                    <div class="relative px-16 py-4" data-te-modal-body-ref>
+                        <div class="mb-4">
+                            <select name="" id="" placeholder="Menu" v-model="selectedMenu" @change="selectedMenuChange()"
+                                class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
+                                <option :value="menu" v-for="(menu, index) in menuList" :key="index">{{ menu.name }}</option>
+                            </select>
+                        </div>
+                        <div class="mb-4">
+                            <select name="" id="" placeholder="Menu" v-model="selectedMenuArea"
+                                class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
+                                <option :value="area" v-for="(area, index) in menuAreaList" :key="index">{{ area.name }}</option>
+                            </select>
+                        </div>
+                        <div class="mb-4">
+                            <!-- <label for="" class="block text-sm text-black mb-3">
+                                Hour
+                            </label> -->
+                            <input type="text" placeholder="Qty" v-model="menuQuantity"
+                                class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
+                        </div>
+                        <div>
+                            <textarea v-model="remark"
+                                class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0"
+                                name="" id="" cols="30" rows="10" placeholder="Remark"></textarea>
+                        </div>
+                    </div>
+
+                    <div class="flex justify-center px-12 mb-6">
+                        <button @click="btnConfirmAddMenu" class="pos-add-btn focus:outline-none focus:ring-0 ">
+                            Add Menu
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- add Package Menu modal -->
+        <div data-te-modal-init
+            class="fixed left-0 top-0 z-[1055] hidden h-full w-full overflow-y-auto overflow-x-hidden outline-none"
+            id="add_package_menu_table_modal" tabindex="-1" aria-labelledby="addMenuModalLabel" aria-modal="true" role="dialog">
+            <div data-te-modal-dialog-ref
+                class="pointer-events-none relative flex min-h-[calc(100%-1rem)] w-auto translate-y-[-50px] items-center opacity-0 transition-all duration-300 ease-in-out min-[576px]:mx-auto min-[576px]:mt-7 min-[576px]:min-h-[calc(100%-3.5rem)] min-[576px]:max-w-[500px]">
+                <div
+                    class="pointer-events-auto relative flex w-full flex-col rounded-md border-none bg-white bg-clip-padding text-current shadow-lg outline-none">
+                    <div class="relative  p-4">
+                        <p class="text-xl w-full text-center">
+                            Add Package Menu
+                        </p>
+                        <button type="button" id="closeAddPackageMenuTableModal"
+                            class="absolute top-4 right-4 focus:shadow-none focus:outline-none" data-te-modal-dismiss
+                            aria-label="Close">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                                stroke="currentColor" class="h-5 w-5">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                        </button>
+                    </div>
+
+                    <div class="relative px-16 py-4" data-te-modal-body-ref>
+                        <div class="mb-4">
+                            <select name="" id="" placeholder="Menu" v-model="selectedMenuForPackage" @change="selectedPackageMenuChange()"
+                                class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
+                                <option :value="menu" v-for="(menu, index) in menuList" :key="index">{{ menu.name }}</option>
+                            </select>
+                        </div>
+                        <div class="mb-4">
+                            <select name="" id="" placeholder="Menu" v-model="selectedMenuAreaForPackage"
+                                class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
+                                <option :value="area" v-for="(area, index) in menuAreaListForPackage" :key="index">{{ area.name }}</option>
+                            </select>
+                        </div>
+                        <div class="mb-4">
+                            <input type="text" placeholder="Qty" v-model="menuQuantityForPackage"
+                                class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
+                        </div>
+                    </div>
+
+                    <div class="flex justify-center px-12 mb-6">
+                        <button @click="btnConfirmAddPackageMenu()" class="pos-add-btn focus:outline-none focus:ring-0 ">
+                            Add Menu
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- change room modal -->
+        <div data-te-modal-init
+            class="fixed left-0 top-0 z-[1055] hidden h-full w-full overflow-y-auto overflow-x-hidden outline-none"
+            id="change_table_modal" tabindex="-1" aria-labelledby="addMenuModalLabel" aria-modal="true" role="dialog">
+            <div data-te-modal-dialog-ref
+                class="pointer-events-none relative flex min-h-[calc(100%-1rem)] w-auto translate-y-[-50px] items-center opacity-0 transition-all duration-300 ease-in-out min-[576px]:mx-auto min-[576px]:mt-7 min-[576px]:min-h-[calc(100%-3.5rem)] min-[576px]:max-w-[500px]">
+                <div
+                    class="pointer-events-auto relative flex w-full flex-col rounded-md border-none bg-white bg-clip-padding text-current shadow-lg outline-none">
+                    <div class="relative  p-4">
+                        <p class="text-xl w-full text-center">
+                            Change Room
+                        </p>
+                        <button type="button" id="closeChangeTableModal"
+                            class="absolute top-4 right-4 focus:shadow-none focus:outline-none" data-te-modal-dismiss
+                            aria-label="Close">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                                stroke="currentColor" class="h-5 w-5">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                        </button>
+                    </div>
+
+                    <div class="relative px-16 py-4" data-te-modal-body-ref>
+                        <div class="mb-4">
+                            <select name="" id="" placeholder="Room" v-model="change_room"
+                                class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
+                                <option :value="changeableRoom" :key="index"
+                                    v-for="(changeableRoom, index) in changeableRoomList">{{ changeableRoom.name }}
+                                </option>
+                            </select>
+                        </div>
+
+                    </div>
+
+                    <div class="flex justify-center px-12 mb-6">
+                        <button @click="btnClickedChangeRoom()" class="pos-add-btn focus:outline-none focus:ring-0 ">
+                            Change
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+
 
     </div>
 
@@ -617,13 +765,18 @@
     import { getCurrentTime } from "../../../utilities/datetime-helpers";
 
     export default {
-        props: ['areaId'],
-
+        name:'PosTableComponent',
+        props:{
+            tableAreaId:{
+                type: Number,
+                required: true
+            }
+        },
+        // props: ['tableAreaId'],
         data() {
             return {
                 roomList:[],
                 area_Id :null,
-
                 isOpenRoom:{
                     open_1: false,
                     open_2: false,
@@ -741,10 +894,9 @@
             ...mapGetters(['getToken']),
 
             async getTableList(){
-                const response = await getApiData({ url: '/api/areas/' + this.areaId + '/entities' , token: this.getToken()});
+                const response = await getApiData({ url: '/api/areas/' + this.tableAreaId + '/entities' , token: this.getToken()});
                 if(response.data){
                     this.roomList = response.data;
-                    console.log('get table')
                 }
             },
             async btnClickedIsOpenRoom(room , roomIndex) {
@@ -758,7 +910,7 @@
                     const response = await getApiData({ url: '/api/entities/'+ this.selectedRoomId, token: this.getToken() });
                     if (response.data) {
                         this.selectedRoom = response.data;
-                        this.purchaseMenuList = response.data.room_sessions[0].invoice.orders
+                        this.purchaseMenuList = response.data.room_sessions.latest_invoice.orders
                     }
                 }
                 else {
@@ -925,10 +1077,10 @@
                 const response = await getApiData({ url: '/api/entities/' + this.selectedRoomId, token: this.getToken() });
                 if (response.data) {
                     if (response.data.room_sessions.length > 0) {
-                        this.purchaseMenuList = response.data.room_sessions[0].invoice.orders;
-                        if (response.data.room_sessions[0].invoice.orders) {
-                            if (response.data.room_sessions[0].invoice.orders[0]) {
-                                this.foodDiscount = response.data.room_sessions[0].invoice.orders[0].total_discount_price
+                        this.purchaseMenuList = response.data.room_sessions.invoice.orders;
+                        if (response.data.room_sessions.invoice.orders) {
+                            if (response.data.room_sessions.invoice.orders[0]) {
+                                this.foodDiscount = response.data.room_sessions.invoice.orders[0].total_discount_price
                             }
                         }
                     }
@@ -939,7 +1091,7 @@
                 const response = await getApiData({ url: '/api/entities/' + this.selectedRoomId, token: this.getToken() });
                 if (response.data) {
                     this.selectedRoom = response.data;
-                    this.purchaseMenuList = response.data.room_sessions[0].invoice.orders
+                    this.purchaseMenuList = response.data.room_sessions.invoice.orders
                 }
             },
 
@@ -966,7 +1118,7 @@
             async doneSession() {
                 let formData = new FormData();
                 let roomSessions = [];
-                formData.append('invoice_id', this.selectedRoom.room_sessions[0].invoice.id);
+                formData.append('invoice_id', this.selectedRoom.room_sessions.latest_invoice.invoice_id);
                 let response = await postApiData({ url: '/api/room_done', form_data: formData, token: this.getToken() });
                 if (response.success) {
                     this.roomSessionData = response.data;
@@ -983,7 +1135,7 @@
                 }
                 let roomChargeTotal = 0;
                 // roomSessions.forEach(roomSession => {
-                if(this.selectedRoom.room_sessions[0].invoice.invoice_type == 'endless_time'){
+                if(this.selectedRoom.room_sessions.latest_invoice.invoice_type == 'endless_time'){
                     roomChargeTotal = this.roomSessionData.total_session_price;
                 }
                 else{
@@ -1003,11 +1155,11 @@
                         })
                     });
                 }
-                if (this.selectedRoom.room_sessions[0].invoice.invoice_type == 'package') {
-                    this.printInvoiceData.room = this.selectedRoom.room_sessions[0].invoice.total_session_price;
-                    this.printInvoiceData.package_discount = this.selectedRoom.room_sessions[0].invoice.package.package_discount;
+                if (this.selectedRoom.room_sessions.latest_invoice.invoice_type == 'package') {
+                    this.printInvoiceData.room = this.selectedRoom.room_sessions.latest_invoice.total_session_price;
+                    this.printInvoiceData.package_discount = this.selectedRoom.room_sessions.latest_invoice.package.package_discount;
                     this.isPackage = true;
-                    this.packagePrice = this.selectedRoom.room_sessions[0].invoice.paid_amount
+                    this.packagePrice = this.selectedRoom.room_sessions.latest_invoice.paid_amount
                     this.printInvoiceData.total = (this.printInvoiceData.room + this.printInvoiceData.food) - this.printInvoiceData.package_discount - this.foodDiscount;
                 }
                 else {
@@ -1267,7 +1419,7 @@
 
                 let response = await postApiData({ url: '/api/entities/done', form_data: formData, token: this.getToken() });
                 if (response.success) {
-                    await this.getRoomList();
+                    await this.getTableList();
                     // this.selectedRoom = await this.roomList[this.selectedRoomIndex];
                     this.isOpenRoom.step_1 = true;
                     this.isOpenRoom.step_2 = false;
@@ -1360,7 +1512,7 @@
                 }
             },
             btnClickAddMenu() {
-                this.invoiceId = this.selectedRoom.room_sessions[0].invoice.invoice_id;
+                this.invoiceId = this.selectedRoom.room_sessions.latest_invoice.id;
                 console.log('invoice id ' + this.invoiceId)
             },
             btnConfirmAddMenu() {
@@ -1377,9 +1529,10 @@
                 let response = await postApiData({ url: '/api/entities/orders', form_data: formData, token: this.getToken() });
                 // console.log(this.invoiceId+','+this.selectedMenu.id + ','+ this.menuQuantity +','+this.selectedMenu.prices[0].price)
                 if (response.success) {
-                    this.closeModal('closeMenuModal');
+                    this.closeModal('closeAddMenuTableModal');
                     this.clearMenuForm();
-                    this.getPurchaseMenuList();
+                    // this.getPurchaseMenuList();
+                    this.getSelectedRoom();
                 }
                 else {
                     console.log('some errors occur');
@@ -1395,7 +1548,7 @@
                 let response = await postApiData({ url: '/api/entities/add_more_sessions', form_data: formData, token: this.getToken() });
                 if (response.success) {
                     console.log("success")
-                    await this.getRoomList();
+                    await this.getTableList();
                     // this.selectedRoom = await this.roomList[this.selectedRoomIndex];
                     this.getSelectedRoom();
                     this.closeModal();
@@ -1414,13 +1567,13 @@
             },
             async changeRoom() {
                 let formData = new FormData();
-                formData.append('invoice_id', this.selectedRoom.room_sessions[0].invoice.invoice_id);
+                formData.append('invoice_id', this.selectedRoom.room_sessions.invoice.id);
                 formData.append('entity_id', this.change_room.id);
                 let response = await postApiData({ url: '/api/entities/change', form_data: formData, token: this.getToken() });
-                console.log('change room ' + this.selectedRoom.room_sessions[0].invoice.invoice_id + ',' + this.change_room.id)
+                console.log('change room ' + this.selectedRoom.room_sessions.invoice.id + ',' + this.change_room.id)
                 if (response.success) {
                     console.log("success");
-                    await this.getRoomList();
+                    await this.getTableList();
                     // this.selectedRoom = this.roomList.find(x => x.id === this.change_room.id);
                     this.selectedRoomId = this.change_room.id;
                     this.getSelectedRoom();
@@ -1435,17 +1588,11 @@
                 this.getChangeableRoomList();
             },
             async getChangeableRoomList() {
-                const response = await getApiData({ url: '/api/areas/' + this.selectedAreaId + '/inactive_entities', token: this.getToken() });
+                const response = await getApiData({ url: '/api/areas/' + this.tableAreaId + '/inactive_entities', token: this.getToken() });
                 if (response.data) {
                     this.changeableRoomList = response.data;
                 }
             },
-
-
-
-
-
-
             closeModal(modalId) {
                 document.getElementById(modalId).click();
             },
@@ -1508,7 +1655,10 @@
             },
 
         },
-        computed(){
+        watch: {
+            selectedRoom(val, oldVal) {
+                console.log(`new: ${val}, old: ${oldVal}`)
+            },
         },
         created(){
             this.getCustomerList();
