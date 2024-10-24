@@ -2,30 +2,7 @@
     <div class="">
         <div class=" bg-gray-100 w-max min-h-screen flex overflow-x-auto hidden-scrollbar" :style="isShowSidebar == true ? 'width:calc(100% - 410px)' : 'width:100%' ">
             <div class="w-fit pt-9 px-6 ">
-                <ul class="mb-5 flex list-none flex-row flex-wrap border-b-0 pl-0" role="tablist" data-te-nav-ref>
-                    <li v-for="(area, index) in areaList" :key="index" role="presentation" @click="btnClickedArea(area.id,area.area_type.type)">
-                        <a href="#tabs-profile" class="my-2 mr-3 text-white block  px-7 pb-2.5 rounded-full
-                            pt-3 text-xs  hover:isolate bg-[#F0C094]
-                            hover:bg-[#f7a559] focus:isolate data-[te-nav-active]:bg-[#F19E51]"
-                            :class="area.id == selectedAreaId ? 'bg-[#F19E51]' : 'bg-[#F0C094]'">
-                            {{ area.name }}
-                        </a>
-                    </li>
-                </ul>
-                <div v-if="areaType == 'bar_and_restaurant'">
-                    <button class="p-10 bg-red-600 text-white" @click="callTest()">
-                        bar
-                    </button>
-                    <pos-table-component :area-id="selectedAreaId" ref="posTable" />
-                </div>
-                <div v-else>
-                    <button class="p-10 bg-red-600 text-white" @click="callTest()">
-                        ktv
-                    </button>
-                    <pos-room-component :area-id="selectedAreaId" ref="posRoom" />
-                </div>
-
-                <div class="mb-6 hidden">
+                <div class="mb-6">
                     <div class="opacity-100 transition-opacity duration-150 ease-linear">
                         <div class="flex flex-col mb-4" v-for="(room, roomIndex) in roomList" :key="roomIndex">
                             <div class="flex flex-row gap-x-4">
@@ -980,12 +957,9 @@
     import { mapGetters } from "vuex";
     import { getCurrentTime } from "../../../utilities/datetime-helpers";
     import PosTableComponent from "../Home/PosTableComponent.vue";
-    import PosRoomComponent from "../Home/PosRoomComponent.vue";
 
     export default {
-        components:{
-            PosTableComponent,
-        },
+        props: ['areaId'],
         data() {
             return {
                 roomList:[],
@@ -1104,38 +1078,13 @@
                 isShowSidebar:false,
                 testbro:null,
 
-                areaType:null,
             };
         },
 
         methods: {
             ...mapGetters(['getToken']),
-            callTest(){
-                if(this.areaType == 'bar_and_restaurant'){
-                    this.$refs.posTable.getTableList()
-                }
-                else{
-                    this.$refs.posRoom.getRoomList()
-                }
-            },
-            async getAreaList() {
-                let url = '/api/areas?area_category_id=2'
-                const response = await getApiData({ url: url, token: this.getToken() });
-                if (response.data) {
-                    this.areaList = response.data;
-                    this.selectedAreaId = response.data[0].id
-                    this.getRoomList();
-                }
-            },
-            btnClickedArea(areaId,areaType){
-                this.selectedAreaId = areaId
-                this.isShowSidebar = false
-                this.getRoomList();
-                this.areaType = areaType
-                console.log(areaType)
-            },
             async getRoomList(){
-                const response = await getApiData({ url: '/api/areas/' + this.selectedAreaId + '/entities' , token: this.getToken()});
+                const response = await getApiData({ url: '/api/areas/' + this.areaId + '/entities' , token: this.getToken()});
                 if(response.data){
                     this.roomList = response.data;
                 }
@@ -1839,7 +1788,7 @@
                 this.getChangeableRoomList();
             },
             async getChangeableRoomList() {
-                const response = await getApiData({ url: '/api/areas/' + this.selectedAreaId + '/inactive_entities', token: this.getToken() });
+                const response = await getApiData({ url: '/api/areas/' + this.areaId + '/inactive_entities', token: this.getToken() });
                 if (response.data) {
                     this.changeableRoomList = response.data;
                 }
@@ -1933,7 +1882,6 @@
             },
         },
         created(){
-            this.getAreaList();
             this.getCustomerList();
             this.getGendersList();
             this.getMenuList();
