@@ -434,6 +434,11 @@ class InvoiceRepository implements InvoiceRepositoryInterface
         try {
 
             $invoice = Invoice::find($data['invoice_id']);
+            if ($invoice->entity_id != null) {
+                $updatedInvoice=$this->changeTable($invoice, $data['entity_id']);
+                DB::commit();
+                ResponseData($updatedInvoice, 200);
+            }
             $roomSessions = RoomSession::where('invoice_id', $invoice->id)->get();
             $newEntity = Entity::find($data['entity_id']);
             $latestRoomSession = $roomSessions->last();
@@ -442,8 +447,6 @@ class InvoiceRepository implements InvoiceRepositoryInterface
                 ->whereTime('start_time', '<=', $current_time)
                 ->whereTime('end_time', '>=', $current_time)
                 ->first();
-
-
             $previousEntity = Entity::find($entitySession->entity_id);
             $firstRoomSession = $roomSessions->first();
             $lastRoomSession = $roomSessions->last();
@@ -561,6 +564,23 @@ class InvoiceRepository implements InvoiceRepositoryInterface
         }
     }
 
+    public function changeTable($invoice, $newEntityId)
+    {
+
+        Entity::where('id', $newEntityId)->update([
+            'status' => 'active',
+            'is_active' => 1,
+        ]);
+        Entity::where('id', $invoice->entity_id)->update([
+            'status' => 'inactive',
+            'is_active' => 0,
+        ]);
+
+        $invoice->entity_id = $newEntityId;
+        $invoice->save();
+        return $invoice;
+    }
+
 
     public function doneRoom(array $data)
     {
@@ -638,11 +658,21 @@ class InvoiceRepository implements InvoiceRepositoryInterface
         $total = 0;
         $totalDiscount = 0;
         foreach ($invoice->orders as $order) {
-            $total += $order->total;
-            $totalDiscount += $order->total_discount_price;
+            if (existOrderItemByStatus($order->orderItems, 'not_yet')) {
+                ResponseMessage('Some items still cooking', 419);
+            }
+            foreach ($order->orderItems as $orderItem) {
+                if ($orderItem->status == 'done') {
+                    $total += $orderItem->price;
+                    $totalDiscount += $orderItem->discount_value;
+                }
+            }
+            // $total += $order->total;
+            // $totalDiscount += $order->total_discount_price;
         }
-        $responseData=[];
-        $responseData=$this->getCustomerLevel($customerTotal,$responseData);
+
+        $responseData = [];
+        $responseData = $this->getCustomerLevel($customerTotal, $responseData);
         $responseData['invoice_id'] = $invoice->id;
         $responseData['entity_id'] = $invoice->entity_id;
         $responseData['food_discount'] = $totalDiscount;
