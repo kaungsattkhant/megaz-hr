@@ -880,7 +880,7 @@ class InvoiceRepository implements InvoiceRepositoryInterface
         $data['payment_status'] = 'received';
         $data['complete_date'] = CurrentTime();
         $invoice->update($data);
-        $this->invoiceService->updateEntityStatus($invoice->entity_id,'active');
+        $this->invoiceService->updateEntityStatus($invoice->entity_id,'inactive');
         return $invoice;
     }
 
