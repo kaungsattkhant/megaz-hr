@@ -1129,14 +1129,15 @@
                     this.selectedAreaId = this.areaList[0].id
                     console.log('area id = ' + this.selectedAreaId)
                     // this.getRoomList();
-                    this.areaType = response.data.area_type
+                    this.areaType = response.data[0].area_type.type
                     this.callTest();
-                    // if(this.areaType == 'bar_and_restaurant'){
-                    //     this.$refs.posTable.getTableList(response.data[0].id)
-                    // }
-                    // else{
-                    //     this.$refs.posRoom.getRoomList(response.data[0].id)
-                    // }
+                    if(this.areaType == 'bar_and_restaurant'){
+                        this.$refs.posTable.getTableList(response.data[0].id)
+                        console.log('why no table?')
+                    }
+                    else{
+                        this.$refs.posRoom.getRoomList(response.data[0].id)
+                    }
                 }
             },
             btnClickedArea(areaId,areaType){
@@ -1144,13 +1145,13 @@
                 // this.isShowSidebar = false
                 // this.getRoomList();
                 this.areaType = areaType
-                console.log(areaType , areaId)
-                // if(this.areaType == 'bar_and_restaurant'){
-                //     this.$refs.posTable.getTableList(areaId)
-                // }
-                // else{
-                //     this.$refs.posRoom.getRoomList(areaId)
-                // }
+                // console.log(areaType , areaId)
+                if(areaType == 'bar_and_restaurant'){
+                    this.$refs.posTable.getTableList(areaId)
+                }
+                else{
+                    this.$refs.posRoom.getRoomList(areaId)
+                }
             },
 
 
@@ -1942,7 +1943,7 @@
 
             }
         },
-        
+
 
         // watch: {
         //     selectedRoom(val, oldVal) {
@@ -1950,7 +1951,7 @@
         //     },
         // },
         created(){
-            
+            this.getAreaList();
             // this.getCustomerList();
             // this.getGendersList();
             // this.getMenuList();
@@ -1959,7 +1960,7 @@
         },
         mounted()
         {
-            this.getAreaList();
+            
             initTE({ Modal, Select, Ripple, Datepicker });
         }
     }
