@@ -12,7 +12,20 @@
                         </a>
                     </li>
                 </ul>
-                <div class="mb-6">
+                <div v-if="areaType == 'bar_and_restaurant'">
+                    <button class="p-10 bg-red-600 text-white" @click="callTest()">
+                        bar
+                    </button>
+                    <PosTableComponent :table-area-id="selectedAreaId" ref="posTable" />
+                </div>
+                <div v-else>
+                    <button class="p-10 bg-red-600 text-white" @click="callTest()">
+                        ktv
+                    </button>
+                    <PosRoomComponent :room-area-id="selectedAreaId" ref="posRoom" />
+                </div>
+
+                <div class="mb-6 hidden">
                     <div class="opacity-100 transition-opacity duration-150 ease-linear">
                         <div class="flex flex-col mb-4" v-for="(room, roomIndex) in roomList" :key="roomIndex">
                             <div class="flex flex-row gap-x-4">
@@ -965,9 +978,17 @@
     import { Modal, Ripple, Select, Datepicker, initTE, Input } from "tw-elements";
     import { getApiData, postApiData, deleteApiData } from '../../../utilities/ajax-helpers';
     import { mapGetters } from "vuex";
-import { getCurrentTime } from "../../../utilities/datetime-helpers";
+    import { getCurrentTime } from "../../../utilities/datetime-helpers";
+    // import PosTableComponent from "./PosTableComponent.vue";
+    // import PosRoomComponent from "./PosRoomComponent.vue";
+    import PosTableComponent from "./PosTableComponent.vue";
+    import PosRoomComponent from "./PosRoomComponent.vue";
 
     export default {
+        components:{
+            PosRoomComponent,
+            PosTableComponent,
+        },
         data() {
             return {
                 roomList:[],
@@ -1086,578 +1107,600 @@ import { getCurrentTime } from "../../../utilities/datetime-helpers";
                 isShowSidebar:false,
                 testbro:null,
 
+                areaType:null,
             };
         },
 
         methods: {
             ...mapGetters(['getToken']),
-
+            callTest(){
+                if(this.areaType == 'bar_and_restaurant'){
+                    this.$refs.posTable.getTableList()
+                }
+                else{
+                    this.$refs.posRoom.getRoomList()
+                }
+            },
             async getAreaList() {
                 let url = '/api/areas?area_category_id=2'
                 const response = await getApiData({ url: url, token: this.getToken() });
                 if (response.data) {
                     this.areaList = response.data;
-                    this.selectedAreaId = response.data[0].id
-                    this.getRoomList();
+                    this.selectedAreaId = this.areaList[0].id
+                    console.log('area id = ' + this.selectedAreaId)
+                    // this.getRoomList();
+                    this.areaType = response.data.area_type
+                    this.callTest();
+                    // if(this.areaType == 'bar_and_restaurant'){
+                    //     this.$refs.posTable.getTableList(response.data[0].id)
+                    // }
+                    // else{
+                    //     this.$refs.posRoom.getRoomList(response.data[0].id)
+                    // }
                 }
             },
             btnClickedArea(areaId,areaType){
                 this.selectedAreaId = areaId
-                this.isShowSidebar = false
-                this.getRoomList();
-                console.log(areaType)
-            },
-            async getRoomList(){
-                const response = await getApiData({ url: '/api/areas/' + this.selectedAreaId + '/entities' , token: this.getToken()});
-                if(response.data){
-                    this.roomList = response.data;
-                }
-            },
-            async btnClickedSession(time, timeIndex, room , roomIndex) {
-                this.isShowSidebar = true;
-                this.selectedTime = time;
-                this.selectedRoom = null;
-
-                this.selectedRoomId = room.id;
-                // this.getSelectedRoom();
-                if (this.roomList[roomIndex].entity_sessions[timeIndex].is_active == 1) {
-                    this.isOpenRoomStep('detail');
-                    // this.getPurchaseMenuList();
-                    const response = await getApiData({ url: '/api/entities_sessions/'+ this.selectedTime.id, token: this.getToken() });
-                    if (response.data) {
-                        this.selectedRoom = response.data;
-                        this.purchaseMenuList = response.data.room_sessions[0].invoice.orders
-                    }
-                }
-                else {
-
-                    this.selectedRoom = this.roomList[roomIndex];
-                    this.isOpenRoomStep('open_1');
-                };
+                // this.isShowSidebar = false
+                // this.getRoomList();
+                this.areaType = areaType
+                console.log(areaType , areaId)
+                // if(this.areaType == 'bar_and_restaurant'){
+                //     this.$refs.posTable.getTableList(areaId)
+                // }
+                // else{
+                //     this.$refs.posRoom.getRoomList(areaId)
+                // }
             },
 
 
+            // async getRoomList(){
+            //     const response = await getApiData({ url: '/api/areas/' + this.selectedAreaId + '/entities' , token: this.getToken()});
+            //     if(response.data){
+            //         this.roomList = response.data;
+            //     }
+            // },
+            // async btnClickedSession(time, timeIndex, room , roomIndex) {
+            //     this.isShowSidebar = true;
+            //     this.selectedTime = time;
+            //     this.selectedRoom = null;
+            //     this.selectedRoomId = room.id;
+            //     if (this.roomList[roomIndex].entity_sessions[timeIndex].is_active == 1) {
+            //         this.isOpenRoomStep('detail');
+            //         const response = await getApiData({ url: '/api/entities_sessions/'+ this.selectedTime.id, token: this.getToken() });
+            //         if (response.data) {
+            //             this.selectedRoom = response.data;
+            //             this.purchaseMenuList = response.data.room_sessions[0].invoice.orders
+            //         }
+            //     }
+            //     else {
 
-            btnClickedOpenRoom() {
-                this.isOpenRoomStep('open_2');
-                // this.clearOpenRoomForm();
-                this.isPackage = false;
+            //         this.selectedRoom = this.roomList[roomIndex];
+            //         this.isOpenRoomStep('open_1');
+            //     };
+            // },
 
-            },
+
+
+            // btnClickedOpenRoom() {
+            //     this.isOpenRoomStep('open_2');
+            //     this.isPackage = false;
+
+            // },
 
             // step 2's methods
-            async getCustomerList() {
-                const response = await getApiData({ url: '/api/customers', token: this.getToken() });
-                if (response.data) {
-                    this.customerList = response.data;
-                }
-            },
-            async getPackageList(time) {
-                const response = await getApiData({ url: '/api/packages?date='+time, token: this.getToken() });
-                if (response.data) {
-                    this.packageList = response.data.data;
-                }
-            },
-            getSelectedPackage(){
-                // this.packageMenuList = this.selectedPackage;
-            },
-            confirmRoomBtnClicked() {
-                this.getPurchaseMenuList();
-                if(this.type == 'package' && this.selectedPackage){
-                    this.isOpenRoomStep('is_package');
-                    let menuOfselectedPackage = this.selectedPackage.menu_packages;
-                    menuOfselectedPackage.forEach((packageMenu)=>{
-                        let is_dis_menu_price = 0;
-                        this.food_total_package += (packageMenu.menu.prices[0].price - is_dis_menu_price) * packageMenu.quantity;
-                        this.packageMenuList.push({
-                            quantity : packageMenu.quantity,
-                            name : packageMenu.menu.name,
-                            original_price : packageMenu.menu.prices[0].price,
-                            discount_value: is_dis_menu_price,
-                            menu_id : packageMenu.menu_id,
-                            is_package : 1,
-                            area_id: null,
-                            areas : packageMenu.menu.areas
-                        });
+            // async getCustomerList() {
+            //     const response = await getApiData({ url: '/api/customers', token: this.getToken() });
+            //     if (response.data) {
+            //         this.customerList = response.data;
+            //     }
+            // },
+            // async getPackageList(time) {
+            //     const response = await getApiData({ url: '/api/packages?date='+time, token: this.getToken() });
+            //     if (response.data) {
+            //         this.packageList = response.data.data;
+            //     }
+            // },
+            // getSelectedPackage(){
+            //     this.packageMenuList = this.selectedPackage;
+            // },
+            // confirmRoomBtnClicked() {
+            //     this.getPurchaseMenuList();
+            //     if(this.type == 'package' && this.selectedPackage){
+            //         this.isOpenRoomStep('is_package');
+            //         let menuOfselectedPackage = this.selectedPackage.menu_packages;
+            //         menuOfselectedPackage.forEach((packageMenu)=>{
+            //             let is_dis_menu_price = 0;
+            //             this.food_total_package += (packageMenu.menu.prices[0].price - is_dis_menu_price) * packageMenu.quantity;
+            //             this.packageMenuList.push({
+            //                 quantity : packageMenu.quantity,
+            //                 name : packageMenu.menu.name,
+            //                 original_price : packageMenu.menu.prices[0].price,
+            //                 discount_value: is_dis_menu_price,
+            //                 menu_id : packageMenu.menu_id,
+            //                 is_package : 1,
+            //                 area_id: null,
+            //                 areas : packageMenu.menu.areas
+            //             });
 
-                    });
+            //         });
 
-                    console.log('package')
-                }
-                else{
-                    this.createRoom();
-                }
-            },
-            async selectedPackageMenuChange() {
-                const response = await getApiData({ url: '/api/menus/' + this.selectedMenuForPackage.id + '/areas', token: this.getToken() });
-                if (response.data) {
-                    this.menuAreaListForPackage = response.data.areas;
-                }
-            },
+            //         console.log('package')
+            //     }
+            //     else{
+            //         this.createRoom();
+            //     }
+            // },
+            // async selectedPackageMenuChange() {
+            //     const response = await getApiData({ url: '/api/menus/' + this.selectedMenuForPackage.id + '/areas', token: this.getToken() });
+            //     if (response.data) {
+            //         this.menuAreaListForPackage = response.data.areas;
+            //     }
+            // },
 
-            btnConfirmAddPackageMenu() {
-                this.addPackageMenu();
-            },
-            packageCookingAreaChange(area,index){
-                // this.packageMenuList[index].area_id = area.id;
-                console.log(area)
-            },
-            async addPackageMenu() {
-                if(this.selectedMenuForPackage.menu_service_discounts.length > 0){
-                    this.is_menu_discount = this.selectedMenuForPackage.menu_service_discounts[0].discount_price
-                }
-                else{
-                    this.is_menu_discount = 0
-                }
+            // btnConfirmAddPackageMenu() {
+            //     this.addPackageMenu();
+            // },
+            // packageCookingAreaChange(area,index){
+            //     this.packageMenuList[index].area_id = area.id;
+            //     console.log(area)
+            // },
+            // async addPackageMenu() {
+            //     if(this.selectedMenuForPackage.menu_service_discounts.length > 0){
+            //         this.is_menu_discount = this.selectedMenuForPackage.menu_service_discounts[0].discount_price
+            //     }
+            //     else{
+            //         this.is_menu_discount = 0
+            //     }
 
-                this.packageMenuList.push({
-                    quantity: this.menuQuantityForPackage,
-                    name: this.selectedMenuForPackage.name,
-                    original_price:this.selectedMenuForPackage.prices[0].price,
-                    menu_id : this.selectedMenuForPackage.prices[0].menu_id,
-                    discount_value: this.is_menu_discount,
-                    is_package : 0,
-                    area_id: this.selectedMenuAreaForPackage.id
-                });
-                this.food_total_package += (this.selectedMenuForPackage.prices[0].price - this.is_menu_discount) * this.menuQuantityForPackage;
-                this.selectedMenu = null
-                this.menuAreaListForPackage = []
-                this.selectedMenuAreaForPackage = null;
-                this.menuQuantityForPackage = null;
-            },
-            removePackageMenu(index){
+            //     this.packageMenuList.push({
+            //         quantity: this.menuQuantityForPackage,
+            //         name: this.selectedMenuForPackage.name,
+            //         original_price:this.selectedMenuForPackage.prices[0].price,
+            //         menu_id : this.selectedMenuForPackage.prices[0].menu_id,
+            //         discount_value: this.is_menu_discount,
+            //         is_package : 0,
+            //         area_id: this.selectedMenuAreaForPackage.id
+            //     });
+            //     this.food_total_package += (this.selectedMenuForPackage.prices[0].price - this.is_menu_discount) * this.menuQuantityForPackage;
+            //     this.selectedMenu = null
+            //     this.menuAreaListForPackage = []
+            //     this.selectedMenuAreaForPackage = null;
+            //     this.menuQuantityForPackage = null;
+            // },
+            // removePackageMenu(index){
 
-                this.food_total_package -= (this.packageMenuList[index].original_price - this.packageMenuList[index].discount_value) * this.packageMenuList[index].quantity;
-                this.packageMenuList.splice(index, 1);
-            },
+            //     this.food_total_package -= (this.packageMenuList[index].original_price - this.packageMenuList[index].discount_value) * this.packageMenuList[index].quantity;
+            //     this.packageMenuList.splice(index, 1);
+            // },
 
-            createRoomForPackage(){
+            // createRoomForPackage(){
 
-                // this.packageMenuList.forEach((packageMenu)=>{
-                //     this.total_package_menu_price += (packageMenu.original_price - packageMenu.discount_value ) * packageMenu.quantity;
-                // });
-                let packageActualTotal = this.food_total_package + (this.selectedPackage.session_price * this.selectedPackage.pay_session) - this.selectedPackage.package_discount;
-                if(packageActualTotal < this.selectedPackage.price){
-                    this.$notify({
-                        title: `Not valid`,
-                        text: 'Your Total is Lower than Package Price',
-                        type: "warn"
-                    });
-                }
-                else{
-                    this.filterMenuForData();
-                    this.createRoom();
-                }
-            },
+            //     // this.packageMenuList.forEach((packageMenu)=>{
+            //     //     this.total_package_menu_price += (packageMenu.original_price - packageMenu.discount_value ) * packageMenu.quantity;
+            //     // });
+            //     let packageActualTotal = this.food_total_package + (this.selectedPackage.session_price * this.selectedPackage.pay_session) - this.selectedPackage.package_discount;
+            //     if(packageActualTotal < this.selectedPackage.price){
+            //         this.$notify({
+            //             title: `Not valid`,
+            //             text: 'Your Total is Lower than Package Price',
+            //             type: "warn"
+            //         });
+            //     }
+            //     else{
+            //         this.filterMenuForData();
+            //         this.createRoom();
+            //     }
+            // },
 
-            async createRoom() {
-                let formData = new FormData();
-                // formData.append('entity_id', this.selectedRoom.id);
-                formData.append('entity_session_id', this.selectedTime.id);
-                formData.append('customer_id', this.selectedCustomer.id);
-                formData.append('start_time', this.invoice_date);
-                if (this.type == 'session') {
-                    formData.append('session_duration', this.duration);
-                }
-                if (this.type == 'package') {
-                    formData.append('package_id', this.selectedPackage.id);
-                    formData.append('orders', JSON.stringify(this.packageMenuList));
-                }
-                formData.append('type', this.type);
-                formData.append('deposit', this.deposit);
-                if (this.female > 0) {
-                    formData.append('female', +this.female);
-                }
-                if (this.male > 0) {
-                    formData.append('male', +this.male);
-                }
-                if (this.child > 0) {
-                    formData.append('child', +this.child);
-                }
-                let response = await postApiData({ url: '/api/entities/start', form_data: formData, token: this.getToken() });
-                if (response.success) {
-                    this.getRoomList();
-                    this.getSelectedRoom();
-                    this.isOpenRoomStep('detail');//for right side bar ui
+            // async createRoom() {
+            //     let formData = new FormData();
+            //     // formData.append('entity_id', this.selectedRoom.id);
+            //     formData.append('entity_session_id', this.selectedTime.id);
+            //     formData.append('customer_id', this.selectedCustomer.id);
+            //     formData.append('start_time', this.invoice_date);
+            //     if (this.type == 'session') {
+            //         formData.append('session_duration', this.duration);
+            //     }
+            //     if (this.type == 'package') {
+            //         formData.append('package_id', this.selectedPackage.id);
+            //         formData.append('orders', JSON.stringify(this.packageMenuList));
+            //     }
+            //     formData.append('type', this.type);
+            //     formData.append('deposit', this.deposit);
+            //     if (this.female > 0) {
+            //         formData.append('female', +this.female);
+            //     }
+            //     if (this.male > 0) {
+            //         formData.append('male', +this.male);
+            //     }
+            //     if (this.child > 0) {
+            //         formData.append('child', +this.child);
+            //     }
+            //     let response = await postApiData({ url: '/api/entities/start', form_data: formData, token: this.getToken() });
+            //     if (response.success) {
+            //         this.getRoomList();
+            //         this.getSelectedRoom();
+            //         this.isOpenRoomStep('detail');//for right side bar ui
 
-                    if (this.selectedRoom.room_sessions.length > 0) {
-                        if (this.selectedRoom.room_sessions[0].invoice.orders.length > 0) {
-                            this.getPurchaseMenuList();
-                        }
-                    }
-                    if (this.selectedRoom.room_sessions.length < 1) {
-                        if (this.selectedRoom.room_sessions[0].invoice.orders.length < 1) {
-                            this.purchaseMenuList = [];
-                        }
-                    }
-                    this.food_total_package = 0 //total price of package menu and add more menu reset
-                    console.log("success")
-                    window.location.reload()
-                }
-                else {
-                    console.log('some errors occur')
-                }
-            },
-            async getPurchaseMenuList() {
-                const response = await getApiData({ url: '/api/entities_sessions/'+ this.selectedTime.id, token: this.getToken() });
-                if (response.data) {
-                    if (response.data.room_sessions.length > 0) {
-                        this.purchaseMenuList = response.data.room_sessions[0].invoice.orders;
-                        if (response.data.room_sessions[0].invoice.orders) {
-                            if (response.data.room_sessions[0].invoice.orders[0]) {
-                                this.foodDiscount = response.data.room_sessions[0].invoice.orders[0].total_discount_price
-                            }
-                        }
-                    }
+            //         if (this.selectedRoom.room_sessions.length > 0) {
+            //             if (this.selectedRoom.room_sessions[0].invoice.orders.length > 0) {
+            //                 this.getPurchaseMenuList();
+            //             }
+            //         }
+            //         if (this.selectedRoom.room_sessions.length < 1) {
+            //             if (this.selectedRoom.room_sessions[0].invoice.orders.length < 1) {
+            //                 this.purchaseMenuList = [];
+            //             }
+            //         }
+            //         this.food_total_package = 0 //total price of package menu and add more menu reset
+            //         console.log("success")
+            //         window.location.reload()
+            //     }
+            //     else {
+            //         console.log('some errors occur')
+            //     }
+            // },
+            // async getPurchaseMenuList() {
+            //     const response = await getApiData({ url: '/api/entities_sessions/'+ this.selectedTime.id, token: this.getToken() });
+            //     if (response.data) {
+            //         if (response.data.room_sessions.length > 0) {
+            //             this.purchaseMenuList = response.data.room_sessions[0].invoice.orders;
+            //             if (response.data.room_sessions[0].invoice.orders) {
+            //                 if (response.data.room_sessions[0].invoice.orders[0]) {
+            //                     this.foodDiscount = response.data.room_sessions[0].invoice.orders[0].total_discount_price
+            //                 }
+            //             }
+            //         }
 
-                }
-            },
-            async getSelectedRoom(){
-                const response = await getApiData({ url: '/api/entities_sessions/'+ this.selectedTime.id, token: this.getToken() });
-                    if (response.data) {
-                        this.selectedRoom = response.data;
-                        this.purchaseMenuList = response.data.room_sessions[0].invoice.orders
-                    }
-            },
+            //     }
+            // },
+            // async getSelectedRoom(){
+            //     const response = await getApiData({ url: '/api/entities_sessions/'+ this.selectedTime.id, token: this.getToken() });
+            //         if (response.data) {
+            //             this.selectedRoom = response.data;
+            //             this.purchaseMenuList = response.data.room_sessions[0].invoice.orders
+            //         }
+            // },
 
 
 
             //invoice or done
-            btnBackToDetail() {
-                this.isOpenRoomStep('detail');
-            },
-            btnClickedDoneSession() {
-                this.doneSession();
-                this.getPurchaseMenuList();
-                this.discount_type = null;
-            },
+            // btnBackToDetail() {
+            //     this.isOpenRoomStep('detail');
+            // },
+            // btnClickedDoneSession() {
+            //     this.doneSession();
+            //     this.getPurchaseMenuList();
+            //     this.discount_type = null;
+            // },
 
-            filterMenuForData(){
-                this.packageMenuList.forEach(om => {
-                    delete om.name;
-                    delete om.areas;
-                    console.log('hello = ' + om.name);
-                });
+            // filterMenuForData(){
+            //     this.packageMenuList.forEach(om => {
+            //         delete om.name;
+            //         delete om.areas;
+            //         console.log('hello = ' + om.name);
+            //     });
 
-            },
-            async doneSession() {
-                let formData = new FormData();
-                let roomSessions = [];
-                formData.append('invoice_id', this.selectedRoom.room_sessions[0].invoice.id);
-                let response = await postApiData({ url: '/api/room_done', form_data: formData, token: this.getToken() });
-                if (response.success) {
-                    this.roomSessionData = response.data;
-                    roomSessions = response.data;
-                    console.log("success")
-                    this.isOpenRoomStep('invoice')
-                }
-                else {
-                    this.$notify({
-                        title: `Not valid`,
-                        text: response.message,
-                        type: "warn"
-                    });
-                }
-                let roomChargeTotal = 0;
-                // roomSessions.forEach(roomSession => {
-                if(this.selectedRoom.room_sessions[0].invoice.invoice_type == 'endless_time'){
-                    roomChargeTotal = this.roomSessionData.total_session_price;
-                }
-                else{
-                    roomChargeTotal = roomSessions.total_session_price;
-                }
-                // roomChargeTotal += roomSession.price; // or roomSession.session_duration * roomSession.entity.price_per_hour;
-                // });
-                this.printInvoiceData.room = roomChargeTotal; // <== or that
-
-
-                if (this.purchaseMenuList.length > 0) {
-                    this.printInvoiceData.food = this.purchaseMenuList[0].total
-                    this.purchaseMenuList[0].order_items.forEach(element => {
-                        this.orderList.push({
-                            'menu_category_id': element.menu.menu_category_id,
-                            'price': element.price,
-                        })
-                    });
-                }
-                if (this.selectedRoom.room_sessions[0].invoice.invoice_type == 'package') {
-                    this.printInvoiceData.room = this.selectedRoom.room_sessions[0].invoice.total_session_price;
-                    this.printInvoiceData.package_discount = this.selectedRoom.room_sessions[0].invoice.package.package_discount;
-                    this.isPackage = true;
-                    this.packagePrice = this.selectedRoom.room_sessions[0].invoice.paid_amount
-                    this.printInvoiceData.total = (this.printInvoiceData.room + this.printInvoiceData.food) - this.printInvoiceData.package_discount - this.foodDiscount;
-                }
-                else {
-                    this.isPackage = false;
-                    this.printInvoiceData.total = (roomChargeTotal + this.printInvoiceData.food) - this.foodDiscount;
-                }
+            // },
+            // async doneSession() {
+            //     let formData = new FormData();
+            //     let roomSessions = [];
+            //     formData.append('invoice_id', this.selectedRoom.room_sessions[0].invoice.id);
+            //     let response = await postApiData({ url: '/api/room_done', form_data: formData, token: this.getToken() });
+            //     if (response.success) {
+            //         this.roomSessionData = response.data;
+            //         roomSessions = response.data;
+            //         console.log("success")
+            //         this.isOpenRoomStep('invoice')
+            //     }
+            //     else {
+            //         this.$notify({
+            //             title: `Not valid`,
+            //             text: response.message,
+            //             type: "warn"
+            //         });
+            //     }
+            //     let roomChargeTotal = 0;
+            //     // roomSessions.forEach(roomSession => {
+            //     if(this.selectedRoom.room_sessions[0].invoice.invoice_type == 'endless_time'){
+            //         roomChargeTotal = this.roomSessionData.total_session_price;
+            //     }
+            //     else{
+            //         roomChargeTotal = roomSessions.total_session_price;
+            //     }
+            //     // roomChargeTotal += roomSession.price; // or roomSession.session_duration * roomSession.entity.price_per_hour;
+            //     // });
+            //     this.printInvoiceData.room = roomChargeTotal; // <== or that
 
 
-                // room price = this.printInvoiceData.room
-                if (this.service_charge = true) {
-                    this.printInvoiceData.service_tax = this.printInvoiceData.total * 0.05
-                }
-                if (this.isTax = true) {
-                    this.printInvoiceData.tax = this.printInvoiceData.food * 0.05
-                }
-
-                // this.printInvoiceData.total = this.printInvoiceData.room + this.printInvoiceData.food + this.printInvoiceData.tax +this.printInvoiceData.service_tax
-
-                this.selectedPaymentMethod = null
-                this.change = null
-                this.paid_amount = null
-                this.printInvoiceData.discount = 0
-
-            },
-
-            btnClickedServiceCharge(){
-                if (this.service_charge = true) {
-                    this.printInvoiceData.service_tax = this.printInvoiceData.total * 0.05
-                }
-            },
-            btnClickedTax(){
-                if (this.isTax = true) {
-                    this.printInvoiceData.tax = (this.printInvoiceData.food - this.foodDiscount) * 0.05
-                }
-            },
-            roomDiscountSelectChanged() {
-                let roomChargeTotal = 0;
-                let roomSessions = this.roomSessionData;
-                let totalSession = 0;
-                let originalSessions = this.room_discount.session;
-                let discountSessions = this.room_discount.free_session;
-                let totalDiscounts = originalSessions + discountSessions;
-                let paidSession = 0;
-                let pricePerHour = 0;
-                roomSessions.rooms_sessions.forEach(roomSession => {
-                    totalSession += parseFloat(roomSession.session_duration);
-                    pricePerHour = roomSession.entity.price_per_hour;
-                });
-
-                if (totalSession <= totalDiscounts) {
-                    if (totalSession > originalSessions) {
-                        paidSession = originalSessions;
-                    }
-                    else {
-                        paidSession = totalSession;
-                    }
-                }
-                else {
-                    let q = Math.floor(totalSession / totalDiscounts);
-                    let qProdOrig = q * originalSessions;
-                    let r = totalSession % totalDiscounts;
-                    paidSession = (qProdOrig + r);
-                }
-                let test = this.roomSessionData.total_session_price - (discountSessions * pricePerHour)
-                console.log('new total = ' + test)
-                roomChargeTotal = paidSession * pricePerHour;
-                if (this.selectedRoom.room_sessions[0].invoice.invoice_type == 'package') {
-                    this.printInvoiceData.room = this.selectedRoom.room_sessions[0].invoice.total_session_price;
-                }
-                else {
-                    this.printInvoiceData.room = roomChargeTotal;
-                }
-                this.printInvoiceData.roomDiscountAmount = roomChargeTotal;
-                this.printInvoiceData.discountSession = totalSession - paidSession;
-                this.printInvoiceData.total = this.printInvoiceData.room + this.printInvoiceData.food -this.foodDiscount;
-            },
-            birthdayDiscountSelectChanged() {
-                this.printInvoiceData.discount = this.birthday_discount.discount_value
-                if (this.selectedRoom.room_sessions[0].invoice.invoice_type == 'package') {
-                    this.printInvoiceData.room = (this.roomSessionData.total_session_price) - this.selectedRoom.room_sessions[0].invoice.package.package_discount;
-                }
-                else {
-                    this.printInvoiceData.room = this.roomSessionData.total_session_price;
-                }
-                console.log(this.printInvoiceData.room,this.printInvoiceData.food,this.printInvoiceData.discount,this.foodDiscount);
-                this.printInvoiceData.total = (this.printInvoiceData.room + this.printInvoiceData.food) - this.printInvoiceData.discount - this.foodDiscount
-            },
-
-            async getRoomDiscount() {
-                this.birthday_discount = null;
-                this.room_discount = null;
-                this.printInvoiceData.discount = 0;
-                if (this.discount_type == 'room_discount') {
-                    const response = await getApiData({ url: '/api/room_discounts', token: this.getToken() });
-                    if (response.data) {
-                        this.roomDiscountList = response.data.data;
-                        console.log('get room dis list' + response.data.data)
-                        // this.printInvoiceData.total = this.printInvoiceData.room + this.printInvoiceData.food;
-                    }
-                    this.printInvoiceData.total = ((this.printInvoiceData.room + this.printInvoiceData.food) - this.foodDiscount);
-
-                }
-                else if (this.discount_type == 'birthday_discount') {
-
-                    const response = await getApiData({ url: '/api/birthday_promotions', token: this.getToken() });
-                    if (response.data) {
-                        this.birthdayDiscountList = response.data.data;
-                    }
-                    this.printInvoiceData.total = (this.printInvoiceData.room + this.printInvoiceData.food) - this.foodDiscount;
-                }
-
-                else if (this.discount_type == 'customer_level') {
-
-                    if (this.selectedRoom.room_sessions[0].invoice.invoice_type == 'package') {
-                        // this.printInvoiceData.room = this.selectedRoom.room_sessions[0].invoice.package.pay_session * this.selectedRoom.room_sessions[0].invoice.package.session_price;
-                        // this.printInvoiceData.customer_discount = this.roomSessionData.customer_level_discount_value + this.selectedRoom.room_sessions[0].invoice.package.package_discount + this.selectedRoom.room_sessions[0].invoice.orders[0].total_discount_price;
-                    this.printInvoiceData.customer_discount = this.roomSessionData.customer_level_discount_value;
-                        this.printInvoiceData.total = (this.roomSessionData.total_session_price + this.printInvoiceData.food) - (this.printInvoiceData.package_discount + this.foodDiscount + this.printInvoiceData.customer_discount);
-                    }
-                    else {
-                    this.printInvoiceData.customer_discount = this.roomSessionData.customer_level_discount_value;
-                        this.printInvoiceData.total = ((this.roomSessionData.total_session_price + this.printInvoiceData.food) - ( this.foodDiscount + this.printInvoiceData.customer_discount));
-                    }
-
-                }
-                else {
-                    this.roomDiscountList = [];
-                    this.room_discount = null;
-                    let roomChargeTotal = 0;
-                    let roomSessions = this.roomSessionData;
-                    // roomSessions.forEach(roomSession => {
-                    roomChargeTotal = roomSessions.room_sessions.price;
-                    // });
-                    if (this.selectedRoom.room_sessions[0].invoice.invoice_type == 'package') {
-                        this.printInvoiceData.room = (this.roomSessionData.total_session_price - this.selectedRoom.room_sessions[0].invoice.package.package_discount);
-                    }
-                    else {
-                        // this.printInvoiceData.room = roomChargeTotal;
-                        this.printInvoiceData.room = this.roomSessionData.total_session_price;
-                    }
-                    this.printInvoiceData.roomDiscountAmount = null;
-                    this.printInvoiceData.discountSession = null;
-                    console.log(this.printInvoiceData.room, this.printInvoiceData.food);
-                    this.printInvoiceData.total = ((this.printInvoiceData.room + this.printInvoiceData.food) - (this.foodDiscount ));
-                    // this.printInvoiceData.total = this.printInvoiceData.room + this.printInvoiceData.food;
-                }
-            },
-            discountChanged() {
-                let roomTotalAmount = (this.roomSessionData.total_session_price + this.printInvoiceData.food) - this.printInvoiceData.package_discount - this.foodDiscount
-                console.log('room total = ' + this.printInvoiceData.room)
-                if (this.discount_type == 'percentage') {
-                    this.printInvoiceData.total = roomTotalAmount - (roomTotalAmount * (this.printInvoiceData.discount / 100));
-                    this.printInvoiceData.percent_discount_amount = roomTotalAmount * (this.printInvoiceData.discount / 100);
-                }
-                else {
-                    // this.printInvoiceData.total = roomTotalAmount - this.printInvoiceData.discount;
-                    if(this.printInvoiceData.discount){
-                        this.printInvoiceData.total = roomTotalAmount - this.printInvoiceData.discount;
-                        console.log(this.printInvoiceData.discount)
-                    }
-                    else{
-                        this.printInvoiceData.total = roomTotalAmount - this.printInvoiceData.discount;
-                        console.log(this.printInvoiceData.discount)
-                    }
-                }
-                console.log('room total amounttt = ' + roomTotalAmount);
+            //     if (this.purchaseMenuList.length > 0) {
+            //         this.printInvoiceData.food = this.purchaseMenuList[0].total
+            //         this.purchaseMenuList[0].order_items.forEach(element => {
+            //             this.orderList.push({
+            //                 'menu_category_id': element.menu.menu_category_id,
+            //                 'price': element.price,
+            //             })
+            //         });
+            //     }
+            //     if (this.selectedRoom.room_sessions[0].invoice.invoice_type == 'package') {
+            //         this.printInvoiceData.room = this.selectedRoom.room_sessions[0].invoice.total_session_price;
+            //         this.printInvoiceData.package_discount = this.selectedRoom.room_sessions[0].invoice.package.package_discount;
+            //         this.isPackage = true;
+            //         this.packagePrice = this.selectedRoom.room_sessions[0].invoice.paid_amount
+            //         this.printInvoiceData.total = (this.printInvoiceData.room + this.printInvoiceData.food) - this.printInvoiceData.package_discount - this.foodDiscount;
+            //     }
+            //     else {
+            //         this.isPackage = false;
+            //         this.printInvoiceData.total = (roomChargeTotal + this.printInvoiceData.food) - this.foodDiscount;
+            //     }
 
 
-            },
+            //     // room price = this.printInvoiceData.room
+            //     if (this.service_charge = true) {
+            //         this.printInvoiceData.service_tax = this.printInvoiceData.total * 0.05
+            //     }
+            //     if (this.isTax = true) {
+            //         this.printInvoiceData.tax = this.printInvoiceData.food * 0.05
+            //     }
 
-            btnClickedEndRoom() {
-                if(this.selectedPaymentMethod){
-                    this.EndRoom();
-                }
-                else{
-                    this.$notify({
-                        title: `Not valid`,
-                        text: 'Please Select Payment Method',
-                        type: "warn"
-                    });
-                }
+            //     // this.printInvoiceData.total = this.printInvoiceData.room + this.printInvoiceData.food + this.printInvoiceData.tax +this.printInvoiceData.service_tax
 
-            },
-            async EndRoom() {
-                let totalAmount = this.printInvoiceData.total;
-                let allTotalDiscounts = 0;
-                let formData = new FormData();
-                formData.append('invoice_id', this.selectedRoom.room_sessions[0].invoice.id);
-                formData.append('payment_type', this.selectedPaymentMethod);
-                formData.append('discount_type', this.discount_type);
+            //     this.selectedPaymentMethod = null
+            //     this.change = null
+            //     this.paid_amount = null
+            //     this.printInvoiceData.discount = 0
 
-                if (this.discount_type == 'fix_amount') {
-                    formData.append('discount_value', this.printInvoiceData.discount);
-                    // totalAmount = totalAmount - this.printInvoiceData.discount;
-                }
-                if (this.discount_type == 'percentage') {
-                    formData.append('discount_value', this.printInvoiceData.percent_discount_amount);
-                }
-                if (this.discount_type == 'room_discount') {
-                    formData.append('room_discount_id', this.room_discount.id);
-                }
-                if (this.discount_type == 'birthday_discount') {
-                    formData.append('birthday_promotion_id', this.birthday_discount.id);
-                    formData.append('birthday_discount', this.birthday_discount.discount_value);
-                }
-                if(this.discount_type == 'customer_level'){
-                    formData.append('customer_level_discount',this.roomSessionData.customer_level_discount_value);
-                }
-                formData.append('order_categories', JSON.stringify(this.orderList));
-                if (this.printInvoiceData.service_charge) {
-                    formData.append('service_charge', this.printInvoiceData.service_tax);
-                    totalAmount = totalAmount + this.printInvoiceData.service_tax
-                }
-                if (this.printInvoiceData.isTax) {
-                    formData.append('tax', this.printInvoiceData.tax);
-                    totalAmount = totalAmount + this.printInvoiceData.tax
-                }
-                // formData.append('total', this.printInvoiceData.total);
-                if (this.room_discount) {
-                    formData.append('room_discount_amount', this.printInvoiceData.roomDiscountAmount);
-                    formData.append('discount_session', this.printInvoiceData.discountSession);
-                }
-                if (this.selectedRoom.room_sessions[0].invoice.invoice_type == 'package') {
-                    if(this.discount_type == 'percentage'){
-                        allTotalDiscounts = this.foodDiscount + this.printInvoiceData.package_discount + this.printInvoiceData.percent_discount_amount
-                    }
-                    else if(this.discount_type == 'customer_level'){
-                        allTotalDiscounts = this.foodDiscount + this.printInvoiceData.package_discount + this.roomSessionData.customer_level_discount_value
-                    }
-                    else if(this.discount_type == 'birthday_discount'){
-                        allTotalDiscounts = this.foodDiscount + this.printInvoiceData.package_discount + this.birthday_discount.discount_value
-                    }
-                    else{
-                        allTotalDiscounts = this.foodDiscount + this.printInvoiceData.discount + this.printInvoiceData.package_discount
-                    }
-                }
-                else{
-                    if(this.discount_type == 'percentage'){
-                        allTotalDiscounts = this.foodDiscount + this.printInvoiceData.percent_discount_amount
-                    }
-                    else if(this.discount_type == 'customer_level'){
-                        allTotalDiscounts = this.foodDiscount + this.roomSessionData.customer_level_discount_value
-                    }
-                    else if(this.discount_type == 'birthday_discount'){
-                        allTotalDiscounts = this.foodDiscount + this.birthday_discount.discount_value
-                    }
-                    else{
-                        allTotalDiscounts = this.foodDiscount + this.printInvoiceData.discount
-                    }
-                }
-                formData.append('total', totalAmount);
-                formData.append('order_discount', this.foodDiscount);
-                formData.append('discount_total', allTotalDiscounts);
+            // },
+
+            // btnClickedServiceCharge(){
+            //     if (this.service_charge = true) {
+            //         this.printInvoiceData.service_tax = this.printInvoiceData.total * 0.05
+            //     }
+            // },
+            // btnClickedTax(){
+            //     if (this.isTax = true) {
+            //         this.printInvoiceData.tax = (this.printInvoiceData.food - this.foodDiscount) * 0.05
+            //     }
+            // },
+            // roomDiscountSelectChanged() {
+            //     let roomChargeTotal = 0;
+            //     let roomSessions = this.roomSessionData;
+            //     let totalSession = 0;
+            //     let originalSessions = this.room_discount.session;
+            //     let discountSessions = this.room_discount.free_session;
+            //     let totalDiscounts = originalSessions + discountSessions;
+            //     let paidSession = 0;
+            //     let pricePerHour = 0;
+            //     roomSessions.rooms_sessions.forEach(roomSession => {
+            //         totalSession += parseFloat(roomSession.session_duration);
+            //         pricePerHour = roomSession.entity.price_per_hour;
+            //     });
+
+            //     if (totalSession <= totalDiscounts) {
+            //         if (totalSession > originalSessions) {
+            //             paidSession = originalSessions;
+            //         }
+            //         else {
+            //             paidSession = totalSession;
+            //         }
+            //     }
+            //     else {
+            //         let q = Math.floor(totalSession / totalDiscounts);
+            //         let qProdOrig = q * originalSessions;
+            //         let r = totalSession % totalDiscounts;
+            //         paidSession = (qProdOrig + r);
+            //     }
+            //     let test = this.roomSessionData.total_session_price - (discountSessions * pricePerHour)
+            //     console.log('new total = ' + test)
+            //     roomChargeTotal = paidSession * pricePerHour;
+            //     if (this.selectedRoom.room_sessions[0].invoice.invoice_type == 'package') {
+            //         this.printInvoiceData.room = this.selectedRoom.room_sessions[0].invoice.total_session_price;
+            //     }
+            //     else {
+            //         this.printInvoiceData.room = roomChargeTotal;
+            //     }
+            //     this.printInvoiceData.roomDiscountAmount = roomChargeTotal;
+            //     this.printInvoiceData.discountSession = totalSession - paidSession;
+            //     this.printInvoiceData.total = this.printInvoiceData.room + this.printInvoiceData.food -this.foodDiscount;
+            // },
+            // birthdayDiscountSelectChanged() {
+            //     this.printInvoiceData.discount = this.birthday_discount.discount_value
+            //     if (this.selectedRoom.room_sessions[0].invoice.invoice_type == 'package') {
+            //         this.printInvoiceData.room = (this.roomSessionData.total_session_price) - this.selectedRoom.room_sessions[0].invoice.package.package_discount;
+            //     }
+            //     else {
+            //         this.printInvoiceData.room = this.roomSessionData.total_session_price;
+            //     }
+            //     console.log(this.printInvoiceData.room,this.printInvoiceData.food,this.printInvoiceData.discount,this.foodDiscount);
+            //     this.printInvoiceData.total = (this.printInvoiceData.room + this.printInvoiceData.food) - this.printInvoiceData.discount - this.foodDiscount
+            // },
+
+            // async getRoomDiscount() {
+            //     this.birthday_discount = null;
+            //     this.room_discount = null;
+            //     this.printInvoiceData.discount = 0;
+            //     if (this.discount_type == 'room_discount') {
+            //         const response = await getApiData({ url: '/api/room_discounts', token: this.getToken() });
+            //         if (response.data) {
+            //             this.roomDiscountList = response.data.data;
+            //             console.log('get room dis list' + response.data.data)
+            //             // this.printInvoiceData.total = this.printInvoiceData.room + this.printInvoiceData.food;
+            //         }
+            //         this.printInvoiceData.total = ((this.printInvoiceData.room + this.printInvoiceData.food) - this.foodDiscount);
+
+            //     }
+            //     else if (this.discount_type == 'birthday_discount') {
+
+            //         const response = await getApiData({ url: '/api/birthday_promotions', token: this.getToken() });
+            //         if (response.data) {
+            //             this.birthdayDiscountList = response.data.data;
+            //         }
+            //         this.printInvoiceData.total = (this.printInvoiceData.room + this.printInvoiceData.food) - this.foodDiscount;
+            //     }
+
+            //     else if (this.discount_type == 'customer_level') {
+
+            //         if (this.selectedRoom.room_sessions[0].invoice.invoice_type == 'package') {
+            //             // this.printInvoiceData.room = this.selectedRoom.room_sessions[0].invoice.package.pay_session * this.selectedRoom.room_sessions[0].invoice.package.session_price;
+            //             // this.printInvoiceData.customer_discount = this.roomSessionData.customer_level_discount_value + this.selectedRoom.room_sessions[0].invoice.package.package_discount + this.selectedRoom.room_sessions[0].invoice.orders[0].total_discount_price;
+            //         this.printInvoiceData.customer_discount = this.roomSessionData.customer_level_discount_value;
+            //             this.printInvoiceData.total = (this.roomSessionData.total_session_price + this.printInvoiceData.food) - (this.printInvoiceData.package_discount + this.foodDiscount + this.printInvoiceData.customer_discount);
+            //         }
+            //         else {
+            //         this.printInvoiceData.customer_discount = this.roomSessionData.customer_level_discount_value;
+            //             this.printInvoiceData.total = ((this.roomSessionData.total_session_price + this.printInvoiceData.food) - ( this.foodDiscount + this.printInvoiceData.customer_discount));
+            //         }
+
+            //     }
+            //     else {
+            //         this.roomDiscountList = [];
+            //         this.room_discount = null;
+            //         let roomChargeTotal = 0;
+            //         let roomSessions = this.roomSessionData;
+            //         // roomSessions.forEach(roomSession => {
+            //         roomChargeTotal = roomSessions.room_sessions.price;
+            //         // });
+            //         if (this.selectedRoom.room_sessions[0].invoice.invoice_type == 'package') {
+            //             this.printInvoiceData.room = (this.roomSessionData.total_session_price - this.selectedRoom.room_sessions[0].invoice.package.package_discount);
+            //         }
+            //         else {
+            //             // this.printInvoiceData.room = roomChargeTotal;
+            //             this.printInvoiceData.room = this.roomSessionData.total_session_price;
+            //         }
+            //         this.printInvoiceData.roomDiscountAmount = null;
+            //         this.printInvoiceData.discountSession = null;
+            //         console.log(this.printInvoiceData.room, this.printInvoiceData.food);
+            //         this.printInvoiceData.total = ((this.printInvoiceData.room + this.printInvoiceData.food) - (this.foodDiscount ));
+            //         // this.printInvoiceData.total = this.printInvoiceData.room + this.printInvoiceData.food;
+            //     }
+            // },
+            // discountChanged() {
+            //     let roomTotalAmount = (this.roomSessionData.total_session_price + this.printInvoiceData.food) - this.printInvoiceData.package_discount - this.foodDiscount
+            //     console.log('room total = ' + this.printInvoiceData.room)
+            //     if (this.discount_type == 'percentage') {
+            //         this.printInvoiceData.total = roomTotalAmount - (roomTotalAmount * (this.printInvoiceData.discount / 100));
+            //         this.printInvoiceData.percent_discount_amount = roomTotalAmount * (this.printInvoiceData.discount / 100);
+            //     }
+            //     else {
+            //         // this.printInvoiceData.total = roomTotalAmount - this.printInvoiceData.discount;
+            //         if(this.printInvoiceData.discount){
+            //             this.printInvoiceData.total = roomTotalAmount - this.printInvoiceData.discount;
+            //             console.log(this.printInvoiceData.discount)
+            //         }
+            //         else{
+            //             this.printInvoiceData.total = roomTotalAmount - this.printInvoiceData.discount;
+            //             console.log(this.printInvoiceData.discount)
+            //         }
+            //     }
+            //     console.log('room total amounttt = ' + roomTotalAmount);
 
 
-                console.log(formData)
+            // },
 
-                let response = await postApiData({ url: '/api/entities/done', form_data: formData, token: this.getToken() });
-                if (response.success) {
-                    await this.getRoomList();
-                    // this.selectedRoom = await this.roomList[this.selectedRoomIndex];
-                    this.isOpenRoom.step_1 = true;
-                    this.isOpenRoom.step_2 = false;
-                    this.isOpenRoom.step_detail = false;
-                    this.isOpenRoom.step_invoice = false;
+            // btnClickedEndRoom() {
+            //     if(this.selectedPaymentMethod){
+            //         this.EndRoom();
+            //     }
+            //     else{
+            //         this.$notify({
+            //             title: `Not valid`,
+            //             text: 'Please Select Payment Method',
+            //             type: "warn"
+            //         });
+            //     }
 
-                    console.log("success")
-                    // window.location.reload()
-                }
-                else {
-                    console.log('some errors occur');
-                }
-            },
+            // },
+            // async EndRoom() {
+            //     let totalAmount = this.printInvoiceData.total;
+            //     let allTotalDiscounts = 0;
+            //     let formData = new FormData();
+            //     formData.append('invoice_id', this.selectedRoom.room_sessions[0].invoice.id);
+            //     formData.append('payment_type', this.selectedPaymentMethod);
+            //     formData.append('discount_type', this.discount_type);
+
+            //     if (this.discount_type == 'fix_amount') {
+            //         formData.append('discount_value', this.printInvoiceData.discount);
+            //         // totalAmount = totalAmount - this.printInvoiceData.discount;
+            //     }
+            //     if (this.discount_type == 'percentage') {
+            //         formData.append('discount_value', this.printInvoiceData.percent_discount_amount);
+            //     }
+            //     if (this.discount_type == 'room_discount') {
+            //         formData.append('room_discount_id', this.room_discount.id);
+            //     }
+            //     if (this.discount_type == 'birthday_discount') {
+            //         formData.append('birthday_promotion_id', this.birthday_discount.id);
+            //         formData.append('birthday_discount', this.birthday_discount.discount_value);
+            //     }
+            //     if(this.discount_type == 'customer_level'){
+            //         formData.append('customer_level_discount',this.roomSessionData.customer_level_discount_value);
+            //     }
+            //     formData.append('order_categories', JSON.stringify(this.orderList));
+            //     if (this.printInvoiceData.service_charge) {
+            //         formData.append('service_charge', this.printInvoiceData.service_tax);
+            //         totalAmount = totalAmount + this.printInvoiceData.service_tax
+            //     }
+            //     if (this.printInvoiceData.isTax) {
+            //         formData.append('tax', this.printInvoiceData.tax);
+            //         totalAmount = totalAmount + this.printInvoiceData.tax
+            //     }
+            //     // formData.append('total', this.printInvoiceData.total);
+            //     if (this.room_discount) {
+            //         formData.append('room_discount_amount', this.printInvoiceData.roomDiscountAmount);
+            //         formData.append('discount_session', this.printInvoiceData.discountSession);
+            //     }
+            //     if (this.selectedRoom.room_sessions[0].invoice.invoice_type == 'package') {
+            //         if(this.discount_type == 'percentage'){
+            //             allTotalDiscounts = this.foodDiscount + this.printInvoiceData.package_discount + this.printInvoiceData.percent_discount_amount
+            //         }
+            //         else if(this.discount_type == 'customer_level'){
+            //             allTotalDiscounts = this.foodDiscount + this.printInvoiceData.package_discount + this.roomSessionData.customer_level_discount_value
+            //         }
+            //         else if(this.discount_type == 'birthday_discount'){
+            //             allTotalDiscounts = this.foodDiscount + this.printInvoiceData.package_discount + this.birthday_discount.discount_value
+            //         }
+            //         else{
+            //             allTotalDiscounts = this.foodDiscount + this.printInvoiceData.discount + this.printInvoiceData.package_discount
+            //         }
+            //     }
+            //     else{
+            //         if(this.discount_type == 'percentage'){
+            //             allTotalDiscounts = this.foodDiscount + this.printInvoiceData.percent_discount_amount
+            //         }
+            //         else if(this.discount_type == 'customer_level'){
+            //             allTotalDiscounts = this.foodDiscount + this.roomSessionData.customer_level_discount_value
+            //         }
+            //         else if(this.discount_type == 'birthday_discount'){
+            //             allTotalDiscounts = this.foodDiscount + this.birthday_discount.discount_value
+            //         }
+            //         else{
+            //             allTotalDiscounts = this.foodDiscount + this.printInvoiceData.discount
+            //         }
+            //     }
+            //     formData.append('total', totalAmount);
+            //     formData.append('order_discount', this.foodDiscount);
+            //     formData.append('discount_total', allTotalDiscounts);
+
+
+            //     console.log(formData)
+
+            //     let response = await postApiData({ url: '/api/entities/done', form_data: formData, token: this.getToken() });
+            //     if (response.success) {
+            //         await this.getRoomList();
+            //         // this.selectedRoom = await this.roomList[this.selectedRoomIndex];
+            //         this.isOpenRoom.step_1 = true;
+            //         this.isOpenRoom.step_2 = false;
+            //         this.isOpenRoom.step_detail = false;
+            //         this.isOpenRoom.step_invoice = false;
+
+            //         console.log("success")
+            //         // window.location.reload()
+            //     }
+            //     else {
+            //         console.log('some errors occur');
+            //     }
+            // },
 
 
 
@@ -1724,99 +1767,99 @@ import { getCurrentTime } from "../../../utilities/datetime-helpers";
 
 
             // add menu
-            async getMenuList() {
-                const response = await getApiData({ url: '/api/menus', token: this.getToken() });
-                if (response.data) {
-                    this.menuList = response.data;
-                }
-            },
-            async selectedMenuChange() {
-                const response = await getApiData({ url: '/api/menus/' + this.selectedMenu.id + '/areas', token: this.getToken() });
-                if (response.data) {
-                    this.menuAreaList = response.data.areas;
-                }
-            },
-            btnClickAddMenu() {
-                this.invoiceId = this.selectedRoom.room_sessions[0].invoice.invoice_id;
-                console.log('invoice id ' + this.invoiceId)
-            },
-            btnConfirmAddMenu() {
-                this.addMenu();
-            },
-            async addMenu() {
-                let formData = new FormData();
-                formData.append('invoice_id', this.invoiceId);
-                formData.append('menu_id', this.selectedMenu.id);
-                formData.append('area_id', this.selectedMenuArea.id);
-                formData.append('quantity', this.menuQuantity);
-                formData.append('original_price', this.selectedMenu.prices[0].price);
-                formData.append('remark', this.remark);
-                let response = await postApiData({ url: '/api/entities/orders', form_data: formData, token: this.getToken() });
-                // console.log(this.invoiceId+','+this.selectedMenu.id + ','+ this.menuQuantity +','+this.selectedMenu.prices[0].price)
-                if (response.success) {
-                    this.closeModal('closeMenuModal');
-                    this.clearMenuForm();
-                    this.getPurchaseMenuList();
-                }
-                else {
-                    console.log('some errors occur');
-                }
-            },
-            btnAddHour() {
-                this.addHour();
-            },
-            async addHour() {
-                let formData = new FormData();
-                formData.append('invoice_id', this.selectedRoom.room_sessions[0].invoice.invoice_id);
-                formData.append('session_duration', this.sessionDuration);
-                let response = await postApiData({ url: '/api/entities/add_more_sessions', form_data: formData, token: this.getToken() });
-                if (response.success) {
-                    console.log("success")
-                    await this.getRoomList();
-                    // this.selectedRoom = await this.roomList[this.selectedRoomIndex];
-                    this.getSelectedRoom();
-                    this.closeModal();
-                    this.clearAddHourForm();
-                }
-                else {
-                    this.$notify({
-                        title: `Not valid`,
-                        text: response.message,
-                        type: "warn"
-                    });
-                }
-            },
-            btnClickedChangeRoom() {
-                this.changeRoom();
-            },
-            async changeRoom() {
-                let formData = new FormData();
-                formData.append('invoice_id', this.selectedRoom.room_sessions[0].invoice.invoice_id);
-                formData.append('entity_id', this.change_room.id);
-                let response = await postApiData({ url: '/api/entities/change', form_data: formData, token: this.getToken() });
-                console.log('change room ' + this.selectedRoom.room_sessions[0].invoice.invoice_id + ',' + this.change_room.id)
-                if (response.success) {
-                    console.log("success");
-                    await this.getRoomList();
-                    // this.selectedRoom = this.roomList.find(x => x.id === this.change_room.id);
-                    this.selectedRoomId = this.change_room.id;
-                    this.getSelectedRoom();
-                    this.closeModal('close_change_room_modal');
-                    this.clearChangeRoomForm();
-                }
-                else {
-                    console.log('some errors occur');
-                }
-            },
-            btnClickedGetChangeableRoomList() {
-                this.getChangeableRoomList();
-            },
-            async getChangeableRoomList() {
-                const response = await getApiData({ url: '/api/areas/' + this.selectedAreaId + '/inactive_entities', token: this.getToken() });
-                if (response.data) {
-                    this.changeableRoomList = response.data;
-                }
-            },
+            // async getMenuList() {
+            //     const response = await getApiData({ url: '/api/menus', token: this.getToken() });
+            //     if (response.data) {
+            //         this.menuList = response.data;
+            //     }
+            // },
+            // async selectedMenuChange() {
+            //     const response = await getApiData({ url: '/api/menus/' + this.selectedMenu.id + '/areas', token: this.getToken() });
+            //     if (response.data) {
+            //         this.menuAreaList = response.data.areas;
+            //     }
+            // },
+            // btnClickAddMenu() {
+            //     this.invoiceId = this.selectedRoom.room_sessions[0].invoice.invoice_id;
+            //     console.log('invoice id ' + this.invoiceId)
+            // },
+            // btnConfirmAddMenu() {
+            //     this.addMenu();
+            // },
+            // async addMenu() {
+            //     let formData = new FormData();
+            //     formData.append('invoice_id', this.invoiceId);
+            //     formData.append('menu_id', this.selectedMenu.id);
+            //     formData.append('area_id', this.selectedMenuArea.id);
+            //     formData.append('quantity', this.menuQuantity);
+            //     formData.append('original_price', this.selectedMenu.prices[0].price);
+            //     formData.append('remark', this.remark);
+            //     let response = await postApiData({ url: '/api/entities/orders', form_data: formData, token: this.getToken() });
+            //     // console.log(this.invoiceId+','+this.selectedMenu.id + ','+ this.menuQuantity +','+this.selectedMenu.prices[0].price)
+            //     if (response.success) {
+            //         this.closeModal('closeMenuModal');
+            //         this.clearMenuForm();
+            //         this.getPurchaseMenuList();
+            //     }
+            //     else {
+            //         console.log('some errors occur');
+            //     }
+            // },
+            // btnAddHour() {
+            //     this.addHour();
+            // },
+            // async addHour() {
+            //     let formData = new FormData();
+            //     formData.append('invoice_id', this.selectedRoom.room_sessions[0].invoice.invoice_id);
+            //     formData.append('session_duration', this.sessionDuration);
+            //     let response = await postApiData({ url: '/api/entities/add_more_sessions', form_data: formData, token: this.getToken() });
+            //     if (response.success) {
+            //         console.log("success")
+            //         await this.getRoomList();
+            //         // this.selectedRoom = await this.roomList[this.selectedRoomIndex];
+            //         this.getSelectedRoom();
+            //         this.closeModal();
+            //         this.clearAddHourForm();
+            //     }
+            //     else {
+            //         this.$notify({
+            //             title: `Not valid`,
+            //             text: response.message,
+            //             type: "warn"
+            //         });
+            //     }
+            // },
+            // btnClickedChangeRoom() {
+            //     this.changeRoom();
+            // },
+            // async changeRoom() {
+            //     let formData = new FormData();
+            //     formData.append('invoice_id', this.selectedRoom.room_sessions[0].invoice.invoice_id);
+            //     formData.append('entity_id', this.change_room.id);
+            //     let response = await postApiData({ url: '/api/entities/change', form_data: formData, token: this.getToken() });
+            //     console.log('change room ' + this.selectedRoom.room_sessions[0].invoice.invoice_id + ',' + this.change_room.id)
+            //     if (response.success) {
+            //         console.log("success");
+            //         await this.getRoomList();
+            //         // this.selectedRoom = this.roomList.find(x => x.id === this.change_room.id);
+            //         this.selectedRoomId = this.change_room.id;
+            //         this.getSelectedRoom();
+            //         this.closeModal('close_change_room_modal');
+            //         this.clearChangeRoomForm();
+            //     }
+            //     else {
+            //         console.log('some errors occur');
+            //     }
+            // },
+            // btnClickedGetChangeableRoomList() {
+            //     this.getChangeableRoomList();
+            // },
+            // async getChangeableRoomList() {
+            //     const response = await getApiData({ url: '/api/areas/' + this.selectedAreaId + '/inactive_entities', token: this.getToken() });
+            //     if (response.data) {
+            //         this.changeableRoomList = response.data;
+            //     }
+            // },
 
 
 
@@ -1837,52 +1880,52 @@ import { getCurrentTime } from "../../../utilities/datetime-helpers";
                 this.address_name = null
                 this.address = null
             },
-            clearMenuForm() {
-                this.invoiceId = null
-                this.menuQuantity = null
-                this.selectedMenu = null
-            },
-            clearAddHourForm() {
-                this.sessionDuration = null
-            },
-            clearChangeRoomForm() {
-                this.change_room = null
-            },
-            clearOpenRoomForm() {
-                this.selectedCustomer = null
-                this.type = 'session'
-                this.selectedPackage = null
-                this.deposit = null
-                this.invoice_date = null
-                this.duration = null
-                this.male = null
-                this.female = null
-                this.child = null
-            },
-            showSidebar(){
-                if(this.isShowSidebar){
+            // clearMenuForm() {
+            //     this.invoiceId = null
+            //     this.menuQuantity = null
+            //     this.selectedMenu = null
+            // },
+            // clearAddHourForm() {
+            //     this.sessionDuration = null
+            // },
+            // clearChangeRoomForm() {
+            //     this.change_room = null
+            // },
+            // clearOpenRoomForm() {
+            //     this.selectedCustomer = null
+            //     this.type = 'session'
+            //     this.selectedPackage = null
+            //     this.deposit = null
+            //     this.invoice_date = null
+            //     this.duration = null
+            //     this.male = null
+            //     this.female = null
+            //     this.child = null
+            // },
+            // showSidebar(){
+            //     if(this.isShowSidebar){
 
-                    this.isOpenRoom.open_1 = false;
-                    this.isOpenRoom.open_2 = false;
-                    this.isOpenRoom.detail = true;
-                    this.isOpenRoom.invoice = false;
-                    this.isShowSidebar = false;
+            //         this.isOpenRoom.open_1 = false;
+            //         this.isOpenRoom.open_2 = false;
+            //         this.isOpenRoom.detail = true;
+            //         this.isOpenRoom.invoice = false;
+            //         this.isShowSidebar = false;
 
-                }
-                else{
-                    this.isShowSidebar = true
-                }
-            },
-            isOpenRoomStep(selectedKey) {
-                for (let key in this.isOpenRoom) {
-                    if (key === selectedKey) {
-                        this.isOpenRoom[key] = true;
-                    }
-                    else {
-                        this.isOpenRoom[key] = false;
-                    }
-                }
-            },
+            //     }
+            //     else{
+            //         this.isShowSidebar = true
+            //     }
+            // },
+            // isOpenRoomStep(selectedKey) {
+            //     for (let key in this.isOpenRoom) {
+            //         if (key === selectedKey) {
+            //             this.isOpenRoom[key] = true;
+            //         }
+            //         else {
+            //             this.isOpenRoom[key] = false;
+            //         }
+            //     }
+            // },
 
             testtime(){
                 let targetTime = '16:00'
@@ -1899,22 +1942,24 @@ import { getCurrentTime } from "../../../utilities/datetime-helpers";
 
             }
         },
+        
 
-        watch: {
-            selectedRoom(val, oldVal) {
-                console.log(`new: ${val}, old: ${oldVal}`)
-            },
-        },
+        // watch: {
+        //     selectedRoom(val, oldVal) {
+        //         console.log(`new: ${val}, old: ${oldVal}`)
+        //     },
+        // },
         created(){
-            this.getAreaList();
-            this.getCustomerList();
-            this.getGendersList();
-            this.getMenuList();
-            this.getDivisionList();
+            
+            // this.getCustomerList();
+            // this.getGendersList();
+            // this.getMenuList();
+            // this.getDivisionList();
             // this.testtime();
         },
         mounted()
         {
+            this.getAreaList();
             initTE({ Modal, Select, Ripple, Datepicker });
         }
     }

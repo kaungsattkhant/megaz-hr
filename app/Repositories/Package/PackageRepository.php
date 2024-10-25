@@ -13,6 +13,7 @@ class PackageRepository implements PackageRepositoryInterface
 {
     public function listAllData(Request $request)
     {
+        // if(isset($request->perPage))
         $validateDate = $request->date ?? CurrentDate();
         $packages = Package::with(['menuPackages.menu.areas'])->where('from_date', '<=', $validateDate)
             ->orderBy('created_at','desc')

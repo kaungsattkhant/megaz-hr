@@ -91,9 +91,11 @@ class EntityRepository implements EntityRepositoryInterface
     public function entityDetail(array $data, int $entitySessionId)
     {
         $entitySession = EntitySession::where('is_available', 1)
-            ->with(['roomSessions' => function ($query) {
-                $query->latest()->first();
-            }])
+            ->with([
+                'roomSessions' => function ($query) {
+                    $query->latest()->first();
+                }
+            ])
             ->find($entitySessionId);
 
 
@@ -136,33 +138,72 @@ class EntityRepository implements EntityRepositoryInterface
         return $entitySession;
     }
 
+
     public function entitySessionWithInvoice(array $data, int $entityId)
     {
         $entity = Entity::find($entityId);
-        $entitySession = EntitySession::where('is_active', 1)
-            ->with(['entity', 'roomSessions'])->where('entity_id', $entityId)->first();
+        if ($entity->entity_type == 'room') {
+            $entitySession = EntitySession::where('is_active', 1)
+                ->with(['entity', 'roomSessions'])->where('entity_id', $entityId)->first();
 
-        $invoiceId = $entitySession->roomSession->invoice_id;
-        $roomSessions = RoomSession::where('invoice_id', $invoiceId)
-            ->orderBy('created_at')
-            ->get();
+            $invoiceId = $entitySession->roomSession->invoice_id;
+            $roomSessions = RoomSession::where('invoice_id', $invoiceId)
+                ->orderBy('created_at')
+                ->get();
 
-        $firstRoomSession = $roomSessions->first();
-        $lastRoomSession = $roomSessions->last();
+            $firstRoomSession = $roomSessions->first();
+            $lastRoomSession = $roomSessions->last();
 
-        foreach ($entitySession->roomSessions as $roomSession) {
-            $invoice = $roomSession->invoice;
-            $invoice->package;
-            if ($invoice) {
-                $consolidatedOrderItems = [];
 
-                foreach ($invoice->orders as $order) {
+            foreach ($entitySession->roomSessions as $roomSession) {
+                $invoice = $roomSession->invoice;
+                $invoice->package;
+                if ($invoice) {
+                    $consolidatedOrderItems = [];
+                    foreach ($invoice->orders as $order) {
+                        $orderItems = OrderItem::where('order_id', $order->id)->get();
+                        foreach ($orderItems as $orderItem) {
+                            $menuId = $orderItem->menu_id;
+                            $status = $orderItem->status;
+                            if (isset($consolidatedOrderItems[$menuId][$status])) {
+                                $consolidatedOrderItems[$menuId][$status]->quantity += $orderItem->quantity;
+                                $consolidatedOrderItems[$menuId][$status]->price += $orderItem->price;
+                                $consolidatedOrderItems[$menuId][$status]->discount_price += $orderItem->discount_price;
+                            } else {
+                                $consolidatedOrderItems[$menuId][$status] = $orderItem;
+                            }
+                        }
+                    }
+
+                    foreach ($invoice->orders as $order) {
+                        $order->order_items = collect();
+
+                        foreach ($consolidatedOrderItems as $menuId => $itemsByStatus) {
+                            foreach ($itemsByStatus as $status => $order_items) {
+                                $order_items->menu;
+                                $order->order_items->push($order_items);
+                            }
+                        }
+                    }
+                }
+            }
+            $entitySession['start_date'] = $firstRoomSession->start_date;
+            $entitySession['end_date'] = $lastRoomSession->end_date;
+            return $entitySession;
+        }
+        if ($entity->entity_type == 'table') {
+            if (!$entity->latestInvoice) {
+                ResponseMessage('Invoice Detail is invalid', 419);
+            }
+            $invoice = $entity->latestInvoice;
+            $orders = $invoice->orders;
+            if ($orders->isNotEmpty()) {
+                // $entity->invoice = $orders;
+                foreach ($orders as $order) {
                     $orderItems = OrderItem::where('order_id', $order->id)->get();
-
                     foreach ($orderItems as $orderItem) {
                         $menuId = $orderItem->menu_id;
                         $status = $orderItem->status;
-
                         if (isset($consolidatedOrderItems[$menuId][$status])) {
                             $consolidatedOrderItems[$menuId][$status]->quantity += $orderItem->quantity;
                             $consolidatedOrderItems[$menuId][$status]->price += $orderItem->price;
@@ -173,7 +214,8 @@ class EntityRepository implements EntityRepositoryInterface
                     }
                 }
 
-                foreach ($invoice->orders as $order) {
+
+                foreach ($orders as $order) {
                     $order->order_items = collect();
 
                     foreach ($consolidatedOrderItems as $menuId => $itemsByStatus) {
@@ -183,11 +225,107 @@ class EntityRepository implements EntityRepositoryInterface
                         }
                     }
                 }
+                $invoice->orders = $orders;
+                $entity->invoice = $invoice;
             }
+            $responseData = [];
+            $responseData['entity_id'] = $entity->id;
+            $responseData['room_sessions'] = $entity;
+            return $responseData;
         }
-        $entitySession['start_date'] = $firstRoomSession->start_date;
-        $entitySession['end_date'] = $lastRoomSession->end_date;
-        return $entitySession;
+
+
+    }
+    public function tableWithInvoiceDetail(array $data, int $entityId)
+    {
+        $entity = Entity::find($entityId);
+        if (!$entity->latestInvoice) {
+            ResponseMessage('Invoice Detail is invalid', 419);
+        }
+        $invoice = $entity->latestInvoice;
+        $orders = $invoice->orders;
+        if ($orders->isNotEmpty()) {
+            // $entity->invoice = $orders;
+            foreach ($orders as $order) {
+                $orderItems = OrderItem::where('order_id', $order->id)->get();
+                foreach ($orderItems as $orderItem) {
+                    $menuId = $orderItem->menu_id;
+                    $status = $orderItem->status;
+                    if (isset($consolidatedOrderItems[$menuId][$status])) {
+                        $consolidatedOrderItems[$menuId][$status]->quantity += $orderItem->quantity;
+                        $consolidatedOrderItems[$menuId][$status]->price += $orderItem->price;
+                        $consolidatedOrderItems[$menuId][$status]->discount_price += $orderItem->discount_price;
+                    } else {
+                        $consolidatedOrderItems[$menuId][$status] = $orderItem;
+                    }
+                }
+            }
+
+
+            foreach ($orders as $order) {
+                $order->order_items = collect();
+
+                foreach ($consolidatedOrderItems as $menuId => $itemsByStatus) {
+                    foreach ($itemsByStatus as $status => $order_items) {
+                        $order_items->menu;
+                        $order->order_items->push($order_items);
+                    }
+                }
+            }
+            $invoice->orders = $orders;
+            $entity->invoice = $invoice;
+        }
+        $responseData = [];
+        $responseData['entity_id'] = $entity->id;
+        $responseData['room_sessions'] = $entity;
+        return $responseData;
+        // $entitySession = EntitySession::where('is_active', 1)
+        //     ->with(['entity', 'roomSessions'])->where('entity_id', $entityId)->first();
+
+        // $invoiceId = $entitySession->roomSession->invoice_id;
+        // $roomSessions = RoomSession::where('invoice_id', $invoiceId)
+        //     ->orderBy('created_at')
+        //     ->get();
+
+        // $firstRoomSession = $roomSessions->first();
+        // $lastRoomSession = $roomSessions->last();
+
+
+        // foreach ($entitySession->roomSessions as $roomSession) {
+        //     $invoice = $roomSession->invoice;
+        //     $invoice->package;
+        //     if ($invoice) {
+        //         $consolidatedOrderItems = [];
+        //         foreach ($invoice->orders as $order) {
+        //             $orderItems = OrderItem::where('order_id', $order->id)->get();
+        //             foreach ($orderItems as $orderItem) {
+        //                 $menuId = $orderItem->menu_id;
+        //                 $status = $orderItem->status;
+        //                 if (isset($consolidatedOrderItems[$menuId][$status])) {
+        //                     $consolidatedOrderItems[$menuId][$status]->quantity += $orderItem->quantity;
+        //                     $consolidatedOrderItems[$menuId][$status]->price += $orderItem->price;
+        //                     $consolidatedOrderItems[$menuId][$status]->discount_price += $orderItem->discount_price;
+        //                 } else {
+        //                     $consolidatedOrderItems[$menuId][$status] = $orderItem;
+        //                 }
+        //             }
+        //         }
+
+        //         foreach ($invoice->orders as $order) {
+        //             $order->order_items = collect();
+
+        //             foreach ($consolidatedOrderItems as $menuId => $itemsByStatus) {
+        //                 foreach ($itemsByStatus as $status => $order_items) {
+        //                     $order_items->menu;
+        //                     $order->order_items->push($order_items);
+        //                 }
+        //             }
+        //         }
+        //     }
+        // }
+        // $entitySession['start_date'] = $firstRoomSession->start_date;
+        // $entitySession['end_date'] = $lastRoomSession->end_date;
+        // return $entitySession;
     }
 
 

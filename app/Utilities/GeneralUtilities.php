@@ -350,3 +350,15 @@ if (!function_exists('InventoryIds')) {
         return UserData()->inventories->pluck('id')->toArray();
     }
 }
+
+if (!function_exists('existOrderItemByStatus')) {
+    function existOrderItemByStatus($orderItems,$status)
+    {
+        // return UserData()->inventories->pluck('id')->toArray();
+        $existOrderItems=$orderItems->whereIn('status',$status);
+        if($existOrderItems->isEmpty()){
+            return false;
+        }
+        return true;
+    }
+}

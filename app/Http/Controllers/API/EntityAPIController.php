@@ -72,6 +72,15 @@ class EntityAPIController extends Controller
         ResponseData($entity);
     }
 
+    public function tableWithInvoiceDetail(Request $request, $id)
+    {
+        $data = $request->all();
+        $data['current_date'] = CurrentDate();
+        $entity = $this->entityRepo->tableWithInvoiceDetail($data,$id);
+        ResponseData($entity);
+    }
+    
+
     public function getEntitySessionDetail(Request $request, int $id)
     {
         $data = $request->all();

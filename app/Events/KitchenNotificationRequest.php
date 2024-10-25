@@ -25,8 +25,8 @@ class KitchenNotificationRequest implements ShouldBroadcast
     public function __construct(Entity $entity,Order $order, array $orderItems = null, OrderItem $orderItem = null, $department_id)
     {
         $this->department_id = $department_id;
-        $this->order = $order;
-        $this->entity = $entity;
+        $this->order = $order;                          
+        $this->entity = $entity;                                                                                                                                                
 
 
         if ($orderItems !== null) {
@@ -59,7 +59,6 @@ class KitchenNotificationRequest implements ShouldBroadcast
             'order_items' => $this->orderItems,
             'entity' => $this->entity
         ];
-
         return $data;
     }
 }

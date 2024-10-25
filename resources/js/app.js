@@ -141,6 +141,9 @@ import MenuSaleReportComponent from './Components/Menus/MenuSaleReportComponent.
 import MenuCostingComponent from './Components/Menus/MenuCostingComponent.vue';
 import PosOrderItemList from './Components/Pos/OrderItem/PosOrderItemList.vue';
 
+import PosTableComponent from './Components/Pos/Home/PosTableComponent.vue';
+import PosRoomComponent from './Components/Pos/Home/PosRoomComponent.vue';
+
 app.component('NavBarComponent', NavBarComponent);
 app.component('StaffListComponent', StaffListComponent);
 app.component('StaffCreateComponent', StaffCreateComponent);
@@ -259,6 +262,9 @@ app.component('SaleTargetMenuEditComponent',SaleTargetMenuEditComponent);
 app.component('MenuSaleReportComponent',MenuSaleReportComponent);
 app.component('MenuCostingComponent',MenuCostingComponent);
 app.component('PosOrderItemList',PosOrderItemList);
+
+app.component('PosTableComponent',PosTableComponent);
+app.component('PosRoomComponent',PosRoomComponent);
 
 app.use(store);
 app.use(Notifications);
