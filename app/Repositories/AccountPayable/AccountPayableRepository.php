@@ -55,7 +55,6 @@ class AccountPayableRepository implements AccountPayableInterface
             ->orderByRaw("CAST(SUBSTRING_INDEX(account_code, '-', -1) AS UNSIGNED) DESC")
             ->first();
         // ->max('account_code');
-
         if ($latestAccount) {
             $latestAccountCodeNo = explode('-', $latestAccount->account_code);
             // dd($account_code_no[1]);
