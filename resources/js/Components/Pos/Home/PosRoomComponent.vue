@@ -839,7 +839,14 @@
     import { getCurrentTime } from "../../../utilities/datetime-helpers";
 
     export default {
-        props: ['roomAreaId'],
+        name:'PosRoomCompnent',
+        props:{
+            roomAreaId:{
+                type: Number,
+                required: true
+            }
+        },
+        // props: ['roomAreaId'],
         data() {
             return {
                 roomList:[],
@@ -1132,22 +1139,22 @@
                 }
                 let response = await postApiData({ url: '/api/entities/start', form_data: formData, token: this.getToken() });
                 if (response.success) {
-                    this.getRoomList();
-                    this.getSelectedRoom();
-                    this.isOpenRoomStep('detail');//for right side bar ui
+                    // this.getRoomList();
+                    // this.getSelectedRoom();
+                    // this.isOpenRoomStep('detail');
 
-                    if (this.selectedRoom.room_sessions.length > 0) {
-                        if (this.selectedRoom.room_sessions[0].invoice.orders.length > 0) {
-                            this.getPurchaseMenuList();
-                        }
-                    }
-                    if (this.selectedRoom.room_sessions.length < 1) {
-                        if (this.selectedRoom.room_sessions[0].invoice.orders.length < 1) {
-                            this.purchaseMenuList = [];
-                        }
-                    }
-                    this.food_total_package = 0 //total price of package menu and add more menu reset
-                    console.log("success")
+                    // if (this.selectedRoom.room_sessions.length > 0) {
+                    //     if (this.selectedRoom.room_sessions[0].invoice.orders.length > 0) {
+                    //         this.getPurchaseMenuList();
+                    //     }
+                    // }
+                    // if (this.selectedRoom.room_sessions.length < 1) {
+                    //     if (this.selectedRoom.room_sessions[0].invoice.orders.length < 1) {
+                    //         this.purchaseMenuList = [];
+                    //     }
+                    // }
+                    // this.food_total_package = 0 
+                    // console.log("success")
                     window.location.reload()
                 }
                 else {
@@ -1760,6 +1767,10 @@
             selectedRoom(val, oldVal) {
                 console.log(`new: ${val}, old: ${oldVal}`)
             },
+            roomAreaId(newId) {
+            // Call your function once areaId is updated
+            this.getRoomList(newId);
+            }
         },
         created(){
             this.getCustomerList();
@@ -1770,6 +1781,9 @@
         },
         mounted()
         {
+            if (this.roomAreaId) {
+                this.getRoomList(this.roomAreaId);
+            }
             initTE({ Modal, Select, Ripple, Datepicker });
         }
     }

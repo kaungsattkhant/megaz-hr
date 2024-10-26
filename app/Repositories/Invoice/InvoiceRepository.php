@@ -29,6 +29,7 @@ use App\Models\TargetPosition;
 use App\Models\TargetPositionResult;
 use App\Models\User;
 use App\Repositories\Order\OrderRepository;
+use App\Services\InvoiceService;
 use App\Services\OrderService;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Log;
@@ -37,9 +38,11 @@ class InvoiceRepository implements InvoiceRepositoryInterface
 {
     use CustomerTrait;
     private $orderService;
-    public function __construct(OrderService $orderService)
+    private $invoiceService;
+    public function __construct(OrderService $orderService,InvoiceService $invoiceService)
     {
         $this->orderService = $orderService;
+        $this->invoiceService = $invoiceService;
     }
     public function listAllData(Request $request)
     {
@@ -692,6 +695,13 @@ class InvoiceRepository implements InvoiceRepositoryInterface
     {
         DB::beginTransaction();
         try {
+            $invoice = Invoice::find($data['invoice_id']);
+            //added end_invoice for table oct 25 2024
+            if($invoice && $invoice->entity_id!=null){
+                $invoice=$this->doneTableForInvoice($data,$invoice);
+                DB::commit();
+                return $invoice;
+            }
             $foodCharge = 0;
             $beverageCharge = 0;
             $total_session_price = 0;
@@ -712,24 +722,17 @@ class InvoiceRepository implements InvoiceRepositoryInterface
             if (isset($data['tax'])) {
                 $tax = $data['tax'];
             }
-
             if (isset($data['service_charge'])) {
                 $service_charge = $data['service_charge'];
             }
 
-
             if (isset($data['order_discount'])) {
                 $order_discount = $data['order_discount'];
             }
-
-            if (isset($data['customer_level_discount'])) {
-                $customerLevelDiscount = $data['customer_level_discount'] ?? 0;
-            }
-
+         
             if (isset($data['birthday_discount'])) {
                 $bdDiscount = $data['birthday_discount'] ?? 0;
             }
-
             if (isset($data['order_categories'])) {
                 $data['order_categories'] = json_decode($data['order_categories'], true);
                 foreach ($data['order_categories'] as $menu) {
@@ -740,7 +743,6 @@ class InvoiceRepository implements InvoiceRepositoryInterface
                     }
                 }
             }
-            $invoice = Invoice::find($data['invoice_id']);
             $customer = Customer::find($invoice->customer_id);
             $invoice_id = $invoice->invoice_id;
             $lastRoomSession = $invoice->latestSession;
@@ -876,6 +878,16 @@ class InvoiceRepository implements InvoiceRepositoryInterface
             ResponseMessage($e->getMessage(), 422);
             throw $e;
         }
+    }
+
+    public function doneTableForInvoice($data,$invoice){
+        $data['total_discount']=$data['birthday_discount']+$data['customer_level_discount']+$data['discount_value']+$data['order_discount'];;
+        $data['sub_total'] = ($data['total'] + $data['tax'] + $data['service_charge'])-$data['total_discount'];
+        $data['payment_status'] = 'received';
+        $data['complete_date'] = CurrentTime();
+        $invoice->update($data);
+        $this->invoiceService->updateEntityStatus($invoice->entity_id,'inactive');
+        return $invoice;
     }
 
     public function invoiceConfirm(array $data)
