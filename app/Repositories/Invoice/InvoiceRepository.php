@@ -869,7 +869,6 @@ class InvoiceRepository implements InvoiceRepositoryInterface
             $entity->is_active = 0;
             $entity->status = 'inactive';
             $entity->save();
-
             DB::commit();
             return $invoice;
         } catch (\Exception $e) {
@@ -880,8 +879,11 @@ class InvoiceRepository implements InvoiceRepositoryInterface
     }
 
     public function doneTableForInvoice($data,$invoice){
+        $data['discount_value']=$data['discount_type']==null || $data['discount_type']=="null" ? 0 :$data['discount_value'];
         $data['total_discount']=$data['birthday_discount']+$data['customer_level_discount']+$data['discount_value']+$data['order_discount'];;
-        $data['sub_total'] = ($data['total'] + $data['tax'] + $data['service_charge'])-$data['total_discount'];
+        // $data['sub_total'] = ($data['total'] + $data['tax'] + $data['service_charge'])-$data['total_discount'];
+        $data['sub_total'] = $data['total'];
+        $data['total'] = $data['total']+$data['total_discount'];
         $data['payment_status'] = 'received';
         $data['complete_date'] = CurrentTime();
         $invoice->update($data);
