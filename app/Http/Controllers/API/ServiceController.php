@@ -28,4 +28,12 @@ class ServiceController extends Controller
         $data=$this->serviceRepo->detail($service);
         ResponseData($data);
     }
+
+    //pos 
+
+    public function getService(Request $request){
+        $data=$this->serviceRepo->getService($request);
+        ResponseData($data);
+    }
+
 }
