@@ -12,7 +12,13 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('entities', function (Blueprint $table) {
-            c
+            $table->id();
+            $table->string('name',45);
+            $table->double('price_per_hour');
+            $table->string('entity_type',45);
+            $table->foreignId('area_id');
+            $table->foreignId('service_category_id')->nullable();
+            $table->boolean('is_available')->default(1);
             $table->timestamps();
         });
     }
