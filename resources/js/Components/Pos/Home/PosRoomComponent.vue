@@ -837,7 +837,8 @@
             </div>
         </div>
 
-        <!-- add service modal -->
+
+            <!-- add Service modal -->
         <div data-te-modal-init
             class="fixed left-0 top-0 z-[1055] hidden h-full w-full overflow-y-auto overflow-x-hidden outline-none"
             id="add_service_modal" tabindex="-1" aria-labelledby="addMenuModalLabel" aria-modal="true" role="dialog">
@@ -849,7 +850,7 @@
                         <p class="text-xl w-full text-center">
                             Add Service
                         </p>
-                        <button type="button" id="closeAddMenuModal"
+                        <button type="button" id="closeMenuModal"
                             class="absolute top-4 right-4 focus:shadow-none focus:outline-none" data-te-modal-dismiss
                             aria-label="Close">
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
@@ -861,16 +862,13 @@
 
                     <div class="relative px-16 py-4" data-te-modal-body-ref>
                         <div class="mb-4">
-                            <!-- <multiselect v-model="selectedMenu" :options="menuList" :close-on-select="true" @select="selectedMenuChange()"
-                                class=" h-10"
-                                :clear-on-select="false" :preserve-search="true" placeholder="Select Menu" label="name"
-                                track-by="id" :preselect-first="false"></multiselect> -->
                             <label for="" class="label-form mb-3">
                                 Service Category
                             </label>
-                            <select name="" id="" placeholder="Service Category" v-model="selectedServiceCategory" @change="serviceCategoryChange()"
-                                class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
-                                <option :value="service" v-for="(service, index) in serviceList" :key="index">{{ service.name }}</option>
+                            <select name="" id="" v-model="selectedServiceCategory" class="input-ui">
+                                <option :value="service" v-for="(service, index) in serviceCategoryList"
+                                    :key="index">{{
+                                        service.name }}</option>
                             </select>
                         </div>
                         <div class="mb-4" v-if="selectedServiceCategory ? selectedServiceCategory.name == 'Lady' : ''">
@@ -887,24 +885,19 @@
                             <label for="" class="label-form mb-3">
                                 DJ
                             </label>
-                            <input type="text" placeholder="DJ Name" v-model="selectedDJ" class="input-ui">
+                            <input type="text" placeholder="DJ Name" v-model="selectedDj" class="input-ui">
                         </div>
                         <div class="mb-4">
-                            <label for="" class="label-form mb-3">
+                            <label for="" class="block text-sm text-black mb-3">
                                 Qty
                             </label>
-                            <input type="text" placeholder="Qty" v-model="serviceQuantity"
+                            <input type="text" placeholder="Hour" v-model="selectedServiceQuantity"
                                 class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
                         </div>
-                        <!-- <div>
-                            <textarea v-model="remark"
-                                class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0"
-                                name="" id="" cols="30" rows="10" placeholder="Remark"></textarea>
-                        </div> -->
                     </div>
 
                     <div class="flex justify-center px-12 mb-6">
-                        <button @click="btnConfirmService()" class="pos-add-btn focus:outline-none focus:ring-0 ">
+                        <button @click="btnConfirmAddPackageMenu()" class="pos-add-btn focus:outline-none focus:ring-0 ">
                             Add Menu
                         </button>
                     </div>
@@ -1052,15 +1045,12 @@
                 isShowSidebar:false,
                 testbro:null,
 
-                // add service 
-                serviceCategoryList:[],
-                ladyList :[],
-                djList:[],
 
-                selectedServiceCategory :null,
-                selectedLady :null, 
-                selectedDJ :null, 
-                serviceQuantity :null,
+                // add service
+                selectedServiceCategory:null,
+                selectedLady:null,
+                selectedDj:null,
+                selectedServiceQuantity:null,
 
             };
         },
@@ -1781,19 +1771,6 @@
 
 
 
-            // add service
-            getServiceCategoryList(){
-
-            },
-            serviceCategoryChange(){
-
-            },
-            btnConfirmService(){
-
-            },
-            addService(){
-
-            },
 
 
 
