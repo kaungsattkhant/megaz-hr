@@ -148,6 +148,12 @@ class StaffAPIController extends Controller
         ResponseData($staff);
     }
 
+    public function getStaffByDepartmentSlug($slug)
+    {
+        $staff = $this->staffRepo->getStaffByDepartmentSlug($slug);
+        ResponseData($staff);
+    }
+
     public function staffReport(Request $request)
     {
         $staff = $this->staffRepo->staffReport($request);

@@ -77,6 +77,7 @@ use App\Http\Controllers\API\PrepaidAPIController;
 use App\Http\Controllers\API\SaleTargetMenuAPIController;
 use App\Http\Controllers\API\SaleTargetPositionAPIController;
 use App\Http\Controllers\API\SaleTargetResultAPIController;
+use App\Http\Controllers\API\ServiceController;
 use App\Http\Controllers\API\SkillAPIController;
 use App\Http\Controllers\API\StaffAdvanceAPIController;
 use App\Models\Complaint;
@@ -376,9 +377,9 @@ Route::middleware('auth:api')->group(function () {
     });
     Route::resource('canteens', CanteenController::class)->only(['index', 'store', 'show']);
     Route::controller(CanteenController::class)->group(function () {
-
     });
-
+    //service
+    Route::resource('services', ServiceController::class)->only(['index', 'store', 'show']);
 });
 
 Route::controller(SaleTargetPositionAPIController::class)->group(function () {
@@ -430,6 +431,7 @@ Route::put('/areas/{id}', [AreaController::class, 'updateArea']);
 Route::delete('/areas/{id}', [AreaController::class, 'deleteArea']);
 Route::get('areas_by_department/{department_id}', [AreaController::class, 'getAreaByDepartment']);
 
+
 Route::get('/departments', [DepartmentAPIController::class, 'getDepartmentData']);
 Route::post('/departments', [DepartmentAPIController::class, 'createDepartment']);
 Route::post('/departments/{id}', [DepartmentAPIController::class, 'updateDepartment']);
@@ -449,6 +451,7 @@ Route::delete('/staffs/{staff_id}/roles/{role_id}', [StaffAPIController::class, 
 Route::delete('/staffs/{staff_id}/inventories/{inventory_id}', [StaffAPIController::class, 'deleteInventoryStaff']);
 Route::delete('/staffs/{staff_id}/features/{feature_id}', [StaffAPIController::class, 'deleteFeatureStaff']);
 Route::get('/departments/{department_id}/staffs', [StaffAPIController::class, 'getStaffByDepartment']);
+Route::get('/staff_by_department_slug/{slug}', [StaffAPIController::class, 'getStaffByDepartmentSlug']);
 Route::get('/staff_balances', [StaffAPIController::class, 'staffBalanceList']);
 Route::get('/staff_balances/{id}', [StaffAPIController::class, 'detailStaffBalance']);
 Route::get('/staff/{id}/duties', [StaffAPIController::class, 'getStaffWithDuties']);

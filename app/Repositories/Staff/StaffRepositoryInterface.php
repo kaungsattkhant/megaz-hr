@@ -22,6 +22,8 @@ interface StaffRepositoryInterface
 
     public function getStaffByDepartment(Request $request, int $departmentId);
 
+    public function getStaffByDepartmentSlug($slug);
+
     public function staffDetail(int $id);
 
     public function deleteStaffRole(int $staff_id, int $role_id);
