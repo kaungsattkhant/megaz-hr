@@ -1,7 +1,7 @@
 <template>
     <div class="">
         <div class="mb-6">
-            <div class="opacity-100 transition-opacity duration-150 ease-linear">
+            <div class="opacity-100 transition-opacity duration-150 ease-linear" :style="isShowSidebar == true ? 'width:calc(100% - 410px)' : 'width:100%' ">
                 <div class="flex flex-wrap gap-x-4 gap-y-4">
                     <div v-for="(room, roomIndex) in roomList" :key="roomIndex"
                         :class="room.is_active == 0 ? 'bg-[#55EFC4]' : 'bg-[#FF7675]'"
@@ -368,10 +368,10 @@
                                         Discount
                                     </label>
                                     <input type="number" placeholder="Discount" v-model="printInvoiceData.discount"
-                                        @input="discountChanged"
+                                        
                                         class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
                                 </div>
-                                <div class="mb-4">
+                                <!-- <div class="mb-4">
                                     <label for="" class="block text-sm text-black mb-3">
                                         Payment Method
                                     </label>
@@ -382,7 +382,7 @@
                                             <option value="cash" selected> Cash </option>
                                         </select>
                                     </div>
-                                </div>
+                                </div> -->
                                 <div class="mb-4">
                                     <div class="mb-[0.125rem] block min-h-[1.5rem] pl-[1.5rem]">
                                         <input class="input-check-pos" type="checkbox" v-model="printInvoiceData.isTax" @click="btnClickedTax()"
@@ -1194,7 +1194,7 @@
 
                 // this.printInvoiceData.total = this.printInvoiceData.room + this.printInvoiceData.food + this.printInvoiceData.tax +this.printInvoiceData.service_tax
 
-                this.selectedPaymentMethod = null
+                // this.selectedPaymentMethod = null
                 this.change = null
                 this.paid_amount = null
                 this.printInvoiceData.discount = 0
@@ -1250,16 +1250,17 @@
             },
 
             btnClickedEndRoom() {
-                if(this.selectedPaymentMethod){
-                    this.EndRoom();
-                }
-                else{
-                    this.$notify({
-                        title: `Not valid`,
-                        text: 'Please Select Payment Method',
-                        type: "warn"
-                    });
-                }
+                this.EndRoom();
+                // if(this.selectedPaymentMethod){
+                //     this.EndRoom();
+                // }
+                // else{
+                //     this.$notify({
+                //         title: `Not valid`,
+                //         text: 'Please Select Payment Method',
+                //         type: "warn"
+                //     });
+                // }
 
             },
             async EndRoom() {
@@ -1267,7 +1268,7 @@
                 let allTotalDiscounts = 0;
                 let formData = new FormData();
                 formData.append('invoice_id', this.selectedRoom.room_sessions.latest_invoice.id);
-                formData.append('payment_type', this.selectedPaymentMethod);
+                // formData.append('payment_type', this.selectedPaymentMethod);
                 formData.append('discount_type', this.discount_type);
 
                 if (this.discount_type == 'fix_amount') {
