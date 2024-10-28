@@ -50,28 +50,23 @@
                             </tr>
                         </thead>
                         <tbody>
-
                             <!-- looping start -->
-                            <div class="contents" v-for="(room, index) in serviceList" :key="index">
+                            <div class="contents" v-for="(service, index) in serviceList" :key="index">
                                 <tr class="">
                                     <td class="  ">
                                         {{ perPage * (currentPage - 1) + (++index) }}
                                     </td>
                                     <td class="whitespace-nowrap  ">
-                                        {{ room.name }}
+                                        {{ service.name ? service.name : service.staff.name }}
                                     </td>
                                     <td class="whitespace-nowrap  ">
-                                        <div v-if="room.service_category"> {{ room.service_category.name }} </div>
+                                        <div v-if="service.service_category"> {{ service.service_category.name }} </div>
                                     </td>
                                     <td class="whitespace-nowrap  ">
-                                        {{ room.price_per_hour }}
+                                        {{ service.price_per_hour }}
                                     </td>
                                     <td class="whitespace-nowrap ">
-                                        <!-- <button id="edit-btn" class="pr-1" @click="deleteBtnClicked(room.id)"
-                                    data-te-toggle="modal" data-te-target="#deleteModal">
-                                        <i class="fas fa-trash-alt"></i>
-                                    </button> -->
-                                        <input :checked="room.is_available == 1" @change="isActiveToggled(room.id)"
+                                        <input :checked="service.is_available == 1" @change="isActiveToggled(service.id)"
                                             class="me-2 mt-[0.3rem] h-3.5 w-8 appearance-none rounded-[0.4375rem] bg-black/25 before:pointer-events-none before:absolute before:h-3.5
                                     before:w-3.5 before:rounded-full before:bg-transparent before:content-[''] after:absolute after:z-[2] after:-mt-[0.1875rem] after:h-5
                                     after:w-5 after:rounded-full after:border-none after:bg-white after:shadow-switch-2 after:transition-[background-color_0.2s,transform_0.2s]
@@ -83,6 +78,16 @@
                                     checked:focus:border-primary checked:focus:bg-primary checked:focus:before:ms-[1.0625rem] checked:focus:before:scale-100 checked:focus:before:shadow-switch-3
                                     checked:focus:before:transition-[box-shadow_0.2s,transform_0.2s] dark:bg-white/25 dark:after:bg-surface-dark dark:checked:bg-primary dark:checked:after:bg-primary"
                                             type="checkbox" role="switch" />
+                                    </td>
+                                    <td class="whitespace-nowrap ">
+                                        <button id="edit-btn" class="pr-1" @click="editBtnClick(service.id)"
+                                            data-te-toggle="modal" data-te-target="#edit_modal">
+                                            <i class="fal fa-pen"></i>
+                                        </button>
+                                        <!-- <button id="delete-btn" class="pr-1" @click="deleteBtnClicked(service.id)"
+                                            data-te-toggle="modal" data-te-target="#deleteModal">
+                                            <i class="fas fa-trash-alt"></i>
+                                        </button> -->
                                     </td>
                                 </tr>
                             </div>
@@ -113,7 +118,7 @@
             </div>
 
 
-            <!-- Modal -->
+            <!-- Create Modal -->
             <div data-te-modal-init
                 class="fixed left-0 top-0 z-[1055] hidden h-full w-full overflow-y-auto overflow-x-hidden outline-none"
                 id="create_modal" tabindex="-1" aria-labelledby="create_modalLabel" aria-hidden="true">
@@ -127,7 +132,7 @@
                                 id="create_modalLabel">
                                 Create Service
                             </h5>
-                            <button type="button" class="text-xs focus:shadow-none focus:outline-none"
+                            <button type="button" class="text-xs focus:shadow-none focus:outline-none" id="closeCreateModal"
                                 data-te-modal-dismiss aria-label="Close">
                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
                                     stroke-width="1.5" stroke="currentColor" class="h-4 w-4">
@@ -136,21 +141,37 @@
                             </button>
                         </div>
                         <div class="relative px-6 py-4 border-b" data-te-modal-body-ref>
-                            <div class="mb-4">
+                            <!-- <div class="mb-4">
                                 <label for="" class="label-form mb-3">
                                     Service Name
                                 </label>
                                 <input type="text" placeholder="Service Name" v-model="name" class="input-ui">
-                            </div>
+                            </div> -->
                             <div class="mb-4">
                                 <label for="" class="label-form mb-3">
-                                    Category
+                                    Service Category
                                 </label>
-                                <select name="" id="" v-model="service_category_id" class="input-ui">
-                                    <option :value="service.id" v-for="(service, index) in serviceCategoryList"
+                                <select name="" id="" v-model="selectedServiceCategory" class="input-ui">
+                                    <option :value="service" v-for="(service, index) in serviceCategoryList"
                                         :key="index">{{
                                             service.name }}</option>
                                 </select>
+                            </div>
+                            <div class="mb-4" v-if="selectedServiceCategory ? selectedServiceCategory.name == 'Lady' : ''">
+                                <label for="" class="label-form mb-3">
+                                    Lady
+                                </label>
+                                <select name="" id="" v-model="selectedLady" class="input-ui">
+                                    <option :value="lady" v-for="(lady, index) in ladyList"
+                                        :key="index">{{
+                                            lady.name }}</option>
+                                </select>
+                            </div>
+                            <div class="mb-4" v-if="selectedServiceCategory ? selectedServiceCategory.name == 'DJ' : ''">
+                                <label for="" class="label-form mb-3">
+                                    DJ
+                                </label>
+                                <input type="text" placeholder="DJ Name" v-model="djName" class="input-ui">
                             </div>
                             <div class="mb-4">
                                 <label for="" class="label-form mb-3">
@@ -179,6 +200,94 @@
                             <button type="button" @click="createBtnClicked"
                                 class="add-btn focus:outline-none focus:ring-0 ">
                                 Create
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Edit Modal -->
+            <div data-te-modal-init
+                class="fixed left-0 top-0 z-[1055] hidden h-full w-full overflow-y-auto overflow-x-hidden outline-none"
+                id="edit_modal" tabindex="-1" aria-labelledby="create_modalLabel" aria-hidden="true">
+                <div data-te-modal-dialog-ref
+                    class="pointer-events-none relative w-auto mb-12 translate-y-[-50px] opacity-0 transition-all duration-300 ease-in-out min-[576px]:mx-auto min-[576px]:mt-7 min-[576px]:max-w-[500px]">
+                    <div
+                        class="min-[576px]:shadow-[0_0.5rem_1rem_rgba(#000, 0.15)] pointer-events-auto relative flex w-full flex-col rounded-md border-none bg-white bg-clip-padding text-current shadow-lg outline-none">
+
+                        <div class="relative flex justify-between py-2 px-6 border-b">
+                            <h5 class="text-base text-center mt-2 font-semibold leading-normal font-inter"
+                                id="create_modalLabel">
+                                Create Service
+                            </h5>
+                            <button type="button" class="text-xs focus:shadow-none focus:outline-none" id="closeEditModal"
+                                data-te-modal-dismiss aria-label="Close">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                    stroke-width="1.5" stroke="currentColor" class="h-4 w-4">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                                </svg>
+                            </button>
+                        </div>
+                        <div class="relative px-6 py-4 border-b" data-te-modal-body-ref>
+                            <!-- <div class="mb-4">
+                                <label for="" class="label-form mb-3">
+                                    Service Name
+                                </label>
+                                <input type="text" placeholder="Service Name" v-model="name" class="input-ui">
+                            </div> -->
+                            <div class="mb-4">
+                                <label for="" class="label-form mb-3">
+                                    Service Category
+                                </label>
+                                <select name="" id="" v-model="selectedServiceCategoryEdit" class="input-ui">
+                                    <option :value="service" v-for="(service, index) in serviceCategoryList"
+                                        :key="index">{{
+                                            service.name }}</option>
+                                </select>
+                            </div>
+                            <div class="mb-4" v-if="selectedServiceCategoryEdit ? selectedServiceCategoryEdit.name == 'Lady' : ''">
+                                <label for="" class="label-form mb-3">
+                                    Lady
+                                </label>
+                                <select name="" id="" v-model="selectedLadyEdit" class="input-ui">
+                                    <option :value="lady.id" v-for="(lady, index) in ladyList"
+                                        :key="index">{{
+                                            lady.name }}</option>
+                                </select>
+                            </div>
+                            <div class="mb-4" v-if="selectedServiceCategoryEdit ? selectedServiceCategoryEdit.name == 'DJ' : ''">
+                                <label for="" class="label-form mb-3">
+                                    DJ
+                                </label>
+                                <input type="text" placeholder="DJ Name" v-model="djNameEdit" class="input-ui">
+                            </div>
+                            <div class="mb-4">
+                                <label for="" class="label-form mb-3">
+                                    Price Per Hour
+                                </label>
+                                <input type="text" placeholder="Price Per Hour" v-model="pricePerHourEdit" class="input-ui">
+                            </div>
+                            <div class="mb-4">
+                                <label for="" class="label-form mb-3">
+                                    Selling Area
+                                </label>
+                                <select name="" id="" v-model="area_id_edit" class="input-ui">
+                                    <option :value="area.id" v-for="(area, index) in areaList" :key="index">{{ area.name
+                                        }}</option>
+                                </select>
+                            </div>
+
+
+
+                        </div>
+                        <div class="flex justify-end gap-x-4 px-6 mb-6 pt-4">
+                            <button type="button" class="cancel-btn focus:shadow-none focus:outline-none"
+                                data-te-modal-dismiss aria-label="Close">
+                                Cancel
+                            </button>
+                            <button type="button" @click="editService"
+                                class="add-btn focus:outline-none focus:ring-0 ">
+                                Update
                             </button>
                         </div>
                     </div>
@@ -254,13 +363,28 @@ export default {
             entityTypeList: ['Room', 'Table'],
             serviceCategoryList: [],
             areaList: [],
+            ladyList:[],
 
+            selectedLady:null,
+            djName:null,
             name: null,
             pricePerHour: null,
             entityType: 'service',
             area_id: null,
-            service_category_id: null,
+            selectedServiceCategory: null,
+
+            selectedLadyEdit:null,
+            djNameEdit:null,
+            nameEdit: null,
+            pricePerHourEdit: null,
+            entityType: 'service',
+            area_id_edit: null,
+            selectedServiceCategoryEdit: null,
+
+            editId:null,
             deleteId: null,
+
+            serviceDetail:null,
 
             searchInput: null,
             currentPage: 0,
@@ -275,10 +399,11 @@ export default {
         ...mapGetters(['getToken']),
 
         async getServiceList(pageNumber) {
-            let url = `/api/entities?type=service&page=${pageNumber}`;
+            let url = `/api/services?page=${pageNumber}`;
             if (this.searchInput) {
-                url = `/api/entities?type=service&search_input=${this.searchInput}&page=${pageNumber}`;
+                url = `/api/services?search_input=${this.searchInput}&page=${pageNumber}`;
             }
+            // let url = `/api/services`;
             const response = await getApiData({ url: url, token: this.getToken() });
             if (response.data) {
                 this.serviceList = response.data.data;
@@ -290,10 +415,9 @@ export default {
         },
 
         async getAreaList() {
-            const response = await getApiData({ url: '/api/areas', token: this.getToken() });
+            const response = await getApiData({ url: '/api/area_categories/2/areas', token: this.getToken() });
             if (response.data) {
                 this.areaList = response.data;
-
             }
         },
 
@@ -304,47 +428,101 @@ export default {
             }
         },
 
-        // inventoryableTypeChanged(){
-        //     if(this.selectedInventoryType == 'area'){
-        //         this.getAreaList();
-        //     }
-        //     if(this.selectedInventoryType == 'department'){
-        //         this.getDepartmentList();
-        //     }
-        // },
-
-        createBtnClicked() {
-            this.createTableAndRoom();
+        async getLadyList(){
+            const response = await getApiData({ url: '/api/staff_by_department_slug/entertainment', token: this.getToken() });
+            if (response.data) {
+                this.ladyList = response.data;
+            }
         },
 
-        async createTableAndRoom() {
+        createBtnClicked() {
+            this.createService();
+        },
+
+        async createService() {
             let formData = new FormData();
-            formData.append('name', this.name);
+            if(this.selectedServiceCategory.name == 'DJ'){
+                formData.append('name', this.djName);
+            }
+            if(this.selectedServiceCategory.name == 'Lady'){
+                formData.append('staff_id', this.selectedLady.id);
+            }
             formData.append('price_per_hour', this.pricePerHour);
-            formData.append('entity_type', this.entityType);
+            // formData.append('entity_type', this.entityType);
             formData.append('area_id', this.area_id);
-            formData.append('service_category_id', this.service_category_id);
-            let response = await postApiData({ url: '/api/entities', form_data: formData, token: this.getToken() });
+            formData.append('service_category_id', this.selectedServiceCategory.id);
+            let response = await postApiData({ url: '/api/services', form_data: formData, token: this.getToken() });
             if (response.success) {
                 this.getServiceList(1);
                 console.log("success")
-                this.closeModal();
+                this.closeModal('closeCreateModal');
                 this.clearForm();
             }
             else {
-                alert('some errors occur');
+                this.$notify({
+                        title: `Input validation`,
+                        text: response.message,
+                        type: "warn"
+                    });
+            }
+        },
+        async editBtnClick(serviceId){
+            this.editId = serviceId;
+            const response = await getApiData({ url: '/api/services/' + serviceId, token: this.getToken() });
+            if (response.data) {
+                this.serviceDetail = response.data;
+                this.selectedServiceCategoryEdit =  response.data.service_category;
+                this.selectedLadyEdit = response.data.staff.id;
+                this.djNameEdit = response.data.name;
+                this.pricePerHourEdit =  response.data.price_per_hour;
+                this.area_id_edit =  response.data.area_id;
+                
+            }
+        },
+        async editService() {
+            let formData = new FormData();
+            formData.append('id', this.editId);
+            if(this.selectedServiceCategoryEdit.name == 'DJ'){
+                formData.append('name', this.djNameEdit);
+            }
+            if(this.selectedServiceCategoryEdit.name == 'Lady'){
+                formData.append('staff_id', this.selectedLadyEdit);
+            }
+            formData.append('price_per_hour', this.pricePerHourEdit);
+            // formData.append('entity_type', this.entityType);
+            formData.append('area_id', this.area_id_edit);
+            formData.append('service_category_id', this.selectedServiceCategoryEdit.id);
+            let response = await postApiData({ url: '/api/services', form_data: formData, token: this.getToken() });
+            if (response.success) {
+                this.getServiceList(1);
+                console.log("success");
+                this.editId = null;
+                this.closeModal('closeEditModal');
+                this.clearForm();
+            }
+            else {
+                this.$notify({
+                        title: `Input validation`,
+                        text: response.message,
+                        type: "warn"
+                    });
             }
         },
 
-        closeModal() {
-            document.getElementById("close").click();
-        },
+        // closeModal() {
+        //     document.getElementById("closeCreateModal").click();
+        // },
 
+        closeModal(modalId) {
+                document.getElementById(modalId).click();
+            },
         clearForm() {
-            this.name = null,
-                this.selectedInventoryType = null,
-                this.inventoryable_id = null,
-                this.typeList = []
+            this.djName = null,
+            this.selectedServiceCategory = null,
+            this.selectedLady = null,
+            this.pricePerHour = null,
+            this.area_id = null,
+            this.ladyList = []
         },
 
         isActiveToggled(id) {
@@ -362,6 +540,9 @@ export default {
                 formData.append('id', id);
                 formData.append('type', 'entity');
                 let response = postApiData({ url: url, form_data: formData, token: this.getToken() });
+                if(response.success){
+                    this.getServiceList(1)
+                }
             }
         },
 
@@ -393,6 +574,7 @@ export default {
 
     created() {
         this.getServiceList(1);
+        this.getLadyList();
         this.getAreaList();
         this.getServiceCategoryList();
     },
