@@ -11,8 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('entities', function (Blueprint $table) {
-            c
+        Schema::create('entities', function (Blueprint $table) {            
             $table->timestamps();
         });
     }
