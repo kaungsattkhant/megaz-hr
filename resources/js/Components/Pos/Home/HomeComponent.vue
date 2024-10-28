@@ -1,7 +1,7 @@
 <template>
     <div class="">
         <div class=" bg-gray-100 min-h-screen w-full" :style="isShowSidebar == true ? 'width:calc(100% - 410px)' : 'width:100%' ">
-            <div class="w-fit pt-9 px-6 ">
+            <div class="w-full pt-9 px-6 ">
                 <ul class="mb-5 flex list-none flex-row flex-wrap border-b-0 pl-0" role="tablist" data-te-nav-ref>
                     <li v-for="(area, index) in areaList" :key="index" role="presentation" @click="btnClickedArea(area.id,area.area_type.type)">
                         <a href="#tabs-profile" class="my-2 mr-3 text-white block  px-7 pb-2.5 rounded-full
