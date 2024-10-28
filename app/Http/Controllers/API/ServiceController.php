@@ -36,4 +36,6 @@ class ServiceController extends Controller
         ResponseData($data);
     }
 
+    
+
 }
