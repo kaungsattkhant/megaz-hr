@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\DB;
 class ServiceRepository implements ServiceInterface
 {
     public function list($request){
-        return Service::with(['service_category','staff'])->paginate(20);
+        return Service::with(['service_category','staff'])->paginate(config('common.list_count'));
     }
     public function updateOrCreate($request){
         DB::beginTransaction();
