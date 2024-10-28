@@ -24,7 +24,7 @@
                                     <th scope="col" class="px-6 py-4">Id</th>
                                     <th scope="col" class="px-6 py-4">Date</th>
                                     <th scope="col" class="px-6 py-4">Customer Name</th>
-                                    <th scope="col" class="px-6 py-4">Room</th>
+                                    <th scope="col" class="px-6 py-4">Room/Table</th>
                                     <th scope="col" class="px-6 py-4">Room Charges</th>
                                     <th scope="col" class="px-6 py-4">Food</th>
                                     <th scope="col" class="px-6 py-4">Services</th>
@@ -44,7 +44,8 @@
                                             {{ invoice.customer.name }}
                                         </td>
                                         <td class="whitespace-nowrap px-6 py-4">
-                                            {{ invoice.room.name }}
+                                            <span v-if="invoice.room">{{ invoice.room.name }}</span>
+                                            <span v-if="invoice.table">{{ invoice.table.name }}</span>
                                         </td>
                                         <td class="whitespace-nowrap px-6 py-4">
                                             {{ invoice.total_session_price}}
@@ -61,7 +62,7 @@
                                         <td class="whitespace-nowrap px-6 py-4">
                                             <select name=""
                                                 class="text-xs pl-0 border-0 focus:shadow-none focus:outline-none focus:ring-0 select-box area-select-box"
-                                                placeholder="Select Area">
+                                                placeholder="Select Payment" :disabled="!isCashier">
                                                 <option disabled selected>Select Payment</option>
                                                 <option>Cash</option>
                                                 <option>Bank</option>
@@ -201,6 +202,7 @@
                 isDetail:false,
                 invoice_date:null,
 
+                isCashier: false,
             };
         },
 
@@ -248,10 +250,11 @@
             },
 
             isCateringCashier(){
-                let isCashier = false;
-                isCashier = this.getRoles().find((role)=>role.name == 'Cashier');
-                console.log(isCashier);
-                // if(this.getDepartment().name == 'Catering');
+                let cashierRole = this.getRoles().find((role)=>role.name == 'Cashier');
+                if(cashierRole)
+                    return true;
+                else
+                    return false;
             },
         },
         mounted()
@@ -260,7 +263,7 @@
             this.getInvoiceList();
             this.getRoomList();
             initTE({ Modal, Select, Ripple, Datepicker });
-            this.isCateringCashier();
+            this.isCashier = this.isCateringCashier();
         }
     }
 </script>
