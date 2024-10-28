@@ -380,6 +380,11 @@ Route::middleware('auth:api')->group(function () {
     });
     //service
     Route::resource('services', ServiceController::class)->only(['index', 'store', 'show']);
+
+    //pos service api
+    Route::controller(ServiceController::class)->group(function () {
+        Route::get('/get_service', 'getService');
+    });
 });
 
 Route::controller(SaleTargetPositionAPIController::class)->group(function () {

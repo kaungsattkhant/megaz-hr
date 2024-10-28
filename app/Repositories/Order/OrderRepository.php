@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Hash;
 use App\Http\Action\SendNotification\SendNotification;
 
 use App\Events\KitchenNotificationRequest;
+use App\Events\KitchenNotificationRequestByArea;
 use App\Events\OrderStatusNotificationRequest;
 use App\Events\WaiterNotificationRequest;
 use App\Events\WaiterOrderConfirmNotificationRequest;
@@ -261,6 +262,7 @@ class OrderRepository implements OrderRepositoryInterface
 
     public function getOrderItemData(Request $request)
     {
+        $areaId=$request->area_id;
         if ($request->per_page || $request->page) {
             if ($request->date) {
                 $date = $request->date;
@@ -269,9 +271,9 @@ class OrderRepository implements OrderRepositoryInterface
             }
             $startTime = $date . ' 00:00:00';
             $endTime = $date . ' 23:59:59';
-
             $order_items = OrderItem::where('status', 'pos_confirmed')->with('menu', 'order.invoice.latestSession.entitySession', 'area') // change entiy to entitySession
                 ->whereBetween('date', [$startTime, $endTime])
+                ->where('area_id',$areaId)
                 ->paginate(config('common.list_count'));
             return $order_items;
         } else {
@@ -299,7 +301,6 @@ class OrderRepository implements OrderRepositoryInterface
     {
         DB::beginTransaction();
         try {
-
             $orderItem = OrderItem::find($id);
             if(!$orderItem){
                 ResponseMessage('Order Item not found',404);
@@ -323,7 +324,8 @@ class OrderRepository implements OrderRepositoryInterface
                 'area_id' => $request->area_id,
                 'status' => $request->status,
             ]);
-            broadcast(new KitchenNotificationRequest($entity, $order, null, $orderItem, 7));
+            // broadcast(new KitchenNotificationRequest($entity, $order, null, $orderItem, 7));
+            broadcast(new KitchenNotificationRequestByArea($entity, $order,[$orderItem],$request->area_id));
             DB::commit();
             ResponseData($orderItem);
         } catch (\Exception $e) {

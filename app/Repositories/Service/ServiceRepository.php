@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\DB;
 class ServiceRepository implements ServiceInterface
 {
     public function list($request){
-        return Service::with(['service_category','staff'])->paginate(20);
+        return Service::with(['service_category','staff'])->paginate(config('common.list_count'));
     }
     public function updateOrCreate($request){
         DB::beginTransaction();
@@ -33,6 +33,15 @@ class ServiceRepository implements ServiceInterface
         $service->load('staff');
         $service->load('service_category');
         return $service;
+    }
+
+    public function getService($request){
+        $areaId=$request->area_id;
+        $serviceCategoryId=$request->service_category_id;
+        $services= Service::where('area_id',$areaId)
+        ->where('service_category_id',$serviceCategoryId)
+        ->get();
+        return $services;
     }
 
 }
