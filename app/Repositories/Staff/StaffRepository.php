@@ -251,6 +251,17 @@ class StaffRepository implements StaffRepositoryInterface
         }
     }
 
+    public function getStaffByDepartmentSlug($slug){
+        $staffs = Staff::with('department')
+        ->whereHas('department',function($query)use($slug){
+            $query->where('slug',$slug);
+        })
+        ->where('is_active', 1)
+        ->get();
+    return $staffs;
+    }
+    
+
     public function deleteStaffRole(int $staff_id, int $role_id)
     {
         DB::beginTransaction();

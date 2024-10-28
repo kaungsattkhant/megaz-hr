@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use App\Models\Department;
+use Illuminate\Support\Str;
 use Illuminate\Database\Seeder;
 
 class DepartmentSeeder extends Seeder
@@ -13,7 +14,7 @@ class DepartmentSeeder extends Seeder
     public function run(): void
     {
         //
-        $names = ['HR', 'Finance', 'Admin', 'Management', 'Catering', 'Inventory', 'Kitchen','Bar','Procurement','Canteen'];
+        $names = ['HR', 'Finance', 'Admin', 'Management', 'Catering', 'Inventory', 'Kitchen','Bar','Procurement','Canteen','Entertainment'];
         $hr_features = config('common.hr_features');
         $inventory_features = config('common.inventory_features');
         $finance_features = config('common.finance_features');
@@ -21,6 +22,7 @@ class DepartmentSeeder extends Seeder
         foreach ($names as $name) {
             $department = Department::create([
                 'name' => $name,
+                'slug' => Str::slug($name, '-')
             ]);
             // switch ($name) {
             //     case 'HR':
