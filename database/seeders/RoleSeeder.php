@@ -26,7 +26,7 @@ class RoleSeeder extends Seeder
         $barDept = Department::where('name', 'Bar')->first();
 
         $basicRoles = ['Staff', 'Supervisor', 'Manager'];
-        $cateringRoles =['Staff','Supervisor','Manager','Waiter','Receptionist'];
+        $cateringRoles =['Staff','Supervisor','Manager','Waiter','Receptionist','Cashier'];
 
         foreach($basicRoles as $roleName){
             Role::create([

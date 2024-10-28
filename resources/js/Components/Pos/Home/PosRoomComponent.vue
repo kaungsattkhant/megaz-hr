@@ -704,10 +704,15 @@
 
                     <div class="relative px-16 py-4" data-te-modal-body-ref>
                         <div class="mb-4">
-                            <select name="" id="" placeholder="Menu" v-model="selectedMenu" @change="selectedMenuChange()"
+                            <multiselect v-model="selectedMenu" :options="menuList" :close-on-select="true" @select="selectedMenuChange()"
+                                class=" h-10"
+                                :clear-on-select="false" :preserve-search="true" placeholder="Select Menu" label="name"
+                                track-by="id" :preselect-first="false"></multiselect>
+
+                            <!-- <select name="" id="" placeholder="Menu" v-model="selectedMenu" @change="selectedMenuChange()"
                                 class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
                                 <option :value="menu" v-for="(menu, index) in menuList" :key="index">{{ menu.name }}</option>
-                            </select>
+                            </select> -->
                         </div>
                         <div class="mb-4">
                             <select name="" id="" placeholder="Menu" v-model="selectedMenuArea"
@@ -837,9 +842,20 @@
     import { getApiData, postApiData, deleteApiData } from '../../../utilities/ajax-helpers';
     import { mapGetters } from "vuex";
     import { getCurrentTime } from "../../../utilities/datetime-helpers";
+    import Multiselect from 'vue-multiselect';
 
     export default {
-        props: ['roomAreaId'],
+        name:'PosRoomCompnent',
+        props:{
+            roomAreaId:{
+                type: Number,
+                required: true
+            }
+        },
+        components:{
+            Multiselect
+        },
+        // props: ['roomAreaId'],
         data() {
             return {
                 roomList:[],
@@ -1132,22 +1148,22 @@
                 }
                 let response = await postApiData({ url: '/api/entities/start', form_data: formData, token: this.getToken() });
                 if (response.success) {
-                    this.getRoomList();
-                    this.getSelectedRoom();
-                    this.isOpenRoomStep('detail');//for right side bar ui
+                    // this.getRoomList();
+                    // this.getSelectedRoom();
+                    // this.isOpenRoomStep('detail');
 
-                    if (this.selectedRoom.room_sessions.length > 0) {
-                        if (this.selectedRoom.room_sessions[0].invoice.orders.length > 0) {
-                            this.getPurchaseMenuList();
-                        }
-                    }
-                    if (this.selectedRoom.room_sessions.length < 1) {
-                        if (this.selectedRoom.room_sessions[0].invoice.orders.length < 1) {
-                            this.purchaseMenuList = [];
-                        }
-                    }
-                    this.food_total_package = 0 //total price of package menu and add more menu reset
-                    console.log("success")
+                    // if (this.selectedRoom.room_sessions.length > 0) {
+                    //     if (this.selectedRoom.room_sessions[0].invoice.orders.length > 0) {
+                    //         this.getPurchaseMenuList();
+                    //     }
+                    // }
+                    // if (this.selectedRoom.room_sessions.length < 1) {
+                    //     if (this.selectedRoom.room_sessions[0].invoice.orders.length < 1) {
+                    //         this.purchaseMenuList = [];
+                    //     }
+                    // }
+                    // this.food_total_package = 0 
+                    // console.log("success")
                     window.location.reload()
                 }
                 else {
@@ -1760,6 +1776,10 @@
             selectedRoom(val, oldVal) {
                 console.log(`new: ${val}, old: ${oldVal}`)
             },
+            roomAreaId(newId) {
+            // Call your function once areaId is updated
+            this.getRoomList(newId);
+            }
         },
         created(){
             this.getCustomerList();
@@ -1770,6 +1790,9 @@
         },
         mounted()
         {
+            if (this.roomAreaId) {
+                this.getRoomList(this.roomAreaId);
+            }
             initTE({ Modal, Select, Ripple, Datepicker });
         }
     }

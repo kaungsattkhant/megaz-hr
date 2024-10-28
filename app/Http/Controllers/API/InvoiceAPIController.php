@@ -100,21 +100,24 @@ class InvoiceAPIController extends Controller
         $catering_department = Department::where('name', 'Catering')->first();
         $invoice = Invoice::find($request->invoice_id);
 
-        $latestRoomSession = RoomSession::where('invoice_id', $invoice->id)->orderBy('created_at', 'desc')->first();
-        $entity = Entity::find($latestRoomSession->entitySession->entity_id);
-
+        //end invoice for table
+        if($invoice->entity_id!=null){
+            $entity=Entity::find($invoice->entity_id);
+        }else{
+            $latestRoomSession = RoomSession::where('invoice_id', $invoice->id)->orderBy('created_at', 'desc')->first();
+            $entity = Entity::find($latestRoomSession->entitySession->entity_id);
+        }
+        //end invoice for room
         if (isset($request->waiter)) {
             $managerRole = Role::where('name', 'Manager')
                 ->where('department_id', $catering_department->id)
                 ->first();
-
             $entity->status = 'done_pending';
             $entity->save();
             broadcast(new PosRoomDoneNotification($invoice, $entity, $managerRole->id));
             ResponseMessage("The request to quit the room {$entity->name} has been sent. Please wait for the confirmation from the catering department.");
         } else if (isset($request->is_confirm)) {
             $role = Role::where('name', 'Staff')->where('department_id', $catering_department->id)->first();
-
             if ($request->is_confirm != 1) {
                 $msg = "The request to quit the room {$entity->name} has been rejected. Thank you for your understanding.";
                 $entity->status = 'active';
@@ -130,6 +133,8 @@ class InvoiceAPIController extends Controller
         $endRoom = $this->invoiceRepo->doneEntityWithInvoice($request->all());
         ResponseData($endRoom);
     }
+
+   
 
     public function getInvoiceData(Request $request)
     {

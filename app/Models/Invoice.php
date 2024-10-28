@@ -37,7 +37,10 @@ class Invoice extends Model
         'invoice_type',
         'discount_type',
         'order_discount_value',
-        'room_discount_value'
+        'room_discount_value',
+        'birthday_discount',
+        'customer_level_discount',
+        'total_discount',
     ];
 
     public function package()

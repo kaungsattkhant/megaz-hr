@@ -12,17 +12,17 @@
                         </a>
                     </li>
                 </ul>
-                <div v-if="areaType == 'bar_and_restaurant'">
-                    <button class="p-10 bg-red-600 text-white" @click="callTest()">
+                <div v-show="areaType == 'bar_and_restaurant'">
+                    <!-- <button class="p-10 bg-red-600 text-white" @click="callTest()">
                         bar
-                    </button>
-                    <PosTableComponent :table-area-id="selectedAreaId" ref="posTable" />
+                    </button> -->
+                    <PosTableComponent v-if="selectedAreaId" :table-area-id="selectedAreaId" ref="posTable" />
                 </div>
-                <div v-else>
-                    <button class="p-10 bg-red-600 text-white" @click="callTest()">
+                <div v-show="areaType == 'ktv'">
+                    <!-- <button class="p-10 bg-red-600 text-white" @click="callTest()">
                         ktv
-                    </button>
-                    <PosRoomComponent :room-area-id="selectedAreaId" ref="posRoom" />
+                    </button> -->
+                    <PosRoomComponent v-if="selectedAreaId" :room-area-id="selectedAreaId" ref="posRoom" />
                 </div>
 
                 <div class="mb-6 hidden">
@@ -1113,44 +1113,53 @@
 
         methods: {
             ...mapGetters(['getToken']),
-            callTest(){
-                if(this.areaType == 'bar_and_restaurant'){
-                    this.$refs.posTable.getTableList()
-                }
-                else{
-                    this.$refs.posRoom.getRoomList()
-                }
-            },
+            // callTest(){
+            //     if(this.areaType == 'bar_and_restaurant'){
+            //         this.$refs.posTable.getTableList()
+            //     }
+            //     else{
+            //         this.$refs.posRoom.getRoomList()
+            //     }
+            // },
             async getAreaList() {
                 let url = '/api/areas?area_category_id=2'
                 const response = await getApiData({ url: url, token: this.getToken() });
                 if (response.data) {
                     this.areaList = response.data;
                     this.selectedAreaId = this.areaList[0].id
-                    console.log('area id = ' + this.selectedAreaId)
-                    // this.getRoomList();
-                    this.areaType = response.data.area_type
-                    this.callTest();
-                    // if(this.areaType == 'bar_and_restaurant'){
-                    //     this.$refs.posTable.getTableList(response.data[0].id)
-                    // }
-                    // else{
-                    //     this.$refs.posRoom.getRoomList(response.data[0].id)
-                    // }
+                    this.areaType = response.data[0].area_type.type
+
+                    if(response.data[0].area_type.type == 'bar_and_restaurant' && response.data[0].id){
+                        this.$nextTick(() => {
+                            if (this.$refs.posTable) { // Check if posTable is defined
+                                this.$refs.posTable.getTableList(response.data[0].id);
+                            } else {
+                                console.warn("posTable component is not available in $refs.");
+                            }
+                        });
+                    }
+                    else{
+                        this.$nextTick(() => {
+                            if (this.$refs.posRoom) { // Check if posRoom is defined
+                                this.$refs.posRoom.getRoomList(response.data[0].id);
+                            } else {
+                                console.warn("posRoom component is not available in $refs.");
+                            }
+                        });
+                    }
                 }
             },
             btnClickedArea(areaId,areaType){
                 this.selectedAreaId = areaId
-                // this.isShowSidebar = false
-                // this.getRoomList();
                 this.areaType = areaType
-                console.log(areaType , areaId)
-                // if(this.areaType == 'bar_and_restaurant'){
-                //     this.$refs.posTable.getTableList(areaId)
-                // }
-                // else{
-                //     this.$refs.posRoom.getRoomList(areaId)
-                // }
+                // console.log(areaType , areaId)
+                // this.callTest();
+                if(areaType == 'bar_and_restaurant'){
+                    this.$refs.posTable.getTableList()
+                }
+                else{
+                    this.$refs.posRoom.getRoomList()
+                }
             },
 
 
@@ -1756,9 +1765,10 @@
                 if (response.success) {
                     this.customerList.push(response.data);
                     this.selectedCustomer = response.data;
-                    console.log("success customer")
-                    this.closeModal('closeCustomerModal');
-                    this.clearCustomerForm();
+                    // console.log("success customer")
+                    // this.closeModal('closeCustomerModal');
+                    // this.clearCustomerForm();
+                    window.location.reload()
                 }
                 else {
                     console.log('some errors occur');
@@ -1942,15 +1952,34 @@
 
             }
         },
-        
 
-        // watch: {
-        //     selectedRoom(val, oldVal) {
-        //         console.log(`new: ${val}, old: ${oldVal}`)
-        //     },
-        // },
+
+        watch: {
+            areaType(newType) {
+                if (newType !== 'bar_and_restaurant') {
+                    this.$nextTick(() => {
+                        if (this.$refs.posTable) {
+                        this.$refs.posTable.getTableList(this.selectedAreaId);
+                        }
+                    });
+                }
+                else
+                {
+                    this.$nextTick(() => {
+                        if (this.$refs.posRoom) { // Check if posRoom is defined
+                            this.$refs.posRoom.getRoomList(this.selectedAreaId);
+                        } 
+                        else {
+                            console.warn("posRoom component is not available in $refs.");
+                        }
+                    });
+                }
+            }
+        },
         created(){
-            
+            this.getAreaList();
+            this.getGendersList();
+            this.getDivisionList();
             // this.getCustomerList();
             // this.getGendersList();
             // this.getMenuList();
@@ -1959,7 +1988,7 @@
         },
         mounted()
         {
-            this.getAreaList();
+            
             initTE({ Modal, Select, Ripple, Datepicker });
         }
     }

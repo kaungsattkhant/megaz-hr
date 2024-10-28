@@ -14,7 +14,7 @@ class Department extends BaseModel
     use HasFactory;
 
     protected $fillable=[
-        'name','inventory_id',
+        'name','inventory_id','slug',
     ];
 
     protected $hidden=[

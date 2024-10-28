@@ -14,8 +14,12 @@ class ServiceCategorySeeder extends Seeder
     public function run(): void
     {
         //
-        ServiceCategory::create([
-            'name' =>'service category 1'
-        ]);
+        $names=['Lady','DJ'];
+        foreach($names as $name){
+            ServiceCategory::create([
+                'name' =>$name
+            ]);
+        }
+        
     }
 }

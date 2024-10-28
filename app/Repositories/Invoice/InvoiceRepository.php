@@ -29,6 +29,7 @@ use App\Models\TargetPosition;
 use App\Models\TargetPositionResult;
 use App\Models\User;
 use App\Repositories\Order\OrderRepository;
+use App\Services\InvoiceService;
 use App\Services\OrderService;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Log;
@@ -37,9 +38,11 @@ class InvoiceRepository implements InvoiceRepositoryInterface
 {
     use CustomerTrait;
     private $orderService;
-    public function __construct(OrderService $orderService)
+    private $invoiceService;
+    public function __construct(OrderService $orderService,InvoiceService $invoiceService)
     {
         $this->orderService = $orderService;
+        $this->invoiceService = $invoiceService;
     }
     public function listAllData(Request $request)
     {
@@ -692,6 +695,20 @@ class InvoiceRepository implements InvoiceRepositoryInterface
     {
         DB::beginTransaction();
         try {
+            $invoice = Invoice::find($data['invoice_id']);
+            if(!$invoice){
+                ResponseMessage('Invoice not found',404);
+            }
+            //added end_invoice for table oct 25 2024
+            if($invoice && $invoice->entity_id!=null){
+                $invoice=$this->doneTableForInvoice($data,$invoice);
+                $this->invoiceService->updateEntityStatus($invoice->entity_id,'inactive'); // after done invoice ,update entity staus to inactive
+                $this->addTargetPosition($invoice->id,$invoice->created_by,$data['total']); //add sale target position for related role
+                $this->addTargetMenu($invoice->id); //add sale target position for related role
+                $this->broadcastNotification($invoice->entity_id); //send notifcation;
+                DB::commit();
+                return $invoice;
+            }
             $foodCharge = 0;
             $beverageCharge = 0;
             $total_session_price = 0;
@@ -712,24 +729,17 @@ class InvoiceRepository implements InvoiceRepositoryInterface
             if (isset($data['tax'])) {
                 $tax = $data['tax'];
             }
-
             if (isset($data['service_charge'])) {
                 $service_charge = $data['service_charge'];
             }
 
-
             if (isset($data['order_discount'])) {
                 $order_discount = $data['order_discount'];
             }
-
-            if (isset($data['customer_level_discount'])) {
-                $customerLevelDiscount = $data['customer_level_discount'] ?? 0;
-            }
-
+         
             if (isset($data['birthday_discount'])) {
                 $bdDiscount = $data['birthday_discount'] ?? 0;
             }
-
             if (isset($data['order_categories'])) {
                 $data['order_categories'] = json_decode($data['order_categories'], true);
                 foreach ($data['order_categories'] as $menu) {
@@ -740,7 +750,6 @@ class InvoiceRepository implements InvoiceRepositoryInterface
                     }
                 }
             }
-            $invoice = Invoice::find($data['invoice_id']);
             $customer = Customer::find($invoice->customer_id);
             $invoice_id = $invoice->invoice_id;
             $lastRoomSession = $invoice->latestSession;
@@ -779,8 +788,6 @@ class InvoiceRepository implements InvoiceRepositoryInterface
                     }
                 }
             }
-
-
             $data['room_discount_value'] = $room_discount_value;
             if (isset($data['discount_value'])) {
                 $discount_value = $data['discount_value'];
@@ -868,7 +875,6 @@ class InvoiceRepository implements InvoiceRepositoryInterface
             $entity->is_active = 0;
             $entity->status = 'inactive';
             $entity->save();
-
             DB::commit();
             return $invoice;
         } catch (\Exception $e) {
@@ -876,6 +882,80 @@ class InvoiceRepository implements InvoiceRepositoryInterface
             ResponseMessage($e->getMessage(), 422);
             throw $e;
         }
+    }
+
+    public function doneTableForInvoice($data,$invoice){
+        $data['discount_value']=$data['discount_type']==null || $data['discount_type']=="null" ? 0 :$data['discount_value'];
+        $data['total_discount']=$data['birthday_discount']+$data['customer_level_discount']+$data['discount_value']+$data['order_discount'];;
+        $data['sub_total'] = ($data['total'] + $data['tax'] + $data['service_charge'])-$data['total_discount'];
+        // $data['sub_total'] = $data['total'];
+        $data['total'] = $data['total']+$data['total_discount'];
+        $data['payment_status'] = 'received';
+        $data['complete_date'] = CurrentTime();
+        $invoice->update($data);
+        return $invoice;
+    }
+
+    public function addTargetPosition($invoiceId,$staffId,$total){
+        $soldStaff = Staff::find($staffId);
+        if(!$soldStaff){
+            ResponseMessage('Staff not found',404);
+        }
+        $firstRole = $soldStaff->roles->first();
+        if(!$firstRole){
+            ResponseMessage('Role not found',404);
+        }
+        TargetPositionResult::create([
+            'role_id' => $firstRole->id,
+            'date_time' => CurrentTime(),
+            'invoice_id' => $invoiceId,
+            'amount' => $total,
+        ]);
+    }
+
+    public function addTargetMenu($invoiceId){
+        $order = Order::where('invoice_id', $invoiceId)->first();
+        if ($order ) {
+            $orderItems = $order->orderItems;
+            $groupedOrderItems = $orderItems
+                ->groupBy(function ($item) {
+                    return $item['menu_id'] . '-' . $item['area_id'];
+                })
+                ->map(function ($items) {
+                    return [
+                        'menu_id' => $items->first()->menu_id, // Access as an object
+                        'area_id' => $items->first()->area_id, // Access as an object
+                        'quantity' => $items->sum('quantity'),  // Sum the quantities
+                    ];
+                })
+                ->values();
+            foreach ($groupedOrderItems as $orderItem) {
+                TargetMenuResult::create([
+                    'date_time' => CurrentTime(),
+                    'invoice_id' => $invoiceId,
+                    'area_id' => $orderItem['area_id'],
+                    'menu_id' => $orderItem['menu_id'],
+                    'quantity' => $orderItem['quantity'],
+                ]);
+            }
+        }
+    }
+    public function broadcastNotification($entityId){
+        $entity=Entity::find($entityId);
+        if(!$entity){
+            ResponseMessage('Entity No found',404);
+        }
+        $catering_department = Department::where('name', 'Catering')->first();
+        if(!$catering_department){
+            ResponseMessage('Catering department not found',404);
+        }
+        $msg = "The {$entity->name} is now closed. Thank you.";
+        //i think this role is not reliable to send notification
+        $role = Role::where('name', 'Staff')->where('department_id', $catering_department->id)->first();
+        if(!$role){
+            ResponseMessage('Role not found',404);
+        }
+        broadcast(new RoomDoneNotificationRequest($entity, $msg, $role->id));
     }
 
     public function invoiceConfirm(array $data)
