@@ -414,7 +414,7 @@ class OrderRepository implements OrderRepositoryInterface
             $orderItem->entity_name=$entity_name;
             // broadcast(new KitchenNotificationRequest($entity, $order, null, $orderItem, 7));
             broadcast(new KitchenNotificationRequestByArea($orderItem));
-            // DB::commit();
+            DB::commit();
             ResponseData($orderItem);
         } catch (\Exception $e) {
             DB::rollBack();
