@@ -270,29 +270,84 @@ class OrderRepository implements OrderRepositoryInterface
             // $startTime = $date . ' 00:00:00';
             // $endTime = $date . ' 23:59:59';
             $order_items = OrderItem::where('status', 'pos_confirmed')
-            ->with('menu', 'order.invoice.roomSession.entitySession.entity', 'area','order.invoice.table') // change entiy to entitySession
+                ->with('menu','order:id,order_id,invoice_id','order.invoice:id,entity_id', 'order.invoice.roomSession.entitySession.entity', 'area', 'order.invoice.table') // change entiy to entitySession
                 // ->whereBetween('date', [$startTime, $endTime])
-                ->where('area_id',$areaId)
-                ->orderBy('id','desc')
-                ->paginate(config('common.list_count'));
+                ->where('area_id', $areaId)
+                ->orderBy('id', 'desc')
+                ->paginate(config(key: 'common.list_count'));
+
+            // foreach($order_items as $orderItem)
+            // {
+            // $entity_name = '';
+            //     if ($orderItem->order->invoice->entity_id == null) {
+            //         $roomSessions = $orderItem->order->invoice->roomSession->unique('entitySession.entity_id');
+            //         $entity_name_arr = [];
+            //         foreach ($roomSessions as $roomSession) {
+            //             $entity_name_arr[] = $roomSession->entitySession->entity->name;
+            //         }
+            //         $entity_name = implode(', ', $entity_name_arr);
+            //     }
+            //     if ($orderItem->order->invoice->entity_id != null) {
+            //         $entity_name = $orderItem->order->invoice->table->name;
+            //     }
+            //     $orderItem->entity_name = $entity_name;
+            //     unset($orderItem->order->invoice->roomSession);
+            //     unset($orderItem->order->invoice->table);
+            //     // UnsetData($orderItem->order->invoice,'roomSession');
+            
+            // }
+
+            $order_items->getCollection()->transform(function ($orderItem) {
+                $invoice = $orderItem->order->invoice ?? null;
+            
+                if ($invoice) {
+                    // Unset roomSession and table from the invoice
+                   
+                    
+                    // Determine entity_name based on entity_id
+                    if ($invoice->entity_id !== null) {
+                        // If entity_id is not null, use the table name
+                        $orderItem->entity_name = $invoice->table->name ?? '';
+                    } else {
+                        // If entity_id is null, derive from roomSessions
+                        $roomSessions = $invoice->roomSession ?? [];
+                        $uniqueEntities = collect($roomSessions)
+                            ->pluck('entitySession.entity.name')
+                            ->unique()
+                            ->join(', '); // Join unique entity names
+            
+                        $orderItem->entity_name = $uniqueEntities;
+                    }
+                    unset($invoice->roomSession);
+                    unset($invoice->table);
+                }
+            
+                return $orderItem;
+            });
 
             // $order_items = OrderItem::where('status', 'pos_confirmed')
-            //     ->with(['menu', 'area'])
-            //     ->where('area_id', $areaId)
-            //     ->orderBy('id', 'desc')
             //     ->with([
-            //         'order.invoice' => function ($query) {
-            //             $query->select('id', 'entity_id') // Optimize by selecting only necessary columns
-            //                 ->when(!is_null($query->first()->entity_id), function ($q) {
-            //                     // Load the `table` relationship when `entity_id` is not null
-            //                     $q->with('table');
-            //                 }, function ($q) {
-            //                     // Load `roomSession.entitySession.entity` when `entity_id` is null
-            //                     $q->with('roomSession.entitySession.entity');
-            //                 });
+            //         'menu',
+            //         'area',
+            //         'order' => function ($query) {
+            //             $query->with([
+            //                 'invoice' => function ($query) {
+            //                     $query->select('id', 'entity_id')
+            //                         ->with([
+            //                             'table' => function ($query) {
+            //                                 $query->select('id', 'name'); // Only load name
+            //                             },
+            //                             'roomSession.entitySession.entity' => function ($query) {
+            //                                 $query->select('id', 'name'); // Only load unique entities
+            //                             }
+            //                         ]);
+            //                 }
+            //             ]);
             //         }
             //     ])
-            //     ->paginate(config('common.list_count'));
+            //     ->where('area_id', $areaId)
+            //     ->orderBy('id', 'desc')
+                // ->paginate(config('common.list_count'));
             return $order_items;
         } else {
             if ($request->date) {
