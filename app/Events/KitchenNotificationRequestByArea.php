@@ -23,9 +23,9 @@ class KitchenNotificationRequestByArea implements ShouldBroadcast
     public $orderItems;
     public $entity;
 
-    public function __construct( $orderItems=null)
+    public function __construct( $orderItems=null,$areaId)
     {
-        // $this->area_id = $area_id;
+        $this->area_id = $areaId;
         // $this->order = $order;                          
         // $this->entity = $entityName;                                                                                                                                                
         // $this->orderItems=$orderItems;
@@ -64,5 +64,6 @@ class KitchenNotificationRequestByArea implements ShouldBroadcast
         //     'entity' => $this->entity
         // ];
         return $data;
+
     }
 }

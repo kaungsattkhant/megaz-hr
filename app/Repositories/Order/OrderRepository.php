@@ -372,8 +372,7 @@ class OrderRepository implements OrderRepositoryInterface
     {
         DB::beginTransaction();
         try {
-            $orderItem = OrderItem::where('status', 'pos_confirmed')
-            ->with('menu','order:id,order_id,invoice_id','order.invoice:id,entity_id', 'order.invoice.roomSession.entitySession.entity', 'area', 'order.invoice.table')
+            $orderItem = OrderItem::with('menu','order:id,order_id,invoice_id','order.invoice:id,entity_id', 'order.invoice.roomSession.entitySession.entity', 'area', 'order.invoice.table')
             ->find($id);
             if (!$orderItem) {
                 ResponseMessage('Order Item not found', 404);
@@ -414,7 +413,7 @@ class OrderRepository implements OrderRepositoryInterface
             ]);
             $orderItem->entity_name=$entity_name;
             // broadcast(new KitchenNotificationRequest($entity, $order, null, $orderItem, 7));
-            broadcast(new KitchenNotificationRequestByArea($orderItem));
+            broadcast(new KitchenNotificationRequestByArea($orderItem,$request->area_id));
             DB::commit();
             ResponseData($orderItem);
         } catch (\Exception $e) {
