@@ -28,7 +28,6 @@ class KitchenNotificationRequest implements ShouldBroadcast
         $this->order = $order;                          
         $this->entity = $entity;                                                                                                                                                
 
-
         if ($orderItems !== null) {
             $this->orderItems = $orderItems;
         } elseif ($orderItem !== null) {

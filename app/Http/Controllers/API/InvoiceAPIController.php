@@ -152,4 +152,9 @@ class InvoiceAPIController extends Controller
     {
         $invoice = $this->invoiceRepo->invoiceConfirm($request->all());
     }
+
+    public function createServiceToInvoice(Request $request){
+        $data=$this->invoiceRepo->createServiceToInvoice($request);
+        ResponseData($data);
+    }
 }

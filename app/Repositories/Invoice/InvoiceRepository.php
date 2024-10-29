@@ -110,9 +110,9 @@ class InvoiceRepository implements InvoiceRepositoryInterface
         $now = Carbon::now();
 
         $remainingTime = $now->diff($endTime);
-        if ($remainingTime->h > 1) {
-            ResponseMessage("Selected Session is not available because selected session time is not available", 422);
-        }
+        // if ($remainingTime->h > 1) {
+        //     ResponseMessage("Selected Session is not available because selected session time is not available", 422);
+        // }
         $totalRemainingMinutes = ($remainingTime->h * 60) + $remainingTime->i;
         $leftHours = $totalRemainingMinutes / 60;
         return round($leftHours, 2);
@@ -1129,8 +1129,6 @@ class InvoiceRepository implements InvoiceRepositoryInterface
                 ]);
             }
         }
-
-
         $debitLedger = (new StoreTransactionLedger())->storeLedger([
             'value' => $debit_total,
             'transaction_id' => $transaction->id,
@@ -1138,5 +1136,10 @@ class InvoiceRepository implements InvoiceRepositoryInterface
             'action' => 'debit',
             'is_cashier_confirmed' => 1
         ]);
+    }
+
+    //add service 
+    public function createServiceToInvoice($request){
+        
     }
 }

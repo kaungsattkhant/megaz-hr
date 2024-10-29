@@ -1,6 +1,6 @@
 <template>
     <div class="">
-        <div class=" bg-gray-100 w-max min-h-screen flex overflow-x-auto hidden-scrollbar" :style="isShowSidebar == true ? 'width:calc(100% - 410px)' : 'width:100%' ">
+        <div class=" bg-gray-100 min-h-screen w-full" :style="isShowSidebar == true ? 'width:calc(100% - 410px)' : 'width:100%' ">
             <div class="w-fit pt-9 px-6 ">
                 <ul class="mb-5 flex list-none flex-row flex-wrap border-b-0 pl-0" role="tablist" data-te-nav-ref>
                     <li v-for="(area, index) in areaList" :key="index" role="presentation" @click="btnClickedArea(area.id,area.area_type.type)">
@@ -12,13 +12,13 @@
                         </a>
                     </li>
                 </ul>
-                <div v-show="areaType == 'bar_and_restaurant'">
+                <div v-show="areaType == 'bar_and_restaurant'" class="contents">
                     <!-- <button class="p-10 bg-red-600 text-white" @click="callTest()">
                         bar
                     </button> -->
                     <PosTableComponent v-if="selectedAreaId" :table-area-id="selectedAreaId" ref="posTable" />
                 </div>
-                <div v-show="areaType == 'ktv'">
+                <div v-show="areaType == 'ktv'" class="contents">
                     <!-- <button class="p-10 bg-red-600 text-white" @click="callTest()">
                         ktv
                     </button> -->

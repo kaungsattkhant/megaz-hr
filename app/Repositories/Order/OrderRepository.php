@@ -34,8 +34,8 @@ class OrderRepository implements OrderRepositoryInterface
             // $data['invoice'] must be unsigned integer format , not 000023
             $order = Order::where('invoice_id', $data['invoice_id'])->first();
             $menu = Menu::find($data['menu_id']);
-            if(!$menu){
-                ResponseMessage('Menu not found',404);
+            if (!$menu) {
+                ResponseMessage('Menu not found', 404);
             }
             $latestMenuServiceDiscount = $menu->menuServiceDiscounts()
                 ->whereDate('from_date', '<=', CurrentDate())
@@ -66,11 +66,11 @@ class OrderRepository implements OrderRepositoryInterface
                 // $order_items->menu = $order_items->menu;
 
                 // $invoice = Invoice::find($data['invoice_id']);
-                if($order->invoice->entity_id==null){
+                if ($order->invoice->entity_id == null) {
                     $latestRoomSession = RoomSession::where('invoice_id', $order->invoice_id)->orderBy('created_at', 'desc')->first();
                     $entity = Entity::find($latestRoomSession->entitySession->entity_id);
-                }else{
-                    $entity=$order->invoice->table;
+                } else {
+                    $entity = $order->invoice->table;
                 }
                 // broadcast(new KitchenNotificationRequest($entity, $order, null, $order_items, 7));
                 DB::commit();
@@ -97,11 +97,11 @@ class OrderRepository implements OrderRepositoryInterface
                 // validate table or room
                 // dd($order->invoice->entity==null);
                 // dd($order->invoice->table);
-                if($order->invoice->entity_id==null){
+                if ($order->invoice->entity_id == null) {
                     $latestRoomSession = RoomSession::where('invoice_id', $data['invoice_id'])->orderBy('created_at', 'desc')->first();
                     $entity = Entity::find($latestRoomSession->entitySession->entity_id);
-                }else{
-                    $entity=$order->invoice->table;
+                } else {
+                    $entity = $order->invoice->table;
                 }
                 // broadcast(new KitchenNotificationRequest($entity, $order, null, $order_items, 7));
                 DB::commit();
@@ -189,7 +189,7 @@ class OrderRepository implements OrderRepositoryInterface
                 }
 
                 $order_item = OrderItem::create($menuData);
-                if($order_item->is_foc == 1){
+                if ($order_item->is_foc == 1) {
                     $focTotal += $order_item->price;
                 }
                 $order_item->menu = $order_item->menu;
@@ -198,17 +198,15 @@ class OrderRepository implements OrderRepositoryInterface
 
             $order->foc_total += $focTotal;
             $order->save();
-            if(isset($data['is_waiter']))
-            {
-                if($data['is_waiter']==1)
-                {
+            if (isset($data['is_waiter'])) {
+                if ($data['is_waiter'] == 1) {
                     broadcast(new WaiterOrderConfirmNotificationRequest($entity, $order, $orderItemsArray, null, 5));
                 }
             }
             broadcast(new KitchenNotificationRequest($entity, $order, $orderItemsArray, null, 7));
             DB::commit();
-             $data['order'] = $order;
-             $data['orderItems'] = $orderItemsArray;
+            $data['order'] = $order;
+            $data['orderItems'] = $orderItemsArray;
             return $data;
         } catch (\Exception $e) {
             DB::rollback();
@@ -262,19 +260,39 @@ class OrderRepository implements OrderRepositoryInterface
 
     public function getOrderItemData(Request $request)
     {
-        $areaId=$request->area_id;
+        $areaId = $request->area_id;
         if ($request->per_page || $request->page) {
             if ($request->date) {
                 $date = $request->date;
             } else {
                 $date = CurrentDate();
             }
-            $startTime = $date . ' 00:00:00';
-            $endTime = $date . ' 23:59:59';
-            $order_items = OrderItem::where('status', 'pos_confirmed')->with('menu', 'order.invoice.latestSession.entitySession', 'area') // change entiy to entitySession
-                ->whereBetween('date', [$startTime, $endTime])
+            // $startTime = $date . ' 00:00:00';
+            // $endTime = $date . ' 23:59:59';
+            $order_items = OrderItem::where('status', 'pos_confirmed')
+            ->with('menu', 'order.invoice.roomSession.entitySession.entity', 'area','order.invoice.table') // change entiy to entitySession
+                // ->whereBetween('date', [$startTime, $endTime])
                 ->where('area_id',$areaId)
+                ->orderBy('id','desc')
                 ->paginate(config('common.list_count'));
+
+            // $order_items = OrderItem::where('status', 'pos_confirmed')
+            //     ->with(['menu', 'area'])
+            //     ->where('area_id', $areaId)
+            //     ->orderBy('id', 'desc')
+            //     ->with([
+            //         'order.invoice' => function ($query) {
+            //             $query->select('id', 'entity_id') // Optimize by selecting only necessary columns
+            //                 ->when(!is_null($query->first()->entity_id), function ($q) {
+            //                     // Load the `table` relationship when `entity_id` is not null
+            //                     $q->with('table');
+            //                 }, function ($q) {
+            //                     // Load `roomSession.entitySession.entity` when `entity_id` is null
+            //                     $q->with('roomSession.entitySession.entity');
+            //                 });
+            //         }
+            //     ])
+            //     ->paginate(config('common.list_count'));
             return $order_items;
         } else {
             if ($request->date) {
@@ -297,35 +315,50 @@ class OrderRepository implements OrderRepositoryInterface
         ResponseData($orderItems);
     }
 
-    public function orderItemAreaConfirm(int $id,$request)
+    public function orderItemAreaConfirm(int $id, $request)
     {
         DB::beginTransaction();
         try {
             $orderItem = OrderItem::find($id);
-            if(!$orderItem){
-                ResponseMessage('Order Item not found',404);
+            if (!$orderItem) {
+                ResponseMessage('Order Item not found', 404);
             }
-            $order=$orderItem->order;
-            
+            $order = $orderItem->order;
+
             // dd($orderItem->order->invoice->entity_id);
-            $entity=null;
-            if($orderItem->order->invoice->entity_id!=null){
-                $entity=$orderItem->order->invoice->table;
-            }else{
-                $entity=$orderItem->order->invoice->latestSession->entitySession->entity;
+            $entity = null;
+            $entity_name = '';
+            if ($orderItem->order->invoice->entity_id != null) {
+                $entity = $orderItem->order->invoice->table;
+                $entity_name = $entity->name;
+            } else {
+                $entity = $orderItem->order->invoice->latestSession->entitySession->entity;
+                $roomSessions = $orderItem->order->invoice->roomSession->unique('entity_id');
+                $entity_name_arr = [];
+                foreach ($roomSessions as $roomSession) {
+                    $entity_name_arr[] = $roomSession->entitySession->entity->name;
+                }
+                $entity_name = implode(', ', $entity_name_arr);
+                // dd($orderItem->order->invoice->roomSession);
                 // dd($orderItem->order->invoice->latestSession->entitySession->entity);
                 // $latestRoomSession = RoomSession::where('invoice_id', $invoice->id)->orderBy('created_at', 'desc')->first();
                 // $entity = Entity::find($latestRoomSession->entitySession->entity_id);
             }
-            if(!$entity){
-                ResponseMessage('Entity not found',404);
+            // $roomSessions=$orderItem->order->invoice->roomSession->unique('entity_id');
+            // $entity_name_arr=[];
+            // foreach($roomSessions as $roomSession){
+            //     $entity_name_arr[]=$roomSession->entitySession->entity->name;
+            // }
+            // $entity_name = implode(', ', $entity_name_arr);
+            if (!$entity) {
+                ResponseMessage('Entity not found', 404);
             }
             $orderItem->update([
                 'area_id' => $request->area_id,
                 'status' => $request->status,
             ]);
             // broadcast(new KitchenNotificationRequest($entity, $order, null, $orderItem, 7));
-            broadcast(new KitchenNotificationRequestByArea($entity, $order,[$orderItem],$request->area_id));
+            broadcast(new KitchenNotificationRequestByArea($entity_name, $order, $orderItem, $request->area_id));
             DB::commit();
             ResponseData($orderItem);
         } catch (\Exception $e) {
@@ -337,26 +370,26 @@ class OrderRepository implements OrderRepositoryInterface
 
     public function orderByInvoiceId(int $invoiceId)
     {
-        $order = Order::where('invoice_id',$invoiceId)->with('orderItems.menu')->get();
+        $order = Order::where('invoice_id', $invoiceId)->with('orderItems.menu')->get();
         ResponseData($order);
 
     }
     public function checkFocSupervision(Request $request)
     {
-        $supervisor = Staff::whereHas('department',function($query){
+        $supervisor = Staff::whereHas('department', function ($query) {
             $query->where('name', 'Catering');
         })
-        ->whereHas('roles', function($query){
-            $query->whereIn('name', ['Supervisor', 'Manager']);
-        })
-        ->where('phone_number', $request->phone_number)->first();
+            ->whereHas('roles', function ($query) {
+                $query->whereIn('name', ['Supervisor', 'Manager']);
+            })
+            ->where('phone_number', $request->phone_number)->first();
 
-        if(!$supervisor){
+        if (!$supervisor) {
             ResponseMessage('No supervisor found', 404);
         }
-        if(Hash::check($request->password,$supervisor->getAuthPassword())){
+        if (Hash::check($request->password, $supervisor->getAuthPassword())) {
             ResponseMessage('Supervisor confirmed');
-        }else{
+        } else {
             ResponseMessage('Supervisor authorization failed', 403);
         }
     }
