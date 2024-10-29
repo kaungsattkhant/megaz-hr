@@ -1,7 +1,7 @@
 <template>
     <div class="">
         <div class="mb-6">
-            <div class="opacity-100 transition-opacity duration-150 ease-linear overflow-x-auto hidden-scrollbar" :style="isShowSidebar == true ? 'width:calc(100% - 410px)' : 'width:100%' ">
+            <div class="opacity-100 transition-opacity duration-150 ease-linear overflow-x-auto hidden-scrollbar" :style="isShowSidebar == true ? 'width:calc(100% - 375px)' : 'width:100%' ">
                 <div class="flex flex-wrap gap-x-4 gap-y-4">
                     <div class="flex flex-col mb-4" v-for="(room, roomIndex) in roomList" :key="roomIndex">
                         <div class="flex flex-row gap-x-4">
@@ -41,7 +41,7 @@
                 </div>
                 
             </div>
-            <div class="fixed right-0 top-0 bottom-0 bg-white shadow-md ease-in-out duration-300 transition delay-100 pt-12 right-sidebar-2" :class="isShowSidebar == true ? 'translate-x-0 opacity-100 w-[400px]' : 'translate-x-full opacity-0 w-0' ">
+            <div class="fixed right-0 top-0 bottom-0 bg-white drop-shadow-xl ease-in-out duration-300 transition delay-100 pt-12 right-sidebar-2" :class="isShowSidebar == true ? 'translate-x-0 opacity-100 w-[400px]' : 'translate-x-full opacity-0 w-0' ">
                 <div class="relative h-full w-full">
                     <div class="fixed right-4 top-4 z-40" :class="isShowSidebar == true ? 'block' : 'hidden' ">
                         <button @click="isShowSidebar = false"><i class="far fa-times"></i></button>
@@ -191,6 +191,10 @@
                                 <button class="transition duration-150 ease-in-out focus:outline-none focus:ring-0"
                                     data-te-toggle="modal" data-te-target="#add_hour_modal">
                                     <i class="far fa-hourglass-half"></i>
+                                </button>
+                                <button class="transition duration-150 ease-in-out focus:outline-none focus:ring-0"
+                                    data-te-toggle="modal" data-te-target="#add_service_modal">
+                                    <i class="far fa-user-music"></i>
                                 </button>
                             </div>
                         </div>
@@ -850,7 +854,7 @@
                         <p class="text-xl w-full text-center">
                             Add Service
                         </p>
-                        <button type="button" id="closeMenuModal"
+                        <button type="button" id="closeServiceModal"
                             class="absolute top-4 right-4 focus:shadow-none focus:outline-none" data-te-modal-dismiss
                             aria-label="Close">
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
@@ -865,7 +869,7 @@
                             <label for="" class="label-form mb-3">
                                 Service Category
                             </label>
-                            <select name="" id="" v-model="selectedServiceCategory" class="input-ui">
+                            <select name="" id="" v-model="selectedServiceCategory" class="input-ui" @change="serviceCategoryChange()">
                                 <option :value="service" v-for="(service, index) in serviceCategoryList"
                                     :key="index">{{
                                         service.name }}</option>
@@ -885,20 +889,32 @@
                             <label for="" class="label-form mb-3">
                                 DJ
                             </label>
-                            <input type="text" placeholder="DJ Name" v-model="selectedDj" class="input-ui">
+                            <select name="" id="" v-model="selectedDj" class="input-ui">
+                                <option :value="dj" v-for="(dj, index) in djList"
+                                    :key="index">{{
+                                        dj.name }}</option>
+                            </select>
+                        </div>
+                        <div class="mb-4" v-if="selectedServiceCategory ? selectedServiceCategory.name == 'DJ' : ''">
+                            <label for="" class="label-form mb-3">
+                                DJ
+                            </label>
+                            <input type="date-time" placeholder="Qty" v-model="selectedStartTime"
+                                class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
                         </div>
                         <div class="mb-4">
                             <label for="" class="block text-sm text-black mb-3">
-                                Qty
+                                Remark
                             </label>
-                            <input type="text" placeholder="Hour" v-model="selectedServiceQuantity"
-                                class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
+                            <textarea v-model="serviceRemark"
+                                class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0"
+                                name="" id="" cols="30" rows="10" placeholder="Remark"></textarea>
                         </div>
                     </div>
 
                     <div class="flex justify-center px-12 mb-6">
-                        <button @click="btnConfirmAddPackageMenu()" class="pos-add-btn focus:outline-none focus:ring-0 ">
-                            Add Menu
+                        <button @click="btnConfirmAddService()" class="pos-add-btn focus:outline-none focus:ring-0 ">
+                            Add Service
                         </button>
                     </div>
                 </div>
@@ -1047,6 +1063,10 @@
 
 
                 // add service
+                serviceCategoryList:[],
+                ladyList:[],
+                djList:[],
+
                 selectedServiceCategory:null,
                 selectedLady:null,
                 selectedDj:null,
@@ -1085,8 +1105,6 @@
                     this.isOpenRoomStep('open_1');
                 };
             },
-
-
 
             btnClickedOpenRoom() {
                 this.isOpenRoomStep('open_2');
@@ -1269,8 +1287,6 @@
                         this.purchaseMenuList = response.data.room_sessions[0].invoice.orders
                     }
             },
-
-
 
             //invoice or done
             btnBackToDetail() {
@@ -1482,28 +1498,27 @@
                     // this.printInvoiceData.total = this.printInvoiceData.room + this.printInvoiceData.food;
                 }
             },
-            discountChanged() {
-                let roomTotalAmount = (this.roomSessionData.total_session_price + this.printInvoiceData.food) - this.printInvoiceData.package_discount - this.foodDiscount
-                console.log('room total = ' + this.printInvoiceData.room)
-                if (this.discount_type == 'percentage') {
-                    this.printInvoiceData.total = roomTotalAmount - (roomTotalAmount * (this.printInvoiceData.discount / 100));
-                    this.printInvoiceData.percent_discount_amount = roomTotalAmount * (this.printInvoiceData.discount / 100);
-                }
-                else {
-                    // this.printInvoiceData.total = roomTotalAmount - this.printInvoiceData.discount;
-                    if(this.printInvoiceData.discount){
-                        this.printInvoiceData.total = roomTotalAmount - this.printInvoiceData.discount;
-                        console.log(this.printInvoiceData.discount)
-                    }
-                    else{
-                        this.printInvoiceData.total = roomTotalAmount - this.printInvoiceData.discount;
-                        console.log(this.printInvoiceData.discount)
-                    }
-                }
-                console.log('room total amounttt = ' + roomTotalAmount);
+            // discountChanged() {
+            //     let roomTotalAmount = (this.roomSessionData.total_session_price + this.printInvoiceData.food) - this.printInvoiceData.package_discount - this.foodDiscount
+            //     console.log('room total = ' + this.printInvoiceData.room)
+            //     if (this.discount_type == 'percentage') {
+            //         this.printInvoiceData.total = roomTotalAmount - (roomTotalAmount * (this.printInvoiceData.discount / 100));
+            //         this.printInvoiceData.percent_discount_amount = roomTotalAmount * (this.printInvoiceData.discount / 100);
+            //     }
+            //     else {
+            //         if(this.printInvoiceData.discount){
+            //             this.printInvoiceData.total = roomTotalAmount - this.printInvoiceData.discount;
+            //             console.log(this.printInvoiceData.discount)
+            //         }
+            //         else{
+            //             this.printInvoiceData.total = roomTotalAmount - this.printInvoiceData.discount;
+            //             console.log(this.printInvoiceData.discount)
+            //         }
+            //     }
+            //     console.log('room total amounttt = ' + roomTotalAmount);
 
 
-            },
+            // },
 
             btnClickedEndRoom() {
                 this.EndRoom();
@@ -1769,7 +1784,61 @@
                 }
             },
 
-
+            // add service
+            // api/get_service?service_category_id=1&area_id=3 dj list
+            async getServiceCategoryList() {
+                const response = await getApiData({ url: '/api/service_categories', token: this.getToken() });
+                if (response.data) {
+                    this.serviceCategoryList = response.data;
+                }
+            },
+            async getLadyList(){
+                const response = await getApiData({ url: '/api/staff_by_department_slug/entertainment', token: this.getToken() });
+                if (response.data) {
+                    this.ladyList = response.data;
+                }
+            },
+            async serviceCategoryChange(){
+                const response = await getApiData({ url: '/api/get_service?service_category_id=' + this.selectedServiceCategory.id + '&area_id=' + this.roomAreaId, token: this.getToken() });
+                if (response.data) {
+                    if(this.selectedServiceCategory.name == 'DJ'){
+                        this.djList = response.data;
+                    }
+                    else{
+                        this.ladyList = response.data;
+                    }
+                    
+                }
+            },
+            btnConfirmAddService() {
+                this.addService();
+            },
+            async addService() {   // invoice pay yan
+                let formData = new FormData();
+                formData.append('invoice_id', this.selectedServiceCategory); // invoice id
+                if(this.selectedServiceCategory.name == 'Lady'){
+                    formData.append('service_id', this.selectedLady);
+                }
+                if(this.selectedServiceCategory.name == 'DJ'){
+                    formData.append('service_id', this.selectedDj);
+                }
+                formData.append('start_date', this.selectedMenuArea.id);
+                formData.append('remark', this.serviceRemark);
+                let response = await postApiData({ url: '/api/entities/add_service', form_data: formData, token: this.getToken() });
+                // console.log(this.invoiceId+','+this.selectedMenu.id + ','+ this.menuQuantity +','+this.selectedMenu.prices[0].price)
+                if (response.success) {
+                    this.closeModal('closeServiceModal');
+                    this.clearServiceForm();
+                    // this.getPurchaseMenuList();
+                }
+                else {
+                    this.$notify({
+                        title: `Input validation`,
+                        text: response.message,
+                        type: "warn"
+                    });
+                }
+            },
 
 
 
@@ -1792,6 +1861,12 @@
                 this.invoiceId = null
                 this.menuQuantity = null
                 this.selectedMenu = null
+            },
+            clearServiceForm() {
+                this.selectedServiceCategory = null
+                this.selectedLady = null
+                this.selectedDj = null
+                this.selectedServiceQuantity = null
             },
             clearAddHourForm() {
                 this.sessionDuration = null
@@ -1865,6 +1940,10 @@
             this.getGendersList();
             this.getMenuList();
             this.getDivisionList();
+
+            this.getServiceCategoryList();
+            this.getLadyList();
+
             // this.testtime();
         },
         mounted()
