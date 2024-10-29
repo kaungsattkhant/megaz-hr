@@ -23,11 +23,11 @@ class KitchenNotificationRequestByArea implements ShouldBroadcast
     public $orderItems;
     public $entity;
 
-    public function __construct($entityName,Order $order, $orderItems=null, $area_id)
+    public function __construct( $orderItems=null)
     {
-        $this->area_id = $area_id;
-        $this->order = $order;                          
-        $this->entity = $entityName;                                                                                                                                                
+        // $this->area_id = $area_id;
+        // $this->order = $order;                          
+        // $this->entity = $entityName;                                                                                                                                                
         // $this->orderItems=$orderItems;
         if ($orderItems !== null) {
             $this->orderItems = [$orderItems];
@@ -44,11 +44,11 @@ class KitchenNotificationRequestByArea implements ShouldBroadcast
      */
     public function broadcastOn(): array
     {
-        Log::info('Broadcasting KitchenNotificationRequestByArea', [
-            'area_id' => $this->area_id,
-            'order_id' => $this->order->id,
-            'entity_id' => $this->entity
-        ]);
+        // Log::info('Broadcasting KitchenNotificationRequestByArea', [
+        //     'area_id' => $this->area_id,
+        //     'order_id' => $this->order->id,
+        //     'entity_id' => $this->entity
+        // ]);
         return [
             new Channel("kitchen-notification-request-by-area.{$this->area_id}"),
         ];
@@ -56,12 +56,13 @@ class KitchenNotificationRequestByArea implements ShouldBroadcast
 
     public function broadcastWith()
     {
-        $data= [
-            'area_id' => $this->area_id,
-            'order' => $this->order,
-            'order_items' => $this->orderItems,
-            'entity' => $this->entity
-        ];
+        $data['order_items']=$this->orderItems;
+        // $data= [
+        //     'area_id' => $this->area_id,
+        //     'order' => $this->order,
+        //     'order_items' => $this->orderItems,
+        //     'entity' => $this->entity
+        // ];
         return $data;
     }
 }
