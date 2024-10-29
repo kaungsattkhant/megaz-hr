@@ -1129,8 +1129,6 @@ class InvoiceRepository implements InvoiceRepositoryInterface
                 ]);
             }
         }
-
-
         $debitLedger = (new StoreTransactionLedger())->storeLedger([
             'value' => $debit_total,
             'transaction_id' => $transaction->id,
