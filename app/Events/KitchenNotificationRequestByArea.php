@@ -64,5 +64,6 @@ class KitchenNotificationRequestByArea implements ShouldBroadcast
         //     'entity' => $this->entity
         // ];
         return $data;
+        
     }
 }
