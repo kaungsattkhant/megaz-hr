@@ -890,7 +890,7 @@ class InvoiceRepository implements InvoiceRepositoryInterface
         $data['sub_total'] = ($data['total'] + $data['tax'] + $data['service_charge'])-$data['total_discount'];
         // $data['sub_total'] = $data['total'];
         $data['total'] = $data['total']+$data['total_discount'];
-        $data['payment_status'] = 'received';
+        $data['payment_status'] = 'received';f
         $data['complete_date'] = CurrentTime();
         $invoice->update($data);
         return $invoice;

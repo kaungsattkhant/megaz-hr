@@ -302,8 +302,6 @@ class OrderRepository implements OrderRepositoryInterface
             
                 if ($invoice) {
                     // Unset roomSession and table from the invoice
-                   
-                    
                     // Determine entity_name based on entity_id
                     if ($invoice->entity_id !== null) {
                         // If entity_id is not null, use the table name
@@ -374,7 +372,9 @@ class OrderRepository implements OrderRepositoryInterface
     {
         DB::beginTransaction();
         try {
-            $orderItem = OrderItem::find($id);
+            $orderItem = OrderItem::where('status', 'pos_confirmed')
+            ->with('menu','order:id,order_id,invoice_id','order.invoice:id,entity_id', 'order.invoice.roomSession.entitySession.entity', 'area', 'order.invoice.table')
+            ->find($id);
             if (!$orderItem) {
                 ResponseMessage('Order Item not found', 404);
             }
@@ -412,8 +412,9 @@ class OrderRepository implements OrderRepositoryInterface
                 'area_id' => $request->area_id,
                 'status' => $request->status,
             ]);
+            $orderItem->entity_name=$entity_name;
             // broadcast(new KitchenNotificationRequest($entity, $order, null, $orderItem, 7));
-            broadcast(new KitchenNotificationRequestByArea($entity_name, $order, $orderItem, $request->area_id));
+            broadcast(new KitchenNotificationRequestByArea($orderItem));
             DB::commit();
             ResponseData($orderItem);
         } catch (\Exception $e) {
