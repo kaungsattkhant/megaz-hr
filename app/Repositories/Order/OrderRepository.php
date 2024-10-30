@@ -251,8 +251,8 @@ class OrderRepository implements OrderRepositoryInterface
             }
             //tem command 
             elseif ($data['status'] == 'in progress'  && $orderItem->status=='pos_confirmed') {
-                // $orderItem->progressed_at = now();
-                // $orderItem->progressed_by = UserData()->id;
+                $orderItem->progressed_at = now();
+                $orderItem->progressed_by = UserData()->id;
             }
             elseif ($data['status'] == 'cancelled') {
                 // $orderItem->cancelled_at = now();
