@@ -11,6 +11,8 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 class Service extends Model
 {
     use HasFactory,SoftDeletes;
+
+    protected $with=['staff'];
     protected $fillable=['service_category_id','name','staff_id','price_per_hour','is_available','area_id'];
     public function service_category(){
         return $this->belongsTo(ServiceCategory::class);

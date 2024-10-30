@@ -10,9 +10,32 @@ class OrderItem extends Model
     use HasFactory;
 
     protected $fillable = [
-        'date','menu_id','quantity','original_price','discount_value','price', 'is_foc','order_id','status','is_complete',
-        'menu_service_discount_id','price',
-        'remark','area_id'
+        'date',
+        'menu_id',
+        'quantity',
+        'original_price',
+        'discount_value',
+        'price',
+        'is_foc',
+        'order_id',
+        'status', 
+        'is_complete',
+        'menu_service_discount_id',
+        'price',
+        'remark',
+        'area_id',
+        'progressed_at',
+        'progressed_by',
+        'confirmed_at',
+        'confirmed_by',
+        'cancelled_at',
+        'cancelled_by',
+        'kitchen_cancelled_at',
+        'kitchen_cancelled_by',
+        'completed_at',
+        'completed_by',
+        'placed_at',
+        'placed_by',
     ];
 
     public function area()
@@ -29,4 +52,5 @@ class OrderItem extends Model
     {
         return $this->belongsTo(Menu::class);
     }
+   
 }

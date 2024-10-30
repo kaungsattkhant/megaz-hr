@@ -23,19 +23,17 @@ class KitchenNotificationRequestByArea implements ShouldBroadcast
     public $orderItems;
     public $entity;
 
-    public function __construct(Entity $entity,Order $order, $orderItems, $area_id)
+    public function __construct( $orderItems=null,$areaId)
     {
-        $this->area_id = $area_id;
-        $this->order = $order;                          
-        $this->entity = $entity;                                                                                                                                                
-        $this->orderItems=$orderItems;
-        // if ($orderItems !== null) {
-        //     $this->orderItems = $orderItems;
-        // } elseif ($orderItem !== null) {
-        //     $this->orderItems = [$orderItem];
-        // } else {
-        //     $this->orderItems = [];
-        // }
+        $this->area_id = $areaId;
+        // $this->order = $order;                          
+        // $this->entity = $entityName;                                                                                                                                                
+        // $this->orderItems=$orderItems;
+        if ($orderItems !== null) {
+            $this->orderItems = [$orderItems];
+        } else {
+            $this->orderItems = [];
+        }
     }
 
 
@@ -46,11 +44,11 @@ class KitchenNotificationRequestByArea implements ShouldBroadcast
      */
     public function broadcastOn(): array
     {
-        Log::info('Broadcasting KitchenNotificationRequestByArea', [
-            'area_id' => $this->area_id,
-            'order_id' => $this->order->id,
-            'entity_id' => $this->entity->id
-        ]);
+        // Log::info('Broadcasting KitchenNotificationRequestByArea', [
+        //     'area_id' => $this->area_id,
+        //     'order_id' => $this->order->id,
+        //     'entity_id' => $this->entity
+        // ]);
         return [
             new Channel("kitchen-notification-request-by-area.{$this->area_id}"),
         ];
@@ -58,13 +56,14 @@ class KitchenNotificationRequestByArea implements ShouldBroadcast
 
     public function broadcastWith()
     {
-        
-        $data= [
-            'area_id' => $this->area_id,
-            'order' => $this->order,
-            'order_items' => $this->orderItems,
-            'entity' => $this->entity
-        ];
+        $data['order_items']=$this->orderItems;
+        // $data= [
+        //     'area_id' => $this->area_id,
+        //     'order' => $this->order,
+        //     'order_items' => $this->orderItems,
+        //     'entity' => $this->entity
+        // ];
         return $data;
+
     }
 }

@@ -6,6 +6,7 @@ use App\Models\Order;
 use App\Models\Entity;
 use App\Models\Package;
 use App\Models\RoomSession;
+use App\Models\InvoiceService;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
@@ -81,5 +82,15 @@ class Invoice extends Model
     public function latestSession()
     {
         return $this->hasOne(RoomSession::class)->latest();
+    }
+
+    public function invoiceService()
+    {
+        return $this->hasMany(InvoiceService::class);
+    }
+
+    public function activeInvoiceService()
+    {
+        return $this->hasMany(InvoiceService::class)->where('is_active',1);
     }
 }

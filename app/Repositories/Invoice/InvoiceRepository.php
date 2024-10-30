@@ -2,44 +2,45 @@
 
 namespace App\Repositories\Invoice;
 
-use App\Events\RoomDoneNotificationRequest;
-use App\Http\Action\Transaction\StoreTransactionLedger;
+use Carbon\Carbon;
+use App\Models\Role;
+use App\Models\User;
+use App\Models\Order;
+use App\Models\Staff;
+use App\Models\Entity;
 use App\Models\Account;
-use App\Models\BirthdayPromotion;
+use App\Models\Invoice;
+use App\Models\Package;
 use App\Models\Customer;
-use App\Models\CustomerLevelDiscount;
-use App\Traits\CustomerTrait;
-use Illuminate\Support\Facades\DB;
+use App\Models\HeadCount;
+use App\Models\Department;
+use App\Models\RoomSession;
+use App\Models\RoomDiscount;
 use Illuminate\Http\Request;
+use App\Models\EntitySession;
+use App\Traits\CustomerTrait;
+use App\Models\InvoiceService;
+use App\Models\TargetPosition;
+use App\Services\OrderService;
+use App\Models\TargetMenuResult;
+use App\Models\BirthdayPromotion;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+use App\Models\TargetPositionResult;
+use App\Models\CustomerLevelDiscount;
+use App\Services\InvoiceModelService;
 use App\Events\RoomNotificationRequest;
 use App\Events\WaiterNotificationRequest;
-use App\Models\Department;
-use App\Models\Entity;
-use App\Models\EntitySession;
-use App\Models\HeadCount;
-use App\Models\Invoice;
-use App\Models\Order;
-use App\Models\Package;
-use App\Models\Role;
-use App\Models\RoomDiscount;
-use App\Models\RoomSession;
-use App\Models\Staff;
-use App\Models\TargetMenuResult;
-use App\Models\TargetPosition;
-use App\Models\TargetPositionResult;
-use App\Models\User;
+use App\Events\RoomDoneNotificationRequest;
 use App\Repositories\Order\OrderRepository;
-use App\Services\InvoiceService;
-use App\Services\OrderService;
-use Carbon\Carbon;
-use Illuminate\Support\Facades\Log;
+use App\Http\Action\Transaction\StoreTransactionLedger;
 
 class InvoiceRepository implements InvoiceRepositoryInterface
 {
     use CustomerTrait;
     private $orderService;
     private $invoiceService;
-    public function __construct(OrderService $orderService,InvoiceService $invoiceService)
+    public function __construct(OrderService $orderService, InvoiceModelService $invoiceService)
     {
         $this->orderService = $orderService;
         $this->invoiceService = $invoiceService;
@@ -88,7 +89,7 @@ class InvoiceRepository implements InvoiceRepositoryInterface
                 $invoices = Invoice::with(['customer'])->get();
             }
 
-            foreach($invoices as $invoice){
+            foreach ($invoices as $invoice) {
                 $lastRoomSession = $invoice->roomSession()->get()->last();
                 $lastRoom = $lastRoomSession->entitySession->entity;
                 $invoice->room = $lastRoom;
@@ -110,9 +111,9 @@ class InvoiceRepository implements InvoiceRepositoryInterface
         $now = Carbon::now();
 
         $remainingTime = $now->diff($endTime);
-        if ($remainingTime->h > 1) {
-            ResponseMessage("Selected Session is not available because selected session time is not available", 422);
-        }
+        // if ($remainingTime->h > 1) {
+        //     ResponseMessage("Selected Session is not available because selected session time is not available", 422);
+        // }
         $totalRemainingMinutes = ($remainingTime->h * 60) + $remainingTime->i;
         $leftHours = $totalRemainingMinutes / 60;
         return round($leftHours, 2);
@@ -444,7 +445,7 @@ class InvoiceRepository implements InvoiceRepositoryInterface
 
             $invoice = Invoice::find($data['invoice_id']);
             if ($invoice->entity_id != null) {
-                $updatedInvoice=$this->changeTable($invoice, $data['entity_id']);
+                $updatedInvoice = $this->changeTable($invoice, $data['entity_id']);
                 DB::commit();
                 ResponseData($updatedInvoice, 200);
             }
@@ -696,14 +697,14 @@ class InvoiceRepository implements InvoiceRepositoryInterface
         DB::beginTransaction();
         try {
             $invoice = Invoice::find($data['invoice_id']);
-            if(!$invoice){
-                ResponseMessage('Invoice not found',404);
+            if (!$invoice) {
+                ResponseMessage('Invoice not found', 404);
             }
             //added end_invoice for table oct 25 2024
-            if($invoice && $invoice->entity_id!=null){
-                $invoice=$this->doneTableForInvoice($data,$invoice);
-                $this->invoiceService->updateEntityStatus($invoice->entity_id,'inactive'); // after done invoice ,update entity staus to inactive
-                $this->addTargetPosition($invoice->id,$invoice->created_by,$data['total']); //add sale target position for related role
+            if ($invoice && $invoice->entity_id != null) {
+                $invoice = $this->doneTableForInvoice($data, $invoice);
+                $this->invoiceService->updateEntityStatus($invoice->entity_id, 'inactive'); // after done invoice ,update entity staus to inactive
+                $this->addTargetPosition($invoice->id, $invoice->created_by, $data['total']); //add sale target position for related role
                 $this->addTargetMenu($invoice->id); //add sale target position for related role
                 $this->broadcastNotification($invoice->entity_id); //send notifcation;
                 DB::commit();
@@ -736,7 +737,7 @@ class InvoiceRepository implements InvoiceRepositoryInterface
             if (isset($data['order_discount'])) {
                 $order_discount = $data['order_discount'];
             }
-         
+
             if (isset($data['birthday_discount'])) {
                 $bdDiscount = $data['birthday_discount'] ?? 0;
             }
@@ -884,26 +885,29 @@ class InvoiceRepository implements InvoiceRepositoryInterface
         }
     }
 
-    public function doneTableForInvoice($data,$invoice){
-        $data['discount_value']=$data['discount_type']==null || $data['discount_type']=="null" ? 0 :$data['discount_value'];
-        $data['total_discount']=$data['birthday_discount']+$data['customer_level_discount']+$data['discount_value']+$data['order_discount'];;
-        $data['sub_total'] = ($data['total'] + $data['tax'] + $data['service_charge'])-$data['total_discount'];
+    public function doneTableForInvoice($data, $invoice)
+    {
+        $data['discount_value'] = $data['discount_type'] == null || $data['discount_type'] == "null" ? 0 : $data['discount_value'];
+        $data['total_discount'] = $data['birthday_discount'] + $data['customer_level_discount'] + $data['discount_value'] + $data['order_discount'];
+        ;
+        $data['sub_total'] = ($data['total'] + $data['tax'] + $data['service_charge']) - $data['total_discount'];
         // $data['sub_total'] = $data['total'];
-        $data['total'] = $data['total']+$data['total_discount'];
+        $data['total'] = $data['total'] + $data['total_discount'];
         $data['payment_status'] = 'received';
         $data['complete_date'] = CurrentTime();
         $invoice->update($data);
         return $invoice;
     }
 
-    public function addTargetPosition($invoiceId,$staffId,$total){
+    public function addTargetPosition($invoiceId, $staffId, $total)
+    {
         $soldStaff = Staff::find($staffId);
-        if(!$soldStaff){
-            ResponseMessage('Staff not found',404);
+        if (!$soldStaff) {
+            ResponseMessage('Staff not found', 404);
         }
         $firstRole = $soldStaff->roles->first();
-        if(!$firstRole){
-            ResponseMessage('Role not found',404);
+        if (!$firstRole) {
+            ResponseMessage('Role not found', 404);
         }
         TargetPositionResult::create([
             'role_id' => $firstRole->id,
@@ -913,9 +917,10 @@ class InvoiceRepository implements InvoiceRepositoryInterface
         ]);
     }
 
-    public function addTargetMenu($invoiceId){
+    public function addTargetMenu($invoiceId)
+    {
         $order = Order::where('invoice_id', $invoiceId)->first();
-        if ($order ) {
+        if ($order) {
             $orderItems = $order->orderItems;
             $groupedOrderItems = $orderItems
                 ->groupBy(function ($item) {
@@ -940,20 +945,21 @@ class InvoiceRepository implements InvoiceRepositoryInterface
             }
         }
     }
-    public function broadcastNotification($entityId){
-        $entity=Entity::find($entityId);
-        if(!$entity){
-            ResponseMessage('Entity No found',404);
+    public function broadcastNotification($entityId)
+    {
+        $entity = Entity::find($entityId);
+        if (!$entity) {
+            ResponseMessage('Entity No found', 404);
         }
         $catering_department = Department::where('name', 'Catering')->first();
-        if(!$catering_department){
-            ResponseMessage('Catering department not found',404);
+        if (!$catering_department) {
+            ResponseMessage('Catering department not found', 404);
         }
         $msg = "The {$entity->name} is now closed. Thank you.";
         //i think this role is not reliable to send notification
         $role = Role::where('name', 'Staff')->where('department_id', $catering_department->id)->first();
-        if(!$role){
-            ResponseMessage('Role not found',404);
+        if (!$role) {
+            ResponseMessage('Role not found', 404);
         }
         broadcast(new RoomDoneNotificationRequest($entity, $msg, $role->id));
     }
@@ -1129,8 +1135,6 @@ class InvoiceRepository implements InvoiceRepositoryInterface
                 ]);
             }
         }
-
-
         $debitLedger = (new StoreTransactionLedger())->storeLedger([
             'value' => $debit_total,
             'transaction_id' => $transaction->id,
@@ -1138,5 +1142,25 @@ class InvoiceRepository implements InvoiceRepositoryInterface
             'action' => 'debit',
             'is_cashier_confirmed' => 1
         ]);
+    }
+
+    //add service 
+    public function addService($request)
+    {
+
+        DB::beginTransaction();
+        try {
+            $createdService = InvoiceService::create([
+                'start_date' => $request->start_date,
+                'invoice_id' => $request->invoice_id,
+                'service_id' => $request->service_id,
+            ]);
+            DB::commit();
+            return $createdService;
+        } catch (\Exception $e) {
+            DB::rollback();
+            ResponseMessage($e->getMessage(), 402);
+            throw $e;
+        }
     }
 }
