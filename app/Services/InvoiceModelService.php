@@ -6,7 +6,7 @@ use App\Models\Entity;
 
 
 
-class InvoiceService
+class InvoiceModelService
 {
     public function updateEntityStatus($entityId,$status){
         return Entity::where('id',$entityId)->update([

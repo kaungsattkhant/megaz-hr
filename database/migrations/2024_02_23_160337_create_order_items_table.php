@@ -23,6 +23,16 @@ return new class extends Migration
             $table->unsignedBigInteger('order_id');
             $table->string('status')->default('not yet');
             $table->boolean('is_complete')->default(value: 0);
+            $table->dateTime('progresed_at')->nullable();
+            $table->integer('progresed_by')->nullable();
+            $table->dateTime('confirmed_at')->nullable();
+            $table->integer('confirmed_by')->nullable();
+            $table->dateTime('cancelled_at')->nullable();
+            $table->integer('cancelled_by')->nullable();
+            $table->dateTime('completed_at')->nullable();
+            $table->integer('completd_by')->nullable();
+            $table->dateTime('placed_at')->nullable();
+            $table->integer('placed_by')->nullable();
             $table->foreignId('menu_service_discount_id')->nullable()->foreignId()->constrained()->onDelete('cascade');
             $table->string('remark')->nullable();
             $table->timestamps();

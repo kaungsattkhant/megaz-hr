@@ -384,8 +384,8 @@ Route::middleware('auth:api')->group(function () {
     //pos service api
     Route::controller(ServiceController::class)->group(function () {
         Route::get('/get_service', 'getService');
-        Route::get('/create_service', 'createServiceToInvoice');
     });
+
 });
 
 Route::controller(SaleTargetPositionAPIController::class)->group(function () {
@@ -534,7 +534,10 @@ Route::post('/entities/change', [InvoiceAPIController::class, 'changeRoom']);
 Route::post('/entities/done', [InvoiceAPIController::class, 'endRoom']);
 Route::post('/room_done', [InvoiceAPIController::class, 'doneRoom']);
 Route::post('/entities/confirm', [InvoiceAPIController::class, 'roomConfirm']);
-
+// Route::post('/entities/add_service', [InvoiceAPIController::class, 'addService']);
+Route::controller(InvoiceAPIController::class)->group(function () {
+    Route::post('entities/add_service','addService');
+});
 Route::get('/order_items', [OrderAPIController::class, 'getOrderItemList']);
 Route::get('/order_items/{invoiceId}/invoice', [OrderAPIController::class, 'getOrderItemByInvoice']);
 Route::get('/pos_order_items', [OrderAPIController::class, 'getOrderItemForPOS']);
