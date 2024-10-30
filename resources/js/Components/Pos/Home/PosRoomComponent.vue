@@ -895,11 +895,11 @@
                                         dj.name }}</option>
                             </select>
                         </div>
-                        <div class="mb-4" v-if="selectedServiceCategory ? selectedServiceCategory.name == 'DJ' : ''">
+                        <div class="mb-4">
                             <label for="" class="label-form mb-3">
                                 Start Date
                             </label>
-                            <input type="date-time" placeholder="Qty" v-model="selectedServiceStartTime"
+                            <input type="datetime-local" placeholder="Qty" v-model="selectedServiceStartTime"
                                 class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
                         </div>
                         <div class="mb-4">
