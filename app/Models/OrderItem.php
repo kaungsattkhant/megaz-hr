@@ -23,7 +23,15 @@ class OrderItem extends Model
         'menu_service_discount_id',
         'price',
         'remark',
-        'area_id'
+        'area_id',
+        'confirmed_at',
+        'confirmed_by',
+        'cancelled_at',
+        'cancelled_by',
+        'completed_at',
+        'completed_by',
+        'placed_at',
+        'placed_by',
     ];
 
     public function area()

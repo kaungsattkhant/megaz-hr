@@ -97,14 +97,14 @@ class EntityRepository implements EntityRepositoryInterface
                 }
             ])
             ->find($entitySessionId);
-
-
+        $invoiceServiceCollection = collect();
         foreach ($entitySession->roomSessions as $roomSession) {
             $invoice = $roomSession->invoice;
             $invoice->package;
             if ($invoice) {
+                // dd($invoice->invoiceService);
+                $invoiceServiceCollection = $invoiceServiceCollection->merge($invoice->invoiceService);
                 $consolidatedOrderItems = [];
-
                 foreach ($invoice->orders as $order) {
                     $orderItems = OrderItem::where('order_id', $order->id)->get();
 
@@ -132,9 +132,10 @@ class EntityRepository implements EntityRepositoryInterface
                         }
                     }
                 }
+                //service list
             }
         }
-
+        $entitySession->services=$invoiceServiceCollection;
         return $entitySession;
     }
 

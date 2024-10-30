@@ -221,18 +221,22 @@ class OrderRepository implements OrderRepositoryInterface
         try {
             $users = UserData();
             $orderItem = OrderItem::find($data['id']);
-            if ($orderItem->status == 'in_progress') {
-                ResponseMessage("Order item can't be canceled because it is already in progress.", 422);
-            } else if ($orderItem->status == 'in progress') {
-                ResponseMessage("Order item can't be canceled because it is already in progress.", 422);
-            } elseif ($orderItem->status == 'done') {
-                ResponseMessage("Order item can't be canceled because it is already done.", 422);
-            } elseif ($orderItem->status == 'confirmed') {
-                ResponseMessage("Order item can't be canceled because it is already confirmed.", 422);
+            if ($data['status'] == 'cancelled') {
+                $nonCancellableStatuses = [
+                    'in progress' => "Order item can't be canceled because it is already in progress.",
+                    'done' => "Order item can't be canceled because it is already done.",
+                    'pos_confirmed' => "Order item can't be canceled because it is already confirmed.",
+                ];
+
+                if (isset($nonCancellableStatuses[$orderItem->status])) {
+                    ResponseMessage($nonCancellableStatuses[$orderItem->status], 422);
+                }
             }
+
             $invoice = Invoice::find($orderItem->order->invoice_id);
             $latestRoomSession = RoomSession::where('invoice_id', $invoice->id)->orderBy('created_at', 'desc')->first();
-            $entity = Entity::find($latestRoomSession->entitySession->entity_id);
+            $entity = $latestRoomSession->entitySession->entity;
+            // $entity = Entity::find($latestRoomSession->entitySession->entity_id);
             if ($data['status'] == 'done') {
                 $packs = Pack::where('menu_id', $orderItem->menu_id)->where('status', 'ready')->where('expired_at', '>', CurrentTime())->orderBy('expired_at', 'asc')->take($orderItem->quantity)->get();
                 if (count($packs) < $orderItem->quantity) {
@@ -246,6 +250,19 @@ class OrderRepository implements OrderRepositoryInterface
                 }
             }
             $orderItem->status = $data['status'];
+            //tem command 
+            // if ($data['status'] == 'in progress') {
+            //     $orderItem->progressed_at = now();
+            //     $orderItem->progressed_by = UserData()->id;
+            // }
+            // if ($data['status'] == 'cancelled') {
+            //     $orderItem->cancelled_at = now();
+            //     $orderItem->cancelled_by = UserData()->id;
+            // }
+            // if ($data['status'] == 'done') {
+            //     $orderItem->completed_at = now();
+            //     $orderItem->completed_by = UserData()->id;
+            // }
             $orderItem->update();
             $orderItem->menu = $orderItem->menu;
             broadcast(new OrderStatusNotificationRequest($entity, $orderItem, 5));
@@ -270,7 +287,7 @@ class OrderRepository implements OrderRepositoryInterface
             // $startTime = $date . ' 00:00:00';
             // $endTime = $date . ' 23:59:59';
             $order_items = OrderItem::where('status', 'pos_confirmed')
-                ->with('menu','order:id,order_id,invoice_id','order.invoice:id,entity_id', 'order.invoice.roomSession.entitySession.entity', 'area', 'order.invoice.table') // change entiy to entitySession
+                ->with('menu', 'order:id,order_id,invoice_id', 'order.invoice:id,entity_id', 'order.invoice.roomSession.entitySession.entity', 'area', 'order.invoice.table') // change entiy to entitySession
                 // ->whereBetween('date', [$startTime, $endTime])
                 ->where('area_id', $areaId)
                 ->orderBy('id', 'desc')
@@ -294,12 +311,12 @@ class OrderRepository implements OrderRepositoryInterface
             //     unset($orderItem->order->invoice->roomSession);
             //     unset($orderItem->order->invoice->table);
             //     // UnsetData($orderItem->order->invoice,'roomSession');
-            
+
             // }
 
             $order_items->getCollection()->transform(function ($orderItem) {
                 $invoice = $orderItem->order->invoice ?? null;
-            
+
                 if ($invoice) {
                     // Unset roomSession and table from the invoice
                     // Determine entity_name based on entity_id
@@ -313,13 +330,13 @@ class OrderRepository implements OrderRepositoryInterface
                             ->pluck('entitySession.entity.name')
                             ->unique()
                             ->join(', '); // Join unique entity names
-            
+
                         $orderItem->entity_name = $uniqueEntities;
                     }
                     unset($invoice->roomSession);
                     unset($invoice->table);
                 }
-            
+
                 return $orderItem;
             });
 
@@ -345,7 +362,7 @@ class OrderRepository implements OrderRepositoryInterface
             //     ])
             //     ->where('area_id', $areaId)
             //     ->orderBy('id', 'desc')
-                // ->paginate(config('common.list_count'));
+            // ->paginate(config('common.list_count'));
             return $order_items;
         } else {
             if ($request->date) {
@@ -372,8 +389,8 @@ class OrderRepository implements OrderRepositoryInterface
     {
         DB::beginTransaction();
         try {
-            $orderItem = OrderItem::with('menu','order:id,order_id,invoice_id','order.invoice:id,entity_id', 'order.invoice.roomSession.entitySession.entity', 'area', 'order.invoice.table')
-            ->find($id);
+            $orderItem = OrderItem::with('menu', 'order:id,order_id,invoice_id', 'order.invoice:id,entity_id', 'order.invoice.roomSession.entitySession.entity', 'area', 'order.invoice.table')
+                ->find($id);
             if (!$orderItem) {
                 ResponseMessage('Order Item not found', 404);
             }
@@ -411,9 +428,9 @@ class OrderRepository implements OrderRepositoryInterface
                 'area_id' => $request->area_id,
                 'status' => $request->status,
             ]);
-            $orderItem->entity_name=$entity_name;
+            $orderItem->entity_name = $entity_name;
             // broadcast(new KitchenNotificationRequest($entity, $order, null, $orderItem, 7));
-            broadcast(new KitchenNotificationRequestByArea($orderItem,$request->area_id));
+            broadcast(new KitchenNotificationRequestByArea($orderItem, $request->area_id));
             DB::commit();
             ResponseData($orderItem);
         } catch (\Exception $e) {

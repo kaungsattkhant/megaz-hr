@@ -26,6 +26,6 @@ interface InvoiceRepositoryInterface
 
     public function ledgerAndTransactionForInvoice(array $data);
 
-    public function createServiceToInvoice($request);
+    public function addService($request);
 }
 

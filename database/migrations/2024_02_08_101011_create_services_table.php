@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('services', function (Blueprint $table) {
             $table->id();
-            $table->string('n ame')->nullable();
+            $table->string('name')->nullable();
             $table->double('price_per_hour');
             $table->foreignId('area_id');
             $table->foreignId('service_category_id')->nullable();
