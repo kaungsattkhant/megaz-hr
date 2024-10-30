@@ -897,9 +897,9 @@
                         </div>
                         <div class="mb-4" v-if="selectedServiceCategory ? selectedServiceCategory.name == 'DJ' : ''">
                             <label for="" class="label-form mb-3">
-                                DJ
+                                Start Date
                             </label>
-                            <input type="date-time" placeholder="Qty" v-model="selectedStartTime"
+                            <input type="date-time" placeholder="Qty" v-model="selectedServiceStartTime"
                                 class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
                         </div>
                         <div class="mb-4">
@@ -1815,14 +1815,15 @@
             },
             async addService() {   // invoice pay yan
                 let formData = new FormData();
-                formData.append('invoice_id', this.selectedServiceCategory); // invoice id
+                formData.append('invoice_id', this.selectedRoom.room_sessions[0].invoice.id);
+                // formData.append('invoice_id', this.selectedServiceCategory);
                 if(this.selectedServiceCategory.name == 'Lady'){
                     formData.append('service_id', this.selectedLady);
                 }
                 if(this.selectedServiceCategory.name == 'DJ'){
-                    formData.append('service_id', this.selectedDj);
+                    formData.append('service_id', this.selectedDj.id);
                 }
-                formData.append('start_date', this.selectedMenuArea.id);
+                formData.append('start_date', this.selectedServiceStartTime);
                 formData.append('remark', this.serviceRemark);
                 let response = await postApiData({ url: '/api/entities/add_service', form_data: formData, token: this.getToken() });
                 // console.log(this.invoiceId+','+this.selectedMenu.id + ','+ this.menuQuantity +','+this.selectedMenu.prices[0].price)
