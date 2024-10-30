@@ -271,7 +271,7 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="padding-section border-b    ">
+                            <div class="padding-section border-b    " v-if="serviceList.length > 0">
                                 <div class="flex justify-between font-semibold mb-3">
                                     <p class="px-2 py-0.5 bg-[#F19E51] text-white text-xs w-fit">
                                         Services
@@ -280,8 +280,26 @@
                                         35,000 MMks
                                     </p>
                                 </div>
-                                <div class=" flex justify-between">
-                                    <div class="block">
+                                <div class=" grid grid-cols-10 gap-x-2 gap-y-3">
+                                    <div class="contents" v-for="(service,index) in serviceList" :key="index" :class="service.is_active == 1 ? 'text-black' : 'text-gray-600'">
+                                        <p class=" col-span-4 text-sm" v-if="service.service.name">
+                                            {{ service.service.name }}
+                                        </p>
+                                        <p class=" col-span-4 text-sm" v-else>
+                                            {{ service.service.staff.name }}
+                                        </p>
+                                        <p class=" col-span-2 text-center text-sm">
+                                            {{ service.service_value }}
+                                        </p>
+                                        <!-- <p :class="menu2.status == 'done' ? 'text-green-600 font-semibold' : 'text-gray-500'"
+                                            class=" col-span-2 text-center text-xs pt-0.5">
+                                            {{ menu2.status }}
+                                        </p> -->
+                                        <p class=" col-span-4 text-sm text-right">
+                                            {{ service.service.price_per_hour.toLocaleString() }} MMKs
+                                        </p>
+                                    </div>
+                                    <!-- <div class="block">
                                         <p class="text-sm">
                                             Service 1
                                         </p>
@@ -296,7 +314,7 @@
                                         <p class="text-sm text-right">
                                             12,000 MMKs
                                         </p>
-                                    </div>
+                                    </div> -->
                                 </div>
                             </div>
                         </div>
@@ -1071,6 +1089,10 @@
                 selectedLady:null,
                 selectedDj:null,
                 selectedServiceQuantity:null,
+                serviceRemark:null,
+                selectedServiceStartTime:null,
+
+                serviceList:[], // use in right sidebar
 
             };
         },
@@ -1092,11 +1114,11 @@
                 // this.getSelectedRoom();
                 if (this.roomList[roomIndex].entity_sessions[timeIndex].is_active == 1) {
                     this.isOpenRoomStep('detail');
-                    // this.getPurchaseMenuList();
+                    this.getPurchaseMenuList();
                     const response = await getApiData({ url: '/api/entities_sessions/'+ this.selectedTime.id, token: this.getToken() });
                     if (response.data) {
                         this.selectedRoom = response.data;
-                        this.purchaseMenuList = response.data.room_sessions[0].invoice.orders
+                        this.serviceList = response.data.services;
                     }
                 }
                 else {
@@ -1703,7 +1725,7 @@
                 }
             },
             btnClickAddMenu() {
-                this.invoiceId = this.selectedRoom.room_sessions[0].invoice.invoice_id;
+                this.invoiceId = this.selectedRoom.room_sessions[0].invoice.id;
                 console.log('invoice id ' + this.invoiceId)
             },
             btnConfirmAddMenu() {
@@ -1818,7 +1840,7 @@
                 formData.append('invoice_id', this.selectedRoom.room_sessions[0].invoice.id);
                 // formData.append('invoice_id', this.selectedServiceCategory);
                 if(this.selectedServiceCategory.name == 'Lady'){
-                    formData.append('service_id', this.selectedLady);
+                    formData.append('service_id', this.selectedLady.id);
                 }
                 if(this.selectedServiceCategory.name == 'DJ'){
                     formData.append('service_id', this.selectedDj.id);
@@ -1938,9 +1960,9 @@
         },
         created(){
             this.getCustomerList();
-            this.getGendersList();
+            // this.getGendersList();
             this.getMenuList();
-            this.getDivisionList();
+            // this.getDivisionList();
 
             this.getServiceCategoryList();
             this.getLadyList();
