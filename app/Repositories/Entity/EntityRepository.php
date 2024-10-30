@@ -102,7 +102,8 @@ class EntityRepository implements EntityRepositoryInterface
             $invoice = $roomSession->invoice;
             $invoice->package;
             if ($invoice) {
-                // dd($invoice->invoiceService);
+                // dd($invoice->invoiceService->service);
+               
                 $invoiceServiceCollection = $invoiceServiceCollection->merge($invoice->invoiceService);
                 $consolidatedOrderItems = [];
                 foreach ($invoice->orders as $order) {
