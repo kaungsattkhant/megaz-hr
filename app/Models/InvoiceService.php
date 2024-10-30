@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 class InvoiceService extends Model
 {
     use HasFactory;
+    protected $with=['service'];
     protected $fillable=['start_date','end_date','invoice_id','service_id','service_value'];
     
     public function invoice(){
