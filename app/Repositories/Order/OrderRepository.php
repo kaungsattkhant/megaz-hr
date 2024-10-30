@@ -232,7 +232,6 @@ class OrderRepository implements OrderRepositoryInterface
                     ResponseMessage($nonCancellableStatuses[$orderItem->status], 422);
                 }
             }
-
             $invoice = Invoice::find($orderItem->order->invoice_id);
             $latestRoomSession = RoomSession::where('invoice_id', $invoice->id)->orderBy('created_at', 'desc')->first();
             $entity = $latestRoomSession->entitySession->entity;
