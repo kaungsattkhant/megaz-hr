@@ -388,6 +388,19 @@ Route::middleware('auth:api')->group(function () {
     });
 
 });
+Route::get('/features', [FeatureAPIController::class, 'getFeatureData']);
+
+Route::controller(AdsAPIController::class)->group(function () {
+    Route::get('/ads', 'getAds');
+    Route::post('/ads', 'createAds');
+    Route::post('/ads/{id}', 'editAds');
+    Route::delete('/ads/{id}', 'deleteAds');
+});
+
+Route::controller(ExcelImportController::class)->group(function () {
+    Route::post('/import_account', 'importAccount');
+});
+
 
 Route::controller(SaleTargetPositionAPIController::class)->group(function () {
     Route::get('/sale_target_positions', 'listAllSalteTargetPosition');
@@ -417,19 +430,6 @@ Route::controller(PackageAPIController::class)->group(function () {
     Route::delete('/packages/{id}', 'deletePackage');
 });
 
-Route::controller(AdsAPIController::class)->group(function () {
-    Route::get('/ads', 'getAds');
-    Route::post('/ads', 'createAds');
-    Route::post('/ads/{id}', 'editAds');
-    Route::delete('/ads/{id}', 'deleteAds');
-});
-
-
-Route::controller(ExcelImportController::class)->group(function () {
-    Route::post('/import_account', 'importAccount');
-});
-
-// Route::post('purchase_orders', [PurchaseOrderAPIController::class, 'createPurchaseOrder']);
 Route::get('/areas', [AreaController::class, 'getAreas']);
 Route::get('/area_types/{id}/areas', [AreaController::class, 'getAreaByAreaType']);
 Route::get('/area_categories/{id}/areas', [AreaController::class, 'getAreaByAreaCategory']);
@@ -485,8 +485,6 @@ Route::post('/entities', [EntityAPIController::class, 'createEntity']);
 Route::put('/entities/{id}', [EntityAPIController::class, 'updateEntity']);
 Route::delete('/entities/{id}', [EntityAPIController::class, 'deleteEntity']);
 
-
-
 Route::controller(ItemAPIController::class)->group(function () {
     Route::get('item_price_list_by_item/{item_id}', 'getItemPriceListByItem');
 });
@@ -528,7 +526,7 @@ Route::get('/entities/{id}', [EntityAPIController::class, 'entitySessionWithInvo
 Route::get('/table/{id}', [EntityAPIController::class, 'tableWithInvoiceDetail']);
 Route::get('/areas/{id}/inactive_entities', [EntityAPIController::class, 'getOnlyInactiveEntities']);
 
-Route::post('/entities/start', [InvoiceAPIController::class, 'startEntity']);
+Route::post('/entities/start',   [InvoiceAPIController::class, 'startEntity']);
 Route::post('/entities/orders', [OrderAPIController::class, 'addOrder']);
 Route::post('/entities/add_more_sessions', [InvoiceAPIController::class, 'addMoreSessions']);
 Route::post('/entities/change', [InvoiceAPIController::class, 'changeRoom']);
@@ -565,7 +563,6 @@ Route::post('/used_defected_items/{id}/confirm', [UsedDefectedAPIController::cla
 
 Route::get('get_inventory', [InventoryAPIController::class, 'getInventory']);
 // feature
-Route::get('/features', [FeatureAPIController::class, 'getFeatureData']);
 
 // customer upcoming birthday list
 Route::get('/crm/upcoming_birthdays', [CustomerAPIController::class, 'upComingBdList']);
