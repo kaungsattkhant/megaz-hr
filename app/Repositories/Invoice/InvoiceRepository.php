@@ -1222,7 +1222,7 @@ class InvoiceRepository implements InvoiceRepositoryInterface
             if (!$existingService) {
                 // If it doesn't exist, create a new InvoiceService
                 $createdService = InvoiceService::create([
-                    'start_date' => $request->start_date,
+                    'end_date' => $request->end_date,
                     'invoice_id' => $request->invoice_id,
                     'service_id' => $request->service_id,
                     'is_active' => 1,
