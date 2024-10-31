@@ -357,8 +357,6 @@ class InvoiceRepository implements InvoiceRepositoryInterface
         $headCount = HeadCount::create($data);
         return $headCount;
     }
-
-
     // public function addSessionDurations(array $data)
     // {
     //     DB::beginTransaction();
@@ -613,6 +611,10 @@ class InvoiceRepository implements InvoiceRepositoryInterface
             $total_session_value = 0;
             $total_service_value = 0;
             $invoiceServices = $invoice->invoiceService;
+            $roomDoneResponse['is_service']=1;
+            if($invoiceServices->isEmpty()){
+                $roomDoneResponse['is_service']=0;
+            }
             foreach ($invoiceServices as $invoiceService) {
                 $serviceValue = $this->invoiceService->getServiceValue($invoiceService, now());
                 $total_service_value += $serviceValue;
