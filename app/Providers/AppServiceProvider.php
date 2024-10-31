@@ -2,8 +2,10 @@
 
 namespace App\Providers;
 
-use Illuminate\Database\Eloquent\Relations\Relation;
+use App\Models\InvoiceService;
 use Illuminate\Support\ServiceProvider;
+use App\Observers\InvoiceServiceObserver;
+use Illuminate\Database\Eloquent\Relations\Relation;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -21,6 +23,7 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         //
+        InvoiceService::observe(InvoiceServiceObserver::class);
         Relation::enforceMorphMap([
             'department' => 'App\Models\Department',
             'area' => 'App\Models\Area',
