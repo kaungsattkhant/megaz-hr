@@ -931,6 +931,7 @@
                             }
                         });
                     }
+                    
                 }
             },
             btnClickedArea(areaId,areaType){
