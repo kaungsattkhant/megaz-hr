@@ -18,7 +18,7 @@ return new class extends Migration
             $table->foreignId('area_id');
             $table->foreignId('service_category_id')->nullable();
             $table->foreignId('staff_id')->nullable();
-            $table->boolean('is_active')->default(0);
+            $table->boolean('is_active')->default(1);
             $table->timestamps();
             $table->softDeletes();
         });
