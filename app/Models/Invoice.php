@@ -42,6 +42,7 @@ class Invoice extends Model
         'birthday_discount',
         'customer_level_discount',
         'total_discount',
+        'total_service_value',
     ];
 
     public function package()

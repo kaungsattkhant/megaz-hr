@@ -1597,9 +1597,9 @@
         },
         created(){
             this.getCustomerList();
-            this.getGendersList();
+            // this.getGendersList();
             this.getMenuList();
-            this.getDivisionList();
+            // this.getDivisionList();
             this.getPackageList(this.currentTime);
         },
         mounted()

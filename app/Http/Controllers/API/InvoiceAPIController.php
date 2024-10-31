@@ -157,4 +157,9 @@ class InvoiceAPIController extends Controller
         $data=$this->invoiceRepo->addService($request);
         ResponseData($data);
     }
+
+    public function endService(Request $request){
+        $data=$this->invoiceRepo->endService($request);
+        ResponseData($data);
+    }
 }
