@@ -917,6 +917,7 @@
                                 this.$refs.posTable.getTableList(response.data[0].id);
                             } else {
                                 console.warn("posTable component is not available in $refs.");
+                                console.log("posTable component is not available in $refs.");
                             }
                         });
                     }
@@ -926,6 +927,7 @@
                                 this.$refs.posRoom.getRoomList(response.data[0].id);
                             } else {
                                 console.warn("posRoom component is not available in $refs.");
+                                console.log("posRoom component is not available in $refs.");
                             }
                         });
                     }

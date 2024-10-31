@@ -438,6 +438,13 @@
                                         </select>
                                     </div>
                                 </div> -->
+                                <div class="mb-4" v-if="roomSessionData.is_service == 1">
+                                    <label for="" class="label-form mb-3">
+                                        Service End Date
+                                    </label>
+                                    <input type="datetime-local" placeholder="End Date" v-model="serviceEndDate"
+                                        class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
+                                </div>
                                 <div class="mb-4">
                                     <div class="mb-[0.125rem] block min-h-[1.5rem] pl-[1.5rem]">
                                         <input class="input-check-pos" type="checkbox" v-model="printInvoiceData.isTax" @click="btnClickedTax()"
@@ -1146,6 +1153,8 @@
                 selectedServiceEndTime:null,
                 serviceList:[], // use in right sidebar
 
+                serviceEndDate:null,
+
             };
         },
 
@@ -1155,6 +1164,7 @@
                 const response = await getApiData({ url: '/api/areas/' + this.roomAreaId + '/entities' , token: this.getToken()});
                 if(response.data){
                     this.roomList = response.data;
+                    console.log('get room list')
                 }
             },
             async btnClickedSession(time, timeIndex, room , roomIndex) {
@@ -1570,31 +1580,31 @@
                     this.printInvoiceData.roomDiscountAmount = null;
                     this.printInvoiceData.discountSession = null;
                     console.log(this.printInvoiceData.room, this.printInvoiceData.food);
-                    this.printInvoiceData.total = ((this.printInvoiceData.room + this.printInvoiceData.food) - (this.foodDiscount ));
+                    this.printInvoiceData.total = ((this.printInvoiceData.room + this.printInvoiceData.food + this.printInvoiceData.service_total_value) - (this.foodDiscount ));
                     // this.printInvoiceData.total = this.printInvoiceData.room + this.printInvoiceData.food;
                 }
             },
-            // discountChanged() {
-            //     let roomTotalAmount = (this.roomSessionData.total_session_price + this.printInvoiceData.food) - this.printInvoiceData.package_discount - this.foodDiscount
-            //     console.log('room total = ' + this.printInvoiceData.room)
-            //     if (this.discount_type == 'percentage') {
-            //         this.printInvoiceData.total = roomTotalAmount - (roomTotalAmount * (this.printInvoiceData.discount / 100));
-            //         this.printInvoiceData.percent_discount_amount = roomTotalAmount * (this.printInvoiceData.discount / 100);
-            //     }
-            //     else {
-            //         if(this.printInvoiceData.discount){
-            //             this.printInvoiceData.total = roomTotalAmount - this.printInvoiceData.discount;
-            //             console.log(this.printInvoiceData.discount)
-            //         }
-            //         else{
-            //             this.printInvoiceData.total = roomTotalAmount - this.printInvoiceData.discount;
-            //             console.log(this.printInvoiceData.discount)
-            //         }
-            //     }
-            //     console.log('room total amounttt = ' + roomTotalAmount);
+            discountChanged() {
+                let roomTotalAmount = (this.roomSessionData.total_session_price + this.printInvoiceData.food + this.printInvoiceData.service_total_value) - this.printInvoiceData.package_discount - this.foodDiscount
+                console.log('room total = ' + this.printInvoiceData.room)
+                if (this.discount_type == 'percentage') {
+                    this.printInvoiceData.total = roomTotalAmount - (roomTotalAmount * (this.printInvoiceData.discount / 100));
+                    this.printInvoiceData.percent_discount_amount = roomTotalAmount * (this.printInvoiceData.discount / 100);
+                }
+                else {
+                    if(this.printInvoiceData.discount){
+                        this.printInvoiceData.total = roomTotalAmount - this.printInvoiceData.discount;
+                        console.log(this.printInvoiceData.discount)
+                    }
+                    else{
+                        this.printInvoiceData.total = roomTotalAmount - this.printInvoiceData.discount;
+                        console.log(this.printInvoiceData.discount)
+                    }
+                }
+                console.log('room total amounttt = ' + roomTotalAmount);
 
 
-            // },
+            },
 
             btnClickedEndRoom() {
                 this.EndRoom();
@@ -1680,6 +1690,7 @@
                 formData.append('total', totalAmount);
                 formData.append('order_discount', this.foodDiscount);
                 formData.append('discount_total', allTotalDiscounts);
+                formData.append('end_date', this.serviceEndDate);
 
 
                 console.log(formData)
