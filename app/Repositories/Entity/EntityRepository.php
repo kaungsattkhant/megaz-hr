@@ -111,11 +111,11 @@ class EntityRepository implements EntityRepositoryInterface
         $total_service_value=0;
         foreach ($entitySession->roomSessions as $roomSession) {
             $invoice = $roomSession->invoice;
+
             $invoice->package;
             if ($invoice) {
                 //service
                 $invoiceServices = $invoice->invoiceService;
-                
                 foreach ($invoiceServices as $invoiceService) {
                     $this->invoiceModelService->calculateInvoiceService($invoiceService, now());
                     $total_service_value+=$invoiceService->service_value;
@@ -152,6 +152,7 @@ class EntityRepository implements EntityRepositoryInterface
                 //service list
             }
         }
+        // dd($invoiceServiceCollection);
         $entitySession->services = $invoiceServiceCollection;
         $entitySession->total_service_value=$total_service_value;
         return $entitySession;

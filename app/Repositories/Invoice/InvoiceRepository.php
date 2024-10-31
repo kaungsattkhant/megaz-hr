@@ -1202,7 +1202,7 @@ class InvoiceRepository implements InvoiceRepositoryInterface
                 'service_id' => $request->service_id,
                 'is_active' => 1,
             ]);
-            // DB::commit();
+            DB::commit();
             ResponseMessage('Service Added Succesfully', 200);
         } catch (\Exception $e) {
             DB::rollback();
