@@ -611,9 +611,9 @@ class InvoiceRepository implements InvoiceRepositoryInterface
             $total_session_value = 0;
             $total_service_value = 0;
             $invoiceServices = $invoice->invoiceService;
-            $roomDoneResponse['is_service']=1;
-            if($invoiceServices->isEmpty()){
-                $roomDoneResponse['is_service']=0;
+            $roomDoneResponse['is_service'] = 1;
+            if ($invoiceServices->isEmpty()) {
+                $roomDoneResponse['is_service'] = 0;
             }
             foreach ($invoiceServices as $invoiceService) {
                 $serviceValue = $this->invoiceService->getServiceValue($invoiceService, now());
@@ -808,10 +808,10 @@ class InvoiceRepository implements InvoiceRepositoryInterface
             $invoiceServices = $invoice->invoiceService;
             foreach ($invoiceServices as $invoiceService) {
                 $serviceValue = $this->invoiceService->getServiceValue($invoiceService, $data['end_date']);
-                if($invoiceService->is_active==1){
-                    $invoiceService->end_date=$data['end_date'];
-                    $invoiceService->service_value=$serviceValue;
-                    $invoiceService->is_active=0;
+                if ($invoiceService->is_active == 1) {
+                    $invoiceService->end_date = $data['end_date'];
+                    $invoiceService->service_value = $serviceValue;
+                    $invoiceService->is_active = 0;
                     $invoiceService->save();
                 }
                 $total_service_value += $serviceValue;
@@ -1175,14 +1175,15 @@ class InvoiceRepository implements InvoiceRepositoryInterface
 
         DB::beginTransaction();
         try {
+
             $createdService = InvoiceService::create([
                 'start_date' => $request->start_date,
                 'invoice_id' => $request->invoice_id,
                 'service_id' => $request->service_id,
                 'is_active' => 1,
             ]);
-            DB::commit();
-            return $createdService;
+            // DB::commit();
+            ResponseMessage('Service Added Succesfully', 200);
         } catch (\Exception $e) {
             DB::rollback();
             ResponseMessage($e->getMessage(), 402);
@@ -1194,14 +1195,26 @@ class InvoiceRepository implements InvoiceRepositoryInterface
     {
         DB::beginTransaction();
         try {
-            $invoiceService = InvoiceService::find($request->invoice_service_id);
-            $invoiceService->end_date = $request->end_date;
-            $invoiceService->is_active = 0;
-            $serviceValue = $this->invoiceService->getServiceValue($invoiceService, $request->end_date);
-            $invoiceService->service_value = $serviceValue;
-            $invoiceService->save();
-            DB::commit();
-            return $invoiceService;
+            $existingService = InvoiceService::where('service_id', $request->service_id)
+                ->where('invoice_id', $request->invoice_id)
+                ->first();
+
+            if (!$existingService) {
+                // If it doesn't exist, create a new InvoiceService
+                $createdService = InvoiceService::create([
+                    'start_date' => $request->start_date,
+                    'invoice_id' => $request->invoice_id,
+                    'service_id' => $request->service_id,
+                    'is_active' => 1,
+                ]);
+                DB::commit();
+                // Optionally, you can return or do something with the created service
+                return response()->json(['message' => 'InvoiceService created successfully.', 'service' => $createdService], 201);
+            } else {
+                // If it exists, you can return a response or handle accordingly
+                return response()->json(['message' => 'InvoiceService already exists.', 'service' => $existingService], 409);
+            }
+            // return $invoiceService;
         } catch (\Exception $e) {
             DB::rollback();
             ResponseMessage($e->getMessage(), 402);
