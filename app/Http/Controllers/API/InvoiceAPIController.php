@@ -33,11 +33,11 @@ class InvoiceAPIController extends Controller
 
     public function startEntity(Request $request)
     {
+        // dd($request->all());
         DB::beginTransaction();
         try {
             $data = $request->all();
-            $data['is_waiter'] = ($request->waiter) ? 1 : 0;
-
+            $data['is_waiter'] = (($request->waiter) || $request->waiter=="1")  ? 1 : 0;
             if (isset($data['male'])) {
                 $data['male'] = (int) $data['male'];
             } else {

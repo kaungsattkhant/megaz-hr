@@ -11,8 +11,13 @@ class Entity extends BaseModel
 {
     use HasFactory;
 
-    protected $fillable=[
-        'area_id','name','service_category_id','price_per_hour','is_available','entity_type',
+    protected $fillable = [
+        'area_id',
+        'name',
+        'service_category_id',
+        'price_per_hour',
+        'is_available',
+        'entity_type',
     ];
 
     public function getCreatedAt()
@@ -58,6 +63,15 @@ class Entity extends BaseModel
     public function latestRoomSession()
     {
         return $this->hasOne(RoomSession::class)->latestOfMany();
+    }
+
+    public function currentEntitySession($currentTime)
+    {
+        return $this->hasOne(EntitySession::class)
+            ->where('is_active', 0)
+            ->where('is_available', 1)
+            ->whereTime('start_time', '<=', $currentTime)
+            ->whereTime('end_time', '>=', $currentTime);
     }
 
 
