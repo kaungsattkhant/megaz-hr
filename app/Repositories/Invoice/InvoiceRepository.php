@@ -809,6 +809,7 @@ class InvoiceRepository implements InvoiceRepositoryInterface
                 if($invoiceService->is_active==1){
                     $invoiceService->end_date=$data['end_date'];
                     $invoiceService->service_value=$serviceValue;
+                    $invoiceService->is_active=0;
                     $invoiceService->save();
                 }
                 $total_service_value += $serviceValue;
