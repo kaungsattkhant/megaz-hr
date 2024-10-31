@@ -277,26 +277,28 @@
                                         Services
                                     </p>
                                     <p class="text-sm text-black font-semibold">
-                                        35,000 MMks
+                                        {{ selectedRoom.total_service_value.toLocaleString() }} MMks
                                     </p>
                                 </div>
                                 <div class=" grid grid-cols-10 gap-x-2 gap-y-3">
                                     <div class="contents" v-for="(service,index) in serviceList" :key="index" :class="service.is_active == 1 ? 'text-black' : 'text-gray-600'">
-                                        <p class=" col-span-4 text-sm" v-if="service.service.name">
-                                            {{ service.service.name }}
-                                        </p>
-                                        <p class=" col-span-4 text-sm" v-else>
+                                        <div class=" col-span-3 text-sm">
+                                            <button  data-te-toggle="modal" data-te-target="#service_end_modal" @click="btnClickedEndService(service.invoice_id)">
+                                                {{ service.service.name ? service.service.name : service.service.staff.name }}
+                                            </button>
+                                        </div>
+                                        <!-- <p class=" col-span-3 text-sm" v-else>
                                             {{ service.service.staff.name }}
-                                        </p>
-                                        <p class=" col-span-2 text-center text-sm">
-                                            {{ service.service_value }}
+                                        </p> -->
+                                        <p class=" col-span-3 text-center text-sm">
+                                            {{ service.minutes }}
                                         </p>
                                         <!-- <p :class="menu2.status == 'done' ? 'text-green-600 font-semibold' : 'text-gray-500'"
                                             class=" col-span-2 text-center text-xs pt-0.5">
                                             {{ menu2.status }}
                                         </p> -->
                                         <p class=" col-span-4 text-sm text-right">
-                                            {{ service.service.price_per_hour.toLocaleString() }} MMKs
+                                            {{ service.service_value.toLocaleString() }} MMKs
                                         </p>
                                     </div>
                                     <!-- <div class="block">
@@ -325,21 +327,21 @@
                                     Total
                                     {{
                                         (selectedRoom ?
-                                            (purchaseMenuList.length > 0 ?
+                                            ((purchaseMenuList.length > 0 ?
                                                 (
                                                     (selectedRoom.room_sessions[0].invoice.total_session_price ?
                                                         selectedRoom.room_sessions[0].invoice.total_session_price : 0)
                                                     +
                                                     (purchaseMenuList.length > 0 ? purchaseMenuList[0].total : 0)
                                                     - (selectedRoom.room_sessions[0].invoice.package ? selectedRoom.room_sessions[0].invoice.package.package_discount : 0)
-                                                ).toLocaleString()
+                                                )
                                                 :
                                                 (
                                                     (selectedRoom.room_sessions[0].invoice.total_session_price ?
                                                         selectedRoom.room_sessions[0].invoice.total_session_price : 0)
                                                     - (selectedRoom.room_sessions[0].invoice.package ? selectedRoom.room_sessions[0].invoice.package.package_discount : 0)
-                                                ).toLocaleString()
-                                            )
+                                                )
+                                            ) + selectedRoom.total_service_value).toLocaleString()
                                             : 0
                                         )
 
@@ -423,6 +425,7 @@
                                         @input="discountChanged"
                                         class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
                                 </div>
+                                
                                 <!-- <div class="mb-4">
                                     <label for="" class="block text-sm text-black mb-3">
                                         Payment Method
@@ -534,14 +537,22 @@
                                     {{ printInvoiceData.customer_discount > 0 ? '- ' : '' }} {{ printInvoiceData.customer_discount }} MMKs
                                 </p>
                             </div>
+                            <div v-show="roomSessionData.is_service == 1" class=" text-sm text-right flex gap-x-2 justify-end pr-2 mb-2">
+                                <p>
+                                    Service Amount
+                                </p>
+                                <p class=" w-28">
+                                    {{ printInvoiceData.service_total_value.toLocaleString() }} MMKs
+                                </p>
+                            </div>
                             <div class=" text-right pr-3 mb-3">
                                 <p class="font-semibold">
                                     Total &nbsp;
-                                    {{    (printInvoiceData.total ? printInvoiceData.total : 0)
+                                    {{  (  (printInvoiceData.total ? printInvoiceData.total : 0)
                                         + (printInvoiceData.service_charge == true ? (printInvoiceData.service_tax ?
                                             printInvoiceData.service_tax : 0) : 0)
                                         + (printInvoiceData.isTax == true ? (printInvoiceData.tax ? printInvoiceData.tax : 0) :
-                                    0) }} MMKs
+                                    0) ).toLocaleString() }} MMKs
                                 </p>
                             </div>
                             <div class="">
@@ -938,7 +949,46 @@
                 </div>
             </div>
         </div>
-        
+            <!-- end Service modal -->
+            <div data-te-modal-init
+            class="fixed left-0 top-0 z-[1055] hidden h-full w-full overflow-y-auto overflow-x-hidden outline-none"
+            id="service_end_modal" tabindex="-1" aria-labelledby="addMenuModalLabel" aria-modal="true" role="dialog">
+            <div data-te-modal-dialog-ref
+                class="pointer-events-none relative flex min-h-[calc(100%-1rem)] w-auto translate-y-[-50px] items-center opacity-0 transition-all duration-300 ease-in-out min-[576px]:mx-auto min-[576px]:mt-7 min-[576px]:min-h-[calc(100%-3.5rem)] min-[576px]:max-w-[500px]">
+                <div
+                    class="pointer-events-auto relative flex w-full flex-col rounded-md border-none bg-white bg-clip-padding text-current shadow-lg outline-none">
+                    <div class="relative  p-4">
+                        <p class="text-xl w-full text-center">
+                            End Service
+                        </p>
+                        <button type="button" id="closeEndServiceModal"
+                            class="absolute top-4 right-4 focus:shadow-none focus:outline-none" data-te-modal-dismiss
+                            aria-label="Close">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                                stroke="currentColor" class="h-5 w-5">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                        </button>
+                    </div>
+
+                    <div class="relative px-16 py-4" data-te-modal-body-ref>
+                        <div class="mb-4">
+                            <label for="" class="label-form mb-3">
+                                End Date
+                            </label>
+                            <input type="datetime-local" placeholder="End Date" v-model="selectedServiceEndTime"
+                                class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
+                        </div>
+                    </div>
+
+                    <div class="flex justify-center px-12 mb-6">
+                        <button @click="btnConfirmEndService()" class="pos-add-btn focus:outline-none focus:ring-0 ">
+                            End Service
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 
 </template>
@@ -1022,6 +1072,7 @@
                     package_discount:0,
                     customer_discount:0,
                     percent_discount_amount:0,
+                    service_total_value:0,
                 },
                 room_discount: null,
                 birthday_discount: null,
@@ -1091,7 +1142,8 @@
                 selectedServiceQuantity:null,
                 serviceRemark:null,
                 selectedServiceStartTime:null,
-
+                serviceInvoiceId :null,
+                selectedServiceEndTime:null,
                 serviceList:[], // use in right sidebar
 
             };
@@ -1306,6 +1358,7 @@
                 const response = await getApiData({ url: '/api/entities_sessions/'+ this.selectedTime.id, token: this.getToken() });
                     if (response.data) {
                         this.selectedRoom = response.data;
+                        this.serviceList = response.data.services;
                         this.purchaseMenuList = response.data.room_sessions[0].invoice.orders
                     }
             },
@@ -1338,6 +1391,7 @@
                     roomSessions = response.data;
                     console.log("success")
                     this.isOpenRoomStep('invoice')
+                    this.printInvoiceData.service_total_value = response.data.total_service_value;
                 }
                 else {
                     this.$notify({
@@ -1373,24 +1427,24 @@
                     this.printInvoiceData.package_discount = this.selectedRoom.room_sessions[0].invoice.package.package_discount;
                     this.isPackage = true;
                     this.packagePrice = this.selectedRoom.room_sessions[0].invoice.paid_amount
-                    this.printInvoiceData.total = (this.printInvoiceData.room + this.printInvoiceData.food) - this.printInvoiceData.package_discount - this.foodDiscount;
+                    this.printInvoiceData.total = (this.printInvoiceData.room + this.printInvoiceData.food + this.printInvoiceData.service_total_value) - this.printInvoiceData.package_discount - this.foodDiscount;
                 }
                 else {
                     this.isPackage = false;
-                    this.printInvoiceData.total = (roomChargeTotal + this.printInvoiceData.food) - this.foodDiscount;
+                    this.printInvoiceData.total = (roomChargeTotal + this.printInvoiceData.food + this.printInvoiceData.service_total_value) - this.foodDiscount;
                 }
 
 
                 // room price = this.printInvoiceData.room
                 if (this.service_charge = true) {
-                    this.printInvoiceData.service_tax = this.printInvoiceData.total * 0.05
+                    this.printInvoiceData.service_tax = this.printInvoiceData.total * 0.15 // 0.05(5%) is used before
                 }
                 if (this.isTax = true) {
-                    this.printInvoiceData.tax = this.printInvoiceData.food * 0.05
+                    // this.printInvoiceData.tax = this.printInvoiceData.food * 0.05 used before
+                    this.printInvoiceData.tax = this.printInvoiceData.total * 0.05
                 }
 
                 // this.printInvoiceData.total = this.printInvoiceData.room + this.printInvoiceData.food + this.printInvoiceData.tax +this.printInvoiceData.service_tax
-
                 // this.selectedPaymentMethod = null
                 this.change = null
                 this.paid_amount = null
@@ -1852,7 +1906,28 @@
                 if (response.success) {
                     this.closeModal('closeServiceModal');
                     this.clearServiceForm();
-                    // this.getPurchaseMenuList();
+                    this.getSelectedRoom();
+                }
+                else {
+                    this.$notify({
+                        title: `Input validation`,
+                        text: response.message,
+                        type: "warn"
+                    });
+                }
+            },
+            btnClickedEndService(id){
+                this.serviceInvoiceId = id;
+            },  
+            async btnConfirmEndService(){
+                let formData = new FormData();
+                formData.append('invoice_service_id', this.serviceInvoiceId);
+                formData.append('end_date', this.selectedServiceEndTime);
+                let response = await postApiData({ url: '/api/entities/end_service', form_data: formData, token: this.getToken() });
+                if (response.success) {
+                    this.closeModal('closeEndServiceModal');
+                    this.selectedServiceEndTime = null;
+                    this.getSelectedRoom();
                 }
                 else {
                     this.$notify({
