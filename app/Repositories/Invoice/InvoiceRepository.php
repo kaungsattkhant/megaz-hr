@@ -11,6 +11,7 @@ use App\Models\Entity;
 use App\Models\Account;
 use App\Models\Invoice;
 use App\Models\Package;
+use App\Models\Service;
 use App\Models\Customer;
 use App\Models\HeadCount;
 use App\Models\Department;
@@ -121,13 +122,16 @@ class InvoiceRepository implements InvoiceRepositoryInterface
 
     public function createData(array $data)
     {
+        // dd($data);
         DB::beginTransaction();
         try {
+
             if ($data['entity_id'] != null) {
                 $tableInvoice = $this->createInvoiceForTable($data);
                 DB::commit();
                 return $tableInvoice;
             }
+
             if ($data['entity_session_id'] != null) {
                 $entitySession = null;
                 if ($data['is_waiter'] === 1) {
@@ -188,7 +192,7 @@ class InvoiceRepository implements InvoiceRepositoryInterface
                 $roomSessionData['session_duration'] = $data['session_duration'] ?? null;
                 $roomSessionData['end_date'] = $end_date->format('Y-m-d H:i:s');
                 $roomSessionData['start_date'] = Carbon::now();
-
+                // dd($leftEntitySession);
                 if ($leftEntitySession >= 0) {
                     $leftDuration = $data['session_duration'] - $leftEntitySession;
                     $sessionsToDeactivate = ceil($leftDuration);
@@ -212,9 +216,10 @@ class InvoiceRepository implements InvoiceRepositoryInterface
                     if ($leftEntitySession > -1 || $leftEntitySession < 0) {
                         $sessionsToDeactivate += 1;
                     }
-
+                    // dd($sessionsToDeactivate);
                     $nextSessions = EntitySession::where('id', '>=', $entitySession->id)
                         ->orderBy('id')
+                        ->select('id', 'start_time', 'end_time', 'is_active')
                         ->take($sessionsToDeactivate)
                         ->get();
                     foreach ($nextSessions as $session) {
@@ -224,11 +229,10 @@ class InvoiceRepository implements InvoiceRepositoryInterface
                         $session->is_active = 1;
                         $session->save();
                     }
-
                     $loopStartTime = $roomSessionData['end_date'];
                     // Ensure that $loopStartTime is a Carbon instance
                     $loopStartTime = Carbon::now();
-
+                    // dd($loopStartTime);
                     foreach ($nextSessions as $index => $session) {
                         // Handle the first session
 
@@ -607,7 +611,12 @@ class InvoiceRepository implements InvoiceRepositoryInterface
             $roomSessions = RoomSession::where('invoice_id', $data['invoice_id'])->with(['entitySession.entity'])->get();
             $total_duration = 0;
             $total_session_value = 0;
-
+            $total_service_value = 0;
+            $invoiceServices = $invoice->invoiceService;
+            foreach ($invoiceServices as $invoiceService) {
+                $serviceValue = $this->invoiceService->getServiceValue($invoiceService, now());
+                $total_service_value += $serviceValue;
+            }
             foreach ($roomSessions as $room) {
                 $total_session_value += $room->price;
                 $total_duration += $room->session_duration ?? 0;
@@ -651,7 +660,7 @@ class InvoiceRepository implements InvoiceRepositoryInterface
             }
             $roomDoneResponse['room_sessions'] = $latestRoomSession;
             $roomDoneResponse['rooms_sessions'] = $roomSessions;
-
+            $roomDoneResponse['total_service_value'] = $total_service_value;
             DB::commit();
             ResponseData($roomDoneResponse);
         } catch (\Exception $e) {
@@ -793,6 +802,18 @@ class InvoiceRepository implements InvoiceRepositoryInterface
             if (isset($data['discount_value'])) {
                 $discount_value = $data['discount_value'];
             }
+            $total_service_value = 0;
+            $invoiceServices = $invoice->invoiceService;
+            foreach ($invoiceServices as $invoiceService) {
+                $serviceValue = $this->invoiceService->getServiceValue($invoiceService, $data['end_date']);
+                if($invoiceService->is_active==1){
+                    $invoiceService->end_date=$data['end_date'];
+                    $invoiceService->service_value=$serviceValue;
+                    $invoiceService->save();
+                }
+                $total_service_value += $serviceValue;
+            }
+
             $data['discount_value'] = $room_discount_value + $bdDiscount + $customerLevelDiscount + $discount_value;
             $data['discount_total'] = $room_discount_value + $bdDiscount + $customerLevelDiscount;
             $data['total'] -= $room_discount_value;
@@ -800,6 +821,7 @@ class InvoiceRepository implements InvoiceRepositoryInterface
             $data['service_charge'] = $service_charge;
             $data['total_session_price'] = $total_session_price;
             $data['order_discount_value'] = $order_discount;
+            $data['total_service_value'] = $total_service_value;
             $data['sub_total'] = ($data['total']) - ($tax + $service_charge);
             $data['payment_status'] = 'received';
             $data['complete_date'] = CurrentTime();
@@ -1154,9 +1176,29 @@ class InvoiceRepository implements InvoiceRepositoryInterface
                 'start_date' => $request->start_date,
                 'invoice_id' => $request->invoice_id,
                 'service_id' => $request->service_id,
+                'is_active' => 1,
             ]);
             DB::commit();
             return $createdService;
+        } catch (\Exception $e) {
+            DB::rollback();
+            ResponseMessage($e->getMessage(), 402);
+            throw $e;
+        }
+    }
+
+    public function endService($request)
+    {
+        DB::beginTransaction();
+        try {
+            $invoiceService = InvoiceService::find($request->invoice_service_id);
+            $invoiceService->end_date = $request->end_date;
+            $invoiceService->is_active = 0;
+            $serviceValue = $this->invoiceService->getServiceValue($invoiceService, $request->end_date);
+            $invoiceService->service_value = $serviceValue;
+            $invoiceService->save();
+            DB::commit();
+            return $invoiceService;
         } catch (\Exception $e) {
             DB::rollback();
             ResponseMessage($e->getMessage(), 402);

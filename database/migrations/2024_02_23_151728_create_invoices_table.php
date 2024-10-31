@@ -34,6 +34,7 @@ return new class extends Migration
             $table->double('discount_value')->default(0);
             $table->double('order_discount_value')->default(0);
             $table->double('room_discount_value')->default(0);
+            $table->double('total_service_value')->default(0);
             $table->double('birthday_discount')->default(0);
             $table->double('customer_level_discount')->default(0);
             $table->double('total_discount')->default(0);
