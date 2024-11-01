@@ -1195,14 +1195,23 @@ class InvoiceRepository implements InvoiceRepositoryInterface
 
         DB::beginTransaction();
         try {
-
-            $createdService = InvoiceService::create([
-                'start_date' => $request->start_date,
-                'invoice_id' => $request->invoice_id,
-                'service_id' => $request->service_id,
-                'is_active' => 1,
-            ]);
-            DB::commit();
+            $existingService = InvoiceService::where('service_id', $request->service_id)
+                ->where('invoice_id', $request->invoice_id)
+                ->first();
+            if (!$existingService) {
+                $createdService = InvoiceService::create([
+                    'start_date' => $request->start_date,
+                    'invoice_id' => $request->invoice_id,
+                    'service_id' => $request->service_id,
+                    'is_active' => 1,
+                ]);
+                DB::commit();
+                ResponseMessage('Invoice Service Create Successfully', 200);
+                // Optionally, you can return or do something with the created service
+            } else {
+                ResponseMessage('InvoiceService already exists.', 409);
+                // If it exists, you can return a response or handle accordingly
+            }
             ResponseMessage('Service Added Succesfully', 200);
         } catch (\Exception $e) {
             DB::rollback();
@@ -1215,25 +1224,14 @@ class InvoiceRepository implements InvoiceRepositoryInterface
     {
         DB::beginTransaction();
         try {
-            $existingService = InvoiceService::where('service_id', $request->service_id)
-                ->where('invoice_id', $request->invoice_id)
-                ->first();
-
-            if (!$existingService) {
-                // If it doesn't exist, create a new InvoiceService
-                $createdService = InvoiceService::create([
-                    'end_date' => $request->end_date,
-                    'invoice_id' => $request->invoice_id,
-                    'service_id' => $request->service_id,
-                    'is_active' => 1,
-                ]);
-                DB::commit();
-                // Optionally, you can return or do something with the created service
-                return response()->json(['message' => 'InvoiceService created successfully.', 'service' => $createdService], 201);
-            } else {
-                // If it exists, you can return a response or handle accordingly
-                return response()->json(['message' => 'InvoiceService already exists.', 'service' => $existingService], 409);
-            }
+            // If it doesn't exist, create a new InvoiceService
+            $createdService = InvoiceService::where('invoice_servie_id', $request->invoice_service_id)
+            ->update([
+                'end_date' => $request->end_date,
+                'is_active' => 1,
+            ]);
+            DB::commit();
+            ResponseMessage('InvoiceService End successfully', 200);
             // return $invoiceService;
         } catch (\Exception $e) {
             DB::rollback();
