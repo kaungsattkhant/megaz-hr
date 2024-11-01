@@ -33,7 +33,6 @@ class InvoiceAPIController extends Controller
 
     public function startEntity(Request $request)
     {
-        // dd($request->all());
         DB::beginTransaction();
         try {
             $data = $request->all();

@@ -520,32 +520,34 @@ Route::post('/menu/{id}/is_feature', [MenuAPIController::class, 'featureToggleMe
 Route::get('/menu_report', [MenuAPIController::class, 'menuReport']);
 Route::get('/menu_costing', [MenuAPIController::class, 'costingMenu']);
 
-Route::get('/areas/{id}/entities', [EntityAPIController::class, 'getEntityWithInvoice']);
-Route::get('/entities_sessions/{id}', [EntityAPIController::class, 'getEntitySessionDetail']);
-Route::get('/entities/{id}', [EntityAPIController::class, 'entitySessionWithInvoiceDetail']);
-Route::get('/table/{id}', [EntityAPIController::class, 'tableWithInvoiceDetail']);
-Route::get('/areas/{id}/inactive_entities', [EntityAPIController::class, 'getOnlyInactiveEntities']);
+//moved to pos.php
 
-Route::post('/entities/start',   [InvoiceAPIController::class, 'startEntity']);
-Route::post('/entities/orders', [OrderAPIController::class, 'addOrder']);
-Route::post('/entities/add_more_sessions', [InvoiceAPIController::class, 'addMoreSessions']);
-Route::post('/entities/change', [InvoiceAPIController::class, 'changeRoom']);
-Route::post('/entities/done', [InvoiceAPIController::class, 'endRoom']);
-Route::post('/room_done', [InvoiceAPIController::class, 'doneRoom']);
-Route::post('/entities/confirm', [InvoiceAPIController::class, 'roomConfirm']);
-Route::get('/order_items', [OrderAPIController::class, 'getOrderItemList']);
-Route::get('/order_items/{invoiceId}/invoice', [OrderAPIController::class, 'getOrderItemByInvoice']);
-Route::get('/pos_order_items', [OrderAPIController::class, 'getOrderItemForPOS']);
-Route::post('/pos_order_items/{order_item_id}/status', [OrderAPIController::class, 'orderItemAreaConfirm']);
-Route::post('/pos_orders/check_foc_supervision', [OrderAPIController::class, 'checkFocSupervision']);
+// Route::get('/areas/{id}/entities', [EntityAPIController::class, 'getEntityWithInvoice']);
+// Route::get('/entities_sessions/{id}', [EntityAPIController::class, 'getEntitySessionDetail']);
+// Route::get('/entities/{id}', [EntityAPIController::class, 'entitySessionWithInvoiceDetail']);
+// Route::get('/table/{id}', [EntityAPIController::class, 'tableWithInvoiceDetail']);
+// Route::get('/areas/{id}/inactive_entities', [EntityAPIController::class, 'getOnlyInactiveEntities']);
 
-// Route::middleware('auth:api')->group(function () {
-    Route::controller(InvoiceAPIController::class)->group(function () {
-        Route::post('entities/add_service', 'addService');
-        Route::post('entities/end_service', 'endService');
-    });
+// Route::post('/entities/start', [InvoiceAPIController::class, 'startEntity']);
+// Route::post('/entities/orders', [OrderAPIController::class, 'addOrder']);
+// Route::post('/entities/add_more_sessions', [InvoiceAPIController::class, 'addMoreSessions']);
+// Route::post('/entities/change', [InvoiceAPIController::class, 'changeRoom']);
+// Route::post('/entities/done', [InvoiceAPIController::class, 'endRoom']);
+// Route::post('/room_done', [InvoiceAPIController::class, 'doneRoom']);
+// Route::post('/entities/confirm', [InvoiceAPIController::class, 'roomConfirm']);
+// Route::get('/order_items', [OrderAPIController::class, 'getOrderItemList']);
+// Route::get('/order_items/{invoiceId}/invoice', [OrderAPIController::class, 'getOrderItemByInvoice']);
+// Route::get('/pos_order_items', [OrderAPIController::class, 'getOrderItemForPOS']);
+// Route::post('/pos_order_items/{order_item_id}/status', [OrderAPIController::class, 'orderItemAreaConfirm']);
+// Route::post('/pos_orders/check_foc_supervision', [OrderAPIController::class, 'checkFocSupervision']);
+
+// Route::controller(InvoiceAPIController::class)->group(function () {
+//     Route::post('entities/add_service', 'addService');
+//     Route::post('entities/end_service', 'endService');
 // });
-Route::get('/invoices', [InvoiceAPIController::class, 'getInvoiceData']);
+// Route::get('/invoices', [InvoiceAPIController::class, 'getInvoiceData']);
+
+//end moved api
 
 // Route::group(['prefix' => 'management'], function () {});
 Route::get("/test", [TestController::class, "index"]);
@@ -554,7 +556,9 @@ Route::get('/menu_categories/{id}/menus', [MenuAPIController::class, 'menuByMenu
 Route::get('/menu_categories_bookings/{id}/menus', [MenuAPIController::class, 'menuByMenuCategoryBooking']);
 Route::get('/menus/{menu_id}/areas', [MenuAPIController::class, 'areaByMenu']);
 
-Route::post("/order_status_change", [OrderAPIController::class, 'orderItemChangeStatus']);
+//moved to pos.php
+// Route::post("/order_status_change", [OrderAPIController::class, 'orderItemChangeStatus']);
+//end moved
 
 Route::get('/used_defected_items', [UsedDefectedAPIController::class, 'lisltUsedDefectedItem']);
 Route::post('/used_defected_items', [UsedDefectedAPIController::class, 'createUsedDefected']);
@@ -594,7 +598,7 @@ Route::controller(DeliveryChargeAPIController::class)->group(function () {
     Route::post('/delivery_charges', 'createDeliveryCharge');
 });
 
-Route::post('send_notification', [NotificationController::class, 'sendNotification']);
+// Route::post('send_notification', [NotificationController::class, 'sendNotification']);
 
 
 

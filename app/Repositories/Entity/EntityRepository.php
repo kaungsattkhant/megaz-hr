@@ -161,7 +161,7 @@ class EntityRepository implements EntityRepositoryInterface
 
     public function entitySessionWithInvoice(array $data, int $entityId)
     {
-        $entity = Entity::find($entityId);
+        $entity = Entity::find($entityId);  
         if ($entity->entity_type == 'room') {
             $entitySession = EntitySession::where('is_active', 1)
                 ->with(['entity', 'roomSessions'])->where('entity_id', $entityId)->first();
@@ -253,8 +253,6 @@ class EntityRepository implements EntityRepositoryInterface
             $responseData['room_sessions'] = $entity;
             return $responseData;
         }
-
-
     }
     public function tableWithInvoiceDetail(array $data, int $entityId)
     {

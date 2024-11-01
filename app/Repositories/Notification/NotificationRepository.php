@@ -2,10 +2,13 @@
 
 namespace App\Repositories\Notification;
 
+use Exception;
+use App\Models\Role;
+use App\Models\Department;
 use App\Models\Notification;
 use App\Models\NotificationUser;
-use Exception;
 use Illuminate\Support\Facades\DB;
+use App\Events\CompleteKitchenOrderNotificationRequest;
 
 class NotificationRepository implements NotificationInterface
 {
@@ -71,6 +74,12 @@ class NotificationRepository implements NotificationInterface
         }
 
         return true;
+    }
+    public function sendPosNotification($request){
+        $roleId=3;
+        $cateringDepartment = Department::getBySlugOrFail('catering');
+        $roleId=Role::getRoleIdByDepartment($cateringDepartment->id,'Staff');
+        broadcast(new CompleteKitchenOrderNotificationRequest($roleId));
     }
 
 }
