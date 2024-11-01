@@ -1224,15 +1224,27 @@ class InvoiceRepository implements InvoiceRepositoryInterface
     {
         DB::beginTransaction();
         try {
+            $existingService = InvoiceService::where('id', $request->invoice_service_id)
+            ->whereNull('end_date')
+            ->first();
+            if($existingService){
+                $this->invoiceService->calculateInvoiceService($existingService, $request->end_date);
+                
+                $updatedInvoiceService = InvoiceService::where('id', $request->invoice_service_id)
+                ->update([
+                    'end_date' => $request->end_date,
+                    'service_value'=>$existingService->service_value,
+                    'is_active' => 0,
+                ]);
+                // dd($existingService->service_value);
+                DB::commit();
+                ResponseMessage('InvoiceService End successfully', 200);
+                // return $invoiceService;
+            }else{
+                ResponseMessage('InvoiceService already ended', 200);
+            }
             // If it doesn't exist, create a new InvoiceService
-            $createdService = InvoiceService::where('invoice_servie_id', $request->invoice_service_id)
-            ->update([
-                'end_date' => $request->end_date,
-                'is_active' => 1,
-            ]);
-            DB::commit();
-            ResponseMessage('InvoiceService End successfully', 200);
-            // return $invoiceService;
+           
         } catch (\Exception $e) {
             DB::rollback();
             ResponseMessage($e->getMessage(), 402);

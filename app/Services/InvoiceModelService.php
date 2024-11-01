@@ -21,7 +21,7 @@ class InvoiceModelService
     {
         // foreach ($invoiceServices as $invoiceService) {
         $startDateTime = Carbon::parse($invoiceService->start_date);
-        $currentDateTime = Carbon::parse(now());
+        $currentDateTime = Carbon::parse($end_time);
         $pricePerHour = $invoiceService->service->price_per_hour;
         $hours = $startDateTime->diffInHours($currentDateTime);
         $minuteDifference = ceil($startDateTime->diffInMinutes($currentDateTime));
