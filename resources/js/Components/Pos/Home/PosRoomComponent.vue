@@ -283,7 +283,7 @@
                                 <div class=" grid grid-cols-10 gap-x-2 gap-y-3">
                                     <div class="contents" v-for="(service,index) in serviceList" :key="index" :class="service.is_active == 1 ? 'text-black' : 'text-gray-600'">
                                         <div class=" col-span-3 text-sm">
-                                            <button  data-te-toggle="modal" data-te-target="#service_end_modal" @click="btnClickedEndService(service.invoice_id)">
+                                            <button  data-te-toggle="modal" data-te-target="#service_end_modal" @click="btnClickedEndService(service)">
                                                 {{ service.service.name ? service.service.name : service.service.staff.name }}
                                             </button>
                                         </div>
@@ -1149,7 +1149,7 @@
                 selectedServiceQuantity:null,
                 serviceRemark:null,
                 selectedServiceStartTime:null,
-                serviceInvoiceId :null,
+                serviceEnd :null,
                 selectedServiceEndTime:null,
                 serviceList:[], // use in right sidebar
 
@@ -1927,12 +1927,13 @@
                     });
                 }
             },
-            btnClickedEndService(id){
-                this.serviceInvoiceId = id;
+            btnClickedEndService(service){
+                this.serviceEnd = service;
             },  
             async btnConfirmEndService(){
                 let formData = new FormData();
-                formData.append('invoice_service_id', this.serviceInvoiceId);
+                formData.append('service_id', this.serviceEnd.service_id);
+                formData.append('invoice_id', this.serviceEnd.invoice_id);
                 formData.append('end_date', this.selectedServiceEndTime);
                 let response = await postApiData({ url: '/api/entities/end_service', form_data: formData, token: this.getToken() });
                 if (response.success) {
