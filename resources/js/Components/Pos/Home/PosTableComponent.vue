@@ -913,6 +913,7 @@
                 const response = await getApiData({ url: '/api/areas/' + this.tableAreaId + '/entities' , token: this.getToken()});
                 if(response.data){
                     this.roomList = response.data;
+                    console.log('get table list')
                 }
             },
             async btnClickedIsOpenRoom(room , roomIndex) {
