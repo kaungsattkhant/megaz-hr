@@ -1136,9 +1136,6 @@ class InvoiceRepository implements InvoiceRepositoryInterface
 
             $debit_total += $data['service_charge'];
         }
-
-
-
         if ($data['tax'] != 0) {
             $taxAcc = Account::where('account_code', '6-9002')->first();
 

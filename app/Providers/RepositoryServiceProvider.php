@@ -5,6 +5,8 @@ namespace App\Providers;
 use App\Models\DeliveryCharge;
 use App\Models\UsedDefectedItem;
 use App\Models\FixedAssetPurchase;
+use App\Repositories\Accessory\AccessoryInterface;
+use App\Repositories\Accessory\AccessoryRepository;
 use App\Repositories\Ads\AdsRepository;
 use App\Repositories\Uom\UomRepository;
 
@@ -224,6 +226,7 @@ class RepositoryServiceProvider extends ServiceProvider
         $this->app->bind(SaleTargetMenuRepositoryInterface::class,SaleTargetMenuRepository::class);
         $this->app->bind(CanteenInterface::class,CanteenRepository::class);
         $this->app->bind(ServiceInterface::class,ServiceRepository::class);
+        $this->app->bind(AccessoryInterface::class,AccessoryRepository::class);
 
     }
 }
