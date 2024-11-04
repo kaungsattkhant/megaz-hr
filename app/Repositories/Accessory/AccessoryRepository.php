@@ -45,7 +45,7 @@ class AccessoryRepository implements AccessoryInterface
             // $hashedName = md5(uniqid() . microtime()) . '.' . $extension;
             // $data['image_path'] = $imageData->storeAs('images/menu_images', $hashedName, 'public');
             // $data['image_url'] = Storage::url($data['image_path']);
-            $items=json_decode($request->items);
+            $items=json_decode($request->accessory_items);
             $data['created_by']=UserData()->id;
             $accessory = Accessory::updateOrCreate(
                 ['id' => $data['id']],
