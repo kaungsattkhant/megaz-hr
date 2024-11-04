@@ -106,9 +106,7 @@ class EntityRepository implements EntityRepositoryInterface
             ])
             ->find($entitySessionId);
         $invoiceServiceCollection = collect();
-        // dd($een)
-        // dd($entitySession->entity);
-        $total_service_value=0;
+        $total_service_value = 0;
         foreach ($entitySession->roomSessions as $roomSession) {
             $invoice = $roomSession->invoice;
 
@@ -118,7 +116,7 @@ class EntityRepository implements EntityRepositoryInterface
                 $invoiceServices = $invoice->invoiceService;
                 foreach ($invoiceServices as $invoiceService) {
                     $this->invoiceModelService->calculateInvoiceService($invoiceService, now());
-                    $total_service_value+=$invoiceService->service_value;
+                    $total_service_value += $invoiceService->service_value;
                 }
                 $invoiceServiceCollection = $invoiceServiceCollection->merge($invoice->invoiceService);
                 //serice
@@ -154,14 +152,14 @@ class EntityRepository implements EntityRepositoryInterface
         }
         // dd($invoiceServiceCollection);
         $entitySession->services = $invoiceServiceCollection;
-        $entitySession->total_service_value=$total_service_value;
+        $entitySession->total_service_value = $total_service_value;
         return $entitySession;
     }
 
 
     public function entitySessionWithInvoice(array $data, int $entityId)
     {
-        $entity = Entity::find($entityId);  
+        $entity = Entity::find($entityId);
         if ($entity->entity_type == 'room') {
             $entitySession = EntitySession::where('is_active', 1)
                 ->with(['entity', 'roomSessions'])->where('entity_id', $entityId)->first();
@@ -174,11 +172,20 @@ class EntityRepository implements EntityRepositoryInterface
             $firstRoomSession = $roomSessions->first();
             $lastRoomSession = $roomSessions->last();
 
-
+            $invoiceServiceCollection = collect();
+            $total_service_value = 0;
             foreach ($entitySession->roomSessions as $roomSession) {
                 $invoice = $roomSession->invoice;
                 $invoice->package;
                 if ($invoice) {
+                    //service
+                    $invoiceServices = $invoice->invoiceService;
+                    foreach ($invoiceServices as $invoiceService) {
+                        $this->invoiceModelService->calculateInvoiceService($invoiceService, now());
+                        $total_service_value += $invoiceService->service_value;
+                    }
+                    $invoiceServiceCollection = $invoiceServiceCollection->merge($invoice->invoiceService);
+                    //end service
                     $consolidatedOrderItems = [];
                     foreach ($invoice->orders as $order) {
                         $orderItems = OrderItem::where('order_id', $order->id)->get();
@@ -209,6 +216,10 @@ class EntityRepository implements EntityRepositoryInterface
             }
             $entitySession['start_date'] = $firstRoomSession->start_date;
             $entitySession['end_date'] = $lastRoomSession->end_date;
+            //service add response
+            $entitySession['services'] = $invoiceServiceCollection;
+            $entitySession['total_service_value'] = $total_service_value;
+            //service add response
             return $entitySession;
         }
         if ($entity->entity_type == 'table') {

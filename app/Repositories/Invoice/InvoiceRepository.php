@@ -1136,9 +1136,6 @@ class InvoiceRepository implements InvoiceRepositoryInterface
 
             $debit_total += $data['service_charge'];
         }
-
-
-
         if ($data['tax'] != 0) {
             $taxAcc = Account::where('account_code', '6-9002')->first();
 
@@ -1229,7 +1226,6 @@ class InvoiceRepository implements InvoiceRepositoryInterface
             ->first();
             if($existingService){
                 $this->invoiceService->calculateInvoiceService($existingService, $request->end_date);
-                
                 $updatedInvoiceService = InvoiceService::where('id', $request->invoice_service_id)
                 ->update([
                     'end_date' => $request->end_date,
