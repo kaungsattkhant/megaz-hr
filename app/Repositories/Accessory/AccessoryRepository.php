@@ -18,7 +18,7 @@ class AccessoryRepository implements AccessoryInterface
         if ($request->per_page || $request->page) {
             $accessory_category_id = $request->accessory_category_id;
 
-            return Accessory::with(['accessory_category', 'accessory_price', 'accessory_items'])
+            return Accessory::with(['accessory_category', 'accessory_price', 'accessory_items.item'])
                 ->when($request->search_input, function ($q) use ($request) {
                     $q->where('name', 'LIKE', '%' . $request->search_input . '%');
                 })
