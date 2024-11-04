@@ -33,7 +33,7 @@
 
             </div>
         </div>
-        {{ menuList }}
+        <!-- {{ menuList }} -->
         <div class="box-container-table">
             <div class="overflow-x-auto">
                 <!-- <div class="inline-block min-w-full py-2 sm:px-6 lg:px-8"> -->
@@ -76,7 +76,7 @@
                                     </td>
                                     <td class="whitespace-nowrap  ">
                                         <p v-for="(accessory, accessoryIndex) in accessories.accessory_items" :key="accessoryIndex">
-                                            {{ accessory.name }}
+                                            {{ accessory.item.name }}
                                         </p>
                                     </td>
                                     <td class="whitespace-nowrap  ">
@@ -93,7 +93,7 @@
                                         {{ (accessories.is_feature == 1) ? 'Yes' : 'No' }}
                                     </td> -->
                                     <td class="whitespace-nowrap ">
-                                        <a :href="`/accessories/${menu.id}/edit`" id="edit-btn" class="pr-1">
+                                        <a :href="`/accessories/${accessories.id}/edit`" id="edit-btn" class="pr-1">
                                             <i class="fas fa-pen"></i>
                                         </a>
                                         <!-- <input :checked="menu.is_active == 1" @change="isActiveToggled(menu.id)"
