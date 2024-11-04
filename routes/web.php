@@ -285,3 +285,4 @@ Route::view('/menu_sale_report', 'menu_sale_report.index')->name('menu_sale_repo
 Route::view('/menu_costing', 'menu_costing.index')->name('menu_costing.index');
 
 Route::view('/pos_order_items','pos.orderItem.index');
+Route::view('/accessories/create','accessories.create');

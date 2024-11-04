@@ -82,6 +82,7 @@ import PackagesCreateComponent from './Components/Packages/PackagesCreateCompone
 import MenuAndServiceDiscountCrudComponent from './Components/MenuAndServiceDiscount/MenuAndServiceDiscountCrudComponent.vue';
 import RoomDiscountCrudComponent from './Components/RoomDiscount/RoomDiscountCrudComponent.vue';
 import DeliveryChargesCrudComponent from './Components/DeliveryCharges/DeliveryChargesCrudComponent.vue';
+import AccessoriesCreateComponent from './Components/Accessories/AccessoriesCreateComponent.vue';
 
 import LoginComponent from './Components/Auth/LoginComponent.vue';
 import LogoutComponent from './Components/Auth/LogoutComponent.vue';
@@ -180,6 +181,7 @@ app.component('PackagesCreateComponent', PackagesCreateComponent);
 app.component('MenuAndServiceDiscountCrudComponent', MenuAndServiceDiscountCrudComponent);
 app.component('RoomDiscountCrudComponent', RoomDiscountCrudComponent);
 app.component('DeliveryChargesCrudComponent', DeliveryChargesCrudComponent);
+app.component('AccessoriesCreateComponent', AccessoriesCreateComponent);
 
 app.component('PurchaseOrderListComponent', PurchaseOrderListComponent);
 app.component('PurchaseOrderCreateComponent', PurchaseOrderCreateComponent);
