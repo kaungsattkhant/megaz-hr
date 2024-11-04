@@ -162,7 +162,7 @@ export default {
         ...mapGetters(['getToken']),
 
         async getMenuCategoryList() {
-            let url = `/api/menu_categories`;
+            let url = `/api/get_accessory_category`;
             let response = await getApiData({ url: url, token: this.getToken() });
             if (response.data) {
                 this.menuCategoryList = response.data;
@@ -171,15 +171,15 @@ export default {
 
         async getMenuList(pageNumber) {
 
-            let url = `/api/menus?page=${pageNumber}`;
+            let url = `/api/accessories?page=${pageNumber}`;
             if (this.searchInput && this.searchCategory) {
-                url = `/api/menus?search_input=${this.searchInput}&menu_category_id=${this.searchCategory.id}&page=${pageNumber}`;
+                url = `/api/accessories?search_input=${this.searchInput}&accessories_id=${this.searchCategory.id}&page=${pageNumber}`;
             }
             if (this.searchInput && !this.searchCategory) {
-                url = `/api/menus?search_input=${this.searchInput}&page=${pageNumber}`;
+                url = `/api/accessories?search_input=${this.searchInput}&page=${pageNumber}`;
             }
             if ((!this.searchInput) && this.searchCategory) {
-                url = `/api/menus?menu_category_id=${this.searchCategory.id}&page=${pageNumber}`;
+                url = `/api/accessories?accessories_id=${this.searchCategory.id}&page=${pageNumber}`;
             }
 
             let response = await getApiData({ url: url, token: this.getToken() });
@@ -192,23 +192,23 @@ export default {
             }
         },
 
-        isActiveToggled(id) {
-            let index = this.menuList.findIndex(menu => menu.id == id);
-            if (index != -1) {
-                if (this.menuList[index].is_active == 1) {
-                    this.menuList[index].is_active = 0;
-                }
-                else {
-                    this.menuList[index].is_active = 1;
-                }
+        // isActiveToggled(id) {
+        //     let index = this.menuList.findIndex(menu => menu.id == id);
+        //     if (index != -1) {
+        //         if (this.menuList[index].is_active == 1) {
+        //             this.menuList[index].is_active = 0;
+        //         }
+        //         else {
+        //             this.menuList[index].is_active = 1;
+        //         }
 
-                let url = `/api/is_active`;
-                let formData = new FormData();
-                formData.append('id', id);
-                formData.append('type', 'menu');
-                let response = postApiData({ url: url, form_data: formData, token: this.getToken() });
-            }
-        },
+        //         let url = `/api/is_active`;
+        //         let formData = new FormData();
+        //         formData.append('id', id);
+        //         formData.append('type', 'menu');
+        //         let response = postApiData({ url: url, form_data: formData, token: this.getToken() });
+        //     }
+        // },
 
         deleteBtnClicked(id) {
             this.deleteId = id;

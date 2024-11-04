@@ -8,7 +8,7 @@
 
 
         <div class="grid !grid-cols-12 gap-x-8 bg-white p-8 rounded-md shadow-md mb-8">
-            <div class="mb-4 col-span-3 pb-6 rounded-md">
+            <div class="mb-4 col-span-3 pb-0 rounded-md">
                 <label for="" class="label-form mb-3">
                     Name
                 </label>
@@ -24,13 +24,13 @@
                     </label>
                 </div> -->
             </div>
-            <div class="mb-4 col-span-3 pb-6 rounded-md">
+            <div class="mb-4 col-span-3 pb-0 rounded-md">
                 <label for="" class="label-form mb-3">
                     Price
                 </label>
                 <input type="text" v-model="price" class="input-ui ">
             </div>
-            <div class="mb-4 col-span-3 pb-6 rounded-md">
+            <div class="mb-4 col-span-3 pb-0 rounded-md">
                 <label for="" class="label-form mb-3">
                     Accessories Category
                 </label>
@@ -42,7 +42,7 @@
                             :key="accessoriesCategoryIndex"> {{ accessoriesCategory.name }} </option>
                     </select>
                 </div>
-            </div>
+            </div><div class="col-span-3"></div>
             <div class="mb-4 col-span-3 rounded-md">
                 <label for="" class="block text-sm text-black mb-3">
                     Images
@@ -91,7 +91,7 @@
                             :key="itemCategoryIndex"> {{ itemCategory.name }} </option>
                     </select>
                 </div>
-            </div>
+            </div><div class="col-span-3"></div>
 
             <div class="mb-0 col-span-3 rounded-md">
                 <label for="" class="label-form mb-3">
@@ -106,7 +106,7 @@
                     </select>
                 </div>
             </div>
-            <div class="mb-0 col-span-3 rounded-md">
+            <div class="mb-4 col-span-3 rounded-md">
                 <label for="" class="label-form mb-3">
                     Weight
                 </label>
@@ -149,7 +149,7 @@
 
             </div>
 
-            <div class="col-span-3">
+            <div class="col-span-12 flex justify-end mt-6">
                 <label for="" class="label-form mb-3">
                     &nbsp;
                 </label>
@@ -225,7 +225,7 @@
                                         {{ (ingredient.price).toLocaleString() }}
                                     </td>
                                     <td class="">
-                                        {{ ingredient.weight }}
+                                        {{ ingredient.quantity }}
                                     </td>
                                     <td class="">
                                         {{ ingredient.uom_name }}
@@ -433,12 +433,12 @@ export default {
             });
         },
 
-        async getCookingAreaList(departmentId) {
-            let response = await getApiData({ url: `/api/areas?department_id=${departmentId}`, token: this.getToken() });
-            if (response.data) {
-                this.areaList = response.data;
-            }
-        },
+        // async getCookingAreaList(departmentId) {
+        //     let response = await getApiData({ url: `/api/areas?department_id=${departmentId}`, token: this.getToken() });
+        //     if (response.data) {
+        //         this.areaList = response.data;
+        //     }
+        // },
 
         updateItemPriceTotal(items){
             this.ingredientItemPriceTotal = 0;
@@ -463,7 +463,7 @@ export default {
         },
 
         async getAccessoriesCategoryList() {
-            let response = await getApiData({ url: `/api/menu_categories`, token: this.getToken() });
+            let response = await getApiData({ url: `/api/get_accessory_category`, token: this.getToken() });
             if (response.data) {
                 this.accessoriesCategoryList = response.data;
             }
@@ -510,50 +510,51 @@ export default {
         },
 
         async addItemBtnClicked() {
-            if(!this.selectedItem){
-                this.alertValidationMessage('an item');
-                return 1;
-            }
-            if (!this.weight) {
-                this.alertValiationMessage('weight');
-                return 1;
-            }
-            if(!this.selectedUom){
-                this.alertValiationMessage('UOM');
-                return 1;
-            }
+            // if(!this.selectedItem){
+            //     this.alertValidationMessage('am item');
+            //     return 1;
+            // }
+            // if (!this.weight) {
+            //     this.alertValiationMessage('weight');
+            //     return 1;
+            // }
+            // if(!this.selectedUom){
+            //     this.alertValiationMessage('UOM');
+            //     return 1;
+            // }
 
-            let url = `/api/get_uom_conversion_by_uom?po_uom_id=${this.selectedUom.id}&item_uom_id=${this.selectedItem.item_prices.uom_id}&item_price=${this.selectedItem.item_prices.price}&base_uom_id=${this.selectedItem.base_uom_id}`;
-            let response = await getApiData({url: url, token: this.getToken()});
+            // let url = `/api/get_uom_conversion_by_uom?po_uom_id=${this.selectedUom.id}&item_uom_id=${this.selectedItem.item_prices.uom_id}&item_price=${this.selectedItem.item_prices.price}&base_uom_id=${this.selectedItem.base_uom_id}`;
+            // let response = await getApiData({url: url, token: this.getToken()});
             let uomConversion = null;
             let amount = 0;
             let price = 0;
-            if(response.data){
-                uomConversion = response.data;
-                amount = parseInt(response.data.price);
-                price = this.weight * amount;
+            // if(response.data){
+            //     uomConversion = response.data;
+            //     amount = parseInt(response.data.price);
+            //     price = this.weight * amount;
 
-                this.$notify({
-                    text: `Uom conversion by uom value ${amount}`,
-                    type: 'info'
-                });
-            }
-            else{
-                this.$notify({
-                    title: 'Error',
-                    text: response.message,
-                    type: 'error'
-                });
+            //     this.$notify({
+            //         text: `Uom conversion by uom value ${amount}`,
+            //         type: 'info'
+            //     });
+            // }
+            // else{
+            //     this.$notify({
+            //         title: 'Error',
+            //         text: response.message,
+            //         type: 'error'
+            //     });
 
-                return 1;
-            }
+            //     return 1;
+            // }
 
             this.ingredientItems.push({
-                id: this.selectedItem.id,
-                price: price,
+                item_id: this.selectedItem.id,
+                // price: price,
+                price: this.selectedItem.item_prices.price,
                 name: this.selectedItem.name,
-                weight: this.weight,
-                is_make_pack: this.isMakePack,
+                quantity: this.weight,
+                // is_make_pack: this.isMakePack,
                 uom_id: this.selectedUom.id,
                 uom_name: this.selectedUom.name
             });
@@ -591,31 +592,32 @@ export default {
                 this.alertValiationMessage(`accessories image`);
                 return 1;
             }
-            else if(this.selectedAreas.length < 1){
-                this.alertValiationMessage(`cooking areas`);
-                return 1;
-            }
+            // else if(this.selectedAreas.length < 1){
+            //     this.alertValiationMessage(`cooking areas`);
+            //     return 1;
+            // }
             else {
-                let areaIds = [];
-                this.selectedAreas.forEach((area)=>{
-                    areaIds.push(area.id);
-                });
-                let accessoriesItems = JSON.stringify({ items: this.ingredientItems });
+                // let areaIds = [];
+                // this.selectedAreas.forEach((area)=>{
+                //     areaIds.push(area.id);
+                // });
+                let accessoriesItems = JSON.stringify(this.ingredientItems);
                 let formData = new FormData();
-                formData.append('accessories_category_id', this.accessoriesCategoryId);
+                formData.append('accessory_category_id', this.accessoriesCategoryId);
                 formData.append('name', this.name);
-                formData.append('is_feature', (this.isFeatured)?1:0);
+                // formData.append('is_feature', (this.isFeatured)?1:0);
                 formData.append('price', this.price);
-                formData.append('items', accessoriesItems);
+                formData.append('accessory_items', accessoriesItems);
                 formData.append('image',this.selectedImage);
-                formData.append('areas',JSON.stringify(areaIds));
+                // formData.append('areas',JSON.stringify(areaIds));
                 formData.append('code',this.code);
-                formData.append('description',this.description);
+                // formData.append('description',this.description);
 
                 let response = await postApiData({ url: `/api/accessories`, form_data: formData, token: this.getToken() });
 
                 if (response.success) {
-                    window.location.replace(`/accessories`);
+                    // window.location.replace(`/accessories`);
+                    console.log('success')
                 }
             }
         }
@@ -632,18 +634,18 @@ export default {
     },
 
     async created() {
-        let response = await getApiData({url: `/api/departments`, token: this.getToken()});
-        if(response.data){
-            response.data.forEach((department)=>{
-                if(department.name == `Kitchen`){
-                    this.departmentId = department.id;
-                }
-            });
-        }
+        // let response = await getApiData({url: `/api/departments`, token: this.getToken()});
+        // if(response.data){
+        //     response.data.forEach((department)=>{
+        //         if(department.name == `Kitchen`){
+        //             this.departmentId = department.id;
+        //         }
+        //     });
+        // }
         this.getAccessoriesCategoryList();
         this.getItemCategoryList();
         this.getUomList();
-        this.getCookingAreaList(this.departmentId);
+        // this.getCookingAreaList(this.departmentId);
     },
 
     mounted() {
