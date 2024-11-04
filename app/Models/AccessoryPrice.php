@@ -5,9 +5,8 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class AccessoryCategory extends Model
+class AccessoryPrice extends Model
 {
     use HasFactory;
-    protected $fillable=['name','is_active'];
-    
+    protected $fillable=['accessory_id','price'];
 }
