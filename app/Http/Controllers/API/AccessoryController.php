@@ -39,4 +39,16 @@ class AccessoryController extends Controller
      public function deletAccessoryItem($id): void{
         $this->accessoryRepo->deletAccessoryItem($id);
      }
+
+     public function getAccessoryByCategory($accessory_category_id){
+        // dd($accessory_category_id);
+        $data=$this->accessoryRepo->getAccessoryByCategory($accessory_category_id);
+        ResponseData($data);
+     }
+
+     public function createInvoiceAccessory(Request $request){
+        $data=$this->accessoryRepo->createInvoiceAccessory($request);
+        ResponseData($data);
+     }
+
 }

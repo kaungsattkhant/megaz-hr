@@ -7,6 +7,7 @@ use App\Models\Menu;
 use App\Models\Accessory;
 use App\Models\AccessoryItem;
 use App\Models\AccessoryPrice;
+use App\Models\InvoiceAccessory;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 
@@ -14,7 +15,6 @@ class AccessoryRepository implements AccessoryInterface
 {
     public function list($request){
         // $validateDate = $request->date ?? CurrentDate();
-
         if ($request->per_page || $request->page) {
             $accessory_category_id = $request->accessory_category_id;
 
@@ -45,7 +45,7 @@ class AccessoryRepository implements AccessoryInterface
             // $hashedName = md5(uniqid() . microtime()) . '.' . $extension;
             // $data['image_path'] = $imageData->storeAs('images/menu_images', $hashedName, 'public');
             // $data['image_url'] = Storage::url($data['image_path']);
-            $items=json_decode($request->items);
+            $items=json_decode($request->accessory_items);
             $data['created_by']=UserData()->id;
             $accessory = Accessory::updateOrCreate(
                 ['id' => $data['id']],
@@ -105,5 +105,28 @@ class AccessoryRepository implements AccessoryInterface
         $accessory->load('accessory_category');
         $accessory->load('accessory_items.uom', 'accessory_items.item');
         return $accessory;
+    }
+
+    public function getAccessoryByCategory($accessory_category_id){
+        $accessories=Accessory::with(['accessory_price'])->where('accessory_category_id',$accessory_category_id)
+        ->where('is_active',1)
+        ->get();
+        return $accessories;
+    }
+
+    public function createInvoiceAccessory($request){
+        // dd($request->all());
+        $data=$request->all();
+        // dd($data);
+        DB::beginTransaction();
+        try {
+            $invoiceAccessory=InvoiceAccessory::create($data);
+            DB::commit();
+            return $invoiceAccessory;
+        } catch (\Exception $e) {
+            DB::rollBack();
+            ResponseMessage($e->getMessage(), 402);
+            throw $e;
+        }
     }
 }
