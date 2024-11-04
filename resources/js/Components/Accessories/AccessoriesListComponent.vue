@@ -1,7 +1,7 @@
 <template>
     <div>
         <p class=" text-lg font-semibold font-inter">
-            Selling Menus
+            Accessories list-none
         </p>
     </div>
     <div class="mt-4 bg-white">
@@ -33,6 +33,7 @@
 
             </div>
         </div>
+        {{ menuList }}
         <div class="box-container-table">
             <div class="overflow-x-auto">
                 <!-- <div class="inline-block min-w-full py-2 sm:px-6 lg:px-8"> -->
@@ -44,10 +45,10 @@
                                     #
                                 </th>
                                 <th scope="col" class="  ">
-                                    Menu Name
+                                    Accessories Name
                                 </th>
                                 <th scope="col" class="  ">
-                                    Ingredients
+                                    Item
                                 </th>
                                 <th scope="col" class="  ">
                                     Image
@@ -55,9 +56,9 @@
                                 <th scope="col" class="  ">
                                     Price
                                 </th>
-                                <th scope="col" class="  ">
+                                <!-- <th scope="col" class="  ">
                                     Is featured?
-                                </th>
+                                </th> -->
                                 <th scope="col" class="">
 
                                 </th>
@@ -65,37 +66,37 @@
                         </thead>
                         <tbody>
 
-                            <div class="contents" v-for="(menu, index) in menuList" :key="index">
+                            <div class="contents" v-for="(accessories, index) in menuList" :key="index">
                                 <tr class="">
                                     <td class="  ">
                                         {{ perPage * (currentPage - 1) + (++index) }}
                                     </td>
                                     <td class="whitespace-nowrap  ">
-                                        {{ menu.name }}
+                                        {{ accessories.name }}
                                     </td>
                                     <td class="whitespace-nowrap  ">
-                                        <p v-for="(ingredient, ingredientIndex) in menu.items" :key="ingredientIndex">
-                                            {{ ingredient.name }}
+                                        <p v-for="(accessory, accessoryIndex) in accessories.accessory_items" :key="accessoryIndex">
+                                            {{ accessory.name }}
                                         </p>
                                     </td>
                                     <td class="whitespace-nowrap  ">
                                         <div
-                                            class="relative flex border rounded text-center shrink-0 overflow-hidden rounded-md h-18 w-18">
+                                            class="relative flex border text-center shrink-0 overflow-hidden rounded-md h-18 w-18">
                                             <img width="80" height="100" style="aspect-ratio: 4/3; object-fit: cover;"
-                                                :src="menu.image_url" alt="Menu image">
+                                                :src="accessories.image_url" alt="Menu image">
                                         </div>
                                     </td>
                                     <td class="  ">
-                                        {{ (menu.prices[0].price).toLocaleString() }}
+                                        {{ (accessories.accessory_price.price).toLocaleString() }}
                                     </td>
-                                    <td class="  ">
-                                        {{ (menu.is_feature == 1) ? 'Yes' : 'No' }}
-                                    </td>
+                                    <!-- <td class="  ">
+                                        {{ (accessories.is_feature == 1) ? 'Yes' : 'No' }}
+                                    </td> -->
                                     <td class="whitespace-nowrap ">
-                                        <a :href="`/menus/${menu.id}/edit`" id="edit-btn" class="pr-1">
+                                        <a :href="`/accessories/${menu.id}/edit`" id="edit-btn" class="pr-1">
                                             <i class="fas fa-pen"></i>
                                         </a>
-                                        <input :checked="menu.is_active == 1" @change="isActiveToggled(menu.id)"
+                                        <!-- <input :checked="menu.is_active == 1" @change="isActiveToggled(menu.id)"
                                             class="me-2 mt-[0.3rem] h-3.5 w-8 appearance-none rounded-[0.4375rem] bg-black/25 before:pointer-events-none before:absolute before:h-3.5
                                     before:w-3.5 before:rounded-full before:bg-transparent before:content-[''] after:absolute after:z-[2] after:-mt-[0.1875rem] after:h-5
                                     after:w-5 after:rounded-full after:border-none after:bg-white after:shadow-switch-2 after:transition-[background-color_0.2s,transform_0.2s]
@@ -106,7 +107,7 @@
                                     focus:after:absolute focus:after:z-[1] focus:after:block focus:after:h-5 focus:after:w-5 focus:after:rounded-full focus:after:content-['']
                                     checked:focus:border-primary checked:focus:bg-primary checked:focus:before:ms-[1.0625rem] checked:focus:before:scale-100 checked:focus:before:shadow-switch-3
                                     checked:focus:before:transition-[box-shadow_0.2s,transform_0.2s] dark:bg-white/25 dark:after:bg-surface-dark dark:checked:bg-primary dark:checked:after:bg-primary"
-                                            type="checkbox" role="switch" />
+                                            type="checkbox" role="switch" /> -->
                                     </td>
                                 </tr>
                             </div>

@@ -616,8 +616,8 @@ export default {
                 let response = await postApiData({ url: `/api/accessories`, form_data: formData, token: this.getToken() });
 
                 if (response.success) {
-                    // window.location.replace(`/accessories`);
-                    console.log('success')
+                    window.location.replace(`/accessories`);
+                    // console.log('success')
                 }
             }
         }
