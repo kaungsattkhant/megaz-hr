@@ -34,7 +34,6 @@ class AccessoryRepository implements AccessoryInterface
 
     public function store($request){
         $data=$request->all();
-        // dd($data);
         DB::beginTransaction();
         try {
             if (!isset($request->id)) {
