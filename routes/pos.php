@@ -15,7 +15,6 @@ Route::middleware('auth:api')->group(function () {
         Route::get('/table/{id}', 'tableWithInvoiceDetail');
         Route::get('/areas/{id}/inactive_entities','getOnlyInactiveEntities');
     });
-
     Route::controller(InvoiceAPIController::class)->group(function () {
         Route::post('entities/add_service', 'addService');
         Route::post('entities/end_service', 'endService');
@@ -39,7 +38,6 @@ Route::middleware('auth:api')->group(function () {
         Route::post('/pos_order_items/{order_item_id}/status', 'orderItemAreaConfirm');
         Route::post('/pos_orders/check_foc_supervision', 'checkFocSupervision');
     });
-
     //ksk
     Route::prefix('pos')->controller(AccessoryController::class)->group(function () {
         Route::get('accessory_by_category/{accessory_category}', 'getAccessoryByCategory');
