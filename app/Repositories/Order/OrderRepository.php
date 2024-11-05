@@ -221,12 +221,14 @@ class OrderRepository implements OrderRepositoryInterface
         try {
             $orderItem = OrderItem::find($data['id']);
             if ($data['status'] == 'cancelled') {
+                if(!checkDepartmentAndRoles('Catering', ['Staff', 'Waiter'])){
+                    ResponseMessage("Permission doesn't allow", 422);
+                }
                 $nonCancellableStatuses = [
                     'in progress' => "Order item can't be canceled because it is already in progress.",
                     'done' => "Order item can't be canceled because it is already done.",
                     'pos_confirmed' => "Order item can't be canceled because it is already confirmed.",
                 ];
-
                 if (isset($nonCancellableStatuses[$orderItem->status])) {
                     ResponseMessage($nonCancellableStatuses[$orderItem->status], 422);
                 }
@@ -235,7 +237,7 @@ class OrderRepository implements OrderRepositoryInterface
             $latestRoomSession = RoomSession::where('invoice_id', $invoice->id)->orderBy('created_at', 'desc')->first();
             $entity = $latestRoomSession->entitySession->entity;
             // $entity = Entity::find($latestRoomSession->entitySession->entity_id);
-            if ($data['status'] == 'done'  && $orderItem->status=='in progress') {
+            if ($data['status'] == 'done' && $orderItem->status == 'in progress') {
                 $packs = Pack::where('menu_id', $orderItem->menu_id)->where('status', 'ready')->where('expired_at', '>', CurrentTime())->orderBy('expired_at', 'asc')->take($orderItem->quantity)->get();
                 if (count($packs) < $orderItem->quantity) {
                     ResponseMessage('Not enough packs to sell', 402);
@@ -250,19 +252,17 @@ class OrderRepository implements OrderRepositoryInterface
                 $orderItem->completed_by = UserData()->id;
             }
             //tem command 
-            elseif ($data['status'] == 'in progress'  && $orderItem->status=='pos_confirmed') {
+            elseif ($data['status'] == 'in progress' && $orderItem->status == 'pos_confirmed') {
                 $orderItem->progressed_at = now();
                 $orderItem->progressed_by = UserData()->id;
-            }
-            elseif ($data['status'] == 'cancelled') {
-                // $orderItem->cancelled_at = now();
-                // $orderItem->cancelled_by = UserData()->id;
-            }
-            elseif ($data['status'] == 'placed' && $orderItem->status=='done') {
+            } elseif ($data['status'] == 'cancelled') {
+                $orderItem->cancelled_at = now();
+                $orderItem->cancelled_by = UserData()->id;
+            } elseif ($data['status'] == 'placed' && $orderItem->status == 'done') {
                 $orderItem->placed_at = now();
                 $orderItem->placed_by = UserData()->id;
-            }else{
-                ResponseMessage("Order can't place at this moment ",422);
+            } else {
+                ResponseMessage("Order can't place at this moment ", 422);
             }
             $orderItem->status = $data['status'];
             $orderItem->update();
