@@ -2,16 +2,17 @@
 
 namespace App\Repositories\Entity;
 
+use Carbon\Carbon;
 use App\Models\Area;
 use App\Models\Entity;
-use App\Models\EntitySession;
-use App\Models\InvoiceService;
+use App\Models\Invoice;
 use App\Models\OrderItem;
 use App\Models\RoomSession;
-use App\Services\InvoiceModelService;
-use Carbon\Carbon;
 use Illuminate\Http\Request;
+use App\Models\EntitySession;
+use App\Models\InvoiceService;
 use Illuminate\Support\Facades\DB;
+use App\Services\InvoiceModelService;
 
 class EntityRepository implements EntityRepositoryInterface
 {
@@ -106,22 +107,28 @@ class EntityRepository implements EntityRepositoryInterface
             ])
             ->find($entitySessionId);
         $invoiceServiceCollection = collect();
-        // dd($een)
-        // dd($entitySession->entity);
-        $total_service_value=0;
+        $invoiceAccessoryCollection = collect();
+        $total_service_value = $total_accessory_value = 0;
+        // dd($entitySession->roomSessions);
         foreach ($entitySession->roomSessions as $roomSession) {
             $invoice = $roomSession->invoice;
-
             $invoice->package;
             if ($invoice) {
                 //service
                 $invoiceServices = $invoice->invoiceService;
                 foreach ($invoiceServices as $invoiceService) {
                     $this->invoiceModelService->calculateInvoiceService($invoiceService, now());
-                    $total_service_value+=$invoiceService->service_value;
+                    $total_service_value += $invoiceService->service_value;
                 }
                 $invoiceServiceCollection = $invoiceServiceCollection->merge($invoice->invoiceService);
                 //serice
+                //accesory
+                $invoiceAccessories = $invoice->accessories;
+                foreach ($invoiceAccessories as $invoiceAccessorie) {
+                    $total_accessory_value += $invoiceAccessorie->accessory->accessory_price->price;
+                }
+                $invoiceAccessoryCollection = $invoiceAccessoryCollection->merge($invoice->invoiceAccessories);
+                //end_accessoryI
                 $consolidatedOrderItems = [];
                 foreach ($invoice->orders as $order) {
                     $orderItems = OrderItem::where('order_id', $order->id)->get();
@@ -154,61 +161,84 @@ class EntityRepository implements EntityRepositoryInterface
         }
         // dd($invoiceServiceCollection);
         $entitySession->services = $invoiceServiceCollection;
-        $entitySession->total_service_value=$total_service_value;
+        $entitySession->invoice_accessories = $invoiceAccessories;
+        $entitySession->total_service_value = $total_service_value;
+        $entitySession->total_accessory_value = $total_accessory_value;
         return $entitySession;
     }
 
 
     public function entitySessionWithInvoice(array $data, int $entityId)
     {
-        $entity = Entity::find($entityId);  
+        $entity = Entity::find($entityId);
         if ($entity->entity_type == 'room') {
             $entitySession = EntitySession::where('is_active', 1)
                 ->with(['entity', 'roomSessions'])->where('entity_id', $entityId)->first();
-
             $invoiceId = $entitySession->roomSession->invoice_id;
+            $invoice = Invoice::find($invoiceId);
             $roomSessions = RoomSession::where('invoice_id', $invoiceId)
                 ->orderBy('created_at')
                 ->get();
-
             $firstRoomSession = $roomSessions->first();
             $lastRoomSession = $roomSessions->last();
 
+            $invoiceServiceCollection = collect();
+            $total_service_value = 0;
+            $total_accessory_value = 0;
 
-            foreach ($entitySession->roomSessions as $roomSession) {
-                $invoice = $roomSession->invoice;
-                $invoice->package;
-                if ($invoice) {
-                    $consolidatedOrderItems = [];
-                    foreach ($invoice->orders as $order) {
-                        $orderItems = OrderItem::where('order_id', $order->id)->get();
-                        foreach ($orderItems as $orderItem) {
-                            $menuId = $orderItem->menu_id;
-                            $status = $orderItem->status;
-                            if (isset($consolidatedOrderItems[$menuId][$status])) {
-                                $consolidatedOrderItems[$menuId][$status]->quantity += $orderItem->quantity;
-                                $consolidatedOrderItems[$menuId][$status]->price += $orderItem->price;
-                                $consolidatedOrderItems[$menuId][$status]->discount_price += $orderItem->discount_price;
-                            } else {
-                                $consolidatedOrderItems[$menuId][$status] = $orderItem;
-                            }
+            // foreach ($roomSessions as $roomSession) {don't need
+            // $invoice = $roomSession->invoice; // 'don't need'
+            $invoice->package;
+            if ($invoice) {
+                //service
+                $invoiceServices = $invoice->invoiceService;
+                foreach ($invoiceServices as $invoiceService) {
+                    $this->invoiceModelService->calculateInvoiceService($invoiceService, now());
+                    $total_service_value += $invoiceService->service_value;
+                }
+                $invoiceServiceCollection = $invoiceServiceCollection->merge($invoice->invoiceService);
+                // end service
+                // invoice accessory
+                $invoiceAccessories = $invoice->accessories;
+                foreach ($invoiceAccessories as $invoiceAccessorie) {
+                    $total_accessory_value += $invoiceAccessorie->accessory->accessory_price->price;
+                }
+                $consolidatedOrderItems = [];
+                foreach ($invoice->orders as $order) {
+                    $orderItems = OrderItem::where('order_id', $order->id)->get();
+                    foreach ($orderItems as $orderItem) {
+                        $menuId = $orderItem->menu_id;
+                        $status = $orderItem->status;
+                        if (isset($consolidatedOrderItems[$menuId][$status])) {
+                            $consolidatedOrderItems[$menuId][$status]->quantity += $orderItem->quantity;
+                            $consolidatedOrderItems[$menuId][$status]->price += $orderItem->price;
+                            $consolidatedOrderItems[$menuId][$status]->discount_price += $orderItem->discount_price;
+                        } else {
+                            $consolidatedOrderItems[$menuId][$status] = $orderItem;
                         }
                     }
+                }
 
-                    foreach ($invoice->orders as $order) {
-                        $order->order_items = collect();
+                foreach ($invoice->orders as $order) {
+                    $order->order_items = collect();
 
-                        foreach ($consolidatedOrderItems as $menuId => $itemsByStatus) {
-                            foreach ($itemsByStatus as $status => $order_items) {
-                                $order_items->menu;
-                                $order->order_items->push($order_items);
-                            }
+                    foreach ($consolidatedOrderItems as $menuId => $itemsByStatus) {
+                        foreach ($itemsByStatus as $status => $order_items) {
+                            $order_items->menu;
+                            $order->order_items->push($order_items);
                         }
                     }
                 }
             }
+            // }
+            // dd($total_accessory_value);
             $entitySession['start_date'] = $firstRoomSession->start_date;
             $entitySession['end_date'] = $lastRoomSession->end_date;
+            //service add response
+            $entitySession['services'] = $invoiceServiceCollection;
+            $entitySession['invoice_accessories'] = $invoiceAccessories;
+            $entitySession['total_service_value'] = $total_service_value;
+            //service add response
             return $entitySession;
         }
         if ($entity->entity_type == 'table') {

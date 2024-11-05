@@ -630,7 +630,9 @@ class InvoiceRepository implements InvoiceRepositoryInterface
             $total_duration = 0;
             $total_session_value = 0;
             $total_service_value = 0;
+            $total_accessory_value = 0;
             $invoiceServices = $invoice->invoiceService;
+            $invoiceAccessories = $invoice->accessories;
             $roomDoneResponse['is_service'] = 1;
             if ($invoiceServices->isEmpty()) {
                 $roomDoneResponse['is_service'] = 0;
@@ -642,6 +644,10 @@ class InvoiceRepository implements InvoiceRepositoryInterface
             foreach ($roomSessions as $room) {
                 $total_session_value += $room->price;
                 $total_duration += $room->session_duration ?? 0;
+            }
+
+            foreach ($invoiceAccessories as $invoiceAccessorie) {
+                $total_accessory_value += $invoiceAccessorie->accessory->accessory_price->price;
             }
 
             $entity = Entity::find($latestRoomSession->entitySession->entity_id);
@@ -683,6 +689,7 @@ class InvoiceRepository implements InvoiceRepositoryInterface
             $roomDoneResponse['room_sessions'] = $latestRoomSession;
             $roomDoneResponse['rooms_sessions'] = $roomSessions;
             $roomDoneResponse['total_service_value'] = $total_service_value;
+            $roomDoneResponse['total_accessory_value'] = $total_accessory_value;
             DB::commit();
             ResponseData($roomDoneResponse);
         } catch (\Exception $e) {
@@ -1136,9 +1143,6 @@ class InvoiceRepository implements InvoiceRepositoryInterface
 
             $debit_total += $data['service_charge'];
         }
-
-
-
         if ($data['tax'] != 0) {
             $taxAcc = Account::where('account_code', '6-9002')->first();
 

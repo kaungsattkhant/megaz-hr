@@ -43,6 +43,7 @@ class Invoice extends Model
         'customer_level_discount',
         'total_discount',
         'total_service_value',
+        'total_accessory_value',
     ];
 
     public function package()
@@ -93,5 +94,10 @@ class Invoice extends Model
     public function activeInvoiceService()
     {
         return $this->hasMany(InvoiceService::class)->where('is_active',1);
+    }
+
+    public function accessories()
+    {
+        return $this->hasMany(InvoiceAccessory::class);
     }
 }
