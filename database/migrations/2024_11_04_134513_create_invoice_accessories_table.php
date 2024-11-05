@@ -11,10 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('accessory_categories', function (Blueprint $table) {
+        Schema::create('invoice_accessories', function (Blueprint $table) {
             $table->id();
-            $table->string('name');
-            $table->boolean('is_active')->default(1);
+            $table->integer('quantity');
+            $table->unsignedInteger('accessory_id');
+            $table->foreignId('invoice_id')->constrained()->onDelete('cascade');
             $table->timestamps();
         });
     }
@@ -24,6 +25,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('accessory_categories');
+        Schema::dropIfExists('invoice_accessories');
     }
 };

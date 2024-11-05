@@ -6,5 +6,12 @@ use Illuminate\Http\Request;
 
 interface AccessoryInterface
 {
-    public function list();
+    public function list($request);
+    public function store($request);
+    public function detail($accessory);
+    public function deletAccessoryItem($id);
+    public function getAccessoryByCategory($accessory_category_id);
+    public function createInvoiceAccessory($request);
+
+
 }

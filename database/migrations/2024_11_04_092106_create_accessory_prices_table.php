@@ -11,10 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('accessory_categories', function (Blueprint $table) {
+        Schema::create('accessory_prices', function (Blueprint $table) {
             $table->id();
-            $table->string('name');
-            $table->boolean('is_active')->default(1);
+            $table->foreignId('accessory_id')->constrained()->onDelete('cascade');
+            $table->double('price');
             $table->timestamps();
         });
     }
@@ -24,6 +24,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('accessory_categories');
+        Schema::dropIfExists('accessory_prices');
     }
 };
