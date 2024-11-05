@@ -614,6 +614,7 @@ export default {
                 this.alertValiationMessage(`accessories image`);
                 return 1;
             }
+            
             else {
                 let accessoriesItems = JSON.stringify(this.ingredientItems);
                 let formData = new FormData();
