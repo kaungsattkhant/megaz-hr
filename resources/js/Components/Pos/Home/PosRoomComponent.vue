@@ -193,6 +193,10 @@
                                     <i class="far fa-hourglass-half"></i>
                                 </button>
                                 <button class="transition duration-150 ease-in-out focus:outline-none focus:ring-0"
+                                    data-te-toggle="modal" data-te-target="#add_accessory_modal">
+                                    <i class="far fa-plus-circle"></i>
+                                </button>
+                                <button class="transition duration-150 ease-in-out focus:outline-none focus:ring-0"
                                     data-te-toggle="modal" data-te-target="#add_service_modal">
                                     <i class="far fa-user-music"></i>
                                 </button>
@@ -319,6 +323,41 @@
                                     </div> -->
                                 </div>
                             </div>
+
+
+                            <div class="padding-section border-b    " v-if="accessoryListSidebar.length > 0">
+                                <div class="flex justify-between font-semibold mb-3">
+                                    <p class="px-2 py-0.5 bg-[#F19E51] text-white text-xs w-fit">
+                                        Accessories
+                                    </p>
+                                    <p class="text-sm text-black font-semibold">
+                                        {{ selectedRoom.total_accessory_value.toLocaleString() }} MMks
+                                    </p>
+                                </div>
+                                <div class=" grid grid-cols-10 gap-x-2 gap-y-3">
+                                    <div class="contents" v-for="(accessory,index) in accessoryListSidebar" :key="index">
+                                        <div class=" col-span-3 text-sm">
+                                            {{ accessory.accessory.name }}
+                                        </div>
+                                        <!-- <p class=" col-span-3 text-sm" v-else>
+                                            {{ service.service.staff.name }}
+                                        </p> -->
+                                        <p class=" col-span-3 text-center text-sm">
+                                            {{ accessory.quantity }}
+                                        </p>
+                                        <!-- <p :class="menu2.status == 'done' ? 'text-green-600 font-semibold' : 'text-gray-500'"
+                                            class=" col-span-2 text-center text-xs pt-0.5">
+                                            {{ menu2.status }}
+                                        </p> -->
+                                        <p class=" col-span-4 text-sm text-right">
+                                            {{ accessory.accessory.accessory_price.price.toLocaleString() }} MMKs
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+
+
+
                         </div>
 
                         <div class="absolute bottom-0 border-t-2 border-gray-200 w-full padding-section">
@@ -957,7 +996,7 @@
             </div>
         </div>
             <!-- end Service modal -->
-            <div data-te-modal-init
+        <div data-te-modal-init
             class="fixed left-0 top-0 z-[1055] hidden h-full w-full overflow-y-auto overflow-x-hidden outline-none"
             id="service_end_modal" tabindex="-1" aria-labelledby="addMenuModalLabel" aria-modal="true" role="dialog">
             <div data-te-modal-dialog-ref
@@ -996,6 +1035,69 @@
                 </div>
             </div>
         </div>
+
+
+            <!-- add accessory modal -->
+        <div data-te-modal-init
+            class="fixed left-0 top-0 z-[1055] hidden h-full w-full overflow-y-auto overflow-x-hidden outline-none"
+            id="add_accessory_modal" tabindex="-1" aria-labelledby="addAccessoryModalLabel" aria-modal="true" role="dialog">
+            <div data-te-modal-dialog-ref
+                class="pointer-events-none relative flex min-h-[calc(100%-1rem)] w-auto translate-y-[-50px] items-center opacity-0 transition-all duration-300 ease-in-out min-[576px]:mx-auto min-[576px]:mt-7 min-[576px]:min-h-[calc(100%-3.5rem)] min-[576px]:max-w-[500px]">
+                <div
+                    class="pointer-events-auto relative flex w-full flex-col rounded-md border-none bg-white bg-clip-padding text-current shadow-lg outline-none">
+                    <div class="relative  p-4">
+                        <p class="text-xl w-full text-center">
+                            Add Accessory
+                        </p>
+                        <button type="button" id="closeAccessoryModal"
+                            class="absolute top-4 right-4 focus:shadow-none focus:outline-none" data-te-modal-dismiss
+                            aria-label="Close">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                                stroke="currentColor" class="h-5 w-5">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                        </button>
+                    </div>
+
+                    <div class="relative px-16 py-4" data-te-modal-body-ref>
+                        <div class="mb-4">
+                            <label for="" class="label-form mb-3">
+                                Accessory Category
+                            </label>
+                            <select name="" id="" v-model="selectedAccessoryCategory" class="input-ui" @change="accessoryCategoryChange()">
+                                <option :value="accessory" v-for="(accessory, index) in accessoryCategoryList"
+                                    :key="index">{{
+                                        accessory.name }}</option>
+                            </select>
+                        </div>
+                        <div class="mb-4">
+                            <label for="" class="label-form mb-3">
+                                Accessory
+                            </label>
+                            <select name="" id="" v-model="selectedAccessory" class="input-ui">
+                                <option :value="accessory" v-for="(accessory, index) in accessoryList"
+                                    :key="index">
+                                    {{ accessory.name }}</option>
+                            </select>
+                        </div>
+                        <div class="mb-4">
+                            <label for="" class="label-form mb-3">
+                                Quantity
+                            </label>
+                            <input type="number" v-model="selectedAccessoryQuantity" class="input-ui mb-2">
+                        </div>
+                    </div>
+
+                    <div class="flex justify-center px-12 mb-6">
+                        <button @click="btnConfirmAddAccessory()" class="pos-add-btn focus:outline-none focus:ring-0 ">
+                            Add Service
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
     </div>
 
 </template>
@@ -1155,6 +1257,17 @@
 
                 serviceEndDate:null,
 
+
+                // add accessory
+                accessoryListSidebar:[],
+                accessoryCategoryList:[],
+                accessoryList:[],
+
+                selectedAccessoryCategory:null,
+                selectedAccessory:null,
+                selectedAccessoryQuantity:null,
+
+
             };
         },
 
@@ -1181,6 +1294,7 @@
                     if (response.data) {
                         this.selectedRoom = response.data;
                         this.serviceList = response.data.services;
+                        this.accessoryListSidebar = response.data.invoice_accessories;
                     }
                 }
                 else {
@@ -1951,6 +2065,43 @@
             },
 
 
+            // add accessory
+            async getAccessoryCategoryList() {
+                const response = await getApiData({ url: '/api/pos/get_accessory_category', token: this.getToken() });
+                if (response.data) {
+                    this.accessoryCategoryList = response.data;
+                }
+            },
+            async accessoryCategoryChange(){ //get accessory list
+                const response = await getApiData({ url: '/api/pos/accessory_by_category/'+ this.selectedAccessoryCategory.id, token: this.getToken() });
+                if (response.data) {
+                    this.accessoryList = response.data;
+                }
+            },
+            btnConfirmAddAccessory() {
+                this.addAccessory();
+            },
+            async addAccessory() {   // invoice pay yan
+                let formData = new FormData();
+                formData.append('invoice_id', this.selectedRoom.room_sessions[0].invoice.id);
+                formData.append('accessory_id', this.selectedAccessory.id);
+                formData.append('quantity', this.selectedAccessoryQuantity);
+                let response = await postApiData({ url: '/api/pos/add_accessory', form_data: formData, token: this.getToken() });
+                // console.log(this.invoiceId+','+this.selectedMenu.id + ','+ this.menuQuantity +','+this.selectedMenu.prices[0].price)
+                if (response.success) {
+                    this.closeModal('closeAccessoryModal');
+                    this.clearAccessoryForm();
+                    this.getSelectedRoom();
+                }
+                else {
+                    this.$notify({
+                        title: `Input validation`,
+                        text: response.message,
+                        type: "warn"
+                    });
+                }
+            },
+
 
 
             closeModal(modalId) {
@@ -1977,6 +2128,11 @@
                 this.selectedLady = null
                 this.selectedDj = null
                 this.selectedServiceQuantity = null
+            },
+            clearServiceForm() {
+                this.selectedAccessoryCategory = null
+                this.selectedAccessory = null
+                this.selectedAccessoryQuantity = null
             },
             clearAddHourForm() {
                 this.sessionDuration = null
@@ -2054,6 +2210,7 @@
             this.getServiceCategoryList();
             this.getLadyList();
 
+            this.getAccessoryCategoryList();
             // this.testtime();
         },
         mounted()

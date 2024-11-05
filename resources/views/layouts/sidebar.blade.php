@@ -546,6 +546,16 @@
                         </li>
                         @endif
 
+
+
+
+                        <li>
+                            <a href="/accessories" class="flex items-center @yield('packages')">
+                            <i class="fal fa-braille pr-3"></i>
+                                Accessories
+                            </a>
+                        </li>
+
                     </ul>
 
                 </div>

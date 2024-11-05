@@ -1,7 +1,7 @@
 <template>
     <div class="px-0">
         <div class="mb-4 ">
-            <p class="text-lg font-semibold font-inter">
+            <p class="text-lg font-semibold font-inter pt-4 pl-1">
                 Add Accessories
             </p>
         </div>
@@ -78,6 +78,7 @@
 
             </div><div class="col-span-6"></div>
 
+            <hr class="col-span-12 mt-3 mb-5">
             <div class="mb-0 col-span-3 rounded-md">
                 <label for="" class="label-form mb-3">
                     Category
@@ -169,24 +170,7 @@
                         data-te-toggle="pill" data-te-target="#tabs-home" data-te-nav-active role="tab"
                         aria-controls="tabs-home" aria-selected="true">Ingredients</a>
                 </li>
-                <li role="presentation">
-                    <a href="#tabs-profile"
-                        class="my-2 block border-x-0 px-7 pb-3.5 pt-3 rounded-md font-inter text-xs font-medium  leading-tight text-neutral-500 hover:isolate hover:border-transparent hover:bg-neutral-100 focus:isolate focus:border-transparent  data-[te-nav-active]:text-[#845adf] data-[te-nav-active]:bg-[#845adf1a]"
-                        data-te-toggle="pill" data-te-target="#tabs-profile" role="tab" aria-controls="tabs-profile"
-                        aria-selected="false">Profile</a>
-                </li>
-                <li role="presentation">
-                    <a href="#tabs-messages"
-                        class="my-2 block border-x-0 px-7 pb-3.5 pt-3 rounded-md font-inter text-xs font-medium  leading-tight text-neutral-500 hover:isolate hover:border-transparent hover:bg-neutral-100 focus:isolate focus:border-transparent  data-[te-nav-active]:text-[#845adf] data-[te-nav-active]:bg-[#845adf1a]"
-                        data-te-toggle="pill" data-te-target="#tabs-messages" role="tab" aria-controls="tabs-messages"
-                        aria-selected="false">Messages</a>
-                </li>
-                <li role="presentation">
-                    <a href="#tabs-contact"
-                        class="my-2 block border-x-0 px-7 pb-3.5 pt-3 rounded-md font-inter text-xs font-medium  leading-tight text-neutral-500 hover:isolate hover:border-transparent hover:bg-neutral-100 focus:isolate focus:border-transparent  data-[te-nav-active]:text-[#845adf] data-[te-nav-active]:bg-[#845adf1a]"
-                        data-te-toggle="pill" data-te-target="#tabs-contact" role="tab" aria-controls="tabs-contact"
-                        aria-selected="false">Contact</a>
-                </li>
+                
             </ul>
 
             <div class="mb-6">
