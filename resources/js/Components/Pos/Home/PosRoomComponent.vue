@@ -380,7 +380,7 @@
                                                         selectedRoom.room_sessions[0].invoice.total_session_price : 0)
                                                     - (selectedRoom.room_sessions[0].invoice.package ? selectedRoom.room_sessions[0].invoice.package.package_discount : 0)
                                                 )
-                                            ) + selectedRoom.total_service_value).toLocaleString()
+                                            ) + selectedRoom.total_service_value+selectedRoom.total_accessory_value).toLocaleString()
                                             : 0
                                         )
 
@@ -585,10 +585,18 @@
                             </div>
                             <div v-show="roomSessionData.is_service == 1" class=" text-sm text-right flex gap-x-2 justify-end pr-2 mb-2">
                                 <p>
-                                    Service Amount
+                                    Service Price
                                 </p>
                                 <p class=" w-28">
                                     {{ printInvoiceData.service_total_value.toLocaleString() }} MMKs
+                                </p>
+                            </div>
+                            <div v-show="roomSessionData.total_accessory_value > 0" class=" text-sm text-right flex gap-x-2 justify-end pr-2 mb-2">
+                                <p>
+                                    Accessories Price
+                                </p>
+                                <p class=" w-28">
+                                    {{ printInvoiceData.accessory_total_value.toLocaleString() }} MMKs
                                 </p>
                             </div>
                             <div class=" text-right pr-3 mb-3">
@@ -1182,6 +1190,7 @@
                     customer_discount:0,
                     percent_discount_amount:0,
                     service_total_value:0,
+                    accessory_total_value:0,
                 },
                 room_discount: null,
                 birthday_discount: null,
@@ -1516,6 +1525,7 @@
                     console.log("success")
                     this.isOpenRoomStep('invoice')
                     this.printInvoiceData.service_total_value = response.data.total_service_value;
+                    this.printInvoiceData.accessory_total_value = response.data.total_accessory_value;
                 }
                 else {
                     this.$notify({
@@ -1551,11 +1561,11 @@
                     this.printInvoiceData.package_discount = this.selectedRoom.room_sessions[0].invoice.package.package_discount;
                     this.isPackage = true;
                     this.packagePrice = this.selectedRoom.room_sessions[0].invoice.paid_amount
-                    this.printInvoiceData.total = (this.printInvoiceData.room + this.printInvoiceData.food + this.printInvoiceData.service_total_value) - this.printInvoiceData.package_discount - this.foodDiscount;
+                    this.printInvoiceData.total = (this.printInvoiceData.room + this.printInvoiceData.food + this.printInvoiceData.service_total_value + this.printInvoiceData.accessory_total_value) - this.printInvoiceData.package_discount - this.foodDiscount;
                 }
                 else {
                     this.isPackage = false;
-                    this.printInvoiceData.total = (roomChargeTotal + this.printInvoiceData.food + this.printInvoiceData.service_total_value) - this.foodDiscount;
+                    this.printInvoiceData.total = (roomChargeTotal + this.printInvoiceData.food + this.printInvoiceData.service_total_value + this.printInvoiceData.accessory_total_value) - this.foodDiscount;
                 }
 
 
