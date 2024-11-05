@@ -191,6 +191,7 @@ class EntityRepository implements EntityRepositoryInterface
             $invoice->package;
             if ($invoice) {
                 //service
+                $entitySession['invoice']=$invoice;
                 $invoiceServices = $invoice->invoiceService;
                 foreach ($invoiceServices as $invoiceService) {
                     $this->invoiceModelService->calculateInvoiceService($invoiceService, now());
