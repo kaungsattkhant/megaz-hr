@@ -244,6 +244,7 @@ class EntityRepository implements EntityRepositoryInterface
             $entitySession['services'] = $invoiceServiceCollection;
             $entitySession['invoice_accessories'] = $invoiceAccessories;
             $entitySession['total_service_value'] = $total_service_value;
+            $entitySession['total_accessory_value'] = $total_accessory_value;
             //service add response
             return $entitySession;
         }
