@@ -11,6 +11,7 @@ Route::middleware('auth:api')->group(function () {
         Route::get('trial_balance', 'TrialBalance');
         Route::get('inventory_schedule', 'getInventorySchedule');
         // Route::get('profit_and_loss', 'getProfitAndLoss');
+        Route::get('working_capital', 'getWorkingCapital');
     });
 });
 Route::controller(FinancialReportController::class)->group(function () {

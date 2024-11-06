@@ -750,6 +750,10 @@ class FinancialRepository implements FinancialInterface
         //groupBy category_id and item type
     }
 
+    public function getWorkingCapital($request){
+        dd('abc');
+    }
+
     protected function getSum($data)
     {
         $sum = 0;
