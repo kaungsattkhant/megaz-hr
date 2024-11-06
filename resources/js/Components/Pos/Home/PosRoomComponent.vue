@@ -193,11 +193,11 @@
                                     <i class="far fa-hourglass-half"></i>
                                 </button>
                                 <button class="transition duration-150 ease-in-out focus:outline-none focus:ring-0"
-                                    data-te-toggle="modal" data-te-target="#add_accessory_modal">
+                                    data-te-toggle="modal" data-te-target="#add_accessory_modal_room">
                                     <i class="far fa-plus-circle"></i>
                                 </button>
                                 <button class="transition duration-150 ease-in-out focus:outline-none focus:ring-0"
-                                    data-te-toggle="modal" data-te-target="#add_service_modal">
+                                    data-te-toggle="modal" data-te-target="#add_service_modal_room">
                                     <i class="far fa-user-music"></i>
                                 </button>
                             </div>
@@ -275,6 +275,7 @@
                                     </div>
                                 </div>
                             </div>
+                                <!-- services -->
                             <div class="padding-section border-b    " v-if="serviceList.length > 0">
                                 <div class="flex justify-between font-semibold mb-3">
                                     <p class="px-2 py-0.5 bg-[#F19E51] text-white text-xs w-fit">
@@ -287,7 +288,7 @@
                                 <div class=" grid grid-cols-10 gap-x-2 gap-y-3">
                                     <div class="contents" v-for="(service,index) in serviceList" :key="index" :class="service.is_active == 1 ? 'text-black' : 'text-gray-400'">
                                         <div class=" col-span-3 text-sm">
-                                            <button  data-te-toggle="modal" data-te-target="#service_end_modal" @click="btnClickedEndService(service)">
+                                            <button  data-te-toggle="modal" data-te-target="#service_end_modal_room" @click="btnClickedEndService(service)">
                                                 {{ service.service.name ? service.service.name : service.service.staff.name }}
                                             </button>
                                         </div>
@@ -324,7 +325,7 @@
                                 </div>
                             </div>
 
-
+                                <!-- accessories -->
                             <div class="padding-section border-b    " v-if="accessoryListSidebar.length > 0">
                                 <div class="flex justify-between font-semibold mb-3">
                                     <p class="px-2 py-0.5 bg-[#F19E51] text-white text-xs w-fit">
@@ -928,7 +929,7 @@
             <!-- add Service modal -->
         <div data-te-modal-init
             class="fixed left-0 top-0 z-[1055] hidden h-full w-full overflow-y-auto overflow-x-hidden outline-none"
-            id="add_service_modal" tabindex="-1" aria-labelledby="addMenuModalLabel" aria-modal="true" role="dialog">
+            id="add_service_modal_room" tabindex="-1" aria-labelledby="addMenuModalLabel" aria-modal="true" role="dialog">
             <div data-te-modal-dialog-ref
                 class="pointer-events-none relative flex min-h-[calc(100%-1rem)] w-auto translate-y-[-50px] items-center opacity-0 transition-all duration-300 ease-in-out min-[576px]:mx-auto min-[576px]:mt-7 min-[576px]:min-h-[calc(100%-3.5rem)] min-[576px]:max-w-[500px]">
                 <div
@@ -937,7 +938,7 @@
                         <p class="text-xl w-full text-center">
                             Add Service
                         </p>
-                        <button type="button" id="closeServiceModal"
+                        <button type="button" id="closeServiceModalRoom"
                             class="absolute top-4 right-4 focus:shadow-none focus:outline-none" data-te-modal-dismiss
                             aria-label="Close">
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
@@ -1006,7 +1007,7 @@
             <!-- end Service modal -->
         <div data-te-modal-init
             class="fixed left-0 top-0 z-[1055] hidden h-full w-full overflow-y-auto overflow-x-hidden outline-none"
-            id="service_end_modal" tabindex="-1" aria-labelledby="addMenuModalLabel" aria-modal="true" role="dialog">
+            id="service_end_modal_room" tabindex="-1" aria-labelledby="addMenuModalLabel" aria-modal="true" role="dialog">
             <div data-te-modal-dialog-ref
                 class="pointer-events-none relative flex min-h-[calc(100%-1rem)] w-auto translate-y-[-50px] items-center opacity-0 transition-all duration-300 ease-in-out min-[576px]:mx-auto min-[576px]:mt-7 min-[576px]:min-h-[calc(100%-3.5rem)] min-[576px]:max-w-[500px]">
                 <div
@@ -1015,7 +1016,7 @@
                         <p class="text-xl w-full text-center">
                             End Service
                         </p>
-                        <button type="button" id="closeEndServiceModal"
+                        <button type="button" id="closeEndServiceModalRoom"
                             class="absolute top-4 right-4 focus:shadow-none focus:outline-none" data-te-modal-dismiss
                             aria-label="Close">
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
@@ -1931,7 +1932,7 @@
                 let response = await postApiData({ url: '/api/entities/orders', form_data: formData, token: this.getToken() });
                 // console.log(this.invoiceId+','+this.selectedMenu.id + ','+ this.menuQuantity +','+this.selectedMenu.prices[0].price)
                 if (response.success) {
-                    this.closeModal('closeMenuModal');
+                    this.closeModal('closeAddMenuModal');
                     this.clearMenuForm();
                     this.getPurchaseMenuList();
                 }
@@ -1968,7 +1969,7 @@
             },
             async changeRoom() {
                 let formData = new FormData();
-                formData.append('invoice_id', this.selectedRoom.room_sessions[0].invoice.invoice_id);
+                formData.append('invoice_id', this.selectedRoom.room_sessions[0].invoice.id);
                 formData.append('entity_id', this.change_room.id);
                 let response = await postApiData({ url: '/api/entities/change', form_data: formData, token: this.getToken() });
                 console.log('change room ' + this.selectedRoom.room_sessions[0].invoice.invoice_id + ',' + this.change_room.id)
@@ -1989,7 +1990,7 @@
                 this.getChangeableRoomList();
             },
             async getChangeableRoomList() {
-                const response = await getApiData({ url: '/api/areas/' + this.areaId + '/inactive_entities', token: this.getToken() });
+                const response = await getApiData({ url: '/api/areas/' + this.roomAreaId + '/inactive_entities', token: this.getToken() });
                 if (response.data) {
                     this.changeableRoomList = response.data;
                 }
@@ -2039,7 +2040,7 @@
                 let response = await postApiData({ url: '/api/entities/add_service', form_data: formData, token: this.getToken() });
                 // console.log(this.invoiceId+','+this.selectedMenu.id + ','+ this.menuQuantity +','+this.selectedMenu.prices[0].price)
                 if (response.success) {
-                    this.closeModal('closeServiceModal');
+                    this.closeModal('closeServiceModalRoom');
                     this.clearServiceForm();
                     this.getSelectedRoom();
                 }
@@ -2061,7 +2062,7 @@
                 formData.append('end_date', this.selectedServiceEndTime);
                 let response = await postApiData({ url: '/api/entities/end_service', form_data: formData, token: this.getToken() });
                 if (response.success) {
-                    this.closeModal('closeEndServiceModal');
+                    this.closeModal('closeEndServiceModalRoom');
                     this.selectedServiceEndTime = null;
                     this.getSelectedRoom();
                 }
@@ -2139,7 +2140,7 @@
                 this.selectedDj = null
                 this.selectedServiceQuantity = null
             },
-            clearServiceForm() {
+            clearAccessoryForm() {
                 this.selectedAccessoryCategory = null
                 this.selectedAccessory = null
                 this.selectedAccessoryQuantity = null
@@ -2225,9 +2226,9 @@
         },
         mounted()
         {
-            if (this.roomAreaId) {
-                this.getRoomList(this.roomAreaId);
-            }
+            // if (this.roomAreaId) {
+            //     this.getRoomList(this.roomAreaId);
+            // }
             initTE({ Modal, Select, Ripple, Datepicker });
         }
     }

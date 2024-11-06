@@ -523,48 +523,48 @@ export default {
         },
 
         async addItemBtnClicked() {
-            // if(!this.selectedItem){
-            //     this.alertValidationMessage('am item');
-            //     return 1;
-            // }
-            // if (!this.weight) {
-            //     this.alertValiationMessage('weight');
-            //     return 1;
-            // }
-            // if(!this.selectedUom){
-            //     this.alertValiationMessage('UOM');
-            //     return 1;
-            // }
+            if(!this.selectedItem){
+                this.alertValidationMessage('am item');
+                return 1;
+            }
+            if (!this.weight) {
+                this.alertValiationMessage('weight');
+                return 1;
+            }
+            if(!this.selectedUom){
+                this.alertValiationMessage('UOM');
+                return 1;
+            }
 
-            // let url = `/api/get_uom_conversion_by_uom?po_uom_id=${this.selectedUom.id}&item_uom_id=${this.selectedItem.item_prices.uom_id}&item_price=${this.selectedItem.item_prices.price}&base_uom_id=${this.selectedItem.base_uom_id}`;
-            // let response = await getApiData({url: url, token: this.getToken()});
+            let url = `/api/get_uom_conversion_by_uom?po_uom_id=${this.selectedUom.id}&item_uom_id=${this.selectedItem.item_prices.uom_id}&item_price=${this.selectedItem.item_prices.price}&base_uom_id=${this.selectedItem.base_uom_id}`;
+            let response = await getApiData({url: url, token: this.getToken()});
             let uomConversion = null;
             let amount = 0;
             let price = 0;
-            // if(response.data){
-            //     uomConversion = response.data;
-            //     amount = parseInt(response.data.price);
-            //     price = this.weight * amount;
+            if(response.data){
+                uomConversion = response.data;
+                amount = parseInt(response.data.price);
+                price = this.weight * amount;
 
-            //     this.$notify({
-            //         text: `Uom conversion by uom value ${amount}`,
-            //         type: 'info'
-            //     });
-            // }
-            // else{
-            //     this.$notify({
-            //         title: 'Error',
-            //         text: response.message,
-            //         type: 'error'
-            //     });
+                this.$notify({
+                    text: `Uom conversion by uom value ${amount}`,
+                    type: 'info'
+                });
+            }
+            else{
+                this.$notify({
+                    title: 'Error',
+                    text: response.message,
+                    type: 'error'
+                });
 
-            //     return 1;
-            // }
+                return 1;
+            }
 
             this.ingredientItems.push({
                 item_id: this.selectedItem.id,
-                // price: price,
-                price: this.selectedItem.item_prices.price,
+                price: price,
+                // price: this.selectedItem.item_prices.price,
                 name: this.selectedItem.name,
                 quantity: this.weight,
                 // is_make_pack: this.isMakePack,
@@ -584,6 +584,7 @@ export default {
                 let response = await deleteApiData({ url: '/api/accessory_item/' + this.ingredientItems[ingredientIndex].id, token: this.getToken() });
                 if (response.success) {
                     alert(`deleted`);
+                    this.ingredientItems.splice(ingredientIndex, 1);
                 }
             }
             else{

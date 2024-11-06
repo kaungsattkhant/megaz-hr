@@ -156,6 +156,14 @@
                                     data-te-toggle="modal" data-te-target="#add_menu_table_modal">
                                     <i class="far fa-cocktail"></i>
                                 </button>
+                                <button class="transition duration-150 ease-in-out focus:outline-none focus:ring-0"
+                                    data-te-toggle="modal" data-te-target="#add_accessory_modal">
+                                    <i class="far fa-plus-circle"></i>
+                                </button>
+                                <button class="transition duration-150 ease-in-out focus:outline-none focus:ring-0"
+                                    data-te-toggle="modal" data-te-target="#add_service_modal">
+                                    <i class="far fa-user-music"></i>
+                                </button>
                                 <!-- <button class="transition duration-150 ease-in-out focus:outline-none focus:ring-0"
                                     data-te-toggle="modal" data-te-target="#add_hour_modal">
                                     <i class="far fa-hourglass-half"></i>
@@ -235,30 +243,60 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="padding-section border-b    ">
+                                <!-- services -->
+                            <div class="padding-section border-b" v-if="serviceList.length > 0">
                                 <div class="flex justify-between font-semibold mb-3">
                                     <p class="px-2 py-0.5 bg-[#F19E51] text-white text-xs w-fit">
-                                        Services
+                                            Services
                                     </p>
                                     <p class="text-sm text-black font-semibold">
-                                        35,000 MMks
+                                            {{ selectedRoom.total_service_value.toLocaleString() }} MMks
                                     </p>
                                 </div>
-                                <div class=" flex justify-between">
-                                    <div class="block">
-                                        <p class="text-sm">
-                                            Service 1
+                                <div class=" grid grid-cols-10 gap-x-2 gap-y-3">
+                                    <div class="contents" v-for="(service,index) in serviceList" :key="index" :class="service.is_active == 1 ? 'text-black' : 'text-gray-400'">
+                                        <div class=" col-span-3 text-sm">
+                                            <button  data-te-toggle="modal" data-te-target="#service_end_modal" @click="btnClickedEndService(service)">
+                                                {{ service.service.name ? service.service.name : service.service.staff.name }}
+                                            </button>
+                                        </div>
+                                            <!-- <p class=" col-span-3 text-sm" v-else>
+                                                {{ service.service.staff.name }}
+                                            </p> -->
+                                        <p class=" col-span-3 text-center text-sm">
+                                            {{ service.minutes }}
                                         </p>
-                                        <p class="text-sm text-right">
-                                            12,000 MMKs
+                                            <!-- <p :class="menu2.status == 'done' ? 'text-green-600 font-semibold' : 'text-gray-500'"
+                                                class=" col-span-2 text-center text-xs pt-0.5">
+                                                {{ menu2.status }}
+                                            </p> -->
+                                        <p class=" col-span-4 text-sm text-right">
+                                            {{ service.service_value.toLocaleString() }} MMKs
                                         </p>
                                     </div>
-                                    <div class="block">
-                                        <p class="text-sm">
-                                            Service 1
+                                </div>
+                            </div>
+    
+                                    <!-- accessories -->
+                            <div class="padding-section border-b    " v-if="accessoryListSidebar.length > 0">
+                                <div class="flex justify-between font-semibold mb-3">
+                                    <p class="px-2 py-0.5 bg-[#F19E51] text-white text-xs w-fit">
+                                        Accessories
+                                    </p>
+                                    <p class="text-sm text-black font-semibold">
+                                        {{ selectedRoom.total_accessory_value.toLocaleString() }} MMks
+                                    </p>
+                                </div>
+                                <div class=" grid grid-cols-10 gap-x-2 gap-y-3">
+                                    <div class="contents" v-for="(accessory,index) in accessoryListSidebar" :key="index">
+                                        <div class=" col-span-3 text-sm">
+                                            {{ accessory.accessory.name }}
+                                        </div>
+                                        <p class=" col-span-3 text-center text-sm">
+                                            {{ accessory.quantity }}
                                         </p>
-                                        <p class="text-sm text-right">
-                                            12,000 MMKs
+                                        <p class=" col-span-4 text-sm text-right">
+                                            {{ accessory.accessory.accessory_price.price.toLocaleString() }} MMKs
                                         </p>
                                     </div>
                                 </div>
@@ -765,6 +803,186 @@
         </div>
 
 
+            <!-- add Service modal -->
+        <div data-te-modal-init
+            class="fixed left-0 top-0 z-[1055] hidden h-full w-full overflow-y-auto overflow-x-hidden outline-none"
+            id="add_service_modal" tabindex="-1" aria-labelledby="addMenuModalLabel" aria-modal="true" role="dialog">
+            <div data-te-modal-dialog-ref
+                class="pointer-events-none relative flex min-h-[calc(100%-1rem)] w-auto translate-y-[-50px] items-center opacity-0 transition-all duration-300 ease-in-out min-[576px]:mx-auto min-[576px]:mt-7 min-[576px]:min-h-[calc(100%-3.5rem)] min-[576px]:max-w-[500px]">
+                <div
+                    class="pointer-events-auto relative flex w-full flex-col rounded-md border-none bg-white bg-clip-padding text-current shadow-lg outline-none">
+                    <div class="relative  p-4">
+                        <p class="text-xl w-full text-center">
+                            Add Service
+                        </p>
+                        <button type="button" id="closeServiceModal"
+                            class="absolute top-4 right-4 focus:shadow-none focus:outline-none" data-te-modal-dismiss
+                            aria-label="Close">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                                stroke="currentColor" class="h-5 w-5">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                        </button>
+                    </div>
+
+                    <div class="relative px-16 py-4" data-te-modal-body-ref>
+                        <div class="mb-4">
+                            <label for="" class="label-form mb-3">
+                                Service Category
+                            </label>
+                            <select name="" id="" v-model="selectedServiceCategory" class="input-ui" @change="serviceCategoryChange()">
+                                <option :value="service" v-for="(service, index) in serviceCategoryList"
+                                    :key="index">{{
+                                        service.name }}</option>
+                            </select>
+                        </div>
+                        <div class="mb-4" v-if="selectedServiceCategory ? selectedServiceCategory.name == 'Lady' : ''">
+                            <label for="" class="label-form mb-3">
+                                Lady
+                            </label>
+                            <select name="" id="" v-model="selectedLady" class="input-ui">
+                                <option :value="lady" v-for="(lady, index) in ladyList"
+                                    :key="index">{{
+                                        lady.staff.name }}</option>
+                            </select>
+                        </div>
+                        <div class="mb-4" v-if="selectedServiceCategory ? selectedServiceCategory.name == 'DJ' : ''">
+                            <label for="" class="label-form mb-3">
+                                DJ
+                            </label>
+                            <select name="" id="" v-model="selectedDj" class="input-ui">
+                                <option :value="dj" v-for="(dj, index) in djList"
+                                    :key="index">{{
+                                        dj.name }}</option>
+                            </select>
+                        </div>
+                        <div class="mb-4">
+                            <label for="" class="label-form mb-3">
+                                Start Date
+                            </label>
+                            <input type="datetime-local" placeholder="Qty" v-model="selectedServiceStartTime"
+                                class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
+                        </div>
+                        <div class="mb-4">
+                            <label for="" class="block text-sm text-black mb-3">
+                                Remark
+                            </label>
+                            <textarea v-model="serviceRemark"
+                                class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0"
+                                name="" id="" cols="30" rows="10" placeholder="Remark"></textarea>
+                        </div>
+                    </div>
+
+                    <div class="flex justify-center px-12 mb-6">
+                        <button @click="btnConfirmAddService()" class="pos-add-btn focus:outline-none focus:ring-0 ">
+                            Add Service
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+            <!-- end Service modal -->
+        <div data-te-modal-init
+            class="fixed left-0 top-0 z-[1055] hidden h-full w-full overflow-y-auto overflow-x-hidden outline-none"
+            id="service_end_modal" tabindex="-1" aria-labelledby="addMenuModalLabel" aria-modal="true" role="dialog">
+            <div data-te-modal-dialog-ref
+                class="pointer-events-none relative flex min-h-[calc(100%-1rem)] w-auto translate-y-[-50px] items-center opacity-0 transition-all duration-300 ease-in-out min-[576px]:mx-auto min-[576px]:mt-7 min-[576px]:min-h-[calc(100%-3.5rem)] min-[576px]:max-w-[500px]">
+                <div
+                    class="pointer-events-auto relative flex w-full flex-col rounded-md border-none bg-white bg-clip-padding text-current shadow-lg outline-none">
+                    <div class="relative  p-4">
+                        <p class="text-xl w-full text-center">
+                            End Service
+                        </p>
+                        <button type="button" id="closeEndServiceModal"
+                            class="absolute top-4 right-4 focus:shadow-none focus:outline-none" data-te-modal-dismiss
+                            aria-label="Close">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                                stroke="currentColor" class="h-5 w-5">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                        </button>
+                    </div>
+
+                    <div class="relative px-16 py-4" data-te-modal-body-ref>
+                        <div class="mb-4">
+                            <label for="" class="label-form mb-3">
+                                End Date
+                            </label>
+                            <input type="datetime-local" placeholder="End Date" v-model="selectedServiceEndTime"
+                                class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
+                        </div>
+                    </div>
+
+                    <div class="flex justify-center px-12 mb-6">
+                        <button @click="btnConfirmEndService()" class="pos-add-btn focus:outline-none focus:ring-0 ">
+                            End Service
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+            <!-- add accessory modal -->
+        <div data-te-modal-init
+            class="fixed left-0 top-0 z-[1055] hidden h-full w-full overflow-y-auto overflow-x-hidden outline-none"
+            id="add_accessory_modal" tabindex="-1" aria-labelledby="addAccessoryModalLabel" aria-modal="true" role="dialog">
+            <div data-te-modal-dialog-ref
+                class="pointer-events-none relative flex min-h-[calc(100%-1rem)] w-auto translate-y-[-50px] items-center opacity-0 transition-all duration-300 ease-in-out min-[576px]:mx-auto min-[576px]:mt-7 min-[576px]:min-h-[calc(100%-3.5rem)] min-[576px]:max-w-[500px]">
+                <div
+                    class="pointer-events-auto relative flex w-full flex-col rounded-md border-none bg-white bg-clip-padding text-current shadow-lg outline-none">
+                    <div class="relative  p-4">
+                        <p class="text-xl w-full text-center">
+                            Add Accessory
+                        </p>
+                        <button type="button" id="closeAccessoryModal"
+                            class="absolute top-4 right-4 focus:shadow-none focus:outline-none" data-te-modal-dismiss
+                            aria-label="Close">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                                stroke="currentColor" class="h-5 w-5">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                        </button>
+                    </div>
+
+                    <div class="relative px-16 py-4" data-te-modal-body-ref>
+                        <div class="mb-4">
+                            <label for="" class="label-form mb-3">
+                                Accessory Category
+                            </label>
+                            <select name="" id="" v-model="selectedAccessoryCategory" class="input-ui" @change="accessoryCategoryChange()">
+                                <option :value="accessory" v-for="(accessory, index) in accessoryCategoryList"
+                                    :key="index">{{
+                                        accessory.name }}</option>
+                            </select>
+                        </div>
+                        <div class="mb-4">
+                            <label for="" class="label-form mb-3">
+                                Accessory
+                            </label>
+                            <select name="" id="" v-model="selectedAccessory" class="input-ui">
+                                <option :value="accessory" v-for="(accessory, index) in accessoryList"
+                                    :key="index">
+                                    {{ accessory.name }}</option>
+                            </select>
+                        </div>
+                        <div class="mb-4">
+                            <label for="" class="label-form mb-3">
+                                Quantity
+                            </label>
+                            <input type="number" v-model="selectedAccessoryQuantity" class="input-ui mb-2">
+                        </div>
+                    </div>
+
+                    <div class="flex justify-center px-12 mb-6">
+                        <button @click="btnConfirmAddAccessory()" class="pos-add-btn focus:outline-none focus:ring-0 ">
+                            Add Service
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
 
 
     </div>
@@ -900,6 +1118,33 @@
                 authUser:null,
                 isCashier :false,
 
+                // add service
+                serviceCategoryList:[],
+                ladyList:[],
+                djList:[],
+
+                selectedServiceCategory:null,
+                selectedLady:null,
+                selectedDj:null,
+                selectedServiceQuantity:null,
+                serviceRemark:null,
+                selectedServiceStartTime:null,
+                serviceEnd :null,
+                selectedServiceEndTime:null,
+                serviceList:[], // use in right sidebar
+
+                serviceEndDate:null,
+
+
+                // add accessory
+                accessoryListSidebar:[],
+                accessoryCategoryList:[],
+                accessoryList:[],
+
+                selectedAccessoryCategory:null,
+                selectedAccessory:null,
+                selectedAccessoryQuantity:null,
+
 
                 currentTime: getCurretDateTime(),
                 isShowSidebar:false,
@@ -928,6 +1173,8 @@
                     if (response.data) {
                         this.selectedRoom = response.data;
                         this.purchaseMenuList = response.data.room_sessions.latest_invoice.orders
+                        // this.serviceList = response.data.services;
+                        // this.accessoryListSidebar = response.data.invoice_accessories;
                     }
                 }
                 else {
@@ -1523,6 +1770,127 @@
                     this.changeableRoomList = response.data;
                 }
             },
+
+
+            // add service
+            // api/get_service?service_category_id=1&area_id=3 dj list
+            async getServiceCategoryList() {
+                const response = await getApiData({ url: '/api/service_categories', token: this.getToken() });
+                if (response.data) {
+                    this.serviceCategoryList = response.data;
+                }
+            },
+            async getLadyList(){
+                const response = await getApiData({ url: '/api/staff_by_department_slug/entertainment', token: this.getToken() });
+                if (response.data) {
+                    this.ladyList = response.data;
+                }
+            },
+            async serviceCategoryChange(){
+                const response = await getApiData({ url: '/api/get_service?service_category_id=' + this.selectedServiceCategory.id + '&area_id=' + this.tableAreaId, token: this.getToken() });
+                if (response.data) {
+                    if(this.selectedServiceCategory.name == 'DJ'){
+                        this.djList = response.data;
+                    }
+                    else{
+                        this.ladyList = response.data;
+                    }
+                    
+                }
+            },
+            btnConfirmAddService() {
+                console.log('add services')
+                this.addService();
+            },
+            async addService() {   // invoice pay yan
+                let formData = new FormData();
+                formData.append('invoice_id', this.selectedRoom.room_sessions.latest_invoice.id);
+                // formData.append('invoice_id', this.selectedServiceCategory);
+                if(this.selectedServiceCategory.name == 'Lady'){
+                    formData.append('service_id', this.selectedLady.id);
+                }
+                if(this.selectedServiceCategory.name == 'DJ'){
+                    formData.append('service_id', this.selectedDj.id);
+                }
+                formData.append('start_date', this.selectedServiceStartTime);
+                formData.append('remark', this.serviceRemark);
+                let response = await postApiData({ url: '/api/entities/add_service', form_data: formData, token: this.getToken() });
+                // console.log(this.invoiceId+','+this.selectedMenu.id + ','+ this.menuQuantity +','+this.selectedMenu.prices[0].price)
+                if (response.success) {
+                    this.closeModal('closeServiceModal');
+                    this.clearServiceForm();
+                    this.getSelectedRoom();
+                }
+                else {
+                    this.$notify({
+                        title: `Input validation`,
+                        text: response.message,
+                        type: "warn"
+                    });
+                }
+            },
+            btnClickedEndService(service){
+                this.serviceEnd = service;
+            },  
+            async btnConfirmEndService(){
+                let formData = new FormData();
+                formData.append('invoice_service_id', this.serviceEnd.id);
+                formData.append('invoice_id', this.serviceEnd.invoice_id);
+                formData.append('end_date', this.selectedServiceEndTime);
+                let response = await postApiData({ url: '/api/entities/end_service', form_data: formData, token: this.getToken() });
+                if (response.success) {
+                    this.closeModal('closeEndServiceModal');
+                    this.selectedServiceEndTime = null;
+                    this.getSelectedRoom();
+                }
+                else {
+                    this.$notify({
+                        title: `Input validation`,
+                        text: response.message,
+                        type: "warn"
+                    });
+                }
+            },
+
+
+            // add accessory
+            async getAccessoryCategoryList() {
+                const response = await getApiData({ url: '/api/pos/get_accessory_category', token: this.getToken() });
+                if (response.data) {
+                    this.accessoryCategoryList = response.data;
+                }
+            },
+            async accessoryCategoryChange(){ //get accessory list
+                const response = await getApiData({ url: '/api/pos/accessory_by_category/'+ this.selectedAccessoryCategory.id, token: this.getToken() });
+                if (response.data) {
+                    this.accessoryList = response.data;
+                }
+            },
+            btnConfirmAddAccessory() {
+                this.addAccessory();
+            },
+            async addAccessory() {   // invoice pay yan
+                let formData = new FormData();
+                formData.append('invoice_id', this.selectedRoom.room_sessions[0].invoice.id);
+                formData.append('accessory_id', this.selectedAccessory.id);
+                formData.append('quantity', this.selectedAccessoryQuantity);
+                let response = await postApiData({ url: '/api/pos/add_accessory', form_data: formData, token: this.getToken() });
+                // console.log(this.invoiceId+','+this.selectedMenu.id + ','+ this.menuQuantity +','+this.selectedMenu.prices[0].price)
+                if (response.success) {
+                    this.closeModal('closeAccessoryModal');
+                    this.clearAccessoryForm();
+                    this.getSelectedRoom();
+                }
+                else {
+                    this.$notify({
+                        title: `Input validation`,
+                        text: response.message,
+                        type: "warn"
+                    });
+                }
+            },
+
+
             closeModal(modalId) {
                 document.getElementById(modalId).click();
             },
@@ -1547,6 +1915,17 @@
             },
             clearChangeRoomForm() {
                 this.change_room = null
+            },
+            clearServiceForm() {
+                this.selectedServiceCategory = null
+                this.selectedLady = null
+                this.selectedDj = null
+                this.selectedServiceQuantity = null
+            },
+            clearAccessoryForm() {
+                this.selectedAccessoryCategory = null
+                this.selectedAccessory = null
+                this.selectedAccessoryQuantity = null
             },
             clearOpenRoomForm() {
                 this.selectedCustomer = null
@@ -1602,12 +1981,17 @@
             this.getMenuList();
             // this.getDivisionList();
             this.getPackageList(this.currentTime);
+
+            this.getServiceCategoryList();
+            this.getLadyList();
+
+            this.getAccessoryCategoryList();
         },
         mounted()
         {
-            if (this.tableAreaId) {
-                this.getTableList(this.tableAreaId);
-            }
+            // if (this.tableAreaId) {
+            //     this.getTableList(this.tableAreaId);
+            // }
             initTE({ Modal, Select, Ripple, Datepicker });
         }
     }
