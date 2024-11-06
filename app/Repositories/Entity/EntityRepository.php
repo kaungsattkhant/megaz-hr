@@ -48,12 +48,23 @@ class EntityRepository implements EntityRepositoryInterface
     {
         $area = Area::find($data['area_id']);
 
+        $today = Carbon::today()->format('Y-m-d');
+        $nextDay = Carbon::tomorrow()->format('Y-m-d');
+
         $entities = Entity::where('is_available', 1)
             ->where('area_id', $area->id)
-            ->with('entitySessions.roomSession.invoice')
+            ->with(['entitySessions' => function ($query) {
+                $query->where('start_time', '>=', '10:01:00')
+                    ->orWhereBetween('start_time', ['00:01:00', '05:01:00'])
+                    ->orderByRaw("CASE WHEN start_time >= '10:01:00' THEN 1 ELSE 2 END")
+                    ->orderBy('start_time');
+            }, 'entitySessions.roomSession.invoice'])
             ->get();
 
+
         foreach ($entities as $entity) {
+
+
             if ($entity->entity_type == 'room' && $entity->is_active == 1) {
                 $roomSessions = collect();
                 $startTimes = collect();
@@ -79,6 +90,7 @@ class EntityRepository implements EntityRepositoryInterface
                 })->values(); // Re-index the collection
 
                 $firstStartTime = $startTimes[0];
+
                 $calculatedEndTime = Carbon::parse($firstStartTime)->addHours($totalSessionDuration)->format('Y-m-d H:i:s');
                 $lastEndTime = $endTimes[0];
 
