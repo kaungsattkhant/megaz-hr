@@ -235,8 +235,6 @@ class EntityRepository implements EntityRepositoryInterface
                 }
             }
             // }
-            // dd($total_accessory_value);
-            // $entitySession->roomSession->invoice=$invoice;
             $entitySession['start_date'] = $firstRoomSession->start_date;
             $entitySession['end_date'] = $lastRoomSession->end_date;
             $entitySession['invoice']=$invoice;
