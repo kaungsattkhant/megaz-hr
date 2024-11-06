@@ -40,13 +40,15 @@ class AccessoryRepository implements AccessoryInterface
         try {
             if (!isset($request->id)) {
                 $data['id'] = null;
+              
+            }
+            if(isset($data['image'])){
                 $imageData = $data['image'];
                 $extension = $imageData->getClientOriginalExtension();
                 $hashedName = md5(uniqid() . microtime()) . '.' . $extension;
                 $data['image_path'] = $imageData->storeAs('images/accessory_images', $hashedName, 'public');
                 $data['image_url'] = Storage::url($data['image_path']);
             }
-
             $items = json_decode($request->accessory_items);
             $data['created_by'] = UserData()->id;
             $accessory = Accessory::updateOrCreate(
