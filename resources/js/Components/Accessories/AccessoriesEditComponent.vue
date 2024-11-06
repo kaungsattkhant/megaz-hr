@@ -455,7 +455,7 @@ export default {
             this.code = detail.code;
             this.price = detail.accessory_price.price;
             this.accessoriesCategoryId = detail.accessory_category_id;
-            this.selectedImage = detail.image_url;
+            // this.selectedImage = detail.image_url;
             // this.accessoriesCategoryId = this.accessoriesCategoryList.find(x => x.id === detail.accessory_category_id)
             detail.accessory_items.forEach((item)=>{
                 this.ingredientItems.push({
@@ -610,10 +610,10 @@ export default {
                 this.alertValiationMessage(`accessories items`);
                 return 1;
             }
-            else if(!this.selectedImage){
-                this.alertValiationMessage(`accessories image`);
-                return 1;
-            }
+            // else if(!this.selectedImage){
+            //     this.alertValiationMessage(`accessories image`);
+            //     return 1;
+            // }
             
             else {
                 let accessoriesItems = JSON.stringify(this.ingredientItems);
@@ -624,8 +624,13 @@ export default {
                 // formData.append('is_feature', (this.isFeatured)?1:0);
                 formData.append('price', this.price);
                 formData.append('accessory_items', accessoriesItems);
-                formData.append('image',this.selectedImage);
+                // formData.append('image',this.selectedImage);
                 formData.append('code',this.code);
+                if(this.selectedImage)
+                {
+                    formData.append('image',this.selectedImage);
+                }
+
                 // formData.append('description',this.description);
                 let response = await postApiData({ url: `/api/accessories`, form_data: formData, token: this.getToken() });
                 if (response.success) {
