@@ -470,8 +470,7 @@ export default {
                     uom_name: item.uom.name
                 });
                 console.log('push')
-            });
-            
+            });           
 
             this.updateItemPriceTotal(this.ingredientItems);
         },
@@ -618,6 +617,7 @@ export default {
             else {
                 let accessoriesItems = JSON.stringify(this.ingredientItems);
                 let formData = new FormData();
+                formData.append('id', this.accessoriesDetail.id);
                 formData.append('accessory_category_id', this.accessoriesCategoryId);
                 formData.append('name', this.name);
                 // formData.append('is_feature', (this.isFeatured)?1:0);
