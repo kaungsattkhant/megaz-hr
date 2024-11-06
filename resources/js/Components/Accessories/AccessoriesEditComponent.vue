@@ -455,6 +455,7 @@ export default {
             this.code = detail.code;
             this.price = detail.accessory_price.price;
             this.accessoriesCategoryId = detail.accessory_category_id;
+            this.selectedImage = detail.image_url;
             // this.accessoriesCategoryId = this.accessoriesCategoryList.find(x => x.id === detail.accessory_category_id)
             detail.accessory_items.forEach((item)=>{
                 this.ingredientItems.push({
