@@ -74,7 +74,7 @@ class AccessoryRepository implements AccessoryInterface
         }
     }
 
-    public function deletAccessoryItem($id)
+    public function deleteAccessoryItem($id)
     {
         $accessory_item = AccessoryItem::find($id);
         if ($accessory_item) {

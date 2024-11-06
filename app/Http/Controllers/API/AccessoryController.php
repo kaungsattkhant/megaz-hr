@@ -36,8 +36,8 @@ class AccessoryController extends Controller
         ResponseData($accessoryCategories);
     }
 
-     public function deletAccessoryItem($id): void{
-        $this->accessoryRepo->deletAccessoryItem($id);
+     public function deleteAccessoryItem($id): void{
+        $this->accessoryRepo->deleteAccessoryItem($id);
      }
 
      public function getAccessoryByCategory($accessory_category_id){
