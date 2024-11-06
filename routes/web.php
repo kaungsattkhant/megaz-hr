@@ -286,4 +286,5 @@ Route::view('/menu_costing', 'menu_costing.index')->name('menu_costing.index');
 
 Route::view('/pos_order_items','pos.orderItem.index');
 Route::view('/accessories/create','accessories.create');
+Route::view('/accessories/{id}/edit','accessories.edit');
 Route::view('/accessories','accessories.index');

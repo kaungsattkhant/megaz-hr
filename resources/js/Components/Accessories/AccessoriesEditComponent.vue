@@ -2,7 +2,7 @@
     <div class="px-0">
         <div class="mb-4 ">
             <p class="text-lg font-semibold font-inter pt-4 pl-1">
-                Add Accessories
+                Edit Accessories
             </p>
         </div>
 
@@ -362,7 +362,7 @@
 
 <script>
 import { Modal, Ripple, initTE, Tab, Select } from "tw-elements";
-import { getApiData, postApiData } from '../../utilities/ajax-helpers';
+import { getApiData, postApiData, deleteApiData } from '../../utilities/ajax-helpers';
 import { mapGetters } from "vuex";
 import Multiselect from 'vue-multiselect';
 
@@ -370,8 +370,11 @@ export default {
     components: {
         Multiselect
     },
+    props: ["accessoriesId"],
     data() {
         return {
+            accessoriesDetail:null, 
+
             accessoriesCategoryList: [],
             itemCategoryList: [],
             itemList: [],
@@ -418,13 +421,6 @@ export default {
             });
         },
 
-        // async getCookingAreaList(departmentId) {
-        //     let response = await getApiData({ url: `/api/areas?department_id=${departmentId}`, token: this.getToken() });
-        //     if (response.data) {
-        //         this.areaList = response.data;
-        //     }
-        // },
-
         updateItemPriceTotal(items){
             this.ingredientItemPriceTotal = 0;
             items.forEach((item)=>{
@@ -447,6 +443,38 @@ export default {
             this.selectedImage = selectedFile;
         },
 
+        async getAccessoriesDetail() {
+            let response = await getApiData({ url: `/api/accessories/`+this.accessoriesId, token: this.getToken() });
+            if (response.data) {
+                this.accessoriesDetail = response.data;
+                this.showData(response.data)
+            }
+        },
+        showData(detail){
+            this.name = detail.name;
+            this.code = detail.code;
+            this.price = detail.accessory_price.price;
+            this.accessoriesCategoryId = detail.accessory_category_id;
+            // this.accessoriesCategoryId = this.accessoriesCategoryList.find(x => x.id === detail.accessory_category_id)
+            detail.accessory_items.forEach((item)=>{
+                this.ingredientItems.push({
+                    is_detail:1,
+                    id: item.id,
+                    item_id: item.item_id,
+                    // price: price,
+                    price: item.price,
+                    name: item.item.name,
+                    quantity: item.quantity,
+                    // is_make_pack: this.isMakePack,
+                    uom_id: item.uom_id,
+                    uom_name: item.uom.name
+                });
+                console.log('push')
+            });
+            
+
+            this.updateItemPriceTotal(this.ingredientItems);
+        },
         async getAccessoriesCategoryList() {
             let response = await getApiData({ url: `/api/get_accessory_category`, token: this.getToken() });
             if (response.data) {
@@ -469,7 +497,7 @@ export default {
             }
         },
 
-        itemSelectChanged() {
+        itemSelectChanged() { // for uom list 
             this.itemUoms = [];
             let index = this.uomList.findIndex(uom => uom.id == this.selectedItem.base_uom_id);
             if (index != -1) {
@@ -551,8 +579,17 @@ export default {
             this.$refs.is_make_pack.checked = false;
         },
 
-        removeIngredientBtnClicked(ingredientIndex) {
-            this.ingredientItems.splice(ingredientIndex, 1);
+        async removeIngredientBtnClicked(ingredientIndex) {
+            if(this.ingredientItems[ingredientIndex].is_detail == 1){
+                let response = await deleteApiData({ url: '/api/accessory_item/' + this.ingredientItems[ingredientIndex].id, token: this.getToken() });
+                if (response.success) {
+                    alert(`deleted`);
+                }
+            }
+            else{
+                this.ingredientItems.splice(ingredientIndex, 1);
+            }
+            
             this.updateItemPriceTotal(this.ingredientItems);
         },
 
@@ -577,15 +614,8 @@ export default {
                 this.alertValiationMessage(`accessories image`);
                 return 1;
             }
-            // else if(this.selectedAreas.length < 1){
-            //     this.alertValiationMessage(`cooking areas`);
-            //     return 1;
-            // }
+            
             else {
-                // let areaIds = [];
-                // this.selectedAreas.forEach((area)=>{
-                //     areaIds.push(area.id);
-                // });
                 let accessoriesItems = JSON.stringify(this.ingredientItems);
                 let formData = new FormData();
                 formData.append('accessory_category_id', this.accessoriesCategoryId);
@@ -594,15 +624,11 @@ export default {
                 formData.append('price', this.price);
                 formData.append('accessory_items', accessoriesItems);
                 formData.append('image',this.selectedImage);
-                // formData.append('areas',JSON.stringify(areaIds));
                 formData.append('code',this.code);
                 // formData.append('description',this.description);
-
                 let response = await postApiData({ url: `/api/accessories`, form_data: formData, token: this.getToken() });
-
                 if (response.success) {
                     window.location.replace(`/accessories`);
-                    // console.log('success')
                 }
             }
         }
@@ -619,18 +645,10 @@ export default {
     },
 
     async created() {
-        // let response = await getApiData({url: `/api/departments`, token: this.getToken()});
-        // if(response.data){
-        //     response.data.forEach((department)=>{
-        //         if(department.name == `Kitchen`){
-        //             this.departmentId = department.id;
-        //         }
-        //     });
-        // }
         this.getAccessoriesCategoryList();
         this.getItemCategoryList();
         this.getUomList();
-        // this.getCookingAreaList(this.departmentId);
+        this.getAccessoriesDetail();
     },
 
     mounted() {
