@@ -83,6 +83,7 @@ use App\Http\Controllers\API\Customers\MenuAPIController as CustomersMenuAPICont
 use App\Http\Controllers\API\Customers\CustomerAPIController as UserAppCustomerAPIController;
 use App\Http\Controllers\API\Customers\PackageAPIController as CustomersPackageAPIController;
 use App\Http\Controllers\API\Customers\MenuCategoryAPIController as CustomerMenuCategoryAPIController;
+use App\Http\Controllers\API\MaterialRequirementsPlanningAPIController;
 
 /*
 |--------------------------------------------------------------------------
@@ -175,7 +176,6 @@ Route::middleware('auth:api')->group(function () {
         Route::post('/tasks/{id}/add_images', 'addTaskImage');
         Route::get('/tasks/{id}/images', 'getTaskImages');
         Route::delete('/tasks_images/{id}', 'deleteTaskImage');
-
     });
     Route::controller(PurchaseOrderAPIController::class)->group(function () {
         Route::get('/purchase_orders', 'getPurchaseOrder');
@@ -191,7 +191,6 @@ Route::middleware('auth:api')->group(function () {
         Route::post('updateIsCheck', 'updateIsCheck');
         Route::get('/purchase_order_item_confirmation_list', 'getPurchaseOrderItemConfirmationList');
         Route::get('/confirm_purchase_order_item', 'confirmPurchaseOrderItem');
-
     });
     #item usage forecast
     Route::resource('item_usage_forecasts', ItemUsageForecastController::class)->only(['index', 'store', 'show', 'destroy']);
@@ -200,7 +199,6 @@ Route::middleware('auth:api')->group(function () {
         Route::get('/item_usage_forecast_items_by_month', 'itemUsageForecastListByMonth');
         Route::get('/item_usage_forecast_items_with_month/{month}', 'itemUsageForecastListByMonthwithDepartment');
         Route::get('/item_usage_forecast_items_with_month/{month}/department/{department_id}', 'iufWithMonthAndDepartment');
-
     });
     Route::resource('head_accounts', HeadAccountController::class)->only(['index', 'store', 'show', 'destroy']);
     Route::resource('sub_accounts', SubAccountController::class)->only(['index', 'store', 'show', 'destroy']);
@@ -377,8 +375,7 @@ Route::middleware('auth:api')->group(function () {
         Route::get('/duties/{id}', 'dutyDetail');
     });
     Route::resource('canteens', CanteenController::class)->only(['index', 'store', 'show']);
-    Route::controller(CanteenController::class)->group(function () {
-    });
+    Route::controller(CanteenController::class)->group(function () {});
     //service
     Route::resource('services', ServiceController::class)->only(['index', 'store', 'show']);
 
@@ -413,7 +410,6 @@ Route::controller(SaleTargetPositionAPIController::class)->group(function () {
     Route::post('/sale_target_positions', 'createSaleTargetPosition');
     Route::post('/sale_target_positions/{id}', 'updateSaleTargetPosition');
     Route::delete('/sale_target_positions/{id}', 'deleteSaleTargetPosition');
-
 });
 
 Route::controller(SaleTargetMenuAPIController::class)->group(function () {
@@ -422,7 +418,6 @@ Route::controller(SaleTargetMenuAPIController::class)->group(function () {
     Route::post('/sale_target_menus', 'createSaleTargetMenu');
     Route::post('/sale_target_menus/{id}', 'updateSaleTargetMenu');
     Route::delete('/sale_target_menus/{id}', 'deleteSaleTargetMenu');
-
 });
 
 Route::get('/sale_target_results', [SaleTargetResultAPIController::class, 'getSaleTargetResult']);
@@ -605,6 +600,6 @@ Route::controller(DeliveryChargeAPIController::class)->group(function () {
 
 // Route::post('send_notification', [NotificationController::class, 'sendNotification']);
 
-
-
-
+Route::controller(MaterialRequirementsPlanningAPIController::class)->group(function () {
+    Route::apiResource('/mrp', MaterialRequirementsPlanningAPIController::class);
+});

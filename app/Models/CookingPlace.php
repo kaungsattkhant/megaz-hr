@@ -9,8 +9,10 @@ class CookingPlace extends Model
 {
     use HasFactory;
 
-    protected $fillable =[
-        'name','area_id','created_by'
+    protected $fillable = [
+        'name',
+        'area_id',
+        'created_by'
     ];
 
     public function area()
@@ -20,7 +22,11 @@ class CookingPlace extends Model
 
     public function availableCookingPlaces()
     {
-        return $this->hasMany(AvailableCookingPlace::class,'cooking_place_id');
+        return $this->hasMany(AvailableCookingPlace::class, 'cooking_place_id');
     }
 
+    public function menus()
+    {
+        return $this->belongsToMany(Menu::class);
+    }
 }

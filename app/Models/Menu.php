@@ -9,12 +9,22 @@ use App\Models\Item;
 use App\Models\MenuCategory;
 use App\Models\MenuPrice;
 use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Menu extends BaseModel
 {
     use HasFactory;
 
-    protected $fillable = ['code','menu_category_id', 'name', 'is_active', 'image_path', 'image_url', 'is_feature','description'];
+    protected $fillable = [
+        'name',
+        'menu_category_id',
+        'code',
+        'image_url',
+        'image_path',
+        'is_active',
+        'is_feature',
+        'description'
+    ];
 
     public function menu_category()
     {
@@ -54,7 +64,12 @@ class Menu extends BaseModel
 
     public function areas()
     {
-        return $this->belongsToMany(Area::class,'menu_area');
+        return $this->belongsToMany(Area::class, 'menu_area');
+    }
+
+    public function menuPlaces()
+    {
+        return $this->belongsToMany(CookingPlace::class, 'menu_places');
     }
 
     public function availableCookingPlaces()
@@ -62,4 +77,9 @@ class Menu extends BaseModel
         return $this->morphMany(AvailableCookingPlace::class, 'cooking_placeable');
     }
 
+
+    public function menuSteps(): HasMany
+    {
+        return $this->hasMany(MenuStep::class);
+    }
 }
