@@ -134,7 +134,7 @@ class EntityRepository implements EntityRepositoryInterface
                 'roomSessions' => function ($query) {
                     $query->latest()->first();
                 }
-            ])
+            ,'entity'])
             ->find($entitySessionId);
         $invoiceServiceCollection = collect();
         $invoiceAccessoryCollection = collect();

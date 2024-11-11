@@ -805,12 +805,12 @@
                                 <option :value="menu" v-for="(menu, index) in menuList" :key="index">{{ menu.name }}</option>
                             </select> -->
                         </div>
-                        <div class="mb-4">
+                        <!-- <div class="mb-4">
                             <select name="" id="" placeholder="Menu" v-model="selectedMenuArea"
                                 class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
                                 <option :value="area" v-for="(area, index) in menuAreaList" :key="index">{{ area.name }}</option>
                             </select>
-                        </div>
+                        </div> -->
                         <div class="mb-4">
                             <!-- <label for="" class="block text-sm text-black mb-3">
                                 Hour
@@ -862,12 +862,12 @@
                                 <option :value="menu" v-for="(menu, index) in menuList" :key="index">{{ menu.name }}</option>
                             </select>
                         </div>
-                        <div class="mb-4">
+                        <!-- <div class="mb-4">
                             <select name="" id="" placeholder="Menu" v-model="selectedMenuAreaForPackage"
                                 class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
                                 <option :value="area" v-for="(area, index) in menuAreaListForPackage" :key="index">{{ area.name }}</option>
                             </select>
-                        </div>
+                        </div> -->
                         <div class="mb-4">
                             <input type="text" placeholder="Qty" v-model="menuQuantityForPackage"
                                 class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
@@ -1393,12 +1393,12 @@
                     menu_id : this.selectedMenuForPackage.prices[0].menu_id,
                     discount_value: this.is_menu_discount,
                     is_package : 0,
-                    area_id: this.selectedMenuAreaForPackage.id
+                    // area_id: this.selectedMenuAreaForPackage.id
                 });
                 this.food_total_package += (this.selectedMenuForPackage.prices[0].price - this.is_menu_discount) * this.menuQuantityForPackage;
                 this.selectedMenu = null
                 this.menuAreaListForPackage = []
-                this.selectedMenuAreaForPackage = null;
+                // this.selectedMenuAreaForPackage = null;
                 this.menuQuantityForPackage = null;
             },
             removePackageMenu(index){
@@ -1925,7 +1925,7 @@
                 let formData = new FormData();
                 formData.append('invoice_id', this.invoiceId);
                 formData.append('menu_id', this.selectedMenu.id);
-                formData.append('area_id', this.selectedMenuArea.id);
+                // formData.append('area_id', this.selectedMenuArea.id);
                 formData.append('quantity', this.menuQuantity);
                 formData.append('original_price', this.selectedMenu.prices[0].price);
                 formData.append('remark', this.remark);
