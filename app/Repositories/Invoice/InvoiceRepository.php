@@ -831,7 +831,6 @@ class InvoiceRepository implements InvoiceRepositoryInterface
             //     }
             // }
             //end temp
-
             if (isset($data['discount_type'])) {
                 if ($data['discount_type'] == 'room_discount') {
                     $roomDiscount = RoomDiscount::find($data['room_discount_id']);
@@ -961,6 +960,18 @@ class InvoiceRepository implements InvoiceRepositoryInterface
 
     public function doneTableForInvoice($data, $invoice)
     {
+        $total_service_value = 0;
+        $invoiceServices = $invoice->invoiceService;
+        foreach ($invoiceServices as $invoiceService) {
+            $serviceValue = $this->invoiceService->getServiceValue($invoiceService, $data['end_date']);
+            if ($invoiceService->is_active == 1) {
+                $invoiceService->end_date = $data['end_date'];
+                $invoiceService->service_value = $serviceValue;
+                $invoiceService->is_active = 0;
+                $invoiceService->save();
+            }
+            $total_service_value += $serviceValue;
+        }
         $data['discount_value'] = $data['discount_type'] == null || $data['discount_type'] == "null" ? 0 : $data['discount_value'];
         $data['total_discount'] = $data['birthday_discount'] + $data['customer_level_discount'] + $data['discount_value'] + $data['order_discount'];
         ;
