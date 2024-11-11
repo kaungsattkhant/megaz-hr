@@ -613,7 +613,6 @@ class InvoiceRepository implements InvoiceRepositoryInterface
         return $invoice;
     }
 
-
     public function doneRoom(array $data)
     {
         DB::beginTransaction();
