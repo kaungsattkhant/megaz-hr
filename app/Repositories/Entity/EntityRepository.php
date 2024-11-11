@@ -560,7 +560,7 @@ class EntityRepository implements EntityRepositoryInterface
 // ${base_url}entities/change?waiter=1
 // ${base_url}areas/${widget.areaId}/entities?type=room'
 //api/areas/${area_id}/inactive_entities?type=room
-        $data['type'] = 'room';
+        // $data['type'] = 'room';
         $area = Area::find($data['area_id']);
         if (isset($data['type'])) {
             $entities = Entity::where("entity_type", $data['type'])
