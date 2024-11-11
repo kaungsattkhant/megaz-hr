@@ -11,7 +11,7 @@ class InvoiceService extends Model
 {
     use HasFactory;
     protected $with=['service'];
-    protected $fillable=['start_date','end_date','invoice_id','service_id','service_value'];
+    protected $fillable=['start_date','end_date','invoice_id','service_id','service_value','is_active'];
     
     public function invoice(){
         return $this->belongsTo(Invoice::class);

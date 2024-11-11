@@ -492,8 +492,6 @@ class InvoiceRepository implements InvoiceRepositoryInterface
             $useHours = $sessionStartTime->diffInHours(Carbon::now());
             $totalDuration = $roomSessions->sum('session_duration');
             $leftDuration = $totalDuration - $useHours;
-            // dd($entitySession);
-            // change entitySession-> newEntitySession
             $remainingEntitySessions = EntitySession::where('id', '>=', $newEntitySession->id)
                 ->where('entity_id', $data['entity_id'])
                 // whereIn('id', $roomSessions->pluck('entity_session_id'))
@@ -639,7 +637,8 @@ class InvoiceRepository implements InvoiceRepositoryInterface
                 $roomDoneResponse['is_service'] = 0;
             }
             foreach ($invoiceServices as $invoiceService) {
-                $serviceValue = $this->invoiceService->getServiceValue($invoiceService, now());
+                $time=$invoiceService->end_date!=null? $invoiceService->end_date : now();
+                $serviceValue = $this->invoiceService->getServiceValue($invoiceService, $time);
                 $total_service_value += $serviceValue;
             }
             foreach ($roomSessions as $room) {
@@ -648,7 +647,7 @@ class InvoiceRepository implements InvoiceRepositoryInterface
             }
 
             foreach ($invoiceAccessories as $invoiceAccessorie) {
-                $total_accessory_value += $invoiceAccessorie->accessory->accessory_price->price;
+                $total_accessory_value += $invoiceAccessorie->accessory->accessory_price->price*$invoiceAccessorie->quantity;
             }
 
             $entity = Entity::find($latestRoomSession->entitySession->entity_id);
@@ -713,7 +712,8 @@ class InvoiceRepository implements InvoiceRepositoryInterface
         $total_accessory_value = 0;
         $invoiceServices = $invoice->invoiceService;
         foreach ($invoiceServices as $invoiceService) {
-            $this->invoiceService->calculateInvoiceService($invoiceService, now());
+            $time=$invoiceService->end_date!=null? $invoiceService->end_date : now();
+            $this->invoiceService->calculateInvoiceService($invoiceService, $time);
             $total_service_value += $invoiceService->service_value;
         }
         $invoiceServiceCollection = $invoiceServiceCollection->merge($invoice->invoiceService);
@@ -721,7 +721,7 @@ class InvoiceRepository implements InvoiceRepositoryInterface
         // invoice accessory
         $invoiceAccessories = $invoice->accessories;
         foreach ($invoiceAccessories as $invoiceAccessorie) {
-            $total_accessory_value += $invoiceAccessorie->accessory->accessory_price->price;
+            $total_accessory_value += $invoiceAccessorie->accessory->accessory_price->price*$invoiceAccessorie->quantity;
         }
         foreach ($invoice->orders as $order) {
             if (existOrderItemByStatus($order->orderItems, 'not_yet')) {
