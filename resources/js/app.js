@@ -84,6 +84,12 @@ import RoomDiscountCrudComponent from './Components/RoomDiscount/RoomDiscountCru
 import DeliveryChargesCrudComponent from './Components/DeliveryCharges/DeliveryChargesCrudComponent.vue';
 import AccessoriesListComponent from './Components/Accessories/AccessoriesListComponent.vue';
 import AccessoriesCreateComponent from './Components/Accessories/AccessoriesCreateComponent.vue';
+import AccessoriesEditComponent from './Components/Accessories/AccessoriesEditComponent.vue';
+import MenuPositionCreateComponent from './Components/MenuPosition/MenuPositionCreateComponent.vue';
+import QkrComponent from './Components/QKR/QkrComponent.vue';
+import QkrCreateComponent from './Components/QKR/QkrCreateComponent.vue';
+import ProductTreeComponent from './Components/ProductTree/ProductTreeComponent.vue';
+import ProductTreeCreateComponent from './Components/ProductTree/ProductTreeCreateComponent.vue';
 
 import LoginComponent from './Components/Auth/LoginComponent.vue';
 import LogoutComponent from './Components/Auth/LogoutComponent.vue';
@@ -184,6 +190,12 @@ app.component('RoomDiscountCrudComponent', RoomDiscountCrudComponent);
 app.component('DeliveryChargesCrudComponent', DeliveryChargesCrudComponent);
 app.component('AccessoriesListComponent', AccessoriesListComponent);
 app.component('AccessoriesCreateComponent', AccessoriesCreateComponent);
+app.component('AccessoriesEditComponent', AccessoriesEditComponent);
+app.component('MenuPositionCreateComponent', MenuPositionCreateComponent);
+app.component('QkrComponent', QkrComponent);
+app.component('QkrCreateComponent', QkrCreateComponent);
+app.component('ProductTreeComponent', ProductTreeComponent);
+app.component('ProductTreeCreateComponent', ProductTreeCreateComponent);
 
 app.component('PurchaseOrderListComponent', PurchaseOrderListComponent);
 app.component('PurchaseOrderCreateComponent', PurchaseOrderCreateComponent);

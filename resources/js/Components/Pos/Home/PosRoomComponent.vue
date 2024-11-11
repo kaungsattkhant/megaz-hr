@@ -72,7 +72,7 @@
                         </div>
                     </div>
                     <div class="relative h-full" v-if="isOpenRoom.open_2 == true" id="open_room_2">
-                        <div class="small-scrollbar overflow-y-auto h-[100vh] pt-8">
+                        <div class="small-scrollbar overflow-y-auto h-[100vh] pt-8 pb-16">
                             <div class="padding-section w-2/3 mx-auto ">
 
                                 <div class="mb-4">
@@ -172,9 +172,9 @@
 
                     <div v-if="isOpenRoom.detail == true" class="relative h-full">
                         <div class="flex justify-between padding-section border-b">
-                            <div>
-                                <p class="text-black text-xl">
-                                    <!-- {{ selectedRoom.name }} --> error
+                            <div v-if="selectedRoom">
+                                <p v-if="selectedRoom.entity" class="text-black text-xl">
+                                    {{ selectedRoom.entity.name }}
                                 </p>
                             </div>
                             <div class="flex gap-x-3">
@@ -193,7 +193,11 @@
                                     <i class="far fa-hourglass-half"></i>
                                 </button>
                                 <button class="transition duration-150 ease-in-out focus:outline-none focus:ring-0"
-                                    data-te-toggle="modal" data-te-target="#add_service_modal">
+                                    data-te-toggle="modal" data-te-target="#add_accessory_modal_room">
+                                    <i class="far fa-plus-circle"></i>
+                                </button>
+                                <button class="transition duration-150 ease-in-out focus:outline-none focus:ring-0"
+                                    data-te-toggle="modal" data-te-target="#add_service_modal_room">
                                     <i class="far fa-user-music"></i>
                                 </button>
                             </div>
@@ -271,6 +275,7 @@
                                     </div>
                                 </div>
                             </div>
+                                <!-- services -->
                             <div class="padding-section border-b    " v-if="serviceList.length > 0">
                                 <div class="flex justify-between font-semibold mb-3">
                                     <p class="px-2 py-0.5 bg-[#F19E51] text-white text-xs w-fit">
@@ -283,7 +288,7 @@
                                 <div class=" grid grid-cols-10 gap-x-2 gap-y-3">
                                     <div class="contents" v-for="(service,index) in serviceList" :key="index" :class="service.is_active == 1 ? 'text-black' : 'text-gray-400'">
                                         <div class=" col-span-3 text-sm">
-                                            <button  data-te-toggle="modal" data-te-target="#service_end_modal" @click="btnClickedEndService(service)">
+                                            <button  data-te-toggle="modal" data-te-target="#service_end_modal_room" @click="btnClickedEndService(service)">
                                                 {{ service.service.name ? service.service.name : service.service.staff.name }}
                                             </button>
                                         </div>
@@ -319,6 +324,41 @@
                                     </div> -->
                                 </div>
                             </div>
+
+                                <!-- accessories -->
+                            <div class="padding-section border-b    " v-if="accessoryListSidebar.length > 0">
+                                <div class="flex justify-between font-semibold mb-3">
+                                    <p class="px-2 py-0.5 bg-[#F19E51] text-white text-xs w-fit">
+                                        Accessories
+                                    </p>
+                                    <p class="text-sm text-black font-semibold">
+                                        {{ selectedRoom.total_accessory_value.toLocaleString() }} MMks
+                                    </p>
+                                </div>
+                                <div class=" grid grid-cols-10 gap-x-2 gap-y-3">
+                                    <div class="contents" v-for="(accessory,index) in accessoryListSidebar" :key="index">
+                                        <div class=" col-span-3 text-sm">
+                                            {{ accessory.accessory.name }}
+                                        </div>
+                                        <!-- <p class=" col-span-3 text-sm" v-else>
+                                            {{ service.service.staff.name }}
+                                        </p> -->
+                                        <p class=" col-span-3 text-center text-sm">
+                                            {{ accessory.quantity }}
+                                        </p>
+                                        <!-- <p :class="menu2.status == 'done' ? 'text-green-600 font-semibold' : 'text-gray-500'"
+                                            class=" col-span-2 text-center text-xs pt-0.5">
+                                            {{ menu2.status }}
+                                        </p> -->
+                                        <p class=" col-span-4 text-sm text-right">
+                                            {{ accessory.accessory.accessory_price.price.toLocaleString() }} MMKs
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+
+
+
                         </div>
 
                         <div class="absolute bottom-0 border-t-2 border-gray-200 w-full padding-section">
@@ -341,7 +381,7 @@
                                                         selectedRoom.room_sessions[0].invoice.total_session_price : 0)
                                                     - (selectedRoom.room_sessions[0].invoice.package ? selectedRoom.room_sessions[0].invoice.package.package_discount : 0)
                                                 )
-                                            ) + selectedRoom.total_service_value).toLocaleString()
+                                            ) + selectedRoom.total_service_value+selectedRoom.total_accessory_value).toLocaleString()
                                             : 0
                                         )
 
@@ -466,7 +506,7 @@
                             </div>
                         </div>
 
-                        <div class="absolute bottom-0 border-t-2 border-gray-200 w-full padding-section !pt-3">
+                        <div class="absolute bottom-0 border-t-2 border-gray-200 w-full padding-section !pt-3 bg-white">
                             <div v-if="isPackage" class=" text-sm text-right flex gap-x-2 justify-end pr-2 mb-2">
                                 <p>
                                     Package Price
@@ -546,10 +586,18 @@
                             </div>
                             <div v-show="roomSessionData.is_service == 1" class=" text-sm text-right flex gap-x-2 justify-end pr-2 mb-2">
                                 <p>
-                                    Service Amount
+                                    Service Price
                                 </p>
                                 <p class=" w-28">
                                     {{ printInvoiceData.service_total_value.toLocaleString() }} MMKs
+                                </p>
+                            </div>
+                            <div v-show="roomSessionData.total_accessory_value > 0" class=" text-sm text-right flex gap-x-2 justify-end pr-2 mb-2">
+                                <p>
+                                    Accessories Price
+                                </p>
+                                <p class=" w-28">
+                                    {{ printInvoiceData.accessory_total_value.toLocaleString() }} MMKs
                                 </p>
                             </div>
                             <div class=" text-right pr-3 mb-3">
@@ -757,12 +805,12 @@
                                 <option :value="menu" v-for="(menu, index) in menuList" :key="index">{{ menu.name }}</option>
                             </select> -->
                         </div>
-                        <div class="mb-4">
+                        <!-- <div class="mb-4">
                             <select name="" id="" placeholder="Menu" v-model="selectedMenuArea"
                                 class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
                                 <option :value="area" v-for="(area, index) in menuAreaList" :key="index">{{ area.name }}</option>
                             </select>
-                        </div>
+                        </div> -->
                         <div class="mb-4">
                             <!-- <label for="" class="block text-sm text-black mb-3">
                                 Hour
@@ -814,12 +862,12 @@
                                 <option :value="menu" v-for="(menu, index) in menuList" :key="index">{{ menu.name }}</option>
                             </select>
                         </div>
-                        <div class="mb-4">
+                        <!-- <div class="mb-4">
                             <select name="" id="" placeholder="Menu" v-model="selectedMenuAreaForPackage"
                                 class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
                                 <option :value="area" v-for="(area, index) in menuAreaListForPackage" :key="index">{{ area.name }}</option>
                             </select>
-                        </div>
+                        </div> -->
                         <div class="mb-4">
                             <input type="text" placeholder="Qty" v-model="menuQuantityForPackage"
                                 class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
@@ -881,7 +929,7 @@
             <!-- add Service modal -->
         <div data-te-modal-init
             class="fixed left-0 top-0 z-[1055] hidden h-full w-full overflow-y-auto overflow-x-hidden outline-none"
-            id="add_service_modal" tabindex="-1" aria-labelledby="addMenuModalLabel" aria-modal="true" role="dialog">
+            id="add_service_modal_room" tabindex="-1" aria-labelledby="addMenuModalLabel" aria-modal="true" role="dialog">
             <div data-te-modal-dialog-ref
                 class="pointer-events-none relative flex min-h-[calc(100%-1rem)] w-auto translate-y-[-50px] items-center opacity-0 transition-all duration-300 ease-in-out min-[576px]:mx-auto min-[576px]:mt-7 min-[576px]:min-h-[calc(100%-3.5rem)] min-[576px]:max-w-[500px]">
                 <div
@@ -890,7 +938,7 @@
                         <p class="text-xl w-full text-center">
                             Add Service
                         </p>
-                        <button type="button" id="closeServiceModal"
+                        <button type="button" id="closeServiceModalRoom"
                             class="absolute top-4 right-4 focus:shadow-none focus:outline-none" data-te-modal-dismiss
                             aria-label="Close">
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
@@ -957,9 +1005,9 @@
             </div>
         </div>
             <!-- end Service modal -->
-            <div data-te-modal-init
+        <div data-te-modal-init
             class="fixed left-0 top-0 z-[1055] hidden h-full w-full overflow-y-auto overflow-x-hidden outline-none"
-            id="service_end_modal" tabindex="-1" aria-labelledby="addMenuModalLabel" aria-modal="true" role="dialog">
+            id="service_end_modal_room" tabindex="-1" aria-labelledby="addMenuModalLabel" aria-modal="true" role="dialog">
             <div data-te-modal-dialog-ref
                 class="pointer-events-none relative flex min-h-[calc(100%-1rem)] w-auto translate-y-[-50px] items-center opacity-0 transition-all duration-300 ease-in-out min-[576px]:mx-auto min-[576px]:mt-7 min-[576px]:min-h-[calc(100%-3.5rem)] min-[576px]:max-w-[500px]">
                 <div
@@ -968,7 +1016,7 @@
                         <p class="text-xl w-full text-center">
                             End Service
                         </p>
-                        <button type="button" id="closeEndServiceModal"
+                        <button type="button" id="closeEndServiceModalRoom"
                             class="absolute top-4 right-4 focus:shadow-none focus:outline-none" data-te-modal-dismiss
                             aria-label="Close">
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
@@ -996,6 +1044,69 @@
                 </div>
             </div>
         </div>
+
+
+            <!-- add accessory modal -->
+        <div data-te-modal-init
+            class="fixed left-0 top-0 z-[1055] hidden h-full w-full overflow-y-auto overflow-x-hidden outline-none"
+            id="add_accessory_modal" tabindex="-1" aria-labelledby="addAccessoryModalLabel" aria-modal="true" role="dialog">
+            <div data-te-modal-dialog-ref
+                class="pointer-events-none relative flex min-h-[calc(100%-1rem)] w-auto translate-y-[-50px] items-center opacity-0 transition-all duration-300 ease-in-out min-[576px]:mx-auto min-[576px]:mt-7 min-[576px]:min-h-[calc(100%-3.5rem)] min-[576px]:max-w-[500px]">
+                <div
+                    class="pointer-events-auto relative flex w-full flex-col rounded-md border-none bg-white bg-clip-padding text-current shadow-lg outline-none">
+                    <div class="relative  p-4">
+                        <p class="text-xl w-full text-center">
+                            Add Accessory
+                        </p>
+                        <button type="button" id="closeAccessoryModal"
+                            class="absolute top-4 right-4 focus:shadow-none focus:outline-none" data-te-modal-dismiss
+                            aria-label="Close">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                                stroke="currentColor" class="h-5 w-5">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                        </button>
+                    </div>
+
+                    <div class="relative px-16 py-4" data-te-modal-body-ref>
+                        <div class="mb-4">
+                            <label for="" class="label-form mb-3">
+                                Accessory Category
+                            </label>
+                            <select name="" id="" v-model="selectedAccessoryCategory" class="input-ui" @change="accessoryCategoryChange()">
+                                <option :value="accessory" v-for="(accessory, index) in accessoryCategoryList"
+                                    :key="index">{{
+                                        accessory.name }}</option>
+                            </select>
+                        </div>
+                        <div class="mb-4">
+                            <label for="" class="label-form mb-3">
+                                Accessory
+                            </label>
+                            <select name="" id="" v-model="selectedAccessory" class="input-ui">
+                                <option :value="accessory" v-for="(accessory, index) in accessoryList"
+                                    :key="index">
+                                    {{ accessory.name }}</option>
+                            </select>
+                        </div>
+                        <div class="mb-4">
+                            <label for="" class="label-form mb-3">
+                                Quantity
+                            </label>
+                            <input type="number" v-model="selectedAccessoryQuantity" class="input-ui mb-2">
+                        </div>
+                    </div>
+
+                    <div class="flex justify-center px-12 mb-6">
+                        <button @click="btnConfirmAddAccessory()" class="pos-add-btn focus:outline-none focus:ring-0 ">
+                            Add Service
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
     </div>
 
 </template>
@@ -1080,6 +1191,7 @@
                     customer_discount:0,
                     percent_discount_amount:0,
                     service_total_value:0,
+                    accessory_total_value:0,
                 },
                 room_discount: null,
                 birthday_discount: null,
@@ -1155,6 +1267,17 @@
 
                 serviceEndDate:null,
 
+
+                // add accessory
+                accessoryListSidebar:[],
+                accessoryCategoryList:[],
+                accessoryList:[],
+
+                selectedAccessoryCategory:null,
+                selectedAccessory:null,
+                selectedAccessoryQuantity:null,
+
+
             };
         },
 
@@ -1181,6 +1304,7 @@
                     if (response.data) {
                         this.selectedRoom = response.data;
                         this.serviceList = response.data.services;
+                        this.accessoryListSidebar = response.data.invoice_accessories;
                     }
                 }
                 else {
@@ -1269,12 +1393,12 @@
                     menu_id : this.selectedMenuForPackage.prices[0].menu_id,
                     discount_value: this.is_menu_discount,
                     is_package : 0,
-                    area_id: this.selectedMenuAreaForPackage.id
+                    // area_id: this.selectedMenuAreaForPackage.id
                 });
                 this.food_total_package += (this.selectedMenuForPackage.prices[0].price - this.is_menu_discount) * this.menuQuantityForPackage;
                 this.selectedMenu = null
                 this.menuAreaListForPackage = []
-                this.selectedMenuAreaForPackage = null;
+                // this.selectedMenuAreaForPackage = null;
                 this.menuQuantityForPackage = null;
             },
             removePackageMenu(index){
@@ -1402,6 +1526,7 @@
                     console.log("success")
                     this.isOpenRoomStep('invoice')
                     this.printInvoiceData.service_total_value = response.data.total_service_value;
+                    this.printInvoiceData.accessory_total_value = response.data.total_accessory_value;
                 }
                 else {
                     this.$notify({
@@ -1437,11 +1562,11 @@
                     this.printInvoiceData.package_discount = this.selectedRoom.room_sessions[0].invoice.package.package_discount;
                     this.isPackage = true;
                     this.packagePrice = this.selectedRoom.room_sessions[0].invoice.paid_amount
-                    this.printInvoiceData.total = (this.printInvoiceData.room + this.printInvoiceData.food + this.printInvoiceData.service_total_value) - this.printInvoiceData.package_discount - this.foodDiscount;
+                    this.printInvoiceData.total = (this.printInvoiceData.room + this.printInvoiceData.food + this.printInvoiceData.service_total_value + this.printInvoiceData.accessory_total_value) - this.printInvoiceData.package_discount - this.foodDiscount;
                 }
                 else {
                     this.isPackage = false;
-                    this.printInvoiceData.total = (roomChargeTotal + this.printInvoiceData.food + this.printInvoiceData.service_total_value) - this.foodDiscount;
+                    this.printInvoiceData.total = (roomChargeTotal + this.printInvoiceData.food + this.printInvoiceData.service_total_value + this.printInvoiceData.accessory_total_value) - this.foodDiscount;
                 }
 
 
@@ -1800,14 +1925,14 @@
                 let formData = new FormData();
                 formData.append('invoice_id', this.invoiceId);
                 formData.append('menu_id', this.selectedMenu.id);
-                formData.append('area_id', this.selectedMenuArea.id);
+                // formData.append('area_id', this.selectedMenuArea.id);
                 formData.append('quantity', this.menuQuantity);
                 formData.append('original_price', this.selectedMenu.prices[0].price);
                 formData.append('remark', this.remark);
                 let response = await postApiData({ url: '/api/entities/orders', form_data: formData, token: this.getToken() });
                 // console.log(this.invoiceId+','+this.selectedMenu.id + ','+ this.menuQuantity +','+this.selectedMenu.prices[0].price)
                 if (response.success) {
-                    this.closeModal('closeMenuModal');
+                    this.closeModal('closeAddMenuModal');
                     this.clearMenuForm();
                     this.getPurchaseMenuList();
                 }
@@ -1844,7 +1969,7 @@
             },
             async changeRoom() {
                 let formData = new FormData();
-                formData.append('invoice_id', this.selectedRoom.room_sessions[0].invoice.invoice_id);
+                formData.append('invoice_id', this.selectedRoom.room_sessions[0].invoice.id);
                 formData.append('entity_id', this.change_room.id);
                 let response = await postApiData({ url: '/api/entities/change', form_data: formData, token: this.getToken() });
                 console.log('change room ' + this.selectedRoom.room_sessions[0].invoice.invoice_id + ',' + this.change_room.id)
@@ -1865,7 +1990,7 @@
                 this.getChangeableRoomList();
             },
             async getChangeableRoomList() {
-                const response = await getApiData({ url: '/api/areas/' + this.areaId + '/inactive_entities', token: this.getToken() });
+                const response = await getApiData({ url: '/api/areas/' + this.roomAreaId + '/inactive_entities', token: this.getToken() });
                 if (response.data) {
                     this.changeableRoomList = response.data;
                 }
@@ -1915,7 +2040,7 @@
                 let response = await postApiData({ url: '/api/entities/add_service', form_data: formData, token: this.getToken() });
                 // console.log(this.invoiceId+','+this.selectedMenu.id + ','+ this.menuQuantity +','+this.selectedMenu.prices[0].price)
                 if (response.success) {
-                    this.closeModal('closeServiceModal');
+                    this.closeModal('closeServiceModalRoom');
                     this.clearServiceForm();
                     this.getSelectedRoom();
                 }
@@ -1937,7 +2062,7 @@
                 formData.append('end_date', this.selectedServiceEndTime);
                 let response = await postApiData({ url: '/api/entities/end_service', form_data: formData, token: this.getToken() });
                 if (response.success) {
-                    this.closeModal('closeEndServiceModal');
+                    this.closeModal('closeEndServiceModalRoom');
                     this.selectedServiceEndTime = null;
                     this.getSelectedRoom();
                 }
@@ -1950,6 +2075,43 @@
                 }
             },
 
+
+            // add accessory
+            async getAccessoryCategoryList() {
+                const response = await getApiData({ url: '/api/pos/get_accessory_category', token: this.getToken() });
+                if (response.data) {
+                    this.accessoryCategoryList = response.data;
+                }
+            },
+            async accessoryCategoryChange(){ //get accessory list
+                const response = await getApiData({ url: '/api/pos/accessory_by_category/'+ this.selectedAccessoryCategory.id, token: this.getToken() });
+                if (response.data) {
+                    this.accessoryList = response.data;
+                }
+            },
+            btnConfirmAddAccessory() {
+                this.addAccessory();
+            },
+            async addAccessory() {   // invoice pay yan
+                let formData = new FormData();
+                formData.append('invoice_id', this.selectedRoom.room_sessions[0].invoice.id);
+                formData.append('accessory_id', this.selectedAccessory.id);
+                formData.append('quantity', this.selectedAccessoryQuantity);
+                let response = await postApiData({ url: '/api/pos/add_accessory', form_data: formData, token: this.getToken() });
+                // console.log(this.invoiceId+','+this.selectedMenu.id + ','+ this.menuQuantity +','+this.selectedMenu.prices[0].price)
+                if (response.success) {
+                    this.closeModal('closeAccessoryModal');
+                    this.clearAccessoryForm();
+                    this.getSelectedRoom();
+                }
+                else {
+                    this.$notify({
+                        title: `Input validation`,
+                        text: response.message,
+                        type: "warn"
+                    });
+                }
+            },
 
 
 
@@ -1977,6 +2139,11 @@
                 this.selectedLady = null
                 this.selectedDj = null
                 this.selectedServiceQuantity = null
+            },
+            clearAccessoryForm() {
+                this.selectedAccessoryCategory = null
+                this.selectedAccessory = null
+                this.selectedAccessoryQuantity = null
             },
             clearAddHourForm() {
                 this.sessionDuration = null
@@ -2054,13 +2221,14 @@
             this.getServiceCategoryList();
             this.getLadyList();
 
+            this.getAccessoryCategoryList();
             // this.testtime();
         },
         mounted()
         {
-            if (this.roomAreaId) {
-                this.getRoomList(this.roomAreaId);
-            }
+            // if (this.roomAreaId) {
+            //     this.getRoomList(this.roomAreaId);
+            // }
             initTE({ Modal, Select, Ripple, Datepicker });
         }
     }

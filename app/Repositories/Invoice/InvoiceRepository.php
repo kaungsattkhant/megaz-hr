@@ -613,14 +613,11 @@ class InvoiceRepository implements InvoiceRepositoryInterface
         return $invoice;
     }
 
-
     public function doneRoom(array $data)
     {
         DB::beginTransaction();
         try {
-
             $invoice = Invoice::find($data['invoice_id']);
-
             if ($invoice->entity_id != null) {
                 $tableResponseData = $this->doneInvoiceForTable($invoice);
                 ResponseData($tableResponseData);
@@ -801,14 +798,16 @@ class InvoiceRepository implements InvoiceRepositoryInterface
                 }
             }
             $order = Order::where('invoice_id', $invoice->id)->first();
-            if ($order) {
-                $allSold = $order->orderItems->every(function ($item) {
-                    return $item->status === 'done';
-                });
-                if ($allSold == false) {
-                    ResponseMessage('Not all order items are done', 422);
-                }
-            }
+            //temp command
+            // if ($order) {
+            //     $allSold = $order->orderItems->every(function ($item) {
+            //         return $item->status === 'done';
+            //     });
+            //     if ($allSold == false) {
+            //         ResponseMessage('Not all order items are done', 422);
+            //     }
+            // }
+            //end temp
 
             if (isset($data['discount_type'])) {
                 if ($data['discount_type'] == 'room_discount') {

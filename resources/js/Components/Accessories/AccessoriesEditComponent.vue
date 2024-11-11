@@ -2,7 +2,7 @@
     <div class="px-0">
         <div class="mb-4 ">
             <p class="text-lg font-semibold font-inter pt-4 pl-1">
-                Add Accessories
+                Edit Accessories
             </p>
         </div>
 
@@ -233,15 +233,24 @@
                                         {{ (ingredientItemPriceTotal).toLocaleString() }}
                                         <span> (Profit: {{ this.profitPercentage.toLocaleString() }} %) </span>
                                     </td>
-                                    <td colspan="4" class="">
-asdfafd
+                                    <td class="">
+
+                                    </td>
+                                    <td class="">
+
+                                    </td>
+                                    <td class="">
+
+                                    </td>
+                                    <td class="">
+
                                     </td>
                                 </tr>
                             </tbody>
                         </table>
                     </div>
                 </div>
-                <!-- <div class="hidden opacity-0 transition-opacity duration-150 ease-linear data-[te-tab-active]:block"
+                <div class="hidden opacity-0 transition-opacity duration-150 ease-linear data-[te-tab-active]:block"
                     id="tabs-profile" role="tabpanel" aria-labelledby="tabs-profile-tab">
                     Tab 2 content
                 </div>
@@ -252,7 +261,7 @@ asdfafd
                 <div class="hidden opacity-0 transition-opacity duration-150 ease-linear data-[te-tab-active]:block"
                     id="tabs-contact" role="tabpanel" aria-labelledby="tabs-contact-tab">
                     Tab 4 content
-                </div> -->
+                </div>
             </div>
 
         </div>
@@ -265,16 +274,95 @@ asdfafd
         </div>
 
 
-        
+        <!-- Department Modal -->
+        <!-- <div data-te-modal-init
+            class="fixed left-0 top-0 z-[1055] hidden h-full w-full overflow-y-auto overflow-x-hidden outline-none"
+            id="add_department_modal" tabindex="-1" aria-labelledby="create_modalLabel" aria-modal="true" role="dialog">
+            <div data-te-modal-dialog-ref
+                class="pointer-events-none relative flex min-h-[calc(100%-1rem)] w-auto translate-y-[-50px] items-center opacity-0 transition-all duration-300 ease-in-out min-[576px]:mx-auto min-[576px]:mt-7 min-[576px]:min-h-[calc(100%-3.5rem)] min-[576px]:max-w-[500px]">
+                <div
+                    class="pointer-events-auto relative flex w-full flex-col rounded-md border-none bg-white bg-clip-padding text-current shadow-lg outline-none">
+                    <div class="relative  p-4">
+                        <button type="button" class="absolute top-4 right-4 focus:shadow-none focus:outline-none"
+                            data-te-modal-dismiss aria-label="Close">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                                stroke="currentColor" class="h-5 w-5">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                        </button>
+                    </div>
+
+                    <div class="relative px-12 py-4" data-te-modal-body-ref>
+
+                        <div class="mb-4">
+                            <label for="" class="block text-sm text-black mb-3">
+                                Department
+                            </label>
+                            <input type="text" placeholder="Department"
+                                class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
+                        </div>
+                    </div>
+
+                    <div class="flex justify-center px-12 mb-6">
+                        <button type="button" class="add-btn focus:outline-none focus:ring-0 ">
+                            Add
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div> -->
 
 
-        
+
+        <!-- Role Modal -->
+        <!-- <div data-te-modal-init
+            class="fixed left-0 top-0 z-[1055] hidden h-full w-full overflow-y-auto overflow-x-hidden outline-none"
+            id="add_role_modal" tabindex="-1" aria-labelledby="create_modalLabel" aria-modal="true" role="dialog">
+            <div data-te-modal-dialog-ref
+                class="pointer-events-none relative flex min-h-[calc(100%-1rem)] w-auto translate-y-[-50px] items-center opacity-0 transition-all duration-300 ease-in-out min-[576px]:mx-auto min-[576px]:mt-7 min-[576px]:min-h-[calc(100%-3.5rem)] min-[576px]:max-w-[500px]">
+                <div
+                    class="pointer-events-auto relative flex w-full flex-col rounded-md border-none bg-white bg-clip-padding text-current shadow-lg outline-none">
+                    <div class="relative  p-4">
+                        <button type="button" class="absolute top-4 right-4 focus:shadow-none focus:outline-none"
+                            data-te-modal-dismiss aria-label="Close">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                                stroke="currentColor" class="h-5 w-5">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                        </button>
+                    </div>
+
+                    <div class="relative px-12 py-4" data-te-modal-body-ref>
+                        <div class="mb-4">
+                            <label for="" class="block text-sm text-black mb-3">
+                                Role
+                            </label>
+                            <input type="text" placeholder="Role"
+                                class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
+                        </div>
+                        <div class="mb-4">
+                            <label for="" class="block text-sm text-black mb-3">
+                                Department
+                            </label>
+                            <input type="text" placeholder="Department"
+                                class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
+                        </div>
+                    </div>
+
+                    <div class="flex justify-center px-12 mb-6">
+                        <button type="button" class="add-btn focus:outline-none focus:ring-0 ">
+                            Add
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div> -->
     </div>
 </template>
 
 <script>
 import { Modal, Ripple, initTE, Tab, Select } from "tw-elements";
-import { getApiData, postApiData } from '../../utilities/ajax-helpers';
+import { getApiData, postApiData, deleteApiData } from '../../utilities/ajax-helpers';
 import { mapGetters } from "vuex";
 import Multiselect from 'vue-multiselect';
 
@@ -282,8 +370,11 @@ export default {
     components: {
         Multiselect
     },
+    props: ["accessoriesId"],
     data() {
         return {
+            accessoriesDetail:null, 
+
             accessoriesCategoryList: [],
             itemCategoryList: [],
             itemList: [],
@@ -330,13 +421,6 @@ export default {
             });
         },
 
-        // async getCookingAreaList(departmentId) {
-        //     let response = await getApiData({ url: `/api/areas?department_id=${departmentId}`, token: this.getToken() });
-        //     if (response.data) {
-        //         this.areaList = response.data;
-        //     }
-        // },
-
         updateItemPriceTotal(items){
             this.ingredientItemPriceTotal = 0;
             items.forEach((item)=>{
@@ -359,6 +443,38 @@ export default {
             this.selectedImage = selectedFile;
         },
 
+        async getAccessoriesDetail() {
+            let response = await getApiData({ url: `/api/accessories/`+this.accessoriesId, token: this.getToken() });
+            if (response.data) {
+                this.accessoriesDetail = response.data;
+                this.showData(response.data)
+            }
+        },
+        showData(detail){
+            this.name = detail.name;
+            this.code = detail.code;
+            this.price = detail.accessory_price.price;
+            this.accessoriesCategoryId = detail.accessory_category_id;
+            // this.selectedImage = detail.image_url;
+            // this.accessoriesCategoryId = this.accessoriesCategoryList.find(x => x.id === detail.accessory_category_id)
+            detail.accessory_items.forEach((item)=>{
+                this.ingredientItems.push({
+                    is_detail:1,
+                    id: item.id,
+                    item_id: item.item_id,
+                    // price: price,
+                    price: item.price,
+                    name: item.item.name,
+                    quantity: item.quantity,
+                    // is_make_pack: this.isMakePack,
+                    uom_id: item.uom_id,
+                    uom_name: item.uom.name
+                });
+                console.log('push')
+            });           
+
+            this.updateItemPriceTotal(this.ingredientItems);
+        },
         async getAccessoriesCategoryList() {
             let response = await getApiData({ url: `/api/get_accessory_category`, token: this.getToken() });
             if (response.data) {
@@ -381,7 +497,7 @@ export default {
             }
         },
 
-        itemSelectChanged() {
+        itemSelectChanged() { // for uom list 
             this.itemUoms = [];
             let index = this.uomList.findIndex(uom => uom.id == this.selectedItem.base_uom_id);
             if (index != -1) {
@@ -463,8 +579,18 @@ export default {
             this.$refs.is_make_pack.checked = false;
         },
 
-        removeIngredientBtnClicked(ingredientIndex) {
-            this.ingredientItems.splice(ingredientIndex, 1);
+        async removeIngredientBtnClicked(ingredientIndex) {
+            if(this.ingredientItems[ingredientIndex].is_detail == 1){
+                let response = await deleteApiData({ url: '/api/accessory_item/' + this.ingredientItems[ingredientIndex].id, token: this.getToken() });
+                if (response.success) {
+                    alert(`deleted`);
+                    this.ingredientItems.splice(ingredientIndex, 1);
+                }
+            }
+            else{
+                this.ingredientItems.splice(ingredientIndex, 1);
+            }
+            
             this.updateItemPriceTotal(this.ingredientItems);
         },
 
@@ -485,36 +611,31 @@ export default {
                 this.alertValiationMessage(`accessories items`);
                 return 1;
             }
-            else if(!this.selectedImage){
-                this.alertValiationMessage(`accessories image`);
-                return 1;
-            }
-            // else if(this.selectedAreas.length < 1){
-            //     this.alertValiationMessage(`cooking areas`);
+            // else if(!this.selectedImage){
+            //     this.alertValiationMessage(`accessories image`);
             //     return 1;
             // }
+            
             else {
-                // let areaIds = [];
-                // this.selectedAreas.forEach((area)=>{
-                //     areaIds.push(area.id);
-                // });
                 let accessoriesItems = JSON.stringify(this.ingredientItems);
                 let formData = new FormData();
+                formData.append('id', this.accessoriesDetail.id);
                 formData.append('accessory_category_id', this.accessoriesCategoryId);
                 formData.append('name', this.name);
                 // formData.append('is_feature', (this.isFeatured)?1:0);
                 formData.append('price', this.price);
                 formData.append('accessory_items', accessoriesItems);
-                formData.append('image',this.selectedImage);
-                // formData.append('areas',JSON.stringify(areaIds));
+                // formData.append('image',this.selectedImage);
                 formData.append('code',this.code);
+                if(this.selectedImage)
+                {
+                    formData.append('image',this.selectedImage);
+                }
+
                 // formData.append('description',this.description);
-
                 let response = await postApiData({ url: `/api/accessories`, form_data: formData, token: this.getToken() });
-
                 if (response.success) {
                     window.location.replace(`/accessories`);
-                    // console.log('success')
                 }
             }
         }
@@ -531,18 +652,10 @@ export default {
     },
 
     async created() {
-        // let response = await getApiData({url: `/api/departments`, token: this.getToken()});
-        // if(response.data){
-        //     response.data.forEach((department)=>{
-        //         if(department.name == `Kitchen`){
-        //             this.departmentId = department.id;
-        //         }
-        //     });
-        // }
         this.getAccessoriesCategoryList();
         this.getItemCategoryList();
         this.getUomList();
-        // this.getCookingAreaList(this.departmentId);
+        this.getAccessoriesDetail();
     },
 
     mounted() {

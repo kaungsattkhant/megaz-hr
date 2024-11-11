@@ -231,6 +231,12 @@
                             </a>
                         </li>
                         <li>
+                            <a href="{{ route('menu_position') }}" class="flex items-center @yield('menu_position')">
+                                <i class="fal fa-clipboard-list  pr-3"></i>
+                                Menu Position
+                            </a>
+                        </li>
+                        <li>
                             <a href="{{ route('menu_sale_report.index') }}" class="flex items-center @yield('menu_sale_report')">
                                 <i class="fal fa-clipboard-list  pr-3"></i>
                                 Menu Sale Report
@@ -545,6 +551,28 @@
                             </div>
                         </li>
                         @endif
+
+
+
+
+                        <li>
+                            <a href="/accessories" class="flex items-center @yield('packages')">
+                            <i class="fal fa-braille pr-3"></i>
+                                Accessories
+                            </a>
+                        </li>
+                        <li>
+                            <a href="/QKR" class="flex items-center @yield('QKR')">
+                            <i class="fal fa-braille pr-3"></i>
+                                QKR
+                            </a>
+                        </li>
+                        <li>
+                            <a href="/product_tree" class="flex items-center @yield('product_tree')">
+                                <i class="fal fa-braille pr-3"></i>
+                                Product Tree
+                            </a>
+                        </li>
 
                     </ul>
 

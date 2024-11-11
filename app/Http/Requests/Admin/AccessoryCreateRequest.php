@@ -14,8 +14,9 @@ class AccessoryCreateRequest extends APIRequest
         return [
             'code' => [
                 'required',
-                Rule::unique('accessories')->ignore($this->accessory),
+                Rule::unique('accessories')->ignore($id),
             ],
+            // 'image' => $id === null ? ['required'] : [], // Make 'price' required only if $id is null
             'price' => $id === null ? ['required'] : [], // Make 'price' required only if $id is null
             'name' => 'required',
             'accessory_category_id' => 'required',

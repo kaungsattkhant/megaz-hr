@@ -92,4 +92,68 @@ class CashBookTransaction
         })
         ->first();
     }
+
+    public function getCashAndBankBalanceByMonth($sub_account_id,$year,$month){
+      
+        // return DB::table('sub_accounts')
+        // ->leftJoin('accounts', 'accounts.sub_account_id', '=', 'sub_accounts.id')
+        // ->leftJoin('ledgers', function ($join) use ($year) {
+        //     $join->on('ledgers.account_id', '=', 'accounts.id')
+        //         ->whereYear('ledgers.created_at', $year); // Only filter by year
+        // })
+        // ->leftJoin('transactions', 'ledgers.transaction_id', '=', 'transactions.id')
+        // ->whereIn('sub_accounts.account_code', $sub_account_id)
+        // ->selectRaw('
+        //     MONTH(ledgers.created_at) as month,
+        //     DATE_FORMAT(ledgers.created_at, "%Y-%m-01") as date,
+        //     SUM(CASE WHEN transactions.is_confirmed = 1 AND ledgers.action = "debit" THEN ledgers.value ELSE 0 END) as total_debit,
+        //     SUM(CASE WHEN transactions.is_confirmed = 1 AND ledgers.action = "credit" THEN ledgers.value ELSE 0 END) as total_credit
+        // ')
+        // ->groupBy(DB::raw('MONTH(ledgers.created_at), DATE_FORMAT(ledgers.created_at, "%Y-%m-01")'))
+        // ->orderBy(DB::raw('MONTH(ledgers.created_at)'))
+        // ->get();
+
+        $year = Carbon::now()->year;
+        $currentMonth = Carbon::now()->month;
+        
+        $monthsOfYear = collect(range(1, $currentMonth))->map(function ($month) use ($year) {
+            $date = Carbon::create($year, $month, 1);
+            return [
+                'month_number' => $month,
+                'month_name' => $date->format('F'),
+                'date' => $date->format('Y-m-01'),
+            ];
+        });
+        
+        // Step 2: Query to get debit and credit sums by month for the specified year
+        $ledgerData = DB::table('sub_accounts')
+            ->leftJoin('accounts', 'accounts.sub_account_id', '=', 'sub_accounts.id')
+            ->leftJoin('ledgers', function ($join) use ($year) {
+                $join->on('ledgers.account_id', '=', 'accounts.id')
+                    ->whereYear('ledgers.created_at', $year);
+            })
+            ->leftJoin('transactions', 'ledgers.transaction_id', '=', 'transactions.id')
+            ->whereIn('sub_accounts.account_code', $sub_account_id)
+            ->selectRaw('
+                MONTH(ledgers.created_at) as month,
+                SUM(CASE WHEN transactions.is_confirmed = 1 AND ledgers.action = "debit" THEN ledgers.value ELSE 0 END) as total_debit,
+                SUM(CASE WHEN transactions.is_confirmed = 1 AND ledgers.action = "credit" THEN ledgers.value ELSE 0 END) as total_credit
+            ')
+            ->groupBy(DB::raw('MONTH(ledgers.created_at)'))
+            ->get();
+        
+        // Step 3: Merge results with months of the year, calculating value as total_debit - total_credit
+        $results = $monthsOfYear->map(function ($month) use ($ledgerData) {
+            $data = $ledgerData->firstWhere('month', $month['month_number']);
+        
+            return [
+                'month' => $month['month_name'],
+                // 'date' => $month['date'],
+                'value' => $data ? ($data->total_debit - $data->total_credit) : 0,
+            ];
+        });
+        
+        // Step 4: Output the results
+        return $results;
+    }
 }

@@ -280,10 +280,23 @@ Route::middleware(['departments:sale-target'])->group(function () {
     Route::view('/sale_target_menu/{id}/edit', 'sale_target_menu.edit')->name('sale_target_menu/edit');
 });
 
-
+// Route::middleware(['departments:accessory'])->group(function () {
+    Route::view('/accessories/create','accessories.create');
+    Route::view('/accessories/{id}/edit','accessories.edit');
+    Route::view('/accessories','accessories.index');
+// });
 Route::view('/menu_sale_report', 'menu_sale_report.index')->name('menu_sale_report.index');
 Route::view('/menu_costing', 'menu_costing.index')->name('menu_costing.index');
 
 Route::view('/pos_order_items','pos.orderItem.index');
+
 Route::view('/accessories/create','accessories.create');
+Route::view('/accessories/{id}/edit','accessories.edit');
 Route::view('/accessories','accessories.index');
+Route::view('/menu_position', 'menu_position.index')->name('menu_position');
+Route::view('/menu_position/create', 'menu_position.create')->name('menu_position.create');
+
+Route::view('/QKR', 'QKR.index')->name('QKR');
+Route::view('/QKR/create', 'QKR.create')->name('QKR.create');
+Route::view('/product_tree', 'product_tree.index')->name('product_tree');
+Route::view('/product_tree/create', 'product_tree.create')->name('product_tree.create');

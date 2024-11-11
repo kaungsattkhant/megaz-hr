@@ -1,7 +1,7 @@
 <template>
     <div>
         <p class=" text-lg font-semibold font-inter">
-            Accessories list-none
+            Accessories list
         </p>
     </div>
     <div class="mt-4 bg-white">
@@ -14,9 +14,9 @@
 
                 <div class="bg-white mb-0 w-[40%] text-xs h-8 border-b border-black rounded-bl-[4px] rounded-br-[4px] overflow-hidden inline-block"
                     data-te-select-wrapper-ref>
-                    <select data-te-select-init data-te-select-placeholder="Filter by category"
+                    <select data-te-select-init data-te-select-placeholder="Filter by category" class="text-xs"
                         data-te-select-filter="true" v-model="searchCategory">
-                        <option :value="category" v-for="category in menuCategoryList" :key="category.id">
+                        <option :value="category" v-for="category in accessoriesCategoryList" :key="category.id">
                             {{ category.name }}
                         </option>
                     </select>
@@ -27,13 +27,13 @@
             </div>
 
             <div class="flex justify-end flex-col">
-                <a href="/menus/create" class="add-btn ">
+                <a href="/accessories/create" class="add-btn ">
                     Add New
                 </a>
 
             </div>
         </div>
-        <!-- {{ menuList }} -->
+        <!-- {{ accessoriesList }} -->
         <div class="box-container-table">
             <div class="overflow-x-auto">
                 <!-- <div class="inline-block min-w-full py-2 sm:px-6 lg:px-8"> -->
@@ -66,33 +66,33 @@
                         </thead>
                         <tbody>
 
-                            <div class="contents" v-for="(accessories, index) in menuList" :key="index">
+                            <div class="contents" v-for="(accessories, index) in accessoriesList" :key="index">
                                 <tr class="">
                                     <td class="  ">
                                         {{ perPage * (currentPage - 1) + (++index) }}
                                     </td>
-                                    <td class="whitespace-nowrap  ">
+                                    <td class="whitespace-nowrap align-middle">
                                         {{ accessories.name }}
                                     </td>
-                                    <td class="whitespace-nowrap  ">
+                                    <td class="whitespace-nowrap align-middle">
                                         <p v-for="(accessory, accessoryIndex) in accessories.accessory_items" :key="accessoryIndex">
                                             {{ accessory.item.name }}
                                         </p>
                                     </td>
-                                    <td class="whitespace-nowrap  ">
+                                    <td class="whitespace-nowrap ">
                                         <div
-                                            class="relative flex border text-center shrink-0 overflow-hidden rounded-md h-18 w-18">
+                                            class="w-full flex justify-center">
                                             <img width="80" height="100" style="aspect-ratio: 4/3; object-fit: cover;"
                                                 :src="accessories.image_url" alt="Menu image">
                                         </div>
                                     </td>
-                                    <td class="  ">
+                                    <td class=" align-middle ">
                                         {{ (accessories.accessory_price.price).toLocaleString() }}
                                     </td>
                                     <!-- <td class="  ">
                                         {{ (accessories.is_feature == 1) ? 'Yes' : 'No' }}
                                     </td> -->
-                                    <td class="whitespace-nowrap ">
+                                    <td class="whitespace-nowrap align-middle">
                                         <a :href="`/accessories/${accessories.id}/edit`" id="edit-btn" class="pr-1">
                                             <i class="fas fa-pen"></i>
                                         </a>
@@ -119,7 +119,7 @@
 
                     <div v-if="totalData != 0" class=" bg-white  flex justify-center mt-5 py-3">
                         <button class="rounded px-6 py-1 border  hover:bg-slate-200" :disabled="currentPage === 1"
-                            @click="getMenuList(currentPage - 1)">«</button>
+                            @click="getAccessoriesList(currentPage - 1)">«</button>
 
                         <button class=" text-sm px-5 border">
                             Page <span @dblclick="showInput">{{ currentPage }}</span> / <span class="text-gray-400">{{
@@ -127,7 +127,7 @@
                         </button>
 
                         <button class=" rounded px-6  py-1 border  hover:bg-slate-200"
-                            :disabled="currentPage === lastPage" @click="getMenuList(currentPage + 1)"> »</button>
+                            :disabled="currentPage === lastPage" @click="getAccessoriesList(currentPage + 1)"> »</button>
                     </div>
                 </div>
             </div>
@@ -145,8 +145,8 @@ import { mapGetters } from "vuex";
 export default {
     data() {
         return {
-            menuCategoryList: [],
-            menuList: [],
+            accessoriesCategoryList: [],
+            accessoriesList: [],
             deleteId: null,
 
             searchInput: null,
@@ -162,15 +162,15 @@ export default {
     methods: {
         ...mapGetters(['getToken']),
 
-        async getMenuCategoryList() {
+        async getAccessoriesCategoryList() {
             let url = `/api/get_accessory_category`;
             let response = await getApiData({ url: url, token: this.getToken() });
             if (response.data) {
-                this.menuCategoryList = response.data;
+                this.accessoriesCategoryList = response.data;
             }
         },
 
-        async getMenuList(pageNumber) {
+        async getAccessoriesList(pageNumber) {
 
             let url = `/api/accessories?page=${pageNumber}`;
             if (this.searchInput && this.searchCategory) {
@@ -180,12 +180,12 @@ export default {
                 url = `/api/accessories?search_input=${this.searchInput}&page=${pageNumber}`;
             }
             if ((!this.searchInput) && this.searchCategory) {
-                url = `/api/accessories?accessories_id=${this.searchCategory.id}&page=${pageNumber}`;
+                url = `/api/accessories?accessory_category_id=${this.searchCategory.id}&page=${pageNumber}`;
             }
 
             let response = await getApiData({ url: url, token: this.getToken() });
             if (response.data) {
-                this.menuList = response.data.data;
+                this.accessoriesList = response.data.data;
                 this.lastPage = response.data.last_page;
                 this.currentPage = pageNumber;
                 this.perPage = response.data.per_page;
@@ -194,13 +194,13 @@ export default {
         },
 
         // isActiveToggled(id) {
-        //     let index = this.menuList.findIndex(menu => menu.id == id);
+        //     let index = this.accessoriesList.findIndex(menu => menu.id == id);
         //     if (index != -1) {
-        //         if (this.menuList[index].is_active == 1) {
-        //             this.menuList[index].is_active = 0;
+        //         if (this.accessoriesList[index].is_active == 1) {
+        //             this.accessoriesList[index].is_active = 0;
         //         }
         //         else {
-        //             this.menuList[index].is_active = 1;
+        //             this.accessoriesList[index].is_active = 1;
         //         }
 
         //         let url = `/api/is_active`;
@@ -225,13 +225,13 @@ export default {
 
         async searchBtnClicked() {
 
-            this.getMenuList(1);
+            this.getAccessoriesList(1);
         },
 
         clearSearchBtnClicked() {
             this.searchInput = null;
             this.searchCategory = null;
-            this.getMenuList(1);
+            this.getAccessoriesList(1);
         },
 
 
@@ -239,8 +239,8 @@ export default {
     },
 
     created() {
-        this.getMenuCategoryList();
-        this.getMenuList(1);
+        this.getAccessoriesCategoryList();
+        this.getAccessoriesList(1);
     },
 
     mounted() {

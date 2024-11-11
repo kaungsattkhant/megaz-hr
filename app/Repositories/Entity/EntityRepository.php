@@ -48,24 +48,55 @@ class EntityRepository implements EntityRepositoryInterface
     {
         $area = Area::find($data['area_id']);
 
+        $today = Carbon::today()->format('Y-m-d');
+        $nextDay = Carbon::tomorrow()->format('Y-m-d');
+
+        // $entities = Entity::where('is_available', 1)
+        //     ->where('area_id', $area->id)
+        //     ->with([
+        //         'entitySessions' => function ($query) {
+        //             $query->where('start_time', '>=', '10:01:00')
+        //                 ->orWhereBetween('start_time', ['00:01:00', '05:01:00'])
+        //                 ->orderByRaw("CASE WHEN start_time >= '10:01:00' THEN 1 ELSE 2 END")
+        //                 ->orderBy('start_time');
+        //         },
+        //         'entitySessions.roomSession.invoice'
+        //     ])
+        //     ->get();
         $entities = Entity::where('is_available', 1)
             ->where('area_id', $area->id)
-            ->with('entitySessions.roomSession.invoice')
+            ->with([
+                'entitySessions' => function ($query) {
+                    $query->where('start_time', '>=', '10:01:00')
+                        ->orWhereBetween('start_time', ['00:01:00', '05:01:00'])
+                        ->orderByRaw("CASE WHEN start_time >= '10:01:00' THEN 1 ELSE 2 END")
+                        ->orderBy('start_time')
+                        ->selectRaw('*, 
+                    CASE 
+                        WHEN start_time >= "10:01:00" THEN CONCAT(CURRENT_DATE, " ", start_time) 
+                        ELSE CONCAT(DATE_ADD(CURRENT_DATE, INTERVAL 1 DAY), " ", start_time)
+                    END AS start_date_time,
+                    CASE 
+                        WHEN end_time >= "10:01:00" THEN CONCAT(CURRENT_DATE, " ", end_time) 
+                        ELSE CONCAT(DATE_ADD(CURRENT_DATE, INTERVAL 1 DAY), " ", end_time)
+                    END AS end_date_time');
+                },
+                'entitySessions.roomSession.invoice'
+            ])
             ->get();
-
         foreach ($entities as $entity) {
             if ($entity->entity_type == 'room' && $entity->is_active == 1) {
                 $roomSessions = collect();
                 $startTimes = collect();
                 $endTimes = collect();
-                foreach ($entity->entitySessions()->where('is_active', 1)->get() as $entitySession) {
+                $entitySessions = $entity->entitySessions()->where('is_active', 1)->get();
+                foreach ($entitySessions as $entitySession) {
                     foreach ($entitySession->roomSessions()->get() as $roomSession) {
                         $roomSessions->push($roomSession);
                         $startTimes->push($roomSession->start_date);
                         $endTimes->push($roomSession->end_date);
                     }
                 }
-
                 $entity->start_time = CurrentTime();
                 $entity->end_time = CurrentTime();
 
@@ -73,17 +104,17 @@ class EntityRepository implements EntityRepositoryInterface
                 $startTimes = $startTimes->sortBy(function ($timestamp) {
                     return strtotime($timestamp);
                 })->values(); // Re-index the collection
-
                 $endTimes = $endTimes->sortByDesc(function ($timestamp) {
                     return strtotime($timestamp);
                 })->values(); // Re-index the collection
 
-                $firstStartTime = $startTimes[0];
-                $calculatedEndTime = Carbon::parse($firstStartTime)->addHours($totalSessionDuration)->format('Y-m-d H:i:s');
-                $lastEndTime = $endTimes[0];
+                $firstStartTime = $startTimes->isNotEmpty() ? $startTimes[0] : null;
 
+                $calculatedEndTime = Carbon::parse($firstStartTime)->addHours($totalSessionDuration)->format('Y-m-d H:i:s');
+                $lastEndTime = $endTimes->isNotEmpty() ? $endTimes[0] : null;
                 $entity->start_time = $firstStartTime;
                 $entity->end_time = $calculatedEndTime;
+
                 // dd($startTimes);
             } else {
                 $entity->start_time = null;
@@ -96,7 +127,6 @@ class EntityRepository implements EntityRepositoryInterface
         return $entities;
     }
 
-
     public function entityDetail(array $data, int $entitySessionId)
     {
         $entitySession = EntitySession::where('is_available', 1)
@@ -104,7 +134,7 @@ class EntityRepository implements EntityRepositoryInterface
                 'roomSessions' => function ($query) {
                     $query->latest()->first();
                 }
-            ])
+            ,'entity'])
             ->find($entitySessionId);
         $invoiceServiceCollection = collect();
         $invoiceAccessoryCollection = collect();
@@ -173,9 +203,9 @@ class EntityRepository implements EntityRepositoryInterface
         $entity = Entity::find($entityId);
         if ($entity->entity_type == 'room') {
             $entitySession = EntitySession::where('is_active', 1)
-                ->with(['entity', 'roomSessions','roomSession.invoice'])->where('entity_id', $entityId)->first();
-            if(!$entitySession){
-                ResponseMessage('Entity have no invic ',404);
+                ->with(['entity', 'roomSessions', 'roomSession.invoice'])->where('entity_id', $entityId)->first();
+            if (!$entitySession) {
+                ResponseMessage('Entity have no invic ', 404);
             }
             $invoiceId = $entitySession->roomSession->invoice_id;
             $invoice = Invoice::find($invoiceId);
@@ -235,11 +265,9 @@ class EntityRepository implements EntityRepositoryInterface
                 }
             }
             // }
-            // dd($total_accessory_value);
-            // $entitySession->roomSession->invoice=$invoice;
             $entitySession['start_date'] = $firstRoomSession->start_date;
             $entitySession['end_date'] = $lastRoomSession->end_date;
-            $entitySession['invoice']=$invoice;
+            $entitySession['invoice'] = $invoice;
             //service add response
             $entitySession['services'] = $invoiceServiceCollection;
             $entitySession['invoice_accessories'] = $invoiceAccessories;
@@ -503,11 +531,17 @@ class EntityRepository implements EntityRepositoryInterface
 
     public function inactiveEntityList($data)
     {
+        // mobile
+// ${base_url}entities/change?waiter=1
+// ${base_url}areas/${widget.areaId}/entities?type=room'
+//api/areas/${area_id}/inactive_entities?type=room
         $area = Area::find($data['area_id']);
         if (isset($data['type'])) {
             $entities = Entity::where("entity_type", $data['type'])->where('area_id', $area->id)->where("is_active", 0)->get();
         } else {
-            $entities = Entity::where("is_active", 0)->where('area_id', $area->id)->get();
+            $entities = Entity::where("is_active", 0)
+                ->where('area_id', $area->id)
+                ->get();
         }
 
         return $entities;
