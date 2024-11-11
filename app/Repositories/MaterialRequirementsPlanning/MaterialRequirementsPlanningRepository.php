@@ -16,7 +16,7 @@ class MaterialRequirementsPlanningRepository implements MaterialRequirementsPlan
 {
   public function getMrpLists(Request $data)
   {
-    $menuLists =  Menu::with([
+    return Menu::with([
       'menu_category',
       'price',
       'menuPlaces.area',
@@ -25,9 +25,7 @@ class MaterialRequirementsPlanningRepository implements MaterialRequirementsPlan
       'menuSteps.menuStepItem.item',
       'menuSteps.menuStepItem.uom'
     ])->get();
-
     // ->paginate(config('common.list_count'));
-    ResponseData($menuLists);
   }
   public function store($validatedData)
   {
@@ -113,6 +111,8 @@ class MaterialRequirementsPlanningRepository implements MaterialRequirementsPlan
       'menu_category',
       'price',
       'menuPlaces.area',
+      'subMenus.menuSteps.menuStepItem.item',
+      'subMenus.menuSteps.menuStepItem.uom',
       'menuSteps.menuStepItem.item',
       'menuSteps.menuStepItem.uom'
     ])->where('id', $menuId)->get();
@@ -167,6 +167,10 @@ class MaterialRequirementsPlanningRepository implements MaterialRequirementsPlan
 
       if (!empty($validatedData['cooking_place_id'])) {
         $menu->menuPlaces()->sync($validatedData['cooking_place_id']);
+      }
+
+      if (!empty($validatedData['sub_menu_id'])) {
+        $menu->subMenus()->sync($validatedData['sub_menu_id']);
       }
 
       DB::commit();
