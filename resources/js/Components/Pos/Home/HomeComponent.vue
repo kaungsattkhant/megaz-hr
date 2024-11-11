@@ -915,6 +915,9 @@
                         this.$nextTick(() => {
                             if (this.$refs.posTable) { // Check if posTable is defined
                                 this.$refs.posTable.getTableList(response.data[0].id);
+                                let num = 0
+                                num += 1
+                                console.log(num)
                             } else {
                                 console.warn("posTable component is not available in $refs.");
                                 console.log("posTable component is not available in $refs.");
@@ -925,6 +928,9 @@
                         this.$nextTick(() => {
                             if (this.$refs.posRoom) { // Check if posRoom is defined
                                 this.$refs.posRoom.getRoomList(response.data[0].id);
+                                let num = 0
+                                num += 1
+                                console.log(num)
                             } else {
                                 console.warn("posRoom component is not available in $refs.");
                                 console.log("posRoom component is not available in $refs.");
@@ -1740,26 +1746,26 @@
 
 
         watch: {
-            areaType(newType) {
-                if (newType !== 'bar_and_restaurant') {
-                    this.$nextTick(() => {
-                        if (this.$refs.posTable) {
-                        this.$refs.posTable.getTableList(this.selectedAreaId);
-                        }
-                    });
-                }
-                else
-                {
-                    this.$nextTick(() => {
-                        if (this.$refs.posRoom) { // Check if posRoom is defined
-                            this.$refs.posRoom.getRoomList(this.selectedAreaId);
-                        } 
-                        else {
-                            console.warn("posRoom component is not available in $refs.");
-                        }
-                    });
-                }
-            }
+            // areaType(newType) {
+            //     if (newType !== 'bar_and_restaurant') {
+            //         this.$nextTick(() => {
+            //             if (this.$refs.posTable) {
+            //             this.$refs.posTable.getTableList(this.selectedAreaId);
+            //             }
+            //         });
+            //     }
+            //     else
+            //     {
+            //         this.$nextTick(() => {
+            //             if (this.$refs.posRoom) { // Check if posRoom is defined
+            //                 this.$refs.posRoom.getRoomList(this.selectedAreaId);
+            //             } 
+            //             else {
+            //                 console.warn("posRoom component is not available in $refs.");
+            //             }
+            //         });
+            //     }
+            // }
         },
         created(){
             this.getAreaList();
