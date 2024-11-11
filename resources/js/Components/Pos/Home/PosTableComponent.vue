@@ -1765,7 +1765,7 @@
                 this.getChangeableRoomList();
             },
             async getChangeableRoomList() {
-                const response = await getApiData({ url: '/api/areas/' + this.tableAreaId + '/inactive_entities', token: this.getToken() });
+                const response = await getApiData({ url: '/api/areas/' + this.tableAreaId + '/inactive_entities?type=table', token: this.getToken() });
                 if (response.data) {
                     this.changeableRoomList = response.data;
                 }

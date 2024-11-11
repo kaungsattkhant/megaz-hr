@@ -1990,7 +1990,7 @@
                 this.getChangeableRoomList();
             },
             async getChangeableRoomList() {
-                const response = await getApiData({ url: '/api/areas/' + this.roomAreaId + '/inactive_entities', token: this.getToken() });
+                const response = await getApiData({ url: '/api/areas/' + this.roomAreaId + '/inactive_entities?type=room', token: this.getToken() });
                 if (response.data) {
                     this.changeableRoomList = response.data;
                 }
