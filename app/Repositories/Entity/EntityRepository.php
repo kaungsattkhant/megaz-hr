@@ -134,7 +134,9 @@ class EntityRepository implements EntityRepositoryInterface
                 'roomSessions' => function ($query) {
                     $query->latest()->first();
                 }
-            ,'entity'])
+                ,
+                'entity'
+            ])
             ->find($entitySessionId);
         $invoiceServiceCollection = collect();
         $invoiceAccessoryCollection = collect();
@@ -281,7 +283,23 @@ class EntityRepository implements EntityRepositoryInterface
                 ResponseMessage('Invoice Detail is invalid', 419);
             }
             $invoice = $entity->latestInvoice;
+            $total_service_value = 0;
+            $total_accessory_value = 0;
+            $invoiceServiceCollection = collect();
+            $invoiceServices = $invoice->invoiceService;
+                foreach ($invoiceServices as $invoiceService) {
+                    $this->invoiceModelService->calculateInvoiceService($invoiceService, now());
+                    $total_service_value += $invoiceService->service_value;
+                }
+                $invoiceServiceCollection = $invoiceServiceCollection->merge($invoice->invoiceService);
+                // end service
+                // invoice accessory
+                $invoiceAccessories = $invoice->accessories;
+                foreach ($invoiceAccessories as $invoiceAccessorie) {
+                    $total_accessory_value += $invoiceAccessorie->accessory->accessory_price->price;
+                }
             $orders = $invoice->orders;
+           
             if ($orders->isNotEmpty()) {
                 // $entity->invoice = $orders;
                 foreach ($orders as $order) {
@@ -316,6 +334,10 @@ class EntityRepository implements EntityRepositoryInterface
             $responseData = [];
             $responseData['entity_id'] = $entity->id;
             $responseData['room_sessions'] = $entity;
+            $responseData['services'] = $invoiceServiceCollection;
+            $responseData['invoice_accessories'] = $invoiceAccessories;
+            $responseData['total_service_value'] = $total_service_value;
+            $responseData['total_accessory_value'] = $total_accessory_value;
             return $responseData;
         }
     }
@@ -535,9 +557,17 @@ class EntityRepository implements EntityRepositoryInterface
 // ${base_url}entities/change?waiter=1
 // ${base_url}areas/${widget.areaId}/entities?type=room'
 //api/areas/${area_id}/inactive_entities?type=room
+        $data['type'] = 'room';
         $area = Area::find($data['area_id']);
         if (isset($data['type'])) {
-            $entities = Entity::where("entity_type", $data['type'])->where('area_id', $area->id)->where("is_active", 0)->get();
+            $entities = Entity::where("entity_type", $data['type'])
+                ->when($data['type'] == 'room', function ($q) {
+                    $q->whereHas('entitySessions'); // Only include entities with non-empty entitySessions
+                    // $q->withCount('entitySessions'); // Adds entity_sessions_count attribute
+    
+                })
+                ->where('area_id', $area->id)->where("is_active", 0)
+                ->get();
         } else {
             $entities = Entity::where("is_active", 0)
                 ->where('area_id', $area->id)
