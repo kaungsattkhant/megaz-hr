@@ -149,7 +149,8 @@ class EntityRepository implements EntityRepositoryInterface
                 //service
                 $invoiceServices = $invoice->invoiceService;
                 foreach ($invoiceServices as $invoiceService) {
-                    $this->invoiceModelService->calculateInvoiceService($invoiceService, now());
+                    $time=$invoiceService->end_date!=null? $invoiceService->end_date : now();
+                    $this->invoiceModelService->calculateInvoiceService($invoiceService, $time);
                     $total_service_value += $invoiceService->service_value;
                 }
                 $invoiceServiceCollection = $invoiceServiceCollection->merge($invoice->invoiceService);
@@ -157,7 +158,7 @@ class EntityRepository implements EntityRepositoryInterface
                 //accesory
                 $invoiceAccessories = $invoice->accessories;
                 foreach ($invoiceAccessories as $invoiceAccessorie) {
-                    $total_accessory_value += $invoiceAccessorie->accessory->accessory_price->price;
+                    $total_accessory_value += $invoiceAccessorie->accessory->accessory_price->price*$invoiceAccessorie->quantity;
                 }
                 $invoiceAccessoryCollection = $invoiceAccessoryCollection->merge($invoice->invoiceAccessories);
                 //end_accessoryI
@@ -229,7 +230,8 @@ class EntityRepository implements EntityRepositoryInterface
                 // $entitySession['invoice']=$invoice;
                 $invoiceServices = $invoice->invoiceService;
                 foreach ($invoiceServices as $invoiceService) {
-                    $this->invoiceModelService->calculateInvoiceService($invoiceService, now());
+                    $time=$invoiceService->end_date!=null? $invoiceService->end_date : now();
+                    $this->invoiceModelService->calculateInvoiceService($invoiceService, $time);
                     $total_service_value += $invoiceService->service_value;
                 }
                 $invoiceServiceCollection = $invoiceServiceCollection->merge($invoice->invoiceService);
@@ -237,7 +239,7 @@ class EntityRepository implements EntityRepositoryInterface
                 // invoice accessory
                 $invoiceAccessories = $invoice->accessories;
                 foreach ($invoiceAccessories as $invoiceAccessorie) {
-                    $total_accessory_value += $invoiceAccessorie->accessory->accessory_price->price;
+                    $total_accessory_value += $invoiceAccessorie->accessory->accessory_price->price*$invoiceAccessorie->quantity;
                 }
                 $consolidatedOrderItems = [];
                 foreach ($invoice->orders as $order) {
@@ -288,7 +290,8 @@ class EntityRepository implements EntityRepositoryInterface
             $invoiceServiceCollection = collect();
             $invoiceServices = $invoice->invoiceService;
                 foreach ($invoiceServices as $invoiceService) {
-                    $this->invoiceModelService->calculateInvoiceService($invoiceService, now());
+                    $time=$invoiceService->end_date!=null? $invoiceService->end_date : now();
+                    $this->invoiceModelService->calculateInvoiceService($invoiceService, $time);
                     $total_service_value += $invoiceService->service_value;
                 }
                 $invoiceServiceCollection = $invoiceServiceCollection->merge($invoice->invoiceService);
@@ -296,7 +299,7 @@ class EntityRepository implements EntityRepositoryInterface
                 // invoice accessory
                 $invoiceAccessories = $invoice->accessories;
                 foreach ($invoiceAccessories as $invoiceAccessorie) {
-                    $total_accessory_value += $invoiceAccessorie->accessory->accessory_price->price;
+                    $total_accessory_value += $invoiceAccessorie->accessory->accessory_price->price*$invoiceAccessorie->quantity;
                 }
             $orders = $invoice->orders;
            
