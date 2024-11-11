@@ -72,7 +72,7 @@
                         </div>
                     </div>
                     <div class="relative h-full" v-if="isOpenRoom.open_2 == true" id="open_room_2">
-                        <div class="small-scrollbar overflow-y-auto h-[100vh] pt-8">
+                        <div class="small-scrollbar overflow-y-auto h-[100vh] pt-8 pb-16">
                             <div class="padding-section w-2/3 mx-auto ">
 
                                 <div class="mb-4">
@@ -172,8 +172,8 @@
 
                     <div v-if="isOpenRoom.detail == true" class="relative h-full">
                         <div class="flex justify-between padding-section border-b">
-                            <div>
-                                <p class="text-black text-xl">
+                            <div v-if="selectedRoom">
+                                <p v-if="selectedRoom.entity" class="text-black text-xl">
                                     {{ selectedRoom.entity.name }}
                                 </p>
                             </div>
