@@ -24,7 +24,7 @@ class MrpStoreRequest extends APIRequest
      */
     public function rules(): array
     {
-        return [
+        $rules = [
             'name' => 'required',
             'menu_category_id' => 'required|exists:menu_categories,id',
             'code' => 'required',
@@ -33,21 +33,23 @@ class MrpStoreRequest extends APIRequest
             'is_feature' => 'nullable',
             'description' => 'required|string',
             'cooking_place_id' => "required|exists:cooking_places,id",
-            'price' => 'required',
-            'menu_steps' => 'required|array',
+            'price' => 'nullable',
+            'sub_menu_id' => 'nullable',
+            'menu_type' => 'required|string|in:menu,custom',
+            'menu_steps' => 'nullable|array',
             // 'menu_steps.*.menu_id' => 'required|exists:menus,id',
-            'menu_steps.*.staff_id' => 'required|exists:staff,id',
-            'menu_steps.*.staff_quantity' => 'required|integer',
-            'menu_steps.*.level' => 'required|string|in:level_1,level_2,level_3,level_4,level_5,level_6,level_7',
-            'menu_steps.*.type' => 'required|string|in:portion,ready_to_sale,cooking,plating',
+            'menu_steps.*.staff_id' => 'nullable|exists:staff,id',
+            'menu_steps.*.staff_quantity' => 'nullable|integer',
+            'menu_steps.*.level' => 'nullable|string',
+            'menu_steps.*.type' => 'nullable|string|in:portion,ready_to_sale,cooking,plating,hardcook',
             'menu_steps.*.duration' => 'nullable|integer',
             'menu_steps.*.order_time' => 'nullable|integer',
-            'menu_steps.*.expected_quantity' => 'required|integer',
-            'menu_steps.*.item_menu' => 'required|array',
+            'menu_steps.*.expected_quantity' => 'nullable|integer',
+            'menu_steps.*.item_menu' => 'nullable|array',
             // 'menu_steps.*.item_menu.*.menu_step_id' => 'required|exists:menu_steps,id',
-            'menu_steps.*.item_menu.*.item_id' => 'required|exists:items,id',
-            'menu_steps.*.item_menu.*.uom_id' => 'required|exists:uoms,id',
-            'menu_steps.*.item_menu.*.weight' => 'required|integer'
+            'menu_steps.*.item_menu.*.item_id' => 'nullable|exists:items,id',
+            'menu_steps.*.item_menu.*.uom_id' => 'nullable|exists:uoms,id',
+            'menu_steps.*.item_menu.*.weight' => 'nullable|integer'
         ];
         foreach ($this->input('menu_steps', []) as $index => $menuStep) {
             if (
@@ -59,6 +61,16 @@ class MrpStoreRequest extends APIRequest
                 $rules["menu_steps.$index.order_time"] = 'required|integer';
             }
         }
+
+        if ($this->input('menu_type') === 'menu') {
+            $rules['menu_steps'] = 'nullable|array';
+            $rules['menu_steps.*.item_menu'] = 'nullable|array';
+        } else {
+            $rules['menu_steps'] = 'required|array';
+            $rules['menu_steps.*.item_menu'] = 'required|array';
+        }
+
+        return $rules;
     }
 
     public function failedValidation(Validator $validator)

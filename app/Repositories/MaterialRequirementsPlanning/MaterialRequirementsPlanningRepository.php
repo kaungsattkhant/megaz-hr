@@ -7,6 +7,7 @@ use App\Models\Menu;
 use App\Models\MenuStep;
 use App\Models\MenuPrice;
 use App\Models\MenuStepItem;
+use App\Models\SubMenu;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
@@ -19,12 +20,15 @@ class MaterialRequirementsPlanningRepository implements MaterialRequirementsPlan
       'menu_category',
       'price',
       'menuPlaces.area',
+      'subMenus.menuSteps.menuStepItem.item',
+      'subMenus.menuSteps.menuStepItem.uom',
       'menuSteps.menuStepItem.item',
       'menuSteps.menuStepItem.uom'
     ])->get();
   }
   public function store($validatedData)
   {
+
 
     DB::beginTransaction();
     try {
@@ -81,6 +85,10 @@ class MaterialRequirementsPlanningRepository implements MaterialRequirementsPlan
 
       if (!empty($validatedData['cooking_place_id'])) {
         $menu->menuPlaces()->sync($validatedData['cooking_place_id']);
+      }
+
+      if (!empty($validatedData['sub_menu_id'])) {
+        $menu->subMenus()->sync($validatedData['sub_menu_id']);
       }
 
       DB::commit();

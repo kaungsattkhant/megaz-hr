@@ -82,4 +82,9 @@ class Menu extends BaseModel
     {
         return $this->hasMany(MenuStep::class);
     }
+
+    public function subMenus()
+    {
+        return $this->belongsToMany(Menu::class, 'sub_menus', 'menu_id', 'sub_menu_id');
+    }
 }
