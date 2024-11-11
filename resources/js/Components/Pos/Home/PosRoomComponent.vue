@@ -174,7 +174,7 @@
                         <div class="flex justify-between padding-section border-b">
                             <div>
                                 <p class="text-black text-xl">
-                                    <!-- {{ selectedRoom.name }} --> error
+                                    {{ selectedRoom.entity.name }}
                                 </p>
                             </div>
                             <div class="flex gap-x-3">
@@ -506,7 +506,7 @@
                             </div>
                         </div>
 
-                        <div class="absolute bottom-0 border-t-2 border-gray-200 w-full padding-section !pt-3">
+                        <div class="absolute bottom-0 border-t-2 border-gray-200 w-full padding-section !pt-3 bg-white">
                             <div v-if="isPackage" class=" text-sm text-right flex gap-x-2 justify-end pr-2 mb-2">
                                 <p>
                                     Package Price
