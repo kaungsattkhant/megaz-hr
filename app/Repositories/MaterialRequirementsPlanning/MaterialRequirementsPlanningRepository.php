@@ -16,7 +16,7 @@ class MaterialRequirementsPlanningRepository implements MaterialRequirementsPlan
 {
   public function getMrpLists(Request $data)
   {
-    return Menu::with([
+    $menuLists =  Menu::with([
       'menu_category',
       'price',
       'menuPlaces.area',
@@ -25,6 +25,9 @@ class MaterialRequirementsPlanningRepository implements MaterialRequirementsPlan
       'menuSteps.menuStepItem.item',
       'menuSteps.menuStepItem.uom'
     ])->get();
+
+    // ->paginate(config('common.list_count'));
+    ResponseData($menuLists);
   }
   public function store($validatedData)
   {
