@@ -78,31 +78,3 @@ class MrpStoreRequest extends APIRequest
         parent::failedValidation($validator);
     }
 }
-
-
-
-
-// payload{
-//     name:'Menu-1',
-//     menu_category_id:'1',
-//     code:'menu-001',
-//     image_url:'tes.jpg',
-//     image_path:'test.jpg',
-//     description:'test',
-//     menu_steps: '[
-//     {"level":"level_4",
-//     "type":"portion",
-//     "staff_id":1,
-//     "staff_quantity":2,
-//     "duration":1,
-//     "order_time":"1",
-//     "expected_quantity":1,
-//     "menu_id":1,
-//     "item_menu":[
-//             {"item_id":1,
-//             "menu_step_id":1,
-//             "uom_id":1
-//             ,"weight":1}
-//             ]}
-//             ];
-// }
