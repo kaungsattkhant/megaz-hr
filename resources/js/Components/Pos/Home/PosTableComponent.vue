@@ -843,7 +843,7 @@
                             <select name="" id="" v-model="selectedLady" class="input-ui">
                                 <option :value="lady" v-for="(lady, index) in ladyList"
                                     :key="index">{{
-                                        lady.staff.name }}</option>
+                                        lady.staff ? lady.staff.name : '' }}</option>
                             </select>
                         </div>
                         <div class="mb-4" v-if="selectedServiceCategory ? selectedServiceCategory.name == 'DJ' : ''">
