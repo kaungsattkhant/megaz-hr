@@ -12,6 +12,8 @@ use Illuminate\Support\Facades\DB;
 use App\Services\DepreciationService;
 use App\Services\TrialBalanceService;
 use App\Services\InventoryFinancialService;
+use App\Http\Action\Transaction\CashBookTransaction;
+use App\Models\PrepaidBalance;
 
 class FinancialRepository implements FinancialInterface
 {
@@ -30,7 +32,6 @@ class FinancialRepository implements FinancialInterface
         $this->trialBalanceService = $trialBalanceService;
         $this->inventoryFinancialService = $inventoryFinancialService;
         $this->depreciationService = $depreciationService;
-
     }
 
     public function CashFlowStatementOriginal($request) //original
@@ -537,7 +538,7 @@ class FinancialRepository implements FinancialInterface
         $total_fix_cost = $total_rt_fix_cost + $total_ktv_fix_cost;
 
 
-        $net_profit=$total_operating_income-($total_over_head+$total_fix_cost);
+        $net_profit = $total_operating_income - ($total_over_head + $total_fix_cost);
         //finance cost
         $financeCost = $this->trialBalanceService->getTotalResultBySubAccountCode($financeCostCode, 'debit', $current, 'cash_sale');
         $financeCostPL = $this->calRTAndKTVPL($rtTotalSale, $ktvTotalSale, $financeCost[0]->total_amount, $totalRevenue);
@@ -545,21 +546,21 @@ class FinancialRepository implements FinancialInterface
         //year teax
         $yearText = $this->trialBalanceService->getTotalResultBySubAccountCode($yearTaxCode, 'debit', $current, 'cash_sale');
         $yearTaxPL = $this->calRTAndKTVPL($rtTotalSale, $ktvTotalSale, $yearText[0]->total_amount, $totalRevenue);
-        $total_rt_interest_and_tax=$financeCostPL[0]+$yearTaxPL[0];
-        $total_ktv_interest_and_tax=$financeCostPL[1]+$yearTaxPL[1];
-        $total_interest_and_tax=$total_rt_interest_and_tax+$total_ktv_interest_and_tax;
+        $total_rt_interest_and_tax = $financeCostPL[0] + $yearTaxPL[0];
+        $total_ktv_interest_and_tax = $financeCostPL[1] + $yearTaxPL[1];
+        $total_interest_and_tax = $total_rt_interest_and_tax + $total_ktv_interest_and_tax;
 
-        $rt_net_profit=$total_rt_operating_income-($total_rt_over_head+$total_rt_fix_cost);
-        $ktv_net_profit=$total_ktv_operating_income-($total_ktv_over_head+$total_ktv_fix_cost);
-        $total_net_profit=$rt_net_profit+$ktv_net_profit;
+        $rt_net_profit = $total_rt_operating_income - ($total_rt_over_head + $total_rt_fix_cost);
+        $ktv_net_profit = $total_ktv_operating_income - ($total_ktv_over_head + $total_ktv_fix_cost);
+        $total_net_profit = $rt_net_profit + $ktv_net_profit;
 
 
 
-        $rt_net_profit_after_tax=$rt_net_profit-$total_rt_interest_and_tax;
-        $ktv_net_profit_after_tax=$ktv_net_profit-$total_ktv_interest_and_tax;
-        $total_net_profit_after_tax=$rt_net_profit_after_tax+$ktv_net_profit_after_tax;
+        $rt_net_profit_after_tax = $rt_net_profit - $total_rt_interest_and_tax;
+        $ktv_net_profit_after_tax = $ktv_net_profit - $total_ktv_interest_and_tax;
+        $total_net_profit_after_tax = $rt_net_profit_after_tax + $ktv_net_profit_after_tax;
 
-        $response=[];
+        $response = [];
 
         $operating_income = [];
         $cashSaleResponse = [
@@ -569,9 +570,9 @@ class FinancialRepository implements FinancialInterface
             "total" => $rtGP + $ktvGP,
         ];
         $operating_income[] = $cashSaleResponse;
-        $operating_income[]=$this->setResponseFormat('Other Income ',$otherIncomePL);
-        $operating_income_response=$this->setTotalResponseFormat('Total Operating Income',$total_rt_operating_income,$total_ktv_operating_income,$total_operating_income);
-    
+        $operating_income[] = $this->setResponseFormat('Other Income ', $otherIncomePL);
+        $operating_income_response = $this->setTotalResponseFormat('Total Operating Income', $total_rt_operating_income, $total_ktv_operating_income, $total_operating_income);
+
         // $otherIncomeResponse = [
         //     "name" => "Other Income ",  // Fixed name
         //     "restaurant_pl" => $otherIncomePL[0],      // Default values
@@ -581,60 +582,62 @@ class FinancialRepository implements FinancialInterface
         // $operating_income[] = $otherIncomeResponse;
         // return $total_operating_income;
 
-        $overhead=[];
-        $overhead[]=$this->setResponseFormat('Operating Expense',$operatingExpensePL);
-        $overhead[]=$this->setResponseFormat('Adminstrative Cost',$adminstrativeCostPL);
-        $overhead[]=$this->setResponseFormat('Pay & Related Expenses',$payAndRelatedCostPL);
-        $total_overhead_response=$this->setTotalResponseFormat('Total Operating Income',$total_rt_over_head,$total_ktv_over_head,$total_over_head);
+        $overhead = [];
+        $overhead[] = $this->setResponseFormat('Operating Expense', $operatingExpensePL);
+        $overhead[] = $this->setResponseFormat('Adminstrative Cost', $adminstrativeCostPL);
+        $overhead[] = $this->setResponseFormat('Pay & Related Expenses', $payAndRelatedCostPL);
+        $total_overhead_response = $this->setTotalResponseFormat('Total Operating Income', $total_rt_over_head, $total_ktv_over_head, $total_over_head);
         // return $operatingExpenseResponse;
 
-        $fixedCost[]=$this->setResponseFormat('Rental Fee',$rentalPL);
-        $fixedCost[]=$this->setResponseFormat('CA-Deprciation',$currentAssetPL);
-        $fixedCost[]=$this->setResponseFormat('FA-Depreciation',$fixAssetPL);
-        $total_fixed_cost_response=$this->setTotalResponseFormat('Total Fixed Cost',$total_rt_fix_cost,$total_ktv_fix_cost,$total_fix_cost);
+        $fixedCost[] = $this->setResponseFormat('Rental Fee', $rentalPL);
+        $fixedCost[] = $this->setResponseFormat('CA-Deprciation', $currentAssetPL);
+        $fixedCost[] = $this->setResponseFormat('FA-Depreciation', $fixAssetPL);
+        $total_fixed_cost_response = $this->setTotalResponseFormat('Total Fixed Cost', $total_rt_fix_cost, $total_ktv_fix_cost, $total_fix_cost);
 
         // $net_profit_before=$this->setTotalResponseFormat('Net Profit (Earning Before Interest & Taxes)',,$total_ktv_interest_and_tax,$total_interest_and_tax);
 
-        $interestAndTax[]=$this->setResponseFormat('Finance Cost',$financeCostPL);
-        $interestAndTax[]=$this->setResponseFormat('Year Tax',$yearTaxPL);
-        $total_interest_and_tax_response=$this->setTotalResponseFormat('Total Interest And Tax',$total_rt_interest_and_tax,$total_ktv_interest_and_tax,$total_interest_and_tax);
-        $net_profit=$this->setTotalResponseFormat('Net Profit (Earning Before Interest & Taxes)',$rt_net_profit,$ktv_net_profit,$total_net_profit);
-        $net_profit_after_tax=$this->setTotalResponseFormat('Net Profit After Inerest &Tax',$rt_net_profit_after_tax,$ktv_net_profit_after_tax,$total_net_profit_after_tax);
+        $interestAndTax[] = $this->setResponseFormat('Finance Cost', $financeCostPL);
+        $interestAndTax[] = $this->setResponseFormat('Year Tax', $yearTaxPL);
+        $total_interest_and_tax_response = $this->setTotalResponseFormat('Total Interest And Tax', $total_rt_interest_and_tax, $total_ktv_interest_and_tax, $total_interest_and_tax);
+        $net_profit = $this->setTotalResponseFormat('Net Profit (Earning Before Interest & Taxes)', $rt_net_profit, $ktv_net_profit, $total_net_profit);
+        $net_profit_after_tax = $this->setTotalResponseFormat('Net Profit After Inerest &Tax', $rt_net_profit_after_tax, $ktv_net_profit_after_tax, $total_net_profit_after_tax);
 
-        $responseOperating['data']=$operating_income;
-        $responseOperating['total']=$operating_income_response;
+        $responseOperating['data'] = $operating_income;
+        $responseOperating['total'] = $operating_income_response;
 
-        $responseOverhead['data']=$overhead;
-        $responseOverhead['total']=$total_overhead_response;
+        $responseOverhead['data'] = $overhead;
+        $responseOverhead['total'] = $total_overhead_response;
 
-        $responseFixedCost['data']=$fixedCost;
-        $responseFixedCost['total']=$total_fixed_cost_response;
+        $responseFixedCost['data'] = $fixedCost;
+        $responseFixedCost['total'] = $total_fixed_cost_response;
 
-        $responseNetProfit['total']=$net_profit;
+        $responseNetProfit['total'] = $net_profit;
 
-        $responseInterestAndTax['data']=$interestAndTax;
-        $responseInterestAndTax['total']=$total_interest_and_tax_response;
+        $responseInterestAndTax['data'] = $interestAndTax;
+        $responseInterestAndTax['total'] = $total_interest_and_tax_response;
 
-        $responseNetProfitAfterTax['total']=$net_profit_after_tax;
+        $responseNetProfitAfterTax['total'] = $net_profit_after_tax;
 
-        $data[]=$responseOperating;
-        $data[]=$responseOverhead;
-        $data[]=$responseFixedCost;
-        $data[]=$responseNetProfit;
-        $data[]=$responseInterestAndTax;
-        $data[]=$responseNetProfitAfterTax;
+        $data[] = $responseOperating;
+        $data[] = $responseOverhead;
+        $data[] = $responseFixedCost;
+        $data[] = $responseNetProfit;
+        $data[] = $responseInterestAndTax;
+        $data[] = $responseNetProfitAfterTax;
         return $data;
     }
-    public function setResponseFormat($name,$plData){
-        return  [
+    public function setResponseFormat($name, $plData)
+    {
+        return [
             "name" => $name,  // Fixed name
             "restaurant_pl" => $plData[0],      // Default values
             "ktv_pl" => $plData[1],
             "total" => $plData[0] + $plData[1],
         ];
     }
-    public function setTotalResponseFormat($name,$total_rt,$total_ktv,$total){
-        return  [
+    public function setTotalResponseFormat($name, $total_rt, $total_ktv, $total)
+    {
+        return [
             "name" => $name,  // Fixed name
             "total_restaurant_pl" => $total_rt,      // Default values
             "total_ktv_pl" => $total_ktv,
@@ -750,8 +753,56 @@ class FinancialRepository implements FinancialInterface
         //groupBy category_id and item type
     }
 
-    public function getWorkingCapital($request){
-        dd('abc');
+    public function getWorkingCapital($request)
+    {
+        //inventory schedule held
+        $inventory_held = '2-1020';
+        $cash_and_back = ['2-1000'];
+        $month = Carbon::parse($request->date)->format('n');
+        $year = Carbon::parse($request->date)->format('Y');
+        $inventoryHeldBalances = $this->depreciationService->depreciationBalanceQueryOfYear($inventory_held, $year);
+        //end
+        $cashBookBalances = (new CashBookTransaction())->getCashAndBankBalanceByMonth($cash_and_back, $year, $month);
+
+        $prepaidBalances = $this->getPrepaidBalance($year);
+        $data['inventory_held'] = $inventoryHeldBalances;
+        $data['cashbook'] = $cashBookBalances;
+        $data['prepaid'] = $prepaidBalances;
+        return $data;
+    }
+
+    public function getPrepaidBalance($year)
+    {
+        $year = Carbon::now()->year;
+        $currentMonth = Carbon::now()->month;
+
+        $monthsOfYear = collect(range(1, $currentMonth))->map(function ($month) use ($year) {
+            $date = Carbon::create($year, $month, 1);
+            return [
+                'month_number' => $month,
+                'month_name' => $date->format('F'),
+                'date' => $date->format('Y-m-01'),
+            ];
+        });
+        $prepaidData = DB::table('prepaid_balances')
+            ->where('year', $year)
+            ->where('month', '<=', $currentMonth) // Only include months up to the current month
+            ->select(
+                'month',
+                DB::raw("DATE_FORMAT(CONCAT(year, '-', LPAD(month, 2, '0'), '-01'), '%Y-%m-%d') as date"),
+                DB::raw('closing_balance as value')
+            )
+            ->get();
+        $prepaidBalances = $monthsOfYear->map(function ($month) use ($prepaidData) {
+            $data = $prepaidData->firstWhere('month', $month['month_number']);
+
+            return [
+                'month' => $month['month_name'],
+                'date' => $month['date'],
+                'value' => $data ? $data->value : 0,
+            ];
+        });
+        return $prepaidBalances;
     }
 
     protected function getSum($data)

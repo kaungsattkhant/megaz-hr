@@ -532,11 +532,17 @@ class EntityRepository implements EntityRepositoryInterface
 
     public function inactiveEntityList($data)
     {
+        // mobile
+// ${base_url}entities/change?waiter=1
+// ${base_url}areas/${widget.areaId}/entities?type=room'
+//api/areas/${area_id}/inactive_entities?type=room
         $area = Area::find($data['area_id']);
         if (isset($data['type'])) {
             $entities = Entity::where("entity_type", $data['type'])->where('area_id', $area->id)->where("is_active", 0)->get();
         } else {
-            $entities = Entity::where("is_active", 0)->where('area_id', $area->id)->get();
+            $entities = Entity::where("is_active", 0)
+                ->where('area_id', $area->id)
+                ->get();
         }
 
         return $entities;
