@@ -127,7 +127,6 @@ class EntityRepository implements EntityRepositoryInterface
         return $entities;
     }
 
-
     public function entityDetail(array $data, int $entitySessionId)
     {
         $entitySession = EntitySession::where('is_available', 1)
