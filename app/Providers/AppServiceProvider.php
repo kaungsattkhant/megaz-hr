@@ -48,6 +48,8 @@ class AppServiceProvider extends ServiceProvider
             'complaint' => 'App\Models\Complaint',
             'canteen' => 'App\Models\Canteen',
             'canteen_item' => 'App\Models\CanteenItem',
+            'prepaid'=>'App\Models\Prepaid',
+            'account_receivable'=>'App\Models\AccountReceivable',
         ]);
     }
 }

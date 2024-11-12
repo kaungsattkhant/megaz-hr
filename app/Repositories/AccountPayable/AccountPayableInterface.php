@@ -14,4 +14,6 @@ interface AccountPayableInterface
     public function createPayableTransaction($request);
 
     public function listOfAccountPayableTransaction($request);
+
+    public function getAccountPayableBalance($request);
 }

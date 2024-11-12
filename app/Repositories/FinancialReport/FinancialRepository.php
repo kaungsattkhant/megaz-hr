@@ -14,11 +14,15 @@ use App\Services\TrialBalanceService;
 use App\Services\InventoryFinancialService;
 use App\Http\Action\Transaction\CashBookTransaction;
 use App\Models\PrepaidBalance;
+use App\Models\StaffBalance;
+use App\Services\FinancialService;
 
 class FinancialRepository implements FinancialInterface
 {
     protected $cashFlowService;
     protected $trialBalanceService;
+
+    protected $financialService;
 
     protected $depreciationService;
 
@@ -26,8 +30,9 @@ class FinancialRepository implements FinancialInterface
     private $receiptSubAccountCode = ['2-1000', '2-1050', '2-2000', '4-3000', '5-0000', '5-0100', '5-1000', '4-4000', '3-1000'];
     private $paymentSubAccountCode = ['1-1000', '1-1100', '2-1000', '2-1020', '2-1050', '2-3000', '2-4000', '3-2000', '4-1000', '4-2000', '4-3000', '4-4000', '6-0000', '6-2000', '6-3000', '6-4000', '6-5000', '6-6000', '6-7000', '6-8000', '6-9000', '3-1000'];
 
-    public function __construct(CashFlowService $cashFlowService, TrialBalanceService $trialBalanceService, InventoryFinancialService $inventoryFinancialService, DepreciationService $depreciationService)
+    public function __construct(FinancialService $financialService, CashFlowService $cashFlowService, TrialBalanceService $trialBalanceService, InventoryFinancialService $inventoryFinancialService, DepreciationService $depreciationService)
     {
+        $this->financialService = $financialService;
         $this->cashFlowService = $cashFlowService;
         $this->trialBalanceService = $trialBalanceService;
         $this->inventoryFinancialService = $inventoryFinancialService;
@@ -762,48 +767,26 @@ class FinancialRepository implements FinancialInterface
         $year = Carbon::parse($request->date)->format('Y');
         $inventoryHeldBalances = $this->depreciationService->depreciationBalanceQueryOfYear($inventory_held, $year);
         //end
-        $cashBookBalances = (new CashBookTransaction())->getCashAndBankBalanceByMonth($cash_and_back, $year, $month);
 
-        $prepaidBalances = $this->getPrepaidBalance($year);
+        //cashbook balance
+        $cashBookBalances = (new CashBookTransaction())->getCashAndBankBalanceByMonth($cash_and_back, $year, $month);
+        //prepaid balance
+        $prepaidBalances = $this->financialService->getClosingBalance('prepaid_balances', $year);
+        //staff loan 
+        $staffLoanBalances = $this->financialService->getClosingBalance('staff_balances', $year);
+
+        $receivableBalances = $this->financialService->getReceivableBalances($year, $month);
+
         $data['inventory_held'] = $inventoryHeldBalances;
         $data['cashbook'] = $cashBookBalances;
         $data['prepaid'] = $prepaidBalances;
+        $data['receiveable'] = $receivableBalances;
+        $data['staff_loan'] = $staffLoanBalances;
+
         return $data;
     }
 
-    public function getPrepaidBalance($year)
-    {
-        $year = Carbon::now()->year;
-        $currentMonth = Carbon::now()->month;
 
-        $monthsOfYear = collect(range(1, $currentMonth))->map(function ($month) use ($year) {
-            $date = Carbon::create($year, $month, 1);
-            return [
-                'month_number' => $month,
-                'month_name' => $date->format('F'),
-                'date' => $date->format('Y-m-01'),
-            ];
-        });
-        $prepaidData = DB::table('prepaid_balances')
-            ->where('year', $year)
-            ->where('month', '<=', $currentMonth) // Only include months up to the current month
-            ->select(
-                'month',
-                DB::raw("DATE_FORMAT(CONCAT(year, '-', LPAD(month, 2, '0'), '-01'), '%Y-%m-%d') as date"),
-                DB::raw('closing_balance as value')
-            )
-            ->get();
-        $prepaidBalances = $monthsOfYear->map(function ($month) use ($prepaidData) {
-            $data = $prepaidData->firstWhere('month', $month['month_number']);
-
-            return [
-                'month' => $month['month_name'],
-                'date' => $month['date'],
-                'value' => $data ? $data->value : 0,
-            ];
-        });
-        return $prepaidBalances;
-    }
 
     protected function getSum($data)
     {

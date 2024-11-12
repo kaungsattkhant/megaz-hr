@@ -40,4 +40,9 @@ class AccountPayableController extends Controller
         $data= $this->accountPayableRepo->listOfAccountPayableTransaction($request);
         ResponseData($data);
     }
+
+    public function getAccountPayableBalance(Request $request){
+        $data= $this->accountPayableRepo->getAccountPayableBalance($request);
+        ResponseData($data);
+    }
 }
