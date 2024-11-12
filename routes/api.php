@@ -602,4 +602,7 @@ Route::controller(DeliveryChargeAPIController::class)->group(function () {
 
 Route::controller(MaterialRequirementsPlanningAPIController::class)->group(function () {
     Route::apiResource('/mrp', MaterialRequirementsPlanningAPIController::class);
+    Route::post('/menu/{id}/toggle', 'menuToggle');
+    Route::get('/menuStep/{id}', 'getMenuStepList');
+    Route::delete('/menu_step_items/{id}', 'menuStepItemsDelete');
 });

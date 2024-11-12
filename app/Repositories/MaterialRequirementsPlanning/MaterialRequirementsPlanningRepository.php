@@ -14,18 +14,23 @@ use Illuminate\Support\Facades\Storage;
 
 class MaterialRequirementsPlanningRepository implements MaterialRequirementsPlanningInterface
 {
-  public function getMrpLists(Request $data)
+  public function getMrpLists(Request $request)
   {
-    return Menu::with([
+    $search = $request->input('search');
+    $category = $request->input('category');
+    $price = $request->input('price');
+    $code = $request->input('code');
+    $menuList = Menu::menuFilter($search, $price, $category, $code)->with([
       'menu_category',
       'price',
       'menuPlaces.area',
+      'menuSteps.staff.roles.department',
+      'menuSteps.menuStepItem.item',
+      'menuSteps.menuStepItem.uom',
       'subMenus.menuSteps.menuStepItem.item',
       'subMenus.menuSteps.menuStepItem.uom',
-      'menuSteps.menuStepItem.item',
-      'menuSteps.menuStepItem.uom'
-    ])->get();
-    // ->paginate(config('common.list_count'));
+    ])->paginate(config('common.list_count'));
+    return $menuList;
   }
   public function store($validatedData)
   {
@@ -111,11 +116,16 @@ class MaterialRequirementsPlanningRepository implements MaterialRequirementsPlan
       'menu_category',
       'price',
       'menuPlaces.area',
+      'menuSteps.staff.roles.department',
+      'menuSteps.menuStepItem.item',
+      'menuSteps.menuStepItem.uom',
       'subMenus.menuSteps.menuStepItem.item',
       'subMenus.menuSteps.menuStepItem.uom',
-      'menuSteps.menuStepItem.item',
-      'menuSteps.menuStepItem.uom'
-    ])->where('id', $menuId)->get();
+    ])->where('id', $menuId)
+      ->where('is_active', 1)
+      ->whereHas('menuSteps.staff', function ($query) {
+        $query->where('is_active', 1);
+      })->get();
   }
 
   public function updateMrpList($menuId, $validatedData)
@@ -139,27 +149,35 @@ class MaterialRequirementsPlanningRepository implements MaterialRequirementsPlan
       if (!empty($validatedData['menu_steps'])) {
 
         foreach ($validatedData['menu_steps'] as $data) {
-          $menuStep = MenuStep::updateOrCreate([
-            ['id' => $data['id'] ?? null],
-            'menu_id' => $menuId,
-            'staff_id' => $data['staff_id'],
-            'staff_quantity' => $data['staff_quantity'],
-            'duration' => $data['duration'],
-            'order_time' => $data['order_time'],
-            'expected_quantity' => $data['expected_quantity'],
-            'level' => $data['level'],
-            'type' => $data['type']
-          ]);
+          $menuStep =  $menu->menuSteps()->updateOrCreate(
+            [
+              'id' => $data['id'] ?? null,
+              'menu_id' => $menuId,
+            ],
+            [
+              'staff_id' => $data['staff_id'],
+              'staff_quantity' => $data['staff_quantity'],
+              'duration' => $data['duration'],
+              'order_time' => $data['order_time'],
+              'expected_quantity' => $data['expected_quantity'],
+              'level' => $data['level'],
+              'type' => $data['type']
+            ]
+          );
 
           if (!empty($data['item_menu'])) {
             foreach ($data['item_menu'] as $itemData) {
-              MenuStepItem::updateOrCreate([
-                ['id' => $itemData['id'] ?? null],
-                'menu_step_id' => $menuStep->id,
-                'item_id' => $itemData['item_id'],
-                'uom_id' => $itemData['uom_id'],
-                'weight' => $itemData['weight']
-              ]);
+              $menuStep->menuStepItem()->updateOrCreate(
+                [
+                  'id' => $itemData['id'] ?? null,
+                  'menu_step_id' => $menuStep->id
+                ],
+                [
+                  'item_id' => $itemData['item_id'],
+                  'uom_id' => $itemData['uom_id'],
+                  'weight' => $itemData['weight']
+                ]
+              );
             }
           }
         }
@@ -184,5 +202,45 @@ class MaterialRequirementsPlanningRepository implements MaterialRequirementsPlan
       ResponseMessage($e->getMessage(), 500);
       throw $e;
     }
+  }
+
+
+  public function menuToggle($menuId, $validatedData)
+  {
+    DB::beginTransaction();
+    try {
+      $menu = Menu::findOrFail($menuId);
+      if (isset($validatedData['is_active'])) {
+        $menu->is_active = $menu->is_active ? 0 : 1;
+      }
+      if (isset($validatedData['is_feature'])) {
+        $menu->is_feature = $menu->is_feature ? 0 : 1;
+      }
+      $menu->save();
+      DB::commit();
+      ResponseMessage('Toggle has been changed');
+    } catch (\Exception $e) {
+      DB::rollback();
+      ResponseMessage($e->getMessage(), 402);
+      throw $e;
+    }
+  }
+
+  public function getMenuStepList($menuStepId)
+  {
+    $menu = MenuStep::with(['staff.roles.department', 'menuStepItem.item', 'menuStepItem.uom'])
+      ->where('id', $menuStepId)
+      ->whereHas('staff', function ($query) {
+        $query->where('is_active', 1);
+      })
+      ->get();
+
+    return $menu;
+  }
+
+  public function menuStepItemsDelete($menuStepItemId)
+  {
+    $itemStepItem = MenuStepItem::findOrFail($menuStepItemId);
+    $itemStepItem->delete();
   }
 }

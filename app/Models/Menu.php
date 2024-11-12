@@ -87,4 +87,27 @@ class Menu extends BaseModel
     {
         return $this->belongsToMany(Menu::class, 'sub_menus', 'menu_id', 'sub_menu_id');
     }
+
+
+    public function scopeMenuFilter($query, $search = null, $price = null, $category = null, $code = null)
+    {
+        return $query
+            ->when($search, function ($q) use ($search) {
+                $q->where(function ($query) use ($search) {
+                    $query->where('name', 'like', '%' . $search . '%')
+                        ->orWhere('price', 'like', '%' . $search . '%')
+                        ->orWhere('category', 'like', '%' . $search . '%')
+                        ->orWhere('code', 'like', '%' . $search . '%');
+                });
+            })
+            ->when($price, function ($q) use ($price) {
+                $q->where('price', $price);
+            })
+            ->when($category, function ($q) use ($category) {
+                $q->where('category', $category);
+            })
+            ->when($code, function ($q) use ($code) {
+                $q->where('code', 'like', '%' . $code . '%');
+            });
+    }
 }

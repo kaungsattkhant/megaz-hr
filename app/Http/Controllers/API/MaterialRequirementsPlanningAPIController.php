@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\MRP\MenuToggleRequest;
 use App\Http\Requests\MRP\MrpStoreRequest;
 use App\Repositories\MaterialRequirementsPlanning\MaterialRequirementsPlanningInterface;
 use Illuminate\Http\Request;
@@ -40,9 +41,21 @@ class MaterialRequirementsPlanningAPIController extends Controller
         ResponseData($data);
     }
 
-
-    public function destroy(string $id)
+    public function menuToggle($menuId, MenuToggleRequest $validatedData)
     {
-        //
+        $data = $this->MaterialRequirementsPlanningRepository->menuToggle($menuId, $validatedData);
+        ResponseData($data);
+    }
+
+    public function getMenuStepList(int $menuStepId)
+    {
+        $data = $this->MaterialRequirementsPlanningRepository->getMenuStepList($menuStepId);
+        ResponseData($data);
+    }
+
+    public function menuStepItemsDelete(int $menuStepItemId)
+    {
+        $data = $this->MaterialRequirementsPlanningRepository->menuStepItemsDelete($menuStepItemId);
+        ResponseData($data);
     }
 }
