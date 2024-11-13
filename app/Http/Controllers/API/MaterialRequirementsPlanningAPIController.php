@@ -22,9 +22,9 @@ class MaterialRequirementsPlanningAPIController extends Controller
         ResponseData($data);
     }
 
-    public function store(MrpStoreRequest $request)
+    public function store(Request $request)
     {
-        $data = $this->MaterialRequirementsPlanningRepository->store($request->validated());
+        $data = $this->MaterialRequirementsPlanningRepository->store($request);
         ResponseData($data);
     }
 
