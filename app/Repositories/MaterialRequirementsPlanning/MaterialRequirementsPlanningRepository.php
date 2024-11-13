@@ -95,9 +95,9 @@ class MaterialRequirementsPlanningRepository implements MaterialRequirementsPlan
       // }
 
       $submenu = json_decode($validatedData['sub_menu_id']);
-      if (!empty($validatedData['sub_menu_id'])) {
-        $menu->subMenus()->sync($submenu);
-      }
+      // if (!empty($validatedData['sub_menu_id'])) {
+      $menu->subMenus()->sync($submenu);
+      // }
 
       DB::commit();
       $menuDatas = Menu::with('menuSteps.menuStepItem')->find($menu->id);
