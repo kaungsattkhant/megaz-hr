@@ -12,13 +12,18 @@ class MenuCategory extends BaseModel
 {
     use HasFactory;
 
-    protected $fillable = ['name', 'is_active', 'image_path', 'image_url'];
+    protected $fillable = [
+        'name',
+        'is_active',
+        'image_path',
+        'image_url'
+    ];
 
     protected static function booted()
     {
         static::addGlobalScope(new IsActiveScope);
     }
-    
+
     public function menus()
     {
         return $this->hasMany(Menu::class);

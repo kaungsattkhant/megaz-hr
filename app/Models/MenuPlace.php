@@ -5,19 +5,12 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-use App\Models\Menu;
-
-class MenuPrice extends BaseModel
+class MenuPlace extends Model
 {
     use HasFactory;
 
     protected $fillable = [
         'menu_id',
-        'price'
+        'cooking_place_id'
     ];
-
-    public function menu()
-    {
-        return $this->belongsTo(Menu::class);
-    }
 }
