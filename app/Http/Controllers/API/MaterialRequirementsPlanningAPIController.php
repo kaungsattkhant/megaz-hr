@@ -58,4 +58,12 @@ class MaterialRequirementsPlanningAPIController extends Controller
         $data = $this->MaterialRequirementsPlanningRepository->menuStepItemsDelete($menuStepItemId);
         ResponseData($data);
     }
+
+    // getCookingPlace
+
+    public function getCookingPlace(Request $request)
+    {
+        $data = $this->MaterialRequirementsPlanningRepository->getCookingPlace($request);
+        ResponseData($data);
+    }
 }

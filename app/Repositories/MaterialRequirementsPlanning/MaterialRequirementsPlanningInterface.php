@@ -19,4 +19,6 @@ interface MaterialRequirementsPlanningInterface
   public function getMenuStepList($menuStepId);
 
   public function menuStepItemsDelete($menuStepItemId);
+
+  public function getCookingPlace(Request $request);
 }

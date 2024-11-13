@@ -4,10 +4,11 @@ namespace App\Repositories\MaterialRequirementsPlanning;
 
 use Exception;
 use App\Models\Menu;
+use App\Models\SubMenu;
 use App\Models\MenuStep;
 use App\Models\MenuPrice;
+use App\Models\CookingPlace;
 use App\Models\MenuStepItem;
-use App\Models\SubMenu;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
@@ -242,5 +243,10 @@ class MaterialRequirementsPlanningRepository implements MaterialRequirementsPlan
   {
     $itemStepItem = MenuStepItem::findOrFail($menuStepItemId);
     $itemStepItem->delete();
+  }
+
+  public function getCookingPlace(Request $request)
+  {
+    return CookingPlace::with('area')->get();
   }
 }
