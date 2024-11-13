@@ -198,6 +198,25 @@
                     </div>
                 </div>
             </div>
+            <div class="mb-4 col-span-3 rounded-md">
+                <label for="" class="block text-sm text-black mb-3">
+                    Images
+                </label>
+                <div class="">
+                    <input type='file' @change="handleFileChange" class="input-ui w-full !p-1 text-xs" />
+                </div>
+
+            </div>
+            <div class="mb-0 col-span-3 rounded-md">
+                <label for="" class="label-form mb-3">
+                    Description
+                </label>
+                <div class="bg-white mb-0 w-full text-sm inline-block h-[34px]"
+                    data-te-select-wrapper-ref>
+                    <textarea type='text' v-model='description' class="input-ui w-full !p-1 text-xs" placeholder="Description" ></textarea>
+                </div>
+
+            </div>
             <div class="col-span-3">
                 <label for="" class="label-form mb-3">
                     &nbsp;
@@ -213,7 +232,7 @@
 
         <div class=" bg-white py-4 px-8 rounded-md shadow-md mb-8">
 
-            <div v-if="menuLevel.item.length > 0">
+            <div v-if="menuLevel.item_menu.length > 0">
                 <div class="flex mb-2">
                     <p v-if="menuLevel.level">
                         {{ menuLevel.level.name }} : 
@@ -260,7 +279,7 @@
                         </tr>
                     </thead>
                     <tbody v-if="menuLevel">
-                        <tr v-if="menuLevel.item.length > 0" class="" v-for="(menu, menuIndex) in menuLevel.item"
+                        <tr v-if="menuLevel.item_menu.length > 0" class="" v-for="(menu, menuIndex) in menuLevel.item_menu"
                             :key="menuIndex">
                             <td class="">
                                 {{ menu.name }}
@@ -365,11 +384,11 @@ export default {
         return {
             cookingAreaList:[],
             levelList:[
-                {"id": 1,"name": "Level 1"},
-                {"id": 2,"name": "Level 2"},
-                {"id": 3,"name": "Level 3"},
-                {"id": 4,"name": "Level 4"},
-                {"id": 5,"name": "Level 5"},
+                {"id": 'level_1',"name": "Level 1"},
+                {"id": 'level_2',"name": "Level 2"},
+                {"id": 'level_3',"name": "Level 3"},
+                {"id": 'level_4',"name": "Level 4"},
+                {"id": 'level_5',"name": "Level 5"},
             ],
             menuTypeList:[
                 'menu',
@@ -379,8 +398,11 @@ export default {
             menuList:[],
             // levelList:[],
             typeList:[
-                {"id": 1,"name": "Portion"},
-                {"id": 2,"name": "Ready To Sale"},
+                {"id": 'portion',"name": "Portion"},
+                {"id": 'ready_to_sale',"name": "Ready To Sale"},
+                {"id": 'cooking',"name": "Cooking"},
+                {"id": 'plating',"name": "Plating"},
+                {"id": 'hardcook',"name": "Hard Cook"},
             ],
             positionList:[ //staff list
                 {"id": 1,"name": "Position 1"},
@@ -408,20 +430,25 @@ export default {
             selectedItem:null,
             amount:null,
             selectedUom:null,
+            description:null,
+            selectedImage:null,
 
             menuLevel:{
                 level : null,
                 type : null,
                 position : null,
+                staff_id:null,
+                staff_quantity:null,
                 duration : null,
                 order_time : null,
                 expected_quantity : null,
-                item:[],
+                item_menu:[],
             },
             levelTable:[],
 
+            departmentId:null,
 
-            departmentId: null,
+
         };
     },
 
@@ -430,13 +457,19 @@ export default {
 
         
 
-        async getCookingAreaList(departmentId) {
-            let response = await getApiData({ url: `/api/areas?department_id=${departmentId}`, token: this.getToken() });
+        async getCookingAreaList() {
+            let response = await getApiData({ url: `/api/cooking_place`, token: this.getToken() });
             if (response.data) {
                 this.cookingAreaList = response.data;
             }
         },
 
+        async getStaffList(departmentId){
+            let response = await getApiData({ url: '/api/departments/' + departmentId + '/staffs', token: this.getToken() });
+            if (response.data) {
+                this.positionList = response.data;
+            }
+        },
         async getMenuCategoryList() {
             let response = await getApiData({ url: `/api/menu_categories`, token: this.getToken() });
             if (response.data) {
@@ -545,36 +578,28 @@ export default {
                 return 1;
             }
 
-            if(this.menuLevel.item.length < 1){
-                this.menuLevel.level = this.selectedLevel;
-                this.menuLevel.type = this.selectedType,
-                this.menuLevel.position = this.selectedPosition,
-                this.menuLevel.duration = this.duration,
-                this.menuLevel.order_time = this.orderTime,
-                this.menuLevel.expected_quantity = this.expectedQuantity,
-                this.menuLevel = {
-                    level : this.selectedLevel,
-                    type : this.selectedType,
-                    position : this.selectedPosition,
-                    duration : this.duration,
-                    order_time : this.orderTime,
-                    expected_quantity : this.expectedQuantity,
-                    item:[
-                        {
-                            id: this.selectedItem.id,
-                            price: price,
-                            name: this.selectedItem.name,
-                            weight: this.amount,
-                            is_make_pack: this.isMakePack,
-                            uom_id: this.selectedUom.id,
-                            uom_name: this.selectedUom.name
-                        }
-                    ]
-                }
+            if(this.menuLevel.item_menu.length < 1){
+                this.menuLevel.level = this.selectedLevel.id;
+                this.menuLevel.type = this.selectedType.id;
+                this.menuLevel.position = this.selectedPosition;
+                this.menuLevel.staff_id = this.selectedPosition.id;
+                this.menuLevel.staff_quantity = 2;
+                this.menuLevel.duration = this.duration;
+                this.menuLevel.order_time = this.orderTime;
+                this.menuLevel.expected_quantity = this.expectedQuantity;
+                this.menuLevel.item_menu.push({
+                    item_id: this.selectedItem.id,
+                    price: price,
+                    name: this.selectedItem.name,
+                    weight: this.amount,
+                    is_make_pack: this.isMakePack,
+                    uom_id: this.selectedUom.id,
+                    uom_name: this.selectedUom.name
+                });
             }
             else{
-                this.menuLevel.item.push({
-                    id: this.selectedItem.id,
+                this.menuLevel.item_menu.push({
+                    item_id: this.selectedItem.id,
                     price: price,
                     name: this.selectedItem.name,
                     weight: this.amount,
@@ -603,53 +628,62 @@ export default {
         },
 
         async createMenuBtnClicked() {
-            if (!this.name) {
-                this.alertValiationMessage(`menu name`);
-                return 1;
-            }
-            else if(!this.price){
-                this.alertValiationMessage(`menu price`);
-                return 1;
-            }
-            else if(!this.menuCategoryId){
-                this.alertValiationMessage(`menu category`);
-                return 1;
-            }
-            else if(this.ingredientItems.length < 1){
-                this.alertValiationMessage(`menu items`);
-                return 1;
-            }
-            else if(!this.selectedImage){
-                this.alertValiationMessage(`menu image`);
-                return 1;
-            }
-            else if(this.selectedAreas.length < 1){
-                this.alertValiationMessage(`cooking areas`);
-                return 1;
-            }
-            else {
-                let areaIds = [];
-                this.selectedAreas.forEach((area)=>{
-                    areaIds.push(area.id);
-                });
+            // if (!this.name) {
+            //     this.alertValiationMessage(`menu name`);
+            //     return 1;
+            // }
+            // else if(!this.price){
+            //     this.alertValiationMessage(`menu price`);
+            //     return 1;
+            // }
+            // else if(!this.menuCategoryId){
+            //     this.alertValiationMessage(`menu category`);
+            //     return 1;
+            // }
+            // else if(this.ingredientItems.length < 1){
+            //     this.alertValiationMessage(`menu items`);
+            //     return 1;
+            // }
+            // else if(!this.selectedImage){
+            //     this.alertValiationMessage(`menu image`);
+            //     return 1;
+            // }
+            // else if(this.selectedAreas.length < 1){
+            //     this.alertValiationMessage(`cooking areas`);
+            //     return 1;
+            // }
+            // else {
+                let cookingPlaceId = [];
+                this.selectedCookingArea.forEach((item) => {
+                    cookingPlaceId.push(item.id)
+                })
+                console.log(cookingPlaceId)
                 let menuItems = JSON.stringify({ items: this.ingredientItems });
                 let formData = new FormData();
-                formData.append('menu_category_id', this.menuCategoryId);
-                formData.append('name', this.name);
-                formData.append('is_feature', (this.isFeatured)?1:0);
-                formData.append('price', this.price);
-                formData.append('items', menuItems);
+                formData.append('name', this.menuName);
+                formData.append('menu_category_id', 4);
+                formData.append('code', this.code);
                 formData.append('image',this.selectedImage);
-                formData.append('areas',JSON.stringify(areaIds));
-                formData.append('code',this.code);
                 formData.append('description',this.description);
+                formData.append('price', this.sellingPrice);
+                formData.append('Menu_type', this.selectedMenuType);
+                // formData.append('areas',JSON.stringify(areaIds));
+                formData.append('cooking_place_id',JSON.stringify(cookingPlaceId));
+                formData.append('menu_steps',JSON.stringify(this.levelTable));
 
-                let response = await postApiData({ url: `/api/menus`, form_data: formData, token: this.getToken() });
+                let response = await postApiData({ url: `/api/mrp`, form_data: formData, token: this.getToken() });
 
                 if (response.success) {
-                    window.location.replace(`/menus`);
+                    // window.location.replace(`/menus`);
                 }
-            }
+                else {
+                    this.$notify({
+                        title: `Input validation`,
+                        text: response.message,
+                        type: "warn"
+                    });
+                }
+            // }
         },
 
         alertValiationMessage(field) {
@@ -683,7 +717,8 @@ export default {
         this.getMenuCategoryList();
         this.getItemCategoryList();
         this.getUomList();
-        this.getCookingAreaList(this.departmentId);
+        this.getCookingAreaList();
+        this.getStaffList(this.departmentId);
     },
 
     mounted() {
