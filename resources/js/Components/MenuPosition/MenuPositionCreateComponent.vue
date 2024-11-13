@@ -657,6 +657,7 @@ export default {
                 this.selectedCookingArea.forEach((item) => {
                     cookingPlaceId.push(item.id)
                 })
+                
                 console.log('array ' ,cookingPlaceId)
                 let formData = new FormData();
                 formData.append('name', this.menuName);
