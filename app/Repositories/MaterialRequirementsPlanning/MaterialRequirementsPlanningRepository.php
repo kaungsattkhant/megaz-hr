@@ -89,9 +89,10 @@ class MaterialRequirementsPlanningRepository implements MaterialRequirementsPlan
         ]);
       }
 
-      if (!empty($validatedData['cooking_place_id'])) {
-        $menu->menuPlaces()->sync($validatedData['cooking_place_id']);
-      }
+      $cookingPlace = json_decode($validatedData['cooking_place_id']);
+      // if (!empty($validatedData['cooking_place_id'])) {
+      $menu->menuPlaces()->sync($cookingPlace);
+      // }
 
       if (!empty($validatedData['sub_menu_id'])) {
         $menu->subMenus()->sync($validatedData['sub_menu_id']);
