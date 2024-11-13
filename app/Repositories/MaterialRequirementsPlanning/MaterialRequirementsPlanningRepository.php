@@ -54,8 +54,8 @@ class MaterialRequirementsPlanningRepository implements MaterialRequirementsPlan
       ]);
 
       if (!empty($validatedData['menu_steps'])) {
-
-        foreach ($validatedData['menu_steps'] as $data) {
+        $menuSteps = json_decode($validatedData['menu_steps']);
+        foreach ($menuSteps as $data) {
           $menuStep = MenuStep::create([
             'menu_id' => $menu->id,
             'staff_id' => $data['staff_id'],
