@@ -58,27 +58,27 @@ class MaterialRequirementsPlanningRepository implements MaterialRequirementsPlan
       foreach ($menuSteps as $data) {
         $menuStep = MenuStep::create([
           'menu_id' => $menu->id,
-          'staff_id' => $data['staff_id'],
-          'staff_quantity' => $data['staff_quantity'],
-          'duration' => $data['duration'],
-          'order_time' => $data['order_time'],
-          'expected_quantity' => $data['expected_quantity'],
-          'level' => $data['level'],
-          'type' => $data['type']
+          'staff_id' => $data->staff_id,
+          'staff_quantity' => $data->staff_quantity,
+          'duration' => $data->duration,
+          'order_time' => $data->order_time,
+          'expected_quantity' => $data->expected_quantity,
+          'level' => $data->level,
+          'type' => $data->type
         ]);
 
-        if (!empty($data['item_menu'])) {
-          foreach ($data['item_menu'] as $itemData) {
+        // if (!empty($data['item_menu'])) {
+        foreach ($data->item_menu as $itemData) {
 
-            MenuStepItem::create([
+          MenuStepItem::create([
 
-              'menu_step_id' => $menuStep->id,
-              'item_id' => $itemData['item_id'],
-              'uom_id' => $itemData['uom_id'],
-              'weight' => $itemData['weight']
-            ]);
-          }
+            'menu_step_id' => $menuStep->id,
+            'item_id' => $itemData->item_id,
+            'uom_id' => $itemData->uom_id,
+            'weight' => $itemData->weight
+          ]);
         }
+        // }
       }
       // }
 
