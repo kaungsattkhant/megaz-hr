@@ -1,5 +1,6 @@
 <template>
     <div class="">
+        <notifications position="top center" />
         <div class="mb-6">
             <div class="opacity-100 transition-opacity duration-150 ease-linear overflow-x-auto hidden-scrollbar" :style="isShowSidebar == true ? 'width:calc(100% - 375px)' : 'width:100%' ">
                 <div class="flex flex-wrap gap-x-4 gap-y-4">
@@ -750,7 +751,7 @@
                             <!-- <label for="" class="block text-sm text-black mb-3">
                                 Hour
                             </label> -->
-                            <input type="text" placeholder="Hour" v-model="sessionDuration"
+                            <input type="number" placeholder="Hour" v-model="sessionDuration"
                                 class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
                         </div>
                         <div class="mb-4">
@@ -1058,7 +1059,7 @@
                         <p class="text-xl w-full text-center">
                             Add Accessory
                         </p>
-                        <button type="button" id="closeAccessoryModal"
+                        <button type="button" id="closeAccessoryModalRoom"
                             class="absolute top-4 right-4 focus:shadow-none focus:outline-none" data-te-modal-dismiss
                             aria-label="Close">
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
@@ -1099,7 +1100,7 @@
 
                     <div class="flex justify-center px-12 mb-6">
                         <button @click="btnConfirmAddAccessory()" class="pos-add-btn focus:outline-none focus:ring-0 ">
-                            Add Service
+                            Add Accessory
                         </button>
                     </div>
                 </div>
@@ -1945,7 +1946,7 @@
             },
             async addHour() {
                 let formData = new FormData();
-                formData.append('invoice_id', this.selectedRoom.room_sessions[0].invoice.invoice_id);
+                formData.append('invoice_id', this.selectedRoom.room_sessions[0].invoice.id);
                 formData.append('session_duration', this.sessionDuration);
                 let response = await postApiData({ url: '/api/entities/add_more_sessions', form_data: formData, token: this.getToken() });
                 if (response.success) {
@@ -2023,7 +2024,22 @@
                 }
             },
             btnConfirmAddService() {
-                this.addService();
+                if(!this.selectedServiceCategory){
+                    this.alertValiationMessage('Service Category')
+                }
+                else if(!this.selectedServiceStartTime){
+                    this.alertValiationMessage('Start Time')
+                    console.log('start hello')
+                }
+                else if(this.selectedServiceCategory.name == 'Lady' && !this.selectedLady){
+                    this.alertValiationMessage('Lady')
+                }
+                else if(this.selectedServiceCategory.name == 'DJ' && !this.selectedDj){
+                    this.alertValiationMessage('DJ')
+                }
+                else{
+                    this.addService();
+                }
             },
             async addService() {   // invoice pay yan
                 let formData = new FormData();
@@ -2089,8 +2105,27 @@
                     this.accessoryList = response.data;
                 }
             },
+            alertValiationMessage(field) {
+                this.$notify({
+                    title: `Input validation`,
+                    text: `You forgot to provide ${field}, please try again`,
+                    type: "warn"
+                });
+            },
             btnConfirmAddAccessory() {
-                this.addAccessory();
+                
+                if(!this.selectedAccessoryCategory){
+                    this.alertValiationMessage('Accessory Category');
+                }
+                if(!this.selectedAccessory){
+                    this.alertValiationMessage('Accessory');
+                }
+                if(!this.selectedAccessoryQuantity){
+                    this.alertValiationMessage('Quantity');
+                }
+                else{
+                    this.addAccessory();
+                }
             },
             async addAccessory() {   // invoice pay yan
                 let formData = new FormData();
@@ -2100,7 +2135,7 @@
                 let response = await postApiData({ url: '/api/pos/add_accessory', form_data: formData, token: this.getToken() });
                 // console.log(this.invoiceId+','+this.selectedMenu.id + ','+ this.menuQuantity +','+this.selectedMenu.prices[0].price)
                 if (response.success) {
-                    this.closeModal('closeAccessoryModal');
+                    this.closeModal('closeAccessoryModalRoom');
                     this.clearAccessoryForm();
                     this.getSelectedRoom();
                 }
