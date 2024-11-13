@@ -657,18 +657,17 @@ export default {
                 this.selectedCookingArea.forEach((item) => {
                     cookingPlaceId.push(item.id)
                 })
-                console.log(cookingPlaceId)
-                let menuItems = JSON.stringify({ items: this.ingredientItems });
+                console.log('array ' ,cookingPlaceId)
                 let formData = new FormData();
                 formData.append('name', this.menuName);
                 formData.append('menu_category_id', 4);
                 formData.append('code', this.code);
                 formData.append('image',this.selectedImage);
-                formData.append('description',this.description);
+                // formData.append('description',this.description);
                 formData.append('price', this.sellingPrice);
                 formData.append('Menu_type', this.selectedMenuType);
                 // formData.append('areas',JSON.stringify(areaIds));
-                formData.append('cooking_place_id',JSON.stringify(cookingPlaceId));
+                formData.append('cooking_place_id',cookingPlaceId);
                 formData.append('menu_steps',JSON.stringify(this.levelTable));
 
                 let response = await postApiData({ url: `/api/mrp`, form_data: formData, token: this.getToken() });
