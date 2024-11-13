@@ -669,6 +669,7 @@ export default {
                 // formData.append('areas',JSON.stringify(areaIds));
                 formData.append('cooking_place_id',JSON.stringify(cookingPlaceId));
                 formData.append('menu_steps',JSON.stringify(this.levelTable));
+                
 
                 let response = await postApiData({ url: `/api/mrp`, form_data: formData, token: this.getToken() });
 
