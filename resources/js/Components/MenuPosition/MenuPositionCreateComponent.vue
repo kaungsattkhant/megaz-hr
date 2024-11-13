@@ -25,11 +25,19 @@
                 </label>
                 <div class="bg-white mb-0 w-full text-sm inline-block h-[34px]"
                     data-te-select-wrapper-ref>
-                    <select data-te-select-init data-te-select-placeholder="Select Category"
+                    <multiselect v-model="selectedCookingArea" :options="cookingAreaList" :multiple="true" :close-on-select="false" :clear-on-select="false"
+                    :preserve-search="true" placeholder="Select Cooking Place" label="name" track-by="id" :preselect-first="true">
+                        <template #selection="{ values, search, isOpen }">
+                            <span class="multiselect__single"
+                                v-if="values.length"
+                                v-show="!isOpen">{{ values.length }} Cooking Place selected</span>
+                        </template>
+                    </multiselect>
+                    <!-- <select data-te-select-init data-te-select-placeholder="Select Category" multiple
                         data-te-select-filter="true" name="" id="" v-model="selectedCookingArea" class="input-ui">
                         <option :value="menuArea.id" v-for="(menuArea, menuAreaIndex) in cookingAreaList"
                             :key="menuAreaIndex"> {{ menuArea.name }} </option>
-                    </select>
+                    </select> -->
                 </div>
             </div>
             <div class="mb-4 col-span-3 rounded-md">
@@ -325,7 +333,7 @@
                             </td>
                         </tr>
                     </tbody>
-                    
+
                 </table>
             </div>
 
@@ -374,7 +382,7 @@ export default {
                 {"id": 1,"name": "Portion"},
                 {"id": 2,"name": "Ready To Sale"},
             ],
-            positionList:[
+            positionList:[ //staff list
                 {"id": 1,"name": "Position 1"},
                 {"id": 2,"name": "Position 2"},
             ],
@@ -402,6 +410,12 @@ export default {
             selectedUom:null,
 
             menuLevel:{
+                level : null,
+                type : null,
+                position : null,
+                duration : null,
+                order_time : null,
+                expected_quantity : null,
                 item:[],
             },
             levelTable:[],
@@ -532,6 +546,12 @@ export default {
             }
 
             if(this.menuLevel.item.length < 1){
+                this.menuLevel.level = this.selectedLevel;
+                this.menuLevel.type = this.selectedType,
+                this.menuLevel.position = this.selectedPosition,
+                this.menuLevel.duration = this.duration,
+                this.menuLevel.order_time = this.orderTime,
+                this.menuLevel.expected_quantity = this.expectedQuantity,
                 this.menuLevel = {
                     level : this.selectedLevel,
                     type : this.selectedType,
