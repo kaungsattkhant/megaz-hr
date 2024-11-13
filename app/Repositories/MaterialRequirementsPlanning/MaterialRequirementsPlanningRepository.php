@@ -94,8 +94,9 @@ class MaterialRequirementsPlanningRepository implements MaterialRequirementsPlan
       $menu->menuPlaces()->sync($cookingPlace);
       // }
 
+      $submenu = json_decode($validatedData['sub_menu_id']);
       if (!empty($validatedData['sub_menu_id'])) {
-        $menu->subMenus()->sync($validatedData['sub_menu_id']);
+        $menu->subMenus()->sync($submenu);
       }
 
       DB::commit();
