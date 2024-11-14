@@ -143,7 +143,7 @@
                         </select>
                     </div>
                 </div>
-                <div class="mb-4 col-span-3 rounded-md">
+                <!-- <div class="mb-4 col-span-3 rounded-md">
                     <label for="" class="block text-sm text-black mb-3">
                         Position
                     </label>
@@ -156,13 +156,27 @@
                                 :key="positionIndex"> {{ position.name }} </option>
                         </select>
                     </div>
-                </div>
+                </div> -->
                 <div class="mb-4 col-span-3 rounded-md">
+                    <label for="" class="block text-sm text-black mb-3">
+                        Role
+                    </label>
+                    <div class="mb-0 w-full text-sm inline-block h-max" :class="is_disable_custom ? 'bg-gray-200 rounded' : ''"
+                        data-te-select-wrapper-ref>
+                        <select data-te-select-init data-te-select-placeholder="Select Role"
+                            :disabled="is_disable_custom" :class="is_disable_custom ? 'cursor-not-allowed' : ''"
+                            data-te-select-filter="true" name="" id="" v-model="selectedRole" class="input-ui">
+                            <option :value="role" v-for="(role, roleIndex) in roleList"
+                                :key="roleIndex"> {{ role.name }} </option>
+                        </select>
+                    </div>
+                </div><div class="col-span"></div>
+                <!-- <div class="mb-4 col-span-3 rounded-md">
                     <label for="" class="label-form mb-3">
                         Position Quantity
                     </label>
                     <input type="number" v-model="positionQuantity" class="input-ui" :disabled="is_disable_custom" :class="is_disable_custom ? 'cursor-not-allowed !bg-gray-200 rounded' : ''">
-                </div>
+                </div> -->
                 <div class="mb-4 col-span-3 rounded-md">
                     <label for="" class="label-form mb-3">
                         Duration
@@ -261,7 +275,7 @@
                             Position : 
                         </p>
                         <p>
-                            &nbsp;{{ menuLevel.position.name }}
+                            &nbsp;{{ menuLevel.role_name }}
                         </p>
                     </div>
                     <div class="flex mb-2">
@@ -357,7 +371,7 @@
                                 {{ level.type }}
                             </td>
                             <td class="">
-                                {{ level.position.name }}
+                                {{ level.role_name }}
                             </td>
                             <td class="">
                                 {{ level.duration }}
@@ -437,6 +451,7 @@ export default {
                 {"id": 1,"name": "Position 1"},
                 {"id": 2,"name": "Position 2"},
             ],
+            roleList:[],
             itemCategoryList:[],
             itemList:[],
             itemUoms:[],
@@ -453,6 +468,7 @@ export default {
             selectedType:null,
             selectedPosition:null,
             positionQuantity:null,
+            selectedRole:null,
             duration:null,
             orderTime:null,
             expectedQuantity:null,
@@ -467,8 +483,10 @@ export default {
                 level : null,
                 type : null,
                 position : null,
-                staff_id:null,
-                staff_quantity:null,
+                // staff_id:null,
+                // staff_quantity:null,
+                role_name:null,
+                role_id:null,
                 duration : null,
                 order_time : null,
                 expected_quantity : null,
@@ -481,6 +499,7 @@ export default {
             departmentId:null,
 
             is_disable_custom:false,
+            mrpDetail:null,
 
         };
     },
@@ -488,10 +507,80 @@ export default {
     methods: {
         ...mapGetters(['getToken']),
 
-        async getMrpDetail(){
-            let response = await getApiData({ url: '' , token: this.getToken() });
+        async getMrpDetail() {
+            let response = await getApiData({ url: `/api/mrp/${this.mrpId}`, token: this.getToken() });
+            if (response.data) {
+                this.mrpDetail = response.data[0];
+                if(response.data[0]){
+                    this.addDetail(response.data[0])
+                }
+            }
         },
+        addDetail(detail){
+            this.menuName = detail.name;
+            this.sellingPrice = detail.price.price;
+            this.selectedCookingArea = detail.menu_places;
+            this.code = detail.code;
+            this.selectedMenuCategory = this.menuCategoryList.find(category => category.id === detail.menu_category_id );
 
+
+            // this.menuLevel.level = this.selectedLevel.id;
+            // this.menuLevel.type = this.selectedType.id;
+            // this.menuLevel.position = this.selectedPosition;
+            // this.menuLevel.role_id = this.selectedRole.id;        
+            // this.menuLevel.role_name = this.selectedRole.name;
+            // this.menuLevel.duration = this.duration;
+            // this.menuLevel.order_time = this.orderTime;
+            // this.menuLevel.expected_quantity = this.expectedQuantity;
+            
+
+
+            // this.menuLevel.item_menu.push({
+            //     item_id: this.selectedItem.id,
+            //     price: price,
+            //     name: this.selectedItem.name,
+            //     weight: this.amount,
+            //     is_make_pack: this.isMakePack,
+            //     uom_id: this.selectedUom.id,
+            //     uom_name: this.selectedUom.name
+            // });
+
+            let sampleMenuLevel = {
+                level : null,
+                type : null,
+                position : null,
+                role_name:null,
+                role_id:null,
+                duration : null,
+                order_time : null,
+                expected_quantity : null,
+                menu_id : null,
+                item_menu:[],
+            };
+            detail.menu_steps.forEach(step => {
+                sampleMenuLevel.level = step.level
+                sampleMenuLevel.type = step.type
+                sampleMenuLevel.role_name = this.roleList.find(role => role.id === step.role_id ).name;
+                sampleMenuLevel.role_id = step.role_id
+                sampleMenuLevel.duration = step.duration
+                sampleMenuLevel.order_time = step.order_time
+                sampleMenuLevel.expected_quantity = step.expected_quantity
+                sampleMenuLevel.menu_id = step.menu_id
+                step.menu_step_item.forEach(item => {
+                    sampleMenuLevel.item_menu.push({
+                        item_id: item.item_id,
+                        menu_step_id: item.menu_step_id,
+                        price: item.item.item_prices.price,
+                        name: item.item.name,
+                        weight: item.weight,
+                        uom_id: item.uom_id,
+                        uom_name: item.uom.name
+                    });
+                })
+                this.levelTable.push(sampleMenuLevel)
+            })    
+            
+        },
         async getCookingAreaList() {
             let response = await getApiData({ url: `/api/cooking_place`, token: this.getToken() });
             if (response.data) {
@@ -503,6 +592,12 @@ export default {
             let response = await getApiData({ url: '/api/departments/' + departmentId + '/staffs', token: this.getToken() });
             if (response.data) {
                 this.positionList = response.data;
+            }
+        },
+        async getRoleList(){
+            let response = await getApiData({ url: '/api/roles', token: this.getToken() });
+            if (response.data) {
+                this.roleList = response.data;
             }
         },
         async getMenuCategoryList() {
@@ -597,12 +692,8 @@ export default {
                 this.alertValidationMessage('Type');
                 return 1;
             }
-            else if(!this.selectedPosition){
-                this.alertValidationMessage('Position');
-                return 1;
-            }
-            else if(!this.positionQuantity){
-                this.alertValidationMessage('Position Quantity');
+            else if(!this.selectedRole){
+                this.alertValidationMessage('Role');
                 return 1;
             }
             else if(!this.duration){
@@ -663,8 +754,10 @@ export default {
                     this.menuLevel.level = this.selectedLevel.id;
                     this.menuLevel.type = this.selectedType.id;
                     this.menuLevel.position = this.selectedPosition;
-                    this.menuLevel.staff_id = this.selectedPosition.id;
-                    this.menuLevel.staff_quantity = 2;
+                    // this.menuLevel.staff_id = this.selectedPosition.id;
+                    // this.menuLevel.staff_quantity = this.positionQuantity;
+                    this.menuLevel.role_id = this.selectedRole.id;
+                    this.menuLevel.role_name = this.selectedRole.name;
                     this.menuLevel.duration = this.duration;
                     this.menuLevel.order_time = this.orderTime;
                     this.menuLevel.expected_quantity = this.expectedQuantity;
@@ -843,6 +936,8 @@ export default {
         this.getUomList();
         this.getCookingAreaList();
         this.getStaffList(this.departmentId);
+        this.getRoleList();
+        this.getMrpDetail();
     },
 
     mounted() {

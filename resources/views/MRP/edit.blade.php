@@ -5,7 +5,7 @@
 @section('content')
 
 <div id="app">
-    <mrp-edit-component mrp-id={{$id}}/>
+    <mrp-edit-component mrp-id={{$id}} />
 </div>
 
 @endsection
