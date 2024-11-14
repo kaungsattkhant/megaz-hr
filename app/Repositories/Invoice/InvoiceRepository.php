@@ -464,7 +464,6 @@ class InvoiceRepository implements InvoiceRepositoryInterface
     {
         DB::beginTransaction();
         try {
-
             $invoice = Invoice::find($data['invoice_id']);
             if ($invoice->entity_id != null) {
                 $updatedInvoice = $this->changeTable($invoice, $data['entity_id']);
@@ -479,27 +478,30 @@ class InvoiceRepository implements InvoiceRepositoryInterface
                 ->whereTime('start_time', '<=', $current_time)
                 ->whereTime('end_time', '>=', $current_time)
                 ->first();
+            //added ksk
+            $newEntitySession = EntitySession::where('entity_id', $data['entity_id'])
+                ->whereTime('start_time', '<=', $current_time)
+                ->whereTime('end_time', '>=', $current_time)
+                ->first();
+            //end 
             $previousEntity = Entity::find($entitySession->entity_id);
             $firstRoomSession = $roomSessions->first();
             $lastRoomSession = $roomSessions->last();
             $endTime = Carbon::parse($lastRoomSession->end_date);
             $sessionStartTime = Carbon::parse($firstRoomSession->start_date);
             $useHours = $sessionStartTime->diffInHours(Carbon::now());
-
             $totalDuration = $roomSessions->sum('session_duration');
             $leftDuration = $totalDuration - $useHours;
-            $remainingEntitySessions = EntitySession::whereIn('id', $roomSessions->pluck('entity_session_id'))
-                ->where('id', '>=', $entitySession->id)
-                ->where('is_active', 1)
+            $remainingEntitySessions = EntitySession::where('id', '>=', $newEntitySession->id)
+                ->where('entity_id', $data['entity_id'])
+                // whereIn('id', $roomSessions->pluck('entity_session_id'))
+                // ->where('is_active', 1)
                 ->get();
-
+            // dd($remainingEntitySessions);
             $deleteEntitySessions = EntitySession::whereIn('id', $roomSessions->pluck('entity_session_id'))
                 ->where('id', '>', $entitySession->id)
                 ->where('is_active', 1)
                 ->get();
-
-
-
             $nextEntitySessions = [];
             foreach ($remainingEntitySessions as $nextSession) {
                 $nextEntitySession = EntitySession::where('entity_id', $data['entity_id'])->where('start_time', $nextSession->start_time)->where('end_time', $nextSession->end_time)->first();
@@ -522,7 +524,6 @@ class InvoiceRepository implements InvoiceRepositoryInterface
                 $nextSession->is_active = 1;
                 $nextSession->save();
             }
-
             foreach ($remainingEntitySessions as $leftSession) {
                 $leftSession->is_active = 0;
                 $leftSession->save();
@@ -613,16 +614,14 @@ class InvoiceRepository implements InvoiceRepositoryInterface
         return $invoice;
     }
 
-
     public function doneRoom(array $data)
     {
         DB::beginTransaction();
         try {
-
             $invoice = Invoice::find($data['invoice_id']);
-
             if ($invoice->entity_id != null) {
                 $tableResponseData = $this->doneInvoiceForTable($invoice);
+                DB::commit();
                 ResponseData($tableResponseData);
             }
             $latestRoomSession = RoomSession::where('invoice_id', $invoice->id)->orderBy('created_at', 'desc')->first();
@@ -638,7 +637,8 @@ class InvoiceRepository implements InvoiceRepositoryInterface
                 $roomDoneResponse['is_service'] = 0;
             }
             foreach ($invoiceServices as $invoiceService) {
-                $serviceValue = $this->invoiceService->getServiceValue($invoiceService, now());
+                $time=$invoiceService->end_date!=null? $invoiceService->end_date : now();
+                $serviceValue = $this->invoiceService->getServiceValue($invoiceService, $time);
                 $total_service_value += $serviceValue;
             }
             foreach ($roomSessions as $room) {
@@ -647,7 +647,7 @@ class InvoiceRepository implements InvoiceRepositoryInterface
             }
 
             foreach ($invoiceAccessories as $invoiceAccessorie) {
-                $total_accessory_value += $invoiceAccessorie->accessory->accessory_price->price;
+                $total_accessory_value += $invoiceAccessorie->accessory->accessory_price->price*$invoiceAccessorie->quantity;
             }
 
             $entity = Entity::find($latestRoomSession->entitySession->entity_id);
@@ -701,10 +701,28 @@ class InvoiceRepository implements InvoiceRepositoryInterface
 
     public function doneInvoiceForTable($invoice)
     {
-        // dd($invoice);
+        if (!$invoice) {
+            ResponseMessage('Invoice is invalid', 422);
+        }
         $customerTotal = $this->getCustomerTotal($invoice->customer_id);
         $total = 0;
         $totalDiscount = 0;
+        $invoiceServiceCollection = collect();
+        $total_service_value = 0;
+        $total_accessory_value = 0;
+        $invoiceServices = $invoice->invoiceService;
+        foreach ($invoiceServices as $invoiceService) {
+            $time=$invoiceService->end_date!=null? $invoiceService->end_date : now();
+            $this->invoiceService->calculateInvoiceService($invoiceService, $time);
+            $total_service_value += $invoiceService->service_value;
+        }
+        $invoiceServiceCollection = $invoiceServiceCollection->merge($invoice->invoiceService);
+        // end service
+        // invoice accessory
+        $invoiceAccessories = $invoice->accessories;
+        foreach ($invoiceAccessories as $invoiceAccessorie) {
+            $total_accessory_value += $invoiceAccessorie->accessory->accessory_price->price*$invoiceAccessorie->quantity;
+        }
         foreach ($invoice->orders as $order) {
             if (existOrderItemByStatus($order->orderItems, 'not_yet')) {
                 ResponseMessage('Some items still cooking', 419);
@@ -726,6 +744,8 @@ class InvoiceRepository implements InvoiceRepositoryInterface
         $responseData['food_discount'] = $totalDiscount;
         $responseData['total'] = $total;
         $responseData['customer_total'] = $customerTotal;
+        $responseData['total_service_value'] = $total_service_value;
+        $responseData['total_accessory_value'] = $total_accessory_value;
         return $responseData;
         // dd($totalDiscount);
     }
@@ -801,15 +821,16 @@ class InvoiceRepository implements InvoiceRepositoryInterface
                 }
             }
             $order = Order::where('invoice_id', $invoice->id)->first();
-            if ($order) {
-                $allSold = $order->orderItems->every(function ($item) {
-                    return $item->status === 'done';
-                });
-                if ($allSold == false) {
-                    ResponseMessage('Not all order items are done', 422);
-                }
-            }
-
+            //temp command
+            // if ($order) {
+            //     $allSold = $order->orderItems->every(function ($item) {
+            //         return $item->status === 'done';
+            //     });
+            //     if ($allSold == false) {
+            //         ResponseMessage('Not all order items are done', 422);
+            //     }
+            // }
+            //end temp
             if (isset($data['discount_type'])) {
                 if ($data['discount_type'] == 'room_discount') {
                     $roomDiscount = RoomDiscount::find($data['room_discount_id']);
@@ -939,6 +960,18 @@ class InvoiceRepository implements InvoiceRepositoryInterface
 
     public function doneTableForInvoice($data, $invoice)
     {
+        $total_service_value = 0;
+        $invoiceServices = $invoice->invoiceService;
+        foreach ($invoiceServices as $invoiceService) {
+            $serviceValue = $this->invoiceService->getServiceValue($invoiceService, $data['end_date']);
+            if ($invoiceService->is_active == 1) {
+                $invoiceService->end_date = $data['end_date'];
+                $invoiceService->service_value = $serviceValue;
+                $invoiceService->is_active = 0;
+                $invoiceService->save();
+            }
+            $total_service_value += $serviceValue;
+        }
         $data['discount_value'] = $data['discount_type'] == null || $data['discount_type'] == "null" ? 0 : $data['discount_value'];
         $data['total_discount'] = $data['birthday_discount'] + $data['customer_level_discount'] + $data['discount_value'] + $data['order_discount'];
         ;
@@ -1229,25 +1262,25 @@ class InvoiceRepository implements InvoiceRepositoryInterface
         DB::beginTransaction();
         try {
             $existingService = InvoiceService::where('id', $request->invoice_service_id)
-            ->whereNull('end_date')
-            ->first();
-            if($existingService){
+                ->whereNull('end_date')
+                ->first();
+            if ($existingService) {
                 $this->invoiceService->calculateInvoiceService($existingService, $request->end_date);
                 $updatedInvoiceService = InvoiceService::where('id', $request->invoice_service_id)
-                ->update([
-                    'end_date' => $request->end_date,
-                    'service_value'=>$existingService->service_value,
-                    'is_active' => 0,
-                ]);
+                    ->update([
+                        'end_date' => $request->end_date,
+                        'service_value' => $existingService->service_value,
+                        'is_active' => 0,
+                    ]);
                 // dd($existingService->service_value);
                 DB::commit();
                 ResponseMessage('InvoiceService End successfully', 200);
                 // return $invoiceService;
-            }else{
+            } else {
                 ResponseMessage('InvoiceService already ended', 200);
             }
             // If it doesn't exist, create a new InvoiceService
-           
+
         } catch (\Exception $e) {
             DB::rollback();
             ResponseMessage($e->getMessage(), 402);

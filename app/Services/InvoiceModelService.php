@@ -20,6 +20,9 @@ class InvoiceModelService
     public function calculateInvoiceService($invoiceService, $end_time)
     {
         // foreach ($invoiceServices as $invoiceService) {
+        if(!$invoiceService->is_active){
+            // return $invoiceService;
+        }
         $startDateTime = Carbon::parse($invoiceService->start_date);
         $currentDateTime = Carbon::parse($end_time);
         $pricePerHour = $invoiceService->service->price_per_hour;

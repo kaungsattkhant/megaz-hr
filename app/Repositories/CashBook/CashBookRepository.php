@@ -106,4 +106,6 @@ class CashBookRepository implements CashBookInterface
 
         // ResponseMessage('Transaction closing is fail', 422);
     }
+
+    
 }

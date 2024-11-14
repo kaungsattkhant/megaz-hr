@@ -88,7 +88,7 @@ class StaffAdvanceRepository implements StaffAdvanceRepositoryInterface
             if ($staffBalance != null) {
                 if ($data['type'] == 'settlement') {
                     if ($staffBalance->closing_balance < $data['amount']) {
-                        ResponseMessage('Invalid Data', 422);
+                        ResponseMessage('Invalid Settlement', 422);
                     }
                 }
                 $staffBalance->closing_balance = $staffBalance->opening_balance + ($totalAddition - $totalSettlement);

@@ -75,5 +75,6 @@ return [
     'ar' => 'AR.index',
     'skill' => 'skill.index',
     'cooking-place' => 'cookingPlace.index',
-    'custom-task' => 'tasks.customtask'
+    'custom-task' => 'tasks.customtask',
+    'feature'=>'accessories.index',
 ];

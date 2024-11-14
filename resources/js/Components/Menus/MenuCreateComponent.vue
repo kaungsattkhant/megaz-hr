@@ -610,7 +610,7 @@ export default {
                 formData.append('image',this.selectedImage);
                 formData.append('areas',JSON.stringify(areaIds));
                 formData.append('code',this.code);
-                formData.append('description',this.description);
+                // formData.append('description',this.description);
 
                 let response = await postApiData({ url: `/api/menus`, form_data: formData, token: this.getToken() });
 

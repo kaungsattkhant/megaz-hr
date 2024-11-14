@@ -233,24 +233,15 @@
                                         {{ (ingredientItemPriceTotal).toLocaleString() }}
                                         <span> (Profit: {{ this.profitPercentage.toLocaleString() }} %) </span>
                                     </td>
-                                    <td class="">
-
-                                    </td>
-                                    <td class="">
-
-                                    </td>
-                                    <td class="">
-
-                                    </td>
-                                    <td class="">
-
+                                    <td colspan="4" class="">
+asdfafd
                                     </td>
                                 </tr>
                             </tbody>
                         </table>
                     </div>
                 </div>
-                <div class="hidden opacity-0 transition-opacity duration-150 ease-linear data-[te-tab-active]:block"
+                <!-- <div class="hidden opacity-0 transition-opacity duration-150 ease-linear data-[te-tab-active]:block"
                     id="tabs-profile" role="tabpanel" aria-labelledby="tabs-profile-tab">
                     Tab 2 content
                 </div>
@@ -261,7 +252,7 @@
                 <div class="hidden opacity-0 transition-opacity duration-150 ease-linear data-[te-tab-active]:block"
                     id="tabs-contact" role="tabpanel" aria-labelledby="tabs-contact-tab">
                     Tab 4 content
-                </div>
+                </div> -->
             </div>
 
         </div>
@@ -274,89 +265,10 @@
         </div>
 
 
-        <!-- Department Modal -->
-        <!-- <div data-te-modal-init
-            class="fixed left-0 top-0 z-[1055] hidden h-full w-full overflow-y-auto overflow-x-hidden outline-none"
-            id="add_department_modal" tabindex="-1" aria-labelledby="create_modalLabel" aria-modal="true" role="dialog">
-            <div data-te-modal-dialog-ref
-                class="pointer-events-none relative flex min-h-[calc(100%-1rem)] w-auto translate-y-[-50px] items-center opacity-0 transition-all duration-300 ease-in-out min-[576px]:mx-auto min-[576px]:mt-7 min-[576px]:min-h-[calc(100%-3.5rem)] min-[576px]:max-w-[500px]">
-                <div
-                    class="pointer-events-auto relative flex w-full flex-col rounded-md border-none bg-white bg-clip-padding text-current shadow-lg outline-none">
-                    <div class="relative  p-4">
-                        <button type="button" class="absolute top-4 right-4 focus:shadow-none focus:outline-none"
-                            data-te-modal-dismiss aria-label="Close">
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
-                                stroke="currentColor" class="h-5 w-5">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
-                            </svg>
-                        </button>
-                    </div>
-
-                    <div class="relative px-12 py-4" data-te-modal-body-ref>
-
-                        <div class="mb-4">
-                            <label for="" class="block text-sm text-black mb-3">
-                                Department
-                            </label>
-                            <input type="text" placeholder="Department"
-                                class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
-                        </div>
-                    </div>
-
-                    <div class="flex justify-center px-12 mb-6">
-                        <button type="button" class="add-btn focus:outline-none focus:ring-0 ">
-                            Add
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div> -->
+        
 
 
-
-        <!-- Role Modal -->
-        <!-- <div data-te-modal-init
-            class="fixed left-0 top-0 z-[1055] hidden h-full w-full overflow-y-auto overflow-x-hidden outline-none"
-            id="add_role_modal" tabindex="-1" aria-labelledby="create_modalLabel" aria-modal="true" role="dialog">
-            <div data-te-modal-dialog-ref
-                class="pointer-events-none relative flex min-h-[calc(100%-1rem)] w-auto translate-y-[-50px] items-center opacity-0 transition-all duration-300 ease-in-out min-[576px]:mx-auto min-[576px]:mt-7 min-[576px]:min-h-[calc(100%-3.5rem)] min-[576px]:max-w-[500px]">
-                <div
-                    class="pointer-events-auto relative flex w-full flex-col rounded-md border-none bg-white bg-clip-padding text-current shadow-lg outline-none">
-                    <div class="relative  p-4">
-                        <button type="button" class="absolute top-4 right-4 focus:shadow-none focus:outline-none"
-                            data-te-modal-dismiss aria-label="Close">
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
-                                stroke="currentColor" class="h-5 w-5">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
-                            </svg>
-                        </button>
-                    </div>
-
-                    <div class="relative px-12 py-4" data-te-modal-body-ref>
-                        <div class="mb-4">
-                            <label for="" class="block text-sm text-black mb-3">
-                                Role
-                            </label>
-                            <input type="text" placeholder="Role"
-                                class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
-                        </div>
-                        <div class="mb-4">
-                            <label for="" class="block text-sm text-black mb-3">
-                                Department
-                            </label>
-                            <input type="text" placeholder="Department"
-                                class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
-                        </div>
-                    </div>
-
-                    <div class="flex justify-center px-12 mb-6">
-                        <button type="button" class="add-btn focus:outline-none focus:ring-0 ">
-                            Add
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div> -->
+        
     </div>
 </template>
 
@@ -495,48 +407,48 @@ export default {
         },
 
         async addItemBtnClicked() {
-            // if(!this.selectedItem){
-            //     this.alertValidationMessage('am item');
-            //     return 1;
-            // }
-            // if (!this.weight) {
-            //     this.alertValiationMessage('weight');
-            //     return 1;
-            // }
-            // if(!this.selectedUom){
-            //     this.alertValiationMessage('UOM');
-            //     return 1;
-            // }
+            if(!this.selectedItem){
+                this.alertValidationMessage('am item');
+                return 1;
+            }
+            if (!this.weight) {
+                this.alertValiationMessage('weight');
+                return 1;
+            }
+            if(!this.selectedUom){
+                this.alertValiationMessage('UOM');
+                return 1;
+            }
 
-            // let url = `/api/get_uom_conversion_by_uom?po_uom_id=${this.selectedUom.id}&item_uom_id=${this.selectedItem.item_prices.uom_id}&item_price=${this.selectedItem.item_prices.price}&base_uom_id=${this.selectedItem.base_uom_id}`;
-            // let response = await getApiData({url: url, token: this.getToken()});
+            let url = `/api/get_uom_conversion_by_uom?po_uom_id=${this.selectedUom.id}&item_uom_id=${this.selectedItem.item_prices.uom_id}&item_price=${this.selectedItem.item_prices.price}&base_uom_id=${this.selectedItem.base_uom_id}`;
+            let response = await getApiData({url: url, token: this.getToken()});
             let uomConversion = null;
             let amount = 0;
             let price = 0;
-            // if(response.data){
-            //     uomConversion = response.data;
-            //     amount = parseInt(response.data.price);
-            //     price = this.weight * amount;
+            if(response.data){
+                uomConversion = response.data;
+                amount = parseInt(response.data.price);
+                price = this.weight * amount;
 
-            //     this.$notify({
-            //         text: `Uom conversion by uom value ${amount}`,
-            //         type: 'info'
-            //     });
-            // }
-            // else{
-            //     this.$notify({
-            //         title: 'Error',
-            //         text: response.message,
-            //         type: 'error'
-            //     });
+                this.$notify({
+                    text: `Uom conversion by uom value ${amount}`,
+                    type: 'info'
+                });
+            }
+            else{
+                this.$notify({
+                    title: 'Error',
+                    text: response.message,
+                    type: 'error'
+                });
 
-            //     return 1;
-            // }
+                return 1;
+            }
 
             this.ingredientItems.push({
                 item_id: this.selectedItem.id,
-                // price: price,
-                price: this.selectedItem.item_prices.price,
+                price: price,
+                // price: this.selectedItem.item_prices.price,
                 name: this.selectedItem.name,
                 quantity: this.weight,
                 // is_make_pack: this.isMakePack,

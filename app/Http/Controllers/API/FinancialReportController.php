@@ -44,4 +44,9 @@ class FinancialReportController extends Controller
         $data=$this->financialRepo->getInventorySchedule($request);
         ResponseData($data);
     }
+
+    public function getWorkingCapital(Request $request){
+        $data=$this->financialRepo->getWorkingCapital($request);
+        ResponseData($data);
+    }
 }

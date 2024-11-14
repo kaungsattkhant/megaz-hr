@@ -50,6 +50,7 @@ class AssetDepreciationBalanceMonthly extends Command
             ->select('asset_depreciation_balances.*', 'assets.useful_life')
             ->get();
         Log::info('Asset Data: ', ['assets' => $assets->toArray()]);
+        Log::info('Asset Depreciation: ', ['assets' => $assetDepreciations->toArray()]);
         DB::beginTransaction();
         try {
             foreach ($assetDepreciations as $depreciation) {
@@ -109,7 +110,7 @@ class AssetDepreciationBalanceMonthly extends Command
     public function updateOrCreateDepreciationBalance($data)
     {
         $updateOrCreated = AssetDepreciationBalance::updateOrCreate(
-            ['id' => $data['id']],
+            ['asset_id' => $data['asset_id'],'year'=>$data['year'],'month'=>$data['month']],
             $data,
         );
         return $updateOrCreated;

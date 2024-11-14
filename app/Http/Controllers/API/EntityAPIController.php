@@ -94,7 +94,6 @@ class EntityAPIController extends Controller
         $data = $request->all();
         $data['area_id'] = $id;
         $entities = $this->entityRepo->inactiveEntityList($data);
-
         ResponseData($entities);
     }
 

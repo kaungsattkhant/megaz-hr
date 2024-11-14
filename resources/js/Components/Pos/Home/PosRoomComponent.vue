@@ -1,5 +1,6 @@
 <template>
     <div class="">
+        <notifications position="top center" />
         <div class="mb-6">
             <div class="opacity-100 transition-opacity duration-150 ease-linear overflow-x-auto hidden-scrollbar" :style="isShowSidebar == true ? 'width:calc(100% - 375px)' : 'width:100%' ">
                 <div class="flex flex-wrap gap-x-4 gap-y-4">
@@ -72,7 +73,7 @@
                         </div>
                     </div>
                     <div class="relative h-full" v-if="isOpenRoom.open_2 == true" id="open_room_2">
-                        <div class="small-scrollbar overflow-y-auto h-[100vh] pt-8">
+                        <div class="small-scrollbar overflow-y-auto h-[100vh] pt-8 pb-16">
                             <div class="padding-section w-2/3 mx-auto ">
 
                                 <div class="mb-4">
@@ -172,9 +173,9 @@
 
                     <div v-if="isOpenRoom.detail == true" class="relative h-full">
                         <div class="flex justify-between padding-section border-b">
-                            <div>
-                                <p class="text-black text-xl">
-                                    <!-- {{ selectedRoom.name }} --> error
+                            <div v-if="selectedRoom">
+                                <p v-if="selectedRoom.entity" class="text-black text-xl">
+                                    {{ selectedRoom.entity.name }}
                                 </p>
                             </div>
                             <div class="flex gap-x-3">
@@ -193,11 +194,11 @@
                                     <i class="far fa-hourglass-half"></i>
                                 </button>
                                 <button class="transition duration-150 ease-in-out focus:outline-none focus:ring-0"
-                                    data-te-toggle="modal" data-te-target="#add_accessory_modal">
+                                    data-te-toggle="modal" data-te-target="#add_accessory_modal_room">
                                     <i class="far fa-plus-circle"></i>
                                 </button>
                                 <button class="transition duration-150 ease-in-out focus:outline-none focus:ring-0"
-                                    data-te-toggle="modal" data-te-target="#add_service_modal">
+                                    data-te-toggle="modal" data-te-target="#add_service_modal_room">
                                     <i class="far fa-user-music"></i>
                                 </button>
                             </div>
@@ -275,6 +276,7 @@
                                     </div>
                                 </div>
                             </div>
+                                <!-- services -->
                             <div class="padding-section border-b    " v-if="serviceList.length > 0">
                                 <div class="flex justify-between font-semibold mb-3">
                                     <p class="px-2 py-0.5 bg-[#F19E51] text-white text-xs w-fit">
@@ -287,7 +289,7 @@
                                 <div class=" grid grid-cols-10 gap-x-2 gap-y-3">
                                     <div class="contents" v-for="(service,index) in serviceList" :key="index" :class="service.is_active == 1 ? 'text-black' : 'text-gray-400'">
                                         <div class=" col-span-3 text-sm">
-                                            <button  data-te-toggle="modal" data-te-target="#service_end_modal" @click="btnClickedEndService(service)">
+                                            <button  data-te-toggle="modal" data-te-target="#service_end_modal_room" @click="btnClickedEndService(service)">
                                                 {{ service.service.name ? service.service.name : service.service.staff.name }}
                                             </button>
                                         </div>
@@ -324,7 +326,7 @@
                                 </div>
                             </div>
 
-
+                                <!-- accessories -->
                             <div class="padding-section border-b    " v-if="accessoryListSidebar.length > 0">
                                 <div class="flex justify-between font-semibold mb-3">
                                     <p class="px-2 py-0.5 bg-[#F19E51] text-white text-xs w-fit">
@@ -350,7 +352,7 @@
                                             {{ menu2.status }}
                                         </p> -->
                                         <p class=" col-span-4 text-sm text-right">
-                                            {{ accessory.accessory.accessory_price.price.toLocaleString() }} MMKs
+                                            {{ (accessory.accessory.accessory_price.price * accessory.quantity).toLocaleString() }} MMKs
                                         </p>
                                     </div>
                                 </div>
@@ -505,7 +507,7 @@
                             </div>
                         </div>
 
-                        <div class="absolute bottom-0 border-t-2 border-gray-200 w-full padding-section !pt-3">
+                        <div class="absolute bottom-0 border-t-2 border-gray-200 w-full padding-section !pt-3 bg-white">
                             <div v-if="isPackage" class=" text-sm text-right flex gap-x-2 justify-end pr-2 mb-2">
                                 <p>
                                     Package Price
@@ -749,7 +751,7 @@
                             <!-- <label for="" class="block text-sm text-black mb-3">
                                 Hour
                             </label> -->
-                            <input type="text" placeholder="Hour" v-model="sessionDuration"
+                            <input type="number" placeholder="Hour" v-model="sessionDuration"
                                 class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
                         </div>
                         <div class="mb-4">
@@ -804,12 +806,12 @@
                                 <option :value="menu" v-for="(menu, index) in menuList" :key="index">{{ menu.name }}</option>
                             </select> -->
                         </div>
-                        <div class="mb-4">
+                        <!-- <div class="mb-4">
                             <select name="" id="" placeholder="Menu" v-model="selectedMenuArea"
                                 class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
                                 <option :value="area" v-for="(area, index) in menuAreaList" :key="index">{{ area.name }}</option>
                             </select>
-                        </div>
+                        </div> -->
                         <div class="mb-4">
                             <!-- <label for="" class="block text-sm text-black mb-3">
                                 Hour
@@ -861,12 +863,12 @@
                                 <option :value="menu" v-for="(menu, index) in menuList" :key="index">{{ menu.name }}</option>
                             </select>
                         </div>
-                        <div class="mb-4">
+                        <!-- <div class="mb-4">
                             <select name="" id="" placeholder="Menu" v-model="selectedMenuAreaForPackage"
                                 class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
                                 <option :value="area" v-for="(area, index) in menuAreaListForPackage" :key="index">{{ area.name }}</option>
                             </select>
-                        </div>
+                        </div> -->
                         <div class="mb-4">
                             <input type="text" placeholder="Qty" v-model="menuQuantityForPackage"
                                 class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
@@ -928,7 +930,7 @@
             <!-- add Service modal -->
         <div data-te-modal-init
             class="fixed left-0 top-0 z-[1055] hidden h-full w-full overflow-y-auto overflow-x-hidden outline-none"
-            id="add_service_modal" tabindex="-1" aria-labelledby="addMenuModalLabel" aria-modal="true" role="dialog">
+            id="add_service_modal_room" tabindex="-1" aria-labelledby="addMenuModalLabel" aria-modal="true" role="dialog">
             <div data-te-modal-dialog-ref
                 class="pointer-events-none relative flex min-h-[calc(100%-1rem)] w-auto translate-y-[-50px] items-center opacity-0 transition-all duration-300 ease-in-out min-[576px]:mx-auto min-[576px]:mt-7 min-[576px]:min-h-[calc(100%-3.5rem)] min-[576px]:max-w-[500px]">
                 <div
@@ -937,7 +939,7 @@
                         <p class="text-xl w-full text-center">
                             Add Service
                         </p>
-                        <button type="button" id="closeServiceModal"
+                        <button type="button" id="closeServiceModalRoom"
                             class="absolute top-4 right-4 focus:shadow-none focus:outline-none" data-te-modal-dismiss
                             aria-label="Close">
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
@@ -965,7 +967,7 @@
                             <select name="" id="" v-model="selectedLady" class="input-ui">
                                 <option :value="lady" v-for="(lady, index) in ladyList"
                                     :key="index">{{
-                                        lady.staff.name }}</option>
+                                        lady.staff ? lady.staff.name : '' }}</option>
                             </select>
                         </div>
                         <div class="mb-4" v-if="selectedServiceCategory ? selectedServiceCategory.name == 'DJ' : ''">
@@ -1006,7 +1008,7 @@
             <!-- end Service modal -->
         <div data-te-modal-init
             class="fixed left-0 top-0 z-[1055] hidden h-full w-full overflow-y-auto overflow-x-hidden outline-none"
-            id="service_end_modal" tabindex="-1" aria-labelledby="addMenuModalLabel" aria-modal="true" role="dialog">
+            id="service_end_modal_room" tabindex="-1" aria-labelledby="addMenuModalLabel" aria-modal="true" role="dialog">
             <div data-te-modal-dialog-ref
                 class="pointer-events-none relative flex min-h-[calc(100%-1rem)] w-auto translate-y-[-50px] items-center opacity-0 transition-all duration-300 ease-in-out min-[576px]:mx-auto min-[576px]:mt-7 min-[576px]:min-h-[calc(100%-3.5rem)] min-[576px]:max-w-[500px]">
                 <div
@@ -1015,7 +1017,7 @@
                         <p class="text-xl w-full text-center">
                             End Service
                         </p>
-                        <button type="button" id="closeEndServiceModal"
+                        <button type="button" id="closeEndServiceModalRoom"
                             class="absolute top-4 right-4 focus:shadow-none focus:outline-none" data-te-modal-dismiss
                             aria-label="Close">
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
@@ -1048,7 +1050,7 @@
             <!-- add accessory modal -->
         <div data-te-modal-init
             class="fixed left-0 top-0 z-[1055] hidden h-full w-full overflow-y-auto overflow-x-hidden outline-none"
-            id="add_accessory_modal" tabindex="-1" aria-labelledby="addAccessoryModalLabel" aria-modal="true" role="dialog">
+            id="add_accessory_modal_room" tabindex="-1" aria-labelledby="addAccessoryModalLabel" aria-modal="true" role="dialog">
             <div data-te-modal-dialog-ref
                 class="pointer-events-none relative flex min-h-[calc(100%-1rem)] w-auto translate-y-[-50px] items-center opacity-0 transition-all duration-300 ease-in-out min-[576px]:mx-auto min-[576px]:mt-7 min-[576px]:min-h-[calc(100%-3.5rem)] min-[576px]:max-w-[500px]">
                 <div
@@ -1057,7 +1059,7 @@
                         <p class="text-xl w-full text-center">
                             Add Accessory
                         </p>
-                        <button type="button" id="closeAccessoryModal"
+                        <button type="button" id="closeAccessoryModalRoom"
                             class="absolute top-4 right-4 focus:shadow-none focus:outline-none" data-te-modal-dismiss
                             aria-label="Close">
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
@@ -1098,7 +1100,7 @@
 
                     <div class="flex justify-center px-12 mb-6">
                         <button @click="btnConfirmAddAccessory()" class="pos-add-btn focus:outline-none focus:ring-0 ">
-                            Add Service
+                            Add Accessory
                         </button>
                     </div>
                 </div>
@@ -1392,12 +1394,12 @@
                     menu_id : this.selectedMenuForPackage.prices[0].menu_id,
                     discount_value: this.is_menu_discount,
                     is_package : 0,
-                    area_id: this.selectedMenuAreaForPackage.id
+                    // area_id: this.selectedMenuAreaForPackage.id
                 });
                 this.food_total_package += (this.selectedMenuForPackage.prices[0].price - this.is_menu_discount) * this.menuQuantityForPackage;
                 this.selectedMenu = null
                 this.menuAreaListForPackage = []
-                this.selectedMenuAreaForPackage = null;
+                // this.selectedMenuAreaForPackage = null;
                 this.menuQuantityForPackage = null;
             },
             removePackageMenu(index){
@@ -1924,14 +1926,14 @@
                 let formData = new FormData();
                 formData.append('invoice_id', this.invoiceId);
                 formData.append('menu_id', this.selectedMenu.id);
-                formData.append('area_id', this.selectedMenuArea.id);
+                // formData.append('area_id', this.selectedMenuArea.id);
                 formData.append('quantity', this.menuQuantity);
                 formData.append('original_price', this.selectedMenu.prices[0].price);
                 formData.append('remark', this.remark);
                 let response = await postApiData({ url: '/api/entities/orders', form_data: formData, token: this.getToken() });
                 // console.log(this.invoiceId+','+this.selectedMenu.id + ','+ this.menuQuantity +','+this.selectedMenu.prices[0].price)
                 if (response.success) {
-                    this.closeModal('closeMenuModal');
+                    this.closeModal('closeAddMenuModal');
                     this.clearMenuForm();
                     this.getPurchaseMenuList();
                 }
@@ -1944,7 +1946,7 @@
             },
             async addHour() {
                 let formData = new FormData();
-                formData.append('invoice_id', this.selectedRoom.room_sessions[0].invoice.invoice_id);
+                formData.append('invoice_id', this.selectedRoom.room_sessions[0].invoice.id);
                 formData.append('session_duration', this.sessionDuration);
                 let response = await postApiData({ url: '/api/entities/add_more_sessions', form_data: formData, token: this.getToken() });
                 if (response.success) {
@@ -1968,7 +1970,7 @@
             },
             async changeRoom() {
                 let formData = new FormData();
-                formData.append('invoice_id', this.selectedRoom.room_sessions[0].invoice.invoice_id);
+                formData.append('invoice_id', this.selectedRoom.room_sessions[0].invoice.id);
                 formData.append('entity_id', this.change_room.id);
                 let response = await postApiData({ url: '/api/entities/change', form_data: formData, token: this.getToken() });
                 console.log('change room ' + this.selectedRoom.room_sessions[0].invoice.invoice_id + ',' + this.change_room.id)
@@ -1989,7 +1991,7 @@
                 this.getChangeableRoomList();
             },
             async getChangeableRoomList() {
-                const response = await getApiData({ url: '/api/areas/' + this.areaId + '/inactive_entities', token: this.getToken() });
+                const response = await getApiData({ url: '/api/areas/' + this.roomAreaId + '/inactive_entities?type=room', token: this.getToken() });
                 if (response.data) {
                     this.changeableRoomList = response.data;
                 }
@@ -2022,7 +2024,22 @@
                 }
             },
             btnConfirmAddService() {
-                this.addService();
+                if(!this.selectedServiceCategory){
+                    this.alertValiationMessage('Service Category')
+                }
+                else if(!this.selectedServiceStartTime){
+                    this.alertValiationMessage('Start Time')
+                    console.log('start hello')
+                }
+                else if(this.selectedServiceCategory.name == 'Lady' && !this.selectedLady){
+                    this.alertValiationMessage('Lady')
+                }
+                else if(this.selectedServiceCategory.name == 'DJ' && !this.selectedDj){
+                    this.alertValiationMessage('DJ')
+                }
+                else{
+                    this.addService();
+                }
             },
             async addService() {   // invoice pay yan
                 let formData = new FormData();
@@ -2039,7 +2056,7 @@
                 let response = await postApiData({ url: '/api/entities/add_service', form_data: formData, token: this.getToken() });
                 // console.log(this.invoiceId+','+this.selectedMenu.id + ','+ this.menuQuantity +','+this.selectedMenu.prices[0].price)
                 if (response.success) {
-                    this.closeModal('closeServiceModal');
+                    this.closeModal('closeServiceModalRoom');
                     this.clearServiceForm();
                     this.getSelectedRoom();
                 }
@@ -2061,7 +2078,7 @@
                 formData.append('end_date', this.selectedServiceEndTime);
                 let response = await postApiData({ url: '/api/entities/end_service', form_data: formData, token: this.getToken() });
                 if (response.success) {
-                    this.closeModal('closeEndServiceModal');
+                    this.closeModal('closeEndServiceModalRoom');
                     this.selectedServiceEndTime = null;
                     this.getSelectedRoom();
                 }
@@ -2088,8 +2105,27 @@
                     this.accessoryList = response.data;
                 }
             },
+            alertValiationMessage(field) {
+                this.$notify({
+                    title: `Input validation`,
+                    text: `You forgot to provide ${field}, please try again`,
+                    type: "warn"
+                });
+            },
             btnConfirmAddAccessory() {
-                this.addAccessory();
+                
+                if(!this.selectedAccessoryCategory){
+                    this.alertValiationMessage('Accessory Category');
+                }
+                if(!this.selectedAccessory){
+                    this.alertValiationMessage('Accessory');
+                }
+                if(!this.selectedAccessoryQuantity){
+                    this.alertValiationMessage('Quantity');
+                }
+                else{
+                    this.addAccessory();
+                }
             },
             async addAccessory() {   // invoice pay yan
                 let formData = new FormData();
@@ -2099,7 +2135,7 @@
                 let response = await postApiData({ url: '/api/pos/add_accessory', form_data: formData, token: this.getToken() });
                 // console.log(this.invoiceId+','+this.selectedMenu.id + ','+ this.menuQuantity +','+this.selectedMenu.prices[0].price)
                 if (response.success) {
-                    this.closeModal('closeAccessoryModal');
+                    this.closeModal('closeAccessoryModalRoom');
                     this.clearAccessoryForm();
                     this.getSelectedRoom();
                 }
@@ -2139,7 +2175,7 @@
                 this.selectedDj = null
                 this.selectedServiceQuantity = null
             },
-            clearServiceForm() {
+            clearAccessoryForm() {
                 this.selectedAccessoryCategory = null
                 this.selectedAccessory = null
                 this.selectedAccessoryQuantity = null
@@ -2225,9 +2261,9 @@
         },
         mounted()
         {
-            if (this.roomAreaId) {
-                this.getRoomList(this.roomAreaId);
-            }
+            // if (this.roomAreaId) {
+            //     this.getRoomList(this.roomAreaId);
+            // }
             initTE({ Modal, Select, Ripple, Datepicker });
         }
     }
