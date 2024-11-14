@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('sub_menus', function (Blueprint $table) {
             $table->id();
             $table->foreignId('menu_id')->constrained()->onDelete('cascade');
-            $table->foreignId('sub_menu_id')->constrained()->onDelete('cascade');
+            $table->integer('sub_menu_id');
             $table->timestamps();
         });
     }

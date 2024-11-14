@@ -35,7 +35,7 @@ class MaterialRequirementsPlanningAPIController extends Controller
         ResponseData($data);
     }
 
-    public function update(Request $request, int $menuId)
+    public function updateMrpList(Request $request, int $menuId)
     {
         $data = $this->MaterialRequirementsPlanningRepository->updateMrpList($menuId, $request->all());
         ResponseData($data);
@@ -64,6 +64,12 @@ class MaterialRequirementsPlanningAPIController extends Controller
     public function getCookingPlace(Request $request)
     {
         $data = $this->MaterialRequirementsPlanningRepository->getCookingPlace($request);
+        ResponseData($data);
+    }
+
+    public function getRoles(Request $request)
+    {
+        $data = $this->MaterialRequirementsPlanningRepository->getRoles($request);
         ResponseData($data);
     }
 }

@@ -13,8 +13,7 @@ class MenuStep extends Model
 
     protected $fillable = [
         'menu_id',
-        'staff_id',
-        'staff_quantity',
+        'role_id',
         'duration',
         'order_time',
         'expected_quantity',
@@ -27,9 +26,9 @@ class MenuStep extends Model
         return $this->belongsTo(Menu::class, 'menu_id');
     }
 
-    public function staff(): BelongsTo
+    public function role(): BelongsTo
     {
-        return $this->belongsTo(Staff::class, 'staff_id');
+        return $this->belongsTo(Role::class, 'role_id');
     }
 
     public function menuStepItem(): HasMany
