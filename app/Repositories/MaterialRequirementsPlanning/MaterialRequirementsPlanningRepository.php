@@ -148,50 +148,53 @@ class MaterialRequirementsPlanningRepository implements MaterialRequirementsPlan
       }
       $menu->menuSteps()->delete();
 
-      if (!empty($validatedData['menu_steps'])) {
+      // if (!empty($validatedData['menu_steps'])) {
+      $menuSteps = json_decode($validatedData['menu_steps']);
 
-        foreach ($validatedData['menu_steps'] as $data) {
-          $menuStep =  $menu->menuSteps()->updateOrCreate(
+      foreach ($menuSteps as $data) {
+        $menuStep =  $menu->menuSteps()->updateOrCreate(
+          [
+            'id' => $data->id ?? null,
+            'menu_id' => $menuId,
+          ],
+          [
+            'staff_id' => $data->staff_id,
+            'staff_quantity' => $data->staff_quantity,
+            'duration' => $data->duration,
+            'order_time' => $data->order_time,
+            'expected_quantity' => $data->expected_quantity,
+            'level' => $data->level,
+            'type' => $data->type
+          ]
+        );
+
+        // if (!empty($data['item_menu'])) {
+        foreach ($data->item_menu as $itemData) {
+          $menuStep->menuStepItem()->updateOrCreate(
             [
-              'id' => $data['id'] ?? null,
-              'menu_id' => $menuId,
+              'id' => $itemData->id ?? null,
+              'menu_step_id' => $menuStep->id
             ],
             [
-              'staff_id' => $data['staff_id'],
-              'staff_quantity' => $data['staff_quantity'],
-              'duration' => $data['duration'],
-              'order_time' => $data['order_time'],
-              'expected_quantity' => $data['expected_quantity'],
-              'level' => $data['level'],
-              'type' => $data['type']
+              'item_id' => $itemData->item_id,
+              'uom_id' => $itemData->uom_id,
+              'weight' => $itemData->weight
             ]
           );
-
-          if (!empty($data['item_menu'])) {
-            foreach ($data['item_menu'] as $itemData) {
-              $menuStep->menuStepItem()->updateOrCreate(
-                [
-                  'id' => $itemData['id'] ?? null,
-                  'menu_step_id' => $menuStep->id
-                ],
-                [
-                  'item_id' => $itemData['item_id'],
-                  'uom_id' => $itemData['uom_id'],
-                  'weight' => $itemData['weight']
-                ]
-              );
-            }
-          }
         }
+        // }
       }
+      // }
 
-      if (!empty($validatedData['cooking_place_id'])) {
-        $menu->menuPlaces()->sync($validatedData['cooking_place_id']);
-      }
+      $cookingPlace = json_decode($validatedData['cooking_place_id']);
+      // if (!empty($validatedData['cooking_place_id'])) {
+      $menu->menuPlaces()->sync($cookingPlace);
+      // }
 
-      if (!empty($validatedData['sub_menu_id'])) {
-        $menu->subMenus()->sync($validatedData['sub_menu_id']);
-      }
+      // if (!empty($validatedData['sub_menu_id'])) {
+      $submenu = json_decode($validatedData['sub_menu_id']);
+      $menu->subMenus()->sync($submenu);
+      // }
 
       DB::commit();
       $menuDatas = Menu::with('menuSteps.menuStepItem')->find($menu->id);
