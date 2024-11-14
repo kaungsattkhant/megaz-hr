@@ -2,7 +2,7 @@
     <div class="px-0">
         <div class="mb-4 ">
             <p class="text-lg font-semibold font-inter">
-                Add MRP
+                Edit MRP
             </p>
         </div>
 
@@ -408,6 +408,7 @@ export default {
     components: {
         Multiselect
     },
+    props: ["mrpId"],
     data() {
         return {
             cookingAreaList:[],
@@ -487,7 +488,9 @@ export default {
     methods: {
         ...mapGetters(['getToken']),
 
-        
+        async getMrpDetail(){
+            let response = await getApiData({ url: '' , token: this.getToken() });
+        },
 
         async getCookingAreaList() {
             let response = await getApiData({ url: `/api/cooking_place`, token: this.getToken() });

@@ -27,7 +27,7 @@
             </div>
 
             <div class="flex justify-end flex-col">
-                <a href="/menus/create" class="add-btn ">
+                <a href="/mrp/create" class="add-btn ">
                     Add New
                 </a>
 
@@ -92,7 +92,7 @@
                                         {{ (menu.is_feature == 1) ? 'Yes' : 'No' }}
                                     </td> -->
                                     <td class="whitespace-nowrap ">
-                                        <a :href="`/menus/${menu.id}/edit`" id="edit-btn" class="pr-1">
+                                        <a :href="`/mrp/${menu.id}/edit`" id="edit-btn" class="pr-1">
                                             <i class="fas fa-pen"></i>
                                         </a>
                                         <!-- <input :checked="menu.is_active == 1" @change="isActiveToggled(menu.id)"
