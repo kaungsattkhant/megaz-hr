@@ -5,7 +5,7 @@
 @section('content')
 
 <div id="app">
-    <menu-position-create-component/>
+    <mrp-create-component/>
 </div>
 
 @endsection

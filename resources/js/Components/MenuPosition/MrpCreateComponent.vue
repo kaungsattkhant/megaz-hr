@@ -40,6 +40,17 @@
                     </select> -->
                 </div>
             </div>
+
+            <div class="mb-0 col-span-3 row-span-2 rounded-md">
+                <label for="" class="label-form mb-3">
+                    Description
+                </label>
+                <div class="bg-white mb-0 w-full text-sm inline-block h-[34px]"
+                    data-te-select-wrapper-ref>
+                    <textarea type='text' v-model='description' class="input-ui w-full !px-1 !py-1.5 text-xs" rows="6" placeholder="Description" ></textarea>
+                </div>
+
+            </div>
             <div class="mb-4 col-span-3 rounded-md">
                 <label for="" class="block text-sm text-black mb-3">
                     Code
@@ -49,7 +60,28 @@
                 </div>
 
             </div>
-            
+            <div class="mb-4 col-span-3 rounded-md">
+                <label for="" class="label-form mb-3">
+                    Menu Category
+                </label>
+                <div class="bg-white mb-0 w-full text-sm inline-block h-[34px]"
+                    data-te-select-wrapper-ref>
+                    <select data-te-select-init data-te-select-placeholder="Select Category" @change="menuCategoryChanged()"
+                        data-te-select-filter="true" name="" id="" v-model="selectedMenuCategory" class="input-ui">
+                        <option :value="menuCategory" v-for="(menuCategory, menuCategoryIndex) in menuCategoryList"
+                            :key="menuCategoryIndex"> {{ menuCategory.name }} </option>
+                    </select>
+                </div>
+            </div>
+            <div class="mb-4 col-span-3 rounded-md">
+                <label for="" class="block text-sm text-black mb-3">
+                    Images
+                </label>
+                <div class="">
+                    <input type='file' @change="handleFileChange" class="input-ui w-full !p-1 text-xs" />
+                </div>
+
+            </div>
             <div class="mb-4 col-span-3 rounded-md">
                 <label for="" class="block text-sm text-black mb-3">
                     Type
@@ -63,20 +95,9 @@
                     </select>
                 </div>
             </div>
+            
             <div class="contents" v-if="selectedMenuType == 'menu'">
-                <div class="mb-4 col-span-3 rounded-md">
-                    <label for="" class="label-form mb-3">
-                        Menu Category
-                    </label>
-                    <div class="bg-white mb-0 w-full text-sm inline-block h-[34px]"
-                        data-te-select-wrapper-ref>
-                        <select data-te-select-init data-te-select-placeholder="Select Category" @change="menuCategoryChanged()"
-                            data-te-select-filter="true" name="" id="" v-model="selectedMenuCategory" class="input-ui">
-                            <option :value="menuCategory" v-for="(menuCategory, menuCategoryIndex) in menuCategoryList"
-                                :key="menuCategoryIndex"> {{ menuCategory.name }} </option>
-                        </select>
-                    </div>
-                </div>
+                
                 <div class="mb-4 col-span-3 rounded-md">
                     <label for="" class="block text-sm text-black mb-3">
                         Menu
@@ -84,8 +105,9 @@
                     <div class="bg-white mb-0 w-full text-sm inline-block h-[34px]"
                         data-te-select-wrapper-ref>
                         <select data-te-select-init data-te-select-placeholder="Select Category"
+                         
                             data-te-select-filter="true" name="" id="" v-model="selectedMenu" class="input-ui">
-                            <option :value="menu.id" v-for="(menu, menuIndex) in menuList"
+                            <option :value="menu" v-for="(menu, menuIndex) in menuList"
                                 :key="menuIndex"> {{ menu.name }} </option>
                         </select>
                     </div>
@@ -97,9 +119,10 @@
                     <label for="" class="block text-sm text-black mb-3">
                         Level
                     </label>
-                    <div class="bg-white mb-0 w-full text-sm inline-block h-[34px]"
+                    <div class="mb-0 w-full text-sm inline-block h-max" :class="is_disable_custom ? 'bg-gray-200 rounded' : ''"
                         data-te-select-wrapper-ref>
                         <select data-te-select-init data-te-select-placeholder="Select Category"
+                        :disabled="is_disable_custom" :class="is_disable_custom ? 'cursor-not-allowed' : ''"
                             data-te-select-filter="true" name="" id="" v-model="selectedLevel" class="input-ui">
                             <option :value="level" v-for="(level, levelIndex) in levelList"
                                 :key="levelIndex"> {{ level.name }} </option>
@@ -110,9 +133,10 @@
                     <label for="" class="block text-sm text-black mb-3">
                         Type
                     </label>
-                    <div class="bg-white mb-0 w-full text-sm inline-block h-[34px]"
+                    <div class=" mb-0 w-full text-sm inline-block h-max" :class="is_disable_custom ? 'bg-gray-200 rounded' : ''"
                         data-te-select-wrapper-ref>
                         <select data-te-select-init data-te-select-placeholder="Select Category"
+                        :disabled="is_disable_custom" :class="is_disable_custom ? 'cursor-not-allowed' : ''"
                             data-te-select-filter="true" name="" id="" v-model="selectedType" class="input-ui">
                             <option :value="type" v-for="(type, typeIndex) in typeList"
                                 :key="typeIndex"> {{ type.name }} </option>
@@ -123,37 +147,44 @@
                     <label for="" class="block text-sm text-black mb-3">
                         Position
                     </label>
-                    <div class="bg-white mb-0 w-full text-sm inline-block h-[34px]"
+                    <div class="mb-0 w-full text-sm inline-block h-max" :class="is_disable_custom ? 'bg-gray-200 rounded' : ''"
                         data-te-select-wrapper-ref>
                         <select data-te-select-init data-te-select-placeholder="Select Category"
+                            :disabled="is_disable_custom" :class="is_disable_custom ? 'cursor-not-allowed' : ''"
                             data-te-select-filter="true" name="" id="" v-model="selectedPosition" class="input-ui">
                             <option :value="position" v-for="(position, positionIndex) in positionList"
                                 :key="positionIndex"> {{ position.name }} </option>
                         </select>
                     </div>
-                </div><div class="col-span-3"></div>
+                </div>
+                <div class="mb-4 col-span-3 rounded-md">
+                    <label for="" class="label-form mb-3">
+                        Position Quantity
+                    </label>
+                    <input type="number" v-model="positionQuantity" class="input-ui" :disabled="is_disable_custom" :class="is_disable_custom ? 'cursor-not-allowed !bg-gray-200 rounded' : ''">
+                </div>
                 <div class="mb-4 col-span-3 rounded-md">
                     <label for="" class="label-form mb-3">
                         Duration
                     </label>
-                    <input type="number" v-model="duration" class="input-ui">
+                    <input type="number" v-model="duration" class="input-ui" :disabled="is_disable_custom" :class="is_disable_custom ? 'cursor-not-allowed !bg-gray-200 rounded' : ''">
                 </div>
                 <div class="mb-4 col-span-3 rounded-md">
                     <label for="" class="label-form mb-3">
                         Order Time
                     </label>
-                    <input type="number" v-model="orderTime" class="input-ui">
+                    <input type="number" v-model="orderTime" class="input-ui" :disabled="is_disable_custom" :class="is_disable_custom ? 'cursor-not-allowed !bg-gray-200 rounded' : ''">
                 </div>
                 <div class="mb-4 col-span-3 rounded-md">
                     <label for="" class="label-form mb-3">
                         Expected Quantity
                     </label>
-                    <input type="number" v-model="expectedQuantity" class="input-ui">
+                    <input type="number" v-model="expectedQuantity" class="input-ui" :disabled="is_disable_custom" :class="is_disable_custom ? 'cursor-not-allowed !bg-gray-200 rounded' : ''">
                 </div><div class="col-span-3"></div>
 
                 <div class="mb-0 col-span-3 rounded-md">
                     <label for="" class="label-form mb-3">
-                        Category
+                        Item Category
                     </label>
                     <div class="bg-white mb-0 w-full text-sm inline-block h-[34px]"
                         data-te-select-wrapper-ref>
@@ -198,30 +229,13 @@
                     </div>
                 </div>
             </div>
-            <div class="mb-4 col-span-3 rounded-md">
-                <label for="" class="block text-sm text-black mb-3">
-                    Images
-                </label>
-                <div class="">
-                    <input type='file' @change="handleFileChange" class="input-ui w-full !p-1 text-xs" />
-                </div>
-
-            </div>
-            <div class="mb-0 col-span-3 rounded-md">
-                <label for="" class="label-form mb-3">
-                    Description
-                </label>
-                <div class="bg-white mb-0 w-full text-sm inline-block h-[34px]"
-                    data-te-select-wrapper-ref>
-                    <textarea type='text' v-model='description' class="input-ui w-full !p-1 text-xs" placeholder="Description" ></textarea>
-                </div>
-
-            </div>
+            <div class="col-span-12"></div>
+            
             <div class="col-span-3">
                 <label for="" class="label-form mb-3">
                     &nbsp;
                 </label>
-                <button class="add-btn" @click="addItemBtnClicked">
+                <button class="add-btn" @click="btnClickedAddMenuLevel()">
                     Add Item
                 </button>
             </div>
@@ -235,10 +249,10 @@
             <div v-if="menuLevel.item_menu.length > 0">
                 <div class="flex mb-2">
                     <p v-if="menuLevel.level">
-                        {{ menuLevel.level.name }} : 
+                        {{ menuLevel.level }} : 
                     </p>
                     <p>
-                        &nbsp;{{ menuLevel.type.name }}
+                        &nbsp;{{ menuLevel.type }}
                     </p>
                 </div>
                 <div class="flex gap-x-8 mb-4">
@@ -255,7 +269,7 @@
                             Duration : 
                         </p>
                         <p>
-                            &nbsp;{{ menuLevel.duration }}
+                            &nbsp;{{ menuLevel.duration }} min
                         </p>
                     </div>
                 </div>
@@ -291,7 +305,7 @@
                                 {{ menu.weight }}
                             </td>
                             <td class="">
-                                <button @click="removeIngredientBtnClicked(menuIndex)">
+                                <button @click="removeMenuLevel(menuIndex)">
                                     <i class="fal fa-trash  pr-3"></i>
                                 </button>
                             </td>
@@ -299,9 +313,12 @@
                     </tbody>
                 </table>
             </div>
-            <div>
+            <div class="flex gap-x-4">
+                <button class="add-btn" @click="clearMenuLevel()">
+                    Clear 
+                </button>
                 <button class="add-btn" @click="addLevelBtnClicked()">
-                    Add Level
+                    Add 
                 </button>
             </div>
 
@@ -346,7 +363,18 @@
                                 {{ level.duration }}
                             </td>
                             <td class="">
-                                <button @click="removeLevelMenuBtnClicked(levelIndex)">
+                                <button @click="removeLevel(levelIndex)">
+                                    <i class="fal fa-trash  pr-3"></i>
+                                </button>
+                            </td>
+                        </tr>
+                        <tr class="" v-for="(submenu, submenuIndex) in subMenuList"
+                            :key="submenuIndex">    
+                            <td class="" colspan="4">
+                                {{ submenu.name }}
+                            </td>
+                            <td class="">
+                                <button @click="removeSubMenu(submenuIndex)">
                                     <i class="fal fa-trash  pr-3"></i>
                                 </button>
                             </td>
@@ -423,6 +451,7 @@ export default {
             selectedLevel:null,
             selectedType:null,
             selectedPosition:null,
+            positionQuantity:null,
             duration:null,
             orderTime:null,
             expectedQuantity:null,
@@ -445,9 +474,12 @@ export default {
                 item_menu:[],
             },
             levelTable:[],
+            subMenu:[], // selected type = menu
+            subMenuList:[], // selected type = menu
 
             departmentId:null,
 
+            is_disable_custom:false,
 
         };
     },
@@ -539,76 +571,127 @@ export default {
             const selectedFile = event.target.files[0];
             this.selectedImage = selectedFile;
         },
-        async addItemBtnClicked() {
-            // if(!this.selectedItem){
-            //     this.alertValidationMessage('an item');
-            //     return 1;
-            // }
-            // if (!this.weight) {
-            //     this.alertValiationMessage('weight');
-            //     return 1;
-            // }
-            // if(!this.selectedUom){
-            //     this.alertValiationMessage('UOM');
-            //     return 1;
-            // }
-
-            let url = `/api/get_uom_conversion_by_uom?po_uom_id=${this.selectedUom.id}&item_uom_id=${this.selectedItem.item_prices.uom_id}&item_price=${this.selectedItem.item_prices.price}&base_uom_id=${this.selectedItem.base_uom_id}`;
-            let response = await getApiData({url: url, token: this.getToken()});
-            let uomConversion = null;
-            let amount = 0;
-            let price = 0;
-            if(response.data){
-                uomConversion = response.data;
-                amount = parseInt(response.data.price);
-                price = this.amount * amount;
-
-                this.$notify({
-                    text: `Uom conversion by uom value ${amount}`,
-                    type: 'info'
+        btnClickedAddMenuLevel(){
+            if(this.selectedMenuType == 'menu'){
+                this.subMenuList.push({
+                    name: this.selectedMenu.name,
+                    id: this.selectedMenu.id,
                 });
+                this.subMenu.push(this.selectedMenu.id);
+                this.selectedMenu = null;
             }
             else{
-                this.$notify({
-                    title: 'Error',
-                    text: response.message,
-                    type: 'error'
-                });
-
+                this.addCustom();
+            }
+            console.log(this.selectedMenuType)
+        },
+        async addCustom() {
+            if(!this.selectedLevel){
+                this.alertValidationMessage('Level');
                 return 1;
             }
-
-            if(this.menuLevel.item_menu.length < 1){
-                this.menuLevel.level = this.selectedLevel.id;
-                this.menuLevel.type = this.selectedType.id;
-                this.menuLevel.position = this.selectedPosition;
-                this.menuLevel.staff_id = this.selectedPosition.id;
-                this.menuLevel.staff_quantity = 2;
-                this.menuLevel.duration = this.duration;
-                this.menuLevel.order_time = this.orderTime;
-                this.menuLevel.expected_quantity = this.expectedQuantity;
-                this.menuLevel.item_menu.push({
-                    item_id: this.selectedItem.id,
-                    price: price,
-                    name: this.selectedItem.name,
-                    weight: this.amount,
-                    is_make_pack: this.isMakePack,
-                    uom_id: this.selectedUom.id,
-                    uom_name: this.selectedUom.name
-                });
+            else if (!this.selectedType) {
+                this.alertValidationMessage('Type');
+                return 1;
+            }
+            else if(!this.selectedPosition){
+                this.alertValidationMessage('Position');
+                return 1;
+            }
+            else if(!this.positionQuantity){
+                this.alertValidationMessage('Position Quantity');
+                return 1;
+            }
+            else if(!this.duration){
+                this.alertValidationMessage('Duration');
+                return 1;
+            }
+            else if(!this.orderTime){
+                this.alertValidationMessage('Order Time');
+                return 1;
+            }
+            else if(!this.expectedQuantity){
+                this.alertValidationMessage('Expected Quantity');
+                return 1;
+            }
+            else if(!this.selectedItemCategory){
+                this.alertValidationMessage('Item Category');
+                return 1;
+            }
+            else if(!this.selectedItem){
+                this.alertValidationMessage('Item');
+                return 1;
+            }
+            else if(!this.amount){
+                this.alertValidationMessage('Amount');
+                return 1;
+            }
+            else if(!this.selectedUom){
+                this.alertValidationMessage('UOM');
+                return 1;
             }
             else{
-                this.menuLevel.item_menu.push({
-                    item_id: this.selectedItem.id,
-                    price: price,
-                    name: this.selectedItem.name,
-                    weight: this.amount,
-                    is_make_pack: this.isMakePack,
-                    uom_id: this.selectedUom.id,
-                    uom_name: this.selectedUom.name
-                });
-            }
+                let url = `/api/get_uom_conversion_by_uom?po_uom_id=${this.selectedUom.id}&item_uom_id=${this.selectedItem.item_prices.uom_id}&item_price=${this.selectedItem.item_prices.price}&base_uom_id=${this.selectedItem.base_uom_id}`;
+                let response = await getApiData({url: url, token: this.getToken()});
+                let uomConversion = null;
+                let amount = 0;
+                let price = 0;
+                if(response.data){
+                    uomConversion = response.data;
+                    amount = parseInt(response.data.price);
+                    price = this.amount * amount;
 
+                    this.$notify({
+                        text: `Uom conversion by uom value ${amount}`,
+                        type: 'info'
+                    });
+                }
+                else{
+                    this.$notify({
+                        title: 'Error',
+                        text: response.message,
+                        type: 'error'
+                    });
+
+                    return 1;
+                }
+
+                if(this.menuLevel.item_menu.length < 1){
+                    this.menuLevel.level = this.selectedLevel.id;
+                    this.menuLevel.type = this.selectedType.id;
+                    this.menuLevel.position = this.selectedPosition;
+                    this.menuLevel.staff_id = this.selectedPosition.id;
+                    this.menuLevel.staff_quantity = 2;
+                    this.menuLevel.duration = this.duration;
+                    this.menuLevel.order_time = this.orderTime;
+                    this.menuLevel.expected_quantity = this.expectedQuantity;
+                    this.menuLevel.item_menu.push({
+                        item_id: this.selectedItem.id,
+                        price: price,
+                        name: this.selectedItem.name,
+                        weight: this.amount,
+                        is_make_pack: this.isMakePack,
+                        uom_id: this.selectedUom.id,
+                        uom_name: this.selectedUom.name
+                    });
+                }
+                else{
+                    this.menuLevel.item_menu.push({
+                        item_id: this.selectedItem.id,
+                        price: price,
+                        name: this.selectedItem.name,
+                        weight: this.amount,
+                        is_make_pack: this.isMakePack,
+                        uom_id: this.selectedUom.id,
+                        uom_name: this.selectedUom.name
+                    });
+                }
+                this.selectedItemCategory = null;
+                this.selectedItem = null;
+                this.selectedUom = null;
+                this.amount = null;
+                this.is_disable_custom = true;
+            }
             // this.updateItemPriceTotal(this.ingredientItems);
 
             // this.weight = null;
@@ -616,43 +699,68 @@ export default {
             // this.$refs.is_make_pack.checked = false;
         },
 
-        removeIngredientBtnClicked(ingredientIndex) {
-            this.ingredientItems.splice(ingredientIndex, 1);
-            this.updateItemPriceTotal(this.ingredientItems);
+        removeMenuLevel(index) {
+            this.menuLevel.item_menu.splice(index, 1);
+            // this.updateItemPriceTotal(this.ingredientItems);
         },
 
+        clearMenuLevel(){
+            this.resetMenuLevel();
+            this.selectedLevel = null;
+            this.selectedType = null;
+            this.selectedPosition = null;
+            this.positionQuantity = null;
+            this.duration = null;
+            this.orderTime = null;
+            this.expectedQuantity = null;
+            this.is_disable_custom = false;
+        },
         addLevelBtnClicked(){
             this.levelTable.push(
-                this.menuLevel
+                JSON.parse(JSON.stringify(this.menuLevel))
             );
+            this.is_disable_custom = false
+            this.clearMenuLevel();
         },
-
+        removeLevel(index) {
+            this.levelTable.splice(index, 1);
+            // this.updateItemPriceTotal(this.ingredientItems);
+        },
+        removeSubMenu(index) {
+            this.subMenuList.splice(index, 1);
+            this.submenu.splice(index, 1);
+            // this.updateItemPriceTotal(this.ingredientItems);
+        },
         async createMenuBtnClicked() {
-            // if (!this.name) {
-            //     this.alertValiationMessage(`menu name`);
-            //     return 1;
-            // }
-            // else if(!this.price){
-            //     this.alertValiationMessage(`menu price`);
-            //     return 1;
-            // }
-            // else if(!this.menuCategoryId){
-            //     this.alertValiationMessage(`menu category`);
-            //     return 1;
-            // }
-            // else if(this.ingredientItems.length < 1){
-            //     this.alertValiationMessage(`menu items`);
-            //     return 1;
-            // }
-            // else if(!this.selectedImage){
-            //     this.alertValiationMessage(`menu image`);
-            //     return 1;
-            // }
-            // else if(this.selectedAreas.length < 1){
-            //     this.alertValiationMessage(`cooking areas`);
-            //     return 1;
-            // }
-            // else {
+            if (!this.menuName) {
+                this.alertValidationMessage(`menu name`);
+                return 1;
+            }
+            else if(!this.sellingPrice){
+                this.alertValidationMessage(`menu price`);
+                return 1;
+            }
+            else if(!this.selectedMenuCategory){
+                this.alertValidationMessage(`menu category`);
+                return 1;
+            }
+            else if(!this.code){
+                this.alertValidationMessage(`Code`);
+                return 1;
+            }
+            else if(!this.selectedImage){
+                this.alertValidationMessage(`menu image`);
+                return 1;
+            }
+            else if(!this.selectedCookingArea){
+                this.alertValidationMessage(`cooking areas`);
+                return 1;
+            }
+            else if(!this.selectedMenuType){
+                this.alertValidationMessage(`Type`);
+                return 1;
+            }
+            else {
                 let cookingPlaceId = [];
                 this.selectedCookingArea.forEach((item) => {
                     cookingPlaceId.push(item.id)
@@ -660,19 +768,20 @@ export default {
                 console.log('array ' ,cookingPlaceId)
                 let formData = new FormData();
                 formData.append('name', this.menuName);
-                formData.append('menu_category_id', 4);
+                formData.append('menu_category_id', this.selectedMenuCategory.id);
                 formData.append('code', this.code);
                 formData.append('image',this.selectedImage);
                 // formData.append('description',this.description);
                 formData.append('price', this.sellingPrice);
                 formData.append('Menu_type', this.selectedMenuType);
-                // formData.append('areas',JSON.stringify(areaIds));
                 formData.append('cooking_place_id',JSON.stringify(cookingPlaceId));
+
                 formData.append('menu_steps',JSON.stringify(this.levelTable));
+                if(this.subMenu.length > 0){
+                    formData.append('sub_menu_id',JSON.stringify(this.subMenu));
+                }
                 
-
                 let response = await postApiData({ url: `/api/mrp`, form_data: formData, token: this.getToken() });
-
                 if (response.success) {
                     // window.location.replace(`/menus`);
                 }
@@ -683,10 +792,22 @@ export default {
                         type: "warn"
                     });
                 }
-            // }
+            }
+        },
+        resetMenuLevel(){
+            this.menuLevel.level = null;
+            this.menuLevel.type = null;
+            this.menuLevel.position = null;
+            this.menuLevel.staff_id=null;
+            this.menuLevel.staff_quantity=null;
+            this.menuLevel.duration = null;
+            this.menuLevel.order_time = null;
+            this.menuLevel.expected_quantity = null;
+            this.menuLevel.item_menu=[];
         },
 
-        alertValiationMessage(field) {
+        
+        alertValidationMessage(field) {
             this.$notify({
                 title: `Input validation`,
                 text: `You forgot to provide ${field}, please try again`,
