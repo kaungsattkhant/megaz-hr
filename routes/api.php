@@ -606,4 +606,6 @@ Route::controller(MaterialRequirementsPlanningAPIController::class)->group(funct
     Route::get('/menu_step/{id}', 'getMenuStepList');
     Route::delete('/menu_step_items/{id}', 'menuStepItemsDelete');
     Route::get('/cooking_place', 'getCookingPlace');
+    Route::post('/mrp/{id}', 'updateMrpList');
+    Route::get('/roles', 'getRoles');
 });

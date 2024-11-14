@@ -4,9 +4,11 @@ namespace App\Repositories\MaterialRequirementsPlanning;
 
 use Exception;
 use App\Models\Menu;
+use App\Models\Role;
 use App\Models\SubMenu;
 use App\Models\MenuStep;
 use App\Models\MenuPrice;
+use App\Models\Department;
 use App\Models\CookingPlace;
 use App\Models\MenuStepItem;
 use Illuminate\Http\Request;
@@ -25,7 +27,7 @@ class MaterialRequirementsPlanningRepository implements MaterialRequirementsPlan
       'menu_category',
       'price',
       'menuPlaces.area',
-      'menuSteps.staff.roles.department',
+      'menuSteps.role.department',
       'menuSteps.menuStepItem.item',
       'menuSteps.menuStepItem.uom',
       'subMenus.menuSteps.menuStepItem.item',
@@ -38,13 +40,13 @@ class MaterialRequirementsPlanningRepository implements MaterialRequirementsPlan
 
     DB::beginTransaction();
     try {
-      // if (isset($validatedData['image'])) {
-      //   $imageData = $validatedData['image'];
-      //   $extension = $imageData->getClientOriginalExtension();
-      //   $hashedName = md5(uniqid() . microtime()) . '.' . $extension;
-      //   $data['image_path'] = $imageData->storeAs('menuImages/', $hashedName, 'public');
-      //   $data['image_url'] = Storage::url($data['image_path']);
-      // }
+      if (isset($validatedData['image'])) {
+        $imageData = $validatedData['image'];
+        $extension = $imageData->getClientOriginalExtension();
+        $hashedName = md5(uniqid() . microtime()) . '.' . $extension;
+        $data['image_path'] = $imageData->storeAs('menuImages/', $hashedName, 'public');
+        $data['image_url'] = Storage::url($data['image_path']);
+      }
 
       $menu = Menu::create([
         'name' => $validatedData['name'],
@@ -58,8 +60,7 @@ class MaterialRequirementsPlanningRepository implements MaterialRequirementsPlan
       foreach ($menuSteps as $data) {
         $menuStep = MenuStep::create([
           'menu_id' => $menu->id,
-          'staff_id' => $data->staff_id,
-          'staff_quantity' => $data->staff_quantity,
+          'role_id' => $data->role_id,
           'duration' => $data->duration,
           'order_time' => $data->order_time,
           'expected_quantity' => $data->expected_quantity,
@@ -94,6 +95,7 @@ class MaterialRequirementsPlanningRepository implements MaterialRequirementsPlan
       $menu->menuPlaces()->sync($cookingPlace);
       // }
 
+      // if (!isset($validatedData['sub_menu_id'])) {
       $submenu = json_decode($validatedData['sub_menu_id']);
       // if (!empty($validatedData['sub_menu_id'])) {
       $menu->subMenus()->sync($submenu);
@@ -118,15 +120,15 @@ class MaterialRequirementsPlanningRepository implements MaterialRequirementsPlan
       'menu_category',
       'price',
       'menuPlaces.area',
-      'menuSteps.staff.roles.department',
+      'menuSteps.role.department',
       'menuSteps.menuStepItem.item',
       'menuSteps.menuStepItem.uom',
       'subMenus.menuSteps.menuStepItem.item',
       'subMenus.menuSteps.menuStepItem.uom',
     ])->where('id', $menuId)
       ->where('is_active', 1)
-      ->whereHas('menuSteps.staff', function ($query) {
-        $query->where('is_active', 1);
+      ->whereHas('menuSteps.role.department', function ($query) {
+        $query->where('name', 'kitchen');
       })->get();
   }
 
@@ -158,8 +160,7 @@ class MaterialRequirementsPlanningRepository implements MaterialRequirementsPlan
             'menu_id' => $menuId,
           ],
           [
-            'staff_id' => $data->staff_id,
-            'staff_quantity' => $data->staff_quantity,
+            'role_id' => $data->role_id,
             'duration' => $data->duration,
             'order_time' => $data->order_time,
             'expected_quantity' => $data->expected_quantity,
@@ -233,10 +234,10 @@ class MaterialRequirementsPlanningRepository implements MaterialRequirementsPlan
 
   public function getMenuStepList($menuStepId)
   {
-    $menu = MenuStep::with(['staff.roles.department', 'menuStepItem.item', 'menuStepItem.uom'])
+    $menu = MenuStep::with(['role.department', 'menuStepItem.item', 'menuStepItem.uom'])
       ->where('id', $menuStepId)
-      ->whereHas('staff', function ($query) {
-        $query->where('is_active', 1);
+      ->whereHas('role.department', function ($query) {
+        $query->where('name', 'kitchen');
       })
       ->get();
 
@@ -252,5 +253,14 @@ class MaterialRequirementsPlanningRepository implements MaterialRequirementsPlan
   public function getCookingPlace(Request $request)
   {
     return CookingPlace::with('area')->get();
+  }
+
+  public function getRoles(Request $request)
+  {
+    $department = Department::where('name', 'kitchen')->first();
+    if (!$department) {
+      return response()->json(['message' => 'Department data not found!'], 404);
+    }
+    return Role::where('department_id', $department->id)->with('department')->get();
   }
 }

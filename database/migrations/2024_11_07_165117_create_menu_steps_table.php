@@ -14,8 +14,7 @@ return new class extends Migration
         Schema::create('menu_steps', function (Blueprint $table) {
             $table->id();
             $table->foreignId('menu_id');
-            $table->foreignId('staff_id');
-            $table->integer('staff_quantity');
+            $table->foreignId('role_id');
             $table->double('duration');
             $table->double('order_time');
             $table->double('expected_quantity');
