@@ -153,6 +153,8 @@ use App\Repositories\MenuServiceDiscount\MenuServiceDiscountRepositoryInterface;
 use App\Repositories\CustomerLevelDiscount\CustomerLevelDiscountRepositoryInterface;
 use App\Repositories\MaterialRequirementsPlanning\MaterialRequirementsPlanningInterface;
 use App\Repositories\MaterialRequirementsPlanning\MaterialRequirementsPlanningRepository;
+use App\Repositories\Objective\ObjectiveInterface;
+use App\Repositories\Objective\ObjectiveRepository;
 
 // >>>>>>> origin/k/backend-api-main
 
@@ -230,5 +232,6 @@ class RepositoryServiceProvider extends ServiceProvider
         $this->app->bind(ServiceInterface::class, ServiceRepository::class);
         $this->app->bind(AccessoryInterface::class, AccessoryRepository::class);
         $this->app->bind(MaterialRequirementsPlanningInterface::class, MaterialRequirementsPlanningRepository::class);
+        $this->app->bind(ObjectiveInterface::class,ObjectiveRepository::class);
     }
 }

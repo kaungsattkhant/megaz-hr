@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('objectives', function (Blueprint $table) {
             $table->id();
-            $table->string('name');
+            $table->string('objective_name');
             $table->foreignId('role_id');
             $table->set('assigned_days',['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'])->nullable();
             $table->integer('created_by');

@@ -39,9 +39,10 @@ use App\Http\Controllers\API\StaffAPIController;
 use App\Http\Controllers\API\SupplierController;
 use App\Http\Controllers\API\AccessoryController;
 use App\Http\Controllers\API\EntityAPIController;
+use App\Http\Controllers\API\ObjectiveController;
 use App\Http\Controllers\API\BookingAPIController;
-use App\Http\Controllers\API\FeatureAPIController;
 // use App\Http\Controllers\API\CustomerAuthController;
+use App\Http\Controllers\API\FeatureAPIController;
 use App\Http\Controllers\API\InvoiceAPIController;
 use App\Http\Controllers\API\JournalAPIController;
 use App\Http\Controllers\API\PackageAPIController;
@@ -77,13 +78,13 @@ use App\Http\Controllers\API\PurchaseOrderItemLeftController;
 use App\Http\Controllers\API\SaleTargetPositionAPIController;
 use App\Http\Controllers\API\MenuServiceDiscountAPIController;
 use App\Http\Controllers\API\CustomerLevelDiscountAPIController;
+use App\Http\Controllers\API\MaterialRequirementsPlanningAPIController;
 use App\Http\Controllers\API\Customers\AuthController as CustomerAuthController;
 use App\Http\Controllers\API\Customers\AdsAPIController as CustomerAdsAPIController;
 use App\Http\Controllers\API\Customers\MenuAPIController as CustomersMenuAPIController;
 use App\Http\Controllers\API\Customers\CustomerAPIController as UserAppCustomerAPIController;
 use App\Http\Controllers\API\Customers\PackageAPIController as CustomersPackageAPIController;
 use App\Http\Controllers\API\Customers\MenuCategoryAPIController as CustomerMenuCategoryAPIController;
-use App\Http\Controllers\API\MaterialRequirementsPlanningAPIController;
 
 /*
 |--------------------------------------------------------------------------
@@ -609,3 +610,9 @@ Route::controller(MaterialRequirementsPlanningAPIController::class)->group(funct
     Route::post('/mrp/{id}', 'updateMrpList');
     Route::get('/roles', 'getRoles');
 });
+
+Route::controller(ObjectiveController::class)->group(function () {
+    Route::post('/objectives','store');
+});
+
+
