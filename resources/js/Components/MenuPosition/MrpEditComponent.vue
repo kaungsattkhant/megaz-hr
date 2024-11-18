@@ -579,7 +579,17 @@ export default {
                 })
                 this.levelTable.push(sampleMenuLevel)
             })    
+            this.getMenuList();
             
+            // this.subMenu = detail.sub_menus
+            detail.sub_menus.forEach(menu => {
+                // let menuName = this.menuList.find(item => item.id === menu).name
+                this.subMenuList.push({
+                    name: menu.name,
+                    id: menu.id,
+                });
+                this.subMenu.push(menu.id);
+            })
         },
         async getCookingAreaList() {
             let response = await getApiData({ url: `/api/cooking_place`, token: this.getToken() });
@@ -877,9 +887,9 @@ export default {
                     formData.append('sub_menu_id',JSON.stringify(this.subMenu));
                 }
                 
-                let response = await postApiData({ url: `/api/mrp`, form_data: formData, token: this.getToken() });
+                let response = await postApiData({ url: `/api/mrp/${this.mrpId}`, form_data: formData, token: this.getToken() });
                 if (response.success) {
-                    // window.location.replace(`/menus`);
+                    window.location.replace(`/mrp`);
                 }
                 else {
                     this.$notify({

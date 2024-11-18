@@ -679,7 +679,7 @@ export default {
                 if(this.menuLevel.item_menu.length < 1){
                     this.menuLevel.level = this.selectedLevel.id;
                     this.menuLevel.type = this.selectedType.id;
-                    this.menuLevel.position = this.selectedPosition;
+                    // this.menuLevel.position = this.selectedPosition;
                     // this.menuLevel.staff_id = this.selectedPosition.id;
                     // this.menuLevel.staff_quantity = this.positionQuantity;
                     this.menuLevel.role_id = this.selectedRole.id;
@@ -803,9 +803,9 @@ export default {
                     formData.append('sub_menu_id',JSON.stringify(this.subMenu));
                 }
                 
-                let response = await postApiData({ url: `/api/mrp`, form_data: formData, token: this.getToken() });
+                let response = await postApiData({ url: `/api/mrpasdf`, form_data: formData, token: this.getToken() });
                 if (response.success) {
-                    window.location.replace(`/mrp`);
+                    // window.location.replace(`/mrp`);
                 }
                 else {
                     this.$notify({
