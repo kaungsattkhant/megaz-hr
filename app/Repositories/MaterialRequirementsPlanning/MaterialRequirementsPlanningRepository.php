@@ -138,13 +138,13 @@ class MaterialRequirementsPlanningRepository implements MaterialRequirementsPlan
     try {
       $menu = Menu::findOrFail($menuId);
       $menu->update($validatedData);
-      // if (isset($validatedData['image'])) {
-      //   $imageData = $validatedData['image'];
-      //   $extension = $imageData->getClientOriginalExtension();
-      //   $hashedName = md5(uniqid() . microtime()) . '.' . $extension;
-      //   $data['image_path'] = $imageData->storeAs('menuImages/', $hashedName, 'public');
-      //   $data['image_url'] = Storage::url($data['image_path']);
-      // }
+      if (isset($validatedData['image'])) {
+        $imageData = $validatedData['image'];
+        $extension = $imageData->getClientOriginalExtension();
+        $hashedName = md5(uniqid() . microtime()) . '.' . $extension;
+        $data['image_path'] = $imageData->storeAs('menuImages/', $hashedName, 'public');
+        $data['image_url'] = Storage::url($data['image_path']);
+      }
       foreach ($menu->menuSteps as $menuStep) {
         $menuStep->menuStepItem()->delete();
       }
