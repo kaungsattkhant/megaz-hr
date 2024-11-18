@@ -601,7 +601,7 @@ export default {
                     name: this.selectedMenu.name,
                     id: this.selectedMenu.id,
                 });
-                this.subMenu.push(this.selectedMenu.id);
+                // this.subMenu.push(this.selectedMenu.id);
                 this.selectedMenu = null;
             }
             else{
@@ -679,7 +679,7 @@ export default {
                 if(this.menuLevel.item_menu.length < 1){
                     this.menuLevel.level = this.selectedLevel.id;
                     this.menuLevel.type = this.selectedType.id;
-                    // this.menuLevel.position = this.selectedPosition;
+                    this.menuLevel.position = this.selectedPosition;
                     // this.menuLevel.staff_id = this.selectedPosition.id;
                     // this.menuLevel.staff_quantity = this.positionQuantity;
                     this.menuLevel.role_id = this.selectedRole.id;
@@ -750,7 +750,7 @@ export default {
         },
         removeSubMenu(index) {
             this.subMenuList.splice(index, 1);
-            this.submenu.splice(index, 1);
+            // this.submenu.splice(index, 1);
             // this.updateItemPriceTotal(this.ingredientItems);
         },
         async createMenuBtnClicked() {
@@ -787,7 +787,12 @@ export default {
                 this.selectedCookingArea.forEach((item) => {
                     cookingPlaceId.push(item.id)
                 })
-                console.log('array ' ,cookingPlaceId)
+                let sub_menu_id = [];
+                this.subMenuList.forEach((submenu) => {
+                    sub_menu_id.push(submenu.id)
+                    console.log('sub menu ' ,sub_menu_id)
+                })
+                console.log('array ' ,sub_menu_id)
                 let formData = new FormData();
                 formData.append('name', this.menuName);
                 formData.append('menu_category_id', this.selectedMenuCategory.id);
@@ -799,11 +804,11 @@ export default {
                 formData.append('cooking_place_id',JSON.stringify(cookingPlaceId));
 
                 formData.append('menu_steps',JSON.stringify(this.levelTable));
-                if(this.subMenu.length > 0){
-                    formData.append('sub_menu_id',JSON.stringify(this.subMenu));
+                if(sub_menu_id.length > 0){
+                    formData.append('sub_menu_id',JSON.stringify(sub_menu_id));
                 }
                 
-                let response = await postApiData({ url: `/api/mrpasdf`, form_data: formData, token: this.getToken() });
+                let response = await postApiData({ url: `/api/mrp`, form_data: formData, token: this.getToken() });
                 if (response.success) {
                     // window.location.replace(`/mrp`);
                 }
