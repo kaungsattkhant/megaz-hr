@@ -155,14 +155,14 @@ export default {
             ],
             selectedDepartment:null,
             selectedRole:null,
-            selectedDate:null,
+            selectedDate:[],
             duration:null,
             objName:null,
 
             objective_key: [{ name: "" ,okr_point: "" }],  // Start with one input box
 
             okrDetail:null,
-
+            test:[],
         };
     },
 
@@ -181,10 +181,25 @@ export default {
             this.selectedDepartment = detail.role.department_id;
             this.getRoleList();
             this.selectedRole = detail.role_id;
-            this.selectedDate = JSON.parse(detail.assigned_days);
+            // this.selectedDate = detail.assigned_days;
             // this.duration = detail.code;
             this.objName = detail.objective_name;
             this.objective_key = detail.objective_keys;
+            detail.assigned_days.forEach(day => {
+                this.selectedDate.push(
+                    this.dateList.find(date => date.name == day )
+                    // day
+                    
+                )
+                let testing = this.dateList.find(date => date.name = day )
+                console.log(testing)
+                 
+            })
+            // this.test.push(
+            //     detail.assigned_days.forEach(day => {
+            //         this.dateList.find(date => date.name = day )
+            //     })
+            // )
         },
 
         async getDepartment(){
@@ -258,17 +273,18 @@ export default {
             let formData = new FormData();
             formData.append('objective_name', this.objName);
             formData.append('role_id', this.selectedRole);
+            // formData.append('assigned_days', JSON.stringify(this.selectedDate));
             formData.append('assigned_days', JSON.stringify(selectedDate));
             formData.append('objective_key', JSON.stringify(this.objective_key));
-            let response = await postApiData({ url: '/api/objectives', form_data: formData, token: this.getToken() });
-            // if (response.success) {
-            //     window.location.replace('/OKR');
-            //     console.log('success')
-            // }
-            if (response.message == "Objective stored successfully!") {
+            let response = await postApiData({ url: '/api/objectives/'+this.okrId, form_data: formData, token: this.getToken() });
+            if (response.success) {
                 window.location.replace('/OKR');
                 console.log('success')
             }
+            // if (response.message == "Objective stored successfully!") {
+            //     window.location.replace('/OKR');
+            //     console.log('success')
+            // }
             else {
                 this.$notify({
                     title: `Input validation`,

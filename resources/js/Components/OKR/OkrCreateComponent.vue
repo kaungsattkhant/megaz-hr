@@ -247,14 +247,14 @@ export default {
             formData.append('assigned_days', JSON.stringify(selectedDate));
             formData.append('objective_key', JSON.stringify(this.objective_key));
             let response = await postApiData({ url: '/api/objectives', form_data: formData, token: this.getToken() });
-            // if (response.success) {
-            //     window.location.replace('/OKR');
-            //     console.log('success')
-            // }
-            if (response.message == "Objective stored successfully!") {
+            if (response.success) {
                 window.location.replace('/OKR');
                 console.log('success')
             }
+            // if (response.message == "Objective stored successfully!") {
+            //     window.location.replace('/OKR');
+            //     console.log('success')
+            // }
             else {
                 this.$notify({
                     title: `Input validation`,
