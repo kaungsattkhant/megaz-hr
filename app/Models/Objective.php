@@ -26,4 +26,10 @@ class Objective extends Model
     {
         return $this->hasMany(ObjectiveKey::class, 'objective_id');
     }
+
+    public function getAssignedDaysAttribute($value)
+    {
+        
+        return explode(',', $value);
+    }
 }
