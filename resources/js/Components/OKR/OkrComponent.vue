@@ -196,11 +196,11 @@ export default {
             let url = `/api/objectives`;
             let response = await getApiData({ url: url, token: this.getToken() });
             if (response.data) {
-                this.okrList = response.data;
-                // this.lastPage = response.data.last_page;
-                // this.currentPage = pageNumber;
-                // this.perPage = response.data.per_page;
-                // this.totalData = response.data.total;
+                this.okrList = response.data.data;
+                this.lastPage = response.data.last_page;
+                this.currentPage = pageNumber;
+                this.perPage = response.data.per_page;
+                this.totalData = response.data.total;
             }
         },
 

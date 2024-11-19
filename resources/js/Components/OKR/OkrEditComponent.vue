@@ -2,7 +2,7 @@
     <div class="px-0">
         <div class="mb-4 ">
             <p class="text-lg font-semibold font-inter">
-                Add Objective Key Results
+                Edit Objective Key Results
             </p>
         </div>
 
@@ -30,7 +30,7 @@
                     data-te-select-wrapper-ref>
                     <select data-te-select-init data-te-select-placeholder="Select Role"
                         data-te-select-filter="true" name="" id="" v-model="selectedRole" class="input-ui !text-black">
-                        <option :value="role" v-for="(role, index) in roleList"
+                        <option :value="role.id" v-for="(role, index) in roleList"
                             :key="index"> {{ role.name }} </option>
                     </select>
                 </div>
@@ -122,7 +122,7 @@
         
         <div>
             <button class="add-btn" @click="btnclickedCreateOkr()">
-                Create QKR
+                Edit QKR
             </button>
         </div>
 
@@ -169,84 +169,22 @@ export default {
     methods: {
         ...mapGetters(['getToken']),
         async getOkrDetail() {
-            this.okrDetail = await getApiData({ url: `/api/objectives/${this.okrId}`, token: this.getToken() });
-            
+            let response = await getApiData({ url: `/api/objectives/${this.okrId}`, token: this.getToken() });
+            if (response.data) {
+                this.okrDetail = response.data[0];
+                if(response.data[0]){
+                    this.addDetail(response.data[0])
+                }
+            }
         },
         addDetail(detail){
             this.selectedDepartment = detail.role.department_id;
-            this.selectedRole = detail.role;
-            this.selectedDate = detail.assigned_days;
+            this.getRoleList();
+            this.selectedRole = detail.role_id;
+            this.selectedDate = JSON.parse(detail.assigned_days);
             // this.duration = detail.code;
             this.objName = detail.objective_name;
-            this.objName = this.menuCategoryList.find(category => category.id === detail.menu_category_id );
-            this.objective_key = objective_keys;
-
-            // this.menuLevel.level = this.selectedLevel.id;
-            // this.menuLevel.type = this.selectedType.id;
-            // this.menuLevel.position = this.selectedPosition;
-            // this.menuLevel.role_id = this.selectedRole.id;        
-            // this.menuLevel.role_name = this.selectedRole.name;
-            // this.menuLevel.duration = this.duration;
-            // this.menuLevel.order_time = this.orderTime;
-            // this.menuLevel.expected_quantity = this.expectedQuantity;
-            
-
-
-            // this.menuLevel.item_menu.push({
-            //     item_id: this.selectedItem.id,
-            //     price: price,
-            //     name: this.selectedItem.name,
-            //     weight: this.amount,
-            //     is_make_pack: this.isMakePack,
-            //     uom_id: this.selectedUom.id,
-            //     uom_name: this.selectedUom.name
-            // });
-
-            let sampleMenuLevel = {
-                level : null,
-                type : null,
-                position : null,
-                role_name:null,
-                role_id:null,
-                duration : null,
-                order_time : null,
-                expected_quantity : null,
-                menu_id : null,
-                item_menu:[],
-            };
-            detail.menu_steps.forEach(step => {
-                sampleMenuLevel.level = step.level
-                sampleMenuLevel.type = step.type
-                sampleMenuLevel.role_name = this.roleList.find(role => role.id === step.role_id ).name;
-                sampleMenuLevel.role_id = step.role_id
-                sampleMenuLevel.duration = step.duration
-                sampleMenuLevel.order_time = step.order_time
-                sampleMenuLevel.expected_quantity = step.expected_quantity
-                sampleMenuLevel.menu_id = step.menu_id
-                step.menu_step_item.forEach(item => {
-                    sampleMenuLevel.item_menu.push({
-                        item_id: item.item_id,
-                        menu_step_id: item.menu_step_id,
-                        price: item.item.item_prices.price,
-                        name: item.item.name,
-                        weight: item.weight,
-                        uom_id: item.uom_id,
-                        uom_name: item.uom.name
-                    });
-                })
-                this.levelTable.push(sampleMenuLevel)
-            })    
-            this.getMenuList();
-            
-            // this.subMenu = detail.sub_menus
-            detail.sub_menus.forEach(menu => {
-                // let menuName = this.menuList.find(item => item.id === menu).name
-                this.subMenuList.push({
-                    name: menu.name,
-                    id: menu.id,
-                });
-                this.subMenu.push(menu.id);
-            })
+            this.objective_key = detail.objective_keys;
         },
 
         async getDepartment(){
@@ -319,7 +257,7 @@ export default {
             console.log(selectedDate)
             let formData = new FormData();
             formData.append('objective_name', this.objName);
-            formData.append('role_id', this.selectedRole.id);
+            formData.append('role_id', this.selectedRole);
             formData.append('assigned_days', JSON.stringify(selectedDate));
             formData.append('objective_key', JSON.stringify(this.objective_key));
             let response = await postApiData({ url: '/api/objectives', form_data: formData, token: this.getToken() });
