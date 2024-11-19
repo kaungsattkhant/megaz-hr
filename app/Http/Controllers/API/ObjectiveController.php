@@ -15,12 +15,31 @@ class ObjectiveController extends Controller
         $this->objectiveRepository =$objectiveRepository;
     }
 
+    public function getObjectives(Request $request)
+    {
+        $data = $this->objectiveRepository->getObjectives($request);
+        ResponseData($data);
+    }
+
+    public function getRolesByDepartmentId(Request $request,int $departmentId)
+    {
+        $data = $this->objectiveRepository->getRolesByDepartmentId($request,$departmentId);
+        ResponseData($data);
+    }
+
     public function store(ObjectiveRequest $request)
     {
-        
-        $validatedData = $request->validated();
-        $data = $this->objectiveRepository->store($validatedData);
+     
+        $data = $this->objectiveRepository->store($request->all());
+        return $data;
+     
+    }
 
+    
+
+    public function update(Request $request)
+    {
+        $data = $this->objectiveRepository->store($request->all());
         return $data;
      
     }

@@ -57,6 +57,7 @@ class MaterialRequirementsPlanningRepository implements MaterialRequirementsPlan
 
       // if (!empty($validatedData['menu_steps'])) {
       $menuSteps = json_decode($validatedData['menu_steps']);
+
       foreach ($menuSteps as $data) {
         $menuStep = MenuStep::create([
           'menu_id' => $menu->id,
@@ -126,10 +127,7 @@ class MaterialRequirementsPlanningRepository implements MaterialRequirementsPlan
       'subMenus.menuSteps.menuStepItem.item',
       'subMenus.menuSteps.menuStepItem.uom',
     ])->where('id', $menuId)
-      ->where('is_active', 1)
-      ->whereHas('menuSteps.role.department', function ($query) {
-        $query->where('name', 'kitchen');
-      })->get();
+      ->where('is_active', 1)->get();
   }
 
   public function updateMrpList($menuId, $validatedData)

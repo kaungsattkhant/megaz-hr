@@ -390,6 +390,26 @@ Route::middleware('auth:api')->group(function () {
         Route::get('/get_accessory_category', 'getAccessoryCategory');
         Route::delete('/accessory_item/{id}', 'deleteAccessoryItem');
     });
+
+    
+// Route::post('send_notification', [NotificationController::class, 'sendNotification']);
+
+Route::controller(MaterialRequirementsPlanningAPIController::class)->group(function () {
+    Route::apiResource('/mrp', MaterialRequirementsPlanningAPIController::class);
+    Route::post('/menu/{id}/toggle', 'menuToggle');
+    Route::get('/menu_step/{id}', 'getMenuStepList');
+    Route::delete('/menu_step_items/{id}', 'menuStepItemsDelete');
+    Route::get('/cooking_place', 'getCookingPlace');
+    Route::post('/mrp/{id}', 'updateMrpList');
+    Route::get('/roles', 'getRoles');
+});
+
+Route::controller(ObjectiveController::class)->group(function () {
+    Route::get('/objectives', 'getObjectives');
+    Route::get('/roles_department/{id}','getRolesByDepartmentId');
+    Route::post('/objectives','store');
+    Route::post('/objective/{id}','update');
+});
 });
 Route::get('/features', [FeatureAPIController::class, 'getFeatureData']);
 
@@ -598,21 +618,4 @@ Route::controller(DeliveryChargeAPIController::class)->group(function () {
     Route::get('/delivery_charges', 'getDeliveryChargeData');
     Route::post('/delivery_charges', 'createDeliveryCharge');
 });
-
-// Route::post('send_notification', [NotificationController::class, 'sendNotification']);
-
-Route::controller(MaterialRequirementsPlanningAPIController::class)->group(function () {
-    Route::apiResource('/mrp', MaterialRequirementsPlanningAPIController::class);
-    Route::post('/menu/{id}/toggle', 'menuToggle');
-    Route::get('/menu_step/{id}', 'getMenuStepList');
-    Route::delete('/menu_step_items/{id}', 'menuStepItemsDelete');
-    Route::get('/cooking_place', 'getCookingPlace');
-    Route::post('/mrp/{id}', 'updateMrpList');
-    Route::get('/roles', 'getRoles');
-});
-
-Route::controller(ObjectiveController::class)->group(function () {
-    Route::post('/objectives','store');
-});
-
 

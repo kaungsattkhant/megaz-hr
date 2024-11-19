@@ -24,8 +24,7 @@ class ObjectiveRequest extends APIRequest
         return [
             'objective_name' => 'required',
             'role_id' =>'required',
-            'assigned_days' => 'nullable',
-            'created_by' => 'nullable',
+            'assigned_days' => 'required',
             'is_active' => 'nullable|boolean',
             'objective_key' => 'nullable',
         ];
