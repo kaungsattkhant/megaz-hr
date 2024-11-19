@@ -15,7 +15,7 @@ class  ObjectiveRepository implements ObjectiveInterface
 {
     public function getObjectives(Request $request)
     {
-        return Objective::with(['role', 'objectiveKeys'])->get();
+        return Objective::with(['role', 'objectiveKeys'])->paginate(config('common.list_count'));
     }
     public function getRolesByDepartmentId(Request $request, $departmentId)
     {
@@ -44,6 +44,7 @@ class  ObjectiveRepository implements ObjectiveInterface
     public function store(array $validatedData)
     {
         return $this->saveObjectiveData($validatedData);
+       
     }
 
     public function update(array $validatedData, int $objId)
