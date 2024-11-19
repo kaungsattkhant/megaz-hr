@@ -88,8 +88,9 @@ import AccessoriesEditComponent from './Components/Accessories/AccessoriesEditCo
 import MrpListComponent from './Components/MenuPosition/MrpListComponent.vue';
 import MrpCreateComponent from './Components/MenuPosition/MrpCreateComponent.vue';
 import MrpEditComponent from './Components/MenuPosition/MrpEditComponent.vue';
-import QkrComponent from './Components/QKR/QkrComponent.vue';
-import QkrCreateComponent from './Components/QKR/QkrCreateComponent.vue';
+import OkrComponent from './Components/OKR/OkrComponent.vue';
+import OkrCreateComponent from './Components/OKR/OkrCreateComponent.vue';
+import OkrEditComponent from './Components/OKR/OkrEditComponent.vue';
 import ProductTreeComponent from './Components/ProductTree/ProductTreeComponent.vue';
 import ProductTreeCreateComponent from './Components/ProductTree/ProductTreeCreateComponent.vue';
 
@@ -196,8 +197,9 @@ app.component('AccessoriesEditComponent', AccessoriesEditComponent);
 app.component('MrpListComponent', MrpListComponent);
 app.component('MrpCreateComponent', MrpCreateComponent);
 app.component('MrpEditComponent', MrpEditComponent);
-app.component('QkrComponent', QkrComponent);
-app.component('QkrCreateComponent', QkrCreateComponent);
+app.component('OkrComponent', OkrComponent);
+app.component('OkrCreateComponent', OkrCreateComponent);
+app.component('OkrEditComponent', OkrEditComponent);
 app.component('ProductTreeComponent', ProductTreeComponent);
 app.component('ProductTreeCreateComponent', ProductTreeCreateComponent);
 

@@ -890,12 +890,12 @@ export default {
 
                 formData.append('menu_steps',JSON.stringify(this.levelTable));
                 if(sub_menu_id.length > 0){
-                    formData.append('sub_menu_id',JSON.stringify(this.sub_menu_id));
+                    formData.append('sub_menu_id',JSON.stringify(sub_menu_id));
                 }
                 
                 let response = await postApiData({ url: `/api/mrp/${this.mrpId}`, form_data: formData, token: this.getToken() });
                 if (response.success) {
-                    // window.location.replace(`/mrp`);
+                    window.location.replace(`/mrp`);
                 }
                 else {
                     this.$notify({

@@ -562,9 +562,9 @@
                             </a>
                         </li>
                         <li>
-                            <a href="/QKR" class="flex items-center @yield('QKR')">
-                            <i class="fal fa-braille pr-3"></i>
-                                QKR
+                            <a href="/OKR" class="flex items-center @yield('OKR')">
+                                <i class="fal fa-braille pr-3"></i>
+                                OKR
                             </a>
                         </li>
                         <li>
