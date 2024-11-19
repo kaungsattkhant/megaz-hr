@@ -31,10 +31,8 @@ class ObjectiveController extends Controller
     {
      
         $data = $this->objectiveRepository->store($request->all());
-        return response()->json([
-            'message' => 'Objective stored successfully!',
-            'data' => $data
-        ], 201);
+        ResponseData($data);
+      
      
     }
 
@@ -42,17 +40,14 @@ class ObjectiveController extends Controller
     {
      
         $data = $this->objectiveRepository->getObjectiveById($request,$objId);
-        return $data;
+        ResponseData($data);
      
     }
 
     public function update(Request $request,int $objId)
     {
         $data = $this->objectiveRepository->update($request->all(),$objId);
-        return response()->json([
-            'message' => 'Objective updated successfully!',
-            'data' => $data
-        ], 200);
+        ResponseData($data);
      
     }
 
@@ -60,7 +55,7 @@ class ObjectiveController extends Controller
     public function deleteObjective(int $objId)
     {
         $data = $this->objectiveRepository->deleteObjective($objId);
-        return $data;
+        ResponseData($data);
      
     }
 }
