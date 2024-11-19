@@ -31,15 +31,35 @@ class ObjectiveController extends Controller
     {
      
         $data = $this->objectiveRepository->store($request->all());
+        return response()->json([
+            'message' => 'Objective stored successfully!',
+            'data' => $data
+        ], 201);
+     
+    }
+
+    public function getObjectiveById(Request $request,int $objId)
+    {
+     
+        $data = $this->objectiveRepository->getObjectiveById($request,$objId);
         return $data;
      
     }
 
-    
-
-    public function update(Request $request)
+    public function update(Request $request,int $objId)
     {
-        $data = $this->objectiveRepository->store($request->all());
+        $data = $this->objectiveRepository->update($request->all(),$objId);
+        return response()->json([
+            'message' => 'Objective updated successfully!',
+            'data' => $data
+        ], 200);
+     
+    }
+
+
+    public function deleteObjective(int $objId)
+    {
+        $data = $this->objectiveRepository->deleteObjective($objId);
         return $data;
      
     }

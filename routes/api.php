@@ -408,7 +408,10 @@ Route::controller(ObjectiveController::class)->group(function () {
     Route::get('/objectives', 'getObjectives');
     Route::get('/roles_department/{id}','getRolesByDepartmentId');
     Route::post('/objectives','store');
-    Route::post('/objective/{id}','update');
+    Route::post('/objectives/{id}','update');
+    Route::get('/objectives/{id}', 'getObjectiveById');
+    Route::get('/objectives/{id}', 'getObjectiveById');
+    Route::delete('/objectives/{id}', 'deleteObjective');
 });
 });
 Route::get('/features', [FeatureAPIController::class, 'getFeatureData']);

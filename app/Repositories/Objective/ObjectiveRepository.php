@@ -23,45 +23,75 @@ class  ObjectiveRepository implements ObjectiveInterface
         return Role::with('department')->where('department_id', $departmentId)->get();
     }
 
-    public function store($validatedData)
+
+
+    public function getObjectiveById(Request $request, $objId)
     {
-       
+        return Objective::with(['role', 'objectiveKeys'])->where('id', $objId)->get();
+    }
+
+
+
+    public function deleteObjective($objId)
+    {
+        $objective = Objective::with('objectiveKeys')->findOrFail($objId);
+        $objective->objectiveKeys()->delete();
+        $objective->delete();
+
+        ResponseMessage("Delete successfully", 200);
+    }
+
+    public function store(array $validatedData)
+    {
+        return $this->saveObjectiveData($validatedData);
+    }
+
+    public function update(array $validatedData, int $objId)
+    {
+        return $this->saveObjectiveData($validatedData, $objId);
+    }
+
+    private function saveObjectiveData(array $data, int $objId = null)
+    {
         DB::beginTransaction();
         try {
-         
 
-            $validatedData['assigned_days'] = is_string($validatedData['assigned_days'])
-                ? json_decode($validatedData['assigned_days'], true)
-                : $validatedData['assigned_days'];
-            $validatedData['assigned_days'] = implode(',', $validatedData['assigned_days'] ?? []);
-            $validatedData['created_by'] = UserData()->id;
-            
-           
-                $objective = Objective::create(
-                    $validatedData
-                );
+            $data['assigned_days'] = is_string($data['assigned_days'])
+                ? json_decode($data['assigned_days'], true)
+                : $data['assigned_days'];
+            $data['assigned_days'] = implode(',', $data['assigned_days'] ?? []);
+            $data['created_by'] = UserData()->id;
 
-                $objKeys = json_decode($validatedData['objective_key']);
+            if ($objId) {
+                $objective = Objective::findOrFail($objId);
+                $objective->update($data);
+            } else {
+                $objective = Objective::create($data);
+            }
 
-                foreach ($objKeys as  $objKey) {
-                    ObjectiveKey::create([
-                        'objective_id' => $objective->id,
-                        'name' => $objKey->name,
-                        'okr_point' => $objKey->okr_point
-
-                    ]);
-                }
-
-                $message = 'Objective stored successfully';
-
+            $this->syncObjectiveKeys($objective, $data['objective_key']);
             DB::commit();
-            return response()->json([
-                'message' => $message,
-                'data' =>  $objective
-            ], 201);
+            return $objective;
         } catch (Exception $e) {
-            ResponseMessage($e->getMessage(), 500);
+            DB::rollBack();
             throw $e;
+        }
+    }
+
+    private function syncObjectiveKeys(Objective $objective, string $objectiveKeys)
+    {
+        if (!empty($objectiveKeys)) {
+            $objectiveKeys = json_decode($objectiveKeys);
+
+            $objective->objectiveKeys()->delete();
+
+            foreach ($objectiveKeys as $key) {
+                ObjectiveKey::create([
+                    'objective_id' => $objective->id,
+                    'name' => $key->name,
+                    'okr_point' => $key->okr_point
+                ]);
+            }
         }
     }
 }
