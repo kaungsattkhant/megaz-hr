@@ -11,8 +11,7 @@
                 <label for="" class="label-form mb-3">
                     Department
                 </label>
-
-                <div class="bg-white mb-0 w-full text-sm inline-block h-[34px] dark:bg-white !text-black"
+                <div class="bg-white mb-0 w-full text-sm inline-block h-[34px] !text-black"
                     data-te-select-wrapper-ref>
                     <select data-te-select-init data-te-select-placeholder="Select Department" @change="selectedDepartmentChange()"
                         data-te-select-filter="true" name="" id="" v-model="selectedDepartment" class="input-ui !text-black">
@@ -25,8 +24,7 @@
                 <label for="" class="label-form mb-3">
                     Role
                 </label>
-
-                <div class="bg-white mb-0 w-full text-sm inline-block h-[34px] dark:bg-white !text-black"
+                <div class="bg-white mb-0 w-full text-sm inline-block h-[34px] !text-black"
                     data-te-select-wrapper-ref>
                     <select data-te-select-init data-te-select-placeholder="Select Role"
                         data-te-select-filter="true" name="" id="" v-model="selectedRole" class="input-ui !text-black">
@@ -43,7 +41,7 @@
                 </label>
                 <!-- <input type="date" v-model="selectedDate" class="input-ui "> -->
                 <multiselect v-model="selectedDate" :options="dateList" :multiple="true" :close-on-select="false" :clear-on-select="false"
-                :preserve-search="false" placeholder="Select Date" label="name" track-by="value" :preselect-first="false">
+                    :preserve-search="false" placeholder="Select Date" label="name" track-by="value" :preselect-first="false">
                     <template #selection="{ values, search, isOpen }">
                         <span class="multiselect__single"
                             v-if="values.length"
@@ -91,7 +89,7 @@
                 </div>
                 <div class="col-span-3">
                     <label for="" class="label-form mb-3">
-                        QKR Point
+                        OKR Point
                     </label>
                     <input type="number" v-model="obj.okr_point" class="input-ui ">
                 </div>
@@ -289,10 +287,10 @@ export default {
     }
 }
 </script>
-<style>
+<style scoped>
     .multiselect__placeholder{
         margin-bottom: 6px!important;
     }
 </style>
 
-<style src="node_modules/vue-multiselect/dist/vue-multiselect.css"></style>
+<style scoped src="node_modules/vue-multiselect/dist/vue-multiselect.css"></style>
