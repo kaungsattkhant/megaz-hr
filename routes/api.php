@@ -39,9 +39,10 @@ use App\Http\Controllers\API\StaffAPIController;
 use App\Http\Controllers\API\SupplierController;
 use App\Http\Controllers\API\AccessoryController;
 use App\Http\Controllers\API\EntityAPIController;
+use App\Http\Controllers\API\ObjectiveController;
 use App\Http\Controllers\API\BookingAPIController;
-use App\Http\Controllers\API\FeatureAPIController;
 // use App\Http\Controllers\API\CustomerAuthController;
+use App\Http\Controllers\API\FeatureAPIController;
 use App\Http\Controllers\API\InvoiceAPIController;
 use App\Http\Controllers\API\JournalAPIController;
 use App\Http\Controllers\API\PackageAPIController;
@@ -77,6 +78,7 @@ use App\Http\Controllers\API\PurchaseOrderItemLeftController;
 use App\Http\Controllers\API\SaleTargetPositionAPIController;
 use App\Http\Controllers\API\MenuServiceDiscountAPIController;
 use App\Http\Controllers\API\CustomerLevelDiscountAPIController;
+use App\Http\Controllers\API\MaterialRequirementsPlanningAPIController;
 use App\Http\Controllers\API\Customers\AuthController as CustomerAuthController;
 use App\Http\Controllers\API\Customers\AdsAPIController as CustomerAdsAPIController;
 use App\Http\Controllers\API\Customers\MenuAPIController as CustomersMenuAPIController;
@@ -175,7 +177,6 @@ Route::middleware('auth:api')->group(function () {
         Route::post('/tasks/{id}/add_images', 'addTaskImage');
         Route::get('/tasks/{id}/images', 'getTaskImages');
         Route::delete('/tasks_images/{id}', 'deleteTaskImage');
-
     });
     Route::controller(PurchaseOrderAPIController::class)->group(function () {
         Route::get('/purchase_orders', 'getPurchaseOrder');
@@ -191,7 +192,6 @@ Route::middleware('auth:api')->group(function () {
         Route::post('updateIsCheck', 'updateIsCheck');
         Route::get('/purchase_order_item_confirmation_list', 'getPurchaseOrderItemConfirmationList');
         Route::get('/confirm_purchase_order_item', 'confirmPurchaseOrderItem');
-
     });
     #item usage forecast
     Route::resource('item_usage_forecasts', ItemUsageForecastController::class)->only(['index', 'store', 'show', 'destroy']);
@@ -200,7 +200,6 @@ Route::middleware('auth:api')->group(function () {
         Route::get('/item_usage_forecast_items_by_month', 'itemUsageForecastListByMonth');
         Route::get('/item_usage_forecast_items_with_month/{month}', 'itemUsageForecastListByMonthwithDepartment');
         Route::get('/item_usage_forecast_items_with_month/{month}/department/{department_id}', 'iufWithMonthAndDepartment');
-
     });
     Route::resource('head_accounts', HeadAccountController::class)->only(['index', 'store', 'show', 'destroy']);
     Route::resource('sub_accounts', SubAccountController::class)->only(['index', 'store', 'show', 'destroy']);
@@ -377,8 +376,7 @@ Route::middleware('auth:api')->group(function () {
         Route::get('/duties/{id}', 'dutyDetail');
     });
     Route::resource('canteens', CanteenController::class)->only(['index', 'store', 'show']);
-    Route::controller(CanteenController::class)->group(function () {
-    });
+    Route::controller(CanteenController::class)->group(function () {});
     //service
     Route::resource('services', ServiceController::class)->only(['index', 'store', 'show']);
 
@@ -392,6 +390,29 @@ Route::middleware('auth:api')->group(function () {
         Route::get('/get_accessory_category', 'getAccessoryCategory');
         Route::delete('/accessory_item/{id}', 'deleteAccessoryItem');
     });
+
+    
+// Route::post('send_notification', [NotificationController::class, 'sendNotification']);
+
+Route::controller(MaterialRequirementsPlanningAPIController::class)->group(function () {
+    Route::apiResource('/mrp', MaterialRequirementsPlanningAPIController::class);
+    Route::post('/menu/{id}/toggle', 'menuToggle');
+    Route::get('/menu_step/{id}', 'getMenuStepList');
+    Route::delete('/menu_step_items/{id}', 'menuStepItemsDelete');
+    Route::get('/cooking_place', 'getCookingPlace');
+    Route::post('/mrp/{id}', 'updateMrpList');
+    Route::get('/roles', 'getRoles');
+});
+
+Route::controller(ObjectiveController::class)->group(function () {
+    Route::get('/objectives', 'getObjectives');
+    Route::get('/roles_department/{id}','getRolesByDepartmentId');
+    Route::post('/objectives','store');
+    Route::post('/objectives/{id}','update');
+    Route::get('/objectives/{id}', 'getObjectiveById');
+    Route::get('/objectives/{id}', 'getObjectiveById');
+    Route::delete('/objectives/{id}', 'deleteObjective');
+});
 });
 Route::get('/features', [FeatureAPIController::class, 'getFeatureData']);
 
@@ -413,7 +434,6 @@ Route::controller(SaleTargetPositionAPIController::class)->group(function () {
     Route::post('/sale_target_positions', 'createSaleTargetPosition');
     Route::post('/sale_target_positions/{id}', 'updateSaleTargetPosition');
     Route::delete('/sale_target_positions/{id}', 'deleteSaleTargetPosition');
-
 });
 
 Route::controller(SaleTargetMenuAPIController::class)->group(function () {
@@ -422,7 +442,6 @@ Route::controller(SaleTargetMenuAPIController::class)->group(function () {
     Route::post('/sale_target_menus', 'createSaleTargetMenu');
     Route::post('/sale_target_menus/{id}', 'updateSaleTargetMenu');
     Route::delete('/sale_target_menus/{id}', 'deleteSaleTargetMenu');
-
 });
 
 Route::get('/sale_target_results', [SaleTargetResultAPIController::class, 'getSaleTargetResult']);
@@ -602,9 +621,4 @@ Route::controller(DeliveryChargeAPIController::class)->group(function () {
     Route::get('/delivery_charges', 'getDeliveryChargeData');
     Route::post('/delivery_charges', 'createDeliveryCharge');
 });
-
-// Route::post('send_notification', [NotificationController::class, 'sendNotification']);
-
-
-
 

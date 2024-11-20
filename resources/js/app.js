@@ -85,9 +85,12 @@ import DeliveryChargesCrudComponent from './Components/DeliveryCharges/DeliveryC
 import AccessoriesListComponent from './Components/Accessories/AccessoriesListComponent.vue';
 import AccessoriesCreateComponent from './Components/Accessories/AccessoriesCreateComponent.vue';
 import AccessoriesEditComponent from './Components/Accessories/AccessoriesEditComponent.vue';
-import MenuPositionCreateComponent from './Components/MenuPosition/MenuPositionCreateComponent.vue';
-import QkrComponent from './Components/QKR/QkrComponent.vue';
-import QkrCreateComponent from './Components/QKR/QkrCreateComponent.vue';
+import MrpListComponent from './Components/MenuPosition/MrpListComponent.vue';
+import MrpCreateComponent from './Components/MenuPosition/MrpCreateComponent.vue';
+import MrpEditComponent from './Components/MenuPosition/MrpEditComponent.vue';
+import OkrComponent from './Components/OKR/OkrComponent.vue';
+import OkrCreateComponent from './Components/OKR/OkrCreateComponent.vue';
+import OkrEditComponent from './Components/OKR/OkrEditComponent.vue';
 import ProductTreeComponent from './Components/ProductTree/ProductTreeComponent.vue';
 import ProductTreeCreateComponent from './Components/ProductTree/ProductTreeCreateComponent.vue';
 
@@ -191,9 +194,12 @@ app.component('DeliveryChargesCrudComponent', DeliveryChargesCrudComponent);
 app.component('AccessoriesListComponent', AccessoriesListComponent);
 app.component('AccessoriesCreateComponent', AccessoriesCreateComponent);
 app.component('AccessoriesEditComponent', AccessoriesEditComponent);
-app.component('MenuPositionCreateComponent', MenuPositionCreateComponent);
-app.component('QkrComponent', QkrComponent);
-app.component('QkrCreateComponent', QkrCreateComponent);
+app.component('MrpListComponent', MrpListComponent);
+app.component('MrpCreateComponent', MrpCreateComponent);
+app.component('MrpEditComponent', MrpEditComponent);
+app.component('OkrComponent', OkrComponent);
+app.component('OkrCreateComponent', OkrCreateComponent);
+app.component('OkrEditComponent', OkrEditComponent);
 app.component('ProductTreeComponent', ProductTreeComponent);
 app.component('ProductTreeCreateComponent', ProductTreeCreateComponent);
 

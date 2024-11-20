@@ -231,9 +231,9 @@
                             </a>
                         </li>
                         <li>
-                            <a href="{{ route('menu_position') }}" class="flex items-center @yield('menu_position')">
+                            <a href="{{ route('MRP') }}" class="flex items-center @yield('mrp')">
                                 <i class="fal fa-clipboard-list  pr-3"></i>
-                                Menu Position
+                                MRP
                             </a>
                         </li>
                         <li>
@@ -562,9 +562,9 @@
                             </a>
                         </li>
                         <li>
-                            <a href="/QKR" class="flex items-center @yield('QKR')">
-                            <i class="fal fa-braille pr-3"></i>
-                                QKR
+                            <a href="/OKR" class="flex items-center @yield('OKR')">
+                                <i class="fal fa-braille pr-3"></i>
+                                OKR
                             </a>
                         </li>
                         <li>

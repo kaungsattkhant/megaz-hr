@@ -38,8 +38,10 @@ class ServiceRepository implements ServiceInterface
     public function getService($request){
         $areaId=$request->area_id;
         $serviceCategoryId=$request->service_category_id;
-        $services= Service::with(['staff'])->where('area_id',$areaId)
+        $services= Service::with(['staff'])
+        // ->where('area_id',$areaId)
         ->where('service_category_id',$serviceCategoryId)
+        ->where('is_active',0)
         ->get();
         return $services;
     }
