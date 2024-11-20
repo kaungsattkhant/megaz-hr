@@ -293,3 +293,4 @@ export default {
     }
 }
 </script>
+<style scoped src="node_modules/vue-multiselect/dist/vue-multiselect.css"></style>

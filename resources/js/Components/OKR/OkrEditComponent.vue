@@ -91,7 +91,7 @@
                 </div>
                 <div class="col-span-3">
                     <label for="" class="label-form mb-3">
-                        QKR Point
+                        OKR Point
                     </label>
                     <input type="number" v-model="obj.okr_point" class="input-ui ">
                 </div>
@@ -324,10 +324,10 @@ export default {
     }
 }
 </script>
-<style>
+<style scoped>
     .multiselect__placeholder{
         margin-bottom: 6px!important;
     }
 </style>
 
-<style src="node_modules/vue-multiselect/dist/vue-multiselect.css"></style>
+<style scoped src="node_modules/vue-multiselect/dist/vue-multiselect.css"></style>
