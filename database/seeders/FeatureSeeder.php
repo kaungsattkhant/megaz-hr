@@ -56,7 +56,8 @@ class FeatureSeeder extends Seeder
             'ar',
             'skill',
             'cooking place',
-            'custom task'
+            'custom task',
+            'feature',
         ];
         foreach ($features as $feature) {
             Feature::create([

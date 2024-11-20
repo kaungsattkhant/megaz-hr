@@ -9,12 +9,22 @@ use App\Models\Item;
 use App\Models\MenuCategory;
 use App\Models\MenuPrice;
 use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Menu extends BaseModel
 {
     use HasFactory;
 
-    protected $fillable = ['code','menu_category_id', 'name', 'is_active', 'image_path', 'image_url', 'is_feature','description'];
+    protected $fillable = [
+        'name',
+        'menu_category_id',
+        'code',
+        'image_url',
+        'image_path',
+        'is_active',
+        'is_feature',
+        'description'
+    ];
 
     public function menu_category()
     {
@@ -54,7 +64,12 @@ class Menu extends BaseModel
 
     public function areas()
     {
-        return $this->belongsToMany(Area::class,'menu_area');
+        return $this->belongsToMany(Area::class, 'menu_area');
+    }
+
+    public function menuPlaces()
+    {
+        return $this->belongsToMany(CookingPlace::class, 'menu_places');
     }
 
     public function availableCookingPlaces()
@@ -62,4 +77,37 @@ class Menu extends BaseModel
         return $this->morphMany(AvailableCookingPlace::class, 'cooking_placeable');
     }
 
+
+    public function menuSteps(): HasMany
+    {
+        return $this->hasMany(MenuStep::class);
+    }
+
+    public function subMenus()
+    {
+        return $this->belongsToMany(Menu::class, 'sub_menus', 'menu_id', 'sub_menu_id');
+    }
+
+
+    public function scopeMenuFilter($query, $search = null, $price = null, $category = null, $code = null)
+    {
+        return $query
+            ->when($search, function ($q) use ($search) {
+                $q->where(function ($query) use ($search) {
+                    $query->where('name', 'like', '%' . $search . '%')
+                        ->orWhere('price', 'like', '%' . $search . '%')
+                        ->orWhere('category', 'like', '%' . $search . '%')
+                        ->orWhere('code', 'like', '%' . $search . '%');
+                });
+            })
+            ->when($price, function ($q) use ($price) {
+                $q->where('price', $price);
+            })
+            ->when($category, function ($q) use ($category) {
+                $q->where('category', $category);
+            })
+            ->when($code, function ($q) use ($code) {
+                $q->where('code', 'like', '%' . $code . '%');
+            });
+    }
 }

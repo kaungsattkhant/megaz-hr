@@ -10,4 +10,6 @@ interface NotificationInterface
     public function setSeenNotifications($staffId, array $notificationIds);
 
     public function markReadNotification($staffId, $notificationId);
+
+    public function sendPosNotification($request);
 }

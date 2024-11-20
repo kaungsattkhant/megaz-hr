@@ -71,4 +71,8 @@ class NotificationController extends Controller
         // $this->send($po, $users, $data);
 
     }
+
+    public function sendPosNotification(Request $request){
+        $isOk = $this->notificationRepo->sendPosNotification($request);
+    }
 }

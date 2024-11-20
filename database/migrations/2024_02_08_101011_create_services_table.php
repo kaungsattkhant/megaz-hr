@@ -13,12 +13,12 @@ return new class extends Migration
     {
         Schema::create('services', function (Blueprint $table) {
             $table->id();
-            $table->string('name')->nullable();
+            $table->string('n ame')->nullable();
             $table->double('price_per_hour');
             $table->foreignId('area_id');
             $table->foreignId('service_category_id')->nullable();
             $table->foreignId('staff_id')->nullable();
-            $table->boolean('is_available')->default(1);
+            $table->boolean('is_active')->default(1);
             $table->timestamps();
             $table->softDeletes();
         });

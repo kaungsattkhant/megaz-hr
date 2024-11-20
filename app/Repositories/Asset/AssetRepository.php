@@ -30,7 +30,7 @@ class AssetRepository implements AssetInterface
     {
         $asset_items = AssetItem::orderBy('created_at', 'desc')->when($request->has('search'), function ($q) use ($request) {
             $q->where('name', 'LIKE', '%' . $request->search . '%')
-              ->orWhere('item_code','LIKE','%'.$request->search.'%');
+                ->orWhere('item_code', 'LIKE', '%' . $request->search . '%');
         })->paginate(config('common.list_count'));
         ResponseData($asset_items);
     }
@@ -40,7 +40,7 @@ class AssetRepository implements AssetInterface
         $asset_items = Asset::orderBy('created_at', 'desc')->when($request->has('search'), function ($q) use ($request) {
             $q->where('name', 'LIKE', '%' . $request->search . '%')
                 ->orWhere('cost', 'LIKE', '%' . $request->search . '%')
-                ->orwhere('quantity', 'LIKE', '%'. $request->search . '%');
+                ->orwhere('quantity', 'LIKE', '%' . $request->search . '%');
         })->paginate(config('common.list_count'));
         ResponseData($asset_items);
     }
@@ -383,8 +383,8 @@ class AssetRepository implements AssetInterface
                     // 'book_value' => $bookValue,
                 ]);
             }
-            return $assetDepreciationBalance;
             DB::commit();
+            return $assetDepreciationBalance;
         } catch (\Exception $e) {
             DB::rollback();
             ResponseMessage($e->getMessage(), 402);
@@ -402,17 +402,25 @@ class AssetRepository implements AssetInterface
         $month = Carbon::parse($request->date)->format('n');
         $year = Carbon::parse($request->date)->format('Y');
         $subAccountIds = $request->sub_account_id;
-        $deptBalance= new \stdClass();
-        if($request->type=='current_asset'){
-            $current_asset=$this->depreciationBalanceQuery($inventory_held,$month,$year);
-            $deptBalance->current_asset=$current_asset;
+
+        $deptBalance = new \stdClass();
+        if ($request->type == 'current_asset') {
+            $current_asset = $this->depreciationBalanceQuery($inventory_held, $month, $year);
+            $deptBalance->current_asset = $current_asset;
+            // $deptBalance->current_asset=$current_asset['data'];
         }
-        if($request->type=='fix_asset')
-        {
-            $fix_asset_tangiable=$this->depreciationBalanceQuery($fix_asset_tangiable,$month,$year);
-            $fix_asset_untangible=$this->depreciationBalanceQuery($fix_asset_untangible,$month,$year);
-            $deptBalance->fix_asset_tangiable=$fix_asset_tangiable;
-            $deptBalance->fix_asset_untangible=$fix_asset_untangible;
+        if ($request->type == 'fix_asset') {
+            $fix_asset_tangiable = $this->depreciationBalanceQuery($fix_asset_tangiable, $month, $year);
+            $fix_asset_untangible = $this->depreciationBalanceQuery($fix_asset_untangible, $month, $year);
+            // $final_original_cost=$final_additon_year=$final_total=$c=$final_depreciation=$final_book_value=0;
+            $deptBalance->fix_asset_tangiable = $fix_asset_tangiable;
+            $deptBalance->fix_asset_untangible = $fix_asset_untangible;
+            $deptBalance->final_original_cost=$fix_asset_tangiable['total_original_cost']+$fix_asset_untangible['total_original_cost'];
+            $deptBalance->final_addition_year=$fix_asset_tangiable['total_addition_year']+$fix_asset_untangible['total_addition_year'];
+            $deptBalance->final_total=$fix_asset_tangiable['total']+$fix_asset_untangible['total'];
+            $deptBalance->final_addition_during_year=$fix_asset_tangiable['total_addition_during_year']+$fix_asset_untangible['total_addition_during_year'];
+            $deptBalance->final_depreciation=$fix_asset_tangiable['total_depreciation']+$fix_asset_untangible['total_depreciation'];
+            $deptBalance->final_book_value=$fix_asset_tangiable['total_book_value']+$fix_asset_untangible['total_book_value'];
         }
         // ->groupBy('main_account.sub_account_id');
         ResponseData($deptBalance);
@@ -420,7 +428,26 @@ class AssetRepository implements AssetInterface
 
     public function depreciationBalanceQuery($account_code, $month, $year)
     {
-        $depreciationBalance=$this->depreciationService->depreciationBalanceQuery($account_code, $month, $year);
+        $depreciationBalance = $this->depreciationService->depreciationBalanceQuery($account_code, $month, $year);
+        $total_original_cost = $total_addition_year = $total = $total_current_month = $total_addition_during_year = $total_depreciation = $total_book_value = 0;
+        foreach ($depreciationBalance as $balance) {
+            $total_original_cost += $balance->original_cost;
+            $total_addition_year += $balance->addition_year_cost;
+            $total += $balance->total_cost;
+            $total_current_month += $balance->current_month_depreciation;
+            $total_addition_during_year += $balance->addition_year_depreciation;
+            $total_depreciation += $balance->total_depreciation;
+            $total_book_value += $balance->book_value;
+        }
+        return [
+            'data' => $depreciationBalance,
+            'total_original_cost' => $total_original_cost,
+            'total_addition_year' => $total_addition_year,
+            'total' => $total,
+            'total_addition_during_year' => $total_addition_during_year,
+            'total_depreciation' => $total_depreciation,
+            'total_book_value' => $total_book_value,
+        ];
         // $depreciationBalance = AssetDepreciationBalance::join('assets', 'asset_depreciation_balances.asset_id', '=', 'assets.id')
         //     ->join('accounts as main_account', 'assets.third_account_id', '=', 'main_account.id')
         //     ->join('accounts as account_depreciation', 'assets.third_depreciation_account_id', '=', 'account_depreciation.id')
@@ -441,7 +468,7 @@ class AssetRepository implements AssetInterface
         //     )
         //     ->groupBy('main_account.id', 'account_depreciation.id')
         //     ->get();
-        return $depreciationBalance;
+
     }
 
 }

@@ -15,4 +15,6 @@ interface FinancialInterface
     public function getProfitAndLoss($request);
 
     public function getInventorySchedule($request);
+
+    public function getWorkingCapital($request);
 }

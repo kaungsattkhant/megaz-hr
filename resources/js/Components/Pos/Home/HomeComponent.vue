@@ -1,7 +1,7 @@
 <template>
     <div class="">
-        <div class=" bg-gray-100 min-h-screen w-full" :style="isShowSidebar == true ? 'width:calc(100% - 410px)' : 'width:100%' ">
-            <div class="w-fit pt-9 px-6 ">
+        <div class=" bg-gray-100 min-h-screen w-full">
+            <div class="w-full pt-9 px-6 ">
                 <ul class="mb-5 flex list-none flex-row flex-wrap border-b-0 pl-0" role="tablist" data-te-nav-ref>
                     <li v-for="(area, index) in areaList" :key="index" role="presentation" @click="btnClickedArea(area.id,area.area_type.type)">
                         <a href="#tabs-profile" class="my-2 mr-3 text-white block  px-7 pb-2.5 rounded-full
@@ -27,7 +27,7 @@
 
                 <div class="mb-6 hidden">
                     <div class="opacity-100 transition-opacity duration-150 ease-linear">
-                        <div class="flex flex-col mb-4" v-for="(room, roomIndex) in roomList" :key="roomIndex">
+                        <!-- <div class="flex flex-col mb-4" v-for="(room, roomIndex) in roomList" :key="roomIndex">
                             <div class="flex flex-row gap-x-4">
                                 <div :class="room.is_active == 0 ? 'bg-[#4fe0b7]' : 'bg-[#FF7675]'"
                                     class=" flex-shrink-0 flex-grow p-6 w-40 max-w-44 h-40">
@@ -46,12 +46,8 @@
                                         </div>
                                     </button>
                                 </div>
-                                <!-- <div :class="[time.is_active == 0 ? 'bg-[#4fe0b7]' : 'bg-[#FF7675]', parseInt(time.start_time.split(':')) < currentTime ? 'opacity-70' : 'opacity-100' ]" v-for="(time,timeIndex) in room.entity_sessions" :key="index"
-                                    class=" flex-shrink-0 flex-grow w-40 max-w-44 h-40"> -->
                                 <div :class="time.is_active == 0 ? 'bg-[#4fe0b7]' : 'bg-[#FF7675]'" v-for="(time,timeIndex) in room.entity_sessions" :key="timeIndex"
                                     class=" flex-shrink-0 flex-grow w-40 max-w-44 h-40">
-                                    <!-- <button @click="btnClickedSession(time, timeIndex, room, roomIndex)" :disabled="parseInt(time.start_time.split(':')) < currentTime" :class="parseInt(time.start_time.split(':')) < currentTime ? ' cursor-not-allowed' : ''"
-                                        class="relative flex flex-col justify-between h-full w-full p-6"> -->
                                     <button @click="btnClickedSession(time, timeIndex, room, roomIndex)"
                                         class="relative flex flex-col justify-between h-full w-full p-6">
                                         <div  class=" flex justify-center flex-col h-full gap-y-4">
@@ -61,15 +57,12 @@
                                     </button>
                                 </div>
                             </div>
-                        </div>
-                        <div class="fixed right-0 top-0 bottom-0 bg-white shadow-md ease-in-out duration-300 transition delay-100 pt-12 right-sidebar-2" :class="isShowSidebar == true ? 'translate-x-0 opacity-100 w-[400px]' : 'translate-x-full opacity-0 w-0' ">
+                        </div> -->
+                        <!-- <div class="fixed right-0 top-0 bottom-0 bg-white shadow-md ease-in-out duration-300 transition delay-100 pt-12 right-sidebar-2" :class="isShowSidebar == true ? 'translate-x-0 opacity-100 w-[400px]' : 'translate-x-full opacity-0 w-0' ">
                             <div class="relative h-full w-full">
                                 <div class="fixed right-4 top-4 z-40" :class="isShowSidebar == true ? 'block' : 'hidden' ">
                                     <button @click="isShowSidebar = false"><i class="far fa-times"></i></button>
                                 </div>
-                                <!-- aa
-                                    </div>  :class="isShowSidebar == true ? 'w-[400px] block opacity-100' : 'w-0 hidden opacity-0'"
-                                    <div class="right-sidebar shadow-lg border-l border-gray-200"> -->
                                 <div class="relative h-full " v-if="isOpenRoom.open_1 == true"  id="open_room_1">
                                     <div class="w-full h-full flex justify-center flex-col">
                                         <div class="w-2/3 mx-auto">
@@ -195,7 +188,7 @@
                                     <div class="flex justify-between padding-section border-b">
                                         <div>
                                             <p class="text-black text-xl">
-                                                <!-- {{ selectedRoom.name }} --> error
+                                                error
                                             </p>
                                         </div>
                                         <div class="flex gap-x-3">
@@ -237,7 +230,6 @@
                                             <div class="mb-2">
                                                 <p class="px-2 py-0.5 bg-[#F19E51] text-white text-xs w-fit">
                                                     Room Err0r
-                                                    <!-- {{ selectedRoom.name }} -->
                                                 </p>
                                             </div>
                                             <div class="">
@@ -271,12 +263,6 @@
                                                         <p class=" col-span-1 text-center text-sm">
                                                             {{ menu2.quantity }}
                                                         </p>
-
-                                                        <!-- <select name="" id="" class="w-12  col-span-2">
-                                                            <option value="test">
-                                                                {{ menu2.status }}
-                                                            </option>
-                                                        </select> -->
                                                         <p :class="menu2.status == 'done' ? 'text-green-600 font-semibold' : 'text-gray-500'"
                                                             class=" col-span-2 text-center text-xs pt-0.5">
                                                             {{ menu2.status }}
@@ -355,7 +341,6 @@
                                         </div>
                                     </div>
                                 </div>
-                                <!-- invoice right sidebar -->
                                 <div v-if="isOpenRoom.invoice == true" class="relative h-full">
                                     <div class="flex justify-between padding-section border-b">
                                         <button @click="btnBackToDetail()">
@@ -377,9 +362,6 @@
                                                 <div class="relative">
                                                     <select name="" id="" v-model="discount_type" @change="getRoomDiscount"
                                                         class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
-                                                        <!-- <option value="room_discount"
-                                                            :disabled="selectedRoom.room_sessions[0].invoice.invoice_type == 'package'">
-                                                            Room Discount </option> -->
                                                         <option value="fix_amount"> Fix Ammount </option>
                                                         <option value="percentage"> Percentage </option>
                                                         <option value="customer_level" :disabled="roomSessionData.customer_level == 'no customer level'"> Customer Level </option>
@@ -551,8 +533,6 @@
                                         </div>
                                     </div>
                                 </div>
-
-
                                 <div v-if="isOpenRoom.is_package == true" class="relative h-full">
                                     <div class="flex justify-center padding-section ">
 
@@ -637,8 +617,7 @@
                                         </div>
                                     </div>
                                 </div>
-
-                                <!-- <div class="relative block h-full">
+                                <div class="relative block h-full">
                                     <div class="w-full h-full flex justify-center flex-col">
                                         <div class="w-2/3 mx-auto">
                                             <div class="text-center">
@@ -650,211 +629,16 @@
 
                                         </div>
                                     </div>
-                                </div> -->
+                                </div>
                             </div>
-                        </div>
+                        </div> -->
                     </div>
                 </div>
             </div>
         </div>
 
         
-        <!-- add Hour modal -->
-        <div data-te-modal-init
-            class="fixed left-0 top-0 z-[1055] hidden h-full w-full overflow-y-auto overflow-x-hidden outline-none"
-            id="add_hour_modal" tabindex="-1" aria-labelledby="addHourModalLabel" aria-modal="true" role="dialog">
-            <div data-te-modal-dialog-ref
-                class="pointer-events-none relative flex min-h-[calc(100%-1rem)] w-auto translate-y-[-50px] items-center opacity-0 transition-all duration-300 ease-in-out min-[576px]:mx-auto min-[576px]:mt-7 min-[576px]:min-h-[calc(100%-3.5rem)] min-[576px]:max-w-[500px]">
-                <div
-                    class="pointer-events-auto relative flex w-full flex-col rounded-md border-none bg-white bg-clip-padding text-current shadow-lg outline-none">
-                    <div class="relative  p-4">
-                        <p class="text-xl w-full text-center">
-                            Add More Hour
-                        </p>
-                        <button type="button" id="closeModal"
-                            class="absolute top-4 right-4 focus:shadow-none focus:outline-none" data-te-modal-dismiss
-                            aria-label="Close">
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
-                                stroke="currentColor" class="h-5 w-5">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
-                            </svg>
-                        </button>
-                    </div>
-
-                    <div class="relative px-16 py-4" data-te-modal-body-ref>
-                        <div class="mb-4">
-                            <!-- <label for="" class="block text-sm text-black mb-3">
-                                Hour
-                            </label> -->
-                            <input type="text" placeholder="Hour" v-model="sessionDuration"
-                                class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
-                        </div>
-                        <div class="mb-4">
-                            <div class="mb-[0.125rem] block min-h-[1.5rem] pl-[1.5rem]">
-                                <input class="input-check-pos" type="checkbox" value="" id="checkboxChecked" checked />
-                                <label class="inline-block pl-[0.15rem] hover:cursor-pointer" for="checkboxChecked">
-                                    Charge
-                                </label>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="flex justify-center px-12 mb-6">
-                        <button @click="btnAddHour()" class="pos-add-btn focus:outline-none focus:ring-0 ">
-                            Add Hours
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <!-- add Menu modal -->
-        <div data-te-modal-init
-            class="fixed left-0 top-0 z-[1055] hidden h-full w-full overflow-y-auto overflow-x-hidden outline-none"
-            id="add_menu_modal" tabindex="-1" aria-labelledby="addMenuModalLabel" aria-modal="true" role="dialog">
-            <div data-te-modal-dialog-ref
-                class="pointer-events-none relative flex min-h-[calc(100%-1rem)] w-auto translate-y-[-50px] items-center opacity-0 transition-all duration-300 ease-in-out min-[576px]:mx-auto min-[576px]:mt-7 min-[576px]:min-h-[calc(100%-3.5rem)] min-[576px]:max-w-[500px]">
-                <div
-                    class="pointer-events-auto relative flex w-full flex-col rounded-md border-none bg-white bg-clip-padding text-current shadow-lg outline-none">
-                    <div class="relative  p-4">
-                        <p class="text-xl w-full text-center">
-                            Add Menu
-                        </p>
-                        <button type="button" id="closeAddMenuModal"
-                            class="absolute top-4 right-4 focus:shadow-none focus:outline-none" data-te-modal-dismiss
-                            aria-label="Close">
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
-                                stroke="currentColor" class="h-5 w-5">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
-                            </svg>
-                        </button>
-                    </div>
-
-                    <div class="relative px-16 py-4" data-te-modal-body-ref>
-                        <div class="mb-4">
-                            <select name="" id="" placeholder="Menu" v-model="selectedMenu" @change="selectedMenuChange()"
-                                class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
-                                <option :value="menu" v-for="(menu, index) in menuList" :key="index">{{ menu.name }}</option>
-                            </select>
-                        </div>
-                        <div class="mb-4">
-                            <select name="" id="" placeholder="Menu" v-model="selectedMenuArea"
-                                class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
-                                <option :value="area" v-for="(area, index) in menuAreaList" :key="index">{{ area.name }}</option>
-                            </select>
-                        </div>
-                        <div class="mb-4">
-                            <!-- <label for="" class="block text-sm text-black mb-3">
-                                Hour
-                            </label> -->
-                            <input type="text" placeholder="Qty" v-model="menuQuantity"
-                                class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
-                        </div>
-                        <div>
-                            <textarea v-model="remark"
-                                class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0"
-                                name="" id="" cols="30" rows="10" placeholder="Remark"></textarea>
-                        </div>
-                    </div>
-
-                    <div class="flex justify-center px-12 mb-6">
-                        <button @click="btnConfirmAddMenu" class="pos-add-btn focus:outline-none focus:ring-0 ">
-                            Add Menu
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <!-- add Package Menu modal -->
-        <div data-te-modal-init
-            class="fixed left-0 top-0 z-[1055] hidden h-full w-full overflow-y-auto overflow-x-hidden outline-none"
-            id="add_package_menu_modal" tabindex="-1" aria-labelledby="addMenuModalLabel" aria-modal="true" role="dialog">
-            <div data-te-modal-dialog-ref
-                class="pointer-events-none relative flex min-h-[calc(100%-1rem)] w-auto translate-y-[-50px] items-center opacity-0 transition-all duration-300 ease-in-out min-[576px]:mx-auto min-[576px]:mt-7 min-[576px]:min-h-[calc(100%-3.5rem)] min-[576px]:max-w-[500px]">
-                <div
-                    class="pointer-events-auto relative flex w-full flex-col rounded-md border-none bg-white bg-clip-padding text-current shadow-lg outline-none">
-                    <div class="relative  p-4">
-                        <p class="text-xl w-full text-center">
-                            Add Package Menu
-                        </p>
-                        <button type="button" id="closeMenuModal"
-                            class="absolute top-4 right-4 focus:shadow-none focus:outline-none" data-te-modal-dismiss
-                            aria-label="Close">
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
-                                stroke="currentColor" class="h-5 w-5">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
-                            </svg>
-                        </button>
-                    </div>
-
-                    <div class="relative px-16 py-4" data-te-modal-body-ref>
-                        <div class="mb-4">
-                            <select name="" id="" placeholder="Menu" v-model="selectedMenuForPackage" @change="selectedPackageMenuChange()"
-                                class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
-                                <option :value="menu" v-for="(menu, index) in menuList" :key="index">{{ menu.name }}</option>
-                            </select>
-                        </div>
-                        <div class="mb-4">
-                            <select name="" id="" placeholder="Menu" v-model="selectedMenuAreaForPackage"
-                                class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
-                                <option :value="area" v-for="(area, index) in menuAreaListForPackage" :key="index">{{ area.name }}</option>
-                            </select>
-                        </div>
-                        <div class="mb-4">
-                            <input type="text" placeholder="Qty" v-model="menuQuantityForPackage"
-                                class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
-                        </div>
-                    </div>
-
-                    <div class="flex justify-center px-12 mb-6">
-                        <button @click="btnConfirmAddPackageMenu()" class="pos-add-btn focus:outline-none focus:ring-0 ">
-                            Add Menu
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <!-- change room modal -->
-        <div data-te-modal-init
-            class="fixed left-0 top-0 z-[1055] hidden h-full w-full overflow-y-auto overflow-x-hidden outline-none"
-            id="change_modal" tabindex="-1" aria-labelledby="addMenuModalLabel" aria-modal="true" role="dialog">
-            <div data-te-modal-dialog-ref
-                class="pointer-events-none relative flex min-h-[calc(100%-1rem)] w-auto translate-y-[-50px] items-center opacity-0 transition-all duration-300 ease-in-out min-[576px]:mx-auto min-[576px]:mt-7 min-[576px]:min-h-[calc(100%-3.5rem)] min-[576px]:max-w-[500px]">
-                <div
-                    class="pointer-events-auto relative flex w-full flex-col rounded-md border-none bg-white bg-clip-padding text-current shadow-lg outline-none">
-                    <div class="relative  p-4">
-                        <p class="text-xl w-full text-center">
-                            Change Room
-                        </p>
-                        <button type="button" id="close_change_room_modal"
-                            class="absolute top-4 right-4 focus:shadow-none focus:outline-none" data-te-modal-dismiss
-                            aria-label="Close">
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
-                                stroke="currentColor" class="h-5 w-5">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
-                            </svg>
-                        </button>
-                    </div>
-
-                    <div class="relative px-16 py-4" data-te-modal-body-ref>
-                        <div class="mb-4">
-                            <select name="" id="" placeholder="Room" v-model="change_room"
-                                class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
-                                <option :value="changeableRoom" :key="index"
-                                    v-for="(changeableRoom, index) in changeableRoomList">{{ changeableRoom.name }}
-                                </option>
-                            </select>
-                        </div>
-
-                    </div>
-
-                    <div class="flex justify-center px-12 mb-6">
-                        <button @click="btnClickedChangeRoom()" class="pos-add-btn focus:outline-none focus:ring-0 ">
-                            Change
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
+        
         <!-- Create Customer modal -->
         <div data-te-modal-init
             class="fixed left-0 top-0 z-[1055] hidden h-full w-full overflow-y-auto overflow-x-hidden outline-none"
@@ -979,8 +763,6 @@
     import { getApiData, postApiData, deleteApiData } from '../../../utilities/ajax-helpers';
     import { mapGetters } from "vuex";
     import { getCurrentTime } from "../../../utilities/datetime-helpers";
-    // import PosTableComponent from "./PosTableComponent.vue";
-    // import PosRoomComponent from "./PosRoomComponent.vue";
     import PosTableComponent from "./PosTableComponent.vue";
     import PosRoomComponent from "./PosRoomComponent.vue";
 
@@ -991,19 +773,19 @@
         },
         data() {
             return {
-                roomList:[],
+                // roomList:[],
                 areaList: [],
-                isOpenRoom:{
-                    open_1: false,
-                    open_2: false,
-                    detail: false,
-                    invoice: false,
-                    is_package:false,
-                },
+                // isOpenRoom:{
+                //     open_1: false,
+                //     open_2: false,
+                //     detail: false,
+                //     invoice: false,
+                //     is_package:false,
+                // },
 
                 selectedAreaId:null,
-                selectedTime:null,
-                selectedRoom:null,
+                // selectedTime:null,
+                // selectedRoom:null,
 
                 //customer data
                 name: null,
@@ -1022,90 +804,90 @@
 
 
                 // open_2's data
-                customerList:[],
-                packageList:[],
+                // customerList:[],
+                // packageList:[],
 
-                selectedCustomer:null,
-                invoice_date:null,
-                type:'session',
-                selectedPackage:null,
-                deposit:null,
-                duration:null,
-                male:null,
-                female:null,
-                child:null,
+                // selectedCustomer:null,
+                // invoice_date:null,
+                // type:'session',
+                // selectedPackage:null,
+                // deposit:null,
+                // duration:null,
+                // male:null,
+                // female:null,
+                // child:null,
 
-                purchaseMenuList: [],
-                foodDiscount: 0,
-                selectedRoomIndex: null,
-                printInvoiceData: {
-                    room: 0,
-                    food: 0,
-                    service_tax: 0,
-                    service_charge: false,
-                    tax: 0,
-                    isTax: false,
-                    discount: 0,
-                    tatalPrice: 0,
-                    package_discount:0,
-                    customer_discount:0,
-                    percent_discount_amount:0,
-                },
-                room_discount: null,
-                birthday_discount: null,
-                orderList: [],
-                orderItemsPrice: null,
-                selectedPaymentMethod: 'cash',
-                change: null,
-                paid_amount: null,
-                isActive: true,
+                // purchaseMenuList: [],
+                // foodDiscount: 0,
+                // selectedRoomIndex: null,
+                // printInvoiceData: {
+                //     room: 0,
+                //     food: 0,
+                //     service_tax: 0,
+                //     service_charge: false,
+                //     tax: 0,
+                //     isTax: false,
+                //     discount: 0,
+                //     tatalPrice: 0,
+                //     package_discount:0,
+                //     customer_discount:0,
+                //     percent_discount_amount:0,
+                // },
+                // room_discount: null,
+                // birthday_discount: null,
+                // orderList: [],
+                // orderItemsPrice: null,
+                // selectedPaymentMethod: 'cash',
+                // change: null,
+                // paid_amount: null,
+                // isActive: true,
 
-                packageMenuList:[],
-                menuAreaListForPackage:[],
-                selectedMenuForPackage:null,
-                selectedMenuAreaForPackage:null,
-                menuQuantityForPackage:null,
-                is_menu_discount:0,
-                food_total_package:0,
-                total_package_menu_price:0,
-                package_total:0,
+                // packageMenuList:[],
+                // menuAreaListForPackage:[],
+                // selectedMenuForPackage:null,
+                // selectedMenuAreaForPackage:null,
+                // menuQuantityForPackage:null,
+                // is_menu_discount:0,
+                // food_total_package:0,
+                // total_package_menu_price:0,
+                // package_total:0,
 
                 // create menu , add hour , change room
-                menuList: [],
-                invoiceId: null,
-                selectedMenu: null,
-                menuAreaList:[],
-                selectedMenuArea:null,
-                menuQuantity: null,
-                remark: null,
-                menuPrice: null,
-                testroom: null,
-                sessionDuration: null,
-                changeableRoomList: [],
-                change_room: null,
+                // menuList: [],
+                // invoiceId: null,
+                // selectedMenu: null,
+                // menuAreaList:[],
+                // selectedMenuArea:null,
+                // menuQuantity: null,
+                // remark: null,
+                // menuPrice: null,
+                // testroom: null,
+                // sessionDuration: null,
+                // changeableRoomList: [],
+                // change_room: null,
 
                 // doneSession
-                roomDiscountList: null,
-                birthdayDiscountList: null,
-                isPackage: false,
-                packagePrice: null,
-                discount_type: null,
-                isShowDiscount: true,
+                // roomDiscountList: null,
+                // birthdayDiscountList: null,
+                // isPackage: false,
+                // packagePrice: null,
+                // discount_type: null,
+                // isShowDiscount: true,
 
                 // rooftop
-                tableList: [],
+                // tableList: [],
 
                 // currentTime: getCurretDateTime(),
-                roomSessionData: null,
+                // roomSessionData: null,
 
-                roomEndTime:null,
+                // roomEndTime:null,
                 authUser:null,
                 isCashier :false,
 
 
-                currentTime:parseInt(getCurrentTime().split(':')),
-                isShowSidebar:false,
-                testbro:null,
+                // currentTime:parseInt(getCurrentTime().split(':')),
+                // isShowSidebar:false,
+                // testbro:null,
 
                 areaType:null,
             };
@@ -1133,8 +915,12 @@
                         this.$nextTick(() => {
                             if (this.$refs.posTable) { // Check if posTable is defined
                                 this.$refs.posTable.getTableList(response.data[0].id);
+                                let num = 0
+                                num += 1
+                                console.log(num)
                             } else {
                                 console.warn("posTable component is not available in $refs.");
+                                console.log("posTable component is not available in $refs.");
                             }
                         });
                     }
@@ -1142,11 +928,16 @@
                         this.$nextTick(() => {
                             if (this.$refs.posRoom) { // Check if posRoom is defined
                                 this.$refs.posRoom.getRoomList(response.data[0].id);
+                                let num = 0
+                                num += 1
+                                console.log(num)
                             } else {
                                 console.warn("posRoom component is not available in $refs.");
+                                console.log("posRoom component is not available in $refs.");
                             }
                         });
                     }
+                    
                 }
             },
             btnClickedArea(areaId,areaType){
@@ -1955,26 +1746,26 @@
 
 
         watch: {
-            areaType(newType) {
-                if (newType !== 'bar_and_restaurant') {
-                    this.$nextTick(() => {
-                        if (this.$refs.posTable) {
-                        this.$refs.posTable.getTableList(this.selectedAreaId);
-                        }
-                    });
-                }
-                else
-                {
-                    this.$nextTick(() => {
-                        if (this.$refs.posRoom) { // Check if posRoom is defined
-                            this.$refs.posRoom.getRoomList(this.selectedAreaId);
-                        } 
-                        else {
-                            console.warn("posRoom component is not available in $refs.");
-                        }
-                    });
-                }
-            }
+            // areaType(newType) {
+            //     if (newType !== 'bar_and_restaurant') {
+            //         this.$nextTick(() => {
+            //             if (this.$refs.posTable) {
+            //             this.$refs.posTable.getTableList(this.selectedAreaId);
+            //             }
+            //         });
+            //     }
+            //     else
+            //     {
+            //         this.$nextTick(() => {
+            //             if (this.$refs.posRoom) { // Check if posRoom is defined
+            //                 this.$refs.posRoom.getRoomList(this.selectedAreaId);
+            //             } 
+            //             else {
+            //                 console.warn("posRoom component is not available in $refs.");
+            //             }
+            //         });
+            //     }
+            // }
         },
         created(){
             this.getAreaList();

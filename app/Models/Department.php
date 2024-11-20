@@ -71,6 +71,17 @@ class Department extends BaseModel
         return $this->belongsToMany(Feature::class,'department_feature');
     }
 
+    public static function getBySlugOrFail($slug)
+    {
+        $department = self::where('slug', $slug)->first();
+        
+        if (!$department) {
+            ResponseMessage('Department not found',404);
+        }
+
+        return $department;
+    }
+
     // public function areas()
     // {
     //     return $this->hasMany(Area::class);

@@ -44,4 +44,13 @@ class Role extends BaseModel
     {
         return $this->hasMany(Skill::class,'role_id');
     }
+
+    public static function getRoleIdByDepartment($departmentId, $roleName)
+    {
+        $role = self::where('department_id', $departmentId)
+                    ->where('name', $roleName)
+                    ->first();
+
+        return $role ? $role->id : null;
+    }
 }

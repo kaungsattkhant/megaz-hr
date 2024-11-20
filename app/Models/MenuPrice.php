@@ -11,7 +11,10 @@ class MenuPrice extends BaseModel
 {
     use HasFactory;
 
-    protected $fillable = ['menu_id','price'];
+    protected $fillable = [
+        'menu_id',
+        'price'
+    ];
 
     public function menu()
     {
