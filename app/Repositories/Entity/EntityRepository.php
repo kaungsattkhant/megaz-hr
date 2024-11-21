@@ -557,7 +557,7 @@ class EntityRepository implements EntityRepositoryInterface
     public function inactiveEntityList($data)
     {
         // mobile
-// ${base_url}entities/change?waiter=1                                                              
+// ${base_url}entities/change?waiter=1                                              
 // ${base_url}areas/${widget.areaId}/entities?type=room'
 //api/areas/${area_id}/inactive_entities?type=room
         // $data['type'] = 'room';

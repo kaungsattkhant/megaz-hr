@@ -763,6 +763,9 @@ class FinancialRepository implements FinancialInterface
         //inventory schedule held
         $inventory_held = '2-1020';
         $cash_and_back = ['2-1000'];
+        $other_receivable = ['2-1050'];
+        $receivable_debtor = ['2-2000'];
+
         $month = Carbon::parse($request->date)->format('n');
         $year = Carbon::parse($request->date)->format('Y');
         $inventoryHeldBalances = $this->depreciationService->depreciationBalanceQueryOfYear($inventory_held, $year);
@@ -770,19 +773,27 @@ class FinancialRepository implements FinancialInterface
 
         //cashbook balance
         $cashBookBalances = (new CashBookTransaction())->getCashAndBankBalanceByMonth($cash_and_back, $year, $month);
+        // return $cashBookBalances;
         //prepaid balance
         $prepaidBalances = $this->financialService->getClosingBalance('prepaid_balances', $year);
         //staff loan 
         $staffLoanBalances = $this->financialService->getClosingBalance('staff_balances', $year);
 
-        $receivableBalances = $this->financialService->getReceivableBalances($year, $month);
+        $other_receivable_balances = $this->financialService->getReceivableBalances($other_receivable, $year, $month);
+
+        $receivable_debtor_balances = $this->financialService->getReceivableBalances($receivable_debtor, $year, $month);
+
 
         $data['inventory_held'] = $inventoryHeldBalances;
         $data['cashbook'] = $cashBookBalances;
         $data['prepaid'] = $prepaidBalances;
-        $data['receiveable'] = $receivableBalances;
         $data['staff_loan'] = $staffLoanBalances;
+        $data['other_receivable'] = $other_receivable_balances;
+        $data['receivable_debtor'] = $receivable_debtor_balances;
 
+        $otherPayableBalances = $this->financialService->getOtherPayableBalances($year, $month);
+        // return $otherPayableBalances;
+        $data['other_payable']=$otherPayableBalances;
         return $data;
     }
 

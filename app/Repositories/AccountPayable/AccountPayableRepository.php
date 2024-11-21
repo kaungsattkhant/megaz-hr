@@ -159,7 +159,7 @@ class AccountPayableRepository implements AccountPayableInterface
         $year = isset($requset->date) || $request->date ? Carbon::parse($request->date)->format('Y') : Carbon::now()->year;
         $currentMonth = isset($requset->date) || $request->date ? Carbon::parse($request->date)->format('n') : Carbon::now()->month;
 
-        $payableAccountList = Account::orderBy('accounts.id', 'asc')
+        $payableAccounts = Account::orderBy('accounts.id', 'asc')
             ->whereHas('sub_account', function ($q) use ($account_code) {
                 $q->whereIn('account_code', $account_code);
             })
@@ -211,7 +211,66 @@ class AccountPayableRepository implements AccountPayableInterface
 
                 return $balance;
             });
-        return $payableAccountList;
+        $total_opening_balance = $total_closing_balance = $total_addition = $total_settlement = 0;
+        foreach ($payableAccounts as $payableAccount) {
+            $total_opening_balance += $payableAccount->opening_balance;
+            $total_closing_balance += $payableAccount->closing_balance;
+            $total_addition += $payableAccount->total_addition;
+            $total_settlement += $payableAccount->total_settlement;
+        }
+        return [
+            'payable_accounts' => $payableAccounts,
+            'total_opening_balance' => $total_opening_balance,
+            'total_closing_balance' => $total_closing_balance,
+            'total_addition' => $total_addition,
+            'total_settlement' => $total_settlement,
+        ];
     }
+
+    // total balance 
+    // $totalBalances = Account::whereHas('sub_account', function ($q) use ($account_code) {
+    //     $q->whereIn('account_code', $account_code);
+    // })
+    // ->leftJoin('account_payables', function ($join) use ($year, $currentMonth) {
+    //     $join->on('accounts.id', '=', 'account_payables.account_id')
+    //         ->whereYear('account_payables.date_time', $year)
+    //         ->whereMonth('account_payables.date_time', '<=', $currentMonth);
+    // })
+    // ->select(
+    //     // Total additions across all months
+    //     DB::raw("COALESCE(SUM(CASE WHEN account_payables.type = 'addition' THEN account_payables.amount ELSE 0 END), 0) as total_addition"),
+
+    //     // Total settlements across all months
+    //     DB::raw("COALESCE(SUM(CASE WHEN account_payables.type = 'settlement' THEN account_payables.amount ELSE 0 END), 0) as total_settlement"),
+
+    //     // Total amount (net additions - settlements across all months)
+    //     DB::raw("COALESCE(SUM(CASE WHEN account_payables.type = 'addition' THEN account_payables.amount ELSE 0 END) - 
+    //               SUM(CASE WHEN account_payables.type = 'settlement' THEN account_payables.amount ELSE 0 END), 0) as total_amount"),
+
+    //     // Opening balance: total addition - settlement before current month
+    //     DB::raw("(
+    //         SELECT COALESCE(SUM(CASE WHEN type = 'addition' THEN amount ELSE 0 END) - 
+    //                SUM(CASE WHEN type = 'settlement' THEN amount ELSE 0 END), 0)
+    //         FROM account_payables AS ap
+    //         WHERE ap.account_id = accounts.id
+    //           AND YEAR(ap.date_time) = {$year}
+    //           AND MONTH(ap.date_time) < {$currentMonth}
+    //     ) as total_opening_balance"),
+
+    //     // Closing balance (opening balance + current month’s total addition - settlement)
+    //     DB::raw("(
+    //         (
+    //             SELECT COALESCE(SUM(CASE WHEN type = 'addition' THEN amount ELSE 0 END) - 
+    //                            SUM(CASE WHEN type = 'settlement' THEN amount ELSE 0 END), 0)
+    //             FROM account_payables AS ap
+    //             WHERE ap.account_id = accounts.id
+    //               AND YEAR(ap.date_time) = {$year}
+    //               AND MONTH(ap.date_time) < {$currentMonth}
+    //         ) + 
+    //         COALESCE(SUM(CASE WHEN account_payables.type = 'addition' THEN account_payables.amount ELSE 0 END) - 
+    //                  SUM(CASE WHEN account_payables.type = 'settlement' THEN account_payables.amount ELSE 0 END), 0)
+    //     ) as total_closing_balance")
+    // )
+    // ->first();
 
 }

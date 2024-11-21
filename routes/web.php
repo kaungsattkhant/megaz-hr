@@ -79,7 +79,7 @@ Route::middleware(['departments:inventory-transfer-list'])->group(function () {
 Route::middleware(['departments:inventory-receive-list'])->group(function () {
     // Route::view('/inventory_receives_list', 'transfers.receives_list')->name('transfers.receives');
 });
-Route::middleware(['departments:inventory-confirmation'])->group(function () {});
+Route::middleware(['departments:inventory-confirmation'])->group(function () { });
 #changed middleware
 
 Route::middleware(['departments:complaint'])->group(function () {
@@ -152,6 +152,8 @@ Route::middleware(['departments:cashbook'])->group(function () {
     Route::view('/bankbook/kbz_special_md_gm', 'cashbook.bank_kbz_special_md_gm')->name('kbz_special_bank');
     Route::view('/bankbook/kbz_old_gm', 'cashbook.bank_kbz_old_gm')->name('kbz_old_gm_bank');
     Route::view('/bankbook/kpay', 'cashbook.bank_kpay')->name('kpay_bank');
+
+
 });
 Route::middleware(['departments:fixed-asset'])->group(function () {
     Route::view('/fixed_assets', 'fixed_assets.index')->name('fixed_assets.index');
@@ -218,32 +220,30 @@ Route::view('/food_orders', 'pos.menu_order.index');
 Route::view('/food_orders/create', 'pos.menu_order.create');
 Route::view('/delivery_charges', 'delivery_charges.index');
 
-Route::middleware(['departments:journal'])->group(function()
-{
-    Route::view('/journals','journals.index')->name('journal');
+Route::middleware(['departments:journal'])->group(function () {
+    Route::view('/journals', 'journals.index')->name('journal');
 });
 
-Route::middleware(['departments:staff-balance'])->group(function()
-{
+Route::middleware(['departments:staff-balance'])->group(function () {
     Route::view('/advanced', 'advanced.index')->name('advance');
 });
 
 Route::view('/advanced/{id}/detail', 'advanced.detail');
 
-Route::middleware(['departments:prepaid'])->group(function()
-{
+Route::middleware(['departments:prepaid'])->group(function () {
     Route::view('prepaid', 'prepaid.index')->name('prepaid');
 });
 
-Route::middleware(['departments:ar'])->group(function()
-{
+Route::middleware(['departments:ar'])->group(function () {
     Route::view('/account_receivable', 'AR.index')->name('account_receivable');
 });
 
 Route::view('/account_receivable/{id}/detail', 'AR.detail');
-Route::middleware(['departments:cash-flow-statement'])->group(function () {
-    Route::view('/cash_flow_statement', 'cash_flow_statement.index');
-});
+// Route::middleware(['departments:financial-report'])->group(function () {
+Route::view('/cash_flow_statement', 'cash_flow_statement.index');
+Route::view('/indirect_cashflow_statement', 'cash_flow_statement.indirect_cashflow_statement')->name('indirect_cashflow_statement');
+
+// });
 
 Route::middleware(['departments:asset-depreciation-balance'])->group(function () {
     Route::view('/asset_depreciation_balance_list', 'asset_depreciation_balance.index')->name('asset_list');
@@ -251,19 +251,16 @@ Route::middleware(['departments:asset-depreciation-balance'])->group(function ()
 
 
 // test
-Route::middleware(['departments:skill'])->group(function()
-{
+Route::middleware(['departments:skill'])->group(function () {
     Route::view('/skill', 'skill.index')->name('skill');
 });
 
-Route::middleware(['departments:cooking-place'])->group(function()
-{
+Route::middleware(['departments:cooking-place'])->group(function () {
     Route::view('/cooking_places', 'cookingPlace.index')->name('cookingPlace');
 });
 
 Route::view('/cooking_places/create', 'cookingPlace.create')->name('cookingPlaceCreate');
 Route::view('/cooking_places/{id}/edit', 'cookingPlace.edit')->name('cookingPlaceCreate');
-Route::view('/indirect_cashflow_statement', 'cash_flow_statement.indirect_cashflow_statement')->name('indirect_cashflow_statement');
 
 Route::middleware(['departments:duty'])->group(function () {
     Route::view('/duty', 'duty.index')->name('duty');
@@ -281,18 +278,18 @@ Route::middleware(['departments:sale-target'])->group(function () {
 });
 
 // Route::middleware(['departments:accessory'])->group(function () {
-    Route::view('/accessories/create','accessories.create');
-    Route::view('/accessories/{id}/edit','accessories.edit');
-    Route::view('/accessories','accessories.index');
+Route::view('/accessories/create', 'accessories.create');
+Route::view('/accessories/{id}/edit', 'accessories.edit');
+Route::view('/accessories', 'accessories.index');
 // });
 Route::view('/menu_sale_report', 'menu_sale_report.index')->name('menu_sale_report.index');
 Route::view('/menu_costing', 'menu_costing.index')->name('menu_costing.index');
 
-Route::view('/pos_order_items','pos.orderItem.index');
+Route::view('/pos_order_items', 'pos.orderItem.index');
 
-Route::view('/accessories/create','accessories.create');
-Route::view('/accessories/{id}/edit','accessories.edit');
-Route::view('/accessories','accessories.index');
+Route::view('/accessories/create', 'accessories.create');
+Route::view('/accessories/{id}/edit', 'accessories.edit');
+Route::view('/accessories', 'accessories.index');
 Route::view('/menu_position', 'menu_position.index')->name('menu_position');
 Route::view('/menu_position/create', 'menu_position.create')->name('menu_position.create');
 
