@@ -634,6 +634,7 @@
 
 
 
+<!-- <<<<<<< HEAD
                 <li>
                     <a href="/accessories" class="flex items-center @yield('packages')">
                         <i class="fal fa-braille pr-3"></i>
@@ -652,6 +653,26 @@
                         Product Tree
                     </a>
                 </li>
+======= -->
+                        <li>
+                            <a href="/accessories" class="flex items-center @yield('packages')">
+                            <i class="fal fa-braille pr-3"></i>
+                                Accessories
+                            </a>
+                        </li>
+                        <li>
+                            <a href="/OKR" class="flex items-center @yield('OKR')">
+                                <i class="fal fa-braille pr-3"></i>
+                                OKR
+                            </a>
+                        </li>
+                        <li>
+                            <a href="/product_tree" class="flex items-center @yield('product_tree')">
+                                <i class="fal fa-braille pr-3"></i>
+                                Product Tree
+                            </a>
+                        </li>
+<!-- >>>>>>> origin/ui_test -->
 
             </ul>
 

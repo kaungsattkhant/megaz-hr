@@ -303,8 +303,9 @@ Route::view('/mrp/{id}/edit','MRP.edit');
 
 // >>>>>>> origin/thhs/okr-backend
 
-Route::view('/QKR', 'QKR.index')->name('QKR');
-Route::view('/QKR/create', 'QKR.create')->name('QKR.create');
+Route::view('/OKR', 'OKR.index')->name('OKR');
+Route::view('/OKR/create', 'OKR.create')->name('OKR.create');
+Route::view('/OKR/{id}/edit','OKR.edit');
 Route::view('/product_tree', 'product_tree.index')->name('product_tree');
 Route::view('/product_tree/create', 'product_tree.create')->name('product_tree.create');
 

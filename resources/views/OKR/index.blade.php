@@ -1,10 +1,10 @@
 @extends('layouts.main')
 
-@section('page_title', 'QKR')
-@section('QKR', 'active-link')
+@section('page_title', 'OKR')
+@section('OKR', 'active-link')
 @section('content')
     <div id="app">
-        <qkr-component/>
+        <okr-component/>
     </div>
 
 @endsection

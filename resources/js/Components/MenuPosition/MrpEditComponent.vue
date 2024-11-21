@@ -88,7 +88,7 @@
                 </label>
                 <div class="bg-white mb-0 w-full text-sm inline-block h-[34px]"
                     data-te-select-wrapper-ref>
-                    <select data-te-select-init data-te-select-placeholder="Select Category"
+                    <select data-te-select-init data-te-select-placeholder="Select Type"
                         data-te-select-filter="true" name="" id="" v-model="selectedMenuType" class="input-ui">
                         <option :value="menuType" v-for="(menuType, menuTypeIndex) in menuTypeList"
                             :key="menuTypeIndex"> {{ menuType }} </option>
@@ -579,7 +579,17 @@ export default {
                 })
                 this.levelTable.push(sampleMenuLevel)
             })    
+            this.getMenuList();
             
+            // this.subMenu = detail.sub_menus
+            detail.sub_menus.forEach(menu => {
+                // let menuName = this.menuList.find(item => item.id === menu).name
+                this.subMenuList.push({
+                    name: menu.name,
+                    id: menu.id,
+                });
+                this.subMenu.push(menu.id);
+            })
         },
         async getCookingAreaList() {
             let response = await getApiData({ url: `/api/cooking_place`, token: this.getToken() });
@@ -824,7 +834,7 @@ export default {
         },
         removeSubMenu(index) {
             this.subMenuList.splice(index, 1);
-            this.submenu.splice(index, 1);
+            // this.submenu.splice(index, 1);
             // this.updateItemPriceTotal(this.ingredientItems);
         },
         async createMenuBtnClicked() {
@@ -844,42 +854,48 @@ export default {
                 this.alertValidationMessage(`Code`);
                 return 1;
             }
-            else if(!this.selectedImage){
-                this.alertValidationMessage(`menu image`);
-                return 1;
-            }
+            // else if(!this.selectedImage){
+            //     this.alertValidationMessage(`menu image`);
+            //     return 1;
+            // }
             else if(!this.selectedCookingArea){
                 this.alertValidationMessage(`cooking areas`);
                 return 1;
             }
-            else if(!this.selectedMenuType){
-                this.alertValidationMessage(`Type`);
-                return 1;
-            }
+            // else if(!this.selectedMenuType){
+            //     this.alertValidationMessage(`Type`);
+            //     return 1;
+            // }
             else {
                 let cookingPlaceId = [];
                 this.selectedCookingArea.forEach((item) => {
                     cookingPlaceId.push(item.id)
+                })
+                let sub_menu_id = [];
+                this.subMenuList.forEach((submenu) => {
+                    sub_menu_id.push(submenu.id)
                 })
                 console.log('array ' ,cookingPlaceId)
                 let formData = new FormData();
                 formData.append('name', this.menuName);
                 formData.append('menu_category_id', this.selectedMenuCategory.id);
                 formData.append('code', this.code);
-                formData.append('image',this.selectedImage);
+                if(this.selectedImage){
+                    formData.append('image',this.selectedImage);
+                }
                 // formData.append('description',this.description);
                 formData.append('price', this.sellingPrice);
                 formData.append('Menu_type', this.selectedMenuType);
                 formData.append('cooking_place_id',JSON.stringify(cookingPlaceId));
 
                 formData.append('menu_steps',JSON.stringify(this.levelTable));
-                if(this.subMenu.length > 0){
-                    formData.append('sub_menu_id',JSON.stringify(this.subMenu));
+                if(sub_menu_id.length > 0){
+                    formData.append('sub_menu_id',JSON.stringify(sub_menu_id));
                 }
                 
-                let response = await postApiData({ url: `/api/mrp`, form_data: formData, token: this.getToken() });
+                let response = await postApiData({ url: `/api/mrp/${this.mrpId}`, form_data: formData, token: this.getToken() });
                 if (response.success) {
-                    // window.location.replace(`/menus`);
+                    window.location.replace(`/mrp`);
                 }
                 else {
                     this.$notify({
