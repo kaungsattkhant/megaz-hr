@@ -10,6 +10,7 @@ use App\Models\TaskDetail;
 use Laravel\Sanctum\HasApiTokens;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 
 class Staff extends Authenticatable
@@ -44,7 +45,10 @@ class Staff extends Authenticatable
     ];
 
     protected $hidden = [
-        'password', 'remember_token', 'created_at', 'updated_at',
+        'password',
+        'remember_token',
+        'created_at',
+        'updated_at',
     ];
 
     public function inventories()
@@ -183,4 +187,27 @@ class Staff extends Authenticatable
     #scope
 
     #end
+
+    public function menuSteps(): HasMany
+    {
+        return $this->hasMany(MenuStep::class, 'staff_id');
+    }
+
+    public function completed_objectives()
+    {
+        return $this->hasMany(ObjectivekeyStaff::class, 'completed_by');
+    }
+    public function in_progressed_objectives()
+    {
+        return $this->hasMany(ObjectivekeyStaff::class, 'in_progressed_by');
+    }
+    public function approved_objectives()
+    {
+        return $this->hasMany(ObjectivekeyStaff::class, 'approved_by');
+    }
+
+    public function cancelled_objectives()
+    {
+        return $this->hasMany(ObjectivekeyStaff::class, 'cancelled_by');
+    }
 }

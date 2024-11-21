@@ -89,6 +89,7 @@
                     </li>
                 @endif
 
+<!-- <<<<<<< HEAD -->
                 @if (checkFeaturePermission('staff'))
                     <li>
                         <a href="{{ route('staff') }}" class="flex items-center @yield('staffs')">
@@ -97,6 +98,48 @@
                         </a>
                     </li>
                 @endif
+<!-- ======= -->
+                        @if (checkFeaturePermission('menu'))
+                        <li>
+                            <a href="{{ route('menu_categories') }}" class="flex items-center @yield('menu_categories')">
+                                <i class="fal fa-clipboard-list  pr-3"></i>
+                                Menu Categories
+                            </a>
+                        </li>
+                        <li>
+                            <a href="{{ route('menus') }}" class="flex items-center @yield('menus')">
+                                <i class="fal fa-clipboard-list  pr-3"></i>
+                                Selling Menus
+                            </a>
+                        </li>
+                        <li>
+                            <a href="{{ route('MRP') }}" class="flex items-center @yield('mrp')">
+                                <i class="fal fa-clipboard-list  pr-3"></i>
+                                MRP
+                            </a>
+                        </li>
+                        <li>
+                            <a href="{{ route('menu_sale_report.index') }}" class="flex items-center @yield('menu_sale_report')">
+                                <i class="fal fa-clipboard-list  pr-3"></i>
+                                Menu Sale Report
+                            </a>
+                        </li>
+                        <li>
+                            <a href="{{ route('menu_costing.index') }}" class="flex items-center @yield('menu_costing')">
+                                <i class="fal fa-clipboard-list  pr-3"></i>
+                                Menu Costing
+                            </a>
+                        </li>
+                        @endif
+                        @if (checkFeaturePermission('room'))
+                        <li>
+                            <a href="{{ route('room') }}" class="flex items-center @yield('room')">
+                                <i class="fal fa-microphone-alt  pr-3"></i>
+                                Room
+                            </a>
+                        </li>
+                        @endif
+<!-- >>>>>>> origin/thhs/okr-backend -->
 
                 @if(checkFeaturePermission('journal'))
                     <li>

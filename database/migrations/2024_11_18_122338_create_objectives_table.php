@@ -11,14 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('menus', function (Blueprint $table) {
+        Schema::create('objectives', function (Blueprint $table) {
             $table->id();
-            $table->string('code')->unique();
-            $table->foreignId('menu_category_id')->constrained()->onDelete('cascade');
-            $table->string('name');
-            $table->string('image_url')->nullable();
-            $table->string('image_path')->nullable();
-            $table->boolean('is_feature')->default(0);
+            $table->string('objective_name');
+            $table->foreignId('role_id');
+            $table->set('assigned_days',['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'])->nullable();
+            $table->integer('created_by');
             $table->boolean('is_active')->default(1);
             $table->timestamps();
         });
@@ -29,7 +27,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('menu_prices');
-        Schema::dropIfExists('menus');
+        Schema::dropIfExists('objectives');
     }
 };

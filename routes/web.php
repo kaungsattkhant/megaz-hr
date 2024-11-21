@@ -287,13 +287,24 @@ Route::view('/menu_costing', 'menu_costing.index')->name('menu_costing.index');
 
 Route::view('/pos_order_items', 'pos.orderItem.index');
 
-Route::view('/accessories/create', 'accessories.create');
-Route::view('/accessories/{id}/edit', 'accessories.edit');
-Route::view('/accessories', 'accessories.index');
+// <<<<<<< HEAD
+// Route::view('/accessories/create', 'accessories.create');
+// Route::view('/accessories/{id}/edit', 'accessories.edit');
+// Route::view('/accessories', 'accessories.index');
 Route::view('/menu_position', 'menu_position.index')->name('menu_position');
 Route::view('/menu_position/create', 'menu_position.create')->name('menu_position.create');
+// =======
+Route::view('/accessories/create','accessories.create');
+Route::view('/accessories/{id}/edit','accessories.edit');
+Route::view('/accessories','accessories.index');
+Route::view('/mrp', 'MRP.index')->name('MRP');
+Route::view('/mrp/create', 'MRP.create')->name('MRP.create');
+Route::view('/mrp/{id}/edit','MRP.edit');
+
+// >>>>>>> origin/thhs/okr-backend
 
 Route::view('/QKR', 'QKR.index')->name('QKR');
 Route::view('/QKR/create', 'QKR.create')->name('QKR.create');
 Route::view('/product_tree', 'product_tree.index')->name('product_tree');
 Route::view('/product_tree/create', 'product_tree.create')->name('product_tree.create');
+
