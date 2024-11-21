@@ -29,7 +29,6 @@ class Objective extends Model
 
     public function getAssignedDaysAttribute($value)
     {
-        
         return explode(',', $value);
     }
 }
