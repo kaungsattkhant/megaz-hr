@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\API\AccountPayableController;
 use App\Http\Controllers\API\FinancialReportController;
 use Illuminate\Support\Facades\Route;
 
@@ -13,7 +14,11 @@ Route::middleware('auth:api')->group(function () {
         // Route::get('profit_and_loss', 'getProfitAndLoss');
         Route::get('working_capital', 'getWorkingCapital');
     });
+    Route::controller(AccountPayableController::class)->group(function () {
+        Route::get('get_account_payable_balance','getAccountPayableBalance');
+    });
 });
+
 Route::controller(FinancialReportController::class)->group(function () {
     Route::get('profit_and_loss', 'getProfitAndLoss');
 });

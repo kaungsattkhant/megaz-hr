@@ -14,52 +14,56 @@ use App\Http\Action\Transaction\StoreTransactionLedger;
 
 class CashBookTransaction
 {
-    public function getOpeningBalanceOriginal($data){
-        $cashAccountId=$data->cash_account_id;
-        $latestClosedTransaction =$this->getLatestClosedTransaction($data,$cashAccountId);
-        if($latestClosedTransaction){
+    public function getOpeningBalanceOriginal($data)
+    {
+        $cashAccountId = $data->cash_account_id;
+        $latestClosedTransaction = $this->getLatestClosedTransaction($data, $cashAccountId);
+        if ($latestClosedTransaction) {
             $balance = DB::table('ledgers')
-            ->join('transactions', 'ledgers.transaction_id', '=', 'transactions.id')
-            ->join('accounts', 'ledgers.account_id', '=', 'accounts.id')
-            ->where('transactions.is_confirmed',1)
-            ->where('ledgers.account_id', $cashAccountId)
-            ->where('transactions.id', '<=', $latestClosedTransaction->id)
-            // ->whereDate('transactions.date', '<=', $transaction_date_filter)
-            // ->whereDate('transactions.date', '<=', $closingDate) // Compare transaction date with closing date
-            ->select(
-                  DB::raw('SUM(CASE WHEN ledgers.action = "debit" AND DATE(transactions.date) THEN ledgers.value ELSE 0 END) as debit_balance'),
-                DB::raw('SUM(CASE WHEN ledgers.action = "credit" AND DATE(transactions.date) THEN ledgers.value ELSE 0 END) as credit_balance'),
-                DB::raw('(SUM(CASE WHEN ledgers.action = "debit" THEN ledgers.value ELSE 0 END) -
-              SUM(CASE WHEN ledgers.action = "credit" THEN ledgers.value ELSE 0 END)) as opening_balance'))
-            ->first();
-            if(is_null($balance->opening_balance)){
-                $balance=new stdClass();
-                $balance->opening_balance=0;
+                ->join('transactions', 'ledgers.transaction_id', '=', 'transactions.id')
+                ->join('accounts', 'ledgers.account_id', '=', 'accounts.id')
+                ->where('transactions.is_confirmed', 1)
+                ->where('ledgers.account_id', $cashAccountId)
+                ->where('transactions.id', '<=', $latestClosedTransaction->id)
+                // ->whereDate('transactions.date', '<=', $transaction_date_filter)
+                // ->whereDate('transactions.date', '<=', $closingDate) // Compare transaction date with closing date
+                ->select(
+                    DB::raw('SUM(CASE WHEN ledgers.action = "debit" AND DATE(transactions.date) THEN ledgers.value ELSE 0 END) as debit_balance'),
+                    DB::raw('SUM(CASE WHEN ledgers.action = "credit" AND DATE(transactions.date) THEN ledgers.value ELSE 0 END) as credit_balance'),
+                    DB::raw('(SUM(CASE WHEN ledgers.action = "debit" THEN ledgers.value ELSE 0 END) -
+              SUM(CASE WHEN ledgers.action = "credit" THEN ledgers.value ELSE 0 END)) as opening_balance')
+                )
+                ->first();
+            if (is_null($balance->opening_balance)) {
+                $balance = new stdClass();
+                $balance->opening_balance = 0;
                 return $balance;
             }
             return $balance;
         }
-        $balance=new stdClass();
-        $balance->opening_balance=0;
+        $balance = new stdClass();
+        $balance->opening_balance = 0;
         return $balance;
     }
 
-    public function getOpeningBalance($data){
-        $cashAccountId=$data->cash_account_id;
-        $month=Carbon::now()->subMonth();
+    public function getOpeningBalance($data)
+    {
+        $cashAccountId = $data->cash_account_id;
+        $month = Carbon::now()->subMonth();
         // $latestClosedTransaction =$this->getLatestClosedTransaction($data,$cashAccountId);
-        $balance= CashbookBalance::where('year', $month->year)
-        ->where('month', $month->month)
-        ->where('cash_account_id',$cashAccountId)
-        ->value('closing_balance') ?? 0;
-        $openingBalance=new stdClass;
-        $openingBalance->opening_balance=$balance;
+        $balance = CashbookBalance::where('year', $month->year)
+            ->where('month', $month->month)
+            ->where('cash_account_id', $cashAccountId)
+            ->value('closing_balance') ?? 0;
+        $openingBalance = new stdClass;
+        $openingBalance->opening_balance = $balance;
         return $openingBalance;
     }
 
-    public function getClosingBalance($openingBalance,$data){
+    public function getClosingBalance($openingBalance, $data)
+    {
 
-        $cash_account_id=$data->cash_account_id;
+        $cash_account_id = $data->cash_account_id;
         $currentMonth = Carbon::now()->month;
         $currentYear = Carbon::now()->year;
         $totals = DB::table('ledgers')
@@ -71,30 +75,32 @@ class CashBookTransaction
             ->whereYear('created_at', $currentYear)
             ->whereMonth('created_at', $currentMonth)
             ->first();
-        $totalDebitAmount = (int)$totals->total_debit_amount;
-        $totalCreditAmount = (int)$totals->total_credit_amount;
-        $closingBalance=((int)$openingBalance+$totalDebitAmount)-$totalCreditAmount;
+        $totalDebitAmount = (int) $totals->total_debit_amount;
+        $totalCreditAmount = (int) $totals->total_credit_amount;
+        $closingBalance = ((int) $openingBalance + $totalDebitAmount) - $totalCreditAmount;
         return $closingBalance;
     }
 
-    public function getLatestClosedTransaction($data,$cashAccountId){
+    public function getLatestClosedTransaction($data, $cashAccountId)
+    {
         $fromDate = convertDateFormat($data->from_date);
         return Transaction::with(['ledgers.account'])
-        ->withoutGlobalScope('dateFilter')
-        ->select(['id', 'date', 'description'])
-        ->whereHas('ledgers', function ($query) use ($cashAccountId) {
-            $query->where('account_id', $cashAccountId);    #transaction close depend on transaction
-        })->where('is_closing', 1)
-        ->orderByDesc('date')
-        ->isConfirmed(1)
-        ->when(($data->from_date), function ($q) use ($fromDate) {
-            $q->whereDate('date', '<', $fromDate);
-        })
-        ->first();
+            ->withoutGlobalScope('dateFilter')
+            ->select(['id', 'date', 'description'])
+            ->whereHas('ledgers', function ($query) use ($cashAccountId) {
+                $query->where('account_id', $cashAccountId);    #transaction close depend on transaction
+            })->where('is_closing', 1)
+            ->orderByDesc('date')
+            ->isConfirmed(1)
+            ->when(($data->from_date), function ($q) use ($fromDate) {
+                $q->whereDate('date', '<', $fromDate);
+            })
+            ->first();
     }
 
-    public function getCashAndBankBalanceByMonth($sub_account_id,$year,$month){
-      
+    public function getCashAndBankBalanceByMonth($sub_account_id, $year, $month)
+    {
+
         // return DB::table('sub_accounts')
         // ->leftJoin('accounts', 'accounts.sub_account_id', '=', 'sub_accounts.id')
         // ->leftJoin('ledgers', function ($join) use ($year) {
@@ -115,7 +121,7 @@ class CashBookTransaction
 
         $year = Carbon::now()->year;
         $currentMonth = Carbon::now()->month;
-        
+
         $monthsOfYear = collect(range(1, $currentMonth))->map(function ($month) use ($year) {
             $date = Carbon::create($year, $month, 1);
             return [
@@ -124,7 +130,7 @@ class CashBookTransaction
                 'date' => $date->format('Y-m-01'),
             ];
         });
-        
+
         // Step 2: Query to get debit and credit sums by month for the specified year
         $ledgerData = DB::table('sub_accounts')
             ->leftJoin('accounts', 'accounts.sub_account_id', '=', 'sub_accounts.id')
@@ -141,18 +147,32 @@ class CashBookTransaction
             ')
             ->groupBy(DB::raw('MONTH(ledgers.created_at)'))
             ->get();
-        
+
         // Step 3: Merge results with months of the year, calculating value as total_debit - total_credit
+        // $results = $monthsOfYear->map(function ($month) use ($ledgerData) {
+        //     $data = $ledgerData->firstWhere('month', $month['month_number']);
+
+        //     return [
+        //         'month' => $month['month_name'],
+        //         // 'date' => $month['date'],
+        //         'value' => $data ? ($data->total_debit - $data->total_credit) : 0,
+        //     ];
+        // });
+
         $results = $monthsOfYear->map(function ($month) use ($ledgerData) {
-            $data = $ledgerData->firstWhere('month', $month['month_number']);
-        
+            // Calculate cumulative debit and credit up to the current month
+            $cumulativeDebit = $ledgerData->where('month', '<=', $month['month_number'])->sum('total_debit');
+            $cumulativeCredit = $ledgerData->where('month', '<=', $month['month_number'])->sum('total_credit');
+
+            // Calculate the cumulative balance as the difference
+            $closingBalance = $cumulativeDebit - $cumulativeCredit;
             return [
                 'month' => $month['month_name'],
-                // 'date' => $month['date'],
-                'value' => $data ? ($data->total_debit - $data->total_credit) : 0,
+                'date' => $month['date'],
+                'value' => $closingBalance,
             ];
         });
-        
+
         // Step 4: Output the results
         return $results;
     }

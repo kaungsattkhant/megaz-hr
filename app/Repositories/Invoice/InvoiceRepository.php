@@ -470,8 +470,19 @@ class InvoiceRepository implements InvoiceRepositoryInterface
                 DB::commit();
                 ResponseData($updatedInvoice, 200);
             }
-            $roomSessions = RoomSession::where('invoice_id', $invoice->id)->get();
             $newEntity = Entity::find($data['entity_id']);
+
+            if($newEntity->is_active){
+                ResponseMessage('Room is invalid',422);
+            }
+            if($invoice->invoice_type=='endless_time')
+            {
+                return $this->invoiceService->changeRoomForEndlessTime($invoice,$newEntity);
+            }
+            dd('abc');
+            
+            $roomSessions = RoomSession::where('invoice_id', $invoice->id)->get();
+            $firstRoomSession = $roomSessions->first();
             $latestRoomSession = $roomSessions->last();
             $current_time = Carbon::now();
             $entitySession = EntitySession::where('entity_id', $latestRoomSession->entitySession->entity_id)
@@ -485,9 +496,7 @@ class InvoiceRepository implements InvoiceRepositoryInterface
                 ->first();
             //end 
             $previousEntity = Entity::find($entitySession->entity_id);
-            $firstRoomSession = $roomSessions->first();
-            $lastRoomSession = $roomSessions->last();
-            $endTime = Carbon::parse($lastRoomSession->end_date);
+            $endTime = Carbon::parse($latestRoomSession->end_date);
             $sessionStartTime = Carbon::parse($firstRoomSession->start_date);
             $useHours = $sessionStartTime->diffInHours(Carbon::now());
             $totalDuration = $roomSessions->sum('session_duration');
@@ -550,6 +559,7 @@ class InvoiceRepository implements InvoiceRepositoryInterface
 
             $newEntity = Entity::find($data['entity_id']);
             $loopEndTime = 0;
+
             // dd([
             //     'total duration' => $totalDuration,
             //     'left session' => $leftSession,

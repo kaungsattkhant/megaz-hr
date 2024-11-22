@@ -28,6 +28,7 @@ class EntitySession extends Model
         return $this->hasOne(RoomSession::class)->latestOfMany();
     }
 
+
     
 
 
