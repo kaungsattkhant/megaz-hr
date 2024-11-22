@@ -568,6 +568,12 @@
                             </a>
                         </li>
                         <li>
+                            <a href="/menu_forecasting" class="flex items-center @yield('menu_forecasting')">
+                                <i class="fal fa-braille pr-3"></i>
+                                Menu Forecasting
+                            </a>
+                        </li>
+                        <li>
                             <a href="/product_tree" class="flex items-center @yield('product_tree')">
                                 <i class="fal fa-braille pr-3"></i>
                                 Product Tree
