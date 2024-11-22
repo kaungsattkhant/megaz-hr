@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\Entity;
+use App\Models\EntitySession;
 use Illuminate\Support\Carbon;
 
 
@@ -20,10 +21,13 @@ class InvoiceModelService
     public function calculateInvoiceService($invoiceService, $end_time)
     {
         // foreach ($invoiceServices as $invoiceService) {
-        if(!$invoiceService->is_active){
+        if (!$invoiceService->is_active) {
             // return $invoiceService;
         }
         $startDateTime = Carbon::parse($invoiceService->start_date);
+        $nowDateTime = Carbon::parse(now());
+        $differenceBeforeStartDate = $startDateTime->diffInMinutes($nowDateTime);
+
         $currentDateTime = Carbon::parse($end_time);
         $pricePerHour = $invoiceService->service->price_per_hour;
         $hours = $startDateTime->diffInHours($currentDateTime);
@@ -39,8 +43,13 @@ class InvoiceModelService
             $formattedTimeDifference = "{$hours}hr {$minutes}min";
             // $formattedTimeDifference = "{$hours}hr {$minuteDifference}min";
         }
-        $invoiceService->service_value = ceil($serviceAmount);
-        $invoiceService->minutes = $formattedTimeDifference;
+        if ($differenceBeforeStartDate < 0) {
+            $invoiceService->service_value = 0;
+            $invoiceService->minutes = "0min";
+        } else {
+            $invoiceService->service_value = ceil($serviceAmount);
+            $invoiceService->minutes = $formattedTimeDifference;
+        }
         $invoiceService->price_per_hour = $pricePerHour;
         return $invoiceService;
         // }
@@ -48,7 +57,7 @@ class InvoiceModelService
 
     public function getServiceValue($invoiceService, $end_time)
     {
-        if(!$invoiceService->is_active){
+        if (!$invoiceService->is_active) {
             return $invoiceService->service_value;
         }
         $startDateTime = Carbon::parse($invoiceService->start_date);
@@ -69,6 +78,31 @@ class InvoiceModelService
         }
         $invoiceService->service_value = ceil($serviceAmount);
         return ceil($serviceAmount);
+    }
+
+    public function changeRoomForEndlessTime($invoice, $newEntity)
+    {
+        $currentRoomSession=$invoice->currentSession;
+        $roomSession = $invoice->roomSession;
+        $latestRoomSession = $invoice->latestSession;
+        $firstRoomSession = $roomSession->first();
+        $current_time=now();
+        $oldEntitySession = $this->getCurrentEntitySessionByEntity($latestRoomSession->entitySession->entity_id);
+        $currentStartTime=Carbon::parse($oldEntitySession->start_time);
+        $useCurrentSession=$currentStartTime->diffInHours($current_time);
+        return $useCurrentSession;
+    }
+
+    public function getCurrentEntitySessionByEntity($entityId)
+    {
+        // dd($startTime);
+        $startTime="2024-11-13 12:24:42";
+        $current_time = now();
+        $entitySession = EntitySession::where('entity_id', $entityId)
+            ->whereTime('start_time', '<=', $current_time)
+            ->whereTime('end_time', '>=', $current_time)
+            ->first();
+        return $entitySession;
     }
 
 }
