@@ -230,8 +230,10 @@ class  ObjectiveRepository implements ObjectiveInterface
         $updateData = [];
         $userId = UserData()->id;
 
-
-
+        if (!checkRoles(['Supervisor']) && $data['status'] === 'approved' || !checkRoles(['Supervisor']) && $data['status'] === 'cancelled') {
+            ResponseMessage('Permission is not allowed', 403);
+            return;
+        }
 
         if (checkRoles(['Supervisor'])) {
             $updateData = [
@@ -247,6 +249,7 @@ class  ObjectiveRepository implements ObjectiveInterface
                 $updateData['cancelled_by'] = $userId;
             }
         } else {
+
             if ($data['status'] == 'in_progress') {
                 $updateData['status'] = $data['status'];
                 $updateData['in_progressed_at'] = now();
