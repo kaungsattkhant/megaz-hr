@@ -13,7 +13,6 @@ return new class extends Migration {
         Schema::create('supplier_items', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->foreignId('supplier_id')->constrained()->onDelete('cascade');
-            $table->unsignedBigInteger('supplier_item_id');
             $table->foreignId('item_id')->constrained()->onDelete('cascade');
         });
     }
