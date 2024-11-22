@@ -46,6 +46,7 @@
                                 <th>#</th>
                                 <th>Item Name</th>
                                 <th>Item Code</th>
+                                <th>Price</th>
                                 <th>Category</th>
                                 <!-- <th></th> -->
                             </tr>
@@ -63,6 +64,9 @@
                                     </td>
                                     <td class="whitespace-nowrap">
                                         {{ item.code }}
+                                    </td>
+                                    <td class="whitespace-nowrap">
+                                        <span v-if="item.average_price" > {{ item.average_price }} </span>
                                     </td>
                                     <td class="whitespace-nowrap">
                                         {{ item.category.name }}
