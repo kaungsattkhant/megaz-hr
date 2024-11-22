@@ -7,6 +7,7 @@ use App\Models\Entity;
 use App\Models\Package;
 use App\Models\RoomSession;
 use App\Models\InvoiceService;
+use Illuminate\Support\Carbon;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
@@ -86,6 +87,14 @@ class Invoice extends Model
         return $this->hasOne(RoomSession::class)->latest();
     }
 
+    public function currentSession()
+    {
+        return $this->hasOne(RoomSession::class)
+            ->where('start_date', '<=', Carbon::now())
+            ->where('end_date', '>=', Carbon::now());
+            // ->latest('start_date'); // Optional: orders by the latest start date if there are multiple active sessions
+    }
+
     public function invoiceService()
     {
         return $this->hasMany(InvoiceService::class);
@@ -93,7 +102,7 @@ class Invoice extends Model
 
     public function activeInvoiceService()
     {
-        return $this->hasMany(InvoiceService::class)->where('is_active',1);
+        return $this->hasMany(InvoiceService::class)->where('is_active', 1);
     }
 
     public function accessories()

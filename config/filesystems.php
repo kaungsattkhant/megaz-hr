@@ -72,6 +72,7 @@ return [
     'links' => [
         public_path('storage') => storage_path('app/public'),
         public_path('menuImages') => storage_path('app/menuImages'),
+        public_path('okrImages') => storage_path('app/okrImages'),
     ],
 
 ];

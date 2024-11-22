@@ -5,7 +5,7 @@ namespace App\Http\Requests\Objective;
 use App\Http\Requests\APIRequest;
 use Illuminate\Contracts\Validation\Validator;
 
-class ObjectiveRequest extends APIRequest
+class ObjImgRequest extends APIRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -23,10 +23,8 @@ class ObjectiveRequest extends APIRequest
     public function rules(): array
     {
         return [
-            'objective_name' => 'required',
-            'role_id' => 'required',
-            'is_active' => 'nullable|boolean',
-            'objective_key' => 'nullable',
+            'objective_key_id' => 'required',
+            'images' => 'nullable|mimes:jpeg,png,jpg|max:10240',
         ];
     }
 

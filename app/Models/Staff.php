@@ -192,4 +192,22 @@ class Staff extends Authenticatable
     {
         return $this->hasMany(MenuStep::class, 'staff_id');
     }
+
+    public function completed_objectives()
+    {
+        return $this->hasMany(ObjectivekeyStaff::class, 'completed_by');
+    }
+    public function in_progressed_objectives()
+    {
+        return $this->hasMany(ObjectivekeyStaff::class, 'in_progressed_by');
+    }
+    public function approved_objectives()
+    {
+        return $this->hasMany(ObjectivekeyStaff::class, 'approved_by');
+    }
+
+    public function cancelled_objectives()
+    {
+        return $this->hasMany(ObjectivekeyStaff::class, 'cancelled_by');
+    }
 }

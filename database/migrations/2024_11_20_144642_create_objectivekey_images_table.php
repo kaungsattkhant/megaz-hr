@@ -11,12 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('objectives', function (Blueprint $table) {
+        Schema::create('objectivekey_images', function (Blueprint $table) {
             $table->id();
-            $table->string('objective_name');
-            $table->foreignId('role_id');
-            $table->integer('created_by');
-            $table->boolean('is_active')->default(1);
+            $table->foreignId('objective_key_id');
+            $table->string('image_url')->nullable();
+            $table->string('image_path')->nullable();
             $table->timestamps();
         });
     }
@@ -26,6 +25,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('objectives');
+        Schema::dropIfExists('objectivekey_images');
     }
 };

@@ -174,6 +174,7 @@ class TaskRepository implements TaskRepositoryInterface
                 if ($taskDetail->completed_by == null) {
                     ResponseMessage('Please complete task first', 422);
                 }
+                
                 $taskDetail->double_checked_by = $staff->id;
                 $taskDetail->is_double_checked = 1;
                 $taskDetail->double_checked_at = CurrentTime();

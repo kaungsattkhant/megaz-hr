@@ -5,6 +5,7 @@ namespace App\Repositories\Item;
 use App\Models\Item;
 use App\Models\ItemType;
 use App\Models\ItemPrice;
+use App\Models\SupplierItem;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -14,7 +15,7 @@ class ItemRepository implements ItemRepositoryInterface
     {
         if ($request->per_page || $request->page) {
             $category_id = $request->category_id;
-            return Item::with(['category','uomConversion'])->orderByDesc('id')
+            return Item::with(['category'])->orderByDesc('id')
                 ->when($request->search_input, function ($q) use ($request) {
                     $q->where('name', 'LIKE', '%' . $request->search_input . '%');
                 })
@@ -35,11 +36,7 @@ class ItemRepository implements ItemRepositoryInterface
         DB::beginTransaction();
         try {
             $item = Item::create($data);
-            $price = ItemPrice::create(['item_id' => $item->id, 'price' => $data['price'],'uom_id'=>$data['uom_id']]);
-            // $uomIds = json_decode($data['uoms'], true);
-            // foreach ($uomIds as $uomId) {
-            //     $item->uoms()->attach($uomId);
-            // }
+            // $price = ItemPrice::create(['item_id' => $item->id, 'price' => $data['price'],'uom_id'=>$data['uom_id']]); //removed after relationship with item price with supplier
             DB::commit();
             return $item;
         } catch (\Exception $e) {
@@ -107,5 +104,9 @@ class ItemRepository implements ItemRepositoryInterface
         return ItemType::all();
     }
 
+    public function supplierByItem($itemId){
+        $supplierByItem=SupplierItem::with('supplier','item')->where('item_id',$itemId)->get();
+        return $supplierByItem;
+    }
 
 }

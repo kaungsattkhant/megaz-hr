@@ -17,6 +17,7 @@ class Kernel extends ConsoleKernel
         $schedule->command('app:prepaid-monthly-schedule')->everyThirtySeconds();
         // $schedule->command('app:asset-depreciation-balance-monthly')->monthlyOn(1, '00:00');
         $schedule->command('app:asset-depreciation-balance-monthly')->everyMinute();
+        $schedule->command('app:assign-objectives-to-staffs')->daily('00:05');
     }
 
     /**
@@ -24,7 +25,7 @@ class Kernel extends ConsoleKernel
      */
     protected function commands(): void
     {
-        $this->load(__DIR__.'/Commands');
+        $this->load(__DIR__ . '/Commands');
 
 
         require base_path('routes/console.php');

@@ -16,6 +16,8 @@ return new class extends Migration
             $table->foreignId('objective_id');
             $table->longText('name');
             $table->double('okr_point');
+            $table->set('assigned_days', ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'])->nullable();
+            $table->integer('duration');
             $table->timestamps();
         });
     }

@@ -3,19 +3,33 @@
 namespace App\Repositories\Objective;
 
 use Exception;
+use App\Models\Role;
+use App\Models\Staff;
 use App\Models\Objective;
 use App\Models\ObjectiveKey;
-use App\Models\Role;
 use Illuminate\Http\Request;
+use App\Models\ObjectivekeyImage;
+use App\Models\ObjectivekeyStaff;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 
 
 class  ObjectiveRepository implements ObjectiveInterface
 {
+
     public function getObjectives(Request $request)
     {
-        return Objective::with(['role', 'objectiveKeys'])->paginate(config('common.list_count'));
+        $search = $request->input('search');
+        $days = $request->input('days');
+        $name = $request->input('name');
+
+        return Objective::with([
+            'role',
+            'objectiveKeys.objKeyStaff',
+            'objectiveKeys.objImages'
+        ])->objectiveFilter($search, $name, $days)
+            ->paginate();
     }
     public function getRolesByDepartmentId(Request $request, $departmentId)
     {
@@ -23,11 +37,9 @@ class  ObjectiveRepository implements ObjectiveInterface
         return Role::with('department')->where('department_id', $departmentId)->get();
     }
 
-
-
     public function getObjectiveById(Request $request, $objId)
     {
-        return Objective::with(['role', 'objectiveKeys'])->where('id', $objId)->get();
+        return Objective::with(['role', 'objectiveKeys.objKeyStaff', 'objectiveKeys.objImages'])->where('id', $objId)->get();
     }
 
 
@@ -44,7 +56,6 @@ class  ObjectiveRepository implements ObjectiveInterface
     public function store(array $validatedData)
     {
         return $this->saveObjectiveData($validatedData);
-       
     }
 
     public function update(array $validatedData, int $objId)
@@ -57,10 +68,6 @@ class  ObjectiveRepository implements ObjectiveInterface
         DB::beginTransaction();
         try {
 
-            $data['assigned_days'] = is_string($data['assigned_days'])
-                ? json_decode($data['assigned_days'], true)
-                : $data['assigned_days'];
-            $data['assigned_days'] = implode(',', $data['assigned_days'] ?? []);
             $data['created_by'] = UserData()->id;
 
             if ($objId) {
@@ -70,7 +77,10 @@ class  ObjectiveRepository implements ObjectiveInterface
                 $objective = Objective::create($data);
             }
 
-            $this->syncObjectiveKeys($objective, $data['objective_key']);
+            if (isset($data['objective_key'])) {
+                $this->syncObjectiveKeys($objective, $data['objective_key']);
+            }
+
             DB::commit();
             return $objective;
         } catch (Exception $e) {
@@ -82,17 +92,179 @@ class  ObjectiveRepository implements ObjectiveInterface
     private function syncObjectiveKeys(Objective $objective, string $objectiveKeys)
     {
         if (!empty($objectiveKeys)) {
-            $objectiveKeys = json_decode($objectiveKeys);
+            $objectiveKeys = json_decode($objectiveKeys, true);
 
             $objective->objectiveKeys()->delete();
+            $roleId =  $objective->role_id;
+
+            $staffLists = Staff::staffByRole($roleId);
+
+            $currentDay = date('l');
 
             foreach ($objectiveKeys as $key) {
-                ObjectiveKey::create([
+                $assignedDays = isset($key['assigned_days']) && is_array($key['assigned_days'])
+                    ? $key['assigned_days']
+                    : [];
+                $assignedDaysData = implode(',', $assignedDays); // Convert array to string
+                $objKey = ObjectiveKey::create([
                     'objective_id' => $objective->id,
-                    'name' => $key->name,
-                    'okr_point' => $key->okr_point
+                    'name' => $key['name'],
+                    'okr_point' => $key['okr_point'],
+                    'assigned_days' => $assignedDaysData,
+                    'duration' => $key['duration'],
                 ]);
+
+                if (in_array($currentDay, $assignedDays)) {
+                    foreach ($staffLists as $staff) {
+                        ObjectivekeyStaff::create([
+                            'staff_id' => $staff->id,
+                            'objective_key_id' => $objKey->id,
+                            'status' =>  'not_started',
+                        ]);
+                    }
+                }
             }
         }
+    }
+
+    public function objectiveLists(Request $request)
+    {
+        $currentDay = now()->format('l');
+        return  Objective::with([
+            'role',
+            'objectiveKeys' => function ($query) use ($currentDay) {
+                $query->whereRaw("FIND_IN_SET(?, assigned_days)", [$currentDay]);
+            },
+            'objectiveKeys.objKeyStaff',
+            'objectiveKeys.objImages'
+        ])
+            ->whereHas('objectiveKeys', function ($query) use ($currentDay) {
+                $query->whereRaw("FIND_IN_SET(?, assigned_days)", [$currentDay]);
+            })
+            ->paginate();
+    }
+
+
+
+    //objkeylistwithstaff assigns 
+    public function getdailyObjectives(Request $request)
+    {
+        $currentDay = now()->format('l');
+
+        $objectives = ObjectivekeyStaff::with([
+            'objectiveKey' => function ($query) use ($currentDay) {
+                $query->whereRaw("FIND_IN_SET(?, assigned_days)", [$currentDay]);
+            },
+            'objectiveKey.objective',
+            'objectiveKey.objImages'
+        ])
+            ->where('staff_id', UserData()->id)
+            ->whereHas('objectiveKey', function ($query) use ($currentDay) {
+                $query->whereRaw("FIND_IN_SET(?, assigned_days)", [$currentDay]);
+            })
+            ->paginate();
+        return $objectives;
+    }
+
+    public function storeImages($validatedData)
+    {
+        if (isset($validatedData['image']) && is_string($validatedData['image'])) {
+            $datas = json_decode($validatedData['image'], true);
+            $storedImages = [];
+            foreach ($datas as $data) {
+
+                $imageData = $data['image'];
+                $extension = $imageData->getClientOriginalExtension();
+                $hashedName = md5(uniqid() . microtime()) . '.' . $extension;
+                $data['image_path'] = $imageData->storeAs('okrImages/', $hashedName, 'public');
+                $data['image_url'] = Storage::url($data['image_path']);
+
+                $storedImages[] = ObjectivekeyImage::create([
+                    'objective_key_id' => $validatedData['objective_key_id'],
+                    'image_path' => $data['image_path'],
+                    'image_url' =>  $data['image_url'],
+                ]);
+            }
+            return $storedImages;
+        } else {
+            throw new \Exception('Invalid Image');
+        }
+    }
+
+    public function updateImages($validatedData, $objKeyImgId)
+    {
+        $data = ObjectivekeyImage::findOrFail($objKeyImgId);
+
+        $updateImages = [];
+
+        if (isset($validatedData['image']) && $validatedData['image']->isValid()) {
+
+            if ($data->image_path && Storage::exists($data->image_path)) {
+                Storage::delete($data->image_path);
+            }
+
+            $objImages = json_decode($validatedData['image'], true);
+            foreach ($objImages as $objImage) {
+                $imageData = $objImage['image'];
+                $extension = $imageData->getClientOriginalExtension();
+                $hashedName = md5(uniqid() . microtime()) . '.' . $extension;
+                $objImage['imagePath'] = $imageData->storeAs('okrImages/', $hashedName, 'public');
+                $objImage['imageUrl'] = Storage::url($objImage['imagePath']);
+
+                $updateImages[] = $data->update([
+                    'objective_key_id' => $data->id,
+                    'image_path' => $objImage['imagePath'],
+                    'image_url' => $objImage['imageUrl'],
+                ]);
+            }
+        } else {
+            throw new \Exception('Invalid image.');
+        }
+        return $updateImages;
+    }
+
+
+    public function updateDailyObjective($data, $objKeyStaffId)
+    {
+        $objKeyStaff = ObjectivekeyStaff::findOrFail($objKeyStaffId);
+        $updateData = [];
+        $userId = UserData()->id;
+
+        if (!checkRoles(['Supervisor']) && $data['status'] === 'approved' || !checkRoles(['Supervisor']) && $data['status'] === 'cancelled') {
+            ResponseMessage('Permission is not allowed', 403);
+            return;
+        }
+
+        if (checkRoles(['Supervisor'])) {
+            $updateData = [
+                'status' => $data['status'],
+            ];
+            if ($data['status'] === 'approved') {
+                $updateData['approved_at'] = now();
+                $updateData['approved_by'] = $userId;
+            }
+
+            if ($data['status'] === 'cancelled') {
+                $updateData['cancelled_at'] = now();
+                $updateData['cancelled_by'] = $userId;
+            }
+        } else {
+
+            if ($data['status'] == 'in_progress') {
+                $updateData['status'] = $data['status'];
+                $updateData['in_progressed_at'] = now();
+                $updateData['in_progressed_by'] = $userId;
+            }
+
+            if ($data['status'] === 'completed') {
+
+                $updateData['status'] = $data['status'];
+                $updateData['completed_at'] = now();
+                $updateData['completed_by'] = $userId;
+            }
+        }
+        $objKeyStaff->update($updateData);
+
+        return $updateData;
     }
 }

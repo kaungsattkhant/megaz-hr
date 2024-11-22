@@ -391,28 +391,35 @@ Route::middleware('auth:api')->group(function () {
         Route::delete('/accessory_item/{id}', 'deleteAccessoryItem');
     });
 
-    
-// Route::post('send_notification', [NotificationController::class, 'sendNotification']);
 
-Route::controller(MaterialRequirementsPlanningAPIController::class)->group(function () {
-    Route::apiResource('/mrp', MaterialRequirementsPlanningAPIController::class);
-    Route::post('/menu/{id}/toggle', 'menuToggle');
-    Route::get('/menu_step/{id}', 'getMenuStepList');
-    Route::delete('/menu_step_items/{id}', 'menuStepItemsDelete');
-    Route::get('/cooking_place', 'getCookingPlace');
-    Route::post('/mrp/{id}', 'updateMrpList');
-    Route::get('/roles', 'getRoles');
-});
+    // Route::post('send_notification', [NotificationController::class, 'sendNotification']);
 
-Route::controller(ObjectiveController::class)->group(function () {
-    Route::get('/objectives', 'getObjectives');
-    Route::get('/roles_department/{id}','getRolesByDepartmentId');
-    Route::post('/objectives','store');
-    Route::post('/objectives/{id}','update');
-    Route::get('/objectives/{id}', 'getObjectiveById');
-    Route::get('/objectives/{id}', 'getObjectiveById');
-    Route::delete('/objectives/{id}', 'deleteObjective');
-});
+    Route::controller(MaterialRequirementsPlanningAPIController::class)->group(function () {
+        Route::apiResource('/mrp', MaterialRequirementsPlanningAPIController::class);
+        Route::post('/menu/{id}/toggle', 'menuToggle');
+        Route::get('/menu_step/{id}', 'getMenuStepList');
+        Route::delete('/menu_step_items/{id}', 'menuStepItemsDelete');
+        Route::get('/cooking_place', 'getCookingPlace');
+        Route::post('/mrp/{id}', 'updateMrpList');
+        Route::get('/roles', 'getRoles');
+    });
+
+    // Route::controller(ObjectiveController::class)->group(function () {
+    //     Route::get('/objectives', 'getObjectives');
+    //     Route::get('/roles_department/{id}', 'getRolesByDepartmentId');
+    //     Route::post('/objectives', 'store');
+    //     Route::post('/objectives/{id}', 'update');
+    //     Route::get('/objectives/{id}', 'getObjectiveById');
+    //     Route::get('/objectives/{id}', 'getObjectiveById');
+    //     Route::delete('/objectives/{id}', 'deleteObjective');
+
+    //     //mobile-api
+    //     Route::get('/daily/objectives', 'objectiveLists');
+    //     Route::get('/daily/objectives_key', 'getdailyObjectives');
+    //     Route::post('/daily/objective_key_staff/{id}', 'updateDailyObjective');
+    //     Route::post('/objectives/images', 'storeImages');
+    //     Route::post('/objectives/images/{objKeyImgId}', 'updateImages');
+    // });
 });
 Route::get('/features', [FeatureAPIController::class, 'getFeatureData']);
 
@@ -511,6 +518,7 @@ Route::delete('/entities/{id}', [EntityAPIController::class, 'deleteEntity']);
 
 Route::controller(ItemAPIController::class)->group(function () {
     Route::get('item_price_list_by_item/{item_id}', 'getItemPriceListByItem');
+    Route::get('supplier_by_item/{item_id}', 'supplierByItem');
 });
 Route::get('/items', [ItemAPIController::class, 'getItemData']);
 Route::post('/items', [ItemAPIController::class, 'createItem']);
@@ -621,4 +629,3 @@ Route::controller(DeliveryChargeAPIController::class)->group(function () {
     Route::get('/delivery_charges', 'getDeliveryChargeData');
     Route::post('/delivery_charges', 'createDeliveryCharge');
 });
-

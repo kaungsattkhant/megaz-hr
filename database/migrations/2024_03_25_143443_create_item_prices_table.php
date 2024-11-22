@@ -14,8 +14,8 @@ return new class extends Migration
         Schema::create('item_prices', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->integer('price');
-            $table->foreignId('item_id')->constrained()->onDelete('cascade');
-            $table->foreignId('uom_id')->constrained()->onDelete('cascade');
+            $table->unsignedBigInteger('supplier_item_id');
+            $table->unsignedBigInteger('base_uom_id');
             $table->timestamps();
         });
     }
