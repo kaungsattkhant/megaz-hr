@@ -67,15 +67,16 @@ class ItemRepository implements ItemRepositoryInterface
         }
     }
 
-    public function addPriceItem(array $data, int $id)
+    public function addPriceItem($request)
     {
+        $data=$request->all();
         DB::beginTransaction();
         try {
-            $item_price = ItemPrice::where('item_id', $id)->latest('created_at')->first();
-            $new_item_price['uom_id'] = $item_price->uom_id;
-            $new_item_price['price'] = $data['price'];
-            $new_item_price['item_id'] = $id;
-            $createdItemPrice = ItemPrice::create($new_item_price);
+            // $item_price = ItemPrice::where('item_id', $id)->latest('created_at')->first();
+            // $new_item_price['uom_id'] = $item_price->uom_id;
+            // $new_item_price['price'] = $data['price'];
+            // $new_item_price['item_id'] = $id;
+            $createdItemPrice = ItemPrice::create($data);
             DB::commit();
             return $createdItemPrice;
         } catch (\Exception $e) {
@@ -105,7 +106,8 @@ class ItemRepository implements ItemRepositoryInterface
     }
 
     public function supplierByItem($itemId){
-        $supplierByItem=SupplierItem::with('supplier','item')->where('item_id',$itemId)->get();
+        $supplierByItem=SupplierItem::with('supplier','item','item_price')
+        ->where('item_id',$itemId)->get();
         return $supplierByItem;
     }
 
