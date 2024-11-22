@@ -57,10 +57,10 @@ class ItemRepository implements ItemRepositoryInterface
                                 WHERE sub_ip.supplier_item_id = si.id
                             )
                         ) AS latest_prices
-                    ), 2) AS average_item_price
+                    ), 2) AS average_price
             '))
             ->orderByDesc('id')
-            ->paginate($request->per_page ?? 10);
+            ->paginate(config('common.list_count'));
         } else {
             if ($request->category_id) {
                 return Item::with('category')->where('category_id', $request->category_id)->get();
@@ -114,6 +114,7 @@ class ItemRepository implements ItemRepositoryInterface
             // $new_item_price['uom_id'] = $item_price->uom_id;
             // $new_item_price['price'] = $data['price'];
             // $new_item_price['item_id'] = $id;
+            // dd($data);
             $createdItemPrice = ItemPrice::create($data);
             DB::commit();
             return $createdItemPrice;
