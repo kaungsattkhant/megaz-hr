@@ -56,6 +56,7 @@ import ConfirmPurchaseOrderItemsComponent from './Components/PurchaseOrders/Conf
 import PurchaseOrderWithLeftItemsComponent from './Components/PurchaseOrders/PurchaseOrderWithLeftItemsComponent.vue';
 import LeftItemListComponent from './Components/PurchaseOrders/LeftItemListComponent.vue';
 import ItemCrudComponent from './Components/Items/ItemCrudComponent.vue';
+import ItemSuppliersComponent from './Components/Items/ItemSuppliersComponent.vue';
 import ItemPricingHistoryComponent from './Components/Items/ItemPricingHistoryComponent.vue';
 import ItemUsageForecastListComponent from './Components/ItemUsageForecastings/ItemUsageForecastListComponent.vue';
 import ItemUsageForecastCreateComponent from './Components/ItemUsageForecastings/ItemUsageForecastCreateComponent.vue';
@@ -212,6 +213,7 @@ app.component('PurchaseOrderWithLeftItemsComponent', PurchaseOrderWithLeftItemsC
 app.component('LeftItemListComponent', LeftItemListComponent);
 app.component('ItemCrudComponent', ItemCrudComponent);
 app.component('ItemPricingHistoryComponent', ItemPricingHistoryComponent);
+app.component('ItemSuppliersComponent', ItemSuppliersComponent);
 app.component('ItemUsageForecastListComponent', ItemUsageForecastListComponent);
 app.component('ItemUsageForecastCreateComponent', ItemUsageForecastCreateComponent);
 app.component('ItemUsageForecastDetailComponent', ItemUsageForecastDetailComponent);

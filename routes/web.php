@@ -47,6 +47,7 @@ Route::middleware(['departments:uom'])->group(function () {
 Route::middleware(['departments:item'])->group(function () {
     Route::view('/items', 'items.index')->name('items');
     Route::view('/items/{id}/pricing_history', 'items.pricing_history')->name('items.pricing_history');
+    Route::view('/items/{id}/suppliers', 'items.item_suppliers')->name('items.item_suppliers');
 });
 
 Route::middleware(['departments:task'])->group(function () {
