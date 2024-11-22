@@ -20,4 +20,6 @@ interface ItemRepositoryInterface
 
     public function getItemType();
 
+    public function supplierByItem($itemId);
+
 }

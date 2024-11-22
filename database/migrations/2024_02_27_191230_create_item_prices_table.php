@@ -15,7 +15,7 @@ return new class extends Migration
             $table->bigIncrements('id');
             $table->integer('price');
             $table->foreignId('item_id')->constrained()->onDelete('cascade');
-            $table->foreignId('uom_id')->constrained()->onDelete('cascade');
+            $table->foreignId('base_uom_id')->constrained()->onDelete('cascade');
             $table->timestamps();
         });
     }

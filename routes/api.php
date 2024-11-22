@@ -518,6 +518,7 @@ Route::delete('/entities/{id}', [EntityAPIController::class, 'deleteEntity']);
 
 Route::controller(ItemAPIController::class)->group(function () {
     Route::get('item_price_list_by_item/{item_id}', 'getItemPriceListByItem');
+    Route::get('supplier_by_item/{item_id}', 'supplierByItem');
 });
 Route::get('/items', [ItemAPIController::class, 'getItemData']);
 Route::post('/items', [ItemAPIController::class, 'createItem']);

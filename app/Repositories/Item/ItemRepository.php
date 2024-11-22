@@ -5,6 +5,7 @@ namespace App\Repositories\Item;
 use App\Models\Item;
 use App\Models\ItemType;
 use App\Models\ItemPrice;
+use App\Models\SupplierItem;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -32,14 +33,11 @@ class ItemRepository implements ItemRepositoryInterface
 
     public function createData(array $data)
     {
+        // dd($data);
         DB::beginTransaction();
         try {
             $item = Item::create($data);
-            $price = ItemPrice::create(['item_id' => $item->id, 'price' => $data['price'],'uom_id'=>$data['uom_id']]);
-            // $uomIds = json_decode($data['uoms'], true);
-            // foreach ($uomIds as $uomId) {
-            //     $item->uoms()->attach($uomId);
-            // }
+            // $price = ItemPrice::create(['item_id' => $item->id, 'price' => $data['price'],'uom_id'=>$data['uom_id']]); //removed after relationship with item price with supplier
             DB::commit();
             return $item;
         } catch (\Exception $e) {
@@ -107,5 +105,9 @@ class ItemRepository implements ItemRepositoryInterface
         return ItemType::all();
     }
 
+    public function supplierByItem($itemId){
+        $supplierByItem=SupplierItem::with('supplier','item')->where('item_id',$itemId)->get();
+        return $supplierByItem;
+    }
 
 }
