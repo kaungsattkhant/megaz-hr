@@ -26,21 +26,21 @@
                     <input type="text" class="input-search" placeholder="Search" v-model="searchInput">
                     <i class="fal fa-search"></i>
                 </label>
-                <button class="add-btn h-8" @click="searchBtnClicked()">Search</button>
+                <button class="add-btn h-8" @click="searchBtnClicked(1)">Search</button>
                 <button class="add-btn h-8" @click="clearSearchBtnClicked()">Clear</button>
             </div>
             <div class="flex pr-0 gap-x-4">
                 <div class="w-full !text-sm" data-te-select-wrapper-ref>
-                    <select data-te-select-init data-te-select-placeholder="Select Department" v-model="selectedDepartment"
+                    <select data-te-select-init data-te-select-placeholder="Select Department" v-model="selectedDepartment" @change="departmentChange(1)"
                     data-te-select-filter="true" class="input-ui w-full">
-                        <option value="all">All</option>
+                        <option value="">All</option>
                         <option v-for="(department,index) in departmentList" :key="index" :value="department"> {{ department.name }} </option>
                     </select>
                 </div>
                 <div class="w-full !text-sm" data-te-select-wrapper-ref>
-                    <select data-te-select-init data-te-select-placeholder="Select Role" v-model="selectedRole"
+                    <select data-te-select-init data-te-select-placeholder="Select Role" v-model="selectedRole" @change="roleChange(1)"
                     data-te-select-filter="true" class="input-ui w-full">
-                        <option value="all">All</option>
+                        <option value="">All</option>
                         <option v-for="(role,index) in roleList" :key="index" :value="role"> {{ role.name }} </option>
                     </select>
                 </div>
@@ -189,6 +189,15 @@ export default {
             okrList: [],
             departmentList:[],
             roleList:[],
+            dateList: [
+                { name: 'Monday', value: 'Monday' },
+                { name: 'Tuesday', value: 'Tuesday' },
+                { name: 'Wednesday', value: 'Wednesday' },
+                { name: 'Thursday', value: 'Thursday' },
+                { name: 'Friday', value: 'Friday' },
+                { name: 'Saturday', value: 'Saturday' },
+                { name: 'Sunday', value: 'Sunday' }
+            ],
             
             currentPage: 0,
             perPage: 0,
@@ -198,6 +207,7 @@ export default {
             searchInput:null,
             selectedDepartment:null,
             selectedRole:null,
+            selectedDate:null,
 
             url:'/api/objectives?page=',
             url_search:'',
@@ -210,6 +220,7 @@ export default {
 
     methods: {
         ...mapGetters(['getToken']),
+        
 
         async getOkrList(pageNumber) {
             let url = this.url + pageNumber + this.url_search + this.url_department + this.url_role;
@@ -233,6 +244,31 @@ export default {
                 // this.totalData = response.data.total;
             }
         },
+        
+        departmentChange(){
+            this.url_search = '';
+            this.searchInput = null;
+            if(this.selectedDepartment == 'all'){
+                this.url_department = ''
+            }
+            else{
+                this.url_department = '&department_id=' + this.selectedDepartment.id;
+            }
+            this.getOkrList(1);
+            this.getRoleList();
+        },
+        roleChange(){
+            this.url_search = '';
+            this.searchInput = null;
+            if(this.selectedRole == 'all'){
+                this.url_role = ''
+            }
+            else{
+                this.url_role = '&role_id=' + this.selectedRole.id;
+            }
+            this.getOkrList(1)
+        },
+
         async searchBtnClicked() {
             this.url_search = '&search=' + this.searchInput
             this.getOkrList(1);
@@ -254,12 +290,12 @@ export default {
         //     this.getOkrList(1);
         //     console.log('hello bro')
         // },
-        // async getRoleList(){
-        //     let response = await getApiData({url: '/api/roles_department/' + this.selectedDepartment.id , token: this.getToken()});
-        //     if(response.data){
-        //         this.roleList = response.data;
-        //     }
-        // },
+        async getRoleList(){
+            let response = await getApiData({url: '/api/roles_department/' + this.selectedDepartment.id , token: this.getToken()});
+            if(response.data){
+                this.roleList = response.data;
+            }
+        },
         // selectedRoleChange(){
         //     this.getOkrList(1);
         // },

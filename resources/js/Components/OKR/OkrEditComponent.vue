@@ -34,37 +34,7 @@
                             :key="index"> {{ role.name }} </option>
                     </select>
                 </div>
-            </div>
-
-
-            <div class="mb-4 col-span-3">
-                <label for="" class="label-form mb-3">
-                    Date Assigned
-                </label>
-                <!-- <input type="date" v-model="selectedDate" class="input-ui "> -->
-                <multiselect v-model="selectedDate" :options="dateList" :multiple="true" :close-on-select="false" :clear-on-select="false"
-                :preserve-search="false" placeholder="Select Date" label="name" track-by="value" :preselect-first="false">
-                    <template #selection="{ values, search, isOpen }">
-                        <span class="multiselect__single"
-                            v-if="values.length"
-                            v-show="!isOpen">{{ values.length }} Date selected</span>
-                    </template>
-                </multiselect>
-                <!-- <div class="bg-white mb-0 w-full text-sm inline-block h-[34px] dark:bg-white !text-black"
-                    data-te-select-wrapper-ref>
-                    <select data-te-select-init data-te-select-placeholder="Select Role"
-                        data-te-select-filter="true" name="" id="" v-model="selectedDate" class="input-ui !text-black">
-                        <option :value="date" v-for="(date, index) in dateList"
-                            :key="index"> {{ date }} </option>
-                    </select>
-                </div> -->
-            </div>
-            <div class="mb-4 col-span-3">
-                <!-- <label for="" class="label-form mb-3">
-                    Duration
-                </label>
-                <input type="number" v-model="duration" class="input-ui "> -->
-            </div>
+            </div><div class="col-span-6"></div>
             
             <div class="mb-4 col-span-3">
                 <label for="" class="label-form mb-3">
@@ -95,6 +65,33 @@
                     </label>
                     <input type="number" v-model="obj.okr_point" class="input-ui ">
                 </div>
+                <div class="mb-4 col-span-3">
+                    <label for="" class="label-form mb-3">
+                        Date Assigned
+                    </label>
+                    <multiselect v-model="obj.assigned_days" :options="dateList" :multiple="true" :close-on-select="false" :clear-on-select="false"
+                        :preserve-search="false" placeholder="Select Date" label="" :preselect-first="false">
+                        <template #selection="{ values, search, isOpen }">
+                            <span class="multiselect__single"
+                                v-if="values.length"
+                                v-show="!isOpen">{{ values.length }} Date selected</span>
+                        </template>
+                    </multiselect>
+                    <!-- <div class="bg-white mb-0 w-full text-sm inline-block h-[34px] dark:bg-white !text-black"
+                        data-te-select-wrapper-ref>
+                        <select data-te-select-init data-te-select-placeholder="Select Role"
+                            data-te-select-filter="true" name="" id="" v-model="selectedDate" class="input-ui !text-black">
+                            <option :value="date" v-for="(date, index) in dateList"
+                                :key="index"> {{ date }} </option>
+                        </select>
+                    </div> -->
+                </div>
+                <div class="col-span-2">
+                    <label for="" class="label-form mb-3">
+                        Duration
+                    </label>
+                    <input type="number" v-model="obj.duration" class="input-ui ">
+                </div>
                 <div class="pl-3">
                     <label for="" class="label-form mb-3">
                         &nbsp;
@@ -103,7 +100,6 @@
                         <i class="fal fa-trash"></i>
                     </button>
                 </div>
-                <div class="col-span-5"></div>
             </div>
 
 
@@ -144,22 +140,24 @@ export default {
         return {
             departmentList:[],
             roleList:[],
-            dateList: [
-                { name: 'Monday', value: 'Monday' },
-                { name: 'Tuesday', value: 'Tuesday' },
-                { name: 'Wednesday', value: 'Wednesday' },
-                { name: 'Thursday', value: 'Thursday' },
-                { name: 'Friday', value: 'Friday' },
-                { name: 'Saturday', value: 'Saturday' },
-                { name: 'Sunday', value: 'Sunday' }
-            ],
+            dateList: ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'],
+            // dateList: [
+            //     { name: 'Monday', value: 'Monday' },
+            //     { name: 'Tuesday', value: 'Tuesday' },
+            //     { name: 'Wednesday', value: 'Wednesday' },
+            //     { name: 'Thursday', value: 'Thursday' },
+            //     { name: 'Friday', value: 'Friday' },
+            //     { name: 'Saturday', value: 'Saturday' },
+            //     { name: 'Sunday', value: 'Sunday' }
+            // ],
             selectedDepartment:null,
             selectedRole:null,
-            selectedDate:[],
+            // selectedDate:[],
             duration:null,
             objName:null,
 
-            objective_key: [{ name: "" ,okr_point: "" }],  // Start with one input box
+            objective_key: [{ name: "",okr_point: "",assigned_days:"", duration: "" }],  // Start with one input box
+            selected_obj_keys:[],
 
             okrDetail:null,
             test:[],
@@ -185,16 +183,16 @@ export default {
             // this.duration = detail.code;
             this.objName = detail.objective_name;
             this.objective_key = detail.objective_keys;
-            detail.assigned_days.forEach(day => {
-                this.selectedDate.push(
-                    this.dateList.find(date => date.name == day )
-                    // day
+            // detail.assigned_days.forEach(day => {
+            //     this.selectedDate.push(
+            //         this.dateList.find(date => date.name == day )
+            //         // day
                     
-                )
-                let testing = this.dateList.find(date => date.name = day )
-                console.log(testing)
+            //     )
+            //     let testing = this.dateList.find(date => date.name = day )
+            //     console.log(testing)
                  
-            })
+            // })
             // this.test.push(
             //     detail.assigned_days.forEach(day => {
             //         this.dateList.find(date => date.name = day )
@@ -244,14 +242,6 @@ export default {
                 this.alertValidationMessage(`Role`);
                 return 1;
             }
-            else if(this.selectedDate.length < 1){
-                this.alertValidationMessage(`Date`);
-                return 1;
-            }
-            // else if(!this.duration){
-            //     this.alertValidationMessage(`Duration`);
-            //     return 1;
-            // }
             else if(!this.objName){
                 this.alertValidationMessage(`Objective Name`);
                 return 1;
@@ -265,16 +255,16 @@ export default {
             }
         },
         async createOkr(){
-            let selectedDate = [];
-            this.selectedDate.forEach(date => {
-                selectedDate.push(date.value)
-            });
-            console.log(selectedDate)
+            // let selectedDate = [];
+            // this.selectedDate.forEach(date => {
+            //     selectedDate.push(date.value)
+            // });
+            // console.log(selectedDate)
             let formData = new FormData();
             formData.append('objective_name', this.objName);
             formData.append('role_id', this.selectedRole);
             // formData.append('assigned_days', JSON.stringify(this.selectedDate));
-            formData.append('assigned_days', JSON.stringify(selectedDate));
+            // formData.append('assigned_days', JSON.stringify(selectedDate));
             formData.append('objective_key', JSON.stringify(this.objective_key));
             let response = await postApiData({ url: '/api/objectives/'+this.okrId, form_data: formData, token: this.getToken() });
             if (response.success) {
