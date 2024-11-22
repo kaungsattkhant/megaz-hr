@@ -29,7 +29,7 @@ class  ObjectiveRepository implements ObjectiveInterface
             'objectiveKeys.objKeyStaff',
             'objectiveKeys.objImages'
         ])->objectiveFilter($search, $name, $days)
-            ->paginate(config('common.list_count'));
+            ->paginate();
     }
     public function getRolesByDepartmentId(Request $request, $departmentId)
     {
@@ -230,17 +230,8 @@ class  ObjectiveRepository implements ObjectiveInterface
         $updateData = [];
         $userId = UserData()->id;
 
-        if ($data['status'] == 'in_progress') {
-            $updateData['status'] = $data['status'];
-            $updateData['in_progressed_at'] = now();
-            $updateData['in_progressed_by'] = $userId;
-        }
 
-        if ($data['status'] === 'completed') {
-            $updateData['status'] = $data['status'];
-            $updateData['completed_at'] = now();
-            $updateData['completed_by'] = $userId;
-        }
+
 
         if (checkRoles(['Supervisor'])) {
             $updateData = [
@@ -256,7 +247,18 @@ class  ObjectiveRepository implements ObjectiveInterface
                 $updateData['cancelled_by'] = $userId;
             }
         } else {
-            ResponseMessage('Permission is not allowed', 403);
+            if ($data['status'] == 'in_progress') {
+                $updateData['status'] = $data['status'];
+                $updateData['in_progressed_at'] = now();
+                $updateData['in_progressed_by'] = $userId;
+            }
+
+            if ($data['status'] === 'completed') {
+
+                $updateData['status'] = $data['status'];
+                $updateData['completed_at'] = now();
+                $updateData['completed_by'] = $userId;
+            }
         }
         $objKeyStaff->update($updateData);
 
