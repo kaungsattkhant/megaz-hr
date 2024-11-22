@@ -8,6 +8,7 @@ use App\Models\ItemPrice;
 use App\Models\SupplierItem;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Database\Eloquent\Builder;
 
 class ItemRepository implements ItemRepositoryInterface
 {
@@ -15,14 +16,51 @@ class ItemRepository implements ItemRepositoryInterface
     {
         if ($request->per_page || $request->page) {
             $category_id = $request->category_id;
-            return Item::with(['category'])->orderByDesc('id')
-                ->when($request->search_input, function ($q) use ($request) {
-                    $q->where('name', 'LIKE', '%' . $request->search_input . '%');
-                })
-                ->when($category_id, function ($query) use ($category_id) {
-                    $query->where('category_id', $category_id);
-                })
-                ->paginate(config('common.list_count'));
+            // return Item::with(['category', 'supplier_items.item_price'])
+
+            //     ->orderByDesc('id')
+            //     ->when($request->search_input, function ($q) use ($request) {
+            //         $q->where('name', 'LIKE', '%' . $request->search_input . '%');
+            //     })
+            //     ->when($category_id, function ($query) use ($category_id) {
+            //         $query->where('category_id', $category_id);
+            //     })
+            //     ->get()
+            //     ->map(function ($item) {
+            //         // Calculate average_item_price
+    
+            //         $item->average_item_price = $item->supplier_items->pluck('item_price.price')->filter()->avg() ?? 0;
+
+            //         // For each supplier item, calculate item_price_avg_price
+            //         // $item->supplier_items->each(function ($supplierItem) {
+            //         //     $supplierItem->item_price_avg_price = $supplierItem->item_price?->price;
+            //         // });
+    
+            //         return $item;
+            //     });
+
+            return Item::with(['category', 'supplier_items.item_price' => function ($query) {
+                $query->orderByDesc('id');
+            }])
+            ->select('items.*', DB::raw('
+                FORMAT(
+                    (
+                        SELECT COALESCE(AVG(latest_prices.price), 0) 
+                        FROM (
+                            SELECT ip.price 
+                            FROM supplier_items si
+                            JOIN item_prices ip ON si.id = ip.supplier_item_id
+                            WHERE si.item_id = items.id
+                            AND ip.id = (
+                                SELECT MAX(sub_ip.id)
+                                FROM item_prices sub_ip
+                                WHERE sub_ip.supplier_item_id = si.id
+                            )
+                        ) AS latest_prices
+                    ), 2) AS average_item_price
+            '))
+            ->orderByDesc('id')
+            ->paginate($request->per_page ?? 10);
         } else {
             if ($request->category_id) {
                 return Item::with('category')->where('category_id', $request->category_id)->get();
@@ -69,7 +107,7 @@ class ItemRepository implements ItemRepositoryInterface
 
     public function addPriceItem($request)
     {
-        $data=$request->all();
+        $data = $request->all();
         DB::beginTransaction();
         try {
             // $item_price = ItemPrice::where('item_id', $id)->latest('created_at')->first();
@@ -97,17 +135,20 @@ class ItemRepository implements ItemRepositoryInterface
         }
     }
 
-    public function getItemPriceListByItem($item_id){
-        return ItemPrice::with('uom')->orderBy('id','desc')->where('item_id',$item_id)->paginate(20);
+    public function getItemPriceListByItem($item_id)
+    {
+        return ItemPrice::with('uom')->orderBy('id', 'desc')->where('item_id', $item_id)->paginate(20);
     }
 
-    public function getItemType(){
+    public function getItemType()
+    {
         return ItemType::all();
     }
 
-    public function supplierByItem($itemId){
-        $supplierByItem=SupplierItem::with('supplier','item','item_price')
-        ->where('item_id',$itemId)->get();
+    public function supplierByItem($itemId)
+    {
+        $supplierByItem = SupplierItem::with('supplier', 'item', 'item_price')
+            ->where('item_id', $itemId)->get();
         return $supplierByItem;
     }
 

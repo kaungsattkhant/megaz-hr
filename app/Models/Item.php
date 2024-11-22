@@ -69,4 +69,8 @@ class Item extends BaseModel
         $conversionRate = $this->uomConversion->conversion; // Conversion rate
         return $itemPrice * $conversionRate;
     }
+
+    public function supplier_items(){
+        return $this->hasMany(SupplierItem::class);
+    }
 }
