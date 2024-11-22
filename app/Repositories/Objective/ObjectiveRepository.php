@@ -20,7 +20,16 @@ class  ObjectiveRepository implements ObjectiveInterface
 
     public function getObjectives(Request $request)
     {
-        return Objective::with(['role', 'objectiveKeys'])->paginate(config('common.list_count'));
+        $search = $request->input('search');
+        $days = $request->input('days');
+        $name = $request->input('name');
+
+        return Objective::with([
+            'role',
+            'objectiveKeys.objKeyStaff',
+            'objectiveKeys.objImages'
+        ])->objectiveFilter($search, $name, $days)
+            ->paginate(config('common.list_count'));
     }
     public function getRolesByDepartmentId(Request $request, $departmentId)
     {
@@ -28,11 +37,9 @@ class  ObjectiveRepository implements ObjectiveInterface
         return Role::with('department')->where('department_id', $departmentId)->get();
     }
 
-
-
     public function getObjectiveById(Request $request, $objId)
     {
-        return Objective::with(['role', 'objectiveKeys'])->where('id', $objId)->get();
+        return Objective::with(['role', 'objectiveKeys.objKeyStaff', 'objectiveKeys.objImages'])->where('id', $objId)->get();
     }
 
 
@@ -61,10 +68,6 @@ class  ObjectiveRepository implements ObjectiveInterface
         DB::beginTransaction();
         try {
 
-            $data['assigned_days'] = is_string($data['assigned_days'])
-                ? json_decode($data['assigned_days'], true)
-                : $data['assigned_days'];
-            $data['assigned_days'] = implode(',', $data['assigned_days'] ?? []);
             $data['created_by'] = UserData()->id;
 
             if ($objId) {
@@ -74,7 +77,10 @@ class  ObjectiveRepository implements ObjectiveInterface
                 $objective = Objective::create($data);
             }
 
-            $this->syncObjectiveKeys($objective, $data['objective_key']);
+            if (isset($data['objective_key'])) {
+                $this->syncObjectiveKeys($objective, $data['objective_key']);
+            }
+
             DB::commit();
             return $objective;
         } catch (Exception $e) {
@@ -86,16 +92,37 @@ class  ObjectiveRepository implements ObjectiveInterface
     private function syncObjectiveKeys(Objective $objective, string $objectiveKeys)
     {
         if (!empty($objectiveKeys)) {
-            $objectiveKeys = json_decode($objectiveKeys);
+            $objectiveKeys = json_decode($objectiveKeys, true);
 
             $objective->objectiveKeys()->delete();
+            $roleId =  $objective->role_id;
+
+            $staffLists = Staff::staffByRole($roleId);
+
+            $currentDay = date('l');
 
             foreach ($objectiveKeys as $key) {
-                ObjectiveKey::create([
+                $assignedDays = isset($key['assigned_days']) && is_array($key['assigned_days'])
+                    ? $key['assigned_days']
+                    : [];
+                $assignedDaysData = implode(',', $assignedDays); // Convert array to string
+                $objKey = ObjectiveKey::create([
                     'objective_id' => $objective->id,
-                    'name' => $key->name,
-                    'okr_point' => $key->okr_point
+                    'name' => $key['name'],
+                    'okr_point' => $key['okr_point'],
+                    'assigned_days' => $assignedDaysData,
+                    'duration' => $key['duration'],
                 ]);
+
+                if (in_array($currentDay, $assignedDays)) {
+                    foreach ($staffLists as $staff) {
+                        ObjectivekeyStaff::create([
+                            'staff_id' => $staff->id,
+                            'objective_key_id' => $objKey->id,
+                            'status' =>  'not_started',
+                        ]);
+                    }
+                }
             }
         }
     }
@@ -103,10 +130,21 @@ class  ObjectiveRepository implements ObjectiveInterface
     public function objectiveLists(Request $request)
     {
         $currentDay = now()->format('l');
-        return  Objective::with(['objectiveKeys.objKeyStaff', 'objectiveKeys.objImages'])
-            ->whereRaw("FIND_IN_SET(?, assigned_days)", [$currentDay])
+        return  Objective::with([
+            'role',
+            'objectiveKeys' => function ($query) use ($currentDay) {
+                $query->whereRaw("FIND_IN_SET(?, assigned_days)", [$currentDay]);
+            },
+            'objectiveKeys.objKeyStaff',
+            'objectiveKeys.objImages'
+        ])
+            ->whereHas('objectiveKeys', function ($query) use ($currentDay) {
+                $query->whereRaw("FIND_IN_SET(?, assigned_days)", [$currentDay]);
+            })
             ->paginate();
     }
+
+
 
     //objkeylistwithstaff assigns 
     public function getdailyObjectives(Request $request)
@@ -114,11 +152,14 @@ class  ObjectiveRepository implements ObjectiveInterface
         $currentDay = now()->format('l');
 
         $objectives = ObjectivekeyStaff::with([
+            'objectiveKey' => function ($query) use ($currentDay) {
+                $query->whereRaw("FIND_IN_SET(?, assigned_days)", [$currentDay]);
+            },
             'objectiveKey.objective',
             'objectiveKey.objImages'
         ])
             ->where('staff_id', UserData()->id)
-            ->whereHas('objectiveKey.objective', function ($query) use ($currentDay) {
+            ->whereHas('objectiveKey', function ($query) use ($currentDay) {
                 $query->whereRaw("FIND_IN_SET(?, assigned_days)", [$currentDay]);
             })
             ->paginate();

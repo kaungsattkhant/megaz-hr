@@ -51,8 +51,5 @@ class AssignObjectivesToStaffs extends Command
                 }
             }
         }
-
-        Log::info('Objective Keys assigned to staff for the day: ' . $dayName);
-        $this->info('Objective Keys assigned successfully.');
     }
 }
