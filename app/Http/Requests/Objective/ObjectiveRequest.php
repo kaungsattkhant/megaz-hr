@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Http\Requests\Objective;
+
 use App\Http\Requests\APIRequest;
 use Illuminate\Contracts\Validation\Validator;
 
@@ -23,8 +24,7 @@ class ObjectiveRequest extends APIRequest
     {
         return [
             'objective_name' => 'required',
-            'role_id' =>'required',
-            'assigned_days' => 'required',
+            'role_id' => 'required',
             'is_active' => 'nullable|boolean',
             'objective_key' => 'nullable',
         ];

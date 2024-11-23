@@ -11,7 +11,9 @@ class ObjectiveKey extends Model
     protected $fillable = [
         'objective_id',
         'name',
-        'okr_point'
+        'okr_point',
+        'assigned_days',
+        'duration',
     ];
 
     public function objective(): BelongsTo
@@ -26,5 +28,10 @@ class ObjectiveKey extends Model
     public function objImages(): HasMany
     {
         return $this->hasMany(ObjectivekeyImage::class);
+    }
+
+    public function getAssignedDaysAttribute($value)
+    {
+        return explode(',', $value);
     }
 }
