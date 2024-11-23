@@ -5,15 +5,20 @@ namespace App\Repositories\Objective;
 use Exception;
 use App\Models\Role;
 use App\Models\Staff;
+use App\Models\Entity;
+use App\Models\KtvItem;
 use App\Models\Objective;
+use App\Models\KtvObjective;
 use App\Models\ObjectiveKey;
 use Illuminate\Http\Request;
+use App\Models\KtvProductTree;
 use App\Models\ObjectivekeyImage;
 use App\Models\ObjectivekeyStaff;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
-
+use App\Http\Resources\KtvObjectiveRsource;
+use App\Models\Item;
 
 class  ObjectiveRepository implements ObjectiveInterface
 {
@@ -23,12 +28,14 @@ class  ObjectiveRepository implements ObjectiveInterface
         $search = $request->input('search');
         $days = $request->input('days');
         $name = $request->input('name');
+        $role = $request->input('role');
+        $department = $request->input('department');
 
         return Objective::with([
-            'role',
+            'role.department',
             'objectiveKeys.objKeyStaff',
             'objectiveKeys.objImages'
-        ])->objectiveFilter($search, $name, $days)
+        ])->objectiveFilter($search, $name, $days, $role, $department)
             ->paginate();
     }
     public function getRolesByDepartmentId(Request $request, $departmentId)
@@ -39,7 +46,7 @@ class  ObjectiveRepository implements ObjectiveInterface
 
     public function getObjectiveById(Request $request, $objId)
     {
-        return Objective::with(['role', 'objectiveKeys.objKeyStaff', 'objectiveKeys.objImages'])->where('id', $objId)->get();
+        return Objective::with(['role.department', 'objectiveKeys.objKeyStaff', 'objectiveKeys.objImages'])->where('id', $objId)->get();
     }
 
 
@@ -266,5 +273,106 @@ class  ObjectiveRepository implements ObjectiveInterface
         $objKeyStaff->update($updateData);
 
         return $updateData;
+    }
+
+    //ktv
+    public function getKtvRoom(Request $request)
+    {
+        return Entity::where('entity_type', 'room')->get();
+    }
+
+    public function getKtvObjective(Request $request)
+    {
+        $currentDay = now()->format('l');
+        $ktvObjectives = Objective::with([
+            'role',
+            'objectiveKeys'
+            // 'objectiveKeys' => function ($query) use ($currentDay) {
+            //     $query->whereRaw("FIND_IN_SET(?, assigned_days)", [$currentDay]);
+            // },
+        ])->get();
+        return KtvObjectiveRsource::collection($ktvObjectives);
+    }
+
+    public function storeKtvObjectiveTree(Request $request)
+    {
+
+        DB::beginTransaction();
+        try {
+            $validatedData = $request->all();
+
+            $validatedData['created_by'] = UserData()->id;
+            $ktvProductTree = KtvProductTree::create($validatedData);
+
+            $ktvObjs = json_decode($validatedData['objectives']);
+
+            foreach ($ktvObjs as $ktvObjective) {
+                KtvObjective::create([
+                    'ktv_product_tree_id' => $ktvProductTree->id,
+                    'objective_id' => $ktvObjective
+                ]);
+            }
+            $ktvItems = json_decode($validatedData['items']);
+            foreach ($ktvItems as $ktvItem) {
+                KtvItem::create([
+                    'ktv_product_tree_id' => $ktvProductTree->id,
+                    'item_id' => $ktvItem->item_id,
+                    'quantity' => $ktvItem->quantity
+                ]);
+            }
+            DB::commit();
+            return   $ktvProductTree;
+        } catch (Exception $e) {
+            DB::rollBack();
+            throw $e;
+        }
+    }
+
+    public function  getKtvObjectiveTree(Request $request)
+    {
+        $data =  KtvProductTree::with(['KtvObjectives.objective', 'KtvItems.item'])->paginate();
+        return $data;
+    }
+    public function getKtvObjTreeById(Request $request, $id)
+    {
+        $data =  KtvProductTree::with(['KtvObjectives.objective', 'KtvItems.item'])->findOrFail($id);
+        return $data;
+    }
+
+    public function updateKtvObjTree(Request $request, $ktvObjTreeId)
+    {
+        $validatedData = $request->all();
+
+        DB::beginTransaction();
+        try {
+
+            $ktvProductTree = KtvProductTree::findOrFail($ktvObjTreeId);
+            $validatedData['created_by'] = UserData()->id;
+
+            $ktvProductTree->update($validatedData);
+
+            $ktvProductTree->ktvObjectives()->delete();
+            $ktvProductTree->ktvItems()->delete();
+            $ktvObjs = json_decode($validatedData['objectives']);
+            foreach ($ktvObjs as $ktvObjective) {
+                $ktvProductTree->KtvObjectives()->create([
+                    'ktv_product_tree_id' => $ktvProductTree->id,
+                    'objective_id' => $ktvObjective
+                ]);
+            }
+            $ktvItems = json_decode($validatedData['items'], true);
+            foreach ($ktvItems as $ktvItem) {
+                $ktvProductTree->KtvItems()->create([
+                    'ktv_product_tree_id' => $ktvProductTree->id,
+                    'item_id' => $ktvItem['item_id'],
+                    'quantity' => $ktvItem['quantity']
+                ]);
+            }
+            DB::commit();
+            return   $ktvProductTree;
+        } catch (Exception $e) {
+            DB::rollBack();
+            throw $e;
+        }
     }
 }

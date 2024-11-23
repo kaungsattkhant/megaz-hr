@@ -19,6 +19,7 @@ class ObjectiveController extends Controller
     public function getObjectives(Request $request)
     {
         $data = $this->objectiveRepository->getObjectives($request);
+
         ResponseData($data);
     }
 
@@ -88,6 +89,45 @@ class ObjectiveController extends Controller
     {
 
         $data = $this->objectiveRepository->updateDailyObjective($request->all(), $objKeyStaffId);
+        ResponseData($data);
+    }
+
+
+    //ktvProductTree
+
+    public function getKtvRoom(Request $request)
+    {
+        $data = $this->objectiveRepository->getKtvRoom($request);
+        ResponseData($data);
+    }
+
+    public function  getKtvObjectiveTree(Request $request)
+    {
+        $data = $this->objectiveRepository->getKtvObjectiveTree($request);
+        ResponseData($data);
+    }
+
+    public function getKtvObjective(Request $request)
+    {
+        $data = $this->objectiveRepository->getKtvObjective($request);
+        ResponseData($data);
+    }
+
+    public function storeKtvObjectiveTree(Request $request)
+    {
+        $data = $this->objectiveRepository->storeKtvObjectiveTree($request);
+        ResponseData($data);
+    }
+
+    public function getKtvObjTreeById(Request $request, $id)
+    {
+        $data = $this->objectiveRepository->getKtvObjTreeById($request, $id);
+        ResponseData($data);
+    }
+
+    public function updateKtvObjTree(Request $request, $ktvObjTreeId)
+    {
+        $data = $this->objectiveRepository->updateKtvObjTree($request, $ktvObjTreeId);
         ResponseData($data);
     }
 }
