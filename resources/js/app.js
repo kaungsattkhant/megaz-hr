@@ -94,6 +94,8 @@ import OkrCreateComponent from './Components/OKR/OkrCreateComponent.vue';
 import OkrEditComponent from './Components/OKR/OkrEditComponent.vue';
 import ProductTreeComponent from './Components/ProductTree/ProductTreeComponent.vue';
 import ProductTreeCreateComponent from './Components/ProductTree/ProductTreeCreateComponent.vue';
+import MenuForecastingComponent from './Components/MenuForecastings/MenuForecastingComponent.vue';
+import MenuForecastingCreateComponent from './Components/MenuForecastings/MenuForecastingCreateComponent.vue';
 
 import LoginComponent from './Components/Auth/LoginComponent.vue';
 import LogoutComponent from './Components/Auth/LogoutComponent.vue';
@@ -203,6 +205,8 @@ app.component('OkrCreateComponent', OkrCreateComponent);
 app.component('OkrEditComponent', OkrEditComponent);
 app.component('ProductTreeComponent', ProductTreeComponent);
 app.component('ProductTreeCreateComponent', ProductTreeCreateComponent);
+app.component('MenuForecastingComponent', MenuForecastingComponent);
+app.component('MenuForecastingCreateComponent', MenuForecastingCreateComponent);
 
 app.component('PurchaseOrderListComponent', PurchaseOrderListComponent);
 app.component('PurchaseOrderCreateComponent', PurchaseOrderCreateComponent);
