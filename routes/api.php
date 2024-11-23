@@ -518,12 +518,13 @@ Route::delete('/entities/{id}', [EntityAPIController::class, 'deleteEntity']);
 
 Route::controller(ItemAPIController::class)->group(function () {
     Route::get('item_price_list_by_item/{item_id}', 'getItemPriceListByItem');
+    Route::get('supplier_by_item/{item_id}', 'supplierByItem');
 });
 Route::get('/items', [ItemAPIController::class, 'getItemData']);
 Route::post('/items', [ItemAPIController::class, 'createItem']);
 Route::put('/items/{id}', [ItemAPIController::class, 'updateItem']);
 Route::delete('/items/{id}', [ItemAPIController::class, 'deleteItem']);
-Route::post('/item_prices/{id}', [ItemAPIController::class, 'addItemPrice']);
+Route::post('/add_item_price_by_supplier_item', [ItemAPIController::class, 'addItemPrice']);
 Route::get('/get_uom_conversion_by_uom', [UomAPIController::class, 'getUomConversionByUom']);
 Route::get('/get_item_type', [ItemAPIController::class, 'getItemType']);
 // Route::get('/transfers', [TransferAPIController::class, 'getTransferData']);

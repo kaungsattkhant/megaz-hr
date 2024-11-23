@@ -234,7 +234,7 @@
                                         <span> (Profit: {{ this.profitPercentage.toLocaleString() }} %) </span>
                                     </td>
                                     <td colspan="4" class="">
-asdfafd
+
                                     </td>
                                 </tr>
                             </tbody>

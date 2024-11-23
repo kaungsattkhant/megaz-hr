@@ -14,10 +14,12 @@ interface ItemRepositoryInterface
 
     public function deleteData(int $id);
 
-    public function addPriceItem(array $data, int $id);
+    public function addPriceItem($request);
 
     public function getItemPriceListByItem($item_id);
 
     public function getItemType();
+
+    public function supplierByItem($itemId);
 
 }

@@ -405,3 +405,10 @@
   .hidden-scrollbar {
     -ms-overflow-style: none;  /* Hides the scrollbar */
   }
+  .select-ui div div input{
+    padding-top: 0.45rem!important;
+    padding-bottom: 0.45rem!important;
+  }
+  .custom-shadow-tab{
+    box-shadow: 3px 0px 3px #0004;
+  }

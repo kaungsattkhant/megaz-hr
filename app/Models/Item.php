@@ -12,10 +12,10 @@ class Item extends BaseModel
     use HasFactory;
 
     protected $fillable=[
-        'name','category_id','is_active','base_uom_id','code','item_type_id'
+        'name','category_id','is_active','base_uom_id','code','item_type_id','uom_id'
     ];
 
-    protected $with=['item_prices'];
+    // protected $with=['item_prices'];
 
     public function category()
     {
@@ -68,5 +68,9 @@ class Item extends BaseModel
         $itemPrice = $this->item_prices->price; // Price of the item
         $conversionRate = $this->uomConversion->conversion; // Conversion rate
         return $itemPrice * $conversionRate;
+    }
+
+    public function supplier_items(){
+        return $this->hasMany(SupplierItem::class);
     }
 }

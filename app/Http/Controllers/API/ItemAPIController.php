@@ -30,36 +30,42 @@ class ItemAPIController extends Controller
 
     public function updateItem(Request $request, int $id)
     {
-        $item = $this->itemRepo->updateData($request->all(),$id);
+        $item = $this->itemRepo->updateData($request->all(), $id);
         ResponseData($item);
     }
 
     public function deleteItem(int $id)
     {
         $item = $this->itemRepo->deleteData($id);
-        if($item==true)
-        {
+        if ($item == true) {
             ResponseMessage("Item deleted");
-        }else{
+        } else {
             ResponseMessage('Item not found or some error occur');
         }
     }
 
-    public function addItemPrice(Request $request,int $id)
+    public function addItemPrice(Request $request)
     {
-        $item = $this->itemRepo->addPriceItem($request->all(),$id);
+        $item = $this->itemRepo->addPriceItem($request);
         ResponseData($item);
     }
 
-    public function getItemPriceListByItem($item_id){
+    public function getItemPriceListByItem($item_id)
+    {
         $item = $this->itemRepo->getItemPriceListByItem($item_id);
         ResponseData($item);
     }
 
-    public function getItemType(){
+    public function getItemType()
+    {
         $item = $this->itemRepo->getItemType();
         ResponseData($item);
     }
+    public function supplierByItem($itemId)
+    {
+        $item = $this->itemRepo->supplierByItem($itemId);
+        ResponseData($item);
+    }
 
-   
+
 }

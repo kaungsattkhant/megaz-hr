@@ -45,9 +45,10 @@
                             <tr>
                                 <th>#</th>
                                 <th>Item Name</th>
+                                <th>Item Code</th>
                                 <th>Price</th>
                                 <th>Category</th>
-                                <th></th>
+                                <!-- <th></th> -->
                             </tr>
                         </thead>
                         <tbody>
@@ -59,14 +60,18 @@
                                     </td>
                                     <td class="whitespace-nowrap">
                                         {{ item.name }}
+                                        <a :href="`/items/${item.id}/suppliers`" class="text-blue-600 hover:underline" > [Set pricing] </a>
                                     </td>
                                     <td class="whitespace-nowrap">
-                                        {{ item.item_prices.price }}
+                                        {{ item.code }}
+                                    </td>
+                                    <td class="whitespace-nowrap">
+                                        <span v-if="item.average_price" > {{ item.average_price }} </span>
                                     </td>
                                     <td class="whitespace-nowrap">
                                         {{ item.category.name }}
                                     </td>
-                                    <td class="whitespace-nowrap">
+                                    <!-- <td class="whitespace-nowrap">
                                         <button id="price-edit-btn" class="pr-2" data-te-toggle="modal"
                                             data-te-target="#priceUpdateModal" @click="updatePriceBtnClicked(item.id)">
                                             <i class="fas fa-tag"></i>
@@ -85,7 +90,7 @@
                                             type="checkbox" role="switch" />
 
                                     <a :href="`/items/${item.id}/pricing_history`" class="text-blue-600 hover:underline" > Pricing History </a>
-                                    </td>
+                                    </td> -->
                                 </tr>
                             </div>
 
@@ -269,12 +274,6 @@
                         </label>
                         <input type="text" placeholder="Code" v-model="code" class="input-ui">
                     </div>
-                    <div class="mb-4">
-                        <label for="" class="label-form mb-3">
-                            Price
-                        </label>
-                        <input type="number" placeholder="Item Price" v-model="price" class="input-ui">
-                    </div>
 
                     <div class="mb-4">
                         <label for="" class="label-form mb-3">
@@ -287,18 +286,18 @@
                     </div>
                     <div class="mb-4">
                         <label for="" class="label-form mb-3">
-                            UOM
+                            Base UOM
                         </label>
-                        <select name="" id="" v-model="selectedUOM" class="input-ui">
+                        <select name="" id="" v-model="selectedBaseUom" class="input-ui">
                             <option :value="uom" v-for="(uom, uomIndex) in uomList" :key="uomIndex"> {{ uom.name }}
                             </option>
                         </select>
                     </div>
                     <div class="mb-4">
                         <label for="" class="label-form mb-3">
-                            Base Unit Uom (Inventory သိမ်းဆည်း unit)
+                            Uom (Inventory သိမ်းဆည်း unit)
                         </label>
-                        <select name="" id="" v-model="selectedBaseUom" class="input-ui">
+                        <select name="" id="" v-model="selectedUOM" class="input-ui">
                             <option :value="uom" v-for="(uom, uomIndex) in uomList" :key="uomIndex"> {{ uom.name }}
                             </option>
                         </select>
@@ -360,12 +359,6 @@
                         <input type="text" placeholder="Item Name" :value="updatePriceItem.name" disabled
                             class="input-ui">
                     </div>
-                    <div class="mb-4">
-                        <label for="" class="label-form mb-3">
-                            Price
-                        </label>
-                        <input type="number" placeholder="Item Price" v-model="updatedPrice" class="input-ui">
-                    </div>
                 </div>
                 <div class="flex justify-end gap-x-4 px-6 mb-6 pt-4">
                     <button type="button" class="cancel-btn focus:shadow-none focus:outline-none" data-te-modal-dismiss
@@ -422,6 +415,14 @@ export default {
 
     methods: {
         ...mapGetters(['getToken']),
+
+        alertValiationMessage(field) {
+            this.$notify({
+                title: `Input validation`,
+                text: `You forgot to provide ${field}, please try again`,
+                type: "warn"
+            });
+        },
 
         updatePriceBtnClicked(itemId){
             let index = this.itemList.findIndex(item => item.id == itemId);
@@ -481,8 +482,8 @@ export default {
         },
 
         async createBtnClicked() {
-            if (!this.selectedUOM || !this.name || !this.price || !this.selectedCategory ||!this.selectedBaseUom) {
-                alert('Required data must be filled');
+            if (!this.selectedUOM || !this.name || !this.selectedCategory ||!this.selectedBaseUom) {
+                this.alertValiationMessage('required data');
                 return false;
             }
             let url = `/api/items`;
@@ -490,7 +491,6 @@ export default {
             formData.append('uom_id', this.selectedUOM.id);
             formData.append('name', this.name);
             formData.append('code',this.code);
-            formData.append('price', this.price);
             formData.append('category_id', this.selectedCategory.id);
             formData.append('base_uom_id',this.selectedBaseUom.id);
             formData.append('item_type_id',this.itemType.id);

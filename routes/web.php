@@ -47,6 +47,7 @@ Route::middleware(['departments:uom'])->group(function () {
 Route::middleware(['departments:item'])->group(function () {
     Route::view('/items', 'items.index')->name('items');
     Route::view('/items/{id}/pricing_history', 'items.pricing_history')->name('items.pricing_history');
+    Route::view('/items/{id}/suppliers', 'items.item_suppliers')->name('items.item_suppliers');
 });
 
 Route::middleware(['departments:task'])->group(function () {
@@ -306,6 +307,8 @@ Route::view('/mrp/{id}/edit','MRP.edit');
 Route::view('/OKR', 'OKR.index')->name('OKR');
 Route::view('/OKR/create', 'OKR.create')->name('OKR.create');
 Route::view('/OKR/{id}/edit','OKR.edit');
+Route::view('/menu_forecasting', 'menu_forecastings.index')->name('menu_forecasting');
+Route::view('/menu_forecasting/create', 'menu_forecastings.create')->name('menu_forecasting.create');
 Route::view('/product_tree', 'product_tree.index')->name('product_tree');
 Route::view('/product_tree/create', 'product_tree.create')->name('product_tree.create');
 

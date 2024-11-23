@@ -1,50 +1,36 @@
 <template>
     <div>
         <p class=" text-lg font-semibold font-inter">
-            Objective Key Results
+            Menu Forecasting
         </p>
     </div>
     <div class="mt-4 bg-white">
         <div class="btn-container">
             <notifications position="top center" />
-
-            <!-- <div class=" flex">
-                <label for="search" class="search-input">
-                    <input type="text" class="input-search" placeholder="Search">
-                    <i class="fal fa-search"></i>
-                </label>
-            </div>
-            <div class="flex justify-end flex-col">
-
-                <a href="/OKR/create"
-                    class="add-btn transition duration-150 ease-in-out focus:outline-none focus:ring-0 ">
-                    Add New
-                </a>
-            </div> -->
             <div class=" flex gap-x-4">
                 <label for="search" class="search-input">
                     <input type="text" class="input-search" placeholder="Search" v-model="searchInput">
                     <i class="fal fa-search"></i>
                 </label>
-                <button class="add-btn h-8" @click="searchBtnClicked(1)">Search</button>
+                <button class="add-btn h-8" @click="searchBtnClicked()">Search</button>
                 <button class="add-btn h-8" @click="clearSearchBtnClicked()">Clear</button>
             </div>
             <div class="flex pr-0 gap-x-4">
-                <div class="w-full !text-sm" data-te-select-wrapper-ref>
-                    <select data-te-select-init data-te-select-placeholder="Select Department" v-model="selectedDepartment" @change="departmentChange(1)"
+                <!-- <div class="w-full !text-sm" data-te-select-wrapper-ref>
+                    <select data-te-select-init data-te-select-placeholder="Select Department" v-model="selectedDepartment"
                     data-te-select-filter="true" class="input-ui w-full">
-                        <option value="">All</option>
+                        <option value="all">All</option>
                         <option v-for="(department,index) in departmentList" :key="index" :value="department"> {{ department.name }} </option>
                     </select>
                 </div>
                 <div class="w-full !text-sm" data-te-select-wrapper-ref>
-                    <select data-te-select-init data-te-select-placeholder="Select Role" v-model="selectedRole" @change="roleChange(1)"
+                    <select data-te-select-init data-te-select-placeholder="Select Role" v-model="selectedRole"
                     data-te-select-filter="true" class="input-ui w-full">
-                        <option value="">All</option>
+                        <option value="all">All</option>
                         <option v-for="(role,index) in roleList" :key="index" :value="role"> {{ role.name }} </option>
                     </select>
-                </div>
-                <a href="/OKR/create"
+                </div> -->
+                <a href="/menu_forecasting/create"
                     class="add-btn  h-8 whitespace-nowrap">
                     Add New
                 </a>
@@ -60,14 +46,14 @@
                                     #
                                 </th>
                                 <th scope="col" class="">
-                                    Objective Name
+                                    Month
                                 </th>
                                 <th scope="col" class="">
-                                    Department
+                                    Amount
                                 </th>
 
                                 <th scope="col" class="">
-                                    Role
+                                    Type
                                 </th>
                                 <th scope="col" class="">
                                     
@@ -76,27 +62,27 @@
                         </thead>
                         <tbody>
                             <!-- looping start -->
-                            <div class="contents" v-for="(okr, index) in okrList" :key="index">
+                            <div class="contents" v-for="(menuForecasting, index) in menuForecastingList" :key="index">
                                 <tr class="">
                                     <td class=" font-medium ">
                                         <!-- {{ perPage * (currentPage - 1) + (++index) }} -->
                                         {{ index+1 }}
                                     </td>
                                     <td class="whitespace-nowrap">
-                                        {{ okr.objective_name }}
+                                        {{ menuForecasting.month }}
                                     </td>
                                     <td class="whitespace-nowrap">
-                                        {{ departmentList.find(department=>department.id = okr.role.department_id)?.name }}
+                                        {{ menuForecasting.amount }}
                                     </td>
                                     <td class="whitespace-nowrap">
-                                        {{ okr.role.name }}
+                                        {{ menuForecasting.type }}
                                     </td>
 
                                     <td class="whitespace-nowrap">
-                                        <a :href="'/OKR/' + okr.id + '/edit'">
+                                        <a :href="'/menu_forecasting/' + menuForecasting.id + '/edit'">
                                             <i class="far fa-pen cursor-pointer mr-3"></i>
                                         </a>
-                                        <button @click="deleteBtnClicked(okr.id)"
+                                        <button @click="deleteBtnClicked(menuForecasting.id)"
                                             data-te-toggle="modal" data-te-target="#deleteModal" id="delete-btn" class="pr-1">
                                             <i class="fas fa-trash-alt"></i>
                                         </button>
@@ -186,18 +172,7 @@ import { mapGetters } from "vuex";
 export default {
     data() {
         return {
-            okrList: [],
-            departmentList:[],
-            roleList:[],
-            dateList: [
-                { name: 'Monday', value: 'Monday' },
-                { name: 'Tuesday', value: 'Tuesday' },
-                { name: 'Wednesday', value: 'Wednesday' },
-                { name: 'Thursday', value: 'Thursday' },
-                { name: 'Friday', value: 'Friday' },
-                { name: 'Saturday', value: 'Saturday' },
-                { name: 'Sunday', value: 'Sunday' }
-            ],
+            menuForecastingList: [],
             
             currentPage: 0,
             perPage: 0,
@@ -205,9 +180,6 @@ export default {
             totalData: 0,
 
             searchInput:null,
-            selectedDepartment:null,
-            selectedRole:null,
-            selectedDate:null,
 
             url:'/api/objectives?page=',
             url_search:'',
@@ -220,9 +192,8 @@ export default {
 
     methods: {
         ...mapGetters(['getToken']),
-        
 
-        async getOkrList(pageNumber) {
+        async getMenuForecastingList(pageNumber) {
             let url = this.url + pageNumber + this.url_search + this.url_department + this.url_role;
             // let url = `/api/objectives?page=${pageNumber}`;
             // if (this.searchInput && this.searchCategory) {
@@ -237,78 +208,32 @@ export default {
             // let url = `/api/objectives`;
             let response = await getApiData({ url: url, token: this.getToken() });
             if (response.data) {
-                this.okrList = response.data.data;
+                this.menuForecastingList = response.data.data;
                 this.lastPage = response.data.last_page;
                 this.currentPage = pageNumber;
                 this.perPage = response.data.per_page;
                 // this.totalData = response.data.total;
             }
         },
-        
-        departmentChange(){
-            this.url_search = '';
-            this.searchInput = null;
-            if(this.selectedDepartment == 'all'){
-                this.url_department = ''
-            }
-            else{
-                this.url_department = '&department_id=' + this.selectedDepartment.id;
-            }
-            this.getOkrList(1);
-            this.getRoleList();
-        },
-        roleChange(){
-            this.url_search = '';
-            this.searchInput = null;
-            if(this.selectedRole == 'all'){
-                this.url_role = ''
-            }
-            else{
-                this.url_role = '&role_id=' + this.selectedRole.id;
-            }
-            this.getOkrList(1)
-        },
-
         async searchBtnClicked() {
             this.url_search = '&search=' + this.searchInput
-            this.getOkrList(1);
+            this.getMenuForecastingList(1);
         },
         clearSearchBtnClicked() {
             this.searchInput = null;
             this.url_search = '';
-            this.getOkrList(1);
+            this.getMenuForecastingList(1);
         },
-
-        async getDepartment(){
-            let response = await getApiData({url: `/api/departments`, token: this.getToken()});
-            if(response.data){
-                this.departmentList = response.data;
-            }
-        },
-        // changeDepartment(){
-        //     this.getRoleList();
-        //     this.getOkrList(1);
-        //     console.log('hello bro')
-        // },
-        async getRoleList(){
-            let response = await getApiData({url: '/api/roles_department/' + this.selectedDepartment.id , token: this.getToken()});
-            if(response.data){
-                this.roleList = response.data;
-            }
-        },
-        // selectedRoleChange(){
-        //     this.getOkrList(1);
-        // },
 
 
 
         deleteBtnClicked(id) {
             this.deleteId = id;
         },
-        async deleteOkr() {
+        async deleteItem() {
             let response = await deleteApiData({ url: `/api/objectives/` + this.deleteId, token: this.getToken() });
             if (response.success) {
-                this.getOkrList(1);
+                this.getMenuForecastingList(1);
             }
             else {
                 this.$notify({
@@ -324,8 +249,7 @@ export default {
         initTE({ Modal, Select, Ripple });
     },
     created() {
-        this.getOkrList(1);
-        this.getDepartment();
+        this.getMenuForecastingList(1);
     }
 }
 </script>

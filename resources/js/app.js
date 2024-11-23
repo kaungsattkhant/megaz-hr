@@ -56,6 +56,7 @@ import ConfirmPurchaseOrderItemsComponent from './Components/PurchaseOrders/Conf
 import PurchaseOrderWithLeftItemsComponent from './Components/PurchaseOrders/PurchaseOrderWithLeftItemsComponent.vue';
 import LeftItemListComponent from './Components/PurchaseOrders/LeftItemListComponent.vue';
 import ItemCrudComponent from './Components/Items/ItemCrudComponent.vue';
+import ItemSuppliersComponent from './Components/Items/ItemSuppliersComponent.vue';
 import ItemPricingHistoryComponent from './Components/Items/ItemPricingHistoryComponent.vue';
 import ItemUsageForecastListComponent from './Components/ItemUsageForecastings/ItemUsageForecastListComponent.vue';
 import ItemUsageForecastCreateComponent from './Components/ItemUsageForecastings/ItemUsageForecastCreateComponent.vue';
@@ -93,6 +94,8 @@ import OkrCreateComponent from './Components/OKR/OkrCreateComponent.vue';
 import OkrEditComponent from './Components/OKR/OkrEditComponent.vue';
 import ProductTreeComponent from './Components/ProductTree/ProductTreeComponent.vue';
 import ProductTreeCreateComponent from './Components/ProductTree/ProductTreeCreateComponent.vue';
+import MenuForecastingComponent from './Components/MenuForecastings/MenuForecastingComponent.vue';
+import MenuForecastingCreateComponent from './Components/MenuForecastings/MenuForecastingCreateComponent.vue';
 
 import LoginComponent from './Components/Auth/LoginComponent.vue';
 import LogoutComponent from './Components/Auth/LogoutComponent.vue';
@@ -202,6 +205,8 @@ app.component('OkrCreateComponent', OkrCreateComponent);
 app.component('OkrEditComponent', OkrEditComponent);
 app.component('ProductTreeComponent', ProductTreeComponent);
 app.component('ProductTreeCreateComponent', ProductTreeCreateComponent);
+app.component('MenuForecastingComponent', MenuForecastingComponent);
+app.component('MenuForecastingCreateComponent', MenuForecastingCreateComponent);
 
 app.component('PurchaseOrderListComponent', PurchaseOrderListComponent);
 app.component('PurchaseOrderCreateComponent', PurchaseOrderCreateComponent);
@@ -212,6 +217,7 @@ app.component('PurchaseOrderWithLeftItemsComponent', PurchaseOrderWithLeftItemsC
 app.component('LeftItemListComponent', LeftItemListComponent);
 app.component('ItemCrudComponent', ItemCrudComponent);
 app.component('ItemPricingHistoryComponent', ItemPricingHistoryComponent);
+app.component('ItemSuppliersComponent', ItemSuppliersComponent);
 app.component('ItemUsageForecastListComponent', ItemUsageForecastListComponent);
 app.component('ItemUsageForecastCreateComponent', ItemUsageForecastCreateComponent);
 app.component('ItemUsageForecastDetailComponent', ItemUsageForecastDetailComponent);
