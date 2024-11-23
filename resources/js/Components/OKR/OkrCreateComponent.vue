@@ -9,6 +9,12 @@
         <div class="grid !grid-cols-12 gap-x-8 bg-white p-8 rounded-md shadow-md mb-8">
             <div class="mb-4 col-span-3">
                 <label for="" class="label-form mb-3">
+                    Objective Name
+                </label>
+                <input type="text" v-model="objName" class="input-ui ">
+            </div>
+            <div class="mb-4 col-span-3">
+                <label for="" class="label-form mb-3">
                     Department
                 </label>
                 <div class="bg-white mb-0 w-full text-sm inline-block h-[34px] !text-black"
@@ -32,7 +38,7 @@
                             :key="index"> {{ role.name }} </option>
                     </select>
                 </div>
-            </div><div class="col-span-6"></div>
+            </div><div class="col-span-3"></div>
 
 
             
@@ -43,12 +49,7 @@
                 <input type="number" v-model="duration" class="input-ui ">
             </div> -->
             
-            <div class="mb-4 col-span-3">
-                <label for="" class="label-form mb-3">
-                    Objective Name
-                </label>
-                <input type="text" v-model="objName" class="input-ui ">
-            </div>
+            
             <div class="col-span-3">
                 <label for="" class="label-form mb-3">
                     &nbsp;
@@ -57,7 +58,7 @@
                     Add Obj
                 </button>
             </div>
-            <div class="col-span-6"></div>
+            <div class="col-span-9"></div>
 
             <div class="contents" v-for="(obj,index) in objective_key" :key="index">
                 <div class="mb-4 col-span-3">
@@ -146,7 +147,6 @@ export default {
         return {
             departmentList:[],
             roleList:[],
-            testList:['1','2','3'],
             dateList: ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'],
             // dateList: [
             //     { name: 'Monday', value: 'Monday' },
