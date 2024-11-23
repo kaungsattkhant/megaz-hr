@@ -5,6 +5,7 @@ use App\Http\Controllers\API\ObjectiveController;
 
 Route::middleware('auth:api')->group(function () {
   Route::controller(ObjectiveController::class)->group(function () {
+    //admin 
     Route::get('/objectives', 'getObjectives');
     Route::get('/roles_department/{id}', 'getRolesByDepartmentId');
     Route::post('/objectives', 'store');
@@ -19,5 +20,13 @@ Route::middleware('auth:api')->group(function () {
     Route::post('/daily/objectives_key_staff/{id}', 'updateDailyObjective');
     Route::post('/objectives/images', 'storeImages');
     Route::post('/objectives/images/{objKeyImgId}', 'updateImages');
+
+    //ktv-objective-tree
+    Route::get('/ktv/entity_room', 'getKtvRoom');
+    Route::get('/ktv/objectives', 'getKtvObjective');
+    Route::get('/ktv/objective_trees', 'getKtvObjectiveTree');
+    Route::post('/ktv/objective_trees', 'storeKtvObjectiveTree');
+    Route::get('/ktv/objective_trees/{id}', 'getKtvObjTreeById');
+    Route::post('/ktv/objective_trees/{id}', 'updateKtvObjTree');
   });
 });

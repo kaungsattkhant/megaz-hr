@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 use App\Models\ServiceCategory;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Entity extends BaseModel
 {
@@ -74,5 +75,8 @@ class Entity extends BaseModel
             ->whereTime('end_time', '>=', $currentTime);
     }
 
-
+    public function ktvProductTree(): HasMany
+    {
+        return $this->hasMany(Ktvproducttree::class);
+    }
 }

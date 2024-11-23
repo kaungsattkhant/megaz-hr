@@ -26,7 +26,7 @@ class Objective extends Model
         return $this->hasMany(ObjectiveKey::class, 'objective_id');
     }
 
-    public function scopeObjectiveFilter($query, $search = null, $name = null, $days = null)
+    public function scopeObjectiveFilter($query, $search = null, $name = null, $days = null, $role = null, $department = null)
     {
         return $query
 
@@ -41,15 +41,28 @@ class Objective extends Model
                 });
             })
 
+            ->when($role, function ($q) use ($role) {
+                $q->whereHas('role', function ($rq) use ($role) {
+                    $rq->where('name', $role);
+                });
+            })
+
+            ->when($department, function ($q) use ($department) {
+                $q->whereHas('role.department', function ($dq) use ($department) {
+                    $dq->where('name', 'like', '%' . $department . '%');
+                });
+            })
+
+
             ->when($name, function ($q) use ($name) {
                 $q->whereHas('objectiveKeys', function ($sq) use ($name) {
-                    $sq->where('name', [$name]);
+                    $sq->where('name', $name);
                 });
             })
 
             ->when($days, function ($q) use ($days) {
                 $q->whereHas('objectiveKeys', function ($subQuery) use ($days) {
-                    $subQuery->whereRaw("FIND_IN_SET(?, assigned_days)", [$days]);
+                    $subQuery->whereRaw("FIND_IN_SET(?, assigned_days)", $days);
                 });
             });
     }
