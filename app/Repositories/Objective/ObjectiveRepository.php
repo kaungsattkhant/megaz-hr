@@ -3,6 +3,7 @@
 namespace App\Repositories\Objective;
 
 use Exception;
+use App\Models\Item;
 use App\Models\Role;
 use App\Models\Staff;
 use App\Models\Entity;
@@ -18,7 +19,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use App\Http\Resources\KtvObjectiveRsource;
-use App\Models\Item;
+use App\Http\Resources\KtvProductTreeEditResource;
 
 class  ObjectiveRepository implements ObjectiveInterface
 {
@@ -283,14 +284,12 @@ class  ObjectiveRepository implements ObjectiveInterface
 
     public function getKtvObjective(Request $request)
     {
-        $currentDay = now()->format('l');
+
         $ktvObjectives = Objective::with([
             'role',
             'objectiveKeys'
-            // 'objectiveKeys' => function ($query) use ($currentDay) {
-            //     $query->whereRaw("FIND_IN_SET(?, assigned_days)", [$currentDay]);
-            // },
         ])->get();
+
         return KtvObjectiveRsource::collection($ktvObjectives);
     }
 
@@ -330,13 +329,23 @@ class  ObjectiveRepository implements ObjectiveInterface
 
     public function  getKtvObjectiveTree(Request $request)
     {
-        $data =  KtvProductTree::with(['KtvObjectives.objective', 'KtvItems.item'])->paginate();
+        $data =  KtvProductTree::with([
+            'entity',
+            'KtvObjectives.objective.role',
+            'KtvObjectives.objective.objectiveKeys',
+            'KtvItems.item'
+        ])->paginate();
         return $data;
     }
     public function getKtvObjTreeById(Request $request, $id)
     {
-        $data =  KtvProductTree::with(['KtvObjectives.objective', 'KtvItems.item'])->findOrFail($id);
-        return $data;
+        $data =  KtvProductTree::with([
+            'entity',
+            'KtvObjectives.objective.role',
+            'KtvObjectives.objective.objectiveKeys',
+            'KtvItems.item'
+        ])->findOrFail($id);
+        return new KtvProductTreeEditResource($data);
     }
 
     public function updateKtvObjTree(Request $request, $ktvObjTreeId)
