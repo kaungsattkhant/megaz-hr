@@ -962,6 +962,7 @@ export default {
     //     }
     // },
 
+    
     async created() {
         let response = await getApiData({url: `/api/departments`, token: this.getToken()});
         if(response.data){
