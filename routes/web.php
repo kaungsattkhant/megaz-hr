@@ -300,11 +300,11 @@ Route::middleware(['departments:accessory'])->group(function () {
 
 
 
-// Route::middleware(['departments:objective'])->group(function () {
+Route::middleware(['departments:objective'])->group(function () {
     Route::view('/OKR', 'OKR.index')->name('OKR');
     Route::view('/OKR/create', 'OKR.create')->name('OKR.create');
     Route::view('/OKR/{id}/edit', 'OKR.edit');
-// });
+});
 Route::view('/menu_forecasting', 'menu_forecastings.index')->name('menu_forecasting');
 Route::view('/menu_forecasting/create', 'menu_forecastings.create')->name('menu_forecasting.create');
 Route::middleware(['departments:objective'])->group(function () {
@@ -312,5 +312,6 @@ Route::middleware(['departments:objective'])->group(function () {
     Route::view('/ktv_product_tree/create', 'ktv_product_tree.create')->name('ktv_product_tree.create');
     Route::view('/ktv_product_tree/{id}/edit', 'ktv_product_tree.edit');
 });
+
 
 
