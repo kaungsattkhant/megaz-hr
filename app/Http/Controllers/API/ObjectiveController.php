@@ -70,18 +70,25 @@ class ObjectiveController extends Controller
         $data = $this->objectiveRepository->getdailyObjectives($request);
         ResponseData($data);
     }
-
-    public function storeImages(ObjImgRequest $request)
+    public function getObjKeyStaffImage($objKeystaffId)
     {
-        $validatedData = $request->validated();
-        $data = $this->objectiveRepository->storeImages($validatedData);
+        $data = $this->objectiveRepository->getObjKeyStaffImage($objKeystaffId);
         ResponseData($data);
     }
 
-    public function updateImages(ObjImgRequest $request, $objKeyImgId)
+
+    public function storeImages(ObjImgRequest $request, $objKeystaffId)
     {
         $validatedData = $request->validated();
-        $data = $this->objectiveRepository->updateImages($validatedData, $objKeyImgId);
+
+        $data = $this->objectiveRepository->storeImages($validatedData, $objKeystaffId);
+        ResponseData($data);
+    }
+
+    public function updateImages(ObjImgRequest $request, $objKeyStaffId)
+    {
+        $validatedData = $request->validated();
+        $data = $this->objectiveRepository->updateImages($validatedData, $objKeyStaffId);
         ResponseData($data);
     }
 
@@ -93,6 +100,13 @@ class ObjectiveController extends Controller
     }
 
 
+    public function deleteObjKeystaffImage($imgId)
+    {
+        $data = $this->objectiveRepository->deleteObjKeystaffImage($imgId);
+        ResponseData($data);
+    }
+
+
     //ktvProductTree
 
     public function getKtvRoom(Request $request)
@@ -100,6 +114,8 @@ class ObjectiveController extends Controller
         $data = $this->objectiveRepository->getKtvRoom($request);
         ResponseData($data);
     }
+
+
 
     public function  getKtvObjectiveTree(Request $request)
     {

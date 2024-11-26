@@ -34,7 +34,7 @@ class  ObjectiveRepository implements ObjectiveInterface
 
         return Objective::with([
             'role.department',
-            'objectiveKeys.objKeyStaff.objKeyStaffImg',
+            'objectiveKeys.objKeyStaff',
         ])->objectiveFilter($search, $name, $days, $role, $department)
             ->paginate();
     }
@@ -46,7 +46,7 @@ class  ObjectiveRepository implements ObjectiveInterface
 
     public function getObjectiveById(Request $request, $objId)
     {
-        return Objective::with(['role.department', 'objectiveKeys.objKeyStaff.objKeyStaffImg'])->where('id', $objId)->get();
+        return Objective::with(['role.department', 'objectiveKeys.objKeyStaff'])->where('id', $objId)->get();
     }
 
 
@@ -211,9 +211,19 @@ class  ObjectiveRepository implements ObjectiveInterface
         }
     }
 
-    public function updateImages($validatedData, $objKeyImgId)
+    public function deleteObjKeystaffImage($imgId)
     {
-        $data = ObjectiveKeyStaffImage::findOrFail($objKeyImgId);
+        $data = ObjectiveKeyStaffImage::findOrFail($imgId);
+        if ($data->image_path && Storage::exists($data->image_path)) {
+            Storage::delete($data->image_path);
+        }
+        $data->delete();
+        return $data;
+    }
+
+    public function updateImages($validatedData, $objKeyStaffId)
+    {
+        $data = ObjectiveKeyStaffImage::findOrFail($objKeyStaffId);
 
         $updateImages = [];
 
@@ -222,25 +232,23 @@ class  ObjectiveRepository implements ObjectiveInterface
             if ($data->image_path && Storage::exists($data->image_path)) {
                 Storage::delete($data->image_path);
             }
+            foreach ($validatedData['images'] as $objImage) {
 
-            $objImages = json_decode($validatedData['images'], true);
-            foreach ($objImages as $objImage) {
-                $imageData = $objImage['images'];
-                $extension = $imageData->getClientOriginalExtension();
+                $extension = $objImage->getClientOriginalExtension();
                 $hashedName = md5(uniqid() . microtime()) . '.' . $extension;
-                $objImage['imagePath'] = $imageData->storeAs('okrImages/', $hashedName, 'public');
-                $objImage['imageUrl'] = Storage::url($objImage['imagePath']);
+                $image_path = $objImage->storeAs('okrImages/', $hashedName, 'public');
+                $image_url = Storage::url($image_path);
 
                 $updateImages[] = $data->update([
                     'objectivekey_staff_id' => $data->id,
-                    'image_path' => $objImage['imagePath'],
-                    'image_url' => $objImage['imageUrl'],
+                    'image_path' => $image_path,
+                    'image_url' =>  $image_url,
                 ]);
             }
         } else {
             throw new \Exception('Invalid image.');
         }
-        return $updateImages;
+        return $data;
     }
 
 

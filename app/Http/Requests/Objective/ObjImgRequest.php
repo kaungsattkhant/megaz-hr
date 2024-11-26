@@ -23,8 +23,7 @@ class ObjImgRequest extends APIRequest
     public function rules(): array
     {
         return [
-            'objective_key_id' => 'required',
-            'images' => 'nullable|mimes:jpeg,png,jpg|max:10240',
+            'images.*' => 'required|mimes:jpeg,png,jpg|max:10240',
         ];
     }
 
