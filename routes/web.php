@@ -98,7 +98,15 @@ Route::middleware(['departments:menu'])->group(function () {
     Route::view('/menu_categories', 'menu_categories.index')->name('menu_categories');
     Route::view('/menus', 'menus.index')->name('menus');
     Route::view('/menus/create', 'menus.create')->name('menus.create');
-    Route::view('/menus/{id}/edit', 'menus.edit')->name('menus.edit');
+    // Route::view('/menus/{id}/edit', 'menus.edit')->name('menus.edit');
+    // Route::view('/mrp', 'MRP.index')->name('MRP');
+    // Route::view('/mrp/create', 'MRP.create')->name('MRP.create');
+    // Route::view('/mrp/{id}/edit', 'MRP.edit');
+});
+Route::middleware(['departments:mrp'])->group(function () {
+    Route::view('/mrp', 'MRP.index')->name('MRP');
+    Route::view('/mrp/create', 'MRP.create')->name('MRP.create');
+    Route::view('/mrp/{id}/edit', 'MRP.edit');
 });
 Route::middleware(['departments:table'])->group(function () {
     Route::view('/tables', 'tables&rooms.table')->name('table');
@@ -278,11 +286,7 @@ Route::middleware(['departments:sale-target'])->group(function () {
     Route::view('/sale_target_menu/{id}/edit', 'sale_target_menu.edit')->name('sale_target_menu/edit');
 });
 
-// Route::middleware(['departments:accessory'])->group(function () {
-Route::view('/accessories/create', 'accessories.create');
-Route::view('/accessories/{id}/edit', 'accessories.edit');
-Route::view('/accessories', 'accessories.index');
-// });
+
 Route::view('/menu_sale_report', 'menu_sale_report.index')->name('menu_sale_report.index');
 Route::view('/menu_costing', 'menu_costing.index')->name('menu_costing.index');
 
@@ -295,20 +299,27 @@ Route::view('/pos_order_items', 'pos.orderItem.index');
 Route::view('/menu_position', 'menu_position.index')->name('menu_position');
 Route::view('/menu_position/create', 'menu_position.create')->name('menu_position.create');
 // =======
-Route::view('/accessories/create','accessories.create');
-Route::view('/accessories/{id}/edit','accessories.edit');
-Route::view('/accessories','accessories.index');
-Route::view('/mrp', 'MRP.index')->name('MRP');
-Route::view('/mrp/create', 'MRP.create')->name('MRP.create');
-Route::view('/mrp/{id}/edit','MRP.edit');
+Route::middleware(['departments:accessory'])->group(function () {
+    Route::view('/accessories/create', 'accessories.create');
+    Route::view('/accessories/{id}/edit', 'accessories.edit');
+    Route::view('/accessories', 'accessories.index');
+});
+
+
 
 // >>>>>>> origin/thhs/okr-backend
 
-Route::view('/OKR', 'OKR.index')->name('OKR');
-Route::view('/OKR/create', 'OKR.create')->name('OKR.create');
-Route::view('/OKR/{id}/edit','OKR.edit');
+Route::middleware(['departments:objective'])->group(function () {
+    Route::view('/OKR', 'OKR.index')->name('OKR');
+    Route::view('/OKR/create', 'OKR.create')->name('OKR.create');
+    Route::view('/OKR/{id}/edit', 'OKR.edit');
+});
 Route::view('/menu_forecasting', 'menu_forecastings.index')->name('menu_forecasting');
 Route::view('/menu_forecasting/create', 'menu_forecastings.create')->name('menu_forecasting.create');
-Route::view('/product_tree', 'product_tree.index')->name('product_tree');
-Route::view('/product_tree/create', 'product_tree.create')->name('product_tree.create');
+Route::middleware(['departments:objective'])->group(function () {
+    Route::view('/ktv_product_tree', 'ktv_product_tree.index')->name('ktv_product_tree');
+    Route::view('/ktv_product_tree/create', 'ktv_product_tree.create')->name('ktv_product_tree.create');
+    Route::view('/ktv_product_tree/{id}/edit', 'ktv_product_tree.edit');
+});
+
 

@@ -5,6 +5,7 @@ use App\Http\Controllers\API\ObjectiveController;
 
 Route::middleware('auth:api')->group(function () {
   Route::controller(ObjectiveController::class)->group(function () {
+    //admin 
     Route::get('/objectives', 'getObjectives');
     Route::get('/roles_department/{id}', 'getRolesByDepartmentId');
     Route::post('/objectives', 'store');
@@ -17,7 +18,17 @@ Route::middleware('auth:api')->group(function () {
     Route::get('/daily/objectives', 'objectiveLists');
     Route::get('/daily/objectives_key', 'getdailyObjectives');
     Route::post('/daily/objectives_key_staff/{id}', 'updateDailyObjective');
-    Route::post('/objectives/images', 'storeImages');
-    Route::post('/objectives/images/{objKeyImgId}', 'updateImages');
+    Route::post('/objectives/key_staff/{id}/images', 'storeImages');
+    Route::post('/objectives/key_staff/{objKeyStaffId}/images/update', 'updateImages');
+    Route::get('/objectives/key_staff/{objKeystaffId}/images', 'getObjKeyStaffImage');
+    Route::delete('/objectives/key_staff/images/{id}', 'deleteObjKeystaffImage');
+
+    //ktv-objective-tree
+    Route::get('/ktv/entity_room', 'getKtvRoom');
+    Route::get('/ktv/objectives', 'getKtvObjective');
+    Route::get('/ktv/objective_trees', 'getKtvObjectiveTree');
+    Route::post('/ktv/objective_trees', 'storeKtvObjectiveTree');
+    Route::get('/ktv/objective_trees/{id}', 'getKtvObjTreeById');
+    Route::post('/ktv/objective_trees/{id}', 'updateKtvObjTree');
   });
 });

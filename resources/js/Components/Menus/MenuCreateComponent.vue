@@ -8,7 +8,7 @@
 
 
         <div class="grid !grid-cols-12 gap-x-8 bg-white p-8 rounded-md shadow-md mb-8">
-            <div class="mb-4 col-span-3 pb-6 rounded-md">
+            <div class="mb-4 col-span-3 rounded-md">
                 <label for="" class="label-form mb-3">
                     Name
                 </label>
@@ -24,13 +24,13 @@
                     </label>
                 </div>
             </div>
-            <div class="mb-4 col-span-3 pb-6 rounded-md">
+            <div class="mb-4 col-span-3 rounded-md">
                 <label for="" class="label-form mb-3">
                     Price
                 </label>
                 <input type="text" v-model="price" class="input-ui ">
             </div>
-            <div class="mb-4 col-span-3 pb-6 rounded-md">
+            <div class="mb-4 col-span-3 rounded-md">
                 <label for="" class="label-form mb-3">
                     Menu Category
                 </label>
@@ -73,7 +73,7 @@
                     Code
                 </label>
                 <div class="">
-                    <input type='text' v-model='code' class="input-ui w-full !p-1 text-xs" placeholder="Code" />
+                    <input type='text' v-model='code' class="input-ui w-full text-xs" placeholder="Code" />
                 </div>
 
             </div>
@@ -144,7 +144,7 @@
                 </label>
                 <div class="bg-white mb-0 w-full text-sm inline-block h-[34px]"
                     data-te-select-wrapper-ref>
-                    <textarea type='text' v-model='description' class="input-ui w-full !p-1 text-xs" placeholder="Description" ></textarea>
+                    <textarea type='text' v-model='description' rows="4" class="input-ui w-full !p-1 text-xs" placeholder="Description" ></textarea>
                 </div>
 
             </div>
@@ -491,7 +491,7 @@ export default {
                 let baseUom = this.uomList[index];
                 this.itemUoms.push(baseUom);
             }
-            index = this.uomList.findIndex(uom => uom.id == this.selectedItem.item_prices.uom_id);
+            index = this.uomList.findIndex(uom => uom.id == this.selectedItem.uom_id);
             if (index != -1) {
                 let itemUom = this.uomList[index];
                 this.itemUoms.push(itemUom);
@@ -523,7 +523,7 @@ export default {
                 return 1;
             }
 
-            let url = `/api/get_uom_conversion_by_uom?po_uom_id=${this.selectedUom.id}&item_uom_id=${this.selectedItem.item_prices.uom_id}&item_price=${this.selectedItem.item_prices.price}&base_uom_id=${this.selectedItem.base_uom_id}`;
+            let url = `/api/get_uom_conversion_by_uom?po_uom_id=${this.selectedUom.id}&item_uom_id=${this.selectedItem.uom_id}&item_price=${this.selectedItem.average_price}&base_uom_id=${this.selectedItem.base_uom_id}`;
             let response = await getApiData({url: url, token: this.getToken()});
             let uomConversion = null;
             let amount = 0;

@@ -4,5 +4,5 @@
 
 @section('product_tree', 'active-link')
 @section('content')
-    <product-tree-create-component/>
+    <ktv-product-tree-create-component/>
 @endsection

@@ -185,7 +185,7 @@
                     let baseUom = this.uomList[index];
                     this.itemUoms.push(baseUom);
                 }
-                index = this.uomList.findIndex(uom => uom.id == this.selectedItem.item_prices.uom_id);
+                index = this.uomList.findIndex(uom => uom.id == this.selectedItem.uom_id);
                 if(index != -1){
                     let itemUom = this.uomList[index];
                     this.itemUoms.push(itemUom);
@@ -213,7 +213,9 @@
                     this.alertValidationMessage('quantity');
                     return 1;
                 }
-                let url = `/api/get_uom_conversion_by_uom?po_uom_id=${this.selectedUom.id}&item_uom_id=${this.selectedItem.item_prices.uom_id}&item_price=${this.selectedItem.item_prices.price}&base_uom_id=${this.selectedItem.base_uom_id}`;
+                let floatItemPrice = parseFloat(this.selectedItem.average_price)
+                console.log(floatItemPrice)
+                let url = `/api/get_uom_conversion_by_uom?po_uom_id=${this.selectedUom.id}&item_uom_id=${this.selectedItem.uom_id}&item_price=${floatItemPrice}&base_uom_id=${this.selectedItem.base_uom_id}`;
                 let response = await getApiData({url: url, token: this.getToken()});
                 let uomConversion = null;
                 let amount = 0;
