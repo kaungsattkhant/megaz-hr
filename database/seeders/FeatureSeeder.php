@@ -61,7 +61,7 @@ class FeatureSeeder extends Seeder
             'financial report',
             'MRP',
             'Objective',
-            'KtvProductTree'
+            'Ktv Product Tree'
         ];
         foreach ($features as $feature) {
             Feature::create([
