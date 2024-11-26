@@ -289,13 +289,9 @@ Route::view('/menu_costing', 'menu_costing.index')->name('menu_costing.index');
 
 Route::view('/pos_order_items', 'pos.orderItem.index');
 
-// <<<<<<< HEAD
-// Route::view('/accessories/create', 'accessories.create');
-// Route::view('/accessories/{id}/edit', 'accessories.edit');
-// Route::view('/accessories', 'accessories.index');
+
 Route::view('/menu_position', 'menu_position.index')->name('menu_position');
 Route::view('/menu_position/create', 'menu_position.create')->name('menu_position.create');
-// =======
 Route::middleware(['departments:accessory'])->group(function () {
     Route::view('/accessories/create', 'accessories.create');
     Route::view('/accessories/{id}/edit', 'accessories.edit');
@@ -304,7 +300,6 @@ Route::middleware(['departments:accessory'])->group(function () {
 
 
 
-// >>>>>>> origin/thhs/okr-backend
 
 Route::middleware(['departments:objective'])->group(function () {
     Route::view('/OKR', 'OKR.index')->name('OKR');
@@ -318,5 +313,6 @@ Route::middleware(['departments:objective'])->group(function () {
     Route::view('/ktv_product_tree/create', 'ktv_product_tree.create')->name('ktv_product_tree.create');
     Route::view('/ktv_product_tree/{id}/edit', 'ktv_product_tree.edit');
 });
+
 
 

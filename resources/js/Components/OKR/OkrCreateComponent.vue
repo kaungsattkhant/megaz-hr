@@ -210,16 +210,34 @@ export default {
     methods: {
         ...mapGetters(['getToken']),
         addObj() {
-            this.objective_List.push({ 
-                name: this.key_result,
-                okr_point: this.selectedOkrPoint,
-                assigned_days: this.selectedDate, 
-                duration: this.duration 
-            });  // Add a new input box
-            this.key_result = null;
-            this.selectedOkrPoint = null;
-            this.selectedDate = null;
-            this.duration = null;
+            if (!this.key_result) {
+                this.alertValidationMessage(`Key Result`);
+                return 1;
+            }
+            else if (!this.selectedOkrPoint) {
+                this.alertValidationMessage(`OKR Point`);
+                return 1;
+            }
+            else if (!this.selectedDate) {
+                this.alertValidationMessage(`Date`);
+                return 1;
+            }
+            else if (!this.duration) {
+                this.alertValidationMessage(`Duration`);
+                return 1;
+            }
+            else{
+                this.objective_List.push({ 
+                    name: this.key_result,
+                    okr_point: this.selectedOkrPoint,
+                    assigned_days: this.selectedDate, 
+                    duration: this.duration 
+                });  // Add a new input box
+                this.key_result = null;
+                this.selectedOkrPoint = null;
+                this.selectedDate = null;
+                this.duration = null;
+            }
         },
         deleteObj(index) {
             this.objective_List.splice(index, 1);
