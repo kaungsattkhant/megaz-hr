@@ -91,8 +91,9 @@ import MrpEditComponent from './Components/MenuPosition/MrpEditComponent.vue';
 import OkrComponent from './Components/OKR/OkrComponent.vue';
 import OkrCreateComponent from './Components/OKR/OkrCreateComponent.vue';
 import OkrEditComponent from './Components/OKR/OkrEditComponent.vue';
-import ProductTreeComponent from './Components/ProductTree/ProductTreeComponent.vue';
-import ProductTreeCreateComponent from './Components/ProductTree/ProductTreeCreateComponent.vue';
+import KtvProductTreeComponent from './Components/KtvProductTree/KtvProductTreeComponent.vue';
+import KtvProductTreeCreateComponent from './Components/KtvProductTree/KtvProductTreeCreateComponent.vue';
+import KtvProductTreeEditComponent from './Components/KtvProductTree/KtvProductTreeEditComponent.vue';
 import MenuForecastingComponent from './Components/MenuForecastings/MenuForecastingComponent.vue';
 import MenuForecastingCreateComponent from './Components/MenuForecastings/MenuForecastingCreateComponent.vue';
 
@@ -202,8 +203,9 @@ app.component('MrpEditComponent', MrpEditComponent);
 app.component('OkrComponent', OkrComponent);
 app.component('OkrCreateComponent', OkrCreateComponent);
 app.component('OkrEditComponent', OkrEditComponent);
-app.component('ProductTreeComponent', ProductTreeComponent);
-app.component('ProductTreeCreateComponent', ProductTreeCreateComponent);
+app.component('KtvProductTreeComponent', KtvProductTreeComponent);
+app.component('KtvProductTreeCreateComponent', KtvProductTreeCreateComponent);
+app.component('KtvProductTreeEditComponent', KtvProductTreeEditComponent);
 app.component('MenuForecastingComponent', MenuForecastingComponent);
 app.component('MenuForecastingCreateComponent', MenuForecastingCreateComponent);
 

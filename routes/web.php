@@ -308,6 +308,7 @@ Route::view('/OKR/create', 'OKR.create')->name('OKR.create');
 Route::view('/OKR/{id}/edit','OKR.edit');
 Route::view('/menu_forecasting', 'menu_forecastings.index')->name('menu_forecasting');
 Route::view('/menu_forecasting/create', 'menu_forecastings.create')->name('menu_forecasting.create');
-Route::view('/product_tree', 'product_tree.index')->name('product_tree');
-Route::view('/product_tree/create', 'product_tree.create')->name('product_tree.create');
+Route::view('/ktv_product_tree', 'ktv_product_tree.index')->name('ktv_product_tree');
+Route::view('/ktv_product_tree/create', 'ktv_product_tree.create')->name('ktv_product_tree.create');
+Route::view('/ktv_product_tree/{id}/edit','ktv_product_tree.edit');
 

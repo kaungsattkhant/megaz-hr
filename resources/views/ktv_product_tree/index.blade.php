@@ -4,7 +4,7 @@
 @section('product_tree', 'active-link')
 @section('content')
     <div id="app">
-        <product-tree-component/>
+        <ktv-product-tree-component/>
     </div>
 
 @endsection

@@ -630,55 +630,30 @@
                         </div>
                     </li>
                 @endif
-
-
-
-
-<!-- <<<<<<< HEAD
-                <li>
-                    <a href="/accessories" class="flex items-center @yield('packages')">
-                        <i class="fal fa-braille pr-3"></i>
-                        Accessories
-                    </a>
-                </li>
-                <li>
-                    <a href="/QKR" class="flex items-center @yield('QKR')">
-                        <i class="fal fa-braille pr-3"></i>
-                        QKR
-                    </a>
-                </li>
-                <li>
-                    <a href="/product_tree" class="flex items-center @yield('product_tree')">
-                        <i class="fal fa-braille pr-3"></i>
-                        Product Tree
-                    </a>
-                </li>
-======= -->
-                        <li>
-                            <a href="/accessories" class="flex items-center @yield('packages')">
+                    <li>
+                        <a href="/accessories" class="flex items-center @yield('packages')">
                             <i class="fal fa-braille pr-3"></i>
-                                Accessories
-                            </a>
-                        </li>
-                        <li>
-                            <a href="/OKR" class="flex items-center @yield('OKR')">
-                                <i class="fal fa-braille pr-3"></i>
-                                OKR
-                            </a>
-                        </li>
-                        <li>
-                            <a href="/menu_forecasting" class="flex items-center @yield('menu_forecasting')">
-                                <i class="fal fa-braille pr-3"></i>
-                                Menu Forecasting
-                            </a>
-                        </li>
-                        <li>
-                            <a href="/product_tree" class="flex items-center @yield('product_tree')">
-                                <i class="fal fa-braille pr-3"></i>
-                                Product Tree
-                            </a>
-                        </li>
-<!-- >>>>>>> origin/ui_test -->
+                            Accessories
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/OKR" class="flex items-center @yield('OKR')">
+                            <i class="fal fa-braille pr-3"></i>
+                            OKR
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/menu_forecasting" class="flex items-center @yield('menu_forecasting')">
+                            <i class="fal fa-braille pr-3"></i>
+                            Menu Forecasting
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/ktv_product_tree" class="flex items-center @yield('ktv_product_tree')">
+                            <i class="fal fa-braille pr-3"></i>
+                            Product Tree
+                        </a>
+                    </li>
 
             </ul>
 

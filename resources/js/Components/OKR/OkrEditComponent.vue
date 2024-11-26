@@ -9,6 +9,12 @@
         <div class="grid !grid-cols-12 gap-x-8 bg-white p-8 rounded-md shadow-md mb-8">
             <div class="mb-4 col-span-3">
                 <label for="" class="label-form mb-3">
+                    Objective Name
+                </label>
+                <input type="text" v-model="objName" class="input-ui ">
+            </div>
+            <div class="mb-4 col-span-3">
+                <label for="" class="label-form mb-3">
                     Department
                 </label>
 
@@ -34,15 +40,40 @@
                             :key="index"> {{ role.name }} </option>
                     </select>
                 </div>
-            </div><div class="col-span-6"></div>
-            
+            </div><div class="col-span-3"></div>
+
             <div class="mb-4 col-span-3">
                 <label for="" class="label-form mb-3">
-                    Objective Name
+                    Key Result
                 </label>
-                <input type="text" v-model="objName" class="input-ui ">
+                <input type="text" v-model="key_result" class="input-ui ">
             </div>
             <div class="col-span-3">
+                <label for="" class="label-form mb-3">
+                    OKR Point
+                </label>
+                <input type="number" v-model="selectedOkrPoint" class="input-ui ">
+            </div>
+            <div class="mb-4 col-span-3">
+                <label for="" class="label-form mb-3">
+                    Date Assigned
+                </label>
+                <multiselect v-model="selectedDate" :options="dateList" :multiple="true" :close-on-select="false" :clear-on-select="false"
+                    :preserve-search="false" placeholder="Select Date" label="" :preselect-first="false">
+                    <template #selection="{ values, search, isOpen }">
+                        <span class="multiselect__single"
+                            v-if="values.length"
+                            v-show="!isOpen">{{ values.length }} Date selected</span>
+                    </template>
+                </multiselect>
+            </div>
+            <div class="col-span-2">
+                <label for="" class="label-form mb-3">
+                    Duration
+                </label>
+                <input type="number" v-model="duration" class="input-ui ">
+            </div>
+            <div class="    ">
                 <label for="" class="label-form mb-3">
                     &nbsp;
                 </label>
@@ -50,70 +81,65 @@
                     Add Obj
                 </button>
             </div>
-            <div class="col-span-6"></div>
 
-            <div class="contents" v-for="(obj,index) in objective_key" :key="index">
-                <div class="mb-4 col-span-3">
-                    <label for="" class="label-form mb-3">
-                        Key Result
-                    </label>
-                    <input type="text" v-model="obj.name" class="input-ui ">
-                </div>
-                <div class="col-span-3">
-                    <label for="" class="label-form mb-3">
-                        OKR Point
-                    </label>
-                    <input type="number" v-model="obj.okr_point" class="input-ui ">
-                </div>
-                <div class="mb-4 col-span-3">
-                    <label for="" class="label-form mb-3">
-                        Date Assigned
-                    </label>
-                    <multiselect v-model="obj.assigned_days" :options="dateList" :multiple="true" :close-on-select="false" :clear-on-select="false"
-                        :preserve-search="false" placeholder="Select Date" label="" :preselect-first="false">
-                        <template #selection="{ values, search, isOpen }">
-                            <span class="multiselect__single"
-                                v-if="values.length"
-                                v-show="!isOpen">{{ values.length }} Date selected</span>
-                        </template>
-                    </multiselect>
-                    <!-- <div class="bg-white mb-0 w-full text-sm inline-block h-[34px] dark:bg-white !text-black"
-                        data-te-select-wrapper-ref>
-                        <select data-te-select-init data-te-select-placeholder="Select Role"
-                            data-te-select-filter="true" name="" id="" v-model="selectedDate" class="input-ui !text-black">
-                            <option :value="date" v-for="(date, index) in dateList"
-                                :key="index"> {{ date }} </option>
-                        </select>
-                    </div> -->
-                </div>
-                <div class="col-span-2">
-                    <label for="" class="label-form mb-3">
-                        Duration
-                    </label>
-                    <input type="number" v-model="obj.duration" class="input-ui ">
-                </div>
-                <div class="pl-3">
-                    <label for="" class="label-form mb-3">
-                        &nbsp;
-                    </label>
-                    <button class="py-2" @click="deleteObj(index)">
-                        <i class="fal fa-trash"></i>
-                    </button>
-                </div>
+
+
+            
+
+
+
+
+        </div>
+
+        <div class=" bg-white py-4 px-8 rounded-md shadow-md mb-8">
+            <div class="table-container">
+                <table class="primary-table">
+                    <thead class="">
+                        <tr>
+                            <th scope="col" class="">
+                                Key Results
+                            </th>
+                            <th scope="col" class="">
+                                OKR Points
+                            </th>
+                            <th scope="col" class="">
+                                Date
+                            </th>
+                            <th scope="col" class="">
+                                Duration
+                            </th>
+                            <th scope="col" class="">
+
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr class="" v-for="(obj, objIndex) in objective_List"
+                            :key="objIndex">
+                            <td class="">
+                                {{ obj.name }}
+                            </td>
+                            <td class="">
+                                {{ obj.okr_point }}
+                            </td>
+                            <td class="">
+                                <span class="after:content-[','] last:after:content-[''] pr-1" v-for="day in obj.assigned_days">
+                                    {{ day }}
+                                </span>
+                            </td>
+                            <td class="">
+                                {{ obj.duration }}
+                            </td>
+                            <td class="">
+                                <button @click="deleteObj(objIndex)">
+                                    <i class="fal fa-trash  pr-3"></i>
+                                </button>
+                            </td>
+                        </tr>
+                    </tbody>
+
+                </table>
             </div>
-
-
-
-
-
-
-
-
-
-
-
-
-
         </div>
         
         <div>
@@ -156,6 +182,7 @@ export default {
             duration:null,
             objName:null,
 
+            objective_List:[],
             objective_key: [{ name: "",okr_point: "",assigned_days:"", duration: "" }],  // Start with one input box
             selected_obj_keys:[],
 
@@ -182,7 +209,7 @@ export default {
             // this.selectedDate = detail.assigned_days;
             // this.duration = detail.code;
             this.objName = detail.objective_name;
-            this.objective_key = detail.objective_keys;
+            this.objective_List = detail.objective_keys;
             // detail.assigned_days.forEach(day => {
             //     this.selectedDate.push(
             //         this.dateList.find(date => date.name == day )
@@ -265,7 +292,7 @@ export default {
             formData.append('role_id', this.selectedRole);
             // formData.append('assigned_days', JSON.stringify(this.selectedDate));
             // formData.append('assigned_days', JSON.stringify(selectedDate));
-            formData.append('objective_key', JSON.stringify(this.objective_key));
+            formData.append('objective_key', JSON.stringify(this.objective_List));
             let response = await postApiData({ url: '/api/objectives/'+this.okrId, form_data: formData, token: this.getToken() });
             if (response.success) {
                 window.location.replace('/OKR');
@@ -286,10 +313,19 @@ export default {
         },
 
         addObj() {
-            this.objective_key.push({ name: "",okr_point:"" });  // Add a new input box
+            this.objective_List.push({ 
+                name: this.key_result,
+                okr_point: this.selectedOkrPoint,
+                assigned_days: this.selectedDate, 
+                duration: this.duration 
+            });  // Add a new input box
+            this.key_result = null;
+            this.selectedOkrPoint = null;
+            this.selectedDate = null;
+            this.duration = null;
         },
         deleteObj(index) {
-            this.objective_key.splice(index, 1);
+            this.objective_List.splice(index, 1);
         },
         alertValidationMessage(field) {
             this.$notify({

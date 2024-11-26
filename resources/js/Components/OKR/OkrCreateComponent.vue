@@ -50,34 +50,27 @@
             </div> -->
             
             
-            <div class="col-span-3">
-                <label for="" class="label-form mb-3">
-                    &nbsp;
-                </label>
-                <button class="add-btn py-[9px]" @click="addObj()">
-                    Add Obj
-                </button>
-            </div>
-            <div class="col-span-9"></div>
+            
+            
 
             <div class="contents" v-for="(obj,index) in objective_key" :key="index">
                 <div class="mb-4 col-span-3">
                     <label for="" class="label-form mb-3">
                         Key Result
                     </label>
-                    <input type="text" v-model="obj.name" class="input-ui ">
+                    <input type="text" v-model="key_result" class="input-ui ">
                 </div>
                 <div class="col-span-3">
                     <label for="" class="label-form mb-3">
                         OKR Point
                     </label>
-                    <input type="number" v-model="obj.okr_point" class="input-ui ">
+                    <input type="number" v-model="selectedOkrPoint" class="input-ui ">
                 </div>
                 <div class="mb-4 col-span-3">
                     <label for="" class="label-form mb-3">
                         Date Assigned
                     </label>
-                    <multiselect v-model="obj.assigned_days" :options="dateList" :multiple="true" :close-on-select="false" :clear-on-select="false"
+                    <multiselect v-model="selectedDate" :options="dateList" :multiple="true" :close-on-select="false" :clear-on-select="false"
                         :preserve-search="false" placeholder="Select Date" label="" :preselect-first="false">
                         <template #selection="{ values, search, isOpen }">
                             <span class="multiselect__single"
@@ -98,29 +91,72 @@
                     <label for="" class="label-form mb-3">
                         Duration
                     </label>
-                    <input type="number" v-model="obj.duration" class="input-ui ">
+                    <input type="number" v-model="duration" class="input-ui ">
                 </div>
-                <div class="pl-3">
+                <div class="">
                     <label for="" class="label-form mb-3">
                         &nbsp;
                     </label>
-                    <button class="py-2" @click="deleteObj(index)">
-                        <i class="fal fa-trash"></i>
+                    <button class="add-btn py-[9px]" @click="addObj()">
+                        Add Obj
                     </button>
                 </div>
             </div>
+        </div>
 
 
 
+        <div class=" bg-white py-4 px-8 rounded-md shadow-md mb-8">
+            <div class="table-container">
+                <table class="primary-table">
+                    <thead class="">
+                        <tr>
+                            <th scope="col" class="">
+                                Key Results
+                            </th>
+                            <th scope="col" class="">
+                                OKR Points
+                            </th>
+                            <th scope="col" class="">
+                                Date
+                            </th>
+                            <th scope="col" class="">
+                                Duration
+                            </th>
+                            <th scope="col" class="">
 
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr class="" v-for="(obj, objIndex) in objective_List"
+                            :key="objIndex">
+                            <td class="">
+                                {{ obj.name }}
+                            </td>
+                            <td class="">
+                                {{ obj.okr_point }}
+                            </td>
+                            <td class="">
+                                <span class="after:content-[','] last:after:content-[''] pr-1" v-for="day in obj.assigned_days">
+                                    {{ day }}
+                                </span>
+                            </td>
+                            <td class="">
+                                {{ obj.duration }}
+                            </td>
+                            <td class="">
+                                <button @click="deleteObj(objIndex)">
+                                    <i class="fal fa-trash  pr-3"></i>
+                                </button>
+                            </td>
+                        </tr>
+                    </tbody>
 
+                </table>
+            </div>
 
-
-
-
-
-
-
+            
 
         </div>
         
@@ -159,10 +195,12 @@ export default {
             // ],
             selectedDepartment:null,
             selectedRole:null,
-            // selectedDate:null,
+            key_result:null,
+            selectedOkrPoint:null,
+            selectedDate:null,
             duration:null,
-            objName:null,
 
+            objective_List:[],
             objective_key: [{ name: "",okr_point: "",assigned_days:"", duration: "" }],  // Start with one input box
             selected_obj_keys:[],
             testKey:[],
@@ -172,10 +210,19 @@ export default {
     methods: {
         ...mapGetters(['getToken']),
         addObj() {
-            this.objective_key.push({ name: "",okr_point:"",assigned_days:"", duration: "" });  // Add a new input box
+            this.objective_List.push({ 
+                name: this.key_result,
+                okr_point: this.selectedOkrPoint,
+                assigned_days: this.selectedDate, 
+                duration: this.duration 
+            });  // Add a new input box
+            this.key_result = null;
+            this.selectedOkrPoint = null;
+            this.selectedDate = null;
+            this.duration = null;
         },
         deleteObj(index) {
-            this.objective_key.splice(index, 1);
+            this.objective_List.splice(index, 1);
         },
 
 
@@ -241,7 +288,7 @@ export default {
             formData.append('objective_name', this.objName);
             formData.append('role_id', this.selectedRole.id);
             // formData.append('assigned_days', JSON.stringify(selectedDate));
-            formData.append('objective_key', JSON.stringify(this.objective_key));
+            formData.append('objective_key', JSON.stringify(this.objective_List));
             let response = await postApiData({ url: '/api/objectives', form_data: formData, token: this.getToken() });
             if (response.success) {
                 window.location.replace('/OKR');
