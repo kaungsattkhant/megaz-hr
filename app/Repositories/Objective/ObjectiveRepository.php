@@ -34,8 +34,7 @@ class  ObjectiveRepository implements ObjectiveInterface
 
         return Objective::with([
             'role.department',
-            'objectiveKeys.objKeyStaff',
-            'objectiveKeys.objImages'
+            'objectiveKeys.objKeyStaff.objKeyStaffImg',
         ])->objectiveFilter($search, $name, $days, $role, $department)
             ->paginate();
     }
@@ -47,7 +46,7 @@ class  ObjectiveRepository implements ObjectiveInterface
 
     public function getObjectiveById(Request $request, $objId)
     {
-        return Objective::with(['role.department', 'objectiveKeys.objKeyStaff', 'objectiveKeys.objImages'])->where('id', $objId)->get();
+        return Objective::with(['role.department', 'objectiveKeys.objKeyStaff.objKeyStaffImg'])->where('id', $objId)->get();
     }
 
 
@@ -139,18 +138,26 @@ class  ObjectiveRepository implements ObjectiveInterface
     public function objectiveLists(Request $request)
     {
         $currentDay = now()->format('l');
-        return  Objective::with([
+        $staffId = UserData()->id;
+
+        $data =  Objective::with([
             'role',
-            'objectiveKeys' => function ($query) use ($currentDay) {
+            'objectiveKeys' => function ($query) use ($currentDay, $staffId) {
                 $query->whereRaw("FIND_IN_SET(?, assigned_days)", [$currentDay]);
             },
-            'objectiveKeys.objKeyStaff',
-            'objKeyStaffImg'
+            'objectiveKeys.objKeyStaff' => function ($query) use ($staffId) {
+                $query->where('staff_id', $staffId);
+            },
+            'objectiveKeys.objKeyStaff.objKeyStaffImg'
         ])
-            ->whereHas('objectiveKeys', function ($query) use ($currentDay) {
-                $query->whereRaw("FIND_IN_SET(?, assigned_days)", [$currentDay]);
+            ->whereHas('objectiveKeys', function ($query) use ($currentDay, $staffId) {
+                $query->whereRaw("FIND_IN_SET(?, assigned_days)", [$currentDay])
+                    ->whereHas('objKeyStaff', function ($query) use ($staffId) {
+                        $query->where('staff_id', $staffId);
+                    });
             })
             ->paginate();
+        return $data;
     }
 
 
@@ -175,23 +182,27 @@ class  ObjectiveRepository implements ObjectiveInterface
         return $objectives;
     }
 
-    public function storeImages($validatedData)
+    public function getObjKeyStaffImage($objKeystaffId)
     {
-        if (isset($validatedData['image']) && is_string($validatedData['image'])) {
-            $datas = json_decode($validatedData['image'], true);
-            $storedImages = [];
-            foreach ($datas as $data) {
 
-                $imageData = $data['image'];
-                $extension = $imageData->getClientOriginalExtension();
+        return ObjectiveKeyStaffImage::with('objective_keyStaff')->where('objectivekey_staff_id', $objKeystaffId)->get();
+    }
+    public function storeImages($validatedData, $objKeystaffId)
+    {
+        if (isset($validatedData['images'])) {
+
+            $storedImages = [];
+            foreach ($validatedData['images'] as $data) {
+
+                $extension = $data->getClientOriginalExtension();
                 $hashedName = md5(uniqid() . microtime()) . '.' . $extension;
-                $data['image_path'] = $imageData->storeAs('okrImages/', $hashedName, 'public');
-                $data['image_url'] = Storage::url($data['image_path']);
+                $image_path = $data->storeAs('okrImages/', $hashedName, 'public');
+                $image_url = Storage::url($image_path);
 
                 $storedImages[] = ObjectiveKeyStaffImage::create([
-                    'objectivekey_staff_id' => $validatedData['objectivekey_staff_id'],
-                    'image_path' => $data['image_path'],
-                    'image_url' =>  $data['image_url'],
+                    'objectivekey_staff_id' => $objKeystaffId,
+                    'image_path' => $image_path,
+                    'image_url' =>  $image_url,
                 ]);
             }
             return $storedImages;
@@ -206,15 +217,15 @@ class  ObjectiveRepository implements ObjectiveInterface
 
         $updateImages = [];
 
-        if (isset($validatedData['image']) && $validatedData['image']->isValid()) {
+        if (isset($validatedData['images'])) {
 
             if ($data->image_path && Storage::exists($data->image_path)) {
                 Storage::delete($data->image_path);
             }
 
-            $objImages = json_decode($validatedData['image'], true);
+            $objImages = json_decode($validatedData['images'], true);
             foreach ($objImages as $objImage) {
-                $imageData = $objImage['image'];
+                $imageData = $objImage['images'];
                 $extension = $imageData->getClientOriginalExtension();
                 $hashedName = md5(uniqid() . microtime()) . '.' . $extension;
                 $objImage['imagePath'] = $imageData->storeAs('okrImages/', $hashedName, 'public');
