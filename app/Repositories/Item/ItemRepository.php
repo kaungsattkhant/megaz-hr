@@ -14,34 +14,15 @@ class ItemRepository implements ItemRepositoryInterface
 {
     public function listAllData(Request $request)
     {
+        $category_id = $request->category_id;
         if ($request->per_page || $request->page) {
-            $category_id = $request->category_id;
-            // return Item::with(['category', 'supplier_items.item_price'])
-
-            //     ->orderByDesc('id')
-            //     ->when($request->search_input, function ($q) use ($request) {
-            //         $q->where('name', 'LIKE', '%' . $request->search_input . '%');
-            //     })
-            //     ->when($category_id, function ($query) use ($category_id) {
-            //         $query->where('category_id', $category_id);
-            //     })
-            //     ->get()
-            //     ->map(function ($item) {
-            //         // Calculate average_item_price
-    
-            //         $item->average_item_price = $item->supplier_items->pluck('item_price.price')->filter()->avg() ?? 0;
-
-            //         // For each supplier item, calculate item_price_avg_price
-            //         // $item->supplier_items->each(function ($supplierItem) {
-            //         //     $supplierItem->item_price_avg_price = $supplierItem->item_price?->price;
-            //         // });
-    
-            //         return $item;
-            //     });
-
             return Item::with(['category', 'supplier_items.item_price' => function ($query) {
                 $query->orderByDesc('id');
             }])
+            ->when($category_id,function($q)use($category_id){
+                $q->where('items.category_id',$category_id);
+            })
+            // ->where('items.category_id', $request->category_id)
             ->select('items.*', DB::raw('
                 FORMAT(
                     (
@@ -62,10 +43,39 @@ class ItemRepository implements ItemRepositoryInterface
             ->orderByDesc('id')
             ->paginate(config('common.list_count'));
         } else {
-            if ($request->category_id) {
-                return Item::with('category')->where('category_id', $request->category_id)->get();
-            }
-            return Item::with('category')->get();
+            // if ($request->category_id) {
+            //     return Item::with('category')
+            //     ->where('category_id', $request->category_id)
+            //     ->get();
+            // }
+            // $items= Item::with('category')->get();
+            // return $items;
+            return Item::with(['category', 'supplier_items.item_price' => function ($query) {
+                $query->orderByDesc('id');
+            }])
+            ->when((isset($request->category_id )&& $category_id),function($q)use($category_id){
+                $q->where('items.category_id',$category_id);
+            })
+            // ->where('items.category_id', $request->category_id)
+            ->select('items.*', DB::raw('
+                FORMAT(
+                    (
+                        SELECT COALESCE(AVG(latest_prices.price), 0) 
+                        FROM (
+                            SELECT ip.price 
+                            FROM supplier_items si
+                            JOIN item_prices ip ON si.id = ip.supplier_item_id
+                            WHERE si.item_id = items.id
+                            AND ip.id = (
+                                SELECT MAX(sub_ip.id)
+                                FROM item_prices sub_ip
+                                WHERE sub_ip.supplier_item_id = si.id
+                            )
+                        ) AS latest_prices
+                    ), 2) AS average_price
+            '))
+            ->orderByDesc('id')
+            ->get();
         }
     }
 

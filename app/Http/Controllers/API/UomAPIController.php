@@ -72,27 +72,51 @@ class UomAPIController extends Controller
 
      #test
      public function getUomConversionByUom(Request $request){
+        // dd($request->all());
         if($request->po_uom_id==$request->item_uom_id){
-            // dd($request->po_uom_id,$request->base_uom_id);
-            $uom_conversion=UomConversion::where('base_unit_id',$request->po_uom_id)
-            ->where('conversion_unit_id',$request->base_uom_id)
+            //old
+            // $uom_conversion=UomConversion::where('base_unit_id',$request->po_uom_id)
+            // ->where('conversion_unit_id',$request->base_uom_id)
+            // ->first();
+            // if($uom_conversion){
+            //     $priceByItem=$request->item_price;
+            //     $uom_conversion->price=$priceByItem;
+            //     ResponseData($uom_conversion);
+            // }
+            //calculate item price with average price of supplier 
+             $uom_conversion=UomConversion::where('base_unit_id',$request->base_uom_id)
+            ->where('conversion_unit_id',$request->item_uom_id)
             ->first();
             if($uom_conversion){
                 $priceByItem=$request->item_price;
-                $uom_conversion->price=$priceByItem;
+                $uom_conversion->price=format_price($priceByItem/$uom_conversion->conversion);
                 ResponseData($uom_conversion);
             }
             // $request->item_price*$request->quantity/$uom_conversion->conversion;
         }
         if($request->po_uom_id==$request->base_uom_id){
-            $uom_conversion=UomConversion::where('base_unit_id',$request->item_uom_id)
+            //before item price
+            // $uom_conversion=UomConversion::where('base_unit_id',$request->item_uom_id)
+            // ->where('conversion_unit_id',$request->po_uom_id)
+            // ->first();
+            // if($uom_conversion){
+            //     $uom_conversion_for_po=UomConversion::where('base_unit_id',$request->po_uom_id)
+            //     ->where('conversion_unit_id',$request->base_uom_id)
+            //     ->first();
+            //     $priceByItem=$request->item_price/$uom_conversion->conversion;
+            //     $uom_conversion_for_po->price=$priceByItem;
+            //     ResponseData($uom_conversion_for_po);
+            // }
+
+            //after item price  have each supplier
+            $uom_conversion=UomConversion::where('base_unit_id',$request->base_uom_id)
             ->where('conversion_unit_id',$request->po_uom_id)
             ->first();
             if($uom_conversion){
                 $uom_conversion_for_po=UomConversion::where('base_unit_id',$request->po_uom_id)
                 ->where('conversion_unit_id',$request->base_uom_id)
                 ->first();
-                $priceByItem=$request->item_price/$uom_conversion->conversion;
+                $priceByItem=format_price($request->item_price/$uom_conversion->conversion);
                 $uom_conversion_for_po->price=$priceByItem;
                 ResponseData($uom_conversion_for_po);
             }
