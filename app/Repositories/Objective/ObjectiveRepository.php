@@ -3,6 +3,7 @@
 namespace App\Repositories\Objective;
 
 use Exception;
+use App\Models\Item;
 use App\Models\Role;
 use App\Models\Staff;
 use App\Models\Entity;
@@ -12,13 +13,13 @@ use App\Models\KtvObjective;
 use App\Models\ObjectiveKey;
 use Illuminate\Http\Request;
 use App\Models\KtvProductTree;
-use App\Models\ObjectivekeyImage;
 use App\Models\ObjectivekeyStaff;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
+use App\Models\ObjectiveKeyStaffImage;
 use Illuminate\Support\Facades\Storage;
 use App\Http\Resources\KtvObjectiveRsource;
-use App\Models\Item;
+use App\Http\Resources\KtvProductTreeEditResource;
 
 class  ObjectiveRepository implements ObjectiveInterface
 {
@@ -134,6 +135,7 @@ class  ObjectiveRepository implements ObjectiveInterface
         }
     }
 
+    //mobile
     public function objectiveLists(Request $request)
     {
         $currentDay = now()->format('l');
@@ -143,7 +145,7 @@ class  ObjectiveRepository implements ObjectiveInterface
                 $query->whereRaw("FIND_IN_SET(?, assigned_days)", [$currentDay]);
             },
             'objectiveKeys.objKeyStaff',
-            'objectiveKeys.objImages'
+            'objKeyStaffImg'
         ])
             ->whereHas('objectiveKeys', function ($query) use ($currentDay) {
                 $query->whereRaw("FIND_IN_SET(?, assigned_days)", [$currentDay]);
@@ -163,7 +165,7 @@ class  ObjectiveRepository implements ObjectiveInterface
                 $query->whereRaw("FIND_IN_SET(?, assigned_days)", [$currentDay]);
             },
             'objectiveKey.objective',
-            'objectiveKey.objImages'
+            'objKeyStaffImg'
         ])
             ->where('staff_id', UserData()->id)
             ->whereHas('objectiveKey', function ($query) use ($currentDay) {
@@ -186,8 +188,8 @@ class  ObjectiveRepository implements ObjectiveInterface
                 $data['image_path'] = $imageData->storeAs('okrImages/', $hashedName, 'public');
                 $data['image_url'] = Storage::url($data['image_path']);
 
-                $storedImages[] = ObjectivekeyImage::create([
-                    'objective_key_id' => $validatedData['objective_key_id'],
+                $storedImages[] = ObjectiveKeyStaffImage::create([
+                    'objectivekey_staff_id' => $validatedData['objectivekey_staff_id'],
                     'image_path' => $data['image_path'],
                     'image_url' =>  $data['image_url'],
                 ]);
@@ -200,7 +202,7 @@ class  ObjectiveRepository implements ObjectiveInterface
 
     public function updateImages($validatedData, $objKeyImgId)
     {
-        $data = ObjectivekeyImage::findOrFail($objKeyImgId);
+        $data = ObjectiveKeyStaffImage::findOrFail($objKeyImgId);
 
         $updateImages = [];
 
@@ -219,7 +221,7 @@ class  ObjectiveRepository implements ObjectiveInterface
                 $objImage['imageUrl'] = Storage::url($objImage['imagePath']);
 
                 $updateImages[] = $data->update([
-                    'objective_key_id' => $data->id,
+                    'objectivekey_staff_id' => $data->id,
                     'image_path' => $objImage['imagePath'],
                     'image_url' => $objImage['imageUrl'],
                 ]);
@@ -283,14 +285,12 @@ class  ObjectiveRepository implements ObjectiveInterface
 
     public function getKtvObjective(Request $request)
     {
-        $currentDay = now()->format('l');
+
         $ktvObjectives = Objective::with([
             'role',
             'objectiveKeys'
-            // 'objectiveKeys' => function ($query) use ($currentDay) {
-            //     $query->whereRaw("FIND_IN_SET(?, assigned_days)", [$currentDay]);
-            // },
         ])->get();
+
         return KtvObjectiveRsource::collection($ktvObjectives);
     }
 
@@ -330,13 +330,23 @@ class  ObjectiveRepository implements ObjectiveInterface
 
     public function  getKtvObjectiveTree(Request $request)
     {
-        $data =  KtvProductTree::with(['KtvObjectives.objective', 'KtvItems.item'])->paginate();
+        $data =  KtvProductTree::with([
+            'entity',
+            'KtvObjectives.objective.role',
+            'KtvObjectives.objective.objectiveKeys',
+            'KtvItems.item'
+        ])->paginate();
         return $data;
     }
     public function getKtvObjTreeById(Request $request, $id)
     {
-        $data =  KtvProductTree::with(['KtvObjectives.objective', 'KtvItems.item'])->findOrFail($id);
-        return $data;
+        $data =  KtvProductTree::with([
+            'entity',
+            'KtvObjectives.objective.role',
+            'KtvObjectives.objective.objectiveKeys',
+            'KtvItems.item'
+        ])->findOrFail($id);
+        return new KtvProductTreeEditResource($data);
     }
 
     public function updateKtvObjTree(Request $request, $ktvObjTreeId)

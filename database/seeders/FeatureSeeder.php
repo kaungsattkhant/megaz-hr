@@ -58,7 +58,11 @@ class FeatureSeeder extends Seeder
             'cooking place',
             'custom task',
             'feature',
-            'financial report'
+            'accessory',
+            'financial report',
+            'MRP',
+            'Objective',
+            'Ktv Product Tree'
         ];
         foreach ($features as $feature) {
             Feature::create([

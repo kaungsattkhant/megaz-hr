@@ -6,33 +6,33 @@
             <ul class=" mb-4">
                 <!-- @if(checkFeaturePermission('financial-report')) -->
 
-                    <li>
-                        <button class="flex items-center pl-9 my-2 text-sm w-full" type="button" data-te-collapse-init
-                            data-te-ripple-init data-te-ripple-color="light" data-te-target="#collapseFinanceReport"
-                            aria-expanded="false" aria-controls="collapseExample">
-                            <i class="fal fa-chart-line  pr-3"></i>
-                            Finance Report <i class="fas fa-angle-down absolute right-2"></i>
-                        </button>
-                        <div class="!visible @yield('cash_flow_collapse')hidden text-center" id="collapseFinanceReport"
-                            data-te-collapse-item>
-                            <ul>
-                                <li>
-                                    <a href="/cash_flow_statement"
-                                        class="flex items-center text-left @yield('cash_flow_statement')">
-                                        <i class="fal fa-tasks  pr-3"></i>
-                                        Cash Flow
-                                    </a>
-                                </li>
-                                <li>
-                                    <a href="/indirect_cashflow_statement"
-                                        class="flex items-center text-left @yield('indirect_cashflow_statement')">
-                                        <i class="fal fa-tasks  pr-3"></i>
-                                        Indirect Cash Flow
-                                    </a>
-                                </li>
-                            </ul>
-                        </div>
-                    </li>
+                <li>
+                    <button class="flex items-center pl-9 my-2 text-sm w-full" type="button" data-te-collapse-init
+                        data-te-ripple-init data-te-ripple-color="light" data-te-target="#collapseFinanceReport"
+                        aria-expanded="false" aria-controls="collapseExample">
+                        <i class="fal fa-chart-line  pr-3"></i>
+                        Finance Report <i class="fas fa-angle-down absolute right-2"></i>
+                    </button>
+                    <div class="!visible @yield('cash_flow_collapse')hidden text-center" id="collapseFinanceReport"
+                        data-te-collapse-item>
+                        <ul>
+                            <li>
+                                <a href="/cash_flow_statement"
+                                    class="flex items-center text-left @yield('cash_flow_statement')">
+                                    <i class="fal fa-tasks  pr-3"></i>
+                                    Cash Flow
+                                </a>
+                            </li>
+                            <li>
+                                <a href="/indirect_cashflow_statement"
+                                    class="flex items-center text-left @yield('indirect_cashflow_statement')">
+                                    <i class="fal fa-tasks  pr-3"></i>
+                                    Indirect Cash Flow
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </li>
 
                 <!-- @endif -->
                 @if(checkFeaturePermission('sale-target'))
@@ -89,7 +89,7 @@
                     </li>
                 @endif
 
-<!-- <<<<<<< HEAD -->
+                <!-- <<<<<<< HEAD -->
                 @if (checkFeaturePermission('staff'))
                     <li>
                         <a href="{{ route('staff') }}" class="flex items-center @yield('staffs')">
@@ -98,48 +98,49 @@
                         </a>
                     </li>
                 @endif
-<!-- ======= -->
-                        @if (checkFeaturePermission('menu'))
-                        <li>
-                            <a href="{{ route('menu_categories') }}" class="flex items-center @yield('menu_categories')">
-                                <i class="fal fa-clipboard-list  pr-3"></i>
-                                Menu Categories
-                            </a>
-                        </li>
-                        <li>
-                            <a href="{{ route('menus') }}" class="flex items-center @yield('menus')">
-                                <i class="fal fa-clipboard-list  pr-3"></i>
-                                Selling Menus
-                            </a>
-                        </li>
-                        <li>
-                            <a href="{{ route('MRP') }}" class="flex items-center @yield('mrp')">
-                                <i class="fal fa-clipboard-list  pr-3"></i>
-                                MRP
-                            </a>
-                        </li>
-                        <li>
-                            <a href="{{ route('menu_sale_report.index') }}" class="flex items-center @yield('menu_sale_report')">
-                                <i class="fal fa-clipboard-list  pr-3"></i>
-                                Menu Sale Report
-                            </a>
-                        </li>
-                        <li>
-                            <a href="{{ route('menu_costing.index') }}" class="flex items-center @yield('menu_costing')">
-                                <i class="fal fa-clipboard-list  pr-3"></i>
-                                Menu Costing
-                            </a>
-                        </li>
-                        @endif
-                        @if (checkFeaturePermission('room'))
-                        <li>
-                            <a href="{{ route('room') }}" class="flex items-center @yield('room')">
-                                <i class="fal fa-microphone-alt  pr-3"></i>
-                                Room
-                            </a>
-                        </li>
-                        @endif
-<!-- >>>>>>> origin/thhs/okr-backend -->
+                <!-- ======= -->
+                @if (checkFeaturePermission('menu'))
+                    <li>
+                        <a href="{{ route('menu_categories') }}" class="flex items-center @yield('menu_categories')">
+                            <i class="fal fa-clipboard-list  pr-3"></i>
+                            Menu Categories
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{{ route('menus') }}" class="flex items-center @yield('menus')">
+                            <i class="fal fa-clipboard-list  pr-3"></i>
+                            Selling Menus
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{{ route('MRP') }}" class="flex items-center @yield('mrp')">
+                            <i class="fal fa-clipboard-list  pr-3"></i>
+                            MRP
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{{ route('menu_sale_report.index') }}"
+                            class="flex items-center @yield('menu_sale_report')">
+                            <i class="fal fa-clipboard-list  pr-3"></i>
+                            Menu Sale Report
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{{ route('menu_costing.index') }}" class="flex items-center @yield('menu_costing')">
+                            <i class="fal fa-clipboard-list  pr-3"></i>
+                            Menu Costing
+                        </a>
+                    </li>
+                @endif
+                @if (checkFeaturePermission('room'))
+                    <li>
+                        <a href="{{ route('room') }}" class="flex items-center @yield('room')">
+                            <i class="fal fa-microphone-alt  pr-3"></i>
+                            Room
+                        </a>
+                    </li>
+                @endif
+                <!-- >>>>>>> origin/thhs/okr-backend -->
 
                 @if(checkFeaturePermission('journal'))
                     <li>
@@ -588,7 +589,7 @@
                         </a>
                     </li>
                 @endif
-                @if(checkFeaturePermission(name: 'crm'))
+                @if(checkFeaturePermission('crm'))
                     <li>
                         <button class="flex items-center pl-9 my-2 text-sm" type="button" data-te-collapse-init
                             data-te-ripple-init data-te-ripple-color="light" data-te-target="#collapseCRM"
@@ -630,30 +631,42 @@
                         </div>
                     </li>
                 @endif
+                @if(checkFeaturePermission('accessory'))
                     <li>
                         <a href="/accessories" class="flex items-center @yield('packages')">
                             <i class="fal fa-braille pr-3"></i>
                             Accessories
                         </a>
                     </li>
+                @endif
+
+                @if(checkFeaturePermission('objective'))
                     <li>
                         <a href="/OKR" class="flex items-center @yield('OKR')">
                             <i class="fal fa-braille pr-3"></i>
                             OKR
                         </a>
                     </li>
+                @endif
+
+                <!-- @if(checkFeaturePermission('accessory')) -->
                     <li>
                         <a href="/menu_forecasting" class="flex items-center @yield('menu_forecasting')">
                             <i class="fal fa-braille pr-3"></i>
                             Menu Forecasting
                         </a>
                     </li>
+                <!-- @endif -->
+
+                @if(checkFeaturePermission('ktv-product-tree'))
                     <li>
                         <a href="/ktv_product_tree" class="flex items-center @yield('ktv_product_tree')">
                             <i class="fal fa-braille pr-3"></i>
                             Product Tree
                         </a>
                     </li>
+                @endif
+
 
             </ul>
 
