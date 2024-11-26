@@ -99,6 +99,14 @@
                     </li>
                 @endif
                 <!-- ======= -->
+                <!-- @if (checkFeaturePermission('mrp')) -->
+                    <li>
+                        <a href="{{ route('MRP') }}" class="flex items-center @yield('mrp')">
+                            <i class="fal fa-clipboard-list  pr-3"></i>
+                            MRP
+                        </a>
+                    </li>
+                <!-- @endif -->
                 @if (checkFeaturePermission('menu'))
                     <li>
                         <a href="{{ route('menu_categories') }}" class="flex items-center @yield('menu_categories')">
@@ -112,12 +120,7 @@
                             Selling Menus
                         </a>
                     </li>
-                    <li>
-                        <a href="{{ route('MRP') }}" class="flex items-center @yield('mrp')">
-                            <i class="fal fa-clipboard-list  pr-3"></i>
-                            MRP
-                        </a>
-                    </li>
+
                     <li>
                         <a href="{{ route('menu_sale_report.index') }}"
                             class="flex items-center @yield('menu_sale_report')">
@@ -650,12 +653,12 @@
                 @endif
 
                 <!-- @if(checkFeaturePermission('accessory')) -->
-                    <li>
-                        <a href="/menu_forecasting" class="flex items-center @yield('menu_forecasting')">
-                            <i class="fal fa-braille pr-3"></i>
-                            Menu Forecasting
-                        </a>
-                    </li>
+                <li>
+                    <a href="/menu_forecasting" class="flex items-center @yield('menu_forecasting')">
+                        <i class="fal fa-braille pr-3"></i>
+                        Menu Forecasting
+                    </a>
+                </li>
                 <!-- @endif -->
 
                 @if(checkFeaturePermission('ktv-product-tree'))
