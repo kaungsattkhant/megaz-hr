@@ -213,7 +213,7 @@
                     this.alertValidationMessage('quantity');
                     return 1;
                 }
-                let floatItemPrice = parseFloat(this.selectedItem.average_price.replace(/,/g, ""))
+                let floatItemPrice = parseFloat(this.selectedItem.average_price)
                 console.log(floatItemPrice)
                 let url = `/api/get_uom_conversion_by_uom?po_uom_id=${this.selectedUom.id}&item_uom_id=${this.selectedItem.uom_id}&item_price=${floatItemPrice}&base_uom_id=${this.selectedItem.base_uom_id}`;
                 let response = await getApiData({url: url, token: this.getToken()});
