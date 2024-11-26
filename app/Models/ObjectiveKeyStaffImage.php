@@ -14,7 +14,7 @@ class ObjectiveKeyStaffImage extends Model
         'image_url',
         'image_path'
     ];
-    public function objective_key(): BelongsTo
+    public function objective_keyStaff(): BelongsTo
     {
         return  $this->belongsTo(ObjectivekeyStaff::class, 'objectivekey_staff_id');
     }

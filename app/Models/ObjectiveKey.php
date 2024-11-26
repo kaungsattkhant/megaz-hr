@@ -25,10 +25,6 @@ class ObjectiveKey extends Model
         return $this->hasMany(ObjectivekeyStaff::class);
     }
 
-    public function objImages(): HasMany
-    {
-        return $this->hasMany(ObjectivekeyImage::class);
-    }
 
     public function getAssignedDaysAttribute($value)
     {
