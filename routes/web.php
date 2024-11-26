@@ -100,6 +100,9 @@ Route::middleware(['departments:menu'])->group(function () {
     Route::view('/menus/create', 'menus.create')->name('menus.create');
     Route::view('/menus/{id}/edit', 'menus.edit')->name('menus.edit');
 
+
+});
+Route::middleware(['departments:menu'])->group(function () {
     Route::view('/mrp', 'MRP.index')->name('MRP');
     Route::view('/mrp/create', 'MRP.create')->name('MRP.create');
     Route::view('/mrp/{id}/edit', 'MRP.edit');
