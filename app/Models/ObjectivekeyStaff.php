@@ -33,4 +33,9 @@ class ObjectivekeyStaff extends Model
     {
         return $this->belongsTo(ObjectiveKey::class, 'objective_key_id');
     }
+
+    public function objKeyStaffImg()
+    {
+        return $this->hasMany(ObjectiveKeyStaffImage::class);
+    }
 }

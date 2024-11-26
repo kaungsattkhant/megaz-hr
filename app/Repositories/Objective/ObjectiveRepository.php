@@ -13,10 +13,10 @@ use App\Models\KtvObjective;
 use App\Models\ObjectiveKey;
 use Illuminate\Http\Request;
 use App\Models\KtvProductTree;
-use App\Models\ObjectivekeyImage;
 use App\Models\ObjectivekeyStaff;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
+use App\Models\ObjectiveKeyStaffImage;
 use Illuminate\Support\Facades\Storage;
 use App\Http\Resources\KtvObjectiveRsource;
 use App\Http\Resources\KtvProductTreeEditResource;
@@ -187,8 +187,8 @@ class  ObjectiveRepository implements ObjectiveInterface
                 $data['image_path'] = $imageData->storeAs('okrImages/', $hashedName, 'public');
                 $data['image_url'] = Storage::url($data['image_path']);
 
-                $storedImages[] = ObjectivekeyImage::create([
-                    'objective_key_id' => $validatedData['objective_key_id'],
+                $storedImages[] = ObjectiveKeyStaffImage::create([
+                    'objectivekey_staff_id' => $validatedData['objectivekey_staff_id'],
                     'image_path' => $data['image_path'],
                     'image_url' =>  $data['image_url'],
                 ]);
@@ -201,7 +201,7 @@ class  ObjectiveRepository implements ObjectiveInterface
 
     public function updateImages($validatedData, $objKeyImgId)
     {
-        $data = ObjectivekeyImage::findOrFail($objKeyImgId);
+        $data = ObjectiveKeyStaffImage::findOrFail($objKeyImgId);
 
         $updateImages = [];
 
@@ -220,7 +220,7 @@ class  ObjectiveRepository implements ObjectiveInterface
                 $objImage['imageUrl'] = Storage::url($objImage['imagePath']);
 
                 $updateImages[] = $data->update([
-                    'objective_key_id' => $data->id,
+                    'objectivekey_staff_id' => $data->id,
                     'image_path' => $objImage['imagePath'],
                     'image_url' => $objImage['imageUrl'],
                 ]);

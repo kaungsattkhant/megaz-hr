@@ -11,9 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('objectivekey_images', function (Blueprint $table) {
+        Schema::create('objective_key_staff_images', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('objective_key_id');
+            $table->foreignId('objectivekey_staff_id');
             $table->string('image_url')->nullable();
             $table->string('image_path')->nullable();
             $table->timestamps();
@@ -25,6 +25,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('objectivekey_images');
+        Schema::dropIfExists('objective_key_staff_images');
     }
 };
