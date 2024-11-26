@@ -18,4 +18,10 @@ class SupplierItem extends Model
     public function item(){
         return $this->belongsTo(Item::class);
     }
+
+    public function item_price(){
+        return $this->hasOne(ItemPrice::class)->orderBy('id','desc');
+    }
+
+
 }

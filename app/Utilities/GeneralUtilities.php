@@ -362,3 +362,16 @@ if (!function_exists('existOrderItemByStatus')) {
         return true;
     }
 }
+
+if (!function_exists('format_price')) {
+    /**
+     * Format a value to two decimal places.
+     *
+     * @param float|int $value The value to format.
+     * @return string The formatted value with two decimal places.
+     */
+    function format_price($value)
+    {
+        return number_format((float)$value, 2, '.', '');
+    }
+}
