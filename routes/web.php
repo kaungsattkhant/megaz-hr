@@ -98,11 +98,12 @@ Route::middleware(['departments:menu'])->group(function () {
     Route::view('/menu_categories', 'menu_categories.index')->name('menu_categories');
     Route::view('/menus', 'menus.index')->name('menus');
     Route::view('/menus/create', 'menus.create')->name('menus.create');
-    Route::view('/menus/{id}/edit', 'menus.edit')->name('menus.edit');
-
-
+    // Route::view('/menus/{id}/edit', 'menus.edit')->name('menus.edit');
+    // Route::view('/mrp', 'MRP.index')->name('MRP');
+    // Route::view('/mrp/create', 'MRP.create')->name('MRP.create');
+    // Route::view('/mrp/{id}/edit', 'MRP.edit');
 });
-Route::middleware(['departments:menu'])->group(function () {
+Route::middleware(['departments:mrp'])->group(function () {
     Route::view('/mrp', 'MRP.index')->name('MRP');
     Route::view('/mrp/create', 'MRP.create')->name('MRP.create');
     Route::view('/mrp/{id}/edit', 'MRP.edit');

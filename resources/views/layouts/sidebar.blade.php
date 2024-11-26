@@ -99,14 +99,14 @@
                     </li>
                 @endif
                 <!-- ======= -->
-                <!-- @if (checkFeaturePermission('mrp')) -->
+                @if (checkFeaturePermission('mrp'))
                     <li>
                         <a href="{{ route('MRP') }}" class="flex items-center @yield('mrp')">
                             <i class="fal fa-clipboard-list  pr-3"></i>
                             MRP
                         </a>
                     </li>
-                <!-- @endif -->
+                @endif
                 @if (checkFeaturePermission('menu'))
                     <li>
                         <a href="{{ route('menu_categories') }}" class="flex items-center @yield('menu_categories')">
