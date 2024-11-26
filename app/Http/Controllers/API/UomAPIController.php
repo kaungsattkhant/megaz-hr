@@ -116,6 +116,7 @@ class UomAPIController extends Controller
                 $uom_conversion_for_po=UomConversion::where('base_unit_id',$request->po_uom_id)
                 ->where('conversion_unit_id',$request->base_uom_id)
                 ->first();
+                // dd($request->item_price);
                 $priceByItem=format_price($request->item_price/$uom_conversion->conversion);
                 $uom_conversion_for_po->price=$priceByItem;
                 ResponseData($uom_conversion_for_po);

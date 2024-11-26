@@ -58,22 +58,21 @@ class ItemRepository implements ItemRepositoryInterface
             })
             // ->where('items.category_id', $request->category_id)
             ->select('items.*', DB::raw('
-                FORMAT(
-                    (
-                        SELECT COALESCE(AVG(latest_prices.price), 0) 
-                        FROM (
-                            SELECT ip.price 
-                            FROM supplier_items si
-                            JOIN item_prices ip ON si.id = ip.supplier_item_id
-                            WHERE si.item_id = items.id
-                            AND ip.id = (
-                                SELECT MAX(sub_ip.id)
-                                FROM item_prices sub_ip
-                                WHERE sub_ip.supplier_item_id = si.id
-                            )
-                        ) AS latest_prices
-                    ), 2) AS average_price
-            '))
+            CAST((
+                SELECT COALESCE(AVG(latest_prices.price), 0) 
+                FROM (
+                    SELECT ip.price 
+                    FROM supplier_items si
+                    JOIN item_prices ip ON si.id = ip.supplier_item_id
+                    WHERE si.item_id = items.id
+                    AND ip.id = (
+                        SELECT MAX(sub_ip.id)
+                        FROM item_prices sub_ip
+                        WHERE sub_ip.supplier_item_id = si.id
+                    )
+                ) AS latest_prices
+            ) AS DECIMAL(10,2)) AS average_price
+        '))
             ->orderByDesc('id')
             ->get();
         }
