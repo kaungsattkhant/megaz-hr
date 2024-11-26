@@ -135,6 +135,7 @@ class  ObjectiveRepository implements ObjectiveInterface
         }
     }
 
+    //mobile
     public function objectiveLists(Request $request)
     {
         $currentDay = now()->format('l');
@@ -144,7 +145,7 @@ class  ObjectiveRepository implements ObjectiveInterface
                 $query->whereRaw("FIND_IN_SET(?, assigned_days)", [$currentDay]);
             },
             'objectiveKeys.objKeyStaff',
-            'objectiveKeys.objImages'
+            'objKeyStaffImg'
         ])
             ->whereHas('objectiveKeys', function ($query) use ($currentDay) {
                 $query->whereRaw("FIND_IN_SET(?, assigned_days)", [$currentDay]);
@@ -164,7 +165,7 @@ class  ObjectiveRepository implements ObjectiveInterface
                 $query->whereRaw("FIND_IN_SET(?, assigned_days)", [$currentDay]);
             },
             'objectiveKey.objective',
-            'objectiveKey.objImages'
+            'objKeyStaffImg'
         ])
             ->where('staff_id', UserData()->id)
             ->whereHas('objectiveKey', function ($query) use ($currentDay) {
