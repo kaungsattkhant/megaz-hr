@@ -18,8 +18,10 @@ interface ObjectiveInterface
   public function objectiveLists(Request $request);
   public function getdailyObjectives(Request $request);
   public function updateDailyObjective(array $data, $objKeyStaffId);
-  public function storeImages($validatedData);
-  public function updateImages($validatedData, $objKeyId);
+  public function storeImages($validatedData, $objKeystaffId);
+  public function updateImages($validatedData, $objKeyStaffId);
+  public function getObjKeyStaffImage($objKeystaffId);
+  public function deleteObjKeystaffImage($imgId);
 
   //ktvobjtree
   public function getKtvRoom(Request $request);
