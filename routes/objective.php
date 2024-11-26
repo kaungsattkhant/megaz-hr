@@ -18,8 +18,10 @@ Route::middleware('auth:api')->group(function () {
     Route::get('/daily/objectives', 'objectiveLists');
     Route::get('/daily/objectives_key', 'getdailyObjectives');
     Route::post('/daily/objectives_key_staff/{id}', 'updateDailyObjective');
-    Route::post('/objectives/images', 'storeImages');
-    Route::post('/objectives/images/{objKeyImgId}', 'updateImages');
+    Route::post('/objectives/key_staff/{id}/images', 'storeImages');
+    Route::post('/objectives/key_staff/{objKeyStaffId}/images/update', 'updateImages');
+    Route::get('/objectives/key_staff/{objKeystaffId}/images', 'getObjKeyStaffImage');
+    Route::delete('/objectives/key_staff/images/{id}', 'deleteObjKeystaffImage');
 
     //ktv-objective-tree
     Route::get('/ktv/entity_room', 'getKtvRoom');
