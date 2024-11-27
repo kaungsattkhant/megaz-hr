@@ -8,26 +8,72 @@ use App\Models\ItemPrice;
 use App\Models\SupplierItem;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Database\Eloquent\Builder;
 
 class ItemRepository implements ItemRepositoryInterface
 {
     public function listAllData(Request $request)
     {
+        $category_id = $request->category_id;
         if ($request->per_page || $request->page) {
-            $category_id = $request->category_id;
-            return Item::with(['category'])->orderByDesc('id')
-                ->when($request->search_input, function ($q) use ($request) {
-                    $q->where('name', 'LIKE', '%' . $request->search_input . '%');
-                })
-                ->when($category_id, function ($query) use ($category_id) {
-                    $query->where('category_id', $category_id);
-                })
-                ->paginate(config('common.list_count'));
+            return Item::with(['category', 'supplier_items.item_price' => function ($query) {
+                $query->orderByDesc('id');
+            }])
+            ->when($category_id,function($q)use($category_id){
+                $q->where('items.category_id',$category_id);
+            })
+            // ->where('items.category_id', $request->category_id)
+            ->select('items.*', DB::raw('
+            CAST((
+                SELECT COALESCE(AVG(latest_prices.price), 0) 
+                FROM (
+                    SELECT ip.price 
+                    FROM supplier_items si
+                    JOIN item_prices ip ON si.id = ip.supplier_item_id
+                    WHERE si.item_id = items.id
+                    AND ip.id = (
+                        SELECT MAX(sub_ip.id)
+                        FROM item_prices sub_ip
+                        WHERE sub_ip.supplier_item_id = si.id
+                    )
+                ) AS latest_prices
+            ) AS DECIMAL(10,2)) AS average_price
+        '))
+            ->orderByDesc('id')
+            ->paginate(config('common.list_count'));
         } else {
-            if ($request->category_id) {
-                return Item::with('category')->where('category_id', $request->category_id)->get();
-            }
-            return Item::with('category')->get();
+            // if ($request->category_id) {
+            //     return Item::with('category')
+            //     ->where('category_id', $request->category_id)
+            //     ->get();
+            // }
+            // $items= Item::with('category')->get();
+            // return $items;
+            return Item::with(['category', 'supplier_items.item_price' => function ($query) {
+                $query->orderByDesc('id');
+            }])
+            ->when((isset($request->category_id )&& $category_id),function($q)use($category_id){
+                $q->where('items.category_id',$category_id);
+            })
+            // ->where('items.category_id', $request->category_id)
+            ->select('items.*', DB::raw('
+            CAST((
+                SELECT COALESCE(AVG(latest_prices.price), 0) 
+                FROM (
+                    SELECT ip.price 
+                    FROM supplier_items si
+                    JOIN item_prices ip ON si.id = ip.supplier_item_id
+                    WHERE si.item_id = items.id
+                    AND ip.id = (
+                        SELECT MAX(sub_ip.id)
+                        FROM item_prices sub_ip
+                        WHERE sub_ip.supplier_item_id = si.id
+                    )
+                ) AS latest_prices
+            ) AS DECIMAL(10,2)) AS average_price
+        '))
+            ->orderByDesc('id')
+            ->get();
         }
     }
 
@@ -67,15 +113,17 @@ class ItemRepository implements ItemRepositoryInterface
         }
     }
 
-    public function addPriceItem(array $data, int $id)
+    public function addPriceItem($request)
     {
+        $data = $request->all();
         DB::beginTransaction();
         try {
-            $item_price = ItemPrice::where('item_id', $id)->latest('created_at')->first();
-            $new_item_price['uom_id'] = $item_price->uom_id;
-            $new_item_price['price'] = $data['price'];
-            $new_item_price['item_id'] = $id;
-            $createdItemPrice = ItemPrice::create($new_item_price);
+            // $item_price = ItemPrice::where('item_id', $id)->latest('created_at')->first();
+            // $new_item_price['uom_id'] = $item_price->uom_id;
+            // $new_item_price['price'] = $data['price'];
+            // $new_item_price['item_id'] = $id;
+            // dd($data);
+            $createdItemPrice = ItemPrice::create($data);
             DB::commit();
             return $createdItemPrice;
         } catch (\Exception $e) {
@@ -96,16 +144,20 @@ class ItemRepository implements ItemRepositoryInterface
         }
     }
 
-    public function getItemPriceListByItem($item_id){
-        return ItemPrice::with('uom')->orderBy('id','desc')->where('item_id',$item_id)->paginate(20);
+    public function getItemPriceListByItem($item_id)
+    {
+        return ItemPrice::with('uom')->orderBy('id', 'desc')->where('item_id', $item_id)->paginate(20);
     }
 
-    public function getItemType(){
+    public function getItemType()
+    {
         return ItemType::all();
     }
 
-    public function supplierByItem($itemId){
-        $supplierByItem=SupplierItem::with('supplier','item')->where('item_id',$itemId)->get();
+    public function supplierByItem($itemId)
+    {
+        $supplierByItem = SupplierItem::with('supplier', 'item', 'item_price')
+            ->where('item_id', $itemId)->get();
         return $supplierByItem;
     }
 

@@ -8,16 +8,25 @@
         <div class="btn-container">
             <notifications position="top center" />
 
-            <div class=" flex">
+            <div class=" flex gap-x-4">
                 <label for="search" class="search-input">
                     <input type="text" class="input-search" placeholder="Search">
                     <i class="fal fa-search"></i>
                 </label>
+                <div class="w-full !text-sm" data-te-select-wrapper-ref>
+                    <select data-te-select-init data-te-select-placeholder="Select Room" v-model="selectedRoom" @change="roomchange(1)"
+                    data-te-select-filter="true" class="input-ui w-full">
+                        <option value="">All</option>
+                        <option v-for="(room,index) in roomList" :key="index" :value="room"> {{ room.name }} </option>
+                    </select>
+                </div>
             </div>
-            <div class="flex justify-end flex-col">
 
-                <a href="/product_tree/create"
-                    class="add-btn transition duration-150 ease-in-out focus:outline-none focus:ring-0 ">
+
+            <div class="flex pr-0 gap-x-4">
+                
+                <a href="/ktv_product_tree/create"
+                    class="add-btn whitespace-nowrap h-8 focus:outline-none focus:ring-0 ">
                     Add New
                 </a>
             </div>
@@ -41,16 +50,19 @@
                         </thead>
                         <tbody>
                             <!-- looping start -->
-                            <div class="contents" v-for="(qkr, index) in QKRList" :key="index">
+                            <div class="contents" v-for="(productTree, index) in productTreeList" :key="index">
                                 <tr class="">
                                     <td class=" font-medium ">
-                                        <!-- {{ perPage * (currentPage - 1) + (++index) }} -->
-                                        1
+                                        {{ perPage * (currentPage - 1) + (++index) }}
+                                    </td>
+                                    <td class=" font-medium ">
+                                        {{productTree.entity.name}}
+                                        <!-- {{ roomList.find(room=>room.id = productTree.entity_id)?.name }} -->
                                     </td>
                                     <td class="whitespace-nowrap">
-                                        <!-- <a :href="'/cooking_places/' + qkr.id + '/edit'">
+                                        <a :href="'/ktv_product_tree/' + productTree.id + '/edit'">
                                             <i class="far fa-pen cursor-pointer mr-3"></i>
-                                        </a> -->
+                                        </a>
                                         <i class="far fa-trash-alt cursor-pointer"
                                             @click="deleteqkr(qkr.id)"></i>
                                     </td>
@@ -89,7 +101,18 @@ import { mapGetters } from "vuex";
 export default {
     data() {
         return {
-            QKRList: [],
+            productTreeList: [],
+            roomList:[],
+
+            searchInput:null,
+            selectedDepartment:null,
+            selectedRole:null,
+            selectedDate:null,
+
+            url:'/api/ktv/objective_trees?page=',
+            url_search:'',
+            url_department:'',
+            url_role:'',
 
             currentPage: 0,
             perPage: 0,
@@ -101,10 +124,18 @@ export default {
     methods: {
         ...mapGetters(['getToken']),
 
-        async getQKR(pageNumber) {
-            const response = await getApiData({ url: `/api/cooking_places?page=${pageNumber}`, token: this.getToken() });
+        async getRoomList(){
+            let response = await getApiData({url: `/api/ktv/entity_room`, token: this.getToken()});
+            if(response.data){
+                this.roomList = response.data;
+            }
+        },
+
+        async getProductTree(pageNumber) {
+            let url = this.url + pageNumber + this.url_search + this.url_department + this.url_role;
+            let response = await getApiData({ url: url, token: this.getToken() });
             if (response.data) {
-                this.QKRList = response.data.data;
+                this.productTreeList = response.data.data;
 
                 this.lastPage = response.data.last_page;
                 this.currentPage = pageNumber;
@@ -113,7 +144,11 @@ export default {
             }
         },
 
-        async deleteQKR(id) {
+
+
+
+
+        async deleteProductTree(id) {
             let response = await deleteApiData({ url: `/api/cooking_places/` + id, token: this.getToken() });
             if (response.success) {
                 this.getQKR(1);
@@ -132,7 +167,8 @@ export default {
         initTE({ Modal, Select, Ripple });
     },
     created() {
-        this.getQKR(1);
+        this.getRoomList();
+        this.getProductTree(1);
     }
 }
 </script>

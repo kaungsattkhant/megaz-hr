@@ -9,6 +9,12 @@
         <div class="grid !grid-cols-12 gap-x-8 bg-white p-8 rounded-md shadow-md mb-8">
             <div class="mb-4 col-span-3">
                 <label for="" class="label-form mb-3">
+                    Objective Name
+                </label>
+                <input type="text" v-model="objName" class="input-ui ">
+            </div>
+            <div class="mb-4 col-span-3">
+                <label for="" class="label-form mb-3">
                     Department
                 </label>
                 <div class="bg-white mb-0 w-full text-sm inline-block h-[34px] !text-black"
@@ -32,89 +38,125 @@
                             :key="index"> {{ role.name }} </option>
                     </select>
                 </div>
-            </div>
+            </div><div class="col-span-3"></div>
 
 
-            <div class="mb-4 col-span-3">
+            
+            <!-- <div class="mb-4 col-span-3">
                 <label for="" class="label-form mb-3">
-                    Date Assigned
-                </label>
-                <!-- <input type="date" v-model="selectedDate" class="input-ui "> -->
-                <multiselect v-model="selectedDate" :options="dateList" :multiple="true" :close-on-select="false" :clear-on-select="false"
-                    :preserve-search="false" placeholder="Select Date" label="name" track-by="value" :preselect-first="false">
-                    <template #selection="{ values, search, isOpen }">
-                        <span class="multiselect__single"
-                            v-if="values.length"
-                            v-show="!isOpen">{{ values.length }} Date selected</span>
-                    </template>
-                </multiselect>
-                <!-- <div class="bg-white mb-0 w-full text-sm inline-block h-[34px] dark:bg-white !text-black"
-                    data-te-select-wrapper-ref>
-                    <select data-te-select-init data-te-select-placeholder="Select Role"
-                        data-te-select-filter="true" name="" id="" v-model="selectedDate" class="input-ui !text-black">
-                        <option :value="date" v-for="(date, index) in dateList"
-                            :key="index"> {{ date }} </option>
-                    </select>
-                </div> -->
-            </div>
-            <div class="mb-4 col-span-3">
-                <!-- <label for="" class="label-form mb-3">
                     Duration
                 </label>
-                <input type="number" v-model="duration" class="input-ui "> -->
-            </div>
+                <input type="number" v-model="duration" class="input-ui ">
+            </div> -->
             
-            <div class="mb-4 col-span-3">
-                <label for="" class="label-form mb-3">
-                    Objective Name
-                </label>
-                <input type="text" v-model="objName" class="input-ui ">
-            </div>
-            <div class="col-span-3">
-                <label for="" class="label-form mb-3">
-                    &nbsp;
-                </label>
-                <button class="add-btn py-[9px]" @click="addObj()">
-                    Add Obj
-                </button>
-            </div>
-            <div class="col-span-6"></div>
+            
+            
+            
 
             <div class="contents" v-for="(obj,index) in objective_key" :key="index">
                 <div class="mb-4 col-span-3">
                     <label for="" class="label-form mb-3">
                         Key Result
                     </label>
-                    <input type="text" v-model="obj.name" class="input-ui ">
+                    <input type="text" v-model="key_result" class="input-ui ">
                 </div>
                 <div class="col-span-3">
                     <label for="" class="label-form mb-3">
                         OKR Point
                     </label>
-                    <input type="number" v-model="obj.okr_point" class="input-ui ">
+                    <input type="number" v-model="selectedOkrPoint" class="input-ui ">
                 </div>
-                <div class="pl-3">
+                <div class="mb-4 col-span-3">
+                    <label for="" class="label-form mb-3">
+                        Date Assigned
+                    </label>
+                    <multiselect v-model="selectedDate" :options="dateList" :multiple="true" :close-on-select="false" :clear-on-select="false"
+                        :preserve-search="false" placeholder="Select Date" label="" :preselect-first="false">
+                        <template #selection="{ values, search, isOpen }">
+                            <span class="multiselect__single"
+                                v-if="values.length"
+                                v-show="!isOpen">{{ values.length }} Date selected</span>
+                        </template>
+                    </multiselect>
+                    <!-- <div class="bg-white mb-0 w-full text-sm inline-block h-[34px] dark:bg-white !text-black"
+                        data-te-select-wrapper-ref>
+                        <select data-te-select-init data-te-select-placeholder="Select Role"
+                            data-te-select-filter="true" name="" id="" v-model="selectedDate" class="input-ui !text-black">
+                            <option :value="date" v-for="(date, index) in dateList"
+                                :key="index"> {{ date }} </option>
+                        </select>
+                    </div> -->
+                </div>
+                <div class="col-span-2">
+                    <label for="" class="label-form mb-3">
+                        Duration
+                    </label>
+                    <input type="number" v-model="duration" class="input-ui ">
+                </div>
+                <div class="">
                     <label for="" class="label-form mb-3">
                         &nbsp;
                     </label>
-                    <button class="py-2" @click="deleteObj(index)">
-                        <i class="fal fa-trash"></i>
+                    <button class="add-btn py-[9px]" @click="addObj()">
+                        Add Obj
                     </button>
                 </div>
-                <div class="col-span-5"></div>
+            </div>
+        </div>
+
+
+
+        <div class=" bg-white py-4 px-8 rounded-md shadow-md mb-8">
+            <div class="table-container">
+                <table class="primary-table">
+                    <thead class="">
+                        <tr>
+                            <th scope="col" class="">
+                                Key Results
+                            </th>
+                            <th scope="col" class="">
+                                OKR Points
+                            </th>
+                            <th scope="col" class="">
+                                Date
+                            </th>
+                            <th scope="col" class="">
+                                Duration
+                            </th>
+                            <th scope="col" class="">
+
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr class="" v-for="(obj, objIndex) in objective_List"
+                            :key="objIndex">
+                            <td class="">
+                                {{ obj.name }}
+                            </td>
+                            <td class="">
+                                {{ obj.okr_point }}
+                            </td>
+                            <td class="">
+                                <span class="after:content-[','] last:after:content-[''] pr-1" v-for="day in obj.assigned_days">
+                                    {{ day }}
+                                </span>
+                            </td>
+                            <td class="">
+                                {{ obj.duration }}
+                            </td>
+                            <td class="">
+                                <button @click="deleteObj(objIndex)">
+                                    <i class="fal fa-trash  pr-3"></i>
+                                </button>
+                            </td>
+                        </tr>
+                    </tbody>
+
+                </table>
             </div>
 
-
-
-
-
-
-
-
-
-
-
-
+            
 
         </div>
         
@@ -141,33 +183,64 @@ export default {
         return {
             departmentList:[],
             roleList:[],
-            dateList: [
-                { name: 'Monday', value: 'Monday' },
-                { name: 'Tuesday', value: 'Tuesday' },
-                { name: 'Wednesday', value: 'Wednesday' },
-                { name: 'Thursday', value: 'Thursday' },
-                { name: 'Friday', value: 'Friday' },
-                { name: 'Saturday', value: 'Saturday' },
-                { name: 'Sunday', value: 'Sunday' }
-            ],
+            dateList: ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'],
+            // dateList: [
+            //     { name: 'Monday', value: 'Monday' },
+            //     { name: 'Tuesday', value: 'Tuesday' },
+            //     { name: 'Wednesday', value: 'Wednesday' },
+            //     { name: 'Thursday', value: 'Thursday' },
+            //     { name: 'Friday', value: 'Friday' },
+            //     { name: 'Saturday', value: 'Saturday' },
+            //     { name: 'Sunday', value: 'Sunday' }
+            // ],
             selectedDepartment:null,
             selectedRole:null,
+            key_result:null,
+            selectedOkrPoint:null,
             selectedDate:null,
             duration:null,
-            objName:null,
 
-            objective_key: [{ name: "",okr_point: "" }],  // Start with one input box
-
+            objective_List:[],
+            objective_key: [{ name: "",okr_point: "",assigned_days:"", duration: "" }],  // Start with one input box
+            selected_obj_keys:[],
+            testKey:[],
         };
     },
 
     methods: {
         ...mapGetters(['getToken']),
         addObj() {
-            this.objective_key.push({ name: "",okr_point:"" });  // Add a new input box
+            if (!this.key_result) {
+                this.alertValidationMessage(`Key Result`);
+                return 1;
+            }
+            else if (!this.selectedOkrPoint) {
+                this.alertValidationMessage(`OKR Point`);
+                return 1;
+            }
+            else if (!this.selectedDate) {
+                this.alertValidationMessage(`Date`);
+                return 1;
+            }
+            else if (!this.duration) {
+                this.alertValidationMessage(`Duration`);
+                return 1;
+            }
+            else{
+                this.objective_List.push({ 
+                    name: this.key_result,
+                    okr_point: this.selectedOkrPoint,
+                    assigned_days: this.selectedDate, 
+                    duration: this.duration 
+                });  // Add a new input box
+                this.key_result = null;
+                this.selectedOkrPoint = null;
+                this.selectedDate = null;
+                this.duration = null;
+            }
         },
         deleteObj(index) {
-            this.objective_key.splice(index, 1);
+            this.objective_List.splice(index, 1);
         },
 
 
@@ -185,23 +258,7 @@ export default {
             if(response.data){
                 this.roleList = response.data;
             }
-            // console.log(department)
         },
-        
-        
-        async getMenuCategoryList(){
-            let response = await getApiData({ url: '/api/menu_categories', token: this.getToken() });
-            if (response.data) {
-                this.menuCategoryList = response.data;
-            }
-        },
-        async getMenuList(){
-            let response = await getApiData({ url: '/api/menu_categories/'+ this.selectedMenuCategory.id +'/menus', token: this.getToken() });
-            if (response.data) {
-                this.menuList = response.data;
-            }
-        },
-        
         
 
         btnclickedCreateOkr(){
@@ -213,14 +270,6 @@ export default {
                 this.alertValidationMessage(`Role`);
                 return 1;
             }
-            else if(this.selectedDate.length < 1){
-                this.alertValidationMessage(`Date`);
-                return 1;
-            }
-            // else if(!this.duration){
-            //     this.alertValidationMessage(`Duration`);
-            //     return 1;
-            // }
             else if(!this.objName){
                 this.alertValidationMessage(`Objective Name`);
                 return 1;
@@ -230,29 +279,39 @@ export default {
                 return 1;
             }
             else{
+                // let dates = [];
+                // this.objective_key.forEach(obj => {
+                //     obj.assigned_days.forEach(day => {
+                //         dates.push(day.value)
+                //     })
+                //     this.selected_obj_keys.push({
+                //         name:obj.name,
+                //         okr_point :obj.okr_point,
+                //         assigned_days:dates
+                //     })
+                //     dates = []
+                    
+                // });
                 this.createOkr()
             }
         },
         async createOkr(){
-            let selectedDate = [];
-            this.selectedDate.forEach(date => {
-                selectedDate.push(date.value)
-            });
-            console.log(selectedDate)
+            // let selectedDate = [];
+            // this.selectedDate.forEach(date => {
+            //     selectedDate.push(date.value)
+            // });
+            // console.log(selectedDate)
+            
             let formData = new FormData();
             formData.append('objective_name', this.objName);
             formData.append('role_id', this.selectedRole.id);
-            formData.append('assigned_days', JSON.stringify(selectedDate));
-            formData.append('objective_key', JSON.stringify(this.objective_key));
+            // formData.append('assigned_days', JSON.stringify(selectedDate));
+            formData.append('objective_key', JSON.stringify(this.objective_List));
             let response = await postApiData({ url: '/api/objectives', form_data: formData, token: this.getToken() });
             if (response.success) {
                 window.location.replace('/OKR');
                 console.log('success')
             }
-            // if (response.message == "Objective stored successfully!") {
-            //     window.location.replace('/OKR');
-            //     console.log('success')
-            // }
             else {
                 this.$notify({
                     title: `Input validation`,

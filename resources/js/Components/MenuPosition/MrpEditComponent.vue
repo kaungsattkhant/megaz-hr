@@ -157,6 +157,19 @@
                         </select>
                     </div>
                 </div> -->
+                <div class="mb-4 col-span-3">
+                    <label for="" class="label-form mb-3">
+                        Department
+                    </label>
+                    <div class="bg-white mb-0 w-full text-sm inline-block h-[34px] !text-black"
+                        data-te-select-wrapper-ref>
+                        <select data-te-select-init data-te-select-placeholder="Select Department" @change="selectedDepartmentChange()"
+                            data-te-select-filter="true" name="" id="" v-model="selectedDepartment" class="input-ui !text-black">
+                            <option :value="department" v-for="(department, index) in departmentList"
+                                :key="index"> {{ department.name }} </option>
+                        </select>
+                    </div>
+                </div>
                 <div class="mb-4 col-span-3 rounded-md">
                     <label for="" class="block text-sm text-black mb-3">
                         Role
@@ -170,7 +183,7 @@
                                 :key="roleIndex"> {{ role.name }} </option>
                         </select>
                     </div>
-                </div><div class="col-span"></div>
+                </div>
                 <!-- <div class="mb-4 col-span-3 rounded-md">
                     <label for="" class="label-form mb-3">
                         Position Quantity
@@ -426,6 +439,7 @@ export default {
     data() {
         return {
             cookingAreaList:[],
+            departmentList:[],
             levelList:[
                 {"id": 'level_1',"name": "Level 1"},
                 {"id": 'level_2',"name": "Level 2"},
@@ -457,6 +471,7 @@ export default {
             itemUoms:[],
             uomList:[],
 
+            selectedDepartment:null,
             menuName:null,
             sellingPrice:null,
             selectedCookingArea:null,
@@ -560,7 +575,8 @@ export default {
             detail.menu_steps.forEach(step => {
                 sampleMenuLevel.level = step.level
                 sampleMenuLevel.type = step.type
-                sampleMenuLevel.role_name = this.roleList.find(role => role.id === step.role_id ).name;
+                // sampleMenuLevel.role_name = this.roleList.find(role => role.id === step.role_id ).name;
+                sampleMenuLevel.role_name = step.role.name;
                 sampleMenuLevel.role_id = step.role_id
                 sampleMenuLevel.duration = step.duration
                 sampleMenuLevel.order_time = step.order_time
@@ -570,7 +586,7 @@ export default {
                     sampleMenuLevel.item_menu.push({
                         item_id: item.item_id,
                         menu_step_id: item.menu_step_id,
-                        price: item.item.item_prices.price,
+                        price: item.item.average_price,
                         name: item.item.name,
                         weight: item.weight,
                         uom_id: item.uom_id,
@@ -604,9 +620,18 @@ export default {
                 this.positionList = response.data;
             }
         },
+        async getDepartment(){
+            let response = await getApiData({url: `/api/departments`, token: this.getToken()});
+            if(response.data){
+                this.departmentList = response.data;
+            }
+        },
+        selectedDepartmentChange(){
+            this.getRoleList();
+        },
         async getRoleList(){
-            let response = await getApiData({ url: '/api/roles', token: this.getToken() });
-            if (response.data) {
+            let response = await getApiData({url: '/api/roles_department/' + this.selectedDepartment.id , token: this.getToken()});
+            if(response.data){
                 this.roleList = response.data;
             }
         },
@@ -647,7 +672,7 @@ export default {
                 let baseUom = this.uomList[index];
                 this.itemUoms.push(baseUom);
             }
-            index = this.uomList.findIndex(uom => uom.id == this.selectedItem.item_prices.uom_id);
+            index = this.uomList.findIndex(uom => uom.id == this.selectedItem.uom_id);
             if (index != -1) {
                 let itemUom = this.uomList[index];
                 this.itemUoms.push(itemUom);
@@ -735,7 +760,7 @@ export default {
                 return 1;
             }
             else{
-                let url = `/api/get_uom_conversion_by_uom?po_uom_id=${this.selectedUom.id}&item_uom_id=${this.selectedItem.item_prices.uom_id}&item_price=${this.selectedItem.item_prices.price}&base_uom_id=${this.selectedItem.base_uom_id}`;
+                let url = `/api/get_uom_conversion_by_uom?po_uom_id=${this.selectedUom.id}&item_uom_id=${this.selectedItem.uom_id}&item_price=${this.selectedItem.average_price}&base_uom_id=${this.selectedItem.base_uom_id}`;
                 let response = await getApiData({url: url, token: this.getToken()});
                 let uomConversion = null;
                 let amount = 0;
@@ -895,7 +920,7 @@ export default {
                 
                 let response = await postApiData({ url: `/api/mrp/${this.mrpId}`, form_data: formData, token: this.getToken() });
                 if (response.success) {
-                    window.location.replace(`/mrp`);
+                    // window.location.replace(`/mrp`);
                 }
                 else {
                     this.$notify({
@@ -938,6 +963,7 @@ export default {
     //     }
     // },
 
+    
     async created() {
         let response = await getApiData({url: `/api/departments`, token: this.getToken()});
         if(response.data){
@@ -952,7 +978,7 @@ export default {
         this.getUomList();
         this.getCookingAreaList();
         this.getStaffList(this.departmentId);
-        this.getRoleList();
+        this.getDepartment();
         this.getMrpDetail();
     },
 

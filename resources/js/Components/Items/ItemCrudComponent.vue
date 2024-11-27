@@ -45,8 +45,9 @@
                             <tr>
                                 <th>#</th>
                                 <th>Item Name</th>
+                                <th>Item Code</th>
                                 <th>Category</th>
-                                <th></th>
+                                <!-- <th></th> -->
                             </tr>
                         </thead>
                         <tbody>
@@ -58,11 +59,15 @@
                                     </td>
                                     <td class="whitespace-nowrap">
                                         {{ item.name }}
+                                        <a :href="`/items/${item.id}/suppliers`" class="text-blue-600 hover:underline" > [Set pricing] </a>
+                                    </td>
+                                    <td class="whitespace-nowrap">
+                                        {{ item.code }}
                                     </td>
                                     <td class="whitespace-nowrap">
                                         {{ item.category.name }}
                                     </td>
-                                    <td class="whitespace-nowrap">
+                                    <!-- <td class="whitespace-nowrap">
                                         <button id="price-edit-btn" class="pr-2" data-te-toggle="modal"
                                             data-te-target="#priceUpdateModal" @click="updatePriceBtnClicked(item.id)">
                                             <i class="fas fa-tag"></i>
@@ -81,7 +86,7 @@
                                             type="checkbox" role="switch" />
 
                                     <a :href="`/items/${item.id}/pricing_history`" class="text-blue-600 hover:underline" > Pricing History </a>
-                                    </td>
+                                    </td> -->
                                 </tr>
                             </div>
 
@@ -407,6 +412,14 @@ export default {
     methods: {
         ...mapGetters(['getToken']),
 
+        alertValiationMessage(field) {
+            this.$notify({
+                title: `Input validation`,
+                text: `You forgot to provide ${field}, please try again`,
+                type: "warn"
+            });
+        },
+
         updatePriceBtnClicked(itemId){
             let index = this.itemList.findIndex(item => item.id == itemId);
             if(index != -1){
@@ -466,7 +479,7 @@ export default {
 
         async createBtnClicked() {
             if (!this.selectedUOM || !this.name || !this.selectedCategory ||!this.selectedBaseUom) {
-                alert('Required data must be filled');
+                this.alertValiationMessage('required data');
                 return false;
             }
             let url = `/api/items`;

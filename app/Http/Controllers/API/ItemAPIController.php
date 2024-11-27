@@ -44,9 +44,9 @@ class ItemAPIController extends Controller
         }
     }
 
-    public function addItemPrice(Request $request, int $id)
+    public function addItemPrice(Request $request)
     {
-        $item = $this->itemRepo->addPriceItem($request->all(), $id);
+        $item = $this->itemRepo->addPriceItem($request);
         ResponseData($item);
     }
 

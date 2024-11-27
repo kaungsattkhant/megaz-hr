@@ -46,7 +46,7 @@
                 <label for="" class="block text-sm text-black mb-3">
                     UOM
                 </label>
-                <div class="bg-white mb-0 w-full text-xs h-8 border-b border-black rounded-bl-[4px] rounded-br-[4px] overflow-hidden inline-block"
+                <div class="bg-white mb-0 w-full text-xs rounded-bl-[4px] rounded-br-[4px]  inline-block"
                     data-te-select-wrapper-ref>
                     <select data-te-select-init data-te-select-placeholder="Select UOM" data-te-select-filter="true"
                         name="" id="" v-model="selectedUom" class="">
@@ -167,7 +167,7 @@ export default {
                 let baseUom = this.uomList[index];
                 this.itemUoms.push(baseUom);
             }
-            index = this.uomList.findIndex(uom => uom.id == this.selectedItem.item_prices.uom_id);
+            index = this.uomList.findIndex(uom => uom.id == this.selectedItem.uom_id);
             if (index != -1) {
                 let itemUom = this.uomList[index];
                 this.itemUoms.push(itemUom);
@@ -191,7 +191,7 @@ export default {
                 alert('You forgot to select uom');
             }
             else {
-                let url = `/api/get_uom_conversion_by_uom?po_uom_id=${this.selectedUom.id}&item_uom_id=${this.selectedItem.item_prices.uom_id}&item_price=${this.selectedItem.item_prices.price}&base_uom_id=${this.selectedItem.base_uom_id}`;
+                let url = `/api/get_uom_conversion_by_uom?po_uom_id=${this.selectedUom.id}&item_uom_id=${this.selectedItem.uom_id}&item_price=${this.selectedItem.average_price}&base_uom_id=${this.selectedItem.base_uom_id}`;
                 let response = await getApiData({ url: url, token: this.getToken() });
                 let uomConversion = null;
                 let amount = 0;
