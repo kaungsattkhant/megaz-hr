@@ -114,13 +114,12 @@
                             Menu Categories
                         </a>
                     </li>
-                    <li>
+                    <!-- <li>
                         <a href="{{ route('menus') }}" class="flex items-center @yield('menus')">
                             <i class="fal fa-clipboard-list  pr-3"></i>
                             Selling Menus
                         </a>
-                    </li>
-
+                    </li> -->
                     <li>
                         <a href="{{ route('menu_sale_report.index') }}"
                             class="flex items-center @yield('menu_sale_report')">
