@@ -16,31 +16,34 @@ class ItemRepository implements ItemRepositoryInterface
     {
         $category_id = $request->category_id;
         if ($request->per_page || $request->page) {
-            return Item::with(['category', 'supplier_items.item_price' => function ($query) {
-                $query->orderByDesc('id');
-            }])
-            ->when($category_id,function($q)use($category_id){
-                $q->where('items.category_id',$category_id);
-            })
-            // ->where('items.category_id', $request->category_id)
-            ->select('items.*', DB::raw('
-            CAST((
-                SELECT COALESCE(AVG(latest_prices.price), 0) 
-                FROM (
-                    SELECT ip.price 
-                    FROM supplier_items si
-                    JOIN item_prices ip ON si.id = ip.supplier_item_id
-                    WHERE si.item_id = items.id
-                    AND ip.id = (
-                        SELECT MAX(sub_ip.id)
-                        FROM item_prices sub_ip
-                        WHERE sub_ip.supplier_item_id = si.id
-                    )
-                ) AS latest_prices
-            ) AS DECIMAL(10,2)) AS average_price
-        '))
-            ->orderByDesc('id')
-            ->paginate(config('common.list_count'));
+            return Item::with([
+                'category',
+                'supplier_items.item_price' => function ($query) {
+                    $query->orderByDesc('id');
+                }
+            ])
+                ->when($category_id, function ($q) use ($category_id) {
+                    $q->where('items.category_id', $category_id);
+                })
+                // ->where('items.category_id', $request->category_id)
+                ->select('items.*', DB::raw('
+                                            CAST((
+                                                SELECT COALESCE(AVG(latest_prices.price), 0) 
+                                                FROM (
+                                                    SELECT ip.price 
+                                                    FROM supplier_items si
+                                                    JOIN item_prices ip ON si.id = ip.supplier_item_id
+                                                    WHERE si.item_id = items.id
+                                                    AND ip.id = (
+                                                        SELECT MAX(sub_ip.id)
+                                                        FROM item_prices sub_ip
+                                                        WHERE sub_ip.supplier_item_id = si.id
+                                                    )
+                                                ) AS latest_prices
+                                            ) AS DECIMAL(10,2)) AS average_price
+                                        '))
+                ->orderByDesc('id')
+                ->paginate(config('common.list_count'));
         } else {
             // if ($request->category_id) {
             //     return Item::with('category')
@@ -49,14 +52,17 @@ class ItemRepository implements ItemRepositoryInterface
             // }
             // $items= Item::with('category')->get();
             // return $items;
-            return Item::with(['category', 'supplier_items.item_price' => function ($query) {
-                $query->orderByDesc('id');
-            }])
-            ->when((isset($request->category_id )&& $category_id),function($q)use($category_id){
-                $q->where('items.category_id',$category_id);
-            })
-            // ->where('items.category_id', $request->category_id)
-            ->select('items.*', DB::raw('
+            return Item::with([
+                'category',
+                'supplier_items.item_price' => function ($query) {
+                    $query->orderByDesc('id');
+                }
+            ])
+                // ->when((isset($request->category_id) && $category_id), function ($q) use ($category_id) {
+                //     $q->where('items.category_id', $category_id);
+                // })
+                // ->where('items.category_id', $request->category_id)
+                ->select('items.*', DB::raw('
             CAST((
                 SELECT COALESCE(AVG(latest_prices.price), 0) 
                 FROM (
@@ -72,8 +78,8 @@ class ItemRepository implements ItemRepositoryInterface
                 ) AS latest_prices
             ) AS DECIMAL(10,2)) AS average_price
         '))
-            ->orderByDesc('id')
-            ->get();
+                ->orderByDesc('id')
+                ->get();
         }
     }
 
