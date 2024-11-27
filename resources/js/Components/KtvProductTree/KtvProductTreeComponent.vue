@@ -56,7 +56,8 @@
                                         {{ perPage * (currentPage - 1) + (++index) }}
                                     </td>
                                     <td class=" font-medium ">
-                                        {{ roomList.find(room=>room.id = productTree.entity_id)?.name }}
+                                        {{productTree.entity.name}}
+                                        <!-- {{ roomList.find(room=>room.id = productTree.entity_id)?.name }} -->
                                     </td>
                                     <td class="whitespace-nowrap">
                                         <a :href="'/ktv_product_tree/' + productTree.id + '/edit'">
