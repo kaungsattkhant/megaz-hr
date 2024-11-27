@@ -163,7 +163,7 @@ class  ObjectiveRepository implements ObjectiveInterface
 
 
     //objkeylistwithstaff assigns 
-    public function getdailyObjectives(Request $request)
+    public function getdailyObjectives(Request $request, $objId)
     {
         $currentDay = now()->format('l');
 
@@ -175,10 +175,11 @@ class  ObjectiveRepository implements ObjectiveInterface
             'objKeyStaffImg'
         ])
             ->where('staff_id', UserData()->id)
-            ->whereHas('objectiveKey', function ($query) use ($currentDay) {
-                $query->whereRaw("FIND_IN_SET(?, assigned_days)", [$currentDay]);
+            ->whereHas('objectiveKey.objective', function ($query) use ($currentDay, $objId) {
+                $query->whereRaw("FIND_IN_SET(?, assigned_days)", [$currentDay])
+                    ->where('id', $objId);
             })
-            ->paginate();
+            ->get();
         return $objectives;
     }
 
