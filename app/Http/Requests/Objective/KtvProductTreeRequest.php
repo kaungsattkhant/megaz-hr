@@ -5,7 +5,7 @@ namespace App\Http\Requests\Objective;
 use App\Http\Requests\APIRequest;
 use Illuminate\Contracts\Validation\Validator;
 
-class ObjImgRequest extends APIRequest
+class KtvProductTreeRequest extends APIRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -15,6 +15,7 @@ class ObjImgRequest extends APIRequest
         return parent::authorize();
     }
 
+
     /**
      * Get the validation rules that apply to the request.
      *
@@ -23,7 +24,9 @@ class ObjImgRequest extends APIRequest
     public function rules(): array
     {
         return [
-            'images.*' => 'required|mimes:jpeg,png,jpg|max:10240',
+            'entity_id' => 'required',
+            'objectives' => 'required|json',
+            'items' => 'required|json',
         ];
     }
 

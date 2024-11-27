@@ -19,6 +19,7 @@ class ObjectiveController extends Controller
     public function getObjectives(Request $request)
     {
         $data = $this->objectiveRepository->getObjectives($request);
+
         ResponseData($data);
     }
 
@@ -69,18 +70,25 @@ class ObjectiveController extends Controller
         $data = $this->objectiveRepository->getdailyObjectives($request);
         ResponseData($data);
     }
-
-    public function storeImages(ObjImgRequest $request)
+    public function getObjKeyStaffImage($objKeystaffId)
     {
-        $validatedData = $request->validated();
-        $data = $this->objectiveRepository->storeImages($validatedData);
+        $data = $this->objectiveRepository->getObjKeyStaffImage($objKeystaffId);
         ResponseData($data);
     }
 
-    public function updateImages(ObjImgRequest $request, $objKeyImgId)
+
+    public function storeImages(ObjImgRequest $request, $objKeystaffId)
     {
         $validatedData = $request->validated();
-        $data = $this->objectiveRepository->updateImages($validatedData, $objKeyImgId);
+
+        $data = $this->objectiveRepository->storeImages($validatedData, $objKeystaffId);
+        ResponseData($data);
+    }
+
+    public function updateImages(ObjImgRequest $request, $objKeyStaffId)
+    {
+        $validatedData = $request->validated();
+        $data = $this->objectiveRepository->updateImages($validatedData, $objKeyStaffId);
         ResponseData($data);
     }
 
@@ -88,6 +96,54 @@ class ObjectiveController extends Controller
     {
 
         $data = $this->objectiveRepository->updateDailyObjective($request->all(), $objKeyStaffId);
+        ResponseData($data);
+    }
+
+
+    public function deleteObjKeystaffImage($imgId)
+    {
+        $data = $this->objectiveRepository->deleteObjKeystaffImage($imgId);
+        ResponseData($data);
+    }
+
+
+    //ktvProductTree
+
+    public function getKtvRoom(Request $request)
+    {
+        $data = $this->objectiveRepository->getKtvRoom($request);
+        ResponseData($data);
+    }
+
+
+
+    public function  getKtvObjectiveTree(Request $request)
+    {
+        $data = $this->objectiveRepository->getKtvObjectiveTree($request);
+        ResponseData($data);
+    }
+
+    public function getKtvObjective(Request $request)
+    {
+        $data = $this->objectiveRepository->getKtvObjective($request);
+        ResponseData($data);
+    }
+
+    public function storeKtvObjectiveTree(Request $request)
+    {
+        $data = $this->objectiveRepository->storeKtvObjectiveTree($request);
+        ResponseData($data);
+    }
+
+    public function getKtvObjTreeById(Request $request, $id)
+    {
+        $data = $this->objectiveRepository->getKtvObjTreeById($request, $id);
+        ResponseData($data);
+    }
+
+    public function updateKtvObjTree(Request $request, $ktvObjTreeId)
+    {
+        $data = $this->objectiveRepository->updateKtvObjTree($request, $ktvObjTreeId);
         ResponseData($data);
     }
 }

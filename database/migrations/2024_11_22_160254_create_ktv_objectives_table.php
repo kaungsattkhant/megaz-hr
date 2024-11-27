@@ -11,11 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('objectivekey_images', function (Blueprint $table) {
+        Schema::create('ktv_objectives', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('objective_key_id');
-            $table->string('image_url')->nullable();
-            $table->string('image_path')->nullable();
+            $table->foreignId('ktv_product_tree_id');
+            $table->foreignId('objective_id');
             $table->timestamps();
         });
     }
@@ -25,6 +24,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('objectivekey_images');
+        Schema::dropIfExists('ktv_objectives');
     }
 };
