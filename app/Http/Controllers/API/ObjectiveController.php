@@ -106,6 +106,11 @@ class ObjectiveController extends Controller
         ResponseData($data);
     }
 
+    public function getdailyObjectivesById(Request $request, $objId)
+    {
+        $data = $this->objectiveRepository->getdailyObjectivesById($request, $objId);
+        ResponseData($data);
+    }
 
     //ktvProductTree
 
