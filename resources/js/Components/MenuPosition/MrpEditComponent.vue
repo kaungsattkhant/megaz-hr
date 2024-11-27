@@ -575,7 +575,8 @@ export default {
             detail.menu_steps.forEach(step => {
                 sampleMenuLevel.level = step.level
                 sampleMenuLevel.type = step.type
-                sampleMenuLevel.role_name = this.roleList.find(role => role.id === step.role_id ).name;
+                // sampleMenuLevel.role_name = this.roleList.find(role => role.id === step.role_id ).name;
+                sampleMenuLevel.role_name = step.role.name;
                 sampleMenuLevel.role_id = step.role_id
                 sampleMenuLevel.duration = step.duration
                 sampleMenuLevel.order_time = step.order_time
