@@ -244,7 +244,7 @@ export default {
         async createProductTree(){
             let obj_list = [];
             this.obj_list.forEach(objId => {
-                obj_list.push(objId.id)
+                obj_list.push(objId.obj_id)
             });
             let item_list = [];
             this.item_list.forEach(item => {
@@ -260,7 +260,7 @@ export default {
             formData.append('items', JSON.stringify(item_list));
             let response = await postApiData({ url: '/api/ktv/objective_trees', form_data: formData, token: this.getToken() });
             if (response.success) {
-                // window.location.replace('/OKR');
+                window.location.replace('/ktv_product_tree');
                 console.log('success')
             }
             else {
@@ -287,7 +287,7 @@ export default {
                     role_id: this.selectedObjective.role_id,
                     role_name: this.selectedObjective.role_name, 
                     duration: this.selectedObjective.total_duration,
-                    id:this.selectedObjective.id,
+                    obj_id:this.selectedObjective.id,
                     // id:this.testList.find(test => test.objective_name === this.selectedObjective.objective_name ).id
                 }); 
                 this.selectedObjective = null;
@@ -343,7 +343,7 @@ export default {
         this.getRoomList();
         this.getObjectiveList();
         this.getItemList();
-        this.test();
+        // this.test();
     },
 
     mounted() {

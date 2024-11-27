@@ -212,13 +212,26 @@ export default {
             this.selectedRoom = detail.entity_id;
             detail.ktv_objectives.forEach(obj => {
                 this.obj_list.push({ 
-                    name: obj.objective.objective_name,
-                    role_id: obj.objective.role_id,
-                    role_name: obj.objective.objective_name, 
-                    duration: obj.objective.objective_name,
-                    id:this.testList.find(test => test.objective_name === this.selectedObjective.objective_name ).id
+                    // id: obj.id,
+                    name: obj.objective_name,
+                    role_id: obj.role_id,
+                    role_name: obj.role_name, 
+                    duration: obj.total_duration,
+                    obj_id:obj.id,
+                    // id:this.testList.find(test => test.objective_name === this.selectedObjective.objective_name ).id 
                 }); 
             });
+
+            detail.ktv_items.forEach(item => {
+                this.item_list.push({ 
+                    // id:item.id,
+                    item_name: item.item.name,
+                    item_id: item.item_id,
+                    quantity: item.quantity, 
+                }); 
+            });
+
+            
             
         },
         async getRoomList(){
@@ -273,7 +286,7 @@ export default {
         async createProductTree(){
             let obj_list = [];
             this.obj_list.forEach(objId => {
-                obj_list.push(objId.id)
+                obj_list.push(objId.obj_id)
             });
             let item_list = [];
             this.item_list.forEach(item => {
@@ -287,7 +300,7 @@ export default {
             formData.append('entity_id', this.selectedRoom);
             formData.append('objectives', JSON.stringify(obj_list));
             formData.append('items', JSON.stringify(item_list));
-            let response = await postApiData({ url: '/api/ktv/objective_trees', form_data: formData, token: this.getToken() });
+            let response = await postApiData({ url: '/api/ktv/objective_trees/' + this.productTreeId, form_data: formData, token: this.getToken() });
             if (response.success) {
                 // window.location.replace('/OKR');
                 console.log('success')
@@ -316,7 +329,8 @@ export default {
                     role_id: this.selectedObjective.role_id,
                     role_name: this.selectedObjective.role_name, 
                     duration: this.selectedObjective.total_duration,
-                    id:this.testList.find(test => test.objective_name === this.selectedObjective.objective_name ).id
+                    obj_id:this.selectedObjective.id,
+                    // id:this.testList.find(test => test.objective_name === this.selectedObjective.objective_name ).id
                 }); 
                 this.selectedObjective = null;
             }
