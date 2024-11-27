@@ -260,8 +260,8 @@ export default {
             formData.append('items', JSON.stringify(item_list));
             let response = await postApiData({ url: '/api/ktv/objective_trees', form_data: formData, token: this.getToken() });
             if (response.success) {
-                // window.location.replace('/OKR');
-                console.log('success')
+                window.location.replace('/ktv_product_tree');
+                // console.log('success')
             }
             else {
                 this.$notify({
