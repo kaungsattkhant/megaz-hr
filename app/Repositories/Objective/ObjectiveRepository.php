@@ -182,6 +182,21 @@ class  ObjectiveRepository implements ObjectiveInterface
         return $objectives;
     }
 
+    public function getdailyObjectivesById(Request $request, $objId)
+    {
+        $currentDay = now()->format('l');
+        $objectives = ObjectiveKey::with([
+            'objKeyStaff' => function ($query) {
+                $query->where('staff_id', UserData()->id);
+            }
+        ])
+            ->where('objective_id', $objId)
+            ->whereRaw("FIND_IN_SET(?, assigned_days)", [$currentDay])
+            ->get();
+
+        return  $objectives;
+    }
+
     public function getObjKeyStaffImage($objKeystaffId)
     {
 
