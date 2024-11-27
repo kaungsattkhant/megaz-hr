@@ -159,7 +159,7 @@
 
         <div>
             <button class="add-btn" @click="btnclickedCreate()">
-                Create Menu
+                Create
             </button>
         </div>
         
@@ -189,7 +189,6 @@ export default {
             selectedItem:null,
             amount:null,
 
-            testList:[],
             inputs: [{ value: "",name: "" }],  // Start with one input box
 
         };
@@ -210,12 +209,6 @@ export default {
             let response = await getApiData({url: `/api/ktv/objectives`, token: this.getToken()});
             if(response.data){
                 this.objectiveList = response.data;
-            }
-        },
-        async test(){
-            let response = await getApiData({url: `/api/objectives`, token: this.getToken()});
-            if(response.data){
-                this.testList = response.data.data;
             }
         },
         async getItemList(){
@@ -267,8 +260,8 @@ export default {
             formData.append('items', JSON.stringify(item_list));
             let response = await postApiData({ url: '/api/ktv/objective_trees', form_data: formData, token: this.getToken() });
             if (response.success) {
-                // window.location.replace('/OKR');
-                console.log('success')
+                window.location.replace('/ktv_product_tree');
+                // console.log('success')
             }
             else {
                 this.$notify({
@@ -294,7 +287,8 @@ export default {
                     role_id: this.selectedObjective.role_id,
                     role_name: this.selectedObjective.role_name, 
                     duration: this.selectedObjective.total_duration,
-                    id:this.testList.find(test => test.objective_name === this.selectedObjective.objective_name ).id
+                    id:this.selectedObjective.id,
+                    // id:this.testList.find(test => test.objective_name === this.selectedObjective.objective_name ).id
                 }); 
                 this.selectedObjective = null;
             }
@@ -312,11 +306,17 @@ export default {
                 return 1;
             }
             else{
-                this.item_list.push({ 
-                    item_name: this.selectedItem.name,
-                    item_id: this.selectedItem.id,
-                    quantity: this.amount, 
-                }); 
+                let index = this.item_list.findIndex(item => item.item_id == this.selectedItem.id);
+                if (index != -1) {
+                    this.item_list[index].quantity += this.amount
+                }
+                else{
+                    this.item_list.push({ 
+                        item_name: this.selectedItem.name,
+                        item_id: this.selectedItem.id,
+                        quantity: this.amount, 
+                    }); 
+                }
                 this.selectedItem = null;
                 this.amount = null;
             }
