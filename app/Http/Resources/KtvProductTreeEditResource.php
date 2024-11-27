@@ -33,6 +33,7 @@ class KtvProductTreeEditResource extends JsonResource
                 $objective = $ktvObjective->objective;
                 return [
                     'id' => $ktvObjective->id,
+                    'objective_id' => $ktvObjective->objective_id,
                     'objective_name' => $objective->objective_name,
                     'role_id' => $objective->role_id,
                     'role_name' => $objective->role->name ?? null,
