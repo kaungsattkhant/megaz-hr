@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\API\MRPForecastController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\API\ObjectiveController;
 
@@ -16,8 +17,8 @@ Route::middleware('auth:api')->group(function () {
 
     //mobile-api
     Route::get('/daily/objectives', 'objectiveLists');
-    Route::get('/daily/objectives_key', 'getdailyObjectives');
-    Route::get('/daily/objectives/{objId}', 'getdailyObjectivesById');
+    Route::get('/daily/objectives_key/{objId}', 'getdailyObjectives');
+    // Route::get('/daily/objectives/{objId}', 'getdailyObjectivesById');
     Route::post('/daily/objectives_key_staff/{id}', 'updateDailyObjective');
     Route::post('/objectives/key_staff/{id}/images', 'storeImages');
     Route::post('/objectives/key_staff/{objKeyStaffId}/images/update', 'updateImages');
@@ -31,5 +32,10 @@ Route::middleware('auth:api')->group(function () {
     Route::post('/ktv/objective_trees', 'storeKtvObjectiveTree');
     Route::get('/ktv/objective_trees/{id}', 'getKtvObjTreeById');
     Route::post('/ktv/objective_trees/{id}', 'updateKtvObjTree');
+  });
+
+
+  Route::controller(MRPForecastController::class)->group(function () {
+    Route::get('/forecast/menus', 'getObjectives');
   });
 });
