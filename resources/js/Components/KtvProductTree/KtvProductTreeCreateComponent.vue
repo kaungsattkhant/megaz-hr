@@ -261,7 +261,7 @@ export default {
             let response = await postApiData({ url: '/api/ktv/objective_trees', form_data: formData, token: this.getToken() });
             if (response.success) {
                 window.location.replace('/ktv_product_tree');
-                console.log('success')
+                // console.log('success')
             }
             else {
                 this.$notify({

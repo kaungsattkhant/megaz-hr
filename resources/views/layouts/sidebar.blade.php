@@ -99,28 +99,27 @@
                     </li>
                 @endif
                 <!-- ======= -->
-                @if (checkFeaturePermission('mrp'))
+                <!-- @if (checkFeaturePermission('mrp'))
                     <li>
                         <a href="{{ route('MRP') }}" class="flex items-center @yield('mrp')">
                             <i class="fal fa-clipboard-list  pr-3"></i>
                             MRP
                         </a>
                     </li>
-                @endif
-                @if (checkFeaturePermission('menu'))
+                @endif -->
+                @if (checkFeaturePermission('mrp'))
                     <li>
                         <a href="{{ route('menu_categories') }}" class="flex items-center @yield('menu_categories')">
                             <i class="fal fa-clipboard-list  pr-3"></i>
                             Menu Categories
                         </a>
                     </li>
-                    <li>
+                    <!-- <li>
                         <a href="{{ route('menus') }}" class="flex items-center @yield('menus')">
                             <i class="fal fa-clipboard-list  pr-3"></i>
                             Selling Menus
                         </a>
-                    </li>
-
+                    </li> -->
                     <li>
                         <a href="{{ route('menu_sale_report.index') }}"
                             class="flex items-center @yield('menu_sale_report')">
@@ -132,6 +131,12 @@
                         <a href="{{ route('menu_costing.index') }}" class="flex items-center @yield('menu_costing')">
                             <i class="fal fa-clipboard-list  pr-3"></i>
                             Menu Costing
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{{ route('MRP') }}" class="flex items-center @yield('mrp')">
+                            <i class="fal fa-clipboard-list  pr-3"></i>
+                            MRP
                         </a>
                     </li>
                 @endif
