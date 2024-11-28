@@ -58,9 +58,9 @@ class ItemRepository implements ItemRepositoryInterface
                     $query->orderByDesc('id');
                 }
             ])
-                // ->when((isset($request->category_id) && $category_id), function ($q) use ($category_id) {
-                //     $q->where('items.category_id', $category_id);
-                // })
+                ->when((isset($request->category_id) && $category_id), function ($q) use ($category_id) {
+                    $q->where('items.category_id', $category_id);
+                })
                 // ->where('items.category_id', $request->category_id)
                 ->select('items.*', DB::raw('
             CAST((

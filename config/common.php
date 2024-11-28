@@ -94,7 +94,6 @@ return [
         'pos',
         'inventory-stocks',
     ],
-
     'management_features' => [1, 15, 32],
     'catering_features' => [27, 32],
     'pos_cash' => 33,
@@ -102,4 +101,5 @@ return [
     'liabilities' => 4,
     'payable_account_code' => '4-4000',
     'cash_code' => "2-1000",
+    'creditor_account_code'=>'4-2000',
 ];
