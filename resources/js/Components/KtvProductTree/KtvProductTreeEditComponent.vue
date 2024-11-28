@@ -217,7 +217,7 @@ export default {
                     role_id: obj.role_id,
                     role_name: obj.role_name, 
                     duration: obj.total_duration,
-                    obj_id:obj.id,
+                    obj_id:obj.objective_id,
                     // id:this.testList.find(test => test.objective_name === this.selectedObjective.objective_name ).id 
                 }); 
             });
@@ -302,7 +302,7 @@ export default {
             formData.append('items', JSON.stringify(item_list));
             let response = await postApiData({ url: '/api/ktv/objective_trees/' + this.productTreeId, form_data: formData, token: this.getToken() });
             if (response.success) {
-                // window.location.replace('/OKR');
+                window.location.replace('/ktv_product_tree');
                 console.log('success')
             }
             else {
