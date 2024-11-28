@@ -15,10 +15,12 @@ class MRPForecastController extends Controller
         $this->mrpForecastRepository = $mrpForecastRepository;
     }
 
-    // public function getObjectives(Request $request)
-    // {
-    //     $data =  $this->mrpForecastRepository->getObjectives($request);
+    public function getForcastMenus(Request $request, $menuId)
+    {
 
-    //     ResponseData($data);
-    // }
+
+        $data =  $this->mrpForecastRepository->getForcastMenus($request, $menuId);
+
+        ResponseData($data);
+    }
 }

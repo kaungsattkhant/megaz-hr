@@ -17,8 +17,6 @@ class KtvObjectiveRsource extends JsonResource
         return [
             'id' =>  $this->id,
             'objective_name' => $this->objective_name,
-            'role_id' => $this->role_id,
-            'role_name' => $this->role->name ?? null,
             'created_by' => $this->created_by,
             'is_active' => $this->is_active,
             'total_duration' => $this->objectiveKeys->sum('duration'),
@@ -28,6 +26,8 @@ class KtvObjectiveRsource extends JsonResource
                 return [
                     'id' => $key->id,
                     'objective_id' => $key->objective->id,
+                    'role_id' => $key->role_id,
+                    'role_name' => $key->role->name ?? null,
                     'name' => $key->name,
                     'okr_point' => $key->okr_point,
                     'duration' => $key->duration,

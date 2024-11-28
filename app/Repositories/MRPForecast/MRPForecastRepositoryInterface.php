@@ -3,4 +3,10 @@
 namespace App\Repositories\MRPForecast;
 
 
-interface MRPForecastRepositoryInterface {}
+
+
+interface MRPForecastRepositoryInterface
+{
+
+  public function getForcastMenus($request, $menuId);
+}

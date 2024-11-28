@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('objective_keys', function (Blueprint $table) {
             $table->id();
             $table->foreignId('objective_id');
+            $table->foreignId('role_id');
             $table->longText('name');
             $table->double('okr_point');
             $table->set('assigned_days', ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'])->nullable();

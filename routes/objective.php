@@ -36,6 +36,6 @@ Route::middleware('auth:api')->group(function () {
 
 
   Route::controller(MRPForecastController::class)->group(function () {
-    Route::get('/forecast/menus', 'getObjectives');
+    Route::post('/forecast/menus/{menuId}', 'getForcastMenus');
   });
 });
