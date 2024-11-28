@@ -102,7 +102,12 @@ class  ObjectiveRepository implements ObjectiveInterface
         if (!empty($objectiveKeys)) {
             $objectiveKeys = json_decode($objectiveKeys, true);
 
+            $objective->objectiveKeys()->each(function ($objectiveKey) {
+                $objectiveKey->objKeyStaff()->delete();
+            });
+
             $objective->objectiveKeys()->delete();
+
             $currentDay = date('l');
 
             foreach ($objectiveKeys as $key) {
