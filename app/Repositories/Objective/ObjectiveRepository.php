@@ -2,6 +2,7 @@
 
 namespace App\Repositories\Objective;
 
+use App\Http\Resources\DailyObjKeyStaffResource;
 use Exception;
 use App\Models\Item;
 use App\Models\Role;
@@ -172,7 +173,6 @@ class  ObjectiveRepository implements ObjectiveInterface
                 $query->whereRaw("FIND_IN_SET(?, assigned_days)", [$currentDay]);
             },
             'objectiveKey.objective',
-            'objKeyStaffImg'
         ])
             ->where('staff_id', UserData()->id)
             ->whereHas('objectiveKey.objective', function ($query) use ($currentDay, $objId) {
@@ -180,7 +180,8 @@ class  ObjectiveRepository implements ObjectiveInterface
                     ->where('id', $objId);
             })
             ->get();
-        return $objectives;
+
+        return DailyObjKeyStaffResource::collection($objectives);
     }
 
     public function getdailyObjectivesById(Request $request, $objId)
