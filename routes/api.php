@@ -73,6 +73,7 @@ use App\Http\Controllers\API\SaleTargetResultAPIController;
 use App\Http\Controllers\API\AccountReceivableAPIController;
 use App\Http\Controllers\API\AssetInventoryLedgerController;
 use App\Http\Controllers\API\BirthDayPromotionAPIController;
+use App\Http\Controllers\API\CreditorControler;
 use App\Http\Controllers\API\FixedAssetPurchaseAPIController;
 use App\Http\Controllers\API\PurchaseOrderItemLeftController;
 use App\Http\Controllers\API\SaleTargetPositionAPIController;
@@ -404,6 +405,10 @@ Route::middleware('auth:api')->group(function () {
         Route::get('/roles', 'getRoles');
     });
 
+    Route::controller(CreditorControler::class)->group(function () {
+        Route::get('/get_creditor_account_list', 'getCreditorAccountList');
+        Route::post('/create_creditor_account', 'createCreditorAccount');
+    });
     // Route::controller(ObjectiveController::class)->group(function () {
     //     Route::get('/objectives', 'getObjectives');
     //     Route::get('/roles_department/{id}', 'getRolesByDepartmentId');
@@ -420,6 +425,8 @@ Route::middleware('auth:api')->group(function () {
     //     Route::post('/objectives/images', 'storeImages');
     //     Route::post('/objectives/images/{objKeyImgId}', 'updateImages');
     // });
+
+
 });
 Route::get('/features', [FeatureAPIController::class, 'getFeatureData']);
 
