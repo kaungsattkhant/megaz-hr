@@ -3,6 +3,7 @@
 namespace App\Console\Commands;
 
 use App\Models\Objective;
+use App\Models\ObjectiveKey;
 use App\Models\ObjectivekeyStaff;
 use App\Models\Staff;
 use Illuminate\Console\Command;
@@ -31,25 +32,33 @@ class AssignObjectivesToStaffs extends Command
     {
         $dayName = now()->format('l');
 
-        $objectives = Objective::whereRaw("FIND_IN_SET(?, assigned_days)", [$dayName])->get();
+        try {
+            $objectiveKeys = ObjectiveKey::whereRaw("FIND_IN_SET(?, assigned_days)", [$dayName])
+                ->get();
 
-        foreach ($objectives as $objective) {
+            foreach ($objectiveKeys as $objectiveKey) {
+                $roleId = $objectiveKey->role_id;
 
-            $roleId = $objective->role_id;
+                $staffLists = Staff::staffByRole($roleId);
 
-            $staffLists = Staff::staffByRole($roleId);
-            $objectiveKeys = $objective->objectiveKeys;
-            foreach ($staffLists as $staff) {
+                foreach ($staffLists as $staff) {
 
-                foreach ($objectiveKeys as $objectiveKey) {
-                    ObjectivekeyStaff::firstOrCreate([
-                        'staff_id' => $staff->id,
-                        'objective_key_id' => $objectiveKey->id,
-                    ], [
-                        'status' => 'not_started',
-                    ]);
+                    ObjectivekeyStaff::firstOrCreate(
+                        [
+                            'staff_id' => $staff->id,
+                            'objective_key_id' => $objectiveKey->id,
+                        ],
+                        [
+                            'status' => 'not_started',
+                        ]
+                    );
                 }
             }
+
+            $this->info('Objective Keys have been successfully assigned to relevant staff.');
+        } catch (\Exception $e) {
+            Log::error('Error assigning Objective Keys to staff.', ['message' => $e->getMessage()]);
+            $this->error('An error occurred while assigning Objective Keys to staff.');
         }
     }
 }

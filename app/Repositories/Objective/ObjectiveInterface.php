@@ -16,7 +16,7 @@ interface ObjectiveInterface
 
   //mobil
   public function objectiveLists(Request $request);
-  public function getdailyObjectives(Request $request);
+  public function getdailyObjectives(Request $request, $objId);
   public function updateDailyObjective(array $data, $objKeyStaffId);
   public function storeImages($validatedData, $objKeystaffId);
   public function updateImages($validatedData, $objKeyStaffId);

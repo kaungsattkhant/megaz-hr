@@ -135,7 +135,7 @@
                     </label>
                     <div class=" mb-0 w-full text-sm inline-block h-max" :class="is_disable_custom ? 'bg-gray-200 rounded' : ''"
                         data-te-select-wrapper-ref>
-                        <select data-te-select-init data-te-select-placeholder="Select Category"
+                        <select data-te-select-init data-te-select-placeholder="Select Category" @change="typeChange()"
                         :disabled="is_disable_custom" :class="is_disable_custom ? 'cursor-not-allowed' : ''"
                             data-te-select-filter="true" name="" id="" v-model="selectedType" class="input-ui">
                             <option :value="type" v-for="(type, typeIndex) in typeList"
@@ -161,10 +161,11 @@
                     <label for="" class="label-form mb-3">
                         Department
                     </label>
-                    <div class="bg-white mb-0 w-full text-sm inline-block h-[34px] !text-black"
+                    <div class="mb-0 w-full text-sm inline-block h-max" :class="is_disable_custom ? 'bg-gray-200 rounded' : ''"
                         data-te-select-wrapper-ref>
                         <select data-te-select-init data-te-select-placeholder="Select Department" @change="selectedDepartmentChange()"
-                            data-te-select-filter="true" name="" id="" v-model="selectedDepartment" class="input-ui !text-black">
+                            :disabled="is_disable_custom" :class="is_disable_custom ? 'cursor-not-allowed' : ''"
+                            data-te-select-filter="true" name="" id="" v-model="selectedDepartment" class="input-ui">
                             <option :value="department" v-for="(department, index) in departmentList"
                                 :key="index"> {{ department.name }} </option>
                         </select>
@@ -196,19 +197,21 @@
                     </label>
                     <input type="number" v-model="duration" class="input-ui" :disabled="is_disable_custom" :class="is_disable_custom ? 'cursor-not-allowed !bg-gray-200 rounded' : ''">
                 </div>
-                <div class="mb-4 col-span-3 rounded-md">
-                    <label for="" class="label-form mb-3">
-                        Order Time
-                    </label>
-                    <input type="number" v-model="orderTime" class="input-ui" :disabled="is_disable_custom" :class="is_disable_custom ? 'cursor-not-allowed !bg-gray-200 rounded' : ''">
+                <div class="contents" v-show="is_show">
+                    <div class="mb-4 col-span-3 rounded-md">
+                        <label for="" class="label-form mb-3">
+                            Order Time
+                        </label>
+                        <input type="number" v-model="orderTime" class="input-ui" :disabled="is_disable_custom" :class="is_disable_custom ? 'cursor-not-allowed !bg-gray-200 rounded' : ''">
+                    </div>
+                    <div class="mb-4 col-span-3 rounded-md">
+                        <label for="" class="label-form mb-3">
+                            Expected Quantity
+                        </label>
+                        <input type="number" v-model="expectedQuantity" class="input-ui" :disabled="is_disable_custom" :class="is_disable_custom ? 'cursor-not-allowed !bg-gray-200 rounded' : ''">
+                    </div><div class="col-span-3"></div>
                 </div>
-                <div class="mb-4 col-span-3 rounded-md">
-                    <label for="" class="label-form mb-3">
-                        Expected Quantity
-                    </label>
-                    <input type="number" v-model="expectedQuantity" class="input-ui" :disabled="is_disable_custom" :class="is_disable_custom ? 'cursor-not-allowed !bg-gray-200 rounded' : ''">
-                </div><div class="col-span-3"></div>
-
+                <div  v-show="!is_show" class="col-span-9"></div>
                 <div class="mb-0 col-span-3 rounded-md">
                     <label for="" class="label-form mb-3">
                         Item Category
@@ -513,6 +516,7 @@ export default {
             departmentId:null,
 
             is_disable_custom:false,
+            is_show:false,
 
         };
     },
@@ -549,6 +553,14 @@ export default {
             let response = await getApiData({url: '/api/roles_department/' + this.selectedDepartment.id , token: this.getToken()});
             if(response.data){
                 this.roleList = response.data;
+            }
+        },
+        typeChange(){
+            if(this.selectedType.name == 'Portion'){
+                this.is_show = true;
+            }
+            else{
+                this.is_show = false;
             }
         },
         async getMenuCategoryList() {
@@ -641,7 +653,7 @@ export default {
             }
             else if (!this.selectedType) {
                 this.alertValidationMessage('Type');
-                return 1;
+                return 1;                
             }
             else if(!this.selectedRole){
                 this.alertValidationMessage('Role');
@@ -651,11 +663,11 @@ export default {
                 this.alertValidationMessage('Duration');
                 return 1;
             }
-            else if(!this.orderTime){
+            else if(this.selectedType.name == 'Portion' && !this.orderTime){
                 this.alertValidationMessage('Order Time');
                 return 1;
             }
-            else if(!this.expectedQuantity){
+            else if(this.selectedType.name == 'Portion' && !this.expectedQuantity){
                 this.alertValidationMessage('Expected Quantity');
                 return 1;
             }
@@ -710,8 +722,15 @@ export default {
                     this.menuLevel.role_id = this.selectedRole.id;
                     this.menuLevel.role_name = this.selectedRole.name;
                     this.menuLevel.duration = this.duration;
-                    this.menuLevel.order_time = this.orderTime;
-                    this.menuLevel.expected_quantity = this.expectedQuantity;
+                    if(this.selectedType.name == 'Portion'){
+                        this.menuLevel.order_time = this.orderTime;
+                        this.menuLevel.expected_quantity = this.expectedQuantity;
+                    }
+                    // else{
+                    //     this.menuLevel.order_time = 0;
+                    //     this.menuLevel.expected_quantity = 0;
+                    // }
+                    
                     this.menuLevel.item_menu.push({
                         item_id: this.selectedItem.id,
                         price: price,
@@ -737,6 +756,7 @@ export default {
                 this.selectedItem = null;
                 this.selectedUom = null;
                 this.amount = null;
+                this.selectedDepartment = null;
                 this.is_disable_custom = true;
             }
             // this.updateItemPriceTotal(this.ingredientItems);

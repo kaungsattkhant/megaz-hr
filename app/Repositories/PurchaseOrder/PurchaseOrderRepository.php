@@ -78,7 +78,6 @@ class PurchaseOrderRepository implements PurchaseOrderRepositoryInterface
                 $data
             );
             foreach ($items as $item) {
-                dd($item);
                 if (isset($item->id) && $item->id !== null) {
                     $item_data['id'] = $item->id;
                 } else {
@@ -153,9 +152,15 @@ class PurchaseOrderRepository implements PurchaseOrderRepositoryInterface
                 $po_item = $po->items()->updateOrCreate(['id' => $item_data['id']], $item_data);
             }
             if ($request->is_grn && $po) {
+                $payableType = $request->payable_type;
                 $morphMapName = RelationMorphName($po);
                 // $po->po_grn_id=$po_grn->ids
-                (new PurchaseOrderTransaction())->createTransaction($po, $morphMapName, $request->cash_account_id); #create transaction
+                if (isset($request->payable_type) && $payableType == 'other_payable') {
+                    (new PurchaseOrderTransaction())->createTransaction($po, $morphMapName, $request->cash_account_id); #create transaction
+                }
+                if (isset($request->payable_type) && $payableType == 'creditor') {
+                    (new PurchaseOrderTransaction())->createCreditorTransaction($po, $morphMapName); #create transaction
+                }
             }
             if (!isset($request->id)) {
                 // $users = $this->getUserByRole('HR', ['Manager']);

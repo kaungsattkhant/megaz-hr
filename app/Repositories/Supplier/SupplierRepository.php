@@ -46,7 +46,19 @@ class SupplierRepository implements SupplierInterface
                 ['id' => $data['id']],
                 $data
             );
-            $supplier->items()->sync($request->items);
+            $brandIds = $request->brands;// [1,2]
+            $itemIds = $request->items;//[6]
+
+            // foreach ($brandIds as $brandId) {
+            //     // $supplier->items()->sync($request->items);
+            //     $supplier->items()->syncWithPivotValues($itemIds, ['brand_id' => $brandId]);
+            // }
+            foreach ($brandIds as $brandId) {
+                foreach ($itemIds as $itemId) {
+                    $supplier->items()->attach($itemId, ['brand_id' => $brandId]);
+                }
+            }
+
             DB::commit();
             return $supplier;
         } catch (\Exception $e) {

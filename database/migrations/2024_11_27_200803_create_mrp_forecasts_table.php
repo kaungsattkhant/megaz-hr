@@ -11,12 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('objectives', function (Blueprint $table) {
+        Schema::create('mrp_forecasts', function (Blueprint $table) {
             $table->id();
-            $table->string('objective_name');
-
-            $table->integer('created_by');
-            $table->boolean('is_active')->default(1);
+            $table->enum('type', ['ktv', 'restaurant ']);
+            $table->date('date');
             $table->timestamps();
         });
     }
@@ -26,6 +24,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('objectives');
+        Schema::dropIfExists('mrp_forecasts');
     }
 };
