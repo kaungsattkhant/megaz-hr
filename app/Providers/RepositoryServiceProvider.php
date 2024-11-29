@@ -146,6 +146,8 @@ use App\Repositories\CustomerLevelDiscount\CustomerLevelDiscountRepository;
 use App\Repositories\PurchaseOrderItemLeft\PurchaseOrderItemLeftRepository;
 use App\Repositories\AccountReceivable\AccountReceivableRepositoryInterface;
 use App\Repositories\BirthdayPromotion\BirthdayPromotionRepositoryInterface;
+use App\Repositories\Creditor\CreditorInterface;
+use App\Repositories\Creditor\CreditorRepository;
 use App\Repositories\PurchaseOrderItem\PurchaseOrderItemRepositoryInterface;
 use App\Repositories\FixedAssetPurchase\FixedAssetPurchaseRepositoryInterface;
 use App\Repositories\SaleTargetPosition\SaleTargetPositionRepositoryInterface;
@@ -153,6 +155,8 @@ use App\Repositories\MenuServiceDiscount\MenuServiceDiscountRepositoryInterface;
 use App\Repositories\CustomerLevelDiscount\CustomerLevelDiscountRepositoryInterface;
 use App\Repositories\MaterialRequirementsPlanning\MaterialRequirementsPlanningInterface;
 use App\Repositories\MaterialRequirementsPlanning\MaterialRequirementsPlanningRepository;
+use App\Repositories\MRPForecast\MRPForecastRepository;
+use App\Repositories\MRPForecast\MRPForecastRepositoryInterface;
 use App\Repositories\Objective\ObjectiveInterface;
 use App\Repositories\Objective\ObjectiveRepository;
 
@@ -233,5 +237,7 @@ class RepositoryServiceProvider extends ServiceProvider
         $this->app->bind(AccessoryInterface::class, AccessoryRepository::class);
         $this->app->bind(MaterialRequirementsPlanningInterface::class, MaterialRequirementsPlanningRepository::class);
         $this->app->bind(ObjectiveInterface::class,ObjectiveRepository::class);
+        $this->app->bind(CreditorInterface::class,CreditorRepository::class);
+        $this->app->bind(MRPForecastRepositoryInterface::class, MRPForecastRepository::class);
     }
 }

@@ -15,7 +15,7 @@ class Item extends BaseModel
         'name','category_id','is_active','base_uom_id','code','item_type_id','uom_id'
     ];
 
-    // protected $with=['item_prices'];
+    protected $with=['brands'];
 
     public function category()
     {
@@ -25,6 +25,11 @@ class Item extends BaseModel
     public function uoms()
     {
         return $this->belongsToMany(Uom::class,'items_uoms', 'item_id', 'uom_id');
+    }
+
+    public function brands()
+    {
+        return $this->belongsToMany(Brand::class,'brand_item', 'item_id', 'brand_id');
     }
 
     public function getCreatedAt()

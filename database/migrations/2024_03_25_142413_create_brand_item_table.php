@@ -11,13 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('objectives', function (Blueprint $table) {
-            $table->id();
-            $table->string('objective_name');
-
-            $table->integer('created_by');
-            $table->boolean('is_active')->default(1);
-            $table->timestamps();
+        Schema::create('brand_item', function (Blueprint $table) {
+            $table->foreignId('item_id')->constrained()->onDelete('cascade');
+            $table->foreignId('brand_id')->constrained()->onDelete('cascade');
         });
     }
 
@@ -26,6 +22,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('objectives');
+        Schema::dropIfExists('brand_item');
     }
 };

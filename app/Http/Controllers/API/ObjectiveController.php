@@ -65,9 +65,9 @@ class ObjectiveController extends Controller
         ResponseData($data);
     }
 
-    public function getdailyObjectives(Request $request)
+    public function getdailyObjectives(Request $request, $objId)
     {
-        $data = $this->objectiveRepository->getdailyObjectives($request);
+        $data = $this->objectiveRepository->getdailyObjectives($request, $objId);
         ResponseData($data);
     }
     public function getObjKeyStaffImage($objKeystaffId)
