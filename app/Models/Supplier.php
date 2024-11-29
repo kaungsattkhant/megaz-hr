@@ -13,8 +13,13 @@ class Supplier extends Model
 
     public function items()
     {
-        return $this->belongsToMany(Item::class,'supplier_items');
+        // return $this->belongsToMany(Item::class,);
+        return $this->belongsToMany(Item::class,'supplier_items')
+        ->withPivot('brand_id'); // Include brand_id in the pivot data
+        // ->withTimestamps();
     }
+    
+   
 
     public function account(){
         return $this->belongsTo(Account::class);

@@ -19,6 +19,10 @@ class SupplierItem extends Model
         return $this->belongsTo(Item::class);
     }
 
+    public function brand(){
+        return $this->belongsTo(Brand::class);
+    }
+
     public function item_price(){
         return $this->hasOne(ItemPrice::class)->orderBy('id','desc');
     }

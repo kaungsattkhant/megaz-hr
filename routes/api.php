@@ -20,12 +20,14 @@ use App\Http\Controllers\API\AuthController;
 use App\Http\Controllers\API\TaskController;
 use App\Http\Controllers\API\TestController;
 use App\Http\Controllers\API\AssetController;
+use App\Http\Controllers\API\BrandController;
 use App\Http\Controllers\AssetItemController;
 use App\Http\Controllers\API\AdsAPIController;
 use App\Http\Controllers\API\CommonController;
 use App\Http\Controllers\API\UomAPIController;
 use App\Http\Controllers\API\AccountController;
 use App\Http\Controllers\API\CanteenController;
+use App\Http\Controllers\API\CreditorControler;
 use App\Http\Controllers\API\DutyAPIController;
 use App\Http\Controllers\API\ItemAPIController;
 use App\Http\Controllers\API\MenuAPIController;
@@ -33,15 +35,16 @@ use App\Http\Controllers\API\PackAPIController;
 use App\Http\Controllers\API\RoleAPIController;
 use App\Http\Controllers\API\ServiceController;
 use App\Http\Controllers\API\CashbookController;
+use App\Http\Controllers\API\CreditorController;
 use App\Http\Controllers\API\OrderAPIController;
 use App\Http\Controllers\API\SkillAPIController;
 use App\Http\Controllers\API\StaffAPIController;
 use App\Http\Controllers\API\SupplierController;
 use App\Http\Controllers\API\AccessoryController;
+// use App\Http\Controllers\API\CustomerAuthController;
 use App\Http\Controllers\API\EntityAPIController;
 use App\Http\Controllers\API\ObjectiveController;
 use App\Http\Controllers\API\BookingAPIController;
-// use App\Http\Controllers\API\CustomerAuthController;
 use App\Http\Controllers\API\FeatureAPIController;
 use App\Http\Controllers\API\InvoiceAPIController;
 use App\Http\Controllers\API\JournalAPIController;
@@ -73,7 +76,6 @@ use App\Http\Controllers\API\SaleTargetResultAPIController;
 use App\Http\Controllers\API\AccountReceivableAPIController;
 use App\Http\Controllers\API\AssetInventoryLedgerController;
 use App\Http\Controllers\API\BirthDayPromotionAPIController;
-use App\Http\Controllers\API\CreditorControler;
 use App\Http\Controllers\API\FixedAssetPurchaseAPIController;
 use App\Http\Controllers\API\PurchaseOrderItemLeftController;
 use App\Http\Controllers\API\SaleTargetPositionAPIController;
@@ -233,8 +235,8 @@ Route::middleware('auth:api')->group(function () {
     });
     Route::controller(AccountPayableController::class)->group(function () {
         Route::get('get_payable_account', 'getPayableAccount');
-        Route::get('account_payables', 'index');
         Route::post('create_payable_account', 'createPayableAccount');
+        Route::get('account_payables', 'index');
         Route::get('account_payable_transaction_list', 'listOfAccountPayableTransaction');
         Route::post('create_payable_transaction', 'createPayableTransaction');
     });
@@ -377,7 +379,7 @@ Route::middleware('auth:api')->group(function () {
         Route::get('/duties/{id}', 'dutyDetail');
     });
     Route::resource('canteens', CanteenController::class)->only(['index', 'store', 'show']);
-    Route::controller(CanteenController::class)->group(function () {});
+    Route::controller(CanteenController::class)->group(function () { });
     //service
     Route::resource('services', ServiceController::class)->only(['index', 'store', 'show']);
 
@@ -405,9 +407,16 @@ Route::middleware('auth:api')->group(function () {
         Route::get('/roles', 'getRoles');
     });
 
-    Route::controller(CreditorControler::class)->group(function () {
+    Route::controller(CreditorController::class)->group(function () {
+        Route::get('creditors', 'index');
+        Route::get('creditor_transaction_list', 'listOfAccountPayableTransaction');
         Route::get('/get_creditor_account_list', 'getCreditorAccountList');
         Route::post('/create_creditor_account', 'createCreditorAccount');
+    });
+    Route::controller(BrandController::class)->group(function () {
+        Route::get('brands', 'index');
+        Route::post('brands', 'createBrand');
+        Route::get('/get_brand_by_item', [BrandController::class, 'getBrandByItem']);
     });
     // Route::controller(ObjectiveController::class)->group(function () {
     //     Route::get('/objectives', 'getObjectives');
@@ -525,6 +534,7 @@ Route::delete('/entities/{id}', [EntityAPIController::class, 'deleteEntity']);
 
 Route::controller(ItemAPIController::class)->group(function () {
     Route::get('item_price_list_by_item/{item_id}', 'getItemPriceListByItem');
+    Route::get('brand_by_supplier/{supplier_id}', 'brandBySupplier');
     Route::get('supplier_by_item/{item_id}', 'supplierByItem');
 });
 Route::get('/items', [ItemAPIController::class, 'getItemData']);

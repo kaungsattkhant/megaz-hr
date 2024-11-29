@@ -88,6 +88,9 @@ class ItemRepository implements ItemRepositoryInterface
         DB::beginTransaction();
         try {
             $item = Item::create($data);
+            if (isset($data['brands'])) {
+                $item->brands()->sync($data['brands']);
+            }
             // $price = ItemPrice::create(['item_id' => $item->id, 'price' => $data['price'],'uom_id'=>$data['uom_id']]); //removed after relationship with item price with supplier
             DB::commit();
             return $item;
@@ -105,9 +108,11 @@ class ItemRepository implements ItemRepositoryInterface
             $item = Item::find($id);
             if ($item) {
                 $item->update($data);
-
-                if (isset($data['uoms'])) {
-                    $item->uoms()->sync($data['uoms']);
+                // if (isset($data['uoms'])) {
+                //     $item->uoms()->sync($data['uoms']);
+                // }
+                if (isset($data['brands'])) {
+                    $item->brands()->sync($data['brands']);
                 }
             }
             DB::commit();
@@ -162,8 +167,15 @@ class ItemRepository implements ItemRepositoryInterface
 
     public function supplierByItem($itemId)
     {
-        $supplierByItem = SupplierItem::with('supplier', 'item', 'item_price')
-            ->where('item_id', $itemId)->get();
+        $supplierByItem = SupplierItem::with('supplier', 'item','brand')
+            ->where('item_id', operator: $itemId)->get();
+        return $supplierByItem;
+    }
+
+    public function brandBySupplier($supplierId)
+    {
+        $supplierByItem = SupplierItem::with('brand', 'item_price')
+            ->where('supplier_id', operator: $supplierId)->get();
         return $supplierByItem;
     }
 
