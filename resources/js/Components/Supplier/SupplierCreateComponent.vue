@@ -27,8 +27,13 @@
                 <input type="tel" v-model="phoneNumber"
                     class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
             </div>
-            <div class="col-span-3"></div>
-
+            <div class="mb-4 col-span-3 pb-6 rounded-md">
+                <label for="" class="block text-sm text-black mb-3">
+                    Credit Limit
+                </label>
+                <input type="number" v-model="maxCredit"
+                    class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
+            </div>
             <div class="mb-4 col-span-6 pb-6 rounded-md">
                 <label for="" class="block text-sm text-black mb-3">
                     Address
@@ -37,35 +42,22 @@
                     class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg" id="" cols="30"
                     rows="10"></textarea>
             </div>
-            <div class="col-span-6"></div>
-            <div class="mb-4 col-span-3 pb-6 rounded-md">
-                <label for="" class="block text-sm text-black mb-3">
-                    Credit Limit
-                </label>
-                <input type="number" v-model="maxCredit"
-                    class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
-            </div>
-            <div class="mb-4 col-span-3 pb-6 rounded-md">
-                <label for="" class="block text-sm text-black mb-3">
-                    Items
-                </label>
-                <div class="bg-white mb-0 w-full text-sm inline-block h-[34px] select-custom2" data-te-select-wrapper-ref>
-                    <select data-te-select-init data-te-select-placeholder="Select Items" v-model="selectedItems" class="input-ui !text-black"
-                    data-te-select-filter="true" multiple>
-                        <option :value="item" v-for="(item, itemIndex) in itemList" :key="itemIndex">
-                            {{ item.name }}
-                        </option>
-                    </select>
-                </div>
-            </div>
+            <!-- <div class="col-span-6"></div> -->
             <div class="col-span-3 mb-4 flex gap-x-4">
                 <div class=" flex-grow">
                     <label for="" class="block text-sm text-black mb-3">
                         AP Account
                     </label>
-                    <multiselect v-model="selectedAccount" :options="apAccountList" :close-on-select="true"
-                    :clear-on-select="false" :preserve-search="true" placeholder="Select Payable Acount" label="name"
-                    track-by="id" :preselect-first="true"></multiselect>
+                    <multiselect
+                    v-model="selectedAccount"
+                    :options="apAccountList"
+                    :close-on-select="true"
+                    :clear-on-select="false"
+                    :preserve-search="true"
+                    placeholder="Select Payable Acount"
+                    label="name"
+                    track-by="id"
+                    :preselect-first="false"></multiselect>
                 </div>
                 <div class=" ">
                     <label for="" class="block text-sm text-black mb-3">
@@ -82,9 +74,16 @@
                     <label for="" class="block text-sm text-black mb-3">
                         Creditor Account
                     </label>
-                    <multiselect v-model="selectedCreditAccount" :options="creditAccList" :close-on-select="true"
-                    :clear-on-select="false" :preserve-search="true" placeholder="Select Payable Acount" label="name"
-                    track-by="id" :preselect-first="true"></multiselect>
+                    <multiselect
+                    v-model="selectedCreditAccount"
+                    :options="creditAccList"
+                    :close-on-select="true"
+                    :clear-on-select="false"
+                    :preserve-search="true"
+                    placeholder="Select Payable Acount"
+                    label="name"
+                    track-by="id"
+                    :preselect-first="false"></multiselect>
                 </div>
                 <div class=" rounded-md">
                     <label for="" class="block text-sm text-black mb-3">
@@ -95,7 +94,46 @@
                     </button>
                 </div>
             </div>
-            
+
+            <div class="mb-4 col-span-3 pb-6 rounded-md">
+                <label for="" class="block text-sm text-black mb-3">
+                    Items
+                </label>
+                <div class="bg-white mb-0 w-full text-sm inline-block h-[34px] select-custom2" data-te-select-wrapper-ref>
+                    <select data-te-select-init data-te-select-placeholder="Select Item" v-model="selectedItem" class="input-ui !text-black"
+                    data-te-select-filter="true" @change="itemSelected()" >
+                        <option :value="item" v-for="(item, itemIndex) in itemList" :key="itemIndex">
+                            {{ item.name }}
+                        </option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="mb-4 col-span-3 pb-6 rounded-md">
+                <label class="label-form mb-3">Brands</label>
+                <multiselect
+                v-model="selectedItemBrands"
+                :options="itemBrandsList"
+                :multiple="true"
+                :close-on-select="false"
+                :clear-on-select="false"
+                :preserve-search="true"
+                placeholder="Select Brands"
+                label="name"
+                track-by="id"
+                :preselect-first="false">
+                    <template #selection="{ values, search, isOpen }">
+                        <span class="multiselect__single" v-if="values.length" v-show="!isOpen">{{ values.length }}
+                        brands selected</span>
+                    </template>
+                </multiselect>
+            </div>
+
+            <div class="col-span-3">
+                <button type="button" class="mt-8 add-btn transition duration-150 ease-in-out focus:outline-none focus:ring-0 " @click="addItemBtnClicked()" >
+                    Add
+                </button>
+            </div>
 
             <div class=" col-span-12">
                 <table class="min-w-[40%] text-sm font-light ">
@@ -105,6 +143,9 @@
                                 Item
                             </th>
                             <th scope="col" class=" px-6 py-4 ">
+                                Brand(s)
+                            </th>
+                            <th scope="col" class=" px-6 py-4 ">
                             </th>
                         </tr>
                     </thead>
@@ -112,6 +153,9 @@
                         <tr class="" v-for="(selectedItem, selectedItemIndex) in selectedItems" :key="selectedItemIndex">
                             <td class=" px-6 py-4 font-medium ">
                                 {{ selectedItem.name }}
+                            </td>
+                            <td class=" px-6 py-4 font-medium ">
+                                <span class="text-sm"v-for="(brand) in selectedItem.brands" > {{ brand.name }}, </span>
                             </td>
                             <td class=" px-6 py-4 font-medium ">
                                 <button>
@@ -259,6 +303,7 @@ export default {
             apAccountList: [],
             creditAccList:[],
             selectedItems: [],
+            selectedItem: null,
 
             selectedAccount: null,
             selectedCreditAccount:null,
@@ -275,6 +320,9 @@ export default {
             creditSubAccList:[],
             creditAccountName:null,
             selectedCreditSubAcc:null,
+
+            itemBrandsList: [],
+            selectedItemBrands: []
         };
     },
 
@@ -317,6 +365,31 @@ export default {
                 text: `You forgot to provide ${field}, please try again`,
                 type: "warn"
             });
+        },
+
+        async itemSelected(){
+            this.selectedItemBrands = [];
+            let url = `/api/get_brand_by_item?item_ids[]=${this.selectedItem.id}`;
+            let response = await getApiData({url: url, token: this.getToken()});
+            if(response.success){
+                this.itemBrandsList = response.data;
+            }
+        },
+
+        addItemBtnClicked(){
+            if(this.selectedItemBrands.length < 1){
+                alertValiationMessage(`brands for item`);
+                return;
+            }
+            this.selectedItems.push({
+                name: this.selectedItem.name,
+                id: this.selectedItem.id,
+                brands: this.selectedItemBrands,
+            });
+
+            this.selectedItem = null;
+            this.selectedItemBrands = [];
+            this.itemBrandsList = [];
         },
 
         async createBtnClicked(){

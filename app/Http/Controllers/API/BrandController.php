@@ -12,7 +12,7 @@ class BrandController extends Controller
     //
     public function index(Request $request)
     {
-        return Brand::orderBy('id','desc')->get();
+        return ResponseData(Brand::orderBy('id','desc')->get());
     }
 
     public function createBrand(Request $request){
@@ -35,7 +35,7 @@ class BrandController extends Controller
         $brands=Brand::whereHas('items',function($query)use($itemIds){
             $query->whereIn('item_id',$itemIds);
         })->get();
-        return $brands;
+        return ResponseData($brands);
     }
 
 }
