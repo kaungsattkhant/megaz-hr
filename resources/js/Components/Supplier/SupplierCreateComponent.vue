@@ -436,12 +436,14 @@ export default {
             formData.append("creditor_account_id", this.selectedCreditAccount.id);
             this.selectedItems.forEach((item)=>{
                 formData.append("items[]", item.id);
+                item.brands.forEach((brand)=>{
+                    formData.append("brands[]", brand.id);
+                });
             });
 
             let url = `/api/suppliers`;
             let response = await postApiData({url: url, form_data: formData, token: this.getToken()});
             if(response.success){
-                // console.log(response);
                 window.location.replace("/suppliers");
             }
         },
