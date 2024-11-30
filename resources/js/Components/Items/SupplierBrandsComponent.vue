@@ -77,22 +77,6 @@
                         <input type="number" placeholder="Price" v-model="price"
                         class="input-ui">
                     </div>
-
-                    <div class="mb-4">
-                        <label for="" class="label-form mb-3">
-                            Base UOM
-                        </label>
-                        <multiselect
-                        v-model="selectedBaseUom"
-                        :options="uomList"
-                        :close-on-select="true"
-                        :clear-on-select="false"
-                        :preserve-search="true"
-                        placeholder="Select Base UOM"
-                        label="name"
-                        track-by="id"
-                        :preselect-first="false"></multiselect>
-                    </div>
                 </div>
                 <div class="flex justify-end gap-x-4 px-6 mb-6 pt-4">
                     <button type="button" class="cancel-btn focus:shadow-none focus:outline-none" data-te-modal-dismiss
@@ -201,8 +185,7 @@ export default {
         return {
             brandsList: [],
 
-            uomList: [],
-            selectedBaseUom: null,
+            baseUomId: null,
             price: null,
             supplierItemId: null,
         };
@@ -219,14 +202,6 @@ export default {
             });
         },
 
-        async getUomList(){
-            let url = `/api/uoms`;
-            let response = await getApiData({ url: url, token: this.getToken() });
-            if (response.data) {
-                this.uomList = response.data;
-            }
-        },
-
         async getSupplierBrands(pageNumber){
             if(pageNumber){
                 this.currentPage = pageNumber;
@@ -240,6 +215,7 @@ export default {
 
         brandBtnClicked(brand){
             this.supplierItemId = brand.id;
+            this.baseUomId = brand.item.base_uom_id;
         },
 
         async confirmUpdatePriceBtnClicked(){
@@ -250,7 +226,7 @@ export default {
             let formData = new FormData();
             formData.append('supplier_item_id', this.supplierItemId);
             formData.append('price', this.price);
-            formData.append('base_uom_id', this.selectedBaseUom.id);
+            formData.append('base_uom_id', this.baseUomId);
             let url = `/api/add_item_price_by_supplier_item`;
             let response = await postApiData({url: url, form_data: formData, token: this.getToken()});
             if(response.success){
@@ -261,7 +237,7 @@ export default {
 
                 this.price = null;
                 this.supplierItemId = null;
-                this.selectedBaseUom = null;
+                this.baseUomId = null;
                 this.getSupplierBrands();
             }
         },
@@ -269,7 +245,6 @@ export default {
 
     created() {
         this.getSupplierBrands();
-        this.getUomList();
     },
 
     mounted() {
