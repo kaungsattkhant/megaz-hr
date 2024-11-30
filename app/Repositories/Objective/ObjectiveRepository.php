@@ -32,7 +32,6 @@ class  ObjectiveRepository implements ObjectiveInterface
         $name = $request->input('name');
         $role = $request->input('role');
         $department = $request->input('department');
-
         return Objective::with([
             'objectiveKeys.role.department',
         ])
