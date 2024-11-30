@@ -174,7 +174,7 @@ class ItemRepository implements ItemRepositoryInterface
 
     public function brandBySupplier($supplierId)
     {
-        $supplierByItem = SupplierItem::with('brand', 'item_price')
+        $supplierByItem = SupplierItem::with('brand','item', 'item_price')
             ->where('supplier_id', operator: $supplierId)->get();
         return $supplierByItem;
     }
