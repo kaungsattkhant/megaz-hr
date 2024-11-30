@@ -60,7 +60,7 @@
                                     </td>
                                     <td class="whitespace-nowrap">
                                         {{ item.name }}
-                                        <a :href="`/items/${item.id}/suppliers`" class="text-blue-600 hover:underline" > [Set pricing] </a>
+                                        <a :href="`/items/${item.id}/suppliers`" class="text-blue-600 hover:underline" > [Detail] </a>
                                     </td>
                                     <td class="whitespace-nowrap">
                                         {{ item.code }}
