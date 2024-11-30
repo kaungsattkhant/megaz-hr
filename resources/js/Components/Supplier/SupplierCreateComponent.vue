@@ -142,15 +142,15 @@
                             <th scope="col" class=" px-6 py-4 ">
                                 Item
                             </th>
-                            <th scope="col" class=" px-6 py-4 ">
+                            <!-- <th scope="col" class=" px-6 py-4 ">
                                 Brand(s)
-                            </th>
+                            </th> -->
                             <th scope="col" class=" px-6 py-4 ">
                             </th>
                         </tr>
                     </thead>
                     <tbody>
-                        <tr class="" v-for="(selectedItem, selectedItemIndex) in selectedItems" :key="selectedItemIndex">
+                        <!-- <tr class="" v-for="(selectedItem, selectedItemIndex) in selectedItems" :key="selectedItemIndex">
                             <td class=" px-6 py-4 font-medium ">
                                 {{ selectedItem.name }}
                             </td>
@@ -162,7 +162,23 @@
                                     <i class="fal fa-trash  pr-3" @click="deleteSelectedItemBtnClicked(selectedItem.id)" ></i>
                                 </button>
                             </td>
-                        </tr>
+                        </tr> -->
+
+                        <div class="contents" v-for="(selectedItem, selectedItemIndex) in selectedItems" :key="selectedItemIndex">
+                            <tr v-for="(brand) in selectedItem.brands" >
+                                <td class=" px-6 py-4 font-medium ">
+                                    {{ selectedItem.name }}
+                                </td>
+                                <td class=" px-6 py-4 font-medium ">
+                                    {{ brand.name }}
+                                </td>
+                                <td class=" px-6 py-4 font-medium ">
+                                    <button>
+                                        <i class="fal fa-trash  pr-3" @click="deleteSelectedItemBtnClicked(selectedItem.id)" ></i>
+                                    </button>
+                                </td>
+                            </tr>
+                        </div>
                         <tr class="">
                             <td class=" py-2 "></td>
                         </tr>
