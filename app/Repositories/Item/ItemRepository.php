@@ -6,12 +6,18 @@ use App\Models\Item;
 use App\Models\ItemType;
 use App\Models\ItemPrice;
 use App\Models\SupplierItem;
+use App\Services\AveragePriceCalculator;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Database\Eloquent\Builder;
 
 class ItemRepository implements ItemRepositoryInterface
 {
+    protected $averagePriceCalculator;
+    public function __construct(AveragePriceCalculator $repo)
+    {
+        $this->averagePriceCalculator = $repo;
+    }
     public function listAllData(Request $request)
     {
         $category_id = $request->category_id;
@@ -25,33 +31,10 @@ class ItemRepository implements ItemRepositoryInterface
                 ->when($category_id, function ($q) use ($category_id) {
                     $q->where('items.category_id', $category_id);
                 })
-                // ->where('items.category_id', $request->category_id)
-                ->select('items.*', DB::raw('
-                                            CAST((
-                                                SELECT COALESCE(AVG(latest_prices.price), 0) 
-                                                FROM (
-                                                    SELECT ip.price 
-                                                    FROM supplier_items si
-                                                    JOIN item_prices ip ON si.id = ip.supplier_item_id
-                                                    WHERE si.item_id = items.id
-                                                    AND ip.id = (
-                                                        SELECT MAX(sub_ip.id)
-                                                        FROM item_prices sub_ip
-                                                        WHERE sub_ip.supplier_item_id = si.id
-                                                    )
-                                                ) AS latest_prices
-                                            ) AS DECIMAL(10,2)) AS average_price
-                                        '))
+                ->withAveragePrice()
                 ->orderByDesc('id')
                 ->paginate(config('common.list_count'));
         } else {
-            // if ($request->category_id) {
-            //     return Item::with('category')
-            //     ->where('category_id', $request->category_id)
-            //     ->get();
-            // }
-            // $items= Item::with('category')->get();
-            // return $items;
             return Item::with([
                 'category',
                 'supplier_items.item_price' => function ($query) {
@@ -61,23 +44,7 @@ class ItemRepository implements ItemRepositoryInterface
                 ->when((isset($request->category_id) && $category_id), function ($q) use ($category_id) {
                     $q->where('items.category_id', $category_id);
                 })
-                // ->where('items.category_id', $request->category_id)
-                ->select('items.*', DB::raw('
-            CAST((
-                SELECT COALESCE(AVG(latest_prices.price), 0) 
-                FROM (
-                    SELECT ip.price 
-                    FROM supplier_items si
-                    JOIN item_prices ip ON si.id = ip.supplier_item_id
-                    WHERE si.item_id = items.id
-                    AND ip.id = (
-                        SELECT MAX(sub_ip.id)
-                        FROM item_prices sub_ip
-                        WHERE sub_ip.supplier_item_id = si.id
-                    )
-                ) AS latest_prices
-            ) AS DECIMAL(10,2)) AS average_price
-        '))
+                ->withAveragePrice()
                 ->orderByDesc('id')
                 ->get();
         }
@@ -167,14 +134,21 @@ class ItemRepository implements ItemRepositoryInterface
 
     public function supplierByItem($itemId)
     {
-        $supplierByItem = SupplierItem::with('supplier', 'item','brand')
-            ->where('item_id', operator: $itemId)->get();
+        // $supplierByItem = SupplierItem::with('supplier', 'item','brand')
+        //     ->where('item_id',  $itemId)
+        //     // ->groupBy('supplier_id')
+        //     ->get();
+        $supplierByItem = SupplierItem::with('supplier', 'item', 'brand')
+            ->where('item_id', $itemId)
+            ->select('supplier_id', DB::raw('MAX(id) as id')) // Use MAX(id) to pick a unique row per supplier_id
+            ->groupBy('supplier_id')
+            ->get();
         return $supplierByItem;
     }
 
     public function brandBySupplier($supplierId)
     {
-        $supplierByItem = SupplierItem::with('brand','item', 'item_price')
+        $supplierByItem = SupplierItem::with('brand', 'item', 'item_price')
             ->where('supplier_id', operator: $supplierId)->get();
         return $supplierByItem;
     }
