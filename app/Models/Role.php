@@ -12,12 +12,14 @@ class Role extends BaseModel
 {
     use HasFactory;
 
-    protected $fillable=[
-        'name','department_id'
+    protected $fillable = [
+        'name',
+        'department_id'
     ];
 
-    protected $hidden=[
-        'created_at','updated_at'
+    protected $hidden = [
+        'created_at',
+        'updated_at'
     ];
 
     public function getCreatedAt()
@@ -42,14 +44,14 @@ class Role extends BaseModel
 
     public function skills()
     {
-        return $this->hasMany(Skill::class,'role_id');
+        return $this->hasMany(Skill::class, 'role_id');
     }
 
     public static function getRoleIdByDepartment($departmentId, $roleName)
     {
         $role = self::where('department_id', $departmentId)
-                    ->where('name', $roleName)
-                    ->first();
+            ->where('name', $roleName)
+            ->first();
 
         return $role ? $role->id : null;
     }
