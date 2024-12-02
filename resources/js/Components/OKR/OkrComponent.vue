@@ -225,6 +225,7 @@ export default {
                 this.lastPage = response.data.last_page;
                 this.currentPage = pageNumber;
                 this.perPage = response.data.per_page;
+                
                 // this.totalData = response.data.total;
             }
         },
