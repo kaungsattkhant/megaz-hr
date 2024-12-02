@@ -53,6 +53,26 @@ class SupplierRepository implements SupplierInterface
             //     // $supplier->items()->sync($request->items);
             //     $supplier->items()->syncWithPivotValues($itemIds, ['brand_id' => $brandId]);
             // }
+
+
+
+
+            // if ($request->id) {
+            //     $supplier->items()->detach(); // Detaches all relationships
+            // }
+
+            // $syncData = [];
+            // foreach ($itemIds as $itemId) {
+            //     foreach ($brandIds as $brandId) {
+            //         $syncData[] = [
+            //             'item_id' => $itemId,
+            //             'brand_id' => $brandId,
+            //         ];
+            //     }
+            // }
+            // // Bulk insert into the pivot table
+            // DB::table('supplier_item')->insert($syncData);
+
             foreach ($brandIds as $brandId) {
                 foreach ($itemIds as $itemId) {
                     $supplier->items()->attach($itemId, ['brand_id' => $brandId]);
