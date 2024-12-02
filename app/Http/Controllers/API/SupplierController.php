@@ -37,6 +37,6 @@ class SupplierController extends Controller
 
     public function createSupplierAccount(Request $request){
         $createdSupplierAccount = $this->supplierRepo->createSupplierAccount($request);
-        return $createdSupplierAccount;
+        ResponseData($createdSupplierAccount);
     }
 }

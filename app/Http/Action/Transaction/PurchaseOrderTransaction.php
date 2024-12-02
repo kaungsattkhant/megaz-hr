@@ -150,7 +150,7 @@ class PurchaseOrderTransaction
                     'date' => now(),
                     'value' => $po_category->total_amount ,
                     'transaction_id' => $transaction->id,
-                    'account_id' => $po_category->account_id,
+                    'account_id' => $po_category->creditor_account_id,
                     'personable_id' => $po_category->supplier_id,
                     'personable_type' => 'supplier',
                     'action' => 'credit',
@@ -168,6 +168,7 @@ class PurchaseOrderTransaction
         ->join('suppliers', 'suppliers.id', '=', 'po_grns.supplier_id')
         ->select(
             'suppliers.account_id',
+            'suppliers.creditor_account_id',
             'suppliers.id as supplier_id',
             'suppliers.name as supplier_name',
             'categories.name as category_name',
@@ -187,6 +188,7 @@ class PurchaseOrderTransaction
         ->select(
             'suppliers.account_id',
             'suppliers.id as supplier_id',
+            'suppliers.creditor_account_id',
             'suppliers.name as supplier_name',
             DB::raw('SUM(purchase_order_items.quantity * purchase_order_items.amount) as total_amount'),
             DB::raw('SUM(po_grns.invoice_amount) as total_invoice_amount')
@@ -219,7 +221,7 @@ class PurchaseOrderTransaction
                     'date_time'=>now(),
                     'amount'=>$creditor->total_amount ,
                     'supplier_id'=>$creditor->supplier_id,
-                    'account_id'=>$creditor->account_id,
+                    'account_id'=>$creditor->creditor_account_id,
                     'created_by'=>UserData()->id,
                 ]);
         }
