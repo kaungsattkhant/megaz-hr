@@ -263,8 +263,10 @@ Route::middleware('auth:api')->group(function () {
 
     Route::post('/packs', [PackAPIController::class, 'createPack']);
     Route::get('/packs', [PackAPIController::class, 'getPacksData']);
-
     Route::resource('suppliers', SupplierController::class)->only(['index', 'store', 'show', 'destroy']);
+    Route::controller(SupplierController::class)->group(function () {
+        Route::post('/create_supplier_account', 'createSupplierAccount');
+    });
     Route::resource('notifications', NotificationController::class)->only(['index']);
     Route::get('notification_by_user', [NotificationController::class, 'notificationUsersData']);
 

@@ -2,6 +2,7 @@
 
 namespace App\Repositories\Supplier;
 
+use App\Models\Account;
 use App\Models\Supplier;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -93,4 +94,49 @@ class SupplierRepository implements SupplierInterface
         $supplier->items = $supplier->items;
         return $supplier;
     }
+
+    public function createSupplierAccount($request)
+    {
+        DB::beginTransaction();
+        try {
+            $otherPayableCode = config('common.payable_account_code');
+            $creditorCode = config('common.creditor_account_code');
+            $otherPayable = $this->createAccountBySubAccount('Other Payable-'.$request->name, $otherPayableCode);
+            $creditor = $this->createAccountBySubAccount($request->name, $creditorCode);
+
+            if ($otherPayable && $creditor) {
+                DB::commit();
+                return ['other_payable' => $otherPayable, 'creditor' => $creditor];
+            }
+            ResponseMessage('Something is wrong', 419);
+        } catch (\Exception $e) {
+            DB::rollback();
+            ResponseMessage($e->getMessage(), 402);
+            throw $e;
+        }
+
+
+    }
+
+    public function createAccountBySubAccount($name, $subAccountCode)
+    {
+        $latestAccount = Account::whereHas('sub_account', function ($q) use ($subAccountCode) {
+            $q->where('account_code', $subAccountCode);
+        })
+            ->orderByRaw("CAST(SUBSTRING_INDEX(account_code, '-', -1) AS UNSIGNED) DESC")
+            ->first();
+        // ->max('account_code');
+        if ($latestAccount) {
+            $latestAccountCodeNo = explode('-', $latestAccount->account_code);
+            $new_account_code = (int) $latestAccountCodeNo[1] + 1;
+            $code = $latestAccountCodeNo[0] . '-' . $new_account_code;
+            $account = Account::create([
+                'name' => $name,
+                'account_code' => $code,
+                'sub_account_id' => $latestAccount->sub_account_id,
+            ]);
+            return $account;
+        }
+    }
+
 }

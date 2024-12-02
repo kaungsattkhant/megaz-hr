@@ -11,4 +11,6 @@ interface SupplierInterface
     public function updateOrCreate($request);
 
     public function detail($supplier);
+
+    public function createSupplierAccount($request);
 }
