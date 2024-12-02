@@ -1,7 +1,7 @@
 <template>
     <div>
         <p class=" text-lg font-semibold font-inter">
-            Item Suppliers
+            Supplier Brands Pricing
         </p>
     </div>
     <div class="mt-4 bg-white">
@@ -13,37 +13,30 @@
                         <thead>
                             <tr>
                                 <th>#</th>
-                                <th>Supplier</th>
-                                <!-- <th>Brand</th> -->
-                                <!-- <th>Price</th>
-                                <th></th> -->
+                                <th>Brand</th>
+                                <th>Price</th>
+                                <th></th>
                             </tr>
                         </thead>
                         <tbody>
                             <!-- looping start -->
-                            <div class="contents" v-for="(itemSupplier, index) in itemSuppliers" :key="index">
+                            <div class="contents" v-for="(brand, index) in brandsList" :key="index">
                                 <tr class="">
                                     <td class="">
                                         {{ index + 1 }}
                                     </td>
                                     <td class="whitespace-nowrap">
-                                        {{ itemSupplier.supplier.name }}
-                                        <a :href="`/items/${itemId}/suppliers/${itemSupplier.supplier_id}/brands`" class="text-blue-600 hover:underline" > [Detail] </a>
+                                        {{ brand.brand.name }}
                                     </td>
-                                    <!-- <td class="whitespace-nowrap">
-                                        {{ itemSupplier.brand.name }}
-                                    </td> -->
-                                    <!-- <td class="whitespace-nowrap">
-                                        <span v-if="itemSupplier.item_price">
-                                            {{ (itemSupplier.item_price.price).toLocaleString() }}
-                                        </span>
+                                    <td class="whitespace-nowrap">
+                                        <span v-if="brand.item_price"> {{ brand.item_price.price.toLocaleString() }} </span>
                                     </td>
-                                    <td>
+                                    <td class="whitespace-nowrap">
                                         <button id="price-edit-btn" class="pr-2" data-te-toggle="modal"
-                                        data-te-target="#priceUpdateModal" @click="itemSupplierBtnClicked(itemSupplier.id)" >
+                                        data-te-target="#priceUpdateModal" @click="brandBtnClicked(brand)" >
                                             <i class="fas fa-tag"></i>
                                         </button>
-                                    </td> -->
+                                    </td>
                                 </tr>
                             </div>
 
@@ -181,17 +174,20 @@ import { Modal, Ripple, initTE, Select, Dropdown } from "tw-elements";
 import { getApiData, postApiData, deleteApiData } from '../../utilities/ajax-helpers';
 import { convertToFriendlyDateTime } from "../../utilities/datetime-helpers";
 import { mapGetters } from "vuex";
+import Multiselect from 'vue-multiselect';
 
 export default {
-    props: ["itemId"],
+    components: {
+        Multiselect
+    },
+    props: ["supplierId"],
     data() {
         return {
-            item: null,
-            itemSuppliers: [],
+            brandsList: [],
 
+            baseUomId: null,
             price: null,
             supplierItemId: null,
-            baseUomId: null,
         };
     },
 
@@ -206,20 +202,20 @@ export default {
             });
         },
 
-        async getItemSuppliers(pageNumber){
+        async getSupplierBrands(pageNumber){
             if(pageNumber){
                 this.currentPage = pageNumber;
             }
-            let url = `/api/supplier_by_item/${this.itemId}`;
+            let url = `/api/brand_by_supplier/${this.supplierId}`;
             let response = await getApiData({url: url, token: this.getToken()});
             if(response.success){
-                this.itemSuppliers = response.data;
-                this.baseUomId = this.itemSuppliers[0].item.base_uom_id;
+                this.brandsList = response.data;
             }
         },
 
-        itemSupplierBtnClicked(id){
-            this.supplierItemId = id;
+        brandBtnClicked(brand){
+            this.supplierItemId = brand.id;
+            this.baseUomId = brand.item.base_uom_id;
         },
 
         async confirmUpdatePriceBtnClicked(){
@@ -227,7 +223,6 @@ export default {
                 this.alertValiationMessage(`price`);
                 return;
             }
-
             let formData = new FormData();
             formData.append('supplier_item_id', this.supplierItemId);
             formData.append('price', this.price);
@@ -242,13 +237,14 @@ export default {
 
                 this.price = null;
                 this.supplierItemId = null;
-                this.getItemSuppliers();
+                this.baseUomId = null;
+                this.getSupplierBrands();
             }
-        }
+        },
     },
 
     created() {
-        this.getItemSuppliers();
+        this.getSupplierBrands();
     },
 
     mounted() {

@@ -5,6 +5,7 @@ namespace App\Http\Action\Transaction;
 use App\Http\Action\Transaction\StoreTransactionLedger;
 use App\Models\Account;
 use App\Models\AccountPayable;
+use App\Models\CreditorBalance;
 use App\Models\Ledger;
 use App\Models\PurchaseOrderItem;
 use Illuminate\Support\Facades\DB;
@@ -16,7 +17,7 @@ class PurchaseOrderTransaction
         $purchaseOrderItemGroupedByCategory=$this->groupedByCategoryAndSupplier($model);
        
         $purchaseOrderItemGroupedBySupplier=$this->groupedBySupplier($model);
-       
+        
         // dd($purchaseOrderItemGroupedByCategory);
         $data['date'] = now();
         $data['created_by'] = UserData()->id;
@@ -92,6 +93,74 @@ class PurchaseOrderTransaction
         return $purchaseOrderItemGroupedByCategory;
     }
 
+    public function createCreditorTransaction($model,$transactionable_type=null){
+        $purchaseOrderItemGroupedByCategory=$this->groupedByCategoryAndSupplier($model);
+       
+        $purchaseOrderItemGroupedBySupplier=$this->groupedBySupplier($model);
+        
+        // dd($purchaseOrderItemGroupedByCategory);
+        $data['date'] = now();
+        $data['created_by'] = UserData()->id;
+        $data['transactionable_id'] = $model->id;
+        $data['is_confirmed'] = 1;
+        $data['transactionable_type'] = $transactionable_type;
+
+        foreach ($purchaseOrderItemGroupedByCategory as $po_category) {
+            $transaction = (new StoreTransactionLedger())->createTransaction($data);
+            $category_id = $po_category->category_id;
+            $account_code = null;
+            switch ($category_id) {
+                case "1":
+                    $account_code = '2-1021'; #Inventory Food
+                    break;
+                case "2":
+                    $account_code = '2-1023'; #Inventory Tobacco
+                    break;
+                case "3":
+                    $account_code = '2-1024'; #Inventory General
+                    break;
+                case "4":
+                    $account_code = '2-1022'; #Inventory Beverage
+                    break;
+                case "5":
+                    $account_code = '2-1025'; #Inventory Stationery
+                    break;
+            }
+            if ($account_code == null) {
+                ResponseMessage('Transaction fail', 419);
+            }
+            #debit
+            if ($account_code) {
+                $debitAccount = (new Account())->accountByCode($account_code); #Inventory Food
+                if ($debitAccount) {
+                    $debitLedger = (new StoreTransactionLedger())->storeLedger([
+                        'value' => $po_category->total_amount,
+                        'transaction_id' => $transaction->id,
+                        'account_id' => $debitAccount->id,
+                        'action' => 'debit',
+                    ]);
+                } else {
+                    ResponseMessage('Account is Invalid', 419);
+                }
+            }
+            #store AP 
+            // if ($po_category->total_invoice_amount < $po_category->total_amount) {
+                // dd($po_category->total_amount - $po_category->total_invoice_amount);
+                $AP = (new StoreTransactionLedger())->storeLedger([
+                    'date' => now(),
+                    'value' => $po_category->total_amount ,
+                    'transaction_id' => $transaction->id,
+                    'account_id' => $po_category->account_id,
+                    'personable_id' => $po_category->supplier_id,
+                    'personable_type' => 'supplier',
+                    'action' => 'credit',
+                ]);
+            // }
+        }
+        $this->storeCreditor($purchaseOrderItemGroupedBySupplier);
+        return $purchaseOrderItemGroupedByCategory;
+    }
+
     public function groupedByCategoryAndSupplier($model){
         return PurchaseOrderItem::join('po_grns', 'purchase_order_items.id', '=', 'po_grns.purchase_order_item_id')
         ->join('items', 'purchase_order_items.item_id', '=', 'items.id')
@@ -140,6 +209,19 @@ class PurchaseOrderTransaction
                     'created_by'=>UserData()->id,
                 ]);
             }
+        }
+    }
+
+    public function storeCreditor($creditors){
+        foreach($creditors as $creditor){
+                $creditorBalance=CreditorBalance::create([
+                    'type'=>'addition',
+                    'date_time'=>now(),
+                    'amount'=>$creditor->total_amount ,
+                    'supplier_id'=>$creditor->supplier_id,
+                    'account_id'=>$creditor->account_id,
+                    'created_by'=>UserData()->id,
+                ]);
         }
     }
     public function storeLedger($data)

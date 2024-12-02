@@ -57,6 +57,7 @@ import PurchaseOrderWithLeftItemsComponent from './Components/PurchaseOrders/Pur
 import LeftItemListComponent from './Components/PurchaseOrders/LeftItemListComponent.vue';
 import ItemCrudComponent from './Components/Items/ItemCrudComponent.vue';
 import ItemSuppliersComponent from './Components/Items/ItemSuppliersComponent.vue';
+import SupplierBrandsComponent from './Components/Items/SupplierBrandsComponent.vue';
 import ItemPricingHistoryComponent from './Components/Items/ItemPricingHistoryComponent.vue';
 import ItemUsageForecastListComponent from './Components/ItemUsageForecastings/ItemUsageForecastListComponent.vue';
 import ItemUsageForecastCreateComponent from './Components/ItemUsageForecastings/ItemUsageForecastCreateComponent.vue';
@@ -220,6 +221,7 @@ app.component('LeftItemListComponent', LeftItemListComponent);
 app.component('ItemCrudComponent', ItemCrudComponent);
 app.component('ItemPricingHistoryComponent', ItemPricingHistoryComponent);
 app.component('ItemSuppliersComponent', ItemSuppliersComponent);
+app.component('SupplierBrandsComponent', SupplierBrandsComponent);
 app.component('ItemUsageForecastListComponent', ItemUsageForecastListComponent);
 app.component('ItemUsageForecastCreateComponent', ItemUsageForecastCreateComponent);
 app.component('ItemUsageForecastDetailComponent', ItemUsageForecastDetailComponent);

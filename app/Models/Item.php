@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Models\ItemPrice;
 use App\Models\UomConversion;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
@@ -11,11 +12,17 @@ class Item extends BaseModel
 {
     use HasFactory;
 
-    protected $fillable=[
-        'name','category_id','is_active','base_uom_id','code','item_type_id','uom_id'
+    protected $fillable = [
+        'name',
+        'category_id',
+        'is_active',
+        'base_uom_id',
+        'code',
+        'item_type_id',
+        'uom_id'
     ];
 
-    // protected $with=['item_prices'];
+    protected $with = ['brands'];
 
     public function category()
     {
@@ -24,7 +31,12 @@ class Item extends BaseModel
 
     public function uoms()
     {
-        return $this->belongsToMany(Uom::class,'items_uoms', 'item_id', 'uom_id');
+        return $this->belongsToMany(Uom::class, 'items_uoms', 'item_id', 'uom_id');
+    }
+
+    public function brands()
+    {
+        return $this->belongsToMany(Brand::class, 'brand_item', 'item_id', 'brand_id');
     }
 
     public function getCreatedAt()
@@ -37,11 +49,13 @@ class Item extends BaseModel
         return parent::getUpdatedAt();
     }
 
-    public function item_prices(){
+    public function item_prices()
+    {
         return $this->hasOne(ItemPrice::class)->latest('created_at');
     }
 
-    public function suppliers(){
+    public function suppliers()
+    {
         return $this->belongsToMany(Supplier::class, 'supplier_items');
 
     }
@@ -60,9 +74,6 @@ class Item extends BaseModel
     }
 
     public function getItemPriceWithConversionAttribute()
-
-
-
     {
         // Calculate the item price with conversion
         $itemPrice = $this->item_prices->price; // Price of the item
@@ -70,7 +81,46 @@ class Item extends BaseModel
         return $itemPrice * $conversionRate;
     }
 
-    public function supplier_items(){
+    public function supplier_items()
+    {
         return $this->hasMany(SupplierItem::class);
+    }
+
+    public function scopeWithAveragePrice($query)
+    {
+        //     return $query->addSelect([
+        //     'average_price' => DB::raw('
+        //         CAST((
+        //             SELECT COALESCE(AVG(latest_prices.price), 0) 
+        //             FROM (
+        //                 SELECT ip.price 
+        //                 FROM supplier_items si
+        //                 JOIN item_prices ip ON si.id = ip.supplier_item_id
+        //                 WHERE si.item_id = items.id
+        //                 AND ip.id = (
+        //                     SELECT MAX(sub_ip.id)
+        //                     FROM item_prices sub_ip
+        //                     WHERE sub_ip.supplier_item_id = si.id
+        //                 )
+        //             ) AS latest_prices
+        //         ) AS DECIMAL(10,2))
+        //     ')
+        // ]);
+        return $query->select('items.*', DB::raw('
+                                            CAST((
+                                                SELECT COALESCE(AVG(latest_prices.price), 0) 
+                                                FROM (
+                                                    SELECT ip.price 
+                                                    FROM supplier_items si
+                                                    JOIN item_prices ip ON si.id = ip.supplier_item_id
+                                                    WHERE si.item_id = items.id
+                                                    AND ip.id = (
+                                                        SELECT MAX(sub_ip.id)
+                                                        FROM item_prices sub_ip
+                                                        WHERE sub_ip.supplier_item_id = si.id
+                                                    )
+                                                ) AS latest_prices
+                                            ) AS DECIMAL(10,2)) AS average_price
+                                        '));
     }
 }

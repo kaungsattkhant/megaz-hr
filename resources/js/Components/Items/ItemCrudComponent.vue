@@ -46,6 +46,7 @@
                                 <th>#</th>
                                 <th>Item Name</th>
                                 <th>Item Code</th>
+                                <th>Price</th>
                                 <th>Category</th>
                                 <!-- <th></th> -->
                             </tr>
@@ -59,10 +60,13 @@
                                     </td>
                                     <td class="whitespace-nowrap">
                                         {{ item.name }}
-                                        <a :href="`/items/${item.id}/suppliers`" class="text-blue-600 hover:underline" > [Set pricing] </a>
+                                        <a :href="`/items/${item.id}/suppliers`" class="text-blue-600 hover:underline" > [Detail] </a>
                                     </td>
                                     <td class="whitespace-nowrap">
                                         {{ item.code }}
+                                    </td>
+                                    <td class="whitespace-nowrap">
+                                        <span v-if="item.average_price" > {{ item.average_price }} </span>
                                     </td>
                                     <td class="whitespace-nowrap">
                                         {{ item.category.name }}
@@ -280,6 +284,37 @@
                             </option>
                         </select>
                     </div>
+
+                    <div class="mb-4">
+                        <label for="" class="label-form mb-3">
+                            Category
+                        </label>
+                        <select name="" id="" v-model="selectedCategory" class="input-ui">
+                            <option :value="category" v-for="(category, categoryIndex) in itemCategoryList"
+                                :key="categoryIndex"> {{ category.name }} </option>
+                        </select>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="label-form mb-3">Brands</label>
+                        <multiselect
+                        v-model="selectedBrands"
+                        :options="brandsList"
+                        :multiple="true"
+                        :close-on-select="false"
+                        :clear-on-select="false"
+                        :preserve-search="true"
+                        placeholder="Select Brands"
+                        label="name"
+                        track-by="id"
+                        :preselect-first="false">
+                            <template #selection="{ values, search, isOpen }">
+                                <span class="multiselect__single" v-if="values.length" v-show="!isOpen">{{ values.length }}
+                                    brands selected</span>
+                            </template>
+                        </multiselect>
+                    </div>
+
                     <div class="mb-4">
                         <label for="" class="label-form mb-3">
                             Base UOM
@@ -298,16 +333,6 @@
                             </option>
                         </select>
                     </div>
-                    <div class="mb-4">
-                        <label for="" class="label-form mb-3">
-                            Category
-                        </label>
-                        <select name="" id="" v-model="selectedCategory" class="input-ui">
-                            <option :value="category" v-for="(category, categoryIndex) in itemCategoryList"
-                                :key="categoryIndex"> {{ category.name }} </option>
-                        </select>
-                    </div>
-
                 </div>
                 <!--Modal footer-->
                 <div class="flex justify-end gap-x-4 px-6 mb-6 pt-4">
@@ -375,8 +400,12 @@
 import { Modal, Ripple, initTE, Select, Dropdown } from "tw-elements";
 import { getApiData, postApiData, deleteApiData } from '../../utilities/ajax-helpers';
 import { mapGetters } from "vuex";
+import Multiselect from 'vue-multiselect';
 
 export default {
+    components: {
+        Multiselect
+    },
     data() {
         return {
             itemCategoryList: [],
@@ -405,7 +434,8 @@ export default {
             lastPage: 0,
             totalData:0,
 
-
+            brandsList: [],
+            selectedBrands: [],
         };
     },
 
@@ -465,6 +495,14 @@ export default {
             }
         },
 
+        async getBrandList(){
+            let url = `/api/brands`;
+            let response = await getApiData({ url: url, token: this.getToken() });
+            if (response.success) {
+                this.brandsList = response.data;
+            }
+        },
+
         async getItemList(pageNumber) {
             let url = `/api/items?page=${pageNumber}`;
             let response = await getApiData({ url: url, token: this.getToken() });
@@ -490,9 +528,15 @@ export default {
             formData.append('category_id', this.selectedCategory.id);
             formData.append('base_uom_id',this.selectedBaseUom.id);
             formData.append('item_type_id',this.itemType.id);
+            if(this.selectedBrands.length > 0){
+                this.selectedBrands.forEach((item)=>{
+                    formData.append('brands[]', item.id);
+                });
+            }
             let response = await postApiData({ url: url, form_data: formData, token: this.getToken() });
             if (response.success) {
                 // this.getItemList(this.currentPage);
+                this.selectedBrands = [];
                 window.location.reload();
             }
         },
@@ -542,6 +586,7 @@ export default {
     created() {
         this.getItemCategoryList();
         this.getUomList();
+        this.getBrandList();
         this.getItemList(1);
         this.getItemTypeList();
     },
