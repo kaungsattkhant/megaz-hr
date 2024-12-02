@@ -53,10 +53,10 @@
                 </div>
                 <div>
                     <p class="mb-3 text-sm">
-                        AP Account - {{ selectedAccount }}
+                        AP Account - {{ selectedAccount ? selectedAccount.name : '' }}
                     </p>
                     <p class="text-sm">
-                        Creditor Account - 
+                        Creditor Account - {{ selectedCreditAccount ? selectedCreditAccount.name : '' }}
                     </p>
                 </div>
             </div>
@@ -159,9 +159,9 @@
                             <th scope="col" class=" px-6 py-4 ">
                                 Item
                             </th>
-                            <!-- <th scope="col" class=" px-6 py-4 ">
-                                Brand(s)
-                            </th> -->
+                            <th scope="col" class=" px-6 py-4 ">
+                                Brand
+                            </th>
                             <th scope="col" class=" px-6 py-4 ">
                             </th>
                         </tr>
@@ -502,8 +502,8 @@ export default {
             formData.append("name", this.accName);
             let response = await postApiData({url: url, form_data: formData, token: this.getToken()});
             if(response.success){
-                this.selectedAccount = response.other_payable;
-                this.selectedCreditAccount = response.creditor;
+                this.selectedAccount = response.data.other_payable;
+                this.selectedCreditAccount = response.data.creditor;
             }
         },
         async createAPAccountBtnClicked(){
