@@ -152,13 +152,16 @@ class PurchaseOrderRepository implements PurchaseOrderRepositoryInterface
                 $po_item = $po->items()->updateOrCreate(['id' => $item_data['id']], $item_data);
             }
             if ($request->is_grn && $po) {
-                $payableType = $request->payable_type;
+                // $payableType = $request->payable_type;
+                $payableType = 'creditor';
                 $morphMapName = RelationMorphName($po);
                 // $po->po_grn_id=$po_grn->ids
+
                 if (isset($request->payable_type) && $payableType == 'other_payable') {
                     (new PurchaseOrderTransaction())->createTransaction($po, $morphMapName, $request->cash_account_id); #create transaction
                 }
-                if (isset($request->payable_type) && $payableType == 'creditor') {
+                // if (isset($request->payable_type) && $payableType == 'creditor') {
+                if ( $payableType == 'creditor') {
                     (new PurchaseOrderTransaction())->createCreditorTransaction($po, $morphMapName); #create transaction
                 }
             }
