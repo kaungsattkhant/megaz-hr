@@ -33,8 +33,10 @@ class Objective extends Model
                     });
             })
             ->when($role, function ($q) use ($role) {
+
                 $q->whereHas('objectiveKeys.role', function ($roleQuery) use ($role) {
-                    $roleQuery->where('name', '=', $role);
+
+                    $roleQuery->where('name',  'like', '%' . $role . '%');
                 });
             })
             ->when($department, function ($q) use ($department) {
