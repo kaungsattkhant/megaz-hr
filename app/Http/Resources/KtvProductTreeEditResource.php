@@ -35,8 +35,6 @@ class KtvProductTreeEditResource extends JsonResource
                     'id' => $ktvObjective->id,
                     'objective_id' => $ktvObjective->objective_id,
                     'objective_name' => $objective->objective_name,
-                    'role_id' => $objective->role_id,
-                    'role_name' => $objective->role->name ?? null,
                     'created_by' => $objective->created_by,
                     'is_active' => $objective->is_active,
                     'total_duration' => $objective->objectiveKeys->sum('duration'),
@@ -46,6 +44,8 @@ class KtvProductTreeEditResource extends JsonResource
                         return [
                             "id" => $key->id,
                             "objective_id" => $key->objective->id,
+                            'role_id' => $key->role_id,
+                            'role_name' => $key->role->name ?? null,
                             'name' => $key->name,
                             'okr_point' => $key->okr_point,
                             'duration' => $key->duration,

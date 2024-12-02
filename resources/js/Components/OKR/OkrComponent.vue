@@ -31,17 +31,10 @@
             </div>
             <div class="flex pr-0 gap-x-4">
                 <div class="w-full !text-sm" data-te-select-wrapper-ref>
-                    <select data-te-select-init data-te-select-placeholder="Select Department" v-model="selectedDepartment" @change="departmentChange(1)"
+                    <select data-te-select-init data-te-select-placeholder="Select Date" v-model="selectedDate" @change="dateChange(1)"
                     data-te-select-filter="true" class="input-ui w-full">
                         <option value="">All</option>
-                        <option v-for="(department,index) in departmentList" :key="index" :value="department"> {{ department.name }} </option>
-                    </select>
-                </div>
-                <div class="w-full !text-sm" data-te-select-wrapper-ref>
-                    <select data-te-select-init data-te-select-placeholder="Select Role" v-model="selectedRole" @change="roleChange(1)"
-                    data-te-select-filter="true" class="input-ui w-full">
-                        <option value="">All</option>
-                        <option v-for="(role,index) in roleList" :key="index" :value="role"> {{ role.name }} </option>
+                        <option v-for="(date,index) in dateList" :key="index" :value="date"> {{ date }} </option>
                     </select>
                 </div>
                 <a href="/OKR/create"
@@ -62,13 +55,13 @@
                                 <th scope="col" class="">
                                     Objective Name
                                 </th>
-                                <th scope="col" class="">
+                                <!-- <th scope="col" class="">
                                     Department
                                 </th>
 
                                 <th scope="col" class="">
                                     Role
-                                </th>
+                                </th> -->
                                 <th scope="col" class="">
                                     
                                 </th>
@@ -85,12 +78,12 @@
                                     <td class="whitespace-nowrap">
                                         {{ okr.objective_name }}
                                     </td>
-                                    <td class="whitespace-nowrap">
+                                    <!-- <td class="whitespace-nowrap">
                                         {{ departmentList.find(department=>department.id = okr.role.department_id)?.name }}
                                     </td>
                                     <td class="whitespace-nowrap">
                                         {{ okr.role.name }}
-                                    </td>
+                                    </td> -->
 
                                     <td class="whitespace-nowrap">
                                         <a :href="'/OKR/' + okr.id + '/edit'">
@@ -189,15 +182,7 @@ export default {
             okrList: [],
             departmentList:[],
             roleList:[],
-            dateList: [
-                { name: 'Monday', value: 'Monday' },
-                { name: 'Tuesday', value: 'Tuesday' },
-                { name: 'Wednesday', value: 'Wednesday' },
-                { name: 'Thursday', value: 'Thursday' },
-                { name: 'Friday', value: 'Friday' },
-                { name: 'Saturday', value: 'Saturday' },
-                { name: 'Sunday', value: 'Sunday' }
-            ],
+            dateList: ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'],
             
             currentPage: 0,
             perPage: 0,
@@ -211,8 +196,7 @@ export default {
 
             url:'/api/objectives?page=',
             url_search:'',
-            url_department:'',
-            url_role:'',
+            url_date:'',
 
             deleteId:null,
         };
@@ -223,7 +207,7 @@ export default {
         
 
         async getOkrList(pageNumber) {
-            let url = this.url + pageNumber + this.url_search + this.url_department + this.url_role;
+            let url = this.url + pageNumber + this.url_search + this.url_date;
             // let url = `/api/objectives?page=${pageNumber}`;
             // if (this.searchInput && this.searchCategory) {
             //     url = `/api/objectives?search_input=${this.searchInput}&menu_category_id=${this.searchCategory.id}&page=${pageNumber}`;
@@ -245,30 +229,17 @@ export default {
             }
         },
         
-        departmentChange(){
+        dateChange(){
             this.url_search = '';
             this.searchInput = null;
-            if(this.selectedDepartment == 'all'){
-                this.url_department = ''
+            if(this.selectedDate == 'all'){
+                this.url_date = ''
             }
             else{
-                this.url_department = '&department_id=' + this.selectedDepartment.id;
+                this.url_date = '&days=' + this.selectedDate;
             }
             this.getOkrList(1);
-            this.getRoleList();
         },
-        roleChange(){
-            this.url_search = '';
-            this.searchInput = null;
-            if(this.selectedRole == 'all'){
-                this.url_role = ''
-            }
-            else{
-                this.url_role = '&role_id=' + this.selectedRole.id;
-            }
-            this.getOkrList(1)
-        },
-
         async searchBtnClicked() {
             this.url_search = '&search=' + this.searchInput
             this.getOkrList(1);

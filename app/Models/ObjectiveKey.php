@@ -10,6 +10,7 @@ class ObjectiveKey extends Model
 {
     protected $fillable = [
         'objective_id',
+        'role_id',
         'name',
         'okr_point',
         'assigned_days',
@@ -20,6 +21,12 @@ class ObjectiveKey extends Model
     {
         return  $this->belongsTo(Objective::class, 'objective_id');
     }
+
+    public function role(): BelongsTo
+    {
+        return $this->belongsTo(Role::class, 'role_id');
+    }
+
     public function objKeyStaff(): HasMany
     {
         return $this->hasMany(ObjectivekeyStaff::class);

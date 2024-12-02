@@ -12,7 +12,8 @@
                     Objective Name
                 </label>
                 <input type="text" v-model="objName" class="input-ui ">
-            </div>
+            </div><div class="col-span-9"></div>
+            <div class="col-span-10 border-b mt-4 mb-6"></div><div class="col-span-2"></div>
             <div class="mb-4 col-span-3">
                 <label for="" class="label-form mb-3">
                     Department
@@ -40,6 +41,19 @@
                             :key="index"> {{ role.name }} </option>
                     </select>
                 </div>
+            </div>
+            <div class="mb-4 col-span-3">
+                <label for="" class="label-form mb-3">
+                    Date Assigned
+                </label>
+                <multiselect v-model="selectedDate" :options="dateList" :multiple="true" :close-on-select="false" :clear-on-select="false"
+                    :preserve-search="false" placeholder="Select Date" label="" :preselect-first="false">
+                    <template #selection="{ values, search, isOpen }">
+                        <span class="multiselect__single"
+                            v-if="values.length"
+                            v-show="!isOpen">{{ values.length }} Date selected</span>
+                    </template>
+                </multiselect>
             </div><div class="col-span-3"></div>
 
             <div class="mb-4 col-span-3">
@@ -54,20 +68,8 @@
                 </label>
                 <input type="number" v-model="selectedOkrPoint" class="input-ui ">
             </div>
-            <div class="mb-4 col-span-3">
-                <label for="" class="label-form mb-3">
-                    Date Assigned
-                </label>
-                <multiselect v-model="selectedDate" :options="dateList" :multiple="true" :close-on-select="false" :clear-on-select="false"
-                    :preserve-search="false" placeholder="Select Date" label="" :preselect-first="false">
-                    <template #selection="{ values, search, isOpen }">
-                        <span class="multiselect__single"
-                            v-if="values.length"
-                            v-show="!isOpen">{{ values.length }} Date selected</span>
-                    </template>
-                </multiselect>
-            </div>
-            <div class="col-span-2">
+            
+            <div class="col-span-3">
                 <label for="" class="label-form mb-3">
                     Duration
                 </label>
@@ -97,6 +99,9 @@
                     <thead class="">
                         <tr>
                             <th scope="col" class="">
+                                Role
+                            </th>
+                            <th scope="col" class="">
                                 Key Results
                             </th>
                             <th scope="col" class="">
@@ -116,6 +121,9 @@
                     <tbody>
                         <tr class="" v-for="(obj, objIndex) in objective_List"
                             :key="objIndex">
+                            <td class="">
+                                {{ obj.role_name }} ({{ obj.department_name }})
+                            </td>
                             <td class="">
                                 {{ obj.name }}
                             </td>
@@ -176,14 +184,15 @@ export default {
             //     { name: 'Saturday', value: 'Saturday' },
             //     { name: 'Sunday', value: 'Sunday' }
             // ],
+            objName:null,
             selectedDepartment:null,
             selectedRole:null,
-            // selectedDate:[],
+            selectedDate:[],
+            key_result:null,
+            selectedOkrPoint:null,
             duration:null,
-            objName:null,
 
             objective_List:[],
-            objective_key: [{ name: "",okr_point: "",assigned_days:"", duration: "" }],  // Start with one input box
             selected_obj_keys:[],
 
             okrDetail:null,
@@ -203,13 +212,24 @@ export default {
             }
         },
         addDetail(detail){
-            this.selectedDepartment = detail.role.department_id;
-            this.getRoleList();
-            this.selectedRole = detail.role_id;
-            // this.selectedDate = detail.assigned_days;
-            // this.duration = detail.code;
+            // this.selectedDepartment = detail.role.department_id;
+            // this.getRoleList();
+            // this.selectedRole = detail.role_id;
             this.objName = detail.objective_name;
-            this.objective_List = detail.objective_keys;
+            // this.objective_List = detail.objective_keys;
+            detail.objective_keys.forEach(obj => {
+                this.objective_List.push({ 
+                    name: obj.name,
+                    department_name: obj.role.department.name,
+                    role_id: obj.role_id,
+                    role_name: obj.role.name,
+                    okr_point: obj.okr_point,
+                    assigned_days: obj.assigned_days, 
+                    duration: obj.duration
+                });
+            });
+
+
             // detail.assigned_days.forEach(day => {
             //     this.selectedDate.push(
             //         this.dateList.find(date => date.name == day )
@@ -261,19 +281,11 @@ export default {
         
 
         btnclickedCreateOkr(){
-            if (!this.selectedDepartment) {
-                this.alertValidationMessage(`Department`);
-                return 1;
-            }
-            else if(!this.selectedRole){
-                this.alertValidationMessage(`Role`);
-                return 1;
-            }
-            else if(!this.objName){
+            if(!this.objName){
                 this.alertValidationMessage(`Objective Name`);
                 return 1;
             }
-            else if(this.objective_key < 1){
+            else if(this.objective_list < 1){
                 this.alertValidationMessage(`Objective Key`);
                 return 1;
             }
@@ -289,7 +301,7 @@ export default {
             // console.log(selectedDate)
             let formData = new FormData();
             formData.append('objective_name', this.objName);
-            formData.append('role_id', this.selectedRole);
+            // formData.append('role_id', this.selectedRole);
             // formData.append('assigned_days', JSON.stringify(this.selectedDate));
             // formData.append('assigned_days', JSON.stringify(selectedDate));
             formData.append('objective_key', JSON.stringify(this.objective_List));
@@ -321,6 +333,10 @@ export default {
                 this.alertValidationMessage(`OKR Point`);
                 return 1;
             }
+            else if (!this.selectedRole) {
+                this.alertValidationMessage(`Role`);
+                return 1;
+            }
             else if (!this.selectedDate) {
                 this.alertValidationMessage(`Date`);
                 return 1;
@@ -332,6 +348,9 @@ export default {
             else{
                 this.objective_List.push({ 
                     name: this.key_result,
+                    department_name: this.departmentList.find(depart => depart.id === this.selectedDepartment).name,
+                    role_id:this.selectedRole,
+                    role_name:this.roleList.find(role => role.id === this.selectedRole).name,
                     okr_point: this.selectedOkrPoint,
                     assigned_days: this.selectedDate, 
                     duration: this.duration 

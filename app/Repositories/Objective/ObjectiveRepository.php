@@ -2,6 +2,7 @@
 
 namespace App\Repositories\Objective;
 
+use App\Http\Resources\DailyObjKeyStaffResource;
 use Exception;
 use App\Models\Item;
 use App\Models\Role;
@@ -33,9 +34,9 @@ class  ObjectiveRepository implements ObjectiveInterface
         $department = $request->input('department');
 
         return Objective::with([
-            'role.department',
-            'objectiveKeys.objKeyStaff',
-        ])->objectiveFilter($search, $name, $days, $role, $department)
+            'objectiveKeys.role.department',
+        ])
+            ->objectiveFilter($search, $name, $days, $role, $department)
             ->paginate();
     }
     public function getRolesByDepartmentId(Request $request, $departmentId)
@@ -46,7 +47,7 @@ class  ObjectiveRepository implements ObjectiveInterface
 
     public function getObjectiveById(Request $request, $objId)
     {
-        return Objective::with(['role.department', 'objectiveKeys.objKeyStaff'])->where('id', $objId)->get();
+        return Objective::with(['objectiveKeys.role.department'])->where('id', $objId)->get();
     }
 
 
@@ -101,10 +102,11 @@ class  ObjectiveRepository implements ObjectiveInterface
         if (!empty($objectiveKeys)) {
             $objectiveKeys = json_decode($objectiveKeys, true);
 
-            $objective->objectiveKeys()->delete();
-            $roleId =  $objective->role_id;
+            $objective->objectiveKeys()->each(function ($objectiveKey) {
+                $objectiveKey->objKeyStaff()->delete();
+            });
 
-            $staffLists = Staff::staffByRole($roleId);
+            $objective->objectiveKeys()->delete();
 
             $currentDay = date('l');
 
@@ -115,11 +117,14 @@ class  ObjectiveRepository implements ObjectiveInterface
                 $assignedDaysData = implode(',', $assignedDays); // Convert array to string
                 $objKey = ObjectiveKey::create([
                     'objective_id' => $objective->id,
+                    'role_id' => $key['role_id'],
                     'name' => $key['name'],
                     'okr_point' => $key['okr_point'],
                     'assigned_days' => $assignedDaysData,
                     'duration' => $key['duration'],
                 ]);
+
+                $staffLists = Staff::staffByRole($key['role_id']);
 
                 if (in_array($currentDay, $assignedDays)) {
                     foreach ($staffLists as $staff) {
@@ -141,7 +146,6 @@ class  ObjectiveRepository implements ObjectiveInterface
         $staffId = UserData()->id;
 
         $data =  Objective::with([
-            'role',
             'objectiveKeys' => function ($query) use ($currentDay, $staffId) {
                 $query->whereRaw("FIND_IN_SET(?, assigned_days)", [$currentDay]);
             },
@@ -163,7 +167,7 @@ class  ObjectiveRepository implements ObjectiveInterface
 
 
     //objkeylistwithstaff assigns 
-    public function getdailyObjectives(Request $request)
+    public function getdailyObjectives(Request $request, $objId)
     {
         $currentDay = now()->format('l');
 
@@ -172,14 +176,15 @@ class  ObjectiveRepository implements ObjectiveInterface
                 $query->whereRaw("FIND_IN_SET(?, assigned_days)", [$currentDay]);
             },
             'objectiveKey.objective',
-            'objKeyStaffImg'
         ])
             ->where('staff_id', UserData()->id)
-            ->whereHas('objectiveKey', function ($query) use ($currentDay) {
-                $query->whereRaw("FIND_IN_SET(?, assigned_days)", [$currentDay]);
+            ->whereHas('objectiveKey.objective', function ($query) use ($currentDay, $objId) {
+                $query->whereRaw("FIND_IN_SET(?, assigned_days)", [$currentDay])
+                    ->where('id', $objId);
             })
-            ->paginate();
-        return $objectives;
+            ->get();
+
+        return DailyObjKeyStaffResource::collection($objectives);
     }
 
     public function getdailyObjectivesById(Request $request, $objId)
@@ -321,8 +326,7 @@ class  ObjectiveRepository implements ObjectiveInterface
     {
 
         $ktvObjectives = Objective::with([
-            'role',
-            'objectiveKeys'
+            'objectiveKeys.role'
         ])->get();
 
         return KtvObjectiveRsource::collection($ktvObjectives);
@@ -366,8 +370,7 @@ class  ObjectiveRepository implements ObjectiveInterface
     {
         $data =  KtvProductTree::with([
             'entity',
-            'KtvObjectives.objective.role',
-            'KtvObjectives.objective.objectiveKeys',
+            'KtvObjectives.objective.objectiveKeys.role',
             'KtvItems.item'
         ])->paginate();
         return $data;
@@ -376,10 +379,10 @@ class  ObjectiveRepository implements ObjectiveInterface
     {
         $data =  KtvProductTree::with([
             'entity',
-            'KtvObjectives.objective.role',
-            'KtvObjectives.objective.objectiveKeys',
+            'KtvObjectives.objective.objectiveKeys.role',
             'KtvItems.item'
         ])->findOrFail($id);
+        // return $data;
         return new KtvProductTreeEditResource($data);
     }
 
