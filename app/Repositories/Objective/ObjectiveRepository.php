@@ -29,12 +29,12 @@ class  ObjectiveRepository implements ObjectiveInterface
     {
         $search = $request->input('search');
 
-        $role = $request->input('role');
-        $department = $request->input('department');
+        $roleId = $request->input('roleId');
+
         return Objective::with([
             'objectiveKeys.role.department',
         ])
-            ->objectiveFilter($search, $role, $department)
+            ->objectiveFilter($search, $roleId)
             ->paginate();
     }
     public function getRolesByDepartmentId(Request $request, $departmentId)

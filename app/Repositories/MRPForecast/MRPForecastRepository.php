@@ -7,6 +7,7 @@ use App\Models\MenuStep;
 use App\Models\ItemPrice;
 use App\Models\SupplierItem;
 use App\Services\MrpWorkingHour;
+use Illuminate\Support\Facades\DB;
 use App\Services\AveragePriceCalculator;
 use App\Http\Resources\HrForecastResource;
 
@@ -24,22 +25,9 @@ class MRPForecastRepository implements MRPForecastRepositoryInterface
   public function getForcastHR($request, $menuId)
   {
     $quantity = $request->quantity;
-
-    $menu = Menu::where('id', $menuId)
-      ->with(['menuSteps.role', 'subMenus.menuSteps.role'])
-      ->first();
-    if (!$menu) {
-      return ['success' => false, 'error' => 'Menu not found'];
-    }
-
-    $result = $this->MrpWorkingHour->calculateHrDuration($menu, $quantity);
-
-    return [
-      'success' => true,
-      'data' => $result,
-    ];
+    $hrDurations = $this->MrpWorkingHour->getGroupedHrDurations($menuId, $quantity);
+    return  $hrDurations;
   }
-
 
 
   public function getForcastMenus($request, $menuId)
