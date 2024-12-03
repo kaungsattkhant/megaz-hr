@@ -28,14 +28,13 @@ class  ObjectiveRepository implements ObjectiveInterface
     public function getObjectives(Request $request)
     {
         $search = $request->input('search');
-        $days = $request->input('days');
-        $name = $request->input('name');
+
         $role = $request->input('role');
         $department = $request->input('department');
         return Objective::with([
             'objectiveKeys.role.department',
         ])
-            ->objectiveFilter($search, $name, $days, $role, $department)
+            ->objectiveFilter($search, $role, $department)
             ->paginate();
     }
     public function getRolesByDepartmentId(Request $request, $departmentId)

@@ -17,9 +17,13 @@ class MRPForecastController extends Controller
 
     public function getForcastMenus(Request $request, $menuId)
     {
-
-
         $data =  $this->mrpForecastRepository->getForcastMenus($request, $menuId);
+        ResponseData($data);
+    }
+
+    public function getForcastHR(Request $request, $menuId)
+    {
+        $data =  $this->mrpForecastRepository->getForcastHR($request, $menuId);
 
         ResponseData($data);
     }
