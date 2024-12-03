@@ -85,4 +85,33 @@ class MRPForecastRepository implements MRPForecastRepositoryInterface
       'totalWeight' => $totalWeight
     ];
   }
+
+  public function getForcastRawMaterial($request, $menuId)
+  {
+    // DB::enableQueryLog();
+    $menu = Menu::where('id', $menuId)
+      ->with(
+        ['subMenus', 'menuSteps.MenuStepItem' => function ($q) {
+          $q->with(['item' => function ($subQuery) {
+            $subQuery->WithAveragePrice();
+          }, 'uom']);
+        }]
+      )
+      ->first();
+
+    return $menu;
+
+    // $queries = DB::getQueryLog();
+
+    // return response()->json($queries);
+
+    if (!$menu) {
+      return collect();
+    }
+
+
+    $menuIds = collect([$menu->id])
+      ->merge($menu->subMenus->pluck('id'))
+      ->toArray();
+  }
 }
