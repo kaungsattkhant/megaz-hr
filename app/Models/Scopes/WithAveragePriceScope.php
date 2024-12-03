@@ -15,13 +15,14 @@ class WithAveragePriceScope implements Scope
     public function apply(Builder $builder, Model $model): void
     {
         //
-        $builder->leftJoin('uom_conversions', function ($join) {
+        $builder->from('items')->leftJoin('uom_conversions', function ($join) {
             $join->on('uom_conversions.base_unit_id', '=', 'items.base_uom_id')
                 ->whereColumn('uom_conversions.conversion_unit_id', '=', 'items.uom_id')
                 ->where('uom_conversions.is_active', '=', 1);
         })
         ->join('uoms as base_uom', 'items.base_uom_id', 'base_uom.id')
         ->join('uoms as item_uom', 'items.uom_id', 'item_uom.id')
+
         ->addSelect(
             'items.*',      
             'base_uom.name as base_uom_name',
