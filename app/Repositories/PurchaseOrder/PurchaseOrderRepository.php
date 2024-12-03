@@ -45,7 +45,6 @@ class PurchaseOrderRepository implements PurchaseOrderRepositoryInterface
     }
     public function createOrUpdate($request)
     {
-        // dd($request->all());
         $data = $request->all();
         $staff = UserData();
         $items = json_decode($request->items);

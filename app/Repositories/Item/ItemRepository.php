@@ -20,6 +20,8 @@ class ItemRepository implements ItemRepositoryInterface
     }
     public function listAllData(Request $request)
     {
+
+
         $category_id = $request->category_id;
         if ($request->per_page || $request->page) {
             return Item::with([
@@ -31,7 +33,8 @@ class ItemRepository implements ItemRepositoryInterface
                 ->when($category_id, function ($q) use ($category_id) {
                     $q->where('items.category_id', $category_id);
                 })
-                ->withAveragePrice()
+                // ->withAveragePrice()
+                ->withUomConversion()
                 ->orderByDesc('id')
                 ->paginate(config('common.list_count'));
         } else {
@@ -44,7 +47,8 @@ class ItemRepository implements ItemRepositoryInterface
                 ->when((isset($request->category_id) && $category_id), function ($q) use ($category_id) {
                     $q->where('items.category_id', $category_id);
                 })
-                ->withAveragePrice()
+                // ->withAveragePrice()
+                ->withUomConversion()
                 ->orderByDesc('id')
                 ->get();
         }
