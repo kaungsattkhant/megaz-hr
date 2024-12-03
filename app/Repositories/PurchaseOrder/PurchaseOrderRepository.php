@@ -45,7 +45,6 @@ class PurchaseOrderRepository implements PurchaseOrderRepositoryInterface
     }
     public function createOrUpdate($request)
     {
-        // dd($request->all());
         $data = $request->all();
         $staff = UserData();
         $items = json_decode($request->items);
@@ -155,10 +154,12 @@ class PurchaseOrderRepository implements PurchaseOrderRepositoryInterface
                 $payableType = $request->payable_type;
                 $morphMapName = RelationMorphName($po);
                 // $po->po_grn_id=$po_grn->ids
+
                 if (isset($request->payable_type) && $payableType == 'other_payable') {
                     (new PurchaseOrderTransaction())->createTransaction($po, $morphMapName, $request->cash_account_id); #create transaction
                 }
-                if (isset($request->payable_type) && $payableType == 'creditor') {
+                // if (isset($request->payable_type) && $payableType == 'creditor') {
+                if ( $payableType == 'creditor') {
                     (new PurchaseOrderTransaction())->createCreditorTransaction($po, $morphMapName); #create transaction
                 }
             }

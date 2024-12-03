@@ -12,7 +12,7 @@
                     <label for="" class="label-form mb-3">
                         Month
                     </label>
-                    <input type="month" v-model="selectedMonth" class="input-ui">
+                    <input type="month" v-model="selectedMonth" class="input-ui" :min="minDate">
                 </div>
                 <div class="mb-4 col-span-3 rounded-md">
                     <label for="" class="label-form mb-3">
@@ -415,7 +415,10 @@ export default {
         return {
             is_step : 1,
 
-            typeList:[],
+            typeList:[
+                {name: 'KTV',value: 'ktv'},
+                {name: 'Restaurant',value: 'restaurant'},
+            ],
             menuCategoryList:[],
             menuList:[],
 
@@ -426,6 +429,8 @@ export default {
             quantity:null,
 
             menuTableList:[],
+
+            minDate: "",
 
         };
     },
@@ -449,17 +454,57 @@ export default {
             }
         },
         btnClickedAddMenu(){
-            let menuTableListLength = this.menuTableList.length;
-            this.menuTableList.push({
-                menuName:this.selectedMenu.name,
-                menuId:this.selectedMenu.id,
-                quantity:this.quantity,
-                amount:this.amount
-            })
-            if(this.menuTableList.length > menuTableListLength){
+            // let menuTableListLength = this.menuTableList.length;
+            // this.menuTableList.push({
+            //     menuName:this.selectedMenu.name,
+            //     menuId:this.selectedMenu.id,
+            //     quantity:this.quantity,
+            //     amount:this.amount
+            // })
+            // if(this.menuTableList.length > menuTableListLength){
+            //     this.selectedMenu = null;
+            //     this.quantity = null;
+            //     this.amount = null;
+            // }
+            if(!this.selectedMonth){
+                this.alertValidationMessage(`Month`);
+                return 1;
+            }
+            else if(!this.selectedType){
+                this.alertValidationMessage(`Type`);
+                return 1;
+            }
+            else if(!this.selectedMenu){
+                this.alertValidationMessage(`Menu`);
+                return 1;
+            }
+            else if(!this.quantity){
+                this.alertValidationMessage(`Quantity`);
+                return 1;
+            }
+            else{
+                this.addMenu();
+            }
+        },
+        async addMenu(){
+            let formData = new FormData();
+            formData.append("quantity", this.quantity);
+            formData.append("type", this.selectedType.value);
+            formData.append("date", this.selectedMonth);
+            let url = '/api/forecast/menus/' + this.selectedMenu.id;
+            let response = await postApiData({url: url, form_data: formData, token: this.getToken()});
+            if(response.success){
+                this.menuTableList.push({
+                    menuName: response.data.menu,
+                    quantity: response.data.quantity,
+                    amount: response.data.total_menu_forecast_amt
+                })
+                this.selectedMenuCategory = null;
+                this.menuList = [];
                 this.selectedMenu = null;
                 this.quantity = null;
-                this.amount = null;
+                this.selectedType = null;
+                this.selectedMonth = null;
             }
         },
 
@@ -484,6 +529,10 @@ export default {
 
     mounted() {
         initTE({ Modal, Select, Tab, Ripple });
+        const today = new Date();
+        const year = today.getFullYear();
+        const month = String(today.getMonth() + 1).padStart(2, "0"); 
+        this.minDate = `${year}-${month}`; 
     }
 }
 </script>

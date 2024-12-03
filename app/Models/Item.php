@@ -6,6 +6,7 @@ use App\Models\ItemPrice;
 use App\Models\UomConversion;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Item extends BaseModel
@@ -59,8 +60,6 @@ class Item extends BaseModel
         return $this->belongsToMany(Supplier::class, 'supplier_items');
 
     }
-
-
     public function uomConversion()
     {
         return $this->hasOneThrough(
@@ -69,9 +68,44 @@ class Item extends BaseModel
             'item_id', // Foreign key on ItemPrice table
             'conversion_unit_id', // Foreign key on UomConversion table
             'id', // Local key on Item table
-            'uom_id' // Local key on ItemPrice table
+            'base_uom_id' // Local key on ItemPrice table
         );
     }
+    public function scopeWithUomConversion($query)
+    {
+        $query->leftJoin('uom_conversions', function ($join) {
+            $join->on('uom_conversions.base_unit_id', '=', 'items.base_uom_id')
+                ->whereColumn('uom_conversions.conversion_unit_id', '=', 'items.uom_id')
+                ->where('uom_conversions.is_active', '=', 1);
+        })
+            ->join('uoms as base_uom', 'items.base_uom_id', 'base_uom.id')
+            ->join('uoms as item_uom', 'items.uom_id', 'item_uom.id')
+            ->select(
+                'items.*',
+                'base_uom.name as base_uom_name',
+                'item_uom.name as item_uom',
+                'uom_conversions.conversion as uom_conversion',
+                DB::raw('
+                                            CAST((
+                                                SELECT COALESCE(AVG(latest_prices.price), 0) 
+                                                FROM (
+                                                    SELECT ip.price 
+                                                    FROM supplier_items si
+                                                    JOIN item_prices ip ON si.id = ip.supplier_item_id
+                                                    WHERE si.item_id = items.id
+                                                    AND ip.id = (
+                                                        SELECT MAX(sub_ip.id)
+                                                        FROM item_prices sub_ip
+                                                        WHERE sub_ip.supplier_item_id = si.id
+                                                    )
+                                                ) AS latest_prices
+                                            ) AS DECIMAL(10,2)) AS average_price
+                                        ')
+            );
+    }
+
+
+
 
     public function getItemPriceWithConversionAttribute()
     {
@@ -88,25 +122,19 @@ class Item extends BaseModel
 
     public function scopeWithAveragePrice($query)
     {
-        //     return $query->addSelect([
-        //     'average_price' => DB::raw('
-        //         CAST((
-        //             SELECT COALESCE(AVG(latest_prices.price), 0) 
-        //             FROM (
-        //                 SELECT ip.price 
-        //                 FROM supplier_items si
-        //                 JOIN item_prices ip ON si.id = ip.supplier_item_id
-        //                 WHERE si.item_id = items.id
-        //                 AND ip.id = (
-        //                     SELECT MAX(sub_ip.id)
-        //                     FROM item_prices sub_ip
-        //                     WHERE sub_ip.supplier_item_id = si.id
-        //                 )
-        //             ) AS latest_prices
-        //         ) AS DECIMAL(10,2))
-        //     ')
-        // ]);
-        return $query->select('items.*', DB::raw('
+        $query->leftJoin('uom_conversions', function ($join) {
+            $join->on('uom_conversions.base_unit_id', '=', 'items.base_uom_id')
+                ->whereColumn('uom_conversions.conversion_unit_id', '=', 'items.uom_id')
+                ->where('uom_conversions.is_active', '=', 1);
+        })
+            ->join('uoms as base_uom', 'items.base_uom_id', 'base_uom.id')
+            ->join('uoms as item_uom', 'items.uom_id', 'item_uom.id')
+            ->select(
+                'items.*',
+                'base_uom.name as base_uom_name',
+                'item_uom.name as item_uom',
+                'uom_conversions.conversion as uom_conversion',
+                DB::raw('
                                             CAST((
                                                 SELECT COALESCE(AVG(latest_prices.price), 0) 
                                                 FROM (
@@ -121,6 +149,84 @@ class Item extends BaseModel
                                                     )
                                                 ) AS latest_prices
                                             ) AS DECIMAL(10,2)) AS average_price
-                                        '));
+                                        ')
+            );
+    }
+
+    public function scopeWithBalanceDetails(Builder $query, $inventoryId, $itemId, $fromDate = null, $toDate = null)
+    {
+        return $query
+            ->join('inventory_ledger_items', 'items.id', '=', 'inventory_ledger_items.item_id')
+            ->joinSub(
+                DB::table('supplier_items as si')
+                    ->join('item_prices as ip', 'si.id', '=', 'ip.supplier_item_id')
+                    ->select(
+                        'si.item_id',
+                        DB::raw('CAST(AVG(ip.price) AS DECIMAL(10,2)) AS average_price'),
+                        'ip.base_uom_id'
+                    )
+                    ->whereIn(
+                        'ip.id',
+                        DB::table('item_prices as sub_ip')
+                            ->select(DB::raw('MAX(sub_ip.id)'))
+                            ->whereColumn('sub_ip.supplier_item_id', 'si.id')
+                            ->groupBy('sub_ip.supplier_item_id')
+                    )
+                    ->groupBy('si.item_id', 'ip.base_uom_id'),
+                'latest_prices',
+                'items.id',
+                'latest_prices.item_id'
+            )
+            ->join('uoms as item_uom', 'items.uom_id', '=', 'item_uom.id')
+            ->join('uoms as base_uom', 'items.base_uom_id', '=', 'base_uom.id')
+            ->join('inventory_ledgers', 'inventory_ledger_items.inventory_ledger_id', '=', 'inventory_ledgers.id')
+            ->join('uom_conversions', function ($join) {
+                $join->on('latest_prices.base_uom_id', '=', 'uom_conversions.base_unit_id')
+                    ->on('items.uom_id', '=', 'uom_conversions.conversion_unit_id')
+                    ->where('uom_conversions.is_active', 1);
+            })
+            ->select(
+                'items.name',
+                'inventory_ledger_items.item_id',
+                'items.uom_id as item_uom_id',
+                'latest_prices.base_uom_id as base_uom_id',
+                'latest_prices.average_price as price',
+                'items.base_uom_id as base_unit_id',
+                'item_uom.name as conversion_uom_name',
+                'base_uom.name as base_uom_name',
+                'uom_conversions.conversion as conversion',
+                DB::raw('SUM(CASE WHEN inventory_ledgers.action = "in" AND DATE(inventory_ledgers.date) < CURDATE() THEN inventory_ledger_items.quantity ELSE 0 END) -
+                  SUM(CASE WHEN inventory_ledgers.action = "out" AND DATE(inventory_ledgers.date) < CURDATE() THEN inventory_ledger_items.quantity ELSE 0 END) as opening_balance'),
+                DB::raw('SUM(CASE WHEN inventory_ledgers.action = "in" AND DATE(inventory_ledgers.date) = CURDATE() THEN inventory_ledger_items.quantity ELSE 0 END) as in_balance'),
+                DB::raw('SUM(CASE WHEN inventory_ledgers.action = "out" AND DATE(inventory_ledgers.date) = CURDATE() THEN inventory_ledger_items.quantity ELSE 0 END) as out_balance'),
+                DB::raw('SUM(CASE WHEN inventory_ledgers.action = "in" AND DATE(inventory_ledgers.date) < CURDATE() THEN inventory_ledger_items.quantity ELSE 0 END) +
+                  SUM(CASE WHEN inventory_ledgers.action = "in" AND DATE(inventory_ledgers.date) = CURDATE() THEN inventory_ledger_items.quantity ELSE 0 END) -
+                  SUM(CASE WHEN inventory_ledgers.action = "out" AND DATE(inventory_ledgers.date) <= CURDATE() THEN inventory_ledger_items.quantity ELSE 0 END) as closing_balance'),
+                DB::raw('((latest_prices.average_price / uom_conversions.conversion) *
+                  (SUM(CASE WHEN inventory_ledgers.action = "in" AND DATE(inventory_ledgers.date) < CURDATE() THEN inventory_ledger_items.quantity ELSE 0 END) +
+                   SUM(CASE WHEN inventory_ledgers.action = "in" AND DATE(inventory_ledgers.date) = CURDATE() THEN inventory_ledger_items.quantity ELSE 0 END) -
+                   SUM(CASE WHEN inventory_ledgers.action = "out" AND DATE(inventory_ledgers.date) <= CURDATE() THEN inventory_ledger_items.quantity ELSE 0 END))) as total_value')
+            )
+            ->where('items.id', $itemId)
+            ->where('inventory_id', $inventoryId)
+            ->when($fromDate && $toDate, function ($q) use ($fromDate, $toDate) {
+                $q->whereBetween(DB::raw('DATE(inventory_ledgers.created_at)'), [$fromDate, $toDate]);
+            })
+            ->when($fromDate && !$toDate, function ($q) use ($fromDate) {
+                $q->whereDate('inventory_ledgers.created_at', '>=', $fromDate);
+            })
+            ->when(!$fromDate && $toDate, function ($q) use ($toDate) {
+                $q->whereDate('inventory_ledgers.created_at', '<=', $toDate);
+            })
+            ->groupBy(
+                'inventory_ledger_items.item_id',
+                'items.name',
+                'latest_prices.average_price',
+                'latest_prices.base_uom_id',
+                'items.base_uom_id',
+                'uom_conversions.conversion',
+                'item_uom.name',
+                'base_uom.name'
+            );
     }
 }

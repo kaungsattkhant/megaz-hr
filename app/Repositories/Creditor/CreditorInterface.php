@@ -7,5 +7,9 @@ interface CreditorInterface{
     public function getCreditorAccountList();
 
     public function createCreditorAccount($request);
+
+    public function listOfCreditorTransaction($request);
+
+    public function createCreditorTransaction($request);
     
 }

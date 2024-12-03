@@ -27,7 +27,14 @@
                 <input type="tel" v-model="phoneNumber"
                     class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
             </div>
-            <div class="col-span-3"></div>
+            <div class="mb-4 col-span-3 pb-6 rounded-md">
+                <label for="" class="block text-sm text-black mb-3">
+                    Credit Limit
+                </label>
+                <input type="number" v-model="maxCredit"
+                    class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
+            </div>
+            
 
             <div class="mb-4 col-span-6 pb-6 rounded-md">
                 <label for="" class="block text-sm text-black mb-3">
@@ -37,14 +44,25 @@
                     class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg" id="" cols="30"
                     rows="10"></textarea>
             </div>
-            <div class="col-span-6"></div>
-            <div class="mb-4 col-span-3 pb-6 rounded-md">
-                <label for="" class="block text-sm text-black mb-3">
-                    Credit Limit
-                </label>
-                <input type="number" v-model="maxCredit"
-                    class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
+            <div class="col-span-6">
+                <div class="flex justify-between mb-4">
+                    <label for="" class="block text-base text-black mb-3">
+                        Account
+                    </label>
+                    <button class="add-btn mt-0.5" data-te-toggle="modal" data-te-target="#create_modal">
+                        <i class="fal fa-plus"></i>
+                    </button>
+                </div>
+                <div>
+                    <p class="mb-3 text-sm">
+                        <span class="text-gray-600 pr-2 w-32 inline-block">AP Account</span>  : <span class="pl-1">{{ selectedAccount ? selectedAccount.name : '' }}</span>
+                    </p>
+                    <p class="text-sm">
+                        <span class="text-gray-600 pr-2 w-32 inline-block">Creditor Account</span> : <span class="pl-1">{{ selectedCreditAccount ? selectedCreditAccount.name : '' }}</span>
+                    </p>
+                </div>
             </div>
+            
             <div class="mb-4 col-span-3 pb-6 rounded-md">
                 <label for="" class="block text-sm text-black mb-3">
                     Items
@@ -58,7 +76,26 @@
                     </select>
                 </div>
             </div>
-            <div class="col-span-3 mb-4 flex gap-x-4">
+            <div class="mb-4 col-span-3 pb-6 rounded-md">
+                <label class="label-form mb-3">Brands</label>
+                <multiselect
+                v-model="selectedItemBrands"
+                :options="itemBrandsList"
+                :multiple="true"
+                :close-on-select="false"
+                :clear-on-select="false"
+                :preserve-search="true"
+                placeholder="Select Brands"
+                label="name"
+                track-by="id"
+                :preselect-first="false">
+                    <template #selection="{ values, search, isOpen }">
+                        <span class="multiselect__single" v-if="values.length" v-show="!isOpen">{{ values.length }}
+                        brands selected</span>
+                    </template>
+                </multiselect>
+            </div>
+            <!-- <div class="col-span-3 mb-4 flex gap-x-4">
                 <div class=" flex-grow">
                     <label for="" class="block text-sm text-black mb-3">
                         AP Account
@@ -94,7 +131,7 @@
                         <i class="fal fa-plus"></i>
                     </button>
                 </div>
-            </div>
+            </div> -->
 
             <div class=" col-span-12">
                 <table class="min-w-[40%] text-sm font-light ">
@@ -104,6 +141,9 @@
                                 Item
                             </th>
                             <th scope="col" class=" px-6 py-4 ">
+                                Brand
+                            </th>
+                            <th scope="col" class=" px-6 py-4 ">
                             </th>
                         </tr>
                     </thead>
@@ -111,6 +151,11 @@
                         <tr class="" v-for="(existingItem, existingItemIndex) in existingItems" :key="existingItemIndex">
                             <td class=" px-6 py-2 font-medium ">
                                 {{ existingItem.name }}
+                            </td>
+                            <td class=" px-6 py-4 font-medium ">
+                                <span v-for="(brand,index) in existingItem.brands" class="after:content-[','] last:after:hidden pr-1">
+                                    {{ brand.name }}
+                                </span>
                             </td>
                             <td class=" px-6 py-2 font-medium ">
                                 <button>
@@ -145,6 +190,50 @@
             </button>
         </div>
     </div>
+
+        <!-- Modal -->
+    <div data-te-modal-init class="fixed left-0 top-0 z-[1055] hidden h-full w-full overflow-y-auto overflow-x-hidden outline-none"
+        id="create_modal" tabindex="-1" aria-labelledby="create_modalLabel" aria-hidden="true">
+        <div data-te-modal-dialog-ref
+            class="pointer-events-none relative w-auto mb-12 translate-y-[-50px] opacity-0 transition-all duration-300 ease-in-out min-[576px]:mx-auto min-[576px]:mt-7 min-[576px]:max-w-[500px]">
+            <div
+                class="min-[576px]:shadow-[0_0.5rem_1rem_rgba(#000, 0.15)] pointer-events-auto relative flex w-full flex-col rounded-md border-none bg-white bg-clip-padding text-current shadow-lg outline-none">
+
+                <div class="relative flex justify-between py-2 px-6 border-b">
+                    <h5 class="text-base text-center mt-2 font-semibold leading-normal font-inter"
+                        id="create_modalLabel">
+                        Create Supplier AP Account
+                    </h5>
+                    <button type="button" class="text-xs focus:shadow-none focus:outline-none" data-te-modal-dismiss
+                        aria-label="Close">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                            stroke="currentColor" class="h-4 w-4">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </button>
+                </div>
+                <div class="relative px-6 py-4 border-b" data-te-modal-body-ref>
+                    <div class="mb-4">
+                        <label for="" class="label-form mb-3">
+                            Name
+                        </label>
+                        <input type="text" v-model="accName" placeholder="AP Account Name"  class="input-ui">
+                    </div>
+                </div>
+                <div class="flex justify-end gap-x-4 px-6 mb-6 pt-4">
+                    <button type="button" class="cancel-btn focus:shadow-none focus:outline-none"
+                        data-te-modal-dismiss aria-label="Close">
+                        Cancel
+                    </button>
+                    <button type="button" @click="createAccountBtnClicked()"
+                        class="add-btn focus:outline-none focus:ring-0 " data-te-modal-dismiss>
+                        Create
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
 
 
     <!-- Modal -->
@@ -293,6 +382,9 @@ export default {
             creditSubAccList:[],
             creditAccountName:null,
             selectedCreditSubAcc:null,
+
+            itemBrandsList: [],
+            selectedItemBrands: []
         };
     },
 
@@ -415,6 +507,9 @@ export default {
             formData.append("creditor_account_id", this.selectedCreditAccount.id);
             this.selectedItems.forEach((item)=>{
                 formData.append("items[]", item.id);
+                item.brands.forEach((brand)=>{
+                    formData.append("brands[]", brand.id);
+                });
             });
 
             let url = `/api/suppliers`;
@@ -432,6 +527,16 @@ export default {
             }
         },
 
+        async createAccountBtnClicked(){
+            let url = '/api/create_supplier_account';
+            let formData = new FormData();
+            formData.append("name", this.accName);
+            let response = await postApiData({url: url, form_data: formData, token: this.getToken()});
+            if(response.success){
+                this.selectedAccount = response.data.other_payable;
+                this.selectedCreditAccount = response.data.creditor;
+            }
+        },
         async createAPAccountBtnClicked(){
             let url = `/api/create_payable_account`;
             let formData = new FormData();

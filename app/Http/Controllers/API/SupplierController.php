@@ -34,4 +34,9 @@ class SupplierController extends Controller
 
     public function destroy($id){
     }
+
+    public function createSupplierAccount(Request $request){
+        $createdSupplierAccount = $this->supplierRepo->createSupplierAccount($request);
+        ResponseData($createdSupplierAccount);
+    }
 }

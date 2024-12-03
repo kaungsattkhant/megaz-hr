@@ -29,4 +29,15 @@ class CreditorController extends Controller
         $data=$this->creditorRepo->createCreditorAccount($request);
         ResponseData($data);
     }
+
+    public function getCreditorTransactionBySupplier(Request $request){
+        $data=$this->creditorRepo->listOfCreditorTransaction($request);
+        ResponseData($data);
+    }
+
+    public function createCreditorTransaction(Request $request){
+        $data=$this->creditorRepo->createCreditorTransaction($request);
+        ResponseData($data);
+    }
+    
 }

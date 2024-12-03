@@ -42,8 +42,25 @@
                     class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg" id="" cols="30"
                     rows="10"></textarea>
             </div>
-            <!-- <div class="col-span-6"></div> -->
-            <div class="col-span-3 mb-4 flex gap-x-4">
+            <div class="col-span-6">
+                <div class="flex justify-between mb-4">
+                    <label for="" class="block text-base text-black mb-3">
+                        Account
+                    </label>
+                    <button class="add-btn mt-0.5" data-te-toggle="modal" data-te-target="#create_modal">
+                        <i class="fal fa-plus"></i>
+                    </button>
+                </div>
+                <div>
+                    <p class="mb-3 text-sm">
+                        AP Account - {{ selectedAccount ? selectedAccount.name : '' }}
+                    </p>
+                    <p class="text-sm">
+                        Creditor Account - {{ selectedCreditAccount ? selectedCreditAccount.name : '' }}
+                    </p>
+                </div>
+            </div>
+            <!-- <div class="col-span-3 mb-4 flex gap-x-4">
                 <div class=" flex-grow">
                     <label for="" class="block text-sm text-black mb-3">
                         AP Account
@@ -93,7 +110,7 @@
                         <i class="fal fa-plus"></i>
                     </button>
                 </div>
-            </div>
+            </div> -->
 
             <div class="mb-4 col-span-3 pb-6 rounded-md">
                 <label for="" class="block text-sm text-black mb-3">
@@ -142,9 +159,9 @@
                             <th scope="col" class=" px-6 py-4 ">
                                 Item
                             </th>
-                            <!-- <th scope="col" class=" px-6 py-4 ">
-                                Brand(s)
-                            </th> -->
+                            <th scope="col" class=" px-6 py-4 ">
+                                Brand
+                            </th>
                             <th scope="col" class=" px-6 py-4 ">
                             </th>
                         </tr>
@@ -216,22 +233,27 @@
                         </button>
                     </div>
                     <div class="relative px-6 py-4 border-b" data-te-modal-body-ref>
-
                         <div class="mb-4">
                             <label for="" class="label-form mb-3">
                                 Name
                             </label>
-                            <input type="text" v-model="apAccountName" placeholder="AP Account Name"  class="input-ui">
+                            <input type="text" v-model="accName" placeholder="AP Account Name"  class="input-ui">
                         </div>
+                        <!-- <div class="mb-4">
+                            <label for="" class="label-form mb-3">
+                                Name
+                            </label>
+                            <input type="text" v-model="apAccountName" placeholder="AP Account Name"  class="input-ui">
+                        </div> -->
 
-                        <div class="mb-4">
+                        <!-- <div class="mb-4">
                             <div>
                                 <label class="label-form mb-3">AP Sub Account</label>
                                 <multiselect v-model="selectedPayableSubAccount" :options="payableSubAccountList" :close-on-select="true"
                                 :clear-on-select="false" :preserve-search="true" placeholder="Select Sub Account" label="name"
                                 track-by="id" :preselect-first="true"></multiselect>
                             </div>
-                        </div>
+                        </div> -->
                     </div>
 
                     <!--Modal footer-->
@@ -240,7 +262,7 @@
                             data-te-modal-dismiss aria-label="Close">
                             Cancel
                         </button>
-                        <button type="button" @click="createAPAccountBtnClicked"
+                        <button type="button" @click="createAccountBtnClicked()"
                             class="add-btn focus:outline-none focus:ring-0 " data-te-modal-dismiss>
                             Create
                         </button>
@@ -321,6 +343,7 @@ export default {
             selectedItems: [],
             selectedItem: null,
 
+            accName:null,
             selectedAccount: null,
             selectedCreditAccount:null,
             name: null,
@@ -473,6 +496,16 @@ export default {
             }
         },
 
+        async createAccountBtnClicked(){
+            let url = '/api/create_supplier_account';
+            let formData = new FormData();
+            formData.append("name", this.accName);
+            let response = await postApiData({url: url, form_data: formData, token: this.getToken()});
+            if(response.success){
+                this.selectedAccount = response.data.other_payable;
+                this.selectedCreditAccount = response.data.creditor;
+            }
+        },
         async createAPAccountBtnClicked(){
             let url = `/api/create_payable_account`;
             let formData = new FormData();
