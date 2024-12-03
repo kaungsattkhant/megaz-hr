@@ -92,9 +92,7 @@ class MRPForecastRepository implements MRPForecastRepositoryInterface
     $menu = Menu::where('id', $menuId)
       ->with(
         ['subMenus', 'menuSteps.MenuStepItem' => function ($q) {
-          $q->with(['item' => function ($subQuery) {
-            $subQuery->WithAveragePrice();
-          }, 'uom']);
+          $q->with(['item', 'uom']);
         }]
       )
       ->first();
