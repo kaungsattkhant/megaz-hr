@@ -5,6 +5,7 @@ namespace App\Repositories\Creditor;
 use App\Models\Ledger;
 use App\Models\Account;
 use Illuminate\Support\Facades\DB;
+use App\Http\Action\Transaction\StoreTransactionLedger;
 
 class CreditorRepository implements CreditorInterface
 {
@@ -69,5 +70,69 @@ class CreditorRepository implements CreditorInterface
                 $q->where('account_code', $creditorAccountCode);
             })
             ->get();
+    }
+
+    public function listOfCreditorTransaction($request)
+    {
+        $ledger = Ledger::join('accounts', 'ledgers.account_id', '=', 'accounts.id')
+            ->join('transactions', 'ledgers.transaction_id', '=', 'transactions.id')
+            ->join('sub_accounts', 'accounts.sub_account_id', '=', 'sub_accounts.id')
+            ->join('suppliers', 'ledgers.personable_id', '=', 'suppliers.id')
+            ->where('sub_accounts.account_code', config('common.creditor_account_code') )
+            ->where('ledgers.personable_type', 'supplier')
+            ->where('ledgers.personable_id', $request->supplier_id)
+            ->whereNull('transactions.transactionable_id')
+            ->select(
+                // 'ledgers.created_at as date',
+                DB::raw("DATE_FORMAT(ledgers.created_at, '%M %d %Y %H:%i') as date"),
+                'accounts.name as account_name',
+                'ledgers.personable_id as supplier_id',
+                'suppliers.creditor_account_id',
+                'suppliers.name as supplier_name',
+                'ledgers.value as amount'
+                // DB::raw('SUM(CASE WHEN ledgers.action = "debit" THEN ledgers.value ELSE 0 END) as debit_amount'),
+                // DB::raw('SUM(CASE WHEN ledgers.action = "credit" THEN ledgers.value ELSE 0 END) as credit_amount'),
+                // DB::raw('(SUM(CASE WHEN ledgers.action = "credit" THEN ledgers.value ELSE 0 END) - SUM(CASE WHEN ledgers.action = "debit" THEN ledgers.value ELSE 0 END)) as total_credit_amount')
+            )
+            ->with('account')
+            // ->groupBy('ledgers.personable_id')
+            ->get();
+        return $ledger;
+    }
+
+    public function createCreditorTransaction($request)
+    {
+        DB::beginTransaction();
+        try {
+            $data = $request->all();
+            $data['created_by'] = UserData()->id;
+            $data['is_confirmed'] = 1;
+            $transaction = (new StoreTransactionLedger())->createTransaction($data);
+            $creditLedger = (new StoreTransactionLedger())->storeLedger([
+                'date' => now(),
+                'value' => $request->value,
+                'transaction_id' => $transaction->id,
+                'account_id' => $request->cash_account_id,
+                'personable_id' => $request->supplier_id,
+                'personable_type' => 'supplier',
+                'action' => 'credit',
+            ]);
+
+            #debit
+            $debitLedger = (new StoreTransactionLedger())->storeLedger([
+                'value' => $request->value,
+                'transaction_id' => $transaction->id,
+                'account_id' => $request->creditor_account_id,
+                'personable_id' => $request->supplier_id,
+                'personable_type' => 'supplier',
+                'action' => 'debit',
+            ]);
+            DB::commit();
+            return $transaction;
+        } catch (\Exception $e) {
+            DB::rollback();
+            ResponseMessage($e->getMessage(), 402);
+            throw $e;
+        }
     }
 }

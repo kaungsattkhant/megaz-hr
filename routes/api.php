@@ -412,8 +412,11 @@ Route::middleware('auth:api')->group(function () {
     Route::controller(CreditorController::class)->group(function () {
         Route::get('creditors', 'index');
         Route::get('creditor_transaction_list', 'listOfAccountPayableTransaction');
+        Route::post('create_creditor_transaction', 'createCreditorTransaction');
+        
         Route::get('/get_creditor_account_list', 'getCreditorAccountList');
         Route::post('/create_creditor_account', 'createCreditorAccount');
+        Route::get('/get_creditor_transaction_by_supplier', 'getCreditorTransactionBySupplier');
     });
     Route::controller(BrandController::class)->group(function () {
         Route::get('brands', 'index');

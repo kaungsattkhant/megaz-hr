@@ -70,7 +70,7 @@ class Item extends BaseModel
             'item_id', // Foreign key on ItemPrice table
             'conversion_unit_id', // Foreign key on UomConversion table
             'id', // Local key on Item table
-            'uom_id' // Local key on ItemPrice table
+            'base_uom_id' // Local key on ItemPrice table
         );
     }
 
@@ -89,24 +89,6 @@ class Item extends BaseModel
 
     public function scopeWithAveragePrice($query)
     {
-        //     return $query->addSelect([
-        //     'average_price' => DB::raw('
-        //         CAST((
-        //             SELECT COALESCE(AVG(latest_prices.price), 0) 
-        //             FROM (
-        //                 SELECT ip.price 
-        //                 FROM supplier_items si
-        //                 JOIN item_prices ip ON si.id = ip.supplier_item_id
-        //                 WHERE si.item_id = items.id
-        //                 AND ip.id = (
-        //                     SELECT MAX(sub_ip.id)
-        //                     FROM item_prices sub_ip
-        //                     WHERE sub_ip.supplier_item_id = si.id
-        //                 )
-        //             ) AS latest_prices
-        //         ) AS DECIMAL(10,2))
-        //     ')
-        // ]);
         return $query->select('items.*', DB::raw('
                                             CAST((
                                                 SELECT COALESCE(AVG(latest_prices.price), 0) 
