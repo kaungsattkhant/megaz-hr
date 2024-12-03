@@ -24,13 +24,14 @@ class MrpWorkingHour
 
     $menuSteps = DB::table('menu_steps')
       ->join('roles', 'menu_steps.role_id', '=', 'roles.id')
+      ->join('departments', 'roles.department_id', '=', 'departments.id')
       ->whereIn('menu_steps.menu_id', $menuIds)
       ->select(
         'menu_steps.role_id',
-        'roles.name as position',
+        DB::raw("CONCAT(roles.name, ' (', departments.name, ')') as position"),
         DB::raw("SUM(menu_steps.duration * $quantity) as total_working_hour")
       )
-      ->groupBy('menu_steps.role_id', 'roles.name')
+      ->groupBy('menu_steps.role_id', 'roles.name', 'departments.name')
       ->get();
 
     $menuSteps = $menuSteps->map(function ($data) {
