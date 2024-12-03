@@ -122,7 +122,19 @@ class Item extends BaseModel
 
     public function scopeWithAveragePrice($query)
     {
-        return $query->select('items.*', DB::raw('
+        $query->leftJoin('uom_conversions', function ($join) {
+            $join->on('uom_conversions.base_unit_id', '=', 'items.base_uom_id')
+                ->whereColumn('uom_conversions.conversion_unit_id', '=', 'items.uom_id')
+                ->where('uom_conversions.is_active', '=', 1);
+        })
+            ->join('uoms as base_uom', 'items.base_uom_id', 'base_uom.id')
+            ->join('uoms as item_uom', 'items.uom_id', 'item_uom.id')
+            ->select(
+                'items.*',
+                'base_uom.name as base_uom_name',
+                'item_uom.name as item_uom',
+                'uom_conversions.conversion as uom_conversion',
+                DB::raw('
                                             CAST((
                                                 SELECT COALESCE(AVG(latest_prices.price), 0) 
                                                 FROM (
@@ -137,7 +149,8 @@ class Item extends BaseModel
                                                     )
                                                 ) AS latest_prices
                                             ) AS DECIMAL(10,2)) AS average_price
-                                        '));
+                                        ')
+            );
     }
 
     public function scopeWithBalanceDetails(Builder $query, $inventoryId, $itemId, $fromDate = null, $toDate = null)

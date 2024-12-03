@@ -33,8 +33,7 @@ class ItemRepository implements ItemRepositoryInterface
                 ->when($category_id, function ($q) use ($category_id) {
                     $q->where('items.category_id', $category_id);
                 })
-                // ->withAveragePrice()
-                ->withUomConversion()
+                ->withAveragePrice()
                 ->orderByDesc('id')
                 ->paginate(config('common.list_count'));
         } else {
@@ -47,8 +46,7 @@ class ItemRepository implements ItemRepositoryInterface
                 ->when((isset($request->category_id) && $category_id), function ($q) use ($category_id) {
                     $q->where('items.category_id', $category_id);
                 })
-                // ->withAveragePrice()
-                ->withUomConversion()
+                ->withAveragePrice()
                 ->orderByDesc('id')
                 ->get();
         }
