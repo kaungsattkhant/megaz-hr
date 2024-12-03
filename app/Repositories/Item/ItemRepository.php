@@ -20,8 +20,6 @@ class ItemRepository implements ItemRepositoryInterface
     }
     public function listAllData(Request $request)
     {
-
-
         $category_id = $request->category_id;
         if ($request->per_page || $request->page) {
             return Item::with([
