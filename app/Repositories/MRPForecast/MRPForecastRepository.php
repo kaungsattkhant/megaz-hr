@@ -2,11 +2,14 @@
 
 namespace App\Repositories\MRPForecast;
 
+use Exception;
 use App\Models\Menu;
 use App\Models\MenuStep;
 use App\Models\ItemPrice;
+use App\Models\MrpForecast;
 use App\Models\SupplierItem;
 use App\Services\MrpWorkingHour;
+use App\Models\TargetMrpForecast;
 use Illuminate\Support\Facades\DB;
 use App\Services\AveragePriceCalculator;
 use App\Http\Resources\HrForecastResource;
@@ -215,29 +218,65 @@ class MRPForecastRepository implements MRPForecastRepositoryInterface
 
     return $groupedResult;
   }
+
+  public function storeForecast($data)
+  {
+    DB::beginTransaction();
+    try {
+      $mrpForecast = MrpForecast::create($data);
+
+      if (isset($data['target_mrps'])) {
+        $targetMrps = json_decode($data['target_mrps'], true);
+
+        foreach ($targetMrps as $targetMrp) {
+
+          TargetMrpForecast::create([
+            'mrp_forecast_id' => $mrpForecast->id,
+            'menu_id' => $targetMrp['menu_id'],
+            'quantity' => $targetMrp['quantity']
+          ]);
+        }
+      }
+
+      DB::commit();
+      return $mrpForecast;
+    } catch (Exception $e) {
+      DB::rollBack();
+      throw $e;
+    }
+  }
+
+  public function updateForecast($data, int $mrpForecastId)
+  {
+    DB::beginTransaction();
+    try {
+      $mrpForecast = MrpForecast::findOrFail($mrpForecastId);
+      $mrpForecast->update($data);
+
+
+      if (isset($data['target_mrps'])) {
+
+        $targetMrps = json_decode($data['target_mrps'], true);
+        foreach ($targetMrps as $targetMrp) {
+
+          $mrpForecast->targetMrpForecast()->update([
+            'mrp_forecast_id' => $mrpForecast->id,
+            'menu_id' => $targetMrp['menu_id'],
+            'quantity' => $targetMrp['quantity']
+          ]);
+        }
+      }
+
+      DB::commit();
+      return $mrpForecast;
+    } catch (Exception $e) {
+      DB::rollBack();
+      throw $e;
+    }
+  }
+
+  public function getForecasts($request)
+  {
+    return MrpForecast::with('targetMrpForecast.menu')->get();
+  }
 }
-
-
-
- //here is update , 
-//  $menu = Menu::where('id', $menuId)
-//  ->with([
-//      'subMenus',
-//      'menuSteps.menuStepItem' => function ($query) use ($inventoryId) {
-//          $query->with([
-//              'item' => function ($itemQuery) use ($inventoryId) {
-//                  $itemQuery->with([
-//                      'balance' => function ($balanceQuery) use ($inventoryId) {
-//                          $balanceQuery->whereHas('inventory_ledger', function ($q) use ($inventoryId) {
-//                              $q->where('inventory_id', $inventoryId);
-//                          });
-//                      }
-//                  ]);
-//              },
-//              'uom'
-//          ]);
-//      }
-//  ])
-//  ->first();
-//  //
-//  return $menu;

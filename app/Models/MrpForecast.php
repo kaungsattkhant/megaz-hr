@@ -13,4 +13,9 @@ class MrpForecast extends Model
         'type',
         'date',
     ];
+
+    public function targetMrpForecast()
+    {
+        return $this->hasMany(TargetMrpForecast::class);
+    }
 }

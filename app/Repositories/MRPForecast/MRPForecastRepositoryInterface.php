@@ -13,4 +13,9 @@ interface MRPForecastRepositoryInterface
   public function getForcastHR($request, $menuId);
 
   public function getForcastRawMaterial($request, $menuId);
+
+  public function storeForecast($data);
+  public function updateForecast($data, int $mrpForecastId);
+
+  public function getForecasts($request);
 }
