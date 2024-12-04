@@ -317,3 +317,11 @@ Route::middleware(['departments:objective'])->group(function () {
 
 
 
+
+
+
+//test
+
+Route::view('/creditor', 'creditor.index')->name('creditor');
+Route::view('/creditor/suppliers/{creditorId}/transactions', 'creditor.history')->name('creditor.history');
+

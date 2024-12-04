@@ -119,7 +119,7 @@
             
             
             <div>
-                <button class="add-btn" @click="is_step = 2">
+                <button class="add-btn" @click="clickedBtnCreate()">
                     Create
                 </button>
             </div>
@@ -128,7 +128,7 @@
             <div class="grid !grid-cols-12 gap-x-8 bg-white p-8 rounded-md shadow-md mb-8">
                 <div class="mb-4 col-span-3 rounded-md">
                     <label for="" class="label-form mb-3">
-                        Month
+                        Month 
                     </label>
                     <input type="month" v-model="selectedMonth" class="input-ui">
                 </div>
@@ -145,8 +145,6 @@
                         </select>
                     </div>
                 </div><div class="col-span-6"></div>
-                
-    
             </div>
 
             <div class=" ">
@@ -248,28 +246,28 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <tr class="" v-for="(menu, menuIndex) in menuTableList"
-                                        :key="menuIndex">
+                                    <tr class="" v-for="(raw, rawIndex) in rawMaterialList"
+                                        :key="rawIndex">
                                         <td class="">
-                                            {{ menu.menuName }}
+                                            {{ raw.name }}
                                         </td>
                                         <td class="">
-                                            {{ menu.quantity }}
+                                            {{ raw.weight }}
                                         </td>
                                         <td class="">
-                                            {{ menu.amount }}
+                                            {{ raw.name }}
                                         </td>
                                         <td class="">
-                                            {{ menu.amount }}
+                                            {{ raw.name }}
                                         </td>
                                         <td class="">
-                                            {{ menu.amount }}
+                                            {{ raw.name }}
                                         </td>
                                         <td class="">
-                                            {{ menu.amount }}
+                                            {{ raw.name }}
                                         </td>
                                         <td class="">
-                                            {{ menu.amount }}
+                                            {{ raw.name }}
                                         </td>
                                         <td class="">
                                             <button data-te-toggle="modal" data-te-target="#create_modal">
@@ -330,13 +328,6 @@
                 </button>
             </div>
         </div>
-
-
-
-
-
-
-
 
 
         <!-- Modal -->
@@ -432,6 +423,9 @@ export default {
 
             minDate: "",
 
+            rawMaterialList:[],
+            hrList:[],
+
         };
     },
 
@@ -499,15 +493,39 @@ export default {
                     quantity: response.data.quantity,
                     amount: response.data.total_menu_forecast_amt
                 })
-                this.selectedMenuCategory = null;
-                this.menuList = [];
-                this.selectedMenu = null;
-                this.quantity = null;
-                this.selectedType = null;
-                this.selectedMonth = null;
+                // this.selectedMenuCategory = null;
+                // this.menuList = [];
+                // this.selectedMenu = null;
+                // this.quantity = null;
+                // this.selectedType = null;
+                // this.selectedMonth = null;
             }
         },
 
+        async clickedBtnCreate(){
+            this.is_step = 2;
+            this.getRawMaterial();
+            this.getHr();
+            
+        },
+        async getRawMaterial(){
+            let formData = new FormData();
+            formData.append("quantity", this.quantity);
+            let url = '/api/forecast/raw_materials/' + this.selectedMenu.id;
+            let response = await postApiData({url: url, form_data: formData, token: this.getToken()});
+            if(response.success){
+                this.rawMaterialList = response.data;
+            }
+        },
+        async getHr(){
+            let formData = new FormData();
+            formData.append("quantity", this.quantity);
+            let url = '/api/forecast/hr/' + this.selectedMenu.id;
+            let response = await postApiData({url: url, form_data: formData, token: this.getToken()});
+            if(response.success){
+                this.hrList = response.data;
+            }
+        },
 
         alertValidationMessage(field) {
             this.$notify({
@@ -533,6 +551,7 @@ export default {
         const year = today.getFullYear();
         const month = String(today.getMonth() + 1).padStart(2, "0"); 
         this.minDate = `${year}-${month}`; 
+        this.selectedMonth = `${year}-${month}`; 
     }
 }
 </script>
