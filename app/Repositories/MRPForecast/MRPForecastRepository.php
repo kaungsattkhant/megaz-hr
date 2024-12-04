@@ -10,6 +10,7 @@ use App\Services\MrpWorkingHour;
 use Illuminate\Support\Facades\DB;
 use App\Services\AveragePriceCalculator;
 use App\Http\Resources\HrForecastResource;
+use PHPUnit\Framework\MockObject\Stub\ReturnStub;
 
 class MRPForecastRepository implements MRPForecastRepositoryInterface
 {
@@ -88,7 +89,9 @@ class MRPForecastRepository implements MRPForecastRepositoryInterface
 
   public function getForcastRawMaterial($request, $menuId)
   {
-    // DB::enableQueryLog();
+    $quantity = $request->quantity;
+    $inventoryId = 6;
+
     $menu = Menu::where('id', $menuId)
       ->with(
         ['subMenus', 'menuSteps.MenuStepItem' => function ($q) {
@@ -97,19 +100,87 @@ class MRPForecastRepository implements MRPForecastRepositoryInterface
       )
       ->first();
 
-    return $menu;
-
-    // $queries = DB::getQueryLog();
-
-    // return response()->json($queries);
-
     if (!$menu) {
       return collect();
     }
 
-
     $menuIds = collect([$menu->id])
       ->merge($menu->subMenus->pluck('id'))
       ->toArray();
+
+    $menuStepDatas = MenuStep::whereIn('menu_id', $menuIds)
+      ->with(['menuStepItem'
+      => function ($q) {
+        $q->with(['item', 'uom']);
+      }])->get();
+
+
+
+    $result = $menuStepDatas->flatMap(function ($mStepdata) use ($quantity) {
+      return $mStepdata->menuStepItem->map(function ($data) use ($quantity) {
+        if (!isset($data->item)) {
+          return null;
+        }
+
+        $conversionRate = $data->item->uom_conversion ?? 1;
+        $average_price = $data->item->average_price ?? 1;
+
+        $totalUom = $data->weight * (int)$quantity;
+        $forecastPrice = round($totalUom * round($average_price / $conversionRate, 4), 4);
+        $uomForecastAmt = round($totalUom / $conversionRate, 4);
+
+        return [
+          'menu_step_id' => $data->menu_step_id,
+          'item_id' => $data->item_id,
+          'name' => $data->item->name ?? 'N/A',
+          'code' => $data->item->code ?? 'N/A',
+          'base_uom_name' => $data->item->base_uom_name ?? 'N/A',
+          'item_uom' => $data->item->item_uom ?? 'N/A',
+          'weight' => $data->weight,
+          'uom_conversion' => $conversionRate,
+          'uom_name' => $data->uom->name ?? 'N/A',
+          'total_uom_amt' => $totalUom,
+          'average_price' => round($average_price, 4),
+          'forecast_price' => $forecastPrice,
+          'forecast_uom_amt' => $uomForecastAmt,
+        ];
+      })->filter();
+    });
+
+
+    $groupedResult = $result->groupBy('item_id')->map(function ($items) {
+      return [
+        'item_id' => $items->first()['item_id'],
+        'name' => $items->first()['name'],
+        'code' => $items->first()['code'],
+        'base_uom_name' => $items->first()['base_uom_name'],
+        'item_uom' => $items->first()['item_uom'],
+        'weight' => $items->sum('weight'),
+        'uom_conversion' => $items->first()['uom_conversion'],
+        'uom_name' => $items->first()['uom_name'],
+        'total_uom_amt' => $items->sum('total_uom_amt'),
+        'average_price' => round($items->avg('average_price'), 4),
+        'forecast_price' => $items->sum('forecast_price'),
+        'forecast_uom_amt' => $items->sum('forecast_uom_amt'),
+      ];
+    })->values();
+
+    return $groupedResult;
   }
 }
+
+
+// $menu = Menu::where('id', $menuId)
+//   ->with([
+//     'subMenus',
+//     'menuSteps.menuStepItem' => function ($query) use ($inventoryId) {
+//       $query->with([
+//         'item' => function ($subQuery) use ($inventoryId) {
+
+//           $subQuery->withBalanceDetails($inventoryId, DB::raw('items.id'));
+//         },
+//         'uom'
+//       ]);
+//     }
+//   ])
+//   ->first();

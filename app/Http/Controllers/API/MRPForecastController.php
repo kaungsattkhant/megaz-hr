@@ -33,7 +33,6 @@ class MRPForecastController extends Controller
     public function getForcastRawMaterial(Request $request, $menuId)
     {
         $data =  $this->mrpForecastRepository->getForcastRawMaterial($request, $menuId);
-
         ResponseData($data);
     }
 }
