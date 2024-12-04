@@ -193,6 +193,20 @@ class Item extends BaseModel
         );
     }
 
+    public function balance()
+{
+    return $this->hasOne(InventoryLedgerItem::class, 'item_id')
+        ->join('inventory_ledgers', 'inventory_ledger_items.inventory_ledger_id', '=', 'inventory_ledgers.id')
+        ->select(
+            'inventory_ledger_items.item_id',
+            DB::raw('SUM(CASE WHEN inventory_ledgers.action = "in" THEN inventory_ledger_items.quantity ELSE 0 END) as in_balance'),
+            DB::raw('SUM(CASE WHEN inventory_ledgers.action = "out" THEN inventory_ledger_items.quantity ELSE 0 END) as out_balance'),
+            DB::raw('SUM(CASE WHEN inventory_ledgers.action = "in" THEN inventory_ledger_items.quantity ELSE 0 END) -
+                     SUM(CASE WHEN inventory_ledgers.action = "out" THEN inventory_ledger_items.quantity ELSE 0 END) as closing_balance')
+        )
+        ->groupBy('inventory_ledger_items.item_id');
+}
+
     public function scopeWithBalanceDetails(Builder $query, $inventoryId, $itemId, $fromDate = null, $toDate = null)
     {
         return $query

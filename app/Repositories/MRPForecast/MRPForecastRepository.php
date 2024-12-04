@@ -91,6 +91,7 @@ class MRPForecastRepository implements MRPForecastRepositoryInterface
   {
     $quantity = $request->quantity;
     $inventoryId = 6;
+   
 
     $menu = Menu::where('id', $menuId)
       ->with(
@@ -184,3 +185,26 @@ class MRPForecastRepository implements MRPForecastRepositoryInterface
 //     }
 //   ])
 //   ->first();
+
+ //here is update , 
+//  $menu = Menu::where('id', $menuId)
+//  ->with([
+//      'subMenus',
+//      'menuSteps.menuStepItem' => function ($query) use ($inventoryId) {
+//          $query->with([
+//              'item' => function ($itemQuery) use ($inventoryId) {
+//                  $itemQuery->with([
+//                      'balance' => function ($balanceQuery) use ($inventoryId) {
+//                          $balanceQuery->whereHas('inventory_ledger', function ($q) use ($inventoryId) {
+//                              $q->where('inventory_id', $inventoryId);
+//                          });
+//                      }
+//                  ]);
+//              },
+//              'uom'
+//          ]);
+//      }
+//  ])
+//  ->first();
+//  //
+//  return $menu;
