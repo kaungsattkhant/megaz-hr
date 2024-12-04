@@ -91,14 +91,24 @@ class MRPForecastRepository implements MRPForecastRepositoryInterface
   {
     $quantity = $request->quantity;
     $inventoryId = 6;
-   
-
     $menu = Menu::where('id', $menuId)
-      ->with(
-        ['subMenus', 'menuSteps.MenuStepItem' => function ($q) {
-          $q->with(['item', 'uom']);
-        }]
-      )
+      ->with([
+        'subMenus',
+        'menuSteps.menuStepItem' => function ($query) use ($inventoryId) {
+          $query->with([
+            'item' => function ($itemQuery) use ($inventoryId) {
+              $itemQuery->with([
+                'balance' => function ($balanceQuery) use ($inventoryId) {
+                  $balanceQuery->whereHas('inventory_ledger', function ($q) use ($inventoryId) {
+                    $q->where('inventory_id', $inventoryId);
+                  });
+                }
+              ]);
+            },
+            'uom'
+          ]);
+        }
+      ])
       ->first();
 
     if (!$menu) {
@@ -110,11 +120,23 @@ class MRPForecastRepository implements MRPForecastRepositoryInterface
       ->toArray();
 
     $menuStepDatas = MenuStep::whereIn('menu_id', $menuIds)
-      ->with(['menuStepItem'
-      => function ($q) {
-        $q->with(['item', 'uom']);
-      }])->get();
-
+      ->with([
+        'menuStepItem'
+        => function ($query) use ($inventoryId) {
+          $query->with([
+            'item' => function ($itemQuery) use ($inventoryId) {
+              $itemQuery->with([
+                'balance' => function ($balanceQuery) use ($inventoryId) {
+                  $balanceQuery->whereHas('inventory_ledger', function ($q) use ($inventoryId) {
+                    $q->where('inventory_id', $inventoryId);
+                  });
+                }
+              ]);
+            },
+            'uom'
+          ]);
+        }
+      ])->get();
 
 
     $result = $menuStepDatas->flatMap(function ($mStepdata) use ($quantity) {
@@ -123,27 +145,38 @@ class MRPForecastRepository implements MRPForecastRepositoryInterface
           return null;
         }
 
-        $conversionRate = $data->item->uom_conversion ?? 1;
-        $average_price = $data->item->average_price ?? 1;
+        $conversionRate = $data->item->uom_conversion ?? 0;
+        $average_price = $data->item->average_price ?? 0;
 
         $totalUom = $data->weight * (int)$quantity;
         $forecastPrice = round($totalUom * round($average_price / $conversionRate, 4), 4);
         $uomForecastAmt = round($totalUom / $conversionRate, 4);
+        $balance = $data->item->balance ?? null;
+        $inBalance = $balance->in_balance ?? 0;
+        $outBalance = $balance->out_balance ?? 0;
+        $closingBalance = $balance->closing_balance ?? 0;
+
+        $currentHolding =  $closingBalance / $conversionRate;
+
 
         return [
           'menu_step_id' => $data->menu_step_id,
           'item_id' => $data->item_id,
-          'name' => $data->item->name ?? 'N/A',
-          'code' => $data->item->code ?? 'N/A',
-          'base_uom_name' => $data->item->base_uom_name ?? 'N/A',
-          'item_uom' => $data->item->item_uom ?? 'N/A',
+          'name' => $data->item->name ?? 'null',
+          'code' => $data->item->code ?? 'null',
+          'base_uom_name' => $data->item->base_uom_name ?? 'null',
+          'item_uom' => $data->item->item_uom ?? 'null',
           'weight' => $data->weight,
           'uom_conversion' => $conversionRate,
-          'uom_name' => $data->uom->name ?? 'N/A',
+          'uom_name' => $data->uom->name ?? 'null',
           'total_uom_amt' => $totalUom,
           'average_price' => round($average_price, 4),
           'forecast_price' => $forecastPrice,
           'forecast_uom_amt' => $uomForecastAmt,
+          'in_balance' => $inBalance,
+          'out_balance' => $outBalance,
+          'closing_balance' => $closingBalance,
+          'current_holdings' => $currentHolding
         ];
       })->filter();
     });
@@ -160,9 +193,23 @@ class MRPForecastRepository implements MRPForecastRepositoryInterface
         'uom_conversion' => $items->first()['uom_conversion'],
         'uom_name' => $items->first()['uom_name'],
         'total_uom_amt' => $items->sum('total_uom_amt'),
-        'average_price' => round($items->avg('average_price'), 4),
+        'average_price' => $items->sum(function ($item) {
+          return $item['average_price'];
+        }),
         'forecast_price' => $items->sum('forecast_price'),
         'forecast_uom_amt' => $items->sum('forecast_uom_amt'),
+        'in_balance' => $items->sum(function ($item) {
+          return $item['in_balance'];
+        }),
+        'out_balance' => $items->sum(function ($item) {
+          return $item['out_balance'];
+        }),
+        'closing_balance' => $items->sum(function ($item) {
+          return $item['closing_balance'];
+        }),
+        'current_holdings' => $items->sum(function ($item) {
+          return $item['current_holdings'];
+        }),
       ];
     })->values();
 
@@ -171,20 +218,6 @@ class MRPForecastRepository implements MRPForecastRepositoryInterface
 }
 
 
-// $menu = Menu::where('id', $menuId)
-//   ->with([
-//     'subMenus',
-//     'menuSteps.menuStepItem' => function ($query) use ($inventoryId) {
-//       $query->with([
-//         'item' => function ($subQuery) use ($inventoryId) {
-
-//           $subQuery->withBalanceDetails($inventoryId, DB::raw('items.id'));
-//         },
-//         'uom'
-//       ]);
-//     }
-//   ])
-//   ->first();
 
  //here is update , 
 //  $menu = Menu::where('id', $menuId)
