@@ -27,4 +27,34 @@ class MRPForecastController extends Controller
 
         ResponseData($data);
     }
+
+    public function getForcastRawMaterial(Request $request, $menuId)
+    {
+        $data =  $this->mrpForecastRepository->getForcastRawMaterial($request, $menuId);
+        ResponseData($data);
+    }
+
+    public function storeForecast(Request $request)
+    {
+
+        $data = $this->mrpForecastRepository->storeForecast($request->all());
+
+        ResponseData($data);
+    }
+
+    public function updateForecast(Request $request, int $mrpForecastId)
+    {
+        $data = $this->mrpForecastRepository->updateForecast($request->all(), $mrpForecastId);
+
+        ResponseData($data);
+    }
+
+
+
+    public function getForecasts(Request $request)
+    {
+        $data = $this->mrpForecastRepository->getForecasts($request->all());
+
+        ResponseData($data);
+    }
 }

@@ -38,5 +38,9 @@ Route::middleware('auth:api')->group(function () {
   Route::controller(MRPForecastController::class)->group(function () {
     Route::post('/forecast/menus/{menuId}', 'getForcastMenus');
     Route::post('/forecast/hr/{menuId}', 'getForcastHR');
+    Route::post('/forecast/raw_materials/{menuId}', 'getForcastRawMaterial');
+    Route::post('/forecasts', 'storeForecast');
+    Route::post('/forecasts/{mrpForecastId}', 'updateForecast');
+    Route::get('/forecasts', 'getForecasts');
   });
 });

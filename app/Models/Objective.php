@@ -21,7 +21,7 @@ class Objective extends Model
         return $this->hasMany(ObjectiveKey::class, 'objective_id');
     }
 
-    public function scopeObjectiveFilter($query, $search = null, $role = null, $department = null)
+    public function scopeObjectiveFilter($query, $search = null, $roleId = null)
     {
         return $query
             ->when($search, function ($q) use ($search) {
@@ -32,16 +32,11 @@ class Objective extends Model
                             ->orWhere('assigned_days', 'like', '%' . $search . '%');
                     });
             })
-            ->when($role, function ($q) use ($role) {
+            ->when($roleId, function ($q) use ($roleId) {
 
-                $q->whereHas('objectiveKeys.role', function ($roleQuery) use ($role) {
+                $q->whereHas('objectiveKeys.role', function ($roleQuery) use ($roleId) {
 
-                    $roleQuery->where('name',  'like', '%' . $role . '%');
-                });
-            })
-            ->when($department, function ($q) use ($department) {
-                $q->whereHas('objectiveKeys.role.department', function ($deptQuery) use ($department) {
-                    $deptQuery->where('name', 'like', '%' . $department . '%');
+                    $roleQuery->where('role_id', $roleId);
                 });
             });
     }
