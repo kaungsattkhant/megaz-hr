@@ -25,8 +25,8 @@ class KtvProductTreeRequest extends APIRequest
     {
         return [
             'entity_id' => 'required',
-            'objectives' => 'required|json',
-            'items' => 'required|json',
+            'objective_keys' => 'required',
+            'items' => 'required',
         ];
     }
 

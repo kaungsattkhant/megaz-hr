@@ -320,13 +320,16 @@ class  ObjectiveRepository implements ObjectiveInterface
         return Entity::where('entity_type', 'room')->get();
     }
 
-    public function getKtvObjective(Request $request)
+    public function getKtvObjective(Request $request, $departmentId)
     {
 
-        $ktvObjectives = Objective::with([
-            'objectiveKeys.role'
-        ])->get();
+        $ktvObjectives = ObjectiveKey::with([
+            'role.department'
+        ])->whereHas('role.department', function ($q) use ($departmentId) {
+            $q->where('department_id', $departmentId);
+        })->get();
 
+        // return $ktvObjectives;
         return KtvObjectiveRsource::collection($ktvObjectives);
     }
 
@@ -340,12 +343,12 @@ class  ObjectiveRepository implements ObjectiveInterface
             $validatedData['created_by'] = UserData()->id;
             $ktvProductTree = KtvProductTree::create($validatedData);
 
-            $ktvObjs = json_decode($validatedData['objectives']);
+            $ktvObjs = json_decode($validatedData['objective_keys']);
 
             foreach ($ktvObjs as $ktvObjective) {
                 KtvObjective::create([
                     'ktv_product_tree_id' => $ktvProductTree->id,
-                    'objective_id' => $ktvObjective
+                    'objective_key_id' => $ktvObjective
                 ]);
             }
             $ktvItems = json_decode($validatedData['items']);
@@ -368,7 +371,7 @@ class  ObjectiveRepository implements ObjectiveInterface
     {
         $data =  KtvProductTree::with([
             'entity',
-            'KtvObjectives.objective.objectiveKeys.role',
+            'KtvObjectives.objectiveKey.role',
             'KtvItems.item'
         ])->paginate();
         return $data;
@@ -377,7 +380,7 @@ class  ObjectiveRepository implements ObjectiveInterface
     {
         $data =  KtvProductTree::with([
             'entity',
-            'KtvObjectives.objective.objectiveKeys.role',
+            'KtvObjectives.objectiveKey.role',
             'KtvItems.item'
         ])->findOrFail($id);
         // return $data;
@@ -398,11 +401,11 @@ class  ObjectiveRepository implements ObjectiveInterface
 
             $ktvProductTree->ktvObjectives()->delete();
             $ktvProductTree->ktvItems()->delete();
-            $ktvObjs = json_decode($validatedData['objectives']);
-            foreach ($ktvObjs as $ktvObjective) {
+            $ktvObjs = json_decode($validatedData['objective_keys']);
+            foreach ($ktvObjs as $ktvObjectiveKey) {
                 $ktvProductTree->KtvObjectives()->create([
                     'ktv_product_tree_id' => $ktvProductTree->id,
-                    'objective_id' => $ktvObjective
+                    'objective_key_id' => $ktvObjectiveKey
                 ]);
             }
             $ktvItems = json_decode($validatedData['items'], true);

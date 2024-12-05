@@ -2,11 +2,12 @@
 
 namespace App\Http\Controllers\API;
 
-use App\Http\Controllers\Controller;
-use App\Http\Requests\Objective\ObjectiveRequest;
-use App\Http\Requests\Objective\ObjImgRequest;
-use App\Repositories\Objective\ObjectiveInterface;
 use Illuminate\Http\Request;
+use App\Http\Controllers\Controller;
+use App\Http\Requests\Objective\ObjImgRequest;
+use App\Http\Requests\Objective\ObjectiveRequest;
+use App\Repositories\Objective\ObjectiveInterface;
+use App\Http\Requests\Objective\KtvProductTreeRequest;
 
 class ObjectiveController extends Controller
 {
@@ -128,13 +129,13 @@ class ObjectiveController extends Controller
         ResponseData($data);
     }
 
-    public function getKtvObjective(Request $request)
+    public function getKtvObjective(Request $request, $departmentId)
     {
-        $data = $this->objectiveRepository->getKtvObjective($request);
+        $data = $this->objectiveRepository->getKtvObjective($request, $departmentId);
         ResponseData($data);
     }
 
-    public function storeKtvObjectiveTree(Request $request)
+    public function storeKtvObjectiveTree(KtvProductTreeRequest $request)
     {
         $data = $this->objectiveRepository->storeKtvObjectiveTree($request);
         ResponseData($data);

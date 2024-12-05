@@ -16,26 +16,19 @@ class KtvObjectiveRsource extends JsonResource
     {
         return [
             'id' =>  $this->id,
-            'objective_name' => $this->objective_name,
-            'created_by' => $this->created_by,
-            'is_active' => $this->is_active,
-            'total_duration' => $this->objectiveKeys->sum('duration'),
+            'name' => $this->name,
+            'objective_id' => $this->objective->id,
+            'objective_name' => $this->objective->objective_name ?? null,
+            'total_duration' => $this->sum('duration'),
+            'role_id' => $this->role_id,
+            'role_name' => $this->role->name ?? null,
+            'department_id' => $this->role->department_id ?? null,
+            'department_name' => $this->role->department->name ?? null,
+            'okr_point' => $this->okr_point,
+            'duration' => $this->duration,
+            'assigned_days' => $this->assigned_days,
             "created_at" => $this->created_at,
             "updated_at" => $this->updated_at,
-            'objective_keys' => $this->objectiveKeys->map(function ($key) {
-                return [
-                    'id' => $key->id,
-                    'objective_id' => $key->objective->id,
-                    'role_id' => $key->role_id,
-                    'role_name' => $key->role->name ?? null,
-                    'name' => $key->name,
-                    'okr_point' => $key->okr_point,
-                    'duration' => $key->duration,
-                    'assigned_days' => $key->assigned_days,
-                    "created_at" => $key->created_at,
-                    "updated_at" => $key->updated_at,
-                ];
-            }),
         ];
     }
 }

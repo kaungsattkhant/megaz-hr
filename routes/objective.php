@@ -17,7 +17,7 @@ Route::middleware('auth:api')->group(function () {
 
     //mobile-api
     Route::get('/daily/objectives', 'objectiveLists');
-    Route::get('c/{objId}', 'getdailyObjectives');
+    Route::get('/daily/objectives_key/{objId}', 'getdailyObjectives');
     // Route::get('/daily/objectives/{objId}', 'getdailyObjectivesById');
     Route::post('/daily/objectives_key_staff/{id}', 'updateDailyObjective');
     Route::post('/objectives/key_staff/{id}/images', 'storeImages');
@@ -27,7 +27,7 @@ Route::middleware('auth:api')->group(function () {
 
     //ktv-objective-tree
     Route::get('/ktv/entity_room', 'getKtvRoom');
-    Route::get('/ktv/objectives', 'getKtvObjective');
+    Route::get('/ktv/objectives/{departmentId}', 'getKtvObjective');
     Route::get('/ktv/objective_trees', 'getKtvObjectiveTree');
     Route::post('/ktv/objective_trees', 'storeKtvObjectiveTree');
     Route::get('/ktv/objective_trees/{id}', 'getKtvObjTreeById');

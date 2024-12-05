@@ -13,7 +13,7 @@ class KtvObjective extends Model
     protected $fillable =
     [
         'ktv_product_tree_id',
-        'objective_id'
+        'objective_key_id'
     ];
 
     public function ktvProductTree(): BelongsTo
@@ -21,8 +21,8 @@ class KtvObjective extends Model
         return $this->belongsTo(KtvProductTree::class, 'ktv_product_tree_id');
     }
 
-    public function objective(): BelongsTo
+    public function objectiveKey(): BelongsTo
     {
-        return $this->belongsTo(Objective::class, 'objective_id');
+        return $this->belongsTo(ObjectiveKey::class, 'objective_key_id');
     }
 }
