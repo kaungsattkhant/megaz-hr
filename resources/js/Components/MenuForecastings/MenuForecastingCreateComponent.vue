@@ -252,16 +252,16 @@
                                             {{ raw.name }}
                                         </td>
                                         <td class="">
-                                            {{ raw.weight }}
+                                            {{ raw.total_uom_amt }}
                                         </td>
                                         <td class="">
-                                            {{ raw.name }}
+                                            {{ raw.uom_name }}
                                         </td>
                                         <td class="">
-                                            {{ raw.name }}
+                                            {{ raw.average_price * raw.total_uom_amt }}
                                         </td>
                                         <td class="">
-                                            {{ raw.name }}
+                                            {{ raw.current_holdings }}
                                         </td>
                                         <td class="">
                                             {{ raw.name }}
@@ -297,13 +297,13 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <tr class="" v-for="(menu, menuIndex) in menuTableList"
-                                        :key="menuIndex">
+                                    <tr class="" v-for="(hr, hrIndex) in hrList"
+                                        :key="hrIndex">
                                         <td class="">
-                                            {{ menu.menuName }}
+                                            {{ hr.position }}
                                         </td>
                                         <td class="">
-                                            {{ menu.quantity }}
+                                            {{ hr.total_working_hour }}
                                         </td>
                                         <td class="">
                                             <button data-te-toggle="modal" data-te-target="#create_modal">
@@ -323,7 +323,7 @@
             
             
             <div>
-                <button class="add-btn" @click="btnclickedCreateOkr()">
+                <button class="add-btn" @click="btnClickedMenuForecastingCreate()">
                     Create QKR
                 </button>
             </div>
@@ -490,6 +490,7 @@ export default {
             if(response.success){
                 this.menuTableList.push({
                     menuName: response.data.menu,
+                    menu_id: response.data.id,
                     quantity: response.data.quantity,
                     amount: response.data.total_menu_forecast_amt
                 })
@@ -499,6 +500,20 @@ export default {
                 // this.quantity = null;
                 // this.selectedType = null;
                 // this.selectedMonth = null;
+            }
+        },
+        btnClickedMenuForecastingCreate(){
+            this.createMenuForcasting();
+        },
+        async createMenuForcasting(){
+            let formData = new FormData();
+            formData.append("type", this.selectedType.value);
+            formData.append("date", this.selectedMonth);
+            formData.append("target_mrps", JSON.stringify(this.menuTableList));
+            let url = '/api/forecasts';
+            let response = await postApiData({url: url, form_data: formData, token: this.getToken()});
+            if(response.success){
+                // this.rawMaterialList = response.data;
             }
         },
 
