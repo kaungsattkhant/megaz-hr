@@ -42,5 +42,8 @@ Route::middleware('auth:api')->group(function () {
     Route::post('/forecasts', 'storeForecast');
     Route::post('/forecasts/{mrpForecastId}', 'updateForecast');
     Route::get('/forecasts', 'getForecasts');
+    // Route::post('/forecast/mrp_menu/{menuId}', 'updateMenuForecast');
+    Route::get('/forecasts/purchase_orders', 'getPoForecasts');
+    Route::post('/forecasts/purchase_orders_item/{itemId}', 'storePoForecastsByItemId');
   });
 });

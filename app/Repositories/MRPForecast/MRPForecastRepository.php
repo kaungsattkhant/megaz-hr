@@ -8,7 +8,9 @@ use App\Models\MenuStep;
 use App\Models\ItemPrice;
 use App\Models\MrpForecast;
 use App\Models\SupplierItem;
+use App\Models\PurchaseOrder;
 use App\Services\MrpWorkingHour;
+use App\Models\PurchaseOrderItem;
 use App\Models\TargetMrpForecast;
 use Illuminate\Support\Facades\DB;
 use App\Services\AveragePriceCalculator;
@@ -253,13 +255,13 @@ class MRPForecastRepository implements MRPForecastRepositoryInterface
       $mrpForecast = MrpForecast::findOrFail($mrpForecastId);
       $mrpForecast->update($data);
 
-
+      $mrpForecast->targetMrpForecast()->delete();
       if (isset($data['target_mrps'])) {
 
         $targetMrps = json_decode($data['target_mrps'], true);
         foreach ($targetMrps as $targetMrp) {
 
-          $mrpForecast->targetMrpForecast()->update([
+          $mrpForecast->targetMrpForecast()->create([
             'mrp_forecast_id' => $mrpForecast->id,
             'menu_id' => $targetMrp['menu_id'],
             'quantity' => $targetMrp['quantity']
@@ -278,5 +280,45 @@ class MRPForecastRepository implements MRPForecastRepositoryInterface
   public function getForecasts($request)
   {
     return MrpForecast::with('targetMrpForecast.menu')->get();
+  }
+
+
+  // public function updateMenuForecast($request, $menuId) {}
+
+
+  public function getPoForecasts($request)
+  {
+    return PurchaseOrder::where('status', 'created')->get();
+  }
+
+  public function storePoForecastsByItemId($data, $itemId)
+  {
+
+    if (isset($data['status'])) {
+      DB::beginTransaction();
+      try {
+        $data['date'] = now()->format('Y-m-d');
+        $data['created_by'] = UserData()->id;
+
+        $po =  PurchaseOrder::create($data);
+        $poItem = PurchaseOrderItem::create([
+          'quantity' => $data['quantity'],
+          'purchase_order_id' => $po->id,
+          'item_id' => $itemId,
+          'amount' => $data['amount'],
+          'original_quantity' => $data['original_quantity'],
+          'uom_id' => $data['uom_id'],
+          'uom_conversion_id' => $data['uom_conversion_id']
+        ]);
+        DB::commit();
+        return $poItem;
+      } catch (Exception $e) {
+        DB::rollBack();
+        throw $e;
+      }
+    } else {
+      $data['item_id'] = $itemId;
+      return PurchaseOrderItem::create($data);
+    }
   }
 }

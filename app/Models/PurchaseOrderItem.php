@@ -9,11 +9,18 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class PurchaseOrderItem extends BaseModel
 {
-    use HasApiTokens,HasFactory;
+    use HasApiTokens, HasFactory;
 
-    protected $with=['item','uom'];
-    protected $fillable=[
-        'quantity','purchase_order_id','item_id','amount','original_quantity','is_grn','uom_id','uom_conversion_id'
+    protected $with = ['item', 'uom'];
+    protected $fillable = [
+        'quantity',
+        'purchase_order_id',
+        'item_id',
+        'amount',
+        'original_quantity',
+        'is_grn',
+        'uom_id',
+        'uom_conversion_id'
     ];
 
     public function getCreatedAt()
@@ -26,33 +33,38 @@ class PurchaseOrderItem extends BaseModel
         return parent::getUpdatedAt();
     }
 
-    public function purchase_order(){
+    public function purchase_order()
+    {
         return $this->belongsTo(PurchaseOrder::class);
     }
-    
-    public function item(){
+
+    public function item()
+    {
         return $this->belongsTo(Item::class);
     }
 
-    public function uom(){
+    public function uom()
+    {
         return $this->belongsTo(Uom::class);
     }
 
-    public function purchaseOrderItemLefts(){
+    public function purchaseOrderItemLefts()
+    {
         return $this->hasMany(PurchaseOrderItemLeft::class);
     }
 
-    public function purchaseOrderItemLeft(){
+    public function purchaseOrderItemLeft()
+    {
         return $this->hasOne(PurchaseOrderItemLeft::class);
     }
 
-    public function poGrn(){
+    public function poGrn()
+    {
         return $this->hasOne(PoGrn::class);
     }
 
-    public function uomConversion(){
-        return $this->belongsTo(UomConversion::class,'uom_conversion_id');
+    public function uomConversion()
+    {
+        return $this->belongsTo(UomConversion::class, 'uom_conversion_id');
     }
-
-
 }

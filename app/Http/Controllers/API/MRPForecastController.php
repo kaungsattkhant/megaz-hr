@@ -49,11 +49,32 @@ class MRPForecastController extends Controller
         ResponseData($data);
     }
 
-
-
     public function getForecasts(Request $request)
     {
         $data = $this->mrpForecastRepository->getForecasts($request->all());
+
+        ResponseData($data);
+    }
+
+    // updateMenuForecast
+    // public function updateMenuForecast(Request $request, $menuId)
+    // {
+    //     $data = $this->mrpForecastRepository->updateMenuForecast($request->all(), $menuId);
+
+    //     ResponseData($data);
+    // }
+
+    public function getPoForecasts(Request $request)
+    {
+        $data = $this->mrpForecastRepository->getPoForecasts($request->all());
+
+        ResponseData($data);
+    }
+
+    // storePoForecastsByItemId
+    public function storePoForecastsByItemId(Request $request, $itemId)
+    {
+        $data = $this->mrpForecastRepository->storePoForecastsByItemId($request->all(), $itemId);
 
         ResponseData($data);
     }
