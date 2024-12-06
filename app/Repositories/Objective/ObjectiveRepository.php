@@ -383,8 +383,7 @@ class  ObjectiveRepository implements ObjectiveInterface
             'KtvObjectives.objectiveKey.role',
             'KtvItems.item'
         ])->findOrFail($id);
-        // return $data;
-        return new KtvProductTreeEditResource($data);
+        return $data;
     }
 
     public function updateKtvObjTree(Request $request, $ktvObjTreeId)

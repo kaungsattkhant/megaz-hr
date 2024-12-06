@@ -19,7 +19,6 @@ class KtvObjectiveRsource extends JsonResource
             'name' => $this->name,
             'objective_id' => $this->objective->id,
             'objective_name' => $this->objective->objective_name ?? null,
-            'total_duration' => $this->sum('duration'),
             'role_id' => $this->role_id,
             'role_name' => $this->role->name ?? null,
             'department_id' => $this->role->department_id ?? null,
