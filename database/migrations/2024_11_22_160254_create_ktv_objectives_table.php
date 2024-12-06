@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('ktv_objectives', function (Blueprint $table) {
             $table->id();
             $table->foreignId('ktv_product_tree_id');
-            $table->foreignId('objective_id');
+            $table->foreignId('objective_key_id');
             $table->timestamps();
         });
     }

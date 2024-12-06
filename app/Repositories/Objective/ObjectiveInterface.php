@@ -26,7 +26,7 @@ interface ObjectiveInterface
 
   //ktvobjtree
   public function getKtvRoom(Request $request);
-  public function getKtvObjective(Request $request);
+  public function getKtvObjective(Request $request, $departmentId);
   public function  getKtvObjectiveTree(Request $request);
   public function storeKtvObjectiveTree(Request $request);
   public function getKtvObjTreeById(Request $request, $id);
