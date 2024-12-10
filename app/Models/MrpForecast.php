@@ -14,8 +14,18 @@ class MrpForecast extends Model
         'date',
     ];
 
-    public function targetMrpForecast()
+    public function targetMrpForecasts()
     {
-        return $this->hasMany(TargetMrpForecast::class);
+        return $this->hasMany(TargetMrpForecast::class, 'mrp_forecast_id');
+    }
+
+    public function MrpHrs()
+    {
+        return $this->hasMany(MrpHr::class, 'mrp_forecast_id');
+    }
+
+    public function MrpRawMaterials()
+    {
+        return $this->hasMany(MrpRawMaterial::class, 'mrp_forecast_id');
     }
 }

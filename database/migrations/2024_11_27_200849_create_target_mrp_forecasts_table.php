@@ -14,8 +14,11 @@ return new class extends Migration
         Schema::create('target_mrp_forecasts', function (Blueprint $table) {
             $table->id();
             $table->foreignId('mrp_forecast_id');
-            $table->foreignId('menu_id');
-            $table->string('quantity');
+            $table->integer('mrp_forecastable_id');
+            $table->string('mrp_forecastable_type');
+            $table->integer('quantity');
+            $table->integer('amount');
+            $table->integer('hour')->nullable();
             $table->timestamps();
         });
     }

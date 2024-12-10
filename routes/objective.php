@@ -36,14 +36,21 @@ Route::middleware('auth:api')->group(function () {
 
 
   Route::controller(MRPForecastController::class)->group(function () {
-    Route::post('/forecast/menus/{menuId}', 'getForcastMenus');
-    Route::post('/forecast/hr/{menuId}', 'getForcastHR');
-    Route::post('/forecast/raw_materials/{menuId}', 'getForcastRawMaterial');
-    Route::post('/forecasts', 'storeForecast');
-    Route::post('/forecasts/{mrpForecastId}', 'updateForecast');
-    Route::get('/forecasts', 'getForecasts');
-    // Route::post('/forecast/mrp_menu/{menuId}', 'updateMenuForecast');
+    Route::post('/forecast/menus', 'getForcastMenus');
+    Route::post('/forecast/menus/{menuId}', 'getForcastMenusByMenuId');
+    Route::post('/forecast/hr', 'getForcastHR');
+    Route::post('/forecast/hr/{menuId}', 'getForcastHrByMenuId');
+    Route::post('/forecast/raw_materials/{menuId}', 'getForcastRawMaterialByMenuId');
+    Route::post('/forecast/raw_materials', 'getForcastRawMaterial');
+
     Route::get('/forecasts/purchase_orders', 'getPoForecasts');
     Route::post('/forecasts/purchase_orders_item/{itemId}', 'storePoForecastsByItemId');
+
+    Route::post('/forecasts', 'storeForecast');
+    Route::get('/forecasts_monthly_menus', 'getMonthlyMenuForecasts');
+    Route::get('/forecasts_monthly_menu/{mrpForecastId}', 'getMonthlyMenuForecastsById');
+    Route::post('/forecasts_monthly_menu/{mrpForecastId}', 'updateMenuForecast');
+    Route::delete('/forecasts_monthly_menu/{mrp_forecastable_id}/forecast_type/{mrp_forecastable_type}', 'deleteMenuForecast');
+    Route::delete('/forecasts_monthly_menu/{forecastId}', 'deleteMonthlyMenuForecast');
   });
 });

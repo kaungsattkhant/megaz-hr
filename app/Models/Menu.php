@@ -110,4 +110,10 @@ class Menu extends BaseModel
                 $q->where('code', 'like', '%' . $code . '%');
             });
     }
+
+
+    public function targetMrpForecasts()
+    {
+        return $this->morphMany(TargetMrpForecast::class, 'mrp_forecastable');
+    }
 }

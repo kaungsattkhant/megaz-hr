@@ -15,22 +15,43 @@ class MRPForecastController extends Controller
         $this->mrpForecastRepository = $mrpForecastRepository;
     }
 
-    public function getForcastMenus(Request $request, $menuId)
+    public function getForcastMenusByMenuId(Request $request, $menuId)
     {
-        $data =  $this->mrpForecastRepository->getForcastMenus($request, $menuId);
+        $data =  $this->mrpForecastRepository->getForcastMenusByMenuId($request, $menuId);
         ResponseData($data);
     }
 
-    public function getForcastHR(Request $request, $menuId)
+    public function getForcastMenus(Request $request)
     {
-        $data =  $this->mrpForecastRepository->getForcastHR($request, $menuId);
+
+        $data =  $this->mrpForecastRepository->getForcastMenus($request->all());
+        ResponseData($data);
+    }
+
+    public function getForcastHR(Request $request)
+    {
+        $data =  $this->mrpForecastRepository->getForcastHR($request->all());
+
+        ResponseData($data);
+    }
+    public function getForcastHrByMenuId(Request $request, $menuId)
+    {
+        $data =  $this->mrpForecastRepository->getForcastHrByMenuId($request, $menuId);
 
         ResponseData($data);
     }
 
-    public function getForcastRawMaterial(Request $request, $menuId)
+    public function getForcastRawMaterialByMenuId(Request $request, $menuId)
     {
-        $data =  $this->mrpForecastRepository->getForcastRawMaterial($request, $menuId);
+        $data =  $this->mrpForecastRepository->getForcastRawMaterialByMenuId($request, $menuId);
+        ResponseData($data);
+    }
+
+
+
+    public function getForcastRawMaterial(Request $request)
+    {
+        $data =  $this->mrpForecastRepository->getForcastRawMaterial($request);
         ResponseData($data);
     }
 
@@ -42,27 +63,29 @@ class MRPForecastController extends Controller
         ResponseData($data);
     }
 
-    public function updateForecast(Request $request, int $mrpForecastId)
+    public function updateMenuForecast(Request $request, int $mrpForecastId)
     {
-        $data = $this->mrpForecastRepository->updateForecast($request->all(), $mrpForecastId);
+        $data = $this->mrpForecastRepository->updateMenuForecast($request->all(), $mrpForecastId);
 
         ResponseData($data);
     }
 
-    public function getForecasts(Request $request)
+    public function getMonthlyMenuForecasts(Request $request)
     {
-        $data = $this->mrpForecastRepository->getForecasts($request->all());
+        $data = $this->mrpForecastRepository->getMonthlyMenuForecasts($request->all());
 
         ResponseData($data);
     }
 
-    // updateMenuForecast
-    // public function updateMenuForecast(Request $request, $menuId)
-    // {
-    //     $data = $this->mrpForecastRepository->updateMenuForecast($request->all(), $menuId);
+    // getMonthlyMenuForecastsById
 
-    //     ResponseData($data);
-    // }
+    public function getMonthlyMenuForecastsById(int $mrpForecastId)
+    {
+
+        $data = $this->mrpForecastRepository->getMonthlyMenuForecastsById($mrpForecastId);
+
+        ResponseData($data);
+    }
 
     public function getPoForecasts(Request $request)
     {
@@ -75,6 +98,21 @@ class MRPForecastController extends Controller
     public function storePoForecastsByItemId(Request $request, $itemId)
     {
         $data = $this->mrpForecastRepository->storePoForecastsByItemId($request->all(), $itemId);
+
+        ResponseData($data);
+    }
+
+    public function deleteMenuForecast($mrp_forecastable_id, $mrp_forecastable_type)
+    {
+        $data = $this->mrpForecastRepository->deleteMenuForecast($mrp_forecastable_id, $mrp_forecastable_type);
+
+        ResponseData($data);
+    }
+
+    // deleteMonthlyMenuForecast
+    public function deleteMonthlyMenuForecast($forecastId)
+    {
+        $data = $this->mrpForecastRepository->deleteMonthlyMenuForecast($forecastId);
 
         ResponseData($data);
     }
