@@ -330,6 +330,7 @@ class MRPForecastRepository implements MRPForecastRepositoryInterface
         'item_id' => $items->first()['item_id'],
         'name' => $items->first()['name'],
         'code' => $items->first()['code'],
+        'base_uom_id' =>  $items->first()['base_uom_id'],
         'base_uom_name' => $items->first()['base_uom_name'],
         'item_uom' => $items->first()['item_uom'],
         'weight' => $items->sum('weight'),
