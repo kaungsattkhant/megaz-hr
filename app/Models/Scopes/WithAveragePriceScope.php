@@ -27,6 +27,7 @@ class WithAveragePriceScope implements Scope
             'base_uom.name as base_uom_name',
             'item_uom.name as item_uom',
             'uom_conversions.conversion as uom_conversion',
+            'uom_conversions.id as uom_conversion_id',
             'average_price' => function ($subQuery) {
                 $subQuery->selectRaw('COALESCE(AVG(ip.price), 0)')
                     ->from('supplier_items as si')
