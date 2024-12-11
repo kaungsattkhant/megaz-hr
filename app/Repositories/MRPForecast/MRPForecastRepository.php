@@ -276,6 +276,8 @@ class MRPForecastRepository implements MRPForecastRepositoryInterface
         })->filter();
       });
 
+
+
       $result = $result->merge($menuStepDataProcessed);
     }
 
@@ -311,6 +313,7 @@ class MRPForecastRepository implements MRPForecastRepositoryInterface
       'item_uom' => $data->item->item_uom ?? 'null',
       'weight' => $data->weight,
       'uom_conversion' => $conversionRate,
+      'uom_id' => $data->item->uom_id,
       'uom_name' => $data->uom->name ?? 'null',
       'total_uom_amt' => $totalUom,
       'average_price' => round($average_price, 4),
@@ -335,6 +338,7 @@ class MRPForecastRepository implements MRPForecastRepositoryInterface
         'item_uom' => $items->first()['item_uom'],
         'weight' => $items->sum('weight'),
         'uom_conversion' => $items->first()['uom_conversion'],
+        'uom_id' => $items->first()['uom_id'],
         'uom_name' => $items->first()['uom_name'],
         'total_uom_amt' => $items->sum('total_uom_amt'),
         'average_price' => $items->sum(function ($item) {
