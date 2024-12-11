@@ -252,6 +252,7 @@ class Item extends BaseModel
                 'item_uom.name as conversion_uom_name',
                 'base_uom.name as base_uom_name',
                 'uom_conversions.conversion as conversion',
+                'uom_conversions.id as conversion_id',
                 DB::raw('SUM(CASE WHEN inventory_ledgers.action = "in" AND DATE(inventory_ledgers.date) < CURDATE() THEN inventory_ledger_items.quantity ELSE 0 END) -
                   SUM(CASE WHEN inventory_ledgers.action = "out" AND DATE(inventory_ledgers.date) < CURDATE() THEN inventory_ledger_items.quantity ELSE 0 END) as opening_balance'),
                 DB::raw('SUM(CASE WHEN inventory_ledgers.action = "in" AND DATE(inventory_ledgers.date) = CURDATE() THEN inventory_ledger_items.quantity ELSE 0 END) as in_balance'),
