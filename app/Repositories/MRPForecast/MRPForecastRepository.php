@@ -19,6 +19,7 @@ use Illuminate\Support\Facades\DB;
 use App\Services\AveragePriceCalculator;
 use App\Http\Resources\HrForecastResource;
 use PHPUnit\Framework\MockObject\Stub\ReturnStub;
+use App\Http\Action\Common\PurchaseOrder as CommonPurchaseOrder;
 
 class MRPForecastRepository implements MRPForecastRepositoryInterface
 {
@@ -538,8 +539,13 @@ class MRPForecastRepository implements MRPForecastRepositoryInterface
       DB::beginTransaction();
       try {
 
+        $latest = PurchaseOrder::orderBy('created_at', 'desc')->first();
+        $count = 4;
+        $no = (new CommonPurchaseOrder())->getUniqueId($latest, 'po_id', $count);
+        $po_id = "PO" . '-' . str_pad($no, $count, "0", STR_PAD_LEFT) . '-' . now()->timestamp;
+
         $po =  PurchaseOrder::create([
-          'po_id' => $data['po_id'],
+          'po_id' => $po_id,
           'total_price' => $totalPrice,
           'date' => now()->format('Y-m-d'),
           'created_by' => UserData()->id,
