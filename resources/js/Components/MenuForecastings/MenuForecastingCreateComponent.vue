@@ -642,11 +642,19 @@ export default {
         //         this.hrList = response.data;
         //     }
         // },
-        btnClickPoModal(item){
-            this.selectedItem = item
+        btnClickPoModal(raw){
+            this.selectedItem = raw
+            this.itemSelectChanged();
         },
-        async btnClickedCreatePo(){
+        btnClickedCreatePo(){
+            
+        },
+        async createPo(){
             let formData = new FormData();
+            formData.append("quantity", this.menuTableList);
+            formData.append("purchase_order_id", this.menuTableList);
+            formData.append("uom_id", this.menuTableList);
+            formData.append("uom_conversion_id", this.menuTableList);
             formData.append("forecast_datas", JSON.stringify(this.menuTableList));
             let url = '/api/forecast/raw_materials';
             let response = await postApiData({url: url, form_data: formData, token: this.getToken()});
