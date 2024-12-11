@@ -271,6 +271,7 @@ class MRPForecastRepository implements MRPForecastRepositoryInterface
         ])
         ->get();
 
+
       $menuStepDataProcessed = $menuStepDatas->flatMap(function ($mStepdata) use ($quantity) {
         return $mStepdata->menuStepItem->map(function ($data) use ($quantity) {
           return $this->processMenuStepItem($data, $quantity);
@@ -313,6 +314,7 @@ class MRPForecastRepository implements MRPForecastRepositoryInterface
       'base_uom_name' => $data->item->base_uom_name ?? 'null',
       'item_uom' => $data->item->item_uom ?? 'null',
       'weight' => $data->weight,
+      'uom_conversion_id' => $data->item->uom_conversion_id,
       'uom_conversion' => $conversionRate,
       'uom_id' => $data->item->uom_id,
       'uom_name' => $data->uom->name ?? 'null',
@@ -338,6 +340,7 @@ class MRPForecastRepository implements MRPForecastRepositoryInterface
         'base_uom_name' => $items->first()['base_uom_name'],
         'item_uom' => $items->first()['item_uom'],
         'weight' => $items->sum('weight'),
+        'uom_conversion_id' =>  $items->first()['uom_conversion_id'],
         'uom_conversion' => $items->first()['uom_conversion'],
         'uom_id' => $items->first()['uom_id'],
         'uom_name' => $items->first()['uom_name'],
