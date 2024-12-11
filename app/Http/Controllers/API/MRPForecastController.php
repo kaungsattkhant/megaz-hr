@@ -102,9 +102,9 @@ class MRPForecastController extends Controller
         ResponseData($data);
     }
 
-    public function deleteMenuForecast($mrp_forecastable_id, $mrp_forecastable_type)
+    public function deleteMenuForecast(Request $request, $mrp_forecastable_id, $mrp_forecastable_type)
     {
-        $data = $this->mrpForecastRepository->deleteMenuForecast($mrp_forecastable_id, $mrp_forecastable_type);
+        $data = $this->mrpForecastRepository->deleteMenuForecast($request, $mrp_forecastable_id, $mrp_forecastable_type);
 
         ResponseData($data);
     }

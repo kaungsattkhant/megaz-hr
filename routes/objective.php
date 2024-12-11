@@ -50,7 +50,7 @@ Route::middleware('auth:api')->group(function () {
     Route::get('/forecasts_monthly_menus', 'getMonthlyMenuForecasts');
     Route::get('/forecasts_monthly_menu/{mrpForecastId}', 'getMonthlyMenuForecastsById');
     Route::post('/forecasts_monthly_menu/{mrpForecastId}', 'updateMenuForecast');
-    Route::delete('/forecasts_monthly_menu/{mrp_forecastable_id}/forecast_type/{mrp_forecastable_type}', 'deleteMenuForecast');
+    Route::post('/forecasts_monthly_menu/{mrp_forecastable_id}/forecast_type/{mrp_forecastable_type}', 'deleteMenuForecast');
     Route::delete('/forecasts_monthly_menu/{forecastId}', 'deleteMonthlyMenuForecast');
   });
 });
