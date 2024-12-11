@@ -402,7 +402,7 @@
                                 data-te-select-wrapper-ref>
                                 <select data-te-select-init data-te-select-placeholder="Select UOM"
                                     data-te-select-filter="true" name="" id="" v-model="po_uom" class="input-ui">
-                                    <option :value="uom" v-for="(uom, uomIndex) in uomList"
+                                    <option :value="uom" v-for="(uom, uomIndex) in itemUoms"
                                         :key="uomIndex"> {{ uom.name }} </option>
                                 </select>
                             </div>
@@ -414,18 +414,23 @@
                                 <select data-te-select-init data-te-select-placeholder="Select PO"
                                     data-te-select-filter="true" name="" id="" v-model="selectedPo" class="input-ui">
                                     <option :value="po" v-for="(po, poIndex) in poList"
-                                        :key="poIndex"> {{ po.name }} </option>
+                                        :key="poIndex"> {{ po.po_id }} </option>
                                 </select>
                             </div>
                         </div>
-
+                        <div>
+                            <label for="new_po">
+                                Create New
+                                <input type="checkbox" id="new_po" v-model="isNewPo">
+                            </label>
+                        </div>
                     </div>
                     <div class="flex justify-end gap-x-4 px-6 mb-6 pt-4">
                         <button type="button" class="cancel-btn focus:shadow-none focus:outline-none"
                             data-te-modal-dismiss aria-label="Close">
                             Cancel
                         </button>
-                        <button type="button" @click="btnClickedCreateJournal()"
+                        <button type="button" @click="btnClickedCreatePo()"
                             class="add-btn focus:outline-none focus:ring-0 ">
                             Create
                         </button>
@@ -483,6 +488,7 @@ export default {
             selectedPo:null,
 
             selectedItem:null,
+            isNewPo:false,
         };
     },
 
@@ -577,8 +583,8 @@ export default {
         async clickedBtnCreate(){
             this.is_step = 2;
             initTE({ Modal });
-            this.getRawMaterial();
-            this.getHr();
+            // this.getRawMaterial();
+            // this.getHr();
             
         },
         async getMenuTableList(){
@@ -647,20 +653,24 @@ export default {
             this.itemSelectChanged();
         },
         btnClickedCreatePo(){
-            
+            this.createPo();
         },
         async createPo(){
             let formData = new FormData();
-            formData.append("quantity", this.menuTableList);
-            formData.append("purchase_order_id", this.menuTableList);
-            formData.append("uom_id", this.menuTableList);
-            formData.append("uom_conversion_id", this.menuTableList);
-            formData.append("forecast_datas", JSON.stringify(this.menuTableList));
-            let url = '/api/forecast/raw_materials';
+            formData.append("quantity", this.po_quantity);
+            
+            formData.append("uom_id", this.po_uom.id);
+            formData.append("uom_conversion_id", 16);
+            if(!this.isNewPo){
+                formData.append("purchase_order_id", this.selectedPo.id);
+            }
+            else{
+                formData.append("status", 'created');
+            }
+            let url = '/api/forecasts/purchase_orders_itemasdf/' + this.selectedItem.item_id;
             let response = await postApiData({url: url, form_data: formData, token: this.getToken()});
             if(response.success){
-                this.rawMaterialList = response.data;
-                initTE({ Modal });
+                
             }
         },
 
