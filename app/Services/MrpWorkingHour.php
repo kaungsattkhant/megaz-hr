@@ -37,9 +37,11 @@ class MrpWorkingHour
     $menuSteps = $menuSteps->map(function ($data) {
 
       $totalMinutes = (int)$data->total_working_hour;
+
       $hours = floor($totalMinutes / 60);
       $minutes = $totalMinutes % 60;
       $data->total_working_hour = sprintf('%02d:%02d', $hours, $minutes);
+
       return $data;
     });
 

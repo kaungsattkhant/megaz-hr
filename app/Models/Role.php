@@ -55,4 +55,9 @@ class Role extends BaseModel
 
         return $role ? $role->id : null;
     }
+
+    public function mrpHrs()
+    {
+        return $this->hasMany(MrpHr::class, 'role_id');
+    }
 }

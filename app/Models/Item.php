@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Models\ItemPrice;
 use App\Models\UomConversion;
+use App\Models\MrpRawMaterial;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
@@ -34,7 +35,7 @@ class Item extends BaseModel
         // Apply the global scope
         static::addGlobalScope(new WithAveragePriceScope);
     }
-    
+
     public function category()
     {
         return $this->belongsTo(Category::class);
@@ -68,7 +69,6 @@ class Item extends BaseModel
     public function suppliers()
     {
         return $this->belongsToMany(Supplier::class, 'supplier_items');
-
     }
     public function uomConversion()
     {
@@ -167,14 +167,14 @@ class Item extends BaseModel
                 ->whereColumn('uom_conversions.conversion_unit_id', '=', 'items.uom_id')
                 ->where('uom_conversions.is_active', '=', 1);
         })
-        ->join('uoms as base_uom', 'items.base_uom_id', 'base_uom.id')
-        ->join('uoms as item_uom', 'items.uom_id', 'item_uom.id')
-        ->addSelect(
-            'items.*',
-            'base_uom.name as base_uom_name',
-            'item_uom.name as item_uom',
-            'uom_conversions.conversion as uom_conversion',
-            DB::raw('
+            ->join('uoms as base_uom', 'items.base_uom_id', 'base_uom.id')
+            ->join('uoms as item_uom', 'items.uom_id', 'item_uom.id')
+            ->addSelect(
+                'items.*',
+                'base_uom.name as base_uom_name',
+                'item_uom.name as item_uom',
+                'uom_conversions.conversion as uom_conversion',
+                DB::raw('
                 CAST((
                     SELECT COALESCE(AVG(latest_prices.price), 0) 
                     FROM (
@@ -190,22 +190,25 @@ class Item extends BaseModel
                     ) AS latest_prices
                 ) AS DECIMAL(10,2)) AS average_price
             ')
-        );
+            );
     }
 
+
+
+
     public function balance()
-{
-    return $this->hasOne(InventoryLedgerItem::class, 'item_id')
-        ->join('inventory_ledgers', 'inventory_ledger_items.inventory_ledger_id', '=', 'inventory_ledgers.id')
-        ->select(
-            'inventory_ledger_items.item_id',
-            DB::raw('SUM(CASE WHEN inventory_ledgers.action = "in" THEN inventory_ledger_items.quantity ELSE 0 END) as in_balance'),
-            DB::raw('SUM(CASE WHEN inventory_ledgers.action = "out" THEN inventory_ledger_items.quantity ELSE 0 END) as out_balance'),
-            DB::raw('SUM(CASE WHEN inventory_ledgers.action = "in" THEN inventory_ledger_items.quantity ELSE 0 END) -
+    {
+        return $this->hasOne(InventoryLedgerItem::class, 'item_id')
+            ->join('inventory_ledgers', 'inventory_ledger_items.inventory_ledger_id', '=', 'inventory_ledgers.id')
+            ->select(
+                'inventory_ledger_items.item_id',
+                DB::raw('SUM(CASE WHEN inventory_ledgers.action = "in" THEN inventory_ledger_items.quantity ELSE 0 END) as in_balance'),
+                DB::raw('SUM(CASE WHEN inventory_ledgers.action = "out" THEN inventory_ledger_items.quantity ELSE 0 END) as out_balance'),
+                DB::raw('SUM(CASE WHEN inventory_ledgers.action = "in" THEN inventory_ledger_items.quantity ELSE 0 END) -
                      SUM(CASE WHEN inventory_ledgers.action = "out" THEN inventory_ledger_items.quantity ELSE 0 END) as closing_balance')
-        )
-        ->groupBy('inventory_ledger_items.item_id');
-}
+            )
+            ->groupBy('inventory_ledger_items.item_id');
+    }
 
     public function scopeWithBalanceDetails(Builder $query, $inventoryId, $itemId, $fromDate = null, $toDate = null)
     {
@@ -282,5 +285,12 @@ class Item extends BaseModel
                 'item_uom.name',
                 'base_uom.name'
             );
+    }
+
+
+
+    public function MrpRawMaterials()
+    {
+        return $this->hasMany(MrpRawMaterial::class, 'item_id');
     }
 }

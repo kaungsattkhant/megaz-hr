@@ -11,10 +11,13 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('mrp_forecasts', function (Blueprint $table) {
+        Schema::create('mrp_raw_materials', function (Blueprint $table) {
             $table->id();
-            $table->enum('type', ['ktv', 'restaurant']);
-            $table->date('date');
+            $table->foreignId('mrp_forecast_id');
+            $table->integer('item_id');
+            $table->integer('uom_id');
+            $table->integer('quantity');
+            $table->double('amount');
             $table->timestamps();
         });
     }
@@ -24,6 +27,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('mrp_forecasts');
+        Schema::dropIfExists('mrp_raw_materials');
     }
 };

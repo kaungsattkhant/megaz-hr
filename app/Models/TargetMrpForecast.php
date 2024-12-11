@@ -12,17 +12,20 @@ class TargetMrpForecast extends Model
 
     protected $fillable = [
         'mrp_forecast_id',
-        'menu_id',
-        'quantity'
+        'mrp_forecastable_id',
+        'mrp_forecastable_type',
+        'quantity',
+        'amount',
+        'hour',
     ];
+
+    public function mrp_forecastable()
+    {
+        return $this->morphTo();
+    }
 
     public function mrpForecast()
     {
-        return $this->belongsTo(MrpForecast::class);
-    }
-
-    public function menu()
-    {
-        return $this->belongsTo(Menu::class);
+        return $this->belongsTo(MrpForecast::class, 'mrp_forecast_id');
     }
 }

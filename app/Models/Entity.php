@@ -79,4 +79,9 @@ class Entity extends BaseModel
     {
         return $this->hasMany(Ktvproducttree::class);
     }
+
+    public function targetMrpForecasts()
+    {
+        return $this->morphMany(TargetMrpForecast::class, 'mrp_forecastable');
+    }
 }

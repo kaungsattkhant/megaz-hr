@@ -2,26 +2,38 @@
 
 namespace App\Repositories\MRPForecast;
 
+use Illuminate\Http\Request;
+
 
 
 
 interface MRPForecastRepositoryInterface
 {
-  public function getForcastMenus($request, $menuId);
+  public function getForcastMenusByMenuId($request, $menuId);
 
-  public function getForcastHR($request, $menuId);
+  public function getForcastMenus($data);
 
-  public function getForcastRawMaterial($request, $menuId);
+  public function getForcastHrByMenuId($request, $menuId);
+
+  public function getForcastHR($data);
+
+  public function getForcastRawMaterialByMenuId($request, $menuId);
+
+  public function getForcastRawMaterial($data);
 
   public function storeForecast($data);
 
-  public function updateForecast($data, int $mrpForecastId);
+  public function updateMenuForecast($data, int $mrpForecastId);
 
-  public function getForecasts($request);
+  public function getMonthlyMenuForecasts($request);
 
-  // public function updateMenuForecast($request, $menuId);
+  public function getMonthlyMenuForecastsById($mrpForecastId);
 
   public function getPoForecasts($request);
 
   public function storePoForecastsByItemId($request, $itemId);
+
+  public function deleteMenuForecast($mrp_forecastable_id, $mrp_forecastable_type);
+
+  public function deleteMonthlyMenuForecast($forecastId);
 }
