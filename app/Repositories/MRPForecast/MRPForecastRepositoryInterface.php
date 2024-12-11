@@ -33,7 +33,7 @@ interface MRPForecastRepositoryInterface
 
   public function storePoForecastsByItemId($request, $itemId);
 
-  public function deleteMenuForecast($mrp_forecastable_id, $mrp_forecastable_type);
+  public function deleteMenuForecast($request, $mrp_forecastable_id, $mrp_forecastable_type);
 
   public function deleteMonthlyMenuForecast($forecastId);
 }
