@@ -591,131 +591,113 @@ class MRPForecastRepository implements MRPForecastRepositoryInterface
   public function deleteMenuForecast($request, $mrp_forecastable_id, $mrp_forecastable_type)
   {
 
-    // DB::beginTransaction();
-    // try {
+    DB::beginTransaction();
+    try {
 
-    //   $mrp_forecast_id = $request->mrp_forecast_id;
+      $mrp_forecast_id = $request->mrp_forecast_id;
+      $quantity =  $request->quantity;
+      $targetMenuMrp = TargetMrpForecast::where('mrp_forecastable_id', $mrp_forecastable_id)
+        ->where('mrp_forecastable_type', $mrp_forecastable_type)
+        ->where('mrp_forecast_id', $mrp_forecast_id)
+        ->first();
+      if (!$targetMenuMrp) {
+        return null;
+      }
 
-    //   $targetMenuMrp = TargetMrpForecast::where('mrp_forecastable_id', $mrp_forecastable_id)
-    //     ->where('mrp_forecastable_type', $mrp_forecastable_type)
-    //     ->where('mrp_forecast_id', $mrp_forecast_id)
-    //     ->firstOrFail();
+      $menuId = $targetMenuMrp->mrp_forecastable_id;
 
-    //   $menuId = $targetMenuMrp->mrp_forecastable_id;
+      $menu = Menu::where('id', $menuId)
+        ->with(['menuSteps.menuStepItem', 'subMenus.menuSteps.menuStepItem'])
+        ->firstOrFail();
 
-    //   $menu = Menu::where('id', $menuId)
-    //     ->with(['menuSteps.menuStepItem', 'subMenus.menuSteps.menuStepItem'])
-    //     ->firstOrFail();
+      $data = $this->getForcastMenusByMenuId($request, $menuId);
+      $totalForecastAmount = $data['total_menu_forecast_amt'];
+      $mrpForecast = $targetMenuMrp->mrpForecast;
 
+      if ($mrpForecast) {
+        $rawMaterials = $mrpForecast->MrpRawMaterials;
+        $menuStepItemIds = $this->collectMenuStepItemIds($menu);
 
-    //   $data = $this->getForcastMenusByMenuId($request, $menuId);
+        foreach ($rawMaterials as $rawMaterial) {
+          if (in_array($rawMaterial->item_id, $menuStepItemIds)) {
+            $originalAmount = $rawMaterial->amount;
+            $reducedAmount = $originalAmount - $totalForecastAmount;
+            $rawMaterial->amount = max(0, $reducedAmount);
+            $rawMaterial->save();
+          } else {
+            $rawMaterial->amount = $rawMaterial->amount;
+          }
 
-    //   $hrData  = $this->getForcastHrByMenuId($request, $menuId);
+          $mrpHrs = $mrpForecast->MrpHrs;
+          $menuStepRoleIds = $this->collectMenuStepRoleIds($menu);
 
-    //   return $hrData;
-    //   $totalForecastAmount = $data['total_menu_forecast_amt'];
+          foreach ($mrpHrs  as $mrpHr) {
 
-    //   $roles = $menu->menuSteps->pluck('role_id')->unique();
-    //   $mrpForecast = $targetMenuMrp->mrpForecast;
+            if (in_array($mrpHr->role_id, $menuStepRoleIds)) {
+              $menuStep = $menu->menuSteps->firstWhere('role_id', $mrpHr->role_id);
 
-    //   if ($mrpForecast) {
-    //     $totalRawAmt = 0;
-    //     $menuStepItemIds = $this->collectMenuStepItemIds($menu);
-    //     $rawMaterials = $mrpForecast->MrpRawMaterials;
+              if ($menuStep) {
 
-    //     $reducedAmounts = [];
+                $totalHrDuration = (int)$mrpHr->total_duration;
 
-    //     foreach ($rawMaterials as $rawMaterial) {
-    //       if (in_array($rawMaterial->item_id, $menuStepItemIds)) {
-
-    //         $originalAmount = $rawMaterial->amount;
-    //         $reducedAmount = $originalAmount - $totalForecastAmount;
-    //         $rawMaterial->amount = max(0, $reducedAmount);
-
-
-    //         $rawMaterial->save();
-
-
-    //         $reducedAmounts[] = [
-    //           'item_id' => $rawMaterial->item_id,
-    //           'original_amount' => $originalAmount,
-    //           'reduced_amount' => $rawMaterial->amount,
-    //         ];
-    //       } else {
-
-    //         $totalRawAmt += $rawMaterial->amount;
-    //       }
-    //     }
+                $menuStepDuration = (int) $menuStep->duration * $quantity;
 
 
-
-    //     // Reduce durations for roles
-
-
-    //     $mrpHrs = $mrpForecast->MrpHrs;
-    //     $reducedDurations = [];
-
-    //     foreach ($hrData['data'] as $hrEntry) {
-    //       $roleId = $hrEntry['role_id'];
-    //       $totalWorkingHour = $hrEntry['total_working_hour'];
-
-
-    //       $durationToReduce = $this->convertDurationToMinutes($totalWorkingHour);
-
-
-    //       $mrpHr = $mrpHrs->firstWhere('role_id', $roleId);
-
-    //       if ($mrpHr) {
-    //         $originalDuration = $mrpHr->total_duration;
-    //         $reducedDuration = max(0, $originalDuration - $durationToReduce);
-
-    //         $mrpHr->total_duration = $reducedDuration;
-    //         $mrpHr->save();
-
-    //         $reducedDurations[] = [
-    //           'role_id' => $roleId,
-    //           'original_duration' => $originalDuration,
-    //           'reduced_duration' => $reducedDuration,
-    //         ];
-    //       }
-    //     }
-
-
-
-
-    //     DB::commit();
-    //     return [
-    //       'total_raw_amount' => $totalRawAmt,
-    //       'total_forecast_amount' => $totalForecastAmount,
-    //       'reducedAmounts' => $reducedAmounts,
-    //     ];
-    //   }
-    // } catch (Exception $e) {
-    //   DB::rollBack();
-    //   throw $e;
-    // }
+                $durationDifference = $totalHrDuration - $menuStepDuration;
+                $mrpHr->total_duration = max(0, $durationDifference);
+                $mrpHr->save();
+              }
+            } else {
+              $mrpHr->total_duration = $mrpHr->total_duration;
+            }
+          }
+          DB::commit();
+        }
+      }
+      $targetMenuMrp->delete();
+    } catch (Exception $e) {
+      DB::rollBack();
+      throw $e;
+    }
   }
-  // private function collectMenuStepItemIds(Menu $menu)
-  // {
-  //   $menuStepItemIds = $menu->menuSteps->flatMap(function ($menuStep) {
-  //     return $menuStep->menuStepItem->pluck('item_id');
-  //   });
+  private function collectMenuStepItemIds(Menu $menu)
+  {
+    $menuStepItemIds = $menu->menuSteps->flatMap(function ($menuStep) {
+      return $menuStep->menuStepItem->pluck('item_id');
+    });
 
 
-  //   foreach ($menu->subMenus as $subMenu) {
-  //     $menuStepItemIds = $menuStepItemIds->merge(
-  //       $this->collectMenuStepItemIds($subMenu)
-  //     );
-  //   }
+    foreach ($menu->subMenus as $subMenu) {
+      $menuStepItemIds = $menuStepItemIds->merge(
+        $this->collectMenuStepItemIds($subMenu)
+      );
+    }
 
-  //   return $menuStepItemIds->unique()->toArray();
-  // }
+    return $menuStepItemIds->unique()->toArray();
+  }
 
-  // private function convertDurationToMinutes($duration)
-  // {
-  //   list($hours, $minutes) = explode(':', $duration);
-  //   return ($hours * 60) + $minutes;
-  // }
+  private function collectMenuStepRoleIds(Menu $menu)
+  {
+    $menuStepRoleIds = $menu->menuSteps->flatMap(function ($menuStep) {
+      return $menuStep->pluck('role_id');
+    });
+
+
+    foreach ($menu->subMenus as $subMenu) {
+      $menuStepRoleIds = $menuStepRoleIds->merge(
+        $this->collectMenuStepRoleIds($subMenu)
+      );
+    }
+
+    return $menuStepRoleIds->unique()->toArray();
+  }
+
+
+  private function convertDurationToMinutes($duration)
+  {
+    list($hours, $minutes) = explode(':', $duration);
+    return ($hours * 60) + $minutes;
+  }
 
 
   public function deleteMonthlyMenuForecast($forecastId)
