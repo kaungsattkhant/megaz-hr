@@ -36,4 +36,8 @@ interface MRPForecastRepositoryInterface
   public function deleteMenuForecast($request, $mrp_forecastable_id, $mrp_forecastable_type);
 
   public function deleteMonthlyMenuForecast($forecastId);
+
+  public function getForecastKTV($data);
+
+  public function getForecastKTVRawMaterials($data);
 }

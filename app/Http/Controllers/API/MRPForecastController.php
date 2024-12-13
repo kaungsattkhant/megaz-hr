@@ -23,7 +23,6 @@ class MRPForecastController extends Controller
 
     public function getForcastMenus(Request $request)
     {
-
         $data =  $this->mrpForecastRepository->getForcastMenus($request->all());
         ResponseData($data);
     }
@@ -114,6 +113,20 @@ class MRPForecastController extends Controller
     {
         $data = $this->mrpForecastRepository->deleteMonthlyMenuForecast($forecastId);
 
+        ResponseData($data);
+    }
+
+    //ktv forecast
+    public function getForecastKTV(Request $request)
+    {
+        $data =  $this->mrpForecastRepository->getForecastKTV($request->all());
+        ResponseData($data);
+    }
+
+    public function getForecastKTVRawMaterials(Request $request)
+    {
+
+        $data =  $this->mrpForecastRepository->getForecastKTVRawMaterials($request->all());
         ResponseData($data);
     }
 }

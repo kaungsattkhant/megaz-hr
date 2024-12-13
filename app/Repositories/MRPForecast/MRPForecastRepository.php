@@ -6,11 +6,13 @@ use Exception;
 use App\Models\Item;
 use App\Models\Menu;
 use App\Models\MrpHr;
+use App\Models\KtvItem;
 use App\Models\MenuStep;
 use App\Models\ItemPrice;
 use App\Models\MrpForecast;
 use App\Models\SupplierItem;
 use App\Models\PurchaseOrder;
+use App\Models\KtvProductTree;
 use App\Models\MrpRawMaterial;
 use App\Services\MrpWorkingHour;
 use App\Models\PurchaseOrderItem;
@@ -215,7 +217,6 @@ class MRPForecastRepository implements MRPForecastRepositoryInterface
 
     $result = collect();
 
-
     foreach ($forecastMenuDatas as $forecastData) {
       $menuId = $forecastData['menu_id'];
       $quantity = $forecastData['quantity'];
@@ -306,7 +307,7 @@ class MRPForecastRepository implements MRPForecastRepositoryInterface
     $currentHolding = $closingBalance / $conversionRate;
 
     return [
-      'menu_step_id' => $data->menu_step_id,
+      'menu_step_id' => $data->menu_step_id ?? 'null',
       'item_id' => $data->item_id,
       'name' => $data->item->name ?? 'null',
       'code' => $data->item->code ?? 'null',
@@ -317,7 +318,7 @@ class MRPForecastRepository implements MRPForecastRepositoryInterface
       'uom_conversion_id' => $data->item->uom_conversion_id,
       'uom_conversion' => $conversionRate,
       'uom_id' => $data->item->uom_id,
-      'uom_name' => $data->uom->name ?? 'null',
+      // 'uom_name' => $data->uom->name ?? 'null',
       'total_uom_amt' => $totalUom,
       'average_price' => round($average_price, 4),
       'forecast_price' => $forecastPrice,
@@ -343,7 +344,7 @@ class MRPForecastRepository implements MRPForecastRepositoryInterface
         'uom_conversion_id' =>  $items->first()['uom_conversion_id'],
         'uom_conversion' => $items->first()['uom_conversion'],
         'uom_id' => $items->first()['uom_id'],
-        'uom_name' => $items->first()['uom_name'],
+        // 'uom_name' => $items->first()['uom_name'],
         'total_uom_amt' => $items->sum('total_uom_amt'),
         'average_price' => $items->sum(function ($item) {
           return $item['average_price'];
@@ -693,11 +694,11 @@ class MRPForecastRepository implements MRPForecastRepositoryInterface
   }
 
 
-  private function convertDurationToMinutes($duration)
-  {
-    list($hours, $minutes) = explode(':', $duration);
-    return ($hours * 60) + $minutes;
-  }
+  // private function convertDurationToMinutes($duration)
+  // {
+  //   list($hours, $minutes) = explode(':', $duration);
+  //   return ($hours * 60) + $minutes;
+  // }
 
 
   public function deleteMonthlyMenuForecast($forecastId)
@@ -707,5 +708,106 @@ class MRPForecastRepository implements MRPForecastRepositoryInterface
     $mrpMenuForecast->MrpHrs()->delete();
     $mrpMenuForecast->MrpRawMaterials()->delete();
     $mrpMenuForecast->delete();
+  }
+
+  //ktv forecast
+  public function getForecastKTV($data)
+  {
+    $forecastKTVDatas = json_decode($data['forecast_datas'], true);
+    $results = [];
+    foreach ($forecastKTVDatas as $forecastKTV) {
+
+      $ktvData =  KtvProductTree::with(['entity'])->where('entity_id',  $forecastKTV['entity_id'])->first();
+      if (!$ktvData) {
+        continue;
+      }
+      // return $ktvData;
+
+      $results[] = [
+        'id' => $ktvData->id,
+        'entity_id' => $ktvData->entity_id,
+        'name' => $ktvData->entity->name,
+        'session' => $forecastKTV['session'],
+        'hour' => $forecastKTV['hour'],
+      ];
+    }
+    return $results;
+  }
+
+  public function getForecastKTVRawMaterials($data)
+  {
+    $inventoryId = 6;
+    $result = collect();
+    $forecastKTVDatas = json_decode($data['forecast_datas'], true);
+
+    foreach ($forecastKTVDatas as $forecastKTV) {
+      $quantity = $forecastKTV['session'];
+      $entityId = $forecastKTV['entity_id'];
+
+      $ktvItems = KtvItem::with([
+        'item' => function ($itemQuery) use ($inventoryId) {
+          $itemQuery->with([
+            'balance' => function ($balanceQuery) use ($inventoryId) {
+              $balanceQuery->whereHas('inventory_ledger', function ($q) use ($inventoryId) {
+                $q->where('inventory_id', $inventoryId);
+              });
+            }
+          ]);
+        }
+      ])
+        ->whereHas('ktvProductTree', function ($query) use ($entityId) {
+          $query->where('entity_id', $entityId);
+        })
+        ->get();
+
+      $processedItems = $ktvItems->map(function ($ktvItem) use ($inventoryId, $entityId) {
+        $item = $ktvItem->item;
+        $processedData = $this->processKTVItem($ktvItem, $item, $inventoryId);
+        $processedData['entity_id'] = $entityId;
+        return $processedData;
+      });
+
+
+      $result = $result->merge($processedItems);
+    }
+    // return $result;
+    return $this->groupMenuStepItems($result);
+  }
+
+
+  private function processKTVItem($ktvItem, $item, $inventoryId)
+  {
+    $conversionRate = $item->uom_conversion ?? 0;
+    $averagePrice = $item->average_price ?? 0;
+    $totalUom = $ktvItem->quantity * $conversionRate;
+    $forecastPrice = round($totalUom * round($averagePrice / $conversionRate, 4), 4);
+
+    $uomForecastAmt = round($totalUom / $conversionRate, 4);
+    $balance = $item->balance ?? null;
+    $inBalance = $balance->in_balance ?? 0;
+    $outBalance = $balance->out_balance ?? 0;
+    $closingBalance = $balance->closing_balance ?? 0;
+    $currentHolding = $closingBalance / $conversionRate;
+    return [
+      'ktv_product_tree_id' => $ktvItem->ktv_product_tree_id,
+      'item_id' => $ktvItem->item_id,
+      'name' =>  $item->name ?? 'null',
+      'code' => $item->code ?? 'null',
+      'base_uom_id' => $item->base_uom_id,
+      'base_uom_name' => $item->base_uom_name ?? 'null',
+      'uom_id' => $item->uom_id,
+      'item_uom' => $item->item_uom ?? 'null',
+      'weight' => $ktvItem->quantity,
+      'uom_conversion_id' => $item->uom_conversion_id,
+      'uom_conversion' => $conversionRate,
+      'total_uom_amt' => $totalUom,
+      'average_price' => round($averagePrice, 4),
+      'forecast_price' => $forecastPrice,
+      'forecast_uom_amt' => $uomForecastAmt,
+      'in_balance' => $inBalance,
+      'out_balance' => $outBalance,
+      'closing_balance' => $closingBalance,
+      'current_holdings' => $currentHolding
+    ];
   }
 }
