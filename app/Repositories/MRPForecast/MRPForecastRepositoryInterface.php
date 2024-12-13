@@ -4,9 +4,6 @@ namespace App\Repositories\MRPForecast;
 
 use Illuminate\Http\Request;
 
-
-
-
 interface MRPForecastRepositoryInterface
 {
   public function getForcastMenusByMenuId($request, $menuId);
@@ -40,4 +37,6 @@ interface MRPForecastRepositoryInterface
   public function getForecastKTV($data);
 
   public function getForecastKTVRawMaterials($data);
+
+  public function getForecastKTVHr($data);
 }

@@ -10,6 +10,7 @@ use App\Models\KtvItem;
 use App\Models\MenuStep;
 use App\Models\ItemPrice;
 use App\Models\MrpForecast;
+use App\Models\KtvObjective;
 use App\Models\SupplierItem;
 use App\Models\PurchaseOrder;
 use App\Models\KtvProductTree;
@@ -721,7 +722,6 @@ class MRPForecastRepository implements MRPForecastRepositoryInterface
       if (!$ktvData) {
         continue;
       }
-      // return $ktvData;
 
       $results[] = [
         'id' => $ktvData->id,
@@ -766,28 +766,35 @@ class MRPForecastRepository implements MRPForecastRepositoryInterface
         $processedData['entity_id'] = $entityId;
         return $processedData;
       });
-
-
       $result = $result->merge($processedItems);
     }
-    // return $result;
     return $this->groupMenuStepItems($result);
   }
 
 
   private function processKTVItem($ktvItem, $item, $inventoryId)
   {
+
     $conversionRate = $item->uom_conversion ?? 0;
     $averagePrice = $item->average_price ?? 0;
-    $totalUom = $ktvItem->quantity * $conversionRate;
-    $forecastPrice = round($totalUom * round($averagePrice / $conversionRate, 4), 4);
 
-    $uomForecastAmt = round($totalUom / $conversionRate, 4);
+    if ($conversionRate == 0) {
+      $forecastPrice = 0;
+      $uomForecastAmt = 0;
+      $currentHolding = 0;
+    } else {
+      $totalUom = $ktvItem->quantity * $conversionRate;
+      $forecastPrice = round($totalUom * round($averagePrice / $conversionRate, 4), 4);
+      $uomForecastAmt = round($totalUom / $conversionRate, 4);
+      $closingBalance = $balance->closing_balance ?? 0;
+      $currentHolding = $closingBalance / $conversionRate;
+    }
+
     $balance = $item->balance ?? null;
     $inBalance = $balance->in_balance ?? 0;
     $outBalance = $balance->out_balance ?? 0;
-    $closingBalance = $balance->closing_balance ?? 0;
-    $currentHolding = $closingBalance / $conversionRate;
+
+
     return [
       'ktv_product_tree_id' => $ktvItem->ktv_product_tree_id,
       'item_id' => $ktvItem->item_id,
@@ -809,5 +816,55 @@ class MRPForecastRepository implements MRPForecastRepositoryInterface
       'closing_balance' => $closingBalance,
       'current_holdings' => $currentHolding
     ];
+  }
+
+
+  public function getForecastKTVHr($data)
+  {
+    $forecastKTVDatas = json_decode($data['forecast_datas'], true);
+    $result = collect();
+    foreach ($forecastKTVDatas as $forecastKTV) {
+      $quantity = $forecastKTV['session'];
+      $entityId = $forecastKTV['entity_id'];
+
+      $ktvHrData = KtvObjective::with('objectiveKey.role.department')
+        ->whereHas('ktvProductTree', function ($query) use ($entityId) {
+          $query->where('entity_id', $entityId);
+        })
+        ->get();
+
+      $KtvHr =  $ktvHrData->map(function ($ktvHr) use ($quantity) {
+        $role = $ktvHr->objectiveKey->role;
+        $departmentName = $role->department->name;
+        $roleId = $role->id;
+        $duration = $ktvHr->objectiveKey->duration;
+        $totalDuration = $duration * $quantity;
+        return [
+          'role_id' => $roleId,
+          'department_name' => $departmentName,
+          'total_duration' => $totalDuration,
+        ];
+      });
+      $result = $result->merge($KtvHr);
+    }
+
+    return $this->groupKTVHr($result);
+  }
+  private function groupKTVHr($result)
+  {
+
+    return $result->groupBy('role_id')->map(function ($roles) {
+      $totalDuration = $roles->sum('total_duration');
+      $hours = floor($totalDuration  / 60);
+      $minutes = $totalDuration  % 60;
+      $totalDurationInHrs = sprintf('%02d:%02d', $hours, $minutes);
+      $departmentName = $roles->first()['department_name'];
+
+      return [
+        'role_id' => $roles->first()['role_id'],
+        'department_name' => $departmentName,
+        'total_duration' => $totalDurationInHrs,
+      ];
+    })->values();
   }
 }

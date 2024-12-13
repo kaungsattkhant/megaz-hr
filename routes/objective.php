@@ -57,5 +57,6 @@ Route::middleware('auth:api')->group(function () {
 
     Route::post('/forecast/ktvs', 'getForecastKTV');
     Route::post('/forecast/ktvs_raw_materials', 'getForecastKTVRawMaterials');
+    Route::post('/forecast/ktvs_hr', 'getForecastKTVHr');
   });
 });

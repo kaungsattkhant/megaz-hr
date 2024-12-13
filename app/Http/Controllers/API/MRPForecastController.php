@@ -116,7 +116,6 @@ class MRPForecastController extends Controller
         ResponseData($data);
     }
 
-    //ktv forecast
     public function getForecastKTV(Request $request)
     {
         $data =  $this->mrpForecastRepository->getForecastKTV($request->all());
@@ -125,8 +124,13 @@ class MRPForecastController extends Controller
 
     public function getForecastKTVRawMaterials(Request $request)
     {
-
         $data =  $this->mrpForecastRepository->getForecastKTVRawMaterials($request->all());
+        ResponseData($data);
+    }
+
+    public function getForecastKTVHr(Request $request)
+    {
+        $data =  $this->mrpForecastRepository->getForecastKTVHr($request->all());
         ResponseData($data);
     }
 }
