@@ -4,9 +4,6 @@ namespace App\Repositories\MRPForecast;
 
 use Illuminate\Http\Request;
 
-
-
-
 interface MRPForecastRepositoryInterface
 {
   public function getForcastMenusByMenuId($request, $menuId);
@@ -25,7 +22,7 @@ interface MRPForecastRepositoryInterface
 
   public function updateMenuForecast($data, int $mrpForecastId);
 
-  public function getMonthlyMenuForecasts($request);
+  public function getMonthlyMenuForecasts($request, $type);
 
   public function getMonthlyMenuForecastsById($mrpForecastId);
 
@@ -36,4 +33,13 @@ interface MRPForecastRepositoryInterface
   public function deleteMenuForecast($request, $mrp_forecastable_id, $mrp_forecastable_type);
 
   public function deleteMonthlyMenuForecast($forecastId);
+
+  public function getForecastKTV($data);
+  public function getForecastKTVByEntityId($data, $entityId);
+
+  public function getForecastKTVRawMaterials($data);
+  public function getForecastKTVRawMaterialsByEntityId($data, $entityId);
+
+  public function getForecastKTVHr($data);
+  public function getForecastKTVHrByEntityId($data, $entityId);
 }
