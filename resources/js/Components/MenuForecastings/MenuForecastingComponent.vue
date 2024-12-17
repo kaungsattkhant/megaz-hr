@@ -180,8 +180,7 @@ export default {
             totalData: 0,
 
             searchInput:null,
-
-            url:'/api/objectives?page=',
+            url:'/api/forecasts_monthly_menus/restaurant',
             url_search:'',
             url_department:'',
             url_role:'',
@@ -194,7 +193,8 @@ export default {
         ...mapGetters(['getToken']),
 
         async getMenuForecastingList(pageNumber) {
-            let url = this.url + pageNumber + this.url_search + this.url_department + this.url_role;
+            // let url = this.url + pageNumber + this.url_search + this.url_department + this.url_role;
+            let url = this.url;
             // let url = `/api/objectives?page=${pageNumber}`;
             // if (this.searchInput && this.searchCategory) {
             //     url = `/api/objectives?search_input=${this.searchInput}&menu_category_id=${this.searchCategory.id}&page=${pageNumber}`;

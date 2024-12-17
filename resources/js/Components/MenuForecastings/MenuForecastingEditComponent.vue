@@ -12,7 +12,7 @@
                     <label for="" class="label-form mb-3">
                         Month
                     </label>
-                    <input type="date" v-model="selectedMonth" class="input-ui" >
+                    <input type="month" v-model="selectedMonth" class="input-ui" :min="minDate">
                 </div>
                 <div class="mb-4 col-span-3 rounded-md">
                     <label for="" class="label-form mb-3">
@@ -130,7 +130,7 @@
                     <label for="" class="label-form mb-3">
                         Month 
                     </label>
-                    <input type="date" v-model="selectedMonth" class="input-ui">
+                    <input type="month" v-model="selectedMonth" class="input-ui">
                 </div>
                 <div class="mb-4 col-span-3 rounded-md">
                     <label for="" class="label-form mb-3">
@@ -732,7 +732,6 @@ export default {
     mounted() {
         initTE({ Modal, Select, Tab, Ripple });
         const today = new Date();
-        console.log(today)
         const year = today.getFullYear();
         const month = String(today.getMonth() + 1).padStart(2, "0"); 
         this.minDate = `${year}-${month}`; 
