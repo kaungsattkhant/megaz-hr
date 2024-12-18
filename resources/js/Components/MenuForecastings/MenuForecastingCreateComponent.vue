@@ -68,9 +68,7 @@
                         Add
                     </button>
                 </div>
-    
             </div>
-
             <div class=" bg-white py-4 px-8 rounded-md shadow-md mb-8">
                 <div class="table-container">
                     <table class="primary-table">
@@ -112,12 +110,7 @@
     
                     </table>
                 </div>
-    
-                
-    
             </div>
-            
-            
             <div>
                 <button class="add-btn" @click="clickedBtnCreate()">
                     Create
@@ -167,7 +160,6 @@
                             data-te-toggle="pill" data-te-target="#tabs-hr" role="tab"
                             aria-controls="tabs-hr" aria-selected="true">HR</a>
                     </li>
-                    
                 </ul>
     
                 <div class="bg-white py-4 px-8 rounded-tr-md rounded-bl-md rounded-br-md shadow-md mb-8 -mt-0.5 z-30 relative">
@@ -561,6 +553,8 @@ export default {
             formData.append("type", this.selectedType.value);
             formData.append("date", this.selectedMonth);
             formData.append("target_mrps", JSON.stringify(this.menuTableList));
+            formData.append("forecast_hr", JSON.stringify(this.hrList));
+            formData.append("forecast_raw", JSON.stringify(this.rawMaterialList));
             let url = '/api/forecasts';
             let response = await postApiData({url: url, form_data: formData, token: this.getToken()});
             if(response.success){
@@ -571,8 +565,9 @@ export default {
         async clickedBtnCreate(){
             this.is_step = 2;
             initTE({ Modal });
-            // this.getRawMaterial();
-            // this.getHr();
+            this.getMenuTableList();
+            this.getRawMaterialList();
+            this.getHrList();
             
         },
         async getMenuTableList(){
@@ -665,7 +660,7 @@ export default {
             let url = '/api/forecasts/purchase_orders_item/' + this.selectedItem.item_id;
             let response = await postApiData({url: url, form_data: formData, token: this.getToken()});
             if(response.success){
-                
+                this.donePoModal();
             }
         },
 
@@ -736,7 +731,7 @@ export default {
         const year = today.getFullYear();
         const month = String(today.getMonth() + 1).padStart(2, "0"); 
         this.minDate = `${year}-${month}`; 
-        this.selectedMonth = `${year}-${month}`; 
+        // this.selectedMonth = `${year}-${month}`; 
     }
 }
 </script>
