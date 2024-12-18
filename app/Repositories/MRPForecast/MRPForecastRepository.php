@@ -55,17 +55,15 @@ class MRPForecastRepository implements MRPForecastRepositoryInterface
     $groupedHrDurations = $allHrDurations->groupBy('role_id')->map(function ($roles) {
       $first = $roles->first();
       $totalMinutes = $roles->reduce(function ($carry, $role) {
-        [$hours, $minutes] = explode(':', $role->total_working_hour);
-        return $carry + ($hours * 60) + $minutes;
+        return $carry + $role->total_working_hour;
       }, 0);
-
-      $hours = floor($totalMinutes / 60);
-      $minutes = $totalMinutes % 60;
+      // $hours = floor($totalMinutes / 60);
+      // $minutes = $totalMinutes % 60;
 
       return [
         'role_id' => $first->role_id,
         'position' => $first->position,
-        'total_working_hour' => sprintf('%02d:%02d', $hours, $minutes),
+        'total_working_hour' => $totalMinutes,
       ];
     })->values();
 
@@ -988,15 +986,15 @@ class MRPForecastRepository implements MRPForecastRepositoryInterface
 
     return $result->groupBy('role_id')->map(function ($roles) {
       $totalDuration = $roles->sum('total_duration');
-      $hours = floor($totalDuration  / 60);
-      $minutes = $totalDuration  % 60;
-      $totalDurationInHrs = sprintf('%02d:%02d', $hours, $minutes);
+      // $hours = floor($totalDuration  / 60);
+      // $minutes = $totalDuration  % 60;
+      // $totalDurationInHrs = sprintf('%02d:%02d', $hours, $minutes);
       $departmentName = $roles->first()['department_name'];
 
       return [
         'role_id' => $roles->first()['role_id'],
         'department_name' => $departmentName,
-        'total_duration' => $totalDurationInHrs,
+        'total_duration' => $totalDuration,
       ];
     })->values();
   }
