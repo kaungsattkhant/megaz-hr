@@ -434,9 +434,21 @@ class MRPForecastRepository implements MRPForecastRepositoryInterface
 
         $targetMrps = json_decode($data['target_mrp'], true);
         foreach ($targetMrps as $targetMrp) {
-          $targetMrpData = TargetMrpForecast::find($targetMrp['id']);
-          if ($targetMrpData) {
-            $targetMrpData->update([
+
+          if (isset($targetMrp['id'])) {
+            $targetMrpData = TargetMrpForecast::find($targetMrp['id']);
+            if ($targetMrpData) {
+              $targetMrpData->update([
+                'mrp_forecast_id' => $mrpForecast->id,
+                'mrp_forecastable_id' => $targetMrp['mrp_forecastable_id'],
+                'mrp_forecastable_type' => $targetMrp['mrp_forecastable_type'],
+                'quantity' => $targetMrp['quantity'],
+                'amount' => $targetMrp['amount'] ?? null,
+                'hour' => $targetMrp['hour'] ?? null,
+              ]);
+            }
+          } else {
+            TargetMrpForecast::create([
               'mrp_forecast_id' => $mrpForecast->id,
               'mrp_forecastable_id' => $targetMrp['mrp_forecastable_id'],
               'mrp_forecastable_type' => $targetMrp['mrp_forecastable_type'],
@@ -449,11 +461,19 @@ class MRPForecastRepository implements MRPForecastRepositoryInterface
       }
       $forecastHrs = json_decode($data['forecast_hr'], true);
       foreach ($forecastHrs as  $forecastHr) {
-        $mrpHrdata = MrpHr::find($forecastHr['id']);
-        if ($mrpHrdata) {
-          $mrpHrdata->update([
+        if (isset($forecastHr['id'])) {
+          $mrpHrdata = MrpHr::find($forecastHr['id']);
+          if ($mrpHrdata) {
+            $mrpHrdata->update([
+              'mrp_forecast_id' => $mrpForecast->id,
+              'role_id' =>  $forecastHr['role_id'],
+              'total_duration' => $forecastHr['total_duration'],
+            ]);
+          }
+        } else {
+          MrpHr::create([
             'mrp_forecast_id' => $mrpForecast->id,
-            'role_id' =>  $forecastHr['role_id'],
+            'role_id' => $forecastHr['role_id'],
             'total_duration' => $forecastHr['total_duration'],
           ]);
         }
@@ -462,9 +482,19 @@ class MRPForecastRepository implements MRPForecastRepositoryInterface
 
       $forecastRaws = json_decode($data['forecast_raw'], true);
       foreach ($forecastRaws as  $forecastRaw) {
-        $mrpRawData =  MrpRawMaterial::find($forecastRaw['id']);
-        if ($mrpRawData) {
-          $mrpRawData->update([
+        if (isset($forecastRaw['id'])) {
+          $mrpRawData =  MrpRawMaterial::find($forecastRaw['id']);
+          if ($mrpRawData) {
+            $mrpRawData->update([
+              'mrp_forecast_id' => $mrpForecast->id,
+              'item_id' => $forecastRaw['item_id'],
+              'uom_id' => $forecastRaw['uom_id'],
+              'quantity' => $forecastRaw['quantity'],
+              'amount' => $forecastRaw['amount'],
+            ]);
+          }
+        } else {
+          MrpRawMaterial::create([
             'mrp_forecast_id' => $mrpForecast->id,
             'item_id' => $forecastRaw['item_id'],
             'uom_id' => $forecastRaw['uom_id'],
