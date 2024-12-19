@@ -12,13 +12,13 @@
                     <label for="" class="label-form mb-3">
                         Month
                     </label>
-                    <input type="date" v-model="selectedMonth" class="input-ui" >
+                    <input type="date" v-model="selectedMonth" class="input-ui">
                 </div>
                 <div class="mb-4 col-span-3 rounded-md">
                     <label for="" class="label-form mb-3">
                         Type
                     </label>
-                    <div class="bg-white mb-0 w-full text-sm inline-block"
+                    <div class="mb-0 w-full text-sm inline-block h-max select-ui"
                         data-te-select-wrapper-ref>
                         <select data-te-select-init data-te-select-placeholder="Select Type"
                             data-te-select-filter="true" name="" id="" v-model="selectedType" class="input-ui">
@@ -123,15 +123,15 @@
                     <label for="" class="label-form mb-3">
                         Month 
                     </label>
-                    <input type="date" v-model="selectedMonth" class="input-ui">
+                    <input type="date" v-model="selectedMonth" class="input-ui"  :disabled="this.is_disable_step_2" :class="this.is_disable_step_2 ? 'cursor-not-allowed opacity-60 !bg-gray-300' : ''">
                 </div>
                 <div class="mb-4 col-span-3 rounded-md">
                     <label for="" class="label-form mb-3">
                         Type
                     </label>
-                    <div class="bg-white mb-0 w-full text-sm inline-block"
+                    <div class="mb-0 w-full text-sm inline-block h-max select-ui"
                         data-te-select-wrapper-ref>
-                        <select data-te-select-init data-te-select-placeholder="Select Type"
+                        <select data-te-select-init data-te-select-placeholder="Select Type" :disabled="this.is_disable_step_2" :class="this.is_disable_step_2 ? 'cursor-not-allowed opacity-60 !bg-gray-300' : ''"
                             data-te-select-filter="true" name="" id="" v-model="selectedType" class="input-ui">
                             <option :value="type" v-for="(type, typeIndex) in typeList"
                                 :key="typeIndex"> {{ type.name }} </option>
@@ -247,11 +247,12 @@
                                             {{ raw.name }}
                                         </td>
                                         <td class="">
-                                            {{ parseInt(parseInt(raw.total_uom_amt)/raw.uom_conversion) }} {{ raw.base_uom_name }}
-                                            {{ ( (parseInt(raw.total_uom_amt)/raw.uom_conversion) - (parseInt(parseInt(raw.total_uom_amt)/raw.uom_conversion)))*raw.uom_conversion  }} {{ raw.uom_name }}
+                                            <!-- {{ parseInt(parseInt(raw.total_uom_amt)/raw.uom_conversion) }} {{ raw.base_uom_name }}
+                                            {{ ( (parseInt(raw.total_uom_amt)/raw.uom_conversion) - (parseInt(parseInt(raw.total_uom_amt)/raw.uom_conversion)))*raw.uom_conversion  }} {{ raw.uom_name }} -->
+                                              {{ raw.total_uom_amt }}
                                         </td>
                                         <td class="">
-                                            {{ raw.uom_name }}
+                                            {{ raw.item_uom }}
                                         </td>
                                         <td class="">
                                             {{ raw.average_price * raw.total_uom_amt }}
@@ -484,6 +485,8 @@ export default {
 
             selectedItem:null,
             isNewPo:false,
+
+            is_disable_step_2:true,
         };
     },
 
@@ -534,11 +537,20 @@ export default {
             let url = '/api/forecast/menus/' + this.selectedMenu.id;
             let response = await postApiData({url: url, form_data: formData, token: this.getToken()});
             if(response.success){
+                let mrp_forecastable_type = null;
+                if(this.selectedType.value == 'restaurant'){
+                    mrp_forecastable_type = "menu"
+                }
+                if(this.selectedType.value == 'ktv'){
+                    mrp_forecastable_type = "entity"
+                }
                 this.menuTableList.push({
                     menuName: response.data.menu,
                     menu_id: response.data.id,
+                    mrp_forecastable_id: response.data.id,
                     quantity: response.data.quantity,
-                    amount: response.data.total_menu_forecast_amt
+                    amount: response.data.total_menu_forecast_amt,
+                    mrp_forecastable_type : mrp_forecastable_type
                 })
                 this.selectedMenuCategory = null;
                 this.selectedMenu = null;
@@ -549,16 +561,34 @@ export default {
             this.createMenuForcasting();
         },
         async createMenuForcasting(){
+            let hrList = [];
+            this.hrList.forEach(hr => {
+                hrList.push({
+                    role_id : hr.role_id,
+                    total_duration : hr.total_working_hour
+                })
+            });
+            let rawList = [];
+            this.rawMaterialList.forEach(raw => {
+                rawList.push({
+                    uom_id : raw.uom_id,
+                    quantity : raw.total_uom_amt,
+                    amount : raw.average_price * raw.total_uom_amt,
+                    item_id : raw.item_id
+                })
+            });
+            
             let formData = new FormData();
             formData.append("type", this.selectedType.value);
             formData.append("date", this.selectedMonth);
-            formData.append("target_mrps", JSON.stringify(this.menuTableList));
-            formData.append("forecast_hr", JSON.stringify(this.hrList));
-            formData.append("forecast_raw", JSON.stringify(this.rawMaterialList));
+            formData.append("target_mrp", JSON.stringify(this.menuTableList));
+            formData.append("forecast_hr", JSON.stringify(hrList));
+            formData.append("forecast_raw", JSON.stringify(rawList));
             let url = '/api/forecasts';
             let response = await postApiData({url: url, form_data: formData, token: this.getToken()});
             if(response.success){
                 // this.rawMaterialList = response.data;
+                window.location.replace('/menu_forecasting');
             }
         },
 

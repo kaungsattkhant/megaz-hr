@@ -3,22 +3,21 @@
         <div v-show="is_step == 1">
             <div class="mb-4 ">
                 <p class="text-lg font-semibold font-inter">
-                    Add Menu Forecasting
+                    Edit Menu Forecasting
                 </p>
             </div>
-    
             <div class="grid !grid-cols-12 gap-x-8 bg-white p-8 rounded-md shadow-md mb-8">
                 <div class="mb-4 col-span-3 rounded-md">
                     <label for="" class="label-form mb-3">
                         Month
                     </label>
-                    <input type="month" v-model="selectedMonth" class="input-ui" :min="minDate">
+                    <input type="date" v-model="selectedMonth" class="input-ui">
                 </div>
                 <div class="mb-4 col-span-3 rounded-md">
                     <label for="" class="label-form mb-3">
                         Type
                     </label>
-                    <div class="bg-white mb-0 w-full text-sm inline-block"
+                    <div class="mb-0 w-full text-sm inline-block h-max select-ui"
                         data-te-select-wrapper-ref>
                         <select data-te-select-init data-te-select-placeholder="Select Type"
                             data-te-select-filter="true" name="" id="" v-model="selectedType" class="input-ui">
@@ -68,9 +67,7 @@
                         Add
                     </button>
                 </div>
-    
             </div>
-
             <div class=" bg-white py-4 px-8 rounded-md shadow-md mb-8">
                 <div class="table-container">
                     <table class="primary-table">
@@ -112,12 +109,7 @@
     
                     </table>
                 </div>
-    
-                
-    
             </div>
-            
-            
             <div>
                 <button class="add-btn" @click="clickedBtnCreate()">
                     Create
@@ -130,15 +122,15 @@
                     <label for="" class="label-form mb-3">
                         Month 
                     </label>
-                    <input type="month" v-model="selectedMonth" class="input-ui">
+                    <input type="date" v-model="selectedMonth" class="input-ui"  :disabled="this.is_disable_step_2" :class="this.is_disable_step_2 ? 'cursor-not-allowed opacity-60 !bg-gray-300' : ''">
                 </div>
                 <div class="mb-4 col-span-3 rounded-md">
                     <label for="" class="label-form mb-3">
                         Type
                     </label>
-                    <div class="bg-white mb-0 w-full text-sm inline-block"
+                    <div class="mb-0 w-full text-sm inline-block h-max select-ui"
                         data-te-select-wrapper-ref>
-                        <select data-te-select-init data-te-select-placeholder="Select Type"
+                        <select data-te-select-init data-te-select-placeholder="Select Type" :disabled="this.is_disable_step_2" :class="this.is_disable_step_2 ? 'cursor-not-allowed opacity-60 !bg-gray-300' : ''"
                             data-te-select-filter="true" name="" id="" v-model="selectedType" class="input-ui">
                             <option :value="type" v-for="(type, typeIndex) in typeList"
                                 :key="typeIndex"> {{ type.name }} </option>
@@ -167,7 +159,6 @@
                             data-te-toggle="pill" data-te-target="#tabs-hr" role="tab"
                             aria-controls="tabs-hr" aria-selected="true">HR</a>
                     </li>
-                    
                 </ul>
     
                 <div class="bg-white py-4 px-8 rounded-tr-md rounded-bl-md rounded-br-md shadow-md mb-8 -mt-0.5 z-30 relative">
@@ -255,11 +246,12 @@
                                             {{ raw.name }}
                                         </td>
                                         <td class="">
-                                            {{ parseInt(parseInt(raw.total_uom_amt)/raw.uom_conversion) }} {{ raw.base_uom_name }}
-                                            {{ ( (parseInt(raw.total_uom_amt)/raw.uom_conversion) - (parseInt(parseInt(raw.total_uom_amt)/raw.uom_conversion)))*raw.uom_conversion  }} {{ raw.uom_name }}
+                                            <!-- {{ parseInt(parseInt(raw.total_uom_amt)/raw.uom_conversion) }} {{ raw.base_uom_name }}
+                                            {{ ( (parseInt(raw.total_uom_amt)/raw.uom_conversion) - (parseInt(parseInt(raw.total_uom_amt)/raw.uom_conversion)))*raw.uom_conversion  }} {{ raw.uom_name }} -->
+                                              {{ raw.total_uom_amt }}
                                         </td>
                                         <td class="">
-                                            {{ raw.uom_name }}
+                                            {{ raw.item_uom }}
                                         </td>
                                         <td class="">
                                             {{ raw.average_price * raw.total_uom_amt }}
@@ -454,6 +446,7 @@ export default {
     components: {
         Multiselect
     },
+    props: ["menuForecastingId"],
     data() {
         return {
             is_step : 1,
@@ -492,12 +485,38 @@ export default {
 
             selectedItem:null,
             isNewPo:false,
+
+            is_disable_step_2:true,
+
+            detail:null,
         };
     },
 
     methods: {
         ...mapGetters(['getToken']),
-        
+        async getMenuForecastDetail() {
+            let response = await getApiData({ url: `/api/forecasts_monthly_menu/${this.menuForecastingId}`, token: this.getToken() });
+            if (response.data) {
+                this.detail = response.data;
+                this.addDetail(response.data);
+            }
+        },
+        addDetail(detail){
+            this.selectedMonth = detail.date;
+            this.selectedType = this.typeList.find(type => type.value === detail.type );
+            detail.target_mrp_forecasts.forEach(mrp => {
+                this.menuTableList.push({
+                    id:mrp.id,
+                    mrp_forecast_id : mrp.mrp_forecast_id,
+                    // menuName: menu ,
+                    menu_id: mrp.mrp_forecastable_id, // menu id = mrp_forecastable_id
+                    mrp_forecastable_id: mrp.mrp_forecastable_id,
+                    quantity: mrp.quantity,
+                    amount: mrp.amount,
+                    mrp_forecastable_type : mrp.mrp_forecastable_type
+                })  
+            });
+        },
         async getMenuCategoryList() {
             let response = await getApiData({ url: `/api/menu_categories`, token: this.getToken() });
             if (response.data) {
@@ -542,11 +561,19 @@ export default {
             let url = '/api/forecast/menus/' + this.selectedMenu.id;
             let response = await postApiData({url: url, form_data: formData, token: this.getToken()});
             if(response.success){
+                let mrp_forecastable_type = null;
+                if(this.selectedType.value == 'restaurant'){
+                    mrp_forecastable_type = "menu"
+                }
+                if(this.selectedType.value == 'ktv'){
+                    mrp_forecastable_type = "entity"
+                }
                 this.menuTableList.push({
                     menuName: response.data.menu,
                     menu_id: response.data.id,
                     quantity: response.data.quantity,
-                    amount: response.data.total_menu_forecast_amt
+                    amount: response.data.total_menu_forecast_amt,
+                    mrp_forecastable_type : mrp_forecastable_type
                 })
                 this.selectedMenuCategory = null;
                 this.selectedMenu = null;
@@ -557,22 +584,43 @@ export default {
             this.createMenuForcasting();
         },
         async createMenuForcasting(){
+            let hrList = [];
+            this.hrList.forEach(hr => {
+                hrList.push({
+                    role_id : hr.role_id,
+                    total_duration : hr.total_working_hour
+                })
+            });
+            let rawList = [];
+            this.rawMaterialList.forEach(raw => {
+                rawList.push({
+                    uom_id : raw.uom_id,
+                    quantity : raw.total_uom_amt,
+                    amount : raw.average_price * raw.total_uom_amt,
+                    item_id : raw.item_id
+                })
+            });
+            
             let formData = new FormData();
             formData.append("type", this.selectedType.value);
             formData.append("date", this.selectedMonth);
-            formData.append("target_mrps", JSON.stringify(this.menuTableList));
-            let url = '/api/forecasts';
+            formData.append("target_mrp", JSON.stringify(this.menuTableList));
+            formData.append("forecast_hr", JSON.stringify(hrList));
+            formData.append("forecast_raw", JSON.stringify(rawList));
+            let url = `/api/forecasts_monthly_menu/${this.menuForecastingId}`;
             let response = await postApiData({url: url, form_data: formData, token: this.getToken()});
             if(response.success){
                 // this.rawMaterialList = response.data;
+                window.location.replace('/menu_forecasting');
             }
         },
 
         async clickedBtnCreate(){
             this.is_step = 2;
             initTE({ Modal });
-            // this.getRawMaterial();
-            // this.getHr();
+            this.getMenuTableList();
+            this.getRawMaterialList();
+            this.getHrList();
             
         },
         async getMenuTableList(){
@@ -615,15 +663,6 @@ export default {
                 initTE({ Modal });
             }
         },
-        // async getRawMaterial(){
-        //     let formData = new FormData();
-        //     formData.append("quantity", this.quantity);
-        //     let url = '/api/forecast/raw_materials/' + this.selectedMenu.id;
-        //     let response = await postApiData({url: url, form_data: formData, token: this.getToken()});
-        //     if(response.success){
-        //         this.rawMaterialList = response.data;
-        //     }
-        // },
         async getHrList(){
             let formData = new FormData();
             formData.append("forecast_datas", JSON.stringify(this.menuTableList));
@@ -634,15 +673,6 @@ export default {
                 initTE({ Modal });
             }
         },
-        // async getHr(){
-        //     let formData = new FormData();
-        //     formData.append("quantity", this.quantity);
-        //     let url = '/api/forecast/hr/' + this.selectedMenu.id;
-        //     let response = await postApiData({url: url, form_data: formData, token: this.getToken()});
-        //     if(response.success){
-        //         this.hrList = response.data;
-        //     }
-        // },
         btnClickPoModal(raw){
             this.selectedItem = raw
             this.itemSelectChanged();
@@ -665,7 +695,7 @@ export default {
             let url = '/api/forecasts/purchase_orders_item/' + this.selectedItem.item_id;
             let response = await postApiData({url: url, form_data: formData, token: this.getToken()});
             if(response.success){
-                
+                this.donePoModal();
             }
         },
 
@@ -727,15 +757,17 @@ export default {
         this.getMenuCategoryList();
         this.getPoList();
         this.getUomList();
+        this.getMenuForecastDetail();
     },
 
     mounted() {
         initTE({ Modal, Select, Tab, Ripple });
         const today = new Date();
+        console.log(today)
         const year = today.getFullYear();
         const month = String(today.getMonth() + 1).padStart(2, "0"); 
         this.minDate = `${year}-${month}`; 
-        this.selectedMonth = `${year}-${month}`; 
+        // this.selectedMonth = `${year}-${month}`; 
     }
 }
 </script>
