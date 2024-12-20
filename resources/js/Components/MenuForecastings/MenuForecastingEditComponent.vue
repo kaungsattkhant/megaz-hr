@@ -112,7 +112,7 @@
             </div>
             <div>
                 <button class="add-btn" @click="clickedBtnCreate()">
-                    Create
+                    Calculate
                 </button>
             </div>
         </div>
@@ -612,12 +612,17 @@ export default {
         },
 
         async clickedBtnCreate(){
-            this.is_step = 2;
-            initTE({ Modal });
-            this.getMenuTableList();
-            this.getRawMaterialList();
-            this.getHrList();
-            
+            if(this.menuTableList.length < 1){
+                this.alertValidationMessage(`Menu`);
+                return 1;
+            }
+            else {
+                this.is_step = 2;
+                initTE({ Modal });
+                this.getMenuTableList();
+                this.getRawMaterialList();
+                this.getHrList();
+            }
         },
         async getMenuTableList(){
             let formData = new FormData();

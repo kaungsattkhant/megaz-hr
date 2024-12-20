@@ -55,14 +55,14 @@
                         </thead>
                         <tbody>
                             <!-- looping start -->
-                            <div class="contents" v-for="(menuForecasting, index) in menuForecastingList" :key="index">
+                            <div class="contents" v-for="(menuForecasting, index) in menuForecastingTable" :key="index">
                                 <tr class="">
                                     <td class=" font-medium ">
                                         <!-- {{ perPage * (currentPage - 1) + (++index) }} -->
                                         {{ index+1 }}
                                     </td>
                                     <td class="whitespace-nowrap">
-                                        {{ menuForecasting.month }}
+                                        {{ menuForecasting.date }}
                                     </td>
                                     <td class="whitespace-nowrap">
                                         {{ menuForecasting.amount }}
@@ -166,6 +166,7 @@ export default {
     data() {
         return {
             menuForecastingList: [],
+            menuForecastingTable: [],
             typeList:[
                 // 'KTV','restaurant',
                 {name: 'KTV',value: 'ktv'},
@@ -183,7 +184,7 @@ export default {
             url_search:'',
             url_department:'',
             url_role:'',
-            url_type:`?type=['ktv','restaurant']`,
+            url_type:'',
             deleteId:null,
         };
     },
@@ -207,11 +208,18 @@ export default {
             // let url = `/api/objectives`;
             let response = await getApiData({ url: url, token: this.getToken() });
             if (response.data) {
-                this.menuForecastingList = response.data.data;
-                this.lastPage = response.data.last_page;
-                this.currentPage = pageNumber;
-                this.perPage = response.data.per_page;
-                // this.totalData = response.data.total;
+                this.menuForecastingList = response.data;
+                this.menuForecastingList.forEach(forecasting => {
+                    let total_amount = 0;
+                    forecasting.mrp_raw_materials.forEach(raw => {
+                        total_amount += raw.amount;
+                    });
+                    forecasting.amount = total_amount
+                });
+                this.menuForecastingTable = this.menuForecastingList
+                // this.lastPage = response.data.last_page;
+                // this.currentPage = pageNumber;
+                // this.perPage = response.data.per_page;
             }
         },
         selectedTypeChanged(){
