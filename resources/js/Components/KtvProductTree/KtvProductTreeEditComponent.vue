@@ -30,6 +30,19 @@
             <div class="grid !grid-cols-12 gap-x-8 mb-5">
                 <div class=" col-span-3 rounded-md">
                     <label for="" class="label-form mb-3">
+                        Department
+                    </label>
+                    <div class="bg-white mb-0 w-full text-sm inline-block h-[34px] !text-black"
+                        data-te-select-wrapper-ref>
+                        <select data-te-select-init data-te-select-placeholder="Select Objective" @change="changedDepartment()"
+                            data-te-select-filter="true" name="" id="" v-model="selectedDepartment" class="input-ui !text-black">
+                            <option :value="department" v-for="(department, index) in departmentList"
+                                :key="index"> {{ department.name }} </option>
+                        </select>
+                    </div>
+                </div>
+                <div class=" col-span-3 rounded-md">
+                    <label for="" class="label-form mb-3">
                         Objective Name
                     </label>
                     <div class="bg-white mb-0 w-full text-sm inline-block h-[34px] !text-black"
@@ -37,7 +50,7 @@
                         <select data-te-select-init data-te-select-placeholder="Select Objective"
                             data-te-select-filter="true" name="" id="" v-model="selectedObjective" class="input-ui !text-black">
                             <option :value="objective" v-for="(objective, index) in objectiveList"
-                                :key="index"> {{ objective.objective_name }} </option>
+                                :key="index"> {{ objective.name }} </option>
                         </select>
                     </div>
                 </div>
@@ -48,7 +61,7 @@
                     <button class="add-btn py-[8px]" @click="addObj()">
                         Add
                     </button>
-                </div><div class="col-span-12"></div>
+                </div><div class="col-span-5"></div>
             </div>
             <div class="">
                 <div class="table-container">
@@ -193,6 +206,10 @@ export default {
             productTreeDetail:null,
             inputs: [{ value: "",name: "" }],  // Start with one input box
 
+            departmentList:[],
+            selectedDepartment:null,
+            url_department:null,
+
         };
     },
 
@@ -213,11 +230,11 @@ export default {
             detail.ktv_objectives.forEach(obj => {
                 this.obj_list.push({ 
                     // id: obj.id,
-                    name: obj.objective_name,
-                    role_id: obj.role_id,
-                    role_name: obj.role_name, 
-                    duration: obj.total_duration,
-                    obj_id:obj.objective_id,
+                    name: obj.objective_key.name,
+                    role_id: obj.objective_key.role_id,
+                    role_name: obj.objective_key.role.name, 
+                    duration: obj.objective_key.duration,
+                    obj_id:obj.objective_key_id,
                     // id:this.testList.find(test => test.objective_name === this.selectedObjective.objective_name ).id 
                 }); 
             });
@@ -241,8 +258,20 @@ export default {
             }
         },
 
-        async getObjectiveList(){
-            let response = await getApiData({url: `/api/ktv/objectives`, token: this.getToken()});
+        async getDepartmentList(){
+            const response = await getApiData({ url: '/api/departments' , token: this.getToken() });
+            if(response.data){
+                    this.departmentList = response.data;
+                    console.log('department')
+            }
+        },
+        changedDepartment(){
+            this.url_department = '/' + this.selectedDepartment.id;
+            this.getObjectiveList(this.url_department)
+        },
+
+        async getObjectiveList(department){
+            let response = await getApiData({url: `/api/ktv/objectives` + department, token: this.getToken()});
             if(response.data){
                 this.objectiveList = response.data;
             }
@@ -298,7 +327,7 @@ export default {
             
             let formData = new FormData();
             formData.append('entity_id', this.selectedRoom);
-            formData.append('objectives', JSON.stringify(obj_list));
+            formData.append('objective_keys', JSON.stringify(obj_list));
             formData.append('items', JSON.stringify(item_list));
             let response = await postApiData({ url: '/api/ktv/objective_trees/' + this.productTreeId, form_data: formData, token: this.getToken() });
             if (response.success) {
@@ -325,10 +354,10 @@ export default {
             }
             else{
                 this.obj_list.push({ 
-                    name: this.selectedObjective.objective_name,
+                    name: this.selectedObjective.name,
                     role_id: this.selectedObjective.role_id,
                     role_name: this.selectedObjective.role_name, 
-                    duration: this.selectedObjective.total_duration,
+                    duration: this.selectedObjective.duration,
                     obj_id:this.selectedObjective.id,
                     // id:this.testList.find(test => test.objective_name === this.selectedObjective.objective_name ).id
                 }); 
@@ -378,7 +407,7 @@ export default {
     async created() {
         this.getProductTreeDetail();
         this.getRoomList();
-        this.getObjectiveList();
+        this.getDepartmentList();
         this.getItemList();
         this.test();
     },

@@ -6,16 +6,27 @@
             </p>
         </div>
 
-        <div class="grid grid-rows-3 grid-cols-12 grid-flow-col gap-x-8 bg-white p-8 rounded-md shadow-md mb-8">
-            <div class="mb-4 row-span-2 col-span-12 w-48 pb-6 rounded-md">
+        <div class="grid grid-cols-12 gap-x-8 bg-white p-8 rounded-md shadow-md mb-8">
+            <div class="mb-6 col-span-3 rounded-md">
                 <label for="" class="block text-sm text-black mb-3">
                     Date
                 </label>
                 <input type="date" v-model="date" disabled
                     class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
             </div>
+            <!-- <div class="col-span-3">
+                <label for="" class="block text-sm text-black mb-3">
+                    Type
+                </label>
+                <select name="" id="" v-model="selectedType" @change="typeChanged()"
+                    class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
+                    <option value="creditor"> Creditor</option>
+                    <option value="other_payable"> Other Payable</option>
+                </select>
+            </div><div class="col-span-6"></div> -->
+            <div class="col-span-9"></div>
 
-            <div class="col-span-3">
+            <div class="col-span-3 mb-4">
                 <label for="" class="block text-sm text-black mb-3">
                     Item Name
                 </label>
@@ -53,136 +64,149 @@
             </select>
         </div> -->
 
-        <div class="grid grid-rows-3 grid-flow-col gap-x-8 bg-white p-8 rounded-md shadow-md mb-8">
-            <table class="w-full primary-table rounded-xl text-center text-sm font-light ">
-                <thead class="border-b font-medium ">
-                    <tr>
-                        <th scope="col" class=" px-6 py-4 ">
-                            Item
-                        </th>
-                        <th scope="col" class=" px-6 py-4 ">
-                            Uom
-                        </th>
-                        <th scope="col" class=" px-4 py-4 ">
-                            Original Qty
-                        </th>
-                        <th scope="col" class=" px-4 py-4 ">
-                            Current Qty
-                        </th>
-                        <th scope="col" class=" px-4 py-4 ">
-                            Left Qty
-                        </th>
-                        <th scope="col" class=" px-2 py-2 ">
-                            Edit
-                        </th>
-                        <th scope="col" class=" px-6 py-4 ">
-                            Amount
-                        </th>
-                        <th scope="col" class=" px-8 py-4 ">
-                            Supplier
-                        </th>
-                        <th scope="col" class=" px-2 py-4 ">
-                            Paid Amount
-                        </th>
-                        <th scope="col" class=" px-2 py-4 ">
-                            Invoice Id
-                        </th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <div class="contents" v-for="(purchaseOrderItem, purchaseOrderItemsIndex) in purchaseOrderItems"
-                        :key="purchaseOrderItemsIndex">
-                        <tr class="bg-white rounded-lg overflow-hidden shadow-lg">
-                            <td class=" px-6 py-4 font-medium ">
-                                {{ purchaseOrderItem.item.name }}
-                            </td>
-                            <td class=" px-6 py-4 font-medium ">
-                                {{ purchaseOrderItem.uom.name }}
-                            </td>
-                            <td class=" px-4 py-4 font-medium ">
-                                {{ purchaseOrderItem.original_quantity }}
-                            </td>
-                            <td class=" px-4 py-4 font-medium ">
-                                {{ purchaseOrderItem.quantity }}
-                            </td>
-                            <td class=" px-4 py-4 font-medium ">
-                                <div v-if="purchaseOrderItem.purchase_order_item_left">
-                                    {{ purchaseOrderItem.purchase_order_item_left.quantity }}
-                                </div>
-                            </td>
-                            <td class=" px-2 py-2 font-medium ">
-                                <button data-te-toggle="modal" data-te-target="#editModal"
-                                @click="editPurchaseOrderItemBtnClicked(purchaseOrderItemsIndex)">
-                                    <i class="fal fa-pencil  pr-3"></i>
-                                </button>
-                            </td>
-                            <td class=" px-6 py-4 font-medium ">
-                                {{ (purchaseOrderItem.quantity * purchaseOrderItem.amount).toLocaleString() }}
-                            </td>
-                            <td class=" px-8 py-4 font-medium ">
-                                <div>
-                                    <select name="" id="" v-model="purchaseOrderItem.supplier"
+        <div class="overflow-x-auto bg-white p-8 rounded-md shadow-md mb-8">
+            <div class="table-container">
+                <table class="primary-table">
+                    <thead class="border-b font-medium ">
+                        <tr>
+                            <th scope="col" class=" px-6 py-4 ">
+                                Item
+                            </th>
+                            <th scope="col" class=" px-6 py-4 ">
+                                Uom
+                            </th>
+                            <th scope="col" class=" px-4 py-4 ">
+                                Original Qty
+                            </th>
+                            <th scope="col" class=" px-4 py-4 ">
+                                Current Qty
+                            </th>
+                            <th scope="col" class=" px-4 py-4 ">
+                                Left Qty
+                            </th>
+                            <th scope="col" class=" px-2 py-2 ">
+                                Edit
+                            </th>
+                            <th scope="col" class=" px-6 py-4 ">
+                                Amount
+                            </th>
+                            <th scope="col" class=" px-8 py-4 ">
+                                Type
+                            </th>
+                            <th scope="col" class=" px-8 py-4 ">
+                                Supplier
+                            </th>
+                            <th scope="col" class=" px-2 py-4 ">
+                                Paid Amount
+                            </th>
+                            <th scope="col" class=" px-2 py-4 ">
+                                Invoice Id
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <div class="contents" v-for="(purchaseOrderItem, purchaseOrderItemsIndex) in purchaseOrderItems"
+                            :key="purchaseOrderItemsIndex">
+                            <tr class="bg-white ">
+                                <td class=" px-6 py-4 font-medium ">
+                                    {{ purchaseOrderItem.item.name }}
+                                </td>
+                                <td class=" px-6 py-4 font-medium ">
+                                    {{ purchaseOrderItem.uom.name }}
+                                </td>
+                                <td class=" px-4 py-4 font-medium ">
+                                    {{ purchaseOrderItem.original_quantity }}
+                                </td>
+                                <td class=" px-4 py-4 font-medium ">
+                                    {{ purchaseOrderItem.quantity }}
+                                </td>
+                                <td class=" px-4 py-4 font-medium ">
+                                    <div v-if="purchaseOrderItem.purchase_order_item_left">
+                                        {{ purchaseOrderItem.purchase_order_item_left.quantity }}
+                                    </div>
+                                </td>
+                                <td class=" px-2 py-2 font-medium ">
+                                    <button data-te-toggle="modal" data-te-target="#editModal"
+                                    @click="editPurchaseOrderItemBtnClicked(purchaseOrderItemsIndex)">
+                                        <i class="fal fa-pencil  pr-3"></i>
+                                    </button>
+                                </td>
+                                <td class=" px-6 py-4 font-medium ">
+                                    {{ (purchaseOrderItem.quantity * purchaseOrderItem.amount).toLocaleString() }}
+                                </td>
+                                <td class=" px-8 py-4 font-medium ">
+                                    <div>
+                                        <select name="" id="" v-model="purchaseOrderItem.type"
+                                            class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0"
+                                            @change="typeChanged(purchaseOrderItemsIndex)">
+                                            <option value="creditor"> Creditor</option>
+                                            <option value="other_payable"> Other Payable</option>
+                                        </select>
+                                    </div>
+                                </td>
+                                <td class=" px-8 py-4 font-medium ">
+                                    <div>
+                                        <select name="" id="" v-model="purchaseOrderItem.supplier"
+                                            class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0"
+                                            @input="selectPOItemSupplierBtnClicked(purchaseOrderItem, purchaseOrderItemsIndex)">
+                                            <option :value="poItemSupplier"
+                                                v-for="(poItemSupplier, poItemSupplierIndex) in purchaseOrderItem.item.suppliers"
+                                                :key="poItemSupplierIndex">
+                                                {{ poItemSupplier.name }}
+                                            </option>
+                                        </select>
+                                    </div>
+                                </td>
+                                <td class=" px-2 py-4 font-medium ">
+                                    <input type="number" @input="validateNumberInput(purchaseOrderItemsIndex)"
+                                        pattern="[0-9]" title="Please enter only numbers"
+                                        :disabled="purchaseOrderItem.type == 'creditor'" :class="purchaseOrderItem.type == 'creditor' ? 'bg-gray-400 cursor-not-allowed' : ''"
+                                        v-model="purchaseOrderItem.invoice_amount"
                                         class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0"
-                                        @input="selectPOItemSupplierBtnClicked(purchaseOrderItem, purchaseOrderItemsIndex)">
-                                        <option :value="poItemSupplier"
-                                            v-for="(poItemSupplier, poItemSupplierIndex) in purchaseOrderItem.item.suppliers"
-                                            :key="poItemSupplierIndex">
-                                            {{ poItemSupplier.name }}
-                                        </option>
-                                    </select>
-                                </div>
-                            </td>
-                            <td class=" px-2 py-4 font-medium ">
-                                <input type="number" @input="validateNumberInput(purchaseOrderItemsIndex)"
-                                    pattern="[0-9]" title="Please enter only numbers"
-                                    v-model="purchaseOrderItem.invoice_amount"
-                                    class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0"
-                                    placeholder="Paid Amount">
-                            </td>
-                            <td class=" px-2 py-4 font-medium ">
-                                <input type="text" v-model="purchaseOrderItem.invoice_no"
-                                    class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0"
-                                    placeholder="Invoice Id">
-                            </td>
-                        </tr>
-                        <tr class="">
-                            <td class=" py-2 "></td>
-                        </tr>
-                    </div>
-                    <div class="contents">
-                        <tr class="bg-white rounded-lg overflow-hidden shadow-lg">
-                            <td class=" px-6 py-4 font-medium ">
-                                &nbsp;
-                            </td>
-                            <td class=" px-6 py-4 font-medium ">
-                                &nbsp;
-                            </td>
-                            <td class=" px-6 py-4 font-medium ">
-                                &nbsp;
-                            </td>
-                            <td class=" px-6 py-4 font-medium ">
-                                &nbsp;
-                            </td>
-                            <td class=" px-6 py-4 font-medium ">
-                                &nbsp;
-                            </td>
-                            <td class=" px-6 py-4 font-medium ">
-                                &nbsp;
-                            </td>
-                            <td class="px-6 py-4">
-                                {{ totalPrice.toLocaleString() }}
-                            </td>
-                            <td class=" px-6 py-4 font-medium ">
-                                &nbsp;
-                            </td>
-                            <td class=" px-6 py-4 font-medium ">
-                                &nbsp;
-                            </td>
-                        </tr>
-                    </div>
-
-                </tbody>
-            </table>
+                                        placeholder="Paid Amount">
+                                </td>
+                                <td class=" px-2 py-4 font-medium ">
+                                    <input type="text" v-model="purchaseOrderItem.invoice_no"
+                                        class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0"
+                                        placeholder="Invoice Id">
+                                </td>
+                            </tr>
+                        </div>
+                        <div class="contents">
+                            <tr class="">
+                                <td class=" px-6 py-4 font-medium ">
+                                    &nbsp;
+                                </td>
+                                <td class=" px-6 py-4 font-medium ">
+                                    &nbsp;
+                                </td>
+                                <td class=" px-6 py-4 font-medium ">
+                                    &nbsp;
+                                </td>
+                                <td class=" px-6 py-4 font-medium ">
+                                    &nbsp;
+                                </td>
+                                <td class=" px-6 py-4 font-medium ">
+                                    &nbsp;
+                                </td>
+                                <td class=" px-6 py-4 font-medium ">
+                                    &nbsp;
+                                </td>
+                                <td class="px-6 py-4">
+                                    {{ totalPrice.toLocaleString() }}
+                                </td>
+                                <td class=" px-6 py-4 font-medium ">
+                                    &nbsp;
+                                </td>
+                                <td class=" px-6 py-4 font-medium ">
+                                    &nbsp;
+                                </td>
+                            </tr>
+                        </div>
+    
+                    </tbody>
+                </table>
+            </div>
         </div>
         <div>
             <button class="add-btn" data-te-toggle="modal" data-te-target="#buyModal" @click="buyPurchaseOrderBtnClicked">
@@ -331,6 +355,8 @@ export default {
             editPurchaseOrderItem: null,
 
             totalPrice: 0,
+
+            selectedType:null,
         };
     },
 
@@ -516,6 +542,11 @@ export default {
                 this.totalPrice += (item.amount * item.quantity);
             });
         },
+        typeChanged(index){
+            if(this.purchaseOrderItems[index].type == 'creditor'){
+                this.purchaseOrderItems[index].invoice_amount = 0
+            }
+        }
     },
 
     created() {

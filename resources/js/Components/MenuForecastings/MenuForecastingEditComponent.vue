@@ -3,10 +3,9 @@
         <div v-show="is_step == 1">
             <div class="mb-4 ">
                 <p class="text-lg font-semibold font-inter">
-                    Add Menu Forecasting
+                    Edit Menu Forecasting
                 </p>
             </div>
-    
             <div class="grid !grid-cols-12 gap-x-8 bg-white p-8 rounded-md shadow-md mb-8">
                 <div class="mb-4 col-span-3 rounded-md">
                     <label for="" class="label-form mb-3">
@@ -447,6 +446,7 @@ export default {
     components: {
         Multiselect
     },
+    props: ["menuForecastingId"],
     data() {
         return {
             is_step : 1,
@@ -487,12 +487,36 @@ export default {
             isNewPo:false,
 
             is_disable_step_2:true,
+
+            detail:null,
         };
     },
 
     methods: {
         ...mapGetters(['getToken']),
-        
+        async getMenuForecastDetail() {
+            let response = await getApiData({ url: `/api/forecasts_monthly_menu/${this.menuForecastingId}`, token: this.getToken() });
+            if (response.data) {
+                this.detail = response.data;
+                this.addDetail(response.data);
+            }
+        },
+        addDetail(detail){
+            this.selectedMonth = detail.date;
+            this.selectedType = this.typeList.find(type => type.value === detail.type );
+            detail.target_mrp_forecasts.forEach(mrp => {
+                this.menuTableList.push({
+                    id:mrp.id,
+                    mrp_forecast_id : mrp.mrp_forecast_id,
+                    // menuName: menu ,
+                    menu_id: mrp.mrp_forecastable_id, // menu id = mrp_forecastable_id
+                    mrp_forecastable_id: mrp.mrp_forecastable_id,
+                    quantity: mrp.quantity,
+                    amount: mrp.amount,
+                    mrp_forecastable_type : mrp.mrp_forecastable_type
+                })  
+            });
+        },
         async getMenuCategoryList() {
             let response = await getApiData({ url: `/api/menu_categories`, token: this.getToken() });
             if (response.data) {
@@ -547,7 +571,6 @@ export default {
                 this.menuTableList.push({
                     menuName: response.data.menu,
                     menu_id: response.data.id,
-                    mrp_forecastable_id: response.data.id,
                     quantity: response.data.quantity,
                     amount: response.data.total_menu_forecast_amt,
                     mrp_forecastable_type : mrp_forecastable_type
@@ -584,7 +607,7 @@ export default {
             formData.append("target_mrp", JSON.stringify(this.menuTableList));
             formData.append("forecast_hr", JSON.stringify(hrList));
             formData.append("forecast_raw", JSON.stringify(rawList));
-            let url = '/api/forecasts';
+            let url = `/api/forecasts_monthly_menu/${this.menuForecastingId}`;
             let response = await postApiData({url: url, form_data: formData, token: this.getToken()});
             if(response.success){
                 // this.rawMaterialList = response.data;
@@ -640,15 +663,6 @@ export default {
                 initTE({ Modal });
             }
         },
-        // async getRawMaterial(){
-        //     let formData = new FormData();
-        //     formData.append("quantity", this.quantity);
-        //     let url = '/api/forecast/raw_materials/' + this.selectedMenu.id;
-        //     let response = await postApiData({url: url, form_data: formData, token: this.getToken()});
-        //     if(response.success){
-        //         this.rawMaterialList = response.data;
-        //     }
-        // },
         async getHrList(){
             let formData = new FormData();
             formData.append("forecast_datas", JSON.stringify(this.menuTableList));
@@ -659,15 +673,6 @@ export default {
                 initTE({ Modal });
             }
         },
-        // async getHr(){
-        //     let formData = new FormData();
-        //     formData.append("quantity", this.quantity);
-        //     let url = '/api/forecast/hr/' + this.selectedMenu.id;
-        //     let response = await postApiData({url: url, form_data: formData, token: this.getToken()});
-        //     if(response.success){
-        //         this.hrList = response.data;
-        //     }
-        // },
         btnClickPoModal(raw){
             this.selectedItem = raw
             this.itemSelectChanged();
@@ -752,6 +757,7 @@ export default {
         this.getMenuCategoryList();
         this.getPoList();
         this.getUomList();
+        this.getMenuForecastDetail();
     },
 
     mounted() {

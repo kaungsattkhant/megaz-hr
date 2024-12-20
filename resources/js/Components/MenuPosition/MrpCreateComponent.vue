@@ -688,7 +688,8 @@ export default {
                 return 1;
             }
             else{
-                let url = `/api/get_uom_conversion_by_uom?po_uom_id=${this.selectedUom.id}&item_uom_id=${this.selectedItem.uom_id}&item_price=${this.selectedItem.average_price}&base_uom_id=${this.selectedItem.base_uom_id}`;
+                let item_price = parseFloat(this.selectedItem.average_price)
+                let url = `/api/get_uom_conversion_by_uom?po_uom_id=${this.selectedUom.id}&item_uom_id=${this.selectedItem.uom_id}&item_price=${item_price}&base_uom_id=${this.selectedItem.base_uom_id}`;
                 let response = await getApiData({url: url, token: this.getToken()});
                 let uomConversion = null;
                 let amount = 0;

@@ -98,6 +98,9 @@ import KtvProductTreeCreateComponent from './Components/KtvProductTree/KtvProduc
 import KtvProductTreeEditComponent from './Components/KtvProductTree/KtvProductTreeEditComponent.vue';
 import MenuForecastingComponent from './Components/MenuForecastings/MenuForecastingComponent.vue';
 import MenuForecastingCreateComponent from './Components/MenuForecastings/MenuForecastingCreateComponent.vue';
+import MenuForecastingEditComponent from './Components/MenuForecastings/MenuForecastingEditComponent.vue';
+import CreditorListComponent from './Components/Creditor/CreditorListComponent.vue';
+import CreditorHistoryComponent from './Components/Creditor/CreditorHistoryComponent.vue';
 
 import LoginComponent from './Components/Auth/LoginComponent.vue';
 import LogoutComponent from './Components/Auth/LogoutComponent.vue';
@@ -210,6 +213,9 @@ app.component('KtvProductTreeCreateComponent', KtvProductTreeCreateComponent);
 app.component('KtvProductTreeEditComponent', KtvProductTreeEditComponent);
 app.component('MenuForecastingComponent', MenuForecastingComponent);
 app.component('MenuForecastingCreateComponent', MenuForecastingCreateComponent);
+app.component('MenuForecastingEditComponent', MenuForecastingEditComponent);
+app.component('CreditorListComponent', CreditorListComponent);
+app.component('CreditorHistoryComponent', CreditorHistoryComponent);
 
 app.component('PurchaseOrderListComponent', PurchaseOrderListComponent);
 app.component('PurchaseOrderCreateComponent', PurchaseOrderCreateComponent);

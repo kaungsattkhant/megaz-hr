@@ -23,7 +23,6 @@ class MRPForecastController extends Controller
 
     public function getForcastMenus(Request $request)
     {
-
         $data =  $this->mrpForecastRepository->getForcastMenus($request->all());
         ResponseData($data);
     }
@@ -70,9 +69,9 @@ class MRPForecastController extends Controller
         ResponseData($data);
     }
 
-    public function getMonthlyMenuForecasts(Request $request)
+    public function getMonthlyMenuForecasts(Request $request, $type)
     {
-        $data = $this->mrpForecastRepository->getMonthlyMenuForecasts($request->all());
+        $data = $this->mrpForecastRepository->getMonthlyMenuForecasts($request->all(), $type);
 
         ResponseData($data);
     }
@@ -114,6 +113,43 @@ class MRPForecastController extends Controller
     {
         $data = $this->mrpForecastRepository->deleteMonthlyMenuForecast($forecastId);
 
+        ResponseData($data);
+    }
+
+    public function getForecastKTV(Request $request)
+    {
+        $data =  $this->mrpForecastRepository->getForecastKTV($request->all());
+        ResponseData($data);
+    }
+
+
+    public function getForecastKTVByEntityId(Request $request, $entityId)
+    {
+        $data =  $this->mrpForecastRepository->getForecastKTVByEntityId($request->all(), $entityId);
+        ResponseData($data);
+    }
+
+    public function getForecastKTVRawMaterials(Request $request)
+    {
+        $data =  $this->mrpForecastRepository->getForecastKTVRawMaterials($request->all());
+        ResponseData($data);
+    }
+
+    public function getForecastKTVRawMaterialsByEntityId(Request $request, $entityId)
+    {
+        $data =  $this->mrpForecastRepository->getForecastKTVRawMaterialsByEntityId($request->all(), $entityId);
+        ResponseData($data);
+    }
+
+    public function getForecastKTVHr(Request $request)
+    {
+        $data =  $this->mrpForecastRepository->getForecastKTVHr($request->all());
+        ResponseData($data);
+    }
+
+    public function getForecastKTVHrByEntityId(Request $request, $entityId)
+    {
+        $data =  $this->mrpForecastRepository->getForecastKTVHrByEntityId($request->all(), $entityId);
         ResponseData($data);
     }
 }
