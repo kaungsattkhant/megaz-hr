@@ -508,7 +508,8 @@ export default {
                 this.menuTableList.push({
                     id:mrp.id,
                     mrp_forecast_id : mrp.mrp_forecast_id,
-                    // menuName: menu ,
+                    menuName: mrp.
+                    mrp_forecastable.name ,
                     menu_id: mrp.mrp_forecastable_id, // menu id = mrp_forecastable_id
                     mrp_forecastable_id: mrp.mrp_forecastable_id,
                     quantity: mrp.quantity,
