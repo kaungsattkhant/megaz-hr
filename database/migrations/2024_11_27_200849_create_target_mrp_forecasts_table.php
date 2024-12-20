@@ -20,7 +20,7 @@ return new class extends Migration
             $table->integer('amount');
             $table->integer('hour')->nullable();
             $table->timestamps();
-            // $table->softDeletes();
+            $table->softDeletes();
         });
     }
 
