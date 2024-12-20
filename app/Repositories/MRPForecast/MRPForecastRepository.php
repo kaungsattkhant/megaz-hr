@@ -19,6 +19,7 @@ use App\Services\MrpWorkingHour;
 use App\Models\PurchaseOrderItem;
 use App\Models\TargetMrpForecast;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Request;
 use App\Services\AveragePriceCalculator;
 use App\Http\Resources\HrForecastResource;
 use Illuminate\Database\Eloquent\Collection;
@@ -513,17 +514,38 @@ class MRPForecastRepository implements MRPForecastRepositoryInterface
   }
 
 
-  public function getMonthlyMenuForecasts($request, $type)
+  public function getMonthlyMenuForecasts($request)
   {
     $inventoryId = 6;
-    $forecastableType = ($type === 'restaurant') ? 'menu' : 'entity';
-    return $this->getForecastData($forecastableType, $inventoryId, $type);
+    $types = $request->input('type');
+    if (is_string($types)) {
+      $types = json_decode($types, true);
+    }
+    if (!is_array($types)) {
+      $types = [$types];
+    }
+
+    $forecastableTypesMap = [];
+    foreach ($types as $type) {
+
+      $forecastableTypesMap[] = ($type === 'restaurant' || $type === 'ktv') ? 'menu' : 'entity';
+    }
+
+    $results = [];
+    foreach ($forecastableTypesMap as $forecastableType) {
+
+      $data = $this->getForecastData($forecastableType, $inventoryId, $types);
+      $results = array_merge($results, $data->toArray());
+    }
+
+    return $results;
   }
 
 
-  private function  getForecastData($forecastableType, $inventoryId, $type)
+  private function  getForecastData($forecastableType, $inventoryId, array $types)
   {
-    return  MrpForecast::with([
+
+    return  MrpForecast::whereIn('type', $types)->with([
       'targetMrpForecasts' => function ($q)  use ($forecastableType) {
         $q->where('mrp_forecastable_type',  $forecastableType);
       },
@@ -539,14 +561,14 @@ class MRPForecastRepository implements MRPForecastRepositoryInterface
         ]);
       },
       'MrpRawMaterials.uom'
-    ])->where('type', $type)->get();
+    ])->get();
   }
 
   public function getMonthlyMenuForecastsById($mrpForecastId)
   {
     $inventoryId = 6;
     $mrpdata = MRPForecast::findOrFail($mrpForecastId);
-    $forecastableType = ($mrpdata->type === 'restaurant') ? 'menu' : 'entity';
+    $forecastableType = ($mrpdata->type === 'restaurant' || $mrpdata->type === 'ktv') ? 'menu' : 'entity';
 
     return $this->getForecastDataByType($mrpForecastId, $forecastableType, $inventoryId);
   }
@@ -634,17 +656,13 @@ class MRPForecastRepository implements MRPForecastRepositoryInterface
   }
 
 
-  public function deleteMenuForecast($request, $mrp_forecastable_id, $mrp_forecastable_type)
+  public function deleteMenuForecast($request, $target_mrp_forecast_id)
   {
 
-    // DB::beginTransaction();
+    DB::beginTransaction();
     try {
 
-      $mrp_forecast_id = $request->mrp_forecast_id;
-
-      $targetMenuMrp = TargetMrpForecast::where('mrp_forecastable_id', $mrp_forecastable_id)
-        ->where('mrp_forecastable_type', $mrp_forecastable_type)
-        ->where('mrp_forecast_id', $mrp_forecast_id)
+      $targetMenuMrp = TargetMrpForecast::where('id',  $target_mrp_forecast_id)
         ->first();
       $quantity =   $targetMenuMrp->quantity;
 
@@ -653,7 +671,7 @@ class MRPForecastRepository implements MRPForecastRepositoryInterface
       }
 
       $mrpForecast = $targetMenuMrp->mrpForecast;
-      if ($mrp_forecastable_type === 'menu') {
+      if ($targetMenuMrp->mrp_forecastable_type === 'menu') {
 
         $menuId = $targetMenuMrp->mrp_forecastable_id;
 
@@ -699,7 +717,7 @@ class MRPForecastRepository implements MRPForecastRepositoryInterface
             }
           }
         }
-      } elseif ($mrp_forecastable_type === 'entity') {
+      } elseif ($targetMenuMrp->mrp_forecastable_type === 'entity') {
 
         $mrpHrs = $mrpForecast->MrpHrs;
         $entityId = $targetMenuMrp->mrp_forecastable_id;
@@ -771,7 +789,7 @@ class MRPForecastRepository implements MRPForecastRepositoryInterface
             $rawMaterial->amount = $rawMaterial->amount;
           }
         }
-        // $targetMenuMrp->delete();
+        $targetMenuMrp->delete();
         DB::commit();
         return $ktvItems;
       }

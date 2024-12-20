@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('mrp_forecasts', function (Blueprint $table) {
             $table->id();
-            $table->enum('type', ['ktv', 'restaurant']);
+            $table->enum('type', ['ktv', 'restaurant', 'ktv_product_tree']);
             $table->date('date');
             $table->timestamps();
         });
