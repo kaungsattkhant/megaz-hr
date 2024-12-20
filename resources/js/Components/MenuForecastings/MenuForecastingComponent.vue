@@ -16,20 +16,13 @@
                 <button class="add-btn h-8" @click="clearSearchBtnClicked()">Clear</button>
             </div>
             <div class="flex pr-0 gap-x-4">
-                <!-- <div class="w-full !text-sm" data-te-select-wrapper-ref>
-                    <select data-te-select-init data-te-select-placeholder="Select Department" v-model="selectedDepartment"
-                    data-te-select-filter="true" class="input-ui w-full">
-                        <option value="all">All</option>
-                        <option v-for="(department,index) in departmentList" :key="index" :value="department"> {{ department.name }} </option>
+                <div class="w-full !text-sm" data-te-select-wrapper-ref>
+                    <select data-te-select-init data-te-select-placeholder="Select Type" @change="selectedTypeChanged()"
+                        data-te-select-filter="true" name="" id="" v-model="selectedType" class="input-ui">
+                        <option :value="type.value" v-for="(type, typeIndex) in typeList"
+                            :key="typeIndex"> {{ type.name }} </option>
                     </select>
                 </div>
-                <div class="w-full !text-sm" data-te-select-wrapper-ref>
-                    <select data-te-select-init data-te-select-placeholder="Select Role" v-model="selectedRole"
-                    data-te-select-filter="true" class="input-ui w-full">
-                        <option value="all">All</option>
-                        <option v-for="(role,index) in roleList" :key="index" :value="role"> {{ role.name }} </option>
-                    </select>
-                </div> -->
                 <a href="/menu_forecasting/create"
                     class="add-btn  h-8 whitespace-nowrap">
                     Add New
@@ -173,7 +166,12 @@ export default {
     data() {
         return {
             menuForecastingList: [],
-            
+            typeList:[
+                // 'KTV','restaurant',
+                {name: 'KTV',value: 'ktv'},
+                {name: 'Restaurant',value: 'restaurant'},
+            ],
+            selectedType:null,
             currentPage: 0,
             perPage: 0,
             lastPage: 0,
@@ -181,11 +179,11 @@ export default {
 
             searchInput:null,
 
-            url:'/api/objectives?page=',
+            url:'/api/forecasts_monthly_menus',
             url_search:'',
             url_department:'',
             url_role:'',
-
+            url_type:`?type=['ktv','restaurant']`,
             deleteId:null,
         };
     },
@@ -194,7 +192,8 @@ export default {
         ...mapGetters(['getToken']),
 
         async getMenuForecastingList(pageNumber) {
-            let url = this.url + pageNumber + this.url_search + this.url_department + this.url_role;
+            // let url = this.url + pageNumber + this.url_search + this.url_department + this.url_role;
+            let url = this.url+this.url_type;
             // let url = `/api/objectives?page=${pageNumber}`;
             // if (this.searchInput && this.searchCategory) {
             //     url = `/api/objectives?search_input=${this.searchInput}&menu_category_id=${this.searchCategory.id}&page=${pageNumber}`;
@@ -215,6 +214,11 @@ export default {
                 // this.totalData = response.data.total;
             }
         },
+        selectedTypeChanged(){
+            this.url_type = '?type='+this.selectedType
+            this.getMenuForecastingList();
+        },
+
         async searchBtnClicked() {
             this.url_search = '&search=' + this.searchInput
             this.getMenuForecastingList(1);

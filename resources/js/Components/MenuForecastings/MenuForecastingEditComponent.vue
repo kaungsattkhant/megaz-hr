@@ -508,8 +508,7 @@ export default {
                 this.menuTableList.push({
                     id:mrp.id,
                     mrp_forecast_id : mrp.mrp_forecast_id,
-                    menuName: mrp.
-                    mrp_forecastable.name ,
+                    menuName: mrp.mrp_forecastable.name ,
                     menu_id: mrp.mrp_forecastable_id, // menu id = mrp_forecastable_id
                     mrp_forecastable_id: mrp.mrp_forecastable_id,
                     quantity: mrp.quantity,
@@ -563,15 +562,11 @@ export default {
             let response = await postApiData({url: url, form_data: formData, token: this.getToken()});
             if(response.success){
                 let mrp_forecastable_type = null;
-                if(this.selectedType.value == 'restaurant'){
-                    mrp_forecastable_type = "menu"
-                }
-                if(this.selectedType.value == 'ktv'){
-                    mrp_forecastable_type = "entity"
-                }
+                mrp_forecastable_type = "menu"
                 this.menuTableList.push({
                     menuName: response.data.menu,
                     menu_id: response.data.id,
+                    mrp_forecastable_id: response.data.id,
                     quantity: response.data.quantity,
                     amount: response.data.total_menu_forecast_amt,
                     mrp_forecastable_type : mrp_forecastable_type
@@ -650,6 +645,7 @@ export default {
                 let response = await postApiData({url: url, form_data: formData, token: this.getToken()});
                 if(response.success){
                     this.menuTableList[this.selectedMenuIndex].quantity = response.data.quantity;
+                    this.menuTableList[this.selectedMenuIndex].amount = response.data.total_menu_forecast_amt;
                     this.doneQuantityModal();
                 }
             }
