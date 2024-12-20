@@ -58,7 +58,7 @@ class FinancialService
             $arTotal = DB::table('account_receivables')
                 ->join('accounts', 'account_receivables.account_id', 'accounts.id')
                 ->join('sub_accounts', 'accounts.sub_account_id', 'sub_accounts.id')
-                ->whereYear('date_time', $year)
+                ->whereYear('date_time', operator: $year)
                 ->whereMonth('date_time', '<=', $month)
                 ->where('account_receivables.type', 'ar')
                 ->whereIn('sub_accounts.account_code',$account_code)

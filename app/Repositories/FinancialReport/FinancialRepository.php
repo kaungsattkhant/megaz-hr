@@ -797,6 +797,10 @@ class FinancialRepository implements FinancialInterface
         return $data;
     }
 
+  
+
+
+
 
 
     protected function getSum($data)
