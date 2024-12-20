@@ -24,6 +24,8 @@ interface MRPForecastRepositoryInterface
 
   public function getMonthlyMenuForecasts(Request $request);
 
+  public function getMonthlyKTVProductTreeForecasts(Request $request);
+
   public function getMonthlyMenuForecastsById($mrpForecastId);
 
   public function getPoForecasts($request);
@@ -31,8 +33,6 @@ interface MRPForecastRepositoryInterface
   public function storePoForecastsByItemId($request, $itemId);
 
   public function deleteMenuForecast($request, $target_mrp_forecast_id);
-
-  public function deleteMonthlyMenuForecast($forecastId);
 
   public function getForecastKTV($data);
   public function getForecastKTVByEntityId($data, $entityId);

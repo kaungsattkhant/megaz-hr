@@ -76,7 +76,14 @@ class MRPForecastController extends Controller
         ResponseData($data);
     }
 
-    // getMonthlyMenuForecastsById
+
+
+    public function getMonthlyKTVProductTreeForecasts(Request $request)
+    {
+        $data = $this->mrpForecastRepository->getMonthlyKTVProductTreeForecasts($request);
+
+        ResponseData($data);
+    }
 
     public function getMonthlyMenuForecastsById(int $mrpForecastId)
     {
@@ -104,14 +111,6 @@ class MRPForecastController extends Controller
     public function deleteMenuForecast(Request $request, $target_mrp_forecast_id)
     {
         $data = $this->mrpForecastRepository->deleteMenuForecast($request, $target_mrp_forecast_id);
-
-        ResponseData($data);
-    }
-
-    // deleteMonthlyMenuForecast
-    public function deleteMonthlyMenuForecast($forecastId)
-    {
-        $data = $this->mrpForecastRepository->deleteMonthlyMenuForecast($forecastId);
 
         ResponseData($data);
     }

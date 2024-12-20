@@ -50,12 +50,10 @@ Route::middleware('auth:api')->group(function () {
     Route::get('/forecasts_monthly_menus', 'getMonthlyMenuForecasts');
     Route::get('/forecasts_monthly_menu/{mrpForecastId}', 'getMonthlyMenuForecastsById');
     Route::post('/forecasts_monthly_menu/{mrpForecastId}', 'updateMenuForecast');
-    // Route::post('/forecasts_monthly_menu/{mrp_forecastable_id}/forecast_type/{mrp_forecastable_type}', 'deleteMenuForecast');
     Route::delete('/forecasts_mrp_monthly_menu/{target_mrp_forecast_id}', 'deleteMenuForecast');
-    // Route::delete('/forecasts_monthly_menu/{forecastId}', 'deleteMonthlyMenuForecast');
 
     //ktv forecasts
-
+    Route::get('/forecasts/monthly/ktv_product_tree', 'getMonthlyKTVProductTreeForecasts');
     Route::post('/forecast/ktvs', 'getForecastKTV');
     Route::post('/forecast/ktvs/{entityId}', 'getForecastKTVByEntityId');
     Route::post('/forecast/ktvs_raw_materials', 'getForecastKTVRawMaterials');
