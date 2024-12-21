@@ -24,6 +24,9 @@ return new class extends Migration
             $table->integer('approved_by')->nullable();
             $table->dateTime('cancelled_at')->nullable();
             $table->integer('cancelled_by')->nullable();
+            $table->double('okr_point');
+            $table->dateTime('manager_checked_at')->nullable();
+            $table->integer('manager_checked_by')->nullable();
             $table->timestamps();
         });
     }
