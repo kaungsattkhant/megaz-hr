@@ -277,12 +277,7 @@ class  ObjectiveRepository implements ObjectiveInterface
         $updateData = [];
         $userId = UserData()->id;
 
-        if (!checkRoles(['Supervisor']) && in_array($data['status'], ['approved', 'cancelled'])) {
-            ResponseMessage('Permission is not allowed', 403);
-            return;
-        }
-
-        if (!checkRoles(['Manager']) && in_array($data['status'], ['approved', 'cancelled'])) {
+        if (!checkRoles(['Supervisor', 'Manager']) && in_array($data['status'], ['approved', 'cancelled'])) {
             ResponseMessage('Permission is not allowed', 403);
             return;
         }
@@ -290,6 +285,7 @@ class  ObjectiveRepository implements ObjectiveInterface
         if (checkRoles(['Supervisor'])) {
             $updateData = $this->getSupervisorUpdateData($data, $userId);
         } elseif (checkRoles(['Manager'])) {
+
             $updateData = $this->getManagerUpdateData($data, $userId);
         } else {
             $updateData = $this->getStaffUpdateData($data, $userId);
@@ -312,6 +308,7 @@ class  ObjectiveRepository implements ObjectiveInterface
 
         if ($data['status'] === 'cancelled') {
             $updateData['cancelled_at'] = now();
+            $updateData['okr_point'] = $data['okr_point'];
             $updateData['cancelled_by'] = $userId;
         }
 
@@ -330,6 +327,7 @@ class  ObjectiveRepository implements ObjectiveInterface
 
         if ($data['status'] === 'cancelled') {
             $updateData['cancelled_at'] = now();
+            $updateData['okr_point'] = $data['okr_point'];
             $updateData['cancelled_by'] = $userId;
         }
 
