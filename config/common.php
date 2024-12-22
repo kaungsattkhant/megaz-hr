@@ -92,7 +92,6 @@ return [
     ],
 
     'catering_feature_slug' => [
-        'cashbook',
         'pos',
         'inventory-stocks',
     ],

@@ -2,11 +2,13 @@
 
 namespace App\Repositories\Customer;
 
-use App\Models\Customer;
-use App\Models\CustomerAddress;
-use App\Models\User;
 use Carbon\Carbon;
+use App\Models\User;
+use App\Models\Account;
+use App\Models\Customer;
 use Illuminate\Http\Request;
+use App\Models\CustomerAddress;
+use App\Models\SubAccount;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
@@ -84,6 +86,10 @@ class CustomerRepository implements CustomerRepositoryInterface
             $data['is_verified'] = 1;
 
             $customer = Customer::create($data);
+            //create customer_deposit account
+            $this->createCustomerDepositAccount($customer->name);
+            //end 
+
             if (isset($data['address'])) {
                 CustomerAddress::create([
                     'name' => $data['address_name'],
@@ -135,6 +141,38 @@ class CustomerRepository implements CustomerRepositoryInterface
             return true;
         }
         return false;
+    }
+
+    public function createCustomerDepositAccount($name){
+        $sub_account_code='4-3000';
+        $subAccount=SubAccount::where('account_code',$sub_account_code)->first();
+        if($subAccount){
+            $latestAccount = Account::where('sub_account_id', $subAccount->id)
+            // ->join('sub_accounts','accounts.sub_account_id','sub_accounts.id')
+                ->orderByRaw("CAST(SUBSTRING_INDEX(accounts.account_code, '-', -1) AS UNSIGNED) DESC")
+                ->first();
+            if ($latestAccount) {
+                $latestAccountCodeNo = explode('-', $latestAccount->account_code);
+                // dd($account_code_no[1]);
+                $new_account_code = (int) $latestAccountCodeNo[1] + 1;
+                $code = $latestAccountCodeNo[0] . '-' . $new_account_code;
+                $account = Account::create([
+                    'name' => $name,
+                    'account_code' => $code,
+                    'sub_account_id' => $latestAccount->sub_account_id,
+                ]);
+                return $account;
+            }else{
+                $account = Account::create([
+                    'name' => $name,
+                    'account_code' => '4-3001',
+                    'sub_account_id' => $subAccount->id,
+                ]);
+                return $account;
+            }
+        }
+        ResponseMessage('SubAccount cannot be null',404);
+        
     }
 
     public function listOfCustomer($request)

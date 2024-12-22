@@ -773,16 +773,11 @@ class FinancialRepository implements FinancialInterface
 
         //cashbook balance
         $cashBookBalances = (new CashBookTransaction())->getCashAndBankBalanceByMonth($cash_and_back, $year, $month);
-        // return $cashBookBalances;
         //prepaid balance
         $prepaidBalances = $this->financialService->getClosingBalance('prepaid_balances', $year);
-        //staff loan 
         $staffLoanBalances = $this->financialService->getClosingBalance('staff_balances', $year);
-
         $other_receivable_balances = $this->financialService->getReceivableBalances($other_receivable, $year, $month);
-
         $receivable_debtor_balances = $this->financialService->getReceivableBalances($receivable_debtor, $year, $month);
-
 
         $data['inventory_held'] = $inventoryHeldBalances;
         $data['cashbook'] = $cashBookBalances;
@@ -792,8 +787,9 @@ class FinancialRepository implements FinancialInterface
         $data['receivable_debtor'] = $receivable_debtor_balances;
 
         $otherPayableBalances = $this->financialService->getOtherPayableBalances($year, $month);
-        // return $otherPayableBalances;
+        $creditorBalances = $this->financialService->getCreditorBalances($year, $month);
         $data['other_payable']=$otherPayableBalances;
+        $data['creditor']=$creditorBalances;
         return $data;
     }
 

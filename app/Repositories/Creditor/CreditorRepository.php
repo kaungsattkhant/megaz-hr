@@ -4,6 +4,7 @@ namespace App\Repositories\Creditor;
 
 use App\Models\Ledger;
 use App\Models\Account;
+use App\Models\CreditorBalance;
 use Illuminate\Support\Facades\DB;
 use App\Http\Action\Transaction\StoreTransactionLedger;
 
@@ -107,6 +108,16 @@ class CreditorRepository implements CreditorInterface
             $data = $request->all();
             $data['created_by'] = UserData()->id;
             $data['is_confirmed'] = 1;
+            
+            $creditorBalance=CreditorBalance::create([
+                'type'=>'settlement',
+                'date_time'=>now(),
+                'amount'=>$request->value ,
+                'supplier_id'=>$request->supplier_id,
+                'account_id'=>$request->creditor_account_id,
+                'cash_account_id' => $request->cash_account_id,
+                'created_by'=>UserData()->id,
+            ]);
             $transaction = (new StoreTransactionLedger())->createTransaction($data);
             $creditLedger = (new StoreTransactionLedger())->storeLedger([
                 'date' => now(),

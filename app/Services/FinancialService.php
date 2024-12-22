@@ -47,7 +47,7 @@ class FinancialService
         return $prepaidBalances;
     }
 
-    public function getReceivableBalances($account_code, $year, $month)
+    public function     getReceivableBalances($account_code, $year, $month)
     {
         $year = Carbon::now()->year;
         $currentMonth = Carbon::now()->month;
@@ -117,4 +117,35 @@ class FinancialService
         return $monthlyBalances;
     }
 
+    public function getCreditorBalances($year, $month)
+    {
+        $year = $year;
+        $currentMonth = $month;
+        $monthlyBalances = collect(range(1, $currentMonth))->map(function ($month) use ($year) {
+            $date = Carbon::create($year, $month, 1);
+
+            // Calculate the sum of 'ar' and 'ar_paid' amounts for the year up to the current month
+            $additiontotal = DB::table('creditor_balances')
+                ->whereYear('date_time', $year)
+                ->whereMonth('date_time', '<=', $month)
+                ->where('type', 'addition')
+                ->sum('amount');
+
+            $settlementTotal = DB::table('creditor_balances')
+                ->whereYear('date_time', $year)
+                ->whereMonth('date_time', '<=', $month)
+                ->where('type', 'settlement')
+                ->sum('amount');
+
+            // Calculate closing balance as the difference
+            $closingBalance = $additiontotal - $settlementTotal;
+
+            return [
+                'month_name' => $date->format('F'),
+                'date' => $date->format('Y-m-01'),
+                'value' => $closingBalance,
+            ];
+        });
+        return $monthlyBalances;
+    }
 }
