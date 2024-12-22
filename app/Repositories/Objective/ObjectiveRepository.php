@@ -130,6 +130,7 @@ class  ObjectiveRepository implements ObjectiveInterface
                             'staff_id' => $staff->id,
                             'objective_key_id' => $objKey->id,
                             'status' =>  'not_started',
+                            'okr_point' =>  $objKey->okr_point,
                         ]);
                     }
                 }
@@ -276,40 +277,76 @@ class  ObjectiveRepository implements ObjectiveInterface
         $updateData = [];
         $userId = UserData()->id;
 
-        if (!checkRoles(['Supervisor']) && $data['status'] === 'approved' || !checkRoles(['Supervisor']) && $data['status'] === 'cancelled') {
+        if (!checkRoles(['Supervisor', 'Manager']) && in_array($data['status'], ['approved', 'cancelled'])) {
             ResponseMessage('Permission is not allowed', 403);
             return;
         }
 
         if (checkRoles(['Supervisor'])) {
-            $updateData = [
-                'status' => $data['status'],
-            ];
-            if ($data['status'] === 'approved') {
-                $updateData['approved_at'] = now();
-                $updateData['approved_by'] = $userId;
-            }
+            $updateData = $this->getSupervisorUpdateData($data, $userId);
+        } elseif (checkRoles(['Manager'])) {
 
-            if ($data['status'] === 'cancelled') {
-                $updateData['cancelled_at'] = now();
-                $updateData['cancelled_by'] = $userId;
-            }
+            $updateData = $this->getManagerUpdateData($data, $userId);
         } else {
-
-            if ($data['status'] == 'in_progress') {
-                $updateData['status'] = $data['status'];
-                $updateData['in_progressed_at'] = now();
-                $updateData['in_progressed_by'] = $userId;
-            }
-
-            if ($data['status'] === 'completed') {
-
-                $updateData['status'] = $data['status'];
-                $updateData['completed_at'] = now();
-                $updateData['completed_by'] = $userId;
-            }
+            $updateData = $this->getStaffUpdateData($data, $userId);
         }
+
         $objKeyStaff->update($updateData);
+
+        return $updateData;
+    }
+
+    private function getSupervisorUpdateData($data, $userId)
+    {
+        $updateData = ['status' => $data['status']];
+
+        if ($data['status'] === 'approved') {
+            $updateData['approved_at'] = now();
+            $updateData['okr_point'] = $data['okr_point'];
+            $updateData['approved_by'] = $userId;
+        }
+
+        if ($data['status'] === 'cancelled') {
+            $updateData['cancelled_at'] = now();
+            $updateData['okr_point'] = $data['okr_point'];
+            $updateData['cancelled_by'] = $userId;
+        }
+
+        return $updateData;
+    }
+
+    private function getManagerUpdateData($data, $userId)
+    {
+        $updateData = ['status' => $data['status']];
+
+        if ($data['status'] === 'approved') {
+            $updateData['manager_checked_at'] = now();
+            $updateData['okr_point'] = $data['okr_point'];
+            $updateData['manager_checked_by'] = $userId;
+        }
+
+        if ($data['status'] === 'cancelled') {
+            $updateData['cancelled_at'] = now();
+            $updateData['okr_point'] = $data['okr_point'];
+            $updateData['cancelled_by'] = $userId;
+        }
+
+        return $updateData;
+    }
+
+    private function getStaffUpdateData($data, $userId)
+    {
+        $updateData = ['status' => $data['status']];
+
+        if ($data['status'] == 'in_progress') {
+            $updateData['in_progressed_at'] = now();
+            $updateData['in_progressed_by'] = $userId;
+        }
+
+        if ($data['status'] === 'completed') {
+            $updateData['completed_at'] = now();
+            $updateData['completed_by'] = $userId;
+        }
 
         return $updateData;
     }

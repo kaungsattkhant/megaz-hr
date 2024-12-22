@@ -69,14 +69,21 @@ class MRPForecastController extends Controller
         ResponseData($data);
     }
 
-    public function getMonthlyMenuForecasts(Request $request, $type)
+    public function getMonthlyMenuForecasts(Request $request)
     {
-        $data = $this->mrpForecastRepository->getMonthlyMenuForecasts($request->all(), $type);
+        $data = $this->mrpForecastRepository->getMonthlyMenuForecasts($request);
 
         ResponseData($data);
     }
 
-    // getMonthlyMenuForecastsById
+
+
+    public function getMonthlyKTVProductTreeForecasts(Request $request)
+    {
+        $data = $this->mrpForecastRepository->getMonthlyKTVProductTreeForecasts($request);
+
+        ResponseData($data);
+    }
 
     public function getMonthlyMenuForecastsById(int $mrpForecastId)
     {
@@ -101,17 +108,9 @@ class MRPForecastController extends Controller
         ResponseData($data);
     }
 
-    public function deleteMenuForecast(Request $request, $mrp_forecastable_id, $mrp_forecastable_type)
+    public function deleteMenuForecast(Request $request, $target_mrp_forecast_id)
     {
-        $data = $this->mrpForecastRepository->deleteMenuForecast($request, $mrp_forecastable_id, $mrp_forecastable_type);
-
-        ResponseData($data);
-    }
-
-    // deleteMonthlyMenuForecast
-    public function deleteMonthlyMenuForecast($forecastId)
-    {
-        $data = $this->mrpForecastRepository->deleteMonthlyMenuForecast($forecastId);
+        $data = $this->mrpForecastRepository->deleteMenuForecast($request, $target_mrp_forecast_id);
 
         ResponseData($data);
     }

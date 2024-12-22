@@ -19,6 +19,7 @@ use App\Services\MrpWorkingHour;
 use App\Models\PurchaseOrderItem;
 use App\Models\TargetMrpForecast;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Request;
 use App\Services\AveragePriceCalculator;
 use App\Http\Resources\HrForecastResource;
 use Illuminate\Database\Eloquent\Collection;
@@ -434,9 +435,21 @@ class MRPForecastRepository implements MRPForecastRepositoryInterface
 
         $targetMrps = json_decode($data['target_mrp'], true);
         foreach ($targetMrps as $targetMrp) {
-          $targetMrpData = TargetMrpForecast::find($targetMrp['id']);
-          if ($targetMrpData) {
-            $targetMrpData->update([
+
+          if (isset($targetMrp['id'])) {
+            $targetMrpData = TargetMrpForecast::find($targetMrp['id']);
+            if ($targetMrpData) {
+              $targetMrpData->update([
+                'mrp_forecast_id' => $mrpForecast->id,
+                'mrp_forecastable_id' => $targetMrp['mrp_forecastable_id'],
+                'mrp_forecastable_type' => $targetMrp['mrp_forecastable_type'],
+                'quantity' => $targetMrp['quantity'],
+                'amount' => $targetMrp['amount'] ?? null,
+                'hour' => $targetMrp['hour'] ?? null,
+              ]);
+            }
+          } else {
+            TargetMrpForecast::create([
               'mrp_forecast_id' => $mrpForecast->id,
               'mrp_forecastable_id' => $targetMrp['mrp_forecastable_id'],
               'mrp_forecastable_type' => $targetMrp['mrp_forecastable_type'],
@@ -449,11 +462,19 @@ class MRPForecastRepository implements MRPForecastRepositoryInterface
       }
       $forecastHrs = json_decode($data['forecast_hr'], true);
       foreach ($forecastHrs as  $forecastHr) {
-        $mrpHrdata = MrpHr::find($forecastHr['id']);
-        if ($mrpHrdata) {
-          $mrpHrdata->update([
+        if (isset($forecastHr['id'])) {
+          $mrpHrdata = MrpHr::find($forecastHr['id']);
+          if ($mrpHrdata) {
+            $mrpHrdata->update([
+              'mrp_forecast_id' => $mrpForecast->id,
+              'role_id' =>  $forecastHr['role_id'],
+              'total_duration' => $forecastHr['total_duration'],
+            ]);
+          }
+        } else {
+          MrpHr::create([
             'mrp_forecast_id' => $mrpForecast->id,
-            'role_id' =>  $forecastHr['role_id'],
+            'role_id' => $forecastHr['role_id'],
             'total_duration' => $forecastHr['total_duration'],
           ]);
         }
@@ -462,9 +483,19 @@ class MRPForecastRepository implements MRPForecastRepositoryInterface
 
       $forecastRaws = json_decode($data['forecast_raw'], true);
       foreach ($forecastRaws as  $forecastRaw) {
-        $mrpRawData =  MrpRawMaterial::find($forecastRaw['id']);
-        if ($mrpRawData) {
-          $mrpRawData->update([
+        if (isset($forecastRaw['id'])) {
+          $mrpRawData =  MrpRawMaterial::find($forecastRaw['id']);
+          if ($mrpRawData) {
+            $mrpRawData->update([
+              'mrp_forecast_id' => $mrpForecast->id,
+              'item_id' => $forecastRaw['item_id'],
+              'uom_id' => $forecastRaw['uom_id'],
+              'quantity' => $forecastRaw['quantity'],
+              'amount' => $forecastRaw['amount'],
+            ]);
+          }
+        } else {
+          MrpRawMaterial::create([
             'mrp_forecast_id' => $mrpForecast->id,
             'item_id' => $forecastRaw['item_id'],
             'uom_id' => $forecastRaw['uom_id'],
@@ -482,20 +513,22 @@ class MRPForecastRepository implements MRPForecastRepositoryInterface
     }
   }
 
-
-  public function getMonthlyMenuForecasts($request, $type)
+  public function getMonthlyMenuForecasts($request)
   {
+    $type = $request->input('type');
     $inventoryId = 6;
-    $forecastableType = ($type === 'restaurant') ? 'menu' : 'entity';
-    return $this->getForecastData($forecastableType, $inventoryId, $type);
-  }
 
+    $query = MrpForecast::query();
 
-  private function  getForecastData($forecastableType, $inventoryId, $type)
-  {
-    return  MrpForecast::with([
-      'targetMrpForecasts' => function ($q)  use ($forecastableType) {
-        $q->where('mrp_forecastable_type',  $forecastableType);
+    if ($type) {
+      $query->where('type', $type);
+    } else {
+      $query->whereIn('type', ['ktv', 'restaurant']);
+    }
+
+    return $query->with([
+      'targetMrpForecasts' => function ($q) {
+        $q->where('mrp_forecastable_type', 'menu');
       },
       'targetMrpForecasts.mrp_forecastable',
       'MrpHrs.role',
@@ -509,14 +542,39 @@ class MRPForecastRepository implements MRPForecastRepositoryInterface
         ]);
       },
       'MrpRawMaterials.uom'
-    ])->where('type', $type)->get();
+    ])->get();
+  }
+
+
+  public function getMonthlyKTVProductTreeForecasts($request)
+  {
+
+    $inventoryId = 6;
+
+    return MrpForecast::where('type', 'ktv_product_tree')->with([
+      'targetMrpForecasts' => function ($q) {
+        $q->where('mrp_forecastable_type', 'entity');
+      },
+      'targetMrpForecasts.mrp_forecastable',
+      'MrpHrs.role',
+      'MrpRawMaterials.item' => function ($itemQuery) use ($inventoryId) {
+        $itemQuery->with([
+          'balance' => function ($balanceQuery) use ($inventoryId) {
+            $balanceQuery->whereHas('inventory_ledger', function ($q) use ($inventoryId) {
+              $q->where('inventory_id', $inventoryId);
+            });
+          }
+        ]);
+      },
+      'MrpRawMaterials.uom'
+    ])->get();
   }
 
   public function getMonthlyMenuForecastsById($mrpForecastId)
   {
     $inventoryId = 6;
     $mrpdata = MRPForecast::findOrFail($mrpForecastId);
-    $forecastableType = ($mrpdata->type === 'restaurant') ? 'menu' : 'entity';
+    $forecastableType = ($mrpdata->type === 'restaurant' || $mrpdata->type === 'ktv') ? 'menu' : 'entity';
 
     return $this->getForecastDataByType($mrpForecastId, $forecastableType, $inventoryId);
   }
@@ -604,17 +662,13 @@ class MRPForecastRepository implements MRPForecastRepositoryInterface
   }
 
 
-  public function deleteMenuForecast($request, $mrp_forecastable_id, $mrp_forecastable_type)
+  public function deleteMenuForecast($request, $target_mrp_forecast_id)
   {
 
-    // DB::beginTransaction();
+    DB::beginTransaction();
     try {
 
-      $mrp_forecast_id = $request->mrp_forecast_id;
-
-      $targetMenuMrp = TargetMrpForecast::where('mrp_forecastable_id', $mrp_forecastable_id)
-        ->where('mrp_forecastable_type', $mrp_forecastable_type)
-        ->where('mrp_forecast_id', $mrp_forecast_id)
+      $targetMenuMrp = TargetMrpForecast::where('id',  $target_mrp_forecast_id)
         ->first();
       $quantity =   $targetMenuMrp->quantity;
 
@@ -623,7 +677,7 @@ class MRPForecastRepository implements MRPForecastRepositoryInterface
       }
 
       $mrpForecast = $targetMenuMrp->mrpForecast;
-      if ($mrp_forecastable_type === 'menu') {
+      if ($targetMenuMrp->mrp_forecastable_type === 'menu') {
 
         $menuId = $targetMenuMrp->mrp_forecastable_id;
 
@@ -669,7 +723,7 @@ class MRPForecastRepository implements MRPForecastRepositoryInterface
             }
           }
         }
-      } elseif ($mrp_forecastable_type === 'entity') {
+      } elseif ($targetMenuMrp->mrp_forecastable_type === 'entity') {
 
         $mrpHrs = $mrpForecast->MrpHrs;
         $entityId = $targetMenuMrp->mrp_forecastable_id;
@@ -741,7 +795,7 @@ class MRPForecastRepository implements MRPForecastRepositoryInterface
             $rawMaterial->amount = $rawMaterial->amount;
           }
         }
-        // $targetMenuMrp->delete();
+        $targetMenuMrp->delete();
         DB::commit();
         return $ktvItems;
       }
@@ -783,21 +837,7 @@ class MRPForecastRepository implements MRPForecastRepositoryInterface
   }
 
 
-  // private function convertDurationToMinutes($duration)
-  // {
-  //   list($hours, $minutes) = explode(':', $duration);
-  //   return ($hours * 60) + $minutes;
-  // }
 
-
-  public function deleteMonthlyMenuForecast($forecastId)
-  {
-    $mrpMenuForecast = MrpForecast::findOrFail($forecastId);
-    $mrpMenuForecast->targetMrpForecasts()->delete();
-    $mrpMenuForecast->MrpHrs()->delete();
-    $mrpMenuForecast->MrpRawMaterials()->delete();
-    $mrpMenuForecast->delete();
-  }
 
   //ktv forecast
   public function getForecastKTV($data)
