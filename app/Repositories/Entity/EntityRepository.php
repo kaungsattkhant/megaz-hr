@@ -194,7 +194,7 @@ class EntityRepository implements EntityRepositoryInterface
         }
         // dd($invoiceServiceCollection);
         $entitySession->services = $invoiceServiceCollection;
-        $entitySession->invoice_accessories = $invoiceAccessories;
+        $entitySession->invoice_accessories = $invoiceAccessoryCollection;
         $entitySession->total_service_value = $total_service_value;
         $entitySession->total_accessory_value = $total_accessory_value;
         return $entitySession;

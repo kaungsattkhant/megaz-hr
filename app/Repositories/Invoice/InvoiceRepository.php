@@ -35,6 +35,7 @@ use App\Events\WaiterNotificationRequest;
 use App\Events\RoomDoneNotificationRequest;
 use App\Repositories\Order\OrderRepository;
 use App\Http\Action\Transaction\StoreTransactionLedger;
+use App\Http\Action\Transaction\PurchaseOrderTransaction;
 
 class InvoiceRepository implements InvoiceRepositoryInterface
 {
@@ -122,7 +123,6 @@ class InvoiceRepository implements InvoiceRepositoryInterface
 
     public function createData(array $data)
     {
-        // dd($data);
         // "entity_session_id" => "15"
         // "customer_id" => "1"
         // "start_time" => "2024-10-31T14:13"
@@ -154,6 +154,7 @@ class InvoiceRepository implements InvoiceRepositoryInterface
                     $data['entity_session_id'] = $entitySession->id;
                     $entity = $entitySession->entity;
                 }
+
                 // if ($data['is_waiter'] === 1) {
                 //     $current_time = Carbon::now()->format('H:i');
                 //     $entitySession = EntitySession::where('entity_id', $data['entity_id'])
@@ -205,9 +206,45 @@ class InvoiceRepository implements InvoiceRepositoryInterface
                 $data['created_by'] = UserData()->id;
                 $data['invoice_date'] = Carbon::now();
                 $invoice = Invoice::create($data);
+
+                //create deposit 
+                $isDeposit = (bool) $data['is_deposit'];
+                if ($isDeposit) {
+                    if((!isset($data['cash_account_id']) ||  (isset($data['cash_account_id']) && $data['cash_account_id']==null))){
+                        ResponseMessage(' Cash Account is required', 419);
+                    }
+                    if(!isset($data['account_id']) || (isset($data['account_id']) && $data['account_id']==null)){
+                        ResponseMessage('Customer Deposit Account is required', 419);
+                        // ResponseMessage(message: 'Customer Deposit Account is required',419);
+                    }
+                    $cash_account_id = $data['cash_account_id'];
+                    $data['date'] = now();
+                    $data['created_by'] = UserData()->id;
+                    $transaction = (new StoreTransactionLedger())->createTransaction($data);
+                    // $depositTransaction(new PurchaseOrderTransaction())->createTransaction($po, $morphMapName, $cash_account_id); #create transaction
+                        $debitLedger = (new StoreTransactionLedger())->storeLedger([
+                            'date' => now(),
+                            'value' => $data['deposit'],
+                            'personable_id'=>$data['customer_id'],
+                            'personable_type'=>'customer',
+                            'transaction_id' => $transaction->id,
+                            'account_id' => $cash_account_id,
+                            'action' => 'debit',
+                        ]);
+                    #store credit ledger 
+                        $creditLedger = (new StoreTransactionLedger())->storeLedger([
+                            'date' => now(),
+                            'value' => $data['deposit'],
+                            'personable_id'=>$data['customer_id'],
+                            'personable_type'=>'customer',
+                            'transaction_id' => $transaction->id,
+                            'account_id' => $data['account_id'],
+                            'action' => 'credit',
+                        ]);
+                }
+                //
                 $invoice->invoice_id = sprintf('%05d', $invoice->id);
                 $invoice->save();
-
                 $roomSessionData['invoice_id'] = $invoice->id;
                 $roomSessionData['entity_session_id'] = $entitySession->id;
                 $roomSessionData['session_duration'] = $data['session_duration'] ?? null;
@@ -302,6 +339,7 @@ class InvoiceRepository implements InvoiceRepositoryInterface
                         }
                     }
                 }
+                dd('success');
                 DB::commit();
                 $returnData = [
                     'customer' => $customer,
@@ -472,15 +510,14 @@ class InvoiceRepository implements InvoiceRepositoryInterface
             }
             $newEntity = Entity::find($data['entity_id']);
 
-            if($newEntity->is_active){
-                ResponseMessage('Room is invalid',422);
+            if ($newEntity->is_active) {
+                ResponseMessage('Room is invalid', 422);
             }
-            if($invoice->invoice_type=='endless_time')
-            {
-                return $this->invoiceService->changeRoomForEndlessTime($invoice,$newEntity);
+            if ($invoice->invoice_type == 'endless_time') {
+                return $this->invoiceService->changeRoomForEndlessTime($invoice, $newEntity);
             }
             dd('abc');
-            
+
             $roomSessions = RoomSession::where('invoice_id', $invoice->id)->get();
             $firstRoomSession = $roomSessions->first();
             $latestRoomSession = $roomSessions->last();
@@ -647,7 +684,7 @@ class InvoiceRepository implements InvoiceRepositoryInterface
                 $roomDoneResponse['is_service'] = 0;
             }
             foreach ($invoiceServices as $invoiceService) {
-                $time=$invoiceService->end_date!=null? $invoiceService->end_date : now();
+                $time = $invoiceService->end_date != null ? $invoiceService->end_date : now();
                 $serviceValue = $this->invoiceService->getServiceValue($invoiceService, $time);
                 $total_service_value += $serviceValue;
             }
@@ -657,7 +694,7 @@ class InvoiceRepository implements InvoiceRepositoryInterface
             }
 
             foreach ($invoiceAccessories as $invoiceAccessorie) {
-                $total_accessory_value += $invoiceAccessorie->accessory->accessory_price->price*$invoiceAccessorie->quantity;
+                $total_accessory_value += $invoiceAccessorie->accessory->accessory_price->price * $invoiceAccessorie->quantity;
             }
 
             $entity = Entity::find($latestRoomSession->entitySession->entity_id);
@@ -722,7 +759,7 @@ class InvoiceRepository implements InvoiceRepositoryInterface
         $total_accessory_value = 0;
         $invoiceServices = $invoice->invoiceService;
         foreach ($invoiceServices as $invoiceService) {
-            $time=$invoiceService->end_date!=null? $invoiceService->end_date : now();
+            $time = $invoiceService->end_date != null ? $invoiceService->end_date : now();
             $this->invoiceService->calculateInvoiceService($invoiceService, $time);
             $total_service_value += $invoiceService->service_value;
         }
@@ -731,7 +768,7 @@ class InvoiceRepository implements InvoiceRepositoryInterface
         // invoice accessory
         $invoiceAccessories = $invoice->accessories;
         foreach ($invoiceAccessories as $invoiceAccessorie) {
-            $total_accessory_value += $invoiceAccessorie->accessory->accessory_price->price*$invoiceAccessorie->quantity;
+            $total_accessory_value += $invoiceAccessorie->accessory->accessory_price->price * $invoiceAccessorie->quantity;
         }
         foreach ($invoice->orders as $order) {
             if (existOrderItemByStatus($order->orderItems, 'not_yet')) {
@@ -1278,10 +1315,10 @@ class InvoiceRepository implements InvoiceRepositoryInterface
                 $this->invoiceService->calculateInvoiceService($existingService, $request->end_date);
                 $updatedInvoiceService = InvoiceService::where('id', $request->invoice_service_id)
                     ->update([
-                        'end_date' => $request->end_date,
-                        'service_value' => $existingService->service_value,
-                        'is_active' => 0,
-                    ]);
+                    'end_date' => $request->end_date,
+                    'service_value' => $existingService->service_value,
+                    'is_active' => 0,
+                ]);
                 // dd($existingService->service_value);
                 DB::commit();
                 ResponseMessage('InvoiceService End successfully', 200);

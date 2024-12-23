@@ -84,10 +84,13 @@ class CustomerRepository implements CustomerRepositoryInterface
             $data['password'] = 'default_password';
             $data['otp'] = '000000';
             $data['is_verified'] = 1;
-
+            $createdDepositAccount=$this->createCustomerDepositAccount($data['name']);
+            if(!$createdDepositAccount){
+                ResponseMessage('Customer Deposit Account is required',419);
+            }
+            $data['account_id']=$createdDepositAccount->id;
             $customer = Customer::create($data);
             //create customer_deposit account
-            $this->createCustomerDepositAccount($customer->name);
             //end 
 
             if (isset($data['address'])) {
@@ -157,14 +160,14 @@ class CustomerRepository implements CustomerRepositoryInterface
                 $new_account_code = (int) $latestAccountCodeNo[1] + 1;
                 $code = $latestAccountCodeNo[0] . '-' . $new_account_code;
                 $account = Account::create([
-                    'name' => $name,
+                    'name' => 'Customer - '.$name,
                     'account_code' => $code,
                     'sub_account_id' => $latestAccount->sub_account_id,
                 ]);
                 return $account;
             }else{
                 $account = Account::create([
-                    'name' => $name,
+                    'name' => 'Customer - '.$name,
                     'account_code' => '4-3001',
                     'sub_account_id' => $subAccount->id,
                 ]);
