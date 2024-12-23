@@ -21,7 +21,10 @@ class ObjectivekeyStaff extends Model
         'approved_at',
         'approved_by',
         'cancelled_at',
-        'cancelled_by'
+        'cancelled_by',
+        'okr_point',
+        'manager_checked_at',
+        'manager_checked_by'
     ];
 
     public function staff()

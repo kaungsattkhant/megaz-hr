@@ -50,6 +50,7 @@ class AssignObjectivesToStaffs extends Command
                         ],
                         [
                             'status' => 'not_started',
+                            'okr_point' => $objectiveKey->okr_point,
                         ]
                     );
                 }
