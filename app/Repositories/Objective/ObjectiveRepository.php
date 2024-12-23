@@ -308,7 +308,7 @@ class  ObjectiveRepository implements ObjectiveInterface
 
         if ($data['status'] === 'cancelled') {
             $updateData['cancelled_at'] = now();
-            $updateData['okr_point'] = $data['okr_point'];
+            // $updateData['okr_point'] = $data['okr_point'];
             $updateData['cancelled_by'] = $userId;
         }
 
@@ -327,7 +327,7 @@ class  ObjectiveRepository implements ObjectiveInterface
 
         if ($data['status'] === 'cancelled') {
             $updateData['cancelled_at'] = now();
-            $updateData['okr_point'] = $data['okr_point'];
+            // $updateData['okr_point'] = $data['okr_point'];
             $updateData['cancelled_by'] = $userId;
         }
 
