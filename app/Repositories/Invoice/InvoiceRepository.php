@@ -36,6 +36,7 @@ use App\Events\RoomDoneNotificationRequest;
 use App\Repositories\Order\OrderRepository;
 use App\Http\Action\Transaction\StoreTransactionLedger;
 use App\Http\Action\Transaction\PurchaseOrderTransaction;
+use App\Models\CustomerDeposit;
 
 class InvoiceRepository implements InvoiceRepositoryInterface
 {
@@ -208,40 +209,7 @@ class InvoiceRepository implements InvoiceRepositoryInterface
                 $invoice = Invoice::create($data);
 
                 //create deposit 
-                $isDeposit = (bool) $data['is_deposit'];
-                if ($isDeposit) {
-                    if((!isset($data['cash_account_id']) ||  (isset($data['cash_account_id']) && $data['cash_account_id']==null))){
-                        ResponseMessage(' Cash Account is required', 419);
-                    }
-                    if(!isset($data['account_id']) || (isset($data['account_id']) && $data['account_id']==null)){
-                        ResponseMessage('Customer Deposit Account is required', 419);
-                        // ResponseMessage(message: 'Customer Deposit Account is required',419);
-                    }
-                    $cash_account_id = $data['cash_account_id'];
-                    $data['date'] = now();
-                    $data['created_by'] = UserData()->id;
-                    $transaction = (new StoreTransactionLedger())->createTransaction($data);
-                    // $depositTransaction(new PurchaseOrderTransaction())->createTransaction($po, $morphMapName, $cash_account_id); #create transaction
-                        $debitLedger = (new StoreTransactionLedger())->storeLedger([
-                            'date' => now(),
-                            'value' => $data['deposit'],
-                            'personable_id'=>$data['customer_id'],
-                            'personable_type'=>'customer',
-                            'transaction_id' => $transaction->id,
-                            'account_id' => $cash_account_id,
-                            'action' => 'debit',
-                        ]);
-                    #store credit ledger 
-                        $creditLedger = (new StoreTransactionLedger())->storeLedger([
-                            'date' => now(),
-                            'value' => $data['deposit'],
-                            'personable_id'=>$data['customer_id'],
-                            'personable_type'=>'customer',
-                            'transaction_id' => $transaction->id,
-                            'account_id' => $data['account_id'],
-                            'action' => 'credit',
-                        ]);
-                }
+                $this->storeCustomerDeposit($data, UserData()->id);
                 //
                 $invoice->invoice_id = sprintf('%05d', $invoice->id);
                 $invoice->save();
@@ -339,7 +307,6 @@ class InvoiceRepository implements InvoiceRepositoryInterface
                         }
                     }
                 }
-                dd('success');
                 DB::commit();
                 $returnData = [
                     'customer' => $customer,
@@ -397,6 +364,66 @@ class InvoiceRepository implements InvoiceRepositoryInterface
         }
 
         return $invoice;
+    }
+
+    public function storeCustomerDeposit($data, $userId)
+    {
+        $isDeposit = (bool) $data['is_deposit'];
+        if ($isDeposit) {
+            if ((!isset($data['cash_account_id']) || (isset($data['cash_account_id']) && $data['cash_account_id'] == null))) {
+                ResponseMessage('Cash Account is required', 419);
+            }
+            if (!isset($data['account_id']) || (isset($data['account_id']) && $data['account_id'] == null)) {
+                ResponseMessage('Customer Deposit Account is required', 419);
+                // ResponseMessage(message: 'Customer Deposit Account is required',419);
+            }
+            $customerDeposit = CustomerDeposit::create([
+                'type' => 'deposit',
+                'date_time' => now(),
+                'amount' => $data['deposit'],
+                'account_id' => $data['account_id'],
+                'cash_account_id' => $data['cash_account_id'],
+            ]);
+            $cash_account_id = $data['cash_account_id'];
+            $data['date'] = now();
+            $data['created_by'] = $userId;
+            $transaction = (new StoreTransactionLedger())->createTransaction($data);
+            // $depositTransaction(new PurchaseOrderTransaction())->createTransaction($po, $morphMapName, $cash_account_id); #create transaction
+            $debitLedger = (new StoreTransactionLedger())->storeLedger([
+                'date' => now(),
+                'value' => $data['deposit'],
+                'personable_id' => $data['customer_id'],
+                'personable_type' => 'customer',
+                'transaction_id' => $transaction->id,
+                'account_id' => $cash_account_id,
+                'action' => 'debit',
+            ]);
+            #store credit ledger 
+            $creditLedger = (new StoreTransactionLedger())->storeLedger([
+                'date' => now(),
+                'value' => $data['deposit'],
+                'personable_id' => $data['customer_id'],
+                'personable_type' => 'customer',
+                'transaction_id' => $transaction->id,
+                'account_id' => $data['account_id'],
+                'action' => 'credit',
+            ]);
+        }
+    }
+
+    public function storeInvoiceCustomerDeposit($data,$userId){
+        $isUsedDeposit = (bool) $data['is_used_deposit'];
+        if($isUsedDeposit){
+            $customerDeposit = CustomerDeposit::create([
+                'type' => 'withdrawal',
+                'date_time' => now(),
+                'amount' => $data['amount'],
+                'account_id' => $data['account_id'],
+                'cash_account_id' => $data['cash_account_id'],
+            ]);
+            return $customerDeposit;
+        }
+      
     }
 
     public function deleteData(int $id)
@@ -799,6 +826,13 @@ class InvoiceRepository implements InvoiceRepositoryInterface
 
     public function doneEntityWithInvoice(array $data)
     {
+        //         invoice_id: 36
+// discount_type: null
+// order_categories: []
+// total: 10000
+// order_discount: 0
+// discount_total: 0
+// end_date: null
         DB::beginTransaction();
         try {
             $invoice = Invoice::find($data['invoice_id']);
@@ -860,7 +894,6 @@ class InvoiceRepository implements InvoiceRepositoryInterface
             $invoice_id = $invoice->invoice_id;
             $lastRoomSession = $invoice->latestSession;
             $entity = Entity::find($lastRoomSession->entitySession->entity_id);
-
             $roomSessions = RoomSession::where('invoice_id', $data['invoice_id'])->get();
             if ($invoice->invoice_type != 'package') {
                 foreach ($roomSessions as $room) {
@@ -925,9 +958,15 @@ class InvoiceRepository implements InvoiceRepositoryInterface
             $data['complete_date'] = CurrentTime();
             $entity->save();
             $data['invoice_id'] = $invoice_id;
-
             $invoice->update($data);
-
+            //customer deposit 
+            // $customerDepositData['customer_id'] = $invoice->customer_id;
+            // $customerDepositData['cash_account_id'] = $data['cash_account_id'];
+            // $customerDepositData['account_id'] = $data['account_id'];
+            // $customerDepositData['amount']=$data['total'];
+            // $customerDepositData['is_used_deposit']=$data['is_used_deposit'];
+            // $this->storeInvoiceCustomerDeposit($customerDepositData, UserData()->id);
+            //end
             foreach ($roomSessions as $session) {
                 $entitySession = $session->entitySession;
                 if ($entitySession) {
@@ -936,7 +975,6 @@ class InvoiceRepository implements InvoiceRepositoryInterface
                     Log::info('it working on ' . $entitySession->id);
                 }
             }
-
             $soldStaff = Staff::find($invoice->created_by);
             $firstRole = $soldStaff->roles->first();
             TargetPositionResult::create([
@@ -1315,10 +1353,10 @@ class InvoiceRepository implements InvoiceRepositoryInterface
                 $this->invoiceService->calculateInvoiceService($existingService, $request->end_date);
                 $updatedInvoiceService = InvoiceService::where('id', $request->invoice_service_id)
                     ->update([
-                    'end_date' => $request->end_date,
-                    'service_value' => $existingService->service_value,
-                    'is_active' => 0,
-                ]);
+                        'end_date' => $request->end_date,
+                        'service_value' => $existingService->service_value,
+                        'is_active' => 0,
+                    ]);
                 // dd($existingService->service_value);
                 DB::commit();
                 ResponseMessage('InvoiceService End successfully', 200);

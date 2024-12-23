@@ -2,6 +2,7 @@
 
 namespace App\Repositories\Entity;
 
+use App\Traits\CustomerTrait;
 use Carbon\Carbon;
 use App\Models\Area;
 use App\Models\Entity;
@@ -17,6 +18,7 @@ use App\Services\InvoiceModelService;
 class EntityRepository implements EntityRepositoryInterface
 {
 
+    use CustomerTrait;
     private $invoiceModelService;
     public function __construct(InvoiceModelService $invoiceModelService)
     {
@@ -141,15 +143,22 @@ class EntityRepository implements EntityRepositoryInterface
         $invoiceServiceCollection = collect();
         $invoiceAccessoryCollection = collect();
         $total_service_value = $total_accessory_value = 0;
-        // dd($entitySession->roomSessions);
+        $firstRoomSession = $entitySession->roomSessions->first();
+        $customerDepositBalance=0;
+        if (!$firstRoomSession) {
+            ResponseMessage('Invoice Room Session is invalid', 419);
+        }
+        $customer = $firstRoomSession->invoice->customer;
+        // $customerDepositBalance = $this->getCustomerDepositBalance($customer->account_id);
         foreach ($entitySession->roomSessions as $roomSession) {
             $invoice = $roomSession->invoice;
             $invoice->package;
+
             if ($invoice) {
                 //service
                 $invoiceServices = $invoice->invoiceService;
                 foreach ($invoiceServices as $invoiceService) {
-                    $time=$invoiceService->end_date!=null? $invoiceService->end_date : now();
+                    $time = $invoiceService->end_date != null ? $invoiceService->end_date : now();
                     $this->invoiceModelService->calculateInvoiceService($invoiceService, $time);
                     $total_service_value += $invoiceService->service_value;
                 }
@@ -158,7 +167,7 @@ class EntityRepository implements EntityRepositoryInterface
                 //accesory
                 $invoiceAccessories = $invoice->accessories;
                 foreach ($invoiceAccessories as $invoiceAccessorie) {
-                    $total_accessory_value += $invoiceAccessorie->accessory->accessory_price->price*$invoiceAccessorie->quantity;
+                    $total_accessory_value += $invoiceAccessorie->accessory->accessory_price->price * $invoiceAccessorie->quantity;
                 }
                 $invoiceAccessoryCollection = $invoiceAccessoryCollection->merge($invoice->invoiceAccessories);
                 //end_accessoryI
@@ -197,6 +206,9 @@ class EntityRepository implements EntityRepositoryInterface
         $entitySession->invoice_accessories = $invoiceAccessoryCollection;
         $entitySession->total_service_value = $total_service_value;
         $entitySession->total_accessory_value = $total_accessory_value;
+        $entitySession->deposit_balance=$customerDepositBalance;
+        // $entitySession->customer_id=$customer->id;
+        // $entitySession->account_id=$customer->account_id;
         return $entitySession;
     }
 
@@ -230,7 +242,7 @@ class EntityRepository implements EntityRepositoryInterface
                 // $entitySession['invoice']=$invoice;
                 $invoiceServices = $invoice->invoiceService;
                 foreach ($invoiceServices as $invoiceService) {
-                    $time=$invoiceService->end_date!=null? $invoiceService->end_date : now();
+                    $time = $invoiceService->end_date != null ? $invoiceService->end_date : now();
                     $this->invoiceModelService->calculateInvoiceService($invoiceService, $time);
                     $total_service_value += $invoiceService->service_value;
                 }
@@ -239,7 +251,7 @@ class EntityRepository implements EntityRepositoryInterface
                 // invoice accessory
                 $invoiceAccessories = $invoice->accessories;
                 foreach ($invoiceAccessories as $invoiceAccessorie) {
-                    $total_accessory_value += $invoiceAccessorie->accessory->accessory_price->price*$invoiceAccessorie->quantity;
+                    $total_accessory_value += $invoiceAccessorie->accessory->accessory_price->price * $invoiceAccessorie->quantity;
                 }
                 $consolidatedOrderItems = [];
                 foreach ($invoice->orders as $order) {
@@ -289,20 +301,20 @@ class EntityRepository implements EntityRepositoryInterface
             $total_accessory_value = 0;
             $invoiceServiceCollection = collect();
             $invoiceServices = $invoice->invoiceService;
-                foreach ($invoiceServices as $invoiceService) {
-                    $time=$invoiceService->end_date!=null? $invoiceService->end_date : now();
-                    $this->invoiceModelService->calculateInvoiceService($invoiceService, $time);
-                    $total_service_value += $invoiceService->service_value;
-                }
-                $invoiceServiceCollection = $invoiceServiceCollection->merge($invoice->invoiceService);
-                // end service
-                // invoice accessory
-                $invoiceAccessories = $invoice->accessories;
-                foreach ($invoiceAccessories as $invoiceAccessorie) {
-                    $total_accessory_value += $invoiceAccessorie->accessory->accessory_price->price*$invoiceAccessorie->quantity;
-                }
+            foreach ($invoiceServices as $invoiceService) {
+                $time = $invoiceService->end_date != null ? $invoiceService->end_date : now();
+                $this->invoiceModelService->calculateInvoiceService($invoiceService, $time);
+                $total_service_value += $invoiceService->service_value;
+            }
+            $invoiceServiceCollection = $invoiceServiceCollection->merge($invoice->invoiceService);
+            // end service
+            // invoice accessory
+            $invoiceAccessories = $invoice->accessories;
+            foreach ($invoiceAccessories as $invoiceAccessorie) {
+                $total_accessory_value += $invoiceAccessorie->accessory->accessory_price->price * $invoiceAccessorie->quantity;
+            }
             $orders = $invoice->orders;
-           
+
             if ($orders->isNotEmpty()) {
                 // $entity->invoice = $orders;
                 foreach ($orders as $order) {
@@ -569,11 +581,11 @@ class EntityRepository implements EntityRepositoryInterface
                     // $q->withCount('entitySessions'); // Adds entity_sessions_count attribute
     
                 })
-                ->where('area_id', $area->id)->where("is_active", 0)                                                                                                                                                                                                                                    
+                ->where('area_id', $area->id)->where("is_active", 0)
                 ->get();
         } else {
             $entities = Entity::where("is_active", 0)
-                ->where('area_id', $area->id)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               
+                ->where('area_id', $area->id)
                 ->get();
         }
 
