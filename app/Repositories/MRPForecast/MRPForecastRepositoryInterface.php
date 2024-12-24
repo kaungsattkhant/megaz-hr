@@ -42,4 +42,6 @@ interface MRPForecastRepositoryInterface
 
   public function getForecastKTVHr($data);
   public function getForecastKTVHrByEntityId($data, $entityId);
+
+  public function deleteMrpForecast($mrpForecastId);
 }

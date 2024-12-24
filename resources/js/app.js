@@ -99,6 +99,9 @@ import KtvProductTreeEditComponent from './Components/KtvProductTree/KtvProductT
 import MenuForecastingComponent from './Components/MenuForecastings/MenuForecastingComponent.vue';
 import MenuForecastingCreateComponent from './Components/MenuForecastings/MenuForecastingCreateComponent.vue';
 import MenuForecastingEditComponent from './Components/MenuForecastings/MenuForecastingEditComponent.vue';
+import KtvForecastingComponent from './Components/KtvForecastings/KtvForecastingComponent.vue';
+import KtvForecastingCreateComponent from './Components/KtvForecastings/KtvForecastingCreateComponent.vue';
+import KtvForecastingEditComponent from './Components/KtvForecastings/KtvForecastingEditComponent.vue';
 import CreditorListComponent from './Components/Creditor/CreditorListComponent.vue';
 import CreditorHistoryComponent from './Components/Creditor/CreditorHistoryComponent.vue';
 
@@ -214,6 +217,9 @@ app.component('KtvProductTreeEditComponent', KtvProductTreeEditComponent);
 app.component('MenuForecastingComponent', MenuForecastingComponent);
 app.component('MenuForecastingCreateComponent', MenuForecastingCreateComponent);
 app.component('MenuForecastingEditComponent', MenuForecastingEditComponent);
+app.component('KtvForecastingComponent', KtvForecastingComponent);
+app.component('KtvForecastingCreateComponent', KtvForecastingCreateComponent);
+app.component('KtvForecastingEditComponent', KtvForecastingEditComponent);
 app.component('CreditorListComponent', CreditorListComponent);
 app.component('CreditorHistoryComponent', CreditorHistoryComponent);
 

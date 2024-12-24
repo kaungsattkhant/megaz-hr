@@ -151,4 +151,10 @@ class MRPForecastController extends Controller
         $data =  $this->mrpForecastRepository->getForecastKTVHrByEntityId($request->all(), $entityId);
         ResponseData($data);
     }
+
+    public function deleteMrpForecast($mrpForecastId)
+    {
+        $data =  $this->mrpForecastRepository->deleteMrpForecast($mrpForecastId);
+        ResponseData($data);
+    }
 }

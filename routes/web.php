@@ -310,6 +310,9 @@ Route::middleware(['departments:objective'])->group(function () {
 Route::view('/menu_forecasting', 'menu_forecastings.index')->name('menu_forecasting');
 Route::view('/menu_forecasting/create', 'menu_forecastings.create')->name('menu_forecasting.create');
 Route::view('/menu_forecasting/{id}/edit', 'menu_forecastings.edit')->name('menu_forecasting.edit');
+Route::view('/ktv_forecasting', 'ktv_forecastings.index')->name('ktv_forecasting');
+Route::view('/ktv_forecasting/create', 'ktv_forecastings.create')->name('ktv_forecasting.create');
+Route::view('/ktv_forecasting/{id}/edit', 'ktv_forecastings.edit')->name('ktv_forecasting.edit');
 Route::middleware(['departments:objective'])->group(function () {
     Route::view('/ktv_product_tree', 'ktv_product_tree.index')->name('ktv_product_tree');
     Route::view('/ktv_product_tree/create', 'ktv_product_tree.create')->name('ktv_product_tree.create');
