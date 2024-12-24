@@ -9,7 +9,7 @@ class CustomerDeposit extends Model
 {
     use HasFactory;
     protected $fillable=[
-        'date_time','account_id','cash_account_id','amount','type',
+        'date_time','account_id','cash_account_id','amount','type','customer_id'
     ];
 
     public function account()

@@ -143,13 +143,14 @@ class EntityRepository implements EntityRepositoryInterface
         $invoiceServiceCollection = collect();
         $invoiceAccessoryCollection = collect();
         $total_service_value = $total_accessory_value = 0;
+        //deposit customer 
         $firstRoomSession = $entitySession->roomSessions->first();
-        $customerDepositBalance=0;
         if (!$firstRoomSession) {
             ResponseMessage('Invoice Room Session is invalid', 419);
         }
         $customer = $firstRoomSession->invoice->customer;
-        // $customerDepositBalance = $this->getCustomerDepositBalance($customer->account_id);
+        $customerDepositBalance = $this->getCustomerDepositBalance($customer->id);
+        //end deposit
         foreach ($entitySession->roomSessions as $roomSession) {
             $invoice = $roomSession->invoice;
             $invoice->package;
@@ -207,8 +208,8 @@ class EntityRepository implements EntityRepositoryInterface
         $entitySession->total_service_value = $total_service_value;
         $entitySession->total_accessory_value = $total_accessory_value;
         $entitySession->deposit_balance=$customerDepositBalance;
-        // $entitySession->customer_id=$customer->id;
-        // $entitySession->account_id=$customer->account_id;
+        $entitySession->customer_id=$customer->id;
+        $entitySession->account_id=$customer->account_id;
         return $entitySession;
     }
 

@@ -40,7 +40,7 @@ trait CustomerTrait
         return $returnData;
     }
 
-    public function getCustomerDepositBalance($customerAccountId)
+    public function getCustomerDepositBalance($customerId)
     {
         // $depositBalances = DB::table('customer_deposits')
         //     ->select(
@@ -56,7 +56,7 @@ trait CustomerTrait
                 DB::raw('COALESCE(SUM(CASE WHEN type = "withdrawal" THEN amount ELSE 0 END), 0) as total_withdrawal'),
                 DB::raw('COALESCE(SUM(CASE WHEN type = "deposit" THEN amount ELSE 0 END) - SUM(CASE WHEN type = "withdrawal" THEN amount ELSE 0 END), 0) as balance')
             )
-            ->where('account_id', $customerAccountId)
+            ->where('customer_id', $customerId)
             ->first();
         return $depositBalances->balance;
 
