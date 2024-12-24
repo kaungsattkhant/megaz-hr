@@ -1565,9 +1565,9 @@
                 let formData = new FormData();
                 let roomSessions = [];
                 formData.append('invoice_id', this.selectedRoom.room_sessions[0].invoice.id);
-                if(this.depositBalance > 0){
-                    formData.append('deposit_balance', this.depositBalance);
-                }
+                // if(this.depositBalance > 0){
+                //     formData.append('deposit_balance', this.depositBalance);
+                // }
                 let response = await postApiData({ url: '/api/room_done', form_data: formData, token: this.getToken() });
                 if (response.success) {
                     this.roomSessionData = response.data;
@@ -1576,7 +1576,7 @@
                     this.isOpenRoomStep('invoice')
                     this.printInvoiceData.service_total_value = response.data.total_service_value;
                     this.printInvoiceData.accessory_total_value = response.data.total_accessory_value;
-                    this.depositBalance = null;
+                    // this.depositBalance = null;
                 }
                 else {
                     this.$notify({
@@ -1801,8 +1801,13 @@
                 let formData = new FormData();
                 formData.append('invoice_id', this.selectedRoom.room_sessions[0].invoice.id);
                 // formData.append('payment_type', this.selectedPaymentMethod);
-                formData.append('discount_type', this.discount_type);
+                if(this.discount_type){
+                    formData.append('discount_type', this.discount_type);
+                }
 
+                if(this.depositBalance > 0){
+                    formData.append('deposit_balance', this.depositBalance);
+                }
                 if (this.discount_type == 'fix_amount') {
                     formData.append('discount_value', this.printInvoiceData.discount);
                     // totalAmount = totalAmount - this.printInvoiceData.discount;
