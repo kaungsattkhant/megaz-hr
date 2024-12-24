@@ -6,7 +6,6 @@
                     Add KTV Forecasting
                 </p>
             </div>
-    
             <div class="grid !grid-cols-12 gap-x-8 bg-white p-8 rounded-md shadow-md mb-8">
                 <div class="mb-4 col-span-3 rounded-md">
                     <label for="" class="label-form mb-3">
@@ -71,19 +70,19 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <tr class="" v-for="(menu, menuIndex) in selectedRoomList"
-                                :key="menuIndex">
+                            <tr class="" v-for="(room, roomIndex) in selectedRoomList"
+                                :key="roomIndex">
                                 <td class="">
-                                    {{ menu.roomName }}
+                                    {{ room.roomName }}
                                 </td>
                                 <td class="">
-                                    {{ menu.quantity }}
+                                    {{ room.quantity }}
                                 </td>
                                 <td class="">
-                                    {{ menu.hour }}
+                                    {{ room.hour }}
                                 </td>
                                 <td class="">
-                                    <button @click="removeMenuTableItem(menuIndex)">
+                                    <button @click="removeRoomTableItem(roomIndex)">
                                         <i class="fal fa-trash  pr-3"></i>
                                     </button>
                                 </td>
@@ -95,7 +94,7 @@
             </div>
             <div>
                 <button class="add-btn" @click="clickedBtnCreate()">
-                    Create
+                    Calculate
                 </button>
             </div>
         </div>
@@ -106,7 +105,8 @@
                         Month 
                     </label>
                     <input type="date" v-model="selectedMonth" class="input-ui"  :disabled="this.is_disable_step_2" :class="this.is_disable_step_2 ? 'cursor-not-allowed opacity-60 !bg-gray-300' : ''">
-                </div><div class="col-span-9"></div>
+                </div>
+                <div class="col-span-9"></div>
             </div>
 
             <div class=" ">
@@ -115,7 +115,7 @@
                         <button @click="getSelectedRoomList()"
                             class="z-20 mt-2 block px-7 pb-3.5 pt-3 rounded-tr-md rounded-tl-md font-inter text-xs font-medium  leading-tight text-neutral-500  focus:isolate data-[te-nav-active]:text-[#fff] data-[te-nav-active]:bg-[#845adf]  bg-white custom-shadow-tab relative"
                             data-te-toggle="pill" data-te-target="#tabs-menu" role="tab" data-te-nav-active
-                            aria-controls="tabs-menu" aria-selected="true">Menu</button>
+                            aria-controls="tabs-menu" aria-selected="true">KTV</button>
                     </li>
                     <li role="presentation" class="-ml-0.5 group">
                         <a href="#tabs-material" @click="getRawMaterialList()"
@@ -139,13 +139,13 @@
                                 <thead class="">
                                     <tr>
                                         <th scope="col" class="">
-                                            Menu
+                                            Room
                                         </th>
                                         <th scope="col" class="">
-                                            Qty
+                                            Session
                                         </th>
                                         <th scope="col" class="">
-                                            Amount
+                                            Hour
                                         </th>
                                         <th scope="col" class="">
     
@@ -153,22 +153,22 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <tr class="" v-for="(menu, menuIndex) in selectedRoomList"
-                                        :key="menuIndex">
+                                    <tr class="" v-for="(room, roomIndex) in selectedRoomList"
+                                        :key="roomIndex">
                                         <td class="">
-                                            {{ menu.menuName }}
+                                            {{ room.roomName }}
                                         </td>
                                         <td class="">
-                                            {{ menu.quantity }}
+                                            {{ room.quantity }}
                                         </td>
                                         <td class="">
-                                            {{ menu.amount }}
+                                            {{ room.hour }}
                                         </td>
                                         <td class="">
-                                            <button data-te-toggle="modal" data-te-target="#change_quantity" @click="btnClickedEditQuantityModal(menu,menuIndex)">
+                                            <button data-te-toggle="modal" data-te-target="#change_quantity" @click="btnClickedEditRoom(room,roomIndex)">
                                                 <i class="fal fa-plus  pr-3"></i>
                                             </button>
-                                            <button @click="removeMenuTableItem(menuIndex)">
+                                            <button @click="removeRoomTableItem(roomIndex)">
                                                 <i class="fal fa-trash  pr-3"></i>
                                             </button>
                                         </td>
@@ -257,7 +257,7 @@
                                             Position
                                         </th>
                                         <th scope="col" class="">
-                                            Working Hour
+                                            Working Time
                                         </th>
                                     </tr>
                                 </thead>
@@ -265,10 +265,10 @@
                                     <tr class="" v-for="(hr, hrIndex) in hrList"
                                         :key="hrIndex">
                                         <td class="">
-                                            {{ hr.position }}
+                                            {{ hr.department_name }}
                                         </td>
                                         <td class="">
-                                            {{ hr.total_working_hour }}
+                                            {{ hr.total_duration }}
                                         </td>
                                     </tr>
                                 </tbody>
@@ -278,19 +278,15 @@
                 </div>
     
             </div>
-
-            
-            
-            
             <div>
-                <button class="add-btn" @click="btnClickedMenuForecastingCreate()">
-                    Create 
+                <button class="add-btn" @click="btnClickedRoomForecastingCreate()">
+                    Done 
                 </button>
             </div>
         </div>
 
 
-        <!-- Quantity Modal -->
+        <!-- Room Modal -->
         <div data-te-modal-init
             class="fixed left-0 top-0 z-[1055] hidden h-full w-full overflow-y-auto overflow-x-hidden outline-none"
             id="change_quantity" tabindex="-1" aria-labelledby="create_modalLabel" aria-hidden="true">
@@ -300,7 +296,7 @@
                     <div class="relative flex justify-between py-2 px-6 border-b">
                         <h5 class="text-base text-center mt-2 font-semibold leading-normal font-inter"
                             id="create_modalLabel">
-                            Edit Quantity
+                            Edit Room
                         </h5>
                         <button type="button" class="text-xs focus:shadow-none focus:outline-none"
                             data-te-modal-dismiss aria-label="Close" id="close_quantity">
@@ -313,9 +309,15 @@
                     <div class="relative px-6 py-4 border-b" data-te-modal-body-ref>
                         <div class="mb-4">
                             <label for="" class="label-form mb-3">
-                                Quantity
+                                Session
                             </label>
-                            <input type="text" placeholder="Quantity" v-model="menuQuantity" class="input-ui">
+                            <input type="text" placeholder="Session" v-model="roomSession" class="input-ui">
+                        </div>
+                        <div class="mb-4">
+                            <label for="" class="label-form mb-3">
+                                Hour
+                            </label>
+                            <input type="text" placeholder="Session" v-model="roomHour" class="input-ui">
                         </div>
                     </div>
                     <div class="flex justify-end gap-x-4 px-6 mb-6 pt-4">
@@ -323,7 +325,7 @@
                             data-te-modal-dismiss aria-label="Close">
                             Cancel
                         </button>
-                        <button type="button" @click="btnClickedEditQuantity()"
+                        <button type="button" @click="editRoom()"
                             class="add-btn focus:outline-none focus:ring-0 ">
                             Create
                         </button>
@@ -332,7 +334,7 @@
             </div>
         </div>
 
-        <!-- Modal -->
+        <!-- PO Modal -->
         <div data-te-modal-init
             class="fixed left-0 top-0 z-[1055] hidden h-full w-full overflow-y-auto overflow-x-hidden outline-none"
             id="add_raw_material" tabindex="-1" aria-labelledby="create_modalLabel" aria-hidden="true">
@@ -420,10 +422,6 @@ export default {
         return {
             is_step : 1,
 
-            typeList:[
-                {name: 'KTV',value: 'ktv'},
-                {name: 'Restaurant',value: 'restaurant'},
-            ],
             roomList:[],
 
             selectedMonth:null,
@@ -439,9 +437,11 @@ export default {
             rawMaterialList:[],
             hrList:[],
 
-            selectedMenuIndex:null,
-            selectedEditMenu:null,
-            menuQuantity:null, // use in quantity change modal
+            selectedRoomIndex:null,
+            selectedEditRoom:null,
+
+            roomSession:null, // use in quantity change modal
+            roomHour:null, // use in quantity change modal
 
             poList:[],
             uomList:[],
@@ -491,6 +491,7 @@ export default {
             let formData = new FormData();
             formData.append("quantity", this.session);
             formData.append("hour", this.hour);
+            formData.append("type", 'ktv_product_tree');
             let url = '/api/forecast/ktvs/' + this.selectedRoom.id;
             let response = await postApiData({url: url, form_data: formData, token: this.getToken()});
             if(response.success){
@@ -513,37 +514,55 @@ export default {
 
 
 
-        btnClickedMenuForecastingCreate(){
-            this.createMenuForcasting();
+        btnClickedRoomForecastingCreate(){
+            this.createRoomForcasting();
         },
-        async createMenuForcasting(){
+        async createRoomForcasting(){
+            let target_mrp = [];
+            if(this.selectedRoomList){
+                this.selectedRoomList.forEach(room => {
+                    target_mrp.push({
+                        mrp_forecastable_type : room.mrp_forecastable_type,
+                        quantity : room.quantity,
+                        amount : 0,
+                        hour : room.hour,
+                        mrp_forecastable_id : room.mrp_forecastable_id,
+                    })
+                });
+            }
             let hrList = [];
-            this.hrList.forEach(hr => {
-                hrList.push({
-                    role_id : hr.role_id,
-                    total_duration : hr.total_working_hour
-                })
-            });
+            if(this.hrList.length > 0){
+                this.hrList.forEach(hr => {
+                    hrList.push({
+                        role_id : hr.role_id,
+                        total_duration : hr.total_duration
+                    })
+                });
+            }
             let rawList = [];
-            this.rawMaterialList.forEach(raw => {
-                rawList.push({
-                    uom_id : raw.uom_id,
-                    quantity : raw.total_uom_amt,
-                    amount : raw.average_price * raw.total_uom_amt,
-                    item_id : raw.item_id
-                })
-            });
+            if(this.rawMaterialList.length > 0){
+                this.rawMaterialList.forEach(raw => {
+                    rawList.push({
+                        uom_id : raw.uom_id,
+                        quantity : raw.total_uom_amt,
+                        amount : raw.average_price * raw.total_uom_amt,
+                        item_id : raw.item_id
+                    })
+                });
+            }
             
             let formData = new FormData();
             formData.append("date", this.selectedMonth);
-            formData.append("target_mrp", JSON.stringify(this.selectedRoomList));
+            formData.append("type", 'ktv_product_tree');
+            formData.append("target_mrp", JSON.stringify(target_mrp));
+            // formData.append("target_mrp_forecasts", JSON.stringify(this.selectedRoomList));
             formData.append("forecast_hr", JSON.stringify(hrList));
             formData.append("forecast_raw", JSON.stringify(rawList));
             let url = '/api/forecasts';
             let response = await postApiData({url: url, form_data: formData, token: this.getToken()});
             if(response.success){
                 // this.rawMaterialList = response.data;
-                window.location.replace('/menu_forecasting');
+                // window.location.replace('/ktv_forecasting');
             }
         },
 
@@ -565,24 +584,29 @@ export default {
                 initTE({ Modal });
             }
         },
-        btnClickedEditQuantityModal(menu,index){
-            this.selectedEditMenu = menu;
-            this.selectedMenuIndex = index;
+        btnClickedEditRoom(room,index){
+            this.selectedEditRoom = room;
+            this.selectedRoomIndex = index;
         },
-        async btnClickedEditQuantity(){
-            if(!this.menuQuantity){
-                this.alertValidationMessage(`Quantity`);
+        async editRoom(){
+            if(!this.roomSession){
+                this.alertValidationMessage(`Session`);
+                return 1;
+            }
+            else if(!this.roomHour){
+                this.alertValidationMessage(`Hour`);
                 return 1;
             }
             else{
                 let formData = new FormData();
-                formData.append("quantity", this.menuQuantity);
-                let url = '/api/forecast/menus/' + this.selectedEditMenu.menu_id;
+                formData.append("quantity", this.roomSession);
+                formData.append("hour", this.roomHour);
+                let url = '/api/forecast/ktvs/' + this.selectedEditRoom.entity_id;
                 let response = await postApiData({url: url, form_data: formData, token: this.getToken()});
                 if(response.success){
-                    this.selectedRoomList[this.selectedMenuIndex].quantity = response.data.quantity;
-                    this.selectedRoomList[this.selectedMenuIndex].amount = response.data.total_menu_forecast_amt;
-                    this.doneQuantityModal();
+                    this.selectedRoomList[this.selectedRoomIndex].quantity = response.data[0].session;
+                    this.selectedRoomList[this.selectedRoomIndex].hour = response.data[0].hour;
+                    this.doneEditModal();
                 }
             }
         },
@@ -632,7 +656,7 @@ export default {
             }
         },
 
-        removeMenuTableItem(index) {
+        removeRoomTableItem(index) {
             this.selectedRoomList.splice(index, 1);
             // this.updateItemPriceTotal(this.ingredientItems);
         },
@@ -663,9 +687,10 @@ export default {
             }
         },
 
-        doneQuantityModal() {
+        doneEditModal() {
             document.getElementById("close_quantity").click();
-            this.menuQuantity = null;
+            this.roomSession = null;
+            this.roomHour = null;
         },
         donePoModal() {
             document.getElementById("close_po").click();

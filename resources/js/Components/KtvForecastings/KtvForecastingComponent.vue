@@ -1,7 +1,7 @@
 <template>
     <div>
         <p class=" text-lg font-semibold font-inter">
-            Menu Forecasting
+            KTV Forecasting
         </p>
     </div>
     <div class="mt-4 bg-white">
@@ -16,13 +16,13 @@
                 <button class="add-btn h-8" @click="clearSearchBtnClicked()">Clear</button>
             </div>
             <div class="flex pr-0 gap-x-4">
-                <div class="w-full !text-sm" data-te-select-wrapper-ref>
+                <!-- <div class="w-full !text-sm" data-te-select-wrapper-ref>
                     <select data-te-select-init data-te-select-placeholder="Select Type" @change="selectedTypeChanged()"
                         data-te-select-filter="true" name="" id="" v-model="selectedType" class="input-ui">
                         <option :value="type.value" v-for="(type, typeIndex) in typeList"
                             :key="typeIndex"> {{ type.name }} </option>
                     </select>
-                </div>
+                </div> -->
                 <a href="/ktv_forecasting/create"
                     class="add-btn  h-8 whitespace-nowrap">
                     Add New
@@ -44,10 +44,6 @@
                                 <th scope="col" class="">
                                     Amount
                                 </th>
-
-                                <th scope="col" class="">
-                                    Type
-                                </th>
                                 <th scope="col" class="">
                                     
                                 </th>
@@ -55,27 +51,23 @@
                         </thead>
                         <tbody>
                             <!-- looping start -->
-                            <div class="contents" v-for="(menuForecasting, index) in menuForecastingTable" :key="index">
+                            <div class="contents" v-for="(roomForecasting, index) in roomForecastingTable" :key="index">
                                 <tr class="">
                                     <td class=" font-medium ">
                                         <!-- {{ perPage * (currentPage - 1) + (++index) }} -->
                                         {{ index+1 }}
                                     </td>
                                     <td class="whitespace-nowrap">
-                                        {{ menuForecasting.date }}
+                                        {{ roomForecasting.date }}
                                     </td>
                                     <td class="whitespace-nowrap">
-                                        {{ menuForecasting.amount }}
+                                        {{ roomForecasting.amount }}
                                     </td>
                                     <td class="whitespace-nowrap">
-                                        {{ menuForecasting.type }}
-                                    </td>
-
-                                    <td class="whitespace-nowrap">
-                                        <a :href="'/menu_forecasting/' + menuForecasting.id + '/edit'">
+                                        <a :href="'/ktv_forecasting/' + roomForecasting.id + '/edit'">
                                             <i class="far fa-pen cursor-pointer mr-3"></i>
                                         </a>
-                                        <button @click="deleteBtnClicked(menuForecasting.id)"
+                                        <button @click="deleteBtnClicked(roomForecasting.id)"
                                             data-te-toggle="modal" data-te-target="#deleteModal" id="delete-btn" class="pr-1">
                                             <i class="fas fa-trash-alt"></i>
                                         </button>
@@ -165,8 +157,8 @@ import { mapGetters } from "vuex";
 export default {
     data() {
         return {
-            menuForecastingList: [],
-            menuForecastingTable: [],
+            roomForecastingList: [],
+            roomForecastingTable: [],
             typeList:[
                 // 'KTV','restaurant',
                 {name: 'KTV',value: 'ktv'},
@@ -180,11 +172,10 @@ export default {
 
             searchInput:null,
 
-            url:'/api/forecasts_monthly_menus',
+            url:'/api/forecasts/monthly/ktv_product_tree',
             url_search:'',
             url_department:'',
             url_role:'',
-            url_type:'',
             deleteId:null,
         };
     },
@@ -194,7 +185,7 @@ export default {
 
         async getMenuForecastingList(pageNumber) {
             // let url = this.url + pageNumber + this.url_search + this.url_department + this.url_role;
-            let url = this.url+this.url_type;
+            let url = this.url;
             // let url = `/api/objectives?page=${pageNumber}`;
             // if (this.searchInput && this.searchCategory) {
             //     url = `/api/objectives?search_input=${this.searchInput}&menu_category_id=${this.searchCategory.id}&page=${pageNumber}`;
@@ -208,23 +199,19 @@ export default {
             // let url = `/api/objectives`;
             let response = await getApiData({ url: url, token: this.getToken() });
             if (response.data) {
-                this.menuForecastingList = response.data;
-                this.menuForecastingList.forEach(forecasting => {
+                this.roomForecastingList = response.data;
+                this.roomForecastingList.forEach(forecasting => {
                     let total_amount = 0;
                     forecasting.mrp_raw_materials.forEach(raw => {
                         total_amount += raw.amount;
                     });
                     forecasting.amount = total_amount
                 });
-                this.menuForecastingTable = this.menuForecastingList
+                this.roomForecastingTable = this.roomForecastingList
                 // this.lastPage = response.data.last_page;
                 // this.currentPage = pageNumber;
                 // this.perPage = response.data.per_page;
             }
-        },
-        selectedTypeChanged(){
-            this.url_type = '?type='+this.selectedType
-            this.getMenuForecastingList();
         },
 
         async searchBtnClicked() {
