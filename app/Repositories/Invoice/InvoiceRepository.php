@@ -427,7 +427,7 @@ class InvoiceRepository implements InvoiceRepositoryInterface
                 'date_time' => now(),
                 'amount' => $amount,
                 'account_id' => $data['account_id'],
-                'cash_account_id' => $data['cash_account_id'],
+                // 'cash_account_id' => $data['cash_account_id'],
                 'customer_id' => $data['customer_id'],
             ]);
             $data['date'] = now();
@@ -984,8 +984,7 @@ class InvoiceRepository implements InvoiceRepositoryInterface
             $invoice->update($data);
             //customer deposit 
             $customerDepositData['customer_id'] = $invoice->customer_id;
-            $customerDepositData['cash_account_id'] = $data['cash_account_id'];
-            $customerDepositData['account_id'] = $data['account_id'];
+            $customerDepositData['account_id'] = $invoice->customer->account_id;
             $customerDepositData['amount']=$data['total'];
             $customerDepositData['deposit_balance']=$data['deposit_balance'];
             $this->storeInvoiceCustomerDeposit($customerDepositData, UserData()->id);
