@@ -178,7 +178,6 @@ class InvoiceRepository implements InvoiceRepositoryInterface
                     if (!$package) {
                         ResponseMessage('Package not found', 404);
                     }
-
                     $end_date = Carbon::now()->addHours($package->free_session + $package->pay_session);
                     $data['total_session_price'] = $package->pay_session * $package->session_price;
                     $data['paid_amount'] = $package->price;
@@ -237,7 +236,6 @@ class InvoiceRepository implements InvoiceRepositoryInterface
                     if ($fraction > 0) {
                         $durations[] = round($fraction, 2);
                     }
-
 
                     if ($leftEntitySession > -1 || $leftEntitySession < 0) {
                         $sessionsToDeactivate += 1;
