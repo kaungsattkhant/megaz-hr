@@ -11,7 +11,7 @@
                                 <button
                                     class="relative flex flex-col justify-between h-full w-full">
                                     <div class=" flex justify-between flex-col h-full">
-    
+
                                         <p class="text-base text-left text-white">
                                             {{ room.price_per_hour }}
                                         </p>
@@ -40,7 +40,7 @@
                         </div>
                     </div>
                 </div>
-                
+
             </div>
             <div class="fixed right-0 top-0 bottom-0 bg-white drop-shadow-xl ease-in-out duration-300 transition delay-100 pt-12 right-sidebar-2" :class="isShowSidebar == true ? 'translate-x-0 opacity-100 w-[400px]' : 'translate-x-full opacity-0 w-0' ">
                 <div class="relative h-full w-full">
@@ -128,9 +128,15 @@
                                 </div>
                                 <div class="mb-4">
                                     <label for="" class="block text-sm text-black mb-3">
+                                        Pre Deposit?
+                                    </label>
+                                    <input type="checkbox" v-model="isPreDeposit" class="rounded" >
+                                </div>
+                                <div class="mb-4">
+                                    <label for="" class="block text-sm text-black mb-3">
                                         Deposit
                                     </label>
-                                    <input type="text" placeholder="Deposit" v-model="deposit"
+                                    <input type="text" placeholder="Deposit Amount" v-model="deposit" :disabled="!isPreDeposit"
                                         class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
                                 </div>
                                 <div class="mb-4" v-show="this.type == 'session'">
@@ -466,7 +472,7 @@
                                         @input="discountChanged"
                                         class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
                                 </div>
-                                
+
                                 <!-- <div class="mb-4">
                                     <label for="" class="block text-sm text-black mb-3">
                                         Payment Method
@@ -657,7 +663,7 @@
                                             <tr class="" v-for="(pm,index) in packageMenuList" :key=index>
                                                 <td class=" py-4 text-sm  ">
                                                     {{ pm.name }}
-                                                </td>                                                
+                                                </td>
                                                 <td class=" py-4 text-sm  ">
                                                     <select name="" :class="pm.is_package == 0 ? 'hidden' : ''"
                                                         class="text-xs pl-0 border-0 focus:shadow-none focus:outline-none focus:ring-0 select-box area-select-box !pr-6"
@@ -723,7 +729,7 @@
             </div>
         </div>
 
-        
+
         <!-- add Hour modal -->
         <div data-te-modal-init
             class="fixed left-0 top-0 z-[1055] hidden h-full w-full overflow-y-auto overflow-x-hidden outline-none"
@@ -1170,6 +1176,7 @@
                 invoice_date:null,
                 type:'session',
                 selectedPackage:null,
+                isPreDeposit: false,
                 deposit:null,
                 duration:null,
                 male:null,
@@ -1428,6 +1435,10 @@
             },
 
             async createRoom() {
+                if(this.isPreDeposit && !this.deposit){
+                    this.alertValiationMessage(`deposit amount`);
+                    return;
+                }
                 let formData = new FormData();
                 // formData.append('entity_id', this.selectedRoom.id);
                 formData.append('entity_session_id', this.selectedTime.id);
@@ -1441,7 +1452,12 @@
                     formData.append('orders', JSON.stringify(this.packageMenuList));
                 }
                 formData.append('type', this.type);
-                formData.append('deposit', this.deposit);
+                let isDeposit = (this.isPreDeposit)? 1: 0;
+                formData.append('is_deposit', isDeposit);
+                if(this.deposit){
+                    formData.append('deposit', this.deposit);
+                }
+
                 if (this.female > 0) {
                     formData.append('female', +this.female);
                 }
@@ -1467,7 +1483,7 @@
                     //         this.purchaseMenuList = [];
                     //     }
                     // }
-                    // this.food_total_package = 0 
+                    // this.food_total_package = 0
                     // console.log("success")
                     window.location.reload()
                 }
@@ -2020,7 +2036,7 @@
                     else{
                         this.ladyList = response.data;
                     }
-                    
+
                 }
             },
             btnConfirmAddService() {
@@ -2070,7 +2086,7 @@
             },
             btnClickedEndService(service){
                 this.serviceEnd = service;
-            },  
+            },
             async btnConfirmEndService(){
                 let formData = new FormData();
                 formData.append('invoice_service_id', this.serviceEnd.id);
@@ -2113,7 +2129,7 @@
                 });
             },
             btnConfirmAddAccessory() {
-                
+
                 if(!this.selectedAccessoryCategory){
                     this.alertValiationMessage('Accessory Category');
                 }
@@ -2245,7 +2261,13 @@
             roomAreaId(newId) {
             // Call your function once areaId is updated
             this.getRoomList(newId);
-            }
+            },
+
+            isPreDeposit(){
+                if(!this.isPreDeposit){
+                    this.deposit = null;
+                }
+            },
         },
         created(){
             this.getCustomerList();
