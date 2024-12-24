@@ -139,6 +139,18 @@
                                     <input type="text" placeholder="Deposit Amount" v-model="deposit" :disabled="!isPreDeposit"
                                         class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
                                 </div>
+                                <div class="mb-4">
+                                    <label for="" class="block text-sm text-black mb-3">
+                                        Cash Account
+                                    </label>
+                                    <div class="relative">
+                                        <select name="" id="" v-model="selectedCashAccount" :disabled="!isPreDeposit"
+                                            class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
+                                            <option disabled selected> Select Cash Account </option>
+                                            <option v-for="cashAccount in cashAccounts" :value="cashAccount" > {{ cashAccount.name }} </option>
+                                        </select>
+                                    </div>
+                                </div>
                                 <div class="mb-4" v-show="this.type == 'session'">
                                     <label for="" class="block text-sm text-black mb-3">
                                         Duration
@@ -1285,7 +1297,8 @@
                 selectedAccessory:null,
                 selectedAccessoryQuantity:null,
 
-
+                cashAccounts: [],
+                selectedCashAccount: null,
             };
         },
 
@@ -1435,8 +1448,8 @@
             },
 
             async createRoom() {
-                if(this.isPreDeposit && !this.deposit){
-                    this.alertValiationMessage(`deposit amount`);
+                if(this.isPreDeposit && !this.deposit && this.selectedCashAccount){
+                    this.alertValiationMessage(`deposit amount or cash account`);
                     return;
                 }
                 let formData = new FormData();
@@ -1456,6 +1469,10 @@
                 formData.append('is_deposit', isDeposit);
                 if(this.deposit){
                     formData.append('deposit', this.deposit);
+                }
+                if(this.selectedCashAccount){
+                    formData.append('cash_account_id', this.selectedCashAccount.id);
+                    formData.append('account_id', this.selectedCustomer.account_id);
                 }
 
                 if (this.female > 0) {
@@ -2251,7 +2268,14 @@
                 let test_time = currentTime > targetDateTime;
                 console.log(test_time)
 
-            }
+            },
+
+            async getCashAccounts(){
+                let response = await getApiData({url: `/api/get_cash_account`, token: this.getToken()});
+                if(response.success){
+                    this.cashAccounts = response.data;
+                }
+            },
         },
 
         watch: {
@@ -2266,6 +2290,7 @@
             isPreDeposit(){
                 if(!this.isPreDeposit){
                     this.deposit = null;
+                    this.selectedCashAccount = null;
                 }
             },
         },
@@ -2280,6 +2305,7 @@
 
             this.getAccessoryCategoryList();
             // this.testtime();
+            this.getCashAccounts();
         },
         mounted()
         {
