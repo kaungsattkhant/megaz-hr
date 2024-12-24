@@ -383,6 +383,7 @@ class InvoiceRepository implements InvoiceRepositoryInterface
                 'amount' => $data['deposit'],
                 'account_id' => $data['account_id'],
                 'cash_account_id' => $data['cash_account_id'],
+                'customer_id' => $data['customer_id'],
             ]);
             $cash_account_id = $data['cash_account_id'];
             $data['date'] = now();
@@ -408,22 +409,44 @@ class InvoiceRepository implements InvoiceRepositoryInterface
                 'account_id' => $data['account_id'],
                 'action' => 'credit',
             ]);
+            return $customerDeposit;
         }
     }
 
-    public function storeInvoiceCustomerDeposit($data,$userId){
-        $isUsedDeposit = (bool) $data['is_used_deposit'];
-        if($isUsedDeposit){
+    public function storeInvoiceCustomerDeposit($data, $userId)
+    {
+        // $isUsedDeposit = (bool) $data['is_used_deposit'];
+        $depositBalance=$data['deposit_balance'];
+        if ($depositBalance>0) {
+            if($depositBalance>=$data['amount']){
+                $amount=$data['amount'];
+            }elseif($depositBalance<$data['amount']){
+                $amount=$depositBalance;
+            }
+
             $customerDeposit = CustomerDeposit::create([
                 'type' => 'withdrawal',
                 'date_time' => now(),
-                'amount' => $data['amount'],
+                'amount' => $amount,
                 'account_id' => $data['account_id'],
                 'cash_account_id' => $data['cash_account_id'],
+                'customer_id' => $data['customer_id'],
+            ]);
+            $data['date'] = now();
+            $data['created_by'] = $userId;
+            $transaction = (new StoreTransactionLedger())->createTransaction($data);
+            $creditLedger = (new StoreTransactionLedger())->storeLedger([
+                'date' => now(),    
+                'value' => $amount,
+                'personable_id' => $data['customer_id'],
+                'personable_type' => 'customer',
+                'transaction_id' => $transaction->id,
+                'account_id' => $data['account_id'],
+                'action' => 'credit',
             ]);
             return $customerDeposit;
         }
-      
+
     }
 
     public function deleteData(int $id)
@@ -826,13 +849,15 @@ class InvoiceRepository implements InvoiceRepositoryInterface
 
     public function doneEntityWithInvoice(array $data)
     {
-        //         invoice_id: 36
+        //payload
+        //invoice_id: 36
 // discount_type: null
 // order_categories: []
 // total: 10000
 // order_discount: 0
 // discount_total: 0
-// end_date: null
+// end_date: null 
+        //end
         DB::beginTransaction();
         try {
             $invoice = Invoice::find($data['invoice_id']);
@@ -960,12 +985,12 @@ class InvoiceRepository implements InvoiceRepositoryInterface
             $data['invoice_id'] = $invoice_id;
             $invoice->update($data);
             //customer deposit 
-            // $customerDepositData['customer_id'] = $invoice->customer_id;
-            // $customerDepositData['cash_account_id'] = $data['cash_account_id'];
-            // $customerDepositData['account_id'] = $data['account_id'];
-            // $customerDepositData['amount']=$data['total'];
-            // $customerDepositData['is_used_deposit']=$data['is_used_deposit'];
-            // $this->storeInvoiceCustomerDeposit($customerDepositData, UserData()->id);
+            $customerDepositData['customer_id'] = $invoice->customer_id;
+            $customerDepositData['cash_account_id'] = $data['cash_account_id'];
+            $customerDepositData['account_id'] = $data['account_id'];
+            $customerDepositData['amount']=$data['total'];
+            $customerDepositData['deposit_balance']=$data['deposit_balance'];
+            $this->storeInvoiceCustomerDeposit($customerDepositData, UserData()->id);
             //end
             foreach ($roomSessions as $session) {
                 $entitySession = $session->entitySession;
@@ -1002,7 +1027,6 @@ class InvoiceRepository implements InvoiceRepositoryInterface
                         ];
                     })
                     ->values();
-
                 foreach ($groupedOrderItems as $orderItem) {
                     TargetMenuResult::create([
                         'date_time' => CurrentTime(),

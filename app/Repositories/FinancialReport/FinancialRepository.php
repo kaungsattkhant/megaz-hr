@@ -662,11 +662,12 @@ class FinancialRepository implements FinancialInterface
 
     public function getInventorySchedule($request)
     {
-        // $current = (isset($request->date) || $request->date != null) ? Carbon::parse($request->date) : Carbon::now();
-        $currentMonth = Carbon::now()->month;
-
+        $current = (isset($request->date) || $request->date != null) ? Carbon::parse($request->date) : Carbon::now();
+        $currentMonth=$current->month;
+        $currentYear=$current->year;
+        // $currentMonth = Carbon::now()->month;
         // return $this->inventoryFinancialService->inventoryScheduleWithTypeByMonth($currentMonth);
-        return $this->inventoryFinancialService->inventoryScheduleWithCategoryByMonth($currentMonth);
+        return $this->inventoryFinancialService->inventoryScheduleWithCategoryByMonth($currentYear,$currentMonth);
         // $purchaseOrder = PurchaseOrderItem::
         //     join('po_grns', 'purchase_order_items.id', '=', 'po_grns.purchase_order_item_id')
         //     ->join('purchase_orders', 'purchase_order_items.purchase_order_id', 'purchase_orders.id')
@@ -779,6 +780,8 @@ class FinancialRepository implements FinancialInterface
         $other_receivable_balances = $this->financialService->getReceivableBalances($other_receivable, $year, $month);
         $receivable_debtor_balances = $this->financialService->getReceivableBalances($receivable_debtor, $year, $month);
 
+        // $closing_stocks = $this->financialService->getClosingStockBalance($year,$currentMonth);
+       
         $data['inventory_held'] = $inventoryHeldBalances;
         $data['cashbook'] = $cashBookBalances;
         $data['prepaid'] = $prepaidBalances;
@@ -786,10 +789,13 @@ class FinancialRepository implements FinancialInterface
         $data['other_receivable'] = $other_receivable_balances;
         $data['receivable_debtor'] = $receivable_debtor_balances;
 
+
         $otherPayableBalances = $this->financialService->getOtherPayableBalances($year, $month);
         $creditorBalances = $this->financialService->getCreditorBalances($year, $month);
+        $depositBalances = $this->financialService->getCustomerDepositBalances($year, $month);
         $data['other_payable']=$otherPayableBalances;
         $data['creditor']=$creditorBalances;
+        $data['deposit']=$depositBalances;
         return $data;
     }
 

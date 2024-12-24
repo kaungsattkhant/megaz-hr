@@ -148,4 +148,35 @@ class FinancialService
         });
         return $monthlyBalances;
     }
+
+    public function getCustomerDepositBalances($year,$month){
+        $year = $year;
+        $currentMonth = $month;
+        $monthlyBalances = collect(range(1, $currentMonth))->map(function ($month) use ($year) {
+            $date = Carbon::create($year, $month, 1);
+
+            // Calculate the sum of 'ar' and 'ar_paid' amounts for the year up to the current month
+            $additiontotal = DB::table('customer_deposits')
+                ->whereYear('date_time', $year)
+                ->whereMonth('date_time', '<=', $month)
+                ->where('type', 'deposit')
+                ->sum('amount');
+
+            $settlementTotal = DB::table('customer_deposits')
+                ->whereYear('date_time', $year)
+                ->whereMonth('date_time', '<=', $month)
+                ->where('type', 'withdrawal')
+                ->sum('amount');
+
+            // Calculate closing balance as the difference
+            $closingBalance = $additiontotal - $settlementTotal;
+
+            return [
+                'month_name' => $date->format('F'),
+                'date' => $date->format('Y-m-01'),
+                'value' => $closingBalance,
+            ];
+        });
+        return $monthlyBalances;
+    }
 }
