@@ -948,7 +948,8 @@ class MRPForecastRepository implements MRPForecastRepositoryInterface
 
     $conversionRate = $item->uom_conversion ?? 0;
     $averagePrice = $item->average_price ?? 0;
-
+    $balance = $item->balance ?? null;
+    $closingBalance = $balance->closing_balance ?? 0;
     if ($conversionRate == 0) {
       $forecastPrice = 0;
       $uomForecastAmt = 0;
@@ -960,8 +961,6 @@ class MRPForecastRepository implements MRPForecastRepositoryInterface
       $closingBalance = $balance->closing_balance ?? 0;
       $currentHolding = $closingBalance / $conversionRate;
     }
-
-    $balance = $item->balance ?? null;
     $inBalance = $balance->in_balance ?? 0;
     $outBalance = $balance->out_balance ?? 0;
 
@@ -971,21 +970,21 @@ class MRPForecastRepository implements MRPForecastRepositoryInterface
       'item_id' => $ktvItem->item_id,
       'name' =>  $item->name ?? 'null',
       'code' => $item->code ?? 'null',
-      'base_uom_id' => $item->base_uom_id,
+      'base_uom_id' => $item->base_uom_id ?? null,
       'base_uom_name' => $item->base_uom_name ?? 'null',
-      'uom_id' => $item->uom_id,
+      'uom_id' => $item->uom_id ?? 0,
       'item_uom' => $item->item_uom ?? 'null',
-      'weight' => $ktvItem->quantity,
+      'weight' => $ktvItem->quantity ?? 0,
       'uom_conversion_id' => $item->uom_conversion_id,
-      'uom_conversion' => $conversionRate,
-      'total_uom_amt' => $totalUom,
+      'uom_conversion' => $conversionRate ?? 0,
+      'total_uom_amt' => $totalUom ?? 0,
       'average_price' => round($averagePrice, 4),
-      'forecast_price' => $forecastPrice,
-      'forecast_uom_amt' => $uomForecastAmt,
+      'forecast_price' => $forecastPrice ?? 0,
+      'forecast_uom_amt' => $uomForecastAmt ?? 0,
       'in_balance' => $inBalance,
       'out_balance' => $outBalance,
-      'closing_balance' => $closingBalance,
-      'current_holdings' => $currentHolding
+      'closing_balance' => $closingBalance ?? 0,
+      'current_holdings' => $currentHolding ?? 0
     ];
   }
 
@@ -1061,5 +1060,21 @@ class MRPForecastRepository implements MRPForecastRepositoryInterface
       ];
     });
     return $this->groupKTVHr($KtvHr);
+  }
+
+  public function deleteMrpForecast($mrpForecastId)
+  {
+    DB::beginTransaction();
+    try {
+      $mrpForecast = MrpForecast::findOrFail($mrpForecastId);
+      $mrpForecast->MrpHrs()->delete();
+      $mrpForecast->MrpRawMaterials()->delete();
+      $mrpForecast->targetMrpForecasts()->delete();
+      $mrpForecast->delete();
+      DB::commit();
+    } catch (Exception $e) {
+      DB::rollBack();
+      throw $e;
+    }
   }
 }

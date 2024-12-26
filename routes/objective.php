@@ -60,5 +60,6 @@ Route::middleware('auth:api')->group(function () {
     Route::post('/forecast/ktvs_raw_materials/{entityId}', 'getForecastKTVRawMaterialsByEntityId');
     Route::post('/forecast/ktvs_hr', 'getForecastKTVHr');
     Route::post('/forecast/ktvs_hr/{entityId}', 'getForecastKTVHrByEntityId');
+    Route::delete('/mrp_forecasts/{mrp_forecast_id}', 'deleteMrpForecast');
   });
 });

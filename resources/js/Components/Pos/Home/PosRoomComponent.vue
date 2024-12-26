@@ -1299,6 +1299,8 @@
 
                 cashAccounts: [],
                 selectedCashAccount: null,
+
+                depositBalance: null,
             };
         },
 
@@ -1320,9 +1322,12 @@
                 // this.getSelectedRoom();
                 if (this.roomList[roomIndex].entity_sessions[timeIndex].is_active == 1) {
                     this.isOpenRoomStep('detail');
-                    this.getPurchaseMenuList();
+                    this.getPurchaseMenuList(); // why is this called
                     const response = await getApiData({ url: '/api/entities_sessions/'+ this.selectedTime.id, token: this.getToken() });
                     if (response.data) {
+                        if(response.data.deposit_balance > 0){
+                            this.depositBalance = response.data.deposit_balance;
+                        }
                         this.selectedRoom = response.data;
                         this.serviceList = response.data.services;
                         this.accessoryListSidebar = response.data.invoice_accessories;
@@ -1509,8 +1514,11 @@
                 }
             },
             async getPurchaseMenuList() {
-                const response = await getApiData({ url: '/api/entities_sessions/'+ this.selectedTime.id, token: this.getToken() });
+                const response = await getApiData({ url: '/api/entities_sessions/'+ this.selectedTime.id, token: this.getToken() }); // and why is this api also called
                 if (response.data) {
+                    if(response.data.deposit_balance > 0){
+                        this.depositBalance = response.data.deposit_balance;
+                    }
                     if (response.data.room_sessions.length > 0) {
                         this.purchaseMenuList = response.data.room_sessions[0].invoice.orders;
                         if (response.data.room_sessions[0].invoice.orders) {
@@ -1525,6 +1533,10 @@
             async getSelectedRoom(){
                 const response = await getApiData({ url: '/api/entities_sessions/'+ this.selectedTime.id, token: this.getToken() });
                     if (response.data) {
+                        if(response.data.deposit_balance > 0){
+                            this.depositBalance = response.data.deposit_balance;
+                            alert(this.depositBalance);
+                        }
                         this.selectedRoom = response.data;
                         this.serviceList = response.data.services;
                         this.purchaseMenuList = response.data.room_sessions[0].invoice.orders
@@ -1553,6 +1565,9 @@
                 let formData = new FormData();
                 let roomSessions = [];
                 formData.append('invoice_id', this.selectedRoom.room_sessions[0].invoice.id);
+                // if(this.depositBalance > 0){
+                //     formData.append('deposit_balance', this.depositBalance);
+                // }
                 let response = await postApiData({ url: '/api/room_done', form_data: formData, token: this.getToken() });
                 if (response.success) {
                     this.roomSessionData = response.data;
@@ -1561,6 +1576,7 @@
                     this.isOpenRoomStep('invoice')
                     this.printInvoiceData.service_total_value = response.data.total_service_value;
                     this.printInvoiceData.accessory_total_value = response.data.total_accessory_value;
+                    // this.depositBalance = null;
                 }
                 else {
                     this.$notify({
@@ -1785,8 +1801,13 @@
                 let formData = new FormData();
                 formData.append('invoice_id', this.selectedRoom.room_sessions[0].invoice.id);
                 // formData.append('payment_type', this.selectedPaymentMethod);
-                formData.append('discount_type', this.discount_type);
+                if(this.discount_type){
+                    formData.append('discount_type', this.discount_type);
+                }
 
+                if(this.depositBalance > 0){
+                    formData.append('deposit_balance', this.depositBalance);
+                }
                 if (this.discount_type == 'fix_amount') {
                     formData.append('discount_value', this.printInvoiceData.discount);
                     // totalAmount = totalAmount - this.printInvoiceData.discount;
