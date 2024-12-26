@@ -12,6 +12,7 @@ class ObjectivekeyStaff extends Model
     protected $fillable =
     [
         'staff_id',
+        'assign_date',
         'objective_key_id',
         'status',
         'in_progressed_at',

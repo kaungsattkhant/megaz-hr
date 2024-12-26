@@ -210,4 +210,9 @@ class Staff extends Authenticatable
     {
         return $this->hasMany(ObjectivekeyStaff::class, 'cancelled_by');
     }
+
+    public function objectiveKeyStaff()
+    {
+        return $this->hasMany(ObjectivekeyStaff::class, 'staff_id');
+    }
 }

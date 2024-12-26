@@ -4,6 +4,7 @@ namespace App\Http\Controllers\API;
 
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Objective\AssignRequest;
 use App\Http\Requests\Objective\ObjImgRequest;
 use App\Http\Requests\Objective\ObjectiveRequest;
 use App\Repositories\Objective\ObjectiveInterface;
@@ -54,6 +55,33 @@ class ObjectiveController extends Controller
     public function deleteObjective(int $objId)
     {
         $data = $this->objectiveRepository->deleteObjective($objId);
+        ResponseData($data);
+    }
+
+    // assign duties 
+
+    public function getObjectiveKeysByStaffId(int $staffId)
+    {
+        $data = $this->objectiveRepository->getObjectiveKeysByStaffId($staffId);
+        ResponseData($data);
+    }
+
+    public function getAssignDutiesByObjectiveKeys(Request $request)
+    {
+        $data = $this->objectiveRepository->getAssignDutiesByObjectiveKeys($request);
+        ResponseData($data);
+    }
+
+    public function storeAssignDutiesByObjectiveKeys(AssignRequest $request)
+    {
+        $data = $this->objectiveRepository->storeAssignDutiesByObjectiveKeys($request->all());
+        ResponseData($data);
+    }
+
+
+    public function updateAssignDutiesByObjectiveKeys(AssignRequest $request, $objectiveKeyStaffId)
+    {
+        $data = $this->objectiveRepository->updateAssignDutiesByObjectiveKeys($request->all(), $objectiveKeyStaffId);
         ResponseData($data);
     }
 

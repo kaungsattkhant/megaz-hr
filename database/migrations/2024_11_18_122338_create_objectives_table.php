@@ -14,7 +14,6 @@ return new class extends Migration
         Schema::create('objectives', function (Blueprint $table) {
             $table->id();
             $table->string('objective_name');
-
             $table->integer('created_by');
             $table->boolean('is_active')->default(1);
             $table->timestamps();

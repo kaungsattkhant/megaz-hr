@@ -14,6 +14,12 @@ interface ObjectiveInterface
   public function update(array $validatedData, int $objId);
   public function deleteObjective($objId);
 
+  //assign duties keyresults
+  public function getObjectiveKeysByStaffId(int $staffId);
+  public function getAssignDutiesByObjectiveKeys(Request $request);
+  public function storeAssignDutiesByObjectiveKeys($validatedData);
+  public function updateAssignDutiesByObjectiveKeys($validatedData, $objectiveKeyStaffId);
+
   //mobil
   public function objectiveLists(Request $request);
   public function getdailyObjectives(Request $request, $objId);

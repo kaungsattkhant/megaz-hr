@@ -13,7 +13,6 @@ class ObjectiveKey extends Model
         'role_id',
         'name',
         'okr_point',
-        'assigned_days',
         'duration',
     ];
 
@@ -29,7 +28,7 @@ class ObjectiveKey extends Model
 
     public function objKeyStaff(): HasMany
     {
-        return $this->hasMany(ObjectivekeyStaff::class);
+        return $this->hasMany(ObjectivekeyStaff::class, 'objective_key_id');
     }
 
 

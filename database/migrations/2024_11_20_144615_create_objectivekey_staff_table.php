@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('objectivekey_staff', function (Blueprint $table) {
             $table->id();
             $table->foreignId('staff_id');
+            $table->date('assign_date');
             $table->foreignId('objective_key_id');
             $table->string('status')->default('assigned');
             $table->dateTime('in_progressed_at')->nullable();
