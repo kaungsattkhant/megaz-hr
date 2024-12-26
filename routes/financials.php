@@ -1,8 +1,9 @@
 <?php
 
+use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\API\CreditorController;
 use App\Http\Controllers\API\AccountPayableController;
 use App\Http\Controllers\API\FinancialReportController;
-use Illuminate\Support\Facades\Route;
 
 Route::middleware('auth:api')->group(function () {
     Route::controller(FinancialReportController::class)->group(function () {
@@ -16,7 +17,12 @@ Route::middleware('auth:api')->group(function () {
     });
     Route::controller(AccountPayableController::class)->group(function () {
         Route::get('get_account_payable_balance','getAccountPayableBalance');
+        Route::get('account_payable_report','accountPayableReport');
     });
+    Route::controller(CreditorController::class)->group(function () {
+        Route::get('get_creditor_balance','getCreditorBalance');
+    });
+
 });
 
 Route::controller(FinancialReportController::class)->group(function () {

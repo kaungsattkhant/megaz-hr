@@ -227,50 +227,9 @@ class AccountPayableRepository implements AccountPayableInterface
         ];
     }
 
-    // total balance 
-    // $totalBalances = Account::whereHas('sub_account', function ($q) use ($account_code) {
-    //     $q->whereIn('account_code', $account_code);
-    // })
-    // ->leftJoin('account_payables', function ($join) use ($year, $currentMonth) {
-    //     $join->on('accounts.id', '=', 'account_payables.account_id')
-    //         ->whereYear('account_payables.date_time', $year)
-    //         ->whereMonth('account_payables.date_time', '<=', $currentMonth);
-    // })
-    // ->select(
-    //     // Total additions across all months
-    //     DB::raw("COALESCE(SUM(CASE WHEN account_payables.type = 'addition' THEN account_payables.amount ELSE 0 END), 0) as total_addition"),
 
-    //     // Total settlements across all months
-    //     DB::raw("COALESCE(SUM(CASE WHEN account_payables.type = 'settlement' THEN account_payables.amount ELSE 0 END), 0) as total_settlement"),
-
-    //     // Total amount (net additions - settlements across all months)
-    //     DB::raw("COALESCE(SUM(CASE WHEN account_payables.type = 'addition' THEN account_payables.amount ELSE 0 END) - 
-    //               SUM(CASE WHEN account_payables.type = 'settlement' THEN account_payables.amount ELSE 0 END), 0) as total_amount"),
-
-    //     // Opening balance: total addition - settlement before current month
-    //     DB::raw("(
-    //         SELECT COALESCE(SUM(CASE WHEN type = 'addition' THEN amount ELSE 0 END) - 
-    //                SUM(CASE WHEN type = 'settlement' THEN amount ELSE 0 END), 0)
-    //         FROM account_payables AS ap
-    //         WHERE ap.account_id = accounts.id
-    //           AND YEAR(ap.date_time) = {$year}
-    //           AND MONTH(ap.date_time) < {$currentMonth}
-    //     ) as total_opening_balance"),
-
-    //     // Closing balance (opening balance + current month’s total addition - settlement)
-    //     DB::raw("(
-    //         (
-    //             SELECT COALESCE(SUM(CASE WHEN type = 'addition' THEN amount ELSE 0 END) - 
-    //                            SUM(CASE WHEN type = 'settlement' THEN amount ELSE 0 END), 0)
-    //             FROM account_payables AS ap
-    //             WHERE ap.account_id = accounts.id
-    //               AND YEAR(ap.date_time) = {$year}
-    //               AND MONTH(ap.date_time) < {$currentMonth}
-    //         ) + 
-    //         COALESCE(SUM(CASE WHEN account_payables.type = 'addition' THEN account_payables.amount ELSE 0 END) - 
-    //                  SUM(CASE WHEN account_payables.type = 'settlement' THEN account_payables.amount ELSE 0 END), 0)
-    //     ) as total_closing_balance")
-    // )
-    // ->first();
+    public function accountPayableReport($request){
+        
+    }
 
 }

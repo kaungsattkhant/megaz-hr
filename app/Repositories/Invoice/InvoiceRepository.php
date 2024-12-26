@@ -986,7 +986,8 @@ class InvoiceRepository implements InvoiceRepositoryInterface
             $customerDepositData['customer_id'] = $invoice->customer_id;
             $customerDepositData['account_id'] = $invoice->customer->account_id;
             $customerDepositData['amount']=$data['total'];
-            $customerDepositData['deposit_balance']=$data['deposit_balance'];
+            $customerDepositData['deposit_balance']=$this->getCustomerDepositBalance($customer->id);
+
             $this->storeInvoiceCustomerDeposit($customerDepositData, UserData()->id);
             //end
             foreach ($roomSessions as $session) {
