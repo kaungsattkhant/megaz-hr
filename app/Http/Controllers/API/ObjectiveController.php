@@ -58,6 +58,8 @@ class ObjectiveController extends Controller
         ResponseData($data);
     }
 
+
+
     // assign duties 
 
     public function getObjectiveKeysByStaffId(int $staffId)
@@ -66,11 +68,31 @@ class ObjectiveController extends Controller
         ResponseData($data);
     }
 
-    public function getAssignDutiesByObjectiveKeys(Request $request)
+    public function getAssignDutiesByObjectiveKeys(Request $request, $assignDutyId = null)
     {
-        $data = $this->objectiveRepository->getAssignDutiesByObjectiveKeys($request);
+        $data = $this->objectiveRepository->getAssignDutiesByObjectiveKeys($request, $assignDutyId = null);
         ResponseData($data);
     }
+
+    public function showAssignDutiesById(Request $request, $assignDutyId)
+    {
+        $data = $this->objectiveRepository->getAssignDutiesByObjectiveKeys($request, $assignDutyId);
+        ResponseData($data);
+    }
+
+
+    public function deleteAssignDutiesById($assignDutyId)
+    {
+        $data = $this->objectiveRepository->deleteAssignDutiesById($assignDutyId);
+        ResponseData($data);
+    }
+
+    public function deleteAssignObjKeyStaffById(int $objKeyStaffId)
+    {
+        $data = $this->objectiveRepository->deleteAssignObjKeyStaffById($objKeyStaffId);
+        ResponseData($data);
+    }
+
 
     public function storeAssignDutiesByObjectiveKeys(AssignRequest $request)
     {
@@ -79,9 +101,9 @@ class ObjectiveController extends Controller
     }
 
 
-    public function updateAssignDutiesByObjectiveKeys(AssignRequest $request, $objectiveKeyStaffId)
+    public function updateAssignDutiesByObjectiveKeys(AssignRequest $request, $assignDutyId)
     {
-        $data = $this->objectiveRepository->updateAssignDutiesByObjectiveKeys($request->all(), $objectiveKeyStaffId);
+        $data = $this->objectiveRepository->updateAssignDutiesByObjectiveKeys($request->all(), $assignDutyId);
         ResponseData($data);
     }
 

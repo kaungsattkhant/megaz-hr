@@ -17,8 +17,11 @@ Route::middleware('auth:api')->group(function () {
     //assign duties by objkeystaff
     Route::get('/objectives_keys_by_staff/{staff_id}', 'getObjectiveKeysByStaffId');
     Route::get('/assign_duties', 'getAssignDutiesByObjectiveKeys');
+    Route::get('/assign_duties/{id}', 'showAssignDutiesById');
+    Route::delete('/assign_duties/{id}', 'deleteAssignDutiesById');
+    Route::delete('/assign_duties/objective_key_staff/{id}', 'deleteAssignObjKeyStaffById');
     Route::post('/assign_duties', 'storeAssignDutiesByObjectiveKeys');
-    Route::post('/assign_duties/{objectiveKeyStaffId}', 'updateAssignDutiesByObjectiveKeys');
+    Route::post('/assign_duties/{assignDutyId}', 'updateAssignDutiesByObjectiveKeys');
 
     //mobile-api
     Route::get('/daily/objectives', 'objectiveLists');

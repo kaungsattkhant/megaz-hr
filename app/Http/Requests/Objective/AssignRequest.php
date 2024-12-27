@@ -24,9 +24,9 @@ class AssignRequest extends APIRequest
     public function rules(): array
     {
         return [
-            'staff_id' => 'required',
+
             'assign_date' => 'required|date',
-            'objective_key_id' => 'required',
+            'assign_duty' => 'required',
         ];
     }
 

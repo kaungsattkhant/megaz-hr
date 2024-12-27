@@ -12,8 +12,8 @@ class ObjectivekeyStaff extends Model
     protected $fillable =
     [
         'staff_id',
-        'assign_date',
         'objective_key_id',
+        'objective_key_duty_id',
         'status',
         'in_progressed_at',
         'in_progressed_by',
@@ -41,5 +41,10 @@ class ObjectivekeyStaff extends Model
     public function objKeyStaffImg()
     {
         return $this->hasMany(ObjectiveKeyStaffImage::class);
+    }
+
+    public function objectiveKeyDuty()
+    {
+        return $this->belongsTo(ObjectiveKeyDuty::class, 'objective_key_duty_id');
     }
 }

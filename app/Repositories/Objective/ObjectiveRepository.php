@@ -13,6 +13,7 @@ use App\Models\KtvObjective;
 use App\Models\ObjectiveKey;
 use Illuminate\Http\Request;
 use App\Models\KtvProductTree;
+use App\Models\ObjectiveKeyDuty;
 use App\Models\ObjectivekeyStaff;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
@@ -126,9 +127,27 @@ class  ObjectiveRepository implements ObjectiveInterface
         DB::beginTransaction();
         try {
 
-            $objKey = ObjectiveKey::findOrFail($validatedData['objective_key_id']);
-            $validatedData['okr_point'] = $objKey->okr_point;
-            $objectiveKeyStaff = ObjectivekeyStaff::create($validatedData);
+            $objectiveKeyDutyData = [
+                'assign_date' => $validatedData['assign_date'],
+                'created_by' => UserData()->id,
+                'is_active' => $validatedData['is_active'] ?? true,
+            ];
+            $objectiveKeyDuty = ObjectiveKeyDuty::create($objectiveKeyDutyData);
+
+            $objectiveKeyStaff = null;
+            if (isset($validatedData['assign_duty'])) {
+                $assignDuties = json_decode($validatedData['assign_duty'], true);
+                foreach ($assignDuties as $assignDuty) {
+                    $objKey = ObjectiveKey::findOrFail($assignDuty['objective_key_id']);
+
+                    $objectiveKeyStaff = ObjectivekeyStaff::create([
+                        'staff_id' => $assignDuty['staff_id'],
+                        'objective_key_id' => $assignDuty['objective_key_id'],
+                        'objective_key_duty_id' => $objectiveKeyDuty->id,
+                        'okr_point' => $objKey->okr_point,
+                    ]);
+                }
+            }
 
             DB::commit();
             return $objectiveKeyStaff;
@@ -138,20 +157,83 @@ class  ObjectiveRepository implements ObjectiveInterface
         }
     }
 
-    public function updateAssignDutiesByObjectiveKeys($validatedData, $objectiveKeyStaffId)
+    public function updateAssignDutiesByObjectiveKeys($validatedData, $assignDutyId)
     {
-        $objKey = ObjectiveKey::findOrFail($validatedData['objective_key_id']);
-        $validatedData['okr_point'] = $objKey->okr_point;
-        $objKeyStaff = ObjectivekeyStaff::findOrFail($objectiveKeyStaffId);
-        $objKeyStaff->update($validatedData);
-        return $objKeyStaff;
+        DB::beginTransaction();
+        try {
+            $objKeyDuty = ObjectiveKeyDuty::findOrFail($assignDutyId);
+            $objKeyDuty->update($validatedData);
+
+            if (isset($validatedData['assign_duty'])) {
+                $assignDuties = json_decode($validatedData['assign_duty'], true);
+                foreach ($assignDuties as $assignDuty) {
+                    $objKey = ObjectiveKey::findOrFail($assignDuty['objective_key_id']);
+                    if (isset($assignDuty['id'])) {
+                        $objectiveKeyStaff = ObjectivekeyStaff::findOrFail($assignDuty['id']);
+                        $objectiveKeyStaff->update([
+                            'staff_id' => $assignDuty['staff_id'],
+                            'objective_key_id' => $assignDuty['objective_key_id'],
+                            'objective_key_duty_id' => $objKeyDuty->id,
+                            'okr_point' => $objKey->okr_point,
+                        ]);
+                    } else {
+                        ObjectivekeyStaff::create([
+                            'staff_id' => $assignDuty['staff_id'],
+                            'objective_key_id' => $assignDuty['objective_key_id'],
+                            'objective_key_duty_id' => $objKeyDuty->id,
+                            'okr_point' => $objKey->okr_point,
+                        ]);
+                    }
+                }
+            }
+
+            DB::commit();
+            return $objKeyDuty;
+        } catch (Exception $e) {
+            DB::rollBack();
+            throw $e;
+        }
     }
 
-    public function getAssignDutiesByObjectiveKeys(Request $request)
+    public function getAssignDutiesByObjectiveKeys(Request $request, $assignDutyId = null)
     {
-        $data =  ObjectivekeyStaff::with('objectiveKey.objective', 'staff.department', 'staff.roles')->get();
+        if ($assignDutyId) {
+            $objKeyDuty = ObjectiveKeyDuty::with([
+                'objectivekeyStaff.objectiveKey.objective',
+                'objectivekeyStaff.staff.department',
+                'objectivekeyStaff.staff.roles',
+            ])->findOrFail($assignDutyId);
+            return new AssignResource($objKeyDuty);
+        } else {
+            $objKeyDuties =  ObjectiveKeyDuty::with([
+                'objectivekeyStaff.objectiveKey.objective',
+                'objectivekeyStaff.staff.department',
+                'objectivekeyStaff.staff.roles'
+            ])->get();
+            return AssignResource::collection($objKeyDuties);
+            // $groupedData = $objKeyDuties->groupBy('assign_date')->map(function ($duties, $date) {
+            //     return [
+            //         'assign_date' => $date,
+            //         'duties' => AssignResource::collection($duties),
+            //     ];
+            // });
+            // return $groupedData->values();
+        }
+    }
 
-        return AssignResource::collection($data);
+    public function deleteAssignDutiesById($assignDutyId)
+    {
+        $objKeyDuty = ObjectiveKeyDuty::findOrFail($assignDutyId);
+        $objKeyDuty->objectivekeyStaff()->delete();
+        $objKeyDuty->delete();
+        return $objKeyDuty;
+    }
+
+    public function deleteAssignObjKeyStaffById(int $objKeyStaffId)
+    {
+        $objKeyStaff = ObjectivekeyStaff::findOrFail($objKeyStaffId);
+        $objKeyStaff->delete();
+        return $objKeyStaff;
     }
 
     //mobile

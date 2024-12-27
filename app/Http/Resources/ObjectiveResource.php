@@ -5,7 +5,7 @@ namespace App\Http\Resources;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class AssignResource extends JsonResource
+class ObjectiveResource extends JsonResource
 {
     /**
      * Transform the resource into an array.
@@ -16,12 +16,11 @@ class AssignResource extends JsonResource
     {
         return [
             'id' => $this->id,
-            'assign_date' => $this->assign_date,
+            'objective_name' => $this->objective_name,
             'created_by' => $this->created_by,
             'is_active' => $this->is_active,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
-            'objectivekey_staff' => ObjectiveKeyStaffResource::collection($this->whenLoaded('objectivekeyStaff')),
         ];
     }
 }

@@ -19,10 +19,10 @@ class ObjectiveKeyResource extends JsonResource
             'objective_id' => $this->objective_id,
             'name' => $this->name,
             'okr_point' => $this->okr_point,
-            'assigned_days' => $this->assigned_days,
             'duration' => $this->duration,
-            'created_at' => $this->created_at,
-            'updated_at' => $this->updated_at,
+            'role_id' => $this->role_id,
+            'role_name' => $this->role->name ?? null,
+            'objective' => new ObjectiveResource($this->whenLoaded('objective')),
         ];
     }
 }

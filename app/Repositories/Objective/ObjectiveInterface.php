@@ -16,10 +16,11 @@ interface ObjectiveInterface
 
   //assign duties keyresults
   public function getObjectiveKeysByStaffId(int $staffId);
-  public function getAssignDutiesByObjectiveKeys(Request $request);
+  public function getAssignDutiesByObjectiveKeys(Request $request, $assignDutyId = null);
   public function storeAssignDutiesByObjectiveKeys($validatedData);
   public function updateAssignDutiesByObjectiveKeys($validatedData, $objectiveKeyStaffId);
-
+  public function deleteAssignDutiesById($assignDutyId);
+  public function deleteAssignObjKeyStaffById(int $objKeyStaffId);
   //mobil
   public function objectiveLists(Request $request);
   public function getdailyObjectives(Request $request, $objId);
