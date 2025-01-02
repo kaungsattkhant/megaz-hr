@@ -5,7 +5,7 @@ namespace App\Http\Resources;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class DailyObjKeyStaffResource extends JsonResource
+class ObjectiveResource extends JsonResource
 {
     /**
      * Transform the resource into an array.
@@ -16,13 +16,10 @@ class DailyObjKeyStaffResource extends JsonResource
     {
         return [
             'id' => $this->id,
-            'assign_date' => $this->objectiveKeyDuty->assign_date,
-            'staff_id' => $this->staff_id,
-            'objective_key_id' => $this->objective_key_id,
-            'status' => $this->status,
+            'objective_name' => $this->objective_name,
+            // 'is_active' => $this->is_active,
             // 'created_at' => $this->created_at,
             // 'updated_at' => $this->updated_at,
-            'objective_key' => new ObjectiveKeyResource($this->objectiveKey),
         ];
     }
 }

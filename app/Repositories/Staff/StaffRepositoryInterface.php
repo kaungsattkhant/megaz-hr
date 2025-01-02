@@ -12,15 +12,15 @@ interface StaffRepositoryInterface
 
     public function staffBalanceList(Request $request);
 
-    public function staffBalanceDetail(Request $request,int $id);
+    public function staffBalanceDetail(Request $request, int $id);
 
     public function createData(array $data);
 
-    public function updateData(array $data,int $id);
+    public function updateData(array $data, int $id);
 
     public function deleteData($id);
 
-    public function getStaffByDepartment(Request $request, int $departmentId);
+    public function getStaffByDepartment(Request $request, int $departmentId, array $roles = null);
 
     public function getStaffByDepartmentSlug($slug);
 
@@ -34,6 +34,5 @@ interface StaffRepositoryInterface
 
     public function staffReport(Request $request);
 
-    public function staffDuty(Request $request,int $id);
-
+    public function staffDuty(Request $request, int $id);
 }

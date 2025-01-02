@@ -12,13 +12,21 @@ Route::middleware('auth:api')->group(function () {
     Route::post('/objectives', 'store');
     Route::post('/objectives/{id}', 'update');
     Route::get('/objectives/{id}', 'getObjectiveById');
-    Route::get('/objectives/{id}', 'getObjectiveById');
     Route::delete('/objectives/{id}', 'deleteObjective');
+
+    //assign duties by objkeystaff
+    Route::get('/objectives_keys_by_staff/{staff_id}', 'getObjectiveKeysByStaffId');
+    Route::get('/assign_duties', 'getAssignDutiesByObjectiveKeys');
+    Route::get('/assign_duties/{id}', 'showAssignDutiesById');
+    Route::delete('/assign_duties/{id}', 'deleteAssignDutiesById');
+    Route::delete('/assign_duties/objective_key_staff/{id}', 'deleteAssignObjKeyStaffById');
+    Route::post('/assign_duties', 'storeAssignDutiesByObjectiveKeys');
+    Route::post('/assign_duties/{assignDutyId}', 'updateAssignDutiesByObjectiveKeys');
 
     //mobile-api
     Route::get('/daily/objectives', 'objectiveLists');
     Route::get('/daily/objectives_key/{objId}', 'getdailyObjectives');
-    // Route::get('/daily/objectives/{objId}', 'getdailyObjectivesById');
+    Route::get('/daily/objectives/{staffId}', 'getdailyObjectivesByStaffId');
     Route::post('/daily/objectives_key_staff/{id}', 'updateDailyObjective');
     Route::post('/objectives/key_staff/{id}/images', 'storeImages');
     Route::post('/objectives/key_staff/{objKeyStaffId}/images/update', 'updateImages');

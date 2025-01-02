@@ -4,6 +4,7 @@ namespace App\Http\Controllers\API;
 
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Objective\AssignRequest;
 use App\Http\Requests\Objective\ObjImgRequest;
 use App\Http\Requests\Objective\ObjectiveRequest;
 use App\Repositories\Objective\ObjectiveInterface;
@@ -58,6 +59,55 @@ class ObjectiveController extends Controller
     }
 
 
+
+    // assign duties 
+
+    public function getObjectiveKeysByStaffId(int $staffId)
+    {
+        $data = $this->objectiveRepository->getObjectiveKeysByStaffId($staffId);
+        ResponseData($data);
+    }
+
+    public function getAssignDutiesByObjectiveKeys(Request $request, $assignDutyId = null)
+    {
+        $data = $this->objectiveRepository->getAssignDutiesByObjectiveKeys($request, $assignDutyId = null);
+        ResponseData($data);
+    }
+
+    public function showAssignDutiesById(Request $request, $assignDutyId)
+    {
+        $data = $this->objectiveRepository->getAssignDutiesByObjectiveKeys($request, $assignDutyId);
+        ResponseData($data);
+    }
+
+
+    public function deleteAssignDutiesById($assignDutyId)
+    {
+        $data = $this->objectiveRepository->deleteAssignDutiesById($assignDutyId);
+        ResponseData($data);
+    }
+
+    public function deleteAssignObjKeyStaffById(int $objKeyStaffId)
+    {
+        $data = $this->objectiveRepository->deleteAssignObjKeyStaffById($objKeyStaffId);
+        ResponseData($data);
+    }
+
+
+    public function storeAssignDutiesByObjectiveKeys(AssignRequest $request)
+    {
+        $data = $this->objectiveRepository->storeAssignDutiesByObjectiveKeys($request->all());
+        ResponseData($data);
+    }
+
+
+    public function updateAssignDutiesByObjectiveKeys(AssignRequest $request, $assignDutyId)
+    {
+        $data = $this->objectiveRepository->updateAssignDutiesByObjectiveKeys($request->all(), $assignDutyId);
+        ResponseData($data);
+    }
+
+
     //for mobile
 
     public function objectiveLists(Request $request)
@@ -107,9 +157,9 @@ class ObjectiveController extends Controller
         ResponseData($data);
     }
 
-    public function getdailyObjectivesById(Request $request, $objId)
+    public function getdailyObjectivesByStaffId(Request $request, $staffId)
     {
-        $data = $this->objectiveRepository->getdailyObjectivesById($request, $objId);
+        $data = $this->objectiveRepository->getdailyObjectivesByStaffId($request, $staffId);
         ResponseData($data);
     }
 
