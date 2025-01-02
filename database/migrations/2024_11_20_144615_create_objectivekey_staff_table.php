@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('staff_id');
             $table->foreignId('objective_key_id');
+            $table->foreignId('objective_key_duty_id');
             $table->string('status')->default('assigned');
             $table->dateTime('in_progressed_at')->nullable();
             $table->integer('in_progressed_by')->nullable();

@@ -1061,4 +1061,20 @@ class MRPForecastRepository implements MRPForecastRepositoryInterface
     });
     return $this->groupKTVHr($KtvHr);
   }
+
+  public function deleteMrpForecast($mrpForecastId)
+  {
+    DB::beginTransaction();
+    try {
+      $mrpForecast = MrpForecast::findOrFail($mrpForecastId);
+      $mrpForecast->MrpHrs()->delete();
+      $mrpForecast->MrpRawMaterials()->delete();
+      $mrpForecast->targetMrpForecasts()->delete();
+      $mrpForecast->delete();
+      DB::commit();
+    } catch (Exception $e) {
+      DB::rollBack();
+      throw $e;
+    }
+  }
 }

@@ -12,8 +12,16 @@ Route::middleware('auth:api')->group(function () {
     Route::post('/objectives', 'store');
     Route::post('/objectives/{id}', 'update');
     Route::get('/objectives/{id}', 'getObjectiveById');
-    Route::get('/objectives/{id}', 'getObjectiveById');
     Route::delete('/objectives/{id}', 'deleteObjective');
+
+    //assign duties by objkeystaff
+    Route::get('/objectives_keys_by_staff/{staff_id}', 'getObjectiveKeysByStaffId');
+    Route::get('/assign_duties', 'getAssignDutiesByObjectiveKeys');
+    Route::get('/assign_duties/{id}', 'showAssignDutiesById');
+    Route::delete('/assign_duties/{id}', 'deleteAssignDutiesById');
+    Route::delete('/assign_duties/objective_key_staff/{id}', 'deleteAssignObjKeyStaffById');
+    Route::post('/assign_duties', 'storeAssignDutiesByObjectiveKeys');
+    Route::post('/assign_duties/{assignDutyId}', 'updateAssignDutiesByObjectiveKeys');
 
     //mobile-api
     Route::get('/daily/objectives', 'objectiveLists');
@@ -60,5 +68,6 @@ Route::middleware('auth:api')->group(function () {
     Route::post('/forecast/ktvs_raw_materials/{entityId}', 'getForecastKTVRawMaterialsByEntityId');
     Route::post('/forecast/ktvs_hr', 'getForecastKTVHr');
     Route::post('/forecast/ktvs_hr/{entityId}', 'getForecastKTVHrByEntityId');
+    Route::delete('/mrp_forecasts/{mrp_forecast_id}', 'deleteMrpForecast');
   });
 });
