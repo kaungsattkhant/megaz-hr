@@ -39,7 +39,7 @@ class StaffRepository implements StaffRepositoryInterface
         $month = $request->input('month', date('m'));
         $year = $request->input('year', date('Y'));
 
-        $staffBalances = StaffBalance::with('staff')->where('month', $month)->where('year', $year)->orderBy('created_at','desc')->paginate(config('common.list_count'));
+        $staffBalances = StaffBalance::with('staff')->where('month', $month)->where('year', $year)->orderBy('created_at', 'desc')->paginate(config('common.list_count'));
 
         foreach ($staffBalances as $staffBalance) {
             $totalAddition = StaffAdvance::where('staff_id', $staffBalance->staff_id)
@@ -219,8 +219,11 @@ class StaffRepository implements StaffRepositoryInterface
         return false;
     }
 
-    public function getStaffByDepartment(Request $request, int $departmentId)
+    public function getStaffByDepartment(Request $request, int $departmentId, array $roles = null)
     {
+        $allowedRoles = in_array('Manager', $roles)
+            ? ['Supervisor', 'Staff']
+            : ['Staff'];
         if ($request->per_page || $request->page) {
             // $totalCount = Staff::where('department_id', $departmentId)->where('is_active', 1)->count();
             // $pageNumber = 1;
@@ -238,29 +241,37 @@ class StaffRepository implements StaffRepositoryInterface
             //     ->get();
             // $staffData = MakePaginationData($request, $totalCount, 'staffs', $staffs);
 
-            $staffs = Staff::with('department')->where('department_id', $departmentId)
+            $staffs = Staff::with(['department', 'roles'])
+                ->whereHas('roles', function ($query) use ($allowedRoles) {
+                    $query->whereIn('name', $allowedRoles);
+                })->where('department_id', $departmentId)
                 ->where('is_active', 1)
                 ->paginate(20);
             return $staffs;
         } else {
-            $staffs = Staff::with('department')
+            $staffs = Staff::with(['department', 'roles'])
+                ->whereHas('roles', function ($query) use ($allowedRoles) {
+                    $query->whereIn('name', $allowedRoles);
+                })
                 ->where('department_id', $departmentId)
                 ->where('is_active', 1)
                 ->get();
+
             return $staffs;
         }
     }
 
-    public function getStaffByDepartmentSlug($slug){
+    public function getStaffByDepartmentSlug($slug)
+    {
         $staffs = Staff::with('department')
-        ->whereHas('department',function($query)use($slug){
-            $query->where('slug',$slug);
-        })
-        ->where('is_active', 1)
-        ->get();
-    return $staffs;
+            ->whereHas('department', function ($query) use ($slug) {
+                $query->where('slug', $slug);
+            })
+            ->where('is_active', 1)
+            ->get();
+        return $staffs;
     }
-    
+
 
     public function deleteStaffRole(int $staff_id, int $role_id)
     {
@@ -352,7 +363,7 @@ class StaffRepository implements StaffRepositoryInterface
             $query->where('staff.department_id', $request->input('department_id'));
         }
 
-        $staffs = $query->orderBy('created_at','desc')->paginate(config('common.list_count'));
+        $staffs = $query->orderBy('created_at', 'desc')->paginate(config('common.list_count'));
 
         ResponseData($staffs);
     }

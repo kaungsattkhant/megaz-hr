@@ -165,7 +165,7 @@ Route::middleware('auth:api')->group(function () {
     Route::delete('/complaints_carbon_copies/{id}', [ComplaintAPIController::class, 'deleteComplaintCarbonCopy']);
 
 
-    Route::get('/supervisor/staff', [StaffAPIController::class, 'getStaffListBySupervisor']);
+    Route::get('/staffs_by_role', [StaffAPIController::class, 'getStaffListBySupervisor']);
     Route::get('/supervisor/staff/{staffId}/tasks', [TaskController::class, 'getStaffTasksBySupervisor']);
     // Route::get('/task_list', [TaskController::class, 'getStaffTasksBySupervisor']);
 
@@ -381,7 +381,7 @@ Route::middleware('auth:api')->group(function () {
         Route::get('/duties/{id}', 'dutyDetail');
     });
     Route::resource('canteens', CanteenController::class)->only(['index', 'store', 'show']);
-    Route::controller(CanteenController::class)->group(function () { });
+    Route::controller(CanteenController::class)->group(function () {});
     //service
     Route::resource('services', ServiceController::class)->only(['index', 'store', 'show']);
 
@@ -413,7 +413,7 @@ Route::middleware('auth:api')->group(function () {
         Route::get('creditors', 'index');
         Route::get('creditor_transaction_list', 'listOfAccountPayableTransaction');
         Route::post('create_creditor_transaction', 'createCreditorTransaction');
-        
+
         Route::get('/get_creditor_account_list', 'getCreditorAccountList');
         Route::post('/create_creditor_account', 'createCreditorAccount');
         Route::get('/get_creditor_transaction_by_supplier', 'getCreditorTransactionBySupplier');

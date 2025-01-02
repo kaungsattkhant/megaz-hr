@@ -20,7 +20,9 @@ use Illuminate\Support\Facades\Auth;
 use App\Http\Resources\AssignResource;
 use App\Models\ObjectiveKeyStaffImage;
 use Illuminate\Support\Facades\Storage;
+use App\Http\Resources\ObjectiveResource;
 use App\Http\Resources\KtvObjectiveRsource;
+use App\Http\Resources\dailyObjectiveByStaffId;
 use App\Http\Resources\DailyObjKeyStaffResource;
 use App\Http\Resources\KtvProductTreeEditResource;
 
@@ -205,19 +207,13 @@ class  ObjectiveRepository implements ObjectiveInterface
             ])->findOrFail($assignDutyId);
             return new AssignResource($objKeyDuty);
         } else {
-            $objKeyDuties =  ObjectiveKeyDuty::with([
-                'objectivekeyStaff.objectiveKey.objective',
-                'objectivekeyStaff.staff.department',
-                'objectivekeyStaff.staff.roles'
-            ])->get();
-            return AssignResource::collection($objKeyDuties);
-            // $groupedData = $objKeyDuties->groupBy('assign_date')->map(function ($duties, $date) {
-            //     return [
-            //         'assign_date' => $date,
-            //         'duties' => AssignResource::collection($duties),
-            //     ];
-            // });
-            // return $groupedData->values();
+            // $objKeyDuties =  ObjectiveKeyDuty::with([
+            //     'objectivekeyStaff.objectiveKey.objective',
+            //     'objectivekeyStaff.staff.department',
+            //     'objectivekeyStaff.staff.roles'
+            // ])->get();
+            // return AssignResource::collection($objKeyDuties);
+            return ObjectiveKeyDuty::paginate();
         }
     }
 
@@ -239,26 +235,25 @@ class  ObjectiveRepository implements ObjectiveInterface
     //mobile
     public function objectiveLists(Request $request)
     {
-        $currentDay = now()->format('l');
+        $currentDate = now()->toDateString();
         $staffId = UserData()->id;
 
-        $data =  Objective::with([
-            'objectiveKeys' => function ($query) use ($currentDay, $staffId) {
-                $query->whereRaw("FIND_IN_SET(?, assigned_days)", [$currentDay]);
-            },
+        $objectives =  Objective::with([
             'objectiveKeys.objKeyStaff' => function ($query) use ($staffId) {
                 $query->where('staff_id', $staffId);
             },
-            'objectiveKeys.objKeyStaff.objKeyStaffImg'
+            'objectiveKeys'
         ])
-            ->whereHas('objectiveKeys', function ($query) use ($currentDay, $staffId) {
-                $query->whereRaw("FIND_IN_SET(?, assigned_days)", [$currentDay])
-                    ->whereHas('objKeyStaff', function ($query) use ($staffId) {
-                        $query->where('staff_id', $staffId);
-                    });
+            ->whereHas('objectiveKeys', function ($query) use ($currentDate, $staffId) {
+                $query->whereHas('objKeyStaff', function ($query) use ($currentDate, $staffId) {
+                    $query->whereHas('objectiveKeyDuty', function ($query) use ($currentDate) {
+                        $query->whereRaw("DATE(assign_date) = ?", [$currentDate]);
+                    })
+                        ->where('staff_id', $staffId);
+                });
             })
             ->paginate();
-        return $data;
+        return ObjectiveResource::collection($objectives);
     }
 
 
@@ -266,37 +261,44 @@ class  ObjectiveRepository implements ObjectiveInterface
     //objkeylistwithstaff assigns 
     public function getdailyObjectives(Request $request, $objId)
     {
-        $currentDay = now()->format('l');
+        $currentDate = now()->toDateString();
 
         $objectives = ObjectivekeyStaff::with([
-            'objectiveKey' => function ($query) use ($currentDay) {
-                $query->whereRaw("FIND_IN_SET(?, assigned_days)", [$currentDay]);
+            'objectiveKeyDuty' => function ($query) use ($currentDate) {
+                $query->whereRaw('DATE(assign_date) = ?', [$currentDate]);
             },
-            'objectiveKey.objective',
+            'objectiveKeyDuty',
+            'objectiveKey',
         ])
             ->where('staff_id', UserData()->id)
-            ->whereHas('objectiveKey.objective', function ($query) use ($currentDay, $objId) {
-                $query->whereRaw("FIND_IN_SET(?, assigned_days)", [$currentDay])
-                    ->where('id', $objId);
+            ->whereHas('objectiveKeyDuty', function ($query) use ($currentDate) {
+                $query->whereRaw('DATE(assign_date) = ?', [$currentDate]);
+            })
+            ->whereHas('objectiveKey.objective', function ($query) use ($objId) {
+                $query->where('id', $objId);
             })
             ->get();
 
         return DailyObjKeyStaffResource::collection($objectives);
     }
 
-    public function getdailyObjectivesById(Request $request, $objId)
+    public function getdailyObjectivesByStaffId(Request $request, $staffId)
     {
-        $currentDay = now()->format('l');
-        $objectives = ObjectiveKey::with([
-            'objKeyStaff' => function ($query) {
-                $query->where('staff_id', UserData()->id);
-            }
-        ])
-            ->where('objective_id', $objId)
-            ->whereRaw("FIND_IN_SET(?, assigned_days)", [$currentDay])
-            ->get();
-
-        return  $objectives;
+        $currentDate = now()->toDateString();
+        if (!checkRoles(['Supervisor', 'Manager'])) {
+            ResponseMessage('Permission is not allowed', 403);
+            return;
+        }
+        if (checkRoles(['Supervisor'])) {
+            $dutyDateIds = ObjectiveKeyDuty::where('assign_date', $currentDate)->pluck('id');
+            $objectiveKeyStaff = ObjectivekeyStaff::with([
+                'objectiveKeyDuty',
+                'objectiveKey',
+            ])->where('staff_id', $staffId)
+                ->whereIn('objective_key_duty_id', $dutyDateIds)
+                ->get();
+            return dailyObjectiveByStaffId::collection($objectiveKeyStaff);
+        }
     }
 
     public function getObjKeyStaffImage($objKeystaffId)

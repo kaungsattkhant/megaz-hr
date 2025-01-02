@@ -26,7 +26,7 @@ Route::middleware('auth:api')->group(function () {
     //mobile-api
     Route::get('/daily/objectives', 'objectiveLists');
     Route::get('/daily/objectives_key/{objId}', 'getdailyObjectives');
-    // Route::get('/daily/objectives/{objId}', 'getdailyObjectivesById');
+    Route::get('/daily/objectives/{staffId}', 'getdailyObjectivesByStaffId');
     Route::post('/daily/objectives_key_staff/{id}', 'updateDailyObjective');
     Route::post('/objectives/key_staff/{id}/images', 'storeImages');
     Route::post('/objectives/key_staff/{objKeyStaffId}/images/update', 'updateImages');

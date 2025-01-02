@@ -17,10 +17,9 @@ class ObjectiveResource extends JsonResource
         return [
             'id' => $this->id,
             'objective_name' => $this->objective_name,
-            'created_by' => $this->created_by,
-            'is_active' => $this->is_active,
-            'created_at' => $this->created_at,
-            'updated_at' => $this->updated_at,
+            // 'is_active' => $this->is_active,
+            // 'created_at' => $this->created_at,
+            // 'updated_at' => $this->updated_at,
         ];
     }
 }

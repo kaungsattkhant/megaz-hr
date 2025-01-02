@@ -29,9 +29,9 @@ class StaffAPIController extends Controller
         $staffBalances = $this->staffRepo->staffBalanceList($request);
     }
 
-    public function detailStaffBalance(Request $request,int $id)
+    public function detailStaffBalance(Request $request, int $id)
     {
-        $staffBalance = $this->staffRepo->staffBalanceDetail($request,$id);
+        $staffBalance = $this->staffRepo->staffBalanceDetail($request, $id);
     }
 
     public function getStaffData(Request $request)
@@ -44,17 +44,17 @@ class StaffAPIController extends Controller
     public function createStaff(Request $request)
     {
         $data = $request->except(['nrc_front_image', 'nrc_back_image', 'household_registration_image']);
-        if($request->hasFile('nrc_front_image')){
+        if ($request->hasFile('nrc_front_image')) {
             $uploadedFile = UploadFileToServer($request, 'nrc_front_image', 'staff_images');
             $data['nrc_front_url'] = $uploadedFile['file_url'];
             $data['nrc_front_path'] = $uploadedFile['file_path'];
         }
-        if($request->hasFile('nrc_back_image')){
+        if ($request->hasFile('nrc_back_image')) {
             $uploadedFile = UploadFileToServer($request, 'nrc_back_image', 'staff_images');
             $data['nrc_back_url'] = $uploadedFile['file_url'];
             $data['nrc_back_path'] = $uploadedFile['file_path'];
         }
-        if($request->hasFile('household_registration_image')){
+        if ($request->hasFile('household_registration_image')) {
             $uploadedFile = UploadFileToServer($request, 'household_registration_image', 'staff_images');
             $data['household_registration_url'] = $uploadedFile['file_url'];
             $data['household_registration_path'] = $uploadedFile['file_path'];
@@ -68,26 +68,25 @@ class StaffAPIController extends Controller
     public function updateStaff(Request $request, $id)
     {
         $data = $request->except(['nrc_front_image', 'nrc_back_image', 'household_registration_image']);
-        if($request->hasFile('nrc_front_image')){
+        if ($request->hasFile('nrc_front_image')) {
             $uploadedFile = UploadFileToServer($request, 'nrc_front_image', 'staff_images');
             $data['nrc_front_url'] = $uploadedFile['file_url'];
             $data['nrc_front_path'] = $uploadedFile['file_path'];
         }
-        if($request->hasFile('nrc_back_image')){
+        if ($request->hasFile('nrc_back_image')) {
             $uploadedFile = UploadFileToServer($request, 'nrc_back_image', 'staff_images');
             $data['nrc_back_url'] = $uploadedFile['file_url'];
             $data['nrc_back_path'] = $uploadedFile['file_path'];
         }
-        if($request->hasFile('household_registration_image')){
+        if ($request->hasFile('household_registration_image')) {
             $uploadedFile = UploadFileToServer($request, 'household_registration_image', 'staff_images');
             $data['household_registration_url'] = $uploadedFile['file_url'];
             $data['household_registration_path'] = $uploadedFile['file_path'];
         }
         $staff = $this->staffRepo->updateData($data, $id);
 
-        if(!$staff)
-        {
-            ResponseMessage('Staff not found with given ID',404);
+        if (!$staff) {
+            ResponseMessage('Staff not found with given ID', 404);
         }
         ResponseData($staff);
     }
@@ -105,18 +104,24 @@ class StaffAPIController extends Controller
     public function getStaffListBySupervisor(Request $request)
     {
         $staff = Staff::find($request->user()->id);
-        $roles = $staff->roles;
-        $isASupervisor = false;
-        foreach($roles as $role){
-            if($role->name == 'Supervisor'){
-                $isASupervisor = true;
-                break;
-            }
+
+        $roles = $staff->roles->pluck('name')->toArray();
+        $isSupervisorOrManager = in_array('Supervisor', $roles) || in_array('Manager', $roles);
+        if (!$isSupervisorOrManager) {
+            ResponseMessage('Not authorized', 403);
         }
-        if(!$isASupervisor){
-            ResponseMessage('Not a supervisor', 403);
-        }
-        $staff = $this->staffRepo->getStaffByDepartment($request, $staff->department_id);
+        // $isASupervisor = false;
+        // foreach ($roles as $role) {
+        //     if ($role->name == 'Supervisor') {
+        //         $isASupervisor = true;
+        //         break;
+        //     }
+        // }
+        // if (!$isASupervisor) {
+        //     ResponseMessage('Not a supervisor', 403);
+        // }
+
+        $staff = $this->staffRepo->getStaffByDepartment($request, $staff->department_id, $roles);
         ResponseData($staff);
     }
 
@@ -128,23 +133,23 @@ class StaffAPIController extends Controller
 
     public function deleteRoleStaff(int $staff_id, int $role_id)
     {
-        $staff = $this->staffRepo->deleteStaffRole($staff_id,$role_id);
+        $staff = $this->staffRepo->deleteStaffRole($staff_id, $role_id);
     }
 
     public function deleteInventoryStaff(int $staff_id, int $inventory_id)
     {
-        $staff = $this->staffRepo->deleteStaffInventory($staff_id,$inventory_id);
+        $staff = $this->staffRepo->deleteStaffInventory($staff_id, $inventory_id);
     }
 
 
     public function deleteFeatureStaff(int $staff_id, int $feature_id)
     {
-        $staff = $this->staffRepo->deleteStaffFeature($staff_id,$feature_id);
+        $staff = $this->staffRepo->deleteStaffFeature($staff_id, $feature_id);
     }
 
-    public function getStaffByDepartment(Request $request,int $department_id)
+    public function getStaffByDepartment(Request $request, int $department_id)
     {
-        $staff = $this->staffRepo->getStaffByDepartment($request,$department_id);
+        $staff = $this->staffRepo->getStaffByDepartment($request, $department_id);
         ResponseData($staff);
     }
 
@@ -159,8 +164,8 @@ class StaffAPIController extends Controller
         $staff = $this->staffRepo->staffReport($request);
     }
 
-    public function getStaffWithDuties(Request $request,int $id)
+    public function getStaffWithDuties(Request $request, int $id)
     {
-        $this->staffRepo->staffDuty($request,$id);
+        $this->staffRepo->staffDuty($request, $id);
     }
 }
