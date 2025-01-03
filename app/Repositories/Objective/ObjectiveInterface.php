@@ -29,7 +29,7 @@ interface ObjectiveInterface
   public function updateImages($validatedData, $objKeyStaffId);
   public function getObjKeyStaffImage($objKeystaffId);
   public function deleteObjKeystaffImage($imgId);
-  public function getdailyObjectivesById(Request $request, $objId);
+  public function getdailyObjectivesByStaffId(Request $request, $staffId);
 
   //ktvobjtree
   public function getKtvRoom(Request $request);
