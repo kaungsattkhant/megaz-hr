@@ -455,7 +455,6 @@ Route::controller(ExcelImportController::class)->group(function () {
     Route::post('/import_account', 'importAccount');
 });
 
-
 Route::controller(SaleTargetPositionAPIController::class)->group(function () {
     Route::get('/sale_target_positions', 'listAllSalteTargetPosition');
     Route::get('/sale_target_positions/{id}', 'saleTargetPositionDetail');

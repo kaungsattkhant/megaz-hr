@@ -12,14 +12,24 @@ class BrandController extends Controller
     //
     public function index(Request $request)
     {
-        return ResponseData(Brand::orderBy('id','desc')->get());
+        $brandQuery=Brand::orderBy('id','desc');
+        if(isset($request->page)){
+            return ResponseData($brandQuery->paginate(config('common.list_count')));
+        }
+        return ResponseData($brandQuery->get());
     }
 
     public function createBrand(Request $request){
         $data=$request->all();
         DB::beginTransaction();
         try {
-            $brand = Brand::create($data);
+            if (!isset($request->id)) {
+                $data['id'] = null;
+            }
+            $brand = Brand::updateOrCreate(
+                ['id' => $data['id']],
+                $data
+            );
             DB::commit();
             return $brand;
         } catch (\Exception $e) {
