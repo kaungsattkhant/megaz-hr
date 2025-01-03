@@ -104,6 +104,9 @@ import KtvForecastingCreateComponent from './Components/KtvForecastings/KtvForec
 import KtvForecastingEditComponent from './Components/KtvForecastings/KtvForecastingEditComponent.vue';
 import CreditorListComponent from './Components/Creditor/CreditorListComponent.vue';
 import CreditorHistoryComponent from './Components/Creditor/CreditorHistoryComponent.vue';
+import OkrDutyComponent from './Components/OkrDuty/OkrDutyComponent.vue';
+import OkrDutyCreateComponent from './Components/OkrDuty/OkrDutyCreateComponent.vue';
+import OkrDutyEditComponent from './Components/OkrDuty/OkrDutyEditComponent.vue';
 
 import LoginComponent from './Components/Auth/LoginComponent.vue';
 import LogoutComponent from './Components/Auth/LogoutComponent.vue';
@@ -222,6 +225,9 @@ app.component('KtvForecastingCreateComponent', KtvForecastingCreateComponent);
 app.component('KtvForecastingEditComponent', KtvForecastingEditComponent);
 app.component('CreditorListComponent', CreditorListComponent);
 app.component('CreditorHistoryComponent', CreditorHistoryComponent);
+app.component('OkrDutyComponent', OkrDutyComponent);
+app.component('OkrDutyCreateComponent', OkrDutyCreateComponent);
+app.component('OkrDutyEditComponent', OkrDutyEditComponent);
 
 app.component('PurchaseOrderListComponent', PurchaseOrderListComponent);
 app.component('PurchaseOrderCreateComponent', PurchaseOrderCreateComponent);

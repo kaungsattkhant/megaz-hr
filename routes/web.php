@@ -329,3 +329,6 @@ Route::middleware(['departments:objective'])->group(function () {
 Route::view('/creditor', 'creditor.index')->name('creditor');
 Route::view('/creditor/suppliers/{creditorId}/transactions', 'creditor.history')->name('creditor.history');
 
+Route::view('/okr_duty', 'okr_duty.index')->name('okr_duty');
+Route::view('/okr_duty/create', 'okr_duty.create')->name('okr_duty.create');
+Route::view('/okr_duty/{id}/edit', 'okr_duty.edit');
