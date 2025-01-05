@@ -293,7 +293,7 @@ class  ObjectiveRepository implements ObjectiveInterface
             $dutyDateIds = ObjectiveKeyDuty::where('assign_date', $currentDate)->pluck('id');
             $objectiveKeyStaff = ObjectivekeyStaff::with([
                 'objectiveKeyDuty',
-                'objectiveKey',
+                'objectiveKey.objective',
             ])->where('staff_id', $staffId)
                 ->whereIn('objective_key_duty_id', $dutyDateIds)
                 ->get();

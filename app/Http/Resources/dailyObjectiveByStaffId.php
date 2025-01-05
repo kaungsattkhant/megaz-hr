@@ -4,6 +4,7 @@ namespace App\Http\Resources;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
+use App\Http\Resources\ObjectiveKeyResource;
 
 class dailyObjectiveByStaffId extends JsonResource
 {
@@ -20,7 +21,7 @@ class dailyObjectiveByStaffId extends JsonResource
             'staff_id' => $this->staff_id,
             'objective_key_id' => $this->objective_key_id,
             'status' => $this->status,
-            'objective_key' => new ObjectiveKeyResource($this->objectiveKey),
+            'objective_key' => new ObjectiveKeyResource($this->objectiveKey) ?? null,
             "in_progressed_at" => $this->in_progressed_at,
             "in_progressed_by" => $this->in_progressed_by,
             "completed_at" =>  $this->completed_at,
