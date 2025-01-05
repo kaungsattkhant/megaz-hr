@@ -62,7 +62,8 @@ class SupplierRepository implements SupplierInterface
             //     $supplier->items()->detach(); // Detaches all relationships
             // }
 
-            // $syncData = [];
+            $syncData = [];
+            $uniqueCombinations = [];
             // foreach ($itemIds as $itemId) {
             //     foreach ($brandIds as $brandId) {
             //         $syncData[] = [
@@ -71,14 +72,22 @@ class SupplierRepository implements SupplierInterface
             //         ];
             //     }
             // }
-            // // Bulk insert into the pivot table
-            // DB::table('supplier_item')->insert($syncData);
-
-            foreach ($brandIds as $brandId) {
-                foreach ($itemIds as $itemId) {
-                    $supplier->items()->attach($itemId, ['brand_id' => $brandId]);
+            foreach ($itemIds as $itemId) {
+                foreach ($brandIds as $brandId) {
+                    $combinationKey = $supplier->id.'_'.$itemId . '_' . $brandId; // Create a unique key
+                    if (!isset($uniqueCombinations[$combinationKey])) {
+                        $syncData[] = [
+                            'supplier_id'=>$supplier->id,
+                            'item_id' => $itemId,
+                            'brand_id' => $brandId,
+                        ];
+                        $uniqueCombinations[$combinationKey] = true; // Mark this combination as added
+                    }
                 }
             }
+            // Bulk insert into the pivot table
+            DB::table('supplier_items')->insert($syncData);
+
 
             DB::commit();
             return $supplier;
