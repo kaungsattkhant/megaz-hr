@@ -180,7 +180,7 @@ export default {
     components: {
         Multiselect
     },
-    props: ["supplierId"],
+    props: ["supplierId","itemId"],
     data() {
         return {
             brandsList: [],
@@ -206,7 +206,7 @@ export default {
             if(pageNumber){
                 this.currentPage = pageNumber;
             }
-            let url = `/api/brand_by_supplier/${this.supplierId}`;
+            let url = `/api/brand_by_supplier?item_id=${this.itemId}&supplier_id=${this.supplierId}`;
             let response = await getApiData({url: url, token: this.getToken()});
             if(response.success){
                 this.brandsList = response.data;
