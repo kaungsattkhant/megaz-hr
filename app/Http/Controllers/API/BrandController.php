@@ -31,7 +31,7 @@ class BrandController extends Controller
                 $data
             );
             DB::commit();
-            return $brand;
+            ResponseData($brand);
         } catch (\Exception $e) {
             DB::rollback();
             ResponseMessage($e->getMessage(), 402);
