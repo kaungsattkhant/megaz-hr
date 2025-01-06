@@ -280,7 +280,7 @@
             </div>
             <div>
                 <button class="add-btn" @click="btnClickedRoomForecastingCreate()">
-                    CrDoneeate 
+                    Done 
                 </button>
             </div>
         </div>
@@ -410,7 +410,7 @@
 
 <script>
 import { Modal, Ripple, initTE, Tab, Select } from "tw-elements";
-import { getApiData, postApiData } from '../../utilities/ajax-helpers';
+import { getApiData, postApiData, deleteApiData } from '../../utilities/ajax-helpers';
 import { mapGetters } from "vuex";
 import Multiselect from 'vue-multiselect';
 export default {
@@ -543,13 +543,26 @@ export default {
             let target_mrp = [];
             if(this.selectedRoomList){
                 this.selectedRoomList.forEach(room => {
-                    target_mrp.push({
-                        mrp_forecastable_type : room.mrp_forecastable_type,
-                        quantity : room.quantity,
-                        amount : 0,
-                        hour : room.hour,
-                        mrp_forecastable_id : room.mrp_forecastable_id,
-                    })
+                    if(room.id){
+                        target_mrp.push({
+                            id: room.id,
+                            mrp_forecastable_type : room.mrp_forecastable_type,
+                            quantity : room.quantity,
+                            amount : 0,
+                            hour : room.hour,
+                            mrp_forecastable_id : room.mrp_forecastable_id,
+                        })
+                    }
+                    else{
+                        target_mrp.push({
+                            mrp_forecastable_type : room.mrp_forecastable_type,
+                            quantity : room.quantity,
+                            amount : 0,
+                            hour : room.hour,
+                            mrp_forecastable_id : room.mrp_forecastable_id,
+                        })
+                    }
+                    
                 });
             }
             let hrList = [];
@@ -584,7 +597,7 @@ export default {
             let response = await postApiData({url: url, form_data: formData, token: this.getToken()});
             if(response.success){
                 // this.rawMaterialList = response.data;
-                // window.location.replace('/ktv_forecasting');
+                window.location.replace('/ktv_forecasting');
             }
         },
 
@@ -683,8 +696,16 @@ export default {
             }
         },
 
-        removeRoomTableItem(index) {
-            this.selectedRoomList.splice(index, 1);
+        async removeRoomTableItem(index) {
+            let id = this.selectedRoomList[index].id;
+            console.log(index)
+            console.log(this.selectedRoomList[index])
+            console.log(id)
+            let response = await deleteApiData({ url: `/api/forecasts_mrp_monthly_menu/` + id, token: this.getToken() });
+            if (response.success) {
+                this.selectedRoomList.splice(index, 1);
+            }
+            
             // this.updateItemPriceTotal(this.ingredientItems);
         },
         async getPoList(){
