@@ -18,5 +18,12 @@ Route::middleware('auth:api')->group(function () {
     Route::post('/time_shifts', 'storeTimeShift');
     Route::post('/time_shifts/{id}', 'updateTimeShift');
     Route::delete('/time_shifts/{id}', 'deleteTimeShiftById');
+
+    //mobile check in out
+    Route::post('/current_time_shift', 'getCurrentTimeShift');
+    Route::get('/check_ins', 'getAllCheckIns');
+    Route::get('/total_hours_check_ins', 'getTotalHoursCheckIns');
+    Route::post('/check_ins', 'checkIn');
+    Route::post('/check_ins/{id}', 'checkOut');
   });
 });
