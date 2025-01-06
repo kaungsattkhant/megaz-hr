@@ -4,9 +4,10 @@ namespace App\Repositories\Supplier;
 
 use App\Models\Account;
 use App\Models\Supplier;
+use App\Models\SupplierItem;
 use Illuminate\Http\Request;
+use PhpParser\Node\Expr\Isset_;
 use Illuminate\Support\Facades\DB;
-
 
 class SupplierRepository implements SupplierInterface
 {
@@ -47,48 +48,63 @@ class SupplierRepository implements SupplierInterface
                 ['id' => $data['id']],
                 $data
             );
-            $brandIds = $request->brands;// [1,2]
-            $itemIds = $request->items;//[6]
-
-            // foreach ($brandIds as $brandId) {
-            //     // $supplier->items()->sync($request->items);
-            //     $supplier->items()->syncWithPivotValues($itemIds, ['brand_id' => $brandId]);
-            // }
-
-
-
-
-            // if ($request->id) {
-            //     $supplier->items()->detach(); // Detaches all relationships
-            // }
-
-            $syncData = [];
-            $uniqueCombinations = [];
-            // foreach ($itemIds as $itemId) {
-            //     foreach ($brandIds as $brandId) {
-            //         $syncData[] = [
-            //             'item_id' => $itemId,
-            //             'brand_id' => $brandId,
-            //         ];
-            //     }
-            // }
-            foreach ($itemIds as $itemId) {
-                foreach ($brandIds as $brandId) {
-                    $combinationKey = $supplier->id.'_'.$itemId . '_' . $brandId; // Create a unique key
-                    if (!isset($uniqueCombinations[$combinationKey])) {
+            // dd($request->all());
+            $decodedSupplierItems = json_decode($request->supplier_items);
+            // dd($decodedSupplierItems);
+            foreach ($decodedSupplierItems as $supplierItems) {
+                if (isset($request->id)) {
+                    if (!isset($supplierItems->id)) {
+                        $isExistSupplierItem = SupplierItem::where('supplier_id', $supplier->id)
+                            ->where('item_id', $supplierItems->item_id)
+                            ->where('brand_id', $supplierItems->brand_id)
+                            ->first();
+                        if ($isExistSupplierItem) {
+                            ResponseMessage('Brand and Item are already created to this supplier', 419);
+                        }
                         $syncData[] = [
-                            'supplier_id'=>$supplier->id,
-                            'item_id' => $itemId,
-                            'brand_id' => $brandId,
+                            'supplier_id' => $supplier->id,
+                            'item_id' => $supplierItems->item_id,
+                            'brand_id' => $supplierItems->brand_id,
                         ];
-                        $uniqueCombinations[$combinationKey] = true; // Mark this combination as added
                     }
+                } else {
+                    // $supplieItem=SupplierItem::create([
+                    //     'supplier_id'=>$supplier->id,
+                    //     'item_id'=>$supplierItems->item_id,
+                    //     'brand_id'=>$supplierItems->brand_id,
+                    // ]);
+                    $syncData[] = [
+                        'supplier_id' => $supplier->id,
+                        'item_id' => $supplierItems->item_id,
+                        'brand_id' => $supplierItems->brand_id,
+                    ];
                 }
             }
-            // Bulk insert into the pivot table
             DB::table('supplier_items')->insert($syncData);
 
-
+            //tem command
+            // if (!isset($request->id)) {
+            //     $brandIds = $request->brands;// [1,2]
+            //     $itemIds = $request->items;//[6]
+            //     $syncData = [];
+            //     $uniqueCombinations = [];
+            //     foreach ($itemIds as $itemId) {
+            //         foreach ($brandIds as $brandId) {
+            //             $combinationKey = $supplier->id . '_' . $itemId . '_' . $brandId; // Create a unique key
+            //             if (!isset($uniqueCombinations[$combinationKey])) {
+            //                 $syncData[] = [
+            //                     'supplier_id' => $supplier->id,
+            //                     'item_id' => $itemId,
+            //                     'brand_id' => $brandId,
+            //                 ];
+            //                 $uniqueCombinations[$combinationKey] = true; // Mark this combination as added
+            //             }
+            //         }
+            //     }
+            //     // Bulk insert into the pivot table
+            //     DB::table('supplier_items')->insert($syncData);
+            // }
+            //
             DB::commit();
             return $supplier;
         } catch (\Exception $e) {
@@ -110,7 +126,7 @@ class SupplierRepository implements SupplierInterface
         try {
             $otherPayableCode = config('common.payable_account_code');
             $creditorCode = config('common.creditor_account_code');
-            $otherPayable = $this->createAccountBySubAccount('Other Payable-'.$request->name, $otherPayableCode);
+            $otherPayable = $this->createAccountBySubAccount('Other Payable-' . $request->name, $otherPayableCode);
             $creditor = $this->createAccountBySubAccount($request->name, $creditorCode);
 
             if ($otherPayable && $creditor) {
