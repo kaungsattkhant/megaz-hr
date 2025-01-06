@@ -87,7 +87,7 @@ class TimeShiftController extends Controller
 
     public function getCurrentTimeShift(Request $request)
     {
-        $data =  $this->TimeShiftRepository->getCurrentTimeShift($request->all());
+        $data =  $this->TimeShiftRepository->getCurrentTimeShift($request);
         ResponseData($data);
     }
 

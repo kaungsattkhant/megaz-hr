@@ -86,12 +86,12 @@ class TimeShiftRepository implements TimeShiftRepositoryInterface
 
     $response = [
       'gps' => $gps,
-      'current_time_shift' => new GetCurrentTimeShiftResource($currentTimeShift),
+      'current_time_shift' => $currentTimeShift ? new GetCurrentTimeShiftResource($currentTimeShift) : null,
     ];
 
-
-    if (isset($request['staff_id'])) {
-      $checkIn = CheckIn::where('staff_id', $request['staff_id'])
+    $staffId = $request->input('staff_id');
+    if (isset($staffId)) {
+      $checkIn = CheckIn::where('staff_id', $staffId)
         ->where('time_shift_id', $currentTimeShift->id)
         ->orderBy('check_in_date_time', 'desc')
         ->first();
@@ -188,7 +188,16 @@ class TimeShiftRepository implements TimeShiftRepositoryInterface
 
   public function checkIn(array $requestData)
   {
+    $staffId = $requestData['staff_id'];
+    $currentDate = now()->format('Y-m-d');
 
+    $existingCheckIn = CheckIn::where('staff_id', $staffId)
+      ->whereDate('check_in_date_time', $currentDate)
+      ->where('is_current_checked_in', true)
+      ->first();
+    if ($existingCheckIn) {
+      return ['error' => 'You have already checked in today.'];
+    }
     $userLat = $requestData['latitude'];
     $userLng = $requestData['longitude'];
 
@@ -226,7 +235,7 @@ class TimeShiftRepository implements TimeShiftRepositoryInterface
   {
     $checkIn = CheckIn::find($checkInId);
 
-    if ($checkIn) {
+    if ($checkIn && $checkIn->is_current_checked_in) {
       if (isset($validatedData['check_out_photo'])) {
         $image = $validatedData['check_out_photo'];
         $extension = $image->getClientOriginalExtension();
