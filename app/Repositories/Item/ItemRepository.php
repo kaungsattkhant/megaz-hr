@@ -134,15 +134,15 @@ class ItemRepository implements ItemRepositoryInterface
 
     public function supplierByItem($itemId)
     {
-        $supplierByItem = SupplierItem::with('supplier', 'item','brand')
-            ->where('item_id',  $itemId)
-            // ->groupBy('supplier_id')
-            ->get();
-        // $supplierByItem = SupplierItem::with('supplier', 'item', 'brand')
-        //     ->where('item_id', $itemId)
-        //     ->select('supplier_id', DB::raw('MAX(id) as id')) // Use MAX(id) to pick a unique row per supplier_id
-        //     ->groupBy('supplier_id')
+        // $supplierByItem = SupplierItem::with('supplier', 'item','brand')
+        //     ->where('item_id',  $itemId)
+        //     // ->groupBy('supplier_id')
         //     ->get();
+        $supplierByItem = SupplierItem::with('supplier', 'item', 'brand')
+            ->where('item_id', $itemId)
+            ->select('supplier_id', DB::raw('MAX(id) as id')) // Use MAX(id) to pick a unique row per supplier_id
+            ->groupBy('supplier_id')
+            ->get();
         return $supplierByItem;
     }
 
