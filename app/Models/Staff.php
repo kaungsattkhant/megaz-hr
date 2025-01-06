@@ -215,4 +215,9 @@ class Staff extends Authenticatable
     {
         return $this->hasMany(ObjectivekeyStaff::class, 'staff_id');
     }
+
+    public function checkIns()
+    {
+        return $this->hasMany(CheckIn::class, 'staff_id');
+    }
 }

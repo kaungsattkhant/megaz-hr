@@ -289,7 +289,7 @@ class  ObjectiveRepository implements ObjectiveInterface
             ResponseMessage('Permission is not allowed', 403);
             return;
         }
-        if (checkRoles(['Supervisor'])) {
+        if (checkRoles(['Supervisor']) || checkRoles(['Manager'])) {
             $dutyDateIds = ObjectiveKeyDuty::where('assign_date', $currentDate)->pluck('id');
             $objectiveKeyStaff = ObjectivekeyStaff::with([
                 'objectiveKeyDuty',

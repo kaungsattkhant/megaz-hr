@@ -2,6 +2,8 @@
 
 namespace App\Repositories\TimeShift;
 
+use Illuminate\Http\Request;
+
 interface TimeShiftRepositoryInterface
 {
 
@@ -26,4 +28,14 @@ interface TimeShiftRepositoryInterface
   public function updateTimeShift($data, $timeShiftId);
 
   public function deleteTimeShiftById($timeShiftId);
+
+  public function getCurrentTimeShift($request);
+
+  public function checkIn(array $validatedData);
+
+  public function checkOut(array $validatedData, $checkInId);
+
+  public function getAllCheckIns(Request $request);
+
+  public function getTotalHoursCheckIns(Request $request);
 }
