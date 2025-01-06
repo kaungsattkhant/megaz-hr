@@ -21,9 +21,11 @@ Route::middleware('auth:api')->group(function () {
 
     //mobile check in out
     Route::get('/current_time_shifts', 'getCurrentTimeShift');
-    Route::get('/check_ins', 'getAllCheckIns');
-    Route::get('/total_hours_check_ins', 'getTotalHoursCheckIns');
     Route::post('/check_ins', 'checkIn');
     Route::post('/check_ins/{id}', 'checkOut');
+
+    //admin panel check in
+    Route::get('/check_ins', 'getAllCheckIns');
+    Route::get('/total_hours_check_ins', 'getTotalHoursCheckIns');
   });
 });
