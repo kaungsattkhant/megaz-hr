@@ -50,6 +50,7 @@ class DatabaseSeeder extends Seeder
             RoomAndTableSeeder::class,
             InventorySeeder::class,
             StaffSeeder::class,
+            GpsSeeder::class
         ]);
     }
 }
