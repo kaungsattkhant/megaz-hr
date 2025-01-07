@@ -5,6 +5,8 @@ namespace App\Http\Controllers\API;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\TimeShift\ShiftRequest;
+use App\Http\Requests\TimeShift\CheckInRequest;
+use App\Http\Requests\TimeShift\CheckOutRequest;
 use App\Http\Requests\TimeShift\TimeShiftRequest;
 use App\Repositories\TimeShift\TimeShiftRepositoryInterface;
 
@@ -80,6 +82,35 @@ class TimeShiftController extends Controller
     public function deleteTimeShiftById($timeShiftId)
     {
         $data = $this->TimeShiftRepository->deleteTimeShiftById($timeShiftId);
+        ResponseData($data);
+    }
+
+    public function getCurrentTimeShift(Request $request)
+    {
+        $data =  $this->TimeShiftRepository->getCurrentTimeShift($request);
+        ResponseData($data);
+    }
+
+    public function checkIn(CheckInRequest $request)
+    {
+        $data =  $this->TimeShiftRepository->checkIn($request->all());
+        ResponseData($data);
+    }
+
+    public function checkOut(CheckOutRequest $request, int $checkInId)
+    {
+        $data =  $this->TimeShiftRepository->checkOut($request->all(), $checkInId);
+        ResponseData($data);
+    }
+    public function getAllCheckIns(Request $request)
+    {
+        $data =  $this->TimeShiftRepository->getAllCheckIns($request);
+        ResponseData($data);
+    }
+
+    public function getTotalHoursCheckIns(Request $request)
+    {
+        $data =  $this->TimeShiftRepository->getTotalHoursCheckIns($request);
         ResponseData($data);
     }
 }
