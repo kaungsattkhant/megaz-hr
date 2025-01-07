@@ -91,19 +91,19 @@ class TimeShiftRepository implements TimeShiftRepositoryInterface
 
     $staffId = $request->input('staff_id');
     if (isset($staffId)) {
-      $checkIn = CheckIn::where('staff_id', $staffId)
-        ->where('time_shift_id', $currentTimeShift->id)
-        ->orderBy('check_in_date_time', 'desc')
-        ->first();
+      if ($currentTimeShift) {
+        $checkIn = CheckIn::where('staff_id', $staffId)
+          ->where('time_shift_id', $currentTimeShift->id)
+          ->orderBy('check_in_date_time', 'desc')
+          ->first();
 
-      if ($checkIn) {
-        if ($checkIn->is_current_checked_in) {
-          $response['check_in_status'] = 'checked_in';
+        if (!$checkIn) {
+          $response['check_in_status'] = 'check_in';
         } else {
-          $response['check_in_status'] = 'checked_out';
+          $response['check_in_status'] = 'check_out';
         }
       } else {
-        $response['check_in_status'] = 'not_checked_in';
+        $response['check_in_status'] = 'check_in';
       }
     }
 
