@@ -670,6 +670,12 @@
                         Menu Forecasting
                     </a>
                 </li>
+                <li>
+                    <a href="/ktv_forecasting" class="flex items-center @yield('ktv_forecasting')">
+                        <i class="fal fa-braille pr-3"></i>
+                        KTV Forecasting
+                    </a>
+                </li>
                 <!-- @endif -->
 
                 @if(checkFeaturePermission('ktv-product-tree'))
