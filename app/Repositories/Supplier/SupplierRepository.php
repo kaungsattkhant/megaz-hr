@@ -48,16 +48,24 @@ class SupplierRepository implements SupplierInterface
                 ['id' => $data['id']],
                 $data
             );
-            // dd($request->all());
             $decodedSupplierItems = json_decode($request->supplier_items);
-            // dd($decodedSupplierItems);
+            // $decodedSupplierItems = json_decode($request->supplier_items, true);
+
+            if (json_last_error() !== JSON_ERROR_NONE) {
+                return ResponseMessage('Invalid JSON data provided for supplier items.', 400);
+            }
+            
+            
+            if (empty($decodedSupplierItems)) {
+                ResponseMessage('Supplier Item is empty', 419);
+            }
             foreach ($decodedSupplierItems as $supplierItems) {
                 if (isset($request->id)) {
                     if (!isset($supplierItems->id)) {
                         $isExistSupplierItem = SupplierItem::where('supplier_id', $supplier->id)
                             ->where('item_id', $supplierItems->item_id)
                             ->where('brand_id', $supplierItems->brand_id)
-                            ->first();
+                            ->exists();
                         if ($isExistSupplierItem) {
                             ResponseMessage('Brand and Item are already created to this supplier', 419);
                         }
@@ -81,7 +89,6 @@ class SupplierRepository implements SupplierInterface
                 }
             }
             DB::table('supplier_items')->insert($syncData);
-
             //tem command
             // if (!isset($request->id)) {
             //     $brandIds = $request->brands;// [1,2]
