@@ -30,6 +30,9 @@ class BrandController extends Controller
                 ['id' => $data['id']],
                 $data
             );
+            if (isset($data['items'])) {
+                $brand->items()->sync($data['items']);
+            }
             DB::commit();
             ResponseData($brand);
         } catch (\Exception $e) {
