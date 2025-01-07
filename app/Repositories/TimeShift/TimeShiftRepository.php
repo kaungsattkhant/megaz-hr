@@ -80,7 +80,10 @@ class TimeShiftRepository implements TimeShiftRepositoryInterface
   {
     $gps = Gps::first();
     $currentTimeShift = TimeShift::with(['shift'])
-      ->where('from_time', '<=', now()->format('H:i'))
+      ->where(function ($q) {
+        $q->where('from_time', '<=', now()->format('H:i'))
+          ->orWhere('from_time', '>=', now()->format('H:i'));
+      })
       ->where('to_time', '>=', now()->format('H:i'))
       ->first();
 
