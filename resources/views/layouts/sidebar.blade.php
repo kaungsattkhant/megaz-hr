@@ -674,7 +674,30 @@
                         </a>
                     </li>
                 @endif
-
+                <li>
+                    <a href="/ktv_forecasting" class="flex items-center @yield('ktv_forecasting')">
+                        <i class="fal fa-braille pr-3"></i>
+                        KTV Forecasting
+                    </a>
+                </li>
+                <li>
+                    <a href="/okr_duty" class="flex items-center @yield('OKR_duty')">
+                        <i class="fal fa-braille pr-3"></i>
+                        OKR Duty
+                    </a>
+                </li>
+                <li>
+                    <a href="/time_shift" class="flex items-center @yield('time_shift')">
+                        <i class="fal fa-braille pr-3"></i>
+                        Time Shift
+                    </a>
+                </li>
+                <li>
+                    <a href="/gps" class="flex items-center @yield('gps')">
+                        <i class="fal fa-braille pr-3"></i>
+                        GPS
+                    </a>
+                </li>
 
             </ul>
 

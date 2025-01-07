@@ -332,3 +332,6 @@ Route::view('/creditor/suppliers/{creditorId}/transactions', 'creditor.history')
 Route::view('/okr_duty', 'okr_duty.index')->name('okr_duty');
 Route::view('/okr_duty/create', 'okr_duty.create')->name('okr_duty.create');
 Route::view('/okr_duty/{id}/edit', 'okr_duty.edit');
+Route::view('/time_shift', 'time_shift.index')->name('time_shift');
+Route::view('/gps', 'GPS.index')->name('gps');
+Route::view('/check_in', 'check_in.index')->name('check_in');
