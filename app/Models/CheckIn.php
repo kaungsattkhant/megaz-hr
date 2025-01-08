@@ -20,7 +20,8 @@ class CheckIn extends Model
         'check_in_photo_path',
         'check_out_photo_url',
         'check_out_photo_path',
-        'is_current_checked_in'
+        'is_current_checked_in',
+        'is_self_checkout',
     ];
 
     public function staff()
