@@ -49,7 +49,13 @@ class CheckIn extends Model
 
     public function scopeDateFilter(Builder $query, $fromDate, $toDate): Builder
     {
-        return $query->whereBetween('check_in_date_time', [$fromDate, $toDate]);
+        return $query
+            ->when($fromDate, function ($q) use ($fromDate) {
+                $q->whereDate('check_in_date_time', '>=', $fromDate);
+            })
+            ->when($toDate, function ($q) use ($toDate) {
+                $q->whereDate('check_in_date_time', '<=', $toDate);
+            });
     }
 
     public function scopeStaffFilter(Builder $query, $staffId): Builder
