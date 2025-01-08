@@ -23,6 +23,7 @@ return new class extends Migration
             $table->string('email')->unique()->nullable();
             $table->double('rentation')->default(0);
             $table->string('otp');
+            $table->unsignedInteger('account_id');
             $table->boolean('is_verified')->default(0);
             $table->boolean('is_active')->default(1);
             $table->timestamps();

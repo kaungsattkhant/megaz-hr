@@ -35,6 +35,8 @@ use App\Events\WaiterNotificationRequest;
 use App\Events\RoomDoneNotificationRequest;
 use App\Repositories\Order\OrderRepository;
 use App\Http\Action\Transaction\StoreTransactionLedger;
+use App\Http\Action\Transaction\PurchaseOrderTransaction;
+use App\Models\CustomerDeposit;
 
 class InvoiceRepository implements InvoiceRepositoryInterface
 {
@@ -122,7 +124,6 @@ class InvoiceRepository implements InvoiceRepositoryInterface
 
     public function createData(array $data)
     {
-        // dd($data);
         // "entity_session_id" => "15"
         // "customer_id" => "1"
         // "start_time" => "2024-10-31T14:13"
@@ -154,6 +155,7 @@ class InvoiceRepository implements InvoiceRepositoryInterface
                     $data['entity_session_id'] = $entitySession->id;
                     $entity = $entitySession->entity;
                 }
+
                 // if ($data['is_waiter'] === 1) {
                 //     $current_time = Carbon::now()->format('H:i');
                 //     $entitySession = EntitySession::where('entity_id', $data['entity_id'])
@@ -176,7 +178,6 @@ class InvoiceRepository implements InvoiceRepositoryInterface
                     if (!$package) {
                         ResponseMessage('Package not found', 404);
                     }
-
                     $end_date = Carbon::now()->addHours($package->free_session + $package->pay_session);
                     $data['total_session_price'] = $package->pay_session * $package->session_price;
                     $data['paid_amount'] = $package->price;
@@ -205,9 +206,12 @@ class InvoiceRepository implements InvoiceRepositoryInterface
                 $data['created_by'] = UserData()->id;
                 $data['invoice_date'] = Carbon::now();
                 $invoice = Invoice::create($data);
+
+                //create deposit 
+                $this->storeCustomerDeposit($data, UserData()->id);
+                //
                 $invoice->invoice_id = sprintf('%05d', $invoice->id);
                 $invoice->save();
-
                 $roomSessionData['invoice_id'] = $invoice->id;
                 $roomSessionData['entity_session_id'] = $entitySession->id;
                 $roomSessionData['session_duration'] = $data['session_duration'] ?? null;
@@ -232,7 +236,6 @@ class InvoiceRepository implements InvoiceRepositoryInterface
                     if ($fraction > 0) {
                         $durations[] = round($fraction, 2);
                     }
-
 
                     if ($leftEntitySession > -1 || $leftEntitySession < 0) {
                         $sessionsToDeactivate += 1;
@@ -361,6 +364,89 @@ class InvoiceRepository implements InvoiceRepositoryInterface
         return $invoice;
     }
 
+    public function storeCustomerDeposit($data, $userId)
+    {
+        $isDeposit = (bool) $data['is_deposit'];
+        if ($isDeposit) {
+            if ((!isset($data['cash_account_id']) || (isset($data['cash_account_id']) && $data['cash_account_id'] == null))) {
+                ResponseMessage('Cash Account is required', 419);
+            }
+            if (!isset($data['account_id']) || (isset($data['account_id']) && $data['account_id'] == null)) {
+                ResponseMessage('Customer Deposit Account is required', 419);
+                // ResponseMessage(message: 'Customer Deposit Account is required',419);
+            }
+            $customerDeposit = CustomerDeposit::create([
+                'type' => 'deposit',
+                'date_time' => now(),
+                'amount' => $data['deposit'],
+                'account_id' => $data['account_id'],
+                'cash_account_id' => $data['cash_account_id'],
+                'customer_id' => $data['customer_id'],
+            ]);
+            $cash_account_id = $data['cash_account_id'];
+            $data['date'] = now();
+            $data['created_by'] = $userId;
+            $transaction = (new StoreTransactionLedger())->createTransaction($data);
+            // $depositTransaction(new PurchaseOrderTransaction())->createTransaction($po, $morphMapName, $cash_account_id); #create transaction
+            $debitLedger = (new StoreTransactionLedger())->storeLedger([
+                'date' => now(),
+                'value' => $data['deposit'],
+                'personable_id' => $data['customer_id'],
+                'personable_type' => 'customer',
+                'transaction_id' => $transaction->id,
+                'account_id' => $cash_account_id,
+                'action' => 'debit',
+            ]);
+            #store credit ledger 
+            $creditLedger = (new StoreTransactionLedger())->storeLedger([
+                'date' => now(),
+                'value' => $data['deposit'],
+                'personable_id' => $data['customer_id'],
+                'personable_type' => 'customer',
+                'transaction_id' => $transaction->id,
+                'account_id' => $data['account_id'],
+                'action' => 'credit',
+            ]);
+            return $customerDeposit;
+        }
+    }
+
+    public function storeInvoiceCustomerDeposit($data, $userId)
+    {
+        // $isUsedDeposit = (bool) $data['is_used_deposit'];
+        $depositBalance=$data['deposit_balance'];
+        if ($depositBalance>0) {
+            if($depositBalance>=$data['amount']){
+                $amount=$data['amount'];
+            }elseif($depositBalance<$data['amount']){
+                $amount=$depositBalance;
+            }
+
+            $customerDeposit = CustomerDeposit::create([
+                'type' => 'withdrawal',
+                'date_time' => now(),
+                'amount' => $amount,
+                'account_id' => $data['account_id'],
+                // 'cash_account_id' => $data['cash_account_id'],
+                'customer_id' => $data['customer_id'],
+            ]);
+            $data['date'] = now();
+            $data['created_by'] = $userId;
+            $transaction = (new StoreTransactionLedger())->createTransaction($data);
+            $creditLedger = (new StoreTransactionLedger())->storeLedger([
+                'date' => now(),    
+                'value' => $amount,
+                'personable_id' => $data['customer_id'],
+                'personable_type' => 'customer',
+                'transaction_id' => $transaction->id,
+                'account_id' => $data['account_id'],
+                'action' => 'credit',
+            ]);
+            return $customerDeposit;
+        }
+
+    }
+
     public function deleteData(int $id)
     {
         $invoice = Invoice::find($id);
@@ -472,15 +558,14 @@ class InvoiceRepository implements InvoiceRepositoryInterface
             }
             $newEntity = Entity::find($data['entity_id']);
 
-            if($newEntity->is_active){
-                ResponseMessage('Room is invalid',422);
+            if ($newEntity->is_active) {
+                ResponseMessage('Room is invalid', 422);
             }
-            if($invoice->invoice_type=='endless_time')
-            {
-                return $this->invoiceService->changeRoomForEndlessTime($invoice,$newEntity);
+            if ($invoice->invoice_type == 'endless_time') {
+                return $this->invoiceService->changeRoomForEndlessTime($invoice, $newEntity);
             }
             dd('abc');
-            
+
             $roomSessions = RoomSession::where('invoice_id', $invoice->id)->get();
             $firstRoomSession = $roomSessions->first();
             $latestRoomSession = $roomSessions->last();
@@ -647,7 +732,7 @@ class InvoiceRepository implements InvoiceRepositoryInterface
                 $roomDoneResponse['is_service'] = 0;
             }
             foreach ($invoiceServices as $invoiceService) {
-                $time=$invoiceService->end_date!=null? $invoiceService->end_date : now();
+                $time = $invoiceService->end_date != null ? $invoiceService->end_date : now();
                 $serviceValue = $this->invoiceService->getServiceValue($invoiceService, $time);
                 $total_service_value += $serviceValue;
             }
@@ -657,7 +742,7 @@ class InvoiceRepository implements InvoiceRepositoryInterface
             }
 
             foreach ($invoiceAccessories as $invoiceAccessorie) {
-                $total_accessory_value += $invoiceAccessorie->accessory->accessory_price->price*$invoiceAccessorie->quantity;
+                $total_accessory_value += $invoiceAccessorie->accessory->accessory_price->price * $invoiceAccessorie->quantity;
             }
 
             $entity = Entity::find($latestRoomSession->entitySession->entity_id);
@@ -722,7 +807,7 @@ class InvoiceRepository implements InvoiceRepositoryInterface
         $total_accessory_value = 0;
         $invoiceServices = $invoice->invoiceService;
         foreach ($invoiceServices as $invoiceService) {
-            $time=$invoiceService->end_date!=null? $invoiceService->end_date : now();
+            $time = $invoiceService->end_date != null ? $invoiceService->end_date : now();
             $this->invoiceService->calculateInvoiceService($invoiceService, $time);
             $total_service_value += $invoiceService->service_value;
         }
@@ -731,7 +816,7 @@ class InvoiceRepository implements InvoiceRepositoryInterface
         // invoice accessory
         $invoiceAccessories = $invoice->accessories;
         foreach ($invoiceAccessories as $invoiceAccessorie) {
-            $total_accessory_value += $invoiceAccessorie->accessory->accessory_price->price*$invoiceAccessorie->quantity;
+            $total_accessory_value += $invoiceAccessorie->accessory->accessory_price->price * $invoiceAccessorie->quantity;
         }
         foreach ($invoice->orders as $order) {
             if (existOrderItemByStatus($order->orderItems, 'not_yet')) {
@@ -762,6 +847,15 @@ class InvoiceRepository implements InvoiceRepositoryInterface
 
     public function doneEntityWithInvoice(array $data)
     {
+        //payload
+        //invoice_id: 36
+// discount_type: null
+// order_categories: []
+// total: 10000
+// order_discount: 0
+// discount_total: 0
+// end_date: null 
+        //end
         DB::beginTransaction();
         try {
             $invoice = Invoice::find($data['invoice_id']);
@@ -823,7 +917,6 @@ class InvoiceRepository implements InvoiceRepositoryInterface
             $invoice_id = $invoice->invoice_id;
             $lastRoomSession = $invoice->latestSession;
             $entity = Entity::find($lastRoomSession->entitySession->entity_id);
-
             $roomSessions = RoomSession::where('invoice_id', $data['invoice_id'])->get();
             if ($invoice->invoice_type != 'package') {
                 foreach ($roomSessions as $room) {
@@ -888,9 +981,15 @@ class InvoiceRepository implements InvoiceRepositoryInterface
             $data['complete_date'] = CurrentTime();
             $entity->save();
             $data['invoice_id'] = $invoice_id;
-
             $invoice->update($data);
+            //customer deposit 
+            $customerDepositData['customer_id'] = $invoice->customer_id;
+            $customerDepositData['account_id'] = $invoice->customer->account_id;
+            $customerDepositData['amount']=$data['total'];
+            $customerDepositData['deposit_balance']=$this->getCustomerDepositBalance($customer->id);
 
+            $this->storeInvoiceCustomerDeposit($customerDepositData, UserData()->id);
+            //end
             foreach ($roomSessions as $session) {
                 $entitySession = $session->entitySession;
                 if ($entitySession) {
@@ -899,7 +998,6 @@ class InvoiceRepository implements InvoiceRepositoryInterface
                     Log::info('it working on ' . $entitySession->id);
                 }
             }
-
             $soldStaff = Staff::find($invoice->created_by);
             $firstRole = $soldStaff->roles->first();
             TargetPositionResult::create([
@@ -927,7 +1025,6 @@ class InvoiceRepository implements InvoiceRepositoryInterface
                         ];
                     })
                     ->values();
-
                 foreach ($groupedOrderItems as $orderItem) {
                     TargetMenuResult::create([
                         'date_time' => CurrentTime(),

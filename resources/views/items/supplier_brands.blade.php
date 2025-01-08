@@ -6,7 +6,7 @@
 @section('content')
 
 <div id="app">
-    <supplier-brands-component supplier-id={{$supplierId}} />
+    <supplier-brands-component item-id={{ $id }} supplier-id={{$supplierId}} />
 </div>
 
 @endsection

@@ -11,5 +11,6 @@ interface CreditorInterface{
     public function listOfCreditorTransaction($request);
 
     public function createCreditorTransaction($request);
+    public function  getCreditorBalance ( $request);
     
 }

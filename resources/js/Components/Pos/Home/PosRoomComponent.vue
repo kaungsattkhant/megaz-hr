@@ -11,7 +11,7 @@
                                 <button
                                     class="relative flex flex-col justify-between h-full w-full">
                                     <div class=" flex justify-between flex-col h-full">
-    
+
                                         <p class="text-base text-left text-white">
                                             {{ room.price_per_hour }}
                                         </p>
@@ -40,7 +40,7 @@
                         </div>
                     </div>
                 </div>
-                
+
             </div>
             <div class="fixed right-0 top-0 bottom-0 bg-white drop-shadow-xl ease-in-out duration-300 transition delay-100 pt-12 right-sidebar-2" :class="isShowSidebar == true ? 'translate-x-0 opacity-100 w-[400px]' : 'translate-x-full opacity-0 w-0' ">
                 <div class="relative h-full w-full">
@@ -128,10 +128,28 @@
                                 </div>
                                 <div class="mb-4">
                                     <label for="" class="block text-sm text-black mb-3">
+                                        Pre Deposit?
+                                    </label>
+                                    <input type="checkbox" v-model="isPreDeposit" class="rounded" >
+                                </div>
+                                <div class="mb-4">
+                                    <label for="" class="block text-sm text-black mb-3">
                                         Deposit
                                     </label>
-                                    <input type="text" placeholder="Deposit" v-model="deposit"
+                                    <input type="text" placeholder="Deposit Amount" v-model="deposit" :disabled="!isPreDeposit"
                                         class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
+                                </div>
+                                <div class="mb-4">
+                                    <label for="" class="block text-sm text-black mb-3">
+                                        Cash Account
+                                    </label>
+                                    <div class="relative">
+                                        <select name="" id="" v-model="selectedCashAccount" :disabled="!isPreDeposit"
+                                            class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
+                                            <option disabled selected> Select Cash Account </option>
+                                            <option v-for="cashAccount in cashAccounts" :value="cashAccount" > {{ cashAccount.name }} </option>
+                                        </select>
+                                    </div>
                                 </div>
                                 <div class="mb-4" v-show="this.type == 'session'">
                                     <label for="" class="block text-sm text-black mb-3">
@@ -466,7 +484,7 @@
                                         @input="discountChanged"
                                         class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
                                 </div>
-                                
+
                                 <!-- <div class="mb-4">
                                     <label for="" class="block text-sm text-black mb-3">
                                         Payment Method
@@ -657,7 +675,7 @@
                                             <tr class="" v-for="(pm,index) in packageMenuList" :key=index>
                                                 <td class=" py-4 text-sm  ">
                                                     {{ pm.name }}
-                                                </td>                                                
+                                                </td>
                                                 <td class=" py-4 text-sm  ">
                                                     <select name="" :class="pm.is_package == 0 ? 'hidden' : ''"
                                                         class="text-xs pl-0 border-0 focus:shadow-none focus:outline-none focus:ring-0 select-box area-select-box !pr-6"
@@ -723,7 +741,7 @@
             </div>
         </div>
 
-        
+
         <!-- add Hour modal -->
         <div data-te-modal-init
             class="fixed left-0 top-0 z-[1055] hidden h-full w-full overflow-y-auto overflow-x-hidden outline-none"
@@ -1170,6 +1188,7 @@
                 invoice_date:null,
                 type:'session',
                 selectedPackage:null,
+                isPreDeposit: false,
                 deposit:null,
                 duration:null,
                 male:null,
@@ -1278,7 +1297,10 @@
                 selectedAccessory:null,
                 selectedAccessoryQuantity:null,
 
+                cashAccounts: [],
+                selectedCashAccount: null,
 
+                depositBalance: null,
             };
         },
 
@@ -1300,9 +1322,12 @@
                 // this.getSelectedRoom();
                 if (this.roomList[roomIndex].entity_sessions[timeIndex].is_active == 1) {
                     this.isOpenRoomStep('detail');
-                    this.getPurchaseMenuList();
+                    this.getPurchaseMenuList(); // why is this called
                     const response = await getApiData({ url: '/api/entities_sessions/'+ this.selectedTime.id, token: this.getToken() });
                     if (response.data) {
+                        if(response.data.deposit_balance > 0){
+                            this.depositBalance = response.data.deposit_balance;
+                        }
                         this.selectedRoom = response.data;
                         this.serviceList = response.data.services;
                         this.accessoryListSidebar = response.data.invoice_accessories;
@@ -1428,6 +1453,10 @@
             },
 
             async createRoom() {
+                if(this.isPreDeposit && !this.deposit && this.selectedCashAccount){
+                    this.alertValiationMessage(`deposit amount or cash account`);
+                    return;
+                }
                 let formData = new FormData();
                 // formData.append('entity_id', this.selectedRoom.id);
                 formData.append('entity_session_id', this.selectedTime.id);
@@ -1441,7 +1470,16 @@
                     formData.append('orders', JSON.stringify(this.packageMenuList));
                 }
                 formData.append('type', this.type);
-                formData.append('deposit', this.deposit);
+                let isDeposit = (this.isPreDeposit)? 1: 0;
+                formData.append('is_deposit', isDeposit);
+                if(this.deposit){
+                    formData.append('deposit', this.deposit);
+                }
+                if(this.selectedCashAccount){
+                    formData.append('cash_account_id', this.selectedCashAccount.id);
+                    formData.append('account_id', this.selectedCustomer.account_id);
+                }
+
                 if (this.female > 0) {
                     formData.append('female', +this.female);
                 }
@@ -1467,7 +1505,7 @@
                     //         this.purchaseMenuList = [];
                     //     }
                     // }
-                    // this.food_total_package = 0 
+                    // this.food_total_package = 0
                     // console.log("success")
                     window.location.reload()
                 }
@@ -1476,8 +1514,11 @@
                 }
             },
             async getPurchaseMenuList() {
-                const response = await getApiData({ url: '/api/entities_sessions/'+ this.selectedTime.id, token: this.getToken() });
+                const response = await getApiData({ url: '/api/entities_sessions/'+ this.selectedTime.id, token: this.getToken() }); // and why is this api also called
                 if (response.data) {
+                    if(response.data.deposit_balance > 0){
+                        this.depositBalance = response.data.deposit_balance;
+                    }
                     if (response.data.room_sessions.length > 0) {
                         this.purchaseMenuList = response.data.room_sessions[0].invoice.orders;
                         if (response.data.room_sessions[0].invoice.orders) {
@@ -1492,6 +1533,10 @@
             async getSelectedRoom(){
                 const response = await getApiData({ url: '/api/entities_sessions/'+ this.selectedTime.id, token: this.getToken() });
                     if (response.data) {
+                        if(response.data.deposit_balance > 0){
+                            this.depositBalance = response.data.deposit_balance;
+                            alert(this.depositBalance);
+                        }
                         this.selectedRoom = response.data;
                         this.serviceList = response.data.services;
                         this.purchaseMenuList = response.data.room_sessions[0].invoice.orders
@@ -1520,6 +1565,9 @@
                 let formData = new FormData();
                 let roomSessions = [];
                 formData.append('invoice_id', this.selectedRoom.room_sessions[0].invoice.id);
+                // if(this.depositBalance > 0){
+                //     formData.append('deposit_balance', this.depositBalance);
+                // }
                 let response = await postApiData({ url: '/api/room_done', form_data: formData, token: this.getToken() });
                 if (response.success) {
                     this.roomSessionData = response.data;
@@ -1528,6 +1576,7 @@
                     this.isOpenRoomStep('invoice')
                     this.printInvoiceData.service_total_value = response.data.total_service_value;
                     this.printInvoiceData.accessory_total_value = response.data.total_accessory_value;
+                    // this.depositBalance = null;
                 }
                 else {
                     this.$notify({
@@ -1752,8 +1801,13 @@
                 let formData = new FormData();
                 formData.append('invoice_id', this.selectedRoom.room_sessions[0].invoice.id);
                 // formData.append('payment_type', this.selectedPaymentMethod);
-                formData.append('discount_type', this.discount_type);
+                if(this.discount_type){
+                    formData.append('discount_type', this.discount_type);
+                }
 
+                if(this.depositBalance > 0){
+                    formData.append('deposit_balance', this.depositBalance);
+                }
                 if (this.discount_type == 'fix_amount') {
                     formData.append('discount_value', this.printInvoiceData.discount);
                     // totalAmount = totalAmount - this.printInvoiceData.discount;
@@ -2020,7 +2074,7 @@
                     else{
                         this.ladyList = response.data;
                     }
-                    
+
                 }
             },
             btnConfirmAddService() {
@@ -2070,7 +2124,7 @@
             },
             btnClickedEndService(service){
                 this.serviceEnd = service;
-            },  
+            },
             async btnConfirmEndService(){
                 let formData = new FormData();
                 formData.append('invoice_service_id', this.serviceEnd.id);
@@ -2113,7 +2167,7 @@
                 });
             },
             btnConfirmAddAccessory() {
-                
+
                 if(!this.selectedAccessoryCategory){
                     this.alertValiationMessage('Accessory Category');
                 }
@@ -2235,7 +2289,14 @@
                 let test_time = currentTime > targetDateTime;
                 console.log(test_time)
 
-            }
+            },
+
+            async getCashAccounts(){
+                let response = await getApiData({url: `/api/get_cash_account`, token: this.getToken()});
+                if(response.success){
+                    this.cashAccounts = response.data;
+                }
+            },
         },
 
         watch: {
@@ -2245,7 +2306,14 @@
             roomAreaId(newId) {
             // Call your function once areaId is updated
             this.getRoomList(newId);
-            }
+            },
+
+            isPreDeposit(){
+                if(!this.isPreDeposit){
+                    this.deposit = null;
+                    this.selectedCashAccount = null;
+                }
+            },
         },
         created(){
             this.getCustomerList();
@@ -2258,6 +2326,7 @@
 
             this.getAccessoryCategoryList();
             // this.testtime();
+            this.getCashAccounts();
         },
         mounted()
         {

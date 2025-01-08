@@ -64,30 +64,7 @@ class PurchaseOrderTransaction
                 }
             }
             #credit
-            if ($cash_account_id) {
-                $creditLedger = (new StoreTransactionLedger())->storeLedger([
-                    'date' => now(),
-                    'value' => $po_category->total_invoice_amount,
-                    'transaction_id' => $transaction->id,
-                    'account_id' => $cash_account_id,
-                    'action' => 'credit',
-                ]);
-            } else {
-                ResponseMessage('Account is Invalid', 419);
-            }
-            #store AP 
-            if ($po_category->total_invoice_amount < $po_category->total_amount) {
-                // dd($po_category->total_amount - $po_category->total_invoice_amount);
-                $AP = (new StoreTransactionLedger())->storeLedger([
-                    'date' => now(),
-                    'value' => $po_category->total_amount - $po_category->total_invoice_amount,
-                    'transaction_id' => $transaction->id,
-                    'account_id' => $po_category->account_id,
-                    'personable_id' => $po_category->supplier_id,
-                    'personable_type' => 'supplier',
-                    'action' => 'credit',
-                ]);
-            }
+           c
         }
         $this->storeAP($purchaseOrderItemGroupedBySupplier,$cash_account_id);
         return $purchaseOrderItemGroupedByCategory;

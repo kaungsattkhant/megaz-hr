@@ -55,6 +55,7 @@ import PurchaseOrderBuyComponent from './Components/PurchaseOrders/PurchaseOrder
 import ConfirmPurchaseOrderItemsComponent from './Components/PurchaseOrders/ConfirmPurchaseOrderItemsComponent.vue';
 import PurchaseOrderWithLeftItemsComponent from './Components/PurchaseOrders/PurchaseOrderWithLeftItemsComponent.vue';
 import LeftItemListComponent from './Components/PurchaseOrders/LeftItemListComponent.vue';
+import BrandCrudComponent from './Components/Brands/BrandCrudComponent.vue';
 import ItemCrudComponent from './Components/Items/ItemCrudComponent.vue';
 import ItemSuppliersComponent from './Components/Items/ItemSuppliersComponent.vue';
 import SupplierBrandsComponent from './Components/Items/SupplierBrandsComponent.vue';
@@ -104,6 +105,9 @@ import KtvForecastingCreateComponent from './Components/KtvForecastings/KtvForec
 import KtvForecastingEditComponent from './Components/KtvForecastings/KtvForecastingEditComponent.vue';
 import CreditorListComponent from './Components/Creditor/CreditorListComponent.vue';
 import CreditorHistoryComponent from './Components/Creditor/CreditorHistoryComponent.vue';
+import OkrDutyComponent from './Components/OkrDuty/OkrDutyComponent.vue';
+import OkrDutyCreateComponent from './Components/OkrDuty/OkrDutyCreateComponent.vue';
+import OkrDutyEditComponent from './Components/OkrDuty/OkrDutyEditComponent.vue';
 
 import LoginComponent from './Components/Auth/LoginComponent.vue';
 import LogoutComponent from './Components/Auth/LogoutComponent.vue';
@@ -222,6 +226,9 @@ app.component('KtvForecastingCreateComponent', KtvForecastingCreateComponent);
 app.component('KtvForecastingEditComponent', KtvForecastingEditComponent);
 app.component('CreditorListComponent', CreditorListComponent);
 app.component('CreditorHistoryComponent', CreditorHistoryComponent);
+app.component('OkrDutyComponent', OkrDutyComponent);
+app.component('OkrDutyCreateComponent', OkrDutyCreateComponent);
+app.component('OkrDutyEditComponent', OkrDutyEditComponent);
 
 app.component('PurchaseOrderListComponent', PurchaseOrderListComponent);
 app.component('PurchaseOrderCreateComponent', PurchaseOrderCreateComponent);
@@ -230,6 +237,7 @@ app.component('PurchaseOrderBuyComponent', PurchaseOrderBuyComponent);
 app.component('ConfirmPurchaseOrderItemsComponent', ConfirmPurchaseOrderItemsComponent);
 app.component('PurchaseOrderWithLeftItemsComponent', PurchaseOrderWithLeftItemsComponent);
 app.component('LeftItemListComponent', LeftItemListComponent);
+app.component('BrandCrudComponent', BrandCrudComponent);
 app.component('ItemCrudComponent', ItemCrudComponent);
 app.component('ItemPricingHistoryComponent', ItemPricingHistoryComponent);
 app.component('ItemSuppliersComponent', ItemSuppliersComponent);
