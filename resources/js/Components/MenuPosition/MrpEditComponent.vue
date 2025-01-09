@@ -550,6 +550,7 @@ export default {
             this.selectedCookingArea = detail.menu_places;
             this.code = detail.code;
             this.selectedMenuCategory = this.menuCategoryList.find(category => category.id === detail.menu_category_id );
+            this.categoryMenu = this.menuCategoryList.find(category => category.id === detail.menu_category_id );
             // this.menuLevel.level = this.selectedLevel.id;
             // this.menuLevel.type = this.selectedType.id;
             // this.menuLevel.position = this.selectedPosition;
