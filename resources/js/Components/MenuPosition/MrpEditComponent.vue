@@ -62,11 +62,11 @@
             </div>
             <div class="mb-4 col-span-3 rounded-md">
                 <label for="" class="label-form mb-3">
-                    Menu Category
+                    MRP Category
                 </label>
                 <div class="bg-white mb-0 w-full text-sm inline-block h-[34px]"
                     data-te-select-wrapper-ref>
-                    <select data-te-select-init data-te-select-placeholder="Select Category" @change="menuCategoryChanged()"
+                    <select data-te-select-init data-te-select-placeholder="Select MRP Category"
                         data-te-select-filter="true" name="" id="" v-model="selectedMenuCategory" class="input-ui">
                         <option :value="menuCategory" v-for="(menuCategory, menuCategoryIndex) in menuCategoryList"
                             :key="menuCategoryIndex"> {{ menuCategory.name }} </option>
@@ -97,7 +97,19 @@
             </div>
             
             <div class="contents" v-if="selectedMenuType == 'menu'">
-                
+                <div class="mb-4 col-span-3 rounded-md">
+                    <label for="" class="label-form mb-3">
+                        Menu Category
+                    </label>
+                    <div class="bg-white mb-0 w-full text-sm inline-block h-[34px]"
+                        data-te-select-wrapper-ref>
+                        <select data-te-select-init data-te-select-placeholder="Select Category" @change="menuCategoryChanged()"
+                            data-te-select-filter="true" name="" id="" v-model="categoryMenu" class="input-ui">
+                            <option :value="menuCategory" v-for="(menuCategory, menuCategoryIndex) in menuCategoryList"
+                                :key="menuCategoryIndex"> {{ menuCategory.name }} </option>
+                        </select>
+                    </div>
+                </div>
                 <div class="mb-4 col-span-3 rounded-md">
                     <label for="" class="block text-sm text-black mb-3">
                         Menu
@@ -478,6 +490,7 @@ export default {
             code:null,
             selectedMenuType:null,
             selectedMenuCategory:null,
+            categoryMenu:null,
             selectedMenu:null,
             selectedLevel:null,
             selectedType:null,
@@ -510,7 +523,7 @@ export default {
             levelTable:[],
             subMenu:[], // selected type = menu
             subMenuList:[], // selected type = menu
-
+            testtestmenu:null,
             departmentId:null,
 
             is_disable_custom:false,
@@ -537,8 +550,6 @@ export default {
             this.selectedCookingArea = detail.menu_places;
             this.code = detail.code;
             this.selectedMenuCategory = this.menuCategoryList.find(category => category.id === detail.menu_category_id );
-
-
             // this.menuLevel.level = this.selectedLevel.id;
             // this.menuLevel.type = this.selectedType.id;
             // this.menuLevel.position = this.selectedPosition;
@@ -547,8 +558,6 @@ export default {
             // this.menuLevel.duration = this.duration;
             // this.menuLevel.order_time = this.orderTime;
             // this.menuLevel.expected_quantity = this.expectedQuantity;
-            
-
 
             // this.menuLevel.item_menu.push({
             //     item_id: this.selectedItem.id,
@@ -593,7 +602,22 @@ export default {
                         uom_name: item.uom.name
                     });
                 })
+                this.testtestmenu = sampleMenuLevel
+                console.log(sampleMenuLevel)
                 this.levelTable.push(sampleMenuLevel)
+                console.log(this.levelTable)
+                sampleMenuLevel = {
+                    level : null,
+                    type : null,
+                    position : null,
+                    role_name:null,
+                    role_id:null,
+                    duration : null,
+                    order_time : null,
+                    expected_quantity : null,
+                    menu_id : null,
+                    item_menu:[],
+                };
             })    
             this.getMenuList();
             
@@ -645,7 +669,7 @@ export default {
             this.getMenuList();
         },
         async getMenuList() {
-            let response = await getApiData({ url: `/api/menu_categories/${this.selectedMenuCategory.id}/menus`, token: this.getToken() });
+            let response = await getApiData({ url: `/api/menu_categories/${this.categoryMenu.id}/menus`, token: this.getToken() });
             if (response.data) {
                 this.menuList = response.data;
             }
@@ -920,7 +944,7 @@ export default {
                 
                 let response = await postApiData({ url: `/api/mrp/${this.mrpId}`, form_data: formData, token: this.getToken() });
                 if (response.success) {
-                    // window.location.replace(`/mrp`);
+                    window.location.replace(`/mrp`);
                 }
                 else {
                     this.$notify({
@@ -977,7 +1001,7 @@ export default {
         this.getItemCategoryList();
         this.getUomList();
         this.getCookingAreaList();
-        this.getStaffList(this.departmentId);
+        // this.getStaffList(this.departmentId);
         this.getDepartment();
         this.getMrpDetail();
     },
