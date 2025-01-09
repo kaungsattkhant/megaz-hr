@@ -34,7 +34,8 @@ class Customer extends Authenticatable
         'image_url',
         'image_path',
         'is_active',
-        'is_verified'
+        'is_verified',
+        'account_id',
     ];
 
     public function setPasswordAttribute($value)

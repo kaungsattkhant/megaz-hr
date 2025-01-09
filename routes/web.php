@@ -49,6 +49,8 @@ Route::middleware(['departments:item'])->group(function () {
     Route::view('/items/{id}/pricing_history', 'items.pricing_history')->name('items.pricing_history');
     Route::view('/items/{id}/suppliers', 'items.item_suppliers')->name('items.item_suppliers');
     Route::view('/items/{id}/suppliers/{supplierId}/brands', 'items.supplier_brands')->name('items.supplier_brands');
+
+    Route::view('/brands', 'brands.index')->name('brands');
 });
 
 Route::middleware(['departments:task'])->group(function () {

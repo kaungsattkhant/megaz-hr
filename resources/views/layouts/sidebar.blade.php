@@ -253,6 +253,12 @@
                 @endif
                 @if (checkFeaturePermission('item'))
                     <li>
+                        <a href="{{ route('brands') }}" class="flex items-center @yield('brands')">
+                            <i class="fal fa-copyright  pr-3"></i>
+                            Brands
+                        </a>
+                    </li>
+                    <li>
                         <a href="{{ route('items') }}" class="flex items-center @yield('items')">
                             <i class="fal fa-hand-receiving  pr-3"></i>
                             Items
@@ -662,6 +668,12 @@
                     <a href="/menu_forecasting" class="flex items-center @yield('menu_forecasting')">
                         <i class="fal fa-braille pr-3"></i>
                         Menu Forecasting
+                    </a>
+                </li>
+                <li>
+                    <a href="/ktv_forecasting" class="flex items-center @yield('ktv_forecasting')">
+                        <i class="fal fa-braille pr-3"></i>
+                        KTV Forecasting
                     </a>
                 </li>
                 <!-- @endif -->

@@ -16,8 +16,8 @@ return new class extends Migration
             $table->foreignId('menu_id');
             $table->foreignId('role_id');
             $table->double('duration');
-            $table->double('order_time');
-            $table->double('expected_quantity');
+            $table->double('order_time')->nullable();
+            $table->double('expected_quantity')->nullable();
             $table->string('level');
             $table->string('type');
             $table->timestamps();

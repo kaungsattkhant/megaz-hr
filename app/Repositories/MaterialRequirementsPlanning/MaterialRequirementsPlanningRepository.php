@@ -147,7 +147,7 @@ class MaterialRequirementsPlanningRepository implements MaterialRequirementsPlan
         $menuStep->menuStepItem()->delete();
       }
       $menu->menuSteps()->delete();
-
+      $menu->subMenus()->detach();
       // if (!empty($validatedData['menu_steps'])) {
       $menuSteps = json_decode($validatedData['menu_steps']);
 

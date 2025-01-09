@@ -12,6 +12,10 @@ class SupplierItem extends Model
     protected $table='supplier_items';
 
 
+    protected $fillable =['supplier_id','item_id','brand_id'];
+
+    public $timestamps = false;
+
     public function supplier(){
         return $this->belongsTo(Supplier::class);
     }

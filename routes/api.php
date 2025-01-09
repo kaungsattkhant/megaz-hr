@@ -439,7 +439,11 @@ Route::middleware('auth:api')->group(function () {
     //     Route::post('/objectives/images', 'storeImages');
     //     Route::post('/objectives/images/{objKeyImgId}', 'updateImages');
     // });
-
+    Route::controller(ItemAPIController::class)->group(function () {
+        Route::get('item_price_list_by_item/{item_id}', 'getItemPriceListByItem');
+        Route::get('brand_by_supplier', 'brandBySupplier');
+        Route::get('supplier_by_item/{item_id}', 'supplierByItem');
+    });
 
 });
 Route::get('/features', [FeatureAPIController::class, 'getFeatureData']);
@@ -454,7 +458,6 @@ Route::controller(AdsAPIController::class)->group(function () {
 Route::controller(ExcelImportController::class)->group(function () {
     Route::post('/import_account', 'importAccount');
 });
-
 
 Route::controller(SaleTargetPositionAPIController::class)->group(function () {
     Route::get('/sale_target_positions', 'listAllSalteTargetPosition');
@@ -537,11 +540,7 @@ Route::post('/entities', [EntityAPIController::class, 'createEntity']);
 Route::put('/entities/{id}', [EntityAPIController::class, 'updateEntity']);
 Route::delete('/entities/{id}', [EntityAPIController::class, 'deleteEntity']);
 
-Route::controller(ItemAPIController::class)->group(function () {
-    Route::get('item_price_list_by_item/{item_id}', 'getItemPriceListByItem');
-    Route::get('brand_by_supplier/{supplier_id}', 'brandBySupplier');
-    Route::get('supplier_by_item/{item_id}', 'supplierByItem');
-});
+
 Route::get('/items', [ItemAPIController::class, 'getItemData']);
 Route::post('/items', [ItemAPIController::class, 'createItem']);
 Route::put('/items/{id}', [ItemAPIController::class, 'updateItem']);

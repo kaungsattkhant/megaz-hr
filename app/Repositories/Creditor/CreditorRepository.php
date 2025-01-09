@@ -4,6 +4,7 @@ namespace App\Repositories\Creditor;
 
 use App\Models\Ledger;
 use App\Models\Account;
+use App\Models\CreditorBalance;
 use Illuminate\Support\Facades\DB;
 use App\Http\Action\Transaction\StoreTransactionLedger;
 
@@ -107,6 +108,16 @@ class CreditorRepository implements CreditorInterface
             $data = $request->all();
             $data['created_by'] = UserData()->id;
             $data['is_confirmed'] = 1;
+            
+            $creditorBalance=CreditorBalance::create([
+                'type'=>'settlement',
+                'date_time'=>now(),
+                'amount'=>$request->value ,
+                'supplier_id'=>$request->supplier_id,
+                'account_id'=>$request->creditor_account_id,
+                'cash_account_id' => $request->cash_account_id,
+                'created_by'=>UserData()->id,
+            ]);
             $transaction = (new StoreTransactionLedger())->createTransaction($data);
             $creditLedger = (new StoreTransactionLedger())->storeLedger([
                 'date' => now(),
@@ -134,5 +145,80 @@ class CreditorRepository implements CreditorInterface
             ResponseMessage($e->getMessage(), 402);
             throw $e;
         }
+    }
+    public function  getCreditorBalance ( $request){
+        $month = $request->input('month', date('m'));
+        $year = $request->input('year', date('Y'));
+        // $data = DB::table('creditor_balances')
+        // ->join('accounts', 'creditor_balances.account_id', '=', 'accounts.id') // Ensure correct join relationship
+        // ->select(
+        //     'creditor_balances.account_id',
+        //     'accounts.name as account_name',
+        //     DB::raw('
+        //         SUM(CASE 
+        //             WHEN MONTH(creditor_balances.date_time) < ' . $month . ' AND YEAR(creditor_balances.date_time) = ' . $year . ' THEN 
+        //                 CASE 
+        //                     WHEN creditor_balances.type = "addition" THEN creditor_balances.amount 
+        //                     WHEN creditor_balances.type = "settlement" THEN -creditor_balances.amount 
+        //                     ELSE 0 
+        //                 END 
+        //             ELSE 0 
+        //         END) AS opening_balance'),
+        //     DB::raw('SUM(CASE WHEN MONTH(creditor_balances.date_time) = ' . $month . ' AND YEAR(creditor_balances.date_time) = ' . $year . ' AND creditor_balances.type = "settlement" THEN creditor_balances.amount ELSE 0 END) AS settlement_amount'),
+        //     DB::raw('SUM(CASE WHEN MONTH(creditor_balances.date_time) = ' . $month . ' AND YEAR(creditor_balances.date_time) = ' . $year . ' AND creditor_balances.type = "addition" THEN creditor_balances.amount ELSE 0 END) AS addition_amount'),
+        //     DB::raw('
+        //         (SUM(CASE 
+        //             WHEN MONTH(creditor_balances.date_time) < ' . $month . ' AND YEAR(creditor_balances.date_time) = ' . $year . ' THEN 
+        //                 CASE 
+        //                     WHEN creditor_balances.type = "addition" THEN creditor_balances.amount 
+        //                     WHEN creditor_balances.type = "settlement" THEN -creditor_balances.amount 
+        //                     ELSE 0 
+        //                 END 
+        //             ELSE 0 
+        //         END)
+        //         + SUM(CASE WHEN MONTH(creditor_balances.date_time) = ' . $month . ' AND YEAR(creditor_balances.date_time) = ' . $year . ' AND creditor_balances.type = "addition" THEN creditor_balances.amount ELSE 0 END)
+        //         - SUM(CASE WHEN MONTH(creditor_balances.date_time) = ' . $month . ' AND YEAR(creditor_balances.date_time) = ' . $year . ' AND creditor_balances.type = "settlement" THEN creditor_balances.amount ELSE 0 END)
+        //     ) AS closing_balance')
+        // )
+        // ->groupBy('creditor_balances.account_id', 'accounts.name')
+        // ->get();
+
+        $data = DB::table('accounts')
+    ->join('sub_accounts','accounts.sub_account_id','sub_accounts.id')
+    ->leftJoin('creditor_balances', 'accounts.id', '=', 'creditor_balances.account_id')
+    ->select(
+        'accounts.id as account_id',
+        'accounts.name as account_name',
+        DB::raw('
+            COALESCE(SUM(CASE 
+                WHEN MONTH(creditor_balances.date_time) < ' . $month . ' AND YEAR(creditor_balances.date_time) = ' . $year . ' THEN 
+                    CASE 
+                        WHEN creditor_balances.type = "addition" THEN creditor_balances.amount 
+                        WHEN creditor_balances.type = "settlement" THEN -creditor_balances.amount 
+                        ELSE 0 
+                    END 
+                ELSE 0 
+            END), 0) AS opening_balance'),
+        DB::raw('COALESCE(SUM(CASE WHEN MONTH(creditor_balances.date_time) = ' . $month . ' AND YEAR(creditor_balances.date_time) = ' . $year . ' AND creditor_balances.type = "settlement" THEN creditor_balances.amount ELSE 0 END), 0) AS settlement_amount'),
+        DB::raw('COALESCE(SUM(CASE WHEN MONTH(creditor_balances.date_time) = ' . $month . ' AND YEAR(creditor_balances.date_time) = ' . $year . ' AND creditor_balances.type = "addition" THEN creditor_balances.amount ELSE 0 END), 0) AS addition_amount'),
+        DB::raw('
+            COALESCE((
+                SUM(CASE 
+                    WHEN MONTH(creditor_balances.date_time) < ' . $month . ' AND YEAR(creditor_balances.date_time) = ' . $year . ' THEN 
+                        CASE 
+                            WHEN creditor_balances.type = "addition" THEN creditor_balances.amount 
+                            WHEN creditor_balances.type = "settlement" THEN -creditor_balances.amount 
+                            ELSE 0 
+                        END 
+                    ELSE 0 
+                END)
+                + SUM(CASE WHEN MONTH(creditor_balances.date_time) = ' . $month . ' AND YEAR(creditor_balances.date_time) = ' . $year . ' AND creditor_balances.type = "addition" THEN creditor_balances.amount ELSE 0 END)
+                - SUM(CASE WHEN MONTH(creditor_balances.date_time) = ' . $month . ' AND YEAR(creditor_balances.date_time) = ' . $year . ' AND creditor_balances.type = "settlement" THEN creditor_balances.amount ELSE 0 END)
+            ), 0) AS closing_balance')
+    )
+    ->where('sub_accounts.account_code','4-2000')
+    ->groupBy('accounts.id', 'accounts.name')
+    ->get();
+        ResponseData($data);
     }
 }
