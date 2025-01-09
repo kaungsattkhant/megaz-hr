@@ -258,6 +258,7 @@ class TimeShiftRepository implements TimeShiftRepositoryInterface
           'check_out_photo_path' => $imagePath ?? null,
           'check_out_photo_url' => $imageUrl ?? null,
           'is_current_checked_in' => false,
+          'is_self_checkout' => true
         ]);
 
         DB::commit();
