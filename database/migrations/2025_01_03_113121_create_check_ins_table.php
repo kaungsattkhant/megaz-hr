@@ -22,6 +22,7 @@ return new class extends Migration
             $table->string('check_out_photo_url')->nullable();
             $table->string('check_out_photo_path')->nullable();
             $table->tinyInteger('is_current_checked_in')->default(null);
+            $table->boolean('is_self_checkout')->nullable();
             $table->timestamps();
         });
     }

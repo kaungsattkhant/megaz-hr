@@ -10,6 +10,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Http\Resources\CheckInResource;
 use Illuminate\Support\Facades\Storage;
+use App\Http\Resources\mobileCheckInResource;
 use App\Http\Resources\GetCurrentTimeShiftResource;
 
 class TimeShiftRepository implements TimeShiftRepositoryInterface
@@ -109,6 +110,9 @@ class TimeShiftRepository implements TimeShiftRepositoryInterface
         $response['check_in_status'] = 'check_in';
       }
     }
+    if (isset($checkIn)) {
+      $response['check_in'] = new mobileCheckInResource($checkIn);
+    }
 
     return $response;
   }
@@ -192,7 +196,7 @@ class TimeShiftRepository implements TimeShiftRepositoryInterface
         ->where('is_current_checked_in', true)
         ->first();
       if ($existingCheckIn) {
-        return ['error' => 'You have already checked in today.'];
+        return ResponseData($data = null, $status_code = 422, false, $extra_message = "You have already checked in today");
       }
       $userLat = $requestData['latitude'];
       $userLng = $requestData['longitude'];
@@ -203,34 +207,33 @@ class TimeShiftRepository implements TimeShiftRepositoryInterface
       $officeLng = $officeGps->longitude;
 
       $distance = $this->haversineFormula($userLat, $userLng, $officeLat, $officeLng);
-
-      if ($distance <= 500) {
-
-        if (isset($requestData['check_in_photo'])) {
-          $image = $requestData['check_in_photo'];
-          $extension = $image->getClientOriginalExtension();
-          $hashedName = md5(uniqid() . microtime()) . '.' . $extension;
-          $imagePath = $image->storeAs('staffImages', $hashedName, 'public');
-          $imageUrl = Storage::url($imagePath);
-        }
-
-        $checkIn = CheckIn::create([
-          'staff_id' => $requestData['staff_id'],
-          'time_shift_id' => $requestData['time_shift_id'],
-          'check_in_date_time' => now(),
-          'check_in_photo_path' => $imagePath ?? null,
-          'check_in_photo_url' => $imageUrl ?? null,
-          'is_current_checked_in' => true,
-        ]);
-
-        DB::commit();
-        return $checkIn;
+      if ($distance > 500) {
+        return ResponseData($data = null, $status_code = 422, false, $extra_message = "You are not within the allowed range.");
       }
 
-      return ['error' => 'Check-in not allowed. You are not within the allowed range.'];
+
+      if (isset($requestData['check_in_photo'])) {
+        $image = $requestData['check_in_photo'];
+        $extension = $image->getClientOriginalExtension();
+        $hashedName = md5(uniqid() . microtime()) . '.' . $extension;
+        $imagePath = $image->storeAs('staffImages', $hashedName, 'public');
+        $imageUrl = Storage::url($imagePath);
+      }
+
+      $checkIn = CheckIn::create([
+        'staff_id' => $requestData['staff_id'],
+        'time_shift_id' => $requestData['time_shift_id'],
+        'check_in_date_time' => now(),
+        'check_in_photo_path' => $imagePath ?? null,
+        'check_in_photo_url' => $imageUrl ?? null,
+        'is_current_checked_in' => true,
+      ]);
+
+      DB::commit();
+      return $checkIn;
     } catch (\Exception $e) {
       DB::rollBack();
-      return ['error' => 'An error occurred during check-in.'];
+      return ResponseData($data = null, $status_code = 422, false, $extra_message = "An error occurred during check-in.");
     }
   }
 
@@ -262,10 +265,10 @@ class TimeShiftRepository implements TimeShiftRepositoryInterface
       }
 
       DB::rollBack();
-      return ['error' => 'Check-in not found.'];
+      return ResponseData($data = null, $status_code = 422, false, $extra_message = "Check-in not found.");
     } catch (\Exception $e) {
       DB::rollBack();
-      return ['error' => 'An error occurred during check-out.'];
+      return ResponseData($data = null, $status_code = 422, false, $extra_message = "An error occurred during check-out.");
     }
   }
 

@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\TimeShift;
 
+use App\Models\Gps;
 use App\Http\Requests\APIRequest;
 use Illuminate\Contracts\Validation\Validator;
 
@@ -29,6 +30,7 @@ class CheckInRequest extends APIRequest
             'time_shift_id' => 'required'
         ];
     }
+
 
     public function failedValidation(Validator $validator)
     {
