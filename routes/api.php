@@ -444,7 +444,6 @@ Route::middleware('auth:api')->group(function () {
         Route::get('brand_by_supplier', 'brandBySupplier');
         Route::get('supplier_by_item/{item_id}', 'supplierByItem');
     });
-
 });
 Route::get('/features', [FeatureAPIController::class, 'getFeatureData']);
 
@@ -545,6 +544,7 @@ Route::get('/items', [ItemAPIController::class, 'getItemData']);
 Route::post('/items', [ItemAPIController::class, 'createItem']);
 Route::put('/items/{id}', [ItemAPIController::class, 'updateItem']);
 Route::delete('/items/{id}', [ItemAPIController::class, 'deleteItem']);
+Route::post('/items/imports', [ItemAPIController::class, 'itemImport']);
 Route::post('/add_item_price_by_supplier_item', [ItemAPIController::class, 'addItemPrice']);
 Route::get('/get_uom_conversion_by_uom', [UomAPIController::class, 'getUomConversionByUom']);
 Route::get('/get_item_type', [ItemAPIController::class, 'getItemType']);
