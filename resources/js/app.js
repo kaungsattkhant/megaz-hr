@@ -108,6 +108,9 @@ import CreditorHistoryComponent from './Components/Creditor/CreditorHistoryCompo
 import OkrDutyComponent from './Components/OkrDuty/OkrDutyComponent.vue';
 import OkrDutyCreateComponent from './Components/OkrDuty/OkrDutyCreateComponent.vue';
 import OkrDutyEditComponent from './Components/OkrDuty/OkrDutyEditComponent.vue';
+import TimeShiftCrudComponent from './Components/TimeShift/TimeShiftCrudComponent.vue';
+import GpsCrudComponent from './Components/GPS/GpsCrudComponent.vue';
+import CheckInComponent from './Components/CheckIn/CheckInComponent.vue';
 
 import LoginComponent from './Components/Auth/LoginComponent.vue';
 import LogoutComponent from './Components/Auth/LogoutComponent.vue';
@@ -229,6 +232,9 @@ app.component('CreditorHistoryComponent', CreditorHistoryComponent);
 app.component('OkrDutyComponent', OkrDutyComponent);
 app.component('OkrDutyCreateComponent', OkrDutyCreateComponent);
 app.component('OkrDutyEditComponent', OkrDutyEditComponent);
+app.component('TimeShiftCrudComponent', TimeShiftCrudComponent);
+app.component('GpsCrudComponent', GpsCrudComponent);
+app.component('CheckInComponent', CheckInComponent);
 
 app.component('PurchaseOrderListComponent', PurchaseOrderListComponent);
 app.component('PurchaseOrderCreateComponent', PurchaseOrderCreateComponent);
