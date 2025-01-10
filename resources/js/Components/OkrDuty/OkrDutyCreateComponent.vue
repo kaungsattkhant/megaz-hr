@@ -324,18 +324,18 @@ export default {
         },
 
         // need to change ,wrong  api
-        async getStaffList(){
-            let response = await getApiData({ url: '/api/departments/' + this.selectedDepartment.id + '/staffs', token: this.getToken() });
-            if (response.data) {
-                this.staffList = response.data;
-            }
-        },
         // async getStaffList(){
-        //     let response = await getApiData({ url: '/api/staff_by_department_slug/' + this.selectedDepartment.id, token: this.getToken() });
+        //     let response = await getApiData({ url: '/api/departments/' + this.selectedDepartment.id + '/staffs', token: this.getToken() });
         //     if (response.data) {
         //         this.staffList = response.data;
         //     }
         // },
+        async getStaffList(){
+            let response = await getApiData({ url: '/api/staff_by_department_slug/' + this.selectedDepartment.name, token: this.getToken() });
+            if (response.data) {
+                this.staffList = response.data;
+            }
+        },
         changeStaff(){
             this.getOkrList();
         },
