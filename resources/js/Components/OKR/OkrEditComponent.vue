@@ -152,7 +152,7 @@
         
         <div>
             <button class="add-btn" @click="btnclickedCreateOkr()">
-                Edit QKR
+                Edit OKR
             </button>
         </div>
 

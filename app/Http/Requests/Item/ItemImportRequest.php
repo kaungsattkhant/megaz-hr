@@ -1,12 +1,11 @@
 <?php
 
-namespace App\Http\Requests\TimeShift;
+namespace App\Http\Requests\Item;
 
-use App\Models\Gps;
 use App\Http\Requests\APIRequest;
 use Illuminate\Contracts\Validation\Validator;
 
-class CheckInRequest extends APIRequest
+class ItemImportRequest extends APIRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -23,14 +22,9 @@ class CheckInRequest extends APIRequest
     public function rules(): array
     {
         return [
-            'latitude' => 'required',
-            'longitude' => 'required',
-            'check_in_photo' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
-            'staff_id' => 'required',
-            'time_shift_id' => 'required'
+            'item_import' => 'required|file|mimes:xlsx,xls,csv'
         ];
     }
-
 
     public function failedValidation(Validator $validator)
     {

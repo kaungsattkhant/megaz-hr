@@ -2,13 +2,16 @@
 
 namespace App\Repositories\Item;
 
+use Exception;
 use App\Models\Item;
 use App\Models\ItemType;
 use App\Models\ItemPrice;
+use App\Imports\ItemsImport;
 use App\Models\SupplierItem;
-use App\Services\AveragePriceCalculator;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Maatwebsite\Excel\HeadingRowImport;
+use App\Services\AveragePriceCalculator;
 use Illuminate\Database\Eloquent\Builder;
 
 class ItemRepository implements ItemRepositoryInterface
@@ -55,9 +58,9 @@ class ItemRepository implements ItemRepositoryInterface
         DB::beginTransaction();
         try {
             $item = Item::create($data);
-            // if (isset($data['brands'])) {
-            //     $item->brands()->sync($data['brands']);
-            // }
+            if (isset($data['brands'])) {
+                $item->brands()->sync($data['brands']);
+            }
             // $price = ItemPrice::create(['item_id' => $item->id, 'price' => $data['price'],'uom_id'=>$data['uom_id']]); //removed after relationship with item price with supplier
             DB::commit();
             return $item;
@@ -148,12 +151,25 @@ class ItemRepository implements ItemRepositoryInterface
 
     public function brandBySupplier($request)
     {
-        $itemId=$request->item_id;
-        $supplierId=$request->supplier_id;
+        $itemId = $request->item_id;
+        $supplierId = $request->supplier_id;
         $supplierByItem = SupplierItem::with('brand', 'item', 'item_price')
             ->where('item_id', $itemId)
             ->where('supplier_id', $supplierId)->get();
         return $supplierByItem;
     }
 
+    public function itemImport($request)
+    {
+        $file = $request->file('item_import');
+        $headings = (new HeadingRowImport)->toArray($file);
+        $expectedHeadings = ['name', 'code', 'category_id', 'item_type_id', 'base_uom_id', 'uom_id'];
+        $actualHeadings = $headings[0][0];
+        if (array_slice($actualHeadings, 0, count($expectedHeadings)) != $expectedHeadings) {
+            throw new Exception('Unexpected Headings', 400);
+        }
+        $import = new ItemsImport();
+        $import->import($file);
+        ResponseMessage('Import Successfully', 200);
+    }
 }

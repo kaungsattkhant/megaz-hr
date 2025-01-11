@@ -147,7 +147,6 @@ class MaterialRequirementsPlanningRepository implements MaterialRequirementsPlan
         $menuStep->menuStepItem()->delete();
       }
       $menu->menuSteps()->delete();
-
       // if (!empty($validatedData['menu_steps'])) {
       $menuSteps = json_decode($validatedData['menu_steps']);
 
@@ -186,14 +185,19 @@ class MaterialRequirementsPlanningRepository implements MaterialRequirementsPlan
       // }
 
       $cookingPlace = json_decode($validatedData['cooking_place_id']);
-      // if (!empty($validatedData['cooking_place_id'])) {
-      $menu->menuPlaces()->sync($cookingPlace);
-      // }
+      if (!empty($cookingPlace)) {
+        $menu->menuPlaces()->sync($cookingPlace);
+      } else {
+        $menu->menuPlaces()->detach();
+      }
 
-      // if (!empty($validatedData['sub_menu_id'])) {
-      $submenu = json_decode($validatedData['sub_menu_id']);
-      $menu->subMenus()->sync($submenu);
-      // }
+      $submenu = json_decode($validatedData['sub_menu_id'] ?? '[]', true);
+      if (!empty($submenu)) {
+        $menu->subMenus()->sync($submenu);
+      } else {
+        $menu->subMenus()->detach();
+      }
+
 
       DB::commit();
       $menuDatas = Menu::with('menuSteps.menuStepItem')->find($menu->id);
