@@ -165,8 +165,10 @@ class ItemRepository implements ItemRepositoryInterface
         $headings = (new HeadingRowImport)->toArray($file);
         $expectedHeadings = ['name', 'code', 'category_id', 'item_type_id', 'base_uom_id', 'uom_id'];
         $actualHeadings = $headings[0][0];
-        if (array_slice($actualHeadings, 0, count($expectedHeadings)) != $expectedHeadings) {
-            throw new Exception('Unexpected Headings', 400);
+        foreach ($expectedHeadings as $heading) {
+            if (!in_array($heading, $actualHeadings)) {
+                return ResponseData($data = null, $status_code = 422, false, $extra_message = 'Missing Heading: ' . $heading);
+            }
         }
         $import = new ItemsImport();
         $import->import($file);
