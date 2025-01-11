@@ -60,7 +60,7 @@ class ItemRepository implements ItemRepositoryInterface
             $item = Item::create($data);
             // if (isset($data['brands'])) {
             //     $item->brands()->sync($data['brands']);
-            }
+            // }
             // $price = ItemPrice::create(['item_id' => $item->id, 'price' => $data['price'],'uom_id'=>$data['uom_id']]); //removed after relationship with item price with supplier
             DB::commit();
             return $item;
