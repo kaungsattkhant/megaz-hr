@@ -79,10 +79,6 @@
                                         </button>
                                     </td>
                                 </tr>
-    
-                                <tr class="">
-                                    <td class=" py-2 "></td>
-                                </tr>
                             </div>
                         </tbody>
                     </table>

@@ -191,7 +191,7 @@
                                 </td>
                                 <td class=" px-6 py-4 font-medium ">
                                     <button>
-                                        <i class="fal fa-trash  pr-3" @click="deleteSelectedItemBtnClicked(selectedItem.id)" ></i>
+                                        <i class="fal fa-trash  pr-3" @click="deleteSelectedItemBtnClicked(selectedItemIndex)" ></i>
                                     </button>
                                 </td>
                             </tr>
@@ -368,8 +368,8 @@ export default {
     methods: {
         ...mapGetters(['getToken']),
 
-        deleteSelectedItemBtnClicked(id){
-            let index = this.selectedItems.findIndex(item => item.id == id);
+        deleteSelectedItemBtnClicked(index){
+            // let index = this.selectedItems.findIndex(item => item.id == id);
             if(index != -1){
                 this.selectedItems.splice(index, 1);
             }
@@ -473,13 +473,19 @@ export default {
             formData.append("address", this.address);
             formData.append("account_id", this.selectedAccount.id);
             formData.append("creditor_account_id", this.selectedCreditAccount.id);
+            let itemBrandList = [];
             this.selectedItems.forEach((item)=>{
-                formData.append("items[]", item.id);
+                // formData.append("items[]", item.id);
                 item.brands.forEach((brand)=>{
-                    formData.append("brands[]", brand.id);
+                    itemBrandList.push({
+                        item_id:item.id,
+                        brand_id:brand.id
+                    })
+                    // formData.append("brands[]", brand.id);
                 });
             });
 
+            formData.append("supplier_items", JSON.stringify(itemBrandList));
             let url = `/api/suppliers`;
             let response = await postApiData({url: url, form_data: formData, token: this.getToken()});
             if(response.success){

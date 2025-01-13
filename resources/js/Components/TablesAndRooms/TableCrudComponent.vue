@@ -127,7 +127,7 @@
                                 id="create_modalLabel">
                                 Create Room / Table
                             </h5>
-                            <button type="button" class="text-xs focus:shadow-none focus:outline-none"
+                            <button type="button" class="text-xs focus:shadow-none focus:outline-none" id="close_create_modal"
                                 data-te-modal-dismiss aria-label="Close">
                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
                                     stroke-width="1.5" stroke="currentColor" class="h-4 w-4">
@@ -325,7 +325,7 @@ export default {
             // formData.append('service_category_id', this.service_category_id);
             let response = await postApiData({ url: '/api/entities', form_data: formData, token: this.getToken() });
             if (response.success) {
-                this.getTable(null);
+                this.getTableList(1);
                 console.log("success")
                 this.closeModal();
                 this.clearForm();
@@ -336,14 +336,13 @@ export default {
         },
 
         closeModal() {
-            document.getElementById("close").click();
+            document.getElementById("close_create_modal").click();
         },
 
         clearForm() {
             this.name = null,
-                this.selectedInventoryType = null,
-                this.inventoryable_id = null,
-                this.typeList = []
+            this.pricePerHour = null,
+            this.area_id = null
         },
 
         isActiveToggled(id) {
@@ -372,7 +371,7 @@ export default {
             let url = `/api/entities/${this.deleteId}`;
             let response = await deleteApiData({ url: url, token: this.getToken() });
             if (response.success) {
-                this.getTable();
+                this.getTableList(1);
             }
             else {
                 alert('some errors occur');

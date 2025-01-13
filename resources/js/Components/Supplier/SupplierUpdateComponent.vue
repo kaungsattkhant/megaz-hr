@@ -34,8 +34,6 @@
                 <input type="number" v-model="maxCredit"
                     class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
             </div>
-            
-
             <div class="mb-4 col-span-6 pb-6 rounded-md">
                 <label for="" class="block text-sm text-black mb-3">
                     Address
@@ -68,8 +66,8 @@
                     Items
                 </label>
                 <div class="bg-white mb-0 w-full text-sm inline-block h-[34px] select-custom2" data-te-select-wrapper-ref>
-                    <select data-te-select-init data-te-select-placeholder="Select Items" v-model="selectedItems"  class="input-ui !text-black"
-                    data-te-select-filter="true" multiple @change="itemSelectChanged">
+                    <select data-te-select-init data-te-select-placeholder="Select Items" v-model="selectedItem"  class="input-ui !text-black"
+                    data-te-select-filter="true" @change="itemSelectChanged">
                         <option :value="item" v-for="(item, itemIndex) in itemList" :key="itemIndex">
                             {{ item.name }}
                         </option>
@@ -95,44 +93,11 @@
                     </template>
                 </multiselect>
             </div>
-            <!-- <div class="col-span-3 mb-4 flex gap-x-4">
-                <div class=" flex-grow">
-                    <label for="" class="block text-sm text-black mb-3">
-                        AP Account
-                    </label>
-                    <multiselect v-model="selectedAccount" :options="apAccountList" :close-on-select="true"
-                    :clear-on-select="false" :preserve-search="true" placeholder="Select Payable Acount" label="name"
-                    track-by="id" :preselect-first="true"></multiselect>
-                </div>
-                <div class=" ">
-                    <label for="" class="block text-sm text-black mb-3">
-                        &nbsp;
-                    </label>
-                    <button class="add-btn mt-0.5" data-te-toggle="modal" data-te-target="#create_modal">
-                        <i class="fal fa-plus"></i>
-                    </button>
-                </div>
+            <div class="col-span-3">
+                <button type="button" class="mt-8 add-btn transition duration-150 ease-in-out focus:outline-none focus:ring-0 " @click="addItemBtnClicked()" >
+                    Add
+                </button>
             </div>
-
-            <div class="col-span-3 mb-4 flex gap-x-4">
-                <div class=" flex-grow">
-                    <label for="" class="block text-sm text-black mb-3">
-                        Creditor Account
-                    </label>
-                    <multiselect v-model="selectedCreditAccount" :options="creditAccList" :close-on-select="true"
-                    :clear-on-select="false" :preserve-search="true" placeholder="Select Payable Acount" label="name"
-                    track-by="id" :preselect-first="true"></multiselect>
-                </div>
-                <div class=" rounded-md">
-                    <label for="" class="block text-sm text-black mb-3">
-                        &nbsp;
-                    </label>
-                    <button class="add-btn mt-0.5" data-te-toggle="modal" data-te-target="#create_credit_modal">
-                        <i class="fal fa-plus"></i>
-                    </button>
-                </div>
-            </div> -->
-
             <div class=" col-span-12">
                 <table class="min-w-[40%] text-sm font-light ">
                     <thead class="font-medium text-left ">
@@ -148,11 +113,12 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <tr class="" v-for="(existingItem, existingItemIndex) in existingItems" :key="existingItemIndex">
+                        <!-- <tr class="" v-for="(existingItem, existingItemIndex) in existingItems" :key="existingItemIndex">
                             <td class=" px-6 py-2 font-medium ">
-                                {{ existingItem.name }}
+                                {{ existingItem.item_name }}
                             </td>
                             <td class=" px-6 py-4 font-medium ">
+                                {{ existingItem.brand_name }}
                                 <span v-for="(brand,index) in existingItem.brands" class="after:content-[','] last:after:hidden pr-1">
                                     {{ brand.name }}
                                 </span>
@@ -165,15 +131,18 @@
                         </tr>
                         <tr class="">
                             <td class=" "></td>
-                        </tr>
+                        </tr> -->
 
-                        <tr class="" v-for="(selectedItem, selectedItemIndex) in selectedItems" :key="selectedItemIndex">
-                            <td class=" px-6 py-2 font-medium ">
-                                {{ selectedItem.name }}
+                        <tr v-for="(selectedItem,selectedItemIndex) in selectedItemList" >
+                            <td class=" px-6 py-4 font-medium ">
+                                {{ selectedItem.item_name }}
                             </td>
-                            <td class=" px-6 py-2 font-medium ">
+                            <td class=" px-6 py-4 font-medium ">
+                                {{ selectedItem.brand_name }}
+                            </td>
+                            <td class=" px-6 py-4 font-medium ">
                                 <button>
-                                    <i class="fal fa-trash  pr-3" @click="deleteSelectedItemBtnClicked(selectedItem.id)" ></i>
+                                    <i class="fal fa-trash  pr-3" @click="deleteSelectedItemBtnClicked(selectedItemIndex)" ></i>
                                 </button>
                             </td>
                         </tr>
@@ -363,9 +332,10 @@ export default {
             itemList: [],
             apAccountList: [],
             creditAccList:[],
-            selectedItems: [],
+            selectedItemList: [],
             existingItems: [],
 
+            accName:null,
             selectedAccount: null,
             selectedCreditAccount:null,
             supplier: null,
@@ -384,17 +354,18 @@ export default {
             selectedCreditSubAcc:null,
 
             itemBrandsList: [],
-            selectedItemBrands: []
+            selectedItem:null,
+            selectedItemBrands: null,
         };
     },
 
     methods: {
         ...mapGetters(['getToken']),
 
-        deleteSelectedItemBtnClicked(id){
-            let index = this.selectedItems.findIndex(item => item.id == id);
+        deleteSelectedItemBtnClicked(index){
+            // let index = this.selectedItemList.findIndex(item => item.id == id);
             if(index != -1){
-                this.selectedItems.splice(index, 1);
+                this.selectedItemList.splice(index, 1);
             }
         },
 
@@ -405,16 +376,22 @@ export default {
             }
         },
 
-        itemSelectChanged(){
-            console.log(`Existing items`,this.existingItems);
-            console.log(`Selected items`,this.selectedItems);
-            this.existingItems.forEach((existingItem)=>{
-                this.selectedItems.forEach((selectedItem)=>{
-                    if(existingItem.id == selectedItem.id){
-                        this.selectedItems.pop();
-                    }
-                });
-            });
+        async itemSelectChanged(){
+            this.selectedItemBrands = [];
+            let url = `/api/get_brand_by_item?item_ids[]=${this.selectedItem.id}`;
+            let response = await getApiData({url: url, token: this.getToken()});
+            if(response.success){
+                this.itemBrandsList = response.data;
+            }
+            // console.log(`Existing items`,this.existingItems);
+            // console.log(`Selected items`,this.selectedItems);
+            // this.existingItems.forEach((existingItem)=>{
+            //     this.selectedItems.forEach((selectedItem)=>{
+            //         if(existingItem.id == selectedItem.id){
+            //             this.selectedItems.pop();
+            //         }
+            //     });
+            // });
         },
 
         async getSupplierDetail(){
@@ -427,12 +404,19 @@ export default {
                 this.phoneNumber = this.supplier.phone_number;
                 this.maxCredit = this.supplier.credit_limit;
                 this.address = this.supplier.address;
-                this.existingItems = this.supplier.items;
+                // this.existingItems = this.supplier.items;
                 this.selectedAccount = this.apAccountList.find(ap => ap.id === this.supplier.account_id )
                 this.selectedCreditAccount = this.creditAccList.find(crd => crd.id === this.supplier.creditor_account_id )
-                // this.supplier.items.forEach(item =>{
-                //     this.selectedItem.push(this.itemList.find(itemid => itemid.id === item.id))
-                // })
+                this.supplier.items.forEach(item =>{
+                    this.selectedItemList.push({
+                        id:item.id,
+                        item_name:item.name,
+                        item_id:item.id,
+                        brand_id:item.pivot.brand_id,
+                        brand_name:item.brands.find(brandId => brandId.id === item.pivot.brand_id).name
+                    })
+                    // this.selectedItem.push(this.itemList.find(itemid => itemid.id === item.id))
+                })
             }
         },
 
@@ -462,14 +446,32 @@ export default {
             alert(`You forgot to provide ${field}, please try again`);
         },
 
-        async createBtnClicked(){
-            if(this.existingItems.length > 0){
-                this.existingItems.forEach((item)=>{
-                    this.selectedItems.push(item);
-                });
-                this.existingItems = [];
-                console.log(this.existingItem)
+        addItemBtnClicked(){
+            if(this.selectedItemBrands.length < 1){
+                alertValiationMessage(`brands for item`);
+                return;
             }
+            this.selectedItemBrands.forEach(item =>{
+                this.selectedItemList.push({
+                    item_name: this.selectedItem.name,
+                    item_id: this.selectedItem.id,
+                    brand_name: item.name,
+                    brand_id: item.id,
+                })
+            })
+
+            this.selectedItem = null;
+            this.selectedItemBrands = [];
+            this.itemBrandsList = [];
+        },
+        async createBtnClicked(){
+            // if(this.existingItems.length > 0){
+            //     this.existingItems.forEach((item)=>{
+            //         this.selectedItemList.push(item);
+            //     });
+            //     this.existingItems = [];
+            //     console.log(this.existingItem)
+            // }
 
             if(!this.name){
                 this.alertValidationMessage(`supplier name`);
@@ -487,7 +489,7 @@ export default {
                 this.alertValidationMessage(`supplier address`);
                 return 1;
             }
-            if(this.selectedItems.length < 1 ){
+            if(this.selectedItemList.length < 1 ){
                 this.alertValidationMessage(`supplier selling items`);
                 return 1;
             }
@@ -505,17 +507,18 @@ export default {
             formData.append("address", this.address);
             formData.append("account_id", this.selectedAccount.id);
             formData.append("creditor_account_id", this.selectedCreditAccount.id);
-            this.selectedItems.forEach((item)=>{
-                formData.append("items[]", item.id);
-                item.brands.forEach((brand)=>{
-                    formData.append("brands[]", brand.id);
-                });
+            let itemBrandList = [];
+            this.selectedItemList.forEach((item)=>{
+                itemBrandList.push({
+                    item_id:item.item_id,
+                    brand_id:item.brand_id
+                })
             });
-
+            formData.append("supplier_items", JSON.stringify(this.selectedItemList));
             let url = `/api/suppliers`;
             let response = await postApiData({url: url, form_data: formData, token: this.getToken()});
             if(response.success){
-                window.location.replace("/suppliers");
+                // window.location.replace("/suppliers");
             }
         },
         async getPayableSubAccountList(){
