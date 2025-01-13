@@ -114,6 +114,25 @@
                         </label>
                         <input type="text" placeholder="Brand Name" v-model="name" class="input-ui">
                     </div>
+                    <div class="mb-4">
+                        <label class="label-form mb-3">Items</label>
+                        <multiselect
+                        v-model="selectedItem"
+                        :options="itemList"
+                        :multiple="true"
+                        :close-on-select="false"
+                        :clear-on-select="false"
+                        :preserve-search="true"
+                        placeholder="Select Items"
+                        label="name"
+                        track-by="id"
+                        :preselect-first="false">
+                            <template #selection="{ values, search, isOpen }">
+                                <span class="multiselect__single" v-if="values.length" v-show="!isOpen">{{ values.length }}
+                                    Item selected</span>
+                            </template>
+                        </multiselect>
+                    </div>
                 </div>
                 <!--Modal footer-->
                 <div class="flex justify-end gap-x-4 px-6 mb-6 pt-4">
@@ -206,6 +225,9 @@ export default {
             brandsList: [],
             selectedBrands: [],
 
+            itemList:[],
+            selectedItem:null,
+
             editId: null,
         };
     },
@@ -235,12 +257,22 @@ export default {
 
         async createBtnClicked() {
             if (!this.name) {
-                this.alertValiationMessage('required data');
+                this.alertValiationMessage('required Brand Name');
                 return false;
             }
+            if (!this.selectedItem) {
+                this.alertValiationMessage('required Item');
+                return false;
+            }
+            let items = [];
+            this.selectedItem.forEach((item) => {
+                items.push(item.id)
+            })
+
             let url = `/api/brands`;
             let formData = new FormData();
             formData.append('name', this.name);
+            formData.append('items',JSON.stringify(items));
             if(this.editId){
                 formData.append('id', this.editId);
             }
@@ -278,6 +310,14 @@ export default {
             }
         },
 
+        async getItemList(){
+            let url = `/api/items`;
+            let response = await getApiData({url: url, token: this.getToken()});
+            if(response.data){
+                this.itemList = response.data;
+            }
+        },
+
         async searchBtnClicked() {
             let url = null;
             if (this.searchInput && this.searchCategory) {
@@ -304,6 +344,7 @@ export default {
 
     created() {
         this.getBrandList(1);
+        this.getItemList();
     },
 
     mounted() {
