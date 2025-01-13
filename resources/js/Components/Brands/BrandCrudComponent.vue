@@ -272,7 +272,11 @@ export default {
             let url = `/api/brands`;
             let formData = new FormData();
             formData.append('name', this.name);
-            formData.append('items',JSON.stringify(items));
+            if(this.selectedItem.length > 0){
+                this.selectedItem.forEach((item)=>{
+                    formData.append('items[]', item.id);
+                });
+            }
             if(this.editId){
                 formData.append('id', this.editId);
             }
