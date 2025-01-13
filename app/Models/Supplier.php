@@ -33,7 +33,7 @@ class Supplier extends Model
         return $this->belongsTo(Account::class);
     }
 
-    public function creditorAccount(){
+    public function creditor_account(){
         return $this->belongsTo(Account::class,'creditor_account_id');
     }
 }

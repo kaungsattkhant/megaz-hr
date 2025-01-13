@@ -126,6 +126,8 @@ class SupplierRepository implements SupplierInterface
     {
         $supplier->items = $supplier->items;
         $supplier->supplier_items = $supplier->supplier_items;
+        $supplier->account = $supplier->account;
+        $supplier->creditor_account = $supplier->creditor_account;
         return $supplier;
     }
 
