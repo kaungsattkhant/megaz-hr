@@ -38,6 +38,13 @@ class AuthController extends Controller
                 ['phone_number' => $request->phone_number, 'is_verified' => 0],
                 $data // Default values to create a new user
             );
+            //customer deposit account
+            $createdDepositAccount=$this->createCustomerDepositAccount($data['name']);
+            if(!$createdDepositAccount){
+                ResponseMessage('Customer Deposit Account is required',419);
+            }
+            $data['account_id']=$createdDepositAccount->id;
+            //
             DB::commit();
             ResponseMessage('OTP code sent, please check your SMS');
         } catch (Exception $e) {
