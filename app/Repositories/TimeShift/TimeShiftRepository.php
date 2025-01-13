@@ -103,15 +103,15 @@ class TimeShiftRepository implements TimeShiftRepositoryInterface
 
         if (!$checkIn) {
           $response['check_in_status'] = 'check_in';
+        } elseif (!$checkIn->is_current_checked_in && !is_null($checkIn->is_self_checkout)) {
+          $response['check_in_status'] = 'already_checked_in';
         } else {
           $response['check_in_status'] = 'check_out';
+          $response['check_in'] = new mobileCheckInResource($checkIn);
         }
       } else {
         $response['check_in_status'] = 'check_in';
       }
-    }
-    if (isset($checkIn)) {
-      $response['check_in'] = new mobileCheckInResource($checkIn);
     }
 
     return $response;

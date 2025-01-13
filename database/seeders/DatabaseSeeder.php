@@ -47,7 +47,7 @@ class DatabaseSeeder extends Seeder
             ItemTypeSeeder::class,
             HeadAccountSeeder::class,
             SubAccountSeeder::class,
-            RoomAndTableSeeder::class,
+            // RoomAndTableSeeder::class,
             InventorySeeder::class,
             StaffSeeder::class,
             GpsSeeder::class
