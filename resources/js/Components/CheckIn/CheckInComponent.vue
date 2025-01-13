@@ -6,7 +6,7 @@
     </div>
 
     <div class="mt-4 bg-white">
-        <div class="btn-container">
+        <div class="btn-container pt-10">
             <notifications position="top center" />
             <div class=" flex gap-x-4">
                 <label for="search" class="search-input">
@@ -17,13 +17,22 @@
                 <button class="add-btn h-8" @click="clearSearchBtnClicked()">Clear</button>
             </div>
             <div class="flex pr-0 gap-x-4">
-                <!-- <div class="w-full !text-sm" data-te-select-wrapper-ref>
-                    <select data-te-select-init data-te-select-placeholder="Select Type" @change="selectedTypeChanged()"
-                        data-te-select-filter="true" name="" id="" v-model="selectedType" class="input-ui">
-                        <option :value="type.value" v-for="(type, typeIndex) in typeList"
-                            :key="typeIndex"> {{ type.name }} </option>
+                <div class="relative">
+                    <label for="search" class="border border-gray-200 rounded bg-white text-xs mx-2 px-2 py-2 absolute left-0 ml-0 -top-[90%] border-b-0"> From </label>
+                    <input type="date" v-model="fromDate" class="search-input rounded " @change="fromDateChanged()">
+                </div>
+
+                <div class="relative">
+                    <label for="search" class="border border-gray-200 rounded bg-white text-xs mx-2 px-2 py-2 absolute left-0 ml-0 -top-[90%] border-b-0"> To </label>
+                    <input type="date" v-model="toDate" class="search-input rounded" @change="toDateChanged()">
+                </div>
+                <div class="w-full !text-sm" data-te-select-wrapper-ref>
+                    <select data-te-select-init data-te-select-placeholder="Select Staff" @change="selectedStaffChanged()"
+                        data-te-select-filter="true" name="" id="" v-model="selectedStaff" class="input-ui">
+                        <option :value="staff" v-for="(staff, staffIndex) in staffList"
+                            :key="staffIndex"> {{ staff.name }} </option>
                     </select>
-                </div> -->
+                </div>
                 <!-- <button type="button"
                     class="add-btn transition duration-150 ease-in-out focus:outline-none focus:ring-0 "
                     data-te-toggle="modal" data-te-target="#create_modal" @click="addBtnClicked">
@@ -62,7 +71,7 @@
                         </thead>
                         <tbody>
                             <!-- looping start -->
-                            <div class="contents" v-for="(gps, index) in gpsList" :key="index">
+                            <div class="contents" v-for="(gps, index) in checkInList" :key="index">
                                 <tr class="">
                                     <td class=" font-medium ">
                                         <!-- {{ perPage * (currentPage - 1) + (++index) }} -->
@@ -122,7 +131,11 @@ export default {
     data() {
         return {
             checkInList: [],
-            
+            staffList:[],
+            selectedStaff:null,
+            fromDate:null,
+            toDate:null,
+
             currentPage: 0,
             perPage: 0,
             lastPage: 0,
@@ -132,8 +145,9 @@ export default {
 
             url:'/api/check_ins',
             url_search:'',
-            url_department:'',
-            url_role:'',
+            url_staff:'',
+            url_from:'',
+            url_to:'',
             deleteId:null,
 
         };
@@ -141,20 +155,16 @@ export default {
 
     methods: {
         ...mapGetters(['getToken']),
+        async getStaffList(){
+            let url = '/api/staffs'
+            let response = await getApiData({ url: url, token: this.getToken() });
+            if (response.data) {
+                this.staffList = response.data;
+            }
+        },
         async getCheckInList(pageNumber) {
-            // let url = this.url + pageNumber + this.url_search + this.url_department + this.url_role;
-            let url = this.url;
-            // let url = `/api/objectives?page=${pageNumber}`;
-            // if (this.searchInput && this.searchCategory) {
-            //     url = `/api/objectives?search_input=${this.searchInput}&menu_category_id=${this.searchCategory.id}&page=${pageNumber}`;
-            // }
-            // if (this.searchInput && !this.searchCategory) {
-            //     url = `/api/objectives?search_input=${this.searchInput}&page=${pageNumber}`;
-            // }
-            // if ((!this.searchInput) && this.searchCategory) {
-            //     url = `/api/objectives?menu_category_id=${this.searchCategory.id}&page=${pageNumber}`;
-            // }
-            // let url = `/api/objectives`;
+            // let url = this.url + pageNumber + this.url_search + this.url_staff + this.url_from + this.url_to;
+            let url = this.url + this.url_search + this.url_staff + this.url_from + this.url_to;
             let response = await getApiData({ url: url, token: this.getToken() });
             if (response.data) {
                 this.checkInList = response.data;
@@ -163,7 +173,21 @@ export default {
                 // this.perPage = response.data.per_page;
             }
         },
-
+        selectedStaffChanged(){
+            this.url_from = '';
+            this.url_to = '';
+            this.url_staff = '?staff_id=' + this.selectedStaff.id
+            this.getCheckInList();
+        },
+        fromDateChanged(){
+            this.url_staff = '';
+            this.url_from = '?from_date=' + this.fromDate
+            this.getCheckInList();
+        },
+        toDateChanged(){
+            this.url_to = '&to_date=' + this.toDate
+            this.getCheckInList();
+        },
         
         alertValidationMessage(field) {
                 this.$notify({
@@ -179,6 +203,7 @@ export default {
     },
     created() {
         this.getCheckInList(1);
+        this.getStaffList();
     }
 }
 </script>

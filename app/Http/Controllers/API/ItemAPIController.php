@@ -2,10 +2,11 @@
 
 namespace App\Http\Controllers\API;
 
-use App\Http\Controllers\Controller;
-use App\Models\UomConversion;
-use App\Repositories\Item\ItemRepositoryInterface;
 use Illuminate\Http\Request;
+use App\Models\UomConversion;
+use App\Http\Controllers\Controller;
+use App\Http\Requests\Item\ItemImportRequest;
+use App\Repositories\Item\ItemRepositoryInterface;
 
 class ItemAPIController extends Controller
 {
@@ -67,10 +68,14 @@ class ItemAPIController extends Controller
         ResponseData($item);
     }
 
-    public function brandBySupplier(Request $request){
+    public function brandBySupplier(Request $request)
+    {
         $brand = $this->itemRepo->brandBySupplier($request);
         ResponseData($brand);
     }
-
-
+    public function itemImport(ItemImportRequest $request)
+    {
+        $item = $this->itemRepo->itemImport($request);
+        return $item;
+    }
 }

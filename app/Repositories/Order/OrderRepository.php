@@ -2,26 +2,27 @@
 
 namespace App\Repositories\Order;
 
+use App\Models\Menu;
+use App\Models\Pack;
+use App\Models\Order;
+
+use App\Models\Staff;
+
+use App\Models\Entity;
+use App\Models\Invoice;
+use App\Models\OrderItem;
+use App\Models\Department;
+use App\Models\RoomSession;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
-
-use App\Http\Action\SendNotification\SendNotification;
-
-use App\Events\KitchenNotificationRequest;
-use App\Events\KitchenNotificationRequestByArea;
-use App\Events\OrderStatusNotificationRequest;
 use App\Events\WaiterNotificationRequest;
+use App\Http\Resources\OrderItemResource;
+use App\Events\KitchenNotificationRequest;
+use App\Events\OrderStatusNotificationRequest;
+use App\Events\KitchenNotificationRequestByArea;
 use App\Events\WaiterOrderConfirmNotificationRequest;
-use App\Models\Order;
-use App\Models\OrderItem;
-use App\Models\Entity;
-use App\Models\Invoice;
-use App\Models\Menu;
-use App\Models\Pack;
-use App\Models\RoomSession;
-use App\Models\Staff;
-use App\Models\Department;
+use App\Http\Action\SendNotification\SendNotification;
 
 class OrderRepository implements OrderRepositoryInterface
 {
@@ -221,7 +222,7 @@ class OrderRepository implements OrderRepositoryInterface
         try {
             $orderItem = OrderItem::find($data['id']);
             if ($data['status'] == 'cancelled') {
-                if(!checkDepartmentAndRoles('Catering', ['Staff', 'Waiter'])){
+                if (!checkDepartmentAndRoles('Catering', ['Staff', 'Waiter'])) {
                     ResponseMessage("Permission doesn't allow", 422);
                 }
                 $nonCancellableStatuses = [
@@ -383,8 +384,13 @@ class OrderRepository implements OrderRepositoryInterface
     // for pos
     public function getOrderItemByPos()
     {
-        $orderItems = OrderItem::with('area', 'menu.areas')->orderBy('created_at', 'desc')->paginate(config('common.list_count'));
-        ResponseData($orderItems);
+        $orderItems = OrderItem::with('area', 'menu.menuPlaces.area')
+            ->orderBy('created_at', 'desc')->paginate(config('common.list_count'));
+        if ($orderItems) {
+            return OrderItemResource::collection($orderItems);
+        } else {
+            return ResponseMessage('No order items found', 404);
+        }
     }
 
     public function orderItemAreaConfirm(int $id, $request)
@@ -446,7 +452,6 @@ class OrderRepository implements OrderRepositoryInterface
     {
         $order = Order::where('invoice_id', $invoiceId)->with('orderItems.menu')->get();
         ResponseData($order);
-
     }
     public function checkFocSupervision(Request $request)
     {

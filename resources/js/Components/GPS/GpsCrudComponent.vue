@@ -169,12 +169,12 @@
                     </button>
                 </div>
                 <div class="relative px-6 py-4 border-b" data-te-modal-body-ref>
-                    <div class="mb-4">
+                    <!-- <div class="mb-4">
                         <label for="" class="label-form mb-3">
                             Name
                         </label>
                         <input type="text" placeholder="Name" v-model="name" class="input-ui">
-                    </div>
+                    </div> -->
                     <div class="mb-4">
                         <label for="" class="label-form mb-3">
                             Latitude

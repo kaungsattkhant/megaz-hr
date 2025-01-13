@@ -387,11 +387,15 @@ class MenuRepository implements MenuRepositoryInterface
         $menus = Menu::with([
             'menu_category',
             'prices',
-            'items',
+            // 'items',
             'menuServiceDiscounts' => function ($query) use ($validateDate) {
                 $query->where('from_date', '<=', $validateDate)->where('to_date', '>=', $validateDate);
             }
-        ])->where('is_feature', 1)->orderBy('created_at', 'desc')->where('is_active', 1)->paginate(config('common.list_count'));
+        ])
+        // ->where('is_feature', 1)
+        ->orderBy('created_at', 'desc')
+        ->where('is_active', 1)
+        ->paginate(config('common.list_count'));
         return $menus;
     }
 }

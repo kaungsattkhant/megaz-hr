@@ -49,7 +49,6 @@ class SupplierRepository implements SupplierInterface
                 $data
             );
             // $decodedSupplierItems = json_decode($request->supplier_items);
-            // // $decodedSupplierItems = json_decode($request->supplier_items, true);
 
             // if (json_last_error() !== JSON_ERROR_NONE) {
             //     return ResponseMessage('Invalid JSON data provided for supplier items.', 400);

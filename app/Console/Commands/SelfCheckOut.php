@@ -32,16 +32,17 @@ class SelfCheckOut extends Command
         DB::beginTransaction();
 
         try {
+
             $checkIns = CheckIn::whereNull('check_out_date_time')->where('is_current_checked_in', true)
                 ->whereHas('timeShift', function ($query) {
-                    $query->where('to_time', '<', now()->format('H:i:s'));
+                    $query->whereRaw('TIMESTAMP(CURDATE(), to_time) < ?', [now()->subHour()]);
                 })->get();
 
             foreach ($checkIns as $checkIn) {
-                $checkOutTime = Carbon::parse($checkIn->timeShift->to_time)->addMinutes(60);
+                $toTime = Carbon::parse($checkIn->timeShift->to_time);
 
                 $checkIn->update([
-                    'check_out_date_time' => $checkOutTime,
+                    'check_out_date_time' => $toTime->format('Y-m-d H:i:s'),
                     'is_current_checked_in' => false,
                     'is_self_checkout' => false,
                 ]);

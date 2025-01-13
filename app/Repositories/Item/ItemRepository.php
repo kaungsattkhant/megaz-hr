@@ -2,13 +2,16 @@
 
 namespace App\Repositories\Item;
 
+use Exception;
 use App\Models\Item;
 use App\Models\ItemType;
 use App\Models\ItemPrice;
+use App\Imports\ItemsImport;
 use App\Models\SupplierItem;
-use App\Services\AveragePriceCalculator;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Maatwebsite\Excel\HeadingRowImport;
+use App\Services\AveragePriceCalculator;
 use Illuminate\Database\Eloquent\Builder;
 
 class ItemRepository implements ItemRepositoryInterface
@@ -148,12 +151,27 @@ class ItemRepository implements ItemRepositoryInterface
 
     public function brandBySupplier($request)
     {
-        $itemId=$request->item_id;
-        $supplierId=$request->supplier_id;
+        $itemId = $request->item_id;
+        $supplierId = $request->supplier_id;
         $supplierByItem = SupplierItem::with('brand', 'item', 'item_price')
             ->where('item_id', $itemId)
             ->where('supplier_id', $supplierId)->get();
         return $supplierByItem;
     }
 
+    public function itemImport($request)
+    {
+        $file = $request->file('item_import');
+        $headings = (new HeadingRowImport)->toArray($file);
+        $expectedHeadings = ['name', 'code', 'category_id', 'item_type_id', 'base_uom_id', 'uom_id'];
+        $actualHeadings = $headings[0][0];
+        foreach ($expectedHeadings as $heading) {
+            if (!in_array($heading, $actualHeadings)) {
+                return ResponseData($data = null, $status_code = 422, false, $extra_message = 'Missing Heading: ' . $heading);
+            }
+        }
+        $import = new ItemsImport();
+        $import->import($file);
+        ResponseMessage('Import Successfully', 200);
+    }
 }

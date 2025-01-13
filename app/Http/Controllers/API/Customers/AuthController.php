@@ -32,7 +32,6 @@ class AuthController extends Controller
         //$data['otp'] = rand(000000,999999);
         $data['otp'] = '000000';
         $data['password'] = 'default_password';
-
         try {
             DB::beginTransaction();
             Customer::firstOrCreate(
