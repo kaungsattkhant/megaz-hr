@@ -295,7 +295,7 @@
                         </select>
                     </div>
 
-                    <div class="mb-4">
+                    <!-- <div class="mb-4">
                         <label class="label-form mb-3">Brands</label>
                         <multiselect
                         v-model="selectedBrands"
@@ -313,7 +313,7 @@
                                     brands selected</span>
                             </template>
                         </multiselect>
-                    </div>
+                    </div> -->
 
                     <div class="mb-4">
                         <label for="" class="label-form mb-3">
@@ -434,8 +434,8 @@ export default {
             lastPage: 0,
             totalData:0,
 
-            brandsList: [],
-            selectedBrands: [],
+            // brandsList: [],
+            // selectedBrands: [],
         };
     },
 
@@ -495,13 +495,13 @@ export default {
             }
         },
 
-        async getBrandList(){
-            let url = `/api/brands`;
-            let response = await getApiData({ url: url, token: this.getToken() });
-            if (response.success) {
-                this.brandsList = response.data;
-            }
-        },
+        // async getBrandList(){
+        //     let url = `/api/brands`;
+        //     let response = await getApiData({ url: url, token: this.getToken() });
+        //     if (response.success) {
+        //         this.brandsList = response.data;
+        //     }
+        // },
 
         async getItemList(pageNumber) {
             let url = `/api/items?page=${pageNumber}`;
@@ -528,15 +528,15 @@ export default {
             formData.append('category_id', this.selectedCategory.id);
             formData.append('base_uom_id',this.selectedBaseUom.id);
             formData.append('item_type_id',this.itemType.id);
-            if(this.selectedBrands.length > 0){
-                this.selectedBrands.forEach((item)=>{
-                    formData.append('brands[]', item.id);
-                });
-            }
+            // if(this.selectedBrands.length > 0){
+            //     this.selectedBrands.forEach((item)=>{
+            //         formData.append('brands[]', item.id);
+            //     });
+            // }
             let response = await postApiData({ url: url, form_data: formData, token: this.getToken() });
             if (response.success) {
                 // this.getItemList(this.currentPage);
-                this.selectedBrands = [];
+                // this.selectedBrands = [];
                 window.location.reload();
             }
         },
@@ -586,7 +586,7 @@ export default {
     created() {
         this.getItemCategoryList();
         this.getUomList();
-        this.getBrandList();
+        // this.getBrandList();
         this.getItemList(1);
         this.getItemTypeList();
     },
