@@ -23,7 +23,7 @@ class Item extends BaseModel
         'base_uom_id',
         'code',
         'item_type_id',
-        // 'uom_id'
+        'uom_id'
     ];
 
     protected $with = ['brands'];
