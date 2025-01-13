@@ -2,8 +2,9 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
+use App\Models\SupplierItem;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Supplier extends Model
 {
@@ -16,6 +17,13 @@ class Supplier extends Model
         // return $this->belongsToMany(Item::class,);
         return $this->belongsToMany(Item::class,'supplier_items')
         ->withPivot('brand_id'); // Include brand_id in the pivot data
+        // ->withTimestamps();
+    }
+
+    public function supplier_items()
+    {
+        // return $this->belongsToMany(Item::class,);
+        return $this->hasMany(SupplierItem::class);
         // ->withTimestamps();
     }
     
