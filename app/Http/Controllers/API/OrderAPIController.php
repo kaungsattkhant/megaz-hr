@@ -18,10 +18,9 @@ class OrderAPIController extends Controller
 
     public function addOrder(Request $request)
     {
-        if($request->menuArray)
-        {
+        if ($request->menuArray) {
             $orders = $this->orderRepo->createMultipleOrder($request->all());
-        }else{
+        } else {
             $orders = $this->orderRepo->createOrder($request->all());
         }
         ResponseData($orders);
@@ -38,10 +37,11 @@ class OrderAPIController extends Controller
         ResponseData($orderItems);
     }
 
-// pos
+    // pos
     public function getOrderItemForPOS()
     {
-        $this->orderRepo->getOrderItemByPos();
+        $data = $this->orderRepo->getOrderItemByPos();
+        ResponseData($data);
     }
 
     public function orderItemAreaConfirm(int $id, Request $request)
@@ -56,10 +56,9 @@ class OrderAPIController extends Controller
 
     public function checkFocSupervision(Request $request)
     {
-        if(!$request->phone_number || !$request->password){
+        if (!$request->phone_number || !$request->password) {
             ResponseMessage('Phone number and password must be present', 400);
         }
         $this->orderRepo->checkFocSupervision($request);
     }
-  
 }

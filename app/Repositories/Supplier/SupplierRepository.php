@@ -48,71 +48,70 @@ class SupplierRepository implements SupplierInterface
                 ['id' => $data['id']],
                 $data
             );
-            $decodedSupplierItems = json_decode($request->supplier_items);
-            // $decodedSupplierItems = json_decode($request->supplier_items, true);
+            // $decodedSupplierItems = json_decode($request->supplier_items);
 
-            if (json_last_error() !== JSON_ERROR_NONE) {
-                return ResponseMessage('Invalid JSON data provided for supplier items.', 400);
-            }
+            // if (json_last_error() !== JSON_ERROR_NONE) {
+            //     return ResponseMessage('Invalid JSON data provided for supplier items.', 400);
+            // }
             
             
-            if (empty($decodedSupplierItems)) {
-                ResponseMessage('Supplier Item is empty', 419);
-            }
-            foreach ($decodedSupplierItems as $supplierItems) {
-                if (isset($request->id)) {
-                    if (!isset($supplierItems->id)) {
-                        $isExistSupplierItem = SupplierItem::where('supplier_id', $supplier->id)
-                            ->where('item_id', $supplierItems->item_id)
-                            ->where('brand_id', $supplierItems->brand_id)
-                            ->exists();
-                        if ($isExistSupplierItem) {
-                            ResponseMessage('Brand and Item are already created to this supplier', 419);
-                        }
-                        $syncData[] = [
-                            'supplier_id' => $supplier->id,
-                            'item_id' => $supplierItems->item_id,
-                            'brand_id' => $supplierItems->brand_id,
-                        ];
-                    }
-                } else {
-                    // $supplieItem=SupplierItem::create([
-                    //     'supplier_id'=>$supplier->id,
-                    //     'item_id'=>$supplierItems->item_id,
-                    //     'brand_id'=>$supplierItems->brand_id,
-                    // ]);
-                    $syncData[] = [
-                        'supplier_id' => $supplier->id,
-                        'item_id' => $supplierItems->item_id,
-                        'brand_id' => $supplierItems->brand_id,
-                    ];
-                }
-            }
-            DB::table('supplier_items')->insert($syncData);
+            // if (empty($decodedSupplierItems)) {
+            //     ResponseMessage('Supplier Item is empty', 419);
+            // }
+            // foreach ($decodedSupplierItems as $supplierItems) {
+            //     if (isset($request->id)) {
+            //         if (!isset($supplierItems->id)) {
+            //             $isExistSupplierItem = SupplierItem::where('supplier_id', $supplier->id)
+            //                 ->where('item_id', $supplierItems->item_id)
+            //                 ->where('brand_id', $supplierItems->brand_id)
+            //                 ->exists();
+            //             if ($isExistSupplierItem) {
+            //                 ResponseMessage('Brand and Item are already created to this supplier', 419);
+            //             }
+            //             $syncData[] = [
+            //                 'supplier_id' => $supplier->id,
+            //                 'item_id' => $supplierItems->item_id,
+            //                 'brand_id' => $supplierItems->brand_id,
+            //             ];
+            //         }
+            //     } else {
+            //         // $supplieItem=SupplierItem::create([
+            //         //     'supplier_id'=>$supplier->id,
+            //         //     'item_id'=>$supplierItems->item_id,
+            //         //     'brand_id'=>$supplierItems->brand_id,
+            //         // ]);
+            //         $syncData[] = [
+            //             'supplier_id' => $supplier->id,
+            //             'item_id' => $supplierItems->item_id,
+            //             'brand_id' => $supplierItems->brand_id,
+            //         ];
+            //     }
+            // }
+            // DB::table('supplier_items')->insert($syncData);
 
 
             // tem command
-            // if (!isset($request->id)) {
-            //     $brandIds = $request->brands;// [1,2]
-            //     $itemIds = $request->items;//[6]
-            //     $syncData = [];
-            //     $uniqueCombinations = [];
-            //     foreach ($itemIds as $itemId) {
-            //         foreach ($brandIds as $brandId) {
-            //             $combinationKey = $supplier->id . '_' . $itemId . '_' . $brandId; // Create a unique key
-            //             if (!isset($uniqueCombinations[$combinationKey])) {
-            //                 $syncData[] = [
-            //                     'supplier_id' => $supplier->id,
-            //                     'item_id' => $itemId,
-            //                     'brand_id' => $brandId,
-            //                 ];
-            //                 $uniqueCombinations[$combinationKey] = true; // Mark this combination as added
-            //             }
-            //         }
-            //     }
-            //     // Bulk insert into the pivot table
-            //     DB::table('supplier_items')->insert($syncData);
-            // }
+            if (!isset($request->id)) {
+                $brandIds = $request->brands;// [1,2]
+                $itemIds = $request->items;//[6]
+                $syncData = [];
+                $uniqueCombinations = [];
+                foreach ($itemIds as $itemId) {
+                    foreach ($brandIds as $brandId) {
+                        $combinationKey = $supplier->id . '_' . $itemId . '_' . $brandId; // Create a unique key
+                        if (!isset($uniqueCombinations[$combinationKey])) {
+                            $syncData[] = [
+                                'supplier_id' => $supplier->id,
+                                'item_id' => $itemId,
+                                'brand_id' => $brandId,
+                            ];
+                            $uniqueCombinations[$combinationKey] = true; // Mark this combination as added
+                        }
+                    }
+                }
+                // Bulk insert into the pivot table
+                DB::table('supplier_items')->insert($syncData);
+            }
             
             DB::commit();
             return $supplier;
