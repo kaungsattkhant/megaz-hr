@@ -39,4 +39,9 @@ class SupplierController extends Controller
         $createdSupplierAccount = $this->supplierRepo->createSupplierAccount($request);
         ResponseData($createdSupplierAccount);
     }
+
+    public function toggleBrandItem(Request $request){
+        $createdSupplierAccount = $this->supplierRepo->toggleBrandItem($request->id);
+        ResponseData($createdSupplierAccount);
+    }
 }

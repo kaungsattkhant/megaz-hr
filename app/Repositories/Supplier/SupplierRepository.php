@@ -177,4 +177,12 @@ class SupplierRepository implements SupplierInterface
         }
     }
 
+    public function toggleBrandItem($supplieItemId){
+        if (toggleColumn(SupplierItem::class, $supplieItemId, 'is_active')) {
+            ResponseMessage('SupplierItem status toggled successfully.',200);
+        } else {
+            ResponseMessage('SupplierItem not found.',404);
+        }
+    }
+
 }
