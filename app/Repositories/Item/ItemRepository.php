@@ -163,7 +163,16 @@ class ItemRepository implements ItemRepositoryInterface
     {
         $file = $request->file('item_import');
         $headings = (new HeadingRowImport)->toArray($file);
-        $expectedHeadings = ['name', 'code', 'category_id', 'item_type_id', 'base_uom_id', 'uom_id'];
+        $expectedHeadings = [
+            'name',
+            'code',
+            'category_id',
+            'item_type_id',
+            'base_uom_id',
+            'uom_id',
+            'lead_time',
+            'minimum_holding_amount',
+        ];
         $actualHeadings = $headings[0][0];
         foreach ($expectedHeadings as $heading) {
             if (!in_array($heading, $actualHeadings)) {

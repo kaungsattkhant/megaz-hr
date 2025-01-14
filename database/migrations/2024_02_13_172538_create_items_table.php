@@ -13,13 +13,15 @@ return new class extends Migration
     {
         Schema::create('items', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->string('name',45);
+            $table->string('name', 45);
             $table->string('code');
             $table->foreignId('category_id')->constrained();
             $table->unsignedInteger(column: 'item_type_id');
             $table->unsignedBigInteger('base_uom_id')->constrained(); //base uom mean large unit
             $table->unsignedBigInteger('uom_id')->constrained(); //inventory store unit
             $table->boolean('is_active')->default(1);
+            $table->double('lead_time');
+            $table->bigInteger('minimum_holding_amount');
             $table->timestamps();
         });
     }
