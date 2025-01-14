@@ -647,7 +647,7 @@
                 @endif
                 @if(checkFeaturePermission('accessory'))
                     <li>
-                        <a href="/accessories" class="flex items-center @yield('packages')">
+                        <a href="/accessories" class="flex items-center @yield('accessories')">
                             <i class="fal fa-braille pr-3"></i>
                             Accessories
                         </a>
