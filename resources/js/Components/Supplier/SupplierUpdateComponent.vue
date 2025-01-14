@@ -140,9 +140,21 @@
                             <td class=" px-6 py-4 font-medium ">
                                 {{ selectedItem.brand_name }}
                             </td>
-                            <td class=" px-6 py-4 font-medium ">
-                                <button>
-                                    <i class="fal fa-trash  pr-3" @click="deleteSelectedItemBtnClicked(selectedItemIndex)" ></i>
+                            <td class=" px-6 py-4 font-medium  text-center">
+                                <input v-if="selectedItem.id" :checked="selectedItem.is_active == 1" @change="isActiveToggled(selectedItem.id)"
+                                            class="me-2 mt-[0.3rem] h-3.5 w-8 appearance-none rounded-[0.4375rem] bg-black/25 before:pointer-events-none before:absolute before:h-3.5
+                                    before:w-3.5 before:rounded-full before:bg-transparent before:content-[''] 
+                                    after:absolute after:z-[2] after:-mt-[0.1875rem] after:h-5 after:w-5 after:rounded-full after:border after:border-gray-400 after:bg-white after:shadow-switch-2 after:transition-[background-color_0.2s,transform_0.2s]
+                                    after:content-[''] checked:bg-primary checked:after:absolute checked:after:z-[2] checked:after:-mt-[3px] checked:after:ms-[1.0625rem]
+                                    checked:after:h-5 checked:after:w-5 checked:after:rounded-full checked:after:border-none checked:after:bg-primary checked:after:shadow-switch-1
+                                    checked:after:transition-[background-color_0.2s,transform_0.2s] checked:after:content-[''] hover:cursor-pointer focus:outline-none focus:before:scale-100
+                                    focus:before:opacity-[0.12] focus:before:shadow-switch-3 focus:before:shadow-black/60 focus:before:transition-[box-shadow_0.2s,transform_0.2s]
+                                    focus:after:absolute focus:after:z-[1] focus:after:block focus:after:h-5 focus:after:w-5 focus:after:rounded-full focus:after:content-['']
+                                    checked:focus:border-primary checked:focus:bg-primary checked:focus:before:ms-[1.0625rem] checked:focus:before:scale-100 checked:focus:before:shadow-switch-3
+                                    checked:focus:before:transition-[box-shadow_0.2s,transform_0.2s] "
+                                            type="checkbox" role="switch" />
+                                <button v-if="!selectedItem.id" @click="deleteSelectedItemBtnClicked(selectedItemIndex)" >
+                                    <i class="fal fa-trash  pr-3"></i>
                                 </button>
                             </td>
                         </tr>
@@ -410,6 +422,7 @@ export default {
                 this.supplier.items.forEach(item =>{
                     this.selectedItemList.push({
                         id:item.id,
+                        is_active:item.is_active,
                         item_name:item.name,
                         item_id:item.id,
                         brand_id:item.pivot.brand_id,
@@ -417,6 +430,25 @@ export default {
                     })
                     // this.selectedItem.push(this.itemList.find(itemid => itemid.id === item.id))
                 })
+            }
+        },
+        isActiveToggled(id) {
+            let index = this.selectedItemList.findIndex(item => item.id == id);
+            if (index != -1) {
+                if (this.selectedItemList[index].is_active == 1) {
+                    this.selectedItemList[index].is_active = 0;
+                }
+                else {
+                    this.selectedItemList[index].is_active = 1;
+                }
+
+                let url = `/api/toggle_brand_item`;
+                let formData = new FormData();
+                formData.append('id', id);
+                let response = postApiData({ url: url, form_data: formData, token: this.getToken() });
+                if(response.success){
+                    this.getSupplierDetail()
+                }
             }
         },
 
@@ -518,7 +550,7 @@ export default {
             let url = `/api/suppliers`;
             let response = await postApiData({url: url, form_data: formData, token: this.getToken()});
             if(response.success){
-                // window.location.replace("/suppliers");
+                window.location.replace("/suppliers");
             }
         },
         async getPayableSubAccountList(){
