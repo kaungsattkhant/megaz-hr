@@ -8,8 +8,8 @@ use App\Models\FixedAssetPurchase;
 use App\Repositories\Ads\AdsRepository;
 use App\Repositories\Uom\UomRepository;
 use Illuminate\Support\ServiceProvider;
-use App\Repositories\Area\AreaRepository;
 
+use App\Repositories\Area\AreaRepository;
 use App\Repositories\Duty\DutyRepository;
 use App\Repositories\Item\ItemRepository;
 use App\Repositories\Menu\MenuRepository;
@@ -18,29 +18,29 @@ use App\Repositories\Role\RoleRepository;
 use App\Repositories\Task\TaskRepository;
 use App\Repositories\Asset\AssetInterface;
 use App\Repositories\Asset\AssetRepository;
+use App\Repositories\Contact\ContactRepository;
 use App\Repositories\Order\OrderRepository;
-
 use App\Repositories\Skill\SkillRepository;
 use App\Repositories\Staff\StaffRepository;
 use App\Repositories\Entity\EntityRepository;
-use App\Repositories\Account\AccountInterface;
 // <<<<<<< HEAD
 // use App\Repositories\AccountPayable\AccountPayableInterface;
 // use App\Repositories\AccountPayable\AccountPayableRepository;
+use App\Repositories\Account\AccountInterface;
 use App\Repositories\Canteen\CanteenInterface;
-use App\Repositories\Service\ServiceInterface;
 // use App\Repositories\Ads\AdsRepository;
 // use App\Repositories\Ads\AdsRepositoryInterface;
 // =======
+use App\Repositories\Service\ServiceInterface;
 use App\Repositories\Account\AccountRepository;
-use App\Repositories\Booking\BookingRepository;
 // >>>>>>> origin/k/backend-api-main
+use App\Repositories\Booking\BookingRepository;
 use App\Repositories\Canteen\CanteenRepository;
 use App\Repositories\Feature\FeatureRepository;
 use App\Repositories\Invoice\InvoiceRepository;
 use App\Repositories\Journal\JournalRepository;
-use App\Repositories\Package\PackageRepository;
 
+use App\Repositories\Package\PackageRepository;
 use App\Repositories\Prepaid\PrepaidRepository;
 use App\Repositories\Service\ServiceRepository;
 use App\Repositories\Ads\AdsRepositoryInterface;
@@ -57,26 +57,26 @@ use App\Repositories\Accessory\AccessoryInterface;
 use App\Repositories\Area\AreaRepositoryInterface;
 use App\Repositories\Duty\DutyRepositoryInterface;
 use App\Repositories\HomeRepository\HomeInterface;
+
 use App\Repositories\Item\ItemRepositoryInterface;
-
 use App\Repositories\Menu\MenuRepositoryInterface;
+
 use App\Repositories\Objective\ObjectiveInterface;
-
 use App\Repositories\Pack\PackRepositoryInterface;
+
 use App\Repositories\Role\RoleRepositoryInterface;
-
 use App\Repositories\Task\TaskRepositoryInterface;
+
 use App\Repositories\Accessory\AccessoryRepository;
-
 use App\Repositories\Complaint\ComplaintRepository;
+
 use App\Repositories\FoodOrder\FoodOrderRepository;
-
 use App\Repositories\HomeRepository\HomeRepository;
+
 use App\Repositories\Inventory\InventoryRepository;
-
 use App\Repositories\Objective\ObjectiveRepository;
-use App\Repositories\TimeShift\TimeShiftRepository;
 
+use App\Repositories\TimeShift\TimeShiftRepository;
 use App\Repositories\Order\OrderRepositoryInterface;
 use App\Repositories\Skill\SkillRepositoryInterface;
 use App\Repositories\Staff\StaffRepositoryInterface;
@@ -89,6 +89,8 @@ use App\Repositories\MRPForecast\MRPForecastRepository;
 use App\Repositories\RoomSession\RoomSessionRepository;
 use App\Repositories\Transaction\TransactionRepository;
 use App\Repositories\Booking\BookingRepositoryInterface;
+use App\Repositories\Contact\ContactRepositoryInterface;
+
 use App\Repositories\Feature\FeatureRepositoryInterface;
 use App\Repositories\FinancialReport\FinancialInterface;
 use App\Repositories\Invoice\InvoiceRepositoryInterface;
@@ -116,8 +118,6 @@ use App\Repositories\SaleTargetMenu\SaleTargetMenuRepository;
 use App\Repositories\Department\DepartmentRepositoryInterface;
 use App\Repositories\MRPForecast\MRPForecastRepositoryInterface;
 use App\Repositories\RoomSession\RoomSessionRepositoryInterface;
-use App\Repositories\UsedDefectedItem\UsedDefectedItemRepository;
-use App\Repositories\CookingPlace\CookingPlaceRepositoryInterface;
 // <<<<<<< HEAD
 // use App\Repositories\Pack\PackRepository;
 // use App\Repositories\Pack\PackRepositoryInterface;
@@ -129,15 +129,17 @@ use App\Repositories\CookingPlace\CookingPlaceRepositoryInterface;
 // use App\Repositories\UsedDefectedItem\UsedDefectedITemRepositoryInterface;
 // use App\Repositories\HomeRepository\HomeInterface;
 // use App\Repositories\HomeRepository\HomeRepository;
-use App\Repositories\ItemUsageForecast\ItemUsageForecastInterface;
-use App\Repositories\MenuCategory\MenuCategoryRepositoryInterface;
+use App\Repositories\UsedDefectedItem\UsedDefectedItemRepository;
+use App\Repositories\CookingPlace\CookingPlaceRepositoryInterface;
 // use App\Repositories\MenuCategory\MenuCategoryRepository;
 // use App\Repositories\MenuCategory\MenuCategoryRepositoryInterface;
+use App\Repositories\ItemUsageForecast\ItemUsageForecastInterface;
+use App\Repositories\MenuCategory\MenuCategoryRepositoryInterface;
 use App\Repositories\RoomDiscount\RoomDiscountRepositoryInterface;
 use App\Repositories\StaffAdvance\StaffAdvanceRepositoryInterface;
+// =======
 use App\Repositories\AccountReceivable\AccountReceivableRepository;
 use App\Repositories\BirthdayPromotion\BirthdayPromotionRepository;
-// =======
 use App\Repositories\ItemUsageForecast\ItemUsageForecastRepository;
 use App\Repositories\PurchaseOrderItem\PurchaseOrderItemRepository;
 use App\Repositories\PurchaseOrder\PurchaseOrderRepositoryInterface;
@@ -242,5 +244,6 @@ class RepositoryServiceProvider extends ServiceProvider
         $this->app->bind(CreditorInterface::class, CreditorRepository::class);
         $this->app->bind(MRPForecastRepositoryInterface::class, MRPForecastRepository::class);
         $this->app->bind(TimeShiftRepositoryInterface::class, TimeShiftRepository::class);
+        $this->app->bind(ContactRepositoryInterface::class, ContactRepository::class);
     }
 }

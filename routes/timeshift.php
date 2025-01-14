@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\API\ContactController;
 use App\Http\Controllers\API\TimeShiftController;
 
 Route::middleware('auth:api')->group(function () {
@@ -27,5 +28,12 @@ Route::middleware('auth:api')->group(function () {
     //admin panel check in
     Route::get('/check_ins', 'getAllCheckIns');
     Route::get('/total_hours_check_ins', 'getTotalHoursCheckIns');
+  });
+
+  Route::controller(ContactController::class)->group(function () {
+    Route::get('/contacts', 'contactList');
+    Route::get('/contacts/{contactId}', 'getContactById');
+    Route::post('/contacts', 'updateOrCreate');
+    Route::delete('/contacts/{id}', 'delete');
   });
 });
