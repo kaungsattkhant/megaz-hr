@@ -13,4 +13,6 @@ interface SupplierInterface
     public function detail($supplier);
 
     public function createSupplierAccount($request);
+
+    public function toggleBrandItem($supplieItemId);
 }
