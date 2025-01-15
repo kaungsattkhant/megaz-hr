@@ -15,11 +15,13 @@ return new class extends Migration
             $table->id();
             $table->unsignedBigInteger('account_id');
             $table->unsignedBigInteger('creditor_account_id');
-            $table->char('name',120);
-            $table->char('shop_name',120);
-            $table->char('phone_number');
+            $table->char('name', 120);
+            $table->char('shop_name', 120);
             $table->longText('address')->nullable();
+            $table->string('email')->nullable();
             $table->integer('credit_limit');
+            $table->double('lead_time');
+            $table->longText('credit_terms');
             $table->timestamps();
         });
     }

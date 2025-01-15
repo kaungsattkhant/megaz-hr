@@ -6,15 +6,17 @@ use App\Models\Account;
 use App\Models\Supplier;
 use App\Models\SupplierItem;
 use Illuminate\Http\Request;
+use App\Models\SupplierPhone;
 use PhpParser\Node\Expr\Isset_;
 use Illuminate\Support\Facades\DB;
+use App\Models\SupplierBankAccount;
 
 class SupplierRepository implements SupplierInterface
 {
 
     public function list($request)
     {
-        $query = Supplier::with(['account', 'items'])->orderBy('id', 'DESC');
+        $query = Supplier::with(['account', 'items', 'supplierPhone', 'supplierBankAccount'])->orderBy('id', 'DESC');
 
         if ($request->has('search')) {
             $searchTerm = $request->input('search');
@@ -53,11 +55,12 @@ class SupplierRepository implements SupplierInterface
             if (json_last_error() !== JSON_ERROR_NONE) {
                 return ResponseMessage('Invalid JSON data provided for supplier items.', 400);
             }
-            
-            
+
+
             if (empty($decodedSupplierItems)) {
                 ResponseMessage('Supplier Item is empty', 419);
             }
+            $syncData = [];
             foreach ($decodedSupplierItems as $supplierItems) {
                 if (isset($request->id)) {
                     if (!isset($supplierItems->id)) {
@@ -89,30 +92,45 @@ class SupplierRepository implements SupplierInterface
             }
             DB::table('supplier_items')->insert($syncData);
 
+            if (isset($request->supplier_phones)) {
+                $supplierPhones = json_decode($request->supplier_phones, true);
+                if (json_last_error() !== JSON_ERROR_NONE) {
+                    return ResponseMessage('Invalid JSON data provided for supplier phone.', 400);
+                }
+                foreach ($supplierPhones as $phone) {
+                    SupplierPhone::updateOrCreate(
+                        [
+                            'supplier_id' => $supplier->id,
+                            'id' => $phone['id'] ?? null,
 
-            // tem command
-            // if (!isset($request->id)) {
-            //     $brandIds = $request->brands;// [1,2]
-            //     $itemIds = $request->items;//[6]
-            //     $syncData = [];
-            //     $uniqueCombinations = [];
-            //     foreach ($itemIds as $itemId) {
-            //         foreach ($brandIds as $brandId) {
-            //             $combinationKey = $supplier->id . '_' . $itemId . '_' . $brandId; // Create a unique key
-            //             if (!isset($uniqueCombinations[$combinationKey])) {
-            //                 $syncData[] = [
-            //                     'supplier_id' => $supplier->id,
-            //                     'item_id' => $itemId,
-            //                     'brand_id' => $brandId,
-            //                 ];
-            //                 $uniqueCombinations[$combinationKey] = true; // Mark this combination as added
-            //             }
-            //         }
-            //     }
-            //     // Bulk insert into the pivot table
-            //     DB::table('supplier_items')->insert($syncData);
-            // }
-            
+                        ],
+                        [
+                            'phone_number' => $phone['phone_number'],
+                            'type' => $phone['type'],
+                        ]
+                    );
+                }
+            }
+
+            if (isset($request->supplier_bank_accounts)) {
+                $supplierBankAccounts = json_decode($request->supplier_bank_accounts, true);
+                if (json_last_error() !== JSON_ERROR_NONE) {
+                    return ResponseMessage('Invalid JSON data provided for supplier bankaccount.', 400);
+                }
+                foreach ($supplierBankAccounts  as $supplierBankAccount) {
+                    SupplierBankAccount::updateOrCreate(
+                        [
+                            'supplier_id' => $supplier->id,
+                            'id' => $supplierBankAccount['id'] ?? null,
+                        ],
+                        [
+                            'account_name' => $supplierBankAccount['account_name'],
+                            'account_number' => $supplierBankAccount['account_number'],
+                        ]
+                    );
+                }
+            }
+
             DB::commit();
             return $supplier;
         } catch (\Exception $e) {
@@ -125,7 +143,7 @@ class SupplierRepository implements SupplierInterface
     public function detail($supplier)
     {
         $supplier->items = $supplier->items;
-        $supplier->load('supplier_items.brand','supplier_items.item');
+        $supplier->load('supplier_items.brand', 'supplier_items.item');
         // $supplier->load('supplier_items.item');
         // $supplier->supplier_items = $supplier->supplier_items;
         $supplier->account = $supplier->account;
@@ -152,8 +170,6 @@ class SupplierRepository implements SupplierInterface
             ResponseMessage($e->getMessage(), 402);
             throw $e;
         }
-
-
     }
 
     public function createAccountBySubAccount($name, $subAccountCode)
@@ -177,12 +193,12 @@ class SupplierRepository implements SupplierInterface
         }
     }
 
-    public function toggleBrandItem($supplieItemId){
+    public function toggleBrandItem($supplieItemId)
+    {
         if (toggleColumn(SupplierItem::class, $supplieItemId, 'is_active')) {
-            ResponseMessage('SupplierItem status toggled successfully.',200);
+            ResponseMessage('SupplierItem status toggled successfully.', 200);
         } else {
-            ResponseMessage('SupplierItem not found.',404);
+            ResponseMessage('SupplierItem not found.', 404);
         }
     }
-
 }

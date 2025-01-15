@@ -18,12 +18,15 @@ class Item extends BaseModel
 
     protected $fillable = [
         'name',
-        'category_id',
-        'is_active',
-        'base_uom_id',
         'code',
+        'category_id',
         'item_type_id',
-        'uom_id'
+        'base_uom_id',
+        'uom_id',
+        'is_active',
+        'lead_time',
+        'minimum_holding_amount',
+
     ];
 
     protected $with = ['brands'];
