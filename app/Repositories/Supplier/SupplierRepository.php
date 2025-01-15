@@ -148,6 +148,8 @@ class SupplierRepository implements SupplierInterface
         // $supplier->supplier_items = $supplier->supplier_items;
         $supplier->account = $supplier->account;
         $supplier->creditor_account = $supplier->creditor_account;
+        $supplier->supplierPhone = $supplier->supplierPhone;
+        $supplier->supplierBankAccount = $supplier->supplierBankAccount;
         return $supplier;
     }
 
@@ -199,6 +201,24 @@ class SupplierRepository implements SupplierInterface
             ResponseMessage('SupplierItem status toggled successfully.', 200);
         } else {
             ResponseMessage('SupplierItem not found.', 404);
+        }
+    }
+
+    public function toggleSupplierPhone($supplierPhoneId)
+    {
+        if (toggleColumn(SupplierPhone::class, $supplierPhoneId, 'is_active')) {
+            ResponseMessage('Supplier Phone status toggled successfully.', 200);
+        } else {
+            ResponseMessage('Supplier Phone not found.', 404);
+        }
+    }
+
+    public function toggleSupplierBankAccount($supplierBankAccountId)
+    {
+        if (toggleColumn(SupplierBankAccount::class, $supplierBankAccountId, 'is_active')) {
+            ResponseMessage('Supplier Bank Account status toggled successfully.', 200);
+        } else {
+            ResponseMessage('Supplier Bank Account not found.', 404);
         }
     }
 }

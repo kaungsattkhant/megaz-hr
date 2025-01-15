@@ -15,4 +15,8 @@ interface SupplierInterface
     public function createSupplierAccount($request);
 
     public function toggleBrandItem($supplieItemId);
+
+    public function toggleSupplierPhone($supplierPhoneId);
+
+    public function toggleSupplierBankAccount($supplierBankAccountId);
 }

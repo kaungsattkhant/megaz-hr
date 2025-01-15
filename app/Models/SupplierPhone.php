@@ -12,7 +12,8 @@ class SupplierPhone extends Model
     protected $fillable = [
         'supplier_id',
         'phone_number',
-        'type'
+        'type',
+        'is_active'
     ];
 
     public function supplier()
