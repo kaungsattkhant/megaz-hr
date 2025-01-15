@@ -17,31 +17,48 @@ class SupplierController extends Controller
         $this->supplierRepo = $supplier_repo;
     }
 
-    public function index(Request $request){
+    public function index(Request $request)
+    {
         $suppliers = $this->supplierRepo->list($request);
         ResponseData($suppliers);
     }
 
-    public function store(Request $request){
+    public function store(Request $request)
+    {
         $supplier = $this->supplierRepo->updateOrCreate($request);
         ResponseData($supplier);
     }
 
-    public function show(Supplier $supplier){
+    public function show(Supplier $supplier)
+    {
         $supplier = $this->supplierRepo->detail($supplier);
         ResponseData($supplier);
     }
 
-    public function destroy($id){
-    }
+    public function destroy($id) {}
 
-    public function createSupplierAccount(Request $request){
+    public function createSupplierAccount(Request $request)
+    {
         $createdSupplierAccount = $this->supplierRepo->createSupplierAccount($request);
         ResponseData($createdSupplierAccount);
     }
 
-    public function toggleBrandItem(Request $request){
+    public function toggleBrandItem(Request $request)
+    {
         $createdSupplierAccount = $this->supplierRepo->toggleBrandItem($request->id);
+        ResponseData($createdSupplierAccount);
+    }
+
+
+    public function toggleSupplierPhone(Request $request)
+    {
+        $createdSupplierAccount = $this->supplierRepo->toggleSupplierPhone($request->id);
+        ResponseData($createdSupplierAccount);
+    }
+
+    public function toggleSupplierBankAccount(Request $request)
+    {
+        $createdSupplierAccount = $this->supplierRepo->toggleSupplierBankAccount($request->id);
         ResponseData($createdSupplierAccount);
     }
 }
