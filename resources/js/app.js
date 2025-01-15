@@ -111,6 +111,7 @@ import OkrDutyEditComponent from './Components/OkrDuty/OkrDutyEditComponent.vue'
 import TimeShiftCrudComponent from './Components/TimeShift/TimeShiftCrudComponent.vue';
 import GpsCrudComponent from './Components/GPS/GpsCrudComponent.vue';
 import CheckInComponent from './Components/CheckIn/CheckInComponent.vue';
+import ContactCrudComponent from './Components/Contact/ContactCrudComponent.vue';
 
 import LoginComponent from './Components/Auth/LoginComponent.vue';
 import LogoutComponent from './Components/Auth/LogoutComponent.vue';
@@ -235,6 +236,7 @@ app.component('OkrDutyEditComponent', OkrDutyEditComponent);
 app.component('TimeShiftCrudComponent', TimeShiftCrudComponent);
 app.component('GpsCrudComponent', GpsCrudComponent);
 app.component('CheckInComponent', CheckInComponent);
+app.component('ContactCrudComponent', ContactCrudComponent);
 
 app.component('PurchaseOrderListComponent', PurchaseOrderListComponent);
 app.component('PurchaseOrderCreateComponent', PurchaseOrderCreateComponent);
