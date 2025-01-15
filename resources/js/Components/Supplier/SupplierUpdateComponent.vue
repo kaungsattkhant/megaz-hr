@@ -153,6 +153,7 @@
                                     checked:focus:border-primary checked:focus:bg-primary checked:focus:before:ms-[1.0625rem] checked:focus:before:scale-100 checked:focus:before:shadow-switch-3
                                     checked:focus:before:transition-[box-shadow_0.2s,transform_0.2s] "
                                             type="checkbox" role="switch" />
+
                                 <button v-if="!selectedItem.id" @click="deleteSelectedItemBtnClicked(selectedItemIndex)" >
                                     <i class="fal fa-trash  pr-3"></i>
                                 </button>
@@ -419,14 +420,15 @@ export default {
                 // this.existingItems = this.supplier.items;
                 this.selectedAccount = this.apAccountList.find(ap => ap.id === this.supplier.account_id )
                 this.selectedCreditAccount = this.creditAccList.find(crd => crd.id === this.supplier.creditor_account_id )
-                this.supplier.items.forEach(item =>{
+                this.supplier.supplier_items.forEach(item =>{
                     this.selectedItemList.push({
                         id:item.id,
                         is_active:item.is_active,
-                        item_name:item.name,
-                        item_id:item.id,
-                        brand_id:item.pivot.brand_id,
-                        brand_name:item.brands.find(brandId => brandId.id === item.pivot.brand_id).name
+                        item_name:item.item.name,
+                        item_id:item.item.id,
+                        brand_id:item.brand.id,
+                        brand_name:item.brand.name,
+                        // brand_name:item.brands.find(brandId => brandId.id === item.pivot.brand_id).name
                     })
                     // this.selectedItem.push(this.itemList.find(itemid => itemid.id === item.id))
                 })
@@ -441,14 +443,16 @@ export default {
                 else {
                     this.selectedItemList[index].is_active = 1;
                 }
-
                 let url = `/api/toggle_brand_item`;
                 let formData = new FormData();
                 formData.append('id', id);
                 let response = postApiData({ url: url, form_data: formData, token: this.getToken() });
-                if(response.success){
-                    this.getSupplierDetail()
+                console.log('test')
+                if(response.success == 'true'){
+                    console.log(response)
+                    
                 }
+                // this.getSupplierDetail();
             }
         },
 
