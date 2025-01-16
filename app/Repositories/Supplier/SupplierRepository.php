@@ -60,6 +60,7 @@ class SupplierRepository implements SupplierInterface
             if (empty($decodedSupplierItems)) {
                 ResponseMessage('Supplier Item is empty', 419);
             }
+            $syncData = [];
             foreach ($decodedSupplierItems as $supplierItems) {
                 if (isset($request->id)) {
                     if (!isset($supplierItems->id)) {
@@ -93,13 +94,18 @@ class SupplierRepository implements SupplierInterface
 
             if (isset($request->supplier_phones)) {
                 $supplierPhones = json_decode($request->supplier_phones, true);
+                if (json_last_error() !== JSON_ERROR_NONE) {
+                    return ResponseMessage('Invalid JSON data provided for supplier phone.', 400);
+                }
                 foreach ($supplierPhones as $phone) {
                     SupplierPhone::updateOrCreate(
                         [
                             'supplier_id' => $supplier->id,
-                            'phone_number' => $phone['phone_number'],
+                            'id' => $phone['id'] ?? null,
+
                         ],
                         [
+                            'phone_number' => $phone['phone_number'],
                             'type' => $phone['type'],
                         ]
                     );
@@ -108,11 +114,16 @@ class SupplierRepository implements SupplierInterface
 
             if (isset($request->supplier_bank_accounts)) {
                 $supplierBankAccounts = json_decode($request->supplier_bank_accounts, true);
-
+                if (json_last_error() !== JSON_ERROR_NONE) {
+                    return ResponseMessage('Invalid JSON data provided for supplier bankaccount.', 400);
+                }
                 foreach ($supplierBankAccounts  as $supplierBankAccount) {
                     SupplierBankAccount::updateOrCreate(
                         [
                             'supplier_id' => $supplier->id,
+                            'id' => $supplierBankAccount['id'] ?? null,
+                        ],
+                        [
                             'account_name' => $supplierBankAccount['account_name'],
                             'account_number' => $supplierBankAccount['account_number'],
                         ]
@@ -132,11 +143,13 @@ class SupplierRepository implements SupplierInterface
     public function detail($supplier)
     {
         $supplier->items = $supplier->items;
-        $supplier->load('supplier_items.brand','supplier_items.item');
+        $supplier->load('supplier_items.brand', 'supplier_items.item');
         // $supplier->load('supplier_items.item');
         // $supplier->supplier_items = $supplier->supplier_items;
         $supplier->account = $supplier->account;
         $supplier->creditor_account = $supplier->creditor_account;
+        $supplier->supplierPhone = $supplier->supplierPhone;
+        $supplier->supplierBankAccount = $supplier->supplierBankAccount;
         return $supplier;
     }
 
@@ -182,13 +195,30 @@ class SupplierRepository implements SupplierInterface
         }
     }
 
-    public function toggleBrandItem($supplieItemId){
+    public function toggleBrandItem($supplieItemId)
+    {
         if (toggleColumn(SupplierItem::class, $supplieItemId, 'is_active')) {
-            ResponseMessage('SupplierItem status toggled successfully.',200);
+            ResponseMessage('SupplierItem status toggled successfully.', 200);
         } else {
-            ResponseMessage('SupplierItem not found.',404);
+            ResponseMessage('SupplierItem not found.', 404);
         }
     }
 
+    public function toggleSupplierPhone($supplierPhoneId)
+    {
+        if (toggleColumn(SupplierPhone::class, $supplierPhoneId, 'is_active')) {
+            ResponseMessage('Supplier Phone status toggled successfully.', 200);
+        } else {
+            ResponseMessage('Supplier Phone not found.', 404);
+        }
+    }
 
+    public function toggleSupplierBankAccount($supplierBankAccountId)
+    {
+        if (toggleColumn(SupplierBankAccount::class, $supplierBankAccountId, 'is_active')) {
+            ResponseMessage('Supplier Bank Account status toggled successfully.', 200);
+        } else {
+            ResponseMessage('Supplier Bank Account not found.', 404);
+        }
+    }
 }

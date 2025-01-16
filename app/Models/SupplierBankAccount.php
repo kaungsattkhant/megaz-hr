@@ -13,7 +13,8 @@ class SupplierBankAccount extends Model
     protected $fillable = [
         'supplier_id',
         'account_name',
-        'account_number'
+        'account_number',
+        'is_active'
     ];
 
     public function supplier()

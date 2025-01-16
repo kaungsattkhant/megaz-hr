@@ -267,6 +267,8 @@ Route::middleware('auth:api')->group(function () {
     Route::controller(SupplierController::class)->group(function () {
         Route::post('/create_supplier_account', 'createSupplierAccount');
         Route::post('/toggle_brand_item', 'toggleBrandItem');
+        Route::post('/suppliers/toggle_phones', 'toggleSupplierPhone');
+        Route::post('/suppliers/toggle_bank_accounts', 'toggleSupplierBankAccount');
     });
     Route::resource('notifications', NotificationController::class)->only(['index']);
     Route::get('notification_by_user', [NotificationController::class, 'notificationUsersData']);

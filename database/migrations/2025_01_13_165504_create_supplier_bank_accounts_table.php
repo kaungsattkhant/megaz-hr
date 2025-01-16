@@ -16,6 +16,7 @@ return new class extends Migration
             $table->unsignedBigInteger('supplier_id');
             $table->string('account_name');
             $table->string('account_number');
+            $table->boolean('is_active')->default(true);
             $table->timestamps();
         });
     }

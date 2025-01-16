@@ -16,6 +16,7 @@ return new class extends Migration
             $table->unsignedBigInteger('supplier_id');
             $table->string('phone_number');
             $table->enum('type', ['kpay', 'phone']);
+            $table->boolean('is_active')->default(true);
             $table->timestamps();
         });
     }
