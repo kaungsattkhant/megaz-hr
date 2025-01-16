@@ -161,7 +161,7 @@
             </div><div class="col-span-3"></div>
 
             <div class=" col-span-12 mb-8" v-show="selectedItems.length > 0">
-                <table class="min-w-[40%] text-sm font-light ">
+                <table class="min-w-[50%] text-sm font-light ml-2">
                     <thead class="font-medium text-left ">
                         <tr>
                             <th scope="col" class=" pr-6 pl-2 py-4 ">
@@ -170,7 +170,7 @@
                             <th scope="col" class=" px-6 py-4 ">
                                 Brand
                             </th>
-                            <th scope="col" class=" px-6 py-4 ">
+                            <th scope="col" class=" px-6 py-4  text-right">
                             </th>
                         </tr>
                     </thead>
@@ -191,15 +191,15 @@
 
                         <div class="contents" v-for="(selectedItem, selectedItemIndex) in selectedItems" :key="selectedItemIndex">
                             <tr v-for="(brand) in selectedItem.brands" >
-                                <td class=" pr-6 pl-2 py-4 font-medium ">
+                                <td class=" pr-6 pl-2 py-3 font-medium ">
                                     {{ selectedItem.name }}
                                 </td>
-                                <td class=" px-6 py-4 font-medium ">
+                                <td class=" px-6 py-3 font-medium ">
                                     {{ brand.name }}
                                 </td>
-                                <td class=" px-6 py-4 font-medium ">
+                                <td class=" px-6 py-3 font-medium  text-right">
                                     <button>
-                                        <i class="fal fa-trash  pr-3" @click="deleteSelectedItemBtnClicked(selectedItemIndex)" ></i>
+                                        <i class="fal fa-trash" @click="deleteSelectedItemBtnClicked(selectedItemIndex)" ></i>
                                     </button>
                                 </td>
                             </tr>
@@ -233,16 +233,16 @@
                     </button>
                 </div><div class="col-span-3"></div>
                 <div class=" col-span-12 mb-8" v-show="phoneNumberList.length > 0">
-                    <table class="min-w-[40%] text-sm font-light ">
+                    <table class="min-w-[50%] text-sm font-light ml-2">
                         <thead class="font-medium text-left ">
                             <tr>
-                                <th scope="col" class=" pr-6 py-4 ">
+                                <th scope="col" class=" pr-6 pl-2 py-4 ">
                                     Phone Number
                                 </th>
                                 <th scope="col" class=" px-6 py-4 ">
                                     Type
                                 </th>
-                                <th scope="col" class=" px-6 py-4 ">
+                                <th scope="col" class=" px-6 py-4 text-right">
                                 </th>
                             </tr>
                         </thead>
@@ -254,9 +254,9 @@
                                 <td class=" px-6 py-3 font-medium capitalize">
                                     {{ phone.type }}
                                 </td>
-                                <td class=" px-6 py-3 font-medium ">
+                                <td class=" px-6 py-3 font-medium text-right">
                                     <button>
-                                        <i class="fal fa-trash  pr-3" @click="deleteSeleted(phoneIndex,phoneNumberList)" ></i>
+                                        <i class="fal fa-trash" @click="deleteSeleted(phoneIndex,phoneNumberList)" ></i>
                                     </button>
                                 </td>
                             </tr>
@@ -287,16 +287,16 @@
                     </button>
                 </div><div class="col-span-3"></div>
                 <div class=" col-span-12 mb-6" v-show="bankAccountList.length > 0">
-                    <table class="min-w-[40%] text-sm font-light ">
+                    <table class="min-w-[50%] text-sm font-light ml-2">
                         <thead class="font-medium text-left ">
                             <tr>
-                                <th scope="col" class=" pr-6 py-4 ">
+                                <th scope="col" class=" pr-6 pl-2 py-4 ">
                                     Account Name
                                 </th>
                                 <th scope="col" class=" px-6 py-4 ">
                                     Account Number
                                 </th>
-                                <th scope="col" class=" px-6 py-4 ">
+                                <th scope="col" class=" px-6 py-4  text-right">
                                 </th>
                             </tr>
                         </thead>
@@ -308,9 +308,9 @@
                                 <td class=" px-6 py-3 font-medium capitalize">
                                     {{ acc.account_number }}
                                 </td>
-                                <td class=" px-6 py-3 font-medium ">
+                                <td class=" px-6 py-3 font-medium  text-right">
                                     <button>
-                                        <i class="fal fa-trash  pr-3" @click="deleteSeleted(accIndex,bankAccountList)" ></i>
+                                        <i class="fal fa-trash" @click="deleteSeleted(accIndex,bankAccountList)" ></i>
                                     </button>
                                 </td>
                             </tr>
@@ -540,11 +540,11 @@ export default {
             }
         },
         addItemBtnClicked(){
-            if(this.selectedItem){
-                this.alertValidationMessage(`brands for item`);
+            if(!this.selectedItem){
+                this.alertValidationMessage(`Item`);
                 return;
             }
-            else if(!this.selectedItemBrands){
+            else if(this.selectedItemBrands.length < 1){
                 this.alertValidationMessage(`brands for item`);
                 return 1;
             }
