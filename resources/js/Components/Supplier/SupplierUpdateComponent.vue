@@ -55,7 +55,7 @@
                 </label>
                 <textarea name="" v-model="address"
                     class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg" id="" cols="30"
-                    rows="10"></textarea>
+                    rows="6"></textarea>
             </div>
             <div class="col-span-6 px-4">
                 <div class="flex justify-between mb-4">
@@ -89,7 +89,7 @@
                     </select>
                 </div>
             </div>
-            <div class="mb-4 col-span-3 pb-6 rounded-md">
+            <div class="mb-4 col-span-3 pb-0 rounded-md">
                 <label class="label-form mb-3">Brands</label>
                 <multiselect
                 v-model="selectedItemBrands"
@@ -114,10 +114,10 @@
                 </button>
             </div>
             <div class=" col-span-12 mb-8" v-show="selectedItemList.length > 0">
-                <table class="min-w-[40%] text-sm font-light ">
+                <table class="min-w-[50%] text-sm font-light ml-2">
                     <thead class="font-medium text-left ">
                         <tr>
-                            <th scope="col" class=" px-6 py-4 ">
+                            <th scope="col" class=" pr-6 py-4 ">
                                 Item
                             </th>
                             <th scope="col" class=" px-6 py-4 ">
@@ -129,14 +129,14 @@
                     </thead>
                     <tbody>
                         <tr v-for="(selectedItem,selectedItemIndex) in selectedItemList" >
-                            <td class=" px-6 py-4 font-medium ">
+                            <td class=" pr-6 py-3 font-medium ">
                                 {{ selectedItem.item_name }}
                             </td>
-                            <td class=" px-6 py-4 font-medium ">
+                            <td class=" px-6 py-3 font-medium ">
                                 {{ selectedItem.brand_name }}
                             </td>
-                            <td class=" px-6 py-4 font-medium  text-center">
-                                <input v-if="selectedItem.id" :checked="selectedItem.is_active == 1" @change="isActiveToggled(selectedItem.id)"
+                            <td class=" px-6 py-3 font-medium  text-right">
+                                <input v-if="selectedItem.id" :checked="selectedItem.is_active == 1" @change="itemActiveToggled(selectedItem.id)"
                                             class="me-2 mt-[0.3rem] h-3.5 w-8 appearance-none rounded-[0.4375rem] bg-black/25 before:pointer-events-none before:absolute before:h-3.5
                                     before:w-3.5 before:rounded-full before:bg-transparent before:content-[''] 
                                     after:absolute after:z-[2] after:-mt-[0.1875rem] after:h-5 after:w-5 after:rounded-full after:border after:border-gray-400 after:bg-white after:shadow-switch-2 after:transition-[background-color_0.2s,transform_0.2s]
@@ -164,7 +164,7 @@
                     <label for="" class="block text-sm text-black mb-3">
                         Phone Numbers
                     </label>
-                    <input type="tel" v-model="ph_number" autocomplete="off"
+                    <input type="number" v-model="ph_number" autocomplete="off"
                         class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
                 </div>
                 <div class="mb-4 col-span-3 pb-0 rounded-md">
@@ -183,7 +183,7 @@
                     </button>
                 </div><div class="col-span-3"></div>
                 <div class=" col-span-12 mb-8" v-show="phoneNumberList.length > 0">
-                    <table class="min-w-[40%] text-sm font-light ">
+                    <table class="min-w-[50%] text-sm font-light ml-2">
                         <thead class="font-medium text-left ">
                             <tr>
                                 <th scope="col" class=" pr-6 py-4 ">
@@ -204,9 +204,21 @@
                                 <td class=" px-6 py-3 font-medium capitalize">
                                     {{ phone.type }}
                                 </td>
-                                <td class=" px-6 py-3 font-medium ">
-                                    <button>
-                                        <i class="fal fa-trash  pr-3" @click="deleteSeleted(phoneIndex,phoneNumberList)" ></i>
+                                <td class=" px-6 py-3 font-medium text-right">
+                                    <input v-if="phone.id" :checked="phone.is_active == 1" @change="phoneActiveToggled(phone.id)"
+                                            class="me-2 mt-[0.3rem] h-3.5 w-8 appearance-none rounded-[0.4375rem] bg-black/25 before:pointer-events-none before:absolute before:h-3.5
+                                    before:w-3.5 before:rounded-full before:bg-transparent before:content-[''] 
+                                    after:absolute after:z-[2] after:-mt-[0.1875rem] after:h-5 after:w-5 after:rounded-full after:border after:border-gray-400 after:bg-white after:shadow-switch-2 after:transition-[background-color_0.2s,transform_0.2s]
+                                    after:content-[''] checked:bg-primary checked:after:absolute checked:after:z-[2] checked:after:-mt-[3px] checked:after:ms-[1.0625rem]
+                                    checked:after:h-5 checked:after:w-5 checked:after:rounded-full checked:after:border-none checked:after:bg-primary checked:after:shadow-switch-1
+                                    checked:after:transition-[background-color_0.2s,transform_0.2s] checked:after:content-[''] hover:cursor-pointer focus:outline-none focus:before:scale-100
+                                    focus:before:opacity-[0.12] focus:before:shadow-switch-3 focus:before:shadow-black/60 focus:before:transition-[box-shadow_0.2s,transform_0.2s]
+                                    focus:after:absolute focus:after:z-[1] focus:after:block focus:after:h-5 focus:after:w-5 focus:after:rounded-full focus:after:content-['']
+                                    checked:focus:border-primary checked:focus:bg-primary checked:focus:before:ms-[1.0625rem] checked:focus:before:scale-100 checked:focus:before:shadow-switch-3
+                                    checked:focus:before:transition-[box-shadow_0.2s,transform_0.2s] "
+                                            type="checkbox" role="switch" />
+                                    <button v-if="!phone.id" @click="deleteSeleted(phoneIndex,phoneNumberList)" >
+                                        <i class="fal fa-trash  pr-3"></i>
                                     </button>
                                 </td>
                             </tr>
@@ -237,7 +249,7 @@
                     </button>
                 </div><div class="col-span-3"></div>
                 <div class=" col-span-12 mb-6" v-show="bankAccountList.length > 0">
-                    <table class="min-w-[40%] text-sm font-light ">
+                    <table class="min-w-[50%] text-sm font-light ml-2">
                         <thead class="font-medium text-left ">
                             <tr>
                                 <th scope="col" class=" pr-6 py-4 ">
@@ -258,8 +270,20 @@
                                 <td class=" px-6 py-3 font-medium capitalize">
                                     {{ acc.account_number }}
                                 </td>
-                                <td class=" px-6 py-3 font-medium ">
-                                    <button>
+                                <td class=" px-6 py-3 font-medium text-right">
+                                    <input v-if="acc.id" :checked="acc.is_active == 1" @change="accActiveToggled(acc.id)"
+                                            class="me-2 mt-[0.3rem] h-3.5 w-8 appearance-none rounded-[0.4375rem] bg-black/25 before:pointer-events-none before:absolute before:h-3.5
+                                    before:w-3.5 before:rounded-full before:bg-transparent before:content-[''] 
+                                    after:absolute after:z-[2] after:-mt-[0.1875rem] after:h-5 after:w-5 after:rounded-full after:border after:border-gray-400 after:bg-white after:shadow-switch-2 after:transition-[background-color_0.2s,transform_0.2s]
+                                    after:content-[''] checked:bg-primary checked:after:absolute checked:after:z-[2] checked:after:-mt-[3px] checked:after:ms-[1.0625rem]
+                                    checked:after:h-5 checked:after:w-5 checked:after:rounded-full checked:after:border-none checked:after:bg-primary checked:after:shadow-switch-1
+                                    checked:after:transition-[background-color_0.2s,transform_0.2s] checked:after:content-[''] hover:cursor-pointer focus:outline-none focus:before:scale-100
+                                    focus:before:opacity-[0.12] focus:before:shadow-switch-3 focus:before:shadow-black/60 focus:before:transition-[box-shadow_0.2s,transform_0.2s]
+                                    focus:after:absolute focus:after:z-[1] focus:after:block focus:after:h-5 focus:after:w-5 focus:after:rounded-full focus:after:content-['']
+                                    checked:focus:border-primary checked:focus:bg-primary checked:focus:before:ms-[1.0625rem] checked:focus:before:scale-100 checked:focus:before:shadow-switch-3
+                                    checked:focus:before:transition-[box-shadow_0.2s,transform_0.2s] "
+                                            type="checkbox" role="switch" />
+                                    <button v-if="!acc.id" @click="deleteSeleted(accIndex,bankAccountList)" >
                                         <i class="fal fa-trash  pr-3" @click="deleteSeleted(accIndex,bankAccountList)" ></i>
                                     </button>
                                 </td>
@@ -478,12 +502,13 @@ export default {
 
             itemBrandsList: [],
             selectedItem:null,
-            selectedItemBrands: null,
+            selectedItemBrands: [],
 
             typeList:[
                 {value:'phone',name:'Phone'},
                 {value:'kpay',name:'Kpay'}
-            ]
+            ],
+            test:null,
         };
     },
 
@@ -532,6 +557,8 @@ export default {
                 this.phoneNumber = this.supplier.phone_number;
                 this.maxCredit = this.supplier.credit_limit;
                 this.address = this.supplier.address;
+                this.lead_time = this.supplier.lead_time;
+                this.credit_terms = this.supplier.credit_terms;
                 // this.existingItems = this.supplier.items;
                 this.selectedAccount = this.apAccountList.find(ap => ap.id === this.supplier.account_id )
                 this.selectedCreditAccount = this.creditAccList.find(crd => crd.id === this.supplier.creditor_account_id )
@@ -547,9 +574,12 @@ export default {
                     })
                     // this.selectedItem.push(this.itemList.find(itemid => itemid.id === item.id))
                 })
+                
+                this.phoneNumberList = this.supplier.supplier_phone;
+                this.bankAccountList = this.supplier.supplier_bank_account;
             }
         },
-        isActiveToggled(id) {
+        itemActiveToggled(id) {
             let index = this.selectedItemList.findIndex(item => item.id == id);
             if (index != -1) {
                 if (this.selectedItemList[index].is_active == 1) {
@@ -571,57 +601,80 @@ export default {
             }
         },
 
-        async getItemList(){
-            let url = `/api/items`;
-            let response = await getApiData({url: url, token: this.getToken()});
-            if(response.data){
-                this.itemList = response.data;
+        phoneActiveToggled(id) {
+            let index = this.phoneNumberList.findIndex(phone => phone.id == id);
+            if (index != -1) {
+                if (this.phoneNumberList[index].is_active == 1) {
+                    this.phoneNumberList[index].is_active = 0;
+                }
+                else {
+                    this.phoneNumberList[index].is_active = 1;
+                }
+                let url = `/api/suppliers/toggle_phones`;
+                let formData = new FormData();
+                formData.append('id', id);
+                let response = postApiData({ url: url, form_data: formData, token: this.getToken() });
+                console.log('test')
+                if(response.success == 'true'){
+                    console.log(response)
+                    
+                }
+                // this.getSupplierDetail();
             }
         },
-        async getAPAccounts(){
-            let url = `/api/get_payable_account`;
-            let response = await getApiData({url: url, token: this.getToken()});
-            if(response.data){
-                this.apAccountList = response.data;
+        accActiveToggled(id) {
+            let index = this.bankAccountList.findIndex(acc => acc.id == id);
+            if (index != -1) {
+                if (this.bankAccountList[index].is_active == 1) {
+                    this.bankAccountList[index].is_active = 0;
+                }
+                else {
+                    this.bankAccountList[index].is_active = 1;
+                }
+                let url = `/api/suppliers/toggle_bank_accounts`;
+                let formData = new FormData();
+                formData.append('id', id);
+                let response = postApiData({ url: url, form_data: formData, token: this.getToken() });
+                this.test = response
+                if(response.success == 'true'){
+                    console.log(response)
+                    
+                }
+                // this.getSupplierDetail();
             }
-        },
-        async getCreditAccList(){
-            let url = `/api/get_creditor_account_list`;
-            let response = await getApiData({url: url, token: this.getToken()});
-            if(response.data){
-                this.creditAccList = response.data;
-            }
-        },
-
-        alertValidationMessage(field){
-            alert(`You forgot to provide ${field}, please try again`);
         },
 
         addItemBtnClicked(){
-            if(this.selectedItemBrands.length < 1){
-                alertValiationMessage(`brands for item`);
-                return;
+            if(!this.selectedItem){
+                this.alertValiationMessage(`Item`);
+                return 1;
             }
-            this.selectedItemBrands.forEach(item =>{
-                this.selectedItemList.push({
-                    item_name: this.selectedItem.name,
-                    item_id: this.selectedItem.id,
-                    brand_name: item.name,
-                    brand_id: item.id,
+            else if(this.selectedItemBrands.length < 1){
+                this.alertValiationMessage(`Brands for item`);
+                return 1;
+            }
+            else{
+                this.selectedItemBrands.forEach(item =>{
+                    this.selectedItemList.push({
+                        item_name: this.selectedItem.name,
+                        item_id: this.selectedItem.id,
+                        brand_name: item.name,
+                        brand_id: item.id,
+                    })
                 })
-            })
 
-            this.selectedItem = null;
-            this.selectedItemBrands = [];
-            this.itemBrandsList = [];
+                this.selectedItem = null;
+                this.selectedItemBrands = [];
+                this.itemBrandsList = [];
+            }
         },
         btnclickedAddPhone(){
             if(!this.ph_number){
-                alertValiationMessage(`Phone Number`);
+                this.alertValiationMessage(`Phone Number`);
                 return;
             }
             else if(!this.selectedType){
-                alertValiationMessage(`Type`);
+                this.alertValiationMessage(`Type`);
                 return;
             }
             else{
@@ -635,11 +688,11 @@ export default {
         },
         btnclickedAddBankAccount(){
             if(!this.account_name){
-                alertValiationMessage(`Account Name`);
+                this.alertValiationMessage(`Account Name`);
                 return;
             }
             else if(!this.account_number){
-                alertValiationMessage(`Account Number`);
+                this.alertValiationMessage(`Account Number`);
                 return;
             }
             else{
@@ -669,12 +722,21 @@ export default {
                 this.alertValidationMessage(`supplier shop`);
                 return 1;
             }
-            if(!this.phoneNumber){
-                this.alertValidationMessage(`supplier phone number`);
-                return 1;
-            }
+            // if(!this.phoneNumber){
+            //     this.alertValidationMessage(`supplier phone number`);
+            //     return 1;
+            // }
             if(!this.address){
                 this.alertValidationMessage(`supplier address`);
+                return 1;
+            }
+
+            if(this.phoneNumberList.length < 1){
+                this.alertValidationMessage(`supplier Phone Number`);
+                return 1;
+            }
+            if(this.bankAccountList.length < 1){
+                this.alertValidationMessage(`supplier Bank Account`);
                 return 1;
             }
             if(this.selectedItemList.length < 1 ){
@@ -690,8 +752,10 @@ export default {
             formData.append("id", this.supplierId);
             formData.append("name", this.name);
             formData.append("shop_name", this.shopName);
-            formData.append("phone_number", this.phoneNumber);
+            // formData.append("phone_number", this.phoneNumber);
             formData.append("credit_limit", this.maxCredit);
+            formData.append("lead_time", this.lead_time);
+            formData.append("credit_terms", this.credit_terms);
             formData.append("address", this.address);
             formData.append("account_id", this.selectedAccount.id);
             formData.append("creditor_account_id", this.selectedCreditAccount.id);
@@ -703,11 +767,42 @@ export default {
                 })
             });
             formData.append("supplier_items", JSON.stringify(this.selectedItemList));
+            formData.append("supplier_phones", JSON.stringify(this.phoneNumberList));
+            formData.append("supplier_bank_accounts", JSON.stringify(this.bankAccountList));
             let url = `/api/suppliers`;
             let response = await postApiData({url: url, form_data: formData, token: this.getToken()});
             if(response.success){
                 window.location.replace("/suppliers");
             }
+        },
+        async getItemList(){
+            let url = `/api/items`;
+            let response = await getApiData({url: url, token: this.getToken()});
+            if(response.data){
+                this.itemList = response.data;
+            }
+        },
+        async getAPAccounts(){
+            let url = `/api/get_payable_account`;
+            let response = await getApiData({url: url, token: this.getToken()});
+            if(response.data){
+                this.apAccountList = response.data;
+            }
+        },
+        async getCreditAccList(){
+            let url = `/api/get_creditor_account_list`;
+            let response = await getApiData({url: url, token: this.getToken()});
+            if(response.data){
+                this.creditAccList = response.data;
+            }
+        },
+
+        alertValiationMessage(field) {
+            this.$notify({
+                title: `Input validation`,
+                text: `You forgot to provide ${field}, please try again`,
+                type: "warn"
+            });
         },
         async getPayableSubAccountList(){
             let url = `/api/sub_account_by_head_account/4`;
