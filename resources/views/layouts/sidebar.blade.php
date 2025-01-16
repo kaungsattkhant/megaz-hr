@@ -391,7 +391,7 @@
                         <button class="flex items-center pl-9 my-2 text-sm" type="button" data-te-collapse-init
                             data-te-ripple-init data-te-ripple-color="light" data-te-target="#collapseCashbooks"
                             aria-expanded="false" aria-controls="collapseExample">
-                            <i class="fal fa-sack-dollar  pr-3"></i>
+                            <i class="fal fa-sack-dollar  pr-4"></i>
                             Cash Book
                         </button>
 
@@ -708,6 +708,12 @@
                     <a href="/gps" class="flex items-center @yield('gps')">
                         <i class="fal fa-braille pr-3"></i>
                         GPS
+                    </a>
+                </li>
+                <li>
+                    <a href="/contact" class="flex items-center @yield('contact')">
+                        <i class="fal fa-braille pr-3"></i>
+                        Contact
                     </a>
                 </li>
 

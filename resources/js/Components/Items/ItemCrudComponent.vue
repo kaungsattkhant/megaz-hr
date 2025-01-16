@@ -294,7 +294,6 @@
                                 :key="categoryIndex"> {{ category.name }} </option>
                         </select>
                     </div>
-
                     <!-- <div class="mb-4">
                         <label class="label-form mb-3">Brands</label>
                         <multiselect
@@ -314,7 +313,6 @@
                             </template>
                         </multiselect>
                     </div> -->
-
                     <div class="mb-4">
                         <label for="" class="label-form mb-3">
                             Base UOM
@@ -333,6 +331,18 @@
                             </option>
                         </select>
                     </div>
+                    <div class="mb-4">
+                        <label for="" class="label-form mb-3">
+                            Lead Time
+                        </label>
+                        <input type="text" placeholder="Lead Time" v-model="lead_time" class="input-ui">
+                    </div>
+                    <div class="mb-4">
+                        <label for="" class="label-form mb-3">
+                            Minimum Holding Amount
+                        </label>
+                        <input type="text" placeholder="Minimum Holding Amount" v-model="min_amount" class="input-ui">
+                    </div>
                 </div>
                 <!--Modal footer-->
                 <div class="flex justify-end gap-x-4 px-6 mb-6 pt-4">
@@ -340,8 +350,7 @@
                         aria-label="Close">
                         Cancel
                     </button>
-                    <button type="button" class="add-btn focus:outline-none focus:ring-0 " @click="createBtnClicked"
-                        data-te-modal-dismiss>
+                    <button type="button" class="add-btn focus:outline-none focus:ring-0 " @click="createBtnClicked">
                         Create
                     </button>
                 </div>
@@ -415,6 +424,9 @@ export default {
             name: '',
             price: null,
             selectedUOM: null,
+            lead_time:null,
+            min_amount:null,
+
             selectedCategory: null,
             searchInput: null,
             searchCategory: null,
@@ -516,7 +528,7 @@ export default {
         },
 
         async createBtnClicked() {
-            if (!this.selectedUOM || !this.name || !this.selectedCategory ||!this.selectedBaseUom) {
+            if (!this.selectedUOM || !this.name || !this.selectedCategory ||!this.selectedBaseUom || !this.code || !this.itemType || !this.lead_time || !this.min_amount) {
                 this.alertValiationMessage('required data');
                 return false;
             }
@@ -528,6 +540,8 @@ export default {
             formData.append('category_id', this.selectedCategory.id);
             formData.append('base_uom_id',this.selectedBaseUom.id);
             formData.append('item_type_id',this.itemType.id);
+            formData.append('lead_time',this.lead_time);
+            formData.append('minimum_holding_amount',this.min_amount);
             // if(this.selectedBrands.length > 0){
             //     this.selectedBrands.forEach((item)=>{
             //         formData.append('brands[]', item.id);

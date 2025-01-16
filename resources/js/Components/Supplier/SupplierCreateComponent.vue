@@ -22,32 +22,40 @@
             </div>
             <div class="mb-4 col-span-3 pb-6 rounded-md">
                 <label for="" class="block text-sm text-black mb-3">
-                    Supplier Ph Number
-                </label>
-                <input type="tel" v-model="phoneNumber"
-                    class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
-            </div>
-            <div class="mb-4 col-span-3 pb-6 rounded-md">
-                <label for="" class="block text-sm text-black mb-3">
                     Credit Limit
                 </label>
                 <input type="number" v-model="maxCredit"
                     class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
             </div>
-            <div class="mb-4 col-span-6 pb-6 rounded-md">
+            <div class="mb-4 col-span-3 pb-6 rounded-md">
+                <label for="" class="block text-sm text-black mb-3">
+                    Lead Time
+                </label>
+                <input type="text" v-model="lead_time"
+                    class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
+            </div>
+            <div class="mb-4 col-span-3 pb-6 rounded-md">
+                <label for="" class="block text-sm text-black mb-3">
+                    Credit Terms
+                </label>
+                <textarea name="" v-model="credit_terms"
+                    class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg" id="" cols="30"
+                    rows="6"></textarea>
+            </div>
+            <div class="mb-4 col-span-3 pb-6 rounded-md">
                 <label for="" class="block text-sm text-black mb-3">
                     Address
                 </label>
                 <textarea name="" v-model="address"
                     class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg" id="" cols="30"
-                    rows="10"></textarea>
+                    rows="6"></textarea>
             </div>
-            <div class="col-span-6">
+            <div class="col-span-6 px-4">
                 <div class="flex justify-between mb-4">
                     <label for="" class="block text-base text-black mb-3">
                         Account
                     </label>
-                    <button class="add-btn mt-0.5" data-te-toggle="modal" data-te-target="#create_modal">
+                    <button class="add-btn mt-0.5 text-xs" data-te-toggle="modal" data-te-target="#create_modal">
                         <i class="fal fa-plus"></i>
                     </button>
                 </div>
@@ -112,7 +120,7 @@
                 </div>
             </div> -->
 
-            <div class="mb-4 col-span-3 pb-6 rounded-md">
+            <div class="mb-4 col-span-3 pb-0 rounded-md">
                 <label for="" class="block text-sm text-black mb-3">
                     Items
                 </label>
@@ -126,7 +134,7 @@
                 </div>
             </div>
 
-            <div class="mb-4 col-span-3 pb-6 rounded-md">
+            <div class="mb-4 col-span-3 pb-0 rounded-md">
                 <label class="label-form mb-3">Brands</label>
                 <multiselect
                 v-model="selectedItemBrands"
@@ -146,17 +154,17 @@
                 </multiselect>
             </div>
 
-            <div class="col-span-3">
+            <div class="col-span-3" :class="selectedItems.length < 1 ? 'mb-10' : ''">
                 <button type="button" class="mt-8 add-btn transition duration-150 ease-in-out focus:outline-none focus:ring-0 " @click="addItemBtnClicked()" >
                     Add
                 </button>
-            </div>
+            </div><div class="col-span-3"></div>
 
-            <div class=" col-span-12">
+            <div class=" col-span-12 mb-8" v-show="selectedItems.length > 0">
                 <table class="min-w-[40%] text-sm font-light ">
                     <thead class="font-medium text-left ">
                         <tr>
-                            <th scope="col" class=" px-6 py-4 ">
+                            <th scope="col" class=" pr-6 pl-2 py-4 ">
                                 Item
                             </th>
                             <th scope="col" class=" px-6 py-4 ">
@@ -183,7 +191,7 @@
 
                         <div class="contents" v-for="(selectedItem, selectedItemIndex) in selectedItems" :key="selectedItemIndex">
                             <tr v-for="(brand) in selectedItem.brands" >
-                                <td class=" px-6 py-4 font-medium ">
+                                <td class=" pr-6 pl-2 py-4 font-medium ">
                                     {{ selectedItem.name }}
                                 </td>
                                 <td class=" px-6 py-4 font-medium ">
@@ -196,11 +204,119 @@
                                 </td>
                             </tr>
                         </div>
-                        <tr class="">
-                            <td class=" py-2 "></td>
-                        </tr>
                     </tbody>
                 </table>
+            </div>
+
+            <!-- supplier phone list -->
+            <div class="contents">
+                <div class="mb-4 col-span-3 pb-0 rounded-md">
+                    <label for="" class="block text-sm text-black mb-3">
+                        Phone Numbers
+                    </label>
+                    <input type="tel" v-model="ph_number" autocomplete="off"
+                        class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
+                </div>
+                <div class="mb-4 col-span-3 pb-0 rounded-md">
+                    <label class="label-form mb-3">Type</label>
+                    <div class="bg-white mb-0 w-full text-sm inline-block h-[34px] select-custom2" data-te-select-wrapper-ref>
+                        <select data-te-select-init data-te-select-placeholder="Select Type" v-model="selectedType" class="input-ui !text-black"
+                        data-te-select-filter="false">
+                            <option :value="type" v-for="type in typeList">{{ type.name }}</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="col-span-3" :class="phoneNumberList.length < 1 ? 'mb-10' : ''">
+                    <label class="label-form mb-3">&nbsp;</label>
+                    <button type="button" class=" add-btn transition duration-150 ease-in-out focus:outline-none focus:ring-0 " @click="btnclickedAddPhone()" >
+                        Add
+                    </button>
+                </div><div class="col-span-3"></div>
+                <div class=" col-span-12 mb-8" v-show="phoneNumberList.length > 0">
+                    <table class="min-w-[40%] text-sm font-light ">
+                        <thead class="font-medium text-left ">
+                            <tr>
+                                <th scope="col" class=" pr-6 py-4 ">
+                                    Phone Number
+                                </th>
+                                <th scope="col" class=" px-6 py-4 ">
+                                    Type
+                                </th>
+                                <th scope="col" class=" px-6 py-4 ">
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr v-for="(phone,phoneIndex) in phoneNumberList" >
+                                <td class=" pr-6 py-3 font-medium ">
+                                    {{ phone.phone_number }}
+                                </td>
+                                <td class=" px-6 py-3 font-medium capitalize">
+                                    {{ phone.type }}
+                                </td>
+                                <td class=" px-6 py-3 font-medium ">
+                                    <button>
+                                        <i class="fal fa-trash  pr-3" @click="deleteSeleted(phoneIndex,phoneNumberList)" ></i>
+                                    </button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            
+            <div class="contents">
+                <div class="mb-4 col-span-3 pb-0 rounded-md">
+                    <label for="" class="block text-sm text-black mb-3">
+                        Account Name
+                    </label>
+                    <input type="text" v-model="account_name" autocomplete="off"
+                        class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
+                </div>
+                <div class="mb-4 col-span-3 pb-0 rounded-md">
+                    <label for="" class="block text-sm text-black mb-3">
+                        Account Number
+                    </label>
+                    <input type="text" v-model="account_number" autocomplete="off"
+                        class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
+                </div>
+                <div class="col-span-3">
+                    <label class="label-form mb-3">&nbsp;</label>
+                    <button type="button" class=" add-btn transition duration-150 ease-in-out focus:outline-none focus:ring-0 " @click="btnclickedAddBankAccount()" >
+                        Add
+                    </button>
+                </div><div class="col-span-3"></div>
+                <div class=" col-span-12 mb-6" v-show="bankAccountList.length > 0">
+                    <table class="min-w-[40%] text-sm font-light ">
+                        <thead class="font-medium text-left ">
+                            <tr>
+                                <th scope="col" class=" pr-6 py-4 ">
+                                    Account Name
+                                </th>
+                                <th scope="col" class=" px-6 py-4 ">
+                                    Account Number
+                                </th>
+                                <th scope="col" class=" px-6 py-4 ">
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr v-for="(acc,accIndex) in bankAccountList" >
+                                <td class=" pr-6 py-3 font-medium ">
+                                    {{ acc.account_name }}
+                                </td>
+                                <td class=" px-6 py-3 font-medium capitalize">
+                                    {{ acc.account_number }}
+                                </td>
+                                <td class=" px-6 py-3 font-medium ">
+                                    <button>
+                                        <i class="fal fa-trash  pr-3" @click="deleteSeleted(accIndex,bankAccountList)" ></i>
+                                    </button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
         <div>
@@ -342,15 +458,24 @@ export default {
             creditAccList:[],
             selectedItems: [],
             selectedItem: null,
+            phoneNumberList:[],
+            bankAccountList:[],
 
             accName:null,
             selectedAccount: null,
             selectedCreditAccount:null,
             name: null,
             shopName: null,
-            phoneNumber: null,
             address: null,
             maxCredit: null,
+            lead_time:null,
+            credit_terms:null,
+
+            ph_number: null,
+            selectedType:null,
+
+            account_name:null,
+            account_number:null,
 
             payableSubAccountList: [],
             selectedPayableSubAccount: null,
@@ -361,19 +486,19 @@ export default {
             selectedCreditSubAcc:null,
 
             itemBrandsList: [],
-            selectedItemBrands: []
+            selectedItemBrands: [],
+
+            typeList:[
+                {value:'phone',name:'Phone'},
+                {value:'kpay',name:'Kpay'}
+            ]
         };
     },
 
     methods: {
         ...mapGetters(['getToken']),
 
-        deleteSelectedItemBtnClicked(index){
-            // let index = this.selectedItems.findIndex(item => item.id == id);
-            if(index != -1){
-                this.selectedItems.splice(index, 1);
-            }
-        },
+        
 
         async getItemList(){
             let url = `/api/items`;
@@ -414,7 +539,6 @@ export default {
                 this.itemBrandsList = response.data;
             }
         },
-
         addItemBtnClicked(){
             if(this.selectedItemBrands.length < 1){
                 alertValiationMessage(`brands for item`);
@@ -431,6 +555,43 @@ export default {
             this.itemBrandsList = [];
         },
 
+        btnclickedAddPhone(){
+            if(!this.ph_number){
+                alertValiationMessage(`Phone Number`);
+                return;
+            }
+            else if(!this.selectedType){
+                alertValiationMessage(`Type`);
+                return;
+            }
+            else{
+                this.phoneNumberList.push({
+                    phone_number: this.ph_number,
+                    type: this.selectedType.value,
+                });
+                this.ph_number = null;
+                this.selectedType = null;
+            }
+        },
+        btnclickedAddBankAccount(){
+            if(!this.account_name){
+                alertValiationMessage(`Account Name`);
+                return;
+            }
+            else if(!this.account_number){
+                alertValiationMessage(`Account Number`);
+                return;
+            }
+            else{
+                this.bankAccountList.push({
+                    account_name: this.account_name,
+                    account_number: this.account_number,
+                });
+                this.account_name = null;
+                this.account_number = null;
+                
+            }
+        },
         async createBtnClicked(){
             if(!this.name){
                 this.alertValidationMessage(`supplier name`);
@@ -440,16 +601,20 @@ export default {
                 this.alertValidationMessage(`supplier shop`);
                 return 1;
             }
-            if(!this.phoneNumber){
-                this.alertValidationMessage(`supplier phone number`);
-                return 1;
-            }
             if(!this.address){
                 this.alertValidationMessage(`supplier address`);
                 return 1;
             }
             if(this.selectedItems.length < 1){
                 this.alertValidationMessage(`supplier selling items`);
+                return 1;
+            }
+            if(this.phoneNumberList.length < 1){
+                this.alertValidationMessage(`supplier Phone Number`);
+                return 1;
+            }
+            if(this.bankAccountList.length < 1){
+                this.alertValidationMessage(`supplier Bank Account`);
                 return 1;
             }
             if(!this.maxCredit){
@@ -468,8 +633,10 @@ export default {
             let formData = new FormData();
             formData.append("name", this.name);
             formData.append("shop_name", this.shopName);
-            formData.append("phone_number", this.phoneNumber);
+            // formData.append("phone_number", this.phoneNumber);
             formData.append("credit_limit", this.maxCredit);
+            formData.append("lead_time", this.lead_time);
+            formData.append("credit_terms", this.credit_terms);
             formData.append("address", this.address);
             formData.append("account_id", this.selectedAccount.id);
             formData.append("creditor_account_id", this.selectedCreditAccount.id);
@@ -486,10 +653,12 @@ export default {
             });
 
             formData.append("supplier_items", JSON.stringify(itemBrandList));
+            formData.append("supplier_phones", JSON.stringify(this.phoneNumberList));
+            formData.append("supplier_bank_accounts", JSON.stringify(this.bankAccountList));
             let url = `/api/suppliers`;
             let response = await postApiData({url: url, form_data: formData, token: this.getToken()});
             if(response.success){
-                window.location.replace("/suppliers");
+                // window.location.replace("/suppliers");
             }
         },
 
@@ -532,6 +701,18 @@ export default {
             if(response.success){
                 this.apAccountList.unshift(response.data);
                 this.selectedCreditAccount = response.data;
+            }
+        },
+
+        deleteSelectedItemBtnClicked(index){
+            // let index = this.selectedItems.findIndex(item => item.id == id);
+            if(index != -1){
+                this.selectedItems.splice(index, 1);
+            }
+        },
+        deleteSeleted(index,list){
+            if(index != -1){
+                list.splice(index, 1);
             }
         },
     },

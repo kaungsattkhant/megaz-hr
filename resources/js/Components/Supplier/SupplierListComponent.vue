@@ -63,7 +63,10 @@
                                         {{ supplier.shop_name }}
                                     </td>
                                     <td class="  ">
-                                        {{ supplier.phone_number }}
+                                        <span v-for="ph in supplier.supplier_phone" class=" after:content-[','] last:after:content-[''] after:pr-2">
+                                            {{ ph.phone_number }} ( {{ ph.type }} )
+                                        </span>
+                                        <!-- {{ supplier.phone_number }} -->
                                     </td>
                                     <td class="whitespace-nowrap  ">
                                         {{ supplier.address }}

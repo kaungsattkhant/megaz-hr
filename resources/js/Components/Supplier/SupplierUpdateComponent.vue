@@ -20,13 +20,13 @@
                 <input type="text" v-model="shopName"
                     class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
             </div>
-            <div class="mb-4 col-span-3 pb-6 rounded-md">
+            <!-- <div class="mb-4 col-span-3 pb-6 rounded-md">
                 <label for="" class="block text-sm text-black mb-3">
                     Supplier Ph Number
                 </label>
                 <input type="tel" v-model="phoneNumber"
                     class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
-            </div>
+            </div> -->
             <div class="mb-4 col-span-3 pb-6 rounded-md">
                 <label for="" class="block text-sm text-black mb-3">
                     Credit Limit
@@ -34,7 +34,22 @@
                 <input type="number" v-model="maxCredit"
                     class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
             </div>
-            <div class="mb-4 col-span-6 pb-6 rounded-md">
+            <div class="mb-4 col-span-3 pb-6 rounded-md">
+                <label for="" class="block text-sm text-black mb-3">
+                    Lead Time
+                </label>
+                <input type="text" v-model="lead_time"
+                    class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
+            </div>
+            <div class="mb-4 col-span-3 pb-6 rounded-md">
+                <label for="" class="block text-sm text-black mb-3">
+                    Credit Terms
+                </label>
+                <textarea name="" v-model="credit_terms"
+                    class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg" id="" cols="30"
+                    rows="6"></textarea>
+            </div>
+            <div class="mb-4 col-span-3 pb-6 rounded-md">
                 <label for="" class="block text-sm text-black mb-3">
                     Address
                 </label>
@@ -42,7 +57,7 @@
                     class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg" id="" cols="30"
                     rows="10"></textarea>
             </div>
-            <div class="col-span-6">
+            <div class="col-span-6 px-4">
                 <div class="flex justify-between mb-4">
                     <label for="" class="block text-base text-black mb-3">
                         Account
@@ -61,7 +76,7 @@
                 </div>
             </div>
             
-            <div class="mb-4 col-span-3 pb-6 rounded-md">
+            <div class="mb-4 col-span-3 pb-0 rounded-md">
                 <label for="" class="block text-sm text-black mb-3">
                     Items
                 </label>
@@ -93,12 +108,12 @@
                     </template>
                 </multiselect>
             </div>
-            <div class="col-span-3">
+            <div class="col-span-3" :class="selectedItemList.length < 1 ? 'mb-10' : ''">
                 <button type="button" class="mt-8 add-btn transition duration-150 ease-in-out focus:outline-none focus:ring-0 " @click="addItemBtnClicked()" >
                     Add
                 </button>
             </div>
-            <div class=" col-span-12">
+            <div class=" col-span-12 mb-8" v-show="selectedItemList.length > 0">
                 <table class="min-w-[40%] text-sm font-light ">
                     <thead class="font-medium text-left ">
                         <tr>
@@ -113,26 +128,6 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <!-- <tr class="" v-for="(existingItem, existingItemIndex) in existingItems" :key="existingItemIndex">
-                            <td class=" px-6 py-2 font-medium ">
-                                {{ existingItem.item_name }}
-                            </td>
-                            <td class=" px-6 py-4 font-medium ">
-                                {{ existingItem.brand_name }}
-                                <span v-for="(brand,index) in existingItem.brands" class="after:content-[','] last:after:hidden pr-1">
-                                    {{ brand.name }}
-                                </span>
-                            </td>
-                            <td class=" px-6 py-2 font-medium ">
-                                <button>
-                                    <i class="fal fa-trash  pr-3" @click="deleteExistingItemBtnClicked(existingItem.id)" ></i>
-                                </button>
-                            </td>
-                        </tr>
-                        <tr class="">
-                            <td class=" "></td>
-                        </tr> -->
-
                         <tr v-for="(selectedItem,selectedItemIndex) in selectedItemList" >
                             <td class=" px-6 py-4 font-medium ">
                                 {{ selectedItem.item_name }}
@@ -153,16 +148,125 @@
                                     checked:focus:border-primary checked:focus:bg-primary checked:focus:before:ms-[1.0625rem] checked:focus:before:scale-100 checked:focus:before:shadow-switch-3
                                     checked:focus:before:transition-[box-shadow_0.2s,transform_0.2s] "
                                             type="checkbox" role="switch" />
+
                                 <button v-if="!selectedItem.id" @click="deleteSelectedItemBtnClicked(selectedItemIndex)" >
                                     <i class="fal fa-trash  pr-3"></i>
                                 </button>
                             </td>
                         </tr>
-                        <tr class="">
-                            <td class=" "></td>
-                        </tr>
                     </tbody>
                 </table>
+            </div>
+
+            <!-- supplier phone list -->
+            <div class="contents">
+                <div class="mb-4 col-span-3 pb-0 rounded-md">
+                    <label for="" class="block text-sm text-black mb-3">
+                        Phone Numbers
+                    </label>
+                    <input type="tel" v-model="ph_number" autocomplete="off"
+                        class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
+                </div>
+                <div class="mb-4 col-span-3 pb-0 rounded-md">
+                    <label class="label-form mb-3">Type</label>
+                    <div class="bg-white mb-0 w-full text-sm inline-block h-[34px] select-custom2" data-te-select-wrapper-ref>
+                        <select data-te-select-init data-te-select-placeholder="Select Type" v-model="selectedType" class="input-ui !text-black"
+                        data-te-select-filter="false">
+                            <option :value="type" v-for="type in typeList">{{ type.name }}</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="col-span-3" :class="phoneNumberList.length < 1 ? 'mb-10' : ''">
+                    <label class="label-form mb-3">&nbsp;</label>
+                    <button type="button" class=" add-btn transition duration-150 ease-in-out focus:outline-none focus:ring-0 " @click="btnclickedAddPhone()" >
+                        Add
+                    </button>
+                </div><div class="col-span-3"></div>
+                <div class=" col-span-12 mb-8" v-show="phoneNumberList.length > 0">
+                    <table class="min-w-[40%] text-sm font-light ">
+                        <thead class="font-medium text-left ">
+                            <tr>
+                                <th scope="col" class=" pr-6 py-4 ">
+                                    Phone Number
+                                </th>
+                                <th scope="col" class=" px-6 py-4 ">
+                                    Type
+                                </th>
+                                <th scope="col" class=" px-6 py-4 ">
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr v-for="(phone,phoneIndex) in phoneNumberList" >
+                                <td class=" pr-6 py-3 font-medium ">
+                                    {{ phone.phone_number }}
+                                </td>
+                                <td class=" px-6 py-3 font-medium capitalize">
+                                    {{ phone.type }}
+                                </td>
+                                <td class=" px-6 py-3 font-medium ">
+                                    <button>
+                                        <i class="fal fa-trash  pr-3" @click="deleteSeleted(phoneIndex,phoneNumberList)" ></i>
+                                    </button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            
+            <div class="contents">
+                <div class="mb-4 col-span-3 pb-0 rounded-md">
+                    <label for="" class="block text-sm text-black mb-3">
+                        Account Name
+                    </label>
+                    <input type="text" v-model="account_name" autocomplete="off"
+                        class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
+                </div>
+                <div class="mb-4 col-span-3 pb-0 rounded-md">
+                    <label for="" class="block text-sm text-black mb-3">
+                        Account Number
+                    </label>
+                    <input type="text" v-model="account_number" autocomplete="off"
+                        class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
+                </div>
+                <div class="col-span-3">
+                    <label class="label-form mb-3">&nbsp;</label>
+                    <button type="button" class=" add-btn transition duration-150 ease-in-out focus:outline-none focus:ring-0 " @click="btnclickedAddBankAccount()" >
+                        Add
+                    </button>
+                </div><div class="col-span-3"></div>
+                <div class=" col-span-12 mb-6" v-show="bankAccountList.length > 0">
+                    <table class="min-w-[40%] text-sm font-light ">
+                        <thead class="font-medium text-left ">
+                            <tr>
+                                <th scope="col" class=" pr-6 py-4 ">
+                                    Account Name
+                                </th>
+                                <th scope="col" class=" px-6 py-4 ">
+                                    Account Number
+                                </th>
+                                <th scope="col" class=" px-6 py-4 ">
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr v-for="(acc,accIndex) in bankAccountList" >
+                                <td class=" pr-6 py-3 font-medium ">
+                                    {{ acc.account_name }}
+                                </td>
+                                <td class=" px-6 py-3 font-medium capitalize">
+                                    {{ acc.account_number }}
+                                </td>
+                                <td class=" px-6 py-3 font-medium ">
+                                    <button>
+                                        <i class="fal fa-trash  pr-3" @click="deleteSeleted(accIndex,bankAccountList)" ></i>
+                                    </button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
         <div>
@@ -214,8 +318,6 @@
             </div>
         </div>
     </div>
-
-
 
     <!-- Modal -->
     <div data-te-modal-init
@@ -346,6 +448,8 @@ export default {
             creditAccList:[],
             selectedItemList: [],
             existingItems: [],
+            phoneNumberList:[],
+            bankAccountList:[],
 
             accName:null,
             selectedAccount: null,
@@ -353,9 +457,16 @@ export default {
             supplier: null,
             name: null,
             shopName: null,
-            phoneNumber: null,
             address: null,
             maxCredit: null,
+            lead_time:null,
+            credit_terms:null,
+
+            ph_number: null,
+            selectedType:null,
+
+            account_name:null,
+            account_number:null,
 
             payableSubAccountList: [],
             selectedPayableSubAccount: null,
@@ -368,6 +479,11 @@ export default {
             itemBrandsList: [],
             selectedItem:null,
             selectedItemBrands: null,
+
+            typeList:[
+                {value:'phone',name:'Phone'},
+                {value:'kpay',name:'Kpay'}
+            ]
         };
     },
 
@@ -419,14 +535,15 @@ export default {
                 // this.existingItems = this.supplier.items;
                 this.selectedAccount = this.apAccountList.find(ap => ap.id === this.supplier.account_id )
                 this.selectedCreditAccount = this.creditAccList.find(crd => crd.id === this.supplier.creditor_account_id )
-                this.supplier.items.forEach(item =>{
+                this.supplier.supplier_items.forEach(item =>{
                     this.selectedItemList.push({
                         id:item.id,
                         is_active:item.is_active,
-                        item_name:item.name,
-                        item_id:item.id,
-                        brand_id:item.pivot.brand_id,
-                        brand_name:item.brands.find(brandId => brandId.id === item.pivot.brand_id).name
+                        item_name:item.item.name,
+                        item_id:item.item.id,
+                        brand_id:item.brand.id,
+                        brand_name:item.brand.name,
+                        // brand_name:item.brands.find(brandId => brandId.id === item.pivot.brand_id).name
                     })
                     // this.selectedItem.push(this.itemList.find(itemid => itemid.id === item.id))
                 })
@@ -441,14 +558,16 @@ export default {
                 else {
                     this.selectedItemList[index].is_active = 1;
                 }
-
                 let url = `/api/toggle_brand_item`;
                 let formData = new FormData();
                 formData.append('id', id);
                 let response = postApiData({ url: url, form_data: formData, token: this.getToken() });
-                if(response.success){
-                    this.getSupplierDetail()
+                console.log('test')
+                if(response.success == 'true'){
+                    console.log(response)
+                    
                 }
+                // this.getSupplierDetail();
             }
         },
 
@@ -495,6 +614,43 @@ export default {
             this.selectedItem = null;
             this.selectedItemBrands = [];
             this.itemBrandsList = [];
+        },
+        btnclickedAddPhone(){
+            if(!this.ph_number){
+                alertValiationMessage(`Phone Number`);
+                return;
+            }
+            else if(!this.selectedType){
+                alertValiationMessage(`Type`);
+                return;
+            }
+            else{
+                this.phoneNumberList.push({
+                    phone_number: this.ph_number,
+                    type: this.selectedType.value,
+                });
+                this.ph_number = null;
+                this.selectedType = null;
+            }
+        },
+        btnclickedAddBankAccount(){
+            if(!this.account_name){
+                alertValiationMessage(`Account Name`);
+                return;
+            }
+            else if(!this.account_number){
+                alertValiationMessage(`Account Number`);
+                return;
+            }
+            else{
+                this.bankAccountList.push({
+                    account_name: this.account_name,
+                    account_number: this.account_number,
+                });
+                this.account_name = null;
+                this.account_number = null;
+                
+            }
         },
         async createBtnClicked(){
             // if(this.existingItems.length > 0){
