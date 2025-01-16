@@ -248,7 +248,7 @@
                         </thead>
                         <tbody>
                             <tr v-for="(phone,phoneIndex) in phoneNumberList" >
-                                <td class=" pr-6 py-3 font-medium ">
+                                <td class=" pr-6 pl-2 py-3 font-medium ">
                                     {{ phone.phone_number }}
                                 </td>
                                 <td class=" px-6 py-3 font-medium capitalize">
@@ -302,7 +302,7 @@
                         </thead>
                         <tbody>
                             <tr v-for="(acc,accIndex) in bankAccountList" >
-                                <td class=" pr-6 py-3 font-medium ">
+                                <td class=" pr-6 pl-2 py-3 font-medium ">
                                     {{ acc.account_name }}
                                 </td>
                                 <td class=" px-6 py-3 font-medium capitalize">
@@ -523,7 +523,7 @@ export default {
             }
         },
 
-        alertValiationMessage(field) {
+        alertValidationMessage(field) {
             this.$notify({
                 title: `Input validation`,
                 text: `You forgot to provide ${field}, please try again`,
@@ -540,28 +540,34 @@ export default {
             }
         },
         addItemBtnClicked(){
-            if(this.selectedItemBrands.length < 1){
-                alertValiationMessage(`brands for item`);
+            if(this.selectedItem){
+                this.alertValidationMessage(`brands for item`);
                 return;
             }
-            this.selectedItems.push({
-                name: this.selectedItem.name,
-                id: this.selectedItem.id,
-                brands: this.selectedItemBrands,
-            });
+            else if(!this.selectedItemBrands){
+                this.alertValidationMessage(`brands for item`);
+                return 1;
+            }
+            else{
+                this.selectedItems.push({
+                    name: this.selectedItem.name,
+                    id: this.selectedItem.id,
+                    brands: this.selectedItemBrands,
+                });
 
-            this.selectedItem = null;
-            this.selectedItemBrands = [];
-            this.itemBrandsList = [];
+                this.selectedItem = null;
+                this.selectedItemBrands = [];
+                this.itemBrandsList = [];
+            }
         },
 
         btnclickedAddPhone(){
             if(!this.ph_number){
-                alertValiationMessage(`Phone Number`);
+                this.alertValidationMessage(`Phone Number`);
                 return;
             }
             else if(!this.selectedType){
-                alertValiationMessage(`Type`);
+                this.alertValidationMessage(`Type`);
                 return;
             }
             else{
@@ -575,11 +581,11 @@ export default {
         },
         btnclickedAddBankAccount(){
             if(!this.account_name){
-                alertValiationMessage(`Account Name`);
+                this.alertValidationMessage(`Account Name`);
                 return;
             }
             else if(!this.account_number){
-                alertValiationMessage(`Account Number`);
+                this.alertValidationMessage(`Account Number`);
                 return;
             }
             else{
@@ -594,23 +600,23 @@ export default {
         },
         async createBtnClicked(){
             if(!this.name){
-                this.alertValidationMessage(`supplier name`);
+                this.alertValidationMessage(`Supplier Same`);
                 return 1;
             }
             if(!this.shopName){
-                this.alertValidationMessage(`supplier shop`);
+                this.alertValidationMessage(`Supplier Shop`);
                 return 1;
             }
             if(!this.address){
-                this.alertValidationMessage(`supplier address`);
+                this.alertValidationMessage(`Supplier Address`);
                 return 1;
             }
             if(this.selectedItems.length < 1){
-                this.alertValidationMessage(`supplier selling items`);
+                this.alertValidationMessage(`Supplier selling Items`);
                 return 1;
             }
             if(this.phoneNumberList.length < 1){
-                this.alertValidationMessage(`supplier Phone Number`);
+                this.alertValidationMessage(`Supplier Phone Number`);
                 return 1;
             }
             if(this.bankAccountList.length < 1){
@@ -618,11 +624,19 @@ export default {
                 return 1;
             }
             if(!this.maxCredit){
-                this.alertValidationMessage(`supplier credit limit`);
+                this.alertValidationMessage(`Supplier Credit Limit`);
                 return 1;
             }
             if(!this.selectedAccount){
-                this.alertValidationMessage(`supplier account payable`);
+                this.alertValidationMessage(`Supplier Account Payable`);
+                return 1;
+            }
+            if(!this.lead_time){
+                this.alertValidationMessage(`Lead Time`);
+                return 1;
+            }
+            if(!this.credit_terms){
+                this.alertValidationMessage(`Credit Terms`);
                 return 1;
             }
             if(!this.selectedCreditAccount){
@@ -658,7 +672,7 @@ export default {
             let url = `/api/suppliers`;
             let response = await postApiData({url: url, form_data: formData, token: this.getToken()});
             if(response.success){
-                // window.location.replace("/suppliers");
+                window.location.replace("/suppliers");
             }
         },
 

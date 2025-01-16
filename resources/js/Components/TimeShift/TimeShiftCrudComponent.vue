@@ -431,7 +431,7 @@ export default {
             formData.append('to_time',this.toTime);
             let response = await postApiData({url:`/api/time_shifts`, form_data:formData, token:this.getToken()})
             if(response.success){
-                this.getShiftList();
+                this.getTimeShiftList();
                 document.getElementById("close_create_modal").click();
             }
         },
@@ -479,7 +479,7 @@ export default {
             formData.append('to_time',this.toTimeEdit);
             let response = await postApiData({url:`/api/time_shifts/`+this.editDetail.id, form_data:formData, token:this.getToken()})
             if(response.success){
-                this.getShiftList();
+                this.getTimeShiftList();
                 document.getElementById("close_edit_modal").click();
             }
         },
