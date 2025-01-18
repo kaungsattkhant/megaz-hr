@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\API\ContactController;
+use App\Http\Controllers\API\PoOrderController;
 use App\Http\Controllers\API\TimeShiftController;
 
 Route::middleware('auth:api')->group(function () {
@@ -35,5 +36,11 @@ Route::middleware('auth:api')->group(function () {
     Route::get('/contacts/{contactId}', 'getContactById');
     Route::post('/contacts', 'updateOrCreate');
     Route::delete('/contacts/{id}', 'delete');
+  });
+
+
+  Route::controller(PoOrderController::class)->group(function () {
+    Route::get('/po_items', 'getPoOrderItems');
+    Route::get('/supplier_brands', 'getSupplierBrands');
   });
 });
