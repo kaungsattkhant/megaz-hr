@@ -191,7 +191,7 @@ Route::middleware('auth:api')->group(function () {
         Route::get('/purchase_orders_items', 'getPurchaseOrderItem');
         Route::post('/purchase_orders_items', 'createPurchaseOrderItem');
         Route::delete('/purchase_orders_items/{id}', 'deletePurchaseOrderItem');
-        Route::post('purchase_orders_bought', 'boughtPurchaseOrder');
+        // Route::post('purchase_orders_bought', 'boughtPurchaseOrder');
         Route::post('updateIsCheck', 'updateIsCheck');
         Route::get('/purchase_order_item_confirmation_list', 'getPurchaseOrderItemConfirmationList');
         Route::get('/confirm_purchase_order_item', 'confirmPurchaseOrderItem');
