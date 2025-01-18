@@ -47,7 +47,7 @@
                                     {{ item.purchase_order.po_id }}
                                 </td>
                                 <td class="whitespace-nowrap px-6 py-4 ">
-                                    {{ item.item.name }}
+                                    {{ item.item ? item.item.name : '' }}
                                 </td>
                                 <td class="whitespace-nowrap px-6 py-4 ">
                                     {{ item.uom.name }}
