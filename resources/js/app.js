@@ -112,6 +112,8 @@ import TimeShiftCrudComponent from './Components/TimeShift/TimeShiftCrudComponen
 import GpsCrudComponent from './Components/GPS/GpsCrudComponent.vue';
 import CheckInComponent from './Components/CheckIn/CheckInComponent.vue';
 import ContactCrudComponent from './Components/Contact/ContactCrudComponent.vue';
+import LeadTimeComponent from './Components/LeadTime/LeadTimeComponent.vue';
+import ProcurementOrderItemsComponent from './Components/ProcurementOrderItems/ProcurementOrderItemsComponent.vue';
 
 import LoginComponent from './Components/Auth/LoginComponent.vue';
 import LogoutComponent from './Components/Auth/LogoutComponent.vue';
@@ -237,6 +239,8 @@ app.component('TimeShiftCrudComponent', TimeShiftCrudComponent);
 app.component('GpsCrudComponent', GpsCrudComponent);
 app.component('CheckInComponent', CheckInComponent);
 app.component('ContactCrudComponent', ContactCrudComponent);
+app.component('LeadTimeComponent', LeadTimeComponent);
+app.component('ProcurementOrderItemsComponent', ProcurementOrderItemsComponent);
 
 app.component('PurchaseOrderListComponent', PurchaseOrderListComponent);
 app.component('PurchaseOrderCreateComponent', PurchaseOrderCreateComponent);
