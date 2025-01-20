@@ -44,6 +44,11 @@ class Item extends BaseModel
         return $this->belongsTo(Category::class);
     }
 
+    public function PurchaseOrderItem()
+    {
+        return $this->hasMany(PurchaseOrderItem::class);
+    }
+
     public function uoms()
     {
         return $this->belongsToMany(Uom::class, 'items_uoms', 'item_id', 'uom_id');

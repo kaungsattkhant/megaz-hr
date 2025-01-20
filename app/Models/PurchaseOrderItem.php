@@ -47,17 +47,17 @@ class PurchaseOrderItem extends BaseModel
 
     public function item()
     {
-        return $this->belongsTo(Item::class);
+        return $this->belongsTo(Item::class, 'item_id');
     }
 
     public function uom()
     {
-        return $this->belongsTo(Uom::class);
+        return $this->belongsTo(Uom::class, 'uom_id');
     }
 
     public function baseUom()
     {
-        return $this->belongsTo(Uom::class);
+        return $this->belongsTo(Uom::class, 'base_uom_id');
     }
 
     public function purchaseOrderItemLefts()
