@@ -42,11 +42,14 @@ class PoOrderRepository implements PoOrderRepositoryInterface
                     ",\"quantity\":", po_item.quantity,
                     ",\"amount\":", po_item.amount,
                     ",\"base_uom_id\":", po_item.base_uom_id,
+                    ",\"base_uom_name\":\"", bu_sub.name, "\"",
                     ",\"base_uom_quantity\":", po_item.base_uom_quantity,
                     ",\"uom_id\":", po_item.uom_id,
+                    ",\"uom_name\":\"", u_sub.name, "\"",
                     ",\"uom_quantity\":", po_item.uom_quantity,
                     ",\"uom_conversion_id\":", po_item.uom_conversion_id,
                     ",\"uom_conversion\":", uc.conversion,
+                    ",\"uom_conversion\":", uc_sub.conversion,
                     ",\"purchase_order\":{",
                         "\"id\":", po.id,
                         ",\"po_id\":\"", po.po_id, "\"",
@@ -57,11 +60,15 @@ class PoOrderRepository implements PoOrderRepositoryInterface
                 ) SEPARATOR ","
             )
             FROM purchase_order_items po_item
-            INNER JOIN purchase_orders po ON po_item.purchase_order_id = po.id
-            WHERE po_item.item_id = poi.item_id
-            AND po_item.is_md_checked = true
-            AND po.status = "md_checked"
-        ) as purchase_order_details')
+                INNER JOIN purchase_orders po ON po_item.purchase_order_id = po.id
+                INNER JOIN items i ON po_item.item_id = i.id
+                INNER JOIN uoms u_sub ON po_item.uom_id = u_sub.id
+                INNER JOIN uoms bu_sub ON po_item.base_uom_id = bu_sub.id
+                INNER JOIN uom_conversions uc_sub ON po_item.uom_conversion_id = uc_sub.id
+                WHERE po_item.item_id = poi.item_id
+                AND po_item.is_md_checked = true
+                AND po.status = "md_checked"
+            ) as purchase_order_details')
       )
       ->groupBy(
         'poi.item_id',
