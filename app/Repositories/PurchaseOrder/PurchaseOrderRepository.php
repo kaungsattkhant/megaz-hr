@@ -248,7 +248,8 @@ class PurchaseOrderRepository implements PurchaseOrderRepositoryInterface
             'items.uom',
             'items.purchaseOrderItemLeft',
             'items.item.suppliers',
-            'items.baseUom'
+            'items.baseUom',
+            'items.uomConversion'
         ]);
         // $purchaseOrder->uom = $purchaseOrder->uom;
         // $purchaseOrder->items = $purchaseOrder->items;
