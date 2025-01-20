@@ -444,7 +444,7 @@ Route::middleware('auth:api')->group(function () {
     // });
     Route::controller(ItemAPIController::class)->group(function () {
         Route::get('item_price_list_by_item/{item_id}', 'getItemPriceListByItem');
-        Route::get('brand_by_supplier/{itemId}/{supplierId}', 'brandBySupplier');
+        Route::get('brand_by_supplier', 'brandBySupplier');
         Route::get('supplier_by_item/{item_id}', 'supplierByItem');
     });
 });

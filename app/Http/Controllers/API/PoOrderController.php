@@ -22,9 +22,9 @@ class PoOrderController extends Controller
     }
 
 
-    public function getPoOrderItemsById(Request $request, $itemId)
-    {
-        $data =  $this->PoOrderRepository->getPoOrderItemsById($request, $itemId);
-        ResponseData($data);
-    }
+    // public function getPoOrderItemsById(Request $request, $itemId)
+    // {
+    //     $data =  $this->PoOrderRepository->getPoOrderItemsById($request, $itemId);
+    //     ResponseData($data);
+    // }
 }
