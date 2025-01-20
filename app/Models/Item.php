@@ -54,6 +54,11 @@ class Item extends BaseModel
         return $this->belongsToMany(Uom::class, 'items_uoms', 'item_id', 'uom_id');
     }
 
+    public function baseUoms()
+    {
+        return $this->belongsToMany(Uom::class, 'items_uoms', 'item_id', 'base_uom_id');
+    }
+
     public function brands()
     {
         return $this->belongsToMany(Brand::class, 'brand_item', 'item_id', 'brand_id');

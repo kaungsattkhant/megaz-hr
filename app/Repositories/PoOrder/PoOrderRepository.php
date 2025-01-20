@@ -67,4 +67,15 @@ class PoOrderRepository implements PoOrderRepositoryInterface
       ->paginate(config('common.list_count'));
     return   $poOrderItems;
   }
+
+
+  public function getPoOrderItemsById(Request $request, $itemId)
+  {
+    $poOrderItem = PurchaseOrderItem::with(['item', 'uom', 'baseUom', 'uomConversion', 'purchase_order'])->where('item_id', $itemId)
+      ->where('is_md_checked', true)
+      ->whereHas('purchase_order', function ($query) {
+        $query->where('status', 'md_checked');
+      })->get();
+    return  $poOrderItem;
+  }
 }
