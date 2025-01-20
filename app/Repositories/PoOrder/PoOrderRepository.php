@@ -75,8 +75,8 @@ class PoOrderRepository implements PoOrderRepositoryInterface
         'u.name',
         'poi.uom_quantity'
       )
-      ->get();
-    $poOrderItems->transform(function ($item) {
+      ->paginate(config('common.list_count'));
+    $poOrderItems->getCollection()->transform(function ($item) {
       if ($item->purchase_order_details) {
         $item->purchase_order_details = json_decode('[' . $item->purchase_order_details . ']');
       }
