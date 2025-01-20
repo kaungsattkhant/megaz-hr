@@ -20,4 +20,12 @@ class PoOrderController extends Controller
         $data =  $this->PoOrderRepository->getPoOrderItems($request);
         ResponseData($data);
     }
+
+
+
+    // public function storePoOrderItems(Request $request)
+    // {
+    //     $data =  $this->PoOrderRepository->storePoOrderItems($request);
+    //     ResponseData($data);
+    // }
 }
