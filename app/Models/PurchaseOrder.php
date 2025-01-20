@@ -14,7 +14,7 @@ class PurchaseOrder extends BaseModel
 {
     use HasFactory;
     // protected $with=['items'];
-    protected $fillable =[
+    protected $fillable = [
         'po_id',
         'total_price',
         'date',
@@ -30,6 +30,8 @@ class PurchaseOrder extends BaseModel
         'updated_at',
         'is_bought',
         'purchased_date_time',
+        'procurement_manager_check_id',
+        'procurement_manager_check_time'
     ];
 
     public function getCreatedAt()
@@ -53,22 +55,23 @@ class PurchaseOrder extends BaseModel
         return $this->hasMany(PurchaseOrderItem::class);
     }
 
-    public function createdBy(){
-        return $this->belongsTo(Staff::class,'created_by');
+    public function createdBy()
+    {
+        return $this->belongsTo(Staff::class, 'created_by');
     }
 
-
-
-    public function managerCheckedBy(){
-        return $this->belongsTo(Staff::class,'manager_check_id');
+    public function managerCheckedBy()
+    {
+        return $this->belongsTo(Staff::class, 'manager_check_id');
     }
 
-    public function financialCheckedBy(){
-        return $this->belongsTo(Staff::class,'financial_check_id');
+    public function financialCheckedBy()
+    {
+        return $this->belongsTo(Staff::class, 'financial_check_id');
     }
 
-
-
-
-
+    public function procurementCheckedBy()
+    {
+        return $this->belongsTo(Staff::class, 'procurement_manager_check_id');
+    }
 }

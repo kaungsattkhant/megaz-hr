@@ -145,7 +145,7 @@ class PurchaseOrderTransaction
             ->join('categories', 'items.category_id', '=', 'categories.id')
             ->join('suppliers', 'suppliers.id', '=', 'po_grns.supplier_id')
             ->select(
-                'suppliers.account_id',
+        'suppliers.account_id',
                 'suppliers.creditor_account_id',
                 'suppliers.id as supplier_id',
                 'suppliers.name as supplier_name',

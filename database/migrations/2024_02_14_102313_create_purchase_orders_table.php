@@ -13,8 +13,8 @@ return new class extends Migration
     {
         Schema::create('purchase_orders', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->string('po_id',45);
-            $table->double('total_price');
+            $table->string('po_id', 45);
+            $table->decimal('total_price', 8, 2);
             $table->date('date');
             $table->unsignedBigInteger('created_by');
             $table->boolean('is_bought')->default(0);
@@ -25,7 +25,9 @@ return new class extends Migration
             $table->dateTime('md_check_time')->nullable();
             $table->boolean('is_md_checked')->default(0);
             $table->boolean(column: 'purchased_date_time')->nullable();
-            $table->enum('status', ['created', 'manager_checked', 'financial_checked', 'md_checked'])->default('created');
+            $table->unsignedBigInteger('procurement_manager_check_id')->nullable();
+            $table->dateTime('procurement_manager_check_time')->nullable();
+            $table->enum('status', ['created', 'manager_checked', 'financial_checked', 'md_checked', 'procurement_manager_checked'])->default('created');
             $table->timestamps();
         });
     }

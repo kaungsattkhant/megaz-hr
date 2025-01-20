@@ -18,12 +18,15 @@ class Item extends BaseModel
 
     protected $fillable = [
         'name',
-        'category_id',
-        'is_active',
-        'base_uom_id',
         'code',
+        'category_id',
         'item_type_id',
-        'uom_id'
+        'base_uom_id',
+        'uom_id',
+        'is_active',
+        'lead_time',
+        'minimum_holding_amount',
+
     ];
 
     protected $with = ['brands'];
@@ -41,9 +44,19 @@ class Item extends BaseModel
         return $this->belongsTo(Category::class);
     }
 
+    public function PurchaseOrderItem()
+    {
+        return $this->hasMany(PurchaseOrderItem::class);
+    }
+
     public function uoms()
     {
         return $this->belongsToMany(Uom::class, 'items_uoms', 'item_id', 'uom_id');
+    }
+
+    public function baseUoms()
+    {
+        return $this->belongsToMany(Uom::class, 'items_uoms', 'item_id', 'base_uom_id');
     }
 
     public function brands()

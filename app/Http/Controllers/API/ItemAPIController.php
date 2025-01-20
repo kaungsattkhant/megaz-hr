@@ -68,9 +68,10 @@ class ItemAPIController extends Controller
         ResponseData($item);
     }
 
-    public function brandBySupplier(Request $request)
+    public function brandBySupplier(Request $request, $itemId, $supplierId)
     {
-        $brand = $this->itemRepo->brandBySupplier($request);
+
+        $brand = $this->itemRepo->brandBySupplier($request, $itemId, $supplierId);
         ResponseData($brand);
     }
     public function itemImport(ItemImportRequest $request)
