@@ -22,7 +22,7 @@ interface ItemRepositoryInterface
 
     public function supplierByItem($itemId);
 
-    public function brandBySupplier($request, $itemId, $supplierId);
+    public function brandBySupplier($request);
 
     public function itemImport($request);
 }
