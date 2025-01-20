@@ -76,12 +76,17 @@ class PoOrderRepository implements PoOrderRepositoryInterface
         'poi.uom_quantity'
       )
       ->paginate(config('common.list_count'));
-    $poOrderItems->getCollection()->transform(function ($item) {
+    // $poOrderItems->getCollection()->transform(function ($item) {
+    //   if ($item->purchase_order_details) {
+    //     $item->purchase_order_details = json_decode('[' . $item->purchase_order_details . ']');
+    //   }
+    //   return $item;
+    // });
+    foreach ($poOrderItems->items() as $item) {
       if ($item->purchase_order_details) {
         $item->purchase_order_details = json_decode('[' . $item->purchase_order_details . ']');
       }
-      return $item;
-    });
+    }
 
     return $poOrderItems;
   }
