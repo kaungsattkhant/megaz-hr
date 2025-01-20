@@ -6,8 +6,8 @@
             </p>
         </div>
 
-        <div class="grid grid-cols-12 gap-x-8 bg-white pt-4 pb-8 px-4 rounded-md shadow-md mb-8">
-            <div class="mb-6 col-span-3">
+        <div class="grid grid-cols-12 gap-x-8 gap-y-6 bg-white pt-4 pb-8 px-4 rounded-md shadow-md mb-8">
+            <div class="col-span-3">
                 <label for="" class="label-form mb-3">
                     Date
                 </label>
@@ -26,7 +26,7 @@
                 </select>
 
             </div>
-
+            <div class="col-span-9"></div>
             <div class="col-span-3">
                 <label for="" class="label-form mb-3">
                     Qty
@@ -42,6 +42,30 @@
                     data-te-select-wrapper-ref>
                     <select data-te-select-init data-te-select-placeholder="Select UOM" data-te-select-filter="true"
                         name="" id="" v-model="selectedUom"
+                        class="">
+                        <option :value="uom" v-for="(uom, uomIndex) in itemUoms" :key="uomIndex">
+                            {{ uom.name }}
+                        </option>
+                    </select>
+                </div>
+            </div>
+            <div class="col-span-6"></div>
+
+            <div class="col-span-3">
+                <label for="" class="label-form mb-3">
+                    Base UOM Qty
+                </label>
+                <input type="number" v-model="baseQuantity" class="input-ui" placeholder="Qty">
+            </div>
+
+            <div class="col-span-3">
+                <label for="" class="block text-sm text-black mb-3">
+                    Base UOM
+                </label>
+                <div class="bg-white mb-0 w-full text-xs h-8 border-b border-black rounded-bl-[4px] rounded-br-[4px] overflow-hidden inline-block"
+                    data-te-select-wrapper-ref>
+                    <select data-te-select-init data-te-select-placeholder="Select UOM" data-te-select-filter="true"
+                        name="" id="" v-model="selectedBaseUom"
                         class="">
                         <option :value="uom" v-for="(uom, uomIndex) in itemUoms" :key="uomIndex">
                             {{ uom.name }}
@@ -152,8 +176,9 @@
                 uomList: [],
                 itemUoms: [],
                 selectedUom: null,
-
                 quantity: null,
+                selectedBaseUom: null,
+                baseQuantity: null,
                 purchaseOrderItems: [],
 
                 totalPrice: 0,
