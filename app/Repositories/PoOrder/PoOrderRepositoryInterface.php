@@ -8,5 +8,5 @@ interface PoOrderRepositoryInterface
 {
 
   public function getPoOrderItems(Request $request);
-  public function getPoOrderItemsById(Request $request, $poId);
+  // public function getPoOrderItemsById(Request $request, $poId);
 }
