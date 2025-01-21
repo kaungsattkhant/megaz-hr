@@ -483,4 +483,56 @@ END,
       throw $e;
     }
   }
+
+  public function getSupplierLeadTime($supplierId)
+  {
+    $poOrderlist = PoOrder::with(['item', 'arrivalItem'])->where('supplier_id', $supplierId)
+      ->get();
+    $averageLeadTimes = [];
+    foreach ($poOrderlist as $poOrder) {
+      $orderTime = new \Carbon\Carbon($poOrder->created_at);
+      $totalLeadTime = 0;
+      $totalQuantity = 0;
+
+      foreach ($poOrder->arrivalItem as $arrival) {
+        $arrivalTime = new \Carbon\Carbon($arrival->created_at);
+
+        $leadTime = abs($arrivalTime->diffInSeconds($orderTime));
+        $totalLeadTime += $leadTime * $arrival->quantity;
+        $totalQuantity += $arrival->quantity;
+      }
+
+      if ($totalQuantity > 0) {
+        $averageLeadTime = $totalLeadTime / $totalQuantity;
+        $averageOrderTime = $averageLeadTime / $totalQuantity;
+        $leadTime = $this->formatTime($averageLeadTime);
+        $orderTime = $this->formatTime($averageOrderTime);
+
+        $averageLeadTimes[] = [
+          'supplier_id' => $poOrder->supplier->id,
+          'supplier_name' => $poOrder->supplier->name,
+          'item_id' => $poOrder->item->id,
+          'item_name' => $poOrder->item->name,
+          'average_lead_time' => $leadTime,
+          'average_order_time' => $orderTime,
+        ];
+      }
+    }
+
+    return $averageLeadTimes;
+  }
+
+
+  private function formatTime($totalTimeInSeconds)
+  {
+    $days = floor($totalTimeInSeconds / (60 * 60 * 24)); // Get full days
+    $hours = floor(($totalTimeInSeconds % (60 * 60 * 24)) / (60 * 60)); // Get remaining hours
+    $minutes = floor(($totalTimeInSeconds % (60 * 60)) / 60); // Get remaining minutes
+
+    if ($days > 0) {
+      return "{$days} days, {$hours} hours, {$minutes} minutes";
+    } else {
+      return "{$hours} hours, {$minutes} minutes";
+    }
+  }
 }

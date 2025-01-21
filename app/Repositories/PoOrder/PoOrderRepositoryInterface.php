@@ -14,4 +14,5 @@ interface PoOrderRepositoryInterface
   public function getPoOrderArrivalListByItemId($itemId);
   public function getInvoiceBySupplier($supplierId);
   public function storePoArrivalItems($validatedData);
+  public function getSupplierLeadTime($supplierId);
 }

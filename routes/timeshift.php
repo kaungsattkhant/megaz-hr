@@ -46,5 +46,6 @@ Route::middleware('auth:api')->group(function () {
     Route::get('/po_arrival_list/{itemId}', 'getPoOrderArrivalListByItemId');
     Route::get('/invoice_by_supplier/{supplierId}', 'getInvoiceBySupplier');
     Route::post('/po_arrival_items', 'storePoArrivalItems');
+    Route::get('/supplier_lead_time/{supplierId}', 'getSupplierLeadTime');
   });
 });

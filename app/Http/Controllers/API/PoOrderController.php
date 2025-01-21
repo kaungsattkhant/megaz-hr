@@ -54,4 +54,10 @@ class PoOrderController extends Controller
         $data =  $this->PoOrderRepository->storePoArrivalItems($validatedData);
         ResponseData($data);
     }
+
+    public function getSupplierLeadTime($supplierId)
+    {
+        $data =  $this->PoOrderRepository->getSupplierLeadTime($supplierId);
+        ResponseData($data);
+    }
 }
