@@ -8,4 +8,6 @@ interface PoOrderRepositoryInterface
 {
 
   public function getPoOrderItems(Request $request);
+  public function test($request);
+  public function  storePoOrderItems($validatedData);
 }
