@@ -19,7 +19,8 @@ class ItemLeft extends Model
         'amount',
         'created_by',
         'item_leftable_id',
-        'item_leftable_type'
+        'item_leftable_type',
+        'purchase_order_id'
     ];
 
     public function itemLeftable()

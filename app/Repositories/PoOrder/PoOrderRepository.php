@@ -15,7 +15,7 @@ class PoOrderRepository implements PoOrderRepositoryInterface
 
   public function getPoOrderItems(Request $request)
   {
-    return $this->test($request);
+    // return $this->test($request);
     $poOrderItems = DB::table('purchase_order_items as poi')
       ->join('items as i', 'poi.item_id', '=', 'i.id')
       ->join('uoms as u', 'poi.uom_id', '=', 'u.id')
@@ -221,7 +221,6 @@ END,
       $item->purchase_order_details = json_decode($item->purchase_order_details, true);
     }
     return $poOrderItems;
-   
   }
 
   public function storePoOrderItems($validatedData)
@@ -258,6 +257,7 @@ END,
             'created_by' => UserData()->id,
             'item_leftable_id' => $poOrder->id,
             'item_leftable_type' => $validatedData['item_leftable_type'],
+            'purchase_order_id' => $validatedData['purchase_order_id'],
           ];
           ItemLeft::create($itemLeftData);
         }
