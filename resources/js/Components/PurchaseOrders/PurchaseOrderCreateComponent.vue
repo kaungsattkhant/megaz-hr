@@ -98,7 +98,7 @@
                                 UOM
                             </th>
                             <th scope="col" class="">
-                                Amount
+                                Unit Price
                             </th>
                             <th scope="col" class="">
                                 Total
@@ -238,49 +238,63 @@
                     this.alertValidationMessage('quantity');
                     return 1;
                 }
-                let floatItemPrice = parseFloat(this.selectedItem.average_price)
-                console.log(floatItemPrice)
-                let url = `/api/get_uom_conversion_by_uom?po_uom_id=${this.selectedUom.id}&item_uom_id=${this.selectedItem.uom_id}&item_price=${floatItemPrice}&base_uom_id=${this.selectedItem.base_uom_id}`;
-                let response = await getApiData({url: url, token: this.getToken()});
-                let uomConversion = null;
-                let amount = 0;
-                let price = 0;
-                if(response.data){
-                    uomConversion = response.data;
-                    amount = parseInt(response.data.price);
-                    price = this.quantity * amount;
-                    // amount = uomConversion.conversion;
-                    // amount = amount * (response.data.price);
-                    this.$notify({
-                        text: `Uom conversion by uom value ${amount}`,
-                        type: 'info'
-                    });
-                }
-                else{
-                    this.$notify({
-                        title: 'Error',
-                        text: response.message,
-                        type: 'error'
-                    });
-
+                if(!this.selectedBaseUom){
+                    this.alertValidationMessage('base uom');
                     return 1;
                 }
+                if(this.baseQuantity < 1){
+                    this.alertValidationMessage('quantity');
+                    return 1;
+                }
+                let floatItemPrice = parseFloat(this.selectedItem.average_price)
+                console.log(floatItemPrice)
+                // let url = `/api/get_uom_conversion_by_uom?po_uom_id=${this.selectedUom.id}&item_uom_id=${this.selectedItem.uom_id}&item_price=${floatItemPrice}&base_uom_id=${this.selectedItem.base_uom_id}`;
+                // let response = await getApiData({url: url, token: this.getToken()});
+                // let uomConversion = null;
+                // let amount = 0;
+                // let price = 0;
+                // if(response.data){
+                //     uomConversion = response.data;
+                //     amount = parseInt(response.data.price);
+                //     price = this.quantity * amount;
+                //     this.$notify({
+                //         text: `Uom conversion by uom value ${amount}`,
+                //         type: 'info'
+                //     });
+                // }
+                // else{
+                //     this.$notify({
+                //         title: 'Error',
+                //         text: response.message,
+                //         type: 'error'
+                //     });
+
+                //     return 1;
+                // }
                 // amount = (this.selectedItem.item_prices)? this.selectedItem.item_prices.price: 0;
+                let quantity = (this.baseQuantity * this.selectedItem.uom_conversion) + this.quantity
+                let price = ((this.baseQuantity * this.selectedItem.uom_conversion) + this.quantity) * this.selectedItem.average_price
                 this.purchaseOrderItems.push({
                     item_id: this.selectedItem.id,
-                    name: this.selectedItem.name,
-                    quantity: this.quantity,
-                    amount: amount,
+                    quantity: quantity,
+                    amount: this.selectedItem.average_price,
                     price: price,
                     uom_id: this.selectedUom.id,
+                    uom_quantity: this.quantity,
                     uom_name: this.selectedUom.name,
-                    uom_conversion_id: uomConversion.id,
+                    uom_conversion_id: this.selectedItem.uom_conversion_id,
+                    base_uom_id: this.selectedBaseUom.id,
+                    base_uom_quantity: this.baseQuantity,
+                    base_uom_name: this.selectedBaseUom.name,
+                    name: this.selectedItem.name,
                 });
 
                 this.updateTotalPrice(this.purchaseOrderItems);
                 this.selectedItem = null;
                 this.selectedUom = null;
                 this.quantity = null;
+                this.selectedBaseUom = null;
+                this.baseQuantity = null;
             },
 
             removePurchaseOrderItemBtnClicked(purchaseOrderItemsIndex){
