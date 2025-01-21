@@ -15,6 +15,7 @@ class PoOrderRepository implements PoOrderRepositoryInterface
 
   public function getPoOrderItems(Request $request)
   {
+    return $this->test($request);
     $poOrderItems = DB::table('purchase_order_items as poi')
       ->join('items as i', 'poi.item_id', '=', 'i.id')
       ->join('uoms as u', 'poi.uom_id', '=', 'u.id')
@@ -98,6 +99,8 @@ class PoOrderRepository implements PoOrderRepositoryInterface
   }
   public function test($request)
   {
+
+
     $poOrderItems = DB::table('purchase_order_items as poi')
       ->join('items as i', 'poi.item_id', '=', 'i.id')
       ->join('uoms as u', 'poi.uom_id', '=', 'u.id')
@@ -117,22 +120,70 @@ class PoOrderRepository implements PoOrderRepositoryInterface
         'poi.uom_id',
         'poi.uom_quantity',
         'poi.uom_conversion_id',
-        DB::raw('SUM(poi.quantity) as total_quantity'),
+        DB::raw('SUM(CASE 
+        WHEN (
+            SELECT COALESCE(SUM(item_lefts.quantity), 0)
+            FROM item_lefts
+            WHERE item_lefts.purchase_order_id = poi.purchase_order_id
+        ) = 0 THEN poi.quantity
+        ELSE (
+            SELECT COALESCE(SUM(item_lefts.quantity), 0)
+            FROM item_lefts
+            WHERE item_lefts.purchase_order_id = poi.purchase_order_id
+        )
+    END) as total_quantity'),
         DB::raw('SUM(poi.amount) as total_amount'),
+        DB::raw('GROUP_CONCAT(po.id SEPARATOR ", ") as po_ids'),
         DB::raw('GROUP_CONCAT(po.po_id SEPARATOR ", ") as po_numbers'),
         DB::raw('(
             SELECT JSON_ARRAYAGG(
                 JSON_OBJECT(
                     "id", po_item.id,
                     "item_name", i.name,
-                    "quantity", po_item.quantity,
                     "amount", po_item.amount,
+                    "quantity", po_item.quantity,
                     "base_uom_id", po_item.base_uom_id,
                     "base_uom_quantity", po_item.base_uom_quantity,
                     "uom_id", po_item.uom_id,
                     "uom_quantity", po_item.uom_quantity,
                     "uom_conversion_id", po_item.uom_conversion_id,
                     "uom_conversion", uc.conversion,
+                   "quantity", CASE 
+    WHEN (
+        SELECT COALESCE(SUM(item_lefts.quantity), 0)
+        FROM item_lefts
+        WHERE item_lefts.purchase_order_id = po_item.purchase_order_id
+    ) = 0 THEN po_item.quantity
+    ELSE (
+        SELECT COALESCE(SUM(item_lefts.quantity), 0)
+        FROM item_lefts
+        WHERE item_lefts.purchase_order_id = po_item.purchase_order_id
+    )
+END,
+"quantity", CASE 
+    WHEN (
+        SELECT COALESCE(SUM(item_lefts.uom_quantity), 0)
+        FROM item_lefts
+        WHERE item_lefts.purchase_order_id = po_item.purchase_order_id
+    ) = 0 THEN po_item.uom_quantity
+    ELSE (
+        SELECT COALESCE(SUM(item_lefts.uom_quantity), 0)
+        FROM item_lefts
+        WHERE item_lefts.purchase_order_id = po_item.purchase_order_id
+    )
+END,
+"quantity", CASE 
+    WHEN (
+        SELECT COALESCE(SUM(item_lefts.base_uom_quantity), 0)
+        FROM item_lefts
+        WHERE item_lefts.purchase_order_id = po_item.purchase_order_id
+    ) = 0 THEN po_item.base_uom_quantity
+    ELSE (
+        SELECT COALESCE(SUM(item_lefts.base_uom_quantity), 0)
+        FROM item_lefts
+        WHERE item_lefts.purchase_order_id = po_item.purchase_order_id
+    )
+END,
                     "purchase_order", JSON_OBJECT(
                         "id", po.id,
                         "po_id", po.po_id,
@@ -150,6 +201,7 @@ class PoOrderRepository implements PoOrderRepositoryInterface
             AND po_item.is_md_checked = true
             AND po.status = "md_checked"
         ) as purchase_order_details')
+
       )
       ->groupBy(
         'poi.item_id',
@@ -161,21 +213,23 @@ class PoOrderRepository implements PoOrderRepositoryInterface
         'poi.base_uom_quantity',
         'poi.uom_id',
         'u.name',
-        'poi.uom_quantity'
+        'poi.uom_quantity',
       )
       ->paginate(config('common.list_count'));
-    foreach ($poOrderItems as  $item) {
+
+    foreach ($poOrderItems as $item) {
       $item->purchase_order_details = json_decode($item->purchase_order_details, true);
     }
     return $poOrderItems;
+   
   }
 
-  public function  storePoOrderItems($validatedData)
+  public function storePoOrderItems($validatedData)
   {
     DB::beginTransaction();
     try {
       $validatedData['created_by'] = UserData()->id;
-      $poOrder =   PoOrder::create($validatedData);
+      $poOrder = PoOrder::create($validatedData);
 
       if (isset($validatedData['later_by'])) {
         $purchaseOrderItem = PurchaseOrderItem::where('purchase_order_id', $validatedData['purchase_order_id'])
@@ -195,15 +249,15 @@ class PoOrderRepository implements PoOrderRepositoryInterface
           }
           $itemLeftData = [
             'base_uom_id' => $validatedData['base_uom_id'],
-            'base_uom_quantity' =>  $purchaseOrderItem->base_uom_quantity -  $validatedData['base_uom_quantity'],
+            'base_uom_quantity' => $purchaseOrderItem->base_uom_quantity - $validatedData['base_uom_quantity'],
             'uom_id' => $validatedData['uom_id'],
-            'uom_quantity' => $purchaseOrderItem->uom_quantity  - $validatedData['uom_quantity'],
+            'uom_quantity' => $purchaseOrderItem->uom_quantity - $validatedData['uom_quantity'],
             'uom_conversion_unit_id' => $validatedData['uom_conversion_unit_id'],
             'quantity' => $remainingQuantity,
             'amount' => $validatedData['amount'],
             'created_by' => UserData()->id,
             'item_leftable_id' => $poOrder->id,
-            'item_leftable_type' =>  $validatedData['item_leftable_type'],
+            'item_leftable_type' => $validatedData['item_leftable_type'],
           ];
           ItemLeft::create($itemLeftData);
         }
