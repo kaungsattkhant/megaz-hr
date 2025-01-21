@@ -175,8 +175,8 @@
                         Edit Quantity
                     </h5>
                     <!--Close button-->
-                    <button type="button" class="absolute top-4 right-4 focus:shadow-none focus:outline-none"
-                        data-te-modal-dismiss aria-label="Close">
+                    <button type="button" class="absolute top-4 right-4 focus:shadow-none focus:outline-none" @click="selectedItem = null"
+                        data-te-modal-dismiss aria-label="Close" id="close_quantity_modal">
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
                             stroke="currentColor" class="h-5 w-5">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
@@ -263,7 +263,7 @@
                 <!--Modal footer-->
                 <div class="flex justify-center px-12 mb-6">
                     <button type="button" @click="confirmEditQuantityBtnClicked()" class="add-btn focus:outline-none focus:ring-0 "
-                        data-te-toggle="modal" data-te-target="#editModal">
+                        >
                         Edit
                     </button>
                 </div>
@@ -532,6 +532,8 @@
                 this.baseQuantityEdit = null;
                 this.editPurchaseOrderItem = null;
                 this.isLaterBuy = false;
+                this.selectedItem = null;
+                document.getElementById("close_quantity_modal").click();
             },
             removePurchaseOrderItemBtnClicked(purchaseOrderItemsIndex){
                 if(this.purchaseOrderItems[purchaseOrderItemsIndex].id){
