@@ -484,7 +484,6 @@
                             Purchase Orders
                         </a>
                     </li>
-                    <li>
                 @endif
                     @if (checkFeaturePermission('purchase-order-confirmation'))
                         <li>
@@ -504,6 +503,12 @@
                         </a>
                     </li>
                 @endif
+                <li>
+                    <a href="{{ route('procurement_order_items') }}" class="flex items-center @yield('procurement_order_items')">
+                        <i class="fal fa-truck-loading  pr-3"></i>
+                        Procurement Order Items
+                    </a>
+                </li>
                 @if (checkFeaturePermission('fixed-asset'))
                     <li>
                         <a href="{{ route('assetItemList') }}" class="flex items-center @yield('asset_items')">
