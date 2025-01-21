@@ -286,9 +286,13 @@ END,
         DB::raw('GROUP_CONCAT(DISTINCT po.po_id SEPARATOR ", ") as po_numbers'),
         DB::raw('SUM(poi.quantity) as total_quantity'),
         DB::raw('SUM(poi.amount) as total_amount'),
+        'u.id as uom_id',
         'u.name as uom_name',
+        'bu.id as base_uom_id',
         'bu.name as base_uom_name',
+        'uc.id as uom_conversion_id',
         'uc.conversion as uom_conversion',
+        'ip.id as item_price_id',
         'ip.price as item_price',
       )
       ->join('uoms as u', 'poi.uom_id', '=', 'u.id')
@@ -297,9 +301,13 @@ END,
       ->groupBy(
         'i.id',
         'i.name',
+        'u.id',
         'u.name',
+        'bu.id',
         'bu.name',
+        'ip.id',
         'ip.price',
+        'uc.id',
         'uc.conversion'
       )
       ->paginate(config('common.list_count'));
