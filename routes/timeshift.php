@@ -41,5 +41,6 @@ Route::middleware('auth:api')->group(function () {
 
   Route::controller(PoOrderController::class)->group(function () {
     Route::get('/po_items', 'getPoOrderItems');
+    Route::post('/po_items', 'storePoOrderItems');
   });
 });
