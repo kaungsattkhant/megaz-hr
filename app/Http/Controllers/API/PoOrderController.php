@@ -4,6 +4,7 @@ namespace App\Http\Controllers\API;
 
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\PoOrder\ArrivalItemRequest;
 use App\Http\Requests\PoOrder\PoOrderItemRequest;
 use App\Repositories\PoOrder\PoOrderRepositoryInterface;
 
@@ -44,6 +45,13 @@ class PoOrderController extends Controller
     public function getInvoiceBySupplier($supplierId)
     {
         $data =  $this->PoOrderRepository->getInvoiceBySupplier($supplierId);
+        ResponseData($data);
+    }
+
+    public function storePoArrivalItems(ArrivalItemRequest $request)
+    {
+        $validatedData = $request->validated();
+        $data =  $this->PoOrderRepository->storePoArrivalItems($validatedData);
         ResponseData($data);
     }
 }

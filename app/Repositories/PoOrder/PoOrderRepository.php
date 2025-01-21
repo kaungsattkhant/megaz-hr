@@ -5,6 +5,7 @@ namespace App\Repositories\PoOrder;
 use App\Models\PoOrder;
 use App\Models\ItemLeft;
 use App\Models\PoInvoice;
+use App\Models\ArrivalItem;
 use Illuminate\Http\Request;
 use App\Models\PurchaseOrderItem;
 use Illuminate\Support\Facades\DB;
@@ -230,7 +231,7 @@ END,
       $validatedData['created_by'] = UserData()->id;
       $poOrder = PoOrder::create($validatedData);
 
-      if (isset($validatedData['later_by'])) {
+      if (isset($validatedData['later_by']) && $validatedData['later_by'] == 1) {
         $purchaseOrderItem = PurchaseOrderItem::where('purchase_order_id', $validatedData['purchase_order_id'])
           ->where('item_id', $validatedData['item_id'])
           ->first();
@@ -417,5 +418,69 @@ END,
       ->get();
 
     return $invoices;
+  }
+
+  public function storePoArrivalItems($validatedData)
+  {
+    DB::beginTransaction();
+    try {
+      $poInvoiceId = null;
+      if (isset($validatedData['is_new_invoice']) && $validatedData['is_new_invoice'] == 1) {
+        $invoiceData = [
+          'invoice_no' => $validatedData['invoice_no'],
+          'date_time' => now(),
+          'total_invoice_amount' => $validatedData['total_invoice_amount'],
+          'created_by' => UserData()->id,
+        ];
+        $poInvoice = PoInvoice::create($invoiceData);
+        $poInvoiceId = $poInvoice->id;
+      }
+      $validatedData['created_by'] = UserData()->id;
+
+      if ($poInvoiceId) {
+        $validatedData['po_invoice_id'] = $poInvoiceId;
+      }
+      $arrivalItem = ArrivalItem::create($validatedData);
+
+
+      if (isset($validatedData['later_by']) && $validatedData['later_by'] == 1) {
+        $poOrder = PoOrder::where('id', $validatedData['po_order_id'])->first();
+
+        if ($poOrder->quantity <  $arrivalItem->quantity) {
+          ResponseMessage('The arrival  quantity exceeds the available quantity.', 419);
+        }
+
+        $remainingQuantity = null;
+        if ($poOrder->quantity >  $arrivalItem->quantity) {
+          $remainingQuantity = $poOrder->quantity -  $arrivalItem->quantity;
+
+          if ($remainingQuantity < 0) {
+            ResponseMessage('Later Buy Quantity must be less than original quantity', 419);
+          }
+          $itemLeftData = [
+            'base_uom_id' => $validatedData['base_uom_id'],
+            'base_uom_quantity' => $poOrder->base_uom_quantity - $validatedData['base_uom_quantity'],
+            'uom_id' => $validatedData['uom_id'],
+            'uom_quantity' => $poOrder->uom_quantity - $validatedData['uom_quantity'],
+            'uom_conversion_unit_id' => $validatedData['uom_conversion_unit_id'],
+            'quantity' => $remainingQuantity,
+            'amount' => $validatedData['amount'],
+            'created_by' => UserData()->id,
+            'item_leftable_id' => $arrivalItem->id,
+            'item_leftable_type' => $validatedData['item_leftable_type'],
+            'purchase_order_id' => $poOrder->purchase_order_id,
+          ];
+
+          ItemLeft::create($itemLeftData);
+        }
+      }
+
+      DB::commit();
+      return $arrivalItem;
+    } catch (\Exception $e) {
+      DB::rollback();
+      ResponseMessage($e->getMessage(), 402);
+      throw $e;
+    }
   }
 }
