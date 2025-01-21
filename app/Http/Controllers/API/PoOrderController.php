@@ -2,9 +2,10 @@
 
 namespace App\Http\Controllers\API;
 
-use App\Http\Controllers\Controller;
-use App\Repositories\PoOrder\PoOrderRepositoryInterface;
 use Illuminate\Http\Request;
+use App\Http\Controllers\Controller;
+use App\Http\Requests\PoOrder\PoOrderItemRequest;
+use App\Repositories\PoOrder\PoOrderRepositoryInterface;
 
 class PoOrderController extends Controller
 {
@@ -21,10 +22,10 @@ class PoOrderController extends Controller
         ResponseData($data);
     }
 
-
-    // public function getPoOrderItemsById(Request $request, $itemId)
-    // {
-    //     $data =  $this->PoOrderRepository->getPoOrderItemsById($request, $itemId);
-    //     ResponseData($data);
-    // }
+    public function storePoOrderItems(PoOrderItemRequest $request)
+    {
+        $validatedData = $request->validated();
+        $data =  $this->PoOrderRepository->storePoOrderItems($validatedData);
+        ResponseData($data);
+    }
 }

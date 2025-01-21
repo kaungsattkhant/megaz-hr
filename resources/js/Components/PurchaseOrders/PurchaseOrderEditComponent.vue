@@ -130,7 +130,7 @@
 
                                 </td>
                                 <td class="">
-                                    <button @click="editPurchaseOrderItemBtnClicked(purchaseOrderItemsIndex)"
+                                    <button @click="editQuantityBtnClicked(purchaseOrderItemsIndex)"
                                     data-te-toggle="modal" data-te-target="#editModal">
                                         <i class="fal fa-pen  pr-3"></i>
                                     </button>
@@ -172,7 +172,7 @@
                 <div class="relative  p-4">
                     <!--Modal title-->
                     <h5 class="text-xl text-center mt-2 font-medium leading-normal text-black" id="create_modalLabel">
-                        Edit
+                        Edit Quantity
                     </h5>
                     <!--Close button-->
                     <button type="button" class="absolute top-4 right-4 focus:shadow-none focus:outline-none"
@@ -186,58 +186,62 @@
 
                 <!--Modal body-->
                 <div class="relative px-12 py-4" data-te-modal-body-ref>
-                    <div class="mb-4">
-                        <label for="" class="label-form mb-3">
-                            Qty
-                        </label>
-                        <input type="number" v-model="quantityEdit" class="input-ui" placeholder="Qty">
-                    </div>
-        
-                    <div class="md-4">
-                        <label for="" class="block text-sm text-black mb-3">
-                            UOM
-                        </label>
-                        <div class="bg-white mb-0 w-full text-xs h-8 border-b border-black rounded-bl-[4px] rounded-br-[4px] overflow-hidden inline-block"
-                            data-te-select-wrapper-ref>
-                            <select data-te-select-init data-te-select-placeholder="Select UOM" disabled data-te-select-filter="true"
-                                name="" id="" v-model="selectedUomEdit"
-                                class="">
-                                <option :value="uom" v-for="(uom, uomIndex) in itemUoms" :key="uomIndex">
-                                    {{ uom.name }}
-                                </option>
-                            </select>
+                    <div class="grid grid-cols-12 gap-x-4 w-full">
+                        <div class=" col-span-8 mb-4">
+                            <label for="" class="label-form mb-3">
+                                Qty
+                            </label>
+                            <input type="number" v-model="quantityEdit" class="input-ui" placeholder="Qty">
+                        </div>
+            
+                        <div class=" col-span-4 mb-4">
+                            <label for="" class="block text-sm text-black mb-3">
+                                UOM
+                            </label>
+                            <div class="bg-white mb-0 w-full text-xs h-auto rounded-bl-[4px] rounded-br-[4px] overflow-hidden inline-block"
+                                data-te-select-wrapper-ref>
+                                <select data-te-select-init data-te-select-placeholder="Select UOM" disabled data-te-select-filter="true"
+                                    name="" id="" v-model="selectedUomEdit"
+                                    class="">
+                                    <option :value="uom" v-for="(uom, uomIndex) in itemUoms" :key="uomIndex">
+                                        {{ uom.name }}
+                                    </option>
+                                </select>
+                            </div>
                         </div>
                     </div>
-        
-                    <div class="mb-4">
-                        <label for="" class="label-form mb-3">
-                            Base UOM Qty
-                        </label>
-                        <input type="number" v-model="baseQuantityEdit" class="input-ui" placeholder="Qty">
-                    </div>
-        
-                    <div class="mb-4">
-                        <label for="" class="block text-sm text-black mb-3">
-                            Base UOM
-                        </label>
-                        <div class="bg-white mb-0 w-full text-xs h-8 border-b border-black rounded-bl-[4px] rounded-br-[4px] overflow-hidden inline-block"
-                            data-te-select-wrapper-ref>
-                            <select data-te-select-init data-te-select-placeholder="Select UOM" disabled data-te-select-filter="true"
-                                name="" id="" v-model="selectedBaseUomEdit"
-                                class="">
-                                <option :value="uom" v-for="(uom, uomIndex) in itemUoms" :key="uomIndex">
-                                    {{ uom.name }}
-                                </option>
-                            </select>
+                    <div class="grid grid-cols-12 gap-x-4 w-full">
+                        <div class="col-span-8 mb-4">
+                            <label for="" class="label-form mb-3">
+                                Base UOM Qty
+                            </label>
+                            <input type="number" v-model="baseQuantityEdit" class="input-ui" placeholder="Qty">
+                        </div>
+            
+                        <div class="col-span-4 mb-4">
+                            <label for="" class="block text-sm text-black mb-3">
+                                Base UOM
+                            </label>
+                            <div class="bg-white mb-0 w-full text-xs h-full rounded-bl-[4px] rounded-br-[4px] overflow-hidden inline-block"
+                                data-te-select-wrapper-ref>
+                                <select data-te-select-init data-te-select-placeholder="Select UOM" disabled data-te-select-filter="true"
+                                    name="" id="" v-model="selectedBaseUomEdit"
+                                    class="input-ui">
+                                    <option :value="uom" v-for="(uom, uomIndex) in itemUoms" :key="uomIndex">
+                                        {{ uom.name }}
+                                    </option>
+                                </select>
+                            </div>
                         </div>
                     </div>
+                    
 
-                    <div class="mb-4">
+                    <!-- <div class="mb-4">
                         <label for="" class="block text-sm text-black mb-3">
                             Quantity
                         </label>
                         <input type="number" placeholder="Quantity" v-model="editQuantity" class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
-                    </div>
+                    </div> -->
                     <div class="mb-[0.125rem] block min-h-[1.5rem] pl-[1.5rem]">
                     <!-- <div v-if="!(getDepartment().name == 'HR' && isStaff)" class="mb-[0.125rem] block min-h-[1.5rem] pl-[1.5rem]"></div> -->
                         <input
@@ -258,7 +262,7 @@
 
                 <!--Modal footer-->
                 <div class="flex justify-center px-12 mb-6">
-                    <button type="button" @click="confirmEditPurchaseOrderItemBtnClicked" class="add-btn focus:outline-none focus:ring-0 "
+                    <button type="button" @click="confirmEditQuantityBtnClicked()" class="add-btn focus:outline-none focus:ring-0 "
                         data-te-toggle="modal" data-te-target="#editModal">
                         Edit
                     </button>
@@ -495,7 +499,7 @@
                 this.selectedBaseUom = null;
                 this.baseQuantity = null;
             },
-            editPurchaseOrderItemBtnClicked(purchaseOrderItemsIndex){
+            editQuantityBtnClicked(purchaseOrderItemsIndex){
                 this.editPurchaseOrderItem = this.purchaseOrderItems[purchaseOrderItemsIndex];
                 console.log(this.editPurchaseOrderItem);
                 if(this.editPurchaseOrderItem.later_buy == 1){
@@ -504,12 +508,31 @@
                 else{
                     this.isLaterBuy = false;
                 }
-                this.editQuantity = this.editPurchaseOrderItem.quantity;
                 this.selectedItem = this.itemList.find(item => item.id == this.editPurchaseOrderItem.item_id);
                 this.itemSelectChanged();
+                this.selectedUomEdit = this.itemUoms.find(uom => uom.id == this.editPurchaseOrderItem.uom_id);
+                this.selectedBaseUomEdit = this.itemUoms.find(uom => uom.id == this.editPurchaseOrderItem.base_uom_id);
+                this.quantityEdit = this.editPurchaseOrderItem.uom_quantity;
+                this.baseQuantityEdit = this.editPurchaseOrderItem.base_uom_quantity;
 
             },
+            confirmEditQuantityBtnClicked(){
+                let index = this.purchaseOrderItems.findIndex(poItem => poItem.id == this.editPurchaseOrderItem.id);
+                if(index != -1){
+                    this.purchaseOrderItems[index].uom_quantity = this.quantityEdit;
+                    this.purchaseOrderItems[index].base_uom_quantity = this.baseQuantityEdit;
+                    this.purchaseOrderItems[index].quantity = (this.baseQuantityEdit * this.selectedItem.uom_conversion) + this.quantityEdit
+                    this.purchaseOrderItems[index].price = ((this.baseQuantityEdit * this.selectedItem.uom_conversion) + this.quantityEdit) * this.selectedItem.average_price
+                    this.purchaseOrderItems[index].later_buy = (this.isLaterBuy)? 1: 0;
+                    console.log(this.purchaseOrderItems[index]);
+                }
 
+                this.updateTotalPrice(this.purchaseOrderItems);
+                this.quantityEdit = null;
+                this.baseQuantityEdit = null;
+                this.editPurchaseOrderItem = null;
+                this.isLaterBuy = false;
+            },
             removePurchaseOrderItemBtnClicked(purchaseOrderItemsIndex){
                 if(this.purchaseOrderItems[purchaseOrderItemsIndex].id){
                     this.deleteId = this.purchaseOrderItems[purchaseOrderItemsIndex].id;
@@ -557,7 +580,7 @@
                         text: `A new purchase order created`,
                         type: 'info'
                     });
-                    // window.location.replace(`/purchase_orders`);
+                    window.location.replace(`/purchase_orders`);
                     // setTimeout(()=>{
                     //     window.location.replace(`/purchase_orders`);
                     // }, 3000);
