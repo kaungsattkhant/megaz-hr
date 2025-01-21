@@ -24,8 +24,8 @@
                     </select>
                 </div> -->
                 <button type="button"
-                    class="add-btn transition duration-150 ease-in-out focus:outline-none focus:ring-0 "
-                    data-te-toggle="modal" data-te-target="#create_modal" @click="addBtnClicked">
+                class="add-btn transition duration-150 ease-in-out focus:outline-none focus:ring-0 "
+                data-te-toggle="modal" data-te-target="#con">
                     Add New
                 </button>
             </div>
@@ -268,11 +268,18 @@
                         <label for="supplier" class="text-sm">Brand</label>
                         <select name="" id="supplier" v-model="selectedBrand"
                         class="text-sm border border-gray-300 input-ui w-12
-                        bg-transparent rounded-lg focus:ring-0">
+                        bg-transparent rounded-lg focus:ring-0" @change="brandSelectChanged" >
                             <option :value="brand" v-for="(brand, brandIndex) in itemBrands" :key="brandIndex">
                                 {{ brand.brand.name }}
                             </option>
                         </select>
+                    </div>
+                    <div class="mb-4">
+                        <label for="supplier" class="text-sm">Price</label>
+                        <input type="number"
+                        class="input-ui"
+                        v-model="totalPrice"
+                        disabled>
                     </div>
                 </div>
                 <div class="flex justify-end gap-x-4 px-6 mb-6 pt-4">
@@ -326,6 +333,7 @@ export default {
             selectedSupplier: null,
             selectedBrand: null,
             itemId: null,
+            totalPrice: 0,
 
             uomConversions: [],
             selectedUomConversion: null,
@@ -353,6 +361,16 @@ export default {
             let response = await getApiData({ url: `/api/brand_by_supplier?item_id=${this.itemId}&supplier_id=${this.selectedSupplier.supplier_id}`, token: this.getToken() });
             if(response.data){
                 this.itemBrands = response.data;
+            }
+        },
+
+        brandSelectChanged(){
+            console.log(this.selectedBrand);
+            if(this.selectedBrand.item_price){
+                this.totalPrice = (this.confirmPOTotalQty / this.selectedUomConversion.conversion) * this.selectedBrand.item_price.price;
+                this.totalPrice = Math.round(this.totalPrice * 100) / 100;
+            }else{
+                this.totalPrice = 0;
             }
         },
 
@@ -390,6 +408,7 @@ export default {
             this.baseUomQty = purchaseOrder.base_uom_quantity;
             this.originalPOTotalQty = (purchaseOrder.base_uom_quantity * this.selectedUomConversion.conversion) + purchaseOrder.uom_quantity;
             this.confirmPOTotalQty = this.originalPOTotalQty;
+            this.totalPrice = 0;
             this.getItemSuppliers(this.itemId);
         },
 
@@ -402,6 +421,7 @@ export default {
                     this.isLaterBuy = false;
                 }
             }
+            this.brandSelectChanged();
         },
 
         uomQtyChanged(){
@@ -413,10 +433,15 @@ export default {
                     this.isLaterBuy = false;
                 }
             }
+            this.brandSelectChanged();
         },
 
         async confirmBtnClicked(){
             let formData = new FormData();
+            if(!this.selectedBrand || !this.selectedSupplier){
+                this.alertValidationMessage('required data');
+                return;
+            }
             formData.append('base_uom_quantity', this.baseUomQty);
             formData.append('uom_quantity', this.uomQty);
             formData.append('base_uom_id', this.confirmPO.base_uom_id);
@@ -450,6 +475,7 @@ export default {
                 this.uomName = null;
                 this.itemId = null;
                 this.isLaterBuy = false;
+                this.totalPrice = 0;
             }else{
                 this.$notify({
                     text: `Procurement Order Item creation failed`,
