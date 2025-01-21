@@ -42,5 +42,8 @@ Route::middleware('auth:api')->group(function () {
   Route::controller(PoOrderController::class)->group(function () {
     Route::get('/po_items', 'getPoOrderItems');
     Route::post('/po_items', 'storePoOrderItems');
+    Route::get('/po_arrival_list', 'getPoOrderArrivalList');
+    Route::get('/po_arrival_list/{itemId}', 'getPoOrderArrivalListByItemId');
+    Route::get('/invoice_by_supplier/{supplierId}', 'getInvoiceBySupplier');
   });
 });

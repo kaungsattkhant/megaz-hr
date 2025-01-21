@@ -20,4 +20,24 @@ class ArrivalItem extends Model
         'po_order_id',
         'created_by'
     ];
+
+    public function poInvoice()
+    {
+        return $this->belongsTo(PoInvoice::class, 'po_invoice_id');
+    }
+    public function poOrder()
+    {
+        return $this->belongsTo(PoOrder::class, 'po_order_id');
+    }
+
+
+    public function uom()
+    {
+        return $this->belongsTo(Uom::class, 'uom_id');
+    }
+
+    public function baseUom()
+    {
+        return $this->belongsTo(Uom::class, 'base_uom_id');
+    }
 }
