@@ -189,7 +189,7 @@ class StaffRepository implements StaffRepositoryInterface
                 }
             }
             DB::commit();
-            return  $staff;
+            return $staff;
         } catch (\Exception $e) {
             DB::rollback();
             ResponseMessage($e->getMessage(), 402);
@@ -221,9 +221,10 @@ class StaffRepository implements StaffRepositoryInterface
 
     public function getStaffByDepartment(Request $request, int $departmentId, array $roles = null)
     {
-        $allowedRoles = in_array('Manager', $roles)
+        
+        $allowedRoles = $roles ? (in_array('Manager', $roles)
             ? ['Supervisor', 'Staff']
-            : ['Staff'];
+            : ['Staff']) : null ;
         if ($request->per_page || $request->page) {
             // $totalCount = Staff::where('department_id', $departmentId)->where('is_active', 1)->count();
             // $pageNumber = 1;
@@ -242,17 +243,25 @@ class StaffRepository implements StaffRepositoryInterface
             // $staffData = MakePaginationData($request, $totalCount, 'staffs', $staffs);
 
             $staffs = Staff::with(['department', 'roles'])
-                ->whereHas('roles', function ($query) use ($allowedRoles) {
-                    $query->whereIn('name', $allowedRoles);
-                })->where('department_id', $departmentId)
+                ->when($roles, function ($query) use ($allowedRoles) {
+                    $query->whereHas('roles', function ($query) use ($allowedRoles) {
+                        $query->whereIn('name', $allowedRoles);
+                    });
+                })
+                ->where('department_id', $departmentId)
                 ->where('is_active', 1)
                 ->paginate(20);
             return $staffs;
         } else {
             $staffs = Staff::with(['department', 'roles'])
-                ->whereHas('roles', function ($query) use ($allowedRoles) {
-                    $query->whereIn('name', $allowedRoles);
+                ->when($roles, function ($query) use ($allowedRoles) {
+                    $query->whereHas('roles', function ($query) use ($allowedRoles) {
+                        $query->whereIn('name', $allowedRoles);
+                    });
                 })
+                    // ->whereHas('roles', function ($query) use ($allowedRoles) {
+                    //     $query->whereIn('name', $allowedRoles);
+                    // })
                 ->where('department_id', $departmentId)
                 ->where('is_active', 1)
                 ->get();
