@@ -28,4 +28,22 @@ class PoOrderController extends Controller
         $data =  $this->PoOrderRepository->storePoOrderItems($validatedData);
         ResponseData($data);
     }
+
+    public function getPoOrderArrivalList(Request $request)
+    {
+        $data =  $this->PoOrderRepository->getPoOrderArrivalList($request);
+        ResponseData($data);
+    }
+
+    public function getPoOrderArrivalListByItemId($itemId)
+    {
+        $data =  $this->PoOrderRepository->getPoOrderArrivalListByItemId($itemId);
+        ResponseData($data);
+    }
+
+    public function getInvoiceBySupplier($supplierId)
+    {
+        $data =  $this->PoOrderRepository->getInvoiceBySupplier($supplierId);
+        ResponseData($data);
+    }
 }

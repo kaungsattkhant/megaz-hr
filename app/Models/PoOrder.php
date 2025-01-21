@@ -25,6 +25,10 @@ class PoOrder extends Model
         'created_by'
     ];
 
+    public function arrivalItem()
+    {
+        return $this->hasMany(ArrivalItem::class, 'po_order_id');
+    }
 
     public function purchaseOrder()
     {
@@ -59,5 +63,10 @@ class PoOrder extends Model
     public function supplier()
     {
         return $this->belongsTo(Supplier::class, 'supplier_id');
+    }
+
+    public function itemPrice()
+    {
+        return $this->belongsTo(ItemPrice::class, 'item_price_id');
     }
 }
