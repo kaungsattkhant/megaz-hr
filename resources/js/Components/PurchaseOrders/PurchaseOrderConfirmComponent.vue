@@ -6,8 +6,8 @@
             </p>
         </div>
 
-        <div class="grid grid-cols-12 gap-x-8 bg-white p-8 rounded-md shadow-md mb-8">
-            <div class="mb-4 col-span-3 rounded-md">
+        <div class="grid grid-cols-12 gap-x-8 gap-y-6 bg-white p-8 rounded-md shadow-md mb-8">
+            <div class=" col-span-3 rounded-md">
                 <label for="" class="block text-sm text-black mb-3">
                     Date
                 </label>
@@ -18,7 +18,7 @@
                 <label for="" class="block text-sm text-black mb-3">
                     Item Name
                 </label>
-                <select name="" id="" v-model="selectedItem"
+                <select name="" id="" v-model="selectedItem" @change="itemSelectChanged()"
                 class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
                     <option :value="item" v-for="(item, itemIndex) in itemList" :key="itemIndex" > {{ item.name }} </option>
                 </select>
@@ -31,6 +31,45 @@
                 </label>
                 <input type="number" v-model="quantity" class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0" placeholder="Qty">
             </div>
+            <!-- <div class="col-span-3">
+                <label for="" class="block text-sm text-black mb-3">
+                    UOM
+                </label>
+                <div class="bg-white mb-0 w-full text-xs h-8 border-b border-black rounded-bl-[4px] rounded-br-[4px] overflow-hidden inline-block"
+                    data-te-select-wrapper-ref>
+                    <select data-te-select-init data-te-select-placeholder="Select UOM" data-te-select-filter="true"
+                        name="" id="" v-model="selectedUom"
+                        class="">
+                        <option :value="uom" v-for="(uom, uomIndex) in itemUoms" :key="uomIndex">
+                            {{ uom.name }}
+                        </option>
+                    </select>
+                </div>
+            </div>
+            <div class="col-span-6"></div>
+
+            <div class="col-span-3">
+                <label for="" class="label-form mb-3">
+                    Base UOM Qty
+                </label>
+                <input type="number" v-model="baseQuantity" class="input-ui" placeholder="Qty">
+            </div>
+
+            <div class="col-span-3">
+                <label for="" class="block text-sm text-black mb-3">
+                    Base UOM
+                </label>
+                <div class="bg-white mb-0 w-full text-xs h-8 border-b border-black rounded-bl-[4px] rounded-br-[4px] overflow-hidden inline-block"
+                    data-te-select-wrapper-ref>
+                    <select data-te-select-init data-te-select-placeholder="Select UOM" data-te-select-filter="true"
+                        name="" id="" v-model="selectedBaseUom"
+                        class="">
+                        <option :value="uom" v-for="(uom, uomIndex) in itemUoms" :key="uomIndex">
+                            {{ uom.name }}
+                        </option>
+                    </select>
+                </div>
+            </div> -->
 
             <div class="col-span-3">
                 <label for="" class="block text-sm text-black mb-3">
@@ -143,44 +182,72 @@
                                 </td>
                             </tr>
                         </div>
+                        <div class="contents" v-for="(addedPO, addedPOIndex) in addedPOItems" :key="addedPOIndex">
+                            <tr class="">
+                                <td class="">
+                                    {{ addedPO.name }}
+                                </td>
+                                <td class="">
+                                    {{ addedPO.uom_name }}
+                                </td>
+                                <td class="">
+                                    
+                                </td>
+                                <td class="">
+                                    {{ addedPO.quantity }}
+                                </td>
+                                <td class="">
+                                    
+                                </td>
+                                <td class="">
+                                    {{ addedPO.amount.toLocaleString() }}
+                                </td>
+                                <td class="">
+                                    {{ addedPO.price.toLocaleString() }}
+                                </td>
+                                <td  class="">
+                                    
+                                </td>
+                                <td class="">
+                                    
+                                </td>
+                                <td class="">
+                                    
+                                </td>
+                                <td class=" ">
+                                    
+                                </td>
+                                <td class=" ">
+                                    
+                                </td>
+                                <td class=" ">
+                                    <!-- <button @click="editPurchaseOrderItemBtnClicked(purchaseOrderItemsIndex)" data-te-toggle="modal" data-te-target="#editModal">
+                                        <i class="fal fa-pencil  pr-3"></i>
+                                    </button>
+                                    <button @click="checkPurchaseOrderItemBtnClicked(purchaseOrderItem.id)" :disabled="purchaseOrderItem.id == null"
+                                    data-te-toggle="modal" data-te-target="#checkModal">
+                                        <i class="fal fa-check  pr-3"></i>
+                                    </button> -->
+                                    <button @click="removePurchaseOrderItemBtnClicked(purchaseOrderItemsIndex)"
+                                    data-te-toggle="modal" data-te-target="#deleteModal">
+                                        <i class="fal fa-times pr-3"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                        </div>
                         <div class="contents">
                             <tr class="">
-                                <td class=" ">
+                                <td class=" " colspan="6">
                                     &nbsp;
                                 </td>
-                                <td class=" ">
-                                    &nbsp;
-                                </td>
-                                <td class=" ">
-                                    &nbsp;
-                                </td>
-                                <td class=" ">
-                                    &nbsp;
-                                </td>
-                                <td class=" ">
-                                    &nbsp;
-                                </td>
+                                
                                 <td class="">
                                     {{ totalPrice.toLocaleString() }}
                                 </td>
-                                <td class="  ">
+                                <td class="  " colspan="6">
                                     &nbsp;
                                 </td>
-                                <td class="  ">
-                                    &nbsp;
-                                </td>
-                                <td class="  ">
-                                    &nbsp;
-                                </td>
-                                <td class="  ">
-                                    &nbsp;
-                                </td>
-                                <td class="  ">
-                                    &nbsp;
-                                </td>
-                                <td class="  ">
-                                    &nbsp;
-                                </td>
+                                
                             </tr>
                         </div>
 
@@ -268,7 +335,8 @@
                         </label>
                         <input type="number" placeholder="Quantity" v-model="editQuantity" class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
                     </div>
-                    <div v-if="!(getDepartment().name == 'HR' && isStaff)" class="mb-[0.125rem] block min-h-[1.5rem] pl-[1.5rem]">
+                    <div class="mb-[0.125rem] block min-h-[1.5rem] pl-[1.5rem]">
+                    <!-- <div v-if="!(getDepartment().name == 'HR' && isStaff)" class="mb-[0.125rem] block min-h-[1.5rem] pl-[1.5rem]"></div> -->
                         <input
                             @change="laterBuyToggled"
                             v-model="isLaterBuy"
@@ -354,9 +422,17 @@
                 purchaseOrder: null,
                 date: null,
                 itemList: [],
+                uomList:[],
                 selectedItem: null,
                 quantity: null,
+                selectedUom: null,
+                baseQuantity: null,
+                selectedBaseUom: null,
                 purchaseOrderItems: [],
+                addedPOItems:[],
+                itemUoms:null,
+
+
                 deleteId: null,
                 deleteIndex: null,
                 checkId: null,
@@ -400,12 +476,45 @@
                 });
             },
 
+            async getUomList() {
+                let response = await getApiData({ url: `/api/uoms`, token: this.getToken() });
+                if (response.data) {
+                    this.uomList = response.data;
+                    console.log(response.data);
+                }
+            },
+
+            itemSelectChanged(){
+                this.itemUoms = [];
+                let index = this.uomList.findIndex(uom => uom.id == this.selectedItem.base_uom_id);
+                if(index != -1){
+                    let baseUom = this.uomList[index];
+                    this.itemUoms.push(baseUom);
+                }
+                index = this.uomList.findIndex(uom => uom.id == this.selectedItem.uom_id);
+                if(index != -1){
+                    let itemUom = this.uomList[index];
+                    this.itemUoms.push(itemUom);
+                }
+            },
             addItemBtnClicked(){
                 if(!this.selectedItem){
                     this.alertValidationMessage('an item');
                     return 1;
                 }
+                if(!this.selectedUom){
+                    this.alertValidationMessage('a uom');
+                    return 1;
+                }
                 if(this.quantity < 1){
+                    this.alertValidationMessage('quantity');
+                    return 1;
+                }
+                if(!this.selectedBaseUom){
+                    this.alertValidationMessage('a uom');
+                    return 1;
+                }
+                if(this.baseQuantity < 1){
                     this.alertValidationMessage('quantity');
                     return 1;
                 }
@@ -414,17 +523,35 @@
                     this.purchaseOrderItems[existingItemIndex].quantity = +this.quantity;
                 }
                 else{
-                    let amount = (this.selectedItem.item_prices)? this.selectedItem.item_prices.price: 0;
-                    this.purchaseOrderItems.push({
+                    let quantity = (this.baseQuantity * this.selectedItem.uom_conversion) + this.quantity
+                    let price = ((this.baseQuantity * this.selectedItem.uom_conversion) + this.quantity) * this.selectedItem.average_price
+                    this.addedPOItems.push({
+                        // item: this.selectedItem,
+                        // quantity: this.quantity,
+                        // amount: amount,
+
                         item_id: this.selectedItem.id,
-                        item: this.selectedItem,
-                        quantity: this.quantity,
-                        amount: amount,
+                        quantity: quantity,
+                        amount: this.selectedItem.average_price,
+                        price: price,
+                        uom_id: this.selectedUom.id,
+                        uom_quantity: this.quantity,
+                        uom_name: this.selectedUom.name,
+                        uom_conversion_id: this.selectedItem.uom_conversion_id,
+                        base_uom_id: this.selectedBaseUom.id,
+                        base_uom_quantity: this.baseQuantity,
+                        base_uom_name: this.selectedBaseUom.name,
+                        name: this.selectedItem.name,
+
+
                     });
                 }
-                this.updateTotalPrice(this.purchaseOrderItems);
+                this.updateTotalPrice(this.addedPOItems);
                 this.selectedItem = null;
                 this.quantity = null;
+                this.selectedUom = null;
+                this.baseQuantity = null;
+                this.selectedBaseUom = null;
             },
 
             removePurchaseOrderItemBtnClicked(purchaseOrderItemsIndex){
@@ -516,6 +643,9 @@
                 this.purchaseOrderItems.forEach((purchaseOrderItem)=>{
                     priceTotal += purchaseOrderItem.amount;
                 });
+                this.addedPOItems.forEach((purchaseOrderItem)=>{
+                    priceTotal += purchaseOrderItem.price;
+                });
                 let updatedPurchaseOrderItems = JSON.parse(JSON.stringify(this.purchaseOrderItems));
                 updatedPurchaseOrderItems.forEach((orderItem)=>{
                     delete orderItem.item;
@@ -553,7 +683,7 @@
             },
 
             updateTotalPrice(poItems){
-                this.totalPrice = 0;
+                // this.totalPrice = 0;
                 poItems.forEach((item)=>{
                     this.totalPrice += (item.amount * item.quantity);
                 });
@@ -581,6 +711,7 @@
             });
             this.getPurchaseOrder();
             this.getItemList();
+            this.getUomList();
         },
 
         mounted(){

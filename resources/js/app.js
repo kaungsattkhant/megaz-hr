@@ -50,6 +50,7 @@ import MenuEditComponent from './Components/Menus/MenuEditComponent.vue';
 import ComplainsCrudComponent from './Components/Complains/ComplainsCrudComponent.vue';
 import PurchaseOrderListComponent from './Components/PurchaseOrders/PurchaseOrderListComponent.vue';
 import PurchaseOrderCreateComponent from './Components/PurchaseOrders/PurchaseOrderCreateComponent.vue';
+import PurchaseOrderEditComponent from './Components/PurchaseOrders/PurchaseOrderEditComponent.vue';
 import PurchaseOrderConfirmComponent from './Components/PurchaseOrders/PurchaseOrderConfirmComponent.vue';
 import PurchaseOrderBuyComponent from './Components/PurchaseOrders/PurchaseOrderBuyComponent.vue';
 import ConfirmPurchaseOrderItemsComponent from './Components/PurchaseOrders/ConfirmPurchaseOrderItemsComponent.vue';
@@ -244,6 +245,7 @@ app.component('ProcurementOrderItemsComponent', ProcurementOrderItemsComponent);
 
 app.component('PurchaseOrderListComponent', PurchaseOrderListComponent);
 app.component('PurchaseOrderCreateComponent', PurchaseOrderCreateComponent);
+app.component('PurchaseOrderEditComponent', PurchaseOrderEditComponent);
 app.component('PurchaseOrderConfirmComponent', PurchaseOrderConfirmComponent);
 app.component('PurchaseOrderBuyComponent', PurchaseOrderBuyComponent);
 app.component('ConfirmPurchaseOrderItemsComponent', ConfirmPurchaseOrderItemsComponent);

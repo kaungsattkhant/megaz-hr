@@ -1,20 +1,20 @@
 <template>
     <div>
         <p class=" text-lg font-semibold font-inter">
-            Order Items by Procurement Team
+            Procurement Order Items
         </p>
     </div>
     <div class="mt-4 bg-white">
         <div class="btn-container">
             <notifications position="top center" />
-            <div class=" flex gap-x-4">
+            <!-- <div class=" flex gap-x-4">
                 <label for="search" class="search-input">
                     <input type="text" class="input-search" placeholder="Search" v-model="searchInput">
                     <i class="fal fa-search"></i>
                 </label>
                 <button class="add-btn h-8" @click="searchBtnClicked()">Search</button>
                 <button class="add-btn h-8" @click="clearSearchBtnClicked()">Clear</button>
-            </div>
+            </div> -->
             <div class="flex pr-0 gap-x-4">
                 <!-- <div class="w-full !text-sm" data-te-select-wrapper-ref>
                     <select data-te-select-init data-te-select-placeholder="Select Type" @change="selectedTypeChanged()"
@@ -24,8 +24,8 @@
                     </select>
                 </div> -->
                 <button type="button"
-                    class="add-btn transition duration-150 ease-in-out focus:outline-none focus:ring-0 "
-                    data-te-toggle="modal" data-te-target="#create_modal" @click="addBtnClicked">
+                class="add-btn transition duration-150 ease-in-out focus:outline-none focus:ring-0 "
+                data-te-toggle="modal" data-te-target="#con">
                     Add New
                 </button>
             </div>
@@ -49,50 +49,64 @@
                                     Qty ( UOM )
                                 </th>
                                 <th scope="col" class="">
-                                    
+
                                 </th>
                             </tr>
                         </thead>
                         <tbody>
                             <!-- looping start -->
-                            <div class="contents" v-for="(contact, index) in orderList" :key="index">
+                            <div class="contents" v-for="(item, index) in orderItems" :key="index">
                                 <tr class="" data-te-collapse-init :data-te-target="'#orderCollapse'+index"
                                 aria-expanded="false" aria-controls="collapseExample">
                                     <td class=" font-medium ">
-                                        <!-- {{ perPage * (currentPage - 1) + (++index) }} -->
-                                        {{ index+1 }}
+                                        {{ index + 1 }}
+                                    </td>
+                                    <td class="whitespace-nowrap" @click="togglePurchaseOrders(index)">
+                                        {{ item.item_name }}
                                     </td>
                                     <td class="whitespace-nowrap">
-                                        {{ contact.phone_number }}
+                                        {{ item.po_numbers }}
                                     </td>
                                     <td class="whitespace-nowrap">
-                                        {{ contact.phone_number }}
+                                        {{ item.total_quantity }}
                                     </td>
                                     <td class="whitespace-nowrap">
-                                        {{ contact.phone_number }}
+                                        <div v-if="item.purchase_order_details.length <= 1" >
+                                            <button data-te-toggle="modal" data-te-target="#edit_modal" id="edit-btn" class="pr-3"
+                                                @click="editBtnClicked(item, index)">
+                                                <i class="fal fa-pen"></i>
+                                            </button>
+                                            <button data-te-toggle="modal" data-te-target="#check_modal" class="pr-3"
+                                                @click="checkBtnClicked(item.purchase_order_details[0], item.item_id)">
+                                                <i class="fal fa-check"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+
+                                <tr v-if="item.showPurchaseOrders" v-for="(po, poIndex) in item.purchase_order_details" :key="poIndex">
+                                    <td class=" font-medium ">
+
+                                    </td>
+                                    <td class="whitespace-nowrap">
+
+                                    </td>
+                                    <td class="whitespace-nowrap">
+                                        {{ po.purchase_order.po_id }}
+                                    </td>
+                                    <td class="whitespace-nowrap">
+                                        {{ po.quantity }}
                                     </td>
                                     <td class="whitespace-nowrap">
                                         <button data-te-toggle="modal" data-te-target="#edit_modal" id="edit-btn" class="pr-3"
-                                            @click="editBtnClicked(contact, index)">
+                                            @click="editBtnClicked(item, index)">
                                             <i class="fal fa-pen"></i>
                                         </button>
-                                        <button @click="deleteBtnClicked(contact.id)"
-                                            data-te-toggle="modal" data-te-target="#deleteModal" id="delete-btn" class="pr-1">
-                                            <i class="fas fa-trash-alt"></i>
+                                        <button data-te-toggle="modal" data-te-target="#check_modal" class="pr-3"
+                                            @click="checkBtnClicked(po, item.item_id)">
+                                            <i class="fal fa-check"></i>
                                         </button>
                                     </td>
-                                </tr>
-                                <tr class="!visible text-center hidden" :id="'orderCollapse'+index" data-te-collapse-item>
-                                    <td colspan="2"></td>
-                                    <td>101</td>
-                                    <td>70</td>
-                                    <td>{{ index }}</td>
-                                </tr>
-                                <tr class="!visible text-center hidden" :id="'orderCollapse'+index" data-te-collapse-item>
-                                    <td colspan="2"></td>
-                                    <td>101</td>
-                                    <td>70</td>
-                                    <td>{{ index }}</td>
                                 </tr>
                             </div>
                         </tbody>
@@ -116,12 +130,12 @@
             </div>
         </div>
     </div>
-    
+
 
     <!-- create modal -->
     <div data-te-modal-init
         class="fixed left-0 top-0 z-[1055] hidden h-full w-full overflow-y-auto overflow-x-hidden outline-none"
-        id="con" tabindex="-1" aria-labelledby="edit_modalLabel" aria-hidden="true">    
+        id="con" tabindex="-1" aria-labelledby="edit_modalLabel" aria-hidden="true">
         <div data-te-modal-dialog-ref
             class="pointer-events-none relative w-auto mb-12 translate-y-[-50px] opacity-0 transition-all duration-300 ease-in-out min-[576px]:mx-auto min-[576px]:mt-7 min-[576px]:max-w-[500px]">
             <div
@@ -140,12 +154,7 @@
                     </button>
                 </div>
                 <div class="relative px-6 py-4 border-b" data-te-modal-body-ref>
-                    <!-- <div class="mb-4">
-                        <label for="" class="label-form mb-3">
-                            Phone Number
-                        </label>
-                        <input type="text" placeholder="Phone Number" v-model="ph_number" class="input-ui">
-                    </div> -->
+
                 </div>
                 <div class="flex justify-end gap-x-4 px-6 mb-6 pt-4">
                     <button type="button" class="cancel-btn focus:shadow-none focus:outline-none"
@@ -159,7 +168,134 @@
                 </div>
             </div>
         </div>
-    </div>  
+    </div>
+
+    <div data-te-modal-init
+        class="fixed left-0 top-0 z-[1055] hidden h-full w-full overflow-y-auto overflow-x-hidden outline-none"
+        id="check_modal" tabindex="-1" aria-labelledby="check_modalLabel" aria-hidden="true">
+        <div data-te-modal-dialog-ref
+            class="pointer-events-none relative w-auto mb-12 translate-y-[-50px] opacity-0 transition-all duration-300 ease-in-out min-[576px]:mx-auto min-[576px]:mt-7 min-[576px]:max-w-[500px]">
+            <div
+                class="min-[576px]:shadow-[0_0.5rem_1rem_rgba(#000, 0.15)] pointer-events-auto relative flex w-full flex-col rounded-md border-none bg-white bg-clip-padding text-current shadow-lg outline-none">
+                <div class="relative flex justify-between py-2 px-6 border-b">
+                    <h5 class="text-base text-center mt-2 font-semibold leading-normal font-inter"
+                        id="check_modalLabel">
+                        Order Item
+                    </h5>
+                    <button type="button" class="text-xs focus:shadow-none focus:outline-none" data-te-modal-dismiss id="close_create_modal"
+                        aria-label="Close">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                            stroke="currentColor" class="h-4 w-4">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </button>
+                </div>
+                <div class="relative px-6 py-4 border-b" data-te-modal-body-ref>
+                    <div class="mb-4 flex gap-x-4 ">
+                        <div>
+                            <input type="number"
+                            placeholder="Base UOM Qty"
+                            v-model="baseUomQty"
+                            class="input-ui"
+                            @change="baseUomQtyChanged">
+                        </div>
+                        <div>
+                            <input type="text"
+                            placeholder="Base UOM"
+                            v-model="baseUomName"
+                            disabled
+                            class="input-ui">
+                        </div>
+                        <div>
+                            <input type="number"
+                            placeholder="UOM Qty"
+                            v-model="uomQty"
+                            class="input-ui"
+                            @change="uomQtyChanged">
+                        </div>
+                        <div>
+                            <input type="text"
+                            placeholder="UOM"
+                            v-model="uomName"
+                            disabled
+                            class="input-ui">
+                        </div>
+                    </div>
+                    <div class="mb-4 ml-6">
+                        <input
+                            v-model="isLaterBuy"
+                            class="relative float-left -ml-[1.5rem] mr-[6px] mt-[0.15rem] h-[1.125rem] w-[1.125rem]
+                            appearance-none rounded-[0.25rem] border-[0.125rem] border-solid border-neutral-300
+                            outline-none before:pointer-events-none before:absolute before:h-[0.875rem] before:w-[0.875rem]
+                            before:scale-0 before:rounded-full before:bg-transparent before:opacity-0
+                            before:shadow-[0px_0px_0px_13px_transparent] before:content-[''] checked:border-primary checked:bg-primary
+                            checked:before:opacity-[0.16] checked:after:absolute checked:after:-mt-px checked:after:ml-[0.25rem]
+                            checked:after:block checked:after:h-[0.8125rem] checked:after:w-[0.375rem] checked:after:rotate-45
+                            checked:after:border-[0.125rem] checked:after:border-l-0 checked:after:border-t-0 checked:after:border-solid
+                            checked:after:border-white checked:after:bg-transparent checked:after:content-[''] hover:cursor-pointer
+                            hover:before:opacity-[0.04] hover:before:shadow-[0px_0px_0px_13px_rgba(0,0,0,0.6)] focus:shadow-none
+                            focus:transition-[border-color_0.2s] focus:before:scale-100 focus:before:opacity-[0.12]
+                            focus:before:shadow-[0px_0px_0px_13px_rgba(0,0,0,0.6)] focus:before:transition-[box-shadow_0.2s,transform_0.2s]
+                            focus:after:absolute focus:after:z-[1] focus:after:block focus:after:h-[0.875rem] focus:after:w-[0.875rem]
+                            focus:after:rounded-[0.125rem] focus:after:content-[''] checked:focus:before:scale-100
+                            checked:focus:before:shadow-[0px_0px_0px_13px_#3b71ca] checked:focus:before:transition-[box-shadow_0.2s,transform_0.2s]
+                            checked:focus:after:-mt-px checked:focus:after:ml-[0.25rem] checked:focus:after:h-[0.8125rem] checked:focus:after:w-[0.375rem]
+                            checked:focus:after:rotate-45 checked:focus:after:rounded-none checked:focus:after:border-[0.125rem] checked:focus:after:border-l-0
+                            checked:focus:after:border-t-0 checked:focus:after:border-solid checked:focus:after:border-white checked:focus:after:bg-transparent
+                            dark:border-neutral-600 dark:checked:border-primary dark:checked:bg-primary dark:focus:before:shadow-[0px_0px_0px_13px_rgba(255,255,255,0.4)]
+                            dark:checked:focus:before:shadow-[0px_0px_0px_13px_#3b71ca]"
+                            type="checkbox"
+                            value=""
+                            :checked="isLaterBuy"
+                            id="checkboxDefault" />
+                        <label
+                            class="inline-block pl-[0.15rem] hover:cursor-pointer text-sm"
+                            for="checkboxDefault">
+                            Later Buy
+                        </label>
+                    </div>
+                    <div class="mb-4">
+                        <label for="supplier" class="text-sm">Supplier</label>
+                        <select name="" id="supplier" v-model="selectedSupplier"
+                        class="text-sm border border-gray-300 input-ui w-12
+                        bg-transparent rounded-lg focus:ring-0" @change="getItemBrands">
+                            <option :value="supplier" v-for="(supplier, supplierIndex) in itemSuppliers" :key="supplierIndex">
+                                {{ supplier.supplier.name }}
+                            </option>
+                        </select>
+                    </div>
+                    <div class="mb-4">
+                        <label for="supplier" class="text-sm">Brand</label>
+                        <select name="" id="supplier" v-model="selectedBrand"
+                        class="text-sm border border-gray-300 input-ui w-12
+                        bg-transparent rounded-lg focus:ring-0" @change="brandSelectChanged" >
+                            <option :value="brand" v-for="(brand, brandIndex) in itemBrands" :key="brandIndex">
+                                {{ brand.brand.name }}
+                            </option>
+                        </select>
+                    </div>
+                    <div class="mb-4">
+                        <label for="supplier" class="text-sm">Price</label>
+                        <input type="number"
+                        class="input-ui"
+                        v-model="totalPrice"
+                        disabled>
+                    </div>
+                </div>
+                <div class="flex justify-end gap-x-4 px-6 mb-6 pt-4">
+                    <button type="button" class="cancel-btn focus:shadow-none focus:outline-none"
+                    data-te-modal-dismiss aria-label="Close">
+                        Cancel
+                    </button>
+                    <button type="button"
+                    class="add-btn focus:outline-none focus:ring-0 "
+                    @click="confirmBtnClicked">
+                        Create
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
 
 </template>
 
@@ -171,66 +307,182 @@ import { mapGetters } from "vuex";
 export default {
     data() {
         return {
-            orderList: [],
+            orderItems: [],
 
             searchInput:null,
 
-            url:'/api/contacts',
+            url:'/api/po_items',
             url_search:'',
-            deleteId:null,   
+            deleteId:null,
 
             currentPage: 0,
             perPage: 0,
             lastPage: 0,
             totalData: 0,
 
+            confirmPO: null,
+            uomName: null,
+            uomQty: 0,
+            baseUomName: null,
+            baseUomQty: 0,
+            originalPOTotalQty: 0,
+            confirmPOTotalQty: 0,
+            isLaterBuy: false,
+            itemSuppliers: [],
+            itemBrands: [],
+            selectedSupplier: null,
+            selectedBrand: null,
+            itemId: null,
+            totalPrice: 0,
+
+            uomConversions: [],
+            selectedUomConversion: null,
         };
     },
 
     methods: {
         ...mapGetters(['getToken']),
-        async getOrderList(pageNumber) {
+
+        async getUomConversions(){
+            let response = await getApiData({ url: '/api/uom_conversions', token: this.getToken() });
+            if(response.data){
+                this.uomConversions = response.data;
+            }
+        },
+
+        async getItemSuppliers(itemId){
+            let response = await getApiData({ url: `/api/supplier_by_item/${itemId}`, token: this.getToken() });
+            if(response.data){
+                this.itemSuppliers = response.data;
+            }
+        },
+
+        async getItemBrands(){
+            let response = await getApiData({ url: `/api/brand_by_supplier?item_id=${this.itemId}&supplier_id=${this.selectedSupplier.supplier_id}`, token: this.getToken() });
+            if(response.data){
+                this.itemBrands = response.data;
+            }
+        },
+
+        brandSelectChanged(){
+            console.log(this.selectedBrand);
+            if(this.selectedBrand.item_price){
+                this.totalPrice = (this.confirmPOTotalQty / this.selectedUomConversion.conversion) * this.selectedBrand.item_price.price;
+                this.totalPrice = Math.round(this.totalPrice * 100) / 100;
+            }else{
+                this.totalPrice = 0;
+            }
+        },
+
+        async getOrderItems(pageNumber) {
             let url = this.url;
             let response = await getApiData({ url: url, token: this.getToken() });
             if (response.data) {
-                this.orderList = response.data;
-                // this.lastPage = response.data.last_page;
-                // this.currentPage = pageNumber;
-                // this.perPage = response.data.per_page;
+                this.orderItems = response.data.data;
+                this.orderItems.map(item => ({ ...item, showPurchaseOrders: false }));
+                this.lastPage = response.data.last_page;
+                this.currentPage = pageNumber;
+                this.perPage = response.data.per_page;
             }
         },
 
-        async editBtnClicked(contact, index){
-            let url = `/api/contacts/` + contact.id;
-            let response = await getApiData({url: url, token: this.getToken()});
-            if(response.data){
-                this.editDetail = response.data;
-                this.ph_number_edit = response.data.phone_number;
+        togglePurchaseOrders(index) {
+            if(this.orderItems[index].purchase_order_details.length > 1){
+                this.orderItems[index].showPurchaseOrders = !this.orderItems[index].showPurchaseOrders;
             }
-            
         },
 
-        btnClickedEditGps(){
-            if(!this.ph_number_edit){
-                this.alertValidationMessage(`Phone Number`);
-                return 1;
-            }
-            else{
-                this.editGps();
-            }
+        async editBtnClicked(poItem, index){
+
         },
-        async editGps(){
+
+        async checkBtnClicked(purchaseOrder, itemId){
+            console.log(purchaseOrder);
+            console.log(itemId);
+            this.itemId = itemId;
+            this.selectedUomConversion = this.uomConversions.find(uomConversion => uomConversion.id === purchaseOrder.uom_conversion_id);
+            this.confirmPO = purchaseOrder;
+            this.uomName = purchaseOrder.uom_name;
+            this.uomQty = purchaseOrder.uom_quantity;
+            this.baseUomName = purchaseOrder.base_uom_name;
+            this.baseUomQty = purchaseOrder.base_uom_quantity;
+            this.originalPOTotalQty = (purchaseOrder.base_uom_quantity * this.selectedUomConversion.conversion) + purchaseOrder.uom_quantity;
+            this.confirmPOTotalQty = this.originalPOTotalQty;
+            this.totalPrice = 0;
+            this.getItemSuppliers(this.itemId);
+        },
+
+        baseUomQtyChanged(){
+            if(this.confirmPO){
+                this.confirmPOTotalQty = (this.baseUomQty * this.selectedUomConversion.conversion) + this.uomQty;
+                if(this.confirmPOTotalQty < this.originalPOTotalQty){
+                    this.isLaterBuy = true;
+                }else{
+                    this.isLaterBuy = false;
+                }
+            }
+            this.brandSelectChanged();
+        },
+
+        uomQtyChanged(){
+            if(this.confirmPO){
+                this.confirmPOTotalQty = (this.baseUomQty * this.selectedUomConversion.conversion) + this.uomQty;
+                if(this.confirmPOTotalQty < this.originalPOTotalQty){
+                    this.isLaterBuy = true;
+                }else{
+                    this.isLaterBuy = false;
+                }
+            }
+            this.brandSelectChanged();
+        },
+
+        async confirmBtnClicked(){
             let formData = new FormData();
-            formData.append('phone_number',this.ph_number_edit);
-            formData.append('id',this.editDetail.id);
-            let response = await postApiData({url:`/api/contacts`, form_data:formData, token:this.getToken()})
+            if(!this.selectedBrand || !this.selectedSupplier){
+                this.alertValidationMessage('required data');
+                return;
+            }
+            formData.append('base_uom_quantity', this.baseUomQty);
+            formData.append('uom_quantity', this.uomQty);
+            formData.append('base_uom_id', this.confirmPO.base_uom_id);
+            formData.append('uom_id', this.confirmPO.uom_id);
+            formData.append('uom_conversion_unit_id', this.selectedUomConversion.id);
+            formData.append('item_id', this.itemId);
+            formData.append('supplier_id', this.selectedSupplier.supplier_id);
+            formData.append('brand_id', this.selectedBrand.brand_id);
+            formData.append('item_price_id', this.selectedBrand.item_price.id);
+            formData.append('purchase_order_id', this.confirmPO.id);
+            formData.append('quantity', this.confirmPO.quantity);
+            formData.append('amount', this.confirmPO.amount);
+            formData.append('later_buy', (this.isLaterBuy) ? 1 : 0);
+            formData.append('item_leftable_type', 'po_order');
+            let response = await postApiData({ url: '/api/po_items', form_data: formData , token: this.getToken() });
             if(response.success){
-                this.getOrderList();
-                document.getElementById("close_edit_modal").click();
+                // this.getOrderItems(1);
+                this.$notify({
+                    text: `Procurement Order Item created successfully`,
+                    type: 'info'
+                });
+                this.selectedBrand = null;
+                this.selectedSupplier = null;
+                this.selectedUomConversion = null;
+                this.confirmPO = null;
+                this.confirmPOTotalQty = 0;
+                this.originalPOTotalQty = 0;
+                this.baseUomQty = 0;
+                this.uomQty = 0;
+                this.baseUomName = null;
+                this.uomName = null;
+                this.itemId = null;
+                this.isLaterBuy = false;
+                this.totalPrice = 0;
+            }else{
+                this.$notify({
+                    text: `Procurement Order Item creation failed`,
+                    type: 'error'
+                });
             }
         },
-
-        
 
         // async searchBtnClicked() {
         //     this.url_search = '&search=' + this.searchInput
@@ -241,21 +493,22 @@ export default {
         //     this.url_search = '';
         //     this.getGpsList(1);
         // },
-        
+
         alertValidationMessage(field) {
-                this.$notify({
-                    title: 'Input validation',
-                    text: `You forgot to provide ${field}, please try again`,
-                    type: 'warn'
-                });
-            },
+            this.$notify({
+                title: 'Input validation',
+                text: `You forgot to provide ${field}, please try again`,
+                type: 'warn'
+            });
+        },
 
     },
     mounted() {
         initTE({ Modal, Select, Ripple });
     },
     created() {
-        this.getOrderList(1);
+        this.getOrderItems(1);
+        this.getUomConversions();
     }
 }
 </script>
