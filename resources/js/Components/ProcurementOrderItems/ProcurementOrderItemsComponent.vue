@@ -116,13 +116,13 @@
                     <div class="flex justify-center">
                         <div v-if="totalData != 0" class=" bg-white  flex justify-center mt-5 py-3">
                             <button class="rounded px-6 py-1 border  hover:bg-slate-200" :disabled="currentPage === 1"
-                                @click="getOkrList(currentPage - 1)">«</button>
+                                @click="getOrderItems(currentPage - 1)">«</button>
                             <button class=" text-sm px-5 border">
                                 Page <span @dblclick="showInput">{{ currentPage }}</span> / <span class="text-gray-400">{{
                                     lastPage }}</span>
                             </button>
                             <button class=" rounded px-6  py-1 border  hover:bg-slate-200"
-                                :disabled="currentPage === lastPage" @click="getOkrList(currentPage + 1)">
+                                :disabled="currentPage === lastPage" @click="getOrderItems(currentPage + 1)">
                                 »</button>
                         </div>
                     </div>
@@ -180,7 +180,7 @@
                 <div class="relative flex justify-between py-2 px-6 border-b">
                     <h5 class="text-base text-center mt-2 font-semibold leading-normal font-inter"
                         id="check_modalLabel">
-                        Order Item
+                        Confirm Procurement Order Item
                     </h5>
                     <button type="button" class="text-xs focus:shadow-none focus:outline-none" data-te-modal-dismiss id="close_create_modal"
                         aria-label="Close">
@@ -265,8 +265,8 @@
                         </select>
                     </div>
                     <div class="mb-4">
-                        <label for="supplier" class="text-sm">Brand</label>
-                        <select name="" id="supplier" v-model="selectedBrand"
+                        <label for="brand" class="text-sm">Brand</label>
+                        <select name="" id="brand" v-model="selectedBrand"
                         class="text-sm border border-gray-300 input-ui w-12
                         bg-transparent rounded-lg focus:ring-0" @change="brandSelectChanged" >
                             <option :value="brand" v-for="(brand, brandIndex) in itemBrands" :key="brandIndex">
@@ -300,7 +300,7 @@
 </template>
 
 <script>
-import { Modal, Ripple, Select, initTE, Input } from "tw-elements";
+import { Modal, Ripple, Select, initTE } from "tw-elements";
 import { getApiData, postApiData, deleteApiData } from '../../utilities/ajax-helpers';
 import { mapGetters } from "vuex";
 
