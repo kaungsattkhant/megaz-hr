@@ -123,7 +123,7 @@
                     <li>
                         <a href="{{ route('menu_sale_report.index') }}"
                             class="flex items-center @yield('menu_sale_report')">
-                            <i class="fal fa-clipboard-list  pr-3"></i>
+                            <i class="fal fa-file-chart-line  pr-3"></i>
                             Menu Sale Report
                         </a>
                     </li>
