@@ -509,6 +509,12 @@
                         Procurement Order Items
                     </a>
                 </li>
+                <li>
+                    <a href="{{ route('arrival_items') }}" class="flex items-center @yield('arrival_items')">
+                        <i class="fal fa-truck-loading  pr-3"></i>
+                        Arrival Items
+                    </a>
+                </li>
                 @if (checkFeaturePermission('fixed-asset'))
                     <li>
                         <a href="{{ route('assetItemList') }}" class="flex items-center @yield('asset_items')">
