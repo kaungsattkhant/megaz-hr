@@ -97,18 +97,7 @@ class PoOrderRepository implements PoOrderRepositoryInterface
   }
   public function test($request)
   {
-     //     DB::raw('SUM(CASE 
-    //     WHEN (
-    //         SELECT COALESCE(SUM(item_lefts.quantity), 0)
-    //         FROM item_lefts
-    //         WHERE item_lefts.purchase_order_id = poi.purchase_order_id
-    //     ) = 0 THEN poi.quantity
-    //     ELSE (
-    //         SELECT COALESCE(SUM(item_lefts.quantity), 0)
-    //         FROM item_lefts
-    //         WHERE item_lefts.purchase_order_id = poi.purchase_order_id
-    //     )
-    // END) as total_quantity'),
+
     $poOrderItems = DB::table('purchase_order_items as poi')
       ->join('items as i', 'poi.item_id', '=', 'i.id')
       ->join('uoms as u', 'poi.uom_id', '=', 'u.id')
@@ -124,111 +113,100 @@ class PoOrderRepository implements PoOrderRepositoryInterface
         'bu.name as base_uom_name',
         'uc.conversion as uom_conversion',
         'poi.base_uom_id',
-        'poi.base_uom_quantity',
         'poi.uom_id',
-        'poi.uom_quantity',
         'poi.uom_conversion_id',
-        DB::raw('(
-          SELECT COALESCE(il.quantity, 0)
-          FROM item_lefts il
-          WHERE il.purchase_order_id = poi.purchase_order_id
-          AND il.id = (
-              SELECT MAX(inner_il.id)
-              FROM item_lefts inner_il
-              WHERE inner_il.purchase_order_id = il.purchase_order_id
-          )
-      ) as total_quantity'),
-//     DB::raw('SUM(CASE 
-//     WHEN (
-//         SELECT COALESCE(SUM(il.quantity), 0)
-//         FROM item_lefts il
-//         WHERE il.purchase_order_id = poi.purchase_order_id
-//         AND il.id = (
-//             SELECT MAX(inner_il.id)
-//             FROM item_lefts inner_il
-//             WHERE inner_il.purchase_order_id = il.purchase_order_id
-//         )
-//     ) = 0 THEN poi.quantity
-//     ELSE (
-//         SELECT COALESCE(SUM(il.quantity), 0)
-//         FROM item_lefts il
-//         WHERE il.purchase_order_id = poi.purchase_order_id
-//         AND il.id = (
-//             SELECT MAX(inner_il.id)
-//             FROM item_lefts inner_il
-//             WHERE inner_il.purchase_order_id = il.purchase_order_id
-//         )
-//     )
-// END) as total_quantity'),
-        DB::raw('SUM(poi.amount) as total_amount'),
-        DB::raw('GROUP_CONCAT(po.id SEPARATOR ", ") as po_ids'),
-        DB::raw('GROUP_CONCAT(po.po_id SEPARATOR ", ") as po_numbers'),
-        DB::raw('(
-            SELECT JSON_ARRAYAGG(
-                JSON_OBJECT(
-                    "id", po_item.id,
-                    "item_name", i.name,
-                    "amount", po_item.amount,
-                    "quantity", po_item.quantity,
-                    "base_uom_id", po_item.base_uom_id,
-                    "base_uom_quantity", po_item.base_uom_quantity,
-                    "uom_id", po_item.uom_id,
-                    "uom_quantity", po_item.uom_quantity,
-                    "uom_conversion_id", po_item.uom_conversion_id,
-                    "uom_conversion", uc.conversion,
-                   "quantity", CASE 
+        DB::raw('SUM(CASE 
     WHEN (
-        SELECT COALESCE(SUM(item_lefts.quantity), 0)
-        FROM item_lefts
-        WHERE item_lefts.purchase_order_id = po_item.purchase_order_id
-    ) = 0 THEN po_item.quantity
+        SELECT COALESCE(SUM(il.quantity), 0)
+        FROM item_lefts il
+        WHERE il.purchase_order_id = poi.purchase_order_id
+        AND il.id = (
+            SELECT MAX(inner_il.id)
+            FROM item_lefts inner_il
+            WHERE inner_il.purchase_order_id = il.purchase_order_id
+        )
+    ) = poi.po_quantity THEN poi.quantity
     ELSE (
-        SELECT COALESCE(SUM(item_lefts.quantity), 0)
-        FROM item_lefts
-        WHERE item_lefts.purchase_order_id = po_item.purchase_order_id
+        SELECT COALESCE(SUM(il.quantity), 0)
+        FROM item_lefts il
+        WHERE il.purchase_order_id = poi.purchase_order_id
+        AND il.id = (
+            SELECT MAX(inner_il.id)
+            FROM item_lefts inner_il
+            WHERE inner_il.purchase_order_id = il.purchase_order_id
+        )
+    )
+END) as total_quantity'),
+        DB::raw('(
+          SELECT JSON_ARRAYAGG(
+              JSON_OBJECT(
+                  "id", po_item.id,
+                  "item_name", i.name,
+                  "amount", po_item.amount,
+                  "quantity", po_item.quantity,
+                  "base_uom_id", po_item.base_uom_id,
+                  "base_uom_quantity", po_item.base_uom_quantity,
+                  "uom_id", po_item.uom_id,
+                  "uom_quantity", po_item.uom_quantity,
+                  "uom_conversion_id", po_item.uom_conversion_id,
+                  "uom_conversion", uc.conversion,
+                   "quantity", 
+CASE 
+    WHEN (
+        SELECT COALESCE(SUM(il.quantity), 0)
+        FROM item_lefts il
+        WHERE il.purchase_order_id = po_item.purchase_order_id
+    ) = po_quantity 
+    THEN po_item.quantity
+    ELSE (
+        SELECT COALESCE(SUM(il.quantity), 0)
+        FROM item_lefts il
+        WHERE il.purchase_order_id = po_item.purchase_order_id
     )
 END,
 "uom_quantity", CASE 
     WHEN (
-        SELECT COALESCE(SUM(item_lefts.uom_quantity), 0)
-        FROM item_lefts
-        WHERE item_lefts.purchase_order_id = po_item.purchase_order_id
-    ) = 0 THEN po_item.uom_quantity
+        SELECT COALESCE(SUM(il.uom_quantity), 0)
+        FROM item_lefts il
+        WHERE il.purchase_order_id = po_item.purchase_order_id
+    ) = po_quantity 
+    THEN po_item.quantity
     ELSE (
-        SELECT COALESCE(SUM(item_lefts.uom_quantity), 0)
-        FROM item_lefts
-        WHERE item_lefts.purchase_order_id = po_item.purchase_order_id
+        SELECT COALESCE(SUM(il.uom_quantity), 0)
+        FROM item_lefts il
+        WHERE il.purchase_order_id = po_item.purchase_order_id
     )
 END,
 "base_uom_quantity", CASE 
     WHEN (
-        SELECT COALESCE(SUM(item_lefts.base_uom_quantity), 0)
-        FROM item_lefts
-        WHERE item_lefts.purchase_order_id = po_item.purchase_order_id
-    ) = 0 THEN po_item.base_uom_quantity
+        SELECT COALESCE(SUM(il.base_uom_quantity), 0)
+        FROM item_lefts il
+        WHERE il.purchase_order_id = po_item.purchase_order_id
+    ) = po_quantity 
+    THEN po_item.quantity
     ELSE (
-        SELECT COALESCE(SUM(item_lefts.base_uom_quantity), 0)
-        FROM item_lefts
-        WHERE item_lefts.purchase_order_id = po_item.purchase_order_id
+        SELECT COALESCE(SUM(il.base_uom_quantity), 0)
+        FROM item_lefts il
+        WHERE il.purchase_order_id = po_item.purchase_order_id
     )
 END,
-                    "purchase_order", JSON_OBJECT(
-                        "id", po.id,
-                        "po_id", po.po_id,
-                        "total_price", po.total_price,
-                        "date", po.date,
-                        "status", po.status
-                    )
-                )
-            )
-            FROM purchase_order_items po_item
-            INNER JOIN purchase_orders po ON po_item.purchase_order_id = po.id
-            INNER JOIN uom_conversions uc ON po_item.uom_conversion_id = uc.id
-            INNER JOIN items i ON po_item.item_id = i.id
-            WHERE po_item.item_id = poi.item_id
-            AND po_item.is_md_checked = true
-            AND po.status = "md_checked"
-        ) as purchase_order_details')
+                  "purchase_order", JSON_OBJECT(
+                      "id", po.id,
+                      "po_id", po.po_id,
+                      "total_price", po.total_price,
+                      "date", po.date,
+                      "status", po.status
+                  )
+              )
+          )
+          FROM purchase_order_items po_item
+          INNER JOIN purchase_orders po ON po_item.purchase_order_id = po.id
+          INNER JOIN uom_conversions uc ON po_item.uom_conversion_id = uc.id
+          INNER JOIN items i ON po_item.item_id = i.id
+          WHERE po_item.item_id = poi.item_id
+          AND po_item.is_md_checked = true
+          AND po.status = "md_checked"
+      ) as purchase_order_details')
 
       )
       ->groupBy(
@@ -238,10 +216,8 @@ END,
         'uc.conversion',
         'poi.base_uom_id',
         'bu.name',
-        'poi.base_uom_quantity',
         'poi.uom_id',
         'u.name',
-        'poi.uom_quantity',
       )
       ->paginate(config('common.list_count'));
 
@@ -249,7 +225,7 @@ END,
       $item->purchase_order_details = json_decode($item->purchase_order_details, true);
     }
     return $poOrderItems;
-   
+
   }
 
   public function storePoOrderItems($validatedData)
