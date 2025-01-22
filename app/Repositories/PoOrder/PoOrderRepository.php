@@ -97,8 +97,18 @@ class PoOrderRepository implements PoOrderRepositoryInterface
   }
   public function test($request)
   {
-
-
+     //     DB::raw('SUM(CASE 
+    //     WHEN (
+    //         SELECT COALESCE(SUM(item_lefts.quantity), 0)
+    //         FROM item_lefts
+    //         WHERE item_lefts.purchase_order_id = poi.purchase_order_id
+    //     ) = 0 THEN poi.quantity
+    //     ELSE (
+    //         SELECT COALESCE(SUM(item_lefts.quantity), 0)
+    //         FROM item_lefts
+    //         WHERE item_lefts.purchase_order_id = poi.purchase_order_id
+    //     )
+    // END) as total_quantity'),
     $poOrderItems = DB::table('purchase_order_items as poi')
       ->join('items as i', 'poi.item_id', '=', 'i.id')
       ->join('uoms as u', 'poi.uom_id', '=', 'u.id')
@@ -118,18 +128,38 @@ class PoOrderRepository implements PoOrderRepositoryInterface
         'poi.uom_id',
         'poi.uom_quantity',
         'poi.uom_conversion_id',
-        DB::raw('SUM(CASE 
-        WHEN (
-            SELECT COALESCE(SUM(item_lefts.quantity), 0)
-            FROM item_lefts
-            WHERE item_lefts.purchase_order_id = poi.purchase_order_id
-        ) = 0 THEN poi.quantity
-        ELSE (
-            SELECT COALESCE(SUM(item_lefts.quantity), 0)
-            FROM item_lefts
-            WHERE item_lefts.purchase_order_id = poi.purchase_order_id
-        )
-    END) as total_quantity'),
+        DB::raw('(
+          SELECT COALESCE(il.quantity, 0)
+          FROM item_lefts il
+          WHERE il.purchase_order_id = poi.purchase_order_id
+          AND il.id = (
+              SELECT MAX(inner_il.id)
+              FROM item_lefts inner_il
+              WHERE inner_il.purchase_order_id = il.purchase_order_id
+          )
+      ) as total_quantity'),
+//     DB::raw('SUM(CASE 
+//     WHEN (
+//         SELECT COALESCE(SUM(il.quantity), 0)
+//         FROM item_lefts il
+//         WHERE il.purchase_order_id = poi.purchase_order_id
+//         AND il.id = (
+//             SELECT MAX(inner_il.id)
+//             FROM item_lefts inner_il
+//             WHERE inner_il.purchase_order_id = il.purchase_order_id
+//         )
+//     ) = 0 THEN poi.quantity
+//     ELSE (
+//         SELECT COALESCE(SUM(il.quantity), 0)
+//         FROM item_lefts il
+//         WHERE il.purchase_order_id = poi.purchase_order_id
+//         AND il.id = (
+//             SELECT MAX(inner_il.id)
+//             FROM item_lefts inner_il
+//             WHERE inner_il.purchase_order_id = il.purchase_order_id
+//         )
+//     )
+// END) as total_quantity'),
         DB::raw('SUM(poi.amount) as total_amount'),
         DB::raw('GROUP_CONCAT(po.id SEPARATOR ", ") as po_ids'),
         DB::raw('GROUP_CONCAT(po.po_id SEPARATOR ", ") as po_numbers'),
@@ -158,7 +188,7 @@ class PoOrderRepository implements PoOrderRepositoryInterface
         WHERE item_lefts.purchase_order_id = po_item.purchase_order_id
     )
 END,
-"quantity", CASE 
+"uom_quantity", CASE 
     WHEN (
         SELECT COALESCE(SUM(item_lefts.uom_quantity), 0)
         FROM item_lefts
@@ -170,7 +200,7 @@ END,
         WHERE item_lefts.purchase_order_id = po_item.purchase_order_id
     )
 END,
-"quantity", CASE 
+"base_uom_quantity", CASE 
     WHEN (
         SELECT COALESCE(SUM(item_lefts.base_uom_quantity), 0)
         FROM item_lefts
