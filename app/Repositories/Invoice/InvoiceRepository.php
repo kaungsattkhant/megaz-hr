@@ -447,6 +447,10 @@ class InvoiceRepository implements InvoiceRepositoryInterface
 
     }
 
+    public function storeInvoiceTransaction($data){
+
+    }
+
     public function deleteData(int $id)
     {
         $invoice = Invoice::find($id);
@@ -988,7 +992,7 @@ class InvoiceRepository implements InvoiceRepositoryInterface
             $customerDepositData['amount']=$data['total'];
             $customerDepositData['deposit_balance']=$this->getCustomerDepositBalance($customer->id);
 
-            $this->storeInvoiceCustomerDeposit($customerDepositData, UserData()->id);
+         
             //end
             foreach ($roomSessions as $session) {
                 $entitySession = $session->entitySession;
@@ -1035,18 +1039,21 @@ class InvoiceRepository implements InvoiceRepositoryInterface
                     ]);
                 }
             }
+            //store customer deposit
+            $this->storeInvoiceCustomerDeposit($customerDepositData, UserData()->id);
+            //store invoice transaction
 
+            $this->ledgerAndTransactionForInvoice([
+                'payment_type' => 'cash',
+                'invoice_id' => $invoice->id,
+                // 'food_charge' => $foodCharge,
+                // 'beverage_charge' => $beverageCharge,
+                'total_session_price' => $total_session_price,
+                'service_charge' => $service_charge,
+                'tax' => $tax,
+                'discount_total' => $data['discount_total'],
+            ]);
 
-            // $this->ledgerAndTransactionForInvoice([
-            //     'payment_type' => 'cash',
-            //     'invoice_id' => $invoice->id,
-            //     'food_charge' => $foodCharge,
-            //     'beverage_charge' => $beverageCharge,
-            //     'total_session_price' => $total_session_price,
-            //     'service_charge' => $service_charge,
-            //     'tax' => $tax,
-            //     'discount_total' => $data['discount_total'],
-            // ]);
             $catering_department = Department::where('name', 'Catering')->first();
             $msg = "The {$entity->name} is now closed. Thank you.";
 
@@ -1193,11 +1200,7 @@ class InvoiceRepository implements InvoiceRepositoryInterface
 
     public function ledgerAndTransactionForInvoice(array $data)
     {
-        if ($data['payment_type'] == 'cash') {
-            $posBook = Account::where('account_code', '2-1011')->first();
-        } else {
-            $posBook = Account::where('account_code', '2-1012')->first();
-        }
+        $posBook=$data['payment_type'] == 'cash' ? $this->invoiceService->accountByCode('2-1011') : $this->invoiceService->accountByCode('2-1012');
 
         // $data['date'] = now();
         // $data['created_by'] = ; //example
@@ -1214,9 +1217,8 @@ class InvoiceRepository implements InvoiceRepositoryInterface
 
         $debit_total = 0;
 
-        if ($data['food_charge'] != 0) {
-            $foodKtvAcc = Account::where('account_code', '5-0101')->first();
-
+        if (isset($data['food_charge'])&&$data['food_charge'] != 0) {
+            $foodKtvAcc = $this->invoiceService->accountByCode('5-0101')->first();
             if ($foodKtvAcc != null) {
                 $foodCreditLedger = (new StoreTransactionLedger())->storeLedger([
                     'value' => $data['food_charge'],
@@ -1231,9 +1233,9 @@ class InvoiceRepository implements InvoiceRepositoryInterface
             $debit_total += $data['food_charge'];
         }
 
-        if ($data['beverage_charge'] != 0) {
+        if (isset($data['beverage_charge'])&&$data['beverage_charge'] != 0) {
 
-            $beverageKtvAcc = Account::where('account_code', '5-0102')->first();
+            $beverageKtvAcc = $this->invoiceService->accountByCode('5-0102')->first();
 
             if ($beverageKtvAcc != null) {
                 $beverageCreditLedger = (new StoreTransactionLedger())->storeLedger([
@@ -1251,7 +1253,7 @@ class InvoiceRepository implements InvoiceRepositoryInterface
 
 
         if ($data['total_session_price'] != 0) {
-            $ktvRoomAcc = Account::where('account_code', '5-0103')->first();
+            $ktvRoomAcc = $this->invoiceService->accountByCode('5-0103');
             if ($ktvRoomAcc != null) {
                 $ktvRoomLedger = (new StoreTransactionLedger())->storeLedger([
                     'value' => $data['total_session_price'],
@@ -1268,7 +1270,7 @@ class InvoiceRepository implements InvoiceRepositoryInterface
 
 
         if ($data['service_charge'] != 0) {
-            $serviceMoneyAcc = Account::where('account_code', '6-2009')->first();
+            $serviceMoneyAcc = $this->invoiceService->accountByCode('6-2009');
 
             if ($serviceMoneyAcc != null) {
                 $serviceLedger = (new StoreTransactionLedger())->storeLedger([
@@ -1284,8 +1286,7 @@ class InvoiceRepository implements InvoiceRepositoryInterface
             $debit_total += $data['service_charge'];
         }
         if ($data['tax'] != 0) {
-            $taxAcc = Account::where('account_code', '6-9002')->first();
-
+            $taxAcc = $this->invoiceService->accountByCode('6-9002');
             if ($data['tax'] != null) {
                 $taxLedger = (new StoreTransactionLedger())->storeLedger([
                     'value' => $data['tax'],
@@ -1302,7 +1303,7 @@ class InvoiceRepository implements InvoiceRepositoryInterface
 
 
         if ($data['discount_total'] != 0) {
-            $discountAcc = Account::where('account_code', '6-2003')->first();
+            $discountAcc = $this->invoiceService->accountByCode('6-2003');
 
             if ($discountAcc != null) {
                 $debit_total += $data['discount_total'];
@@ -1324,6 +1325,7 @@ class InvoiceRepository implements InvoiceRepositoryInterface
                 ]);
             }
         }
+
         $debitLedger = (new StoreTransactionLedger())->storeLedger([
             'value' => $debit_total,
             'transaction_id' => $transaction->id,
@@ -1332,6 +1334,7 @@ class InvoiceRepository implements InvoiceRepositoryInterface
             'is_cashier_confirmed' => 1
         ]);
     }
+
 
     //add service 
     public function addService($request)
