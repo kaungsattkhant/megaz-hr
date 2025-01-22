@@ -272,8 +272,62 @@ END,
     }
   }
 
+  // public function getPoOrderArrivalList(Request $request)
+  // {
+  //   $poOrders = DB::table('po_orders')
+  //     ->join('purchase_order_items as poi', 'po_orders.id', '=', 'poi.purchase_order_id')
+  //     ->join('items as i', 'poi.item_id', '=', 'i.id')
+  //     ->join('suppliers as s', 'po_orders.supplier_id', '=', 's.id')
+  //     ->join('purchase_orders as po', 'po_orders.purchase_order_id', '=', 'po.id')
+  //     ->join('item_prices as ip', 'po_orders.item_price_id', '=', 'ip.id')
+  //     ->select(
+  //       'i.id as item_id',
+  //       'i.name as item_name',
+  //       DB::raw('GROUP_CONCAT(DISTINCT s.name SEPARATOR ", ") as supplier_name'),
+  //       DB::raw('GROUP_CONCAT(DISTINCT po.po_id SEPARATOR ", ") as po_numbers'),
+  //       DB::raw('SUM(poi.quantity) as total_quantity'),
+  //       DB::raw('SUM(poi.amount) as total_amount'),
+  //       'u.id as uom_id',
+  //       'u.name as uom_name',
+  //       'bu.id as base_uom_id',
+  //       'bu.name as base_uom_name',
+  //       'uc.id as uom_conversion_id',
+  //       'uc.conversion as uom_conversion',
+  //       'ip.id as item_price_id',
+  //       'ip.price as item_price',
+  //     )
+  //     ->join('uoms as u', 'poi.uom_id', '=', 'u.id')
+  //     ->join('uoms as bu', 'poi.base_uom_id', '=', 'bu.id')
+  //     ->join('uom_conversions as uc', 'poi.uom_conversion_id', '=', 'uc.id')
+  //     ->groupBy(
+  //       'i.id',
+  //       'i.name',
+  //       'u.id',
+  //       'u.name',
+  //       'bu.id',
+  //       'bu.name',
+  //       'ip.id',
+  //       'ip.price',
+  //       'uc.id',
+  //       'uc.conversion'
+  //     )
+  //     ->paginate(config('common.list_count'));
+  //   return $poOrders;
+  // }
+
+  public function getPoOrderArrivalListByItemId($itemId)
+  {
+    $poOrders = PoOrder::with(['purchaseOrder', 'uomConversion', 'uom', 'baseUom', 'item', 'brand', 'supplier', 'itemPrice'])
+      ->where('item_id', $itemId)
+      ->get();
+
+    return PoOrderItemResource::collection($poOrders);
+  }
+
+
   public function getPoOrderArrivalList(Request $request)
   {
+
     $poOrders = DB::table('po_orders')
       ->join('purchase_order_items as poi', 'po_orders.id', '=', 'poi.purchase_order_id')
       ->join('items as i', 'poi.item_id', '=', 'i.id')
@@ -287,14 +341,51 @@ END,
         DB::raw('GROUP_CONCAT(DISTINCT po.po_id SEPARATOR ", ") as po_numbers'),
         DB::raw('SUM(poi.quantity) as total_quantity'),
         DB::raw('SUM(poi.amount) as total_amount'),
-        'u.id as uom_id',
         'u.name as uom_name',
-        'bu.id as base_uom_id',
         'bu.name as base_uom_name',
-        'uc.id as uom_conversion_id',
         'uc.conversion as uom_conversion',
-        'ip.id as item_price_id',
         'ip.price as item_price',
+        DB::raw('(
+                  SELECT GROUP_CONCAT(
+                      CONCAT(
+                          "{",
+                          "\"id\":", po_item.id,
+                          ",\"item_name\":\"", i_sub.name, "\"",
+                          ",\"quantity\":", po_item.quantity,
+                          ",\"amount\":", po_item.amount,
+                          ",\"base_uom_id\":", po_item.base_uom_id,
+                          ",\"base_uom_name\":\"", bu_sub.name, "\"",
+                          ",\"base_uom_quantity\":", po_item.base_uom_quantity,
+                          ",\"uom_id\":", po_item.uom_id,
+                          ",\"uom_name\":\"", u_sub.name, "\"",
+                          ",\"uom_quantity\":", po_item.uom_quantity,
+                          ",\"uom_conversion_id\":", po_item.uom_conversion_id,
+                          ",\"uom_conversion\":", uc_sub.conversion,
+                          ",\"purchase_order\":{",
+                              "\"id\":", po.id,
+                              ",\"po_id\":\"", po.po_id, "\"",
+                              ",\"total_price\":\"", po.total_price, "\"",
+                              ",\"date\":\"", po.date, "\"",
+                              ",\"status\":\"", po.status, "\"",
+                          "},",
+                          "\"supplier\":{",
+                              "\"id\":", s.id,
+                              ",\"name\":\"", s.name, "\"",
+                          "}}"
+                      ) SEPARATOR ","
+                  )
+                  FROM purchase_order_items po_item
+                      INNER JOIN purchase_orders po ON po_item.purchase_order_id = po.id
+                      INNER JOIN po_orders  po_order ON po_order.purchase_order_id = po.id
+                      INNER JOIN items i_sub ON po_item.item_id = i_sub.id
+                      INNER JOIN uoms u_sub ON po_item.uom_id = u_sub.id
+                      INNER JOIN uoms bu_sub ON po_item.base_uom_id = bu_sub.id
+                      INNER JOIN uom_conversions uc_sub ON po_item.uom_conversion_id = uc_sub.id
+                      INNER JOIN suppliers s ON po_order.supplier_id = s.id
+                  WHERE po_item.item_id = po_order.item_id
+                      AND po_item.is_md_checked = true
+                      AND po.status = "md_checked"
+              ) as purchase_order_details')
       )
       ->join('uoms as u', 'poi.uom_id', '=', 'u.id')
       ->join('uoms as bu', 'poi.base_uom_id', '=', 'bu.id')
@@ -302,112 +393,22 @@ END,
       ->groupBy(
         'i.id',
         'i.name',
-        'u.id',
         'u.name',
-        'bu.id',
         'bu.name',
-        'ip.id',
         'ip.price',
-        'uc.id',
         'uc.conversion'
       )
       ->paginate(config('common.list_count'));
+
+    foreach ($poOrders->items() as $item) {
+      if ($item->purchase_order_details) {
+
+        $item->purchase_order_details = json_decode('[' . $item->purchase_order_details . ']', true);
+      }
+    }
+
     return $poOrders;
   }
-
-  public function getPoOrderArrivalListByItemId($itemId)
-  {
-    $poOrders = PoOrder::with(['purchaseOrder', 'uomConversion', 'uom', 'baseUom', 'item', 'brand', 'supplier', 'itemPrice'])
-      ->where('item_id', $itemId)
-      ->get();
-
-    return PoOrderItemResource::collection($poOrders);
-  }
-
-
-  //   public function getPoOrderArrivalList(Request $request)
-  // {
-
-  //     $poOrders = DB::table('po_orders')
-  //         ->join('purchase_order_items as poi', 'po_orders.id', '=', 'poi.purchase_order_id')
-  //         ->join('items as i', 'poi.item_id', '=', 'i.id')
-  //         ->join('suppliers as s', 'po_orders.supplier_id', '=', 's.id')
-  //         ->join('purchase_orders as po', 'po_orders.purchase_order_id', '=', 'po.id')
-  //         ->join('item_prices as ip', 'po_orders.item_price_id', '=', 'ip.id')
-  //         ->select(
-  //             'i.id as item_id',
-  //             'i.name as item_name',
-  //             DB::raw('GROUP_CONCAT(DISTINCT s.name SEPARATOR ", ") as supplier_name'),
-  //             DB::raw('GROUP_CONCAT(DISTINCT po.po_id SEPARATOR ", ") as po_numbers'),
-  //             DB::raw('SUM(poi.quantity) as total_quantity'),
-  //             DB::raw('SUM(poi.amount) as total_amount'),
-  //             'u.name as uom_name',
-  //             'bu.name as base_uom_name',
-  //             'uc.conversion as uom_conversion',
-  //             'ip.price as item_price',
-  //             DB::raw('(
-  //                 SELECT GROUP_CONCAT(
-  //                     CONCAT(
-  //                         "{",
-  //                         "\"id\":", po_item.id,
-  //                         ",\"item_name\":\"", i_sub.name, "\"",
-  //                         ",\"quantity\":", po_item.quantity,
-  //                         ",\"amount\":", po_item.amount,
-  //                         ",\"base_uom_id\":", po_item.base_uom_id,
-  //                         ",\"base_uom_name\":\"", bu_sub.name, "\"",
-  //                         ",\"base_uom_quantity\":", po_item.base_uom_quantity,
-  //                         ",\"uom_id\":", po_item.uom_id,
-  //                         ",\"uom_name\":\"", u_sub.name, "\"",
-  //                         ",\"uom_quantity\":", po_item.uom_quantity,
-  //                         ",\"uom_conversion_id\":", po_item.uom_conversion_id,
-  //                         ",\"uom_conversion\":", uc_sub.conversion,
-  //                         ",\"purchase_order\":{",
-  //                             "\"id\":", po.id,
-  //                             ",\"po_id\":\"", po.po_id, "\"",
-  //                             ",\"total_price\":\"", po.total_price, "\"",
-  //                             ",\"date\":\"", po.date, "\"",
-  //                             ",\"status\":\"", po.status, "\"",
-  //                         "},",
-  //                         "\"supplier\":{",
-  //                             "\"id\":", s.id,
-  //                             ",\"name\":\"", s.name, "\"",
-  //                         "}}"
-  //                     ) SEPARATOR ","
-  //                 )
-  //                 FROM purchase_order_items po_item
-  //                     INNER JOIN purchase_orders po ON po_item.purchase_order_id = po.id
-  //                     INNER JOIN items i_sub ON po_item.item_id = i_sub.id
-  //                     INNER JOIN uoms u_sub ON po_item.uom_id = u_sub.id
-  //                     INNER JOIN uoms bu_sub ON po_item.base_uom_id = bu_sub.id
-  //                     INNER JOIN uom_conversions uc_sub ON po_item.uom_conversion_id = uc_sub.id
-  //                     INNER JOIN suppliers s ON po.supplier_id = s.id
-  //                 WHERE po_item.item_id = poi.item_id
-  //                     AND po_item.is_md_checked = true
-  //                     AND po.status = "md_checked"
-  //             ) as purchase_order_details')
-  //         )
-  //         ->join('uoms as u', 'poi.uom_id', '=', 'u.id')
-  //         ->join('uoms as bu', 'poi.base_uom_id', '=', 'bu.id')
-  //         ->join('uom_conversions as uc', 'poi.uom_conversion_id', '=', 'uc.id')
-  //         ->groupBy(
-  //             'i.id',
-  //             'i.name',
-  //             'u.name',
-  //             'bu.name',
-  //             'ip.price',
-  //             'uc.conversion'
-  //         )
-  //         ->paginate(config('common.list_count')); 
-
-  //     foreach ($poOrders->items() as $item) {
-  //         if ($item->purchase_order_details) {
-
-  //             $item->purchase_order_details = json_decode('[' . $item->purchase_order_details . ']', true);
-  //         }
-  //     }
-
-  //     return $poOrders;
-  // }
 
   public function getInvoiceBySupplier($supplierId)
   {
@@ -424,7 +425,7 @@ END,
   {
     DB::beginTransaction();
     try {
-      $poInvoiceId = null;
+
       if (isset($validatedData['is_new_invoice']) && $validatedData['is_new_invoice'] == 1) {
         $invoiceData = [
           'invoice_no' => $validatedData['invoice_no'],
@@ -432,16 +433,47 @@ END,
           'total_invoice_amount' => $validatedData['total_invoice_amount'],
           'created_by' => UserData()->id,
         ];
-        $poInvoice = PoInvoice::create($invoiceData);
-        $poInvoiceId = $poInvoice->id;
-      }
-      $validatedData['created_by'] = UserData()->id;
+        $newPoInvoice = PoInvoice::create($invoiceData);
 
-      if ($poInvoiceId) {
-        $validatedData['po_invoice_id'] = $poInvoiceId;
+        $arrivalItemData = [
+          'base_uom_id'  => $validatedData['base_uom_id'],
+          'base_uom_quantity'  => $validatedData['base_uom_quantity'],
+          'uom_id' => $validatedData['uom_id'],
+          'uom_quantity' => $validatedData['uom_quantity'],
+          'quantity' => $validatedData['quantity'],
+          'amount' => $validatedData['amount'],
+          'po_invoice_id' => $newPoInvoice->id,
+          'po_order_id' =>  $validatedData['po_order_id'],
+          'created_by' => UserData()->id,
+        ];
+        $arrivalItem = ArrivalItem::create($arrivalItemData);
       }
-      $arrivalItem = ArrivalItem::create($validatedData);
 
+      if (isset($validatedData['po_invoice_id'])) {
+
+        $poInvoice = PoInvoice::find($validatedData['po_invoice_id']);
+
+        if ($poInvoice) {
+
+          $poInvoice->total_invoice_amount += $validatedData['total_invoice_amount'];
+          $poInvoice->save();
+          $arrivalItemData = [
+            'base_uom_id'  => $validatedData['base_uom_id'],
+            'base_uom_quantity'  => $validatedData['base_uom_quantity'],
+            'uom_id' => $validatedData['uom_id'],
+            'uom_quantity' => $validatedData['uom_quantity'],
+            'quantity' => $validatedData['quantity'],
+            'amount' => $validatedData['amount'],
+            'po_invoice_id' => $poInvoice->id,
+            'po_order_id' =>  $validatedData['po_order_id'],
+            'created_by' => UserData()->id,
+          ];
+          $arrivalItem = ArrivalItem::create($arrivalItemData);
+        } else {
+
+          throw new \Exception('PoInvoice not found for the given ID.');
+        }
+      }
 
       if (isset($validatedData['later_by']) && $validatedData['later_by'] == 1) {
         $poOrder = PoOrder::where('id', $validatedData['po_order_id'])->first();
