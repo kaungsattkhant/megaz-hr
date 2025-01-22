@@ -108,12 +108,14 @@ class PoOrderRepository implements PoOrderRepositoryInterface
       ->where('po.status', 'md_checked')
       ->select(
         'poi.item_id',
+
         'i.name as item_name',
         'u.name as uom_name',
         'bu.name as base_uom_name',
         'uc.conversion as uom_conversion',
         'poi.base_uom_id',
         'poi.uom_id',
+        // 'poi.uom_quantity',
         'poi.uom_conversion_id',
         DB::raw('SUM(CASE 
     WHEN (
@@ -142,6 +144,7 @@ END) as total_quantity'),
               JSON_OBJECT(
                   "id", po_item.id,
                   "item_name", i.name,
+                  "item_id", i.id,
                   "amount", po_item.amount,
                   "quantity", po_item.quantity,
                   "base_uom_id", po_item.base_uom_id,

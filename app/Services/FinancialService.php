@@ -109,7 +109,7 @@ class FinancialService
             $closingBalance = $additiontotal - $settlementTotal;
 
             return [
-                'month_name' => $date->format('F'),
+                'month' => $date->format('F'),
                 'date' => $date->format('Y-m-01'),
                 'value' => $closingBalance,
             ];
@@ -141,7 +141,7 @@ class FinancialService
             $closingBalance = $additiontotal - $settlementTotal;
 
             return [
-                'month_name' => $date->format('F'),
+                'month' => $date->format('F'),
                 'date' => $date->format('Y-m-01'),
                 'value' => $closingBalance,
             ];
@@ -172,7 +172,7 @@ class FinancialService
             $closingBalance = $additiontotal - $settlementTotal;
 
             return [
-                'month_name' => $date->format('F'),
+                'month' => $date->format('F'),
                 'date' => $date->format('Y-m-01'),
                 'value' => $closingBalance,
             ];
