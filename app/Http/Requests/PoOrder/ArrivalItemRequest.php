@@ -32,7 +32,7 @@ class ArrivalItemRequest extends APIRequest
             'amount' => 'required|numeric',
             'po_invoice_id' => 'nullable|integer|exists:po_invoices,id',
             'po_order_id' => 'required|integer|exists:po_orders,id',
-            'later_by' => 'nullable',
+            'later_buy' => 'nullable',
             'item_leftable_type' => 'nullable',
             'is_new_invoice' => 'nullable',
             'invoice_no' => 'nullable',
