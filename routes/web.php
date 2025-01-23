@@ -145,6 +145,7 @@ Route::middleware(['departments:supplier'])->group(function () {
     Route::view('/suppliers', 'supplier.index')->name('suppliers.index');
     Route::view('/suppliers/create', 'supplier.create')->name('suppliers.create');
     Route::view('/suppliers/{id}/edit', 'supplier.edit')->name('suppliers.edit');
+    Route::view('/suppliers/{id}/lead_times', 'supplier.supplier_leadtime')->name('suppliers.leadttime');
 });
 Route::middleware(['departments:cashbook'])->group(function () {
     Route::view('/accounting', 'accounting.index')->name('accountings');
