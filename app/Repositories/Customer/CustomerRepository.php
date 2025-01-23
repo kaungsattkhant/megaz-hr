@@ -160,14 +160,14 @@ class CustomerRepository implements CustomerRepositoryInterface
                 $new_account_code = (int) $latestAccountCodeNo[1] + 1;
                 $code = $latestAccountCodeNo[0] . '-' . $new_account_code;
                 $account = Account::create([
-                    'name' => 'Customer - '.$name,
+                    'name' => 'Deposit - '.$name,
                     'account_code' => $code,
                     'sub_account_id' => $latestAccount->sub_account_id,
                 ]);
                 return $account;
             }else{
                 $account = Account::create([
-                    'name' => 'Customer - '.$name,
+                    'name' => 'Deposit - '.$name,
                     'account_code' => '4-3001',
                     'sub_account_id' => $subAccount->id,
                 ]);

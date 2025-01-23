@@ -33,7 +33,7 @@ class EntityAPIController extends Controller
 
     public function createEntity(EntityCreateRequest $request)
     {
-        $entity = $this->entityRepo->c($request->all());
+        $entity = $this->entityRepo->createData($request->all());
         ResponseData($entity);
     }
 

@@ -145,7 +145,6 @@ Route::middleware(['departments:supplier'])->group(function () {
     Route::view('/suppliers', 'supplier.index')->name('suppliers.index');
     Route::view('/suppliers/create', 'supplier.create')->name('suppliers.create');
     Route::view('/suppliers/{id}/edit', 'supplier.edit')->name('suppliers.edit');
-    Route::view('/suppliers/{id}/lead_times', 'supplier.supplier_leadtime')->name('suppliers.leadttime');
 });
 Route::middleware(['departments:cashbook'])->group(function () {
     Route::view('/accounting', 'accounting.index')->name('accountings');
@@ -341,4 +340,5 @@ Route::view('/check_in', 'check_in.index')->name('check_in');
 Route::view('/contact', 'contact.index')->name('contact');
 Route::view('/lead_time', 'lead_time.index')->name('lead_time');
 Route::view('/procurement_order_items', 'procurement_order_items.index')->name('procurement_order_items');
-Route::view('/arrival_items', 'procurement_order_arrival.index')->name('arrival_items');
+
+Route::view('/purchase_orders/{id}/edit', 'purchase_orders.edit');

@@ -793,10 +793,13 @@ class FinancialRepository implements FinancialInterface
         $otherPayableBalances = $this->financialService->getOtherPayableBalances($year, $month);
         $creditorBalances = $this->financialService->getCreditorBalances($year, $month);
         $depositBalances = $this->financialService->getCustomerDepositBalances($year, $month);
-        $data['other_payable']=$otherPayableBalances;
-        $data['creditor']=$creditorBalances;
-        $data['deposit']=$depositBalances;
-        return $data;
+        $current_liabilities['other_payable']=$otherPayableBalances;
+        $current_liabilities['creditor']=$creditorBalances;
+        $current_liabilities['deposit']=$depositBalances;
+        return [
+            'current_asset'=>$data,
+            'current_liabilities'=>$current_liabilities
+        ];
     }
 
   

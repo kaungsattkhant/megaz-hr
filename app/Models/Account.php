@@ -22,4 +22,8 @@ class Account extends Model
     {
         return $this->hasMany(AccountReceivable::class);
     }
+    public static function getByAccountCode(string $accountCode)
+    {
+        return self::where('account_code', $accountCode)->first();
+    }
 }
