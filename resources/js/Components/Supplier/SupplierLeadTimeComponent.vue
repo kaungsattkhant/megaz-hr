@@ -15,14 +15,14 @@
                 <button class="add-btn h-8 text-[13px] font-inter" @click="clearSearchBtnClicked()">Clear</button> -->
             </div>
             <div class="flex justify-end flex-col gap-y-4">
-                <div>
+                <!-- <div>
                     <a href="/suppliers/create" class="add-btn ">
                         Add New
                     </a>
-                </div>
+                </div> -->
 
                 <div>
-                    <p> Average Lead Time: 30min </p>
+                    <p> Total Average Lead Time: {{ totalAvgLeadTime }} </p>
                 </div>
             </div>
         </div>
@@ -39,7 +39,7 @@
                                     Item
                                 </th>
                                 <th scope="col" class=" ">
-                                    Accepted Lead Time
+                                    Average Lead Time
                                 </th>
                             </tr>
                         </thead>
@@ -53,7 +53,7 @@
                                         {{ leadTime.item_name }}
                                     </td>
                                     <td class="whitespace>nowrap  ">
-                                        {{ leadTime.item_name }}
+                                        {{ leadTime.average_order_time }}
                                     </td>
                                 </tr>
                             </div>
@@ -83,7 +83,7 @@ export default {
             lastPage: 0,
             totalData: 0,
 
-            averageLeadTime: null,
+            totalAvgLeadTime: null,
             averageOrderTime: null,
         };
     },
@@ -103,7 +103,8 @@ export default {
         async getLeadTimes(){
             let response = await getApiData({ url: `/api/supplier_lead_time/${this.supplier.id}`, token: this.getToken() });
             if (response.data) {
-                this.leadTimes = response.data;
+                this.totalAvgLeadTime = response.data.total_average_lead_time;
+                this.leadTimes = response.data.details;
             }
         },
     },
