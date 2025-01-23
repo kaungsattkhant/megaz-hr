@@ -364,13 +364,11 @@ export default {
             this.baseUomQty = this.confirmArrivalItem.base_uom_quantity;
             this.uomName = this.confirmArrivalItem.uom.name;
             this.uomQty = this.confirmArrivalItem.uom_quantity;
-            // this.selectedUomConversion = this.uomConversions.find(uomConversion => uomConversion.id === arrival.uom_conversion_unit_id);
             this.selectedUomConversion = this.confirmArrivalItem.uom_conversion;
             this.originalArrivalTotalQty = (arrival.base_uom_quantity * this.selectedUomConversion.conversion) + arrival.uom_quantity;
             this.confirmArrivalTotalQty = this.originalArrivalTotalQty;
             this.calculateTotalPrice();
             console.log(this.confirmArrivalItem);
-            // console.log(this.confirmArrivalTotalQty);
             this.getInvoices(this.confirmArrivalItem.supplier_id);
         },
 
@@ -401,7 +399,6 @@ export default {
         calculateTotalPrice(){
             this.totalPrice = (this.confirmArrivalTotalQty / this.selectedUomConversion.conversion) * this.confirmArrivalItem.item_price.price;
             this.totalPrice = Math.round(this.totalPrice * 100) / 100;
-            console.log('total price', this.totalPrice);
         },
 
         createInvoiceCheckboxChanged(){
@@ -434,8 +431,8 @@ export default {
             formData.append('base_uom_id', this.confirmArrivalItem.base_uom_id);
             formData.append('uom_id', this.confirmArrivalItem.uom_id);
             formData.append('uom_conversion_unit_id', this.selectedUomConversion.id);
-            formData.append('quantity', this.confirmArrivalItem.quantity);
-            formData.append('amount', this.confirmArrivalItem.amount);
+            formData.append('quantity', this.confirmArrivalTotalQty);
+            formData.append('amount', this.totalPrice);
             formData.append('item_id', this.confirmArrivalItem.item_id);
             formData.append('po_order_id', this.confirmArrivalItem.id);
             if(this.selectedInvoice){
@@ -444,7 +441,7 @@ export default {
             formData.append('later_buy', (this.isLaterArrival) ? 1 : 0);
             formData.append('is_new_invoice', (this.isCreateNewInvoice) ? 1 : 0);
             formData.append('item_leftable_type', 'arrival_item');
-            formData.append('total_invoice_amount', this.totalInvoiceAmount); // example must be changed later
+            formData.append('total_invoice_amount', this.totalInvoiceAmount);
             if(this.newInvoiceNumber){
                 formData.append('invoice_no', this.newInvoiceNumber);
             }
