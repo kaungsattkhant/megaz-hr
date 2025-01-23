@@ -486,15 +486,16 @@ END,
         }
       }
 
-      if (isset($validatedData['later_by']) && $validatedData['later_by'] == 1) {
+      if (isset($validatedData['later_buy']) && $validatedData['later_buy'] == 1) {
         $poOrder = PoOrder::where('id', $validatedData['po_order_id'])->first();
-
         if ($poOrder->quantity <  $arrivalItem->quantity) {
           ResponseMessage('The arrival  quantity exceeds the available quantity.', 419);
         }
 
+
         $remainingQuantity = null;
         if ($poOrder->quantity >  $arrivalItem->quantity) {
+
           $remainingQuantity = $poOrder->quantity -  $arrivalItem->quantity;
 
           if ($remainingQuantity < 0) {
@@ -529,7 +530,7 @@ END,
 
   public function getSupplierLeadTime($supplierId)
   {
-    $result = [];
+    $result = null;
     $totalAvgLeadTime = 0;
     $itemsData = [];
     $itemLeadTimes = [];
@@ -583,7 +584,7 @@ END,
     // Calculate total average lead time
     $totalAverageLeadTimeFormatted = $this->formatTime($totalAvgLeadTime);
 
-    $result[] = [
+    $result = [
       'supplier_id' => $supplierId,
       'supplier_name' => $poOrder->supplier->name,
       'total_average_lead_time' => isset($totalAverageLeadTimeFormatted) ? $totalAverageLeadTimeFormatted : 'null',
