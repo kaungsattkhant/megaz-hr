@@ -360,8 +360,8 @@ export default {
             this.originalArrivalTotalQty = (arrival.base_uom_quantity * this.selectedUomConversion.conversion) + arrival.uom_quantity;
             this.confirmArrivalTotalQty = this.originalArrivalTotalQty;
             this.calculateTotalPrice();
-            console.log(this.originalArrivalTotalQty);
-            console.log(this.confirmArrivalTotalQty);
+            console.log(this.confirmArrivalItem);
+            // console.log(this.confirmArrivalTotalQty);
             this.getInvoices(this.confirmArrivalItem.supplier_id);
         },
 
@@ -424,7 +424,7 @@ export default {
             formData.append('quantity', this.confirmArrivalItem.quantity);
             formData.append('amount', this.confirmArrivalItem.amount);
             formData.append('item_id', this.confirmArrivalItem.item_id);
-            formData.append('po_order_id', this.confirmArrivalItem.purchase_order.id);
+            formData.append('po_order_id', this.confirmArrivalItem.id);
             if(this.selectedInvoice){
                 formData.append('po_invoice_id', this.selectedInvoice.id);
             }
