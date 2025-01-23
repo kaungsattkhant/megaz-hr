@@ -38,8 +38,8 @@ class Supplier extends Model
         return $this->hasMany(SupplierItem::class);
         // ->withTimestamps();
     }
-    
-   
+
+
 
 
 
