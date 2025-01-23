@@ -248,6 +248,14 @@
                         class="input-ui"
                         >
                     </div>
+                    <div class="mb-4">
+                        <label for="invoice-number" class="text-sm">Invoice Amount</label>
+                        <input type="number"
+                        placeholder="Invoice Number"
+                        v-model="totalInvoiceAmount"
+                        class="input-ui"
+                        >
+                    </div>
                 </div>
                 <div class="flex justify-end gap-x-4 px-6 mb-6 pt-4">
                     <button type="button" class="cancel-btn focus:shadow-none focus:outline-none"
@@ -256,7 +264,7 @@
                     </button>
                     <button type="button"
                     class="add-btn focus:outline-none focus:ring-0 "
-                    @click="confirmBtnClicked">
+                    @click="confirmBtnClicked" data-te-modal-dismiss>
                         Create
                     </button>
                 </div>
@@ -301,6 +309,7 @@ export default {
             newInvoiceNumber: null,
 
             totalPrice: 0,
+            totalInvoiceAmount: 0,
         }
     },
 
@@ -337,7 +346,7 @@ export default {
         },
 
         toggleItems(index) {
-            if(this.items[index].arrival_details.length > 1){
+            if(this.items[index].arrival_details.length > 0){
                 this.items[index].showDatails = !this.items[index].showDatails;
             }
         },
@@ -415,6 +424,10 @@ export default {
                 this.alertValidationMessage(`existing invoice number`);
                 return;
             }
+            if(this.totalInvoiceAmount <= 0){
+                this.alertValidationMessage(`total invoice amount`);
+                return;
+            }
             let formData = new FormData();
             formData.append('base_uom_quantity', this.baseUomQty);
             formData.append('uom_quantity', this.uomQty);
@@ -431,7 +444,7 @@ export default {
             formData.append('later_buy', (this.isLaterArrival) ? 1 : 0);
             formData.append('is_new_invoice', (this.isCreateNewInvoice) ? 1 : 0);
             formData.append('item_leftable_type', 'arrival_item');
-            formData.append('total_invoice_amount', 10000); // example must be changed later
+            formData.append('total_invoice_amount', this.totalInvoiceAmount); // example must be changed later
             if(this.newInvoiceNumber){
                 formData.append('invoice_no', this.newInvoiceNumber);
             }
@@ -452,6 +465,7 @@ export default {
                 this.newInvoiceNumber = null;
                 this.selectedInvoice = null;
                 this.totalPrice = 0;
+                this.totalInvoiceAmount = 0;
             }else{
                 this.$notify({
                     text: `Arrival item confirmation failed`,
