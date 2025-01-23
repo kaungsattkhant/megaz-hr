@@ -425,10 +425,16 @@ export default {
             formData.append('amount', this.confirmArrivalItem.amount);
             formData.append('item_id', this.confirmArrivalItem.item_id);
             formData.append('po_order_id', this.confirmArrivalItem.purchase_order.id);
-            formData.append('po_invoice_id', (this.selectedInvoice)? this.selectedInvoice.id: null);
+            if(this.selectedInvoice){
+                formData.append('po_invoice_id', this.selectedInvoice.id);
+            }
             formData.append('later_buy', (this.isLaterArrival) ? 1 : 0);
+            formData.append('is_new_invoice', (this.isCreateNewInvoice) ? 1 : 0);
             formData.append('item_leftable_type', 'arrival_item');
-            formData.append('total_invoice_amount', this.totalPrice);
+            formData.append('total_invoice_amount', 10000); // example must be changed later
+            if(this.newInvoiceNumber){
+                formData.append('invoice_no', this.newInvoiceNumber);
+            }
             let response = await postApiData({url: `/api/po_arrival_items`, form_data: formData, token: this.getToken()});
             if(response.success){
                 this.$notify({
