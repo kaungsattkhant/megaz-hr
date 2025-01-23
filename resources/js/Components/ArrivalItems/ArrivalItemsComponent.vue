@@ -1,31 +1,16 @@
 <template>
     <div>
         <p class=" text-lg font-semibold font-inter">
-            Procurement Order Items
+            Arrival Items
         </p>
     </div>
     <div class="mt-4 bg-white">
         <div class="btn-container">
             <notifications position="top center" />
-            <!-- <div class=" flex gap-x-4">
-                <label for="search" class="search-input">
-                    <input type="text" class="input-search" placeholder="Search" v-model="searchInput">
-                    <i class="fal fa-search"></i>
-                </label>
-                <button class="add-btn h-8" @click="searchBtnClicked()">Search</button>
-                <button class="add-btn h-8" @click="clearSearchBtnClicked()">Clear</button>
-            </div> -->
             <div class="flex pr-0 gap-x-4">
-                <!-- <div class="w-full !text-sm" data-te-select-wrapper-ref>
-                    <select data-te-select-init data-te-select-placeholder="Select Type" @change="selectedTypeChanged()"
-                        data-te-select-filter="true" name="" id="" v-model="selectedType" class="input-ui">
-                        <option :value="type.value" v-for="(type, typeIndex) in typeList"
-                            :key="typeIndex"> {{ type.name }} </option>
-                    </select>
-                </div> -->
-                <button type="button"
+                <button type="button" hidden disabled
                 class="add-btn transition duration-150 ease-in-out focus:outline-none focus:ring-0 "
-                data-te-toggle="modal" data-te-target="#con">
+                data-te-toggle="modal" data-te-target="#check_modal">
                     Add New
                 </button>
             </div>
@@ -49,19 +34,22 @@
                                     Qty ( UOM )
                                 </th>
                                 <th scope="col" class="">
+                                    Supplier
+                                </th>
+                                <th scope="col" class="">
 
                                 </th>
                             </tr>
                         </thead>
                         <tbody>
                             <!-- looping start -->
-                            <div class="contents" v-for="(item, index) in orderItems" :key="index">
+                            <div class="contents" v-for="(item, index) in items" :key="index">
                                 <tr class="" data-te-collapse-init :data-te-target="'#orderCollapse'+index"
                                 aria-expanded="false" aria-controls="collapseExample">
                                     <td class=" font-medium ">
-                                        {{ index + 1 }}
+                                        {{ perPage * (currentPage - 1) + (index + 1) }}
                                     </td>
-                                    <td class="whitespace-nowrap" @click="togglePurchaseOrders(index)">
+                                    <td class="whitespace-nowrap" @click="toggleItems(index)">
                                         {{ item.item_name }}
                                     </td>
                                     <td class="whitespace-nowrap">
@@ -71,39 +59,31 @@
                                         {{ item.total_quantity }}
                                     </td>
                                     <td class="whitespace-nowrap">
-                                        <div v-if="item.purchase_order_details.length <= 1" >
-                                            <button data-te-toggle="modal" data-te-target="#edit_modal" id="edit-btn" class="pr-3"
-                                                @click="editBtnClicked(item, index)">
+                                        {{ item.supplier_name }}
+                                    </td>
+                                    <td class="whitespace-nowrap">
+                                        <!-- <div v-if="item.arrival_details.length <= 1" >
+                                            <button data-te-toggle="modal" data-te-target="#edit_modal" id="edit-btn" class="pr-3">
                                                 <i class="fal fa-pen"></i>
                                             </button>
-                                            <button data-te-toggle="modal" data-te-target="#check_modal" class="pr-3"
-                                                @click="checkBtnClicked(item.purchase_order_details[0], item.item_id)">
+                                            <button data-te-toggle="modal" data-te-target="#check_modal" class="pr-3">
                                                 <i class="fal fa-check"></i>
                                             </button>
-                                        </div>
+                                        </div> -->
                                     </td>
                                 </tr>
-
-                                <tr v-if="item.showPurchaseOrders" v-for="(po, poIndex) in item.purchase_order_details" :key="poIndex">
-                                    <td class=" font-medium ">
-
-                                    </td>
+                                <tr v-if="item.showDatails" v-for="(arrival, arrivalIndex) in item.arrival_details" :key="arrivalIndex">
+                                    <td> &nbsp; </td>
+                                    <td class="whitespace-nowrap"> {{ arrival.item.name }} </td>
+                                    <td class="whitespace-nowrap"> {{ arrival.purchase_order.po_id }} </td>
+                                    <td class="whitespace-nowrap"> {{ arrival.quantity }} </td>
+                                    <td class="whitespace-nowrap"> {{ arrival.supplier.name }} {{ arrival.supplier_id }} </td>
                                     <td class="whitespace-nowrap">
-
-                                    </td>
-                                    <td class="whitespace-nowrap">
-                                        {{ po.purchase_order.po_id }}
-                                    </td>
-                                    <td class="whitespace-nowrap">
-                                        {{ po.quantity }}
-                                    </td>
-                                    <td class="whitespace-nowrap">
-                                        <button data-te-toggle="modal" data-te-target="#edit_modal" id="edit-btn" class="pr-3"
-                                            @click="editBtnClicked(item, index)">
+                                        <button data-te-toggle="modal" data-te-target="#edit_modal" id="edit-btn" class="pr-3">
                                             <i class="fal fa-pen"></i>
                                         </button>
                                         <button data-te-toggle="modal" data-te-target="#check_modal" class="pr-3"
-                                            @click="checkBtnClicked(po, item.item_id)">
+                                        @click="checkBtnClicked(arrival)">
                                             <i class="fal fa-check"></i>
                                         </button>
                                     </td>
@@ -116,55 +96,16 @@
                     <div class="flex justify-center">
                         <div v-if="totalData != 0" class=" bg-white  flex justify-center mt-5 py-3">
                             <button class="rounded px-6 py-1 border  hover:bg-slate-200" :disabled="currentPage === 1"
-                                @click="getOrderItems(currentPage - 1)">«</button>
+                                @click="getItems(currentPage - 1)">«</button>
                             <button class=" text-sm px-5 border">
                                 Page <span @dblclick="showInput">{{ currentPage }}</span> / <span class="text-gray-400">{{
                                     lastPage }}</span>
                             </button>
                             <button class=" rounded px-6  py-1 border  hover:bg-slate-200"
-                                :disabled="currentPage === lastPage" @click="getOrderItems(currentPage + 1)">
+                                :disabled="currentPage === lastPage" @click="getItems(currentPage + 1)">
                                 »</button>
                         </div>
                     </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-
-    <!-- create modal -->
-    <div data-te-modal-init
-        class="fixed left-0 top-0 z-[1055] hidden h-full w-full overflow-y-auto overflow-x-hidden outline-none"
-        id="con" tabindex="-1" aria-labelledby="edit_modalLabel" aria-hidden="true">
-        <div data-te-modal-dialog-ref
-            class="pointer-events-none relative w-auto mb-12 translate-y-[-50px] opacity-0 transition-all duration-300 ease-in-out min-[576px]:mx-auto min-[576px]:mt-7 min-[576px]:max-w-[500px]">
-            <div
-                class="min-[576px]:shadow-[0_0.5rem_1rem_rgba(#000, 0.15)] pointer-events-auto relative flex w-full flex-col rounded-md border-none bg-white bg-clip-padding text-current shadow-lg outline-none">
-                <div class="relative flex justify-between py-2 px-6 border-b">
-                    <h5 class="text-base text-center mt-2 font-semibold leading-normal font-inter"
-                        id="edit_modalLabel">
-                        Add Contact
-                    </h5>
-                    <button type="button" class="text-xs focus:shadow-none focus:outline-none" data-te-modal-dismiss id="close_create_modal"
-                        aria-label="Close">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
-                            stroke="currentColor" class="h-4 w-4">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
-                        </svg>
-                    </button>
-                </div>
-                <div class="relative px-6 py-4 border-b" data-te-modal-body-ref>
-
-                </div>
-                <div class="flex justify-end gap-x-4 px-6 mb-6 pt-4">
-                    <button type="button" class="cancel-btn focus:shadow-none focus:outline-none"
-                            data-te-modal-dismiss aria-label="Close">
-                            Cancel
-                    </button>
-                    <button type="button" @click="btnClickedCreateContact()"
-                            class="add-btn focus:outline-none focus:ring-0 ">
-                            Create
-                    </button>
                 </div>
             </div>
         </div>
@@ -180,7 +121,7 @@
                 <div class="relative flex justify-between py-2 px-6 border-b">
                     <h5 class="text-base text-center mt-2 font-semibold leading-normal font-inter"
                         id="check_modalLabel">
-                        Confirm Procurement Order Item
+                        Confirm Arrival Item
                     </h5>
                     <button type="button" class="text-xs focus:shadow-none focus:outline-none" data-te-modal-dismiss id="close_create_modal"
                         aria-label="Close">
@@ -223,7 +164,7 @@
                     </div>
                     <div class="mb-4 ml-6">
                         <input
-                            v-model="isLaterBuy"
+                            v-model="isLaterArrival"
                             class="relative float-left -ml-[1.5rem] mr-[6px] mt-[0.15rem] h-[1.125rem] w-[1.125rem]
                             appearance-none rounded-[0.25rem] border-[0.125rem] border-solid border-neutral-300
                             outline-none before:pointer-events-none before:absolute before:h-[0.875rem] before:w-[0.875rem]
@@ -246,40 +187,66 @@
                             dark:checked:focus:before:shadow-[0px_0px_0px_13px_#3b71ca]"
                             type="checkbox"
                             value=""
-                            :checked="isLaterBuy"
+                            :checked="isLaterArrival"
                             id="checkboxDefault" />
                         <label
                             class="inline-block pl-[0.15rem] hover:cursor-pointer text-sm"
                             for="checkboxDefault">
-                            Later Buy
+                            Later Arrival
                         </label>
                     </div>
                     <div class="mb-4">
-                        <label for="supplier" class="text-sm">Supplier</label>
-                        <select name="" id="supplier" v-model="selectedSupplier"
+                        <label for="invoice" class="text-sm">Invoice</label>
+                        <select id="invoice" v-model="selectedInvoice" @change="invoiceSelectChanged()"
                         class="text-sm border border-gray-300 input-ui w-12
-                        bg-transparent rounded-lg focus:ring-0" @change="getItemBrands">
-                            <option :value="supplier" v-for="(supplier, supplierIndex) in itemSuppliers" :key="supplierIndex">
-                                {{ supplier.supplier.name }}
+                        bg-transparent rounded-lg focus:ring-0">
+                            <option :value="invoice" v-for="(invoice, invoiceIndex) in invoices" :key="invoiceIndex">
+                                {{ invoice.invoice_no }}
                             </option>
                         </select>
                     </div>
-                    <div class="mb-4">
-                        <label for="brand" class="text-sm">Brand</label>
-                        <select name="" id="brand" v-model="selectedBrand"
-                        class="text-sm border border-gray-300 input-ui w-12
-                        bg-transparent rounded-lg focus:ring-0" @change="brandSelectChanged" >
-                            <option :value="brand" v-for="(brand, brandIndex) in itemBrands" :key="brandIndex">
-                                {{ brand.brand.name }}
-                            </option>
-                        </select>
+                    <div class="mb-4 ml-6">
+                        <input
+                            v-model="isCreateNewInvoice"
+                            class="relative float-left -ml-[1.5rem] mr-[6px] mt-[0.15rem] h-[1.125rem] w-[1.125rem]
+                            appearance-none rounded-[0.25rem] border-[0.125rem] border-solid border-neutral-300
+                            outline-none before:pointer-events-none before:absolute before:h-[0.875rem] before:w-[0.875rem]
+                            before:scale-0 before:rounded-full before:bg-transparent before:opacity-0
+                            before:shadow-[0px_0px_0px_13px_transparent] before:content-[''] checked:border-primary checked:bg-primary
+                            checked:before:opacity-[0.16] checked:after:absolute checked:after:-mt-px checked:after:ml-[0.25rem]
+                            checked:after:block checked:after:h-[0.8125rem] checked:after:w-[0.375rem] checked:after:rotate-45
+                            checked:after:border-[0.125rem] checked:after:border-l-0 checked:after:border-t-0 checked:after:border-solid
+                            checked:after:border-white checked:after:bg-transparent checked:after:content-[''] hover:cursor-pointer
+                            hover:before:opacity-[0.04] hover:before:shadow-[0px_0px_0px_13px_rgba(0,0,0,0.6)] focus:shadow-none
+                            focus:transition-[border-color_0.2s] focus:before:scale-100 focus:before:opacity-[0.12]
+                            focus:before:shadow-[0px_0px_0px_13px_rgba(0,0,0,0.6)] focus:before:transition-[box-shadow_0.2s,transform_0.2s]
+                            focus:after:absolute focus:after:z-[1] focus:after:block focus:after:h-[0.875rem] focus:after:w-[0.875rem]
+                            focus:after:rounded-[0.125rem] focus:after:content-[''] checked:focus:before:scale-100
+                            checked:focus:before:shadow-[0px_0px_0px_13px_#3b71ca] checked:focus:before:transition-[box-shadow_0.2s,transform_0.2s]
+                            checked:focus:after:-mt-px checked:focus:after:ml-[0.25rem] checked:focus:after:h-[0.8125rem] checked:focus:after:w-[0.375rem]
+                            checked:focus:after:rotate-45 checked:focus:after:rounded-none checked:focus:after:border-[0.125rem] checked:focus:after:border-l-0
+                            checked:focus:after:border-t-0 checked:focus:after:border-solid checked:focus:after:border-white checked:focus:after:bg-transparent
+                            dark:border-neutral-600 dark:checked:border-primary dark:checked:bg-primary dark:focus:before:shadow-[0px_0px_0px_13px_rgba(255,255,255,0.4)]
+                            dark:checked:focus:before:shadow-[0px_0px_0px_13px_#3b71ca]"
+                            type="checkbox"
+                            value=""
+                            :checked="isCreateNewInvoice"
+                            @change="createInvoiceCheckboxChanged"
+                            id="createInvoiceChkb" />
+                        <label
+                            class="inline-block pl-[0.15rem] hover:cursor-pointer text-sm"
+                            for="createInvoiceChkb">
+                            Create new invoice?
+                        </label>
                     </div>
                     <div class="mb-4">
-                        <label for="supplier" class="text-sm">Price</label>
-                        <input type="number"
+                        <label for="invoice-number" class="text-sm">Invoice Number</label>
+                        <input type="text"
+                        placeholder="Invoice Number"
+                        v-model="newInvoiceNumber"
+                        :disabled="!isCreateNewInvoice"
                         class="input-ui"
-                        v-model="totalPrice"
-                        disabled>
+                        >
                     </div>
                 </div>
                 <div class="flex justify-end gap-x-4 px-6 mb-6 pt-4">
@@ -296,7 +263,6 @@
             </div>
         </div>
     </div>
-
 </template>
 
 <script>
@@ -307,41 +273,43 @@ import { mapGetters } from "vuex";
 export default {
     data() {
         return {
-            orderItems: [],
+            items: [],
 
-            searchInput:null,
-
-            url:'/api/po_items',
-            url_search:'',
-            deleteId:null,
-
-            currentPage: 0,
+            currentPage: 1,
             perPage: 0,
             lastPage: 0,
             totalData: 0,
 
-            confirmPO: null,
+            search: '',
+            isShowInput: false,
+
+            uomConversions: [],
+            selectedUomConversion: null,
+
+            confirmArrivalItem: null,
             uomName: null,
             uomQty: 0,
             baseUomName: null,
             baseUomQty: 0,
-            originalPOTotalQty: 0,
-            confirmPOTotalQty: 0,
-            isLaterBuy: false,
-            itemSuppliers: [],
-            itemBrands: [],
-            selectedSupplier: null,
-            selectedBrand: null,
-            itemId: null,
-            totalPrice: 0,
+            isLaterArrival: false,
+            originalArrivalTotalQty: 0,
+            confirmArrivalTotalQty: 0,
 
-            uomConversions: [],
-            selectedUomConversion: null,
-        };
+            invoices:  [],
+            selectedInvoice: null,
+            isCreateNewInvoice: false,
+            newInvoiceNumber: null,
+
+            totalPrice: 0,
+        }
     },
 
     methods: {
         ...mapGetters(['getToken']),
+
+        showInput() {
+            this.isShowInput = true;
+        },
 
         async getUomConversions(){
             let response = await getApiData({ url: '/api/uom_conversions', token: this.getToken() });
@@ -350,149 +318,141 @@ export default {
             }
         },
 
-        async getItemSuppliers(itemId){
-            let response = await getApiData({ url: `/api/supplier_by_item/${itemId}`, token: this.getToken() });
-            if(response.data){
-                this.itemSuppliers = response.data;
-            }
-        },
-
-        async getItemBrands(){
-            let response = await getApiData({ url: `/api/brand_by_supplier?item_id=${this.itemId}&supplier_id=${this.selectedSupplier.supplier_id}`, token: this.getToken() });
-            if(response.data){
-                this.itemBrands = response.data;
-            }
-        },
-
-        brandSelectChanged(){
-            console.log(this.selectedBrand);
-            if(this.selectedBrand.item_price){
-                this.totalPrice = (this.confirmPOTotalQty / this.selectedUomConversion.conversion) * this.selectedBrand.item_price.price;
-                this.totalPrice = Math.round(this.totalPrice * 100) / 100;
-            }else{
-                this.totalPrice = 0;
-            }
-        },
-
-        async getOrderItems(pageNumber) {
-            let url = this.url;
+        async getItems(page) {
+            let url = `/api/po_arrival_list?page=${page}`;
             let response = await getApiData({ url: url, token: this.getToken() });
             if (response.data) {
-                this.orderItems = response.data.data;
-                this.orderItems.map(item => ({ ...item, showPurchaseOrders: false }));
+                this.items = response.data.data;
+                this.items.map(item => ({ ...item, showDatails: false, arrival_details: [] }));
+                this.items.forEach(item => {
+                    let responsePromise = getApiData({ url: `/api/po_arrival_list/${item.item_id}`, token: this.getToken() });
+                    responsePromise.then(response => {
+                        item.arrival_details = response.data;
+                    });
+                });
                 this.lastPage = response.data.last_page;
-                this.currentPage = pageNumber;
+                this.currentPage = page;
                 this.perPage = response.data.per_page;
             }
         },
 
-        togglePurchaseOrders(index) {
-            if(this.orderItems[index].purchase_order_details.length > 1){
-                this.orderItems[index].showPurchaseOrders = !this.orderItems[index].showPurchaseOrders;
+        toggleItems(index) {
+            if(this.items[index].arrival_details.length > 1){
+                this.items[index].showDatails = !this.items[index].showDatails;
             }
         },
 
-        async editBtnClicked(poItem, index){
-
+        async getInvoices(supplierId){
+            let response = await getApiData({ url: `/api/invoice_by_supplier/${supplierId}`, token: this.getToken() });
+            if(response.data){
+                this.invoices = response.data;
+            }
         },
 
-        async checkBtnClicked(purchaseOrder, itemId){
-            console.log(purchaseOrder);
-            console.log(itemId);
-            this.itemId = itemId;
-            this.selectedUomConversion = this.uomConversions.find(uomConversion => uomConversion.id === purchaseOrder.uom_conversion_id);
-            this.confirmPO = purchaseOrder;
-            this.uomName = purchaseOrder.uom_name;
-            this.uomQty = purchaseOrder.uom_quantity;
-            this.baseUomName = purchaseOrder.base_uom_name;
-            this.baseUomQty = purchaseOrder.base_uom_quantity;
-            this.originalPOTotalQty = (purchaseOrder.base_uom_quantity * this.selectedUomConversion.conversion) + purchaseOrder.uom_quantity;
-            this.confirmPOTotalQty = this.originalPOTotalQty;
-            this.totalPrice = 0;
-            this.getItemSuppliers(this.itemId);
+        checkBtnClicked(arrival){
+            this.confirmArrivalItem = arrival;
+            this.baseUomName = this.confirmArrivalItem.base_uom.name;
+            this.baseUomQty = this.confirmArrivalItem.base_uom_quantity;
+            this.uomName = this.confirmArrivalItem.uom.name;
+            this.uomQty = this.confirmArrivalItem.uom_quantity;
+            // this.selectedUomConversion = this.uomConversions.find(uomConversion => uomConversion.id === arrival.uom_conversion_unit_id);
+            this.selectedUomConversion = this.confirmArrivalItem.uom_conversion;
+            this.originalArrivalTotalQty = (arrival.base_uom_quantity * this.selectedUomConversion.conversion) + arrival.uom_quantity;
+            this.confirmArrivalTotalQty = this.originalArrivalTotalQty;
+            this.calculateTotalPrice();
+            console.log(this.originalArrivalTotalQty);
+            console.log(this.confirmArrivalTotalQty);
+            this.getInvoices(this.confirmArrivalItem.supplier_id);
         },
 
         baseUomQtyChanged(){
-            if(this.confirmPO){
-                this.confirmPOTotalQty = (this.baseUomQty * this.selectedUomConversion.conversion) + this.uomQty;
-                if(this.confirmPOTotalQty < this.originalPOTotalQty){
-                    this.isLaterBuy = true;
+            if(this.confirmArrivalItem){
+                this.confirmArrivalTotalQty = (this.baseUomQty * this.selectedUomConversion.conversion) + this.uomQty;
+                if(this.confirmArrivalTotalQty < this.originalArrivalTotalQty){
+                    this.isLaterArrival = true;
                 }else{
-                    this.isLaterBuy = false;
+                    this.isLaterArrival = false;
                 }
             }
-            this.brandSelectChanged();
+            this.calculateTotalPrice();
         },
 
         uomQtyChanged(){
-            if(this.confirmPO){
-                this.confirmPOTotalQty = (this.baseUomQty * this.selectedUomConversion.conversion) + this.uomQty;
-                if(this.confirmPOTotalQty < this.originalPOTotalQty){
-                    this.isLaterBuy = true;
+            if(this.confirmArrivalItem){
+                this.confirmArrivalTotalQty = (this.baseUomQty * this.selectedUomConversion.conversion) + this.uomQty;
+                if(this.confirmArrivalTotalQty < this.originalArrivalTotalQty){
+                    this.isLaterArrival = true;
                 }else{
-                    this.isLaterBuy = false;
+                    this.isLaterArrival = false;
                 }
             }
-            this.brandSelectChanged();
+            this.calculateTotalPrice();
+        },
+
+        calculateTotalPrice(){
+            this.totalPrice = (this.confirmArrivalTotalQty / this.selectedUomConversion.conversion) * this.confirmArrivalItem.item_price.price;
+            this.totalPrice = Math.round(this.totalPrice * 100) / 100;
+            console.log('total price', this.totalPrice);
+        },
+
+        createInvoiceCheckboxChanged(){
+            if(this.isCreateNewInvoice){
+                this.selectedInvoice = null;
+            }
+        },
+
+        invoiceSelectChanged(){
+            this.isCreateNewInvoice = false;
+            this.newInvoiceNumber = null;
         },
 
         async confirmBtnClicked(){
-            let formData = new FormData();
-            if(!this.selectedBrand || !this.selectedSupplier){
-                this.alertValidationMessage('required data');
+            if(this.isCreateNewInvoice && !this.newInvoiceNumber){
+                this.alertValidationMessage(`new invoice number`);
                 return;
             }
+            if(!this.isCreateNewInvoice && !this.selectedInvoice){
+                this.alertValidationMessage(`existing invoice number`);
+                return;
+            }
+            let formData = new FormData();
             formData.append('base_uom_quantity', this.baseUomQty);
             formData.append('uom_quantity', this.uomQty);
-            formData.append('base_uom_id', this.confirmPO.base_uom_id);
-            formData.append('uom_id', this.confirmPO.uom_id);
+            formData.append('base_uom_id', this.confirmArrivalItem.base_uom_id);
+            formData.append('uom_id', this.confirmArrivalItem.uom_id);
             formData.append('uom_conversion_unit_id', this.selectedUomConversion.id);
-            formData.append('item_id', this.itemId);
-            formData.append('supplier_id', this.selectedSupplier.supplier_id);
-            formData.append('brand_id', this.selectedBrand.brand_id);
-            formData.append('item_price_id', this.selectedBrand.item_price.id);
-            formData.append('purchase_order_id', this.confirmPO.id);
-            formData.append('quantity', this.confirmPO.quantity);
-            formData.append('amount', this.confirmPO.amount);
-            formData.append('later_buy', (this.isLaterBuy) ? 1 : 0);
-            formData.append('item_leftable_type', 'po_order');
-            let response = await postApiData({ url: '/api/po_items', form_data: formData , token: this.getToken() });
+            formData.append('quantity', this.confirmArrivalItem.quantity);
+            formData.append('amount', this.confirmArrivalItem.amount);
+            formData.append('item_id', this.confirmArrivalItem.item_id);
+            formData.append('po_order_id', this.confirmArrivalItem.purchase_order.id);
+            formData.append('po_invoice_id', (this.selectedInvoice)? this.selectedInvoice.id: null);
+            formData.append('later_buy', (this.isLaterArrival) ? 1 : 0);
+            formData.append('item_leftable_type', 'arrival_item');
+            formData.append('total_invoice_amount', this.totalPrice);
+            let response = await postApiData({url: `/api/po_arrival_items`, form_data: formData, token: this.getToken()});
             if(response.success){
-                // this.getOrderItems(1);
                 this.$notify({
-                    text: `Procurement Order Item created successfully`,
+                    text: `Arrival item confirmed successfully`,
                     type: 'info'
                 });
-                this.selectedBrand = null;
-                this.selectedSupplier = null;
+                this.getItems(this.currentPage);
+                this.confirmArrivalItem = null;
                 this.selectedUomConversion = null;
-                this.confirmPO = null;
-                this.confirmPOTotalQty = 0;
-                this.originalPOTotalQty = 0;
-                this.baseUomQty = 0;
                 this.uomQty = 0;
-                this.baseUomName = null;
                 this.uomName = null;
-                this.itemId = null;
-                this.isLaterBuy = false;
+                this.baseUomQty = 0;
+                this.isLaterArrival = false;
+                this.isCreateNewInvoice = false;
+                this.newInvoiceNumber = null;
+                this.selectedInvoice = null;
                 this.totalPrice = 0;
             }else{
                 this.$notify({
-                    text: `Procurement Order Item creation failed`,
+                    text: `Arrival item confirmation failed`,
                     type: 'error'
                 });
             }
         },
-
-        // async searchBtnClicked() {
-        //     this.url_search = '&search=' + this.searchInput
-        //     this.getGpsList(1);
-        // },
-        // clearSearchBtnClicked() {
-        //     this.searchInput = null;
-        //     this.url_search = '';
-        //     this.getGpsList(1);
-        // },
 
         alertValidationMessage(field) {
             this.$notify({
@@ -501,15 +461,15 @@ export default {
                 type: 'warn'
             });
         },
-
     },
+
+    created() {
+        this.getItems(this.currentPage);
+        // this.getUomConversions();
+    },
+
     mounted() {
         initTE({ Modal, Select, Ripple });
-    },
-    created() {
-        this.getOrderItems(1);
-        this.getUomConversions();
     }
 }
 </script>
-<style scoped src="node_modules/vue-multiselect/dist/vue-multiselect.css"></style>
