@@ -17,8 +17,9 @@ class PoInvoiceResource extends JsonResource
         return [
             'id' => $this->id,
             'invoice_no' => $this->invoice_no,
+            'date_time' => $this->date_time,
+            'total_invoice_quantity' => $this->total_invoice_quantity,
             'total_invoice_amount' => $this->total_invoice_amount,
-            // 'date_time' => $this->date_time,
             'item_names' => $this->item_names,
             'supplier_id' => $this->supplier_id,
             'supplier_name' => $this->supplier_name,
