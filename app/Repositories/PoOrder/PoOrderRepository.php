@@ -9,6 +9,7 @@ use App\Models\ArrivalItem;
 use Illuminate\Http\Request;
 use App\Models\PurchaseOrderItem;
 use Illuminate\Support\Facades\DB;
+use App\Http\Resources\PoInvoiceResource;
 use App\Http\Resources\PoOrderItemResource;
 
 class PoOrderRepository implements PoOrderRepositoryInterface
@@ -16,7 +17,6 @@ class PoOrderRepository implements PoOrderRepositoryInterface
 
   public function getPoOrderItems(Request $request)
   {
-    // return $this->test($request);
     $poOrderItems = DB::table('purchase_order_items as poi')
       ->join('items as i', 'poi.item_id', '=', 'i.id')
       ->join('uoms as u', 'poi.uom_id', '=', 'u.id')
@@ -657,9 +657,20 @@ END,
 
   public function getInvoices(Request $request)
   {
-    $invoices = PoInvoice::with(['arrivalItems.poOrder.PurchaseOrder', 'arrivalItems.poOrder.Item', 'arrivalItems.poOrder.Supplier'])
+    $poInvoices = PoInvoice::select([
+      'po_invoices.id',
+      'po_invoices.invoice_no',
+      'po_invoices.total_invoice_amount',
+      'po.supplier_id',
+      's.name as supplier_name',
+      DB::raw('GROUP_CONCAT(DISTINCT i.name SEPARATOR ", ") as item_names'),
+    ])
+      ->join('arrival_items as ai', 'po_invoices.id', '=', 'ai.po_invoice_id')
+      ->join('po_orders as po', 'ai.po_order_id', '=', 'po.id')
+      ->join('items as i', 'po.item_id', '=', 'i.id')
+      ->join('suppliers as s', 'po.supplier_id', '=', 's.id')
+      ->groupBy('po_invoices.id', 'po_invoices.invoice_no', 'po_invoices.total_invoice_amount', 'po.supplier_id', 's.name')
       ->paginate(config('common.list_count'));
-
-    return $invoices;
+    return PoInvoiceResource::collection($poInvoices);
   }
 }
