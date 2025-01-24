@@ -232,7 +232,7 @@ END,
       $validatedData['created_by'] = UserData()->id;
       $poOrder = PoOrder::create($validatedData);
 
-      if (isset($validatedData['later_by']) && $validatedData['later_by'] == 1) {
+      if (isset($validatedData['later_buy']) && $validatedData['later_buy'] == 1) {
 
         $purchaseOrderItem = PurchaseOrderItem::where('purchase_order_id', $validatedData['purchase_order_id'])
           ->where('item_id', $validatedData['item_id'])
@@ -368,7 +368,7 @@ END,
   //   return $poOrders;
   // }
 
-
+  // correct groupBy
   public function getPoOrderArrivalList(Request $request)
   {
     $poOrders = DB::table('po_orders as poOrder')
@@ -412,14 +412,57 @@ END,
     return $poOrders;
   }
 
+  // public function getPoOrderArrivalListByItemId($itemId)
+  // {
+  //   $poOrders = PoOrder::with(['purchaseOrder', 'uomConversion', 'uom', 'baseUom', 'item', 'brand', 'supplier', 'itemPrice'])
+  //     ->where('item_id', $itemId)
+  //     ->get();
+
+  //   return PoOrderItemResource::collection($poOrders);
+  // }
+
+
+
   public function getPoOrderArrivalListByItemId($itemId)
   {
     $poOrders = PoOrder::with(['purchaseOrder', 'uomConversion', 'uom', 'baseUom', 'item', 'brand', 'supplier', 'itemPrice'])
       ->where('item_id', $itemId)
       ->get();
 
+    foreach ($poOrders as $poOrder) {
+
+      $arrivalItems = ArrivalItem::where('po_order_id', $poOrder->id)->get();
+
+      if ($arrivalItems->isNotEmpty()) {
+        foreach ($arrivalItems as $arrivalItem) {
+
+          $itemLeft = ItemLeft::where('item_leftable_id', $arrivalItem->id)
+            ->where('item_leftable_type', 'arrival_item')
+            ->get();
+
+          if ($itemLeft->isNotEmpty()) {
+
+            $totalItemLeftQuantity = $itemLeft->sum('quantity');
+            $totalItemLeftAmount = $itemLeft->sum('amount');
+            $totalItemLeftBaseUomQuantity = $itemLeft->sum('base_uom_quantity');
+            $totalItemLeftUomQuantity = $itemLeft->sum('uom_quantity');
+
+            $poOrder->quantity -= $totalItemLeftQuantity;
+            $poOrder->amount -= $totalItemLeftAmount;
+            $poOrder->base_uom_quantity -= $totalItemLeftBaseUomQuantity;
+            $poOrder->uom_quantity -= $totalItemLeftUomQuantity;
+          } else {
+            $poOrder->quantity = 0;
+            $poOrder->amount = 0;
+            $poOrder->base_uom_quantity = 0;
+            $poOrder->uom_quantity = 0;
+          }
+        }
+      }
+    }
     return PoOrderItemResource::collection($poOrders);
   }
+
 
   public function getInvoiceBySupplier($supplierId)
   {
@@ -441,7 +484,7 @@ END,
         $invoiceData = [
           'invoice_no' => $validatedData['invoice_no'],
           'date_time' => now(),
-          'total_invoice_amount' => $validatedData['total_invoice_amount'],
+          'total_invoice_amount' =>  $validatedData['amount'],
           'created_by' => UserData()->id,
         ];
         $newPoInvoice = PoInvoice::create($invoiceData);
@@ -466,7 +509,7 @@ END,
 
         if ($poInvoice) {
 
-          $poInvoice->total_invoice_amount += $validatedData['total_invoice_amount'];
+          $poInvoice->total_invoice_amount += $validatedData['amount'];
           $poInvoice->save();
           $arrivalItemData = [
             'base_uom_id'  => $validatedData['base_uom_id'],
@@ -491,7 +534,6 @@ END,
         if ($poOrder->quantity <  $arrivalItem->quantity) {
           ResponseMessage('The arrival  quantity exceeds the available quantity.', 419);
         }
-
 
         $remainingQuantity = null;
         if ($poOrder->quantity >  $arrivalItem->quantity) {
@@ -605,5 +647,13 @@ END,
     } else {
       return "{$hours} hours, {$minutes} minutes";
     }
+  }
+
+  public function getInvoices(Request $request)
+  {
+    $invoices = PoInvoice::with(['arrivalItems.poOrder.PurchaseOrder', 'arrivalItems.poOrder.Item', 'arrivalItems.poOrder.Supplier'])
+      ->paginate(config('common.list_count'));
+
+    return $invoices;
   }
 }

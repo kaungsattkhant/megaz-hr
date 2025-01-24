@@ -60,4 +60,10 @@ class PoOrderController extends Controller
         $data =  $this->PoOrderRepository->getSupplierLeadTime($supplierId);
         ResponseData($data);
     }
+
+    public function getInvoices(Request $request)
+    {
+        $data =  $this->PoOrderRepository->getInvoices($request);
+        ResponseData($data);
+    }
 }

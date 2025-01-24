@@ -35,7 +35,7 @@ class PoOrderItemRequest extends APIRequest
             'supplier_id' => 'required|integer|exists:suppliers,id',
             'purchase_order_id' => 'required|integer|exists:purchase_orders,id',
             'item_price_id' => 'nullable|integer|exists:item_prices,id',
-            'later_by' => 'nullable',
+            'later_buy' => 'nullable',
             'item_leftable_type' => 'nullable'
         ];
     }

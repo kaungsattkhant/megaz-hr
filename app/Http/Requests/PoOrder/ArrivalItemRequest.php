@@ -36,7 +36,6 @@ class ArrivalItemRequest extends APIRequest
             'item_leftable_type' => 'nullable',
             'is_new_invoice' => 'nullable',
             'invoice_no' => 'nullable',
-            'total_invoice_amount' => 'nullable',
         ];
     }
 
