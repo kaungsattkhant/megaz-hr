@@ -248,14 +248,6 @@
                         class="input-ui"
                         >
                     </div>
-                    <div class="mb-4">
-                        <label for="invoice-number" class="text-sm">Invoice Amount</label>
-                        <input type="number"
-                        placeholder="Invoice Number"
-                        v-model="totalInvoiceAmount"
-                        class="input-ui"
-                        >
-                    </div>
                 </div>
                 <div class="flex justify-end gap-x-4 px-6 mb-6 pt-4">
                     <button type="button" class="cancel-btn focus:shadow-none focus:outline-none"
@@ -309,7 +301,6 @@ export default {
             newInvoiceNumber: null,
 
             totalPrice: 0,
-            totalInvoiceAmount: 0,
         }
     },
 
@@ -376,9 +367,9 @@ export default {
             if(this.confirmArrivalItem){
                 this.confirmArrivalTotalQty = (this.baseUomQty * this.selectedUomConversion.conversion) + this.uomQty;
                 if(this.confirmArrivalTotalQty < this.originalArrivalTotalQty){
-                    this.isLaterArrival = true;
+                    // this.isLaterArrival = true;
                 }else{
-                    this.isLaterArrival = false;
+                    // this.isLaterArrival = false;
                 }
             }
             this.calculateTotalPrice();
@@ -388,9 +379,9 @@ export default {
             if(this.confirmArrivalItem){
                 this.confirmArrivalTotalQty = (this.baseUomQty * this.selectedUomConversion.conversion) + this.uomQty;
                 if(this.confirmArrivalTotalQty < this.originalArrivalTotalQty){
-                    this.isLaterArrival = true;
+                    // this.isLaterArrival = true;
                 }else{
-                    this.isLaterArrival = false;
+                    // this.isLaterArrival = false;
                 }
             }
             this.calculateTotalPrice();
@@ -421,10 +412,6 @@ export default {
                 this.alertValidationMessage(`existing invoice number`);
                 return;
             }
-            if(this.totalInvoiceAmount <= 0){
-                this.alertValidationMessage(`total invoice amount`);
-                return;
-            }
             let formData = new FormData();
             formData.append('base_uom_quantity', this.baseUomQty);
             formData.append('uom_quantity', this.uomQty);
@@ -441,7 +428,6 @@ export default {
             formData.append('later_buy', (this.isLaterArrival) ? 1 : 0);
             formData.append('is_new_invoice', (this.isCreateNewInvoice) ? 1 : 0);
             formData.append('item_leftable_type', 'arrival_item');
-            formData.append('total_invoice_amount', this.totalInvoiceAmount);
             if(this.newInvoiceNumber){
                 formData.append('invoice_no', this.newInvoiceNumber);
             }
@@ -462,7 +448,6 @@ export default {
                 this.newInvoiceNumber = null;
                 this.selectedInvoice = null;
                 this.totalPrice = 0;
-                this.totalInvoiceAmount = 0;
             }else{
                 this.$notify({
                     text: `Arrival item confirmation failed`,
