@@ -44,8 +44,7 @@
                         <tbody>
                             <!-- looping start -->
                             <div class="contents" v-for="(item, index) in items" :key="index">
-                                <tr class="" data-te-collapse-init :data-te-target="'#orderCollapse'+index"
-                                aria-expanded="false" aria-controls="collapseExample">
+                                <tr class="">
                                     <td class=" font-medium ">
                                         {{ perPage * (currentPage - 1) + (index + 1) }}
                                     </td>
