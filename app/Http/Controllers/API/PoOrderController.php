@@ -4,6 +4,7 @@ namespace App\Http\Controllers\API;
 
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\PoOrder\ArrivalItemRequest;
 use App\Http\Requests\PoOrder\PoOrderItemRequest;
 use App\Repositories\PoOrder\PoOrderRepositoryInterface;
 
@@ -26,6 +27,43 @@ class PoOrderController extends Controller
     {
         $validatedData = $request->validated();
         $data =  $this->PoOrderRepository->storePoOrderItems($validatedData);
+        ResponseData($data);
+    }
+
+    public function getPoOrderArrivalList(Request $request)
+    {
+        $data =  $this->PoOrderRepository->getPoOrderArrivalList($request);
+        ResponseData($data);
+    }
+
+    public function getPoOrderArrivalListByItemId($itemId)
+    {
+        $data =  $this->PoOrderRepository->getPoOrderArrivalListByItemId($itemId);
+        ResponseData($data);
+    }
+
+    public function getInvoiceBySupplier($supplierId)
+    {
+        $data =  $this->PoOrderRepository->getInvoiceBySupplier($supplierId);
+        ResponseData($data);
+    }
+
+    public function storePoArrivalItems(ArrivalItemRequest $request)
+    {
+        $validatedData = $request->validated();
+        $data =  $this->PoOrderRepository->storePoArrivalItems($validatedData);
+        ResponseData($data);
+    }
+
+    public function getSupplierLeadTime($supplierId)
+    {
+        $data =  $this->PoOrderRepository->getSupplierLeadTime($supplierId);
+        ResponseData($data);
+    }
+
+    public function getInvoices(Request $request)
+    {
+        $data =  $this->PoOrderRepository->getInvoices($request);
         ResponseData($data);
     }
 }

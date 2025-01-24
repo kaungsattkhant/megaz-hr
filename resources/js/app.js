@@ -77,6 +77,7 @@ import ArPaidComponent from './Components/AR/ArPaidComponent.vue';
 import SupplierListComponent from './Components/Supplier/SupplierListComponent.vue';
 import SupplierCreateComponent from './Components/Supplier/SupplierCreateComponent.vue';
 import SupplierUpdateComponent from './Components/Supplier/SupplierUpdateComponent.vue';
+import SupplierLeadTimeComponent from './Components/Supplier/SupplierLeadTimeComponent.vue';
 import FixedAssetCrudComponent from './Components/FixedAssets/FixedAssetCrudComponent.vue';
 import AssetItemCrudComponent from './Components/FixedAssets/AssetItemCrudComponent.vue';
 import AssetCrudComponent from './Components/FixedAssets/AssetCrudComponent.vue';
@@ -115,6 +116,7 @@ import CheckInComponent from './Components/CheckIn/CheckInComponent.vue';
 import ContactCrudComponent from './Components/Contact/ContactCrudComponent.vue';
 import LeadTimeComponent from './Components/LeadTime/LeadTimeComponent.vue';
 import ProcurementOrderItemsComponent from './Components/ProcurementOrderItems/ProcurementOrderItemsComponent.vue';
+import ArrivalItemsComponent from './Components/ArrivalItems/ArrivalItemsComponent.vue';
 
 import LoginComponent from './Components/Auth/LoginComponent.vue';
 import LogoutComponent from './Components/Auth/LogoutComponent.vue';
@@ -242,6 +244,7 @@ app.component('CheckInComponent', CheckInComponent);
 app.component('ContactCrudComponent', ContactCrudComponent);
 app.component('LeadTimeComponent', LeadTimeComponent);
 app.component('ProcurementOrderItemsComponent', ProcurementOrderItemsComponent);
+app.component('ArrivalItemsComponent', ArrivalItemsComponent);
 
 app.component('PurchaseOrderListComponent', PurchaseOrderListComponent);
 app.component('PurchaseOrderCreateComponent', PurchaseOrderCreateComponent);
@@ -267,6 +270,7 @@ app.component('TableCrudComponent', TableCrudComponent);
 app.component('SupplierListComponent', SupplierListComponent);
 app.component('SupplierCreateComponent', SupplierCreateComponent);
 app.component('SupplierUpdateComponent', SupplierUpdateComponent);
+app.component('SupplierLeadTimeComponent', SupplierLeadTimeComponent);
 
 app.component('FixedAssetCrudComponent', FixedAssetCrudComponent);
 app.component('AssetItemCrudComponent', AssetItemCrudComponent);

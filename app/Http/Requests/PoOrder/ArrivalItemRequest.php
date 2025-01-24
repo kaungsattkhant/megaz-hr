@@ -5,14 +5,14 @@ namespace App\Http\Requests\PoOrder;
 use App\Http\Requests\APIRequest;
 use Illuminate\Contracts\Validation\Validator;
 
-class PoOrderItemRequest extends APIRequest
+class ArrivalItemRequest extends APIRequest
 {
     /**
      * Determine if the user is authorized to make this request.
      */
     public function authorize(): bool
     {
-        return parent::authorize();
+        return true;
     }
 
     /**
@@ -30,13 +30,12 @@ class PoOrderItemRequest extends APIRequest
             'uom_conversion_unit_id' => 'required|integer|exists:uom_conversions,id',
             'quantity' => 'required|numeric',
             'amount' => 'required|numeric',
-            'item_id' => 'required|integer|exists:items,id',
-            'brand_id' => 'nullable|integer|exists:brands,id',
-            'supplier_id' => 'required|integer|exists:suppliers,id',
-            'purchase_order_id' => 'required|integer|exists:purchase_orders,id',
-            'item_price_id' => 'nullable|integer|exists:item_prices,id',
+            'po_invoice_id' => 'nullable|integer|exists:po_invoices,id',
+            'po_order_id' => 'required|integer|exists:po_orders,id',
             'later_buy' => 'nullable',
-            'item_leftable_type' => 'nullable'
+            'item_leftable_type' => 'nullable',
+            'is_new_invoice' => 'nullable',
+            'invoice_no' => 'nullable',
         ];
     }
 
