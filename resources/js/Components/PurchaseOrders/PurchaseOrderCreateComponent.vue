@@ -6,8 +6,8 @@
             </p>
         </div>
 
-        <div class="grid grid-cols-12 gap-x-8 bg-white pt-4 pb-8 px-4 rounded-md shadow-md mb-8">
-            <div class="mb-6 col-span-3">
+        <div class="grid grid-cols-12 gap-x-8 gap-y-6 bg-white pt-4 pb-8 px-4 rounded-md shadow-md mb-8">
+            <div class="col-span-3">
                 <label for="" class="label-form mb-3">
                     Date
                 </label>
@@ -26,7 +26,7 @@
                 </select>
 
             </div>
-
+            <div class="col-span-9"></div>
             <div class="col-span-3">
                 <label for="" class="label-form mb-3">
                     Qty
@@ -42,6 +42,30 @@
                     data-te-select-wrapper-ref>
                     <select data-te-select-init data-te-select-placeholder="Select UOM" data-te-select-filter="true"
                         name="" id="" v-model="selectedUom"
+                        class="">
+                        <option :value="uom" v-for="(uom, uomIndex) in itemUoms" :key="uomIndex">
+                            {{ uom.name }}
+                        </option>
+                    </select>
+                </div>
+            </div>
+            <div class="col-span-6"></div>
+
+            <div class="col-span-3">
+                <label for="" class="label-form mb-3">
+                    Base UOM Qty
+                </label>
+                <input type="number" v-model="baseQuantity" class="input-ui" placeholder="Qty">
+            </div>
+
+            <div class="col-span-3">
+                <label for="" class="block text-sm text-black mb-3">
+                    Base UOM
+                </label>
+                <div class="bg-white mb-0 w-full text-xs h-8 border-b border-black rounded-bl-[4px] rounded-br-[4px] overflow-hidden inline-block"
+                    data-te-select-wrapper-ref>
+                    <select data-te-select-init data-te-select-placeholder="Select UOM" data-te-select-filter="true"
+                        name="" id="" v-model="selectedBaseUom"
                         class="">
                         <option :value="uom" v-for="(uom, uomIndex) in itemUoms" :key="uomIndex">
                             {{ uom.name }}
@@ -74,7 +98,7 @@
                                 UOM
                             </th>
                             <th scope="col" class="">
-                                Amount
+                                Unit Price
                             </th>
                             <th scope="col" class="">
                                 Total
@@ -152,8 +176,9 @@
                 uomList: [],
                 itemUoms: [],
                 selectedUom: null,
-
                 quantity: null,
+                selectedBaseUom: null,
+                baseQuantity: null,
                 purchaseOrderItems: [],
 
                 totalPrice: 0,
@@ -213,49 +238,63 @@
                     this.alertValidationMessage('quantity');
                     return 1;
                 }
-                let floatItemPrice = parseFloat(this.selectedItem.average_price)
-                console.log(floatItemPrice)
-                let url = `/api/get_uom_conversion_by_uom?po_uom_id=${this.selectedUom.id}&item_uom_id=${this.selectedItem.uom_id}&item_price=${floatItemPrice}&base_uom_id=${this.selectedItem.base_uom_id}`;
-                let response = await getApiData({url: url, token: this.getToken()});
-                let uomConversion = null;
-                let amount = 0;
-                let price = 0;
-                if(response.data){
-                    uomConversion = response.data;
-                    amount = parseInt(response.data.price);
-                    price = this.quantity * amount;
-                    // amount = uomConversion.conversion;
-                    // amount = amount * (response.data.price);
-                    this.$notify({
-                        text: `Uom conversion by uom value ${amount}`,
-                        type: 'info'
-                    });
-                }
-                else{
-                    this.$notify({
-                        title: 'Error',
-                        text: response.message,
-                        type: 'error'
-                    });
-
+                if(!this.selectedBaseUom){
+                    this.alertValidationMessage('base uom');
                     return 1;
                 }
+                if(this.baseQuantity < 1){
+                    this.alertValidationMessage('quantity');
+                    return 1;
+                }
+                let floatItemPrice = parseFloat(this.selectedItem.average_price)
+                console.log(floatItemPrice)
+                // let url = `/api/get_uom_conversion_by_uom?po_uom_id=${this.selectedUom.id}&item_uom_id=${this.selectedItem.uom_id}&item_price=${floatItemPrice}&base_uom_id=${this.selectedItem.base_uom_id}`;
+                // let response = await getApiData({url: url, token: this.getToken()});
+                // let uomConversion = null;
+                // let amount = 0;
+                // let price = 0;
+                // if(response.data){
+                //     uomConversion = response.data;
+                //     amount = parseInt(response.data.price);
+                //     price = this.quantity * amount;
+                //     this.$notify({
+                //         text: `Uom conversion by uom value ${amount}`,
+                //         type: 'info'
+                //     });
+                // }
+                // else{
+                //     this.$notify({
+                //         title: 'Error',
+                //         text: response.message,
+                //         type: 'error'
+                //     });
+
+                //     return 1;
+                // }
                 // amount = (this.selectedItem.item_prices)? this.selectedItem.item_prices.price: 0;
+                let quantity = (this.baseQuantity * this.selectedItem.uom_conversion) + this.quantity
+                let price = ((this.baseQuantity * this.selectedItem.uom_conversion) + this.quantity) * this.selectedItem.average_price
                 this.purchaseOrderItems.push({
                     item_id: this.selectedItem.id,
-                    name: this.selectedItem.name,
-                    quantity: this.quantity,
-                    amount: amount,
+                    quantity: quantity,
+                    amount: this.selectedItem.average_price,
                     price: price,
                     uom_id: this.selectedUom.id,
+                    uom_quantity: this.quantity,
                     uom_name: this.selectedUom.name,
-                    uom_conversion_id: uomConversion.id,
+                    uom_conversion_id: this.selectedItem.uom_conversion_id,
+                    base_uom_id: this.selectedBaseUom.id,
+                    base_uom_quantity: this.baseQuantity,
+                    base_uom_name: this.selectedBaseUom.name,
+                    name: this.selectedItem.name,
                 });
 
                 this.updateTotalPrice(this.purchaseOrderItems);
                 this.selectedItem = null;
                 this.selectedUom = null;
                 this.quantity = null;
+                this.selectedBaseUom = null;
+                this.baseQuantity = null;
             },
 
             removePurchaseOrderItemBtnClicked(purchaseOrderItemsIndex){

@@ -51,7 +51,7 @@
                                     MD Checked
                                 </th>
 
-                                <th scope="col" class=" col-span-3">
+                                <th scope="col" colspan="4">
 
                                 </th>
                             </tr>
@@ -102,7 +102,11 @@
                                             <i class="far fa-shopping-basket"></i>
                                         </a>
                                     </td>
-
+                                    <td class="whitespace-nowrap  space-x-4">
+                                        <a :href="'/purchase_orders/' + purchaseOrder.id + '/edit'" id="" class="pr-1">
+                                            <i class="far fa-pen"></i>
+                                        </a>
+                                    </td>
                                     <td class="whitespace-nowrap  space-x-4">
                                         <a :href="'/purchase_orders/' + purchaseOrder.id + '/confirm'" id="" class="pr-1">
                                             <i class="far fa-bars"></i>

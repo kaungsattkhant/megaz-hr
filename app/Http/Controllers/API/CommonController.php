@@ -21,4 +21,5 @@ class CommonController extends Controller
         }
         ResponseMessage('Update fail',422);
     }
+
 }

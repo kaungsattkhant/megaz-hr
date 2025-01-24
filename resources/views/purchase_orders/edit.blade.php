@@ -5,7 +5,7 @@
 @section('content')
 
 <div id="app">
-    <purchase-order-create-component/>
+    <purchase-order-edit-component po-id={{$id}} />
 </div>
 
 @endsection

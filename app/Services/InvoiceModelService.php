@@ -3,7 +3,9 @@
 namespace App\Services;
 
 use App\Models\Entity;
+use App\Models\Account;
 use App\Models\EntitySession;
+use GuzzleHttp\Psr7\Response;
 use Illuminate\Support\Carbon;
 
 
@@ -103,6 +105,14 @@ class InvoiceModelService
             ->whereTime('end_time', '>=', $current_time)
             ->first();
         return $entitySession;
+    }
+
+    public function accountByCode($code){
+        $account=Account::getByAccountCode($code);
+        if(!$account){
+            ResponseMessage('Account is required',419) ;
+        }
+        return $account;
     }
 
 }
