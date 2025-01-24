@@ -788,7 +788,6 @@ class FinancialRepository implements FinancialInterface
         $data['other_receivable'] = $other_receivable_balances;
         $data['receivable_debtor'] = $receivable_debtor_balances;
 
-
         $otherPayableBalances = $this->financialService->getOtherPayableBalances($year, $month);
         $creditorBalances = $this->financialService->getCreditorBalances($year, $month);
         $depositBalances = $this->financialService->getCustomerDepositBalances($year, $month);
