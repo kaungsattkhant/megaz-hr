@@ -104,7 +104,6 @@ class PoOrderRepository implements PoOrderRepositoryInterface
   public function test($request)
   {
     $poClass = 'po_order';
-    // $poClass = 'App\Models\PoOrder';
 
     $leftsSubquery = DB::table('item_lefts')
       ->join('po_orders', function ($join) use ($poClass) {
@@ -231,6 +230,7 @@ class PoOrderRepository implements PoOrderRepositoryInterface
 
   public function storePoOrderItems($validatedData)
   {
+    dd($validatedData);
     DB::beginTransaction();
     try {
       $validatedData['created_by'] = UserData()->id;
