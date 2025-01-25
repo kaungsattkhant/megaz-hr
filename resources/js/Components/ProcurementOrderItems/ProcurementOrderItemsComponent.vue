@@ -287,8 +287,8 @@
                     data-te-modal-dismiss aria-label="Close">
                         Cancel
                     </button>
-                    <button type="button"
-                    class="add-btn focus:outline-none focus:ring-0 "
+                    <button type="button" class="add-btn focus:outline-none focus:ring-0 "
+                    data-te-modal-dismiss aria-label="Close"
                     @click="confirmBtnClicked">
                         Create
                     </button>
@@ -451,7 +451,7 @@ export default {
             formData.append('supplier_id', this.selectedSupplier.supplier_id);
             formData.append('brand_id', this.selectedBrand.brand_id);
             formData.append('item_price_id', this.selectedBrand.item_price.id);
-            formData.append('purchase_order_id', this.confirmPO.id);
+            formData.append('purchase_order_id', this.confirmPO.purchase_order.id);
             formData.append('quantity', this.confirmPO.quantity);
             formData.append('amount', this.confirmPO.amount);
             formData.append('later_buy', (this.isLaterBuy) ? 1 : 0);

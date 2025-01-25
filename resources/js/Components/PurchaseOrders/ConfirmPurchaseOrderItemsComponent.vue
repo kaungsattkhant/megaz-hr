@@ -2,96 +2,94 @@
     <div class="flex justify-between mb-3">
 
     </div>
-    <div class="block rounded-xl">
-        <div class="overflow-x-auto">
-            <div class="overflow-hidden ">
-                <table class="min-w-full primary-table rounded-xl text-center text-sm font-light ">
-                    <thead class="border-b font-medium ">
-                        <tr>
-                            <th scope="col" class=" px-6 py-4 ">
-                                #
-                            </th>
-                            <th scope="col" class=" px-6 py-4 ">
-                                Date
-                            </th>
-                            <th scope="col" class=" px-6 py-4 ">
-                                Purchase Order Id
-                            </th>
-                            <th scope="col" class=" px-6 py-4 ">
-                                Item Name
-                            </th>
-                            <th scope="col" class=" px-6 py-4 ">
-                                Uom
-                            </th>
-                            <th scope="col" class=" px-6 py-4 ">
-                                Quantity
-                            </th>
-                            <th scope="col" class=" px-6 py-4 ">
-                                Received?
-                            </th>
-                            <th scope="col" class="px-6 py-4 ">
+    <div class="pt-2 bg-white">
+        <div class="box-container-table">
+            <div class="overflow-x-auto">
+                <div class="table-container ">
+                    <table class="primary-table">
+                        <thead class="">
+                            <tr>
+                                <th scope="col" class="">
+                                    #
+                                </th>
+                                <th scope="col" class="">
+                                    Date
+                                </th>
+                                <th scope="col" class="">
+                                    Purchase Order Id
+                                </th>
+                                <th scope="col" class="">
+                                    Item Name
+                                </th>
+                                <th scope="col" class="">
+                                    Uom
+                                </th>
+                                <th scope="col" class="">
+                                    Quantity
+                                </th>
+                                <th scope="col" class="">
+                                    Received?
+                                </th>
+                                <th scope="col" class="">
 
-                            </th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <div class="contents" v-for="(item, index) in itemList" :key="index">
-                            <tr class="bg-white rounded-lg overflow-hidden shadow-lg">
-                                <td class=" px-6 py-4 font-medium ">
-                                    {{ ++index }}
-                                </td>
-                                <td class="whitespace-nowrap px-6 py-4 ">
-                                    {{ item.purchase_order.date }}
-                                </td>
-                                <td class="whitespace-nowrap px-6 py-4 ">
-                                    {{ item.purchase_order.po_id }}
-                                </td>
-                                <td class="whitespace-nowrap px-6 py-4 ">
-                                    {{ item.item ? item.item.name : '' }}
-                                </td>
-                                <td class="whitespace-nowrap px-6 py-4 ">
-                                    {{ item.uom.name }}
-                                </td>
-                                <td class="whitespace-nowrap px-6 py-4 ">
-                                    {{ item.quantity }}
-                                </td>
-                                <td class="whitespace-nowrap px-6 py-4 ">
-                                    {{ (item.is_confirmed == 1) ? "Yes" : "No" }}
-                                </td>
-                                <td class="whitespace-nowrap px-6 py-4 space-x-4">
-                                    <button data-te-toggle="modal" data-te-target="#checkModal"
-                                        @click="checkPurchaseOrderItemBtnClicked(item.id)"
-                                        :disabled="item.is_confirmed == 1">
-                                        <i class="far fa-check"></i>
-                                    </button>
-                                </td>
+                                </th>
                             </tr>
+                        </thead>
+                        <tbody>
+                            <div class="contents" v-for="(item, index) in itemList" :key="index">
+                                <tr class="">
+                                    <td class="font-medium ">
+                                        {{ ++index }}
+                                    </td>
+                                    <td class="whitespace-nowrap">
+                                        {{ item.purchase_order.date }}
+                                    </td>
+                                    <td class="whitespace-nowrap">
+                                        {{ item.purchase_order.po_id }}
+                                    </td>
+                                    <td class="whitespace-nowrap">
+                                        {{ item.item ? item.item.name : '' }}
+                                    </td>
+                                    <td class="whitespace-nowrap">
+                                        {{ item.uom.name }}
+                                    </td>
+                                    <td class="whitespace-nowrap">
+                                        {{ item.quantity }}
+                                    </td>
+                                    <td class="whitespace-nowrap">
+                                        {{ (item.is_confirmed == 1) ? "Yes" : "No" }}
+                                    </td>
+                                    <td class="whitespace-nowrap">
+                                        <button data-te-toggle="modal" data-te-target="#checkModal"
+                                            @click="checkPurchaseOrderItemBtnClicked(item.id)"
+                                            :disabled="item.is_confirmed == 1">
+                                            <i class="far fa-check"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                            </div>
+                        </tbody>
+                    </table>
+                    <!-- pagination -->
+                    <div class="flex justify-center">
 
-                            <tr class="">
-                                <td class=" py-2 "></td>
-                            </tr>
+                        <div v-if="totalData != 0" class=" bg-white  flex justify-center mt-5 py-3">
+                            <button class="rounded px-6 py-1 border  hover:bg-slate-200" :disabled="currentPage === 1"
+                                @click="getItemList(currentPage - 1)">«</button>
+
+                            <button class=" text-sm px-5 border">
+                                Page <span @dblclick="showInput">{{ currentPage }}</span> / <span class="text-gray-400">{{
+                                    lastPage }}</span>
+                            </button>
+
+                            <button class=" rounded px-6  py-1 border  hover:bg-slate-200"
+                                :disabled="currentPage === lastPage" @click="getItemList(currentPage + 1)">
+                                »</button>
                         </div>
-                    </tbody>
-                </table>
-                <!-- pagination -->
-                <div class="flex justify-center">
-
-                    <div v-if="totalData != 0" class=" bg-white  flex justify-center mt-5 py-3">
-                        <button class="rounded px-6 py-1 border  hover:bg-slate-200" :disabled="currentPage === 1"
-                            @click="getItemList(currentPage - 1)">«</button>
-
-                        <button class=" text-sm px-5 border">
-                            Page <span @dblclick="showInput">{{ currentPage }}</span> / <span class="text-gray-400">{{
-                                lastPage }}</span>
-                        </button>
-
-                        <button class=" rounded px-6  py-1 border  hover:bg-slate-200"
-                            :disabled="currentPage === lastPage" @click="getItemList(currentPage + 1)">
-                            »</button>
                     </div>
                 </div>
-            </div>
 
+            </div>
         </div>
     </div>
 
