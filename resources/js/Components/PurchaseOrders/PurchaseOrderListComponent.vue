@@ -283,13 +283,6 @@ export default {
                 });
             }
         },
-        async getTest() {
-            let url = `/api/working_capital`;
-            let response = await getApiData({ url: url, token: this.getToken() });
-            if (response.data) {
-                console.log(response.data)
-            }
-        },
 
         checkPurchaseOrderBtnClicked(purchaseOrderId) {
             this.checkId = purchaseOrderId;
@@ -368,7 +361,6 @@ export default {
             }
         });
         this.getPurhaseOrderList(1);
-        this.getTest();
     },
 
     mounted() {

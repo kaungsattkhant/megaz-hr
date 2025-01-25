@@ -115,6 +115,9 @@ import CheckInComponent from './Components/CheckIn/CheckInComponent.vue';
 import ContactCrudComponent from './Components/Contact/ContactCrudComponent.vue';
 import LeadTimeComponent from './Components/LeadTime/LeadTimeComponent.vue';
 import ProcurementOrderItemsComponent from './Components/ProcurementOrderItems/ProcurementOrderItemsComponent.vue';
+import WorkingCapitalComponent from './Components/WorkingCapital/WorkingCapitalComponent.vue';
+import ApBalancesComponent from './Components/ApBalances/ApBalancesComponent.vue';
+import CreditorBalancesComponent from './Components/CreditorBalances/CreditorBalancesComponent.vue';
 
 import LoginComponent from './Components/Auth/LoginComponent.vue';
 import LogoutComponent from './Components/Auth/LogoutComponent.vue';
@@ -242,6 +245,9 @@ app.component('CheckInComponent', CheckInComponent);
 app.component('ContactCrudComponent', ContactCrudComponent);
 app.component('LeadTimeComponent', LeadTimeComponent);
 app.component('ProcurementOrderItemsComponent', ProcurementOrderItemsComponent);
+app.component('WorkingCapitalComponent', WorkingCapitalComponent);
+app.component('ApBalancesComponent', ApBalancesComponent);
+app.component('CreditorBalancesComponent', CreditorBalancesComponent);
 
 app.component('PurchaseOrderListComponent', PurchaseOrderListComponent);
 app.component('PurchaseOrderCreateComponent', PurchaseOrderCreateComponent);

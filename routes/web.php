@@ -342,3 +342,6 @@ Route::view('/lead_time', 'lead_time.index')->name('lead_time');
 Route::view('/procurement_order_items', 'procurement_order_items.index')->name('procurement_order_items');
 
 Route::view('/purchase_orders/{id}/edit', 'purchase_orders.edit');
+Route::view('/working_capital', 'working_capital.index');
+Route::view('/ap_balances', 'ap_balances.index');
+Route::view('/creditor_balances', 'creditor_balances.index');
