@@ -52,6 +52,7 @@ class AppServiceProvider extends ServiceProvider
             'account_receivable' => 'App\Models\AccountReceivable',
             'po_order' => 'App\Models\PoOrder',
             'arrival_item' => 'App\Models\ArrivalItem',
+            'po_invoice' => 'App\Models\PoInvoice',
         ]);
     }
 }
