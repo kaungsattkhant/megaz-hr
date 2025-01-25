@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\PoOrder\ArrivalItemRequest;
 use App\Http\Requests\PoOrder\PoOrderItemRequest;
+use App\Http\Requests\Admin\PoInvoiceTransactionRequest;
 use App\Repositories\PoOrder\PoOrderRepositoryInterface;
 
 class PoOrderController extends Controller
@@ -64,6 +65,11 @@ class PoOrderController extends Controller
     public function getInvoices(Request $request)
     {
         $data =  $this->PoOrderRepository->getInvoices($request);
+        ResponseData($data);
+    }
+
+    public function processInvoiceTransaction(PoInvoiceTransactionRequest $request){
+        $data =  $this->PoOrderRepository->processInvoiceTransaction($request);
         ResponseData($data);
     }
 }

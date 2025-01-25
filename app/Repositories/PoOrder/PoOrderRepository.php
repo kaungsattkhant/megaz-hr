@@ -6,6 +6,7 @@ use App\Models\PoOrder;
 use App\Models\ItemLeft;
 use App\Models\PoInvoice;
 use App\Models\ArrivalItem;
+use App\Traits\PoInvoiceTransaction;
 use Illuminate\Http\Request;
 use App\Models\PurchaseOrderItem;
 use Illuminate\Support\Facades\DB;
@@ -15,9 +16,10 @@ use App\Http\Resources\PoOrderItemResource;
 class PoOrderRepository implements PoOrderRepositoryInterface
 {
 
+  use PoInvoiceTransaction;
   public function getPoOrderItems(Request $request)
   {
-    return $this->test($request);
+    // return $this->test($request);
     $poOrderItems = DB::table('purchase_order_items as poi')
       ->join('items as i', 'poi.item_id', '=', 'i.id')
       ->join('uoms as u', 'poi.uom_id', '=', 'u.id')
@@ -220,145 +222,6 @@ class PoOrderRepository implements PoOrderRepositoryInterface
         'po_orders.total_po_order_quantity'
       )
       ->paginate(config('common.list_count'));
-    //       "total_left_quantity", (
-    //         SELECT COALESCE(SUM(po_item_sub.quantity), 0)
-    //         FROM purchase_order_items po_item_sub
-    //         WHERE po_item_sub.item_id = po_item.item_id
-    //           AND po_item_sub.purchase_order_id = po_item.purchase_order_id
-    //     ) - (
-    // SELECT COALESCE(SUM(po_order_sub.quantity), 0)
-    // FROM po_orders po_order_sub
-    // WHERE po_order_sub.item_id = po_item.item_id
-    // AND po_order_sub.purchase_order_id = po_item.purchase_order_id
-    // ),
-    //     $poOrderItems = DB::table('purchase_order_items as poi')
-    //       ->join('items as i', 'poi.item_id', '=', 'i.id')
-    //       ->joinSub($leftsSubquery, 'i_lefts', function ($join) {
-    //         $join->on('i_lefts.item_id', '=', 'i.id');
-    //       })
-    //       ->join('uoms as u', 'poi.uom_id', '=', 'u.id')
-    //       ->join('uoms as bu', 'poi.base_uom_id', '=', 'bu.id')
-    //       ->join('uom_conversions as uc', 'poi.uom_conversion_id', '=', 'uc.id')
-    //       ->join('purchase_orders as po', 'poi.purchase_order_id', '=', 'po.id')
-    //       ->where('poi.is_md_checked', true)
-    //       ->where('po.status', 'md_checked')
-    //       ->select(
-    //         'poi.item_id',
-    //         'i.name as item_name',
-    //         'u.name as uom_name',
-    //         'bu.name as base_uom_name',
-    //         'uc.conversion as uom_conversion',
-    //         'poi.base_uom_id',
-    //         'poi.uom_id',
-    //         // 'poi.uom_quantity',
-    //         'poi.uom_conversion_id',
-    //         'i_lefts.total_quantity as left_quantity',
-    // //         DB::raw('SUM(CASE 
-    // //     WHEN (
-    // //         SELECT COALESCE(SUM(il.quantity), 0)
-    // //         FROM item_lefts il
-    // //         WHERE il.purchase_order_id = poi.purchase_order_id
-    // //         AND il.id = (
-    // //             SELECT MAX(inner_il.id)
-    // //             FROM item_lefts inner_il
-    // //             WHERE inner_il.purchase_order_id = il.purchase_order_id
-    // //         )
-    // //     ) = poi.po_quantity THEN poi.quantity
-    // //     ELSE (
-    // //         SELECT COALESCE(SUM(il.quantity), 0)
-    // //         FROM item_lefts il
-    // //         WHERE il.purchase_order_id = poi.purchase_order_id
-    // //         AND il.id = (
-    // //             SELECT MAX(inner_il.id)
-    // //             FROM item_lefts inner_il
-    // //             WHERE inner_il.purchase_order_id = il.purchase_order_id
-    // //         )
-    // //     )
-    // // END) as total_quantity'),
-    //         DB::raw('(
-    //           SELECT JSON_ARRAYAGG(
-    //               JSON_OBJECT(
-    //                   "id", po_item.id,
-    //                   "item_name", i.name,
-    //                   "item_id", i.id,
-    //                   "amount", po_item.amount,
-    //                   "quantity", po_item.quantity,
-    //                   "base_uom_id", po_item.base_uom_id,
-    //                   "base_uom_quantity", po_item.base_uom_quantity,
-    //                   "uom_id", po_item.uom_id,
-    //                   "uom_quantity", po_item.uom_quantity,
-    //                   "uom_conversion_id", po_item.uom_conversion_id,
-    //                   "uom_conversion", uc.conversion,
-    //                    "quantity", 
-    // CASE 
-    //     WHEN (
-    //         SELECT COALESCE(SUM(il.quantity), 0)
-    //         FROM item_lefts il
-    //         WHERE il.purchase_order_id = po_item.purchase_order_id
-    //     ) = po_quantity 
-    //     THEN po_item.quantity
-    //     ELSE (
-    //         SELECT COALESCE(SUM(il.quantity), 0)
-    //         FROM item_lefts il
-    //         WHERE il.purchase_order_id = po_item.purchase_order_id
-    //     )
-    // END,
-    // "uom_quantity", CASE 
-    //     WHEN (
-    //         SELECT COALESCE(SUM(il.uom_quantity), 0)
-    //         FROM item_lefts il
-    //         WHERE il.purchase_order_id = po_item.purchase_order_id
-    //     ) = po_quantity 
-    //     THEN po_item.quantity
-    //     ELSE (
-    //         SELECT COALESCE(SUM(il.uom_quantity), 0)
-    //         FROM item_lefts il
-    //         WHERE il.purchase_order_id = po_item.purchase_order_id
-    //     )
-    // END,
-    // "base_uom_quantity", CASE 
-    //     WHEN (
-    //         SELECT COALESCE(SUM(il.base_uom_quantity), 0)
-    //         FROM item_lefts il
-    //         WHERE il.purchase_order_id = po_item.purchase_order_id
-    //     ) = po_quantity 
-    //     THEN po_item.quantity
-    //     ELSE (
-    //         SELECT COALESCE(SUM(il.base_uom_quantity), 0)
-    //         FROM item_lefts il
-    //         WHERE il.purchase_order_id = po_item.purchase_order_id
-    //     )
-    // END,
-    //                   "purchase_order", JSON_OBJECT(
-    //                       "id", po.id,
-    //                       "po_id", po.po_id,
-    //                       "total_price", po.total_price,
-    //                       "date", po.date,
-    //                       "status", po.status
-    //                   )
-    //               )
-    //           )
-    //           FROM purchase_order_items po_item
-    //           INNER JOIN purchase_orders po ON po_item.purchase_order_id = po.id
-    //           INNER JOIN uom_conversions uc ON po_item.uom_conversion_id = uc.id
-    //           INNER JOIN items i ON po_item.item_id = i.id
-    //           WHERE po_item.item_id = poi.item_id
-    //           AND po_item.is_md_checked = true
-    //           AND po.status = "md_checked"
-    //       ) as purchase_order_details')
-    //       )
-    //       ->groupBy(
-    //         'poi.item_id',
-    //         'i.name',
-    //         'poi.uom_conversion_id',
-    //         'uc.conversion',
-    //         'poi.base_uom_id',
-    //         'bu.name',
-    //         'poi.uom_id',
-    //         'u.name',
-    //         'i_lefts.total_quantity as left_quantity'
-    //       )
-    //       ->paginate(config('common.list_count'));
 
     foreach ($poOrderItems as $item) {
       $item->purchase_order_details = json_decode($item->purchase_order_details, true);
@@ -782,5 +645,31 @@ class PoOrderRepository implements PoOrderRepositoryInterface
       ->groupBy('po_invoices.id', 'po_invoices.invoice_no', 'po_invoices.date_time', 'po_invoices.total_invoice_amount', 'po.supplier_id', 's.name', 's.account_id')
       ->paginate(config('common.list_count'));
     return PoInvoiceResource::collection($poInvoices);
+  }
+
+  public function processInvoiceTransaction($request)
+  {
+    $poInvoiceId = $request->po_invoice_id;
+    $supplierId = $request->po_invoice_id;
+    $supplierAccountId = $request->supplier_account_id;
+    $apAmount = $request->ap_amount;
+    $cashAccountId = $request->cash_account_id;
+    $poInvoice = PoInvoice::find($poInvoiceId);
+    if (!$poInvoice) {
+      ResponseMessage('Po Invoice not found', 404);
+    }
+    DB::beginTransaction();
+    try {
+      $transaction=$this->storeInvoiceTransaction($poInvoice,$request->amount,$cashAccountId);
+      if ($apAmount > 0 || ($request->total_invoice_amount < $request->amount)) {
+        $this->storeAP($transaction,$apAmount, $supplierId, $supplierAccountId, $cashAccountId);
+      }
+       DB::commit();
+       return ResponseMessage('Transaction created successfully',200);
+    } catch (\Exception $e) {
+      DB::rollback();
+      ResponseMessage($e->getMessage(), 402);
+      throw $e;
+    }
   }
 }
