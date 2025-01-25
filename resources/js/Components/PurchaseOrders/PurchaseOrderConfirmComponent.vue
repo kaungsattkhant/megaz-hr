@@ -11,10 +11,10 @@
                 <label for="" class="block text-sm text-black mb-3">
                     Date
                 </label>
-                <input type="date" v-model="date" class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
+                <input type="date" v-model="date" disabled class="cursor-not-allowed text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
             </div><div class="col-span-9"></div>
 
-            <div class="col-span-3">
+            <!-- <div class="col-span-3">
                 <label for="" class="block text-sm text-black mb-3">
                     Item Name
                 </label>
@@ -30,7 +30,7 @@
                     Qty
                 </label>
                 <input type="number" v-model="quantity" class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0" placeholder="Qty">
-            </div>
+            </div> -->
             <!-- <div class="col-span-3">
                 <label for="" class="block text-sm text-black mb-3">
                     UOM
@@ -71,12 +71,12 @@
                 </div>
             </div> -->
 
-            <div class="col-span-3">
+            <!-- <div class="col-span-3">
                 <label for="" class="block text-sm text-black mb-3">
                     &nbsp;
                 </label>
                 <button class="add-btn" @click="addItemBtnClicked"> Add </button>
-            </div>
+            </div> -->
 
         </div>
 
@@ -115,7 +115,7 @@
                             <th scope="col" class="  ">
                                 MD Checked
                             </th>
-                            <th scope="col" class="" colspan="3">
+                            <th scope="col" class="" colspan="2">
 
                             </th>
                         </tr>
@@ -155,12 +155,12 @@
                                 <td class="">
                                     {{ purchaseOrderItem.is_md_checked == 1 ? 'Yes' : 'No' }}
                                 </td>
-                                <td class=" ">
+                                <!-- <td class=" ">
                                     <button @click="editPurchaseOrderItemBtnClicked(purchaseOrderItemsIndex)"
                                     data-te-toggle="modal" data-te-target="#editModal">
                                         <i class="fal fa-pencil  pr-3"></i>
                                     </button>
-                                </td>
+                                </td> -->
                                 <td class=" ">
                                     <button @click="checkPurchaseOrderItemBtnClicked(purchaseOrderItem.id)" :disabled="purchaseOrderItem.id == null"
                                     data-te-toggle="modal" data-te-target="#checkModal">

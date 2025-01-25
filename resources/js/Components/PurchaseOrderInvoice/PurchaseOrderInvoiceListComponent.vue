@@ -25,17 +25,17 @@
                                     #
                                 </th>
                                 <th scope="col" class="">
-                                    Item(s)
+                                    Invoice Number
                                 </th>
                                 <th scope="col" class="">
-                                    Invoice Number
+                                    Item(s)
                                 </th>
                                 <th scope="col" class="">
                                     Supplier
                                 </th>
-                                <th scope="col" class="">
+                                <!-- <th scope="col" class="">
                                     Qty ( UOM )
-                                </th>
+                                </th> -->
                                 <th scope="col" class="">
                                     Amount
                                 </th>
@@ -51,17 +51,17 @@
                                         {{ (index + 1) }}
                                     </td>
                                     <td class="whitespace-nowrap" @click="toggleItems(index)">
-                                        {{ item.item_names }}
-                                    </td>
-                                    <td class="whitespace-nowrap">
                                         {{ item.invoice_no }}
+                                    </td>
+                                    <td class="whitespace-nowrap" @click="toggleItems(index)">
+                                        {{ item.item_names }}
                                     </td>
                                     <td class="whitespace-nowrap">
                                         {{ item.supplier_name }}
                                     </td>
-                                    <td class="whitespace-nowrap">
+                                    <!-- <td class="whitespace-nowrap">
                                         <span v-if="item.total_invoice_quantity"> {{ item.total_invoice_quantity.toLocaleString() }} </span>
-                                    </td>
+                                    </td> -->
                                     <td class="whitespace-nowrap">
                                         <span v-if="item.total_invoice_amount"> {{ item.total_invoice_amount.toLocaleString() }} </span>
                                     </td>
@@ -79,10 +79,10 @@
                                 </tr>
                                 <tr v-if="item.showDatails" v-for="(arrival, arrivalIndex) in item.arrival_items" :key="arrivalIndex">
                                     <td> &nbsp; </td>
+                                    <td class="whitespace-nowrap"> &nbsp; </td>
                                     <td class="whitespace-nowrap"> {{ arrival.item_name }} </td>
-                                    <td class="whitespace-nowrap"> {{ item.invoice_no }} </td>
                                     <td class="whitespace-nowrap"> {{ item.supplier_name }} </td>
-                                    <td class="whitespace-nowrap"> {{ arrival.quantity.toLocaleString() }} </td>
+                                    <!-- <td class="whitespace-nowrap"> {{ arrival.quantity.toLocaleString() }} </td> -->
                                     <td class="whitespace-nowrap"> {{ arrival.amount.toLocaleString() }} </td>
                                     <td class="whitespace-nowrap">
                                         <button data-te-toggle="modal" data-te-target="#edit_modal" id="edit-btn" class="pr-3">

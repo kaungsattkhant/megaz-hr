@@ -344,3 +344,6 @@ Route::view('/arrival_items', 'procurement_order_arrival.index')->name('arrival_
 Route::view('/purchase_order_invoices', 'purchase_order_invoices.index')->name('purchase_order_invoices');
 
 Route::view('/purchase_orders/{id}/edit', 'purchase_orders.edit');
+Route::view('/working_capital', 'working_capital.index');
+Route::view('/ap_balances', 'ap_balances.index');
+Route::view('/creditor_balances', 'creditor_balances.index');

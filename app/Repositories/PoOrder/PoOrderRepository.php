@@ -104,7 +104,6 @@ class PoOrderRepository implements PoOrderRepositoryInterface
   public function test($request)
   {
     $poClass = 'po_order';
-    // $poClass = 'App\Models\PoOrder';
 
     $leftsSubquery = DB::table('item_lefts')
       ->join('po_orders', function ($join) use ($poClass) {
@@ -121,7 +120,7 @@ class PoOrderRepository implements PoOrderRepositoryInterface
 
     $poOrderSubquery = DB::table('po_orders')
       ->select('item_id', DB::raw('SUM(quantity) as total_po_order_quantity'))
-      ->groupBy('item_id',);
+      ->groupBy('item_id', );
 
     $poOrderItems = DB::table('purchase_order_items as poi')
       ->join('items as i', 'poi.item_id', '=', 'i.id')
@@ -231,7 +230,6 @@ class PoOrderRepository implements PoOrderRepositoryInterface
 
   public function storePoOrderItems($validatedData)
   {
-    DB::beginTransaction();
     try {
       $validatedData['created_by'] = UserData()->id;
       $poOrder = PoOrder::create($validatedData);
@@ -282,6 +280,7 @@ class PoOrderRepository implements PoOrderRepositoryInterface
   public function getPoOrderArrivalList(Request $request)
   {
 
+    return $this->testArrivalList($request);
     $leftsSubquery = DB::table('item_lefts')
       ->join('arrival_items', 'item_lefts.item_leftable_id', '=', 'arrival_items.id')
       ->join('po_orders', 'arrival_items.po_order_id', '=', 'po_orders.id')
@@ -292,6 +291,7 @@ class PoOrderRepository implements PoOrderRepositoryInterface
       )
       ->where('item_lefts.item_leftable_type', '=', 'arrival_item')
       ->groupBy('po_orders.id');
+
 
 
     $poOrders = DB::table('po_orders as poOrder')
@@ -351,6 +351,95 @@ class PoOrderRepository implements PoOrderRepositoryInterface
     return $poOrders;
   }
 
+  public function testArrivalList($request)
+  {
+
+    $leftsSubquery = DB::table('item_lefts')
+      ->join('arrival_items', function ($join) {
+        $join->on('item_lefts.item_leftable_id', '=', 'arrival_items.id')
+          ->where('item_lefts.item_leftable_type', '=', 'arrival_item');
+      })
+      ->join('po_orders', 'arrival_items.po_order_id', 'po_orders.id')
+      ->select(
+        'po_orders.item_id',
+        DB::raw('SUM(item_lefts.quantity) as left_quantity'),
+        DB::raw('GROUP_CONCAT(item_lefts.id SEPARATOR ", ") as item_left_ids'),
+      )
+      // ->where('po_orders.is_active', 1)
+      ->groupBy('po_orders.item_id');
+
+
+    $arrivalSubQuery = DB::table('arrival_items')
+      ->join('po_orders', 'arrival_items.po_order_id', 'po_orders.id')
+      ->select(
+        'po_orders.item_id',
+        DB::raw('SUM(arrival_items.quantity) as arrival_quantity'),
+      )
+      // ->where('po_orders.is_active', 1)
+      ->groupBy('po_orders.item_id');
+
+
+
+
+    $poOrders = DB::table('po_orders as poOrder')
+      // ->where('poOrder.is_active', 1)
+      ->join('purchase_orders as po', 'poOrder.purchase_order_id', '=', 'po.id')
+      ->join('purchase_order_items as poi', 'po.id', '=', 'poi.purchase_order_id')
+      ->join('items as i', 'poOrder.item_id', '=', 'i.id')
+      ->join('suppliers as s', 'poOrder.supplier_id', '=', 's.id')
+      ->join('item_prices as ip', 'poOrder.item_price_id', '=', 'ip.id')
+      ->leftJoinSub($leftsSubquery, 'item_lefts', function ($join) {
+        $join->on('i.id', '=', 'item_lefts.item_id');
+      })
+      ->leftJoinSub($arrivalSubQuery, 'arrival_items', function ($join) {
+        $join->on('i.id', '=', 'arrival_items.item_id');
+      })
+      ->select(
+        'i.id as item_id',
+        'i.name as item_name',
+        DB::raw('GROUP_CONCAT(DISTINCT s.name SEPARATOR ", ") as supplier_name'),
+        DB::raw('GROUP_CONCAT(DISTINCT po.po_id SEPARATOR ", ") as po_numbers'),
+        DB::raw('COALESCE(SUM(poOrder.quantity), 0) as total_po_order_quantity'),
+        DB::raw('COALESCE(SUM(arrival_items.arrival_quantity), 0) as total_arrival_quantity'),
+        DB::raw('COALESCE(SUM(item_lefts.left_quantity), 0) as total_item_left_quantity'),
+        DB::raw('
+        CASE 
+            WHEN COALESCE(item_lefts.item_left_ids, "null") = "null" THEN 
+                COALESCE(SUM(item_lefts.left_quantity), 0)
+            ELSE 
+                COALESCE(SUM(poOrder.quantity), 0) - COALESCE(SUM(item_lefts.left_quantity), 0)
+        END as total_quantity
+    '),
+        DB::raw('COALESCE(item_lefts.item_left_ids, "null") as item_left_ids'),
+
+        'u.id as uom_id',
+        'u.name as uom_name',
+        'bu.id as base_uom_id',
+        'bu.name as base_uom_name',
+        'uc.id as uom_conversion_id',
+        'uc.conversion as uom_conversion',
+        'ip.id as item_price_id',
+        'ip.price as item_price'
+      )
+      ->join('uoms as u', 'poOrder.uom_id', '=', 'u.id')
+      ->join('uoms as bu', 'poOrder.base_uom_id', '=', 'bu.id')
+      ->join('uom_conversions as uc', 'poOrder.uom_conversion_unit_id', '=', 'uc.id')
+      ->leftJoin('arrival_items', 'poOrder.id', '=', 'arrival_items.po_order_id')
+      ->groupBy(
+        'i.id',
+        'i.name',
+        'u.id',
+        'u.name',
+        'bu.id',
+        'bu.name',
+        'ip.id',
+        'ip.price',
+        'uc.id',
+        'uc.conversion'
+      )
+      ->paginate(config('common.list_count'));
+    return $poOrders;
+  }
 
   // correct groupBy
   // public function getPoOrderArrivalList(Request $request)
@@ -660,12 +749,12 @@ class PoOrderRepository implements PoOrderRepositoryInterface
     }
     DB::beginTransaction();
     try {
-      $transaction=$this->storeInvoiceTransaction($poInvoice,$request->amount,$cashAccountId);
+      $transaction = $this->storeInvoiceTransaction($poInvoice, $request->amount, $cashAccountId);
       if ($apAmount > 0 || ($request->total_invoice_amount < $request->amount)) {
-        $this->storeAP($transaction,$apAmount, $supplierId, $supplierAccountId, $cashAccountId);
+        $this->storeAP($transaction, $apAmount, $supplierId, $supplierAccountId, $cashAccountId);
       }
-       DB::commit();
-       return ResponseMessage('Transaction created successfully',200);
+      DB::commit();
+      return ResponseMessage('Transaction created successfully', 200);
     } catch (\Exception $e) {
       DB::rollback();
       ResponseMessage($e->getMessage(), 402);

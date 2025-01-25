@@ -249,12 +249,10 @@
                     </div>
                 </div>
                 <div class="flex justify-end gap-x-4 px-6 mb-6 pt-4">
-                    <button type="button" class="cancel-btn focus:shadow-none focus:outline-none"
-                    data-te-modal-dismiss aria-label="Close">
+                    <button type="button" class="cancel-btn focus:shadow-none focus:outline-none" data-te-modal-dismiss aria-label="Close">
                         Cancel
                     </button>
-                    <button type="button"
-                    class="add-btn focus:outline-none focus:ring-0 "
+                    <button type="button" class="add-btn focus:outline-none focus:ring-0 "
                     @click="confirmBtnClicked" data-te-modal-dismiss>
                         Create
                     </button>

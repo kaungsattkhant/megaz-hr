@@ -273,7 +273,8 @@
                 // }
                 // amount = (this.selectedItem.item_prices)? this.selectedItem.item_prices.price: 0;
                 let quantity = (this.baseQuantity * this.selectedItem.uom_conversion) + this.quantity
-                let price = ((this.baseQuantity * this.selectedItem.uom_conversion) + this.quantity) * this.selectedItem.average_price
+                // let price = ((this.baseQuantity * this.selectedItem.uom_conversion) + this.quantity) * this.selectedItem.average_price
+                let price = (this.baseQuantity * this.selectedItem.average_price) + (this.quantity * (this.selectedItem.average_price  / this.selectedItem.uom_conversion))
                 this.purchaseOrderItems.push({
                     item_id: this.selectedItem.id,
                     quantity: quantity,
@@ -341,7 +342,8 @@
             updateTotalPrice(poItems){
                 this.totalPrice = 0;
                 poItems.forEach((item)=>{
-                    this.totalPrice += (item.amount * item.quantity);
+                    // this.totalPrice += (item.amount * item.quantity);
+                    this.totalPrice += item.price;
                 });
             },
 
