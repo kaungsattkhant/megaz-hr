@@ -20,7 +20,7 @@ return new class extends Migration
             $table->integer('quantity');
             $table->double('amount');
             $table->integer('created_by');
-
+            $table->foreignId('purchase_order_id');
             $table->integer('item_leftable_id');
             $table->string('item_leftable_type');
 

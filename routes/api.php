@@ -88,6 +88,7 @@ use App\Http\Controllers\API\Customers\MenuAPIController as CustomersMenuAPICont
 use App\Http\Controllers\API\Customers\CustomerAPIController as UserAppCustomerAPIController;
 use App\Http\Controllers\API\Customers\PackageAPIController as CustomersPackageAPIController;
 use App\Http\Controllers\API\Customers\MenuCategoryAPIController as CustomerMenuCategoryAPIController;
+use App\Http\Controllers\API\PoOrderController;
 
 /*
 |--------------------------------------------------------------------------
@@ -384,7 +385,7 @@ Route::middleware('auth:api')->group(function () {
         Route::get('/duties/{id}', 'dutyDetail');
     });
     Route::resource('canteens', CanteenController::class)->only(['index', 'store', 'show']);
-    Route::controller(CanteenController::class)->group(function () {});
+    Route::controller(CanteenController::class)->group(function () { });
     //service
     Route::resource('services', ServiceController::class)->only(['index', 'store', 'show']);
 
@@ -447,6 +448,8 @@ Route::middleware('auth:api')->group(function () {
         Route::get('brand_by_supplier', 'brandBySupplier');
         Route::get('supplier_by_item/{item_id}', 'supplierByItem');
     });
+    //invoice transaction
+    Route::post('/invoice_transaction', [PoOrderController::class, 'processInvoiceTransaction']);
 });
 Route::get('/features', [FeatureAPIController::class, 'getFeatureData']);
 

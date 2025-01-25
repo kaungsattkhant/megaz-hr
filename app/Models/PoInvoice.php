@@ -15,4 +15,9 @@ class PoInvoice extends Model
         'total_invoice_amount',
         'created_by'
     ];
+
+    public function arrivalItems()
+    {
+        return $this->hasMany(ArrivalItem::class, 'po_invoice_id');
+    }
 }

@@ -340,6 +340,8 @@ Route::view('/check_in', 'check_in.index')->name('check_in');
 Route::view('/contact', 'contact.index')->name('contact');
 Route::view('/lead_time', 'lead_time.index')->name('lead_time');
 Route::view('/procurement_order_items', 'procurement_order_items.index')->name('procurement_order_items');
+Route::view('/arrival_items', 'procurement_order_arrival.index')->name('arrival_items');
+Route::view('/purchase_order_invoices', 'purchase_order_invoices.index')->name('purchase_order_invoices');
 
 Route::view('/purchase_orders/{id}/edit', 'purchase_orders.edit');
 Route::view('/working_capital', 'working_capital.index');
