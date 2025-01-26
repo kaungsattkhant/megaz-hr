@@ -353,7 +353,6 @@ class PoOrderRepository implements PoOrderRepositoryInterface
 
   public function testArrivalList($request)
   {
-
     $leftsSubquery = DB::table('item_lefts')
       ->join('arrival_items', function ($join) {
         $join->on('item_lefts.item_leftable_id', '=', 'arrival_items.id')
@@ -739,7 +738,7 @@ class PoOrderRepository implements PoOrderRepositoryInterface
   public function processInvoiceTransaction($request)
   {
     $poInvoiceId = $request->po_invoice_id;
-    $supplierId = $request->po_invoice_id;
+    $supplierId = $request->supplier_id;
     $supplierAccountId = $request->supplier_account_id;
     $apAmount = $request->ap_amount;
     $cashAccountId = $request->cash_account_id;
