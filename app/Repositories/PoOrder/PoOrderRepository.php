@@ -6,12 +6,15 @@ use App\Models\PoOrder;
 use App\Models\ItemLeft;
 use App\Models\PoInvoice;
 use App\Models\ArrivalItem;
-use App\Traits\PoInvoiceTransaction;
 use Illuminate\Http\Request;
+use App\Models\InventoryLedger;
 use App\Models\PurchaseOrderItem;
 use Illuminate\Support\Facades\DB;
+use App\Models\InventoryLedgerItem;
+use App\Traits\PoInvoiceTransaction;
 use App\Http\Resources\PoInvoiceResource;
 use App\Http\Resources\PoOrderItemResource;
+use App\Models\Inventory;
 
 class PoOrderRepository implements PoOrderRepositoryInterface
 {
@@ -124,7 +127,7 @@ class PoOrderRepository implements PoOrderRepositoryInterface
         DB::raw('SUM(quantity) as total_po_order_quantity'),
         DB::raw('GROUP_CONCAT(po_orders.purchase_order_id SEPARATOR ",") as po_order_ids'),
       )
-      ->groupBy('item_id', );
+      ->groupBy('item_id',);
 
 
     $poOrderItems = DB::table('purchase_order_items as poi')
@@ -696,6 +699,8 @@ class PoOrderRepository implements PoOrderRepositoryInterface
         }
       }
 
+      $this->storeInventoryLedger($validatedData, $arrivalItem);
+
       if (isset($validatedData['later_buy']) && $validatedData['later_buy'] == 1) {
         $poOrder = PoOrder::where('id', $validatedData['po_order_id'])->first();
         if ($poOrder->quantity < $arrivalItem->quantity) {
@@ -734,6 +739,33 @@ class PoOrderRepository implements PoOrderRepositoryInterface
       DB::rollback();
       ResponseMessage($e->getMessage(), 402);
       throw $e;
+    }
+  }
+
+  private function storeInventoryLedger($validatedData, $arrivalItem)
+  {
+
+    $inventory = Inventory::where('name', '=', 'Main Inventory')->first();
+    if (!$inventory) {
+      throw new \Exception('Main Inventory not found.');
+    }
+    $inventoryLedger = InventoryLedger::create([
+      'inventory_id' =>  $inventory->id,
+      'date' => now()->format('Y-m-d'),
+      'ledgerable_id' => $arrivalItem->id,
+      'ledgerable_type' => 'arrival_item',
+      'action' => 'in'
+    ]);
+
+    $poOrder =  PoOrder::where('id', $validatedData['po_order_id'])->first();
+    if ($poOrder) {
+      InventoryLedgerItem::create([
+        'inventory_ledger_id' => $inventoryLedger->id,
+        'item_id' => $poOrder->item_id,
+        'quantity' => $validatedData['quantity']
+      ]);
+    } else {
+      throw new \Exception('PoOrder not found for the given ID.');
     }
   }
 

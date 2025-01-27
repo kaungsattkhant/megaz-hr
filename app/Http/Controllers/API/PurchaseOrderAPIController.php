@@ -80,4 +80,10 @@ class PurchaseOrderAPIController extends Controller
     {
         $this->purchaseOrderRepo->confirmPurchaseOrderItem($request);
     }
+
+    public function getAvgPriceByBrand($itemId, $brandId)
+    {
+        $brands = $this->purchaseOrderRepo->getAvgPriceByBrand($itemId, $brandId);
+        ResponseData($brands);
+    }
 }
