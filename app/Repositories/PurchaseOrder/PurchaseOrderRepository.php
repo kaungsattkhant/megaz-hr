@@ -2,7 +2,11 @@
 
 namespace App\Repositories\PurchaseOrder;
 
+use App\Models\Item;
+use App\Models\Brand;
 use App\Models\PoGrn;
+use App\Models\ItemPrice;
+use App\Models\SupplierItem;
 use Illuminate\Http\Request;
 use App\Models\PurchaseOrder;
 use Laravel\Reverb\Loggers\Log;
@@ -456,5 +460,27 @@ class PurchaseOrderRepository implements PurchaseOrderRepositoryInterface
             ResponseMessage($e->getMessage(), 402);
             throw $e;
         }
+    }
+
+    public function getAvgPriceByBrand($itemId, $brandId)
+    {
+        $supplierItems = SupplierItem::where('item_id', $itemId)
+            ->where('brand_id', $brandId)
+            ->get();
+
+        $totalPrice = 0;
+        $totalCount = 0;
+        foreach ($supplierItems as $supplierItem) {
+            $itemPrice = $supplierItem->item_price;
+
+            if ($itemPrice) {
+                $totalPrice += $itemPrice->price;
+                $totalCount++;
+            }
+        }
+
+        $avgItemPrice = $totalCount > 0 ? $totalPrice / $totalCount : 0;
+
+        return  $avgItemPrice;
     }
 }

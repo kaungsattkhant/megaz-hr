@@ -14,6 +14,7 @@ class PurchaseOrderItem extends BaseModel
     protected $with = ['item', 'uom'];
     protected $fillable = [
         'item_id',
+        'brand_id',
         'base_uom_id',
         'base_uom_quantity',
         'uom_id',
@@ -48,6 +49,11 @@ class PurchaseOrderItem extends BaseModel
     public function item()
     {
         return $this->belongsTo(Item::class, 'item_id');
+    }
+
+    public function brand()
+    {
+        return $this->belongsTo(Brand::class, 'brand_id');
     }
 
     public function uom()
