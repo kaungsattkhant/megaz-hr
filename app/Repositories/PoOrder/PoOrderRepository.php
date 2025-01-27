@@ -311,12 +311,22 @@ class PoOrderRepository implements PoOrderRepositoryInterface
         'u.name',
         'i_lefts.total_left_quantity',
         'po_orders.total_po_order_quantity',
+        'po_orders.po_order_ids',
       )
       ->having('total_quantity', '>', 0) // Filter out records where quantity <= 0
       ->paginate(config('common.list_count'));
 
     foreach ($poOrderItems as $item) {
-      $item->purchase_order_details = json_decode($item->purchase_order_details, true);
+      // $item->purchase_order_details = json_decode($item->purchase_order_details, true);
+      $details = collect(json_decode($item->purchase_order_details, true)); // Convert to a Collection
+
+      // Filter the details where quantity > 0
+      $filteredDetails = $details->filter(function ($detail) {
+        return isset($detail['quantity']) && $detail['quantity'] > 0;
+      });
+
+      // Assign the filtered details back to the item
+      $item->purchase_order_details = $filteredDetails->values()->toArray();
     }
     return $poOrderItems;
   }
