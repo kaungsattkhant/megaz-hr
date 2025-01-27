@@ -549,7 +549,8 @@ class PoOrderRepository implements PoOrderRepositoryInterface
         'ip.id',
         'ip.price',
         'uc.id',
-        'uc.conversion'
+        'uc.conversion',
+        'arrival_items.po_order_ids'
       )
       ->paginate(config('common.list_count'));
     return $poOrders;
