@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('purchase_order_items', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->foreignId('item_id')->constrained();
+            $table->foreignId('brand_id')->constrained();
             $table->integer('base_uom_id')->constrained();
             $table->integer('base_uom_quantity');
             $table->foreignId('uom_id')->constrained();

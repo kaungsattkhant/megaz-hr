@@ -2,7 +2,11 @@
 
 namespace App\Repositories\PurchaseOrder;
 
+use App\Models\Item;
+use App\Models\Brand;
 use App\Models\PoGrn;
+use App\Models\ItemPrice;
+use App\Models\SupplierItem;
 use Illuminate\Http\Request;
 use App\Models\PurchaseOrder;
 use Laravel\Reverb\Loggers\Log;
@@ -98,6 +102,7 @@ class PurchaseOrderRepository implements PurchaseOrderRepositoryInterface
             if (!isset($request->id)) {
                 $data['id'] = null;
             }
+            $data['total_price'] = (int)$data['total_price']; //wrong data from frontend
             $latest = PurchaseOrder::orderBy('created_at', 'desc')->first();
             $count = 4;
             $no = (new CommonPurchaseOrder())->getUniqueId($latest, 'po_id', $count);
@@ -132,6 +137,7 @@ class PurchaseOrderRepository implements PurchaseOrderRepositoryInterface
                 }
                 $item_data['purchase_order_id'] = $po->id;
                 $item_data['item_id'] = $item->item_id;
+                $item_data['brand_id'] = $item->brand_id;
                 $item_data['amount'] = $item->amount;
                 $item_data['uom_id'] = $item->uom_id;
                 $item_data['uom_conversion_id'] = $item->uom_conversion_id;
@@ -441,7 +447,7 @@ class PurchaseOrderRepository implements PurchaseOrderRepositoryInterface
                         ResponseMessage("Inventory is required", 419);
                     }
                     $inventoryId = UserData()->department->inventory->inventory_id;
-                    $inventoryLedger = (new StoreInventory($inventoryId))->storeToInventoryLedger($po_item->purchase_order, 'purchase_order', 'in');
+                    $inventoryLedger = (new StoreInventory(inventoryId: $inventoryId))->storeToInventoryLedger($po_item->purchase_order, 'purchase_order', 'in');
                     (new StoreInventory($inventoryId))->storeItemToInventory($inventoryLedger, $po_item);
                     #store inventory
                     DB::commit();
@@ -455,5 +461,27 @@ class PurchaseOrderRepository implements PurchaseOrderRepositoryInterface
             ResponseMessage($e->getMessage(), 402);
             throw $e;
         }
+    }
+
+    public function getAvgPriceByBrand($itemId, $brandId)
+    {
+        $supplierItems = SupplierItem::where('item_id', $itemId)
+            ->where('brand_id', $brandId)
+            ->get();
+
+        $totalPrice = 0;
+        $totalCount = 0;
+        foreach ($supplierItems as $supplierItem) {
+            $itemPrice = $supplierItem->item_price;
+
+            if ($itemPrice) {
+                $totalPrice += $itemPrice->price;
+                $totalCount++;
+            }
+        }
+
+        $avgItemPrice = $totalCount > 0 ? $totalPrice / $totalCount : 0;
+
+        return  $avgItemPrice;
     }
 }

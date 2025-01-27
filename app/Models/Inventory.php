@@ -10,7 +10,10 @@ class Inventory extends BaseModel
     use HasFactory;
 
     protected $fillable = [
-        'area_id', 'department_id', 'name', 'is_active','start_time','end_time'
+        'name',
+        'start_time',
+        'end_time',
+        'is_active'
     ];
 
 
@@ -36,6 +39,6 @@ class Inventory extends BaseModel
 
     public function staff()
     {
-        return $this->belongsToMany(Staff::class,'inventory_staff', 'inventory_id', 'staff_id');
+        return $this->belongsToMany(Staff::class, 'inventory_staff', 'inventory_id', 'staff_id');
     }
 }
