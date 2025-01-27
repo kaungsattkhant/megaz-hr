@@ -608,6 +608,7 @@ class PoOrderRepository implements PoOrderRepositoryInterface
   {
     $poOrders = PoOrder::with(['purchaseOrder', 'uomConversion', 'uom', 'baseUom', 'item', 'brand', 'supplier', 'itemPrice'])
       ->where('item_id', $itemId)
+      // ->where('is_arrival_completed', 1)
       ->get();
 
     foreach ($poOrders as $poOrder) {
@@ -709,8 +710,17 @@ class PoOrderRepository implements PoOrderRepositoryInterface
           throw new \Exception('PoInvoice not found for the given ID.');
         }
       }
+      $poOrder =  PoOrder::where('id', $validatedData['po_order_id'])->first();
+      // if ($poOrder) {
+      //   $poOrder->is_arrival_completed = 0;
+      //   $poOrder->save();
+      // } else {
+      //   ResponseMessage('PoOrder not found', 404);
+      // }
+      // $this->storeInventoryLedger($validatedData, $arrivalItem);
+      $this->storeInventoryLedger($validatedData, $arrivalItem, $poOrder);
 
-      $this->storeInventoryLedger($validatedData, $arrivalItem);
+
 
       if (isset($validatedData['later_buy']) && $validatedData['later_buy'] == 1) {
         $poOrder = PoOrder::where('id', $validatedData['po_order_id'])->first();
@@ -753,12 +763,12 @@ class PoOrderRepository implements PoOrderRepositoryInterface
     }
   }
 
-  private function storeInventoryLedger($validatedData, $arrivalItem)
+  private function storeInventoryLedger($validatedData, $arrivalItem, $poOrder)
   {
 
     $inventory = Inventory::where('name', '=', 'Main Inventory')->first();
     if (!$inventory) {
-      throw new \Exception('Main Inventory not found.');
+      ResponseMessage('Main Inventory not found.', 404);
     }
     $inventoryLedger = InventoryLedger::create([
       'inventory_id' =>  $inventory->id,
@@ -768,7 +778,7 @@ class PoOrderRepository implements PoOrderRepositoryInterface
       'action' => 'in'
     ]);
 
-    $poOrder =  PoOrder::where('id', $validatedData['po_order_id'])->first();
+
     if ($poOrder) {
       InventoryLedgerItem::create([
         'inventory_ledger_id' => $inventoryLedger->id,
@@ -776,7 +786,7 @@ class PoOrderRepository implements PoOrderRepositoryInterface
         'quantity' => $validatedData['quantity']
       ]);
     } else {
-      throw new \Exception('PoOrder not found for the given ID.');
+      ResponseMessage('PoOrder not found', 404);
     }
   }
 
