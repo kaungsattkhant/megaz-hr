@@ -67,9 +67,9 @@
                                     </td>
                                     <td class="whitespace-nowrap">
                                         <div>
-                                            <button data-te-toggle="modal" data-te-target="#edit_modal" id="edit-btn" class="pr-3">
+                                            <!-- <button data-te-toggle="modal" data-te-target="#edit_modal" id="edit-btn" class="pr-3">
                                                 <i class="fal fa-pen"></i>
-                                            </button>
+                                            </button> -->
                                             <button data-te-toggle="modal" data-te-target="#check_modal" class="pr-3"
                                             @click="checkBtnClicked(item.arrival_items[0], index, item)">
                                                 <i class="fal fa-check"></i>
