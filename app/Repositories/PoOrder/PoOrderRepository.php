@@ -116,8 +116,6 @@ class PoOrderRepository implements PoOrderRepositoryInterface
       ->groupBy('po_orders.item_id', 'po_orders.purchase_order_id');
 
 
-
-
     $poOrderSubquery = DB::table('po_orders')
       ->select(
         'item_id',
