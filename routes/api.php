@@ -196,6 +196,7 @@ Route::middleware('auth:api')->group(function () {
         Route::post('updateIsCheck', 'updateIsCheck');
         Route::get('/purchase_order_item_confirmation_list', 'getPurchaseOrderItemConfirmationList');
         Route::get('/confirm_purchase_order_item', 'confirmPurchaseOrderItem');
+        Route::get('/items/{itemId}/brands/{brandId}', 'getAvgPriceByBrand');
     });
     #item usage forecast
     Route::resource('item_usage_forecasts', ItemUsageForecastController::class)->only(['index', 'store', 'show', 'destroy']);
@@ -385,7 +386,7 @@ Route::middleware('auth:api')->group(function () {
         Route::get('/duties/{id}', 'dutyDetail');
     });
     Route::resource('canteens', CanteenController::class)->only(['index', 'store', 'show']);
-    Route::controller(CanteenController::class)->group(function () { });
+    Route::controller(CanteenController::class)->group(function () {});
     //service
     Route::resource('services', ServiceController::class)->only(['index', 'store', 'show']);
 
