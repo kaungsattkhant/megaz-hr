@@ -107,9 +107,6 @@ class PoOrderRepository implements PoOrderRepositoryInterface
   public function test($request)
   {
     $poClass = 'po_order';
-    // $leftsSubquery = DB::table('item_lefts')
-    //   ->select('item_id', DB::raw('SUM(quantity) as total_left_quantity'))
-    //   ->groupBy('item_id');
     $leftsSubquery = DB::table('item_lefts')
       ->join('po_orders', function ($join) use ($poClass) {
         $join->on('item_lefts.item_leftable_id', '=', 'po_orders.id')
@@ -167,15 +164,6 @@ class PoOrderRepository implements PoOrderRepositoryInterface
         DB::raw('COALESCE(po_orders.total_po_order_quantity, 0) as po_order_quantity'), // Default to 0 if no data
         DB::raw('COALESCE(po_orders.po_order_ids, "null") as po_order_ids'),
         DB::raw('GROUP_CONCAT(DISTINCT poi.purchase_order_id SEPARATOR ", ") as po_ids'),
-        // DB::raw('
-        //     GROUP_CONCAT(
-        //         DISTINCT 
-        //         CASE 
-        //             WHEN poi.purchase_order_id NOT IN (po_order_ids) =0 THEN poi.purchase_order_id
-        //         END 
-        //         SEPARATOR ", "
-        //     ) as unmatched_po_ids
-        // '),
         DB::raw('
         GROUP_CONCAT(
             DISTINCT 
@@ -323,11 +311,22 @@ class PoOrderRepository implements PoOrderRepositoryInterface
         'u.name',
         'i_lefts.total_left_quantity',
         'po_orders.total_po_order_quantity',
+        'po_orders.po_order_ids',
       )
+      ->having('total_quantity', '>', 0) // Filter out records where quantity <= 0
       ->paginate(config('common.list_count'));
 
     foreach ($poOrderItems as $item) {
-      $item->purchase_order_details = json_decode($item->purchase_order_details, true);
+      // $item->purchase_order_details = json_decode($item->purchase_order_details, true);
+      $details = collect(json_decode($item->purchase_order_details, true)); // Convert to a Collection
+
+      // Filter the details where quantity > 0
+      $filteredDetails = $details->filter(function ($detail) {
+        return isset($detail['quantity']) && $detail['quantity'] > 0;
+      });
+
+      // Assign the filtered details back to the item
+      $item->purchase_order_details = $filteredDetails->values()->toArray();
     }
     return $poOrderItems;
   }
@@ -550,8 +549,10 @@ class PoOrderRepository implements PoOrderRepositoryInterface
         'ip.price',
         'uc.id',
         'uc.conversion',
+        'item_lefts.left_quantity',
         'arrival_items.po_order_ids'
       )
+      ->having('total_quantity', '>', 0) // Filter out records where quantity <= 0
       ->paginate(config('common.list_count'));
     return $poOrders;
   }

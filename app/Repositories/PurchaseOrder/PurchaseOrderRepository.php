@@ -102,7 +102,7 @@ class PurchaseOrderRepository implements PurchaseOrderRepositoryInterface
             if (!isset($request->id)) {
                 $data['id'] = null;
             }
-            $data['total_price']=(int)$data['total_price']; //wrong data from frontend
+            $data['total_price'] = (int)$data['total_price']; //wrong data from frontend
             $latest = PurchaseOrder::orderBy('created_at', 'desc')->first();
             $count = 4;
             $no = (new CommonPurchaseOrder())->getUniqueId($latest, 'po_id', $count);
@@ -137,6 +137,7 @@ class PurchaseOrderRepository implements PurchaseOrderRepositoryInterface
                 }
                 $item_data['purchase_order_id'] = $po->id;
                 $item_data['item_id'] = $item->item_id;
+                $item_data['brand_id'] = $item->brand_id;
                 $item_data['amount'] = $item->amount;
                 $item_data['uom_id'] = $item->uom_id;
                 $item_data['uom_conversion_id'] = $item->uom_conversion_id;
