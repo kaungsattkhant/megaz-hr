@@ -19,7 +19,7 @@ class PoOrderRepository implements PoOrderRepositoryInterface
   use PoInvoiceTransaction;
   public function getPoOrderItems(Request $request)
   {
-    // return $this->test($request);
+    return $this->test($request);
     $poOrderItems = DB::table('purchase_order_items as poi')
       ->join('items as i', 'poi.item_id', '=', 'i.id')
       ->join('uoms as u', 'poi.uom_id', '=', 'u.id')
@@ -104,7 +104,9 @@ class PoOrderRepository implements PoOrderRepositoryInterface
   public function test($request)
   {
     $poClass = 'po_order';
-
+    // $leftsSubquery = DB::table('item_lefts')
+    //   ->select('item_id', DB::raw('SUM(quantity) as total_left_quantity'))
+    //   ->groupBy('item_id');
     $leftsSubquery = DB::table('item_lefts')
       ->join('po_orders', function ($join) use ($poClass) {
         $join->on('item_lefts.item_leftable_id', '=', 'po_orders.id')
@@ -114,13 +116,16 @@ class PoOrderRepository implements PoOrderRepositoryInterface
       ->groupBy('po_orders.item_id', 'po_orders.purchase_order_id');
 
 
-    // $leftsSubquery = DB::table('item_lefts')
-    //   ->select('item_id', DB::raw('SUM(quantity) as total_left_quantity'))
-    //   ->groupBy('item_id');
+
 
     $poOrderSubquery = DB::table('po_orders')
-      ->select('item_id', DB::raw('SUM(quantity) as total_po_order_quantity'))
+      ->select(
+        'item_id',
+        DB::raw('SUM(quantity) as total_po_order_quantity'),
+        DB::raw('GROUP_CONCAT(po_orders.purchase_order_id SEPARATOR ",") as po_order_ids'),
+      )
       ->groupBy('item_id', );
+
 
     $poOrderItems = DB::table('purchase_order_items as poi')
       ->join('items as i', 'poi.item_id', '=', 'i.id')
@@ -145,26 +150,81 @@ class PoOrderRepository implements PoOrderRepositoryInterface
         'poi.base_uom_id',
         'poi.uom_id',
         'poi.uom_conversion_id',
-        DB::raw('COALESCE(SUM(poi.quantity), 0) as total_purchase_order_quantity'),
+        DB::raw('GROUP_CONCAT(DISTINCT po.po_id SEPARATOR ", ") as po_numbers'),
+        DB::raw('
+        COALESCE(
+    SUM(
+        CASE 
+            WHEN po_orders.po_order_ids IS NULL THEN poi.quantity
+            WHEN FIND_IN_SET(poi.purchase_order_id, po_orders.po_order_ids) = 0 THEN poi.quantity
+            ELSE 0 
+        END
+    ), 0
+) AS total_purchase_order_quantity
+    '),
         DB::raw('COALESCE(i_lefts.total_left_quantity, 0) as left_quantity'), // Default to 0 if no data
         DB::raw('COALESCE(po_orders.total_po_order_quantity, 0) as po_order_quantity'), // Default to 0 if no data
-        DB::raw('COALESCE(SUM(poi.quantity), 0) - COALESCE(po_orders.total_po_order_quantity, 0) as total_quantity'),
+        DB::raw('COALESCE(po_orders.po_order_ids, "null") as po_order_ids'),
+        DB::raw('GROUP_CONCAT(DISTINCT poi.purchase_order_id SEPARATOR ", ") as po_ids'),
+        // DB::raw('
+        //     GROUP_CONCAT(
+        //         DISTINCT 
+        //         CASE 
+        //             WHEN poi.purchase_order_id NOT IN (po_order_ids) =0 THEN poi.purchase_order_id
+        //         END 
+        //         SEPARATOR ", "
+        //     ) as unmatched_po_ids
+        // '),
+        DB::raw('
+        GROUP_CONCAT(
+            DISTINCT 
+            CASE 
+                WHEN FIND_IN_SET(poi.purchase_order_id, po_order_ids) = 0 THEN poi.purchase_order_id
+            END 
+            SEPARATOR ", "
+        ) as unmatched_po_ids
+    '),
+        DB::raw('(
+      COALESCE(i_lefts.total_left_quantity, 0) + 
+      COALESCE(
+          CASE 
+              WHEN po_orders.po_order_ids IS NULL THEN 
+                  SUM(poi.quantity)
+              ELSE 
+                  SUM(CASE 
+                      WHEN FIND_IN_SET(poi.purchase_order_id, po_order_ids)  = 0 THEN poi.quantity
+                      ELSE 0 
+                  END)
+          END, 0)
+  ) as total_quantity'),
         DB::raw('(
           SELECT JSON_ARRAYAGG(
               JSON_OBJECT(
-                  "id", po_item.id,
+                  "id", po_item.purchase_order_id,
                   "item_name", i.name,
+                  "item_name", po_orders.po_order_ids,
                   "item_id", i.id,
                   "amount", po_item.amount,
-                  "quantity", po_item.quantity,
                   "base_uom_id", po_item.base_uom_id,
                   "base_uom_quantity", po_item.base_uom_quantity,
                   "uom_id", po_item.uom_id,
                   "uom_quantity", po_item.uom_quantity,
                   "uom_conversion_id", po_item.uom_conversion_id,
                   "uom_conversion", uc.conversion,
-                   "total_purchase_order_quantity",(
-                SELECT COALESCE(SUM(po_item_sub.quantity), 0)
+                  "total_purchase_order_quantity", (
+                SELECT COALESCE(
+                    SUM(
+                        CASE
+                            WHEN po_orders.po_order_ids IS NULL THEN po_item_sub.quantity
+                            ELSE 
+                                CASE 
+                                    WHEN FIND_IN_SET(po_item.purchase_order_id,  po_orders.po_order_ids) =0
+                                    THEN po_item_sub.quantity 
+                                    ELSE 0 
+                                END
+                        END
+                    ), 0
+                )
                 FROM purchase_order_items po_item_sub
                 WHERE po_item_sub.item_id = po_item.item_id
                   AND po_item_sub.purchase_order_id = po_item.purchase_order_id
@@ -190,6 +250,48 @@ class PoOrderRepository implements PoOrderRepositoryInterface
     WHERE lefts.item_id = po_item.item_id
       AND lefts.purchase_order_id = po_item.purchase_order_id
 ),
+"quantity", (
+                SELECT (
+                    COALESCE(
+                        (
+                            SELECT COALESCE(
+                                SUM(
+                                    CASE
+                                        WHEN po_orders.po_order_ids IS NULL THEN po_item_sub.quantity
+                                        ELSE 
+                                            CASE 
+                                                WHEN FIND_IN_SET(po_item_sub.purchase_order_id, po_orders.po_order_ids) = 0 
+                                                THEN po_item_sub.quantity
+                                                ELSE 0 
+                                            END
+                                    END
+                                ), 0
+                            )
+                            FROM purchase_order_items po_item_sub
+                            WHERE po_item_sub.item_id = po_item.item_id
+                              AND po_item_sub.purchase_order_id = po_item.purchase_order_id
+                        ), 0
+                    )
+                    +
+                    COALESCE(
+                        (
+                            SELECT COALESCE(SUM(lefts.total_left_quantity), 0)
+                            FROM (
+                                SELECT 
+                                    po_orders.item_id,
+                                    po_orders.purchase_order_id,
+                                    SUM(il.quantity) as total_left_quantity
+                                FROM item_lefts il
+                                INNER JOIN po_orders ON il.item_leftable_id = po_orders.id
+                                WHERE il.item_leftable_type = "' . $poClass . '"
+                                GROUP BY po_orders.item_id, po_orders.purchase_order_id
+                            ) as lefts
+                            WHERE lefts.item_id = po_item.item_id
+                              AND lefts.purchase_order_id = po_item.purchase_order_id
+                        ), 0
+                    )
+                )
+            ),
                   "purchase_order", JSON_OBJECT(
                       "id", po.id,
                       "po_id", po.po_id,
@@ -208,6 +310,7 @@ class PoOrderRepository implements PoOrderRepositoryInterface
           AND po.status = "md_checked"
       ) as purchase_order_details')
       )
+      // ->whereRaw('FIND_IN_SET(poi.purchase_order_id, po_orders.po_order_ids) = 0')  // Exclude po_order_ids
       ->groupBy(
         'poi.item_id',
         'i.name',
@@ -218,7 +321,7 @@ class PoOrderRepository implements PoOrderRepositoryInterface
         'poi.uom_id',
         'u.name',
         'i_lefts.total_left_quantity',
-        'po_orders.total_po_order_quantity'
+        'po_orders.total_po_order_quantity',
       )
       ->paginate(config('common.list_count'));
 
@@ -353,7 +456,6 @@ class PoOrderRepository implements PoOrderRepositoryInterface
 
   public function testArrivalList($request)
   {
-
     $leftsSubquery = DB::table('item_lefts')
       ->join('arrival_items', function ($join) {
         $join->on('item_lefts.item_leftable_id', '=', 'arrival_items.id')
@@ -739,7 +841,7 @@ class PoOrderRepository implements PoOrderRepositoryInterface
   public function processInvoiceTransaction($request)
   {
     $poInvoiceId = $request->po_invoice_id;
-    $supplierId = $request->po_invoice_id;
+    $supplierId = $request->supplier_id;
     $supplierAccountId = $request->supplier_account_id;
     $apAmount = $request->ap_amount;
     $cashAccountId = $request->cash_account_id;

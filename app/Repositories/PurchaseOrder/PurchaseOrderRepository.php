@@ -102,6 +102,7 @@ class PurchaseOrderRepository implements PurchaseOrderRepositoryInterface
             if (!isset($request->id)) {
                 $data['id'] = null;
             }
+            $data['total_price']=(int)$data['total_price']; //wrong data from frontend
             $latest = PurchaseOrder::orderBy('created_at', 'desc')->first();
             $count = 4;
             $no = (new CommonPurchaseOrder())->getUniqueId($latest, 'po_id', $count);
@@ -445,7 +446,7 @@ class PurchaseOrderRepository implements PurchaseOrderRepositoryInterface
                         ResponseMessage("Inventory is required", 419);
                     }
                     $inventoryId = UserData()->department->inventory->inventory_id;
-                    $inventoryLedger = (new StoreInventory($inventoryId))->storeToInventoryLedger($po_item->purchase_order, 'purchase_order', 'in');
+                    $inventoryLedger = (new StoreInventory(inventoryId: $inventoryId))->storeToInventoryLedger($po_item->purchase_order, 'purchase_order', 'in');
                     (new StoreInventory($inventoryId))->storeItemToInventory($inventoryLedger, $po_item);
                     #store inventory
                     DB::commit();

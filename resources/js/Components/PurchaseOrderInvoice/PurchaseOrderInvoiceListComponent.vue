@@ -71,15 +71,15 @@
                                                 <i class="fal fa-pen"></i>
                                             </button>
                                             <button data-te-toggle="modal" data-te-target="#check_modal" class="pr-3"
-                                            @click="checkBtnClicked(item.arrival_items[0], index)">
+                                            @click="checkBtnClicked(item.arrival_items[0], index, item)">
                                                 <i class="fal fa-check"></i>
                                             </button>
                                         </div>
                                     </td>
                                 </tr>
                                 <tr v-if="item.showDatails" v-for="(arrival, arrivalIndex) in item.arrival_items" :key="arrivalIndex">
-                                    <td> &nbsp; </td>
-                                    <td class="whitespace-nowrap"> &nbsp; </td>
+                                    <!-- <td> &nbsp; </td> -->
+                                    <td colspan="2" class="whitespace-nowrap"> &nbsp; </td>
                                     <td class="whitespace-nowrap"> {{ arrival.item_name }} </td>
                                     <td class="whitespace-nowrap"> {{ item.supplier_name }} </td>
                                     <!-- <td class="whitespace-nowrap"> {{ arrival.quantity.toLocaleString() }} </td> -->
@@ -89,7 +89,7 @@
                                                 <i class="fal fa-pen"></i>
                                         </button>
                                         <button data-te-toggle="modal" data-te-target="#check_modal" class="pr-3"
-                                        @click="checkBtnClicked(arrival, index)">
+                                        @click="checkBtnClicked(arrival, index, item)">
                                             <i class="fal fa-check"></i>
                                         </button>
                                     </td>
@@ -114,7 +114,7 @@
                         id="check_modalLabel">
                         Confirm Invoice
                     </h5>
-                    <button type="button" class="text-xs focus:shadow-none focus:outline-none" data-te-modal-dismiss id="close_create_modal"
+                    <button type="button" class="text-xs focus:shadow-none focus:outline-none" data-te-modal-dismiss id="close_check_modal"
                         aria-label="Close">
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
                             stroke="currentColor" class="h-4 w-4">
@@ -128,7 +128,7 @@
                     </div>
                     <div class="mb-4 ">
                         <label for="amount" class="text-sm">Amount</label>
-                        <input type="number" id="amount" placeholder="Invoice Amount" v-model="invoiceAmount" class="input-ui">
+                        <input type="number" id="amount" placeholder="Invoice Amount" v-model="invoiceAmount" @input="invoiceAmountChange()" class="input-ui">
                     </div>
                     <div class="mb-4 ml-6">
 
@@ -136,13 +136,16 @@
 
                     <div class="mb-4">
                         <label for="cashbook" class="text-sm">Cash Book</label>
-                        <select id="cashbook" v-model="selectedCashAccount" @change=""
+                        <select id="cashbook" v-model="selectedCashAccount"
                         class="text-sm border border-gray-300 input-ui w-12
                         bg-transparent rounded-lg focus:ring-0">
                             <option :value="cashAccount" v-for="(cashAccount, cashAccountIndex) in cashAccountList" :key="cashAccountIndex">
                                 {{ cashAccount.name }}
                             </option>
                         </select>
+                    </div>
+                    <div class="mb-4 ">
+                        <label for="total-amount" class="text-sm">AP Amount: {{ apAmount.toLocaleString() }}</label>
                     </div>
                 </div>
                 <div class="flex justify-end gap-x-4 px-6 mb-6 pt-4">
@@ -152,7 +155,7 @@
                     </button>
                     <button type="button"
                     class="add-btn focus:outline-none focus:ring-0 "
-                    @click="confirmBtnClicked" data-te-modal-dismiss>
+                    @click="confirmBtnClicked">
                         Create
                     </button>
                 </div>
@@ -175,6 +178,8 @@ export default {
             invoiceAmount: 0,
 
             totalInvoiceAmount: 0,
+            apAmount:0,
+            selectedPoInvoice:null,
 
             currentPage: 1,
             perPage: 0,
@@ -216,14 +221,49 @@ export default {
             }
         },
 
-        checkBtnClicked(arrivalItem, index){
+        checkBtnClicked(arrivalItem, index, invoice){
             console.log(arrivalItem);
+            this.selectedPoInvoice = arrivalItem;
+            this.invoiceAmount = arrivalItem.amount;
             this.totalInvoiceAmount = this.items[index].total_invoice_amount;
             this.selectedCashAccount = null;
+            this.apAmount = this.items[index].total_invoice_amount - this.invoiceAmount;
+            this.selectedPoInvoice = invoice;
         },
-
+        invoiceAmountChange(){
+            this.apAmount = this.totalInvoiceAmount - this.invoiceAmount
+        },
         async confirmBtnClicked(){
-
+            if(!this.invoiceAmount || this.invoiceAmount < 1){
+                this.alertValidationMessage('Amount');
+                return 1;
+            }
+            if(!this.selectedCashAccount){
+                this.alertValidationMessage('Account');
+                return 1;
+            }
+            let formData = new FormData();
+            formData.append('cash_account_id', this.selectedCashAccount.id);
+            formData.append('amount', this.invoiceAmount);
+            formData.append('ap_amount', this.apAmount);
+            formData.append('total_invoice_amount', this.totalInvoiceAmount);
+            formData.append('po_invoice_id', this.selectedPoInvoice.invoice_no);
+            formData.append('supplier_id', this.selectedPoInvoice.supplier_id);
+            formData.append('supplier_account_id', this.selectedPoInvoice.account_id);
+            let response = await postApiData({url: `/api/invoice_transaction`, form_data:  formData, token: this.getToken()});
+            if(response.success){
+                this.$notify({
+                    text: `A new PO Invoice created`,
+                    type: 'info'
+                });
+                document.getElementById("close_check_modal").click();
+            }
+            else{
+                this.$notify({
+                    text: `Some errors occurred`,
+                    type: 'error'
+                });
+            }
         },
 
         alertValidationMessage(field) {
@@ -233,6 +273,14 @@ export default {
                 type: 'warn'
             });
         },
+    },
+    watch: {
+        apAmount: function () {
+            this.invoiceAmountChange();
+        },
+        // apAmount(val,oldVal) {
+        //     console.log(`new: ${val}, old: ${oldVal}`)
+        // }
     },
 
     created() {
