@@ -66,7 +66,7 @@
                                         <span v-if="item.total_invoice_amount"> {{ item.total_invoice_amount.toLocaleString() }} </span>
                                     </td>
                                     <td class="whitespace-nowrap">
-                                        <div v-if="item.arrival_items.length <= 1" >
+                                        <div>
                                             <button data-te-toggle="modal" data-te-target="#edit_modal" id="edit-btn" class="pr-3">
                                                 <i class="fal fa-pen"></i>
                                             </button>
@@ -85,13 +85,13 @@
                                     <!-- <td class="whitespace-nowrap"> {{ arrival.quantity.toLocaleString() }} </td> -->
                                     <td class="whitespace-nowrap"> {{ arrival.amount.toLocaleString() }} </td>
                                     <td class="whitespace-nowrap">
-                                        <button data-te-toggle="modal" data-te-target="#edit_modal" id="edit-btn" class="pr-3">
+                                        <!-- <button data-te-toggle="modal" data-te-target="#edit_modal" id="edit-btn" class="pr-3">
                                                 <i class="fal fa-pen"></i>
                                         </button>
                                         <button data-te-toggle="modal" data-te-target="#check_modal" class="pr-3"
                                         @click="checkBtnClicked(arrival, index, item)">
                                             <i class="fal fa-check"></i>
-                                        </button>
+                                        </button> -->
                                     </td>
                                 </tr>
                             </div>
