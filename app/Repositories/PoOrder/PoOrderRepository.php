@@ -218,7 +218,7 @@ class PoOrderRepository implements PoOrderRepositoryInterface
                             WHEN po_orders.po_order_ids IS NULL THEN po_item_sub.quantity
                             ELSE 
                                 CASE 
-                                    WHEN FIND_IN_SET(po_item.purchase_order_id, "1,2") =0
+                                    WHEN FIND_IN_SET(po_item.purchase_order_id,  po_orders.po_order_ids) =0
                                     THEN po_item_sub.quantity 
                                     ELSE 0 
                                 END
@@ -260,7 +260,7 @@ class PoOrderRepository implements PoOrderRepositoryInterface
                                         WHEN po_orders.po_order_ids IS NULL THEN po_item_sub.quantity
                                         ELSE 
                                             CASE 
-                                                WHEN FIND_IN_SET(po_item_sub.purchase_order_id, "1,2") = 0 
+                                                WHEN FIND_IN_SET(po_item_sub.purchase_order_id, po_orders.po_order_ids) = 0 
                                                 THEN po_item_sub.quantity
                                                 ELSE 0 
                                             END
