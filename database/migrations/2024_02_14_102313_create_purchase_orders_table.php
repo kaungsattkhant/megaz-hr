@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('purchase_orders', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->string('po_id', 45);
-            $table->decimal('total_price', 8, 2);
+            $table->double('total_price');
             $table->date('date');
             $table->unsignedBigInteger('created_by');
             $table->boolean('is_bought')->default(0);
