@@ -85,8 +85,8 @@ return [
     'Objective' => 'OKR.index',
     'KtvProductTree' => 'product_tree.index',
     //procurement
-    'po-order'=>'',   //procurement order-item
-    'arrival-item'=>'',
-    'po-invoice'=>'',   //purchase order invoice list
+    'po-order'=>'procurement_order_items.index',   //procurement order-item
+    'arrival-item'=>'procurement_order_arrival.index',
+    'po-invoice'=>'purchase_order_invoices.index',   //purchase order invoice list
     //end procurement
 ];

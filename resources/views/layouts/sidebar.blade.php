@@ -733,6 +733,24 @@
                         Contact
                     </a>
                 </li>
+                <li>
+                    <a href="/working_capital" class="flex items-center @yield('working_capital')">
+                        <i class="fal fa-braille pr-3"></i>
+                        Working Capital
+                    </a>
+                </li>
+                <li>
+                    <a href="/ap_balances" class="flex items-center @yield('ap_balances')">
+                        <i class="fal fa-braille pr-3"></i>
+                        AP Balance
+                    </a>
+                </li>
+                <li>
+                    <a href="/creditor_balances" class="flex items-center @yield('creditor_balances')">
+                        <i class="fal fa-braille pr-3"></i>
+                        Creditor Balance
+                    </a>
+                </li>
 
             </ul>
 
