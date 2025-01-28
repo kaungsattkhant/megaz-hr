@@ -41,77 +41,78 @@
                                     Code
                                 </th>
                                 <th scope="col" class="">
-                                    Other Payable
+                                    Name
                                 </th>
                                 <th scope="col" class="">
                                     Opening Balanes
                                 </th>
                                 <th scope="col" class="">
-                                    Addition
+                                    Current Purchase
                                 </th>
                                 <th scope="col" class="">
                                     Cash Paid
                                 </th>
                                 <th scope="col" class="">
-                                    Rebate / Adjust
+                                    Discount
                                 </th>
                                 <th scope="col" class="">
-                                    Closing Balances
+                                    Purchase Return
                                 </th>
                                 <th scope="col" class="">
-                                    Location
+                                    Closing Balance
                                 </th>
                             </tr>
                         </thead>
                         <tbody>
-                            <tr class="" v-for="(ap,index) in apBalanceList.payable_accounts" :key="index">
+                            <tr class="" v-for="(creditor,index) in creditorBalanceList" :key="index">
                                 <td class="">
                                     {{ index+1 }}
                                 </td>
                                 <td class="">
-                                    {{ ap.account_id }}
+                                    {{ creditor.account_id }}
                                 </td>
                                 <td class="">
-                                    {{ ap.account_name }}
+                                    {{ creditor.account_name }}
                                 </td>
                                 <td class="">
-                                    {{ ap.opening_balance }}
+                                    {{ creditor.opening_balance }}
                                 </td>
                                 <td class="">
-                                    {{ ap.total_addition }}
+                                    --
+                                    <!-- {{ creditor.total_addition }} -->
                                 </td>
                                 <td class="">
-                                    {{ ap.total_settlement }}
+                                    {{ creditor.settlement_amount }}
                                 </td>
                                 <td class="">
                                     --
                                 </td>
                                 <td class="">
-                                    {{ ap.closing_balance }}
+                                    --
                                 </td>
                                 <td class="">
-                                    --
+                                    {{ creditor.closing_balance }}
                                 </td>
                             </tr>
-                            <tr>
+                            <!-- <tr>
                                 <td colspan="3"  class="text-right bg-blue-50">
                                     Total
                                 </td>
                                 <td class="bg-blue-50">
-                                    {{ apBalanceList.total_opening_balance }} 
+                                    {{ creditorBalanceList.total_opening_balance }} 
                                 </td> 
                                 <td class="bg-blue-50">
-                                    {{ apBalanceList.total_addition }} 
+                                    {{ creditorBalanceList.total_addition }} 
                                 </td>
                                 <td class="bg-blue-50">
-                                    {{ apBalanceList.total_settlement }} 
+                                    {{ creditorBalanceList.total_settlement }} 
                                 </td>
                                 <td class="bg-blue-50"></td>
                                 <td class="bg-blue-50">
-                                    {{ apBalanceList.total_closing_balance }} 
+                                    {{ creditorBalanceList.total_closing_balance }} 
                                 </td>
                                 <td class=" bg-blue-50"></td>
-                            </tr>
+                            </tr> -->
                         </tbody>
                     </table>
 
@@ -144,7 +145,7 @@ import { mapGetters } from "vuex";
 export default {
     data() {
         return {
-            apBalanceList: [],
+            creditorBalanceList: [],
             staffList:[],
             selectedStaff:null,
             fromDate:null,
@@ -157,7 +158,7 @@ export default {
 
             searchInput:null,
 
-            url:'/api/get_account_payable_balance',
+            url:'/api/get_creditor_balance',
             url_from:'',
             url_to:'',
             deleteId:null,
@@ -167,11 +168,11 @@ export default {
 
     methods: {
         ...mapGetters(['getToken']),
-        async getApBalanceList(pageNumber) {
+        async getCreditorBalance(pageNumber) {
             let url = this.url + this.url_from + this.url_to;
             let response = await getApiData({ url: url, token: this.getToken() });
             if (response.data) {
-                this.apBalanceList = response.data;
+                this.creditorBalanceList = response.data;
                 // this.lastPage = response.data.last_page;
                 // this.currentPage = pageNumber;
                 // this.perPage = response.data.per_page;
@@ -180,11 +181,11 @@ export default {
         fromDateChanged(){
             this.url_staff = '';
             this.url_from = '?from_date=' + this.fromDate
-            this.getApBalanceList();
+            this.getCreditorBalance();
         },
         toDateChanged(){
             this.url_to = '&to_date=' + this.toDate
-            this.getApBalanceList();
+            this.getCreditorBalance();
         },
         
         alertValidationMessage(field) {
@@ -200,7 +201,7 @@ export default {
         initTE({ Modal, Select, Ripple });
     },
     created() {
-        this.getApBalanceList(1);
+        this.getCreditorBalance(1);
     }
 }
 </script>
