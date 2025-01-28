@@ -27,6 +27,7 @@ class ItemRepository implements ItemRepositoryInterface
         if ($request->per_page || $request->page) {
             return Item::with([
                 'category',
+                'supplier_items.brand',
                 'supplier_items.item_price' => function ($query) {
                     $query->orderByDesc('id');
                 }
@@ -40,6 +41,7 @@ class ItemRepository implements ItemRepositoryInterface
         } else {
             return Item::with([
                 'category',
+                'supplier_items.brand',
                 'supplier_items.item_price' => function ($query) {
                     $query->orderByDesc('id');
                 }
@@ -151,6 +153,7 @@ class ItemRepository implements ItemRepositoryInterface
 
     public function brandBySupplier($request)
     {
+
         $itemId = $request->item_id;
         $supplierId = $request->supplier_id;
         $supplierByItem = SupplierItem::with('brand', 'item', 'item_price')
@@ -163,7 +166,16 @@ class ItemRepository implements ItemRepositoryInterface
     {
         $file = $request->file('item_import');
         $headings = (new HeadingRowImport)->toArray($file);
-        $expectedHeadings = ['name', 'code', 'category_id', 'item_type_id', 'base_uom_id', 'uom_id'];
+        $expectedHeadings = [
+            'name',
+            'code',
+            'category_id',
+            'item_type_id',
+            'base_uom_id',
+            'uom_id',
+            'lead_time',
+            'minimum_holding_amount',
+        ];
         $actualHeadings = $headings[0][0];
         foreach ($expectedHeadings as $heading) {
             if (!in_array($heading, $actualHeadings)) {
@@ -173,5 +185,19 @@ class ItemRepository implements ItemRepositoryInterface
         $import = new ItemsImport();
         $import->import($file);
         ResponseMessage('Import Successfully', 200);
+    }
+
+    public function brandlistOfSupplierByItem($itemId)
+    {
+        $brands = DB::table('supplier_items')
+            ->join('brands', 'supplier_items.brand_id', '=', 'brands.id')
+            ->where('supplier_items.item_id', $itemId)
+            ->select('brands.id', 'brands.name') // Include only the necessary columns
+            ->distinct() // Ensure unique rows
+            ->get();
+        // $supplierByItems = SupplierItem::with('supplier', 'item', 'brand')
+        // ->where('item_id', $itemId)->get();
+        // $brands = $supplierByItems->pluck('brand')->unique('id')->values();
+        return $brands;
     }
 }

@@ -39,7 +39,6 @@ class PurchaseOrderAPIController extends Controller
             $purchaseOrder = $this->purchaseOrderRepo->updateData($request->all(), $id);
             ResponseData($purchaseOrder);
         }
-
     }
 
     public function detail(PurchaseOrder $purchase_order)
@@ -70,10 +69,6 @@ class PurchaseOrderAPIController extends Controller
         $purchase_order_item = $this->purchaseOrderRepo->updateIsCheck($request);
     }
 
-    public function boughtPurchaseOrder(Request $request)
-    {
-        $purchase_order_item = $this->purchaseOrderRepo->boughtPurchaseOrder($request);
-    }
 
     public function getPurchaseOrderItemConfirmationList(Request $request)
     {
@@ -84,5 +79,11 @@ class PurchaseOrderAPIController extends Controller
     public function confirmPurchaseOrderItem(Request $request)
     {
         $this->purchaseOrderRepo->confirmPurchaseOrderItem($request);
+    }
+
+    public function getAvgPriceByBrand($itemId, $brandId)
+    {
+        $brands = $this->purchaseOrderRepo->getAvgPriceByBrand($itemId, $brandId);
+        ResponseData($brands);
     }
 }

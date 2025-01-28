@@ -4,8 +4,7 @@
 
         <div class="relative w-[15rem] pt-12">
             <ul class=" mb-4">
-                <!-- @if(checkFeaturePermission('financial-report')) -->
-
+                @if(checkFeaturePermission('financial-report'))
                 <li>
                     <button class="flex items-center pl-9 my-2 text-sm w-full" type="button" data-te-collapse-init
                         data-te-ripple-init data-te-ripple-color="light" data-te-target="#collapseFinanceReport"
@@ -30,11 +29,30 @@
                                     Indirect Cash Flow
                                 </a>
                             </li>
+
+                            <li>
+                                <a href="/working_capital" class="flex items-center text-left @yield('working_capital')">
+                                    <i class="fal fa-braille pr-3"></i>
+                                    Working Capital
+                                </a>
+                            </li>
+                            <li>
+                                <a href="/ap_balances" class="flex items-center text-left @yield('ap_balances')">
+                                    <i class="fal fa-braille pr-3"></i>
+                                    AP Balance
+                                </a>
+                            </li>
+                            <li>
+                                <a href="/creditor_balances" class="flex items-center text-left @yield('creditor_balances')">
+                                    <i class="fal fa-braille pr-3"></i>
+                                    Creditor Balance
+                                </a>
+                            </li>
+
                         </ul>
                     </div>
                 </li>
-
-                <!-- @endif -->
+                @endif
                 @if(checkFeaturePermission('sale-target'))
                     <li>
                         <button class="flex items-center pl-9 my-2 text-sm w-full" type="button" data-te-collapse-init
@@ -123,7 +141,7 @@
                     <li>
                         <a href="{{ route('menu_sale_report.index') }}"
                             class="flex items-center @yield('menu_sale_report')">
-                            <i class="fal fa-clipboard-list  pr-3"></i>
+                            <i class="fal fa-file-chart-line  pr-3"></i>
                             Menu Sale Report
                         </a>
                     </li>
@@ -391,7 +409,7 @@
                         <button class="flex items-center pl-9 my-2 text-sm" type="button" data-te-collapse-init
                             data-te-ripple-init data-te-ripple-color="light" data-te-target="#collapseCashbooks"
                             aria-expanded="false" aria-controls="collapseExample">
-                            <i class="fal fa-sack-dollar  pr-3"></i>
+                            <i class="fal fa-sack-dollar  pr-4"></i>
                             Cash Book
                         </button>
 
@@ -484,7 +502,6 @@
                             Purchase Orders
                         </a>
                     </li>
-                    <li>
                 @endif
                     @if (checkFeaturePermission('purchase-order-confirmation'))
                         <li>
@@ -503,6 +520,33 @@
                             Purchase Orders with Left Items
                         </a>
                     </li>
+                @endif
+                @if (checkFeaturePermission('po-order'))
+
+                <li>
+                    <a href="{{ route('procurement_order_items') }}" class="flex items-center @yield('procurement_order_items')">
+                        <i class="fal fa-truck-loading  pr-3"></i>
+                        Procurement Order Items
+                    </a>
+                </li>
+                @endif
+                @if (checkFeaturePermission('arrival-item'))
+                
+                <li>
+                    <a href="{{ route('arrival_items') }}" class="flex items-center @yield('arrival_items')">
+                        <i class="fal fa-truck-loading  pr-3"></i>
+                        Arrival Items
+                    </a>
+                </li>
+                @endif
+                @if (checkFeaturePermission('po-order-invoice'))
+
+                <li>
+                    <a href="{{ route('purchase_order_invoices') }}" class="flex items-center @yield('purchase_order_invoices')">
+                        <i class="fal fa-truck-loading  pr-3"></i>
+                        Purchase Order Invoices
+                    </a>
+                </li>
                 @endif
                 @if (checkFeaturePermission('fixed-asset'))
                     <li>
@@ -647,7 +691,7 @@
                 @endif
                 @if(checkFeaturePermission('accessory'))
                     <li>
-                        <a href="/accessories" class="flex items-center @yield('packages')">
+                        <a href="/accessories" class="flex items-center @yield('accessories')">
                             <i class="fal fa-braille pr-3"></i>
                             Accessories
                         </a>
@@ -710,6 +754,13 @@
                         GPS
                     </a>
                 </li>
+                <li>
+                    <a href="/contact" class="flex items-center @yield('contact')">
+                        <i class="fal fa-braille pr-3"></i>
+                        Contact
+                    </a>
+                </li>
+                
 
             </ul>
 

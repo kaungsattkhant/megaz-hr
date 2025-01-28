@@ -34,6 +34,7 @@ class FeatureSeeder extends Seeder
             'inventory confirmation',
             'inventory transfer list',
             'inventory receive list',
+            'brand',
             'supplier',
             'cashbook',
             'fixed asset',
@@ -49,20 +50,25 @@ class FeatureSeeder extends Seeder
             'crm',
             'sale target',
             'duty',
+            // financial
             'asset depreciation balance',
             'journal',
             'staff balance',
             'prepaid',
             'ar',
+            'financial report', 
+            //financial
             'skill',
             'cooking place',
             'custom task',
             'feature',
             'accessory',
-            'financial report',
             'MRP',
             'Objective',
-            'Ktv Product Tree'
+            'Ktv Product Tree',
+            'po-order',
+            'arrival-item',
+            'po-order-invoice',
         ];
         foreach ($features as $feature) {
             Feature::create([

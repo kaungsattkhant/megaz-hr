@@ -1,6 +1,6 @@
 @extends('layouts.main')
 
-@section('page_title', 'Create Purchase Order')
+@section('page_title', 'Purchase Order')
 @section('purchase_orders', 'active-link')
 @section('content')
 

@@ -88,6 +88,7 @@ use App\Http\Controllers\API\Customers\MenuAPIController as CustomersMenuAPICont
 use App\Http\Controllers\API\Customers\CustomerAPIController as UserAppCustomerAPIController;
 use App\Http\Controllers\API\Customers\PackageAPIController as CustomersPackageAPIController;
 use App\Http\Controllers\API\Customers\MenuCategoryAPIController as CustomerMenuCategoryAPIController;
+use App\Http\Controllers\API\PoOrderController;
 
 /*
 |--------------------------------------------------------------------------
@@ -191,10 +192,11 @@ Route::middleware('auth:api')->group(function () {
         Route::get('/purchase_orders_items', 'getPurchaseOrderItem');
         Route::post('/purchase_orders_items', 'createPurchaseOrderItem');
         Route::delete('/purchase_orders_items/{id}', 'deletePurchaseOrderItem');
-        Route::post('purchase_orders_bought', 'boughtPurchaseOrder');
+        // Route::post('purchase_orders_bought', 'boughtPurchaseOrder');
         Route::post('updateIsCheck', 'updateIsCheck');
         Route::get('/purchase_order_item_confirmation_list', 'getPurchaseOrderItemConfirmationList');
         Route::get('/confirm_purchase_order_item', 'confirmPurchaseOrderItem');
+        Route::get('/items/{itemId}/brands/{brandId}', 'getAvgPriceByBrand');
     });
     #item usage forecast
     Route::resource('item_usage_forecasts', ItemUsageForecastController::class)->only(['index', 'store', 'show', 'destroy']);
@@ -266,6 +268,9 @@ Route::middleware('auth:api')->group(function () {
     Route::resource('suppliers', SupplierController::class)->only(['index', 'store', 'show', 'destroy']);
     Route::controller(SupplierController::class)->group(function () {
         Route::post('/create_supplier_account', 'createSupplierAccount');
+        Route::post('/toggle_brand_item', 'toggleBrandItem');
+        Route::post('/suppliers/toggle_phones', 'toggleSupplierPhone');
+        Route::post('/suppliers/toggle_bank_accounts', 'toggleSupplierBankAccount');
     });
     Route::resource('notifications', NotificationController::class)->only(['index']);
     Route::get('notification_by_user', [NotificationController::class, 'notificationUsersData']);
@@ -443,7 +448,10 @@ Route::middleware('auth:api')->group(function () {
         Route::get('item_price_list_by_item/{item_id}', 'getItemPriceListByItem');
         Route::get('brand_by_supplier', 'brandBySupplier');
         Route::get('supplier_by_item/{item_id}', 'supplierByItem');
+        Route::get('brand_list_of_supplier_by_item/{item_id}','brandlistOfSupplierByItem');
     });
+    //invoice transaction
+    Route::post('/invoice_transaction', [PoOrderController::class, 'processInvoiceTransaction']);
 });
 Route::get('/features', [FeatureAPIController::class, 'getFeatureData']);
 

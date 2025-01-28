@@ -52,9 +52,10 @@ class MaterialRequirementsPlanningRepository implements MaterialRequirementsPlan
         'name' => $validatedData['name'],
         'menu_category_id' => $validatedData['menu_category_id'],
         'code' => $validatedData['code'],
-        'description' => $validatedData['description']
+        'description' => $validatedData['description'],
+        'image_path'=>$data['image_path'],
+        'image_url'=>$data['image_url'],
       ]);
-
       // if (!empty($validatedData['menu_steps'])) {
       $menuSteps = json_decode($validatedData['menu_steps']);
 

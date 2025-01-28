@@ -34,6 +34,7 @@ class StaffSeeder extends Seeder
         $catering_features = config('common.catering_feature_slug');
         $entertainment_features = config('common.entertainment_feature_slug');
         $management_features = config('common.management_feature_slug');
+        $procurement_features = config('common.procurement_feature_slug');
 
         foreach ($departments as $i => $department) {
             foreach ($department->roles as $departmentRole) {
@@ -57,35 +58,35 @@ class StaffSeeder extends Seeder
                         'name' => $faker->name,
                         'phone_number' => $phoneNumber,
                         'password' => 'password',
-                        'joined_date'=>now(),
-                        'alt_phone_number'=>$phoneNumber,
-                        'email'=>$faker->email,
-                        'nrc_number'=>$this->generateNRCNumber(),
-                        'birthdate'=>'1990-12-12',
-                        'father_name'=>'U Aung',
-                        'mother_name'=>'Daw Moe',
-                        'state'=>'Mandalay',
-                        'city'=>'myitnge',
-                        'zip_code'=>'address',
-                        'address'=>'Mandalay/Myitnge',
-                        'bank_account_number'=>'0002 0331 9933 8423',
-                        'nrc_front_url'=>'test',
-                        'nrc_front_path'=>'/path',
-                        'nrc_back_url'=>'test-back',
-                        'nrc_back_path'=>'/path/back',
-                        'household_registration_url'=>'/household_registration_url',
-                        'household_registration_path'=>'/household_registration_path',
+                        'joined_date' => now(),
+                        'alt_phone_number' => $phoneNumber,
+                        'email' => $faker->email,
+                        'nrc_number' => $this->generateNRCNumber(),
+                        'birthdate' => '1990-12-12',
+                        'father_name' => 'U Aung',
+                        'mother_name' => 'Daw Moe',
+                        'state' => 'Mandalay',
+                        'city' => 'myitnge',
+                        'zip_code' => 'address',
+                        'address' => 'Mandalay/Myitnge',
+                        'bank_account_number' => '0002 0331 9933 8423',
+                        'nrc_front_url' => 'test',
+                        'nrc_front_path' => '/path',
+                        'nrc_back_url' => 'test-back',
+                        'nrc_back_path' => '/path/back',
+                        'household_registration_url' => '/household_registration_url',
+                        'household_registration_path' => '/household_registration_path',
                     ]);
                     $staff->emergencyContacts()->create([
-                        'primary_name'=>$faker->name,
-                        'primary_phone'=>$phoneNumber,
-                        'primary_relationship'=>'None',
-                        'secondary_name'=>'None',
-                        'secondary_phone'=>$phoneNumber,
-                        'secondary_relationship'=>'None'
+                        'primary_name' => $faker->name,
+                        'primary_phone' => $phoneNumber,
+                        'primary_relationship' => 'None',
+                        'secondary_name' => 'None',
+                        'secondary_phone' => $phoneNumber,
+                        'secondary_relationship' => 'None'
                     ]);
                     $department_id = $department->id;
-                    $name=$department->name;
+                    $name = $department->name;
                     // switch ($department_id) {
                     //     case 1:
                     //         $staff->features()->sync($hr_features);
@@ -132,6 +133,10 @@ class StaffSeeder extends Seeder
                             break;
                         case 'Entertainement':
                             $featureIds = Feature::whereIn('slug', $entertainment_features)->pluck('id')->toArray();
+                            $staff->features()->sync($featureIds);
+                            break;
+                        case 'Procurement':
+                            $featureIds = Feature::whereIn('slug', $procurement_features)->pluck('id')->toArray();
                             $staff->features()->sync($featureIds);
                             break;
                         default:

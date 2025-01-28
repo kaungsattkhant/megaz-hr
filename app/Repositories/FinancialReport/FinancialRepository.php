@@ -771,7 +771,6 @@ class FinancialRepository implements FinancialInterface
         $year = Carbon::parse($request->date)->format('Y');
         $inventoryHeldBalances = $this->depreciationService->depreciationBalanceQueryOfYear($inventory_held, $year);
         //end
-
         //cashbook balance
         $cashBookBalances = (new CashBookTransaction())->getCashAndBankBalanceByMonth($cash_and_back, $year, $month);
         //prepaid balance
@@ -789,14 +788,16 @@ class FinancialRepository implements FinancialInterface
         $data['other_receivable'] = $other_receivable_balances;
         $data['receivable_debtor'] = $receivable_debtor_balances;
 
-
         $otherPayableBalances = $this->financialService->getOtherPayableBalances($year, $month);
         $creditorBalances = $this->financialService->getCreditorBalances($year, $month);
         $depositBalances = $this->financialService->getCustomerDepositBalances($year, $month);
-        $data['other_payable']=$otherPayableBalances;
-        $data['creditor']=$creditorBalances;
-        $data['deposit']=$depositBalances;
-        return $data;
+        $current_liabilities['other_payable']=$otherPayableBalances;
+        $current_liabilities['creditor']=$creditorBalances;
+        $current_liabilities['deposit']=$depositBalances;
+        return [
+            'current_asset'=>$data,
+            'current_liabilities'=>$current_liabilities
+        ];
     }
 
   
