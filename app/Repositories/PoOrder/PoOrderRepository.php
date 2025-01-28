@@ -618,7 +618,6 @@ class PoOrderRepository implements PoOrderRepositoryInterface
   {
     $poOrders = PoOrder::with(['purchaseOrder', 'uomConversion', 'uom', 'baseUom', 'item', 'brand', 'supplier', 'itemPrice'])
       ->where('item_id', $itemId)
-      // ->where('is_arrival_completed', 1)
       ->get();
 
     foreach ($poOrders as $poOrder) {
@@ -721,16 +720,11 @@ class PoOrderRepository implements PoOrderRepositoryInterface
         }
       }
       $poOrder =  PoOrder::where('id', $validatedData['po_order_id'])->first();
-      // if ($poOrder) {
-      //   $poOrder->is_arrival_completed = 0;
-      //   $poOrder->save();
-      // } else {
-      //   ResponseMessage('PoOrder not found', 404);
-      // }
-      // $this->storeInventoryLedger($validatedData, $arrivalItem);
-      $this->storeInventoryLedger($validatedData, $arrivalItem, $poOrder);
-
-
+      if (!$poOrder) {
+        ResponseMessage('PoOrder not found', 404);
+      } else {
+        $this->storeInventoryLedger($validatedData, $arrivalItem, $poOrder);
+      }
 
       if (isset($validatedData['later_buy']) && $validatedData['later_buy'] == 1) {
         $poOrder = PoOrder::where('id', $validatedData['po_order_id'])->first();
@@ -889,6 +883,8 @@ class PoOrderRepository implements PoOrderRepositoryInterface
       'po.supplier_id',
       's.name as supplier_name',
       's.account_id',
+      'po_invoices.is_complete',
+      'po_invoices.completed_at',
       DB::raw('GROUP_CONCAT(DISTINCT i.name SEPARATOR ", ") as item_names'),
       DB::raw('CAST(SUM(ai.quantity) AS SIGNED) as total_invoice_quantity')
     ])
@@ -918,6 +914,9 @@ class PoOrderRepository implements PoOrderRepositoryInterface
       if ($apAmount > 0 || ($request->total_invoice_amount < $request->amount)) {
         $this->storeAP($transaction, $apAmount, $supplierId, $supplierAccountId, $cashAccountId);
       }
+      $poInvoice->is_complete  = 1;
+      $poInvoice->completed_at = now();
+      $poInvoice->save();
       DB::commit();
       return ResponseMessage('Transaction created successfully', 200);
     } catch (\Exception $e) {

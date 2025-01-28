@@ -26,6 +26,7 @@ class DepartmentSeeder extends Seeder
         $catering_features = config('common.catering_feature_slug');
         $entertainment_features = config('common.entertainment_feature_slug');
         $management_features = config('common.management_feature_slug');
+        $procurement_features = config('common.procurement_feature_slug');
         foreach ($names as $name) {
             $department = Department::create([
                 'name' => $name,
@@ -57,6 +58,10 @@ class DepartmentSeeder extends Seeder
                     break;
                 case 'Entertainement':
                     $featureIds = Feature::whereIn('slug', $entertainment_features)->pluck('id')->toArray();
+                    $department->features()->sync($featureIds);
+                    break;
+                case 'Procurement':
+                    $featureIds = Feature::whereIn('slug', $procurement_features)->pluck('id')->toArray();
                     $department->features()->sync($featureIds);
                     break;
                 default:

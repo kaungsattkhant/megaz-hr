@@ -22,7 +22,6 @@ class PoOrder extends Model
         'supplier_id',
         'purchase_order_id',
         'item_price_id',
-        'is_arrival_completed',
         'created_by'
     ];
 
