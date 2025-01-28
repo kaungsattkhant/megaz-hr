@@ -139,7 +139,7 @@ class PurchaseOrderRepository implements PurchaseOrderRepositoryInterface
                 $item_data['item_id'] = $item->item_id;
                 $item_data['brand_id'] = $item->brand_id;
                 $item_data['amount'] = $item->amount;
-                $item_data['unit_price'] = $item->unit_pirce;
+                $item_data['unit_price'] = $item->unit_price;
                 $item_data['uom_id'] = $item->uom_id;
                 $item_data['uom_conversion_id'] = $item->uom_conversion_id;
                 $item_data['base_uom_id'] = $item->base_uom_id;
