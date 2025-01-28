@@ -44,6 +44,7 @@ return [
     'table' => 'table',
     'service' => 'services',
     'item' => 'items',
+    'brand' => 'brands',
     'uom-conversion' => 'uom_conversions',
     'uom' => 'uoms',
     'menu' => 'menus',

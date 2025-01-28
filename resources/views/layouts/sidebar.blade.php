@@ -523,24 +523,33 @@
                         </a>
                     </li>
                 @endif
+                @if (checkFeaturePermission('po-order'))
+
                 <li>
                     <a href="{{ route('procurement_order_items') }}" class="flex items-center @yield('procurement_order_items')">
                         <i class="fal fa-truck-loading  pr-3"></i>
                         Procurement Order Items
                     </a>
                 </li>
+                @endif
+                @if (checkFeaturePermission('arrival-item'))
+                
                 <li>
                     <a href="{{ route('arrival_items') }}" class="flex items-center @yield('arrival_items')">
                         <i class="fal fa-truck-loading  pr-3"></i>
                         Arrival Items
                     </a>
                 </li>
+                @endif
+                @if (checkFeaturePermission('po-order-invoice'))
+
                 <li>
                     <a href="{{ route('purchase_order_invoices') }}" class="flex items-center @yield('purchase_order_invoices')">
                         <i class="fal fa-truck-loading  pr-3"></i>
                         Purchase Order Invoices
                     </a>
                 </li>
+                @endif
                 @if (checkFeaturePermission('fixed-asset'))
                     <li>
                         <a href="{{ route('assetItemList') }}" class="flex items-center @yield('asset_items')">
