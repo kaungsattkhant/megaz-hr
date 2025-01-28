@@ -66,10 +66,10 @@
                                         <span v-if="item.total_invoice_amount"> {{ item.total_invoice_amount.toLocaleString() }} </span>
                                     </td>
                                     <td class="whitespace-nowrap">
-                                        <div v-if="item.arrival_items.length <= 1" >
-                                            <button data-te-toggle="modal" data-te-target="#edit_modal" id="edit-btn" class="pr-3">
+                                        <div>
+                                            <!-- <button data-te-toggle="modal" data-te-target="#edit_modal" id="edit-btn" class="pr-3">
                                                 <i class="fal fa-pen"></i>
-                                            </button>
+                                            </button> -->
                                             <button data-te-toggle="modal" data-te-target="#check_modal" class="pr-3"
                                             @click="checkBtnClicked(item.arrival_items[0], index, item)">
                                                 <i class="fal fa-check"></i>
@@ -85,13 +85,13 @@
                                     <!-- <td class="whitespace-nowrap"> {{ arrival.quantity.toLocaleString() }} </td> -->
                                     <td class="whitespace-nowrap"> {{ arrival.amount.toLocaleString() }} </td>
                                     <td class="whitespace-nowrap">
-                                        <button data-te-toggle="modal" data-te-target="#edit_modal" id="edit-btn" class="pr-3">
+                                        <!-- <button data-te-toggle="modal" data-te-target="#edit_modal" id="edit-btn" class="pr-3">
                                                 <i class="fal fa-pen"></i>
                                         </button>
                                         <button data-te-toggle="modal" data-te-target="#check_modal" class="pr-3"
                                         @click="checkBtnClicked(arrival, index, item)">
                                             <i class="fal fa-check"></i>
-                                        </button>
+                                        </button> -->
                                     </td>
                                 </tr>
                             </div>
@@ -247,7 +247,7 @@ export default {
             formData.append('amount', this.invoiceAmount);
             formData.append('ap_amount', this.apAmount);
             formData.append('total_invoice_amount', this.totalInvoiceAmount);
-            formData.append('po_invoice_id', this.selectedPoInvoice.invoice_no);
+            formData.append('po_invoice_id', this.selectedPoInvoice.id);
             formData.append('supplier_id', this.selectedPoInvoice.supplier_id);
             formData.append('supplier_account_id', this.selectedPoInvoice.account_id);
             let response = await postApiData({url: `/api/invoice_transaction`, form_data:  formData, token: this.getToken()});

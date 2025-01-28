@@ -136,6 +136,7 @@
                             <input type="number"
                             placeholder="Base UOM Qty"
                             v-model="baseUomQty"
+                            min="0"
                             class="input-ui"
                             @change="baseUomQtyChanged">
                         </div>
@@ -150,6 +151,8 @@
                             <input type="number"
                             placeholder="UOM Qty"
                             v-model="uomQty"
+                            min="0"
+                            :max="uomUpperLimit"
                             class="input-ui"
                             @change="uomQtyChanged">
                         </div>
@@ -298,6 +301,7 @@ export default {
             newInvoiceNumber: null,
 
             totalPrice: 0,
+            uomUpperLimit: 0,
         }
     },
 
@@ -353,6 +357,7 @@ export default {
             this.uomName = this.confirmArrivalItem.uom.name;
             this.uomQty = this.confirmArrivalItem.uom_quantity;
             this.selectedUomConversion = this.confirmArrivalItem.uom_conversion;
+            this.uomUpperLimit = this.selectedUomConversion.conversion - 1;
             this.originalArrivalTotalQty = (arrival.base_uom_quantity * this.selectedUomConversion.conversion) + arrival.uom_quantity;
             this.confirmArrivalTotalQty = this.originalArrivalTotalQty;
             this.calculateTotalPrice();
