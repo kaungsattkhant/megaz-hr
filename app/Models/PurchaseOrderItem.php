@@ -23,6 +23,7 @@ class PurchaseOrderItem extends BaseModel
         'quantity',
         'purchase_order_id',
         'amount',
+        'unit_price',
         'original_quantity',
         'is_manager_checked',
         'is_financial_checked',

@@ -114,7 +114,7 @@ class TransactionRepository implements TransactionInterface
         if($transaction){
             $transaction->delete();
             $transaction->ledgers()->delete();
-            ResponseMessage("Delete is successfully",422);
+            ResponseMessage("Delete is successfully",200);
         }
         ResponseMessage("Data isn't found",422);
     }

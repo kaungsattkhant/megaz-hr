@@ -95,6 +95,7 @@ class PurchaseOrderRepository implements PurchaseOrderRepositoryInterface
     public function createOrUpdate($request)
     {
         $data = $request->all();
+        dd($data);
         $staff = UserData();
         $items = json_decode($request->items);
         DB::beginTransaction();
@@ -102,7 +103,7 @@ class PurchaseOrderRepository implements PurchaseOrderRepositoryInterface
             if (!isset($request->id)) {
                 $data['id'] = null;
             }
-            $data['total_price'] = (int)$data['total_price']; //wrong data from frontend
+            $data['total_price'] = (int) $data['total_price']; //wrong data from frontend
             $latest = PurchaseOrder::orderBy('created_at', 'desc')->first();
             $count = 4;
             $no = (new CommonPurchaseOrder())->getUniqueId($latest, 'po_id', $count);
@@ -139,6 +140,7 @@ class PurchaseOrderRepository implements PurchaseOrderRepositoryInterface
                 $item_data['item_id'] = $item->item_id;
                 $item_data['brand_id'] = $item->brand_id;
                 $item_data['amount'] = $item->amount;
+                $item_data['unit_price'] = $item->unit_pirce;
                 $item_data['uom_id'] = $item->uom_id;
                 $item_data['uom_conversion_id'] = $item->uom_conversion_id;
                 $item_data['base_uom_id'] = $item->base_uom_id;
@@ -465,23 +467,31 @@ class PurchaseOrderRepository implements PurchaseOrderRepositoryInterface
 
     public function getAvgPriceByBrand($itemId, $brandId)
     {
-        $supplierItems = SupplierItem::where('item_id', $itemId)
+        $avgItemPrice = SupplierItem::where('item_id', $itemId)
             ->where('brand_id', $brandId)
-            ->get();
+            ->whereHas('item_price') // Ensure related item_price exists
+            ->with('item_price') // Load the related item_price
+            ->join('item_prices', 'supplier_items.id', '=', 'item_prices.supplier_item_id') // Join with item_prices
+            ->avg('item_prices.price'); // Calculate average price
+        return $avgItemPrice ? (float) $avgItemPrice : 0; 
 
-        $totalPrice = 0;
-        $totalCount = 0;
-        foreach ($supplierItems as $supplierItem) {
-            $itemPrice = $supplierItem->item_price;
+        // $supplierItems = SupplierItem::where('item_id', $itemId)
+        //     ->where('brand_id', $brandId)
+        //     ->get();
 
-            if ($itemPrice) {
-                $totalPrice += $itemPrice->price;
-                $totalCount++;
-            }
-        }
+        // $totalPrice = 0;
+        // $totalCount = 0;
+        // foreach ($supplierItems as $supplierItem) {
+        //     $itemPrice = $supplierItem->item_price;
 
-        $avgItemPrice = $totalCount > 0 ? $totalPrice / $totalCount : 0;
+        //     if ($itemPrice) {
+        //         $totalPrice += $itemPrice->price;
+        //         $totalCount++;
+        //     }
+        // }
 
-        return  $avgItemPrice;
+        // $avgItemPrice = $totalCount > 0 ? $totalPrice / $totalCount : 0;
+
+        // return $avgItemPrice;
     }
 }
