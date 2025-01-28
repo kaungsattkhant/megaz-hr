@@ -224,7 +224,7 @@ export default {
         checkBtnClicked(arrivalItem, index, invoice){
             console.log(arrivalItem);
             this.selectedPoInvoice = arrivalItem;
-            this.invoiceAmount = arrivalItem.amount;
+            this.invoiceAmount = invoice.total_invoice_amount;
             this.totalInvoiceAmount = this.items[index].total_invoice_amount;
             this.selectedCashAccount = null;
             this.apAmount = this.items[index].total_invoice_amount - this.invoiceAmount;

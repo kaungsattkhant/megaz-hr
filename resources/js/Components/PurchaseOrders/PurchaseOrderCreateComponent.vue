@@ -379,13 +379,13 @@
                 formData.append('date', this.date);
                 formData.append('total_price', priceTotal);
                 formData.append('items', JSON.stringify(this.purchaseOrderItems));
-                let response = await postApiData({url: `/api/purchase_orderswwww`, form_data:  formData, token: this.getToken()});
+                let response = await postApiData({url: `/api/purchase_orders`, form_data:  formData, token: this.getToken()});
                 if(response.success){
                     this.$notify({
                         text: `A new purchase order created`,
                         type: 'info'
                     });
-                    // window.location.replace(`/purchase_orders`);
+                    window.location.replace(`/purchase_orders`);
                     // setTimeout(()=>{
                     //     window.location.replace(`/purchase_orders`);
                     // }, 3000);
