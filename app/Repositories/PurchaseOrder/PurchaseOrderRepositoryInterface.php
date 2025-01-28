@@ -10,11 +10,11 @@ interface PurchaseOrderRepositoryInterface
 
     public function createOrUpdate($request);
 
-    public function updateData(array $data,int $id);
+    public function updateData(array $data, int $id);
 
     public function deleteData(int $id);
 
-    public function updateKitchenAndFinancePO(string $condition, array $data ,int $id);
+    public function updateKitchenAndFinancePO(string $condition, array $data, int $id);
 
     public function detail($model);
 
@@ -22,10 +22,10 @@ interface PurchaseOrderRepositoryInterface
 
     public function updateIsCheck($request);
 
-    public function boughtPurchaseOrder($request);
 
     public function getPurchaseOrderItemConfirmationList($request);
 
     public function confirmPurchaseOrderItem($request);
 
+    public function getAvgPriceByBrand($itemId, $brandId);
 }

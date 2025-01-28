@@ -291,6 +291,7 @@ export default {
         editBtnClicked(brand){
             this.name = brand.name;
             this.editId = brand.id;
+            this.selectedItem = brand.items
         },
 
         isActiveToggled(id) {

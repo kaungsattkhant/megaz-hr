@@ -11,8 +11,8 @@ class SupplierItem extends Model
     use HasFactory;
     protected $table='supplier_items';
 
-
-    protected $fillable =['supplier_id','item_id','brand_id'];
+    // protected $with=['item','brand'];
+    protected $fillable =['supplier_id','item_id','brand_id','is_active'];
 
     public $timestamps = false;
 

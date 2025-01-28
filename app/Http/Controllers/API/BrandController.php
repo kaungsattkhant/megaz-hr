@@ -12,7 +12,7 @@ class BrandController extends Controller
     //
     public function index(Request $request)
     {
-        $brandQuery=Brand::orderBy('id','desc');
+        $brandQuery=Brand::with('items')->orderBy('id','desc');
         if(isset($request->page)){
             return ResponseData($brandQuery->paginate(config('common.list_count')));
         }

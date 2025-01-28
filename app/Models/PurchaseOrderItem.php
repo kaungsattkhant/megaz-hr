@@ -13,14 +13,23 @@ class PurchaseOrderItem extends BaseModel
 
     protected $with = ['item', 'uom'];
     protected $fillable = [
+        'item_id',
+        'brand_id',
+        'base_uom_id',
+        'base_uom_quantity',
+        'uom_id',
+        'uom_quantity',
+        'uom_conversion_id',
         'quantity',
         'purchase_order_id',
-        'item_id',
         'amount',
+        'unit_price',
         'original_quantity',
-        'is_grn',
-        'uom_id',
-        'uom_conversion_id'
+        'is_manager_checked',
+        'is_financial_checked',
+        'is_md_checked',
+        'is_procurement_manager_checked',
+        'is_confirmed'
     ];
 
     public function getCreatedAt()
@@ -40,12 +49,22 @@ class PurchaseOrderItem extends BaseModel
 
     public function item()
     {
-        return $this->belongsTo(Item::class);
+        return $this->belongsTo(Item::class, 'item_id');
+    }
+
+    public function brand()
+    {
+        return $this->belongsTo(Brand::class, 'brand_id');
     }
 
     public function uom()
     {
-        return $this->belongsTo(Uom::class);
+        return $this->belongsTo(Uom::class, 'uom_id');
+    }
+
+    public function baseUom()
+    {
+        return $this->belongsTo(Uom::class, 'base_uom_id');
     }
 
     public function purchaseOrderItemLefts()

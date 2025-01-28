@@ -6,8 +6,8 @@
             </p>
         </div>
 
-        <div class="grid grid-cols-12 gap-x-8 bg-white pt-4 pb-8 px-4 rounded-md shadow-md mb-8">
-            <div class="mb-6 col-span-3">
+        <div class="grid grid-cols-12 gap-x-8 gap-y-6 bg-white pt-4 pb-8 px-4 rounded-md shadow-md mb-8">
+            <div class="col-span-3">
                 <label for="" class="label-form mb-3">
                     Date
                 </label>
@@ -26,28 +26,76 @@
                 </select>
 
             </div>
-
             <div class="col-span-3">
                 <label for="" class="label-form mb-3">
-                    Qty
+                    Brand
                 </label>
-                <input type="number" v-model="quantity" class="input-ui" placeholder="Qty">
-            </div>
+                <select name="" id="" v-model="selectedBrand" class="input-ui" @change="selectedBrandChange()">
+                    <option :value="brand" v-for="(brand, brandIndex) in brandList" :key="brandIndex">
+                        {{ brand.name }}
+                    </option>
+                </select>
 
-            <div class="col-span-3">
-                <label for="" class="block text-sm text-black mb-3">
-                    UOM
-                </label>
-                <div class="bg-white mb-0 w-full text-xs h-8 border-b border-black rounded-bl-[4px] rounded-br-[4px] overflow-hidden inline-block"
-                    data-te-select-wrapper-ref>
-                    <select data-te-select-init data-te-select-placeholder="Select UOM" data-te-select-filter="true"
-                        name="" id="" v-model="selectedUom"
-                        class="">
+            </div>
+            <div class="col-span-6"></div>
+            <div class="col-span-6 grid grid-cols-4 gap-x-8">
+                <div class="col-span-1">
+                    <label for="" class="label-form mb-3">
+                        Base UOM Qty
+                    </label>
+                    <input type="number" v-model="baseQuantity" class="input-ui" placeholder="Base Qty">
+                </div>
+    
+                <div class="col-span-1">
+                    <label for="" class="block text-sm text-black mb-3">
+                        Base UOM
+                    </label>
+                    <select name="" id="" v-model="selectedBaseUom" class="input-ui" disabled>
                         <option :value="uom" v-for="(uom, uomIndex) in itemUoms" :key="uomIndex">
                             {{ uom.name }}
                         </option>
                     </select>
+                    <!-- <div class="bg-white mb-0 w-full text-xs h-8 border-b border-black rounded-bl-[4px] rounded-br-[4px] overflow-hidden inline-block"
+                        data-te-select-wrapper-ref>
+                        <select data-te-select-init data-te-select-placeholder="Select UOM" data-te-select-filter="true"
+                            name="" id="" v-model="selectedBaseUom"
+                            class="">
+                            <option :value="uom" v-for="(uom, uomIndex) in itemUoms" :key="uomIndex">
+                                {{ uom.name }}
+                            </option>
+                        </select>
+                    </div> -->
                 </div>
+                <div class="col-span-1">
+                    <label for="" class="label-form mb-3">
+                        Qty
+                    </label>
+                    <input type="number" v-model="quantity" class="input-ui" placeholder="Qty">
+                </div>
+    
+                <div class="col-span-1">
+                    <label for="" class="block text-sm text-black mb-3">
+                        UOM
+                    </label>
+                    <select name="" id="" v-model="selectedUom" class="input-ui" disabled>
+                        <option :value="uom" v-for="(uom, uomIndex) in itemUoms" :key="uomIndex">
+                            {{ uom.name }}
+                        </option>
+                    </select>
+                    <!-- <div class="bg-white mb-0 w-full text-xs h-8 border-b border-black rounded-bl-[4px] rounded-br-[4px] overflow-hidden inline-block"
+                        data-te-select-wrapper-ref>
+                        <select data-te-select-init data-te-select-placeholder="Select UOM" data-te-select-filter="true"
+                            name="" id="" v-model="selectedUom"
+                            class="">
+                            <option :value="uom" v-for="(uom, uomIndex) in itemUoms" :key="uomIndex">
+                                {{ uom.name }}
+                            </option>
+                        </select>
+                    </div> -->
+                </div>
+                <!-- <div class="col-span-6"></div> -->
+    
+                
             </div>
 
             <div class="col-span-3">
@@ -68,13 +116,16 @@
                                 Item
                             </th>
                             <th scope="col" class="">
+                                Brand
+                            </th>
+                            <th scope="col" class="">
                                 Qty
                             </th>
                             <th scope="col" class="">
                                 UOM
                             </th>
                             <th scope="col" class="">
-                                Amount
+                                Unit Price
                             </th>
                             <th scope="col" class="">
                                 Total
@@ -92,17 +143,20 @@
                                     {{ purchaseOrderItem.name }}
                                 </td>
                                 <td class="">
+                                    {{ purchaseOrderItem.brand_name }}
+                                </td>
+                                <td class="">
                                     {{ purchaseOrderItem.quantity }}
                                 </td>
                                 <td class="">
                                     {{ purchaseOrderItem.uom_name }}
                                 </td>
                                 <td class="">
-                                    {{ purchaseOrderItem.amount.toLocaleString() }}
+                                    {{ purchaseOrderItem.unit_price.toLocaleString() }}
                                 </td>
                                 <td class="">
                                     <!-- {{ (purchaseOrderItem.amount * purchaseOrderItem.quantity).toLocaleString() }} -->
-                                    {{ purchaseOrderItem.price.toLocaleString() }}
+                                    {{ purchaseOrderItem.amount.toLocaleString() }}
 
                                 </td>
                                 <td class="">
@@ -148,14 +202,18 @@
                 date: getCurrentDate(),
                 itemList: [],
                 selectedItem: null,
+                brandList:[],
+                selectedBrand:null,
 
                 uomList: [],
                 itemUoms: [],
                 selectedUom: null,
-
-                quantity: null,
+                quantity: 0,
+                selectedBaseUom: null,
+                baseQuantity: 0,
                 purchaseOrderItems: [],
 
+                unitPrice:null,
                 totalPrice: 0,
             };
         },
@@ -190,72 +248,112 @@
                     let itemUom = this.uomList[index];
                     this.itemUoms.push(itemUom);
                 }
+                this.selectedUom = this.itemUoms.find(uom => uom.id == this.selectedItem.uom_id)
+                this.selectedBaseUom = this.itemUoms.find(uom => uom.id == this.selectedItem.base_uom_id)
+                this.brandList = this.selectedItem.brands;
             },
-
+            async selectedBrandChange(){
+                console.log('brand change')
+                let response = await getApiData({url: '/api/items/' + this.selectedItem.id + '/brands/' + this.selectedBrand.id, token: this.getToken()});
+                if(response.data){
+                    this.unitPrice = response.data;
+                    console.log(response)
+                }
+            },
             alertValidationMessage(field){
                 this.$notify({
                     title: 'Input validation',
                     text: `You forgot to prvide ${field}, please try again`,
                     type: 'warn'
                 });
+
             },
+
+
 
             async addItemBtnClicked(){
                 if(!this.selectedItem){
                     this.alertValidationMessage('an item');
                     return 1;
                 }
+                if(!this.selectedBrand){
+                    this.alertValidationMessage('Brand');
+                    return 1;
+                }
                 if(!this.selectedUom){
-                    this.alertValidationMessage('a uom');
+                    this.alertValidationMessage('UOM');
                     return 1;
                 }
-                if(this.quantity < 1){
-                    this.alertValidationMessage('quantity');
+                if(this.quantity < 1 && this.baseQuantity < 1){
+                    this.alertValidationMessage('Quantity');
                     return 1;
                 }
+                if(!this.selectedBaseUom){
+                    this.alertValidationMessage('Base UOM');
+                    return 1;
+                }
+                // if(this.baseQuantity < 1){
+                //     this.alertValidationMessage('Base Quantity');
+                //     return 1;
+                // }
                 let floatItemPrice = parseFloat(this.selectedItem.average_price)
                 console.log(floatItemPrice)
-                let url = `/api/get_uom_conversion_by_uom?po_uom_id=${this.selectedUom.id}&item_uom_id=${this.selectedItem.uom_id}&item_price=${floatItemPrice}&base_uom_id=${this.selectedItem.base_uom_id}`;
-                let response = await getApiData({url: url, token: this.getToken()});
-                let uomConversion = null;
-                let amount = 0;
-                let price = 0;
-                if(response.data){
-                    uomConversion = response.data;
-                    amount = parseInt(response.data.price);
-                    price = this.quantity * amount;
-                    // amount = uomConversion.conversion;
-                    // amount = amount * (response.data.price);
-                    this.$notify({
-                        text: `Uom conversion by uom value ${amount}`,
-                        type: 'info'
-                    });
-                }
-                else{
-                    this.$notify({
-                        title: 'Error',
-                        text: response.message,
-                        type: 'error'
-                    });
+                // let url = `/api/get_uom_conversion_by_uom?po_uom_id=${this.selectedUom.id}&item_uom_id=${this.selectedItem.uom_id}&item_price=${floatItemPrice}&base_uom_id=${this.selectedItem.base_uom_id}`;
+                // let response = await getApiData({url: url, token: this.getToken()});
+                // let uomConversion = null;
+                // let amount = 0;
+                // let price = 0;
+                // if(response.data){
+                //     uomConversion = response.data;
+                //     amount = parseInt(response.data.price);
+                //     price = this.quantity * amount;
+                //     this.$notify({
+                //         text: `Uom conversion by uom value ${amount}`,
+                //         type: 'info'
+                //     });
+                // }
+                // else{
+                //     this.$notify({
+                //         title: 'Error',
+                //         text: response.message,
+                //         type: 'error'
+                //     });
 
-                    return 1;
-                }
+                //     return 1;
+                // }
                 // amount = (this.selectedItem.item_prices)? this.selectedItem.item_prices.price: 0;
+                let quantity = (this.baseQuantity * this.selectedItem.uom_conversion) + this.quantity
+                // let price = ((this.baseQuantity * this.selectedItem.uom_conversion) + this.quantity) * this.selectedItem.average_price
+                // let price = (this.baseQuantity * this.selectedItem.average_price) + (this.quantity * (this.selectedItem.average_price  / this.selectedItem.uom_conversion))
+                let price = quantity * (this.unitPrice / this.selectedItem.uom_conversion);
                 this.purchaseOrderItems.push({
                     item_id: this.selectedItem.id,
-                    name: this.selectedItem.name,
-                    quantity: this.quantity,
-                    amount: amount,
-                    price: price,
+                    brand_id:this.selectedBrand.id,
+                    brand_name:this.selectedBrand.name,
+                    quantity: quantity,
+                    // amount: this.selectedItem.average_price,
+                    amount:price,
+                    unit_price: this.unitPrice / this.selectedItem.uom_conversion,
                     uom_id: this.selectedUom.id,
+                    uom_quantity: this.quantity,
                     uom_name: this.selectedUom.name,
-                    uom_conversion_id: uomConversion.id,
+                    uom_conversion_id: this.selectedItem.uom_conversion_id,
+                    base_uom_id: this.selectedBaseUom.id,
+                    base_uom_quantity: this.baseQuantity,
+                    base_uom_name: this.selectedBaseUom.name,
+                    name: this.selectedItem.name,
+                    // unit_price:this.unitPrice,
+                    // total_unit_price:this.unitPrice*quantity
                 });
 
                 this.updateTotalPrice(this.purchaseOrderItems);
                 this.selectedItem = null;
                 this.selectedUom = null;
-                this.quantity = null;
+                this.quantity = 0;
+                this.selectedBaseUom = null;
+                this.baseQuantity = 0;
+                this.selectedBrand = null;
+                // this.unitPrice = null;
             },
 
             removePurchaseOrderItemBtnClicked(purchaseOrderItemsIndex){
@@ -274,8 +372,9 @@
                 }
                 let priceTotal = 0;
                 this.purchaseOrderItems.forEach((purchaseOrderItem)=>{
-                    priceTotal += purchaseOrderItem.amount;
+                    priceTotal += purchaseOrderItem.price;
                 });
+                console.log(priceTotal)
                 let formData = new FormData();
                 formData.append('date', this.date);
                 formData.append('total_price', priceTotal);
@@ -302,7 +401,9 @@
             updateTotalPrice(poItems){
                 this.totalPrice = 0;
                 poItems.forEach((item)=>{
-                    this.totalPrice += (item.amount * item.quantity);
+                    // this.totalPrice += (item.amount * item.quantity);
+                    this.totalPrice += item.amount;
+                    console.log(this.totalPrice)
                 });
             },
 

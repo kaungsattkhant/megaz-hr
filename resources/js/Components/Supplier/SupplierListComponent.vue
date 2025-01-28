@@ -19,7 +19,7 @@
                 <a href="/suppliers/create" class="add-btn ">
                     Add New
                 </a>
-    
+
             </div>
         </div>
         <div class="box-container-table">
@@ -44,7 +44,7 @@
                                     Address
                                 </th>
                                 <th scope="col" class="">
-    
+
                                 </th>
                             </tr>
                         </thead>
@@ -54,16 +54,21 @@
                                 <tr class="">
                                     <td class="  font-medium ">
                                         {{ perPage * (currentPage - 1) + (++supplierIndex) }}
-    
+
                                     </td>
                                     <td class="whitespace-nowrap  ">
                                         {{ supplier.name }}
+                                        <a :href="`/suppliers/${supplier.id}/lead_times`"
+                                        class="text-blue-500 hover:underline"> [Lead Time] </a>
                                     </td>
                                     <td class="whitespace-nowrap  ">
                                         {{ supplier.shop_name }}
                                     </td>
                                     <td class="  ">
-                                        {{ supplier.phone_number }}
+                                        <span v-for="ph in supplier.supplier_phone" class=" after:content-[','] last:after:content-[''] after:pr-2">
+                                            {{ ph.phone_number }} ( {{ ph.type }} )
+                                        </span>
+                                        <!-- {{ supplier.phone_number }} -->
                                     </td>
                                     <td class="whitespace-nowrap  ">
                                         {{ supplier.address }}
@@ -72,33 +77,29 @@
                                         <a class="pr-2" :href="'/suppliers/' + supplier.id + '/edit'">
                                             <i class="fal fa-pen"></i>
                                         </a>
-    
+
                                         <button data-te-toggle="modal" data-te-target="#deleteModal" id="edit-btn"
                                             class="pl-2">
                                             <i class="fas fa-trash-alt"></i>
                                         </button>
                                     </td>
                                 </tr>
-    
-                                <tr class="">
-                                    <td class=" py-2 "></td>
-                                </tr>
                             </div>
                         </tbody>
                     </table>
-    
+
                     <!-- pagination -->
                     <div class="flex justify-center">
-    
+
                         <div v-if="totalData != 0" class=" bg-white  flex justify-center mt-5 py-3">
                             <button class="rounded px-6 py-1 border  hover:bg-slate-200" :disabled="currentPage === 1"
                                 @click="getSupplierList(currentPage - 1)">«</button>
-    
+
                             <button class=" text-sm px-5 border">
                                 Page <span @dblclick="showInput">{{ currentPage }}</span> / <span class="text-gray-400">{{
                                     lastPage }}</span>
                             </button>
-    
+
                             <button class=" rounded px-6  py-1 border  hover:bg-slate-200"
                                 :disabled="currentPage === lastPage" @click="getSupplierList(currentPage + 1)">
                                 »</button>
@@ -106,10 +107,10 @@
                     </div>
                 </div>
             </div>
-    
+
         </div>
     </div>
-    
+
 </template>
 
 <script>
