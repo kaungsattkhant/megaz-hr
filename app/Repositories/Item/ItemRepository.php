@@ -27,6 +27,7 @@ class ItemRepository implements ItemRepositoryInterface
         if ($request->per_page || $request->page) {
             return Item::with([
                 'category',
+                'supplier_items.brand',
                 'supplier_items.item_price' => function ($query) {
                     $query->orderByDesc('id');
                 }
@@ -40,6 +41,7 @@ class ItemRepository implements ItemRepositoryInterface
         } else {
             return Item::with([
                 'category',
+                'supplier_items.brand',
                 'supplier_items.item_price' => function ($query) {
                     $query->orderByDesc('id');
                 }
@@ -183,5 +185,19 @@ class ItemRepository implements ItemRepositoryInterface
         $import = new ItemsImport();
         $import->import($file);
         ResponseMessage('Import Successfully', 200);
+    }
+
+    public function brandlistOfSupplierByItem($itemId)
+    {
+        $brands = DB::table('supplier_items')
+            ->join('brands', 'supplier_items.brand_id', '=', 'brands.id')
+            ->where('supplier_items.item_id', $itemId)
+            ->select('brands.id', 'brands.name') // Include only the necessary columns
+            ->distinct() // Ensure unique rows
+            ->get();
+        // $supplierByItems = SupplierItem::with('supplier', 'item', 'brand')
+        // ->where('item_id', $itemId)->get();
+        // $brands = $supplierByItems->pluck('brand')->unique('id')->values();
+        return $brands;
     }
 }

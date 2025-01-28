@@ -5,6 +5,7 @@ namespace App\Http\Controllers\API;
 use Illuminate\Http\Request;
 use App\Models\UomConversion;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Admin\ItemRequest;
 use App\Http\Requests\Item\ItemImportRequest;
 use App\Repositories\Item\ItemRepositoryInterface;
 
@@ -23,7 +24,7 @@ class ItemAPIController extends Controller
         ResponseData($items);
     }
 
-    public function createItem(Request $request)
+    public function createItem(ItemRequest $request)
     {
         $item = $this->itemRepo->createData($request->all());
         ResponseData($item);
@@ -77,6 +78,10 @@ class ItemAPIController extends Controller
     public function itemImport(ItemImportRequest $request)
     {
         $item = $this->itemRepo->itemImport($request);
+        return $item;
+    }
+    public function brandlistOfSupplierByItem($itemId){
+        $item = $this->itemRepo->brandlistOfSupplierByItem($itemId);
         return $item;
     }
 }
