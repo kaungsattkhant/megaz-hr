@@ -148,7 +148,7 @@ class PoOrderRepository implements PoOrderRepositoryInterface
         'poi.base_uom_id',
         'poi.uom_id',
         'poi.uom_conversion_id',
-        DB::raw('GROUP_CONCAT(DISTINCT po.po_id SEPARATOR ", ") as po_numbers'),
+        // DB::raw('GROUP_CONCAT(DISTINCT po.po_id SEPARATOR ", ") as po_numbers'),
         DB::raw('
         COALESCE(
     SUM(
@@ -321,12 +321,22 @@ class PoOrderRepository implements PoOrderRepositoryInterface
       $details = collect(json_decode($item->purchase_order_details, true)); // Convert to a Collection
 
       // Filter the details where quantity > 0
-      $filteredDetails = $details->filter(function ($detail) {
-        return isset($detail['quantity']) && $detail['quantity'] > 0;
-      });
+      $poNumbers = []; // Initialize an array to store po_ids
 
+    // Filter the details and collect po_ids
+    $filteredDetails = $details->filter(function ($detail) use (&$poNumbers) {
+        if (isset($detail['quantity']) && $detail['quantity'] > 0) {
+            // Collect po_id if it meets the criteria
+            if (isset($detail['purchase_order']['po_id'])) {
+                $poNumbers[] = $detail['purchase_order']['po_id'];
+            }
+            return true; // Keep this detail
+        }
+        return false; // Filter out this detail
+    });
       // Assign the filtered details back to the item
       $item->purchase_order_details = $filteredDetails->values()->toArray();
+      $item->po_numbers = implode(',', $poNumbers);
     }
     return $poOrderItems;
   }
