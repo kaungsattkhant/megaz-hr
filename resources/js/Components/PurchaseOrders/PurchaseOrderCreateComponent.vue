@@ -152,11 +152,11 @@
                                     {{ purchaseOrderItem.uom_name }}
                                 </td>
                                 <td class="">
-                                    {{ purchaseOrderItem.amount.toLocaleString() }}
+                                    {{ purchaseOrderItem.unit_price.toLocaleString() }}
                                 </td>
                                 <td class="">
                                     <!-- {{ (purchaseOrderItem.amount * purchaseOrderItem.quantity).toLocaleString() }} -->
-                                    {{ purchaseOrderItem.price.toLocaleString() }}
+                                    {{ purchaseOrderItem.amount.toLocaleString() }}
 
                                 </td>
                                 <td class="">
@@ -332,8 +332,8 @@
                     brand_name:this.selectedBrand.name,
                     quantity: quantity,
                     // amount: this.selectedItem.average_price,
-                    amount:this.unitPrice,
-                    price: price,
+                    amount:price,
+                    unit_price: this.unitPrice / this.selectedItem.uom_conversion,
                     uom_id: this.selectedUom.id,
                     uom_quantity: this.quantity,
                     uom_name: this.selectedUom.name,
@@ -342,8 +342,8 @@
                     base_uom_quantity: this.baseQuantity,
                     base_uom_name: this.selectedBaseUom.name,
                     name: this.selectedItem.name,
-                    unit_price:this.unitPrice,
-                    total_unit_price:this.unitPrice*quantity
+                    // unit_price:this.unitPrice,
+                    // total_unit_price:this.unitPrice*quantity
                 });
 
                 this.updateTotalPrice(this.purchaseOrderItems);
@@ -402,7 +402,7 @@
                 this.totalPrice = 0;
                 poItems.forEach((item)=>{
                     // this.totalPrice += (item.amount * item.quantity);
-                    this.totalPrice += item.price;
+                    this.totalPrice += item.amount;
                     console.log(this.totalPrice)
                 });
             },
