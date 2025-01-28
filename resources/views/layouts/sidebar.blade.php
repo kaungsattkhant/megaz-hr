@@ -4,8 +4,7 @@
 
         <div class="relative w-[15rem] pt-12">
             <ul class=" mb-4">
-                <!-- @if(checkFeaturePermission('financial-report')) -->
-
+                @if(checkFeaturePermission('financial-report'))
                 <li>
                     <button class="flex items-center pl-9 my-2 text-sm w-full" type="button" data-te-collapse-init
                         data-te-ripple-init data-te-ripple-color="light" data-te-target="#collapseFinanceReport"
@@ -53,8 +52,7 @@
                         </ul>
                     </div>
                 </li>
-
-                <!-- @endif -->
+                @endif
                 @if(checkFeaturePermission('sale-target'))
                     <li>
                         <button class="flex items-center pl-9 my-2 text-sm w-full" type="button" data-te-collapse-init

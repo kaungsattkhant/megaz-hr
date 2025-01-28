@@ -248,11 +248,13 @@ Route::middleware(['departments:ar'])->group(function () {
 });
 
 Route::view('/account_receivable/{id}/detail', 'AR.detail');
-// Route::middleware(['departments:financial-report'])->group(function () {
-Route::view('/cash_flow_statement', 'cash_flow_statement.index');
-Route::view('/indirect_cashflow_statement', 'cash_flow_statement.indirect_cashflow_statement')->name('indirect_cashflow_statement');
-
-// });
+Route::middleware(['departments:financial-report'])->group(function () {
+    Route::view('/cash_flow_statement', 'cash_flow_statement.index');
+    Route::view('/indirect_cashflow_statement', 'cash_flow_statement.indirect_cashflow_statement')->name('indirect_cashflow_statement');
+    Route::view('/working_capital', 'working_capital.index');
+    Route::view('/ap_balances', 'ap_balances.index');
+    Route::view('/creditor_balances', 'creditor_balances.index');
+});
 
 Route::middleware(['departments:asset-depreciation-balance'])->group(function () {
     Route::view('/asset_depreciation_balance_list', 'asset_depreciation_balance.index')->name('asset_list');
@@ -322,8 +324,15 @@ Route::middleware(['departments:objective'])->group(function () {
 });
 
 
-
-
+Route::middleware(['departments:po-order'])->group(function () {
+    Route::view('/procurement_order_items', 'procurement_order_items.index')->name('procurement_order_items');
+});
+Route::middleware(['departments:arrival-item'])->group(function () {
+    Route::view('/arrival_items', 'procurement_order_arrival.index')->name('arrival_items');
+});
+Route::middleware(['departments:po-invoice'])->group(function () {
+    Route::view('/purchase_order_invoices', 'purchase_order_invoices.index')->name('purchase_order_invoices');
+});
 
 
 //test
@@ -339,11 +348,5 @@ Route::view('/gps', 'GPS.index')->name('gps');
 Route::view('/check_in', 'check_in.index')->name('check_in');
 Route::view('/contact', 'contact.index')->name('contact');
 Route::view('/lead_time', 'lead_time.index')->name('lead_time');
-Route::view('/procurement_order_items', 'procurement_order_items.index')->name('procurement_order_items');
-Route::view('/arrival_items', 'procurement_order_arrival.index')->name('arrival_items');
-Route::view('/purchase_order_invoices', 'purchase_order_invoices.index')->name('purchase_order_invoices');
 
 Route::view('/purchase_orders/{id}/edit', 'purchase_orders.edit');
-Route::view('/working_capital', 'working_capital.index');
-Route::view('/ap_balances', 'ap_balances.index');
-Route::view('/creditor_balances', 'creditor_balances.index');
