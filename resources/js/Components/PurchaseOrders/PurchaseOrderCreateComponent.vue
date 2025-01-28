@@ -195,6 +195,7 @@
     import { getApiData, postApiData } from '../../utilities/ajax-helpers';
     import { getCurrentDate } from '../../utilities/datetime-helpers';
     import { mapGetters } from "vuex";
+import { find } from "lodash";
 
     export default {
         data() {
@@ -296,56 +297,43 @@
                 //     this.alertValidationMessage('Base Quantity');
                 //     return 1;
                 // }
-                let floatItemPrice = parseFloat(this.selectedItem.average_price)
-                console.log(floatItemPrice)
-                // let url = `/api/get_uom_conversion_by_uom?po_uom_id=${this.selectedUom.id}&item_uom_id=${this.selectedItem.uom_id}&item_price=${floatItemPrice}&base_uom_id=${this.selectedItem.base_uom_id}`;
-                // let response = await getApiData({url: url, token: this.getToken()});
-                // let uomConversion = null;
-                // let amount = 0;
-                // let price = 0;
-                // if(response.data){
-                //     uomConversion = response.data;
-                //     amount = parseInt(response.data.price);
-                //     price = this.quantity * amount;
-                //     this.$notify({
-                //         text: `Uom conversion by uom value ${amount}`,
-                //         type: 'info'
-                //     });
-                // }
-                // else{
-                //     this.$notify({
-                //         title: 'Error',
-                //         text: response.message,
-                //         type: 'error'
-                //     });
-
-                //     return 1;
-                // }
+                
                 // amount = (this.selectedItem.item_prices)? this.selectedItem.item_prices.price: 0;
-                let quantity = (this.baseQuantity * this.selectedItem.uom_conversion) + this.quantity
                 // let price = ((this.baseQuantity * this.selectedItem.uom_conversion) + this.quantity) * this.selectedItem.average_price
                 // let price = (this.baseQuantity * this.selectedItem.average_price) + (this.quantity * (this.selectedItem.average_price  / this.selectedItem.uom_conversion))
+                let quantity = (this.baseQuantity * this.selectedItem.uom_conversion) + this.quantity
                 let price = quantity * (this.unitPrice / this.selectedItem.uom_conversion);
-                this.purchaseOrderItems.push({
-                    item_id: this.selectedItem.id,
-                    brand_id:this.selectedBrand.id,
-                    brand_name:this.selectedBrand.name,
-                    quantity: quantity,
-                    // amount: this.selectedItem.average_price,
-                    amount:price,
-                    unit_price: this.unitPrice / this.selectedItem.uom_conversion,
-                    uom_id: this.selectedUom.id,
-                    uom_quantity: this.quantity,
-                    uom_name: this.selectedUom.name,
-                    uom_conversion_id: this.selectedItem.uom_conversion_id,
-                    base_uom_id: this.selectedBaseUom.id,
-                    base_uom_quantity: this.baseQuantity,
-                    base_uom_name: this.selectedBaseUom.name,
-                    name: this.selectedItem.name,
-                    // unit_price:this.unitPrice,
-                    // total_unit_price:this.unitPrice*quantity
-                });
 
+                if(this.purchaseOrderItems.some((item) => item.item_id === this.selectedItem.id && item.brand_id === this.selectedBrand.id) && this.purchaseOrderItems.length > 0){
+                    let index = this.purchaseOrderItems.findIndex(item => item.item_id == this.selectedItem.id && item.brand_id == this.selectedBrand.id)
+                    // alert('item brand match' + index)
+                    this.purchaseOrderItems[index].quantity += quantity;
+                    this.purchaseOrderItems[index].amount += price;
+                    this.purchaseOrderItems[index].uom_quantity += this.quantity;
+                    this.purchaseOrderItems[index].base_uom_quantity += this.baseQuantity;
+                }
+                else{
+                    this.purchaseOrderItems.push({
+                        item_id: this.selectedItem.id,
+                        brand_id:this.selectedBrand.id,
+                        brand_name:this.selectedBrand.name,
+                        quantity: quantity,
+                        // amount: this.selectedItem.average_price,
+                        amount:price,
+                        unit_price: this.unitPrice / this.selectedItem.uom_conversion,
+                        uom_id: this.selectedUom.id,
+                        uom_quantity: this.quantity,
+                        uom_name: this.selectedUom.name,
+                        uom_conversion_id: this.selectedItem.uom_conversion_id,
+                        base_uom_id: this.selectedBaseUom.id,
+                        base_uom_quantity: this.baseQuantity,
+                        base_uom_name: this.selectedBaseUom.name,
+                        name: this.selectedItem.name,
+                        // unit_price:this.unitPrice,
+                        // total_unit_price:this.unitPrice*quantity
+                    });
+                }
+                
                 this.updateTotalPrice(this.purchaseOrderItems);
                 this.selectedItem = null;
                 this.selectedUom = null;
@@ -372,7 +360,7 @@
                 }
                 let priceTotal = 0;
                 this.purchaseOrderItems.forEach((purchaseOrderItem)=>{
-                    priceTotal += purchaseOrderItem.price;
+                    priceTotal += purchaseOrderItem.amount;
                 });
                 console.log(priceTotal)
                 let formData = new FormData();
