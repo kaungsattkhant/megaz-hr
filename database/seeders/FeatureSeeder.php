@@ -49,17 +49,19 @@ class FeatureSeeder extends Seeder
             'crm',
             'sale target',
             'duty',
+            // financial
             'asset depreciation balance',
             'journal',
             'staff balance',
             'prepaid',
             'ar',
+            'financial report', 
+            //financial
             'skill',
             'cooking place',
             'custom task',
             'feature',
             'accessory',
-            'financial report',
             'MRP',
             'Objective',
             'Ktv Product Tree'

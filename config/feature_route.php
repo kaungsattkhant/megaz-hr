@@ -55,7 +55,6 @@ return [
     'inventory-receive-list' => 'transfers.receives',
     'supplier' => 'suppliers.index',
     'cashbook' => 'cashbook',
-    'fixed-asset' => 'fixed_assets.index',
     'customer' => 'pos.customers',
     'purchase-order-item-left' => 'purchase_orders.left_items_index',
     'purchase-order-item-left-confirmation' => 'purchase_orders.left_items_detail',
@@ -65,6 +64,9 @@ return [
     'menu-service-discount' => 'menu_service_discount.index',
     'account-payables' => 'AP.index',
     'inventory-stocks' => 'inventory_stocks.index',
+
+    //financial
+    'fixed-asset' => 'fixed_assets.index',
     'cash-flow-statement' => 'cash_flow_statement.index',
     'sale-target' => 'sale_target_position.index',
     'duty' => 'duty.index',
@@ -73,11 +75,18 @@ return [
     'staff_balance' => 'advanced.index',
     'prepaid' => 'prepaid.index',
     'ar' => 'AR.index',
+    //financial
+
     'skill' => 'skill.index',
     'cooking-place' => 'cookingPlace.index',
     'custom-task' => 'tasks.customtask',
     'feature' => 'accessories.index',
     'MRP' => 'MRP.index',
     'Objective' => 'OKR.index',
-    'KtvProductTree' => 'product_tree.index'
+    'KtvProductTree' => 'product_tree.index',
+    //procurement
+    'po-order'=>'',   //procurement order-item
+    'arrival-item'=>'',
+    'po-invoice'=>'',   //purchase order invoice list
+    //end procurement
 ];
