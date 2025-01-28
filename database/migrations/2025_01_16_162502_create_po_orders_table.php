@@ -25,7 +25,6 @@ return new class extends Migration
             $table->foreignId('supplier_id')->constrained();
             $table->foreignId('purchase_order_id')->constrained();
             $table->foreignId('item_price_id');
-            $table->boolean('is_arrival_completed')->default(true);
             $table->integer('created_by');
             $table->timestamps();
         });
