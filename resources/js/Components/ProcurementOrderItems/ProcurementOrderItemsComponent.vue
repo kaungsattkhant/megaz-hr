@@ -72,12 +72,12 @@
                                     </td>
                                     <td class="whitespace-nowrap">
                                         <div v-if="item.purchase_order_details.length <= 1" >
-                                            <button data-te-toggle="modal" data-te-target="#edit_modal" id="edit-btn" class="pr-3"
+                                            <!-- <button data-te-toggle="modal" data-te-target="#edit_modal" id="edit-btn" class="pr-3"
                                                 @click="editBtnClicked(item, index)">
                                                 <i class="fal fa-pen"></i>
-                                            </button>
+                                            </button> -->
                                             <button data-te-toggle="modal" data-te-target="#check_modal" class="pr-3"
-                                                @click="checkBtnClicked(item.purchase_order_details[0], item.item_id)">
+                                                @click="checkBtnClicked(item.purchase_order_details[0], item.item_id, index)">
                                                 <i class="fal fa-check"></i>
                                             </button>
                                         </div>
@@ -98,12 +98,12 @@
                                         {{ po.quantity }}
                                     </td>
                                     <td class="whitespace-nowrap">
-                                        <button data-te-toggle="modal" data-te-target="#edit_modal" id="edit-btn" class="pr-3"
+                                        <!-- <button data-te-toggle="modal" data-te-target="#edit_modal" id="edit-btn" class="pr-3"
                                             @click="editBtnClicked(item, index)">
                                             <i class="fal fa-pen"></i>
-                                        </button>
+                                        </button> -->
                                         <button data-te-toggle="modal" data-te-target="#check_modal" class="pr-3"
-                                            @click="checkBtnClicked(po, item.item_id)">
+                                            @click="checkBtnClicked(po, item.item_id, index)">
                                             <i class="fal fa-check"></i>
                                         </button>
                                     </td>
@@ -196,6 +196,7 @@
                             <input type="number"
                             placeholder="Base UOM Qty"
                             v-model="baseUomQty"
+                            min="0"
                             class="input-ui"
                             @change="baseUomQtyChanged">
                         </div>
@@ -210,6 +211,8 @@
                             <input type="number"
                             placeholder="UOM Qty"
                             v-model="uomQty"
+                            min="0"
+                            :max="uomUpperLimit"
                             class="input-ui"
                             @change="uomQtyChanged">
                         </div>
@@ -337,6 +340,7 @@ export default {
 
             uomConversions: [],
             selectedUomConversion: null,
+            uomUpperLimit: 0,
         };
     },
 
@@ -366,7 +370,8 @@ export default {
 
         brandSelectChanged(){
             console.log(this.selectedBrand);
-            if(this.selectedBrand.item_price){
+            if(this.selectedBrand && this.selectedBrand.item_price && this.confirmPO){
+                this.confirmPOTotalQty = (this.baseUomQty * this.selectedUomConversion.conversion) + this.uomQty;
                 this.totalPrice = (this.confirmPOTotalQty / this.selectedUomConversion.conversion) * this.selectedBrand.item_price.price;
                 this.totalPrice = Math.round(this.totalPrice * 100) / 100;
             }else{
@@ -396,15 +401,15 @@ export default {
 
         },
 
-        async checkBtnClicked(purchaseOrder, itemId){
-            console.log(purchaseOrder);
-            console.log(itemId);
+        async checkBtnClicked(purchaseOrder, itemId, orderItemIndex){
+            console.log(this.orderItems[orderItemIndex]);
             this.itemId = itemId;
             this.selectedUomConversion = this.uomConversions.find(uomConversion => uomConversion.id === purchaseOrder.uom_conversion_id);
+            this.uomUpperLimit = this.selectedUomConversion.conversion - 1;
             this.confirmPO = purchaseOrder;
-            this.uomName = purchaseOrder.uom_name;
+            this.uomName = this.orderItems[orderItemIndex].uom_name;
             this.uomQty = purchaseOrder.uom_quantity;
-            this.baseUomName = purchaseOrder.base_uom_name;
+            this.baseUomName = this.orderItems[orderItemIndex].base_uom_name;
             this.baseUomQty = purchaseOrder.base_uom_quantity;
             this.originalPOTotalQty = (purchaseOrder.base_uom_quantity * this.selectedUomConversion.conversion) + purchaseOrder.uom_quantity;
             this.confirmPOTotalQty = this.originalPOTotalQty;
@@ -413,37 +418,45 @@ export default {
         },
 
         baseUomQtyChanged(){
-            if(this.confirmPO){
-                this.confirmPOTotalQty = (this.baseUomQty * this.selectedUomConversion.conversion) + this.uomQty;
-                if(this.confirmPOTotalQty < this.originalPOTotalQty){
-                    this.isLaterBuy = true;
-                }else{
-                    this.isLaterBuy = false;
-                }
+            if(this.baseUomQty < 0 || this.uomQty < 0){
+                this.alertValidationMessage('Base UOM and UOM must be greater than zero');
+                return;
             }
+            // if(this.confirmPO){
+            //     this.confirmPOTotalQty = (this.baseUomQty * this.selectedUomConversion.conversion) + this.uomQty;
+            //     // if(this.confirmPOTotalQty < this.originalPOTotalQty){
+            //     //     this.isLaterBuy = true;
+            //     // }else{
+            //     //     this.isLaterBuy = false;
+            //     // }
+            // }
             this.brandSelectChanged();
         },
 
         uomQtyChanged(){
-            if(this.confirmPO){
-                this.confirmPOTotalQty = (this.baseUomQty * this.selectedUomConversion.conversion) + this.uomQty;
-                if(this.confirmPOTotalQty < this.originalPOTotalQty){
-                    this.isLaterBuy = true;
-                }else{
-                    this.isLaterBuy = false;
-                }
+            if(this.baseUomQty < 0 || this.uomQty < 0){
+                this.alertValidationMessage('Base UOM and UOM must be greater than zero');
+                return;
             }
+            // if(this.confirmPO){
+            //     this.confirmPOTotalQty = (this.baseUomQty * this.selectedUomConversion.conversion) + this.uomQty;
+            //     // if(this.confirmPOTotalQty < this.originalPOTotalQty){
+            //     //     this.isLaterBuy = true;
+            //     // }else{
+            //     //     this.isLaterBuy = false;
+            //     // }
+            // }
             this.brandSelectChanged();
         },
 
         async confirmBtnClicked(){
             let formData = new FormData();
             if(!this.selectedBrand || !this.selectedSupplier){
-                this.alertValidationMessage('required data');
+                this.alertValidationMessage('you forgot to provide required data');
                 return;
             }
-            formData.append('base_uom_quantity', this.baseUomQty);
-            formData.append('uom_quantity', this.uomQty);
+            formData.append('base_uom_quantity', (this.baseUomQty)? this.baseUomQty: 0);
+            formData.append('uom_quantity', (this.uomQty)? this.uomQty: 0);
             formData.append('base_uom_id', this.confirmPO.base_uom_id);
             formData.append('uom_id', this.confirmPO.uom_id);
             formData.append('uom_conversion_unit_id', this.selectedUomConversion.id);
@@ -452,8 +465,8 @@ export default {
             formData.append('brand_id', this.selectedBrand.brand_id);
             formData.append('item_price_id', this.selectedBrand.item_price.id);
             formData.append('purchase_order_id', this.confirmPO.purchase_order.id);
-            formData.append('quantity', this.confirmPO.quantity);
-            formData.append('amount', this.confirmPO.amount);
+            formData.append('quantity', this.confirmPOTotalQty);// total single qty // check for single value
+            formData.append('amount', this.totalPrice);
             formData.append('later_buy', (this.isLaterBuy) ? 1 : 0);
             formData.append('item_leftable_type', 'po_order');
             let response = await postApiData({ url: '/api/po_items', form_data: formData , token: this.getToken() });
@@ -497,7 +510,7 @@ export default {
         alertValidationMessage(field) {
             this.$notify({
                 title: 'Input validation',
-                text: `You forgot to provide ${field}, please try again`,
+                text: field,
                 type: 'warn'
             });
         },
