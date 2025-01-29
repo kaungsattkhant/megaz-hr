@@ -251,12 +251,14 @@ class PurchaseOrderRepository implements PurchaseOrderRepositoryInterface
             ResponseMessage('Purchase order not found', 404);
         }
         $purchaseOrder->load([
+            'items.brand',
             'items.uom',
             'items.purchaseOrderItemLeft',
             'items.item.suppliers',
             'items.baseUom',
             'items.uomConversion'
         ]);
+        // $purchaseOrder->brand = $purchaseOrder->brand;
         // $purchaseOrder->uom = $purchaseOrder->uom;
         // $purchaseOrder->items = $purchaseOrder->items;
         // $purchaseOrder->items->load('purchaseOrderItemLeft');

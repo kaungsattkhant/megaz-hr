@@ -873,8 +873,8 @@ class PoOrderRepository implements PoOrderRepositoryInterface
       'po.supplier_id',
       's.name as supplier_name',
       's.account_id',
-      'po_invoices.is_complete',
-      'po_invoices.completed_at',
+      // 'po_invoices.is_complete',
+      // 'po_invoices.completed_at',
       DB::raw('GROUP_CONCAT(DISTINCT i.name SEPARATOR ", ") as item_names'),
       DB::raw('CAST(SUM(ai.quantity) AS SIGNED) as total_invoice_quantity')
     ])
