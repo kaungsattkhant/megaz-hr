@@ -38,7 +38,7 @@ class PoOrderItemRequest extends APIRequest
             'item_price_id' => 'nullable|integer|exists:item_prices,id',
             'later_buy' => 'nullable',
             'item_leftable_type' => 'nullable',
-            'item_left_id' => 'nullable|integer|exists:item_lefts,id',
+            'item_left_id' => 'nullable|exists:item_lefts,id',
         ];
     }
 

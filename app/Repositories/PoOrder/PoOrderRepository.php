@@ -393,7 +393,7 @@ class PoOrderRepository implements PoOrderRepositoryInterface
     try {
       $validatedData['created_by'] = UserData()->id;
       $poOrder = PoOrder::create($validatedData);
-      if (isset($validatedData['item_left_id'])) {
+      if (isset($validatedData['item_left_id']) && $validatedData['item_left_id'] != null) {
         $itemLeft = ItemLeft::where('id', $validatedData['item_left_id'])->first();
         if ($itemLeft && (isset($validatedData['later_buy']) && $validatedData['later_buy'] == 1) && $itemLeft->purchase_order_id == $poOrder->purchase_order_id) {
 
@@ -413,7 +413,7 @@ class PoOrderRepository implements PoOrderRepositoryInterface
           $itemLeft->save();
         }
       } else {
-        if (isset($validatedData['later_buy']) && $validatedData['later_buy'] == 1 && !isset($validatedData['item_left_id'])) {
+        if (isset($validatedData['later_buy']) && $validatedData['later_buy'] == 1 && isset($validatedData['item_left_id']) && $validatedData['item_left_id'] == null) {
 
           $purchaseOrderItem = PurchaseOrderItem::where('purchase_order_id', $validatedData['purchase_order_id'])
             ->where('item_id', $validatedData['item_id'])
@@ -789,7 +789,7 @@ class PoOrderRepository implements PoOrderRepositoryInterface
       // })
       //   ->where('id', $validatedData['item_left_id'])
       //   ->first();
-      if (isset($validatedData['item_left_id'])) {
+      if (isset($validatedData['item_left_id']) && $validatedData['item_left_id'] != null) {
         $itemLeft = ItemLeft::where('id', $validatedData['item_left_id'])->first();
         if ($itemLeft && (isset($validatedData['later_buy']) && $validatedData['later_buy'] == 1) && $itemLeft->purchase_order_id == $arrivalItem->poOrder->purchase_order_id) {
 
@@ -812,7 +812,7 @@ class PoOrderRepository implements PoOrderRepositoryInterface
 
         if (
           isset($validatedData['later_buy']) && $validatedData['later_buy'] == 1 &&
-          !isset($validatedData['item_left_id'])
+          isset($validatedData['item_left_id']) && $validatedData['item_left_id'] == null
         ) {
           $poOrder = PoOrder::where('id', $validatedData['po_order_id'])->first();
           if ($poOrder->quantity < $arrivalItem->quantity) {
