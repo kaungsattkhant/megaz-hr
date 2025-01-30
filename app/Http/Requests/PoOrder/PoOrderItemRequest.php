@@ -30,6 +30,7 @@ class PoOrderItemRequest extends APIRequest
             'uom_conversion_unit_id' => 'required|integer|exists:uom_conversions,id',
             'quantity' => 'required|numeric',
             'amount' => 'required|numeric',
+            'unit_price'  => 'required|numeric',
             'item_id' => 'required|integer|exists:items,id',
             'brand_id' => 'nullable|integer|exists:brands,id',
             'supplier_id' => 'required|integer|exists:suppliers,id',

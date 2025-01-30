@@ -419,6 +419,7 @@ class PoOrderRepository implements PoOrderRepositoryInterface
             'uom_conversion_unit_id' => $validatedData['uom_conversion_unit_id'],
             'quantity' => $remainingQuantity,
             'amount' => $validatedData['amount'],
+            'unit_price' => $validatedData['unit_price'],
             'created_by' => UserData()->id,
             'item_leftable_id' => $poOrder->id,
             'item_leftable_type' => $validatedData['item_leftable_type'],
@@ -525,7 +526,6 @@ class PoOrderRepository implements PoOrderRepositoryInterface
         DB::raw('SUM(item_lefts.amount) as left_amount'),
         DB::raw('GROUP_CONCAT(item_lefts.id SEPARATOR ", ") as item_left_ids'),
       )
-      // ->where('po_orders.is_active', 1)
       ->groupBy('po_orders.item_id');
 
     $arrivalSubQuery = DB::table('arrival_items')
@@ -536,7 +536,6 @@ class PoOrderRepository implements PoOrderRepositoryInterface
         DB::raw('SUM(arrival_items.amount) as arrival_amount'),
         DB::raw('GROUP_CONCAT(po_orders.purchase_order_id SEPARATOR ",") as po_order_ids'),
       )
-      // ->where('po_orders.is_active', 1)
       ->groupBy('po_orders.item_id');
 
 
@@ -559,7 +558,7 @@ class PoOrderRepository implements PoOrderRepositoryInterface
         DB::raw('GROUP_CONCAT(DISTINCT s.name SEPARATOR ", ") as supplier_name'),
         DB::raw('GROUP_CONCAT(DISTINCT po.po_id SEPARATOR ", ") as po_numbers'),
         DB::raw('COALESCE(arrival_items.po_order_ids, "null") as arrival_po_order_ids'),
-        DB::raw('COALESCE(SUM(poOrder.quantity), 0) as po_order_quantity'), // Fixed syntax
+        // DB::raw('COALESCE(SUM(poOrder.quantity), 0) as po_order_quantity'), // Fixed syntax
         DB::raw('COALESCE(item_lefts.left_quantity, 0) as total_left_quantity'), // Default to 0 if no data
         // DB::raw('COALESCE(item_lefts.left_amount, 0) as total_left_amount'),
         // DB::raw('COALESCE(arrival_items.arrival_amount, 0) as total_arrival_amount'),
@@ -648,51 +647,6 @@ class PoOrderRepository implements PoOrderRepositoryInterface
     return $poOrders;
   }
 
-  // correct groupBy
-  // public function getPoOrderArrivalList(Request $request)
-  // {
-  //   $poOrders = DB::table('po_orders as poOrder')
-  //     ->join('purchase_orders as po', 'poOrder.purchase_order_id', '=', 'po.id')
-  //     ->join('purchase_order_items as poi', 'po.id', '=', 'poi.purchase_order_id')
-  //     ->join('items as i', 'poi.item_id', '=', 'i.id')
-  //     ->join('suppliers as s', 'poOrder.supplier_id', '=', 's.id')
-  //     ->join('item_prices as ip', 'poOrder.item_price_id', '=', 'ip.id')
-  //     ->select(
-  //       'i.id as item_id',
-  //       'i.name as item_name',
-  //       DB::raw('GROUP_CONCAT(DISTINCT s.name SEPARATOR ", ") as supplier_name'),
-  //       DB::raw('GROUP_CONCAT(DISTINCT po.po_id SEPARATOR ", ") as po_numbers'),
-  //       DB::raw('SUM(poOrder.quantity) as total_quantity'),
-  //       DB::raw('SUM(poOrder.amount) as total_amount'),
-  //       'u.id as uom_id',
-  //       'u.name as uom_name',
-  //       'bu.id as base_uom_id',
-  //       'bu.name as base_uom_name',
-  //       'uc.id as uom_conversion_id',
-  //       'uc.conversion as uom_conversion',
-  //       'ip.id as item_price_id',
-  //       'ip.price as item_price',
-  //     )
-  //     ->join('uoms as u', 'poOrder.uom_id', '=', 'u.id')
-  //     ->join('uoms as bu', 'poOrder.base_uom_id', '=', 'bu.id')
-  //     ->join('uom_conversions as uc', 'poOrder.uom_conversion_unit_id', '=', 'uc.id')
-  //     ->groupBy(
-  //       'i.id',
-  //       'i.name',
-  //       'u.id',
-  //       'u.name',
-  //       'bu.id',
-  //       'bu.name',
-  //       'ip.id',
-  //       'ip.price',
-  //       'uc.id',
-  //       'uc.conversion',
-  //       'po.po_id'
-  //     )
-  //     ->paginate(config('common.list_count'));
-  //   return $poOrders;
-  // }
-
   public function getPoOrderArrivalListByItemId($itemId)
   {
     $poOrders = PoOrder::with(['purchaseOrder', 'uomConversion', 'uom', 'baseUom', 'item', 'brand', 'supplier', 'itemPrice'])
@@ -706,11 +660,11 @@ class PoOrderRepository implements PoOrderRepositoryInterface
       if ($arrivalItems->isNotEmpty()) {
         foreach ($arrivalItems as $arrivalItem) {
 
-          $itemLeft = ItemLeft::where('item_leftable_id', $arrivalItem->id)
+          $itemLeft = ItemLeft::where('purchase_order_id', $arrivalItem->poOrder->purchase_order_id)
             ->where('item_leftable_type', 'arrival_item')
-            ->get();
+            ->first();
 
-          if ($itemLeft->isNotEmpty()) {
+          if ($itemLeft) {
 
             $totalItemLeftQuantity = $itemLeft->sum('quantity');
             $totalItemLeftAmount = $itemLeft->sum('amount');
@@ -721,11 +675,13 @@ class PoOrderRepository implements PoOrderRepositoryInterface
             $poOrder->amount = $totalItemLeftAmount;
             $poOrder->base_uom_quantity = $totalItemLeftBaseUomQuantity;
             $poOrder->uom_quantity = $totalItemLeftUomQuantity;
+            $poOrder->item_left_id = $itemLeft->id;
           } else {
             $poOrder->quantity = 0;
             $poOrder->amount = 0;
             $poOrder->base_uom_quantity = 0;
             $poOrder->uom_quantity = 0;
+            $poOrder->item_left_id = null;
           }
         }
       }
@@ -766,6 +722,7 @@ class PoOrderRepository implements PoOrderRepositoryInterface
           'uom_quantity' => $validatedData['uom_quantity'],
           'quantity' => $validatedData['quantity'],
           'amount' => $validatedData['amount'],
+          'unit_price' => $validatedData['unit_price'],
           'po_invoice_id' => $newPoInvoice->id,
           'po_order_id' => $validatedData['po_order_id'],
           'created_by' => UserData()->id,
@@ -788,6 +745,7 @@ class PoOrderRepository implements PoOrderRepositoryInterface
             'uom_quantity' => $validatedData['uom_quantity'],
             'quantity' => $validatedData['quantity'],
             'amount' => $validatedData['amount'],
+            'unit_price' => $validatedData['unit_price'],
             'po_invoice_id' => $poInvoice->id,
             'po_order_id' => $validatedData['po_order_id'],
             'created_by' => UserData()->id,
@@ -805,38 +763,68 @@ class PoOrderRepository implements PoOrderRepositoryInterface
         $this->storeInventoryLedger($validatedData, $arrivalItem, $poOrder);
       }
 
-      if (isset($validatedData['later_buy']) && $validatedData['later_buy'] == 1) {
-        $poOrder = PoOrder::where('id', $validatedData['po_order_id'])->first();
-        if ($poOrder->quantity < $arrivalItem->quantity) {
-          ResponseMessage('The arrival  quantity exceeds the available quantity.', 419);
-        }
+      // $itemLeft = ItemLeft::whereHas('itemLeftable', function ($query) use ($arrivalItem) {
 
-        $remainingQuantity = null;
-        if ($poOrder->quantity > $arrivalItem->quantity) {
+      //   $query->where('item_leftable_type', 'arrival_item');
+      // })
+      //   ->where('id', $validatedData['item_left_id'])
+      //   ->first();
+      if (isset($validatedData['item_left_id'])) {
+        $itemLeft = ItemLeft::where('id', $validatedData['item_left_id'])->first();
+        if ($itemLeft && (isset($validatedData['later_buy']) && $validatedData['later_buy'] == 1) && $itemLeft->purchase_order_id == $arrivalItem->poOrder->purchase_order_id) {
 
-          $remainingQuantity = $poOrder->quantity - $arrivalItem->quantity;
-
-          if ($remainingQuantity < 0) {
-            ResponseMessage('Later Buy Quantity must be less than original quantity', 419);
+          if ($itemLeft->quantity < $arrivalItem->quantity) {
+            ResponseMessage('The arrival quantity exceeds the available quantity.', 419);
           }
-          $itemLeftData = [
-            'base_uom_id' => $validatedData['base_uom_id'],
-            'base_uom_quantity' => $poOrder->base_uom_quantity - $validatedData['base_uom_quantity'],
-            'uom_id' => $validatedData['uom_id'],
-            'uom_quantity' => $poOrder->uom_quantity - $validatedData['uom_quantity'],
-            'uom_conversion_unit_id' => $validatedData['uom_conversion_unit_id'],
-            'quantity' => $remainingQuantity,
-            'amount' => $poOrder->amount - $validatedData['amount'],
-            'created_by' => UserData()->id,
-            'item_leftable_id' => $arrivalItem->id,
-            'item_leftable_type' => $validatedData['item_leftable_type'],
-            'purchase_order_id' => $poOrder->purchase_order_id,
-          ];
+          $itemLeft->base_uom_quantity -= $validatedData['base_uom_quantity'];
+          $itemLeft->uom_quantity -= $validatedData['uom_quantity'];
+          $itemLeft->quantity -= $arrivalItem->quantity;
+          $itemLeft->amount -= $validatedData['amount'];
+          $itemLeft->save();
+        } else {
+          $itemLeft->base_uom_quantity = 0;
+          $itemLeft->uom_quantity = 0;
+          $itemLeft->quantity = 0;
+          $itemLeft->amount = 0;
+          $itemLeft->save();
+        }
+      } else {
 
-          ItemLeft::create($itemLeftData);
+        if (
+          isset($validatedData['later_buy']) && $validatedData['later_buy'] == 1 &&
+          !isset($validatedData['item_left_id'])
+        ) {
+          $poOrder = PoOrder::where('id', $validatedData['po_order_id'])->first();
+          if ($poOrder->quantity < $arrivalItem->quantity) {
+            ResponseMessage('The arrival quantity exceeds the available quantity.', 419);
+          }
+
+          $remainingQuantity = null;
+          if ($poOrder->quantity > $arrivalItem->quantity) {
+            $remainingQuantity = $poOrder->quantity - $arrivalItem->quantity;
+
+            if ($remainingQuantity < 0) {
+              ResponseMessage('Later Buy Quantity must be less than original quantity', 419);
+            }
+            $itemLeftData = [
+              'base_uom_id' => $validatedData['base_uom_id'],
+              'base_uom_quantity' => $poOrder->base_uom_quantity - $validatedData['base_uom_quantity'],
+              'uom_id' => $validatedData['uom_id'],
+              'uom_quantity' => $poOrder->uom_quantity - $validatedData['uom_quantity'],
+              'uom_conversion_unit_id' => $validatedData['uom_conversion_unit_id'],
+              'quantity' => $remainingQuantity,
+              'amount' => $poOrder->amount - $validatedData['amount'],
+              'unit_price' => $validatedData['unit_price'],
+              'created_by' => UserData()->id,
+              'item_leftable_id' => $arrivalItem->id,
+              'item_leftable_type' => $validatedData['item_leftable_type'],
+              'purchase_order_id' => $poOrder->purchase_order_id,
+            ];
+
+            ItemLeft::create($itemLeftData);
+          }
         }
       }
-
       DB::commit();
       return $arrivalItem;
     } catch (\Exception $e) {

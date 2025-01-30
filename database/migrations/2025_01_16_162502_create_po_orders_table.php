@@ -20,6 +20,7 @@ return new class extends Migration
             $table->foreignId('uom_conversion_unit_id');
             $table->double('quantity');
             $table->double('amount');
+            $table->double('unit_price');
             $table->foreignId('item_id')->constrained();
             $table->foreignId('brand_id')->constrained();
             $table->foreignId('supplier_id')->constrained();
