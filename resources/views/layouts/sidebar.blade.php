@@ -521,7 +521,7 @@
                         </a>
                     </li>
                 @endif
-                <!-- @if (checkFeaturePermission('po-order')) -->
+                @if (checkFeaturePermission('po-order'))
 
                 <li>
                     <a href="{{ route('procurement_order_items') }}" class="flex items-center @yield('procurement_order_items')">
@@ -529,7 +529,7 @@
                         Procurement Order Items
                     </a>
                 </li>
-                <!-- @endif -->
+                @endif
                 @if (checkFeaturePermission('arrival-item'))
                 
                 <li>
