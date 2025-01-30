@@ -68,7 +68,8 @@ class PoOrderController extends Controller
         ResponseData($data);
     }
 
-    public function processInvoiceTransaction(PoInvoiceTransactionRequest $request){
+    public function processInvoiceTransaction(PoInvoiceTransactionRequest $request)
+    {
         $data =  $this->PoOrderRepository->processInvoiceTransaction($request);
         ResponseData($data);
     }

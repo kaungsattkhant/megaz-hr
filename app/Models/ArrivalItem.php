@@ -40,4 +40,9 @@ class ArrivalItem extends Model
     {
         return $this->belongsTo(Uom::class, 'base_uom_id');
     }
+
+    public function itemLeft()
+    {
+        return $this->morphOne(ItemLeft::class, 'itemLeftable');
+    }
 }
