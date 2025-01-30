@@ -426,10 +426,11 @@ class PoOrderRepository implements PoOrderRepositoryInterface
   }
   public function storePoOrderItems($validatedData)
   {
+    DB::beginTransaction();
     try {
       $validatedData['created_by'] = UserData()->id;
       $poOrder = PoOrder::create($validatedData);
-      if (isset($validatedData['item_left_id']) && $validatedData['item_left_id'] != null) {
+      if (isset($validatedData['item_left_id']) && $validatedData['item_left_id'] != "null") {
         $itemLeft = ItemLeft::where('id', $validatedData['item_left_id'])->first();
         if ($itemLeft && (isset($validatedData['later_buy']) && $validatedData['later_buy'] == 1) && $itemLeft->purchase_order_id == $poOrder->purchase_order_id) {
 
@@ -449,7 +450,7 @@ class PoOrderRepository implements PoOrderRepositoryInterface
           $itemLeft->save();
         }
       } else {
-        if (isset($validatedData['later_buy']) && $validatedData['later_buy'] == 1 && isset($validatedData['item_left_id']) && $validatedData['item_left_id'] == null) {
+        if (isset($validatedData['later_buy']) && $validatedData['later_buy'] == 1 && isset($validatedData['item_left_id']) && $validatedData['item_left_id'] == "null") {
 
           $purchaseOrderItem = PurchaseOrderItem::where('purchase_order_id', $validatedData['purchase_order_id'])
             ->where('item_id', $validatedData['item_id'])
@@ -614,10 +615,7 @@ class PoOrderRepository implements PoOrderRepositoryInterface
         DB::raw('GROUP_CONCAT(DISTINCT s.name SEPARATOR ", ") as supplier_name'),
         DB::raw('GROUP_CONCAT(DISTINCT po.po_id SEPARATOR ", ") as po_numbers'),
         DB::raw('COALESCE(arrival_items.po_order_ids, "null") as arrival_po_order_ids'),
-        // DB::raw('COALESCE(SUM(poOrder.quantity), 0) as po_order_quantity'), // Fixed syntax
         DB::raw('COALESCE(item_lefts.left_quantity, 0) as total_left_quantity'), // Default to 0 if no data
-        // DB::raw('COALESCE(item_lefts.left_amount, 0) as total_left_amount'),
-        // DB::raw('COALESCE(arrival_items.arrival_amount, 0) as total_arrival_amount'),
         //total_po_order quantity is sum poOrder.quantity related purchase_order_id with not match po_order_ids
         DB::raw('
         COALESCE(
