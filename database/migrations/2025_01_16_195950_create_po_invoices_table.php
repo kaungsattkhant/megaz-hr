@@ -17,6 +17,8 @@ return new class extends Migration
             $table->date('date_time');
             $table->double('total_invoice_amount');
             $table->integer('created_by');
+            $table->boolean('is_complete')->default(0);
+            $table->dateTime('completed_at')->nullable();
             $table->timestamps();
         });
     }

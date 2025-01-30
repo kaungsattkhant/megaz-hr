@@ -13,7 +13,9 @@ class PoInvoice extends Model
         'invoice_no',
         'date_time',
         'total_invoice_amount',
-        'created_by'
+        'created_by',
+        'is_complete',
+        'completed_at',
     ];
 
     public function arrivalItems()
