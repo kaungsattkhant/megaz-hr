@@ -515,22 +515,33 @@
                 let quantity = (this.baseQuantity * this.selectedItem.uom_conversion) + this.quantity
                 // let price = ((this.baseQuantity * this.selectedItem.uom_conversion) + this.quantity) * this.selectedItem.average_price
                 let price = quantity * (this.unitPrice / this.selectedItem.uom_conversion);
-                this.purchaseOrderItems.push({
-                    item_id: this.selectedItem.id,
-                    brand_id: this.selectedBrand.id,
-                    bradn_name: this.selectedBrand.name,
-                    quantity: quantity,
-                    amount: price,
-                    unit_price: this.unitPrice / this.selectedItem.uom_conversion,
-                    uom_id: this.selectedUom.id,
-                    uom_quantity: this.quantity,
-                    uom_name: this.selectedUom.name,
-                    uom_conversion_id: this.selectedItem.uom_conversion_id,
-                    base_uom_id: this.selectedBaseUom.id,
-                    base_uom_quantity: this.baseQuantity,
-                    base_uom_name: this.selectedBaseUom.name,
-                    name: this.selectedItem.name,
-                });
+                if(this.purchaseOrderItems.some((item) => item.item_id === this.selectedItem.id && item.brand_id === this.selectedBrand.id) && this.purchaseOrderItems.length > 0){
+                    let index = this.purchaseOrderItems.findIndex(item => item.item_id == this.selectedItem.id && item.brand_id == this.selectedBrand.id)
+                    // alert('item brand match' + index)
+                    this.purchaseOrderItems[index].quantity += quantity;
+                    this.purchaseOrderItems[index].amount += price;
+                    this.purchaseOrderItems[index].uom_quantity += this.quantity;
+                    this.purchaseOrderItems[index].base_uom_quantity += this.baseQuantity;
+                }
+                else{
+                    this.purchaseOrderItems.push({
+                        item_id: this.selectedItem.id,
+                        brand_id: this.selectedBrand.id,
+                        bradn_name: this.selectedBrand.name,
+                        quantity: quantity,
+                        amount: price,
+                        unit_price: this.unitPrice / this.selectedItem.uom_conversion,
+                        uom_id: this.selectedUom.id,
+                        uom_quantity: this.quantity,
+                        uom_name: this.selectedUom.name,
+                        uom_conversion_id: this.selectedItem.uom_conversion_id,
+                        base_uom_id: this.selectedBaseUom.id,
+                        base_uom_quantity: this.baseQuantity,
+                        base_uom_name: this.selectedBaseUom.name,
+                        name: this.selectedItem.name,
+                    });
+                }
+                
 
                 this.updateTotalPrice(this.purchaseOrderItems);
                 this.selectedItem = null;
