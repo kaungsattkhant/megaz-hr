@@ -407,7 +407,6 @@ class PoOrderRepository implements PoOrderRepositoryInterface
         $remainingQuantity = null;
         if ($purchaseOrderItem->quantity > $poOrder->quantity) {
           $remainingQuantity = $purchaseOrderItem->quantity - $poOrder->quantity;
-
           if ($remainingQuantity < 0) {
             ResponseMessage('Later Buy Quantity must be less than original quantity', 419);
           }
