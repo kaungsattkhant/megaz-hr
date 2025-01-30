@@ -32,6 +32,7 @@ class PoOrderItemResource extends JsonResource
             'item_price_id' => $this->item_price_id,
             'created_by' => $this->created_by,
             'item_left_id' => $this->item_left_id,
+            'unit_price' => $this->unit_price,
             'purchase_order' => [
                 'id' => $this->purchaseOrder->id,
                 'po_id' => $this->purchaseOrder->po_id,
