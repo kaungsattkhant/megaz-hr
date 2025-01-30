@@ -530,7 +530,6 @@
                 let price = quantity * (this.unitPrice / this.selectedItem.uom_conversion);
                 if(this.purchaseOrderItems.some((item) => item.item_id === this.selectedItem.id && item.brand_id === this.selectedBrand.id) && this.purchaseOrderItems.length > 0){
                     let index = this.purchaseOrderItems.findIndex(item => item.item_id == this.selectedItem.id && item.brand_id == this.selectedBrand.id)
-                    // alert('item brand match' + index)
                     this.purchaseOrderItems[index].quantity += quantity;
                     this.purchaseOrderItems[index].amount += price;
                     this.purchaseOrderItems[index].uom_quantity += this.quantity;
