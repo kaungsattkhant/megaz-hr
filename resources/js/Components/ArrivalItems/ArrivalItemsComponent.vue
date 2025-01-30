@@ -122,7 +122,7 @@
                         id="check_modalLabel">
                         Confirm Arrival Item
                     </h5>
-                    <button type="button" class="text-xs focus:shadow-none focus:outline-none" data-te-modal-dismiss id="close_create_modal"
+                    <button type="button" class="text-xs focus:shadow-none focus:outline-none" data-te-modal-dismiss id="close_confirm_modal"
                         aria-label="Close">
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
                             stroke="currentColor" class="h-4 w-4">
@@ -256,7 +256,7 @@
                         Cancel
                     </button>
                     <button type="button" class="add-btn focus:outline-none focus:ring-0 "
-                    @click="confirmBtnClicked" data-te-modal-dismiss>
+                    @click="confirmBtnClicked()">
                         Create
                     </button>
                 </div>
@@ -433,6 +433,8 @@ export default {
             if(this.newInvoiceNumber){
                 formData.append('invoice_no', this.newInvoiceNumber);
             }
+            formData.append('item_left_id', this.confirmArrivalItem.item_left_id);
+            formData.append('unit_price', this.confirmArrivalItem.unit_price);
             let response = await postApiData({url: `/api/po_arrival_items`, form_data: formData, token: this.getToken()});
             if(response.success){
                 this.$notify({
@@ -440,6 +442,7 @@ export default {
                     type: 'info'
                 });
                 this.getItems(this.currentPage);
+                document.getElementById('close_confirm_modal').click();
                 this.confirmArrivalItem = null;
                 this.selectedUomConversion = null;
                 this.uomQty = 0;
