@@ -112,17 +112,22 @@ class PoOrderRepository implements PoOrderRepositoryInterface
         $join->on('item_lefts.item_leftable_id', '=', 'po_orders.id')
           ->where('item_lefts.item_leftable_type', '=', $poClass);
       })
-      ->select('po_orders.item_id', 'po_orders.purchase_order_id', DB::raw('SUM(item_lefts.quantity) as total_left_quantity'))
-      ->groupBy('po_orders.item_id', 'po_orders.purchase_order_id');
+      ->select(
+        'po_orders.item_id',
+        // 'po_orders.purchase_order_id',
+        DB::raw('SUM(item_lefts.quantity) as total_left_quantity'),
+        // DB::raw('GROUP_CONCAT(item_lefts.id SEPARATOR ",") as item_left_ids'),
+      )
+      ->groupBy('po_orders.item_id');
 
-
+      // return $leftsSubquery->get();
     $poOrderSubquery = DB::table('po_orders')
       ->select(
         'item_id',
         DB::raw('SUM(quantity) as total_po_order_quantity'),
         DB::raw('GROUP_CONCAT(po_orders.purchase_order_id SEPARATOR ",") as po_order_ids'),
       )
-      ->groupBy('item_id',);
+      ->groupBy('item_id' );
 
 
     $poOrderItems = DB::table('purchase_order_items as poi')
@@ -161,8 +166,9 @@ class PoOrderRepository implements PoOrderRepositoryInterface
 ) AS total_purchase_order_quantity
     '),
         DB::raw('COALESCE(i_lefts.total_left_quantity, 0) as left_quantity'), // Default to 0 if no data
-        DB::raw('COALESCE(po_orders.total_po_order_quantity, 0) as po_order_quantity'), // Default to 0 if no data
+        // DB::raw('COALESCE(po_orders.total_po_order_quantity, 0) as po_order_quantity'), // Default to 0 if no data
         DB::raw('COALESCE(po_orders.po_order_ids, "null") as po_order_ids'),
+        // DB::raw('COALESCE(i_lefts.item_left_ids, "null") as item_left_ids'),
         DB::raw('GROUP_CONCAT(DISTINCT poi.purchase_order_id SEPARATOR ", ") as po_ids'),
         DB::raw('
         GROUP_CONCAT(
@@ -191,7 +197,6 @@ class PoOrderRepository implements PoOrderRepositoryInterface
               JSON_OBJECT(
                   "id", po_item.purchase_order_id,
                   "item_name", i.name,
-                  "item_name", po_orders.po_order_ids,
                   "item_id", i.id,
                   "amount", po_item.amount,
                   "base_uom_id", po_item.base_uom_id,
@@ -200,6 +205,15 @@ class PoOrderRepository implements PoOrderRepositoryInterface
                   "uom_quantity", po_item.uom_quantity,
                   "uom_conversion_id", po_item.uom_conversion_id,
                   "uom_conversion", uc.conversion,
+                  "item_left_id", (
+    SELECT il.id
+    FROM item_lefts il
+    INNER JOIN po_orders ON il.item_leftable_id = po_orders.id
+    WHERE il.item_leftable_type = "' . $poClass . '"
+      AND po_orders.item_id = po_item.item_id
+      AND po_orders.purchase_order_id = po_item.purchase_order_id
+    LIMIT 1
+),
                   "total_purchase_order_quantity", (
                 SELECT COALESCE(
                     SUM(
@@ -310,12 +324,14 @@ class PoOrderRepository implements PoOrderRepositoryInterface
         'poi.uom_id',
         'u.name',
         'i_lefts.total_left_quantity',
-        'po_orders.total_po_order_quantity',
-        'po_orders.po_order_ids',
+        // 'po_orders.total_po_order_quantity',
+        // 'po_orders.po_order_ids',
+        // 'i_lefts.item_left_ids',
       )
       ->having('total_quantity', '>', 0) // Filter out records where quantity <= 0
       ->paginate(config('common.list_count'));
 
+      // return $poOrderItems;
     foreach ($poOrderItems as $item) {
       // $item->purchase_order_details = json_decode($item->purchase_order_details, true);
       $details = collect(json_decode($item->purchase_order_details, true)); // Convert to a Collection
@@ -323,17 +339,17 @@ class PoOrderRepository implements PoOrderRepositoryInterface
       // Filter the details where quantity > 0
       $poNumbers = []; // Initialize an array to store po_ids
 
-    // Filter the details and collect po_ids
-    $filteredDetails = $details->filter(function ($detail) use (&$poNumbers) {
+      // Filter the details and collect po_ids
+      $filteredDetails = $details->filter(function ($detail) use (&$poNumbers) {
         if (isset($detail['quantity']) && $detail['quantity'] > 0) {
-            // Collect po_id if it meets the criteria
-            if (isset($detail['purchase_order']['po_id'])) {
-                $poNumbers[] = $detail['purchase_order']['po_id'];
-            }
-            return true; // Keep this detail
+          // Collect po_id if it meets the criteria
+          if (isset($detail['purchase_order']['po_id'])) {
+            $poNumbers[] = $detail['purchase_order']['po_id'];
+          }
+          return true; // Keep this detail
         }
         return false; // Filter out this detail
-    });
+      });
       // Assign the filtered details back to the item
       $item->purchase_order_details = $filteredDetails->values()->toArray();
       $item->po_numbers = implode(',', $poNumbers);
@@ -751,7 +767,7 @@ class PoOrderRepository implements PoOrderRepositoryInterface
           throw new \Exception('PoInvoice not found for the given ID.');
         }
       }
-      $poOrder =  PoOrder::where('id', $validatedData['po_order_id'])->first();
+      $poOrder = PoOrder::where('id', $validatedData['po_order_id'])->first();
       if (!$poOrder) {
         ResponseMessage('PoOrder not found', 404);
       } else {
@@ -807,7 +823,7 @@ class PoOrderRepository implements PoOrderRepositoryInterface
       ResponseMessage('Main Inventory not found.', 404);
     }
     $inventoryLedger = InventoryLedger::create([
-      'inventory_id' =>  $inventory->id,
+      'inventory_id' => $inventory->id,
       'date' => now()->format('Y-m-d'),
       'ledgerable_id' => $arrivalItem->id,
       'ledgerable_type' => 'arrival_item',
@@ -957,7 +973,7 @@ class PoOrderRepository implements PoOrderRepositoryInterface
       if ($apAmount > 0 || ($request->total_invoice_amount < $request->amount)) {
         $this->storeAP($transaction, $apAmount, $supplierId, $supplierAccountId, $cashAccountId);
       }
-      $poInvoice->is_complete  = 1;
+      $poInvoice->is_complete = 1;
       $poInvoice->completed_at = now();
       $poInvoice->save();
       DB::commit();

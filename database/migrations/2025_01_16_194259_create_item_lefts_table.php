@@ -24,8 +24,6 @@ return new class extends Migration
             $table->foreignId('purchase_order_id');
             $table->integer('item_leftable_id');
             $table->string('item_leftable_type');
-
-
             $table->timestamps();
         });
     }
