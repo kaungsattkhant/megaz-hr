@@ -324,9 +324,9 @@ Route::middleware(['departments:objective'])->group(function () {
 });
 
 
-Route::middleware(['departments:po-order'])->group(function () {
+// Route::middleware(['departments:po-order'])->group(function () {
     Route::view('/procurement_order_items', 'procurement_order_items.index')->name('procurement_order_items');
-});
+// });
 Route::middleware(['departments:arrival-item'])->group(function () {
     Route::view('/arrival_items', 'procurement_order_arrival.index')->name('arrival_items');
 });
