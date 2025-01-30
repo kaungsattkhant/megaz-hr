@@ -114,6 +114,9 @@
                                 Item
                             </th>
                             <th scope="col" class="">
+                                Brand
+                            </th>
+                            <th scope="col" class="">
                                 Qty
                             </th>
                             <th scope="col" class="">
@@ -138,7 +141,12 @@
                                     {{ purchaseOrderItem.name }}
                                 </td>
                                 <td class="">
-                                    {{ purchaseOrderItem.quantity }}
+                                    {{ purchaseOrderItem.brand_name }}
+                                </td>
+                                <td class="">
+                                    <!-- {{ purchaseOrderItem.big_quantity > 0 ? purchaseOrderItem.big_quantity : '' }}{{ purchaseOrderItem.big_quantity > 0 ? purchaseOrderItem.base_uom_name : '' }} 
+                                    {{ purchaseOrderItem.small_quantity > 0 ? purchaseOrderItem.small_quantity : '' }} {{ purchaseOrderItem.small_quantity > 0 ? purchaseOrderItem.uom_name : '' }} -->
+                                     {{ purchaseOrderItem.quantity }}
                                 </td>
                                 <td class="">
                                     {{ purchaseOrderItem.uom_name }}
@@ -166,7 +174,7 @@
                         </div>
                         <div class="contents">
                             <tr class="">
-                                <td class="" colspan="4">
+                                <td class="" colspan="5">
                                     &nbsp;
                                 </td>
                                 <td class="">
@@ -399,9 +407,12 @@
                     let quantity = (po.base_uom_quantity * po.uom_conversion.conversion) + po.uom_quantity
                     // let price = ((po.base_uom_quantity * po.uom_conversion.conversion) + po.uom_quantity) * po.item.average_price
                     let price = quantity * po.unit_price;
+                    let big_uom_quantity = Math.floor(quantity / po.uom_conversion.conversion);
+                    let small_uom_quantity = quantity % po.uom_conversion.conversion;
                     this.purchaseOrderItems.push({
                         id:po.id,
                         item_id: po.item_id,
+                        brand_name:po.brand.name,
                         brand_id:po.brand_id,
                         quantity: po.quantity,
                         amount: price,
@@ -414,6 +425,8 @@
                         base_uom_quantity: po.base_uom_quantity,
                         base_uom_name: po.base_uom.name,
                         name: po.item.name,
+                        small_quantity: small_uom_quantity,
+                        big_quantity: big_uom_quantity
                     });
                 });
                 this.updateTotalPrice(this.purchaseOrderItems);
@@ -517,7 +530,6 @@
                 let price = quantity * (this.unitPrice / this.selectedItem.uom_conversion);
                 if(this.purchaseOrderItems.some((item) => item.item_id === this.selectedItem.id && item.brand_id === this.selectedBrand.id) && this.purchaseOrderItems.length > 0){
                     let index = this.purchaseOrderItems.findIndex(item => item.item_id == this.selectedItem.id && item.brand_id == this.selectedBrand.id)
-                    // alert('item brand match' + index)
                     this.purchaseOrderItems[index].quantity += quantity;
                     this.purchaseOrderItems[index].amount += price;
                     this.purchaseOrderItems[index].uom_quantity += this.quantity;

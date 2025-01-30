@@ -334,24 +334,55 @@ class PoOrderRepository implements PoOrderRepositoryInterface
     // return $poOrderItems;
     foreach ($poOrderItems as $item) {
       // $item->purchase_order_details = json_decode($item->purchase_order_details, true);
+      // $details = collect(json_decode($item->purchase_order_details, true)); // Convert to a Collection
+
+      // // Filter the details where quantity > 0
+      // $poNumbers = []; // Initialize an array to store po_ids
+
+      // // Filter the details and collect po_ids
+      // $filteredDetails = $details->filter(function ($detail) use (&$poNumbers) {
+      //   if (isset($detail['quantity']) && $detail['quantity'] > 0) {
+      //     // Collect po_id if it meets the criteria
+
+      //     if (isset($detail['purchase_order']['po_id'])) {
+      //       $poNumbers[] = $detail['purchase_order']['po_id'];
+      //     }
+      //     return true; // Keep this detail
+      //   }
+      //   return false; // Filter out this detail
+      // });
+      // // Assign the filtered details back to the item
+      // $item->purchase_order_details = $filteredDetails->values()->toArray();
+      // $item->po_numbers = implode(',', $poNumbers);
+
       $details = collect(json_decode($item->purchase_order_details, true)); // Convert to a Collection
 
-      // Filter the details where quantity > 0
-      $poNumbers = []; // Initialize an array to store po_ids
+      // Initialize an array to store po_ids
+      $poNumbers = [];
 
-      // Filter the details and collect po_ids
-      $filteredDetails = $details->filter(function ($detail) use (&$poNumbers) {
-        if (isset($detail['quantity']) && $detail['quantity'] > 0) {
-          // Collect po_id if it meets the criteria
-          if (isset($detail['purchase_order']['po_id'])) {
-            $poNumbers[] = $detail['purchase_order']['po_id'];
-          }
-          return true; // Keep this detail
+      // Filter details and modify quantities
+      $filteredDetails = $details->filter(function ($detail) {
+        return isset($detail['quantity']) && $detail['quantity'] > 0;
+      })->map(function ($detail) use (&$poNumbers) {
+        // Modify base_uom_quantity and uom_quantity
+        if ($detail['quantity'] < $detail['uom_conversion']) {
+          $detail['base_uom_quantity'] = 0;
+          $detail['uom_quantity'] = $detail['quantity'];
+        } else {
+          $detail['base_uom_quantity'] = intdiv($detail['quantity'], $detail['uom_conversion']); // Quotient only
+          $detail['uom_quantity'] = $detail['quantity'] % $detail['uom_conversion']; // Remainder only
         }
-        return false; // Filter out this detail
-      });
-      // Assign the filtered details back to the item
-      $item->purchase_order_details = $filteredDetails->values()->toArray();
+
+        // Collect po_id if it exists
+        if (isset($detail['purchase_order']['po_id'])) {
+          $poNumbers[] = $detail['purchase_order']['po_id'];
+        }
+
+        return $detail; // Keep this detail
+      })->values(); // Reset array keys
+
+      // Assign updated details back to the item
+      $item->purchase_order_details = $filteredDetails->toArray();
       $item->po_numbers = implode(',', $poNumbers);
     }
     return $poOrderItems;
