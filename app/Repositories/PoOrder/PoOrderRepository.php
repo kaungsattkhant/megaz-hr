@@ -372,6 +372,7 @@ class PoOrderRepository implements PoOrderRepositoryInterface
       });
       // Assign the filtered details back to the item
       $item->purchase_order_details = $filteredDetails->values()->toArray();
+
       $item->po_numbers = implode(',', $poNumbers);
     }
     return $poOrderItems;
@@ -428,38 +429,59 @@ class PoOrderRepository implements PoOrderRepositoryInterface
     try {
       $validatedData['created_by'] = UserData()->id;
       $poOrder = PoOrder::create($validatedData);
+      if (isset($validatedData['item_left_id'])) {
+        $itemLeft = ItemLeft::where('id', $validatedData['item_left_id'])->first();
+        if ($itemLeft && (isset($validatedData['later_buy']) && $validatedData['later_buy'] == 1) && $itemLeft->purchase_order_id == $poOrder->purchase_order_id) {
 
-      if (isset($validatedData['later_buy']) && $validatedData['later_buy'] == 1) {
-
-        $purchaseOrderItem = PurchaseOrderItem::where('purchase_order_id', $validatedData['purchase_order_id'])
-          ->where('item_id', $validatedData['item_id'])
-          ->first();
-
-        if ($purchaseOrderItem->quantity < $poOrder->quantity) {
-          ResponseMessage('The order quantity exceeds the available quantity.', 419);
-        }
-
-        $remainingQuantity = null;
-        if ($purchaseOrderItem->quantity > $poOrder->quantity) {
-          $remainingQuantity = $purchaseOrderItem->quantity - $poOrder->quantity;
-          if ($remainingQuantity < 0) {
-            ResponseMessage('Later Buy Quantity must be less than original quantity', 419);
+          if ($itemLeft->quantity < $poOrder->quantity) {
+            ResponseMessage('The order quantity exceeds the available quantity.', 419);
           }
-          $itemLeftData = [
-            'base_uom_id' => $validatedData['base_uom_id'],
-            'base_uom_quantity' => $purchaseOrderItem->base_uom_quantity - $validatedData['base_uom_quantity'],
-            'uom_id' => $validatedData['uom_id'],
-            'uom_quantity' => $purchaseOrderItem->uom_quantity - $validatedData['uom_quantity'],
-            'uom_conversion_unit_id' => $validatedData['uom_conversion_unit_id'],
-            'quantity' => $remainingQuantity,
-            'amount' => $validatedData['amount'],
-            'unit_price' => $validatedData['unit_price'],
-            'created_by' => UserData()->id,
-            'item_leftable_id' => $poOrder->id,
-            'item_leftable_type' => $validatedData['item_leftable_type'],
-            'purchase_order_id' => $validatedData['purchase_order_id'],
-          ];
-          ItemLeft::create($itemLeftData);
+          $itemLeft->base_uom_quantity -= $validatedData['base_uom_quantity'];
+          $itemLeft->uom_quantity -= $validatedData['uom_quantity'];
+          $itemLeft->quantity -= $poOrder->quantity;
+          $itemLeft->amount -= $validatedData['amount'];
+          $itemLeft->save();
+        } else {
+          $itemLeft->base_uom_quantity = 0;
+          $itemLeft->uom_quantity = 0;
+          $itemLeft->quantity = 0;
+          $itemLeft->amount = 0;
+          $itemLeft->save();
+        }
+      } else {
+        if (isset($validatedData['later_buy']) && $validatedData['later_buy'] == 1 && !isset($validatedData['item_left_id'])) {
+
+          $purchaseOrderItem = PurchaseOrderItem::where('purchase_order_id', $validatedData['purchase_order_id'])
+            ->where('item_id', $validatedData['item_id'])
+            ->first();
+
+          if ($purchaseOrderItem->quantity < $poOrder->quantity) {
+            ResponseMessage('The order quantity exceeds the available quantity.', 419);
+          }
+
+          $remainingQuantity = null;
+          if ($purchaseOrderItem->quantity > $poOrder->quantity) {
+            $remainingQuantity = $purchaseOrderItem->quantity - $poOrder->quantity;
+
+            if ($remainingQuantity < 0) {
+              ResponseMessage('Later Buy Quantity must be less than original quantity', 419);
+            }
+            $itemLeftData = [
+              'base_uom_id' => $validatedData['base_uom_id'],
+              'base_uom_quantity' => $purchaseOrderItem->base_uom_quantity - $validatedData['base_uom_quantity'],
+              'uom_id' => $validatedData['uom_id'],
+              'uom_quantity' => $purchaseOrderItem->uom_quantity - $validatedData['uom_quantity'],
+              'uom_conversion_unit_id' => $validatedData['uom_conversion_unit_id'],
+              'quantity' => $remainingQuantity,
+              'amount' => $purchaseOrderItem->amount - $validatedData['amount'],
+              'unit_price' => $validatedData['unit_price'],
+              'created_by' => UserData()->id,
+              'item_leftable_id' => $poOrder->id,
+              'item_leftable_type' => $validatedData['item_leftable_type'],
+              'purchase_order_id' => $validatedData['purchase_order_id'],
+            ];
+            ItemLeft::create($itemLeftData);
+          }
         }
       }
       DB::commit();
