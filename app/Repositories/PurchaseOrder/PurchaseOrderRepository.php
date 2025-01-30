@@ -91,7 +91,6 @@ class PurchaseOrderRepository implements PurchaseOrderRepositoryInterface
 
         return $paginatedOrders;
     }
-
     public function createOrUpdate($request)
     {
         $data = $request->all();
@@ -122,7 +121,6 @@ class PurchaseOrderRepository implements PurchaseOrderRepositoryInterface
                 $data
             );
             foreach ($items as $item) {
-
                 if (isset($item->id) && $item->id !== null) {
                     $item_data['id'] = $item->id;
                 } else {
