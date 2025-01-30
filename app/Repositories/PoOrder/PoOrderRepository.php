@@ -711,15 +711,13 @@ class PoOrderRepository implements PoOrderRepositoryInterface
 
       $arrivalItems = ArrivalItem::where('po_order_id', $poOrder->id)->get();
 
+
       if ($arrivalItems->isNotEmpty()) {
         foreach ($arrivalItems as $arrivalItem) {
-
           $itemLeft = ItemLeft::where('purchase_order_id', $arrivalItem->poOrder->purchase_order_id)
             ->where('item_leftable_type', 'arrival_item')
             ->first();
-
           if ($itemLeft) {
-
             $totalItemLeftQuantity = $itemLeft->sum('quantity');
             $totalItemLeftAmount = $itemLeft->sum('amount');
             $totalItemLeftBaseUomQuantity = $itemLeft->sum('base_uom_quantity');
@@ -823,7 +821,7 @@ class PoOrderRepository implements PoOrderRepositoryInterface
       // })
       //   ->where('id', $validatedData['item_left_id'])
       //   ->first();
-      if (isset($validatedData['item_left_id']) && $validatedData['item_left_id'] != null) {
+      if (isset($validatedData['item_left_id']) && $validatedData['item_left_id'] != "null") {
         $itemLeft = ItemLeft::where('id', $validatedData['item_left_id'])->first();
         if ($itemLeft && (isset($validatedData['later_buy']) && $validatedData['later_buy'] == 1) && $itemLeft->purchase_order_id == $arrivalItem->poOrder->purchase_order_id) {
 
@@ -843,10 +841,9 @@ class PoOrderRepository implements PoOrderRepositoryInterface
           $itemLeft->save();
         }
       } else {
-
         if (
           isset($validatedData['later_buy']) && $validatedData['later_buy'] == 1 &&
-          isset($validatedData['item_left_id']) && $validatedData['item_left_id'] == null
+          isset($validatedData['item_left_id']) && $validatedData['item_left_id'] == "null"
         ) {
           $poOrder = PoOrder::where('id', $validatedData['po_order_id'])->first();
           if ($poOrder->quantity < $arrivalItem->quantity) {
