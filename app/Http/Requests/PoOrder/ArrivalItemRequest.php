@@ -30,6 +30,7 @@ class ArrivalItemRequest extends APIRequest
             'uom_conversion_unit_id' => 'required|integer|exists:uom_conversions,id',
             'quantity' => 'required|numeric',
             'amount' => 'required|numeric',
+            'unit_price'  => 'required|numeric',
             'po_invoice_id' => 'nullable|integer|exists:po_invoices,id',
             'po_order_id' => 'required|integer|exists:po_orders,id',
             'later_buy' => 'nullable',

@@ -17,6 +17,7 @@ class PoOrder extends Model
         'uom_conversion_unit_id',
         'quantity',
         'amount',
+        'unit_price',
         'item_id',
         'brand_id',
         'supplier_id',

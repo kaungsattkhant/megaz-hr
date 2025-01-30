@@ -323,17 +323,17 @@ class PoOrderRepository implements PoOrderRepositoryInterface
       // Filter the details where quantity > 0
       $poNumbers = []; // Initialize an array to store po_ids
 
-    // Filter the details and collect po_ids
-    $filteredDetails = $details->filter(function ($detail) use (&$poNumbers) {
+      // Filter the details and collect po_ids
+      $filteredDetails = $details->filter(function ($detail) use (&$poNumbers) {
         if (isset($detail['quantity']) && $detail['quantity'] > 0) {
-            // Collect po_id if it meets the criteria
-            if (isset($detail['purchase_order']['po_id'])) {
-                $poNumbers[] = $detail['purchase_order']['po_id'];
-            }
-            return true; // Keep this detail
+          // Collect po_id if it meets the criteria
+          if (isset($detail['purchase_order']['po_id'])) {
+            $poNumbers[] = $detail['purchase_order']['po_id'];
+          }
+          return true; // Keep this detail
         }
         return false; // Filter out this detail
-    });
+      });
       // Assign the filtered details back to the item
       $item->purchase_order_details = $filteredDetails->values()->toArray();
       $item->po_numbers = implode(',', $poNumbers);
@@ -372,6 +372,7 @@ class PoOrderRepository implements PoOrderRepositoryInterface
             'uom_conversion_unit_id' => $validatedData['uom_conversion_unit_id'],
             'quantity' => $remainingQuantity,
             'amount' => $validatedData['amount'],
+            'unit_price' => $validatedData['unit_price'],
             'created_by' => UserData()->id,
             'item_leftable_id' => $poOrder->id,
             'item_leftable_type' => $validatedData['item_leftable_type'],
@@ -601,51 +602,6 @@ class PoOrderRepository implements PoOrderRepositoryInterface
     return $poOrders;
   }
 
-  // correct groupBy
-  // public function getPoOrderArrivalList(Request $request)
-  // {
-  //   $poOrders = DB::table('po_orders as poOrder')
-  //     ->join('purchase_orders as po', 'poOrder.purchase_order_id', '=', 'po.id')
-  //     ->join('purchase_order_items as poi', 'po.id', '=', 'poi.purchase_order_id')
-  //     ->join('items as i', 'poi.item_id', '=', 'i.id')
-  //     ->join('suppliers as s', 'poOrder.supplier_id', '=', 's.id')
-  //     ->join('item_prices as ip', 'poOrder.item_price_id', '=', 'ip.id')
-  //     ->select(
-  //       'i.id as item_id',
-  //       'i.name as item_name',
-  //       DB::raw('GROUP_CONCAT(DISTINCT s.name SEPARATOR ", ") as supplier_name'),
-  //       DB::raw('GROUP_CONCAT(DISTINCT po.po_id SEPARATOR ", ") as po_numbers'),
-  //       DB::raw('SUM(poOrder.quantity) as total_quantity'),
-  //       DB::raw('SUM(poOrder.amount) as total_amount'),
-  //       'u.id as uom_id',
-  //       'u.name as uom_name',
-  //       'bu.id as base_uom_id',
-  //       'bu.name as base_uom_name',
-  //       'uc.id as uom_conversion_id',
-  //       'uc.conversion as uom_conversion',
-  //       'ip.id as item_price_id',
-  //       'ip.price as item_price',
-  //     )
-  //     ->join('uoms as u', 'poOrder.uom_id', '=', 'u.id')
-  //     ->join('uoms as bu', 'poOrder.base_uom_id', '=', 'bu.id')
-  //     ->join('uom_conversions as uc', 'poOrder.uom_conversion_unit_id', '=', 'uc.id')
-  //     ->groupBy(
-  //       'i.id',
-  //       'i.name',
-  //       'u.id',
-  //       'u.name',
-  //       'bu.id',
-  //       'bu.name',
-  //       'ip.id',
-  //       'ip.price',
-  //       'uc.id',
-  //       'uc.conversion',
-  //       'po.po_id'
-  //     )
-  //     ->paginate(config('common.list_count'));
-  //   return $poOrders;
-  // }
-
   public function getPoOrderArrivalListByItemId($itemId)
   {
     $poOrders = PoOrder::with(['purchaseOrder', 'uomConversion', 'uom', 'baseUom', 'item', 'brand', 'supplier', 'itemPrice'])
@@ -719,6 +675,7 @@ class PoOrderRepository implements PoOrderRepositoryInterface
           'uom_quantity' => $validatedData['uom_quantity'],
           'quantity' => $validatedData['quantity'],
           'amount' => $validatedData['amount'],
+          'unit_price' => $validatedData['unit_price'],
           'po_invoice_id' => $newPoInvoice->id,
           'po_order_id' => $validatedData['po_order_id'],
           'created_by' => UserData()->id,
@@ -741,6 +698,7 @@ class PoOrderRepository implements PoOrderRepositoryInterface
             'uom_quantity' => $validatedData['uom_quantity'],
             'quantity' => $validatedData['quantity'],
             'amount' => $validatedData['amount'],
+            'unit_price' => $validatedData['unit_price'],
             'po_invoice_id' => $poInvoice->id,
             'po_order_id' => $validatedData['po_order_id'],
             'created_by' => UserData()->id,
@@ -780,6 +738,7 @@ class PoOrderRepository implements PoOrderRepositoryInterface
             'uom_conversion_unit_id' => $validatedData['uom_conversion_unit_id'],
             'quantity' => $remainingQuantity,
             'amount' => $poOrder->amount - $validatedData['amount'],
+            'unit_price' => $validatedData['unit_price'],
             'created_by' => UserData()->id,
             'item_leftable_id' => $arrivalItem->id,
             'item_leftable_type' => $validatedData['item_leftable_type'],

@@ -19,6 +19,7 @@ return new class extends Migration
             $table->integer('uom_quantity');
             $table->integer('quantity');
             $table->double('amount');
+            $table->double('unit_price');
             $table->integer('uom_conversion_unit_id');
             $table->integer('created_by');
             $table->foreignId('purchase_order_id');

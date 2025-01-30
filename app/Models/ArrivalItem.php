@@ -16,6 +16,7 @@ class ArrivalItem extends Model
         'uom_quantity',
         'quantity',
         'amount',
+        'unit_price',
         'po_invoice_id',
         'po_order_id',
         'created_by'
@@ -29,7 +30,6 @@ class ArrivalItem extends Model
     {
         return $this->belongsTo(PoOrder::class, 'po_order_id');
     }
-
 
     public function uom()
     {
