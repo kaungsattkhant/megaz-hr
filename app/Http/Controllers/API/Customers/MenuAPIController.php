@@ -27,7 +27,9 @@ class MenuAPIController extends Controller
     public function categoryMenuByUserApp(int $id,Request $request)
     {
         $validateDate = $request->date ?? CurrentDate();
-        $menu = Menu::where('menu_category_id',$id)->where('is_feature',1)->with(['menu_category', 'prices', 'items','menuServiceDiscounts' => function ($query) use ($validateDate)
+        $menu = Menu::where('menu_category_id',$id)
+        // ->where('is_feature',1)// is feature
+        ->with(['menu_category', 'prices', 'items','menuServiceDiscounts' => function ($query) use ($validateDate)
         {
             $query->where('from_date', '<=',$validateDate)->where('to_date', '>=',$validateDate);
         }
