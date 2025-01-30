@@ -116,7 +116,7 @@ class PoOrderRepository implements PoOrderRepositoryInterface
         'po_orders.item_id',
         // 'po_orders.purchase_order_id',
         DB::raw('SUM(item_lefts.quantity) as total_left_quantity'),
-        // DB::raw('GROUP_CONCAT(item_lefts.id SEPARATOR ",") as item_left_ids'),
+        DB::raw('GROUP_CONCAT(item_lefts.id SEPARATOR ",") as item_left_ids'),
       )
       ->groupBy('po_orders.item_id');
 
@@ -210,7 +210,7 @@ class PoOrderRepository implements PoOrderRepositoryInterface
         DB::raw('COALESCE(i_lefts.total_left_quantity, 0) as left_quantity'), // Default to 0 if no data
         // DB::raw('COALESCE(po_orders.total_po_order_quantity, 0) as po_order_quantity'), // Default to 0 if no data
         DB::raw('COALESCE(po_orders.po_order_ids, "null") as po_order_ids'),
-        // DB::raw('COALESCE(i_lefts.item_left_ids, "null") as item_left_ids'),
+        DB::raw('COALESCE(i_lefts.item_left_ids, "null") as item_left_ids'),
         DB::raw('GROUP_CONCAT(DISTINCT poi.purchase_order_id SEPARATOR ", ") as po_ids'),
         DB::raw('
         GROUP_CONCAT(
@@ -345,7 +345,7 @@ class PoOrderRepository implements PoOrderRepositoryInterface
         'i_lefts.total_left_quantity',
         // 'po_orders.total_po_order_quantity',
         // 'po_orders.po_order_ids',
-        // 'i_lefts.item_left_ids',
+        'i_lefts.item_left_ids',
       )
       ->having('total_quantity', '>', 0) // Filter out records where quantity <= 0
       ->paginate(config('common.list_count'));
