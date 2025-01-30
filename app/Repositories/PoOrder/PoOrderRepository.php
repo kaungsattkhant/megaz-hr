@@ -128,6 +128,48 @@ class PoOrderRepository implements PoOrderRepositoryInterface
         DB::raw('GROUP_CONCAT(po_orders.purchase_order_id SEPARATOR ",") as po_order_ids'),
       )
       ->groupBy('item_id');
+    $quantitySubQuery = '(
+        SELECT (
+            COALESCE(
+                (
+                    SELECT COALESCE(
+                        SUM(
+                            CASE
+                                WHEN po_orders.po_order_ids IS NULL THEN po_item_sub.quantity
+                                ELSE 
+                                    CASE 
+                                        WHEN FIND_IN_SET(po_item_sub.purchase_order_id, po_orders.po_order_ids) = 0 
+                                        THEN po_item_sub.quantity
+                                        ELSE 0 
+                                    END
+                            END
+                        ), 0
+                    )
+                    FROM purchase_order_items po_item_sub
+                    WHERE po_item_sub.item_id = po_item.item_id
+                      AND po_item_sub.purchase_order_id = po_item.purchase_order_id
+                ), 0
+            )
+            +
+            COALESCE(
+                (
+                    SELECT COALESCE(SUM(lefts.total_left_quantity), 0)
+                    FROM (
+                        SELECT 
+                            po_orders.item_id,
+                            po_orders.purchase_order_id,
+                            SUM(il.quantity) as total_left_quantity
+                        FROM item_lefts il
+                        INNER JOIN po_orders ON il.item_leftable_id = po_orders.id
+                        WHERE il.item_leftable_type = "' . $poClass . '"
+                        GROUP BY po_orders.item_id, po_orders.purchase_order_id
+                    ) as lefts
+                    WHERE lefts.item_id = po_item.item_id
+                      AND lefts.purchase_order_id = po_item.purchase_order_id
+                ), 0
+            )
+        )
+    )';
 
 
     $poOrderItems = DB::table('purchase_order_items as poi')
@@ -200,11 +242,29 @@ class PoOrderRepository implements PoOrderRepositoryInterface
                   "item_id", i.id,
                   "amount", po_item.amount,
                   "base_uom_id", po_item.base_uom_id,
-                  "base_uom_quantity", po_item.base_uom_quantity,
                   "uom_id", po_item.uom_id,
-                  "uom_quantity", po_item.uom_quantity,
                   "uom_conversion_id", po_item.uom_conversion_id,
                   "uom_conversion", uc.conversion,
+                  "base_uom_quantity", 
+                CASE 
+                    WHEN (
+                        ' . $quantitySubQuery . '
+                    ) < uc.conversion THEN 0 
+                    ELSE FLOOR((
+                        ' . $quantitySubQuery . '
+                    ) / uc.conversion) 
+                END,
+                "uom_quantity", 
+                CASE 
+                    WHEN (
+                        ' . $quantitySubQuery . '
+                    ) < uc.conversion THEN (
+                        ' . $quantitySubQuery . '
+                    ) 
+                    ELSE (
+                        ' . $quantitySubQuery . '
+                    ) % uc.conversion 
+                END,
                   "item_left_id", (
     SELECT il.id
     FROM item_lefts il
@@ -253,48 +313,7 @@ class PoOrderRepository implements PoOrderRepositoryInterface
     WHERE lefts.item_id = po_item.item_id
       AND lefts.purchase_order_id = po_item.purchase_order_id
 ),
-"quantity", (
-                SELECT (
-                    COALESCE(
-                        (
-                            SELECT COALESCE(
-                                SUM(
-                                    CASE
-                                        WHEN po_orders.po_order_ids IS NULL THEN po_item_sub.quantity
-                                        ELSE 
-                                            CASE 
-                                                WHEN FIND_IN_SET(po_item_sub.purchase_order_id, po_orders.po_order_ids) = 0 
-                                                THEN po_item_sub.quantity
-                                                ELSE 0 
-                                            END
-                                    END
-                                ), 0
-                            )
-                            FROM purchase_order_items po_item_sub
-                            WHERE po_item_sub.item_id = po_item.item_id
-                              AND po_item_sub.purchase_order_id = po_item.purchase_order_id
-                        ), 0
-                    )
-                    +
-                    COALESCE(
-                        (
-                            SELECT COALESCE(SUM(lefts.total_left_quantity), 0)
-                            FROM (
-                                SELECT 
-                                    po_orders.item_id,
-                                    po_orders.purchase_order_id,
-                                    SUM(il.quantity) as total_left_quantity
-                                FROM item_lefts il
-                                INNER JOIN po_orders ON il.item_leftable_id = po_orders.id
-                                WHERE il.item_leftable_type = "' . $poClass . '"
-                                GROUP BY po_orders.item_id, po_orders.purchase_order_id
-                            ) as lefts
-                            WHERE lefts.item_id = po_item.item_id
-                              AND lefts.purchase_order_id = po_item.purchase_order_id
-                        ), 0
-                    )
-                )
-            ),
+"quantity",' . $quantitySubQuery . ',
                   "purchase_order", JSON_OBJECT(
                       "id", po.id,
                       "po_id", po.po_id,
@@ -334,60 +353,76 @@ class PoOrderRepository implements PoOrderRepositoryInterface
     // return $poOrderItems;
     foreach ($poOrderItems as $item) {
       // $item->purchase_order_details = json_decode($item->purchase_order_details, true);
-      // $details = collect(json_decode($item->purchase_order_details, true)); // Convert to a Collection
-
-      // // Filter the details where quantity > 0
-      // $poNumbers = []; // Initialize an array to store po_ids
-
-      // // Filter the details and collect po_ids
-      // $filteredDetails = $details->filter(function ($detail) use (&$poNumbers) {
-      //   if (isset($detail['quantity']) && $detail['quantity'] > 0) {
-      //     // Collect po_id if it meets the criteria
-
-      //     if (isset($detail['purchase_order']['po_id'])) {
-      //       $poNumbers[] = $detail['purchase_order']['po_id'];
-      //     }
-      //     return true; // Keep this detail
-      //   }
-      //   return false; // Filter out this detail
-      // });
-      // // Assign the filtered details back to the item
-      // $item->purchase_order_details = $filteredDetails->values()->toArray();
-      // $item->po_numbers = implode(',', $poNumbers);
-
       $details = collect(json_decode($item->purchase_order_details, true)); // Convert to a Collection
 
-      // Initialize an array to store po_ids
-      $poNumbers = [];
+      // Filter the details where quantity > 0
+      $poNumbers = []; // Initialize an array to store po_ids
 
-      // Filter details and modify quantities
-      $filteredDetails = $details->filter(function ($detail) {
-        return isset($detail['quantity']) && $detail['quantity'] > 0;
-    })->map(function ($detail) use (&$poNumbers) {
-        // Modify base_uom_quantity and uom_quantity
-        if ($detail['quantity'] < $detail['uom_conversion']) {
-            $detail['base_uom_quantity'] = 0;
-            $detail['uom_quantity'] = $detail['quantity'];
-        } else {
-            $detail['base_uom_quantity'] = intdiv($detail['quantity'], $detail['uom_conversion']); // Quotient only
-            $detail['uom_quantity'] = $detail['quantity'] % $detail['uom_conversion']; // Remainder only
-        }
-    
-        // Collect po_id if it exists
-        if (isset($detail['purchase_order']['po_id'])) {
+      // Filter the details and collect po_ids
+      $filteredDetails = $details->filter(function ($detail) use (&$poNumbers) {
+        if (isset($detail['quantity']) && $detail['quantity'] > 0) {
+          // Collect po_id if it meets the criteria
+
+          if (isset($detail['purchase_order']['po_id'])) {
             $poNumbers[] = $detail['purchase_order']['po_id'];
+          }
+          return true; // Keep this detail
         }
-    
-        return $detail; // Keep this detail
-    })->values(); // Reset array keys
-    
-    // Assign updated details back to the item
-    $item->purchase_order_details = $filteredDetails->toArray();
-    $item->po_numbers = implode(',', $poNumbers);
+        return false; // Filter out this detail
+      });
+      // Assign the filtered details back to the item
+      $item->purchase_order_details = $filteredDetails->values()->toArray();
+      $item->po_numbers = implode(',', $poNumbers);
     }
     return $poOrderItems;
+
   }
 
+  public function queryQuantity()
+  {
+    // "quantity", (
+    //             SELECT (
+    //                 COALESCE(
+    //                     (
+    //                         SELECT COALESCE(
+    //                             SUM(
+    //                                 CASE
+    //                                     WHEN po_orders.po_order_ids IS NULL THEN po_item_sub.quantity
+    //                                     ELSE 
+    //                                         CASE 
+    //                                             WHEN FIND_IN_SET(po_item_sub.purchase_order_id, po_orders.po_order_ids) = 0 
+    //                                             THEN po_item_sub.quantity
+    //                                             ELSE 0 
+    //                                         END
+    //                                 END
+    //                             ), 0
+    //                         )
+    //                         FROM purchase_order_items po_item_sub
+    //                         WHERE po_item_sub.item_id = po_item.item_id
+    //                           AND po_item_sub.purchase_order_id = po_item.purchase_order_id
+    //                     ), 0
+    //                 )
+    //                 +
+    //                 COALESCE(
+    //                     (
+    //                         SELECT COALESCE(SUM(lefts.total_left_quantity), 0)
+    //                         FROM (
+    //                             SELECT 
+    //                                 po_orders.item_id,
+    //                                 po_orders.purchase_order_id,
+    //                                 SUM(il.quantity) as total_left_quantity
+    //                             FROM item_lefts il
+    //                             INNER JOIN po_orders ON il.item_leftable_id = po_orders.id
+    //                             WHERE il.item_leftable_type = "' . $poClass . '"
+    //                             GROUP BY po_orders.item_id, po_orders.purchase_order_id
+    //                         ) as lefts
+    //                         WHERE lefts.item_id = po_item.item_id
+    //                           AND lefts.purchase_order_id = po_item.purchase_order_id
+    //                     ), 0
+    //                 )
+    //             )
+    //         ),
+  }
   public function storePoOrderItems($validatedData)
   {
     try {
