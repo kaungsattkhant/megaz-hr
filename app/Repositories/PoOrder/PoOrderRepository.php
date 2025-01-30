@@ -343,7 +343,6 @@ class PoOrderRepository implements PoOrderRepositoryInterface
 
   public function storePoOrderItems($validatedData)
   {
-    dd($validatedData);
     try {
       $validatedData['created_by'] = UserData()->id;
       $poOrder = PoOrder::create($validatedData);
