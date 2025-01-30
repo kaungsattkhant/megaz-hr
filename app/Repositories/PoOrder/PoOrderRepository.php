@@ -619,26 +619,26 @@ class PoOrderRepository implements PoOrderRepositoryInterface
         //total_po_order quantity is sum poOrder.quantity related purchase_order_id with not match po_order_ids
         DB::raw('
         COALESCE(
-    SUM(
-        CASE 
-            WHEN arrival_items.po_order_ids IS NULL THEN poOrder.quantity
-            WHEN FIND_IN_SET(poOrder.purchase_order_id, arrival_items.po_order_ids) = 0 THEN poOrder.quantity
-            ELSE 0 
-        END
-    ), 0
-) AS total_po_order_quantity 
+            SUM(
+                DISTINCT CASE 
+                    WHEN arrival_items.po_order_ids IS NULL THEN poOrder.quantity
+                    WHEN FIND_IN_SET(poOrder.purchase_order_id, arrival_items.po_order_ids) = 0 THEN poOrder.quantity
+                    ELSE 0 
+                END
+            ), 0
+        ) AS total_po_order_quantity 
     '),
         DB::raw('
             COALESCE(item_lefts.left_quantity, 0) +
             COALESCE(
-                SUM(
-                    CASE 
-                        WHEN arrival_items.po_order_ids IS NULL THEN poOrder.quantity
-                        WHEN FIND_IN_SET(poOrder.purchase_order_id, arrival_items.po_order_ids) = 0 THEN poOrder.quantity
-                        ELSE 0 
-                    END
-                ), 0
-            ) AS total_quantity
+            SUM(
+                DISTINCT CASE 
+                    WHEN arrival_items.po_order_ids IS NULL THEN poOrder.quantity
+                    WHEN FIND_IN_SET(poOrder.purchase_order_id, arrival_items.po_order_ids) = 0 THEN poOrder.quantity
+                    ELSE 0 
+                END
+            ), 0
+        ) AS total_quantity
         '),
         DB::raw('COALESCE(item_lefts.left_amount, 0) as total_left_amount'),
         DB::raw('COALESCE(arrival_items.arrival_amount, 0) as total_arrival_amount'),
