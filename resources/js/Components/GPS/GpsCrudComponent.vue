@@ -276,24 +276,21 @@ export default {
                 this.latitude = response.data.latitude;
                 this.longitude = response.data.longitude;
             }
-            
         },
         btnClickedEditGps(){
             if(!this.name){
                 this.alertValidationMessage(`Name`);
                 return 1;
             }
-            else if(!this.latitude){
+            if(!this.latitude){
                 this.alertValidationMessage(`Latitude`);
                 return 1;
             }
-            else if(!this.longitude){
+            if(!this.longitude){
                 this.alertValidationMessage(`Longitude`);
                 return 1;
             }
-            else{
-                this.editGps();
-            }
+            this.editGps();
         },
         async editGps(){
             let formData = new FormData();
@@ -306,8 +303,6 @@ export default {
                 document.getElementById("close_edit_modal").click();
             }
         },
-
-        
 
         // async searchBtnClicked() {
         //     this.url_search = '&search=' + this.searchInput
