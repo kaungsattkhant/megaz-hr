@@ -330,12 +330,14 @@ Route::middleware(['departments:po-order'])->group(function () {
 // Route::middleware(['departments:arrival-item'])->group(function () {
     Route::view('/arrival_items', 'procurement_order_arrival.index')->name('arrival_items');
 // });
-Route::middleware(['departments:po-invoice'])->group(function () {
+Route::middleware(['departments:po-order-invoice'])->group(function () {
     Route::view('/purchase_order_invoices', 'purchase_order_invoices.index')->name('purchase_order_invoices');
 });
 
 
 //test
+
+Route::view('/suppliers/{id}/lead_times', 'supplier.supplier_leadtime')->name('supplier.lead_times');
 
 Route::view('/creditor', 'creditor.index')->name('creditor');
 Route::view('/creditor/suppliers/{creditorId}/transactions', 'creditor.history')->name('creditor.history');
