@@ -74,7 +74,7 @@
                                 <tr v-if="item.showDatails" v-for="(arrival, arrivalIndex) in item.arrival_details" :key="arrivalIndex">
                                     <td> &nbsp; </td>
                                     <td class="whitespace-nowrap"> {{ arrival.item_name }} </td>
-                                    <td class="whitespace-nowrap"> {{ arrival.purchase_order_id }} </td>
+                                    <td class="whitespace-nowrap"> {{ arrival.po_id }} </td>
                                     <td class="whitespace-nowrap"> {{ arrival.quantity }} </td>
                                     <td class="whitespace-nowrap"> {{ arrival.supplier_name }} </td>
                                     <td class="whitespace-nowrap">
@@ -372,12 +372,10 @@ export default {
         checkBtnClicked(arrival){
             this.confirmArrivalItem = arrival;
             this.baseUomName = this.confirmArrivalItem.base_uom_name;
-            this.baseUomQty = this.confirmArrivalItem.quantity / this.confirmArrivalItem.uom_conversion;
+            this.baseUomQty = this.confirmArrivalItem.base_uom_quantity;
             this.uomName = this.confirmArrivalItem.uom_name;
-            this.uomQty = this.confirmArrivalItem.quantity % this.confirmArrivalItem.uom_conversion;
+            this.uomQty = this.confirmArrivalItem.uom_quantity;
             this.selectedUomConversion = this.confirmArrivalItem.uom_conversion;
-
-
             this.uomUpperLimit = this.selectedUomConversion - 1;
 
             this.originalArrivalTotalQty = (this.baseUomQty * this.selectedUomConversion) + this.uomQty;
@@ -439,7 +437,7 @@ export default {
             let formData = new FormData();
             formData.append('base_uom_quantity', this.baseUomQty);
 
-            
+
             formData.append('uom_quantity', this.uomQty);
             formData.append('base_uom_id', this.confirmArrivalItem.base_uom_id);
             formData.append('uom_id', this.confirmArrivalItem.uom_id);
