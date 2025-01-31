@@ -158,7 +158,7 @@ export default {
             perPage:null,
             currentPage:null,
             lastPage:null,
-
+            totalData:null,
             
         };
     },
