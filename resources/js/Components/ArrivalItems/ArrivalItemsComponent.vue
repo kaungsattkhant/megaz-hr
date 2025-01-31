@@ -371,12 +371,15 @@ export default {
 
         checkBtnClicked(arrival){
             this.confirmArrivalItem = arrival;
-            this.baseUomName = this.confirmArrivalItem.base_uom.name;
-            this.baseUomQty = this.confirmArrivalItem.base_uom_quantity;
-            this.uomName = this.confirmArrivalItem.uom.name;
-            this.uomQty = this.confirmArrivalItem.uom_quantity;
+            this.baseUomName = this.confirmArrivalItem.base_uom_name;
+            this.baseUomQty = this.confirmArrivalItem.quantity / this.confirmArrivalItem.uom_conversion;
+            this.uomName = this.confirmArrivalItem.uom_name;
+            this.uomQty = this.confirmArrivalItem.quantity % this.confirmArrivalItem.uom_conversion;
             this.selectedUomConversion = this.confirmArrivalItem.uom_conversion;
-            this.uomUpperLimit = this.selectedUomConversion.conversion - 1;
+
+
+            this.uomUpperLimit = this.selectedUomConversion - 1;
+
             this.originalArrivalTotalQty = (arrival.base_uom_quantity * this.selectedUomConversion.conversion) + arrival.uom_quantity;
             this.confirmArrivalTotalQty = this.originalArrivalTotalQty;
             this.calculateTotalPrice();
@@ -438,11 +441,13 @@ export default {
             formData.append('uom_quantity', this.uomQty);
             formData.append('base_uom_id', this.confirmArrivalItem.base_uom_id);
             formData.append('uom_id', this.confirmArrivalItem.uom_id);
-            formData.append('uom_conversion_unit_id', this.selectedUomConversion.id);
+            formData.append('uom_conversion_unit_id', this.confirmArrivalItem.uom_conversion_id);
             formData.append('quantity', this.confirmArrivalTotalQty);
             formData.append('amount', this.totalPrice);
             formData.append('item_id', this.confirmArrivalItem.item_id);
-            formData.append('po_order_id', this.confirmArrivalItem.id);
+
+
+            formData.append('purchase_order_id', this.confirmArrivalItem.id);
             if(this.selectedInvoice){
                 formData.append('po_invoice_id', this.selectedInvoice.id);
             }
@@ -452,6 +457,7 @@ export default {
             if(this.newInvoiceNumber){
                 formData.append('invoice_no', this.newInvoiceNumber);
             }
+            formData.append('supplier_id', this.confirmArrivalItem.supplier_id);
             formData.append('item_left_id', this.confirmArrivalItem.item_left_id);
             formData.append('unit_price', this.confirmArrivalItem.unit_price);
             let response = await postApiData({url: `/api/po_arrival_items`, form_data: formData, token: this.getToken()});
