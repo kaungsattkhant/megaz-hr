@@ -764,13 +764,14 @@ class PoOrderRepository implements PoOrderRepositoryInterface
       // ->join('po_orders', 'arrival_items.po_order_id', 'po_orders.id')
       ->select(
         'arrival_items.item_id',
+        'arrival_items.purchase_order_id',
         // 'po_orders.id as po_order_id',
         DB::raw('SUM(item_lefts.quantity) as left_quantity'),
         DB::raw('SUM(item_lefts.amount) as left_amount'),
         DB::raw('GROUP_CONCAT(item_lefts.id SEPARATOR ", ") as item_left_ids'),
       )
       ->where('arrival_items.item_id', $itemId) // Add filtering condition
-      ->groupBy('arrival_items.item_id');
+      ->groupBy('arrival_items.item_id','arrival_items.purchase_order_id');
 
     $arrivalSubQuery = DB::table('arrival_items')
       // ->join('po_orders', 'arrival_items.po_order_id', 'po_orders.id')
@@ -789,7 +790,8 @@ class PoOrderRepository implements PoOrderRepositoryInterface
       ->join('suppliers as s', 'poOrder.supplier_id', '=', 's.id')
       ->join('item_prices as ip', 'poOrder.item_price_id', '=', 'ip.id')
       ->leftJoinSub($leftsSubquery, 'item_lefts', function ($join) {
-        $join->on('poOrder.item_id', '=', 'item_lefts.item_id');
+        $join->on('poOrder.item_id', '=', 'item_lefts.item_id')
+        ->on('item_lefts.purchase_order_id','=','poOrder.purchase_order_id');
       })
       ->leftJoinSub($arrivalSubQuery, 'arrival_items', function ($join) {
         $join->on('poOrder.item_id', '=', 'arrival_items.item_id');
@@ -946,7 +948,7 @@ class PoOrderRepository implements PoOrderRepositoryInterface
         'arrival_items.arrival_amount',
       )
       ->where('poOrder.item_id', $itemId)
-      // ->having('total_quantity', '>', 0)
+      ->having('quantity', '>', 0)
       // ->having('total_amount', '>', 0)
       ->get();
      
