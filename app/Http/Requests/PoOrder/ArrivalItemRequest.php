@@ -32,7 +32,9 @@ class ArrivalItemRequest extends APIRequest
             'amount' => 'required|numeric',
             'unit_price'  => 'required|numeric',
             'po_invoice_id' => 'nullable|integer|exists:po_invoices,id',
-            'po_order_id' => 'required|integer|exists:po_orders,id',
+            'item_id' => 'required',
+            'supplier_id' => 'required',
+            'purchase_order_id' => 'required',
             'later_buy' => 'nullable',
             'item_leftable_type' => 'nullable',
             'is_new_invoice' => 'nullable',
@@ -40,7 +42,6 @@ class ArrivalItemRequest extends APIRequest
             'item_left_id' => 'nullable',
         ];
     }
-
     public function failedValidation(Validator $validator)
     {
         parent::failedValidation($validator);

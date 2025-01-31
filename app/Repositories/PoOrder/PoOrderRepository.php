@@ -376,7 +376,6 @@ class PoOrderRepository implements PoOrderRepositoryInterface
       $item->po_numbers = implode(',', $poNumbers);
     }
     return $poOrderItems;
-
   }
 
   public function queryQuantity()
@@ -758,7 +757,7 @@ class PoOrderRepository implements PoOrderRepositoryInterface
   {
     // $itemId = 2;
     $leftsSubquery = DB::table('item_lefts')
-    // ->join('purchase_orders','item_lefts.purchase_order_id','purchase_orders.id')
+      // ->join('purchase_orders','item_lefts.purchase_order_id','purchase_orders.id')
       ->join('arrival_items', function ($join) {
         $join->on('item_lefts.item_leftable_id', '=', 'arrival_items.id')
           ->where('item_lefts.item_leftable_type', '=', 'arrival_item');
@@ -791,10 +790,10 @@ class PoOrderRepository implements PoOrderRepositoryInterface
       ->join('suppliers as s', 'poOrder.supplier_id', '=', 's.id')
       ->join('item_prices as ip', 'poOrder.item_price_id', '=', 'ip.id')
       ->leftJoinSub($leftsSubquery, 'item_lefts', function ($join) {
-          $join->on('poOrder.item_id', '=', 'item_lefts.item_id');
+        $join->on('poOrder.item_id', '=', 'item_lefts.item_id');
       })
       ->leftJoinSub($arrivalSubQuery, 'arrival_items', function ($join) {
-          $join->on('poOrder.item_id', '=', 'arrival_items.item_id');
+        $join->on('poOrder.item_id', '=', 'arrival_items.item_id');
       })
       // ->leftJoinSub($leftsSubquery, 'item_lefts', function ($join) {
       //   $join->on('poOrder.id', '=', 'item_lefts.po_order_id');  // Join on po_order_id
@@ -922,11 +921,14 @@ class PoOrderRepository implements PoOrderRepositoryInterface
           'base_uom_quantity' => $validatedData['base_uom_quantity'],
           'uom_id' => $validatedData['uom_id'],
           'uom_quantity' => $validatedData['uom_quantity'],
+          'uom_conversion_unit_id' => $validatedData['uom_conversion_unit_id'],
           'quantity' => $validatedData['quantity'],
           'amount' => $validatedData['amount'],
           'unit_price' => $validatedData['unit_price'],
           'po_invoice_id' => $newPoInvoice->id,
-          'po_order_id' => $validatedData['po_order_id'],
+          'item_id' => $validatedData['item_id'],
+          'supplier_id' => $validatedData['supplier_id'],
+          'purchase_order_id' => $validatedData['purchase_order_id'],
           'created_by' => UserData()->id,
         ];
         $arrivalItem = ArrivalItem::create($arrivalItemData);
@@ -945,11 +947,14 @@ class PoOrderRepository implements PoOrderRepositoryInterface
             'base_uom_quantity' => $validatedData['base_uom_quantity'],
             'uom_id' => $validatedData['uom_id'],
             'uom_quantity' => $validatedData['uom_quantity'],
+            'uom_conversion_unit_id' => $validatedData['uom_conversion_unit_id'],
             'quantity' => $validatedData['quantity'],
             'amount' => $validatedData['amount'],
             'unit_price' => $validatedData['unit_price'],
             'po_invoice_id' => $poInvoice->id,
-            'po_order_id' => $validatedData['po_order_id'],
+            'item_id' => $validatedData['item_id'],
+            'supplier_id' => $validatedData['supplier_id'],
+            'purchase_order_id' => $validatedData['purchase_order_id'],
             'created_by' => UserData()->id,
           ];
           $arrivalItem = ArrivalItem::create($arrivalItemData);
@@ -958,22 +963,14 @@ class PoOrderRepository implements PoOrderRepositoryInterface
           throw new \Exception('PoInvoice not found for the given ID.');
         }
       }
-      $poOrder = PoOrder::where('id', $validatedData['po_order_id'])->first();
-      if (!$poOrder) {
-        ResponseMessage('PoOrder not found', 404);
-      } else {
-        $this->storeInventoryLedger($validatedData, $arrivalItem, $poOrder);
-      }
 
-      // $itemLeft = ItemLeft::whereHas('itemLeftable', function ($query) use ($arrivalItem) {
+      $this->storeInventoryLedger($validatedData, $arrivalItem);
 
-      //   $query->where('item_leftable_type', 'arrival_item');
-      // })
-      //   ->where('id', $validatedData['item_left_id'])
-      //   ->first();
+
+
       if (isset($validatedData['item_left_id']) && $validatedData['item_left_id'] != "null") {
         $itemLeft = ItemLeft::where('id', $validatedData['item_left_id'])->first();
-        if ($itemLeft && (isset($validatedData['later_buy']) && $validatedData['later_buy'] == 1) && $itemLeft->purchase_order_id == $arrivalItem->poOrder->purchase_order_id) {
+        if ($itemLeft && (isset($validatedData['later_buy']) && $validatedData['later_buy'] == 1) && $itemLeft->purchase_order_id == $arrivalItem->purchase_order_id) {
 
           if ($itemLeft->quantity < $arrivalItem->quantity) {
             ResponseMessage('The arrival quantity exceeds the available quantity.', 419);
@@ -995,7 +992,9 @@ class PoOrderRepository implements PoOrderRepositoryInterface
           isset($validatedData['later_buy']) && $validatedData['later_buy'] == 1 &&
           isset($validatedData['item_left_id']) && $validatedData['item_left_id'] == "null"
         ) {
-          $poOrder = PoOrder::where('id', $validatedData['po_order_id'])->first();
+          $poOrder = PoOrder::where('purchase_order_id', $validatedData['purchase_order_id'])
+            ->where('item_id', $validatedData['item_id'])->first();
+
           if ($poOrder->quantity < $arrivalItem->quantity) {
             ResponseMessage('The arrival quantity exceeds the available quantity.', 419);
           }
@@ -1035,7 +1034,7 @@ class PoOrderRepository implements PoOrderRepositoryInterface
     }
   }
 
-  private function storeInventoryLedger($validatedData, $arrivalItem, $poOrder)
+  private function storeInventoryLedger($validatedData, $arrivalItem)
   {
 
     $inventory = Inventory::where('name', '=', 'Main Inventory')->first();
@@ -1050,16 +1049,11 @@ class PoOrderRepository implements PoOrderRepositoryInterface
       'action' => 'in'
     ]);
 
-
-    if ($poOrder) {
-      InventoryLedgerItem::create([
-        'inventory_ledger_id' => $inventoryLedger->id,
-        'item_id' => $poOrder->item_id,
-        'quantity' => $validatedData['quantity']
-      ]);
-    } else {
-      ResponseMessage('PoOrder not found', 404);
-    }
+    InventoryLedgerItem::create([
+      'inventory_ledger_id' => $inventoryLedger->id,
+      'item_id' => $arrivalItem->item_id,
+      'quantity' => $validatedData['quantity']
+    ]);
   }
 
   public function getSupplierLeadTime($supplierId)

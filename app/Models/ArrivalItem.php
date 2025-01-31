@@ -2,8 +2,9 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
+use App\Models\PurchaseOrder;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class ArrivalItem extends Model
 {
@@ -14,11 +15,14 @@ class ArrivalItem extends Model
         'base_uom_quantity',
         'uom_id',
         'uom_quantity',
+        'uom_conversion_unit_id',
         'quantity',
         'amount',
         'unit_price',
         'po_invoice_id',
-        'po_order_id',
+        'item_id',
+        'supplier_id',
+        'purchase_order_id',
         'created_by'
     ];
 
@@ -26,9 +30,9 @@ class ArrivalItem extends Model
     {
         return $this->belongsTo(PoInvoice::class, 'po_invoice_id');
     }
-    public function poOrder()
+    public function purchaseOrder()
     {
-        return $this->belongsTo(PoOrder::class, 'po_order_id');
+        return $this->belongsTo(PurchaseOrder::class, 'purchase_order_id');
     }
 
     public function uom()
@@ -41,8 +45,12 @@ class ArrivalItem extends Model
         return $this->belongsTo(Uom::class, 'base_uom_id');
     }
 
-    public function itemLeft()
+    public function supplier()
     {
-        return $this->morphOne(ItemLeft::class, 'itemLeftable');
+        return $this->belongsTo(Supplier::class, 'supplier_id');
+    }
+    public function item()
+    {
+        return $this->belongsTo(Item::class, 'item_id');
     }
 }
