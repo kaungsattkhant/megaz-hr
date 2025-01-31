@@ -928,7 +928,7 @@ class PoOrderRepository implements PoOrderRepositoryInterface
       ->join('uoms as bu', 'poOrder.base_uom_id', '=', 'bu.id')
       ->join('uom_conversions as uc', 'poOrder.uom_conversion_unit_id', '=', 'uc.id')
       ->groupBy(
-'poOrder.purchase_order_id', // Grouping by purchase_order_id
+        'poOrder.purchase_order_id', // Grouping by purchase_order_id
         'i.id',
         's.id',
         // 'il.id',
@@ -947,7 +947,8 @@ class PoOrderRepository implements PoOrderRepositoryInterface
         'arrival_items.po_order_ids',
         'arrival_items.arrival_amount',
         's.name',
-        'po.po_id'
+        'po.po_id',
+        'item_lefts.item_left_ids'
       )
       ->where('poOrder.item_id', $itemId)
       ->having('quantity', '>', 0)
@@ -1128,18 +1129,19 @@ class PoOrderRepository implements PoOrderRepositoryInterface
     $itemsData = [];
     $itemLeadTimes = [];
 
-    $poOrderlist = PoOrder::with(['purchaseOrder', 'item'])
+    $poOrderlist = PoOrder::with(['purchaseOrder', 'item', 'arrivalItems', 'supplier'])
       ->where('supplier_id', $supplierId)
       ->get();
 
     $purchaseOrderIds = $poOrderlist->pluck('purchase_order_id');
     $totalArrivalItemCount = ArrivalItem::whereIn('purchase_order_id',  $purchaseOrderIds)
+      ->where('supplier_id', $supplierId)
       ->count();
 
     foreach ($poOrderlist as $poOrder) {
       $orderTime = new \Carbon\Carbon($poOrder->created_at);
 
-      foreach ($poOrder->arrivalItem as $arrival) {
+      foreach ($poOrder->arrivalItems as $arrival) {
         $arrivalTime = new \Carbon\Carbon($arrival->created_at);
 
         $leadTime = abs($arrivalTime->diffInSeconds($orderTime));
@@ -1207,8 +1209,9 @@ class PoOrderRepository implements PoOrderRepositoryInterface
       'po_invoices.invoice_no',
       'po_invoices.date_time',
       'po_invoices.total_invoice_amount',
-      'po.supplier_id',
+      'ai.supplier_id',
       's.name as supplier_name',
+      'i.name as i_name',
       's.account_id',
       'po_invoices.is_complete',
       'po_invoices.completed_at',
@@ -1216,16 +1219,16 @@ class PoOrderRepository implements PoOrderRepositoryInterface
       DB::raw('CAST(SUM(ai.quantity) AS SIGNED) as total_invoice_quantity')
     ])
       ->join('arrival_items as ai', 'po_invoices.id', '=', 'ai.po_invoice_id')
-      ->join('po_orders as po', 'ai.po_order_id', '=', 'po.id')
-      ->join('items as i', 'po.item_id', '=', 'i.id')
-      ->join('suppliers as s', 'po.supplier_id', '=', 's.id')
+      ->join('suppliers as s', 'ai.supplier_id', '=', 's.id')
+      ->join('items as i', 'ai.item_id', '=', 'i.id')
       ->groupBy(
         'po_invoices.id',
         'po_invoices.invoice_no',
         'po_invoices.date_time',
         'po_invoices.total_invoice_amount',
-        'po.supplier_id',
+        'ai.supplier_id',
         's.name',
+        'i.name',
         's.account_id',
         'po_invoices.is_complete',
         'po_invoices.completed_at',
