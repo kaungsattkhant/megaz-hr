@@ -754,6 +754,7 @@ class PoOrderRepository implements PoOrderRepositoryInterface
   public function testArrivalListByItemId($itemId)
   {
     // $itemId = 2;
+
     $leftsSubquery = DB::table('item_lefts')
       // ->join('purchase_orders','item_lefts.purchase_order_id','purchase_orders.id')
       ->join('arrival_items', function ($join) {
@@ -799,11 +800,23 @@ class PoOrderRepository implements PoOrderRepositoryInterface
       // ->leftJoinSub($arrivalSubQuery, 'arrival_items', function ($join) {
       //   $join->on('poOrder.id', '=', 'arrival_items.po_order_id');  // Join on po_order_id
       // })
+      ->leftJoin('item_lefts as il', function ($join) use ($itemId) {
+        $join->on('poOrder.purchase_order_id', '=', 'il.purchase_order_id')
+          ->whereRaw('(il.item_leftable_type = "arrival_item" OR EXISTS (
+                 SELECT 1 FROM arrival_items ai 
+                 WHERE ai.id = il.item_leftable_id 
+                 AND ai.item_id = ?
+             ))', [$itemId]);
+      })
       ->select(
         'poOrder.purchase_order_id',
         'i.id as item_id',
         'i.name as item_name',
-        DB::raw('GROUP_CONCAT(DISTINCT s.name SEPARATOR ", ") as supplier_name'),
+        's.id as supplier_id',
+        's.name as supplier_name',
+        DB::raw('COALESCE(il.id, NULL) as item_left_id'),
+        // DB::raw('GROUP_CONCAT(DISTINCT s.name SEPARATOR ", ") as supplier_name'),
+        // DB::raw('GROUP_CONCAT(DISTINCT s.id SEPARATOR ", ") as supplier_id'),
         DB::raw('GROUP_CONCAT(DISTINCT po.po_id SEPARATOR ", ") as po_numbers'),
         DB::raw('COALESCE(arrival_items.po_order_ids, "null") as arrival_po_order_ids'),
         DB::raw('COALESCE(item_lefts.left_quantity, 0) as total_left_quantity'),
@@ -867,6 +880,8 @@ class PoOrderRepository implements PoOrderRepositoryInterface
       ->groupBy(
         'poOrder.purchase_order_id', // Grouping by purchase_order_id
         'i.id',
+        's.id',
+        'il.id',
         'i.name',
         'u.id',
         'u.name',
@@ -879,7 +894,7 @@ class PoOrderRepository implements PoOrderRepositoryInterface
         'item_lefts.left_quantity',
         'item_lefts.left_amount',
         'arrival_items.po_order_ids',
-        'arrival_items.arrival_amount'
+        'arrival_items.arrival_amount',
       )
       ->where('poOrder.item_id', $itemId)
       // ->having('total_quantity', '>', 0)x
@@ -899,7 +914,6 @@ class PoOrderRepository implements PoOrderRepositoryInterface
   {
     DB::beginTransaction();
     try {
-
       if (isset($validatedData['is_new_invoice']) && $validatedData['is_new_invoice'] == 1) {
         $invoiceData = [
           'invoice_no' => $validatedData['invoice_no'],
