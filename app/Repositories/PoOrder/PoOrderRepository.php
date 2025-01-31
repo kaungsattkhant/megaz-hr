@@ -897,7 +897,7 @@ class PoOrderRepository implements PoOrderRepositoryInterface
         'arrival_items.arrival_amount',
       )
       ->where('poOrder.item_id', $itemId)
-      // ->having('total_quantity', '>', 0)x
+      // ->having('total_quantity', '>', 0)
       // ->having('total_amount', '>', 0)
       ->get();
     return $poOrders;
