@@ -337,6 +337,8 @@ Route::middleware(['departments:po-order-invoice'])->group(function () {
 
 //test
 
+Route::view('/suppliers/{id}/lead_times', 'supplier.supplier_leadtime')->name('supplier.lead_times');
+
 Route::view('/creditor', 'creditor.index')->name('creditor');
 Route::view('/creditor/suppliers/{creditorId}/transactions', 'creditor.history')->name('creditor.history');
 
