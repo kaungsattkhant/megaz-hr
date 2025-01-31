@@ -776,7 +776,6 @@ class PoOrderRepository implements PoOrderRepositoryInterface
     $arrivalSubQuery = DB::table('arrival_items')
       ->join('po_orders', 'arrival_items.po_order_id', 'po_orders.id')
       ->select(
-        'po_orders.item_id',
         'po_orders.id as po_order_id',
         DB::raw('SUM(arrival_items.quantity) as arrival_quantity'),
         DB::raw('SUM(arrival_items.amount) as arrival_amount'),
