@@ -810,10 +810,12 @@ class PoOrderRepository implements PoOrderRepositoryInterface
       })
       ->select(
         'poOrder.purchase_order_id',
+        'po.po_id',
         'i.id as item_id',
         'i.name as item_name',
         's.id as supplier_id',
         's.name as supplier_name',
+        'poOrder.unit_price',
         DB::raw('COALESCE(il.id, NULL) as item_left_id'),
         // DB::raw('GROUP_CONCAT(DISTINCT s.name SEPARATOR ", ") as supplier_name'),
         // DB::raw('GROUP_CONCAT(DISTINCT s.id SEPARATOR ", ") as supplier_id'),
@@ -852,7 +854,6 @@ class PoOrderRepository implements PoOrderRepositoryInterface
               ELSE 0 
           END) AS quantity
           '),
-
         // total_amount = left_amount + total_po_order_amount
         DB::raw('
               COALESCE(item_lefts.left_amount, 0) +
@@ -864,6 +865,53 @@ class PoOrderRepository implements PoOrderRepositoryInterface
                   END
               ) AS total_amount
           '),
+          DB::raw('
+          CASE 
+              WHEN (
+                  COALESCE(item_lefts.left_quantity, 0) +
+                  SUM(DISTINCT CASE 
+                      WHEN arrival_items.po_order_ids IS NULL THEN poOrder.quantity
+                      WHEN FIND_IN_SET(poOrder.purchase_order_id, arrival_items.po_order_ids) = 0 THEN poOrder.quantity
+                      ELSE 0 
+                  END)
+              ) < uc.conversion THEN 0 
+              ELSE FLOOR((
+                  COALESCE(item_lefts.left_quantity, 0) +
+                  SUM(DISTINCT CASE 
+                      WHEN arrival_items.po_order_ids IS NULL THEN poOrder.quantity
+                      WHEN FIND_IN_SET(poOrder.purchase_order_id, arrival_items.po_order_ids) = 0 THEN poOrder.quantity
+                      ELSE 0 
+                  END)
+              ) / uc.conversion) 
+          END AS base_uom_quantity
+      '),
+      DB::raw('
+          CASE 
+              WHEN (
+                  COALESCE(item_lefts.left_quantity, 0) +
+                  SUM(DISTINCT CASE 
+                      WHEN arrival_items.po_order_ids IS NULL THEN poOrder.quantity
+                      WHEN FIND_IN_SET(poOrder.purchase_order_id, arrival_items.po_order_ids) = 0 THEN poOrder.quantity
+                      ELSE 0 
+                  END)
+              ) < uc.conversion THEN (
+                  COALESCE(item_lefts.left_quantity, 0) +
+                  SUM(DISTINCT CASE 
+                      WHEN arrival_items.po_order_ids IS NULL THEN poOrder.quantity
+                      WHEN FIND_IN_SET(poOrder.purchase_order_id, arrival_items.po_order_ids) = 0 THEN poOrder.quantity
+                      ELSE 0 
+                  END)
+              ) 
+              ELSE (
+                  COALESCE(item_lefts.left_quantity, 0) +
+                  SUM(DISTINCT CASE 
+                      WHEN arrival_items.po_order_ids IS NULL THEN poOrder.quantity
+                      WHEN FIND_IN_SET(poOrder.purchase_order_id, arrival_items.po_order_ids) = 0 THEN poOrder.quantity
+                      ELSE 0 
+                  END)
+              ) % uc.conversion 
+          END AS uom_quantity
+      '),
 
         'u.id as uom_id',
         'u.name as uom_name',
@@ -889,6 +937,7 @@ class PoOrderRepository implements PoOrderRepositoryInterface
         'bu.name',
         'ip.id',
         'ip.price',
+        'poOrder.unit_price',
         'uc.id',
         'uc.conversion',
         'item_lefts.left_quantity',
@@ -900,6 +949,7 @@ class PoOrderRepository implements PoOrderRepositoryInterface
       // ->having('total_quantity', '>', 0)
       // ->having('total_amount', '>', 0)
       ->get();
+     
     return $poOrders;
   }
 
