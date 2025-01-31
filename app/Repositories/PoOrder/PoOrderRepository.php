@@ -758,52 +758,52 @@ class PoOrderRepository implements PoOrderRepositoryInterface
   {
     // $itemId = 2;
     $leftsSubquery = DB::table('item_lefts')
+    // ->join('purchase_orders','item_lefts.purchase_order_id','purchase_orders.id')
       ->join('arrival_items', function ($join) {
         $join->on('item_lefts.item_leftable_id', '=', 'arrival_items.id')
           ->where('item_lefts.item_leftable_type', '=', 'arrival_item');
       })
       ->join('po_orders', 'arrival_items.po_order_id', 'po_orders.id')
       ->select(
-        // 'po_orders.item_id',
-        'po_orders.id as po_order_id',
+        'po_orders.item_id',
+        // 'po_orders.id as po_order_id',
         DB::raw('SUM(item_lefts.quantity) as left_quantity'),
         DB::raw('SUM(item_lefts.amount) as left_amount'),
         DB::raw('GROUP_CONCAT(item_lefts.id SEPARATOR ", ") as item_left_ids'),
       )
       ->where('po_orders.item_id', $itemId) // Add filtering condition
-      ->groupBy('po_orders.id');
+      ->groupBy('po_orders.item_id');
 
     $arrivalSubQuery = DB::table('arrival_items')
       ->join('po_orders', 'arrival_items.po_order_id', 'po_orders.id')
       ->select(
-        'po_orders.id as po_order_id',
+        'po_orders.item_id',
         DB::raw('SUM(arrival_items.quantity) as arrival_quantity'),
         DB::raw('SUM(arrival_items.amount) as arrival_amount'),
         DB::raw('GROUP_CONCAT(po_orders.purchase_order_id SEPARATOR ",") as po_order_ids'),
       )
       ->where('po_orders.item_id', $itemId) // Add filtering condition
-      ->groupBy('po_orders.id');
+      ->groupBy('po_orders.item_id');
 
     $poOrders = DB::table('po_orders as poOrder')
       ->join('purchase_orders as po', 'poOrder.purchase_order_id', '=', 'po.id')
       ->join('items as i', 'poOrder.item_id', '=', 'i.id')
       ->join('suppliers as s', 'poOrder.supplier_id', '=', 's.id')
       ->join('item_prices as ip', 'poOrder.item_price_id', '=', 'ip.id')
-      // ->leftJoinSub($leftsSubquery, 'item_lefts', function ($join) {
-      //     $join->on('poOrder.item_id', '=', 'item_lefts.item_id');
-      // })
-      // ->leftJoinSub($arrivalSubQuery, 'arrival_items', function ($join) {
-      //     $join->on('poOrder.item_id', '=', 'arrival_items.item_id');
-      // })
       ->leftJoinSub($leftsSubquery, 'item_lefts', function ($join) {
-        $join->on('poOrder.id', '=', 'item_lefts.po_order_id');  // Join on po_order_id
+          $join->on('poOrder.item_id', '=', 'item_lefts.item_id');
       })
       ->leftJoinSub($arrivalSubQuery, 'arrival_items', function ($join) {
-        $join->on('poOrder.id', '=', 'arrival_items.po_order_id');  // Join on po_order_id
+          $join->on('poOrder.item_id', '=', 'arrival_items.item_id');
       })
+      // ->leftJoinSub($leftsSubquery, 'item_lefts', function ($join) {
+      //   $join->on('poOrder.id', '=', 'item_lefts.po_order_id');  // Join on po_order_id
+      // })
+      // ->leftJoinSub($arrivalSubQuery, 'arrival_items', function ($join) {
+      //   $join->on('poOrder.id', '=', 'arrival_items.po_order_id');  // Join on po_order_id
+      // })
       ->select(
         'poOrder.purchase_order_id',
-        'poOrder.id',
         'i.id as item_id',
         'i.name as item_name',
         DB::raw('GROUP_CONCAT(DISTINCT s.name SEPARATOR ", ") as supplier_name'),
@@ -869,7 +869,6 @@ class PoOrderRepository implements PoOrderRepositoryInterface
       ->join('uom_conversions as uc', 'poOrder.uom_conversion_unit_id', '=', 'uc.id')
       ->groupBy(
         'poOrder.purchase_order_id', // Grouping by purchase_order_id
-        'poOrder.id',
         'i.id',
         'i.name',
         'u.id',
