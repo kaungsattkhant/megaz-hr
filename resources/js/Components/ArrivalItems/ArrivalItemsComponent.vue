@@ -48,7 +48,7 @@
                                     <td class=" font-medium ">
                                         {{ perPage * (currentPage - 1) + (index + 1) }}
                                     </td>
-                                    <td class="whitespace-nowrap" @click="toggleItems(index)">
+                                    <td class="whitespace-nowrap" @click="getItemDetail(item,index)">
                                         {{ item.item_name }}
                                     </td>
                                     <td class="whitespace-nowrap">
@@ -73,10 +73,10 @@
                                 </tr>
                                 <tr v-if="item.showDatails" v-for="(arrival, arrivalIndex) in item.arrival_details" :key="arrivalIndex">
                                     <td> &nbsp; </td>
-                                    <td class="whitespace-nowrap"> {{ arrival.item.name }} </td>
-                                    <td class="whitespace-nowrap"> {{ arrival.purchase_order.po_id }} </td>
+                                    <td class="whitespace-nowrap"> {{ arrival.item_name }} </td>
+                                    <td class="whitespace-nowrap"> {{ arrival.purchase_order_id }} </td>
                                     <td class="whitespace-nowrap"> {{ arrival.quantity }} </td>
-                                    <td class="whitespace-nowrap"> {{ arrival.supplier.name }} {{ arrival.supplier_id }} </td>
+                                    <td class="whitespace-nowrap"> {{ arrival.supplier_name }} </td>
                                     <td class="whitespace-nowrap">
                                         <button data-te-toggle="modal" data-te-target="#edit_modal" id="edit-btn" class="pr-3">
                                             <i class="fal fa-pen"></i>
@@ -302,6 +302,7 @@ export default {
 
             totalPrice: 0,
             uomUpperLimit: 0,
+            isLoading:true,
         }
     },
 
@@ -326,14 +327,32 @@ export default {
                 this.items = response.data.data;
                 this.items.map(item => ({ ...item, showDatails: false, arrival_details: [] }));
                 this.items.forEach(item => {
-                    let responsePromise = getApiData({ url: `/api/po_arrival_list/${item.item_id}`, token: this.getToken() });
-                    responsePromise.then(response => {
-                        item.arrival_details = response.data;
-                    });
+                    item.showDatails = false;
+                    item.arrival_details = [];
+
                 });
+                // arrivalItemList.forEach(item => {
+                //     let response = await getApiData({ url: `/api/po_arrival_list/${item.item_id}`, token: this.getToken() });
+                //     resposne.then(response => {
+                //             item.arrival_details = response.data;
+                //     });
+                // });
                 this.lastPage = response.data.last_page;
                 this.currentPage = page;
                 this.perPage = response.data.per_page;
+            }
+        },
+        async getItemDetail(item, index){
+            
+            if(this.items[index].arrival_details.length > 0){
+                this.items[index].showDatails = !this.items[index].showDatails;
+            }
+            else{
+                let response = await getApiData({ url: `/api/po_arrival_list/${item.item_id}`, token: this.getToken() });
+                if(response.data){
+                    this.items[index].arrival_details = response.data
+                    this.items[index].showDatails = !this.items[index].showDatails;
+                }
             }
         },
 
@@ -469,7 +488,6 @@ export default {
             });
         },
     },
-
     created() {
         this.getItems(this.currentPage);
         // this.getUomConversions();
