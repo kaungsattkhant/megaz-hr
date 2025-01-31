@@ -19,6 +19,7 @@ return new class extends Migration
             $table->integer('uom_quantity');
             $table->integer('quantity');
             $table->double('amount');
+            $table->double('unit_price');
             $table->foreignId('po_invoice_id')->constrained();
             $table->foreignId('po_order_id')->constrained();
             $table->integer('created_by');

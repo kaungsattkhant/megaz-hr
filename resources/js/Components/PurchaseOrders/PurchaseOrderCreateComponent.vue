@@ -351,7 +351,7 @@ import { find } from "lodash";
 
             async createPurchaseOrderBtnClicked(){
                 if(!this.date){
-                    this.alertValidationMessage('date');
+                    this.alertValidationMessage('Date');
                     return 1;
                 }
                 if(this.purchaseOrderItems.length<1){
