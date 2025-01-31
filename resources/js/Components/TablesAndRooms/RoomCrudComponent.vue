@@ -334,9 +334,9 @@ export default {
 
         clearForm() {
             this.name = null,
-                this.selectedInventoryType = null,
-                this.inventoryable_id = null,
-                this.typeList = []
+            this.pricePerHour = null,
+            this.area_id = null,
+            this.typeList = []
         },
 
         isActiveToggled(id) {
