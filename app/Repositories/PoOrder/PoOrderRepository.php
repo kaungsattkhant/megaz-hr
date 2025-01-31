@@ -771,7 +771,7 @@ class PoOrderRepository implements PoOrderRepositoryInterface
         DB::raw('GROUP_CONCAT(item_lefts.id SEPARATOR ", ") as item_left_ids'),
       )
       ->where('arrival_items.item_id', $itemId) // Add filtering condition
-      ->groupBy('arrival_items.item_id','arrival_items.purchase_order_id');
+      ->groupBy('arrival_items.item_id', 'arrival_items.purchase_order_id');
 
     $arrivalSubQuery = DB::table('arrival_items')
       // ->join('po_orders', 'arrival_items.po_order_id', 'po_orders.id')
@@ -791,7 +791,7 @@ class PoOrderRepository implements PoOrderRepositoryInterface
       ->join('item_prices as ip', 'poOrder.item_price_id', '=', 'ip.id')
       ->leftJoinSub($leftsSubquery, 'item_lefts', function ($join) {
         $join->on('poOrder.item_id', '=', 'item_lefts.item_id')
-        ->on('item_lefts.purchase_order_id','=','poOrder.purchase_order_id');
+          ->on('item_lefts.purchase_order_id', '=', 'poOrder.purchase_order_id');
       })
       ->leftJoinSub($arrivalSubQuery, 'arrival_items', function ($join) {
         $join->on('poOrder.item_id', '=', 'arrival_items.item_id');
@@ -867,7 +867,7 @@ class PoOrderRepository implements PoOrderRepositoryInterface
                   END
               ) AS total_amount
           '),
-          DB::raw('
+        DB::raw('
           CASE 
               WHEN (
                   COALESCE(item_lefts.left_quantity, 0) +
@@ -887,7 +887,7 @@ class PoOrderRepository implements PoOrderRepositoryInterface
               ) / uc.conversion) 
           END AS base_uom_quantity
       '),
-      DB::raw('
+        DB::raw('
           CASE 
               WHEN (
                   COALESCE(item_lefts.left_quantity, 0) +
@@ -946,12 +946,14 @@ class PoOrderRepository implements PoOrderRepositoryInterface
         'item_lefts.left_amount',
         'arrival_items.po_order_ids',
         'arrival_items.arrival_amount',
+        's.name',
+        'po.po_id'
       )
       ->where('poOrder.item_id', $itemId)
       ->having('quantity', '>', 0)
       // ->having('total_amount', '>', 0)
       ->get();
-     
+
     return $poOrders;
   }
 
@@ -959,10 +961,10 @@ class PoOrderRepository implements PoOrderRepositoryInterface
   public function getInvoiceBySupplier($supplierId)
   {
     $invoices = PoInvoice::with(['arrivalItems'])
-    ->whereHas('arrivalItems',function($q)use($supplierId){
-      $q->where('supplier_id', $supplierId);
-    })
-    ->get();
+      ->whereHas('arrivalItems', function ($q) use ($supplierId) {
+        $q->where('supplier_id', $supplierId);
+      })
+      ->get();
     return $invoices;
   }
 
