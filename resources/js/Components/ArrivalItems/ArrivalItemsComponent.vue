@@ -438,6 +438,8 @@ export default {
             }
             let formData = new FormData();
             formData.append('base_uom_quantity', this.baseUomQty);
+
+            
             formData.append('uom_quantity', this.uomQty);
             formData.append('base_uom_id', this.confirmArrivalItem.base_uom_id);
             formData.append('uom_id', this.confirmArrivalItem.uom_id);
