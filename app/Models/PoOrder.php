@@ -26,11 +26,6 @@ class PoOrder extends Model
         'created_by'
     ];
 
-    public function arrivalItem()
-    {
-        return $this->hasMany(ArrivalItem::class, 'po_order_id');
-    }
-
     public function purchaseOrder()
     {
         return $this->belongsTo(PurchaseOrder::class, 'purchase_order_id');

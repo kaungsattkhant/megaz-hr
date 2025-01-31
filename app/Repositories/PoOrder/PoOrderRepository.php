@@ -1056,12 +1056,12 @@ class PoOrderRepository implements PoOrderRepositoryInterface
     $itemsData = [];
     $itemLeadTimes = [];
 
-    $poOrderlist = PoOrder::with(['arrivalItem', 'item'])
+    $poOrderlist = PoOrder::with(['purchaseOrder', 'item'])
       ->where('supplier_id', $supplierId)
       ->get();
 
-    $poOrderIds = $poOrderlist->pluck('id');
-    $totalArrivalItemCount = ArrivalItem::whereIn('po_order_id', $poOrderIds)
+    $purchaseOrderIds = $poOrderlist->pluck('purchase_order_id');
+    $totalArrivalItemCount = ArrivalItem::whereIn('purchase_order_id',  $purchaseOrderIds)
       ->count();
 
     foreach ($poOrderlist as $poOrder) {
