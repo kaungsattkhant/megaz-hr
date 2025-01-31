@@ -48,7 +48,7 @@
                                     <td class=" font-medium ">
                                         {{ perPage * (currentPage - 1) + (index + 1) }}
                                     </td>
-                                    <td class="whitespace-nowrap" @click="toggleItems(index)">
+                                    <td class="whitespace-nowrap" @click="getItemDetail(item,index)">
                                         {{ item.item_name }}
                                     </td>
                                     <td class="whitespace-nowrap">
@@ -73,10 +73,10 @@
                                 </tr>
                                 <tr v-if="item.showDatails" v-for="(arrival, arrivalIndex) in item.arrival_details" :key="arrivalIndex">
                                     <td> &nbsp; </td>
-                                    <td class="whitespace-nowrap"> {{ arrival.item.name }} </td>
-                                    <td class="whitespace-nowrap"> {{ arrival.purchase_order.po_id }} </td>
+                                    <td class="whitespace-nowrap"> {{ arrival.item_name }} </td>
+                                    <td class="whitespace-nowrap"> {{ arrival.po_id }} </td>
                                     <td class="whitespace-nowrap"> {{ arrival.quantity }} </td>
-                                    <td class="whitespace-nowrap"> {{ arrival.supplier.name }} {{ arrival.supplier_id }} </td>
+                                    <td class="whitespace-nowrap"> {{ arrival.supplier_name }} </td>
                                     <td class="whitespace-nowrap">
                                         <button data-te-toggle="modal" data-te-target="#edit_modal" id="edit-btn" class="pr-3">
                                             <i class="fal fa-pen"></i>
@@ -302,6 +302,7 @@ export default {
 
             totalPrice: 0,
             uomUpperLimit: 0,
+            isLoading:true,
         }
     },
 
@@ -326,14 +327,32 @@ export default {
                 this.items = response.data.data;
                 this.items.map(item => ({ ...item, showDatails: false, arrival_details: [] }));
                 this.items.forEach(item => {
-                    let responsePromise = getApiData({ url: `/api/po_arrival_list/${item.item_id}`, token: this.getToken() });
-                    responsePromise.then(response => {
-                        item.arrival_details = response.data;
-                    });
+                    item.showDatails = false;
+                    item.arrival_details = [];
+
                 });
+                // arrivalItemList.forEach(item => {
+                //     let response = await getApiData({ url: `/api/po_arrival_list/${item.item_id}`, token: this.getToken() });
+                //     resposne.then(response => {
+                //             item.arrival_details = response.data;
+                //     });
+                // });
                 this.lastPage = response.data.last_page;
                 this.currentPage = page;
                 this.perPage = response.data.per_page;
+            }
+        },
+        async getItemDetail(item, index){
+            
+            if(this.items[index].arrival_details.length > 0){
+                this.items[index].showDatails = !this.items[index].showDatails;
+            }
+            else{
+                let response = await getApiData({ url: `/api/po_arrival_list/${item.item_id}`, token: this.getToken() });
+                if(response.data){
+                    this.items[index].arrival_details = response.data
+                    this.items[index].showDatails = !this.items[index].showDatails;
+                }
             }
         },
 
@@ -352,13 +371,14 @@ export default {
 
         checkBtnClicked(arrival){
             this.confirmArrivalItem = arrival;
-            this.baseUomName = this.confirmArrivalItem.base_uom.name;
+            this.baseUomName = this.confirmArrivalItem.base_uom_name;
             this.baseUomQty = this.confirmArrivalItem.base_uom_quantity;
-            this.uomName = this.confirmArrivalItem.uom.name;
+            this.uomName = this.confirmArrivalItem.uom_name;
             this.uomQty = this.confirmArrivalItem.uom_quantity;
             this.selectedUomConversion = this.confirmArrivalItem.uom_conversion;
-            this.uomUpperLimit = this.selectedUomConversion.conversion - 1;
-            this.originalArrivalTotalQty = (arrival.base_uom_quantity * this.selectedUomConversion.conversion) + arrival.uom_quantity;
+            this.uomUpperLimit = this.selectedUomConversion - 1;
+
+            this.originalArrivalTotalQty = (this.baseUomQty * this.selectedUomConversion) + this.uomQty;
             this.confirmArrivalTotalQty = this.originalArrivalTotalQty;
             this.calculateTotalPrice();
             console.log(this.confirmArrivalItem);
@@ -367,7 +387,7 @@ export default {
 
         baseUomQtyChanged(){
             if(this.confirmArrivalItem){
-                this.confirmArrivalTotalQty = (this.baseUomQty * this.selectedUomConversion.conversion) + this.uomQty;
+                this.confirmArrivalTotalQty = (this.baseUomQty * this.selectedUomConversion) + this.uomQty;
                 if(this.confirmArrivalTotalQty < this.originalArrivalTotalQty){
                     // this.isLaterArrival = true;
                 }else{
@@ -379,7 +399,7 @@ export default {
 
         uomQtyChanged(){
             if(this.confirmArrivalItem){
-                this.confirmArrivalTotalQty = (this.baseUomQty * this.selectedUomConversion.conversion) + this.uomQty;
+                this.confirmArrivalTotalQty = (this.baseUomQty * this.selectedUomConversion) + this.uomQty;
                 if(this.confirmArrivalTotalQty < this.originalArrivalTotalQty){
                     // this.isLaterArrival = true;
                 }else{
@@ -390,7 +410,7 @@ export default {
         },
 
         calculateTotalPrice(){
-            this.totalPrice = (this.confirmArrivalTotalQty / this.selectedUomConversion.conversion) * this.confirmArrivalItem.item_price.price;
+            this.totalPrice = (this.confirmArrivalTotalQty / this.selectedUomConversion) * this.confirmArrivalItem.item_price;
             this.totalPrice = Math.round(this.totalPrice * 100) / 100;
         },
 
@@ -416,14 +436,18 @@ export default {
             }
             let formData = new FormData();
             formData.append('base_uom_quantity', this.baseUomQty);
+
+
             formData.append('uom_quantity', this.uomQty);
             formData.append('base_uom_id', this.confirmArrivalItem.base_uom_id);
             formData.append('uom_id', this.confirmArrivalItem.uom_id);
-            formData.append('uom_conversion_unit_id', this.selectedUomConversion.id);
+            formData.append('uom_conversion_unit_id', this.confirmArrivalItem.uom_conversion_id);
             formData.append('quantity', this.confirmArrivalTotalQty);
             formData.append('amount', this.totalPrice);
             formData.append('item_id', this.confirmArrivalItem.item_id);
-            formData.append('po_order_id', this.confirmArrivalItem.id);
+
+
+            formData.append('purchase_order_id', this.confirmArrivalItem.purchase_order_id);
             if(this.selectedInvoice){
                 formData.append('po_invoice_id', this.selectedInvoice.id);
             }
@@ -433,6 +457,7 @@ export default {
             if(this.newInvoiceNumber){
                 formData.append('invoice_no', this.newInvoiceNumber);
             }
+            formData.append('supplier_id', this.confirmArrivalItem.supplier_id);
             formData.append('item_left_id', this.confirmArrivalItem.item_left_id);
             formData.append('unit_price', this.confirmArrivalItem.unit_price);
             let response = await postApiData({url: `/api/po_arrival_items`, form_data: formData, token: this.getToken()});
@@ -469,7 +494,6 @@ export default {
             });
         },
     },
-
     created() {
         this.getItems(this.currentPage);
         // this.getUomConversions();

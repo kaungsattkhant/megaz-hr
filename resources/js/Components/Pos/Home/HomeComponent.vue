@@ -748,7 +748,7 @@
                     </div>
 
                     <div class="flex justify-center px-12 mb-6">
-                        <button @click="createCustomerBtnClicked" class="pos-add-btn focus:outline-none focus:ring-0 ">
+                        <button @click="createCustomerBtnClicked()" class="pos-add-btn focus:outline-none focus:ring-0 ">
                             Create
                         </button>
                     </div>
@@ -1554,12 +1554,14 @@
                 let response = await postApiData({ url: '/api/customers', form_data: formData, token: this.getToken() });
                 console.log(this.selectedGender + ',' + this.name + ',' + this.email + ',' + this.ph_number + ',' + this.address + ',' + this.date)
                 if (response.success) {
-                    this.customerList.push(response.data);
-                    this.selectedCustomer = response.data;
+                    // this.customerList.push(response.data);
+                    this.$refs.posTable.getCustomerList();
+                    // this.$refs.posTable.selectedCustomer = response.data;
+                    // this.selectedCustomer = response.data;
                     // console.log("success customer")
-                    // this.closeModal('closeCustomerModal');
-                    // this.clearCustomerForm();
-                    window.location.reload()
+                    this.closeModal('closeCustomerModal');
+                    this.clearCustomerForm();
+                    // window.location.reload()
                 }
                 else {
                     console.log('some errors occur');

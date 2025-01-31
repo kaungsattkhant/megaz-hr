@@ -180,17 +180,19 @@
                         <div class="mb-4">
                             <div>
                                 <label class="block text-sm text-black mb-3">Time Shift</label>
-                                <div class="bg-white mb-0 w-full text-sm inline-block h-[34px] dark:bg-white !text-black"
-                                    data-te-select-wrapper-ref>
-                                    <select data-te-select-init data-te-select-placeholder="Select Shift"
-                                        data-te-select-filter="true" name="" id="" v-model="selectedShift" class="input-ui">
-                                        <option v-if="shiftList.length < 1" selected disabled> Not Found! </option>
-                                        <option :value="shift" v-for="(shift, index) in shiftList"
-                                            :key="index"> {{ shift.name }} </option>
-                                    </select>
-                                    
+                                <div class="flex gap-x-2">
+                                    <div class="bg-white mb-0 w-full text-sm inline-block h-[34px] !text-black"
+                                        data-te-select-wrapper-ref>
+                                        <select data-te-select-init data-te-select-placeholder="Select Shift"
+                                            data-te-select-filter="true" name="" id="" v-model="selectedShift" class="input-ui">
+                                            <option v-if="shiftList.length < 1" selected disabled> Not Found! </option>
+                                            <option :value="shift" v-for="(shift, index) in shiftList"
+                                                :key="index"> {{ shift.name }} </option>
+                                        </select>
+                                        
+                                    </div>
+                                    <button @click="isShiftStep = true" class="px-2"><i class="fal fa-plus"></i></button>
                                 </div>
-                                <button @click="isShiftStep = true"><i class="fal fa-plus  pr-3"></i></button>
                             </div>
                         </div>
                         <div class="mb-4">
