@@ -893,12 +893,7 @@ class PoOrderRepository implements PoOrderRepositoryInterface
 
   public function getInvoiceBySupplier($supplierId)
   {
-    $invoices = PoInvoice::with(['arrivalItems.poOrder'])
-      ->whereHas('arrivalItems.poOrder', function ($query) use ($supplierId) {
-        $query->where('supplier_id', $supplierId);
-      })
-      ->get();
-
+    $invoices = PoInvoice::with(['arrivalItems'])->where('supplier_id', $supplierId)->get();
     return $invoices;
   }
 
