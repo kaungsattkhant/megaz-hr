@@ -116,7 +116,7 @@ class PoOrderRepository implements PoOrderRepositoryInterface
         'po_orders.item_id',
         // 'po_orders.purchase_order_id',
         DB::raw('SUM(item_lefts.quantity) as total_left_quantity'),
-        // DB::raw('GROUP_CONCAT(item_lefts.id SEPARATOR ",") as item_left_ids'),
+        DB::raw('GROUP_CONCAT(item_lefts.id SEPARATOR ",") as item_left_ids'),
       )
       ->groupBy('po_orders.item_id');
 
@@ -210,7 +210,7 @@ class PoOrderRepository implements PoOrderRepositoryInterface
         DB::raw('COALESCE(i_lefts.total_left_quantity, 0) as left_quantity'), // Default to 0 if no data
         // DB::raw('COALESCE(po_orders.total_po_order_quantity, 0) as po_order_quantity'), // Default to 0 if no data
         DB::raw('COALESCE(po_orders.po_order_ids, "null") as po_order_ids'),
-        // DB::raw('COALESCE(i_lefts.item_left_ids, "null") as item_left_ids'),
+        DB::raw('COALESCE(i_lefts.item_left_ids, "null") as item_left_ids'),
         DB::raw('GROUP_CONCAT(DISTINCT poi.purchase_order_id SEPARATOR ", ") as po_ids'),
         DB::raw('
         GROUP_CONCAT(
@@ -345,7 +345,7 @@ class PoOrderRepository implements PoOrderRepositoryInterface
         'i_lefts.total_left_quantity',
         // 'po_orders.total_po_order_quantity',
         // 'po_orders.po_order_ids',
-        // 'i_lefts.item_left_ids',
+        'i_lefts.item_left_ids',
       )
       ->having('total_quantity', '>', 0) // Filter out records where quantity <= 0
       ->paginate(config('common.list_count'));
@@ -619,26 +619,26 @@ class PoOrderRepository implements PoOrderRepositoryInterface
         //total_po_order quantity is sum poOrder.quantity related purchase_order_id with not match po_order_ids
         DB::raw('
         COALESCE(
-    SUM(
-        CASE 
-            WHEN arrival_items.po_order_ids IS NULL THEN poOrder.quantity
-            WHEN FIND_IN_SET(poOrder.purchase_order_id, arrival_items.po_order_ids) = 0 THEN poOrder.quantity
-            ELSE 0 
-        END
-    ), 0
-) AS total_po_order_quantity 
+            SUM(
+                DISTINCT CASE 
+                    WHEN arrival_items.po_order_ids IS NULL THEN poOrder.quantity
+                    WHEN FIND_IN_SET(poOrder.purchase_order_id, arrival_items.po_order_ids) = 0 THEN poOrder.quantity
+                    ELSE 0 
+                END
+            ), 0
+        ) AS total_po_order_quantity 
     '),
         DB::raw('
             COALESCE(item_lefts.left_quantity, 0) +
             COALESCE(
-                SUM(
-                    CASE 
-                        WHEN arrival_items.po_order_ids IS NULL THEN poOrder.quantity
-                        WHEN FIND_IN_SET(poOrder.purchase_order_id, arrival_items.po_order_ids) = 0 THEN poOrder.quantity
-                        ELSE 0 
-                    END
-                ), 0
-            ) AS total_quantity
+            SUM(
+                DISTINCT CASE 
+                    WHEN arrival_items.po_order_ids IS NULL THEN poOrder.quantity
+                    WHEN FIND_IN_SET(poOrder.purchase_order_id, arrival_items.po_order_ids) = 0 THEN poOrder.quantity
+                    ELSE 0 
+                END
+            ), 0
+        ) AS total_quantity
         '),
         DB::raw('COALESCE(item_lefts.left_amount, 0) as total_left_amount'),
         DB::raw('COALESCE(arrival_items.arrival_amount, 0) as total_arrival_amount'),
@@ -711,15 +711,13 @@ class PoOrderRepository implements PoOrderRepositoryInterface
 
       $arrivalItems = ArrivalItem::where('po_order_id', $poOrder->id)->get();
 
+
       if ($arrivalItems->isNotEmpty()) {
         foreach ($arrivalItems as $arrivalItem) {
-
           $itemLeft = ItemLeft::where('purchase_order_id', $arrivalItem->poOrder->purchase_order_id)
             ->where('item_leftable_type', 'arrival_item')
             ->first();
-
           if ($itemLeft) {
-
             $totalItemLeftQuantity = $itemLeft->sum('quantity');
             $totalItemLeftAmount = $itemLeft->sum('amount');
             $totalItemLeftBaseUomQuantity = $itemLeft->sum('base_uom_quantity');
@@ -823,7 +821,7 @@ class PoOrderRepository implements PoOrderRepositoryInterface
       // })
       //   ->where('id', $validatedData['item_left_id'])
       //   ->first();
-      if (isset($validatedData['item_left_id']) && $validatedData['item_left_id'] != null) {
+      if (isset($validatedData['item_left_id']) && $validatedData['item_left_id'] != "null") {
         $itemLeft = ItemLeft::where('id', $validatedData['item_left_id'])->first();
         if ($itemLeft && (isset($validatedData['later_buy']) && $validatedData['later_buy'] == 1) && $itemLeft->purchase_order_id == $arrivalItem->poOrder->purchase_order_id) {
 
@@ -843,10 +841,9 @@ class PoOrderRepository implements PoOrderRepositoryInterface
           $itemLeft->save();
         }
       } else {
-
         if (
           isset($validatedData['later_buy']) && $validatedData['later_buy'] == 1 &&
-          isset($validatedData['item_left_id']) && $validatedData['item_left_id'] == null
+          isset($validatedData['item_left_id']) && $validatedData['item_left_id'] == "null"
         ) {
           $poOrder = PoOrder::where('id', $validatedData['po_order_id'])->first();
           if ($poOrder->quantity < $arrivalItem->quantity) {
