@@ -802,23 +802,24 @@ class PoOrderRepository implements PoOrderRepositoryInterface
       // ->leftJoinSub($arrivalSubQuery, 'arrival_items', function ($join) {
       //   $join->on('poOrder.id', '=', 'arrival_items.po_order_id');  // Join on po_order_id
       // })
-      ->leftJoin('item_lefts as il', function ($join) use ($itemId) {
-        $join->on('poOrder.purchase_order_id', '=', 'il.purchase_order_id')
-          ->whereRaw('(il.item_leftable_type = "arrival_item" OR EXISTS (
-                 SELECT 1 FROM arrival_items ai 
-                 WHERE ai.id = il.item_leftable_id 
-                 AND ai.item_id = ?
-             ))', [$itemId]);
-      })
+      // ->leftJoin('item_lefts as il', function ($join) use ($itemId) {
+      //   $join->on('poOrder.purchase_order_id', '=', 'il.purchase_order_id')
+      //     ->whereRaw('(il.item_leftable_type = "arrival_item" OR EXISTS (
+      //            SELECT 1 FROM arrival_items ai 
+      //            WHERE ai.id = il.item_leftable_id 
+      //            AND ai.item_id = ?
+      //        ))', [$itemId]);
+      // })
       ->select(
         'poOrder.purchase_order_id',
+        'item_lefts.item_left_ids as item_left_id',
         'po.po_id',
         'i.id as item_id',
         'i.name as item_name',
         's.id as supplier_id',
         's.name as supplier_name',
         'poOrder.unit_price',
-        DB::raw('COALESCE(il.id, NULL) as item_left_id'),
+        // DB::raw('COALESCE(il.id, NULL) as item_left_id'),
         // DB::raw('GROUP_CONCAT(DISTINCT s.name SEPARATOR ", ") as supplier_name'),
         // DB::raw('GROUP_CONCAT(DISTINCT s.id SEPARATOR ", ") as supplier_id'),
         DB::raw('GROUP_CONCAT(DISTINCT po.po_id SEPARATOR ", ") as po_numbers'),
@@ -914,7 +915,6 @@ class PoOrderRepository implements PoOrderRepositoryInterface
               ) % uc.conversion 
           END AS uom_quantity
       '),
-
         'u.id as uom_id',
         'u.name as uom_name',
         'bu.id as base_uom_id',
@@ -928,10 +928,10 @@ class PoOrderRepository implements PoOrderRepositoryInterface
       ->join('uoms as bu', 'poOrder.base_uom_id', '=', 'bu.id')
       ->join('uom_conversions as uc', 'poOrder.uom_conversion_unit_id', '=', 'uc.id')
       ->groupBy(
-        'poOrder.purchase_order_id', // Grouping by purchase_order_id
+'poOrder.purchase_order_id', // Grouping by purchase_order_id
         'i.id',
         's.id',
-        'il.id',
+        // 'il.id',
         'i.name',
         'u.id',
         'u.name',
