@@ -380,7 +380,7 @@ export default {
 
             this.uomUpperLimit = this.selectedUomConversion - 1;
 
-            this.originalArrivalTotalQty = (arrival.base_uom_quantity * this.selectedUomConversion.conversion) + arrival.uom_quantity;
+            this.originalArrivalTotalQty = (this.baseUomQty * this.selectedUomConversion) + this.uomQty;
             this.confirmArrivalTotalQty = this.originalArrivalTotalQty;
             this.calculateTotalPrice();
             console.log(this.confirmArrivalItem);
@@ -389,7 +389,7 @@ export default {
 
         baseUomQtyChanged(){
             if(this.confirmArrivalItem){
-                this.confirmArrivalTotalQty = (this.baseUomQty * this.selectedUomConversion.conversion) + this.uomQty;
+                this.confirmArrivalTotalQty = (this.baseUomQty * this.selectedUomConversion) + this.uomQty;
                 if(this.confirmArrivalTotalQty < this.originalArrivalTotalQty){
                     // this.isLaterArrival = true;
                 }else{
@@ -401,7 +401,7 @@ export default {
 
         uomQtyChanged(){
             if(this.confirmArrivalItem){
-                this.confirmArrivalTotalQty = (this.baseUomQty * this.selectedUomConversion.conversion) + this.uomQty;
+                this.confirmArrivalTotalQty = (this.baseUomQty * this.selectedUomConversion) + this.uomQty;
                 if(this.confirmArrivalTotalQty < this.originalArrivalTotalQty){
                     // this.isLaterArrival = true;
                 }else{
@@ -412,7 +412,7 @@ export default {
         },
 
         calculateTotalPrice(){
-            this.totalPrice = (this.confirmArrivalTotalQty / this.selectedUomConversion.conversion) * this.confirmArrivalItem.item_price.price;
+            this.totalPrice = (this.confirmArrivalTotalQty / this.selectedUomConversion) * this.confirmArrivalItem.item_price;
             this.totalPrice = Math.round(this.totalPrice * 100) / 100;
         },
 
@@ -447,7 +447,7 @@ export default {
             formData.append('item_id', this.confirmArrivalItem.item_id);
 
 
-            formData.append('purchase_order_id', this.confirmArrivalItem.id);
+            formData.append('purchase_order_id', this.confirmArrivalItem.purchase_order_id);
             if(this.selectedInvoice){
                 formData.append('po_invoice_id', this.selectedInvoice.id);
             }
