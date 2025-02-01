@@ -69,8 +69,8 @@ class PoOrder extends Model
 
     public function arrivalItems()
     {
-        return $this->hasMany(ArrivalItem::class, 'purchase_order_id', 'purchase_order_id')
-            ->where('supplier_id', $this->supplier_id)
-            ->where('item_id', $this->item_id);
+        return $this->hasMany(ArrivalItem::class, 'purchase_order_id', 'purchase_order_id');
+        // ->where('supplier_id', $this->supplier_id)
+        // ->where('item_id', $this->item_id);
     }
 }

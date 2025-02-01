@@ -1133,7 +1133,12 @@ class PoOrderRepository implements PoOrderRepositoryInterface
       ->where('supplier_id', $supplierId)
       ->get();
 
+    if ($poOrderlist->isEmpty()) {
+      ResponseMessage('No purchase orders found for this supplier.', 404);
+    }
+
     $purchaseOrderIds = $poOrderlist->pluck('purchase_order_id');
+
     $totalArrivalItemCount = ArrivalItem::whereIn('purchase_order_id',  $purchaseOrderIds)
       ->where('supplier_id', $supplierId)
       ->count();
@@ -1144,20 +1149,21 @@ class PoOrderRepository implements PoOrderRepositoryInterface
       foreach ($poOrder->arrivalItems as $arrival) {
         $arrivalTime = new \Carbon\Carbon($arrival->created_at);
 
+
         $leadTime = abs($arrivalTime->diffInSeconds($orderTime));
         $avgLeadtime = $leadTime / $totalArrivalItemCount;
         $totalAvgLeadTime += $avgLeadtime;
         // Group lead times by item_id (handle duplicates)
-        if (!isset($itemLeadTimes[$poOrder->item->id])) {
-          $itemLeadTimes[$poOrder->item->id] = [
+        if (!isset($itemLeadTimes[$arrival->item->id])) {
+          $itemLeadTimes[$arrival->item->id] = [
             'total_lead_time' => 0,
             'count' => 0
           ];
         }
 
         // Add lead time and increase count for unique items
-        $itemLeadTimes[$poOrder->item->id]['total_lead_time'] += $leadTime;
-        $itemLeadTimes[$poOrder->item->id]['count']++;
+        $itemLeadTimes[$arrival->item->id]['total_lead_time'] += $leadTime;
+        $itemLeadTimes[$arrival->item->id]['count']++;
       }
     }
 
@@ -1181,13 +1187,16 @@ class PoOrderRepository implements PoOrderRepositoryInterface
 
     $result = [
       'supplier_id' => $supplierId,
-      'supplier_name' => $poOrder->supplier->name,
+      'supplier_name' => $poOrder->supplier->name ?? 'null',
       'total_average_lead_time' => isset($totalAverageLeadTimeFormatted) ? $totalAverageLeadTimeFormatted : 'null',
       'details' => $itemsData,
     ];
 
     return $result;
   }
+
+
+
 
   private function formatTime($totalTimeInSeconds)
   {
