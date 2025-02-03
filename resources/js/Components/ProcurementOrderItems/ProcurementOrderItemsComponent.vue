@@ -419,6 +419,7 @@ export default {
             this.totalPrice = 0;
             this.item_left_id = purchaseOrder.item_left_id;
             this.getItemSuppliers(this.itemId);
+            console.log('uom = ' + this.uomQty + ' / base uom = ' + this.baseUomQty)
         },
 
         baseUomQtyChanged(){
