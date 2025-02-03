@@ -735,10 +735,10 @@ export default {
                 this.alertValidationMessage(`supplier Phone Number`);
                 return 1;
             }
-            if(this.bankAccountList.length < 1){
-                this.alertValidationMessage(`supplier Bank Account`);
-                return 1;
-            }
+            // if(this.bankAccountList.length < 1){
+            //     this.alertValidationMessage(`supplier Bank Account`);
+            //     return 1;
+            // }
             if(this.selectedItemList.length < 1 ){
                 this.alertValidationMessage(`supplier selling items`);
                 return 1;
@@ -768,7 +768,10 @@ export default {
             });
             formData.append("supplier_items", JSON.stringify(this.selectedItemList));
             formData.append("supplier_phones", JSON.stringify(this.phoneNumberList));
-            formData.append("supplier_bank_accounts", JSON.stringify(this.bankAccountList));
+            if(this.bankAccountList.length > 0){
+                formData.append("supplier_bank_accounts", JSON.stringify(this.bankAccountList));
+            }
+            
             let url = `/api/suppliers`;
             let response = await postApiData({url: url, form_data: formData, token: this.getToken()});
             if(response.success){
