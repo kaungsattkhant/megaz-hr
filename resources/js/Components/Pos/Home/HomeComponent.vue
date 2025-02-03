@@ -1555,7 +1555,12 @@
                 console.log(this.selectedGender + ',' + this.name + ',' + this.email + ',' + this.ph_number + ',' + this.address + ',' + this.date)
                 if (response.success) {
                     // this.customerList.push(response.data);
-                    this.$refs.posTable.getCustomerList();
+                    if(this.areaType == 'bar_and_restaurant'){
+                        this.$refs.posTable.getCustomerList();
+                    }
+                    if(this.areaType == 'ktv'){
+                        this.$refs.posRoom.getCustomerList();
+                    }
                     // this.$refs.posTable.selectedCustomer = response.data;
                     // this.selectedCustomer = response.data;
                     // console.log("success customer")
