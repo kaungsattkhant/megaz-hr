@@ -17,10 +17,14 @@ return new class extends Migration
             $table->integer('base_uom_quantity');
             $table->foreignId('uom_id');
             $table->integer('uom_quantity');
+            $table->foreignId('uom_conversion_unit_id');
             $table->integer('quantity');
             $table->double('amount');
+            $table->double('unit_price');
             $table->foreignId('po_invoice_id')->constrained();
-            $table->foreignId('po_order_id')->constrained();
+            $table->foreignId('item_id')->constrained();
+            $table->foreignId('supplier_id')->constrained();
+            $table->foreignId('purchase_order_id')->constrained();
             $table->integer('created_by');
             $table->timestamps();
         });

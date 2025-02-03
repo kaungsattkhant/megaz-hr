@@ -29,8 +29,8 @@ class PoInvoiceResource extends JsonResource
             'arrival_items' => $this->arrivalItems->map(function ($arrivalItem) {
                 return [
                     'id' => $arrivalItem->id,
-                    'item_id' => $arrivalItem->poOrder->item->id,
-                    'item_name' => $arrivalItem->poOrder->item->name,
+                    'item_id' => $arrivalItem->item->id,
+                    'item_name' => $arrivalItem->item->name,
                     'quantity' => $arrivalItem->quantity,
                     'amount' => $arrivalItem->amount,
                     'uom_id' => $arrivalItem->uom->id,
@@ -41,6 +41,13 @@ class PoInvoiceResource extends JsonResource
                     'base_uom_quantity' => $arrivalItem->base_uom_quantity,
                     'po_invoice_id' => $arrivalItem->po_invoice_id,
                     'po_order_id' => $arrivalItem->po_order_id,
+                    'uom_conversion_unit_id' => $arrivalItem->uom_conversion_unit_id,
+                    // 'unit_price',
+                    // 'po_invoice_id',
+                    // 'item_id',
+                    // 'supplier_id',
+                    // 'purchase_order_id',
+                    // 'created_by'
                 ];
             })
         ];

@@ -131,7 +131,6 @@
         </div>
     </div>
 
-
     <!-- create modal -->
     <div data-te-modal-init
         class="fixed left-0 top-0 z-[1055] hidden h-full w-full overflow-y-auto overflow-x-hidden outline-none"
@@ -182,7 +181,7 @@
                         id="check_modalLabel">
                         Confirm Procurement Order Item
                     </h5>
-                    <button type="button" class="text-xs focus:shadow-none focus:outline-none" data-te-modal-dismiss id="close_create_modal"
+                    <button type="button" class="text-xs focus:shadow-none focus:outline-none" data-te-modal-dismiss id="close_confirm_modal"
                         aria-label="Close">
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
                             stroke="currentColor" class="h-4 w-4">
@@ -291,7 +290,6 @@
                         Cancel
                     </button>
                     <button type="button" class="add-btn focus:outline-none focus:ring-0 "
-                    data-te-modal-dismiss aria-label="Close"
                     @click="confirmBtnClicked">
                         Create
                     </button>
@@ -341,6 +339,8 @@ export default {
             uomConversions: [],
             selectedUomConversion: null,
             uomUpperLimit: 0,
+
+            item_left_id:null,
         };
     },
 
@@ -376,6 +376,9 @@ export default {
                 this.totalPrice = Math.round(this.totalPrice * 100) / 100;
             }else{
                 this.totalPrice = 0;
+            }
+            if(!this.selectedBrand.item_price){
+                this.alertValidationMessage('No Item Price');
             }
         },
 
@@ -414,7 +417,9 @@ export default {
             this.originalPOTotalQty = (purchaseOrder.base_uom_quantity * this.selectedUomConversion.conversion) + purchaseOrder.uom_quantity;
             this.confirmPOTotalQty = this.originalPOTotalQty;
             this.totalPrice = 0;
+            this.item_left_id = purchaseOrder.item_left_id;
             this.getItemSuppliers(this.itemId);
+            console.log('uom = ' + this.uomQty + ' / base uom = ' + this.baseUomQty)
         },
 
         baseUomQtyChanged(){
@@ -450,6 +455,8 @@ export default {
         },
 
         async confirmBtnClicked(){
+            let unit_price = this.selectedBrand.item_price.price / this.selectedBrand.item.uom_conversion;
+            console.log(unit_price)
             let formData = new FormData();
             if(!this.selectedBrand || !this.selectedSupplier){
                 this.alertValidationMessage('you forgot to provide required data');
@@ -469,9 +476,12 @@ export default {
             formData.append('amount', this.totalPrice);
             formData.append('later_buy', (this.isLaterBuy) ? 1 : 0);
             formData.append('item_leftable_type', 'po_order');
+            formData.append('unit_price', unit_price);
+            formData.append('item_left_id', this.item_left_id);
             let response = await postApiData({ url: '/api/po_items', form_data: formData , token: this.getToken() });
             if(response.success){
-                // this.getOrderItems(1);
+                document.getElementById('close_confirm_modal').click();
+                this.getOrderItems(1);
                 this.$notify({
                     text: `Procurement Order Item created successfully`,
                     type: 'info'
@@ -489,6 +499,7 @@ export default {
                 this.itemId = null;
                 this.isLaterBuy = false;
                 this.totalPrice = 0;
+                this.item_left_id = null;
             }else{
                 this.$notify({
                     text: `Procurement Order Item creation failed`,

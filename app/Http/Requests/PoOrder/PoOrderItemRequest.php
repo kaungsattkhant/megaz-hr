@@ -30,13 +30,15 @@ class PoOrderItemRequest extends APIRequest
             'uom_conversion_unit_id' => 'required|integer|exists:uom_conversions,id',
             'quantity' => 'required|numeric',
             'amount' => 'required|numeric',
+            'unit_price'  => 'required|numeric',
             'item_id' => 'required|integer|exists:items,id',
             'brand_id' => 'nullable|integer|exists:brands,id',
             'supplier_id' => 'required|integer|exists:suppliers,id',
             'purchase_order_id' => 'required|integer|exists:purchase_orders,id',
             'item_price_id' => 'nullable|integer|exists:item_prices,id',
             'later_buy' => 'nullable',
-            'item_leftable_type' => 'nullable'
+            'item_leftable_type' => 'nullable',
+            'item_left_id' => 'nullable',
         ];
     }
 
