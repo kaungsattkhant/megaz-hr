@@ -42,6 +42,9 @@
                                 <th scope="col" class="  ">
                                     Manager Check
                                 </th>
+                                <th scope="col" class="  ">
+                                    Procurement Check
+                                </th>
 
                                 <th scope="col" class="  ">
                                     Financial Check
