@@ -175,6 +175,8 @@ class ItemRepository implements ItemRepositoryInterface
             'uom_id',
             'lead_time',
             'minimum_holding_amount',
+            'min_holding_base_uom_quantity',
+            'min_holding_uom_quantity',
         ];
         $actualHeadings = $headings[0][0];
         foreach ($expectedHeadings as $heading) {
