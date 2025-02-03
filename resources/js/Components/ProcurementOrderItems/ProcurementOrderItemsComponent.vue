@@ -190,7 +190,7 @@
                     </button>
                 </div>
                 <div class="relative px-6 py-4 border-b" data-te-modal-body-ref>
-                    <div class="mb-4 flex gap-x-4 ">
+                    <div class="mb-4 grid grid-cols-4 gap-x-4 ">
                         <div>
                             <input type="number"
                             placeholder="Base UOM Qty"
@@ -419,6 +419,7 @@ export default {
             this.totalPrice = 0;
             this.item_left_id = purchaseOrder.item_left_id;
             this.getItemSuppliers(this.itemId);
+            console.log('uom = ' + this.uomQty + ' / base uom = ' + this.baseUomQty)
         },
 
         baseUomQtyChanged(){

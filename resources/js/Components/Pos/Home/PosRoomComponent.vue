@@ -1507,7 +1507,7 @@
                     // }
                     // this.food_total_package = 0
                     // console.log("success")
-                    window.location.reload()
+                    // window.location.reload()
                 }
                 else {
                     console.log('some errors occur')
