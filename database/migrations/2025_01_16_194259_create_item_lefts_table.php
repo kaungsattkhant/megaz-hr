@@ -22,7 +22,8 @@ return new class extends Migration
             $table->double('unit_price');
             $table->integer('uom_conversion_unit_id');
             $table->integer('created_by');
-            $table->foreignId('purchase_order_id');
+            $table->foreignId('purchase_order_id')->constrained();
+            $table->foreignId('brand_id')->constrained();
             $table->integer('item_leftable_id')->nullable();
             $table->string('item_leftable_type');
             $table->timestamps();
