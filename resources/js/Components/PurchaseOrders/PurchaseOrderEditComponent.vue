@@ -114,6 +114,9 @@
                                 Item
                             </th>
                             <th scope="col" class="">
+                                Brand
+                            </th>
+                            <th scope="col" class="">
                                 Qty
                             </th>
                             <th scope="col" class="">
@@ -138,17 +141,22 @@
                                     {{ purchaseOrderItem.name }}
                                 </td>
                                 <td class="">
-                                    {{ purchaseOrderItem.quantity }}
+                                    {{ purchaseOrderItem.brand_name }}
+                                </td>
+                                <td class="">
+                                    <!-- {{ purchaseOrderItem.big_quantity > 0 ? purchaseOrderItem.big_quantity : '' }}{{ purchaseOrderItem.big_quantity > 0 ? purchaseOrderItem.base_uom_name : '' }} 
+                                    {{ purchaseOrderItem.small_quantity > 0 ? purchaseOrderItem.small_quantity : '' }} {{ purchaseOrderItem.small_quantity > 0 ? purchaseOrderItem.uom_name : '' }} -->
+                                     {{ purchaseOrderItem.quantity }}
                                 </td>
                                 <td class="">
                                     {{ purchaseOrderItem.uom_name }}
                                 </td>
                                 <td class="">
-                                    {{ purchaseOrderItem.amount.toLocaleString() }}
+                                    {{ purchaseOrderItem.unit_price.toLocaleString() }}
                                 </td>
                                 <td class="">
                                     <!-- {{ (purchaseOrderItem.amount * purchaseOrderItem.quantity).toLocaleString() }} -->
-                                    {{ purchaseOrderItem.price.toLocaleString() }}
+                                    {{ purchaseOrderItem.amount.toLocaleString() }}
 
                                 </td>
                                 <td class="">
@@ -166,7 +174,7 @@
                         </div>
                         <div class="contents">
                             <tr class="">
-                                <td class="" colspan="4">
+                                <td class="" colspan="5">
                                     &nbsp;
                                 </td>
                                 <td class="">
@@ -397,14 +405,18 @@
                 this.data = this.poDetail.date;
                 this.poDetail.items.forEach(po => {
                     let quantity = (po.base_uom_quantity * po.uom_conversion.conversion) + po.uom_quantity
-                    let price = ((po.base_uom_quantity * po.uom_conversion.conversion) + po.uom_quantity) * po.item.average_price
+                    // let price = ((po.base_uom_quantity * po.uom_conversion.conversion) + po.uom_quantity) * po.item.average_price
+                    let price = quantity * po.unit_price;
+                    let big_uom_quantity = Math.floor(quantity / po.uom_conversion.conversion);
+                    let small_uom_quantity = quantity % po.uom_conversion.conversion;
                     this.purchaseOrderItems.push({
                         id:po.id,
                         item_id: po.item_id,
+                        brand_name:po.brand.name,
                         brand_id:po.brand_id,
                         quantity: po.quantity,
-                        amount: po.amount,
-                        price: price,
+                        amount: price,
+                        unit_price: po.unit_price,
                         uom_id: po.uom_id,
                         uom_quantity: po.uom_quantity,
                         uom_name: po.uom.name,
@@ -413,6 +425,8 @@
                         base_uom_quantity: po.base_uom_quantity,
                         base_uom_name: po.base_uom.name,
                         name: po.item.name,
+                        small_quantity: small_uom_quantity,
+                        big_quantity: big_uom_quantity
                     });
                 });
                 this.updateTotalPrice(this.purchaseOrderItems);
@@ -448,7 +462,14 @@
                 this.selectedBaseUom = this.itemUoms.find(uom => uom.id == this.selectedItem.base_uom_id)
                 this.brandList = this.selectedItem.brands;
             },
-
+            async selectedBrandChange(){
+                console.log('brand change')
+                let response = await getApiData({url: '/api/items/' + this.selectedItem.id + '/brands/' + this.selectedBrand.id, token: this.getToken()});
+                if(response.data){
+                    this.unitPrice = response.data;
+                    console.log(response)
+                }
+            },
             alertValidationMessage(field){
                 this.$notify({
                     title: 'Input validation',
@@ -505,22 +526,34 @@
                 // }
                 // amount = (this.selectedItem.item_prices)? this.selectedItem.item_prices.price: 0;
                 let quantity = (this.baseQuantity * this.selectedItem.uom_conversion) + this.quantity
-                let price = ((this.baseQuantity * this.selectedItem.uom_conversion) + this.quantity) * this.selectedItem.average_price
-                this.purchaseOrderItems.push({
-                    item_id: this.selectedItem.id,
-                    brand_id: this.selectedBrand.id,
-                    quantity: quantity,
-                    amount: this.selectedItem.average_price,
-                    price: price,
-                    uom_id: this.selectedUom.id,
-                    uom_quantity: this.quantity,
-                    uom_name: this.selectedUom.name,
-                    uom_conversion_id: this.selectedItem.uom_conversion_id,
-                    base_uom_id: this.selectedBaseUom.id,
-                    base_uom_quantity: this.baseQuantity,
-                    base_uom_name: this.selectedBaseUom.name,
-                    name: this.selectedItem.name,
-                });
+                // let price = ((this.baseQuantity * this.selectedItem.uom_conversion) + this.quantity) * this.selectedItem.average_price
+                let price = quantity * (this.unitPrice / this.selectedItem.uom_conversion);
+                if(this.purchaseOrderItems.some((item) => item.item_id === this.selectedItem.id && item.brand_id === this.selectedBrand.id) && this.purchaseOrderItems.length > 0){
+                    let index = this.purchaseOrderItems.findIndex(item => item.item_id == this.selectedItem.id && item.brand_id == this.selectedBrand.id)
+                    this.purchaseOrderItems[index].quantity += quantity;
+                    this.purchaseOrderItems[index].amount += price;
+                    this.purchaseOrderItems[index].uom_quantity += this.quantity;
+                    this.purchaseOrderItems[index].base_uom_quantity += this.baseQuantity;
+                }
+                else{
+                    this.purchaseOrderItems.push({
+                        item_id: this.selectedItem.id,
+                        brand_id: this.selectedBrand.id,
+                        bradn_name: this.selectedBrand.name,
+                        quantity: quantity,
+                        amount: price,
+                        unit_price: this.unitPrice / this.selectedItem.uom_conversion,
+                        uom_id: this.selectedUom.id,
+                        uom_quantity: this.quantity,
+                        uom_name: this.selectedUom.name,
+                        uom_conversion_id: this.selectedItem.uom_conversion_id,
+                        base_uom_id: this.selectedBaseUom.id,
+                        base_uom_quantity: this.baseQuantity,
+                        base_uom_name: this.selectedBaseUom.name,
+                        name: this.selectedItem.name,
+                    });
+                }
+                
 
                 this.updateTotalPrice(this.purchaseOrderItems);
                 this.selectedItem = null;
@@ -528,6 +561,7 @@
                 this.quantity = 0;
                 this.selectedBaseUom = null;
                 this.baseQuantity = 0;
+                this.selectedBrand = null;
             },
             editQuantityBtnClicked(purchaseOrderItemsIndex){
                 this.editPurchaseOrderItem = this.purchaseOrderItems[purchaseOrderItemsIndex];
@@ -590,11 +624,11 @@
 
             async editPurchaseOrderBtnClicked(){
                 if(!this.date){
-                    this.alertValidationMessage('date');
+                    this.alertValidationMessage('Date');
                     return 1;
                 }
                 if(this.purchaseOrderItems.length<1){
-                    this.alertValidationMessage('items');
+                    this.alertValidationMessage('Items');
                     return 1;
                 }
                 let priceTotal = 0;
@@ -628,7 +662,7 @@
             updateTotalPrice(poItems){
                 this.totalPrice = 0;
                 poItems.forEach((item)=>{
-                    this.totalPrice += (item.amount * item.quantity);
+                    this.totalPrice += item.amount;
                 });
             },
 

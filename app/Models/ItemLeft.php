@@ -17,6 +17,7 @@ class ItemLeft extends Model
         'uom_conversion_unit_id',
         'quantity',
         'amount',
+        'unit_price',
         'created_by',
         'item_leftable_id',
         'item_leftable_type',

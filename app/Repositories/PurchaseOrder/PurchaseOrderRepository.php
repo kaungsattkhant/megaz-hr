@@ -91,7 +91,6 @@ class PurchaseOrderRepository implements PurchaseOrderRepositoryInterface
 
         return $paginatedOrders;
     }
-
     public function createOrUpdate($request)
     {
         $data = $request->all();
@@ -122,7 +121,6 @@ class PurchaseOrderRepository implements PurchaseOrderRepositoryInterface
                 $data
             );
             foreach ($items as $item) {
-
                 if (isset($item->id) && $item->id !== null) {
                     $item_data['id'] = $item->id;
                 } else {
@@ -252,12 +250,14 @@ class PurchaseOrderRepository implements PurchaseOrderRepositoryInterface
             ResponseMessage('Purchase order not found', 404);
         }
         $purchaseOrder->load([
+            'items.brand',
             'items.uom',
             'items.purchaseOrderItemLeft',
             'items.item.suppliers',
             'items.baseUom',
             'items.uomConversion'
         ]);
+        // $purchaseOrder->brand = $purchaseOrder->brand;
         // $purchaseOrder->uom = $purchaseOrder->uom;
         // $purchaseOrder->items = $purchaseOrder->items;
         // $purchaseOrder->items->load('purchaseOrderItemLeft');
@@ -307,7 +307,6 @@ class PurchaseOrderRepository implements PurchaseOrderRepositoryInterface
             if ($model) {
                 if (checkDepartmentAndRoles('HR', ['Manager'])) {
                     // if (!checkDepartmentAndRoles('Finance', ['Manager']) && checkRoles(['Manager']) && !checkDepartmentAndRoles('Procurement', ['Manager'])) {
-
                     $column = 'manager_check';
                     $is_column = 'is_manager_checked';
                     $status = 'manager_checked';
@@ -321,7 +320,6 @@ class PurchaseOrderRepository implements PurchaseOrderRepositoryInterface
                     $is_column = 'is_md_checked';
                     $status = 'md_checked';
                 } else if (checkDepartmentAndRoles('Procurement', ['Manager'])) {
-
                     $column = 'procurement_manager_check';
                     $is_column = 'is_procurement_manager_checked';
                     $status = 'procurement_manager_checked';
@@ -405,15 +403,23 @@ class PurchaseOrderRepository implements PurchaseOrderRepositoryInterface
                     if ($model->procurement_manager_check_id != null) {
                         ResponseMessage('This Purchase Order is already checked By Procurement Manager', 422);
                     }
+                    if ($model->manager_check_id == null || $model->manager_check_time==null) {
+                        ResponseMessage('Required confirmation from HR(Manager) ! ', 422);
+                    }
                 } else if (checkDepartmentAndRoles('Finance', ['Manager'])) {
                     if ($model->financial_check_id != null) {
                         ResponseMessage('This Purchase Order is already checked By Financial', 422);
+                    }
+                    if ($model->procurement_manager_check_id == null || $model->procurement_manager_check_time==null) {
+                        ResponseMessage('Required confirmation from Procurement', 422);
                     }
                 } else if (checkDepartmentAndRoles('Management', ['MD'])) {
                     if ($model->is_md_checked) {
                         ResponseMessage('This Purchase Order is already checked By MD', 422);
                     }
-
+                    if ($model->financial_check_id == null || $model->financial_check_time==null) {
+                        ResponseMessage('Required confirmation from Finance', 422);
+                    }
                     // if (!$model->createdBy->department->inventory) {
                     //     ResponseMessage('Inventory is required', 422);
                     // }

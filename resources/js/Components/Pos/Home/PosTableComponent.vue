@@ -1941,6 +1941,7 @@
                 this.invoiceId = null
                 this.menuQuantity = null
                 this.selectedMenu = null
+                this.remark = null
             },
             clearAddHourForm() {
                 this.sessionDuration = null
