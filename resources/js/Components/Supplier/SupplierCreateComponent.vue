@@ -619,10 +619,10 @@ export default {
                 this.alertValidationMessage(`Supplier Phone Number`);
                 return 1;
             }
-            if(this.bankAccountList.length < 1){
-                this.alertValidationMessage(`supplier Bank Account`);
-                return 1;
-            }
+            // if(this.bankAccountList.length < 1){
+            //     this.alertValidationMessage(`supplier Bank Account`);
+            //     return 1;
+            // }
             if(!this.maxCredit){
                 this.alertValidationMessage(`Supplier Credit Limit`);
                 return 1;
