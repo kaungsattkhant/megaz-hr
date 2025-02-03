@@ -713,23 +713,23 @@ class PoOrderRepository implements PoOrderRepositoryInterface
   {
     // $itemId = 2;
 
-    // $leftsSubquery = DB::table('item_lefts')
-    //   // ->join('purchase_orders','item_lefts.purchase_order_id','purchase_orders.id')
-    //   ->join('arrival_items', function ($join) {
-    //     $join->on('item_lefts.item_leftable_id', '=', 'arrival_items.id')
-    //       ->where('item_lefts.item_leftable_type', '=', 'arrival_item');
-    //   })
-    //   // ->join('po_orders', 'arrival_items.po_order_id', 'po_orders.id')
-    //   ->select(
-    //     'arrival_items.item_id',
-    //     'arrival_items.purchase_order_id',
-    //     // 'po_orders.id as po_order_id',
-    //     DB::raw('SUM(item_lefts.quantity) as left_quantity'),
-    //     DB::raw('SUM(item_lefts.amount) as left_amount'),
-    //     DB::raw('GROUP_CONCAT(item_lefts.id SEPARATOR ", ") as item_left_ids'),
-      // )
-      // ->where('arrival_items.item_id', $itemId) // Add filtering condition
-      // ->groupBy('arrival_items.item_id', 'arrival_items.purchase_order_id');
+    $leftsSubquery = DB::table('item_lefts')
+      // ->join('purchase_orders','item_lefts.purchase_order_id','purchase_orders.id')
+      ->join('arrival_items', function ($join) {
+        $join->on('item_lefts.item_leftable_id', '=', 'arrival_items.id')
+          ->where('item_lefts.item_leftable_type', '=', 'arrival_item');
+      })
+      // ->join('po_orders', 'arrival_items.po_order_id', 'po_orders.id')
+      ->select(
+        'arrival_items.item_id',
+        'arrival_items.purchase_order_id',
+        // 'po_orders.id as po_order_id',
+        DB::raw('SUM(item_lefts.quantity) as left_quantity'),
+        DB::raw('SUM(item_lefts.amount) as left_amount'),
+        DB::raw('GROUP_CONCAT(item_lefts.id SEPARATOR ", ") as item_left_ids'),
+      )
+      ->where('arrival_items.item_id', $itemId) // Add filtering condition
+      ->groupBy('arrival_items.item_id', 'arrival_items.purchase_order_id');
 
     $arrivalSubQuery = DB::table('arrival_items')
       // ->join('po_orders', 'arrival_items.po_order_id', 'po_orders.id')
@@ -760,7 +760,7 @@ class PoOrderRepository implements PoOrderRepositoryInterface
       })
       ->select(
         'poOrder.purchase_order_id',
-        // 'item_lefts.item_left_ids as item_left_id',
+        'item_lefts.item_left_ids as item_left_id',
         'po.po_id',
         'i.id as item_id',
         'i.name as item_name',
@@ -843,7 +843,7 @@ class PoOrderRepository implements PoOrderRepositoryInterface
         'arrival_items.arrival_amount',
         's.name',
         'po.po_id',
-        // 'item_lefts.item_left_ids'
+        'item_lefts.item_left_ids'
       )
       ->where('poOrder.item_id', $itemId)
       ->having('quantity', '>', 0)
