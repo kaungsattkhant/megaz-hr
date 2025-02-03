@@ -750,10 +750,10 @@ class PoOrderRepository implements PoOrderRepositoryInterface
       ->join('items as i', 'poOrder.item_id', '=', 'i.id')
       ->join('suppliers as s', 'poOrder.supplier_id', '=', 's.id')
       ->join('item_prices as ip', 'poOrder.item_price_id', '=', 'ip.id')
-      // ->leftJoinSub($leftsSubquery, 'item_lefts', function ($join) {
-      //   $join->on('poOrder.item_id', '=', 'item_lefts.item_id')
-      //     ->on('item_lefts.purchase_order_id', '=', 'poOrder.purchase_order_id');
-      // })
+      ->leftJoinSub($leftsSubquery, 'item_lefts', function ($join) {
+        $join->on('poOrder.item_id', '=', 'item_lefts.item_id')
+          ->on('item_lefts.purchase_order_id', '=', 'poOrder.purchase_order_id');
+      })
       ->leftJoinSub($arrivalSubQuery, 'arrival_items', function ($join) {
         $join->on('poOrder.item_id', '=', 'arrival_items.item_id')
           ->on('arrival_items.purchase_order_id', '=', 'poOrder.purchase_order_id');
