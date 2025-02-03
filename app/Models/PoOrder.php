@@ -2,8 +2,9 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
+use App\Models\ArrivalItem;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class PoOrder extends Model
 {
@@ -25,11 +26,6 @@ class PoOrder extends Model
         'item_price_id',
         'created_by'
     ];
-
-    public function arrivalItem()
-    {
-        return $this->hasMany(ArrivalItem::class, 'po_order_id');
-    }
 
     public function purchaseOrder()
     {
@@ -69,5 +65,12 @@ class PoOrder extends Model
     public function itemPrice()
     {
         return $this->belongsTo(ItemPrice::class, 'item_price_id');
+    }
+
+    public function arrivalItems()
+    {
+        return $this->hasMany(ArrivalItem::class, 'purchase_order_id', 'purchase_order_id');
+        // ->where('supplier_id', $this->supplier_id)
+        // ->where('item_id', $this->item_id);
     }
 }

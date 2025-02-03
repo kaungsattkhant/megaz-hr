@@ -53,4 +53,9 @@ class ArrivalItem extends Model
     {
         return $this->belongsTo(Item::class, 'item_id');
     }
+
+    public function poOrder()
+    {
+        return $this->belongsTo(PoOrder::class, 'purchase_order_id');
+    }
 }
