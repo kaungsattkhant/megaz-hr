@@ -1209,6 +1209,9 @@ class PoOrderRepository implements PoOrderRepositoryInterface
     if (!$poInvoice) {
       ResponseMessage('Po Invoice not found', 404);
     }
+    if($poInvoice->is_complete){
+      ResponseMessage('Po Invoice is already completed', 404);
+    }
     DB::beginTransaction();
     try {
       $transaction = $this->storeInvoiceTransaction($poInvoice, $request->amount, $cashAccountId);
