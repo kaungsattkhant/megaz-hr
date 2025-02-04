@@ -77,17 +77,17 @@ trait PoInvoiceTransaction
     public function groupedByCategoryAndSupplier($model)
     {
         return ArrivalItem::join('po_invoices', 'arrival_items.po_invoice_id', 'po_invoices.id')
-            ->join('po_orders', 'arrival_items.po_order_id', '=', 'po_orders.id')
-            ->join('items', 'po_orders.item_id', '=', 'items.id')
+            // ->join('po_orders', 'arrival_items.purchase_order_id', '=', 'po_orders.purchase_order_id')
+            ->join('items', 'arrival_items.item_id', '=', 'items.id')
             ->join('categories', 'items.category_id', '=', 'categories.id')
-            ->join('suppliers', 'suppliers.id', '=', 'po_orders.supplier_id')
+            ->join('suppliers', 'suppliers.id', '=', 'arrival_items.supplier_id')
             ->select(
                 // 'suppliers.account_id',
                 // 'suppliers.creditor_account_id',
                 // 'suppliers.id as supplier_id',
                 // 'suppliers.name as supplier_name', //don't need supplier
                 'categories.name as category_name',
-                'items.category_id',
+                'categories.id as category_id',
                 DB::raw('SUM(arrival_items.amount) as total_amount'),
             )
             ->where('po_invoices.id', $model->id)

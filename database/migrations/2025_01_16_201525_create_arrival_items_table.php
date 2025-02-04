@@ -25,6 +25,7 @@ return new class extends Migration
             $table->foreignId('item_id')->constrained();
             $table->foreignId('supplier_id')->constrained();
             $table->foreignId('purchase_order_id')->constrained();
+            $table->foreignId('brand_id')->constrained();
             $table->integer('created_by');
             $table->timestamps();
         });

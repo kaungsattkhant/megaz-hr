@@ -40,6 +40,7 @@ class ArrivalItemRequest extends APIRequest
             'is_new_invoice' => 'nullable',
             'invoice_no' => 'nullable',
             'item_left_id' => 'nullable',
+            'brand_id' => 'nullable',
         ];
     }
     public function failedValidation(Validator $validator)

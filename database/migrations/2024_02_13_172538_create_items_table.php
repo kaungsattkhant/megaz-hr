@@ -21,7 +21,9 @@ return new class extends Migration
             $table->unsignedBigInteger('uom_id')->constrained(); //inventory store unit
             $table->boolean('is_active')->default(1);
             $table->double('lead_time');
-            $table->bigInteger('minimum_holding_amount');
+            $table->double('minimum_holding_amount');
+            $table->double('min_holding_base_uom_quantity');
+            $table->double('min_holding_uom_quantity');
             $table->timestamps();
         });
     }
