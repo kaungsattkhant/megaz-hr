@@ -41,7 +41,12 @@
   padding-left: 4px;
   padding-right: 4px;
   padding-top: 0.5rem; }
-
+.sidebar-gap-x{
+  column-gap: 0.9rem;
+}
+.sidebar-img{
+  width: 1.25rem;
+}
 .side-bar ul li a,.side-bar ul li button {
   padding: 0.75rem 1rem;
   margin: 0.25rem 0rem;

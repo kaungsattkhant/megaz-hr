@@ -28,11 +28,15 @@
 
             </div>
             <div class="flex justify-end gap-x-4">
-                <button type="button"
+                <label for="excel_import" class="add-btn">
+                    Excel Import
+                    <input type="file" placeholder="Excel" id="excel_import" class="opacity-0 w-0"  @change="handleFileChange">
+                </label>
+                <!-- <button type="button"
                     class="add-btn transition duration-150 ease-in-out focus:outline-none focus:ring-0 "
                     data-te-toggle="modal" data-te-target="#import_modal">
                     Excel Import
-                </button>
+                </button> -->
                 <button type="button"
                     class="add-btn transition duration-150 ease-in-out focus:outline-none focus:ring-0 "
                     data-te-toggle="modal" data-te-target="#create_modal">
@@ -615,6 +619,12 @@ export default {
                 // this.selectedBrands = [];
                 window.location.reload();
             }
+            else {
+                this.$notify({
+                    text: response.message,
+                    type: "error"
+                });
+            }
         },
 
         isActiveToggled(id) {
@@ -660,12 +670,10 @@ export default {
         handleFileChange(event) {
             console.log("Event object:", event);
             const selectedFile = event.target.files[0];
-            const file = ref(null);
-            if (selectedFile) {
-                file.value = selectedFile;
-                console.log("File selected:", file.name);
-            }
             this.selectedFile = selectedFile;
+            if(this.selectedFile){
+                this.importBtnClicked();
+            }
         },
         async importBtnClicked() {
             let formData = new FormData();

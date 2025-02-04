@@ -43,6 +43,9 @@
                                     Item
                                 </th>
                                 <th scope="col" class="">
+                                    Brand
+                                </th>
+                                <th scope="col" class="">
                                     PO Number
                                 </th>
                                 <th scope="col" class="">
@@ -63,6 +66,9 @@
                                     </td>
                                     <td class="whitespace-nowrap" @click="togglePurchaseOrders(index)">
                                         {{ item.item_name }}
+                                    </td>
+                                    <td class="whitespace-nowrap">
+                                        {{ item.brand_name }}
                                     </td>
                                     <td class="whitespace-nowrap">
                                         {{ item.po_numbers }}
