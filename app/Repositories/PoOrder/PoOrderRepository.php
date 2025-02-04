@@ -126,10 +126,10 @@ class PoOrderRepository implements PoOrderRepositoryInterface
         'item_id',
         DB::raw('SUM(quantity) as total_po_order_quantity'),
         DB::raw('GROUP_CONCAT(po_orders.purchase_order_id SEPARATOR ",") as po_order_ids'),
-        'brand_id',
+        'brands.id as brand_id',
         'brands.name as brand_name'
       )->join('brands', 'po_orders.brand_id', '=', 'brands.id')
-      ->groupBy('item_id', 'brand_id', 'brands.name');
+      ->groupBy('item_id', 'brands.id','brands.name');
     $quantitySubQuery = '(
           SELECT (
               COALESCE(
@@ -199,8 +199,8 @@ class PoOrderRepository implements PoOrderRepositoryInterface
         'poi.base_uom_id',
         'poi.uom_id',
         'poi.uom_conversion_id',
-        'po_orders.brand_id',
-        'po_orders.brand_name',
+        // 'po_orders.brand_id',
+        // 'po_orders.brand_name',
         // DB::raw('GROUP_CONCAT(DISTINCT po.po_id SEPARATOR ", ") as po_numbers'),
         DB::raw('
           COALESCE(
