@@ -166,7 +166,7 @@ class PoOrderRepository implements PoOrderRepositoryInterface
                           FROM item_lefts il
                           INNER JOIN po_orders ON il.item_leftable_id = po_orders.id
                           WHERE il.item_leftable_type = "' . $poClass . '"
-                          GROUP BY po_orders.item_id, po_orders.purchase_order_id,po_orders,brand_id
+                          GROUP BY po_orders.item_id, po_orders.purchase_order_id
                       ) as lefts
                       WHERE lefts.item_id = po_item.item_id
                         AND lefts.purchase_order_id = po_item.purchase_order_id
@@ -185,7 +185,7 @@ class PoOrderRepository implements PoOrderRepositoryInterface
       ->leftJoinSub($poOrderSubquery, 'po_orders', function ($join) {
         $join->on('po_orders.item_id', '=', 'i.id');
       })
-      ->join('uoms as u', 'poi.uom_id'u, '=', 'u.id')
+      ->join('uoms as u', 'poi.uom_id', '=', 'u.id')
       ->join('uoms as bu', 'poi.base_uom_id', '=', 'bu.id')
       ->join('uom_conversions as uc', 'poi.uom_conversion_id', '=', 'uc.id')
       ->join('purchase_orders as po', 'poi.purchase_order_id', '=', 'po.id')
