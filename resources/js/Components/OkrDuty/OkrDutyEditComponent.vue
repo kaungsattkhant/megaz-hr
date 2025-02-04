@@ -2,7 +2,7 @@
     <div class="px-0">
         <div class="mb-4 ">
             <p class="text-lg font-semibold font-inter">
-                Add Okr Duty
+                Edit Okr Duty
             </p>
         </div>
 
@@ -15,7 +15,13 @@
                 </label>
                 <input type="date" v-model="selectedDate" class="input-ui ">
             </div>
-            <div class="col-span-9"></div>
+            <div class="mb-4 col-span-3 pb-6 rounded-md">
+                <label for="" class="label-form mb-3">
+                    Due Date
+                </label>
+                <input type="date" v-model="selectedDueDate" class="input-ui ">
+            </div>
+            <div class="col-span-6"></div>
             <div class="mb-4 col-span-3 pb-6 rounded-md">
                 <label for="" class="label-form mb-3">
                     Department
@@ -54,7 +60,7 @@
                         data-te-select-filter="true" name="" id="" v-model="selectedOkr" class="input-ui">
                         <option v-if="okrList.length < 1" selected disabled> Not Found! </option>
                         <option :value="okr" v-for="(okr, index) in okrList"
-                            :key="index"> {{ okr.objective.objective_name }} </option>
+                            :key="index"> {{ okr.name }} </option>
                     </select>
                 </div>
             </div>
@@ -147,6 +153,7 @@ export default {
             dutyList:[],
 
             selectedDate:null,
+            selectedDueDate:null,
             selectedDepartment:null,
             selectedStaff:null,
             selectedOkr:null,
@@ -180,7 +187,7 @@ export default {
                     department_name:duty.department_name,
                     staff_name: duty.staff_name,
                     staff_id: duty.staff_id,
-                    objective_key_name: duty.objective_key.objective.objective_name,
+                    objective_key_name: duty.objective_key_name,
                     objective_key_id: duty.objective_key_id,
                 }) 
             });
@@ -244,8 +251,8 @@ export default {
                 department_name:this.selectedDepartment.name,
                 staff_name: this.selectedStaff.name,
                 staff_id: this.selectedStaff.id,
-                objective_key_name: this.selectedOkr.objective.objective_name,
-                objective_key_id: this.selectedOkr.objective_id, // objective_id = objective_key_id ????
+                objective_key_name: this.selectedOkr.name,
+                objective_key_id: this.selectedOkr.id, // objective_id = objective_key_id ????
             })
             this.selectedStaff = null
             this.selectedDepartment = null
@@ -273,7 +280,11 @@ export default {
                 this.alertValidationMessage(`Date`);
                 return 1;
             }
-            else if(!this.dutyList){
+            else if(!this.selectedDueDate){
+                this.alertValidationMessage(`Due Date`);
+                return 1;
+            }
+            else if(this.dutyList.length < 1){
                 this.alertValidationMessage(`Duty`);
                 return 1;
             }
@@ -284,6 +295,7 @@ export default {
         async editDuty(){
             let formData = new FormData();
             formData.append('assign_date',this.selectedDate);
+            formData.append('due_date',this.selectedDueDate);
             formData.append('assign_duty',JSON.stringify(this.dutyList));
             let response = await postApiData({url:`/api/assign_duties/${this.okrDutyId}`, form_data:formData, token:this.getToken()})
             if(response.success){
