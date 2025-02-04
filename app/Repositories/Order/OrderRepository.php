@@ -296,27 +296,6 @@ class OrderRepository implements OrderRepositoryInterface
                 ->orderBy('id', 'desc')
                 ->paginate(config(key: 'common.list_count'));
 
-            // foreach($order_items as $orderItem)
-            // {
-            // $entity_name = '';
-            //     if ($orderItem->order->invoice->entity_id == null) {
-            //         $roomSessions = $orderItem->order->invoice->roomSession->unique('entitySession.entity_id');
-            //         $entity_name_arr = [];
-            //         foreach ($roomSessions as $roomSession) {
-            //             $entity_name_arr[] = $roomSession->entitySession->entity->name;
-            //         }
-            //         $entity_name = implode(', ', $entity_name_arr);
-            //     }
-            //     if ($orderItem->order->invoice->entity_id != null) {
-            //         $entity_name = $orderItem->order->invoice->table->name;
-            //     }
-            //     $orderItem->entity_name = $entity_name;
-            //     unset($orderItem->order->invoice->roomSession);
-            //     unset($orderItem->order->invoice->table);
-            //     // UnsetData($orderItem->order->invoice,'roomSession');
-
-            // }
-
             $order_items->getCollection()->transform(function ($orderItem) {
                 $invoice = $orderItem->order->invoice ?? null;
 
@@ -342,30 +321,7 @@ class OrderRepository implements OrderRepositoryInterface
 
                 return $orderItem;
             });
-
-            // $order_items = OrderItem::where('status', 'pos_confirmed')
-            //     ->with([
-            //         'menu',
-            //         'area',
-            //         'order' => function ($query) {
-            //             $query->with([
-            //                 'invoice' => function ($query) {
-            //                     $query->select('id', 'entity_id')
-            //                         ->with([
-            //                             'table' => function ($query) {
-            //                                 $query->select('id', 'name'); // Only load name
-            //                             },
-            //                             'roomSession.entitySession.entity' => function ($query) {
-            //                                 $query->select('id', 'name'); // Only load unique entities
-            //                             }
-            //                         ]);
-            //                 }
-            //             ]);
-            //         }
-            //     ])
-            //     ->where('area_id', $areaId)
-            //     ->orderBy('id', 'desc')
-            // ->paginate(config('common.list_count'));
+            
             return $order_items;
         } else {
             if ($request->date) {
@@ -471,5 +427,14 @@ class OrderRepository implements OrderRepositoryInterface
         } else {
             ResponseMessage('Supervisor authorization failed', 403);
         }
+    }
+
+    public function combineOrderItem($request){
+        // dd($request->all());
+        $orderItemIds=$request->order_item_ids;
+        $orderItems=OrderItem::whereIn('id',$orderItemIds)
+        ->where('status','pos_confirmed')
+        ->get();
+        return $orderItems;
     }
 }

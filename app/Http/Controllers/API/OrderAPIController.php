@@ -61,4 +61,9 @@ class OrderAPIController extends Controller
         }
         $this->orderRepo->checkFocSupervision($request);
     }
+
+    public function combineOrderItem(Request $request){
+        $data=$this->orderRepo->combineOrderItem($request);
+        ResponseData($data);
+    }
 }
