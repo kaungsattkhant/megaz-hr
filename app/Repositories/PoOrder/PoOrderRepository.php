@@ -150,6 +150,8 @@ class PoOrderRepository implements PoOrderRepositoryInterface
                       FROM purchase_order_items po_item_sub
                       WHERE po_item_sub.item_id = po_item.item_id
                         AND po_item_sub.purchase_order_id = po_item.purchase_order_id
+                        AND po_item_sub.brand_id = po_item.brand_id
+
                   ), 0
               )
               +
@@ -164,7 +166,7 @@ class PoOrderRepository implements PoOrderRepositoryInterface
                           FROM item_lefts il
                           INNER JOIN po_orders ON il.item_leftable_id = po_orders.id
                           WHERE il.item_leftable_type = "' . $poClass . '"
-                          GROUP BY po_orders.item_id, po_orders.purchase_order_id
+                          GROUP BY po_orders.item_id, po_orders.purchase_order_id,brand_id
                       ) as lefts
                       WHERE lefts.item_id = po_item.item_id
                         AND lefts.purchase_order_id = po_item.purchase_order_id
@@ -243,6 +245,8 @@ class PoOrderRepository implements PoOrderRepositoryInterface
             SELECT JSON_ARRAYAGG(
                 JSON_OBJECT(
                     "id", po_item.purchase_order_id,
+                    "brand_id", po_item.brand_id,
+                    "brand_name",brand.name,
                     "item_name", i.name,
                     "item_id", i.id,
                     "amount", po_item.amount,
@@ -296,12 +300,15 @@ class PoOrderRepository implements PoOrderRepositoryInterface
                   FROM purchase_order_items po_item_sub
                   WHERE po_item_sub.item_id = po_item.item_id
                     AND po_item_sub.purchase_order_id = po_item.purchase_order_id
+        AND po_item_sub.brand_id = po_item.brand_id
+
               ),
                    "total_po_order_quantity", (
       SELECT COALESCE(SUM(po_order_sub.quantity), 0)
       FROM po_orders po_order_sub
       WHERE po_order_sub.item_id = po_item.item_id
         AND po_order_sub.purchase_order_id = po_item.purchase_order_id
+        AND po_order_sub.brand_id = po_item.brand_id
   ),
                      "total_left_quantity", (
       SELECT COALESCE(SUM(lefts.total_left_quantity), 0)
@@ -330,6 +337,7 @@ class PoOrderRepository implements PoOrderRepositoryInterface
             )
             FROM purchase_order_items po_item
             INNER JOIN purchase_orders po ON po_item.purchase_order_id = po.id
+            INNER JOIN brands brand ON po_item.brand_id = brand.id
             INNER JOIN uom_conversions uc ON po_item.uom_conversion_id = uc.id
             INNER JOIN items i ON po_item.item_id = i.id
             WHERE po_item.item_id = poi.item_id
