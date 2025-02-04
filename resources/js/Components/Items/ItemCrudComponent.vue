@@ -319,7 +319,7 @@
                     </div> -->
                     <div class="mb-4">
                         <label for="" class="label-form mb-3">
-                            Base UOM
+                            Base UOM (အကြီး)
                         </label>
                         <select name="" id="" v-model="selectedBaseUom" class="input-ui">
                             <option :value="uom" v-for="(uom, uomIndex) in uomList" :key="uomIndex"> {{ uom.name }}
@@ -328,7 +328,7 @@
                     </div>
                     <div class="mb-4">
                         <label for="" class="label-form mb-3">
-                            Uom (Inventory သိမ်းဆည်း unit)
+                            Uom အသေး (Inventory သိမ်းဆည်း unit)
                         </label>
                         <select name="" id="" v-model="selectedUOM" class="input-ui">
                             <option :value="uom" v-for="(uom, uomIndex) in uomList" :key="uomIndex"> {{ uom.name }}
@@ -343,7 +343,13 @@
                     </div>
                     <div class="mb-4">
                         <label for="" class="label-form mb-3">
-                            Minimum Holding Amount
+                            Minimum Holding Amount ( Base UOM - အကြီး )
+                        </label>
+                        <input type="text" placeholder="Minimum Holding Amount" v-model="base_min_amount" class="input-ui">
+                    </div>
+                    <div class="mb-4">
+                        <label for="" class="label-form mb-3">
+                            Minimum Holding Amount ( UOM - အသေး )
                         </label>
                         <input type="text" placeholder="Minimum Holding Amount" v-model="min_amount" class="input-ui">
                     </div>
@@ -379,7 +385,7 @@
                     </h5>
                     <!--Close button-->
                     <button type="button" class="text-xs focus:shadow-none focus:outline-none" data-te-modal-dismiss
-                        aria-label="Close">
+                        aria-label="Close" id="close_import_modal">
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
                             stroke="currentColor" class="h-4 w-4">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
@@ -393,7 +399,7 @@
                         <label for="" class="label-form mb-3">
                             Excel
                         </label>
-                        <input type="file" placeholder="Excel" class="input-ui">
+                        <input type="file" placeholder="Excel" class="input-ui"  @change="handleFileChange">
                     </div>
                 </div>
                 <!--Modal footer-->
@@ -462,6 +468,7 @@ import { Modal, Ripple, initTE, Select, Dropdown } from "tw-elements";
 import { getApiData, postApiData, deleteApiData } from '../../utilities/ajax-helpers';
 import { mapGetters } from "vuex";
 import Multiselect from 'vue-multiselect';
+import { ref } from 'vue';
 
 export default {
     components: {
@@ -477,7 +484,8 @@ export default {
             price: null,
             selectedUOM: null,
             lead_time:null,
-            min_amount:null,
+            base_min_amount:0,
+            min_amount:0,
 
             selectedCategory: null,
             searchInput: null,
@@ -581,7 +589,7 @@ export default {
         },
 
         async createBtnClicked() {
-            if (!this.selectedUOM || !this.name || !this.selectedCategory ||!this.selectedBaseUom || !this.code || !this.itemType || !this.lead_time || !this.min_amount) {
+            if (!this.selectedUOM || !this.name || !this.selectedCategory ||!this.selectedBaseUom || !this.code || !this.itemType || !this.lead_time || !this.base_min_amount || !this.min_amount) {
                 this.alertValiationMessage('required data');
                 return false;
             }
@@ -594,7 +602,8 @@ export default {
             formData.append('base_uom_id',this.selectedBaseUom.id);
             formData.append('item_type_id',this.itemType.id);
             formData.append('lead_time',this.lead_time);
-            formData.append('minimum_holding_amount',this.min_amount);
+            formData.append('min_holding_base_uom_quantity',this.base_min_amount);
+            formData.append('min_holding_uom_quantity',this.min_amount);
             // if(this.selectedBrands.length > 0){
             //     this.selectedBrands.forEach((item)=>{
             //         formData.append('brands[]', item.id);
@@ -649,19 +658,26 @@ export default {
             this.getItemList(1);
         },
         handleFileChange(event) {
+            console.log("Event object:", event);
             const selectedFile = event.target.files[0];
+            const file = ref(null);
+            if (selectedFile) {
+                file.value = selectedFile;
+                console.log("File selected:", file.name);
+            }
             this.selectedFile = selectedFile;
         },
         async importBtnClicked() {
             let formData = new FormData();
-            formData.append('image', this.selectedFile);
-            let response = await postApiData({ url: '/api/import_account', form_data: formData, token: this.getToken() });
+            formData.append('item_import', this.selectedFile);
+            let response = await postApiData({ url: '/api/items/imports', form_data: formData, token: this.getToken() });
             if (response.success) {
                 this.$notify({
                     text: `Excel Imported successfully`,
                     type: "info"
                 });
                 this.selectedFile = null;
+                document.getElementById('close_import_modal').click();
             }
             else {
                 this.$notify({
