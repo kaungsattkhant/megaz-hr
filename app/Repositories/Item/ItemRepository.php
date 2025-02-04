@@ -9,6 +9,7 @@ use App\Models\ItemPrice;
 use App\Imports\ItemsImport;
 use App\Models\SupplierItem;
 use Illuminate\Http\Request;
+use App\Models\UomConversion;
 use Illuminate\Support\Facades\DB;
 use Maatwebsite\Excel\HeadingRowImport;
 use App\Services\AveragePriceCalculator;
@@ -59,11 +60,24 @@ class ItemRepository implements ItemRepositoryInterface
     {
         DB::beginTransaction();
         try {
+            $baseUomId = $data['base_uom_id'];
+            $uomId = $data['uom_id'];
+            $uomConversion = UomConversion::where('base_unit_id', $baseUomId)
+                ->where('conversion_unit_id', $uomId)
+                ->where('is_active', 1)
+                ->first();
+
+            if (!$uomConversion) {
+                return ResponseMessage('No UOM conversion found for the given units.', 404);
+            }
+
+            $conversionRate = $uomConversion->conversion;
+
+            $minimumHoldingAmount = ($data['min_holding_base_uom_quantity'] * $conversionRate) + $data['min_holding_uom_quantity'];
+            $data['minimum_holding_amount'] = $minimumHoldingAmount;
+
             $item = Item::create($data);
-            // if (isset($data['brands'])) {
-            //     $item->brands()->sync($data['brands']);
-            // }
-            // $price = ItemPrice::create(['item_id' => $item->id, 'price' => $data['price'],'uom_id'=>$data['uom_id']]); //removed after relationship with item price with supplier
+
             DB::commit();
             return $item;
         } catch (\Exception $e) {
@@ -78,11 +92,26 @@ class ItemRepository implements ItemRepositoryInterface
         DB::beginTransaction();
         try {
             $item = Item::find($id);
+
             if ($item) {
+                if (isset($data['base_uom_id']) && isset($data['uom_id'])) {
+                    $baseUomId = $data['base_uom_id'];
+                    $uomId = $data['uom_id'];
+                    $uomConversion = UomConversion::where('base_unit_id', $baseUomId)
+                        ->where('conversion_unit_id', $uomId)
+                        ->where('is_active', 1)
+                        ->first();
+                    if (!$uomConversion) {
+                        return ResponseMessage('No UOM conversion found for the given units.', 404);
+                    }
+                    $conversionRate = $uomConversion->conversion;
+
+                    if (isset($data['min_holding_base_uom_quantity']) && isset($data['min_holding_uom_quantity'])) {
+                        $minimumHoldingAmount = ($data['min_holding_base_uom_quantity'] * $conversionRate) + $data['min_holding_uom_quantity'];
+                        $data['minimum_holding_amount'] = $minimumHoldingAmount;
+                    }
+                }
                 $item->update($data);
-                // if (isset($data['uoms'])) {
-                //     $item->uoms()->sync($data['uoms']);
-                // }
                 if (isset($data['brands'])) {
                     $item->brands()->sync($data['brands']);
                 }
@@ -175,6 +204,8 @@ class ItemRepository implements ItemRepositoryInterface
             'uom_id',
             'lead_time',
             'minimum_holding_amount',
+            'min_holding_base_uom_quantity',
+            'min_holding_uom_quantity',
         ];
         $actualHeadings = $headings[0][0];
         foreach ($expectedHeadings as $heading) {

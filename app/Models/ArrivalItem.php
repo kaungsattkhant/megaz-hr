@@ -23,7 +23,8 @@ class ArrivalItem extends Model
         'item_id',
         'supplier_id',
         'purchase_order_id',
-        'created_by'
+        'created_by',
+        'brand_id'
     ];
 
     public function poInvoice()
@@ -57,5 +58,10 @@ class ArrivalItem extends Model
     public function poOrder()
     {
         return $this->belongsTo(PoOrder::class, 'purchase_order_id');
+    }
+
+    public function brand()
+    {
+        return $this->belongsTo(Brand::class, 'brand_id');
     }
 }

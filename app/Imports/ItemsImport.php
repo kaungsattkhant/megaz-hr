@@ -37,7 +37,9 @@ class ItemsImport implements ToModel, WithHeadingRow, WithValidation, SkipsOnErr
             'base_uom_id' => $row['base_uom_id'],
             'uom_id' => $row['uom_id'],
             'lead_time' => $row['lead_time'],
-            'minimum_holding_amount' => $row['minimum_holding_amount']
+            'minimum_holding_amount' => $row['minimum_holding_amount'],
+            'min_holding_base_uom_quantity' => $row['min_holding_base_uom_quantity'],
+            'min_holding_uom_quantity' => $row['min_holding_uom_quantity'],
         ]);
     }
 
@@ -62,7 +64,9 @@ class ItemsImport implements ToModel, WithHeadingRow, WithValidation, SkipsOnErr
             'base_uom_id' => 'required',
             'uom_id' => 'required',
             'lead_time' => 'required',
-            'minimum_holding_amount' => 'required'
+            'minimum_holding_amount' => 'required',
+            'min_holding_base_uom_quantity' => 'required',
+            'min_holding_uom_quantity' => 'required',
         ];
     }
 

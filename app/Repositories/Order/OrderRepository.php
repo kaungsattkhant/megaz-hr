@@ -321,7 +321,7 @@ class OrderRepository implements OrderRepositoryInterface
 
                 return $orderItem;
             });
-            
+
             return $order_items;
         } else {
             if ($request->date) {
@@ -429,12 +429,27 @@ class OrderRepository implements OrderRepositoryInterface
         }
     }
 
-    public function combineOrderItem($request){
+    public function combineOrderItem($request)
+    {
         // dd($request->all());
-        $orderItemIds=$request->order_item_ids;
-        $orderItems=OrderItem::whereIn('id',$orderItemIds)
-        ->where('status','pos_confirmed')
-        ->get();
-        return $orderItems;
+        $orderItemIds = $request->order_item_ids;
+        $generateUniqueId = now()->format('YmdHis') . '_' . implode('_', $orderItemIds) . '_' . rand(1000000, 9999999);
+        $orderItemQuery = OrderItem::whereIn('id', $orderItemIds)
+            ->where('status', 'pos_confirmed')
+            ->whereNull('group_order_id');
+        $getOrderItem = $orderItemQuery->get();
+        if ($getOrderItem->isNotEmpty()) {
+            $orderItemQuery->update(
+                [
+                    'group_order_id' => $generateUniqueId,
+                ]
+            );
+            ResponseMessage('Grouped is successfully', 200);
+        }
+        ResponseMessage('Grouped Order Item fail!', 200);
+
+    }
+    public function getOrderItemGroupList($request){
+        
     }
 }

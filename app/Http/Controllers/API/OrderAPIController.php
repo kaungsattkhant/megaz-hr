@@ -66,4 +66,9 @@ class OrderAPIController extends Controller
         $data=$this->orderRepo->combineOrderItem($request);
         ResponseData($data);
     }
+
+    public function getOrderItemGroupList(Request $request){
+        $data=$this->orderRepo->getOrderItemGroupList($request);
+        ResponseData($data);
+    }
 }

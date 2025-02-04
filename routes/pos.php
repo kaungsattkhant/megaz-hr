@@ -38,6 +38,8 @@ Route::middleware('auth:api')->group(function () {
         Route::post('/pos_order_items/{order_item_id}/status', 'orderItemAreaConfirm');
         Route::post('/pos_orders/check_foc_supervision', 'checkFocSupervision');
         Route::post('combine_order_items','combineOrderItem');
+        Route::get('/order_item_group_list', 'getOrderItemGroupList');
+        
     });
     //ksk
     Route::prefix('pos')->controller(AccessoryController::class)->group(function () {
