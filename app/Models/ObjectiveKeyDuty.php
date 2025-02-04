@@ -13,6 +13,7 @@ class ObjectiveKeyDuty extends Model
         'assign_date',
         'created_by',
         'is_active',
+        'due_date'
     ];
 
     public function objectivekeyStaff()
