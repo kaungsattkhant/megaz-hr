@@ -240,7 +240,7 @@ class PoOrderRepository implements PoOrderRepositoryInterface
                     END)
             END, 0)
     ) as total_quantity'),
-        DB::raw('GROUP_CONCAT(DISTINCT CONCAT(po_orders.brand_id, "-", po_orders.brand_name) SEPARATOR ", ") as brand_details'),
+        // DB::raw('GROUP_CONCAT(DISTINCT CONCAT(po_orders.brand_id, "-", po_orders.brand_name) SEPARATOR ", ") as brand_details'),
         DB::raw('(
             SELECT JSON_ARRAYAGG(
                 JSON_OBJECT(
@@ -349,6 +349,8 @@ class PoOrderRepository implements PoOrderRepositoryInterface
       ->groupBy(
         'poi.item_id',
         'i.name',
+        'po_orders.brand_id',
+        'po_orders.brand_name',
         'poi.uom_conversion_id',
         'uc.conversion',
         'poi.base_uom_id',
@@ -356,8 +358,7 @@ class PoOrderRepository implements PoOrderRepositoryInterface
         'poi.uom_id',
         'u.name',
         'i_lefts.total_left_quantity',
-        // 'po_orders.brand_id',
-        // 'po_orders.brand_name',
+        
         // 'po_orders.total_po_order_quantity',
         'po_orders.po_order_ids',
         'i_lefts.item_left_ids',
