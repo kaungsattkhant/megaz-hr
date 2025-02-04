@@ -359,7 +359,7 @@ class PoOrderRepository implements PoOrderRepositoryInterface
         'po_orders.brand_id',
         'po_orders.brand_name',
         // 'po_orders.total_po_order_quantity',
-        // 'po_orders.po_order_ids',
+        'po_orders.po_order_ids',
         'i_lefts.item_left_ids',
       )
       ->having('total_quantity', '>', 0) // Filter out records where quantity <= 0
