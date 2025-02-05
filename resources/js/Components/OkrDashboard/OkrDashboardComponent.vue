@@ -194,6 +194,19 @@ export default {
 
     methods: {
         ...mapGetters(['getToken']),
+        
+        
+        async getOkrList(pageNumber) {
+            // let url = this.url + pageNumber + this.url_search + this.url_staff + this.url_from + this.url_to;
+            let url = this.url + this.url_staff + this.url_from + this.url_to + this.url_department;
+            let response = await getApiData({ url: url, token: this.getToken() });
+            if (response.data) {
+                this.okrList = response.data.data;
+                // this.lastPage = response.data.last_page;
+                // this.currentPage = pageNumber;
+                // this.perPage = response.data.per_page;
+            }
+        },
         async getStaffList(){
             let url = '/api/staffs'
             let response = await getApiData({ url: url, token: this.getToken() });
@@ -209,6 +222,14 @@ export default {
         },
         selectedDepartmentChange(){
             this.getRoleList();
+            this.url_from = '';
+            this.url_to = '';
+            this.url_staff = '';
+            this.url_department = '?department_id=' + this.selectedDepartment.id;
+            this.getOkrList();
+            this.fromDate = null;
+            this.toDate = null;
+            this.selectedStaff = null;
         },
         async getRoleList(){
             let response = await getApiData({url: '/api/roles_department/' + this.selectedDepartment.id , token: this.getToken()});
@@ -216,23 +237,11 @@ export default {
                 this.roleList = response.data;
             }
         },
-        
-        async getOkrList(pageNumber) {
-            // let url = this.url + pageNumber + this.url_search + this.url_staff + this.url_from + this.url_to;
-            let url = this.url + this.url_staff + this.url_from + this.url_to;
-            let response = await getApiData({ url: url, token: this.getToken() });
-            if (response.data) {
-                this.okrList = response.data.data;
-                // this.lastPage = response.data.last_page;
-                // this.currentPage = pageNumber;
-                // this.perPage = response.data.per_page;
-            }
-        },
         selectedRoleChange(){
             this.url_from = '';
             this.url_to = '';
             this.url_staff = '';
-            this.url_staff = '?role_id=' + this.selectedRole.id;
+            this.url_role = '?role_id=' + this.selectedRole.id;
             this.getOkrList();
             this.fromDate = null;
             this.toDate = null;

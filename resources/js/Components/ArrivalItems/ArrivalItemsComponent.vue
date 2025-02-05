@@ -75,7 +75,15 @@
                                     <td> &nbsp; </td>
                                     <td class="whitespace-nowrap"> {{ arrival.item_name }} </td>
                                     <td class="whitespace-nowrap"> {{ arrival.po_id }} </td>
-                                    <td class="whitespace-nowrap"> {{ arrival.quantity }} </td>
+                                    <td class="whitespace-nowrap"> 
+                                        <span v-if="arrival.base_uom_quantity > 0">
+                                            {{ arrival.base_uom_quantity }}  {{ arrival.base_uom_name }}
+                                        </span>  
+                                        <span v-if="arrival.uom_quantity > 0">
+                                            {{ arrival.uom_quantity }}  {{ arrival.uom_name }} 
+                                        </span> 
+                                        
+                                    </td>
                                     <td class="whitespace-nowrap"> {{ arrival.supplier_name }} </td>
                                     <td class="whitespace-nowrap">
                                         <button data-te-toggle="modal" data-te-target="#edit_modal" id="edit-btn" class="pr-3">
