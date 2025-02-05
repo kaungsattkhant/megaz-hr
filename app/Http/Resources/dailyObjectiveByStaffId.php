@@ -22,6 +22,7 @@ class dailyObjectiveByStaffId extends JsonResource
             'objective_key_id' => $this->objective_key_id,
             'status' => $this->status,
             'created_at' => $this->created_at,
+            'due_date' => $this->due_date,
             'objective_key' => new ObjectiveKeyResource($this->objectiveKey) ?? null,
             "in_progressed_at" => $this->in_progressed_at,
             "in_progressed_by" => $this->in_progressed_by,
