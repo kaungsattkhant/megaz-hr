@@ -431,7 +431,6 @@ class OrderRepository implements OrderRepositoryInterface
 
     public function combineOrderItem($request)
     {
-        // dd($request->all());
         $orderItemIds = $request->order_item_ids;
         $generateUniqueId = now()->format('YmdHis') . '_' . implode('_', $orderItemIds) . '_' . rand(1000000, 9999999);
         $orderItemQuery = OrderItem::whereIn('id', $orderItemIds)
@@ -449,7 +448,20 @@ class OrderRepository implements OrderRepositoryInterface
         ResponseMessage('Grouped Order Item fail!', 200);
 
     }
-    public function getOrderItemGroupList($request){
-        
+    public function getOrderItemGroupList($request)
+    {
+        $groupedOrderItem = OrderItem::whereNotNull('group_order_id')
+            ->join('menus', 'order_items.menu_id', 'menus.id')
+            ->select(
+                'order_items.group_order_id',
+                DB::raw('GROUP_CONCAT(order_items.id SEPARATOR ", ") as order_item_ids'),
+                DB::raw('GROUP_CONCAT(order_items.order_id SEPARATOR ", ") as order_ids'),
+                DB::raw('GROUP_CONCAT(menus.id SEPARATOR ", ") as menu_ids'),
+                DB::raw('GROUP_CONCAT(menus.name SEPARATOR ", ") as menu_names'),
+                DB::raw('SUM(order_items.quantity) as total_quantity'),
+            )
+            ->groupBy('group_order_id')
+            ->get();
+        return $groupedOrderItem;
     }
 }
