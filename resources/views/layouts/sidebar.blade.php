@@ -787,6 +787,12 @@
                         Lead Time
                     </a>
                 </li>
+                <li>
+                    <a href="/okr_dashboard" class="flex items-center @yield('okr_dashboard')">
+                        <i class="fal fa-braille pr-3"></i>
+                        OKR Dashboard
+                    </a>
+                </li>
                 
 
             </ul>

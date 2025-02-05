@@ -114,6 +114,7 @@ import OkrDutyEditComponent from './Components/OkrDuty/OkrDutyEditComponent.vue'
 import TimeShiftCrudComponent from './Components/TimeShift/TimeShiftCrudComponent.vue';
 import GpsCrudComponent from './Components/GPS/GpsCrudComponent.vue';
 import CheckInComponent from './Components/CheckIn/CheckInComponent.vue';
+import OkrDashboardComponent from './Components/OkrDashboard/OkrDashboardComponent.vue';
 import ContactCrudComponent from './Components/Contact/ContactCrudComponent.vue';
 import LeadTimeComponent from './Components/LeadTime/LeadTimeComponent.vue';
 import ProcurementOrderItemsComponent from './Components/ProcurementOrderItems/ProcurementOrderItemsComponent.vue';
@@ -246,6 +247,7 @@ app.component('OkrDutyEditComponent', OkrDutyEditComponent);
 app.component('TimeShiftCrudComponent', TimeShiftCrudComponent);
 app.component('GpsCrudComponent', GpsCrudComponent);
 app.component('CheckInComponent', CheckInComponent);
+app.component('OkrDashboardComponent', OkrDashboardComponent);
 app.component('ContactCrudComponent', ContactCrudComponent);
 app.component('LeadTimeComponent', LeadTimeComponent);
 app.component('ProcurementOrderItemsComponent', ProcurementOrderItemsComponent);
