@@ -26,14 +26,34 @@ use App\Http\Resources\dailyObjectiveByStaffId;
 use App\Http\Resources\DailyObjKeyStaffResource;
 use App\Http\Resources\KtvProductTreeEditResource;
 
-class  ObjectiveRepository implements ObjectiveInterface
+class ObjectiveRepository implements ObjectiveInterface
 {
 
-    public function dashboardOkr($request){
+    public function dashboardOkr($request)
+    {
         $from_date = isset($request->from_date) ? convertDateFormat($request->from_date) : null;
-        $to_date = isset($request->to_date) ? convertDateFormat($request->to_date) : null; 
-        $staffId=$request->staff_id;
-        $departmentId=$request->department_id;
+        $to_date = isset($request->to_date) ? convertDateFormat($request->to_date) : null;
+        $staffId = $request->staff_id;
+        $departmentId = $request->department_id;
+
+        $okrDashboard = ObjectivekeyStaff::join('objective_key_duties', 'objective_key_staff.objective_key_duty_id', 'objective_key_duties.id')
+            ->join('staff', 'objective_key_staff.staff_id', 'staff.id')
+            ->join('departments', 'objective_key_staff.department_id', 'departments.id')
+            ->join('objective_keys', 'objective_key_staff.objective_key_id', 'objective_keys.id')
+            ->select(
+                'objective_key_duties.assign_date',
+                'objective_key_duties.due_date',
+                'staff.name',   
+                'objective_keys.name',
+                DB::raw('SUM(objective_keys.okr_point) as okr_total_point'),
+            )
+            ->whereNotNull('objective_key_staff.manager_checked_at')
+            ->whereNotNull('objective_key_staff.manager_checked_by	')
+            ->groupBy('objective_key_staff.staff_id')
+            ->groupBy('objective_key_staff.objective_key_id')
+            ->get();
+        return $okrDashboard;
+        // ->where('status')
 
         // return Objec
     }
@@ -248,7 +268,7 @@ class  ObjectiveRepository implements ObjectiveInterface
         $currentDate = now()->toDateString();
         $staffId = UserData()->id;
 
-        $objectives =  Objective::with([
+        $objectives = Objective::with([
             'objectiveKeys.objKeyStaff' => function ($query) use ($staffId) {
                 $query->where('staff_id', $staffId);
             },
@@ -331,7 +351,7 @@ class  ObjectiveRepository implements ObjectiveInterface
                 $storedImages[] = ObjectiveKeyStaffImage::create([
                     'objectivekey_staff_id' => $objKeystaffId,
                     'image_path' => $image_path,
-                    'image_url' =>  $image_url,
+                    'image_url' => $image_url,
                 ]);
             }
             return $storedImages;
@@ -371,7 +391,7 @@ class  ObjectiveRepository implements ObjectiveInterface
                 $updateImages[] = $data->update([
                     'objectivekey_staff_id' => $data->id,
                     'image_path' => $image_path,
-                    'image_url' =>  $image_url,
+                    'image_url' => $image_url,
                 ]);
             }
         } else {
@@ -507,16 +527,16 @@ class  ObjectiveRepository implements ObjectiveInterface
                 ]);
             }
             DB::commit();
-            return   $ktvProductTree;
+            return $ktvProductTree;
         } catch (Exception $e) {
             DB::rollBack();
             throw $e;
         }
     }
 
-    public function  getKtvObjectiveTree(Request $request)
+    public function getKtvObjectiveTree(Request $request)
     {
-        $data =  KtvProductTree::with([
+        $data = KtvProductTree::with([
             'entity',
             'KtvObjectives.objectiveKey.role',
             'KtvItems.item'
@@ -525,7 +545,7 @@ class  ObjectiveRepository implements ObjectiveInterface
     }
     public function getKtvObjTreeById(Request $request, $id)
     {
-        $data =  KtvProductTree::with([
+        $data = KtvProductTree::with([
             'entity',
             'KtvObjectives.objectiveKey.role',
             'KtvItems.item'
@@ -563,7 +583,7 @@ class  ObjectiveRepository implements ObjectiveInterface
                 ]);
             }
             DB::commit();
-            return   $ktvProductTree;
+            return $ktvProductTree;
         } catch (Exception $e) {
             DB::rollBack();
             throw $e;
