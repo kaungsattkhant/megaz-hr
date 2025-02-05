@@ -43,7 +43,7 @@ class ObjectiveRepository implements ObjectiveInterface
             ->select(
                 'objective_key_duties.assign_date',
                 'objective_key_duties.due_date',
-                'staff.name',   
+                'staff.name',
                 'objective_keys.name',
                 DB::raw('SUM(objective_keys.okr_point) as okr_total_point'),
             )
