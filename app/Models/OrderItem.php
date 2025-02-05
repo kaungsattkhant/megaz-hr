@@ -36,6 +36,7 @@ class OrderItem extends Model
         'completed_by',
         'placed_at',
         'placed_by',
+        'group_order_id',
     ];
 
     public function area()
