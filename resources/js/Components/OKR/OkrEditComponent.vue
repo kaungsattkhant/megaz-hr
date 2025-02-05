@@ -42,7 +42,7 @@
                     </select>
                 </div>
             </div>
-            <div class="mb-4 col-span-3">
+            <!-- <div class="mb-4 col-span-3">
                 <label for="" class="label-form mb-3">
                     Date Assigned
                 </label>
@@ -54,7 +54,8 @@
                             v-show="!isOpen">{{ values.length }} Date selected</span>
                     </template>
                 </multiselect>
-            </div><div class="col-span-3"></div>
+            </div> -->
+            <div class="col-span-6"></div>
 
             <div class="mb-4 col-span-3">
                 <label for="" class="label-form mb-3">
@@ -71,7 +72,7 @@
             
             <div class="col-span-3">
                 <label for="" class="label-form mb-3">
-                    Duration
+                    Duration ( minutes )
                 </label>
                 <input type="number" v-model="duration" class="input-ui ">
             </div>
@@ -107,11 +108,11 @@
                             <th scope="col" class="">
                                 OKR Points
                             </th>
-                            <th scope="col" class="">
+                            <!-- <th scope="col" class="">
                                 Date
-                            </th>
+                            </th> -->
                             <th scope="col" class="">
-                                Duration
+                                Duration ( minutes )
                             </th>
                             <th scope="col" class="">
 
@@ -130,11 +131,11 @@
                             <td class="">
                                 {{ obj.okr_point }}
                             </td>
-                            <td class="">
+                            <!-- <td class="">
                                 <span class="after:content-[','] last:after:content-[''] pr-1" v-for="day in obj.assigned_days">
                                     {{ day }}
                                 </span>
-                            </td>
+                            </td> -->
                             <td class="">
                                 {{ obj.duration }}
                             </td>
@@ -224,7 +225,7 @@ export default {
                     role_id: obj.role_id,
                     role_name: obj.role.name,
                     okr_point: obj.okr_point,
-                    assigned_days: obj.assigned_days, 
+                    // assigned_days: obj.assigned_days, 
                     duration: obj.duration
                 });
             });
@@ -337,10 +338,10 @@ export default {
                 this.alertValidationMessage(`Role`);
                 return 1;
             }
-            else if (!this.selectedDate) {
-                this.alertValidationMessage(`Date`);
-                return 1;
-            }
+            // else if (!this.selectedDate) {
+            //     this.alertValidationMessage(`Date`);
+            //     return 1;
+            // }
             else if (!this.duration) {
                 this.alertValidationMessage(`Duration`);
                 return 1;
@@ -352,12 +353,12 @@ export default {
                     role_id:this.selectedRole,
                     role_name:this.roleList.find(role => role.id === this.selectedRole).name,
                     okr_point: this.selectedOkrPoint,
-                    assigned_days: this.selectedDate, 
+                    // assigned_days: this.selectedDate, 
                     duration: this.duration 
                 });
                 this.key_result = null;
                 this.selectedOkrPoint = null;
-                this.selectedDate = null;
+                // this.selectedDate = null;
                 this.duration = null;
             }
         },

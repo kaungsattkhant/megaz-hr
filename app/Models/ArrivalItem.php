@@ -23,7 +23,8 @@ class ArrivalItem extends Model
         'item_id',
         'supplier_id',
         'purchase_order_id',
-        'created_by'
+        'created_by',
+        'brand_id'
     ];
 
     public function poInvoice()

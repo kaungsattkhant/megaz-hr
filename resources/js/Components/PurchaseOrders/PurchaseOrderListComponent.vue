@@ -42,6 +42,9 @@
                                 <th scope="col" class="  ">
                                     Manager Check
                                 </th>
+                                <th scope="col" class="  ">
+                                    Procurement Check
+                                </th>
 
                                 <th scope="col" class="  ">
                                     Financial Check
@@ -77,6 +80,9 @@
                                         {{ purchaseOrder.manager_check_id == null ? 'No' : 'Yes' }}
                                     </td>
                                     <td class="">
+                                        {{ purchaseOrder.procurement_manager_check_id == null ? 'No' : 'Yes' }}
+                                    </td>
+                                    <td class="">
                                         {{ purchaseOrder.financial_check_id == null ? 'No' : 'Yes' }}
                                     </td>
                                     <td class="">
@@ -84,7 +90,7 @@
                                     </td>
 
                                     <td class="whitespace-nowrap  space-x-4">
-                                        <button v-if="purchaseOrder.is_md_checked != 1" class="pr-1"
+                                        <button v-if="purchaseOrder.is_md_checked != 1 && !isStaff" class="pr-1"
                                             @click="checkPurchaseOrderBtnClicked(purchaseOrder.id)"
                                             data-te-toggle="modal" data-te-target="#checkModal">
                                             <i class="far fa-check"></i>
@@ -262,6 +268,7 @@ export default {
             perPage: 0,
             lastPage: 0,
             totalData: 0,
+            isStaff: false,
         };
     },
 
@@ -358,6 +365,9 @@ export default {
             }
             if (role.name == 'Finance') {
                 this.isFinance = true;
+            }
+            if (role.name == 'Staff'){
+                this.isStaff = true;
             }
         });
         this.getPurhaseOrderList(1);

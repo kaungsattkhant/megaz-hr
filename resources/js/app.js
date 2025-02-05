@@ -77,6 +77,7 @@ import ArPaidComponent from './Components/AR/ArPaidComponent.vue';
 import SupplierListComponent from './Components/Supplier/SupplierListComponent.vue';
 import SupplierCreateComponent from './Components/Supplier/SupplierCreateComponent.vue';
 import SupplierUpdateComponent from './Components/Supplier/SupplierUpdateComponent.vue';
+import SupplierDetailComponent from './Components/Supplier/SupplierDetailComponent.vue';
 import SupplierLeadTimeComponent from './Components/Supplier/SupplierLeadTimeComponent.vue';
 import FixedAssetCrudComponent from './Components/FixedAssets/FixedAssetCrudComponent.vue';
 import AssetItemCrudComponent from './Components/FixedAssets/AssetItemCrudComponent.vue';
@@ -278,6 +279,7 @@ app.component('TableCrudComponent', TableCrudComponent);
 app.component('SupplierListComponent', SupplierListComponent);
 app.component('SupplierCreateComponent', SupplierCreateComponent);
 app.component('SupplierUpdateComponent', SupplierUpdateComponent);
+app.component('SupplierDetailComponent', SupplierDetailComponent);
 app.component('SupplierLeadTimeComponent', SupplierLeadTimeComponent);
 
 app.component('FixedAssetCrudComponent', FixedAssetCrudComponent);
