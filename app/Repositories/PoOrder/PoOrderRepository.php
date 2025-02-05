@@ -586,6 +586,7 @@ class PoOrderRepository implements PoOrderRepositoryInterface
                       WHEN COUNT(arrival_items.id) > 0 THEN 0  -- If arrival item exists but no lefts, assume 0
                       ELSE SUM(poOrder.quantity)
                   END as total_quantity'),
+        
         DB::raw('
                   CASE 
                       WHEN SUM(item_lefts.total_left_amount) > 0 THEN SUM(item_lefts.total_left_amount) 
@@ -728,32 +729,23 @@ class PoOrderRepository implements PoOrderRepositoryInterface
       })
       ->select(
         'arrival_items.item_id',
-        // 'arrival_items.purchase_order_id as po_order_id',
-        // 'arrival_items.brand_id',
         DB::raw('SUM(item_lefts.quantity) as left_quantity'),
         DB::raw('SUM(item_lefts.amount) as left_amount'),
         DB::raw('GROUP_CONCAT(item_lefts.id SEPARATOR ", ") as item_left_ids')
       )
       ->groupBy(
         'arrival_items.item_id',
-        //  'arrival_items.purchase_order_id', 
-        //  'arrival_items.brand_id'
       );
 
     $arrivalSubQuery = DB::table('arrival_items')
       ->select(
         'arrival_items.item_id',
-        // 'arrival_items.purchase_order_id',
-        // 'arrival_items.purchase_order_id as po_order_id',
-        // 'arrival_items.brand_id',
         DB::raw('SUM(arrival_items.quantity) as arrival_quantity'),
         DB::raw('SUM(arrival_items.amount) as arrival_amount'),
         DB::raw('GROUP_CONCAT(arrival_items.purchase_order_id SEPARATOR ",") as po_order_ids')
       )
       ->groupBy(
         'arrival_items.item_id',
-        //  'arrival_items.purchase_order_id',
-        // 'arrival_items.brand_id'
       );
 
     // Main PO Orders Query
@@ -776,8 +768,6 @@ class PoOrderRepository implements PoOrderRepositoryInterface
       ->select(
         'i.id as item_id',
         'i.name as item_name',
-        // 'poOrder.purchase_order_id as po_order_id',
-        // 'poOrder.brand_id as brand_id',
         DB::raw('COALESCE(SUM(poOrder.quantity), 0) AS total_po_order_quantity'),
         DB::raw('COALESCE(SUM(poOrder.amount), 0) AS total_po_order_amount'),
         DB::raw('GROUP_CONCAT(DISTINCT s.name SEPARATOR ", ") as supplier_name'),
@@ -791,6 +781,21 @@ class PoOrderRepository implements PoOrderRepositoryInterface
         DB::raw('COALESCE(SUM(poOrder.quantity), 0) - COALESCE(arrival_items.arrival_quantity, 0) AS total_quantity'),
         DB::raw('COALESCE(item_lefts.left_amount, 0) as total_left_amount'),
         DB::raw('COALESCE(arrival_items.arrival_amount, 0) as total_arrival_amount'),
+        DB::raw('
+    CASE 
+        WHEN (COALESCE(SUM(poOrder.quantity), 0) - COALESCE(arrival_items.arrival_quantity, 0)) < uc.conversion 
+        THEN 0 
+        ELSE FLOOR((COALESCE(SUM(poOrder.quantity), 0) - COALESCE(arrival_items.arrival_quantity, 0)) / uc.conversion) 
+    END AS total_base_uom_quantity
+'),
+
+        DB::raw('
+    CASE 
+        WHEN (COALESCE(SUM(poOrder.quantity), 0) - COALESCE(arrival_items.arrival_quantity, 0)) < uc.conversion 
+        THEN (COALESCE(SUM(poOrder.quantity), 0) - COALESCE(arrival_items.arrival_quantity, 0))
+        ELSE (COALESCE(SUM(poOrder.quantity), 0) - COALESCE(arrival_items.arrival_quantity, 0)) % uc.conversion 
+    END AS total_uom_quantity
+'),
         // DB::raw('GROUP_CONCAT(DISTINCT b.name SEPARATOR ", ") as brands')
       )
       ->join('uoms as u', 'poOrder.uom_id', '=', 'u.id')
