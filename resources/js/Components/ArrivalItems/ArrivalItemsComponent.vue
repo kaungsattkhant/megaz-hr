@@ -55,7 +55,13 @@
                                         {{ item.po_numbers }}
                                     </td>
                                     <td class="whitespace-nowrap">
-                                        {{ item.total_quantity }}
+                                        <!-- {{ item.total_quantity }} -->
+                                        <span class="pr-2">
+                                            {{ item.total_base_uom_quantity }}  {{ item.base_uom_name }}
+                                        </span>  
+                                        <span>
+                                            {{ item.total_uom_quantity }}  {{ item.uom_name }} 
+                                        </span> 
                                     </td>
                                     <td class="whitespace-nowrap">
                                         {{ item.supplier_name }}
@@ -76,10 +82,10 @@
                                     <td class="whitespace-nowrap"> {{ arrival.item_name }} </td>
                                     <td class="whitespace-nowrap"> {{ arrival.po_id }} </td>
                                     <td class="whitespace-nowrap"> 
-                                        <span v-if="arrival.base_uom_quantity > 0">
+                                        <span class="pr-2">
                                             {{ arrival.base_uom_quantity }}  {{ arrival.base_uom_name }}
                                         </span>  
-                                        <span v-if="arrival.uom_quantity > 0">
+                                        <span>
                                             {{ arrival.uom_quantity }}  {{ arrival.uom_name }} 
                                         </span> 
                                         
