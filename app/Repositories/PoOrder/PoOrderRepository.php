@@ -768,6 +768,8 @@ class PoOrderRepository implements PoOrderRepositoryInterface
       ->select(
         'i.id as item_id',
         'i.name as item_name',
+        'u.name as uom_name',
+        'bu.name as base_uom_name',
         DB::raw('COALESCE(SUM(poOrder.quantity), 0) AS total_po_order_quantity'),
         DB::raw('COALESCE(SUM(poOrder.amount), 0) AS total_po_order_amount'),
         DB::raw('GROUP_CONCAT(DISTINCT s.name SEPARATOR ", ") as supplier_name'),
