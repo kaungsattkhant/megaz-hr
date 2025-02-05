@@ -279,7 +279,7 @@
                             </option>
                         </select>
                     </div>
-                    <!-- <div class="mb-4">
+                    <div class="mb-4">
                         <label for="brand" class="text-sm">Brand</label>
                         <select name="" id="brand" v-model="selectedBrand"
                         class="text-sm border border-gray-300 input-ui w-12
@@ -288,7 +288,7 @@
                                 {{ brand.brand.name }}
                             </option>
                         </select>
-                    </div> -->
+                    </div>
                     <div class="mb-4">
                         <label for="supplier" class="text-sm">Price</label>
                         <input type="number"
