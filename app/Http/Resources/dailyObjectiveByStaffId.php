@@ -21,6 +21,7 @@ class dailyObjectiveByStaffId extends JsonResource
             'staff_id' => $this->staff_id,
             'objective_key_id' => $this->objective_key_id,
             'status' => $this->status,
+            'created_at' => $this->created_at,
             'objective_key' => new ObjectiveKeyResource($this->objectiveKey) ?? null,
             "in_progressed_at" => $this->in_progressed_at,
             "in_progressed_by" => $this->in_progressed_by,
@@ -32,8 +33,7 @@ class dailyObjectiveByStaffId extends JsonResource
             "cancelled_by" => $this->cancelled_by,
             "manager_checked_at" => $this->manager_checked_at,
             "manager_checked_by" => $this->manager_checked_by,
-            'created_at' => $this->created_at,
-            'updated_at' => $this->updated_at,
+
         ];
     }
 }

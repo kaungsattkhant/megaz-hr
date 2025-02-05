@@ -80,7 +80,8 @@ class ItemAPIController extends Controller
         $item = $this->itemRepo->itemImport($request);
         return $item;
     }
-    public function brandlistOfSupplierByItem($itemId){
+    public function brandlistOfSupplierByItem($itemId)
+    {
         $item = $this->itemRepo->brandlistOfSupplierByItem($itemId);
         return $item;
     }
