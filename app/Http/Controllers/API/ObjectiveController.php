@@ -18,6 +18,11 @@ class ObjectiveController extends Controller
         $this->objectiveRepository = $objectiveRepository;
     }
 
+    public function dashboardOkr(Request $request){
+        $data = $this->objectiveRepository->dashboardOkr($request);
+        ResponseData($data);
+    }
+
     public function getObjectives(Request $request)
     {
         $data = $this->objectiveRepository->getObjectives($request);
