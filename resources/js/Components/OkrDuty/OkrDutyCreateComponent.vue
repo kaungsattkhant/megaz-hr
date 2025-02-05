@@ -410,7 +410,7 @@ export default {
         async createDuty(){
             let formData = new FormData();
             formData.append('assign_date',this.selectedDate);
-            formData.append('assign_date',this.selectedDueDate);
+            formData.append('due_date',this.selectedDueDate);
             formData.append('assign_duty',JSON.stringify(this.dutyList));
             let response = await postApiData({url:`/api/assign_duties`, form_data:formData, token:this.getToken()})
             if(response.success){

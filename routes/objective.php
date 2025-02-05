@@ -13,7 +13,7 @@ Route::middleware('auth:api')->group(function () {
     Route::post('/objectives/{id}', 'update');
     Route::get('/objectives/{id}', 'getObjectiveById');
     Route::delete('/objectives/{id}', 'deleteObjective');
-    Route::get('dashboard_okr','dashboardOkr');
+    Route::get('dashboard_okr', 'dashboardOkr');
 
     //assign duties by objkeystaff
     Route::get('/objectives_keys_by_staff/{staff_id}', 'getObjectiveKeysByStaffId');
@@ -21,7 +21,7 @@ Route::middleware('auth:api')->group(function () {
     Route::get('/assign_duties/{id}', 'showAssignDutiesById');
     Route::delete('/assign_duties/{id}', 'deleteAssignDutiesById');
     Route::delete('/assign_duties/objective_key_staff/{id}', 'deleteAssignObjKeyStaffById');
-    Route::post('/assign_duties', 'storeAssignDutiesByObjecOtiveKeys');
+    Route::post('/assign_duties', 'storeAssignDutiesByObjectiveKeys');
     Route::post('/assign_duties/{assignDutyId}', 'updateAssignDutiesByObjectiveKeys');
 
     //mobile-api
@@ -41,7 +41,6 @@ Route::middleware('auth:api')->group(function () {
     Route::post('/ktv/objective_trees', 'storeKtvObjectiveTree');
     Route::get('/ktv/objective_trees/{id}', 'getKtvObjTreeById');
     Route::post('/ktv/objective_trees/{id}', 'updateKtvObjTree');
-
   });
 
 

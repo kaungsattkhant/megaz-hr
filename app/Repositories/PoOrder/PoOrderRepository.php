@@ -243,7 +243,7 @@ class PoOrderRepository implements PoOrderRepositoryInterface
                     END)
             END, 0)
     ) as total_quantity'),
-    DB::raw('
+        DB::raw('
     CASE 
         WHEN (
             (COALESCE(i_lefts.total_left_quantity, 0) + 
@@ -274,7 +274,7 @@ class PoOrderRepository implements PoOrderRepositoryInterface
             )) / uc.conversion) 
     END AS total_base_uom_quantity
 '),
-DB::raw('
+        DB::raw('
     CASE 
         WHEN (
             (COALESCE(i_lefts.total_left_quantity, 0) + 
@@ -719,7 +719,6 @@ DB::raw('
 
   public function testArrivalList($request)
   {
-    // Left Subquery: Simplified for performance
     $leftsSubquery = DB::table('item_lefts')
       ->join('arrival_items', function ($join) {
         $join->on('item_lefts.item_leftable_id', '=', 'arrival_items.id')
@@ -727,21 +726,24 @@ DB::raw('
       })
       ->select(
         'arrival_items.item_id',
+        'arrival_items.purchase_order_id as po_order_id',
+        'arrival_items.brand_id',
         DB::raw('SUM(item_lefts.quantity) as left_quantity'),
         DB::raw('SUM(item_lefts.amount) as left_amount'),
         DB::raw('GROUP_CONCAT(item_lefts.id SEPARATOR ", ") as item_left_ids')
       )
-      ->groupBy('arrival_items.item_id');
+      ->groupBy('arrival_items.item_id', 'arrival_items.purchase_order_id', 'arrival_items.brand_id');
 
-    // Arrival Subquery
     $arrivalSubQuery = DB::table('arrival_items')
       ->select(
         'arrival_items.item_id',
+        'arrival_items.purchase_order_id as po_order_id',
+        'arrival_items.brand_id',
         DB::raw('SUM(arrival_items.quantity) as arrival_quantity'),
         DB::raw('SUM(arrival_items.amount) as arrival_amount'),
         DB::raw('GROUP_CONCAT(arrival_items.purchase_order_id SEPARATOR ",") as po_order_ids')
       )
-      ->groupBy('arrival_items.item_id');
+      ->groupBy('arrival_items.item_id', 'arrival_items.purchase_order_id', 'arrival_items.brand_id');
 
     // Main PO Orders Query
     $poOrders = DB::table('po_orders as poOrder')
@@ -750,15 +752,21 @@ DB::raw('
       ->join('suppliers as s', 'poOrder.supplier_id', '=', 's.id')
       ->join('item_prices as ip', 'poOrder.item_price_id', '=', 'ip.id')
       ->leftJoinSub($leftsSubquery, 'item_lefts', function ($join) {
-        $join->on('poOrder.item_id', '=', 'item_lefts.item_id');
+        $join->on('poOrder.item_id', '=', 'item_lefts.item_id')
+          ->on('poOrder.purchase_order_id', '=', 'item_lefts.po_order_id')
+          ->on('poOrder.brand_id', '=', 'item_lefts.brand_id');
       })
       ->leftJoinSub($arrivalSubQuery, 'arrival_items', function ($join) {
-        $join->on('poOrder.item_id', '=', 'arrival_items.item_id');
+        $join->on('poOrder.item_id', '=', 'arrival_items.item_id')
+          ->on('poOrder.purchase_order_id', '=', 'item_lefts.po_order_id')
+          ->on('poOrder.brand_id', '=', 'item_lefts.brand_id');
       })
       ->join('brands as b', 'poOrder.brand_id', '=', 'b.id')
       ->select(
         'i.id as item_id',
         'i.name as item_name',
+        'poOrder.purchase_order_id as po_order_id',
+        'poOrder.brand_id as brand_id',
         DB::raw('COALESCE(SUM(poOrder.quantity), 0) AS total_po_order_quantity'),
         DB::raw('COALESCE(SUM(poOrder.amount), 0) AS total_po_order_amount'),
         DB::raw('GROUP_CONCAT(DISTINCT s.name SEPARATOR ", ") as supplier_name'),
@@ -794,6 +802,8 @@ DB::raw('
         'arrival_items.arrival_amount',
         'arrival_items.arrival_quantity',
         'item_lefts.item_left_ids',
+        'poOrder.brand_id',
+        'poOrder.purchase_order_id',
       )
       ->paginate(config('common.list_count'));
 
@@ -846,7 +856,6 @@ DB::raw('
 
   public function testArrivalListByItemId($itemId)
   {
-    // $itemId = 2;
 
     $leftsSubquery = DB::table('item_lefts')
       // ->join('purchase_orders','item_lefts.purchase_order_id','purchase_orders.id')
@@ -858,25 +867,27 @@ DB::raw('
       ->select(
         'arrival_items.item_id',
         'arrival_items.purchase_order_id',
+        'arrival_items.brand_id',
         // 'po_orders.id as po_order_id',
         DB::raw('SUM(item_lefts.quantity) as left_quantity'),
         DB::raw('SUM(item_lefts.amount) as left_amount'),
         DB::raw('GROUP_CONCAT(item_lefts.id SEPARATOR ", ") as item_left_ids'),
       )
       ->where('arrival_items.item_id', $itemId) // Add filtering condition
-      ->groupBy('arrival_items.item_id', 'arrival_items.purchase_order_id');
+      ->groupBy('arrival_items.item_id', 'arrival_items.purchase_order_id', 'arrival_items.brand_id');
 
     $arrivalSubQuery = DB::table('arrival_items')
       // ->join('po_orders', 'arrival_items.po_order_id', 'po_orders.id')
       ->select(
         'arrival_items.item_id',
         'arrival_items.purchase_order_id',
+        'arrival_items.brand_id',
         DB::raw('SUM(arrival_items.quantity) as arrival_quantity'),
         DB::raw('SUM(arrival_items.amount) as arrival_amount'),
         // DB::raw('GROUP_CONCAT(arrival_items.purchase_order_id SEPARATOR ",") as po_order_ids'),
       )
       ->where('arrival_items.item_id', $itemId) // Add filtering condition
-      ->groupBy('arrival_items.item_id', 'arrival_items.purchase_order_id');
+      ->groupBy('arrival_items.item_id', 'arrival_items.purchase_order_id', 'arrival_items.brand_id');
 
     // return $arrivalSubQuery->get();
 
@@ -887,11 +898,13 @@ DB::raw('
       ->join('item_prices as ip', 'poOrder.item_price_id', '=', 'ip.id')
       ->leftJoinSub($leftsSubquery, 'item_lefts', function ($join) {
         $join->on('poOrder.item_id', '=', 'item_lefts.item_id')
-          ->on('item_lefts.purchase_order_id', '=', 'poOrder.purchase_order_id');
+          ->on('item_lefts.purchase_order_id', '=', 'poOrder.purchase_order_id')
+          ->on('poOrder.brand_id', '=', 'item_lefts.brand_id');
       })
       ->leftJoinSub($arrivalSubQuery, 'arrival_items', function ($join) {
         $join->on('poOrder.item_id', '=', 'arrival_items.item_id')
-          ->on('arrival_items.purchase_order_id', '=', 'poOrder.purchase_order_id');
+          ->on('arrival_items.purchase_order_id', '=', 'poOrder.purchase_order_id')
+          ->on('poOrder.brand_id', '=', 'item_lefts.brand_id');
       })->join('brands as b', 'poOrder.brand_id', '=', 'b.id')
       ->select(
         'poOrder.purchase_order_id',
@@ -914,6 +927,10 @@ DB::raw('
         COALESCE(arrival_items.arrival_quantity, 0)
          AS quantity
     '),
+        DB::raw('
+                COALESCE(SUM(poOrder.amount), 0) - COALESCE(arrival_items.arrival_amount, 0) 
+                AS amount
+            '),
         DB::raw('COALESCE(SUM(poOrder.quantity), 0) AS total_po_order_quantity'),
         DB::raw('
           COALESCE(SUM(poOrder.quantity), 0) -
