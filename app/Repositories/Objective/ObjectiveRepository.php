@@ -51,8 +51,8 @@ class ObjectiveRepository implements ObjectiveInterface
             ->when($departmentId, function ($q) use ($departmentId) {
                 $q->where('departments.id', $departmentId);
             })
-            ->when($staffId, function ($q) use ($departmentId) {
-                $q->where('staff.id', $departmentId);
+            ->when($staffId, function ($q) use ($staffId) {
+                $q->where('staff.id', $staffId);
             })
             ->when(($from_date && $to_date), function ($q) use ($from_date, $to_date) {
                 $q->whereBetween(DB::raw('DATE(objective_key_duties.assign_date)'), [$from_date, $to_date]);
