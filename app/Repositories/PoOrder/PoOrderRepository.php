@@ -129,7 +129,7 @@ class PoOrderRepository implements PoOrderRepositoryInterface
         'brands.id as brand_id',
         'brands.name as brand_name'
       )->join('brands', 'po_orders.brand_id', '=', 'brands.id')
-      ->groupBy('item_id', 'brands.id','brands.name');
+      ->groupBy('item_id', 'brands.id', 'brands.name');
     $quantitySubQuery = '(
           SELECT (
               COALESCE(
@@ -177,7 +177,7 @@ class PoOrderRepository implements PoOrderRepositoryInterface
 
 
     $poOrderItems = DB::table('purchase_order_items as poi')
-    ->join('brands as b', 'poi.brand_id', '=', 'b.id')
+      ->join('brands as b', 'poi.brand_id', '=', 'b.id')
       ->join('items as i', 'poi.item_id', '=', 'i.id')
       ->leftJoinSub($leftsSubquery, 'i_lefts', function ($join) {
         $join->on('i_lefts.item_id', '=', 'i.id');
@@ -202,7 +202,9 @@ class PoOrderRepository implements PoOrderRepositoryInterface
         'poi.uom_conversion_id',
         // 'po_orders.brand_id',
         // 'po_orders.brand_name',
-        // DB::raw('GROUP_CONCAT(DISTINCT po.po_id SEPARATOR ", ") as po_numbers'),
+        DB::raw('GROUP_CONCAT(DISTINCT b.id SEPARATOR ", ") as brand_ids'),
+        DB::raw('GROUP_CONCAT(DISTINCT b.name SEPARATOR ", ") as brand_name'),
+
         DB::raw('
           COALESCE(
       SUM(
@@ -241,6 +243,80 @@ class PoOrderRepository implements PoOrderRepositoryInterface
                     END)
             END, 0)
     ) as total_quantity'),
+    DB::raw('
+    CASE 
+        WHEN (
+            (COALESCE(i_lefts.total_left_quantity, 0) + 
+            COALESCE(
+                CASE 
+                    WHEN po_orders.po_order_ids IS NULL THEN 
+                        SUM(poi.quantity)
+                    ELSE 
+                        SUM(CASE 
+                            WHEN FIND_IN_SET(poi.purchase_order_id, po_order_ids)  = 0 THEN poi.quantity
+                            ELSE 0 
+                        END)
+                END, 0)
+            ) 
+        ) < uc.conversion THEN 0 
+        ELSE FLOOR((
+            (COALESCE(i_lefts.total_left_quantity, 0) + 
+            COALESCE(
+                CASE 
+                    WHEN po_orders.po_order_ids IS NULL THEN 
+                        SUM(poi.quantity)
+                    ELSE 
+                        SUM(CASE 
+                            WHEN FIND_IN_SET(poi.purchase_order_id, po_order_ids)  = 0 THEN poi.quantity
+                            ELSE 0 
+                        END)
+                END, 0)
+            )) / uc.conversion) 
+    END AS total_base_uom_quantity
+'),
+DB::raw('
+    CASE 
+        WHEN (
+            (COALESCE(i_lefts.total_left_quantity, 0) + 
+            COALESCE(
+                CASE 
+                    WHEN po_orders.po_order_ids IS NULL THEN 
+                        SUM(poi.quantity)
+                    ELSE 
+                        SUM(CASE 
+                            WHEN FIND_IN_SET(poi.purchase_order_id, po_order_ids)  = 0 THEN poi.quantity
+                            ELSE 0 
+                        END)
+                END, 0)
+            ) 
+        ) < uc.conversion THEN 
+            (COALESCE(i_lefts.total_left_quantity, 0) + 
+            COALESCE(
+                CASE 
+                    WHEN po_orders.po_order_ids IS NULL THEN 
+                        SUM(poi.quantity)
+                    ELSE 
+                        SUM(CASE 
+                            WHEN FIND_IN_SET(poi.purchase_order_id, po_order_ids)  = 0 THEN poi.quantity
+                            ELSE 0 
+                        END)
+                END, 0)
+            ) 
+        ELSE 
+            (COALESCE(i_lefts.total_left_quantity, 0) + 
+            COALESCE(
+                CASE 
+                    WHEN po_orders.po_order_ids IS NULL THEN 
+                        SUM(poi.quantity)
+                    ELSE 
+                        SUM(CASE 
+                            WHEN FIND_IN_SET(poi.purchase_order_id, po_order_ids)  = 0 THEN poi.quantity
+                            ELSE 0 
+                        END)
+                END, 0)
+            ) % uc.conversion 
+    END AS total_uom_quantity
+'),
         // DB::raw('GROUP_CONCAT(DISTINCT CONCAT(po_orders.brand_id, "-", po_orders.brand_name) SEPARATOR ", ") as brand_details'),
         DB::raw('(
             SELECT JSON_ARRAYAGG(
@@ -359,7 +435,7 @@ class PoOrderRepository implements PoOrderRepositoryInterface
         'poi.uom_id',
         'u.name',
         'i_lefts.total_left_quantity',
-        
+
         // 'po_orders.total_po_order_quantity',
         'po_orders.po_order_ids',
         'i_lefts.item_left_ids',
@@ -1154,7 +1230,7 @@ class PoOrderRepository implements PoOrderRepositoryInterface
 
     $purchaseOrderIds = $poOrderlist->pluck('purchase_order_id');
 
-    $totalArrivalItemCount = ArrivalItem::whereIn('purchase_order_id',  $purchaseOrderIds)
+    $totalArrivalItemCount = ArrivalItem::whereIn('purchase_order_id', $purchaseOrderIds)
       ->where('supplier_id', $supplierId)
       ->count();
 
