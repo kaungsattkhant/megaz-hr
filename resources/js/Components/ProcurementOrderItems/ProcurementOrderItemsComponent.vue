@@ -155,7 +155,7 @@
                 <div class="relative flex justify-between py-2 px-6 border-b">
                     <h5 class="text-base text-center mt-2 font-semibold leading-normal font-inter"
                         id="edit_modalLabel">
-                        Add Contact
+                        Add 
                     </h5>
                     <button type="button" class="text-xs focus:shadow-none focus:outline-none" data-te-modal-dismiss id="close_create_modal"
                         aria-label="Close">

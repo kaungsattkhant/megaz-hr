@@ -781,6 +781,12 @@
                         Check In
                     </a>
                 </li>
+                <li>
+                    <a href="/lead_time" class="flex items-center @yield('lead_time')">
+                        <i class="fal fa-braille pr-3"></i>
+                        Lead Time
+                    </a>
+                </li>
                 
 
             </ul>
