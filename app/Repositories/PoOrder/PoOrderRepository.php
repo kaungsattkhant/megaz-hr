@@ -744,7 +744,10 @@ class PoOrderRepository implements PoOrderRepositoryInterface
         DB::raw('SUM(arrival_items.amount) as arrival_amount'),
         DB::raw('GROUP_CONCAT(arrival_items.purchase_order_id SEPARATOR ",") as po_order_ids')
       )
-      ->groupBy('arrival_items.item_id', 'arrival_items.purchase_order_id', 'arrival_items.brand_id');
+      ->groupBy('arrival_items.item_id',
+       'arrival_items.purchase_order_id',
+        'arrival_items.brand_id'
+      );
 
     // Main PO Orders Query
     $poOrders = DB::table('po_orders as poOrder')
@@ -754,20 +757,20 @@ class PoOrderRepository implements PoOrderRepositoryInterface
       ->join('item_prices as ip', 'poOrder.item_price_id', '=', 'ip.id')
       ->leftJoinSub($leftsSubquery, 'item_lefts', function ($join) {
         $join->on('poOrder.item_id', '=', 'item_lefts.item_id')
-          ->on('poOrder.purchase_order_id', '=', 'item_lefts.po_order_id')
-          ->on('poOrder.brand_id', '=', 'item_lefts.brand_id');
+          ->on('poOrder.purchase_order_id', '=', 'item_lefts.po_order_id');
+          // ->on('poOrder.brand_id', '=', 'item_lefts.brand_id');
       })
       ->leftJoinSub($arrivalSubQuery, 'arrival_items', function ($join) {
         $join->on('poOrder.item_id', '=', 'arrival_items.item_id')
-          ->on('poOrder.purchase_order_id', '=', 'item_lefts.po_order_id')
-          ->on('poOrder.brand_id', '=', 'item_lefts.brand_id');
+          ->on('poOrder.purchase_order_id', '=', 'item_lefts.po_order_id');
+          // ->on('poOrder.brand_id', '=', 'item_lefts.brand_id');
       })
-      ->join('brands as b', 'poOrder.brand_id', '=', 'b.id')
+      // ->join('brands as b', 'poOrder.brand_id', '=', 'b.id')
       ->select(
         'i.id as item_id',
         'i.name as item_name',
         'poOrder.purchase_order_id as po_order_id',
-        'poOrder.brand_id as brand_id',
+        // 'poOrder.brand_id as brand_id',
         DB::raw('COALESCE(SUM(poOrder.quantity), 0) AS total_po_order_quantity'),
         DB::raw('COALESCE(SUM(poOrder.amount), 0) AS total_po_order_amount'),
         DB::raw('GROUP_CONCAT(DISTINCT s.name SEPARATOR ", ") as supplier_name'),
@@ -781,13 +784,14 @@ class PoOrderRepository implements PoOrderRepositoryInterface
         DB::raw('COALESCE(SUM(poOrder.quantity), 0) - COALESCE(arrival_items.arrival_quantity, 0) AS total_quantity'),
         DB::raw('COALESCE(item_lefts.left_amount, 0) as total_left_amount'),
         DB::raw('COALESCE(arrival_items.arrival_amount, 0) as total_arrival_amount'),
-        DB::raw('GROUP_CONCAT(DISTINCT b.name SEPARATOR ", ") as brands')
+        // DB::raw('GROUP_CONCAT(DISTINCT b.name SEPARATOR ", ") as brands')
       )
       ->join('uoms as u', 'poOrder.uom_id', '=', 'u.id')
       ->join('uoms as bu', 'poOrder.base_uom_id', '=', 'bu.id')
       ->join('uom_conversions as uc', 'poOrder.uom_conversion_unit_id', '=', 'uc.id')
       ->groupBy(
         'i.id',
+        'poOrder.purchase_order_id',
         'i.name',
         'u.id',
         'u.name',
@@ -803,8 +807,7 @@ class PoOrderRepository implements PoOrderRepositoryInterface
         'arrival_items.arrival_amount',
         'arrival_items.arrival_quantity',
         'item_lefts.item_left_ids',
-        'poOrder.brand_id',
-        'poOrder.purchase_order_id',
+        // 'poOrder.brand_id',
       )
       ->paginate(config('common.list_count'));
 
