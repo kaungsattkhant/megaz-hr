@@ -46,6 +46,7 @@ class ObjectiveRepository implements ObjectiveInterface
                 'staff.name',
                 'objective_keys.name as objective_key_name',
                 'departments.name',
+
                 DB::raw('SUM(objective_keys.okr_point) as okr_total_point'),
             )
             ->whereNotNull('objectivekey_staff.manager_checked_at')
