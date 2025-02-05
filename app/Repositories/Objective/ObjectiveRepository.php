@@ -36,21 +36,26 @@ class ObjectiveRepository implements ObjectiveInterface
         $staffId = $request->staff_id;
         $departmentId = $request->department_id;
 
-        $okrDashboard = ObjectivekeyStaff::join('objective_key_duties', 'objective_key_staff.objective_key_duty_id', 'objective_key_duties.id')
-            ->join('staff', 'objective_key_staff.staff_id', 'staff.id')
-            ->join('departments', 'objective_key_staff.department_id', 'departments.id')
-            ->join('objective_keys', 'objective_key_staff.objective_key_id', 'objective_keys.id')
+        $okrDashboard = ObjectivekeyStaff::join('objective_key_duties', 'objectivekey_staff.objective_key_duty_id', 'objective_key_duties.id')
+            ->join('staff', 'objectivekey_staff.staff_id', 'staff.id')
+            ->join('departments', 'staff.department_id', 'departments.id')
+            ->join('objective_keys', 'objectivekey_staff.objective_key_id', 'objective_keys.id')
             ->select(
                 'objective_key_duties.assign_date',
                 'objective_key_duties.due_date',
-                'staff.name',   
-                'objective_keys.name',
+                'staff.name',
+                'objective_keys.name as objective_key_name',
+                'departments.name',
                 DB::raw('SUM(objective_keys.okr_point) as okr_total_point'),
             )
-            ->whereNotNull('objective_key_staff.manager_checked_at')
-            ->whereNotNull('objective_key_staff.manager_checked_by	')
-            ->groupBy('objective_key_staff.staff_id')
-            ->groupBy('objective_key_staff.objective_key_id')
+            ->whereNotNull('objectivekey_staff.manager_checked_at')
+            ->whereNotNull('objectivekey_staff.manager_checked_by')
+            ->groupBy(
+                'objectivekey_staff.staff_id',
+                'objectivekey_staff.objective_key_id',
+                'objective_key_duties.assign_date',
+                'objective_key_duties.due_date',
+            )
             ->get();
         return $okrDashboard;
         // ->where('status')
