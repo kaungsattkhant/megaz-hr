@@ -71,20 +71,33 @@
                         </thead>
                         <tbody>
                             <!-- looping start -->
-                            <div class="contents" v-for="(gps, index) in checkInList" :key="index">
+                            <div class="contents" v-for="(checkIn, index) in checkInList" :key="index">
                                 <tr class="">
                                     <td class=" font-medium ">
                                         <!-- {{ perPage * (currentPage - 1) + (++index) }} -->
                                         {{ index+1 }}
                                     </td>
                                     <td class="whitespace-nowrap">
-                                        {{ gps.name }}
+                                        {{ checkIn.staff_name }}
                                     </td>
                                     <td class="whitespace-nowrap">
-                                        {{ gps.latitude }}
+                                        {{ checkIn.time_shift.shift.name }}
                                     </td>
                                     <td class="whitespace-nowrap">
-                                        {{ gps.longitude }}
+                                        <div class="flex w-full justify-center gap-x-4">
+                                            {{ checkIn.check_in_date_time }}
+                                            <img class="w-12 rounded-sm" :src="checkIn.check_in_photo_url" alt="">
+                                        </div>
+                                    </td>
+                                    <td class="whitespace-nowrap">
+                                        <div class="flex w-full justify-center gap-x-4">
+                                            {{ checkIn.check_out_date_time }}
+                                            <img class="w-12 rounded-sm" :src="checkIn.check_out_photo_url" alt="">
+                                        </div>
+                                        {{ checkIn.check_out_date_time }}
+                                    </td>
+                                    <td class="whitespace-nowrap">
+                                        {{ checkIn.total }}
                                     </td>
                                     <td class="whitespace-nowrap">
                                         <button data-te-toggle="modal" data-te-target="#edit_modal" id="edit-btn" class="pr-3"
