@@ -24,8 +24,8 @@
 
 .side-bar {
   position: fixed;
-  background-color: #111c43;
-  color: white;
+  background-color: #FDFDFD;
+  color: black;
   min-height: 100vh;
   padding-top: 1.5rem;
   border-right: 1px solid #e5e5e5; }
@@ -37,18 +37,24 @@
   padding-right: 4px;
   padding-top: 0.5rem; }
 
+.sidebar-gap-x {
+  column-gap: 0.9rem; }
+
+.sidebar-img {
+  width: 1.25rem; }
+
 .side-bar ul li a, .side-bar ul li button {
   padding: 0.75rem 1rem;
   margin: 0.25rem 0rem;
   display: flex;
   position: relative;
   font-size: 14px;
-  color: white;
+  color: black;
   font-family: Inter, sans-serif; }
 
 .side-bar ul li a.active-link {
-  color: white;
-  background-color: #fff2;
+  color: black;
+  background-color: #0002;
   border-radius: 6px; }
 
 .side-bar ul li a i {

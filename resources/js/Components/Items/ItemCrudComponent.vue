@@ -27,8 +27,16 @@
                 <button class="add-btn h-8 mx-2 " @click="clearSearchBtnClicked">Clear</button>
 
             </div>
-            <div class="flex justify-end flex-col">
-
+            <div class="flex justify-end gap-x-4">
+                <label for="excel_import" class="add-btn">
+                    Excel Import
+                    <input type="file" placeholder="Excel" id="excel_import" class="opacity-0 w-0"  @change="handleFileChange">
+                </label>
+                <!-- <button type="button"
+                    class="add-btn transition duration-150 ease-in-out focus:outline-none focus:ring-0 "
+                    data-te-toggle="modal" data-te-target="#import_modal">
+                    Excel Import
+                </button> -->
                 <button type="button"
                     class="add-btn transition duration-150 ease-in-out focus:outline-none focus:ring-0 "
                     data-te-toggle="modal" data-te-target="#create_modal">
@@ -315,7 +323,7 @@
                     </div> -->
                     <div class="mb-4">
                         <label for="" class="label-form mb-3">
-                            Base UOM
+                            Base UOM (အကြီး)
                         </label>
                         <select name="" id="" v-model="selectedBaseUom" class="input-ui">
                             <option :value="uom" v-for="(uom, uomIndex) in uomList" :key="uomIndex"> {{ uom.name }}
@@ -324,7 +332,7 @@
                     </div>
                     <div class="mb-4">
                         <label for="" class="label-form mb-3">
-                            Uom (Inventory သိမ်းဆည်း unit)
+                            Uom အသေး (Inventory သိမ်းဆည်း unit)
                         </label>
                         <select name="" id="" v-model="selectedUOM" class="input-ui">
                             <option :value="uom" v-for="(uom, uomIndex) in uomList" :key="uomIndex"> {{ uom.name }}
@@ -339,7 +347,13 @@
                     </div>
                     <div class="mb-4">
                         <label for="" class="label-form mb-3">
-                            Minimum Holding Amount
+                            Minimum Holding Amount ( Base UOM - အကြီး )
+                        </label>
+                        <input type="text" placeholder="Minimum Holding Amount" v-model="base_min_amount" class="input-ui">
+                    </div>
+                    <div class="mb-4">
+                        <label for="" class="label-form mb-3">
+                            Minimum Holding Amount ( UOM - အသေး )
                         </label>
                         <input type="text" placeholder="Minimum Holding Amount" v-model="min_amount" class="input-ui">
                     </div>
@@ -351,6 +365,54 @@
                         Cancel
                     </button>
                     <button type="button" class="add-btn focus:outline-none focus:ring-0 " @click="createBtnClicked">
+                        Create
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- import Modal -->
+    <div data-te-modal-init
+        class="fixed left-0 top-0 z-[1055] hidden h-full w-full overflow-y-auto overflow-x-hidden outline-none"
+        id="import_modal" tabindex="-1" aria-labelledby="import_modalLabel" aria-hidden="true">
+        <div data-te-modal-dialog-ref
+            class="pointer-events-none relative w-auto mb-12 translate-y-[-50px] opacity-0 transition-all duration-300 ease-in-out min-[576px]:mx-auto min-[576px]:mt-7 min-[576px]:max-w-[500px]">
+            <div
+                class="min-[576px]:shadow-[0_0.5rem_1rem_rgba(#000, 0.15)] pointer-events-auto relative flex w-full flex-col rounded-md border-none bg-white bg-clip-padding text-current shadow-lg outline-none">
+
+                <div class="relative flex justify-between py-2 px-6 border-b">
+                    <!--Modal title-->
+                    <h5 class="text-base text-center mt-2 font-semibold leading-normal font-inter"
+                        id="import_modalLabel">
+                        Import Excel
+                    </h5>
+                    <!--Close button-->
+                    <button type="button" class="text-xs focus:shadow-none focus:outline-none" data-te-modal-dismiss
+                        aria-label="Close" id="close_import_modal">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                            stroke="currentColor" class="h-4 w-4">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </button>
+                </div>
+
+                <!--Modal body-->
+                <div class="relative px-6 py-4 border-b" data-te-modal-body-ref>
+                    <div class="mb-4">
+                        <label for="" class="label-form mb-3">
+                            Excel
+                        </label>
+                        <input type="file" placeholder="Excel" class="input-ui"  @change="handleFileChange">
+                    </div>
+                </div>
+                <!--Modal footer-->
+                <div class="flex justify-end gap-x-4 px-6 mb-6 pt-4">
+                    <button type="button" class="cancel-btn focus:shadow-none focus:outline-none" data-te-modal-dismiss
+                        aria-label="Close">
+                        Cancel
+                    </button>
+                    <button type="button" class="add-btn focus:outline-none focus:ring-0 " @click="importBtnClicked()">
                         Create
                     </button>
                 </div>
@@ -410,6 +472,7 @@ import { Modal, Ripple, initTE, Select, Dropdown } from "tw-elements";
 import { getApiData, postApiData, deleteApiData } from '../../utilities/ajax-helpers';
 import { mapGetters } from "vuex";
 import Multiselect from 'vue-multiselect';
+import { ref } from 'vue';
 
 export default {
     components: {
@@ -425,7 +488,8 @@ export default {
             price: null,
             selectedUOM: null,
             lead_time:null,
-            min_amount:null,
+            base_min_amount:0,
+            min_amount:0,
 
             selectedCategory: null,
             searchInput: null,
@@ -448,6 +512,7 @@ export default {
 
             // brandsList: [],
             // selectedBrands: [],
+            selectedFile:null,
         };
     },
 
@@ -528,7 +593,7 @@ export default {
         },
 
         async createBtnClicked() {
-            if (!this.selectedUOM || !this.name || !this.selectedCategory ||!this.selectedBaseUom || !this.code || !this.itemType || !this.lead_time || !this.min_amount) {
+            if (!this.selectedUOM || !this.name || !this.selectedCategory ||!this.selectedBaseUom || !this.code || !this.itemType || !this.lead_time || !this.base_min_amount || !this.min_amount) {
                 this.alertValiationMessage('required data');
                 return false;
             }
@@ -541,7 +606,8 @@ export default {
             formData.append('base_uom_id',this.selectedBaseUom.id);
             formData.append('item_type_id',this.itemType.id);
             formData.append('lead_time',this.lead_time);
-            formData.append('minimum_holding_amount',this.min_amount);
+            formData.append('min_holding_base_uom_quantity',this.base_min_amount);
+            formData.append('min_holding_uom_quantity',this.min_amount);
             // if(this.selectedBrands.length > 0){
             //     this.selectedBrands.forEach((item)=>{
             //         formData.append('brands[]', item.id);
@@ -552,6 +618,12 @@ export default {
                 // this.getItemList(this.currentPage);
                 // this.selectedBrands = [];
                 window.location.reload();
+            }
+            else {
+                this.$notify({
+                    text: response.message,
+                    type: "error"
+                });
             }
         },
 
@@ -594,6 +666,33 @@ export default {
             this.searchInput = null;
             this.searchCategory = null;
             this.getItemList(1);
+        },
+        handleFileChange(event) {
+            console.log("Event object:", event);
+            const selectedFile = event.target.files[0];
+            this.selectedFile = selectedFile;
+            if(this.selectedFile){
+                this.importBtnClicked();
+            }
+        },
+        async importBtnClicked() {
+            let formData = new FormData();
+            formData.append('item_import', this.selectedFile);
+            let response = await postApiData({ url: '/api/items/imports', form_data: formData, token: this.getToken() });
+            if (response.success) {
+                this.$notify({
+                    text: `Excel Imported successfully`,
+                    type: "info"
+                });
+                this.selectedFile = null;
+                document.getElementById('close_import_modal').click();
+            }
+            else {
+                this.$notify({
+                    text: `Excel Imported failed`,
+                    type: "error"
+                });
+            }
         },
     },
 

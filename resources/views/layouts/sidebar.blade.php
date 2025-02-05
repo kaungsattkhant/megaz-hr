@@ -100,8 +100,9 @@
 
                 @if(checkFeaturePermission('duty'))
                     <li>
-                        <a href="{{ route('duty') }}" class="flex items-center @yield('duty')">
-                            <i class="fal fa-clipboard-list pr-3"></i>
+                        <a href="{{ route('duty') }}" class="flex items-center @yield('duty') sidebar-gap-x">
+                            <!-- <i class="fal fa-clipboard-list pr-3"></i> -->
+                            <img class=" sidebar-img" src="{{ asset('img/icons8-list-50.png') }}" alt="">
                             Duty
                         </a>
                     </li>
@@ -110,8 +111,9 @@
                 <!-- <<<<<<< HEAD -->
                 @if (checkFeaturePermission('staff'))
                     <li>
-                        <a href="{{ route('staff') }}" class="flex items-center @yield('staffs')">
-                            <i class="fal fa-user  pr-3"></i>
+                        <a href="{{ route('staff') }}" class="flex items-center @yield('staffs') sidebar-gap-x">
+                            <!-- <i class="fal fa-user  pr-3"></i> -->
+                            <img class=" sidebar-img" src="{{ asset('img/icons8-staff-16.png') }}" alt="">
                             Staff
                         </a>
                     </li>
@@ -127,8 +129,9 @@
                 @endif -->
                 @if (checkFeaturePermission('mrp'))
                     <li>
-                        <a href="{{ route('menu_categories') }}" class="flex items-center @yield('menu_categories')">
-                            <i class="fal fa-clipboard-list  pr-3"></i>
+                        <a href="{{ route('menu_categories') }}" class="flex items-center @yield('menu_categories') sidebar-gap-x">
+                            <!-- <i class="fal fa-clipboard-list  pr-3"></i> -->
+                            <img class=" sidebar-img" src="{{ asset('img/icons8-menu-50 (2).png') }}" alt="">
                             Menu Categories
                         </a>
                     </li>
@@ -160,8 +163,9 @@
                 @endif
                 @if (checkFeaturePermission('room'))
                     <li>
-                        <a href="{{ route('room') }}" class="flex items-center @yield('room')">
-                            <i class="fal fa-microphone-alt  pr-3"></i>
+                        <a href="{{ route('room') }}" class="flex items-center @yield('room') sidebar-gap-x">
+                            <img class=" sidebar-img" src="{{ asset('img/icons8-microphone-20.png') }}" alt="">
+                            <!-- <i class="fal fa-microphone-alt  pr-3"></i> -->
                             Room
                         </a>
                     </li>
@@ -170,8 +174,9 @@
 
                 @if(checkFeaturePermission('journal'))
                     <li>
-                        <a href="{{ route('journal') }}" class="flex items-center @yield('journals')">
-                            <i class="fal fa-books pr-3"></i>
+                        <a href="{{ route('journal') }}" class="flex items-center @yield('journals') sidebar-gap-x">
+                            <!-- <i class="fal fa-books pr-3"></i> -->
+                            <img class=" sidebar-img" src="{{ asset('img/icons8-journal-48.png') }}" alt="">
                             Journal
                         </a>
                     </li>
@@ -271,22 +276,25 @@
                 @endif
                 @if (checkFeaturePermission('item'))
                     <li>
-                        <a href="{{ route('brands') }}" class="flex items-center @yield('brands')">
-                            <i class="fal fa-copyright  pr-3"></i>
+                        <a href="{{ route('brands') }}" class="flex items-center @yield('brands') sidebar-gap-x">
+                            <!-- <i class="fal fa-copyright  pr-3"></i> -->
+                            <img class=" sidebar-img" src="{{ asset('img/icons8-brand-48.png') }}" alt="">
                             Brands
                         </a>
                     </li>
                     <li>
-                        <a href="{{ route('items') }}" class="flex items-center @yield('items')">
-                            <i class="fal fa-hand-receiving  pr-3"></i>
+                        <a href="{{ route('items') }}" class="flex items-center @yield('items') sidebar-gap-x">
+                            <img class=" sidebar-img" src="{{ asset('img/icons8-item-48.png') }}" alt="">
+                            <!-- <i class="fal fa-hand-receiving  pr-3"></i> -->
                             Items
                         </a>
                     </li>
                 @endif
                 @if (checkFeaturePermission('uom'))
                     <li>
-                        <a href="{{ route('uoms') }}" class="flex items-center @yield('uom_conversions')">
-                            <i class="fal fa-balance-scale  pr-3"></i>
+                        <a href="{{ route('uoms') }}" class="flex items-center @yield('uom_conversions') sidebar-gap-x">
+                            <!-- <i class="fal fa-balance-scale  pr-3"></i> -->
+                            <img class=" sidebar-img" src="{{ asset('img/icons8-unit-48.png') }}" alt="">
                             UOMs
                         </a>
                     </li>
@@ -385,8 +393,9 @@
                 @endif
                 @if (checkFeaturePermission('supplier'))
                     <li>
-                        <a href="{{ route('suppliers.index') }}" class="flex items-center @yield('supplier')">
-                            <i class="fal fa-tasks  pr-3"></i>
+                        <a href="{{ route('suppliers.index') }}" class="flex items-center @yield('supplier') sidebar-gap-x">
+                            <img class=" sidebar-img" src="{{ asset('img/icons8-supplier-48.png') }}" alt="">
+                            <!-- <i class="fal fa-tasks  pr-3"></i> -->
                             Suppliers
                         </a>
                     </li>
@@ -497,8 +506,9 @@
                 @endif
                 @if (checkFeaturePermission('purchase-order'))
                     <li>
-                        <a href="{{ route('purchase_orders') }}" class="flex items-center @yield('purchase_orders')">
-                            <i class="fal fa-truck-loading  pr-3"></i>
+                        <a href="{{ route('purchase_orders') }}" class="flex items-center @yield('purchase_orders') sidebar-gap-x">
+                            <img class="sidebar-img " src="{{ asset('img/icons8-shopping-cart-48.png') }}" alt="">
+                            <!-- <i class="fal fa-truck-loading  pr-3"></i> -->
                             Purchase Orders
                         </a>
                     </li>
@@ -506,8 +516,9 @@
                     @if (checkFeaturePermission('purchase-order-confirmation'))
                         <li>
                             <a href="{{ route('purchase_orders.confirm_poitems') }}"
-                                class="flex items-center @yield('confirm_purchase_order_items')">
-                                <i class="fal fa-truck-loading  pr-3"></i>
+                                class="flex items-center @yield('confirm_purchase_order_items') sidebar-gap-x">
+                                <img class="sidebar-img " src="{{ asset('img/icons8-shopping-cart-48.png') }}" alt="">
+                                <!-- <i class="fal fa-truck-loading  pr-3"></i> -->
                                 Confirm Purchase Order Items
                             </a>
                         </li>
@@ -515,8 +526,9 @@
                 @if (checkFeaturePermission('purchase-order-item-left'))
                     <li>
                         <a href="{{ route('purchase_orders.left_items_index') }}"
-                            class="flex items-center @yield('purchase_order_left_items')">
-                            <i class="fal fa-truck-loading  pr-3"></i>
+                            class="flex items-center @yield('purchase_order_left_items') sidebar-gap-x">
+                            <img class="sidebar-img " src="{{ asset('img/icons8-shopping-cart-48.png') }}" alt="">
+                            <!-- <i class="fal fa-truck-loading  pr-3"></i> -->
                             Purchase Orders with Left Items
                         </a>
                     </li>
@@ -524,8 +536,9 @@
                 @if (checkFeaturePermission('po-order'))
 
                 <li>
-                    <a href="{{ route('procurement_order_items') }}" class="flex items-center @yield('procurement_order_items')">
-                        <i class="fal fa-truck-loading  pr-3"></i>
+                    <a href="{{ route('procurement_order_items') }}" class="flex items-center @yield('procurement_order_items') sidebar-gap-x">
+                        <img class="sidebar-img " src="{{ asset('img/icons8-shopping-cart-48.png') }}" alt="">
+                        <!-- <i class="fal fa-truck-loading  pr-3"></i> -->
                         Procurement Order Items
                     </a>
                 </li>
@@ -533,8 +546,9 @@
                 @if (checkFeaturePermission('arrival-item'))
                 
                 <li>
-                    <a href="{{ route('arrival_items') }}" class="flex items-center @yield('arrival_items')">
-                        <i class="fal fa-truck-loading  pr-3"></i>
+                    <a href="{{ route('arrival_items') }}" class="flex items-center @yield('arrival_items') sidebar-gap-x">
+                        <img class="sidebar-img " src="{{ asset('img/icons8-shopping-cart-48.png') }}" alt="">
+                        <!-- <i class="fal fa-truck-loading  pr-3"></i> -->
                         Arrival Items
                     </a>
                 </li>
@@ -542,8 +556,9 @@
                 @if (checkFeaturePermission('po-order-invoice'))
 
                 <li>
-                    <a href="{{ route('purchase_order_invoices') }}" class="flex items-center @yield('purchase_order_invoices')">
-                        <i class="fal fa-truck-loading  pr-3"></i>
+                    <a href="{{ route('purchase_order_invoices') }}" class="flex items-center @yield('purchase_order_invoices') sidebar-gap-x">
+                        <img class="sidebar-img " src="{{ asset('img/icons8-shopping-cart-48.png') }}" alt="">
+                        <!-- <i class="fal fa-truck-loading  pr-3"></i> -->
                         Purchase Order Invoices
                     </a>
                 </li>
@@ -760,6 +775,12 @@
                         Contact
                     </a>
                 </li>
+                <li>
+                    <a href="/check_in" class="flex items-center @yield('check_in')">
+                        <i class="fal fa-braille pr-3"></i>
+                        Check In
+                    </a>
+                </li>
                 
 
             </ul>
@@ -768,7 +789,7 @@
 
     </div>
     <div id="app"
-        class="absolute bottom-0 left-0 w-[15rem] h-14 bg-[#111c43] border-t border-[#0002] flex items-center justify-start">
+        class="absolute bottom-0 left-0 w-[15rem] h-14 bg-[#fdfdfd] border-t border-[#0002] flex items-center justify-start">
         <logout-component />
     </div>
 </nav>
