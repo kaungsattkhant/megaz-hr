@@ -175,7 +175,7 @@
                     </tbody>
                 </table>
             </div> -->
-            <div class="col-span-2 pt-12 mb-6 table-container" v-if="selectedItemList.length > 0">
+            <div class="col-span-2 pt-12 mb-0 table-container" v-if="selectedItemList.length > 0">
                 <table class="primary-table !text-left !min-w-[50%] !w-1/2">
                     <thead class=" ">
                         <tr>
@@ -200,7 +200,7 @@
                     </tbody>
                 </table>
             </div>
-            <div class="col-span-2 pt-12 mb-6 table-container" v-if="phoneNumberList.length > 0">
+            <div class="col-span-2 pt-8 mb-0 table-container" v-if="phoneNumberList.length > 0">
                 <table class="primary-table !text-left !min-w-[50%] !w-1/2">
                     <thead class=" ">
                         <tr>
@@ -225,7 +225,7 @@
                     </tbody>
                 </table>
             </div>
-            <div class="col-span-2 pt-12 mb-6 table-container" v-if="bankAccountList.length > 0">
+            <div class="col-span-2 pt-8 mb-0 table-container" v-if="bankAccountList.length > 0">
                 <table class="primary-table !text-left !min-w-[50%] !w-1/2">
                     <thead class=" ">
                         <tr>

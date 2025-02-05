@@ -43,6 +43,9 @@
                                     Item
                                 </th>
                                 <th scope="col" class="">
+                                    Brand
+                                </th>
+                                <th scope="col" class="">
                                     PO Number
                                 </th>
                                 <th scope="col" class="">
@@ -65,10 +68,17 @@
                                         {{ item.item_name }}
                                     </td>
                                     <td class="whitespace-nowrap">
+                                        <span class="after:content-[','] last:after:content-[''] pr-1" v-for="brand in item.purchase_order_details">
+                                            {{ brand.brand_name }}
+                                        </span>
+                                    </td>
+                                    <td class="whitespace-nowrap">
                                         {{ item.po_numbers }}
                                     </td>
                                     <td class="whitespace-nowrap">
-                                        {{ item.total_quantity }}
+                                        <!-- {{ item.total_quantity }} -->
+                                        {{ item.total_base_uom_quantity }} {{ item.base_uom_name }}
+                                        {{ item.total_uom_quantity }} {{ item.uom_name }}
                                     </td>
                                     <td class="whitespace-nowrap">
                                         <div v-if="item.purchase_order_details.length <= 1" >
@@ -85,17 +95,20 @@
                                 </tr>
 
                                 <tr v-if="item.showPurchaseOrders" v-for="(po, poIndex) in item.purchase_order_details" :key="poIndex">
-                                    <td class=" font-medium ">
+                                    <td class=" font-medium " colspan="2">
 
                                     </td>
-                                    <td class="whitespace-nowrap">
 
+                                    <td class="whitespace-nowrap">
+                                        {{ po.brand_name }}
                                     </td>
                                     <td class="whitespace-nowrap">
                                         {{ po.purchase_order.po_id }}
                                     </td>
                                     <td class="whitespace-nowrap">
-                                        {{ po.quantity }}
+                                        {{ po.base_uom_quantity }} {{ po.base_uom_name }}
+                                        {{ po.uom_quantity }} {{ po.uom_name }}
+                                        <!-- {{ po.quantity }} -->
                                     </td>
                                     <td class="whitespace-nowrap">
                                         <!-- <button data-te-toggle="modal" data-te-target="#edit_modal" id="edit-btn" class="pr-3"
@@ -365,22 +378,25 @@ export default {
             let response = await getApiData({ url: `/api/brand_by_supplier?item_id=${this.itemId}&supplier_id=${this.selectedSupplier.supplier_id}`, token: this.getToken() });
             if(response.data){
                 this.itemBrands = response.data;
+                // this.totalPrice = this.itemBrands.find(brand => brand.brand_id == this.selectedBrand)
+                this.confirmPOTotalQty = (this.baseUomQty * this.selectedUomConversion.conversion) + this.uomQty;
+                this.totalPrice = (this.confirmPOTotalQty ) * (response.data[0].item_price.price / this.selectedUomConversion.conversion);
             }
         },
 
-        brandSelectChanged(){
-            console.log(this.selectedBrand);
-            if(this.selectedBrand && this.selectedBrand.item_price && this.confirmPO){
-                this.confirmPOTotalQty = (this.baseUomQty * this.selectedUomConversion.conversion) + this.uomQty;
-                this.totalPrice = (this.confirmPOTotalQty / this.selectedUomConversion.conversion) * this.selectedBrand.item_price.price;
-                this.totalPrice = Math.round(this.totalPrice * 100) / 100;
-            }else{
-                this.totalPrice = 0;
-            }
-            if(!this.selectedBrand.item_price){
-                this.alertValidationMessage('No Item Price');
-            }
-        },
+        // brandSelectChanged(){
+        //     console.log(this.selectedBrand);
+        //     if(this.selectedBrand && this.selectedBrand.item_price && this.confirmPO){
+        //         this.confirmPOTotalQty = (this.baseUomQty * this.selectedUomConversion.conversion) + this.uomQty;
+        //         this.totalPrice = (this.confirmPOTotalQty / this.selectedUomConversion.conversion) * this.selectedBrand.item_price.price;
+        //         this.totalPrice = Math.round(this.totalPrice * 100) / 100;
+        //     }else{
+        //         this.totalPrice = 0;
+        //     }
+        //     if(!this.selectedBrand.item_price){
+        //         this.alertValidationMessage('No Item Price');
+        //     }
+        // },
 
         async getOrderItems(pageNumber) {
             let url = this.url;
@@ -418,6 +434,7 @@ export default {
             this.confirmPOTotalQty = this.originalPOTotalQty;
             this.totalPrice = 0;
             this.item_left_id = purchaseOrder.item_left_id;
+            this.selectedBrand = purchaseOrder;
             this.getItemSuppliers(this.itemId);
             console.log('uom = ' + this.uomQty + ' / base uom = ' + this.baseUomQty)
         },

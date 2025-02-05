@@ -57,7 +57,9 @@
 
                                     </td>
                                     <td class="whitespace-nowrap  ">
-                                        {{ supplier.name }}
+                                        
+                                        <a :href="`/suppliers/${supplier.id}/detail`"
+                                        class="hover:underline"> {{ supplier.name }} </a>
                                         <a :href="`/suppliers/${supplier.id}/lead_times`"
                                         class="text-blue-500 hover:underline"> [Lead Time] </a>
                                     </td>
