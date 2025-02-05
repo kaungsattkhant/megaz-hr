@@ -745,8 +745,9 @@ class PoOrderRepository implements PoOrderRepositoryInterface
         DB::raw('SUM(arrival_items.amount) as arrival_amount'),
         DB::raw('GROUP_CONCAT(arrival_items.purchase_order_id SEPARATOR ",") as po_order_ids')
       )
-      ->groupBy('arrival_items.item_id',
-       'arrival_items.purchase_order_id',
+      ->groupBy(
+        'arrival_items.item_id',
+        'arrival_items.purchase_order_id',
         'arrival_items.brand_id'
       );
 
