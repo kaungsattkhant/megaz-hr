@@ -51,6 +51,11 @@
                             </tr>
                         </thead>
                         <tbody>
+                            <tr v-if="leadTimeList.length < 1 && errorMessage">
+                                <td colspan="3">
+                                    {{ errorMessage }}
+                                </td>
+                            </tr>
                             <!-- looping start -->
                             <div class="contents" v-for="(leadTime, index) in leadTimeList.details" :key="index">
                                 <tr class="">
@@ -101,6 +106,8 @@ export default {
             supplierList: [],
             itemList: [],
 
+            errorMessage:null,
+
             selectedSupplier: null,
             totalAvgLeadTime:null,
 
@@ -119,11 +126,6 @@ export default {
 
     methods: {
         ...mapGetters(['getToken']),
-        initialLeadTimeList(){
-            this.selectedSupplier = this.supplierList[0];
-            this.getLeadTimeList();
-            console.log(this.supplierList[0])
-        },
         async getLeadTimeList(pageNumber) {
             // let url = this.url + pageNumber + this.url_search + this.url_department + this.url_role;
             let url = this.url + this.selectedSupplier.id;
@@ -135,12 +137,17 @@ export default {
                 // this.currentPage = pageNumber;
                 // this.perPage = response.data.per_page;
             }
+            else{
+                this.errorMessage = response.message
+            }
         },
         async getSupplierList(){
             let url = '/api/suppliers';
             let response = await getApiData({ url: url, token: this.getToken() });
             if (response.data) {
                 this.supplierList = response.data;
+                this.selectedSupplier = response.data[0]
+                this.getLeadTimeList();
             }
         },
         alertValidationMessage(field) {
@@ -157,7 +164,6 @@ export default {
     },
     created() {
         this.getSupplierList();
-        // this.initialLeadTimeList();
 
     }
 }
