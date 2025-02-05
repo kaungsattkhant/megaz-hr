@@ -77,8 +77,8 @@
                                     </td>
                                     <td class="whitespace-nowrap">
                                         <!-- {{ item.total_quantity }} -->
-                                        {{ Math.floor(item.total_quantity / item.uom_conversion) }} {{ item.base_uom_name }}
-                                        {{ item.total_quantity % item.uom_conversion }} {{ item.uom_name }}
+                                        {{ item.total_base_uom_quantity }} {{ item.base_uom_name }}
+                                        {{ item.total_uom_quantity }} {{ item.uom_name }}
                                     </td>
                                     <td class="whitespace-nowrap">
                                         <div v-if="item.purchase_order_details.length <= 1" >
@@ -106,7 +106,9 @@
                                         {{ po.purchase_order.po_id }}
                                     </td>
                                     <td class="whitespace-nowrap">
-                                        {{ po.quantity }}
+                                        {{ po.base_uom_quantity }} {{ po.base_uom_name }}
+                                        {{ po.uom_quantity }} {{ po.uom_name }}
+                                        <!-- {{ po.quantity }} -->
                                     </td>
                                     <td class="whitespace-nowrap">
                                         <!-- <button data-te-toggle="modal" data-te-target="#edit_modal" id="edit-btn" class="pr-3"
