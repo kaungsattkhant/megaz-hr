@@ -351,5 +351,6 @@ Route::view('/gps', 'GPS.index')->name('gps');
 Route::view('/check_in', 'check_in.index')->name('check_in');
 Route::view('/contact', 'contact.index')->name('contact');
 Route::view('/lead_time', 'lead_time.index')->name('lead_time');
+Route::view('/okr_dashboard', 'okr_dashboard.index')->name('okr_dashboard');
 
 Route::view('/purchase_orders/{id}/edit', 'purchase_orders.edit');
