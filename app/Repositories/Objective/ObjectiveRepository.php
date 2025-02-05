@@ -45,19 +45,33 @@ class ObjectiveRepository implements ObjectiveInterface
                 'objective_key_duties.due_date',
                 'staff.name',
                 'objective_keys.name as objective_key_name',
-                'departments.name',
-
+                'departments.name as department_name',
                 DB::raw('SUM(objective_keys.okr_point) as okr_total_point'),
             )
-            ->whereNotNull('objectivekey_staff.manager_checked_at')
-            ->whereNotNull('objectivekey_staff.manager_checked_by')
+            ->when($departmentId, function ($q) use ($departmentId) {
+                $q->where('departments.id', $departmentId);
+            })
+            ->when($staffId, function ($q) use ($departmentId) {
+                $q->where('staff.id', $departmentId);
+            })
+            ->when(($from_date && $to_date), function ($q) use ($from_date, $to_date) {
+                $q->whereBetween(DB::raw('DATE(objective_key_duties.assign_date)'), [$from_date, $to_date]);
+            })
+            ->when(($from_date && $to_date == null), function ($q) use ($from_date) {
+                $q->whereDate('objective_key_duties.assign_date', '>=', $from_date);
+            })
+            ->when(($from_date == null && $to_date), function ($q) use ($to_date) {
+                $q->whereBetween('objective_key_duties.assign_date', [now(), $to_date]);
+            })
+            // ->whereNotNull('objectivekey_staff.completed_at')
+            // ->whereNotNull('objectivekey_staff.completed_at')
             ->groupBy(
                 'objectivekey_staff.staff_id',
                 'objectivekey_staff.objective_key_id',
                 'objective_key_duties.assign_date',
                 'objective_key_duties.due_date',
             )
-            ->get();
+            ->paginate(20);
         return $okrDashboard;
         // ->where('status')
 
