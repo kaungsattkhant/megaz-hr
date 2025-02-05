@@ -452,6 +452,7 @@ class OrderRepository implements OrderRepositoryInterface
     {
         $groupedOrderItem = OrderItem::whereNotNull('group_order_id')
             ->join('menus', 'order_items.menu_id', 'menus.id')
+            ->join('orders', 'order_items.order_id', 'orders.id')
             ->select(
                 'order_items.group_order_id',
                 DB::raw('GROUP_CONCAT(order_items.id SEPARATOR ", ") as order_item_ids'),
