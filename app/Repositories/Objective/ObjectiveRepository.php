@@ -29,6 +29,15 @@ use App\Http\Resources\KtvProductTreeEditResource;
 class  ObjectiveRepository implements ObjectiveInterface
 {
 
+    public function dashboardOkr($request){
+        $from_date = isset($request->from_date) ? convertDateFormat($request->from_date) : null;
+        $to_date = isset($request->to_date) ? convertDateFormat($request->to_date) : null; 
+        $staffId=$request->staff_id;
+        $departmentId=$request->department_id;
+
+        // return Objec
+    }
+
     public function getObjectives(Request $request)
     {
         $search = $request->input('search');

@@ -328,6 +328,8 @@ class PoOrderRepository implements PoOrderRepositoryInterface
                     "item_id", i.id,
                     "amount", po_item.amount,
                     "base_uom_id", po_item.base_uom_id,
+                    "base_uom_name",base_uom.name,
+                    "uom_name",uom.name,
                     "uom_id", po_item.uom_id,
                     "uom_conversion_id", po_item.uom_conversion_id,
                     "uom_conversion", uc.conversion,
@@ -413,6 +415,8 @@ class PoOrderRepository implements PoOrderRepositoryInterface
                 )
             )
             FROM purchase_order_items po_item
+            INNER JOIN uoms uom ON po_item.uom_id = uom.id
+            INNER JOIN uoms base_uom ON po_item.base_uom_id = base_uom.id
             INNER JOIN purchase_orders po ON po_item.purchase_order_id = po.id
             INNER JOIN brands brand ON po_item.brand_id = brand.id
             INNER JOIN uom_conversions uc ON po_item.uom_conversion_id = uc.id

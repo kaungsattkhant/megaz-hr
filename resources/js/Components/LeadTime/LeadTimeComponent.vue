@@ -9,28 +9,28 @@
             <notifications position="top center" />
             <div class="flex pr-0 gap-x-4">
                 <div class="w-full !text-sm" data-te-select-wrapper-ref>
-                    <select data-te-select-init data-te-select-placeholder="Supplier"
+                    <select data-te-select-init data-te-select-placeholder="Supplier" @change="getLeadTimeList"
                         data-te-select-filter="true" name="" id="" v-model="selectedSupplier" class="input-ui">
-                        <option :value="supplier.value" v-for="(supplier, supplierIndex) in supplierList"
+                        <option :value="supplier" v-for="(supplier, supplierIndex) in supplierList"
                             :key="supplierIndex"> {{ supplier.name }} </option>
                     </select>
                 </div>
-                <div class="w-full !text-sm" data-te-select-wrapper-ref>
+                <!-- <div class="w-full !text-sm" data-te-select-wrapper-ref>
                     <select data-te-select-init data-te-select-placeholder="Item"
                         data-te-select-filter="true" name="" id="" v-model="selectedItem" class="input-ui">
                         <option :value="item.value" v-for="(item, itemIndex) in itemList"
                             :key="itemIndex"> {{ item.name }} </option>
                     </select>
-                </div>
+                </div> -->
                 
             </div>
         </div>
         <div class="flex justify-between mb-4 px-6 font-semibold">
-            <p>
-                Supplier : {{ selectedSupplier }}
+            <p v-if="selectedSupplier">
+                Supplier : {{ selectedSupplier.name }}
             </p>
-            <p>
-                Average Lead Time : 1 Day 3 Hour
+            <p v-if="totalAvgLeadTime">
+                Average Lead Time : {{ totalAvgLeadTime }}
             </p>
         </div>
         <div class="box-container-table">
@@ -52,17 +52,17 @@
                         </thead>
                         <tbody>
                             <!-- looping start -->
-                            <div class="contents" v-for="(leadTime, index) in leadTimeList" :key="index">
+                            <div class="contents" v-for="(leadTime, index) in leadTimeList.details" :key="index">
                                 <tr class="">
                                     <td class=" font-medium ">
                                         <!-- {{ perPage * (currentPage - 1) + (++index) }} -->
                                         {{ index+1 }}
                                     </td>
                                     <td class="whitespace-nowrap">
-                                        {{ leadTime.name }}
+                                        {{ leadTime.item_name }}
                                     </td>
                                     <td class="whitespace-nowrap">
-                                        {{ leadTime.latitude }}
+                                        {{ leadTime.average_order_time }}
                                     </td>
                                 </tr>
                             </div>
@@ -102,8 +102,8 @@ export default {
             itemList: [],
 
             selectedSupplier: null,
-            selectedItem: null,
-            
+            totalAvgLeadTime:null,
+
             currentPage: 0,
             perPage: 0,
             lastPage: 0,
@@ -111,29 +111,38 @@ export default {
 
             searchInput:null,
 
-            url:'/api/gps',
-            url_search:'',
-            url_department:'',
-            url_role:'',
-            deleteId:null,
+            url:'/api/supplier_lead_time/',
+            url_supplier:''
 
         };
     },
 
     methods: {
         ...mapGetters(['getToken']),
+        initialLeadTimeList(){
+            this.selectedSupplier = this.supplierList[0];
+            this.getLeadTimeList();
+            console.log(this.supplierList[0])
+        },
         async getLeadTimeList(pageNumber) {
             // let url = this.url + pageNumber + this.url_search + this.url_department + this.url_role;
-            let url = this.url;
+            let url = this.url + this.selectedSupplier.id;
             let response = await getApiData({ url: url, token: this.getToken() });
             if (response.data) {
                 this.leadTimeList = response.data;
+                this.totalAvgLeadTime = response.data.total_average_lead_time;
                 // this.lastPage = response.data.last_page;
                 // this.currentPage = pageNumber;
                 // this.perPage = response.data.per_page;
             }
         },
-
+        async getSupplierList(){
+            let url = '/api/suppliers';
+            let response = await getApiData({ url: url, token: this.getToken() });
+            if (response.data) {
+                this.supplierList = response.data;
+            }
+        },
         alertValidationMessage(field) {
                 this.$notify({
                     title: 'Input validation',
@@ -147,7 +156,9 @@ export default {
         initTE({ Modal, Select, Ripple });
     },
     created() {
-        this.getLeadTimeList(1);
+        this.getSupplierList();
+        // this.initialLeadTimeList();
+
     }
 }
 </script>

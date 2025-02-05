@@ -40,8 +40,8 @@
                     </select>
                 </div>
             </div>
-            <div class="mb-4 col-span-3">
-                <label for="" class="label-form mb-3">
+            <!-- <div class="mb-4 col-span-3"> -->
+                <!-- <label for="" class="label-form mb-3">
                     Date Assigned
                 </label>
                 <multiselect v-model="selectedDate" :options="dateList" :multiple="true" :close-on-select="false" :clear-on-select="false"
@@ -51,7 +51,7 @@
                             v-if="values.length"
                             v-show="!isOpen">{{ values.length }} Date selected</span>
                     </template>
-                </multiselect>
+                </multiselect> -->
                 <!-- <div class="bg-white mb-0 w-full text-sm inline-block h-[34px] dark:bg-white !text-black"
                     data-te-select-wrapper-ref>
                     <select data-te-select-init data-te-select-placeholder="Select Role"
@@ -60,7 +60,8 @@
                             :key="index"> {{ date }} </option>
                     </select>
                 </div> -->
-            </div><div class="col-span-3"></div>
+            <!-- </div> -->
+            <div class="col-span-6"></div>
 
 
             
@@ -91,7 +92,7 @@
                 
                 <div class="col-span-3">
                     <label for="" class="label-form mb-3">
-                        Duration
+                        Duration ( minutes )
                     </label>
                     <input type="number" v-model="duration" class="input-ui ">
                 </div>
@@ -122,11 +123,11 @@
                             <th scope="col" class="">
                                 OKR Points
                             </th>
-                            <th scope="col" class="">
+                            <!-- <th scope="col" class="">
                                 Date
-                            </th>
+                            </th> -->
                             <th scope="col" class="">
-                                Duration
+                                Duration ( minutes )
                             </th>
                             <th scope="col" class="">
 
@@ -145,11 +146,11 @@
                             <td class="">
                                 {{ obj.okr_point }}
                             </td>
-                            <td class="">
+                            <!-- <td class="">
                                 <span class="after:content-[','] last:after:content-[''] pr-1" v-for="day in obj.assigned_days">
                                     {{ day }}
                                 </span>
-                            </td>
+                            </td> -->
                             <td class="">
                                 {{ obj.duration }}
                             </td>
@@ -229,10 +230,10 @@ export default {
                 this.alertValidationMessage(`Role`);
                 return 1;
             }
-            else if (!this.selectedDate) {
-                this.alertValidationMessage(`Date`);
-                return 1;
-            }
+            // else if (!this.selectedDate) {
+            //     this.alertValidationMessage(`Date`);
+            //     return 1;
+            // }
             else if (!this.duration) {
                 this.alertValidationMessage(`Duration`);
                 return 1;
@@ -244,14 +245,14 @@ export default {
                     role_id:this.selectedRole.id,
                     role_name:this.selectedRole.name,
                     okr_point: this.selectedOkrPoint,
-                    assigned_days: this.selectedDate, 
+                    // assigned_days: this.selectedDate, 
                     duration: this.duration
                 });  // Add a new input box
                 this.selectedDepartment = null;
                 this.selectedRole = null;
                 this.key_result = null;
                 this.selectedOkrPoint = null;
-                this.selectedDate = null;
+                // this.selectedDate = null;
                 this.duration = null;
             }
         },

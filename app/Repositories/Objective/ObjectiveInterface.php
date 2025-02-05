@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 interface ObjectiveInterface
 {
   //adminpanel
+  public function dashboardOkr($request);
   public function getObjectives(Request $request);
   public function getObjectiveById(Request $request, $objId);
   public function getRolesByDepartmentId(Request $request, int $departmentId);
