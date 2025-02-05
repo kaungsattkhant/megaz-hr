@@ -460,6 +460,7 @@ export default {
             formData.append('supplier_id', this.confirmArrivalItem.supplier_id);
             formData.append('item_left_id', this.confirmArrivalItem.item_left_id);
             formData.append('unit_price', this.confirmArrivalItem.unit_price);
+            formData.append('brand_id',this.confirmArrivalItem.brand_id);
             let response = await postApiData({url: `/api/po_arrival_items`, form_data: formData, token: this.getToken()});
             if(response.success){
                 this.$notify({

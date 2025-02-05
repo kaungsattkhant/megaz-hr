@@ -379,24 +379,29 @@ export default {
             if(response.data){
                 this.itemBrands = response.data;
                 // this.totalPrice = this.itemBrands.find(brand => brand.brand_id == this.selectedBrand)
-                this.confirmPOTotalQty = (this.baseUomQty * this.selectedUomConversion.conversion) + this.uomQty;
-                this.totalPrice = (this.confirmPOTotalQty ) * (response.data[0].item_price.price / this.selectedUomConversion.conversion);
+                this.selectedBrand = this.itemBrands.find(brand => brand.brand_id == this.confirmPO.brand_id)
+                // this.confirmPOTotalQty = (this.baseUomQty * this.selectedUomConversion.conversion) + this.uomQty;
+                this.confirmPOTotalQty = this.confirmPO.quantity;
+                // this.totalPrice = (this.confirmPOTotalQty ) * (response.data[0].item_price.price / this.selectedUomConversion.conversion);
+                // this.totalPrice = (this.confirmPOTotalQty / this.selectedUomConversion.conversion) * this.selectedBrand.item_price.price;
+                // this.totalPrice = Math.round(this.totalPrice * 100) / 100;
+                this.brandSelectChanged();
             }
         },
 
-        // brandSelectChanged(){
-        //     console.log(this.selectedBrand);
-        //     if(this.selectedBrand && this.selectedBrand.item_price && this.confirmPO){
-        //         this.confirmPOTotalQty = (this.baseUomQty * this.selectedUomConversion.conversion) + this.uomQty;
-        //         this.totalPrice = (this.confirmPOTotalQty / this.selectedUomConversion.conversion) * this.selectedBrand.item_price.price;
-        //         this.totalPrice = Math.round(this.totalPrice * 100) / 100;
-        //     }else{
-        //         this.totalPrice = 0;
-        //     }
-        //     if(!this.selectedBrand.item_price){
-        //         this.alertValidationMessage('No Item Price');
-        //     }
-        // },
+        brandSelectChanged(){
+            console.log(this.selectedBrand);
+            if(this.selectedBrand && this.selectedBrand.item_price && this.confirmPO){
+                this.confirmPOTotalQty = (this.baseUomQty * this.selectedUomConversion.conversion) + this.uomQty;
+                this.totalPrice = (this.confirmPOTotalQty / this.selectedUomConversion.conversion) * this.selectedBrand.item_price.price;
+                this.totalPrice = Math.round(this.totalPrice * 100) / 100;
+            }else{
+                this.totalPrice = 0;
+            }
+            if(!this.selectedBrand.item_price){
+                this.alertValidationMessage('No Item Price Select Brand');
+            }
+        },
 
         async getOrderItems(pageNumber) {
             let url = this.url;
