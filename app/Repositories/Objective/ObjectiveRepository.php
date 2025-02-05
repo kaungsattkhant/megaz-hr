@@ -142,6 +142,7 @@ class  ObjectiveRepository implements ObjectiveInterface
                 'assign_date' => $validatedData['assign_date'],
                 'created_by' => UserData()->id,
                 'is_active' => $validatedData['is_active'] ?? true,
+                'due_date' => $validatedData['due_date']
             ];
             $objectiveKeyDuty = ObjectiveKeyDuty::create($objectiveKeyDutyData);
 
@@ -294,20 +295,20 @@ class  ObjectiveRepository implements ObjectiveInterface
     public function getdailyObjectivesByStaffId(Request $request, $staffId)
     {
         $currentDate = now()->toDateString();
-        if (!checkRoles(['Supervisor', 'Manager'])) {
-            ResponseMessage('Permission is not allowed', 403);
-            return;
-        }
-        if (checkRoles(['Supervisor']) || checkRoles(['Manager'])) {
-            $dutyDateIds = ObjectiveKeyDuty::where('assign_date', $currentDate)->pluck('id');
-            $objectiveKeyStaff = ObjectivekeyStaff::with([
-                'objectiveKeyDuty',
-                'objectiveKey.objective',
-            ])->where('staff_id', $staffId)
-                ->whereIn('objective_key_duty_id', $dutyDateIds)
-                ->get();
-            return dailyObjectiveByStaffId::collection($objectiveKeyStaff);
-        }
+        // if (!checkRoles(['Supervisor', 'Manager'])) {
+        //     ResponseMessage('Permission is not allowed', 403);
+        //     return;
+        // }
+        // if (checkRoles(['Supervisor']) || checkRoles(['Manager'])) {
+        $dutyDateIds = ObjectiveKeyDuty::where('assign_date', $currentDate)->pluck('id');
+        $objectiveKeyStaff = ObjectivekeyStaff::with([
+            'objectiveKeyDuty',
+            'objectiveKey.objective',
+        ])->where('staff_id', $staffId)
+            ->whereIn('objective_key_duty_id', $dutyDateIds)
+            ->get();
+        return dailyObjectiveByStaffId::collection($objectiveKeyStaff);
+        // }
     }
 
     public function getObjKeyStaffImage($objKeystaffId)
