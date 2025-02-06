@@ -50,11 +50,20 @@
 </body>
 
 @yield('script_index')
-
+<script type="application/javascript">
+    $(document).ready(function(){
+            $('#toggleBtn').on('click', function() {
+                $('#sidebar_admin').toggleClass('!w-0');
+                $('#toggleBtn i').toggleClass('rotate-180');
+                console.log('testing sidenav');
+                $('#content_collapse').toggleClass('!ml-0 w-full');
+            });
+        });
+</script>
 <script type="application/javascript">
     $(document).ready(function () {
         function scrollToActiveLink() {
-            const $activeLink = $("#sidebar a.active-link");
+            const $activeLink = $("#sidebar_admin a.active-link");
             if ($activeLink.length) {
             $activeLink[0].scrollIntoView({
                 behavior: "smooth", // Smooth scrolling animation
@@ -63,9 +72,9 @@
             }
         }
         const currentPath = window.location.pathname;
-            $("#sidebar a").each(function () {
+            $("#sidebar_admin a").each(function () {
                 if ($(this).attr("href") === currentPath) {
-                    $("#sidebar a").removeClass("active-link"); // Remove 'active' from all links
+                    $("#sidebar_admin a").removeClass("active-link"); // Remove 'active' from all links
                     $(this).addClass("active-link"); // Add 'active' to the matching link
                 }
             });
