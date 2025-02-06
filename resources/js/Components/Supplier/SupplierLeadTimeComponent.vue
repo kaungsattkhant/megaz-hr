@@ -44,6 +44,11 @@
                             </tr>
                         </thead>
                         <tbody>
+                            <tr v-if="leadTimes.length < 1 && errorMessage">
+                                <td colspan="3">
+                                    {{ errorMessage }}
+                                </td>
+                            </tr>
                             <div class="contents" v-for="(leadTime, index) in leadTimes" :key="index">
                                 <tr class="">
                                     <td class="  font-medium ">
@@ -78,6 +83,8 @@ export default {
 
             searchInput:null,
 
+            errorMessage:null,
+
             currentPage: 0,
             perPage: 0,
             lastPage: 0,
@@ -105,6 +112,9 @@ export default {
             if (response.data) {
                 this.totalAvgLeadTime = response.data.total_average_lead_time;
                 this.leadTimes = response.data.details;
+            }
+            else{
+                this.errorMessage = response.message
             }
         },
     },
