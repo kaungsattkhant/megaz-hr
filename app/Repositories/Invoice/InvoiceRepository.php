@@ -825,10 +825,10 @@ class InvoiceRepository implements InvoiceRepositoryInterface
                 ResponseMessage('Some items still cooking', 419);
             }
             foreach ($order->orderItems as $orderItem) {
-                if ($orderItem->status == 'done') {
+                // if ($orderItem->status == 'done') {
                     $total += $orderItem->price;
                     $totalDiscount += $orderItem->discount_value;
-                }
+                // }
             }
             // $total += $order->total;
             // $totalDiscount += $order->total_discount_price;
