@@ -487,8 +487,6 @@ class PoOrderRepository implements PoOrderRepositoryInterface
       )
       ->groupBy(
         'arrival_items.item_id',
-        'arrival_items.purchase_order_id',
-        'arrival_items.brand_id'
       );
 
     // Main PO Orders Query

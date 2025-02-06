@@ -10,18 +10,26 @@ class ItemPrice extends Model
 {
     use HasFactory;
 
-    protected $fillable=['price','supplier_item_id','base_uom_id'];
+    protected $fillable = [
+        'price',
+        'supplier_item_id',
+        'uom_id',
+        'type',
+        'uom_price'
+    ];
 
-    public function item(){
+    public function item()
+    {
         return $this->belongsTo(Item::class);
     }
 
-    public function supplier_item(){
+    public function supplier_item()
+    {
         return $this->belongsTo(SupplierItem::class);
     }
 
-    public function uom(){
+    public function uom()
+    {
         return $this->belongsTo(Uom::class);
     }
-
 }
