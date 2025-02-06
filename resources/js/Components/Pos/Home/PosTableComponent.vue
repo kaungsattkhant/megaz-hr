@@ -213,7 +213,7 @@
                                         Menu Total
                                     </p>
                                     <p class="text-sm text-black font-semibold">
-                                        {{ purchaseMenuList.length > 0 ? purchaseMenuList[0].total.toLocaleString() : '0' }}
+                                        {{ purchaseMenuList.length > 0 ? (purchaseMenuList[0].total - purchaseMenuList[0].total_discount_price).toLocaleString() : '0' }}
                                         MMks
                                     </p>
                                 </div>
@@ -237,7 +237,7 @@
                                                 {{ menu2.status }}
                                             </p>
                                             <p class=" col-span-3 text-sm text-right">
-                                                {{ menu2.price.toLocaleString() }} MMKs
+                                                {{ (menu2.price - menu2.discount_value).toLocaleString() }} MMKs
                                             </p>
                                         </div>
                                     </div>
@@ -713,9 +713,6 @@
                             </select>
                         </div> -->
                         <div class="mb-4">
-                            <!-- <label for="" class="block text-sm text-black mb-3">
-                                Hour
-                            </label> -->
                             <input type="text" placeholder="Qty" v-model="menuQuantity"
                                 class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
                         </div>
