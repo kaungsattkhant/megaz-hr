@@ -1624,7 +1624,7 @@
 
                 console.log(formData)
 
-                let response = await postApiData({ url: '/api/entities/donewwww', form_data: formData, token: this.getToken() });
+                let response = await postApiData({ url: '/api/entities/done', form_data: formData, token: this.getToken() });
                 if (response.success) {
                     await this.getTableList();
                     // this.selectedRoom = await this.roomList[this.selectedRoomIndex];
