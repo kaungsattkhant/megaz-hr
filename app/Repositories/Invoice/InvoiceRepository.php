@@ -245,9 +245,9 @@ class InvoiceRepository implements InvoiceRepositoryInterface
                         ->take($sessionsToDeactivate)
                         ->get();
                     foreach ($nextSessions as $session) {
-                        if ($session->is_active == 1) {
-                            ResponseMessage('Session is not availale', 422);
-                        }
+                        // if ($session->is_active == 1) {
+                        //     ResponseMessage('Session is not availale', 422);
+                        // }
                         $session->is_active = 1;
                         $session->save();
                     }
@@ -566,8 +566,7 @@ class InvoiceRepository implements InvoiceRepositoryInterface
             if ($invoice->invoice_type == 'endless_time') {
                 return $this->invoiceService->changeRoomForEndlessTime($invoice, $newEntity);
             }
-            dd('abc');
-
+         
             $roomSessions = RoomSession::where('invoice_id', $invoice->id)->get();
             $firstRoomSession = $roomSessions->first();
             $latestRoomSession = $roomSessions->last();
