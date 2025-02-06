@@ -50,7 +50,16 @@
 </body>
 
 @yield('script_index')
-
+<script type="application/javascript">
+    $(document).ready(function(){
+            $('#toggleBtn').on('click', function() {
+                $('#sidebar').toggleClass('!w-0');
+                $('#toggleBtn i').toggleClass('rotate-180');
+                console.log('testing sidenav');
+                $('#content_collapse').toggleClass('!ml-0 w-full');
+            });
+        });
+</script>
 <script type="application/javascript">
     $(document).ready(function () {
         function scrollToActiveLink() {
