@@ -213,7 +213,7 @@
                                         Menu Total
                                     </p>
                                     <p class="text-sm text-black font-semibold">
-                                        {{ purchaseMenuList.length > 0 ? (purchaseMenuList[0].total - purchaseMenuList[0].total_discount_price).toLocaleString() : '0' }}
+                                        {{ purchaseMenuList.length > 0 ? (purchaseMenuList[0].total).toLocaleString() : '0' }}
                                         MMks
                                     </p>
                                 </div>
@@ -237,7 +237,7 @@
                                                 {{ menu2.status }}
                                             </p>
                                             <p class=" col-span-3 text-sm text-right">
-                                                {{ (menu2.price - menu2.discount_value).toLocaleString() }} MMKs
+                                                {{ (menu2.price).toLocaleString() }} MMKs
                                             </p>
                                         </div>
                                     </div>
@@ -550,6 +550,7 @@
                                         + (printInvoiceData.service_charge == true ? (printInvoiceData.service_tax ?
                                             printInvoiceData.service_tax : 0) : 0)
                                         + (printInvoiceData.isTax == true ? (printInvoiceData.tax ? printInvoiceData.tax : 0) : 0) 
+                                        - foodDiscount
                                         ).toLocaleString()
                                     }} MMKs
                                 </p>
@@ -1362,9 +1363,9 @@
             async getPurchaseMenuList() {
                 const response = await getApiData({ url: '/api/entities/' + this.selectedRoomId, token: this.getToken() });
                 if (response.data) {
-                    if (response.data.room_sessions.length > 0) {
+                    if (response.data.room_sessions) {
                         this.purchaseMenuList = response.data.room_sessions.latest_invoice.orders;
-                        if (response.data.room_sessions.latest_invoice.orders) {
+                        if (response.data.room_sessions.latest_invoice.orders.length > 0) {
                             if (response.data.room_sessions.latest_invoice.orders[0]) {
                                 this.foodDiscount = response.data.room_sessions.latest_invoice.orders[0].total_discount_price
                             }
@@ -1623,7 +1624,7 @@
 
                 console.log(formData)
 
-                let response = await postApiData({ url: '/api/entities/done', form_data: formData, token: this.getToken() });
+                let response = await postApiData({ url: '/api/entities/donewwww', form_data: formData, token: this.getToken() });
                 if (response.success) {
                     await this.getTableList();
                     // this.selectedRoom = await this.roomList[this.selectedRoomIndex];
