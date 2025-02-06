@@ -20,7 +20,7 @@ class PoOrderRepository implements PoOrderRepositoryInterface
 {
 
   use PoInvoiceTransaction;
-  public function q(Request $request)
+  public function getPoOrderItems(Request $request)
   {
     $poClass = 'po_order';
     $leftsSubquery = DB::table('item_lefts')
