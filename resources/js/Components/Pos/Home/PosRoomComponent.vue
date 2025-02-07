@@ -1238,7 +1238,7 @@
                 selectedMenu: null,
                 menuAreaList:[],
                 selectedMenuArea:null,
-                menuQuantity: 1,
+                menuQuantity: null,
                 remark: null,
                 menuPrice: null,
                 testroom: null,
@@ -1967,6 +1967,7 @@
                 const response = await getApiData({ url: '/api/menus/' + this.selectedMenu.id + '/areas', token: this.getToken() });
                 if (response.data) {
                     this.menuAreaList = response.data.areas;
+                    this.menuQuantity = 1;
                 }
             },
             btnClickAddMenu() {
@@ -2220,7 +2221,7 @@
             },
             clearMenuForm() {
                 this.invoiceId = null
-                this.menuQuantity = 1
+                this.menuQuantity = null
                 this.selectedMenu = null
             },
             clearServiceForm() {
