@@ -8,6 +8,7 @@ interface PoOrderRepositoryInterface
 {
 
   public function getPoOrderItems(Request $request);
+  public function test($request);
   public function storePoOrderItems($validatedData);
   public function getPoOrderArrivalList(Request $request);
   public function getPoOrderArrivalListByItemId($itemId);
@@ -15,6 +16,5 @@ interface PoOrderRepositoryInterface
   public function storePoArrivalItems($validatedData);
   public function getSupplierLeadTime($supplierId);
   public function getInvoices(Request $request);
-
   public function processInvoiceTransaction($request);
 }
