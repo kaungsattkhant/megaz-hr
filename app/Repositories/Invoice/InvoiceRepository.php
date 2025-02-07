@@ -727,6 +727,7 @@ class InvoiceRepository implements InvoiceRepositoryInterface
             $total_service_value = 0;
             $total_accessory_value = 0;
             $invoiceServices = $invoice->invoiceService;
+            $this->invoiceService->checkOrderStatus($invoice->order->orderItems);
             $invoiceAccessories = $invoice->accessories;
             $roomDoneResponse['is_service'] = 1;
             if ($invoiceServices->isEmpty()) {
@@ -800,6 +801,7 @@ class InvoiceRepository implements InvoiceRepositoryInterface
         if (!$invoice) {
             ResponseMessage('Invoice is invalid', 422);
         }
+        $this->invoiceService->checkOrderStatus($invoice->order->orderItems);
         $customerTotal = $this->getCustomerTotal($invoice->customer_id);
         $total = 0;
         $totalDiscount = 0;
