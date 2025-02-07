@@ -115,4 +115,13 @@ class InvoiceModelService
         return $account;
     }
 
+    public function checkOrderStatus($orderItems){
+        $checkIsNotYeyOrder=$orderItems->whereIn('status','not yet')
+        ->first();
+        if($checkIsNotYeyOrder){
+            ResponseMessage('Order Item need to confirm first',419);
+        }
+        return true;
+    }
+
 }
