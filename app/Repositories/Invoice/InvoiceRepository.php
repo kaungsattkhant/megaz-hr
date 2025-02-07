@@ -144,7 +144,6 @@ class InvoiceRepository implements InvoiceRepositoryInterface
             }
             if ((isset($data['entity_session_id']) && $data['entity_session_id'] != null) || $data['is_waiter']) { // create room invoice
                 $entitySession = null;
-
                 if (isset($data['entity_id']) && $data['entity_id'] != null) {
                     $entity = Entity::find($data['entity_id']);
                     $currentTime = Carbon::parse(now())->format('H:i');
@@ -192,7 +191,6 @@ class InvoiceRepository implements InvoiceRepositoryInterface
                     $roomSessionData['price'] = $data['total_session_price'];
                     $data['total'] = $data['total_session_price'];
                     $data['invoice_type'] = 'session';
-
                 } else if ($data['type'] == 'endless_time') {
                     $end_date = Carbon::now()->addMinute(1 * 60);
                     $data['session_duration'] = 1;
@@ -827,10 +825,10 @@ class InvoiceRepository implements InvoiceRepositoryInterface
                 ResponseMessage('Some items still cooking', 419);
             }
             foreach ($order->orderItems as $orderItem) {
-                if ($orderItem->status == 'done') {
+                // if ($orderItem->status == 'done') {
                     $total += $orderItem->price;
                     $totalDiscount += $orderItem->discount_value;
-                }
+                // }
             }
             // $total += $order->total;
             // $totalDiscount += $order->total_discount_price;

@@ -66,13 +66,17 @@ class OrderRepository implements OrderRepositoryInterface
                 // $orderItems = OrderItem::find($order_items->id);
                 // $order_items->menu = $order_items->menu;
 
-                // $invoice = Invoice::find($data['invoice_id']);
+                $invoice = Invoice::find($data['invoice_id']);
+                $invoice->order_discount_value+=$discountAmount;
+                $invoice->save();
+                
                 if ($order->invoice->entity_id == null) {
                     $latestRoomSession = RoomSession::where('invoice_id', $order->invoice_id)->orderBy('created_at', 'desc')->first();
                     $entity = Entity::find($latestRoomSession->entitySession->entity_id);
                 } else {
                     $entity = $order->invoice->table;
                 }
+
                 // broadcast(new KitchenNotificationRequest($entity, $order, null, $order_items, 7));
                 DB::commit();
                 return $order;

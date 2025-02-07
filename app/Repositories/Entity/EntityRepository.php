@@ -326,12 +326,13 @@ class EntityRepository implements EntityRepositoryInterface
                         if (isset($consolidatedOrderItems[$menuId][$status])) {
                             $consolidatedOrderItems[$menuId][$status]->quantity += $orderItem->quantity;
                             $consolidatedOrderItems[$menuId][$status]->price += $orderItem->price;
-                            $consolidatedOrderItems[$menuId][$status]->discount_price += $orderItem->discount_price;
+                            $consolidatedOrderItems[$menuId][$status]->discount_price += $orderItem->discount_value;
                         } else {
                             $consolidatedOrderItems[$menuId][$status] = $orderItem;
                         }
                     }
                 }
+
 
 
                 foreach ($orders as $order) {

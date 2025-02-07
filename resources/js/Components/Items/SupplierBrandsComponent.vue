@@ -15,6 +15,7 @@
                                 <th>#</th>
                                 <th>Brand</th>
                                 <th>Price</th>
+                                <th>UOM</th>
                                 <th></th>
                             </tr>
                         </thead>
@@ -29,7 +30,10 @@
                                         {{ brand.brand.name }}
                                     </td>
                                     <td class="whitespace-nowrap">
-                                        <span v-if="brand.item_price"> {{ brand.item_price.price.toLocaleString() }} </span>
+                                        <span v-if="brand.item_price"> {{ brand.item_price.uom_price.toLocaleString() }} </span>
+                                    </td>
+                                    <td class="whitespace-nowrap">
+                                        <span v-if="brand.item_price"> {{ brand.item_price.uom.name }} </span>
                                     </td>
                                     <td class="whitespace-nowrap">
                                         <button id="price-edit-btn" class="pr-2" data-te-toggle="modal"
@@ -255,7 +259,7 @@ export default {
             }
             let formData = new FormData();
             formData.append('supplier_item_id', this.supplierItemId);
-            formData.append('price', this.price);
+            formData.append('uom_price', this.price);
             formData.append('base_uom_id', this.baseUomId);
             if(this.selectedUom.base_uom_id){
                 formData.append('type', 'base_uom');

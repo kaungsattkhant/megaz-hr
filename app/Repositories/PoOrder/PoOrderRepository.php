@@ -20,7 +20,7 @@ class PoOrderRepository implements PoOrderRepositoryInterface
 {
 
   use PoInvoiceTransaction;
-  public function q(Request $request)
+  public function getPoOrderItems(Request $request)
   {
     $poClass = 'po_order';
     $leftsSubquery = DB::table('item_lefts')
@@ -487,8 +487,6 @@ class PoOrderRepository implements PoOrderRepositoryInterface
       )
       ->groupBy(
         'arrival_items.item_id',
-        'arrival_items.purchase_order_id',
-        'arrival_items.brand_id'
       );
 
     // Main PO Orders Query

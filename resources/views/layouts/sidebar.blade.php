@@ -1,6 +1,6 @@
-<nav id="sidebar" class="side-bar w-fit pt-0 h-[100vh]">
+<nav id="sidebar_admin" class="side-bar w-fit pt-0 h-[100vh]">
     <div class="relative">
-        <button type="button" id="toggleBtn" class="py-3 px-2 absolute left-full top-5 bg-[#fafafa] text-black rounded-tr-md rounded-br-md border-gray-400 ">
+        <button type="button" id="toggleBtn" class="py-3 px-2 absolute left-full top-8 bg-[#fafafa] text-black rounded-tr-md rounded-br-md border-gray-400 ">
             <i class="fas fa-chevron-double-left ease-linear" style="transition:transform 0.5s ease;"></i>
         </button>
         <div class="relative pb-20 small-scrollbar h-[100vh]" onmouseover="this.style.overflowY='scroll'"
@@ -729,14 +729,16 @@
 
                     <!-- @if(checkFeaturePermission('accessory')) -->
                     <li>
-                        <a href="/menu_forecasting" class="flex items-center @yield('menu_forecasting')">
-                            <i class="fal fa-braille pr-3"></i>
+                        <a href="/menu_forecasting" class="flex items-center @yield('menu_forecasting') sidebar-gap-x">
+                            <img class="sidebar-img " src="{{ asset('img/icons8-analytics-48.png') }}" alt="">
+                            <!-- <i class="fal fa-braille pr-3"></i> -->
                             Menu Forecasting
                         </a>
                     </li>
                     <li>
-                        <a href="/ktv_forecasting" class="flex items-center @yield('ktv_forecasting')">
-                            <i class="fal fa-braille pr-3"></i>
+                        <a href="/ktv_forecasting" class="flex items-center @yield('ktv_forecasting') sidebar-gap-x">
+                            <img class="sidebar-img " src="{{ asset('img/icons8-analytics-48.png') }}" alt="">
+                            <!-- <i class="fal fa-braille pr-3"></i> -->
                             KTV Forecasting
                         </a>
                     </li>
@@ -750,13 +752,7 @@
                             </a>
                         </li>
                     @endif
-                    <li>
-                        <a href="/ktv_forecasting" class="flex items-center @yield('ktv_forecasting') sidebar-gap-x">
-                            <!-- <i class="fal fa-braille pr-3"></i> -->
-                            <img class="sidebar-img " src="{{ asset('img/icons8-analytics-48.png') }}" alt="">
-                            KTV Forecasting
-                        </a>
-                    </li>
+                    
                     <li>
                         <a href="/okr_duty" class="flex items-center @yield('OKR_duty') sidebar-gap-x">
                             <!-- <i class="fal fa-braille pr-3"></i> -->

@@ -128,13 +128,14 @@ class ItemRepository implements ItemRepositoryInterface
     public function addPriceItem($request)
     {
         $data = $request->all();
+
         DB::beginTransaction();
         try {
-            // $item_price = ItemPrice::where('item_id', $id)->latest('created_at')->first();
-            // $new_item_price['uom_id'] = $item_price->uom_id;
-            // $new_item_price['price'] = $data['price'];
-            // $new_item_price['item_id'] = $id;
-            // dd($data);
+            if ((isset($data['type']) &&  $data['type'] === 'uom')) {
+                $data['price'] = $data['uom_conversion'] * $data['uom_price'];
+            } else if ((isset($data['type']) && $data['type'] === 'base_uom')) {
+                $data['price'] = $data['uom_price'];
+            }
             $createdItemPrice = ItemPrice::create($data);
             DB::commit();
             return $createdItemPrice;
@@ -185,7 +186,7 @@ class ItemRepository implements ItemRepositoryInterface
 
         $itemId = $request->item_id;
         $supplierId = $request->supplier_id;
-        $supplierByItem = SupplierItem::with('brand', 'item', 'item_price')
+        $supplierByItem = SupplierItem::with('brand', 'item', 'item_price.uom')
             ->where('item_id', $itemId)
             ->where('supplier_id', $supplierId)->get();
         return $supplierByItem;
