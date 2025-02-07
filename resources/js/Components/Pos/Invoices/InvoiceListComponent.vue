@@ -216,7 +216,7 @@
                 }
             },
             async getInvoiceList(){
-                const response = await getApiData({ url: '/api/invoices' , token: this.getToken()});
+                const response = await getApiData({ url: '/api/pos/invoices' , token: this.getToken()});
                 if(response.data){
                     this.invoiceList = response.data;
                 }
