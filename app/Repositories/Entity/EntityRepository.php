@@ -94,6 +94,7 @@ class EntityRepository implements EntityRepositoryInterface
                 $entitySessions = $entity->entitySessions()->where('is_active', 1)->get();
                 foreach ($entitySessions as $entitySession) {
                     foreach ($entitySession->roomSessions()->get() as $roomSession) {
+
                         $roomSessions->push($roomSession);
                         $startTimes->push($roomSession->start_date);
                         $endTimes->push($roomSession->end_date);
@@ -101,7 +102,6 @@ class EntityRepository implements EntityRepositoryInterface
                 }
                 $entity->start_time = CurrentTime();
                 $entity->end_time = CurrentTime();
-
                 $totalSessionDuration = (float) number_format($roomSessions->sum('session_duration'), 2);
                 $startTimes = $startTimes->sortBy(function ($timestamp) {
                     return strtotime($timestamp);

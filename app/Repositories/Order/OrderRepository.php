@@ -67,7 +67,7 @@ class OrderRepository implements OrderRepositoryInterface
                 // $order_items->menu = $order_items->menu;
 
                 $invoice = Invoice::find($data['invoice_id']);
-                $invoice->order_discount_value+=$discountAmount;
+                $invoice->order_discount_value += $discountAmount;
                 $invoice->save();
 
                 if ($order->invoice->entity_id == null) {
@@ -293,7 +293,7 @@ class OrderRepository implements OrderRepositoryInterface
             }
             // $startTime = $date . ' 00:00:00';
             // $endTime = $date . ' 23:59:59';
-            $order_items = OrderItem::where('status', 'pos_confirmed')
+            $order_items = OrderItem::whereIn('status', ['pos_confirmed', 'in_progress', 'done'])
                 ->with('menu', 'order:id,order_id,invoice_id', 'order.invoice:id,entity_id', 'order.invoice.roomSession.entitySession.entity', 'area', 'order.invoice.table') // change entiy to entitySession
                 // ->whereBetween('date', [$startTime, $endTime])
                 ->where('area_id', $areaId)
@@ -331,15 +331,13 @@ class OrderRepository implements OrderRepositoryInterface
             if ($request->date) {
                 $startTime = $request->date . ' 00:00:00';
                 $endTime = $request->date . ' 23:59:59';
-                $orderItems = OrderItem::where('status', 'pos_confirmed')
-                ->with('menu', 'order.invoice.latestSession.entity', 'area')
-                ->whereBetween('date', [$startTime, $endTime])->get();
+                $orderItems = OrderItem::with('menu', 'order.invoice.latestSession.entity', 'area')
+                    ->whereBetween('date', [$startTime, $endTime])->get();
             } else {
-                $orderItems = OrderItem::where('status', 'pos_confirmed')
-                ->with('menu', 'order.invoice.latestSession.entity', 'area')
-                ->get();
+                $orderItems = OrderItem::with('menu', 'order.invoice.latestSession.entity', 'area')
+                    ->whereIn('status', ['pos_confirmed', 'in_progress', 'done'])
+                    ->get();
             }
-
             return $orderItems;
         }
     }
