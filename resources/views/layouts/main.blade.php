@@ -4,7 +4,7 @@
     <div id="app" class="main-container">
         @include('layouts.sidebar')
 
-        <div class="main-content">
+        <div class="main-content" id="content_collapse">
             @include('layouts.navbar')
 
             <main class="inner-container bg-[#f0f1f700] py-3">

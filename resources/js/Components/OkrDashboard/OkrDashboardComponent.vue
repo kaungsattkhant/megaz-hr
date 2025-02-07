@@ -30,19 +30,19 @@
             </div>
             <div class="flex pr-0 gap-x-4">
                 <div class="w-full !text-sm" data-te-select-wrapper-ref>
-                    <select data-te-select-init data-te-select-placeholder="Select Department" @change="selectedStaffChanged()"
+                    <select data-te-select-init data-te-select-placeholder="Select Department" @change="selectedDepartmentChange()"
                         data-te-select-filter="true" name="" id="" v-model="selectedDepartment" class="input-ui">
-                        <option :value="staff" v-for="(staff, staffIndex) in staffList"
-                            :key="staffIndex"> {{ staff.name }} </option>
+                        <option :value="department" v-for="(department, departmentIndex) in departmentList"
+                            :key="departmentIndex"> {{ department.name }} </option>
                     </select>
                 </div>
-                <div class="w-full !text-sm" data-te-select-wrapper-ref>
-                    <select data-te-select-init data-te-select-placeholder="Select Role" @change="selectedStaffChanged()"
+                <!-- <div class="w-full !text-sm" data-te-select-wrapper-ref>
+                    <select data-te-select-init data-te-select-placeholder="Select Role" @change="selectedRoleChange()"
                         data-te-select-filter="true" name="" id="" v-model="selectedRole" class="input-ui">
-                        <option :value="staff" v-for="(staff, staffIndex) in staffList"
-                            :key="staffIndex"> {{ staff.name }} </option>
+                        <option :value="role" v-for="(role, roleIndex) in roleList"
+                            :key="roleIndex"> {{ role.name }} </option>
                     </select>
-                </div>
+                </div> -->
                 <div class="w-full !text-sm" data-te-select-wrapper-ref>
                     <select data-te-select-init data-te-select-placeholder="Select Staff" @change="selectedStaffChanged()"
                         data-te-select-filter="true" name="" id="" v-model="selectedStaff" class="input-ui">
@@ -85,45 +85,39 @@
                                 <th scope="col" class="">
                                     Okr Point
                                 </th>
-                                <th scope="col" class="">
-                                    
-                                </th>
                             </tr>
                         </thead>
                         <tbody>
                             <!-- looping start -->
-                            <div class="contents" v-for="(checkIn, index) in okrList" :key="index">
+                            <div class="contents" v-for="(okr, index) in okrList" :key="index">
                                 <tr class="">
                                     <td class=" font-medium ">
                                         <!-- {{ perPage * (currentPage - 1) + (++index) }} -->
                                         {{ index+1 }}
                                     </td>
                                     <td class="whitespace-nowrap">
-                                        
+                                        {{ okr.name }}
                                     </td>
                                     <td class="whitespace-nowrap">
-                                        
+                                        {{ okr.department_name }}
                                     </td>
                                     <td class="whitespace-nowrap">
-                                        
+                                        {{ okr.objective_key_name }}
                                     </td>
                                     <td class="whitespace-nowrap">
-                                        
+                                        {{ okr.assign_date }}
                                     </td>
                                     <td class="whitespace-nowrap">
-                                        
+                                        {{ okr.due_date }}
                                     </td>
                                     <td class="whitespace-nowrap">
-                                        
+                                        {{ okr.assign_date }}
                                     </td>
                                     <td class="whitespace-nowrap">
-                                        
+                                        {{ okr.due_date }}
                                     </td>
                                     <td class="whitespace-nowrap">
-                                        
-                                    </td>
-                                    <td class="whitespace-nowrap">
-                                        
+                                        {{ okr.okr_total_point }}
                                     </td>
                                     
                                     <!-- <td class="whitespace-nowrap">
@@ -172,6 +166,8 @@ export default {
         return {
             okrList: [],
             staffList:[],
+            departmentList:[],
+            roleList:[],
             selectedStaff:null,
             selectedRole:null,
             selectedDepartment:null,
@@ -198,6 +194,19 @@ export default {
 
     methods: {
         ...mapGetters(['getToken']),
+        
+        
+        async getOkrList(pageNumber) {
+            // let url = this.url + pageNumber + this.url_search + this.url_staff + this.url_from + this.url_to;
+            let url = this.url + this.url_staff + this.url_from + this.url_to + this.url_department;
+            let response = await getApiData({ url: url, token: this.getToken() });
+            if (response.data) {
+                this.okrList = response.data.data;
+                // this.lastPage = response.data.last_page;
+                // this.currentPage = pageNumber;
+                // this.perPage = response.data.per_page;
+            }
+        },
         async getStaffList(){
             let url = '/api/staffs'
             let response = await getApiData({ url: url, token: this.getToken() });
@@ -205,31 +214,66 @@ export default {
                 this.staffList = response.data;
             }
         },
-        async getOkrList(pageNumber) {
-            // let url = this.url + pageNumber + this.url_search + this.url_staff + this.url_from + this.url_to;
-            let url = this.url + this.url_staff + this.url_from + this.url_to;
-            let response = await getApiData({ url: url, token: this.getToken() });
-            if (response.data) {
-                this.okrList = response.data;
-                // this.lastPage = response.data.last_page;
-                // this.currentPage = pageNumber;
-                // this.perPage = response.data.per_page;
+        async getDepartmentList(){
+            let response = await getApiData({url: `/api/departments`, token: this.getToken()});
+            if(response.data){
+                this.departmentList = response.data;
             }
+        },
+        selectedDepartmentChange(){
+            this.getRoleList();
+            this.url_from = '';
+            this.url_to = '';
+            this.url_staff = '';
+            this.url_department = '?department_id=' + this.selectedDepartment.id;
+            this.getOkrList();
+            this.fromDate = null;
+            this.toDate = null;
+            this.selectedStaff = null;
+        },
+        async getRoleList(){
+            let response = await getApiData({url: '/api/roles_department/' + this.selectedDepartment.id , token: this.getToken()});
+            if(response.data){
+                this.roleList = response.data;
+            }
+        },
+        selectedRoleChange(){
+            this.url_from = '';
+            this.url_to = '';
+            this.url_staff = '';
+            this.url_role = '?role_id=' + this.selectedRole.id;
+            this.getOkrList();
+            this.fromDate = null;
+            this.toDate = null;
+            this.selectedStaff = null;
         },
         selectedStaffChanged(){
             this.url_from = '';
             this.url_to = '';
+            this.url_department = '';
+            this.url_role = '';
             this.url_staff = '?staff_id=' + this.selectedStaff.id
-            this.getCheckInList();
+            this.getOkrList();
+            this.selectedDepartment = null;
+            this.selectedRole = null;
+            this.roleList = null;
+            this.fromDate = null;
+            this.toDate = null;
         },
         fromDateChanged(){
             this.url_staff = '';
+            this.url_department = '';
+            this.url_role = '';
             this.url_from = '?from_date=' + this.fromDate
-            this.getCheckInList();
+            this.getOkrList();
+            this.selectedDepartment = null;
+            this.selectedRole = null;
+            this.roleList = [];
+            this.selectedStaff = null;
         },
         toDateChanged(){
             this.url_to = '&to_date=' + this.toDate
-            this.getCheckInList();
+            this.getOkrList();
         },
         
         alertValidationMessage(field) {
@@ -245,8 +289,9 @@ export default {
         initTE({ Modal, Select, Ripple });
     },
     created() {
-        this.getCheckInList(1);
+        this.getOkrList(1);
         this.getStaffList();
+        this.getDepartmentList();
     }
 }
 </script>
