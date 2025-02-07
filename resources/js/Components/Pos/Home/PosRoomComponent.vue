@@ -834,7 +834,7 @@
                             <!-- <label for="" class="block text-sm text-black mb-3">
                                 Hour
                             </label> -->
-                            <input type="text" placeholder="Qty" v-model="menuQuantity"
+                            <input type="number" placeholder="Qty" v-model="menuQuantity"
                                 class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
                         </div>
                         <div>
@@ -1238,7 +1238,7 @@
                 selectedMenu: null,
                 menuAreaList:[],
                 selectedMenuArea:null,
-                menuQuantity: null,
+                menuQuantity: 1,
                 remark: null,
                 menuPrice: null,
                 testroom: null,
@@ -2220,7 +2220,7 @@
             },
             clearMenuForm() {
                 this.invoiceId = null
-                this.menuQuantity = null
+                this.menuQuantity = 1
                 this.selectedMenu = null
             },
             clearServiceForm() {
