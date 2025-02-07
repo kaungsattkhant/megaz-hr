@@ -608,7 +608,7 @@ Route::get('/menu_costing', [MenuAPIController::class, 'costingMenu']);
 //     Route::post('entities/add_service', 'addService');
 //     Route::post('entities/end_service', 'endService');
 // });
-// Route::get('/invoices', [InvoiceAPIController::class, 'getInvoiceData']);
+Route::get('/pos/invoices', [InvoiceAPIController::class, 'getInvoiceData']);
 
 //end moved api
 
