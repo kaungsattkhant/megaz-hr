@@ -727,7 +727,9 @@ class InvoiceRepository implements InvoiceRepositoryInterface
             $total_service_value = 0;
             $total_accessory_value = 0;
             $invoiceServices = $invoice->invoiceService;
-            $this->invoiceService->checkOrderStatus($invoice->order->orderItems);
+            if($invoice->order){
+                $this->invoiceService->checkOrderStatus($invoice->order->orderItems);
+            }
             $invoiceAccessories = $invoice->accessories;
             $roomDoneResponse['is_service'] = 1;
             if ($invoiceServices->isEmpty()) {
