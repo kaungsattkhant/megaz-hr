@@ -57,6 +57,11 @@ class Invoice extends Model
         return $this->hasMany(Order::class);
     }
 
+    public function order()
+    {
+        return $this->hasOne(Order::class);
+    }
+
     public function room()
     {
         return $this->belongsTo(Entity::class, 'entity_id');
