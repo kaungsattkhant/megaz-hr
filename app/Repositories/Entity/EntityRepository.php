@@ -219,7 +219,8 @@ class EntityRepository implements EntityRepositoryInterface
         $entity = Entity::find($entityId);
         if ($entity->entity_type == 'room') {
             $entitySession = EntitySession::where('is_active', 1)
-                ->with(['entity', 'roomSessions', 'roomSession.invoice'])->where('entity_id', $entityId)->first();
+                ->with(['entity', 'roomSessions', 'roomSession.invoice'])
+                ->where('entity_id', $entityId)->first();
             if (!$entitySession) {
                 ResponseMessage('Entity have no invic ', 404);
             }
