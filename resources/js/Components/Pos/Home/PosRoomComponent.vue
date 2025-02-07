@@ -834,7 +834,7 @@
                             <!-- <label for="" class="block text-sm text-black mb-3">
                                 Hour
                             </label> -->
-                            <input type="text" placeholder="Qty" v-model="menuQuantity"
+                            <input type="number" placeholder="Qty" v-model="menuQuantity"
                                 class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
                         </div>
                         <div>
@@ -1364,7 +1364,7 @@
                 // this.packageMenuList = this.selectedPackage;
             },
             confirmRoomBtnClicked() {
-                this.getPurchaseMenuList();
+                // this.getPurchaseMenuList();
                 if(this.type == 'package' && this.selectedPackage){
                     this.isOpenRoomStep('is_package');
                     let menuOfselectedPackage = this.selectedPackage.menu_packages;
@@ -1491,23 +1491,23 @@
                 }
                 let response = await postApiData({ url: '/api/entities/start', form_data: formData, token: this.getToken() });
                 if (response.success) {
-                    // this.getRoomList();
-                    // this.getSelectedRoom();
-                    // this.isOpenRoomStep('detail');
+                    this.getRoomList();
+                    this.getSelectedRoom();
+                    this.isOpenRoomStep('detail');
 
-                    // if (this.selectedRoom.room_sessions.length > 0) {
-                    //     if (this.selectedRoom.room_sessions[0].invoice.orders.length > 0) {
-                    //         this.getPurchaseMenuList();
-                    //     }
-                    // }
-                    // if (this.selectedRoom.room_sessions.length < 1) {
-                    //     if (this.selectedRoom.room_sessions[0].invoice.orders.length < 1) {
-                    //         this.purchaseMenuList = [];
-                    //     }
-                    // }
-                    // this.food_total_package = 0
+                    if (this.selectedRoom.room_sessions.length > 0) {
+                        if (this.selectedRoom.room_sessions[0].invoice.orders.length > 0) {
+                            this.getPurchaseMenuList();
+                        }
+                    }
+                    if (this.selectedRoom.room_sessions.length < 1) {
+                        if (this.selectedRoom.room_sessions[0].invoice.orders.length < 1) {
+                            this.purchaseMenuList = [];
+                        }
+                    }
+                    this.food_total_package = 0
                     // console.log("success")
-                    // window.location.reload()
+                    window.location.reload()
                 }
                 else {
                     console.log('some errors occur')
@@ -1967,6 +1967,7 @@
                 const response = await getApiData({ url: '/api/menus/' + this.selectedMenu.id + '/areas', token: this.getToken() });
                 if (response.data) {
                     this.menuAreaList = response.data.areas;
+                    this.menuQuantity = 1;
                 }
             },
             btnClickAddMenu() {
