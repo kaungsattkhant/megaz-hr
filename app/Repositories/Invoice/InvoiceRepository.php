@@ -1135,9 +1135,10 @@ class InvoiceRepository implements InvoiceRepositoryInterface
             }
             $total_service_value += $serviceValue;
         }
-        $data['discount_value'] = $data['discount_type'] == null || $data['discount_type'] == "null" ? 0 : $data['discount_value'];
+        if(isset($data['discount_type'])){
+            $data['discount_value'] = $data['discount_type'] == null || $data['discount_type'] == "null" ? 0 : $data['discount_value'];
+        }
         $data['total_discount'] = $data['birthday_discount'] + $data['customer_level_discount'] + $data['discount_value'] + $data['order_discount'];
-        ;
         $data['sub_total'] = ($data['total'] + $data['tax'] + $data['service_charge']) - $data['total_discount'];
         // $data['sub_total'] = $data['total'];
         $data['total'] = $data['total'] + $data['total_discount'];
