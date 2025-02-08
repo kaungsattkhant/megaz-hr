@@ -10,7 +10,7 @@ class EntitySession extends Model
     use HasFactory;
 
     protected $fillable =[
-        'start_time','end_time','is_available','is_active','entity_id',
+        'start_time','end_time','is_available','is_active','entity_id','spans_midnight'
     ];
 
     public function entity()

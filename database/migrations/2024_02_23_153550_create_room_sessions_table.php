@@ -21,6 +21,7 @@ return new class extends Migration
             $table->double('price')->default(0);
             // $table->string('status')->default('running');
             $table->double('discount_session')->nullable(); 
+            $table->boolean('is_active')->default(1);
             $table->timestamps();
         });
     }

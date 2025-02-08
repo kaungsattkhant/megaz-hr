@@ -4,9 +4,11 @@ namespace App\Services;
 
 use App\Models\Entity;
 use App\Models\Account;
+use App\Models\RoomSession;
 use App\Models\EntitySession;
 use GuzzleHttp\Psr7\Response;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Log;
 
 
 
@@ -84,21 +86,21 @@ class InvoiceModelService
 
     public function changeRoomForEndlessTime($invoice, $newEntity)
     {
-        $currentRoomSession=$invoice->currentSession;
+        $currentRoomSession = $invoice->currentSession;
         $roomSession = $invoice->roomSession;
         $latestRoomSession = $invoice->latestSession;
         $firstRoomSession = $roomSession->first();
-        $current_time=now();
+        $current_time = now();
         $oldEntitySession = $this->getCurrentEntitySessionByEntity($latestRoomSession->entitySession->entity_id);
-        $currentStartTime=Carbon::parse($oldEntitySession->start_time);
-        $useCurrentSession=$currentStartTime->diffInHours($current_time);
+        $currentStartTime = Carbon::parse($oldEntitySession->start_time);
+        $useCurrentSession = $currentStartTime->diffInHours($current_time);
         return $useCurrentSession;
     }
 
     public function getCurrentEntitySessionByEntity($entityId)
     {
         // dd($startTime);
-        $startTime="2024-11-13 12:24:42";
+        $startTime = "2024-11-13 12:24:42";
         $current_time = now();
         $entitySession = EntitySession::where('entity_id', $entityId)
             ->whereTime('start_time', '<=', $current_time)
@@ -107,21 +109,33 @@ class InvoiceModelService
         return $entitySession;
     }
 
-    public function accountByCode($code){
-        $account=Account::getByAccountCode($code);
-        if(!$account){
-            ResponseMessage('Account is required',419) ;
+    public function accountByCode($code)
+    {
+        $account = Account::getByAccountCode($code);
+        if (!$account) {
+            ResponseMessage('Account is required', 419);
         }
         return $account;
     }
 
-    public function checkOrderStatus($orderItems){
-        $checkIsNotYeyOrder=$orderItems->whereIn('status','not yet')
-        ->first();
-        if($checkIsNotYeyOrder){
-            ResponseMessage('Order Item need to confirm first',419);
+    public function checkOrderStatus($orderItems)
+    {
+        $checkIsNotYeyOrder = $orderItems->whereIn('status', 'not yet')
+            ->first();
+        if ($checkIsNotYeyOrder) {
+            ResponseMessage('Order Item need to confirm first', 419);
         }
         return true;
+    }
+
+    public function updateIsActive($invoiceId, $isActive)
+    {
+        $invoiceRoomSessionUpdated = RoomSession::where('invoice_id', $invoiceId)
+            ->update(['is_active' => $isActive]);
+
+        Log::info('Room Sesion Status update is succesfully');
+        return $invoiceRoomSessionUpdated;
+
     }
 
 }

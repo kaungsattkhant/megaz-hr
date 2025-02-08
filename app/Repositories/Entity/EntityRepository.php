@@ -69,9 +69,9 @@ class EntityRepository implements EntityRepositoryInterface
             ->where('area_id', $area->id)
             ->with([
                 'entitySessions' => function ($query) {
-                    $query->where('start_time', '>=', '10:01:00')
+                    $query->where('start_time', '>=', '09:01:00')
                         ->orWhereBetween('start_time', ['00:01:00', '05:01:00'])
-                        ->orderByRaw("CASE WHEN start_time >= '10:01:00' THEN 1 ELSE 2 END")
+                        ->orderByRaw("CASE WHEN start_time >= '09:01:00' THEN 1 ELSE 2 END")
                         ->orderBy('start_time')
                         ->selectRaw('*, 
                     CASE 
@@ -86,15 +86,18 @@ class EntityRepository implements EntityRepositoryInterface
                 'entitySessions.roomSession.invoice'
             ])
             ->get();
+
         foreach ($entities as $entity) {
             if ($entity->entity_type == 'room' && $entity->is_active == 1) {
                 $roomSessions = collect();
                 $startTimes = collect();
                 $endTimes = collect();
-                $entitySessions = $entity->entitySessions()->where('is_active', 1)->get();
+                $entitySessions = $entity->entitySessions()
+                ->where('is_active', 1)
+                ->get();
                 foreach ($entitySessions as $entitySession) {
-                    foreach ($entitySession->roomSessions()->get() as $roomSession) {
-
+                    foreach ($entitySession->roomSessions()->where('is_active',1)->get() as $roomSession) {
+                        // dd($roomSession->invoice->payment_status);
                         $roomSessions->push($roomSession);
                         $startTimes->push($roomSession->start_date);
                         $endTimes->push($roomSession->end_date);
@@ -521,13 +524,16 @@ class EntityRepository implements EntityRepositoryInterface
                 for ($hour = 0; $hour < 24; $hour++) {
                     $startTime = Carbon::createFromTime($hour, 1)->format('H:i');
                     $endTime = Carbon::createFromTime(($hour + 1) % 24, 0)->format('H:i');
-                    EntitySession::create([
+                    $spansMidnight = $startTime > $endTime ? 1 : 0;
+                    $EntitySession=EntitySession::create([
                         'start_time' => $startTime,
                         'end_time' => $endTime,
                         'is_available' => 1,
                         'is_active' => 0,
+                        'spans_midnight' => $spansMidnight,
                         'entity_id' => $entity->id,
                     ]);
+                   
                 }
             }
 

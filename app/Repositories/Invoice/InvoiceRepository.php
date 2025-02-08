@@ -214,40 +214,64 @@ class InvoiceRepository implements InvoiceRepositoryInterface
                 $leftEntitySession = $this->entitySessionLeftTime($entitySession->id);
                 $startTime = now()->format('H:i');
                 $endTime = now()->addHour((int) $data['session_duration'])->format('H:i');
-                $takeSessions = EntitySession::orderBy('id')
-                ->select('id', 'start_time', 'end_time', 'is_active')
-                ->where(function ($query) use ($startTime, $endTime) {
-                    $query->whereTime('start_time', '<=', $endTime)
-                          ->whereTime('end_time', '>=', $startTime);
-                })
-                ->where('entity_id', $entitySession->entity_id)
-                ->get();
-                // $query->where(function ($q) use ($startTime) {
-                //     $q->whereTime('start_time', '<=', $startTime)
-                //         ->whereTime('end_time', '>=', $startTime);
-                // })
-                //     ->orWhere(function ($q) use ($endTime) {
-                //     $q->whereTime('start_time', '<=', $endTime)
-                //         ->whereTime('end_time', '>=', $endTime);
-                // });
+                // $startTime = "22:10";
+                // $endTime = "00:10";
+
+                $takeSessions = EntitySession::select('id', 'start_time', 'end_time', 'is_active', 'spans_midnight', 'entity_id')
+                    ->where('entity_id', $entitySession->entity_id)
+                    ->where(function ($query) use ($startTime, $endTime) {
+                        if ($startTime < $endTime) {
+                            // Normal case: within the same day (e.g., 15:00 - 16:00)
+                            $query->whereTime('start_time', '<', $endTime)
+                                ->whereTime('end_time', '>', $startTime);
+                        } else {
+                            // Special case: across midnight (e.g., 23:06 - 01:06)
+                            $query
+                                ->where(function ($q) use ($startTime, $endTime) {
+                                $q->whereTime('start_time', '<', $endTime)
+                                    ->orWhereTime('end_time', '>', $startTime);
+                            })
+                                ->orWhere(function ($q) use ($startTime, $endTime) {
+                                // Case 1: Sessions starting before midnight and ending after
+                                $q->whereTime('start_time', '>=', $startTime)
+                                    ->orWhereTime('end_time', '<=', $endTime);
+                            })
+                                ->orWhere(function ($q) {
+                                // Case 2: Sessions that completely span over midnight (e.g., 22:00 - 02:00)
+                                $q->whereTime('start_time', '>', '23:59')
+                                    ->orWhereTime('end_time', '<', '00:00');
+                            });
+                        }
+
+                    })
+                    //     ->orderByRaw("
+                    //     CASE 
+                    //         WHEN spans_midnight = 1 THEN 0 
+                    //         ELSE 1 
+                    //     END, start_time
+                    // ")
+                    ->orderByRaw("
+        CASE 
+            WHEN start_time >= '00:00:00' AND start_time < '12:00:00' THEN 2 -- Sessions after midnight (00:xx)
+            WHEN spans_midnight = 1 THEN 1 -- Sessions spanning midnight (23:xx - 00:xx)
+            ELSE 0 -- Sessions before midnight (22:xx)
+        END, start_time
+    ")
+                    ->get();
                 $startEntitySession = $takeSessions->first();
                 $lastEntitySession = $takeSessions->last();
                 //currenct codding is here
                 foreach ($takeSessions as $session) {
-                    // $now = now();
-                    // $endTime = Carbon::parse($session->end_time);
-                    // $remainingTime = floor($now->diffInMinutes($endTime));
                     $nowDate = now()->format('Y-m-d');
-
                     $roomSession['start_date'] = Carbon::parse($nowDate . ' ' . $session->start_time);
                     $roomSession['end_date'] = Carbon::parse($nowDate . ' ' . $session->end_time);
-                    if ($startEntitySession->start_time == $session->start_time ) {
-                    $startEntitySessionLeft = $this->entitySessionLeftTime($session->id);
+                    if ($startEntitySession->start_time == $session->start_time) {
+                        $startEntitySessionLeft = $this->entitySessionLeftTime($session->id);
                         $roomSession['session_duration'] = $startEntitySessionLeft;
                         $roomSession['start_date'] = Carbon::parse($nowDate . ' ' . $startTime);
                         $roomSession['end_date'] = Carbon::parse($nowDate . ' ' . $session->end_time);
-                    } elseif ( $lastEntitySession->end_time == $session->end_time) {
-                    $lastEntitySesionLeft = $this->entitySessionLeftTime($startEntitySession->id);
+                    } elseif ($lastEntitySession->end_time == $session->end_time) {
+                        $lastEntitySesionLeft = $this->entitySessionLeftTime($startEntitySession->id);
                         $roomSession['session_duration'] = 1 - $lastEntitySesionLeft;
                         $roomSession['start_date'] = Carbon::parse($nowDate . ' ' . $session->start_time);
                         $roomSession['end_date'] = Carbon::parse($nowDate . ' ' . $endTime);
@@ -758,6 +782,8 @@ class InvoiceRepository implements InvoiceRepositoryInterface
         return $invoice;
     }
 
+
+
     public function doneRoom(array $data)
     {
         DB::beginTransaction();
@@ -1032,16 +1058,15 @@ class InvoiceRepository implements InvoiceRepositoryInterface
             $data['sub_total'] = ($data['total']) - ($tax + $service_charge);
             $data['payment_status'] = 'received';
             $data['complete_date'] = CurrentTime();
-            $entity->save();
             $data['invoice_id'] = $invoice_id;
             $invoice->update($data);
+            //update is active  to room_session 
+            $this->invoiceService->updateIsActive($invoice->id, 0);
             //customer deposit 
             $customerDepositData['customer_id'] = $invoice->customer_id;
             $customerDepositData['account_id'] = $invoice->customer->account_id;
             $customerDepositData['amount'] = $data['total'];
             $customerDepositData['deposit_balance'] = $this->getCustomerDepositBalance($customer->id);
-
-
             //end
             foreach ($roomSessions as $session) {
                 $entitySession = $session->entitySession;
@@ -1135,12 +1160,11 @@ class InvoiceRepository implements InvoiceRepositoryInterface
             }
             $total_service_value += $serviceValue;
         }
-        if(isset($data['discount_type'])){
+        if (isset($data['discount_type'])) {
             $data['discount_value'] = $data['discount_type'] == null || $data['discount_type'] == "null" ? 0 : $data['discount_value'];
         }
         $data['total_discount'] = $data['birthday_discount'] + $data['customer_level_discount'] + $data['discount_value'] + $data['order_discount'];
         $data['sub_total'] = ($data['total'] + $data['tax'] + $data['service_charge']) - $data['total_discount'];
-        // $data['sub_total'] = $data['total'];
         $data['total'] = $data['total'] + $data['total_discount'];
         $data['payment_status'] = 'received';
         $data['complete_date'] = CurrentTime();
