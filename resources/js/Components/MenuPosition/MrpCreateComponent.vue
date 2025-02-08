@@ -742,7 +742,7 @@ export default {
                         uom_name: this.selectedUom.name,
                         quantity : this.null,
                         uom_type: this.null,
-                        uom_conversion: this.null
+                        uom_conversion: this.selectedItem.uom_conversion
                     });
                 }
                 else{
