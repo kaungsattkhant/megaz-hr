@@ -82,7 +82,8 @@ class MaterialRequirementsPlanningRepository implements MaterialRequirementsPlan
             'item_id' => $itemData->item_id,
             'uom_id' => $itemData->uom_id,
             'quantity' => $quantity,
-            'weight' =>  $itemData->weight
+            'weight' =>  $itemData->weight,
+            'uom_type' => $itemData->uom_type
           ]);
         }
       }
@@ -152,24 +153,27 @@ class MaterialRequirementsPlanningRepository implements MaterialRequirementsPlan
       // if (!empty($validatedData['menu_steps'])) {
       $menuSteps = json_decode($validatedData['menu_steps']);
 
-      foreach ($menuSteps as $data) {
+      foreach ($menuSteps as $step) {
         $menuStep =  $menu->menuSteps()->updateOrCreate(
           [
-            'id' => $data->id ?? null,
+            'id' => $step->id ?? null,
             'menu_id' => $menuId,
           ],
           [
-            'role_id' => $data->role_id,
-            'duration' => $data->duration,
-            'order_time' => $data->order_time,
-            'expected_quantity' => $data->expected_quantity,
-            'level' => $data->level,
-            'type' => $data->type
+            'role_id' => $step->role_id,
+            'duration' => $step->duration,
+            'order_time' => $step->order_time,
+            'expected_quantity' => $step->expected_quantity,
+            'level' => $step->level,
+            'type' => $step->type
           ]
         );
 
-        // if (!empty($data['item_menu'])) {
-        foreach ($data->item_menu as $itemData) {
+        // if (!empty( $step['item_menu'])) {
+        foreach ($step->item_menu as $itemData) {
+          $quantity = ($itemData->uom_type === 'base_uom')
+            ? $itemData->weight * $itemData->uom_conversion
+            : $itemData->weight;
           $menuStep->menuStepItem()->updateOrCreate(
             [
               'id' => $itemData->id ?? null,
@@ -178,7 +182,10 @@ class MaterialRequirementsPlanningRepository implements MaterialRequirementsPlan
             [
               'item_id' => $itemData->item_id,
               'uom_id' => $itemData->uom_id,
-              'weight' => $itemData->weight
+              'weight' => $itemData->weight,
+              'quantity' => $quantity,
+              'weight' => $itemData->weight,
+              'uom_type' => $itemData->uom_type
             ]
           );
         }
