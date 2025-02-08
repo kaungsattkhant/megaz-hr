@@ -73,7 +73,7 @@ class MaterialRequirementsPlanningRepository implements MaterialRequirementsPlan
         // if (!empty($step['item_menu'])) {
         foreach ($step->item_menu as $itemData) {
 
-          $weight = ($itemData->uom_type === 'base_uom')
+          $quantity = ($itemData->uom_type === 'base_uom')
             ? $itemData->weight * $itemData->uom_conversion
             : $itemData->weight;
 
@@ -81,8 +81,8 @@ class MaterialRequirementsPlanningRepository implements MaterialRequirementsPlan
             'menu_step_id' => $menuStep->id,
             'item_id' => $itemData->item_id,
             'uom_id' => $itemData->uom_id,
-            'quantity' => $itemData->quantity,
-            'weight' =>  $weight
+            'quantity' => $quantity,
+            'weight' =>  $itemData->weight
           ]);
         }
       }
