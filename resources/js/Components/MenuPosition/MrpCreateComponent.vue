@@ -739,7 +739,10 @@ export default {
                         weight: this.amount,
                         is_make_pack: this.isMakePack,
                         uom_id: this.selectedUom.id,
-                        uom_name: this.selectedUom.name
+                        uom_name: this.selectedUom.name,
+                        quantity : this.null,
+                        uom_type: this.null,
+                        uom_conversion: this.null
                     });
                 }
                 else{
