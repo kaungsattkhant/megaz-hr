@@ -74,8 +74,8 @@ class MaterialRequirementsPlanningRepository implements MaterialRequirementsPlan
         foreach ($step->item_menu as $itemData) {
 
           $quantity = ($itemData->uom_type === 'base_uom')
-            ? $itemData->quantity * $itemData->uom_conversion
-            : $itemData->quantity;
+            ? $itemData->weight * $itemData->uom_conversion
+            : $itemData->weight;
 
           MenuStepItem::create([
             'menu_step_id' => $menuStep->id,
