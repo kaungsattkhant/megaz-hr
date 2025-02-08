@@ -71,7 +71,7 @@
                                                 placeholder="Select Area"
                                             >
                                                 <option disabled selected>
-                                                    Select Area
+                                                    {{ foodOrder.area ? foodOrder.area.name : 'Select Area' }}
                                                 </option>
                                                 <option
                                                     v-for="(

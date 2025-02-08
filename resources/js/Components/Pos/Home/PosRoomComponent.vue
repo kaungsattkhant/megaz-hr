@@ -88,7 +88,8 @@
                                         </select>
                                         <button
                                             class="absolute -right-6 transition duration-150 ease-in-out focus:outline-none focus:ring-0"
-                                            data-te-toggle="modal" data-te-target="#create_customer_modal">
+                                            data-te-toggle="modal" data-te-target="#create_customer_modal"
+                                            @click="handleClick">
                                             +
                                         </button>
                                     </div>
@@ -212,11 +213,11 @@
                                     <i class="far fa-hourglass-half"></i>
                                 </button>
                                 <button class="transition duration-150 ease-in-out focus:outline-none focus:ring-0"
-                                    data-te-toggle="modal" data-te-target="#add_accessory_modal_room">
+                                    data-te-toggle="modal" data-te-target="#add_accessory_modal_room" @click="getAccessoryCategoryList()">
                                     <i class="far fa-plus-circle"></i>
                                 </button>
                                 <button class="transition duration-150 ease-in-out focus:outline-none focus:ring-0"
-                                    data-te-toggle="modal" data-te-target="#add_service_modal_room">
+                                    data-te-toggle="modal" data-te-target="#add_service_modal_room" @click="getServiceCategoryList()">
                                     <i class="far fa-user-music"></i>
                                 </button>
                             </div>
@@ -1142,6 +1143,10 @@
             roomAreaId:{
                 type: Number,
                 required: true
+            },
+            area:{
+                type: Object,
+                required: true
             }
         },
         components:{
@@ -1306,12 +1311,18 @@
 
         methods: {
             ...mapGetters(['getToken']),
-            async getRoomList(){
-                const response = await getApiData({ url: '/api/areas/' + this.roomAreaId + '/entities' , token: this.getToken()});
-                if(response.data){
-                    this.roomList = response.data;
-                    console.log('get room list')
+            handleClick() {
+                this.$emit('callParent');
+            },
+            async getRoomList(area){
+                if(area.area_type.type == 'ktv'){
+                    const response = await getApiData({ url: '/api/areas/' + this.roomAreaId + '/entities' , token: this.getToken()});
+                    if(response.data){
+                        this.roomList = response.data;
+                        console.log('get room list')
+                    }
                 }
+                
             },
             async btnClickedSession(time, timeIndex, room , roomIndex) {
                 this.isShowSidebar = true;
@@ -1344,7 +1355,18 @@
                 this.isOpenRoomStep('open_2');
                 // this.clearOpenRoomForm();
                 this.isPackage = false;
-
+                this.getCustomerList();
+                this.selectedCustomer = null;
+                this.invoice_date = null;
+                this.duration = null;
+                this.selectedPackage = null;
+                this.type = null;
+                this.isPreDeposit = false;
+                this.deposit = null;
+                this.selectedCashAccount = null;
+                this.female = null;
+                this.male = null;
+                this.child = null;
             },
 
             // step 2's methods
@@ -1973,6 +1995,7 @@
             btnClickAddMenu() {
                 this.invoiceId = this.selectedRoom.room_sessions[0].invoice.id;
                 console.log('invoice id ' + this.invoiceId)
+                this.getMenuList();
             },
             btnConfirmAddMenu() {
                 this.addMenu();
@@ -2304,9 +2327,11 @@
             selectedRoom(val, oldVal) {
                 console.log(`new: ${val}, old: ${oldVal}`)
             },
-            roomAreaId(newId) {
-            // Call your function once areaId is updated
-            this.getRoomList(newId);
+            // roomAreaId(newId) {
+            //     this.getRoomList(newId);
+            // },
+            area(area){
+                this.getRoomList(area);
             },
 
             isPreDeposit(){
@@ -2317,15 +2342,15 @@
             },
         },
         created(){
-            this.getCustomerList();
+            // this.getCustomerList();
             // this.getGendersList();
-            this.getMenuList();
+            // this.getMenuList();
             // this.getDivisionList();
 
-            this.getServiceCategoryList();
-            this.getLadyList();
+            // this.getServiceCategoryList();
+            // this.getLadyList();
 
-            this.getAccessoryCategoryList();
+            // this.getAccessoryCategoryList();
             // this.testtime();
             this.getCashAccounts();
         },
