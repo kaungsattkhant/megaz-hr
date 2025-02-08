@@ -16,6 +16,7 @@ return new class extends Migration
             $table->foreignId('menu_step_id');
             $table->integer('item_id');
             $table->integer('uom_id');
+            $table->integer('quantity');
             $table->double('weight');
             $table->timestamps();
         });
