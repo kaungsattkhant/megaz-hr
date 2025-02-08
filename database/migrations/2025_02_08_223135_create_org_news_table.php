@@ -11,14 +11,13 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('menu_step_items', function (Blueprint $table) {
+        Schema::create('org_news', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('menu_step_id');
-            $table->integer('item_id');
-            $table->integer('uom_id');
-            $table->string('uom_type');
-            $table->integer('quantity');
-            $table->double('weight');
+            $table->dateTime('date_time');
+            $table->foreignId('trained_by');
+            $table->longText('description');
+            $table->foreignId('created_by');
+            $table->string('org_news_type');
             $table->timestamps();
         });
     }
@@ -28,6 +27,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('menu_step_items');
+        Schema::dropIfExists('org_news');
     }
 };

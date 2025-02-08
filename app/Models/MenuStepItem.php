@@ -14,6 +14,7 @@ class MenuStepItem extends Model
         'menu_step_id',
         'item_id',
         'uom_id',
+        'uom_type',
         'quantity',
         'weight'
     ];
