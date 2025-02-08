@@ -2,6 +2,8 @@
 
 namespace App\Repositories\Invoice;
 
+use Exception;
+
 use Carbon\Carbon;
 use App\Models\Role;
 use App\Models\User;
@@ -37,6 +39,8 @@ use App\Repositories\Order\OrderRepository;
 use App\Http\Action\Transaction\StoreTransactionLedger;
 use App\Http\Action\Transaction\PurchaseOrderTransaction;
 use App\Models\CustomerDeposit;
+
+use App\Events\PosRoomDoneNotification;
 
 class InvoiceRepository implements InvoiceRepositoryInterface
 {
@@ -87,9 +91,10 @@ class InvoiceRepository implements InvoiceRepositoryInterface
                 $invoices = Invoice::with(['customer'])
                     ->whereBetween('created_at', [$request->date . ' 00:00:00', $request->date . ' 23:59:59'])
                     ->orderBy('created_at', 'desc')
+                    ->where('payment_status', 'checkout')
                     ->get();
             } else {
-                $invoices = Invoice::with(['customer'])->get();
+                $invoices = Invoice::with(['customer'])->where('payment_status', 'checkout')->get();
             }
 
             foreach ($invoices as $invoice) {
@@ -158,7 +163,7 @@ class InvoiceRepository implements InvoiceRepositoryInterface
                 //         ->whereTime('end_time', '>=', $current_time) // Check if end_time is greater than or equal to current time
                 //         ->first();
                 //     $entity = Entity::find($data['entity_id']);
-                // } 
+                // }
                 else if (isset($data['entity_session_id'])) {
                     $entitySession = EntitySession::find($data['entity_session_id']);
                     $entity = Entity::find($entitySession->entity_id);
@@ -200,7 +205,7 @@ class InvoiceRepository implements InvoiceRepositoryInterface
                 $data['invoice_date'] = Carbon::now();
                 $invoice = Invoice::create($data);
 
-                //create deposit 
+                //create deposit
                 $this->storeCustomerDeposit($data, UserData()->id);
                 //
                 $invoice->invoice_id = sprintf('%05d', $invoice->id);
@@ -265,7 +270,7 @@ class InvoiceRepository implements InvoiceRepositoryInterface
                     $session->is_active = 1;
                     $session->save();
                 }
-                //current coding is here 
+                //current coding is here
                 // if ($leftEntitySession >= 0) {
                 //     // dd($data['session_duration'],$leftEntitySession);
                 //     $leftDuration = (int) $data['session_duration'] - $leftEntitySession;
@@ -442,7 +447,7 @@ class InvoiceRepository implements InvoiceRepositoryInterface
                 'account_id' => $cash_account_id,
                 'action' => 'debit',
             ]);
-            #store credit ledger 
+            #store credit ledger
             $creditLedger = (new StoreTransactionLedger())->storeLedger([
                 'date' => now(),
                 'value' => $data['deposit'],
@@ -628,7 +633,7 @@ class InvoiceRepository implements InvoiceRepositoryInterface
                 ->whereTime('start_time', '<=', $current_time)
                 ->whereTime('end_time', '>=', $current_time)
                 ->first();
-            //end 
+            //end
             $previousEntity = Entity::find($entitySession->entity_id);
             $endTime = Carbon::parse($latestRoomSession->end_date);
             $sessionStartTime = Carbon::parse($firstRoomSession->start_date);
@@ -898,16 +903,172 @@ class InvoiceRepository implements InvoiceRepositoryInterface
         // dd($totalDiscount);
     }
 
+    public function checkoutInvoice(Request $request)
+    {
+        $catering_department = Department::where('name', 'Catering')->first();
+        $invoice = Invoice::find($request->invoice_id);
+
+        //end invoice for table
+        if($invoice->entity_id!=null){
+            $entity=Entity::find($invoice->entity_id);
+        }else{
+            $latestRoomSession = $invoice->latestSession;
+            $entity = Entity::find($latestRoomSession->entitySession->entity_id);
+        }
+        //end invoice for room
+        if (isset($request->waiter)) {
+            $managerRole = Role::where('name', 'Manager')
+                ->where('department_id', $catering_department->id)
+                ->first();
+            $entity->status = 'done_pending';
+            $entity->save();
+            broadcast(new PosRoomDoneNotification($invoice, $entity, $managerRole->id));
+            ResponseMessage("The request to quit the room {$entity->name} has been sent. Please wait for the confirmation from the catering department.");
+        } else if (isset($request->is_confirm)) {
+            $role = Role::where('name', 'Staff')->where('department_id', $catering_department->id)->first();
+            $msg = '';
+            if ($request->is_confirm != 1) {
+                $msg = "The request to quit the room {$entity->name} has been rejected. Thank you for your understanding.";
+                $entity->status = 'active';
+                $entity->save();
+            } else {
+                $msg = "The request to quit the room {$entity->name} has been confirmed. The room will be quit and will soon close. Thank you.";
+            }
+            broadcast(new RoomDoneNotificationRequest($entity, $msg, $role->id));
+            ResponseMessage($msg);
+        }
+        $total_session_price = 0;
+        $room_discount_value = 0;
+        $foodCharge = 0;
+        $beverageCharge = 0;
+
+        $roomSessions = RoomSession::where('invoice_id', $invoice->id)->get();
+        foreach ($roomSessions as $room) {
+            $total_session_price += ($invoice->invoice_type != 'package')? $room->price: 0;
+            $entitySession = $room->entitySession;
+            if ($entitySession) {
+                $entitySession->is_active = 0;
+                $entitySession->status = 'inactive';
+                $entitySession->save();
+            }
+        }
+        $invoice->discount_type = ($request->discount_type)? $request->discount_type: null;
+
+        if($invoice->discount_type && $invoice->discount_type == 'room_discount'){
+            $roomDiscount = RoomDiscount::find($request->room_discount_id);
+            if (!$roomDiscount->rooms->contains($entity->id)) {
+                ResponseMessage('Selected discount cannot be applied', 422);
+            }
+            if ($roomDiscount->session <= $latestRoomSession->session_duration) {
+                $room_discount_value = $total_session_price - $request->room_discount_amount;
+                $total_session_price = $request->room_discount_amount;
+                $latestRoomSession->discount_session = $request->discount_session;
+                $latestRoomSession->save();
+            } else {
+                ResponseMessage('Discount cannot be applied', 422);
+            }
+        }
+
+        $invoice->room_discount_value = $room_discount_value;
+        $invoice->discount_value = ($request->discount_value)? $request->discount_value: 0;
+        $invoice->birthday_discount = ($request->birthday_discount)? $request->birthday_discount: 0;
+        $invoice->customer_level_discount = ($request->customer_level_discount)? $request->customer_level_discount: 0;
+        $invoice->order_discount_value = ($request->order_discount)? $request->order_discount: 0;
+        $invoice->total_discount = $invoice->birthday_discount + $invoice->customer_level_discount + $invoice->order_discount_value + $invoice->discount_value + $invoice->room_discount_value;
+
+        $invoice->total_session_price = $total_session_price;
+        $invoice->tax = ($request->tax)? $request->tax: 0;
+        $invoice->service_charge = ($request->taservice_chargex)? $request->service_charge: 0;
+
+        $orderCategories = json_decode($request->order_categories, true);
+        foreach($orderCategories as $menu){
+            if ($menu['menu_category_id'] == 1 || $menu['menu_category_id'] == 2 || $menu['menu_category_id'] == 3) {
+                $foodCharge += $menu['price'];
+            } else {
+                $beverageCharge += $menu['price'];
+            }
+        }
+
+        // accquired service charges total remaining
+        $invoice->total_service_value = 0;
+
+        // accquired accessory charges total remaining
+        $invoice->total_accessory_value = 0;
+
+        $invoice->total = $foodCharge + $beverageCharge + $invoice->total_session_price + $invoice->tax + $invoice->service_charge + $invoice->total_service_value + $invoice->total_accessory_value;
+        $invoice->sub_total = $invoice->total - $invoice->total_discount;
+
+        $invoice->payment_status = 'checkout';
+        $invoice->save();
+
+        return $invoice;
+    }
+
+    public function paidInvoice(Request $request)
+    {
+        $invoice = Invoice::find($request->id);
+        $customer = $invoice->customer;
+        $depositBalance = $this->getCustomerDepositBalance($customer->id);
+        try{
+            DB::beginTransaction();
+            if($depositBalance < 1 && $request->paid_amount < 1){
+                ResponseMessage('Paid amout must be entered', 400);
+            }
+            if($depositBalance > 0){
+                $updatedCustomerDepositBalance = $depositBalance - $invoice->sub_total;
+                $ApOrAr = null;
+                if($updatedCustomerDepositBalance != 0){
+                    $ApOrAr = ($updatedCustomerDepositBalance > 0)? 'ap': 'ar';
+                    if($ApOrAr == 'ap'){
+                        // stores AP transaction for customer deposit balance
+                    }
+                    if($ApOrAr == 'ar'){
+                        // stores AR transaction for receivable from customer
+                    }
+                }
+
+                $this->ledgerAndTransactionForInvoice([
+                    'payment_type' => ($request->payment_type)? $request->payment_type: 'cash',
+                    'invoice_id' => $invoice->id,
+                    // 'food_charge' => $foodCharge,
+                    // 'beverage_charge' => $beverageCharge,
+                    'total_session_price' => $invoice->total_session_price,
+                    'service_charge' => $invoice->service_charge,
+                    'tax' => $invoice->tax,
+                    'discount_total' => $invoice->total_discount,
+                ]);
+
+                $customerDeposit = CustomerDeposit::create([
+                    'type' => 'withdrawal',
+                    'date_time' => now(),
+                    'amount' => $invoice->sub_total,
+                    'account_id' => CustomerDeposit::where('customer_id', $customer->id)->first()->account_id,
+                    'cash_account_id' => CustomerDeposit::where('customer_id', $customer->id)->first()->cash_account_id,
+                    'customer_id' => $customer->id,
+                ]);
+            }
+
+            $invoice->paid_amount = $request->paid_amount;
+            $invoice->payment_status = 'paid';
+            $invoice->save();
+
+            DB::commit();
+        }catch(Exception $e){
+            DB::rollBack();
+            ResponseMessage($e->getMessage(), 500);
+        }
+    }
+
     public function doneEntityWithInvoice(array $data)
     {
         //payload
         //invoice_id: 36
-// discount_type: null
-// order_categories: []
-// total: 10000
-// order_discount: 0
-// discount_total: 0
-// end_date: null 
+        // discount_type: null
+        // order_categories: []
+        // total: 10000
+        // order_discount: 0
+        // discount_total: 0
+        // end_date: null
         //end
         DB::beginTransaction();
         try {
@@ -1035,12 +1196,13 @@ class InvoiceRepository implements InvoiceRepositoryInterface
             $entity->save();
             $data['invoice_id'] = $invoice_id;
             $invoice->update($data);
-            //customer deposit 
-            $customerDepositData['customer_id'] = $invoice->customer_id;
-            $customerDepositData['account_id'] = $invoice->customer->account_id;
-            $customerDepositData['amount'] = $data['total'];
-            $customerDepositData['deposit_balance'] = $this->getCustomerDepositBalance($customer->id);
-
+            //customer deposit
+            // $customerDepositData['customer_id'] = $invoice->customer_id;
+            // $customerDepositData['account_id'] = $invoice->customer->account_id;
+            // $customerDepositData['amount'] = $data['sub_total'];
+            // $customerDepositData['deposit_balance'] = $this->getCustomerDepositBalance($customer->id);
+            // store customer deposit
+            // $this->storeInvoiceCustomerDeposit($customerDepositData, UserData()->id);
 
             //end
             foreach ($roomSessions as $session) {
@@ -1088,20 +1250,6 @@ class InvoiceRepository implements InvoiceRepositoryInterface
                     ]);
                 }
             }
-            //store customer deposit
-            $this->storeInvoiceCustomerDeposit($customerDepositData, UserData()->id);
-            //store invoice transaction
-
-            $this->ledgerAndTransactionForInvoice([
-                'payment_type' => 'cash',
-                'invoice_id' => $invoice->id,
-                // 'food_charge' => $foodCharge,
-                // 'beverage_charge' => $beverageCharge,
-                'total_session_price' => $total_session_price,
-                'service_charge' => $service_charge,
-                'tax' => $tax,
-                'discount_total' => $data['discount_total'],
-            ]);
 
             $catering_department = Department::where('name', 'Catering')->first();
             $msg = "The {$entity->name} is now closed. Thank you.";
@@ -1112,6 +1260,9 @@ class InvoiceRepository implements InvoiceRepositoryInterface
             $entity->is_active = 0;
             $entity->status = 'inactive';
             $entity->save();
+
+            $invoice->payment_status = 'checkout';
+            $invoice->save();
             DB::commit();
             return $invoice;
         } catch (\Exception $e) {
@@ -1386,7 +1537,7 @@ class InvoiceRepository implements InvoiceRepositoryInterface
     }
 
 
-    //add service 
+    //add service
     public function addService($request)
     {
 
@@ -1446,5 +1597,16 @@ class InvoiceRepository implements InvoiceRepositoryInterface
             ResponseMessage($e->getMessage(), 402);
             throw $e;
         }
+    }
+
+    private function getCustomerDepositBalance($customerId)
+    {
+        $balance = CustomerDeposit::where('customer_id', $customerId)
+        ->selectRaw("
+            SUM(CASE WHEN type = 'deposit' THEN amount ELSE 0 END) -
+            SUM(CASE WHEN type = 'withdrawal' THEN amount ELSE 0 END) AS balance
+        ")->value('balance');
+
+        return $balance;
     }
 }

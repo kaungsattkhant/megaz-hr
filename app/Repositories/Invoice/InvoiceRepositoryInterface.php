@@ -18,6 +18,8 @@ interface InvoiceRepositoryInterface
 
     public function invoiceEntityChange(array $data);
 
+    public function checkoutInvoice(Request $request);
+
     public function doneEntityWithInvoice(array $data);
 
     public function doneRoom(array $data);
