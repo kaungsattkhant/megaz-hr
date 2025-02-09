@@ -11,13 +11,13 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('item_prices', function (Blueprint $table) {
-            $table->bigIncrements('id');
-            $table->double('price'); // base uom price
-            $table->unsignedBigInteger('supplier_item_id');
-            $table->unsignedBigInteger('uom_id');
-            $table->string('type');
-            $table->double('uom_price');
+        Schema::create('org_news', function (Blueprint $table) {
+            $table->id();
+            $table->dateTime('date_time');
+            $table->foreignId('trained_by');
+            $table->longText('description');
+            $table->foreignId('created_by');
+            $table->string('org_news_type');
             $table->timestamps();
         });
     }
@@ -27,6 +27,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('item_prices');
+        Schema::dropIfExists('org_news');
     }
 };

@@ -3,7 +3,7 @@
         <div class=" bg-gray-100 min-h-screen w-full">
             <div class="w-full pt-9 px-6 ">
                 <ul class="mb-5 flex list-none flex-row flex-wrap border-b-0 pl-0" role="tablist" data-te-nav-ref>
-                    <li v-for="(area, index) in areaList" :key="index" role="presentation" @click="btnClickedArea(area.id,area.area_type.type)">
+                    <li v-for="(area, index) in areaList" :key="index" role="presentation" @click="btnClickedArea(area.id,area.area_type.type,area)">
                         <a href="#tabs-profile" class="my-2 mr-3 text-white block  px-7 pb-2.5 rounded-full
                             pt-3 text-xs  hover:isolate bg-[#F0C094]
                             hover:bg-[#f7a559] focus:isolate data-[te-nav-active]:bg-[#F19E51]"
@@ -16,13 +16,13 @@
                     <!-- <button class="p-10 bg-red-600 text-white" @click="callTest()">
                         bar
                     </button> -->
-                    <PosTableComponent v-if="selectedAreaId" :table-area-id="selectedAreaId" ref="posTable" />
+                    <PosTableComponent v-if="selectedAreaId" :table-area-id="selectedAreaId" :area="selectedArea" ref="posTable" @callParent="parentFunction" />
                 </div>
                 <div v-show="areaType == 'ktv'" class="contents">
                     <!-- <button class="p-10 bg-red-600 text-white" @click="callTest()">
                         ktv
                     </button> -->
-                    <PosRoomComponent v-if="selectedAreaId" :room-area-id="selectedAreaId" ref="posRoom" />
+                    <PosRoomComponent v-if="selectedAreaId" :room-area-id="selectedAreaId" :area="selectedArea" ref="posRoom" @callParent="parentFunction" />
                 </div>
 
                 <div class="mb-6 hidden">
@@ -784,6 +784,7 @@
                 // },
 
                 selectedAreaId:null,
+                selectedArea:null,
                 // selectedTime:null,
                 // selectedRoom:null,
 
@@ -903,18 +904,25 @@
             //         this.$refs.posRoom.getRoomList()
             //     }
             // },
+            parentFunction() {
+                console.log('Parent function called from child!');
+                // Place your desired functionality here.
+                this.getGendersList();
+                this.getDivisionList();
+            },
             async getAreaList() {
                 let url = '/api/areas?area_category_id=2'
                 const response = await getApiData({ url: url, token: this.getToken() });
                 if (response.data) {
                     this.areaList = response.data;
                     this.selectedAreaId = this.areaList[0].id
+                    this.selectedArea = this.areaList[0]
                     this.areaType = response.data[0].area_type.type
 
                     if(response.data[0].area_type.type == 'bar_and_restaurant' && response.data[0].id){
                         this.$nextTick(() => {
                             if (this.$refs.posTable) { // Check if posTable is defined
-                                this.$refs.posTable.getTableList(response.data[0].id);
+                                this.$refs.posTable.getTableList(response.data[0]);
                                 let num = 0
                                 num += 1
                                 console.log(num)
@@ -927,7 +935,7 @@
                     else{
                         this.$nextTick(() => {
                             if (this.$refs.posRoom) { // Check if posRoom is defined
-                                this.$refs.posRoom.getRoomList(response.data[0].id);
+                                this.$refs.posRoom.getRoomList(response.data[0]);
                                 let num = 0
                                 num += 1
                                 console.log(num)
@@ -940,17 +948,18 @@
                     
                 }
             },
-            btnClickedArea(areaId,areaType){
+            btnClickedArea(areaId,areaType,area){
                 this.selectedAreaId = areaId
                 this.areaType = areaType
+                this.selectedArea = area;
                 // console.log(areaType , areaId)
                 // this.callTest();
-                if(areaType == 'bar_and_restaurant'){
-                    this.$refs.posTable.getTableList()
-                }
-                else{
-                    this.$refs.posRoom.getRoomList()
-                }
+                // if(areaType == 'bar_and_restaurant'){
+                //     this.$refs.posTable.homeGetTableList()
+                // }
+                // else{
+                //     this.$refs.posRoom.getRoomList()
+                // }
             },
 
 
@@ -1776,8 +1785,8 @@
         },
         created(){
             this.getAreaList();
-            this.getGendersList();
-            this.getDivisionList();
+            // this.getGendersList();
+            // this.getDivisionList();
             // this.getCustomerList();
             // this.getGendersList();
             // this.getMenuList();

@@ -40,6 +40,7 @@ class MaterialRequirementsPlanningRepository implements MaterialRequirementsPlan
 
     DB::beginTransaction();
     try {
+      $data = [];
       if (isset($validatedData['image'])) {
         $imageData = $validatedData['image'];
         $extension = $imageData->getClientOriginalExtension();
@@ -53,36 +54,40 @@ class MaterialRequirementsPlanningRepository implements MaterialRequirementsPlan
         'menu_category_id' => $validatedData['menu_category_id'],
         'code' => $validatedData['code'],
         'description' => $validatedData['description'],
-        'image_path'=>$data['image_path'],
-        'image_url'=>$data['image_url'],
+        'image_path' => $data['image_path'] ?? null,
+        'image_url' => $data['image_url'] ?? null,
       ]);
       // if (!empty($validatedData['menu_steps'])) {
       $menuSteps = json_decode($validatedData['menu_steps']);
-
-      foreach ($menuSteps as $data) {
+      foreach ($menuSteps as $step) {
         $menuStep = MenuStep::create([
           'menu_id' => $menu->id,
-          'role_id' => $data->role_id,
-          'duration' => $data->duration,
-          'order_time' => $data->order_time,
-          'expected_quantity' => $data->expected_quantity,
-          'level' => $data->level,
-          'type' => $data->type
+          'role_id' => $step->role_id,
+          'duration' => $step->duration,
+          'order_time' => $step->order_time,
+          'expected_quantity' => $step->expected_quantity,
+          'level' => $step->level,
+          'type' => $step->type
         ]);
 
-        // if (!empty($data['item_menu'])) {
-        foreach ($data->item_menu as $itemData) {
+        // if (!empty($step['item_menu'])) {
+        foreach ($step->item_menu as $itemData) {
+
+          $quantity = ($itemData->uom_type === 'base_uom')
+            ? $itemData->weight * $itemData->uom_conversion
+            : $itemData->weight;
 
           MenuStepItem::create([
-
             'menu_step_id' => $menuStep->id,
             'item_id' => $itemData->item_id,
             'uom_id' => $itemData->uom_id,
-            'weight' => $itemData->weight
+            'quantity' => $quantity,
+            'weight' =>  $itemData->weight,
+            'uom_type' => $itemData->uom_type
           ]);
         }
-        // }
       }
+      // }
       // }
 
       if (!empty($validatedData['price'])) {
@@ -104,12 +109,9 @@ class MaterialRequirementsPlanningRepository implements MaterialRequirementsPlan
       // }
 
       DB::commit();
-      $menuDatas = Menu::with('menuSteps.menuStepItem')->find($menu->id);
+      // $menuDatas = Menu::with('menuSteps.menuStepItem')->find($menu->id);
 
-      return response()->json([
-        'message' => 'Menu stored successfully!',
-        'data' =>   $menuDatas
-      ], 201);
+      return ResponseMessage('Menu stored successfully!', 201);
     } catch (Exception $e) {
       ResponseMessage($e->getMessage(), 500);
       throw $e;
@@ -151,24 +153,27 @@ class MaterialRequirementsPlanningRepository implements MaterialRequirementsPlan
       // if (!empty($validatedData['menu_steps'])) {
       $menuSteps = json_decode($validatedData['menu_steps']);
 
-      foreach ($menuSteps as $data) {
+      foreach ($menuSteps as $step) {
         $menuStep =  $menu->menuSteps()->updateOrCreate(
           [
-            'id' => $data->id ?? null,
+            'id' => $step->id ?? null,
             'menu_id' => $menuId,
           ],
           [
-            'role_id' => $data->role_id,
-            'duration' => $data->duration,
-            'order_time' => $data->order_time,
-            'expected_quantity' => $data->expected_quantity,
-            'level' => $data->level,
-            'type' => $data->type
+            'role_id' => $step->role_id,
+            'duration' => $step->duration,
+            'order_time' => $step->order_time,
+            'expected_quantity' => $step->expected_quantity,
+            'level' => $step->level,
+            'type' => $step->type
           ]
         );
 
-        // if (!empty($data['item_menu'])) {
-        foreach ($data->item_menu as $itemData) {
+        // if (!empty( $step['item_menu'])) {
+        foreach ($step->item_menu as $itemData) {
+          $quantity = ($itemData->uom_type === 'base_uom')
+            ? $itemData->weight * $itemData->uom_conversion
+            : $itemData->weight;
           $menuStep->menuStepItem()->updateOrCreate(
             [
               'id' => $itemData->id ?? null,
@@ -177,7 +182,10 @@ class MaterialRequirementsPlanningRepository implements MaterialRequirementsPlan
             [
               'item_id' => $itemData->item_id,
               'uom_id' => $itemData->uom_id,
-              'weight' => $itemData->weight
+              'weight' => $itemData->weight,
+              'quantity' => $quantity,
+              'weight' => $itemData->weight,
+              'uom_type' => $itemData->uom_type
             ]
           );
         }

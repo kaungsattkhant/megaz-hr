@@ -11,14 +11,13 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('menu_step_items', function (Blueprint $table) {
+        Schema::create('participants', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('menu_step_id');
-            $table->integer('item_id');
-            $table->integer('uom_id');
-            $table->string('uom_type');
-            $table->integer('quantity');
-            $table->double('weight');
+            $table->foreignId('department_id')->nullable();
+            $table->foreignId('role_id')->nullable();
+            $table->foreignId('staff_id')->nullable();
+            $table->integer('participantable_id');
+            $table->string('participantable_type');
             $table->timestamps();
         });
     }
@@ -28,6 +27,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('menu_step_items');
+        Schema::dropIfExists('participants');
     }
 };

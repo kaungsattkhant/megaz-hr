@@ -11,13 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('item_prices', function (Blueprint $table) {
-            $table->bigIncrements('id');
-            $table->double('price'); // base uom price
-            $table->unsignedBigInteger('supplier_item_id');
-            $table->unsignedBigInteger('uom_id');
-            $table->string('type');
-            $table->double('uom_price');
+        Schema::create('types', function (Blueprint $table) {
+            $table->id();
+            $table->string('name');
+            $table->integer('typeable_id');
+            $table->string('typeable_type');
             $table->timestamps();
         });
     }
@@ -27,6 +25,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('item_prices');
+        Schema::dropIfExists('types');
     }
 };

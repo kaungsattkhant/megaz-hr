@@ -71,7 +71,8 @@
                                         </select>
                                         <button
                                             class="absolute -right-6 transition duration-150 ease-in-out focus:outline-none focus:ring-0"
-                                            data-te-toggle="modal" data-te-target="#create_customer_modal">
+                                            data-te-toggle="modal" data-te-target="#create_customer_modal"
+                                            @click="handleClick">
                                             +
                                         </button>
                                     </div>
@@ -157,11 +158,11 @@
                                     <i class="far fa-cocktail"></i>
                                 </button>
                                 <button class="transition duration-150 ease-in-out focus:outline-none focus:ring-0"
-                                    data-te-toggle="modal" data-te-target="#add_accessory_modal">
+                                    data-te-toggle="modal" data-te-target="#add_accessory_modal" @click="getAccessoryCategoryList()">
                                     <i class="far fa-plus-circle"></i>
                                 </button>
                                 <button class="transition duration-150 ease-in-out focus:outline-none focus:ring-0"
-                                    data-te-toggle="modal" data-te-target="#add_service_modal">
+                                    data-te-toggle="modal" data-te-target="#add_service_modal" @click="btnClickAddService()">
                                     <i class="far fa-user-music"></i>
                                 </button>
                                 <!-- <button class="transition duration-150 ease-in-out focus:outline-none focus:ring-0"
@@ -714,7 +715,7 @@
                             </select>
                         </div> -->
                         <div class="mb-4">
-                            <input type="text" placeholder="Qty" v-model="menuQuantity"
+                            <input type="number" placeholder="Qty" v-model="menuQuantity"
                                 class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
                         </div>
                         <div>
@@ -1023,6 +1024,10 @@
             tableAreaId:{
                 type: Number,
                 required: true
+            },
+            area:{
+                type: Object,
+                required: true
             }
         },
         components:{
@@ -1178,11 +1183,23 @@
         methods: {
             ...mapGetters(['getToken']),
 
+            handleClick() {
+                this.$emit('callParent');
+            },
             async getTableList(){
-                const response = await getApiData({ url: '/api/areas/' + this.tableAreaId + '/entities' , token: this.getToken()});
+                if(this.area.area_type.type == 'bar_and_restaurant'){
+                    const response = await getApiData({ url: '/api/areas/' + this.area.id + '/entities' , token: this.getToken()});
+                    if(response.data){
+                        this.roomList = response.data;
+                        console.log('get table list')
+                    }
+                }
+            },
+            async homeGetTableList(id){
+                const response = await getApiData({ url: '/api/areas/' + id + '/entities' , token: this.getToken()});
                 if(response.data){
                     this.roomList = response.data;
-                    console.log('get table list')
+                    console.log('get home table list')
                 }
             },
             async btnClickedIsOpenRoom(room , roomIndex) {
@@ -1211,7 +1228,13 @@
                 this.isOpenRoomStep('open_2');
                 // this.clearOpenRoomForm();
                 this.isPackage = false;
-
+                this.getCustomerList();
+                this.selectedCustomer = null;
+                this.type = null;
+                this.deposit = null;
+                this.male = null;
+                this.female = null;
+                this.child = null;
             },
 
             // step 2's methods
@@ -1716,11 +1739,13 @@
                 const response = await getApiData({ url: '/api/menus/' + this.selectedMenu.id + '/areas', token: this.getToken() });
                 if (response.data) {
                     this.menuAreaList = response.data.areas;
+                    this.menuQuantity = 1;
                 }
             },
             btnClickAddMenu() {
                 this.invoiceId = this.selectedRoom.room_sessions.latest_invoice.id;
                 console.log('invoice id ' + this.invoiceId)
+                this.getMenuList();
             },
             btnConfirmAddMenu() {
                 this.addMenu();
@@ -1804,6 +1829,9 @@
 
             // add service
             // api/get_service?service_category_id=1&area_id=3 dj list
+            btnClickAddService(){
+                this.getServiceCategoryList();
+            },
             async getServiceCategoryList() {
                 const response = await getApiData({ url: '/api/service_categories', token: this.getToken() });
                 if (response.data) {
@@ -2001,22 +2029,24 @@
                 console.log(`new: ${val}, old: ${oldVal}`)
             },
         
-            tableAreaId(newId) {
-            // Call your function once areaId is updated
-            this.getTableList(newId);
+            // tableAreaId(newId) {
+            //     this.getTableList(newId);
+            // },
+            area(area){
+                this.getTableList(area);
             }
         },
         created(){
-            this.getCustomerList();
+            // this.getCustomerList();
             // this.getGendersList();
-            this.getMenuList();
+            // this.getMenuList();
             // this.getDivisionList();
             this.getPackageList(this.currentTime);
 
-            this.getServiceCategoryList();
-            this.getLadyList();
+            // this.getServiceCategoryList();
+            // this.getLadyList();
 
-            this.getAccessoryCategoryList();
+            // this.getAccessoryCategoryList();
         },
         mounted()
         {
