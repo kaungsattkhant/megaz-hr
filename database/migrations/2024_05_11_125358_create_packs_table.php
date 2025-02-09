@@ -18,6 +18,7 @@ return new class extends Migration
             $table->date('expired_at');
             $table->unsignedBigInteger('created_by');
             $table->string('status');
+            $table->softDeletes();
             $table->timestamps();
         });
     }
