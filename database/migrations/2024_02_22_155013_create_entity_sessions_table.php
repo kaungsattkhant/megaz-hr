@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->time('start_time');
             $table->time('end_time');
+            $table->boolean('spans_midnight')->default(false);
             $table->boolean('is_available')->default(1);
             $table->boolean('is_active')->default(1);
             $table->foreignId('entity_id')->constrained()->onDelete('cascade');

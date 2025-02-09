@@ -12,14 +12,8 @@ class RoomSession extends Model
 {
     use HasFactory;
 
-    protected $fillable = [
-        'start_date',
-        'end_date',
-        'session_duration',
-        'invoice_id',
-        'price',
-        'entity_session_id',
-        'discount_session'
+    protected $fillable=[
+        'start_date','end_date','session_duration','invoice_id','price','entity_session_id','discount_session','is_active',
     ];
 
     public function invoice()
