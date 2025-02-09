@@ -465,7 +465,7 @@ export default {
             let response = await postApiData({ url: '/api/inventories', form_data: formData, token: this.getToken() });
             if (response.success) {
                 this.getInventoryList(1)
-                window.location.reload();
+                // window.location.reload();
                 this.closeModal();
                 this.clearForm();
             }

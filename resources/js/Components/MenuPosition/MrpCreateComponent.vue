@@ -742,6 +742,13 @@ export default {
                     return 1;
                 }
 
+                let uom_type = null;
+                if(this.selectedUom.base_uom_id){
+                    uom_type = 'base_uom'
+                }
+                if(this.selectedUom.uom_id){
+                    uom_type = 'uom'
+                }
                 if(this.menuLevel.item_menu.length < 1){
                     this.menuLevel.level = this.selectedLevel.id;
                     this.menuLevel.type = this.selectedType.id;
@@ -759,13 +766,7 @@ export default {
                     //     this.menuLevel.order_time = 0;
                     //     this.menuLevel.expected_quantity = 0;
                     // }
-                    let uom_type = null;
-                    if(this.selectedUom.base_uom_id){
-                        uom_type = 'base_uom'
-                    }
-                    if(this.selectedUom.uom_id){
-                        uom_type = 'uom'
-                    }
+                    
                     this.menuLevel.item_menu.push({
                         item_id: this.selectedItem.id,
                         price: price,
@@ -787,7 +788,9 @@ export default {
                         weight: this.amount,
                         is_make_pack: this.isMakePack,
                         uom_id: this.selectedUom.id,
-                        uom_name: this.selectedUom.name
+                        uom_name: this.selectedUom.name,
+                        uom_type: uom_type,
+                        uom_conversion: this.selectedUom.uom_conversion
                     });
                 }
                 this.selectedItemCategory = null;

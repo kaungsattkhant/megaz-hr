@@ -591,6 +591,8 @@ export default {
                     text: `Success`,
                     type: 'info'
                 });
+                this.selectedUom = null;
+                this.transferItem = null;
             }
             else {
                 this.$notify({
@@ -599,8 +601,7 @@ export default {
                 });
             }
 
-            this.selectedUom = null;
-            this.transferItem = null;
+            
         },
 
         searchBtnClicked(){
