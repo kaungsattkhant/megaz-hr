@@ -42,6 +42,8 @@ use App\Models\CustomerDeposit;
 
 use App\Events\PosRoomDoneNotification;
 
+use App\Http\Action\Common\AccountFetcher;
+
 class InvoiceRepository implements InvoiceRepositoryInterface
 {
     use CustomerTrait;
@@ -1014,49 +1016,169 @@ class InvoiceRepository implements InvoiceRepositoryInterface
             if($depositBalance < 1 && $request->paid_amount < 1){
                 ResponseMessage('Paid amout must be entered', 400);
             }
+
             if($depositBalance > 0){
+                $withdrawalAmt = $invoice->sub_total;
                 $updatedCustomerDepositBalance = $depositBalance - $invoice->sub_total;
                 $ApOrAr = null;
                 if($updatedCustomerDepositBalance != 0){
                     $ApOrAr = ($updatedCustomerDepositBalance > 0)? 'ap': 'ar';
                     if($ApOrAr == 'ap'){
                         // stores AP transaction for customer deposit balance
+                        // deposit credit
+                        $withdrawalAmt = $invoice->sub_total;
                     }
                     if($ApOrAr == 'ar'){
                         // stores AR transaction for receivable from customer
+                        $withdrawalAmt = $depositBalance;
                     }
                 }
 
-                $this->ledgerAndTransactionForInvoice([
-                    'payment_type' => ($request->payment_type)? $request->payment_type: 'cash',
-                    'invoice_id' => $invoice->id,
-                    // 'food_charge' => $foodCharge,
-                    // 'beverage_charge' => $beverageCharge,
-                    'total_session_price' => $invoice->total_session_price,
-                    'service_charge' => $invoice->service_charge,
-                    'tax' => $invoice->tax,
-                    'discount_total' => $invoice->total_discount,
-                ]);
-
+                // ဖြတ်ရမယ့် အမောင့်က
+                // ကျသင့်ငွေက balance ထက်များနေရင် ရှိသလောက် balance အကုန်ဖြတ်
+                // ကျသင့်ငွေက balance ထက်နည်းနေရင်တော့ ရှင်းရမယ့် အမောင့်တိုင်း ဖြတ်
                 $customerDeposit = CustomerDeposit::create([
                     'type' => 'withdrawal',
                     'date_time' => now(),
-                    'amount' => $invoice->sub_total,
+                    'amount' => $withdrawalAmt, // **
                     'account_id' => CustomerDeposit::where('customer_id', $customer->id)->first()->account_id,
                     'cash_account_id' => CustomerDeposit::where('customer_id', $customer->id)->first()->cash_account_id,
                     'customer_id' => $customer->id,
                 ]);
             }
 
+            // debit cash bank
+            // credit menu (inv food)
+
+            // credit service charge
+            // credit tax
+            // credit services
+            // credit accessory
+            // credit room
+
+            // debit discount
+            // credit cash
+
+            // credit deposit
+
+            $accountFetcher = new AccountFetcher();
+            $cashAccount = ($request->payment_type == 'bank')? $accountFetcher->getAccountByName('POS Bank'): $accountFetcher->getAccountByName('POS Cash');
+
+            $ledgerTransactionWriter = new StoreTransactionLedger();
+            $transaction = $ledgerTransactionWriter->createTransaction([
+                'date' => now(),
+                'created_by' => UserData()->id,
+                'transactionable_id' => $invoice->id,
+                'transactionable_type' => 'invoice',
+                'is_confirmed' => 1,
+            ]);
+
+            $ledgerTransactionWriter->storeLedger([
+                'value' => $request->paid_amount,
+                'action' => 'debit',
+                'account_id' => $cashAccount->id
+            ], $transaction->id);
+
+            $ledgerTransactionWriter->storeLedger([
+                'value' => $invoice->total_session_price,
+                'action' => 'credit',
+                'account_id' => $accountFetcher->getAccountByCode('5-0103')->id,
+            ], $transaction->id);
+
+            if($invoice->service_charge > 0){
+                $ledgerTransactionWriter->storeLedger([
+                    'value' => $invoice->service_charge,
+                    'action' => 'credit',
+                    'account_id' => $accountFetcher->getAccountByCode('5-1009')->id, // Service Charges(8%)
+                ], $transaction->id);
+            }
+            if($invoice->tax > 0){
+                $ledgerTransactionWriter->storeLedger([
+                    'value' => $invoice->tax,
+                    'action' => 'credit',
+                    'account_id' => $accountFetcher->getAccountByCode('2-1057')->id, // Receivable 5% Tax
+                ], $transaction->id);
+            }
+
+            if($invoice->total_service_value){
+                $ledgerTransactionWriter->storeLedger([
+                    'value' => $invoice->total_service_value,
+                    'action' => 'credit',
+                    'account_id' => $accountFetcher->getAccountByCode('5-1014')->id, // Event/Function-Service Fees
+                ], $transaction->id);
+            }
+
+            if($invoice->total_accessory_value){
+                $ledgerTransactionWriter->storeLedger([
+                    'value' => $invoice->total_accessory_value,
+                    'action' => 'credit',
+                    'account_id' => $accountFetcher->getAccountByCode('5-1014')->id, // should be the account for accessory sales
+                ], $transaction->id);
+            }
+
+            if($invoice->total_discount > 0){
+                $ledgerTransactionWriter->storeLedger([
+                    'value' => $invoice->total_discount,
+                    'action' => 'debit',
+                    'account_id' => $accountFetcher->getAccountByCode('6-2003')->id, // Discount Allowed
+                ], $transaction->id);
+            }
+
+            if($invoice->order){
+                $foodMenus = $this->getOrderedMenusSummary($invoice->id, [1,2,3,4]);
+                $beverageMenus = $this->getOrderedMenusSummary($invoice->id, [5]);
+
+                if(($foodMenus)->count() > 0){
+                    $foodTotal = $foodMenus->sum('total_price');
+                    $ledgerTransactionWriter->storeLedger([
+                        'value' => $foodTotal,
+                        'action' => 'credit',
+                        'account_id' => $accountFetcher->getAccountByCode('5-0101')->id, // Income - Food (KTV)
+                    ], $transaction->id);
+                }
+                if(($beverageMenus->count() > 0)){
+                    $beverageTotal = $beverageMenus->sum('total_price');
+                    $ledgerTransactionWriter->storeLedger([
+                        'value' => $beverageTotal,
+                        'action' => 'credit',
+                        'account_id' => $accountFetcher->getAccountByCode('5-0102')->id, // Income - Beverages (KTV)
+                    ], $transaction->id);
+                }
+            }
+
             $invoice->paid_amount = $request->paid_amount;
             $invoice->payment_status = 'paid';
+            $invoice->payment_type = $request->payment_type;
             $invoice->save();
 
             DB::commit();
+
+            ResponseData($invoice);
         }catch(Exception $e){
             DB::rollBack();
             ResponseMessage($e->getMessage(), 500);
         }
+    }
+
+    private function getOrderedMenusSummary($invoiceId, array $categoryIds)
+    {
+        $menus = Invoice::where('invoices.id', $invoiceId)
+            ->whereIn('menu_categories.id', $categoryIds)
+            ->join('orders', 'invoices.id', '=', 'orders.invoice_id') // Join orders
+            ->join('order_items', 'orders.id', '=', 'order_items.order_id') // Join order items
+            ->join('menus', 'order_items.menu_id', '=', 'menus.id') // Join menus
+            ->join('menu_categories', 'menus.menu_category_id', '=', 'menu_categories.id') // Join menu categories
+            ->select(
+                'menu_categories.id as category_id',
+                'menu_categories.name as category_name',
+                DB::raw('COUNT(order_items.id) as menu_count'), // Count number of menu items in each category
+                DB::raw('SUM(order_items.price) as total_price') // Sum of order item prices per category
+            )
+            ->groupBy('menu_categories.id', 'menu_categories.name') // Group by category
+            ->orderBy('menu_categories.name')
+            ->get();
+
+        return $menus;
     }
 
     public function doneEntityWithInvoice(array $data)
@@ -1597,16 +1719,5 @@ class InvoiceRepository implements InvoiceRepositoryInterface
             ResponseMessage($e->getMessage(), 402);
             throw $e;
         }
-    }
-
-    private function getCustomerDepositBalance($customerId)
-    {
-        $balance = CustomerDeposit::where('customer_id', $customerId)
-        ->selectRaw("
-            SUM(CASE WHEN type = 'deposit' THEN amount ELSE 0 END) -
-            SUM(CASE WHEN type = 'withdrawal' THEN amount ELSE 0 END) AS balance
-        ")->value('balance');
-
-        return $balance;
     }
 }

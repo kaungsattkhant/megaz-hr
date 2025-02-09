@@ -165,4 +165,9 @@ class InvoiceAPIController extends Controller
         $data=$this->invoiceRepo->endService($request);
         ResponseData($data);
     }
+
+    public function settleInvoice(Request $request)
+    {
+        $this->invoiceRepo->paidInvoice($request);
+    }
 }

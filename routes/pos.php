@@ -19,6 +19,7 @@ Route::middleware('auth:api')->group(function () {
         Route::post('entities/add_service', 'addService');
         Route::post('entities/end_service', 'endService');
         Route::get('/pos/invoices', 'getInvoiceData');
+        Route::post('/pos/invoices', 'settleInvoice');
         Route::post('/entities/start', 'startEntity');
         Route::post('/entities/add_more_sessions', 'addMoreSessions');
         Route::post('/entities/change', 'changeRoom');
