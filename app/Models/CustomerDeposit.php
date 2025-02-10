@@ -8,8 +8,14 @@ use Illuminate\Database\Eloquent\Model;
 class CustomerDeposit extends Model
 {
     use HasFactory;
-    protected $fillable=[
-        'date_time','account_id','cash_account_id','amount','type','customer_id'
+
+    protected $fillable = [
+        'date_time',
+        'account_id',
+        'cash_account_id',
+        'amount',
+        'type',
+        'customer_id'
     ];
 
     public function account()

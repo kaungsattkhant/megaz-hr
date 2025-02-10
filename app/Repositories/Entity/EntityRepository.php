@@ -12,6 +12,7 @@ use App\Models\RoomSession;
 use Illuminate\Http\Request;
 use App\Models\EntitySession;
 use App\Models\InvoiceService;
+use App\Models\InvoiceSession;
 use Illuminate\Support\Facades\DB;
 use App\Services\InvoiceModelService;
 
@@ -69,9 +70,9 @@ class EntityRepository implements EntityRepositoryInterface
             ->where('area_id', $area->id)
             ->with([
                 'entitySessions' => function ($query) {
-                    $query->where('start_time', '>=', '10:01:00')
+                    $query->where('start_time', '>=', '09:01:00')
                         ->orWhereBetween('start_time', ['00:01:00', '05:01:00'])
-                        ->orderByRaw("CASE WHEN start_time >= '10:01:00' THEN 1 ELSE 2 END")
+                        ->orderByRaw("CASE WHEN start_time >= '09:01:00' THEN 1 ELSE 2 END")
                         ->orderBy('start_time')
                         ->selectRaw('*, 
                     CASE 
@@ -86,15 +87,18 @@ class EntityRepository implements EntityRepositoryInterface
                 'entitySessions.roomSession.invoice'
             ])
             ->get();
+
         foreach ($entities as $entity) {
             if ($entity->entity_type == 'room' && $entity->is_active == 1) {
                 $roomSessions = collect();
                 $startTimes = collect();
                 $endTimes = collect();
-                $entitySessions = $entity->entitySessions()->where('is_active', 1)->get();
+                $entitySessions = $entity->entitySessions()
+                    ->where('is_active', 1)
+                    ->get();
                 foreach ($entitySessions as $entitySession) {
-                    foreach ($entitySession->roomSessions()->get() as $roomSession) {
-
+                    foreach ($entitySession->roomSessions()->where('is_active', 1)->get() as $roomSession) {
+                        // dd($roomSession->invoice->payment_status);
                         $roomSessions->push($roomSession);
                         $startTimes->push($roomSession->start_date);
                         $endTimes->push($roomSession->end_date);
@@ -148,68 +152,72 @@ class EntityRepository implements EntityRepositoryInterface
         if (!$firstRoomSession) {
             ResponseMessage('Invoice Room Session is invalid', 419);
         }
-        $customer = $firstRoomSession->invoice->customer;
+        $customer = $firstRoomSession->invoiceSession->invoice->customer;
+
         $customerDepositBalance = $this->getCustomerDepositBalance($customer->id);
         //end deposit
-        foreach ($entitySession->roomSessions as $roomSession) {
-            $invoice = $roomSession->invoice;
-            $invoice->package;
-
-            if ($invoice) {
-                //service
-                $invoiceServices = $invoice->invoiceService;
-                foreach ($invoiceServices as $invoiceService) {
-                    $time = $invoiceService->end_date != null ? $invoiceService->end_date : now();
-                    $this->invoiceModelService->calculateInvoiceService($invoiceService, $time);
-                    $total_service_value += $invoiceService->service_value;
-                }
-                $invoiceServiceCollection = $invoiceServiceCollection->merge($invoice->invoiceService);
-                //serice
-                //accesory
-                $invoiceAccessories = $invoice->accessories;
-                foreach ($invoiceAccessories as $invoiceAccessorie) {
-                    $total_accessory_value += $invoiceAccessorie->accessory->accessory_price->price * $invoiceAccessorie->quantity;
-                }
-                $invoiceAccessoryCollection = $invoiceAccessoryCollection->merge($invoice->invoiceAccessories);
-                //end_accessoryI
-                $consolidatedOrderItems = [];
-                foreach ($invoice->orders as $order) {
-                    $orderItems = OrderItem::where('order_id', $order->id)->get();
-
-                    foreach ($orderItems as $orderItem) {
-                        $menuId = $orderItem->menu_id;
-                        $status = $orderItem->status;
-
-                        if (isset($consolidatedOrderItems[$menuId][$status])) {
-                            $consolidatedOrderItems[$menuId][$status]->quantity += $orderItem->quantity;
-                            $consolidatedOrderItems[$menuId][$status]->price += $orderItem->price;
-                            $consolidatedOrderItems[$menuId][$status]->discount_price += $orderItem->discount_price;
-                        } else {
-                            $consolidatedOrderItems[$menuId][$status] = $orderItem;
-                        }
-                    }
-                }
-                foreach ($invoice->orders as $order) {
-                    $order->order_items = collect();
-
-                    foreach ($consolidatedOrderItems as $menuId => $itemsByStatus) {
-                        foreach ($itemsByStatus as $status => $order_items) {
-                            $order_items->menu;
-                            $order->order_items->push($order_items);
-                        }
-                    }
-                }
-                //service list
+        // foreach ($entitySession->roomSessions as $roomSession) {
+        $invoice = $firstRoomSession->invoiceSession->invoice;
+        $invoice->package;
+        if ($invoice) {
+            //service
+            $invoiceServices = $invoice->invoiceService;
+            foreach ($invoiceServices as $invoiceService) {
+                $time = $invoiceService->end_date != null ? $invoiceService->end_date : now();
+                $this->invoiceModelService->calculateInvoiceService($invoiceService, $time);
+                $total_service_value += $invoiceService->service_value;
             }
+            $invoiceServiceCollection = $invoiceServiceCollection->merge($invoice->invoiceService);
+            //serice
+            //accesory
+            $invoiceAccessories = $invoice->accessories;
+            foreach ($invoiceAccessories as $invoiceAccessorie) {
+                $total_accessory_value += $invoiceAccessorie->accessory->accessory_price->price * $invoiceAccessorie->quantity;
+            }
+            $invoiceAccessoryCollection = $invoiceAccessoryCollection->merge($invoice->invoiceAccessories);
+            //end_accessoryI
+            $consolidatedOrderItems = [];
+            foreach ($invoice->orders as $order) {
+                $orderItems = OrderItem::where('order_id', $order->id)->get();
+
+                foreach ($orderItems as $orderItem) {
+                    $menuId = $orderItem->menu_id;
+                    $status = $orderItem->status;
+
+                    if (isset($consolidatedOrderItems[$menuId][$status])) {
+                        $consolidatedOrderItems[$menuId][$status]->quantity += $orderItem->quantity;
+                        $consolidatedOrderItems[$menuId][$status]->price += $orderItem->price;
+                        $consolidatedOrderItems[$menuId][$status]->discount_price += $orderItem->discount_price;
+                    } else {
+                        $consolidatedOrderItems[$menuId][$status] = $orderItem;
+                    }
+                }
+            }
+            foreach ($invoice->orders as $order) {
+                $order->order_items = collect();
+
+                foreach ($consolidatedOrderItems as $menuId => $itemsByStatus) {
+                    foreach ($itemsByStatus as $status => $order_items) {
+                        $order_items->menu;
+                        $order->order_items->push($order_items);
+                    }
+                }
+            }
+            //service list
         }
+        // }
         // dd($invoiceServiceCollection);
+        $entitySession->start_date_time = $firstRoomSession->invoiceSession->start_date_time;
+        $entitySession->end_date_time = $firstRoomSession->invoiceSession->end_date_time;
         $entitySession->services = $invoiceServiceCollection;
         $entitySession->invoice_accessories = $invoiceAccessoryCollection;
         $entitySession->total_service_value = $total_service_value;
         $entitySession->total_accessory_value = $total_accessory_value;
-        $entitySession->deposit_balance=$customerDepositBalance;
-        $entitySession->customer_id=$customer->id;
-        $entitySession->account_id=$customer->account_id;
+        $entitySession->deposit_balance = $customerDepositBalance;
+        $entitySession->customer_id = $customer->id;
+        $entitySession->account_id = $customer->account_id;
+        $entitySession->total_session_price = $invoice->total_session_price;
+        $entitySession->invoice = $invoice;
         return $entitySession;
     }
 
@@ -218,19 +226,22 @@ class EntityRepository implements EntityRepositoryInterface
     {
         $entity = Entity::find($entityId);
         if ($entity->entity_type == 'room') {
-            $entitySession = EntitySession::where('is_active', 1)
-                ->with(['entity', 'roomSessions', 'roomSession.invoice'])
-                ->where('entity_id', $entityId)->first();
-            if (!$entitySession) {
-                ResponseMessage('Entity have no invic ', 404);
-            }
-            $invoiceId = $entitySession->roomSession->invoice_id;
-            $invoice = Invoice::find($invoiceId);
-            $roomSessions = RoomSession::where('invoice_id', $invoiceId)
-                ->orderBy('created_at')
-                ->get();
-            $firstRoomSession = $roomSessions->first();
-            $lastRoomSession = $roomSessions->last();
+            $activeInvoiceSession = InvoiceSession::where('is_active', 1)->where('entity_id', $entityId);
+            $invoice = $activeInvoiceSession->invoice;
+
+            // $entitySession = EntitySession::where('is_active', 1)
+            //     ->with(['entity', 'roomSessions', 'roomSession.invoice'])
+            //     ->where('entity_id', $entityId)->first();
+            // if (!$entitySession) {
+            //     ResponseMessage('Entity have no invic ', 404);
+            // }
+            // $invoiceId = $entitySession->roomSession->invoice_id;
+            // $invoice = Invoice::find($invoiceId);
+            // $roomSessions = RoomSession::where('invoice_id', $invoiceId)
+            //     ->orderBy('created_at')
+            //     ->get();
+            // $firstRoomSession = $roomSessions->first();
+            // $lastRoomSession = $roomSessions->last();
 
             $invoiceServiceCollection = collect();
             $total_service_value = 0;
@@ -283,8 +294,10 @@ class EntityRepository implements EntityRepositoryInterface
                 }
             }
             // }
-            $entitySession['start_date'] = $firstRoomSession->start_date;
-            $entitySession['end_date'] = $lastRoomSession->end_date;
+            // $entitySession['start_date'] = $firstRoomSession->start_date;
+            // $entitySession['end_date'] = $lastRoomSession->end_date;
+            $entitySession['start_date']=$activeInvoiceSession->start_date_time;
+            $entitySession['end_date']=$activeInvoiceSession->start_date_time;
             $entitySession['invoice'] = $invoice;
             //service add response
             $entitySession['services'] = $invoiceServiceCollection;
@@ -521,13 +534,16 @@ class EntityRepository implements EntityRepositoryInterface
                 for ($hour = 0; $hour < 24; $hour++) {
                     $startTime = Carbon::createFromTime($hour, 1)->format('H:i');
                     $endTime = Carbon::createFromTime(($hour + 1) % 24, 0)->format('H:i');
-                    EntitySession::create([
+                    $spansMidnight = $startTime > $endTime ? 1 : 0;
+                    $EntitySession = EntitySession::create([
                         'start_time' => $startTime,
                         'end_time' => $endTime,
                         'is_available' => 1,
                         'is_active' => 0,
+                        'spans_midnight' => $spansMidnight,
                         'entity_id' => $entity->id,
                     ]);
+
                 }
             }
 

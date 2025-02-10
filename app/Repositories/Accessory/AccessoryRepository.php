@@ -123,9 +123,7 @@ class AccessoryRepository implements AccessoryInterface
 
     public function createInvoiceAccessory($request)
     {
-        // dd($request->all());
         $data = $request->all();
-        // dd($data);
         DB::beginTransaction();
         try {
             $invoiceAccessory = InvoiceAccessory::create($data);

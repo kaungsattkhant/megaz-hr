@@ -13,7 +13,7 @@ class RoomSession extends Model
     use HasFactory;
 
     protected $fillable=[
-        'start_date','end_date','session_duration','invoice_id','price','entity_session_id','discount_session'
+        'start_date','end_date','session_duration','invoice_id','price','entity_session_id','discount_session','is_active',
     ];
 
     public function invoice()
@@ -31,4 +31,8 @@ class RoomSession extends Model
         return $this->belongsTo(EntitySession::class,'entity_session_id');
     }
 
+    public function invoiceSession()
+    {
+        return $this->belongsTo(InvoiceSession::class,'invoice_session_id');
+    }
 }

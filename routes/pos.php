@@ -18,7 +18,8 @@ Route::middleware('auth:api')->group(function () {
     Route::controller(InvoiceAPIController::class)->group(function () {
         Route::post('entities/add_service', 'addService');
         Route::post('entities/end_service', 'endService');
-        Route::get('/invoices', 'getInvoiceData');
+        Route::get('/pos/invoices', 'getInvoiceData');
+        Route::post('/pos/invoices', 'settleInvoice');
         Route::post('/entities/start', 'startEntity');
         Route::post('/entities/add_more_sessions', 'addMoreSessions');
         Route::post('/entities/change', 'changeRoom');
@@ -31,7 +32,7 @@ Route::middleware('auth:api')->group(function () {
     });
     Route::controller(OrderAPIController::class)->group(function () {
         Route::post('/entities/orders', 'addOrder');
-        Route::post("/order_status_change", 'orderItemChangeStatus');
+        Route::post('/order_status_change', 'orderItemChangeStatus');
         Route::get('/order_items', 'getOrderItemList');
         Route::get('/order_items/{invoiceId}/invoice', 'getOrderItemByInvoice');
         Route::get('/pos_order_items', 'getOrderItemForPOS');
@@ -39,7 +40,7 @@ Route::middleware('auth:api')->group(function () {
         Route::post('/pos_orders/check_foc_supervision', 'checkFocSupervision');
         Route::post('combine_order_items','combineOrderItem');
         Route::get('/order_item_group_list', 'getOrderItemGroupList');
-        
+
     });
     //ksk
     Route::prefix('pos')->controller(AccessoryController::class)->group(function () {

@@ -52,6 +52,7 @@ class GetInventoryStockAction
                 'item_uom.name as conversion_uom_name',
                 'base_uom.name as  base_uom_name',
                 'uom_conversions.conversion',
+                'uom_conversions.id as conversion_unit_id',
                 DB::raw('(SUM(CASE WHEN action = "in" AND DATE(date) < CURDATE() THEN quantity ELSE 0 END) -
                     SUM(CASE WHEN action = "out" AND DATE(date) < CURDATE() THEN quantity ELSE 0 END)) as opening_balance'),
                 DB::raw('SUM(CASE WHEN action = "in" AND DATE(date) = CURDATE() THEN quantity ELSE 0 END) as in_balance'),
@@ -82,9 +83,11 @@ class GetInventoryStockAction
                 'latest_prices.base_uom_id',
                 'items.base_uom_id',
                 'uom_conversions.conversion',
+                'uom_conversions.id',
                 'item_uom.name',
                 'base_uom.name'
-            )->orderByRaw('CASE WHEN 
+            )
+            ->orderByRaw('CASE WHEN 
             (SUM(CASE WHEN action = "in" AND DATE(date) < CURDATE() THEN quantity ELSE 0 END) +
             SUM(CASE WHEN action = "in" AND DATE(date) = CURDATE() THEN quantity ELSE 0 END) -
             SUM(CASE WHEN action = "out" AND DATE(date) <= CURDATE() THEN quantity ELSE 0 END)) = 0 
@@ -95,13 +98,11 @@ class GetInventoryStockAction
             THEN 0
             ELSE 1 
         END ASC')
-
             ->orderByRaw('CASE WHEN (SUM(CASE WHEN action = "in" AND DATE(date) < CURDATE() THEN quantity ELSE 0 END) +
         SUM(CASE WHEN action = "in" AND DATE(date) = CURDATE() THEN quantity ELSE 0 END) -
         SUM(CASE WHEN action = "out" AND DATE(date) <= CURDATE() THEN quantity ELSE 0 END)) = 0 
         THEN 0 
         ELSE 1 END ASC')
-
             ->orderBy('closing_balance', 'ASC')
             ->orderBy('total_value', 'ASC');
 

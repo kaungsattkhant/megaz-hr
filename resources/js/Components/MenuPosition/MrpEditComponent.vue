@@ -263,7 +263,7 @@
                         <select data-te-select-init data-te-select-placeholder="Select Category"
                             data-te-select-filter="true" name="" id="" v-model="selectedUom" class="input-ui">
                             <option :value="uom" v-for="(uom, uomIndex) in itemUoms"
-                                :key="uomIndex"> {{ uom.name }} </option>
+                                :key="uomIndex"> {{ uom.uom_name }} </option>
                         </select>
                     </div>
                 </div>
@@ -600,7 +600,9 @@ export default {
                         name: item.item.name,
                         weight: item.weight,
                         uom_id: item.uom_id,
-                        uom_name: item.uom.name
+                        uom_name: item.uom.name,
+                        uom_type: item.uom_type,
+                        uom_conversion: item.item.uom_conversion
                     });
                 })
                 this.testtestmenu = sampleMenuLevel
@@ -692,17 +694,33 @@ export default {
 
         itemSelectChanged() {
             this.itemUoms = [];
-            let index = this.uomList.findIndex(uom => uom.id == this.selectedItem.base_uom_id);
-            if (index != -1) {
-                let baseUom = this.uomList[index];
-                this.itemUoms.push(baseUom);
-            }
-            index = this.uomList.findIndex(uom => uom.id == this.selectedItem.uom_id);
-            if (index != -1) {
-                let itemUom = this.uomList[index];
-                this.itemUoms.push(itemUom);
-            }
-            console.log('uom test')
+            console.log(this.selectedItem)
+            this.itemUoms.push(
+                {
+                    id:this.selectedItem.base_uom_id,
+                    base_uom_id : this.selectedItem.base_uom_id,
+                    uom_name : this.selectedItem.base_uom_name,
+                    uom_conversion : this.selectedItem.uom_conversion
+                },
+                {
+                    id:this.selectedItem.uom_id,
+                    uom_id : this.selectedItem.uom_id,
+                    uom_name : this.selectedItem.item_uom,
+                    uom_conversion : this.selectedItem.uom_conversion
+                }
+            )
+
+            // let index = this.uomList.findIndex(uom => uom.id == this.selectedItem.base_uom_id);
+            // if (index != -1) {
+            //     let baseUom = this.uomList[index];
+            //     this.itemUoms.push(baseUom);
+            // }
+            // index = this.uomList.findIndex(uom => uom.id == this.selectedItem.uom_id);
+            // if (index != -1) {
+            //     let itemUom = this.uomList[index];
+            //     this.itemUoms.push(itemUom);
+            // }
+            // console.log('uom test')
         },
 
         async getUomList() {
@@ -810,6 +828,13 @@ export default {
                     return 1;
                 }
 
+                let uom_type = null;
+                if(this.selectedUom.base_uom_id){
+                    uom_type = 'base_uom'
+                }
+                if(this.selectedUom.uom_id){
+                    uom_type = 'uom'
+                }
                 if(this.menuLevel.item_menu.length < 1){
                     this.menuLevel.level = this.selectedLevel.id;
                     this.menuLevel.type = this.selectedType.id;
@@ -828,7 +853,9 @@ export default {
                         weight: this.amount,
                         is_make_pack: this.isMakePack,
                         uom_id: this.selectedUom.id,
-                        uom_name: this.selectedUom.name
+                        uom_name: this.selectedUom.name,
+                        uom_type: uom_type,
+                        uom_conversion: this.selectedUom.uom_conversion
                     });
                 }
                 else{
@@ -839,7 +866,9 @@ export default {
                         weight: this.amount,
                         is_make_pack: this.isMakePack,
                         uom_id: this.selectedUom.id,
-                        uom_name: this.selectedUom.name
+                        uom_name: this.selectedUom.name,
+                        uom_type: uom_type,
+                        uom_conversion: this.selectedUom.uom_conversion
                     });
                 }
                 this.selectedItemCategory = null;
