@@ -2,8 +2,9 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Meeting extends Model
 {
@@ -17,6 +18,21 @@ class Meeting extends Model
         'chaired_by',
         'description',
         'created_by',
-        'meeting_type'
+        'meeting_type' //dep_type,role_type,staff
     ];
+
+    public function chairedBy()
+    {
+        return $this->belongsTo(User::class, 'chaired_by');
+    }
+
+    public function createdBy()
+    {
+        return $this->belongsTo(User::class, 'created_by');
+    }
+
+    public function participants(): MorphMany
+    {
+        return $this->morphMany(Participant::class, 'participantable');
+    }
 }

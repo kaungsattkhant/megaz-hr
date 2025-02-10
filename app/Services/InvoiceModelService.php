@@ -234,4 +234,15 @@ class InvoiceModelService
         return $invoiceSession;
     }
 
+    public function checkIsActiveChangeRoom($entityId)
+    {
+
+        $isEntity=Entity::where('is_active',1)
+        ->where('id',$entityId)
+        ->first();
+        if($isEntity){
+            ResponseMessage('Entity is not available now',419);
+        }
+    }
+
 }

@@ -40,7 +40,6 @@ use App\Http\Action\Transaction\StoreTransactionLedger;
 use App\Http\Action\Transaction\PurchaseOrderTransaction;
 use App\Models\CustomerDeposit;
 use App\Models\InvoiceSession;
-use App\Models\AreaType;
 
 use App\Http\Action\Common\AccountFetcher;
 
@@ -699,9 +698,9 @@ class InvoiceRepository implements InvoiceRepositoryInterface
     }
 
     public function modifyEntityChange($data){
-
-        // dd($data);
-        $this->invoiceService->checkIsActiveChangeRoom();
+        $entityId=$data['entity_id'];
+        $invoiceId=$data['invoice_id'];
+        $this->invoiceService->checkIsActiveChangeRoom($entityId);
     }
 
     public function changeTable($invoice, $newEntityId)
@@ -1006,10 +1005,8 @@ class InvoiceRepository implements InvoiceRepositoryInterface
             }
 
             if ($invoice->order) {
-                $ktvAreaTypeId = AreaType::where('type','ktv')->first()->id;
-                $restaurantAreaTypeId = AreaType::where('type','bar_and_restaurant')->first()->id;
-                $foodMenusKTV = $this->getOrderedMenusSummary($invoice->id, [1, 2, 3, 4], $ktvAreaTypeId);
-                $beverageMenusKTV = $this->getOrderedMenusSummary($invoice->id, [5], $ktvAreaTypeId);
+                $foodMenusKTV = $this->getOrderedMenusSummary($invoice->id, [1, 2, 3, 4], 2);
+                $beverageMenusKTV = $this->getOrderedMenusSummary($invoice->id, [5], 2);
 
                 if (($foodMenusKTV)->count() > 0) {
                     $foodTotal = $foodMenusKTV->sum('total_price');
@@ -1028,8 +1025,8 @@ class InvoiceRepository implements InvoiceRepositoryInterface
                     ], $transaction->id);
                 }
 
-                $foodMenusRT = $this->getOrderedMenusSummary($invoice->id, [1, 2, 3, 4], $restaurantAreaTypeId);
-                $beverageMenusRT = $this->getOrderedMenusSummary($invoice->id, [5], $restaurantAreaTypeId);
+                $foodMenusRT = $this->getOrderedMenusSummary($invoice->id, [1, 2, 3, 4], 1);
+                $beverageMenusRT = $this->getOrderedMenusSummary($invoice->id, [5], 1);
 
                 if (($foodMenusRT)->count() > 0) {
                     $foodTotal = $foodMenusRT->sum('total_price');
@@ -1252,9 +1249,9 @@ class InvoiceRepository implements InvoiceRepositoryInterface
             $data['complete_date'] = CurrentTime();
             $data['invoice_id'] = $invoice_id;
             $invoice->update($data);
-            //update is active  to room_session
+            //update is active  to room_session 
             // $this->invoiceService->updateIsActive($invoice->id, 0);
-            //customer deposit
+            //customer deposit 
 
             $customerDepositData['customer_id'] = $invoice->customer_id;
             $customerDepositData['account_id'] = $invoice->customer->account_id;
@@ -1267,10 +1264,9 @@ class InvoiceRepository implements InvoiceRepositoryInterface
                 $entitySession=$roomSession->entitySession;
                 $entitySession->is_active = 0;
                 $entitySession->save();
-                dd($entitySession);
+                // dd($entitySession);
                 Log::info('Room sesion is active updated ');
             }
-            dd('abc');
             // foreach ($roomSessions as $session) {
             //     $entitySession = $session->entitySession;
             //     if ($entitySession) {
