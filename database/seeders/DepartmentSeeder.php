@@ -15,7 +15,11 @@ class DepartmentSeeder extends Seeder
     public function run(): void
     {
         //
-        $names = ['HR', 'Finance', 'Admin', 'Management', 'Catering', 'Inventory', 'Kitchen', 'Bar', 'Procurement', 'Canteen', 'Entertainment'];
+        $names = [
+            'HR', 'Finance', 'Admin', 'Management', 'Catering',
+            // 'Inventory',
+            'Kitchen', 'Bar', 'Procurement', 'Canteen', 'Entertainment'
+        ];
         // $hr_features = config('common.hr_features');
         // $inventory_features = config('common.inventory_features');
         // $finance_features = config('common.finance_features');
@@ -45,9 +49,9 @@ class DepartmentSeeder extends Seeder
                     $featureIds = Feature::whereIn('slug', $management_features)->pluck('id')->toArray();
                     $department->features()->sync($featureIds);
                     break;
-                case 'Inventory':
-                    $featureIds = Feature::whereIn('slug', $inventory_features)->pluck('id')->toArray();
-                    $department->features()->sync($featureIds);
+                // case 'Inventory':
+                //     $featureIds = Feature::whereIn('slug', $inventory_features)->pluck('id')->toArray();
+                //     $department->features()->sync($featureIds);
                 case 'Catering':
                     $featureIds = Feature::whereIn('slug', $catering_features)->pluck('id')->toArray();
                     $department->features()->sync($featureIds);

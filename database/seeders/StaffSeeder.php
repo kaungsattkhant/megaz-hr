@@ -29,7 +29,7 @@ class StaffSeeder extends Seeder
         // $catering_features = config('common.catering_features');
         $departments = Department::with('roles')->get();
         $hr_features = config('common.hr_feature_slug');
-        $inventory_features = config('common.inventory_feature_slug');
+        // $inventory_features = config('common.inventory_feature_slug');
         $finance_features = config('common.finance_feature_slug');
         $catering_features = config('common.catering_feature_slug');
         $entertainment_features = config('common.entertainment_feature_slug');
@@ -120,9 +120,9 @@ class StaffSeeder extends Seeder
                             $featureIds = Feature::whereIn('slug', $management_features)->pluck('id')->toArray();
                             $staff->features()->sync($featureIds);
                             break;
-                        case 'Inventory':
-                            $featureIds = Feature::whereIn('slug', $inventory_features)->pluck('id')->toArray();
-                            $staff->features()->sync($featureIds);
+                        // case 'Inventory':
+                        //     $featureIds = Feature::whereIn('slug', $inventory_features)->pluck('id')->toArray();
+                        //     $staff->features()->sync($featureIds);
                         case 'Catering':
                             $featureIds = Feature::whereIn('slug', $catering_features)->pluck('id')->toArray();
                             $staff->features()->sync($featureIds);
