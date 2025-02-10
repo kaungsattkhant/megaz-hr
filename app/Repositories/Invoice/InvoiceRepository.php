@@ -568,6 +568,8 @@ class InvoiceRepository implements InvoiceRepositoryInterface
                 DB::commit();
                 ResponseData($updatedInvoice, 200);
             }
+
+            $this->modifyEntityChange($data);
             $newEntity = Entity::find($data['entity_id']);
             if ($newEntity->is_active) {
                 ResponseMessage('Room is invalid', 422);
@@ -576,6 +578,7 @@ class InvoiceRepository implements InvoiceRepositoryInterface
             // if ($invoice->invoice_type == 'endless_time') {
             //     return $this->invoiceService->changeRoomForEndlessTime($invoice, $newEntity);
             // }
+
 
             $roomSessions = RoomSession::where('invoice_id', $invoice->id)
                 ->where('is_active', 1)
@@ -658,17 +661,6 @@ class InvoiceRepository implements InvoiceRepositoryInterface
             $newEntity = Entity::find($data['entity_id']);
             $loopEndTime = 0;
 
-            // dd([
-            //     'total duration' => $totalDuration,
-            //     'left session' => $leftSession,
-            //     'diff hours' => number_format($diffHours,2),
-            //     'matching sessions' => $nextEntitySessions,
-            //     'remaining entity sessions' => $remainingEntitySessions,
-            //     'used hours' => $useHours,
-            //     'left duration' => $leftDuration,
-
-            // ]);
-
             foreach ($leftSession as $index => $session) {
                 $session = (float) $session;
                 $newRoomSession['invoice_id'] = $data['invoice_id'];
@@ -703,6 +695,11 @@ class InvoiceRepository implements InvoiceRepositoryInterface
             ResponseMessage($e->getMessage(), 402);
             throw $e;
         }
+    }
+
+    public function modifyEntityChange($data){
+
+        dd($data);
     }
 
     public function changeTable($invoice, $newEntityId)
@@ -1263,10 +1260,13 @@ class InvoiceRepository implements InvoiceRepositoryInterface
             $activeInvoiceSession->is_active = 0;
             $activeInvoiceSession->save();
             foreach ($roomSessionsByInvoice as $roomSession) {
-                $roomSession->is_active = 0;
-                $roomSession->save();
+                $entitySession=$roomSession->entitySession;
+                $entitySession->is_active = 0;
+                $entitySession->save();
+                dd($entitySession);
                 Log::info('Room sesion is active updated ');
             }
+            dd('abc');
             // foreach ($roomSessions as $session) {
             //     $entitySession = $session->entitySession;
             //     if ($entitySession) {
