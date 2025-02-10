@@ -67,7 +67,7 @@
                                             <option>Cash</option>
                                             <option>Bank</option>
                                         </select>
-                                        <button data-te-toggle="modal" data-te-target="#confirm_invoice_modal">Confirm</button>
+                                        <button data-te-toggle="modal" data-te-target="#confirm_invoice_modal" @click="confirmBtnClicked(invoice)">Confirm</button>
                                     </td>
                                 </tr>
 
@@ -105,7 +105,7 @@
                                             <option>Cash</option>
                                             <option>Bank</option>
                                         </select>
-                                        <button data-te-toggle="modal" data-te-target="#confirm_invoice_modal">Confirm</button>
+                                        <button data-te-toggle="modal" data-te-target="#confirm_invoice_modal" @click="confirmBtnClicked()">Confirm</button>
                                     </td>
                                 </tr>
 
@@ -272,7 +272,7 @@
                     </div>
 
                     <div class="flex justify-center px-12 mb-6">
-                        <button @click="createBtnClicked" class="pos-add-btn !px-16 focus:outline-none focus:ring-0 ">
+                        <button @click="confirmInvoice" class="pos-add-btn !px-16 focus:outline-none focus:ring-0 ">
                             Create
                         </button>
                     </div>
