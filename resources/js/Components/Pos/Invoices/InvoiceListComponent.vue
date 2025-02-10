@@ -60,56 +60,16 @@
                                         {{ invoice.total }}
                                     </td>
                                     <td class="whitespace-nowrap px-6 py-4">
-                                        <select name=""
+                                        <!-- <select name=""
                                             class="text-xs pl-0 border-0 focus:shadow-none focus:outline-none focus:ring-0 select-box area-select-box"
                                             placeholder="Select Payment" :disabled="!isCashier">
                                             <option disabled selected>Select Payment</option>
                                             <option>Cash</option>
                                             <option>Bank</option>
-                                        </select>
+                                        </select> -->
                                         <button data-te-toggle="modal" data-te-target="#confirm_invoice_modal" @click="confirmBtnClicked(invoice)">Confirm</button>
                                     </td>
                                 </tr>
-
-
-                                <tr>
-                                    <td class="whitespace-nowrap px-6 py-4 font-medium">
-                                        1
-                                    </td>
-                                    <td class="whitespace-nowrap px-6 py-4">
-                                        2
-                                    </td>
-                                    <td class="whitespace-nowrap px-6 py-4">
-                                        3
-                                    </td>
-                                    <td class="whitespace-nowrap px-6 py-4">
-                                        4
-                                    </td>
-                                    <td class="whitespace-nowrap px-6 py-4">
-                                        5
-                                    </td>
-                                    <td class="whitespace-nowrap px-6 py-4">
-                                        6
-                                    </td>
-                                    <td class="whitespace-nowrap px-6 py-4">
-                                        Service?
-                                    </td>
-                                    <td class="whitespace-nowrap px-6 py-4">
-                                        7
-                                    </td>
-                                    <td class="whitespace-nowrap px-6 py-4">
-                                        <select name=""
-                                            class="text-xs pl-0 border-0 focus:shadow-none focus:outline-none focus:ring-0 select-box area-select-box"
-                                            placeholder="Select Payment" :disabled="!isCashier">
-                                            <option disabled selected>Select Payment</option>
-                                            <option>Cash</option>
-                                            <option>Bank</option>
-                                        </select>
-                                        <button data-te-toggle="modal" data-te-target="#confirm_invoice_modal" @click="confirmBtnClicked()">Confirm</button>
-                                    </td>
-                                </tr>
-
-
 
                             </tbody>
                         </table>
@@ -366,11 +326,12 @@
                 console.log('test confirm invoice')
                 let formData = new FormData();
                 formData.append('id', this.selectedInvoice.id);
-                formData.append('paid_amount', this.selectedPayment);
-                formData.append('payment_type', this.paidAmount);
-                let response = await postApiData({ url: '/api/pos/invoicessss', form_data: formData, token: this.getToken() });
+                formData.append('paid_amount', this.paidAmount);
+                formData.append('payment_type', this.selectedPayment);
+                let response = await postApiData({ url: '/api/pos/invoices', form_data: formData, token: this.getToken() });
                 if (response.success) {
                     this.getInvoiceList();
+                    document.getElementById("closeModal").click();
                 }
 
             }
