@@ -927,12 +927,16 @@
 
                     <div class="relative px-16 py-4" data-te-modal-body-ref>
                         <div class="mb-4">
-                            <select name="" id="" placeholder="Room" v-model="change_room"
+                            <select name="" id="" placeholder="Select Room" v-model="change_room"
                                 class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
                                 <option :value="changeableRoom" :key="index"
                                     v-for="(changeableRoom, index) in changeableRoomList">{{ changeableRoom.name }}
                                 </option>
                             </select>
+                        </div>
+                        <div class="mb-4">
+                            <input type="datetime-local" placeholder="Time" v-model="start_date_time" @change="getPackageList(invoice_date)"
+                                class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
                         </div>
 
                     </div>
@@ -1135,7 +1139,7 @@
     import { Modal, Ripple, Select, Datepicker, initTE, Input } from "tw-elements";
     import { getApiData, postApiData, deleteApiData } from '../../../utilities/ajax-helpers';
     import { mapGetters } from "vuex";
-    import { getCurrentTime } from "../../../utilities/datetime-helpers";
+    import { getCurrentTime, getCurretDateTime } from "../../../utilities/datetime-helpers";
     import Multiselect from 'vue-multiselect';
 
     export default {
@@ -1272,6 +1276,7 @@
 
 
                 currentTime:parseInt(getCurrentTime().split(':')),
+                start_date_time:getCurretDateTime(),
                 isShowSidebar:false,
                 testbro:null,
 
@@ -2065,6 +2070,7 @@
                 let formData = new FormData();
                 formData.append('invoice_id', this.selectedRoom.invoice.id);
                 formData.append('entity_id', this.change_room.id);
+                formData.append('start_date_time', this.start_date_time);
                 let response = await postApiData({ url: '/api/entities/change', form_data: formData, token: this.getToken() });
                 console.log('change room ' + this.selectedRoom.invoice.invoice_id + ',' + this.change_room.id)
                 if (response.success) {
