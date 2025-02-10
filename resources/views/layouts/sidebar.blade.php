@@ -96,8 +96,9 @@
                     @if(checkFeaturePermission('asset-depreciation-balance'))
                         <li>
                             <a href="{{ route('asset_list') }}"
-                                class="flex items-center @yield('asset_depreciation_balance_list')">
-                                <i class="fal fa-clipboard-list pr-3"></i>
+                                class="flex items-center @yield('asset_depreciation_balance_list') sidebar-gap-x">
+                                <!-- <i class="fal fa-clipboard-list pr-3"></i> -->
+                                <img class=" sidebar-img" src="{{ asset('img/icons8-balance-list-50.png') }}" alt="">
                                 Asset Depreciation Balance List
                             </a>
                         </li>
@@ -148,20 +149,23 @@
                         </li> -->
                         <li>
                             <a href="{{ route('menu_sale_report.index') }}"
-                                class="flex items-center @yield('menu_sale_report')">
-                                <i class="fal fa-file-chart-line  pr-3"></i>
+                                class="flex items-center @yield('menu_sale_report') sidebar-gap-x">
+                                <img class=" sidebar-img" src="{{ asset('img/icons8-report-50.png') }}" alt="">
+                                <!-- <i class="fal fa-file-chart-line  pr-3"></i> -->
                                 Menu Sale Report
                             </a>
                         </li>
                         <li>
-                            <a href="{{ route('menu_costing.index') }}" class="flex items-center @yield('menu_costing')">
-                                <i class="fal fa-clipboard-list  pr-3"></i>
+                            <a href="{{ route('menu_costing.index') }}" class="flex items-center @yield('menu_costing') sidebar-gap-x">
+                                <img class=" sidebar-img" src="{{ asset('img/icons8-estimate-50.png') }}" alt="">
+                                <!-- <i class="fal fa-clipboard-list  pr-3"></i> -->
                                 Menu Costing
                             </a>
                         </li>
                         <li>
-                            <a href="{{ route('MRP') }}" class="flex items-center @yield('mrp')">
-                                <i class="fal fa-clipboard-list  pr-3"></i>
+                            <a href="{{ route('MRP') }}" class="flex items-center @yield('mrp') sidebar-gap-x">
+                                <img class=" sidebar-img" src="{{ asset('img/icons8-mrp-50.png') }}" alt="">
+                                <!-- <i class="fal fa-clipboard-list  pr-3"></i> -->
                                 MRP
                             </a>
                         </li>
@@ -189,8 +193,9 @@
 
                     @if(checkFeaturePermission('staff-balance'))
                         <li>
-                            <a href="{{ route('advance') }}" class="flex items-center @yield('advanced')">
-                                <i class="fal fa-balance-scale-right pr-3"></i>
+                            <a href="{{ route('advance') }}" class="flex items-center @yield('advanced') sidebar-gap-x">
+                                <!-- <i class="fal fa-balance-scale-right pr-3"></i> -->
+                                <img class=" sidebar-img" src="{{ asset('img/icons8-balance-50.png') }}" alt="">
                                 Staff Balance
                             </a>
                         </li>
@@ -198,8 +203,9 @@
 
                     @if(checkFeaturePermission('prepaid'))
                         <li>
-                            <a href="{{ route('prepaid') }}" class="flex items-center @yield('prepaid')">
-                                <i class="fas fa-dollar-sign"></i>
+                            <a href="{{ route('prepaid') }}" class="flex items-center @yield('prepaid') sidebar-gap-x">
+                                <!-- <i class="fas fa-dollar-sign"></i> -->
+                                <img class=" sidebar-img" src="{{ asset('img/icons8-prepaid-50.png') }}" alt="">
                                 Prepaid
                             </a>
                         </li>
@@ -225,8 +231,9 @@
 
                     @if(checkFeaturePermission('cooking-place'))
                         <li>
-                            <a href="{{ route('cookingPlace') }}" class="flex items-center @yield('cooking_place')">
-                                <i class="far fa-hat-chef"></i>
+                            <a href="{{ route('cookingPlace') }}" class="flex items-center @yield('cooking_place') sidebar-gap-x">
+                                <!-- <i class="far fa-hat-chef"></i> -->
+                                <img class=" sidebar-img" src="{{ asset('img/icons8-cooking-50.png') }}" alt="">
                                 Cooking Place
                             </a>
                         </li>
@@ -234,38 +241,43 @@
 
                     @if (checkFeaturePermission('department'))
                         <li>
-                            <a href="{{ route('departments') }}" class="flex items-center @yield('departments')">
-                                <i class="fal fa-network-wired  pr-3"></i>
+                            <a href="{{ route('departments') }}" class="flex items-center @yield('departments') sidebar-gap-x">
+                                <!-- <i class="fal fa-network-wired  pr-3"></i> -->
+                                <img class=" sidebar-img" src="{{ asset('img/icons8-department-50.png') }}" alt="">
                                 Department
                             </a>
                         </li>
                     @endif
                     @if (checkFeaturePermission('role'))
                         <li>
-                            <a href="{{ route('roles') }}" class="flex items-center @yield('roles')">
-                                <i class="fal fa-tasks  pr-3"></i>
+                            <a href="{{ route('roles') }}" class="flex items-center @yield('roles') sidebar-gap-x">
+                                <!-- <i class="fal fa-tasks  pr-3"></i> -->
+                                <img class=" sidebar-img" src="{{ asset('img/icons8-role-50.png') }}" alt="">
                                 Roles
                             </a>
                         </li>
                     @endif
                     @if (checkFeaturePermission('task'))
                         <li>
-                            <a href="{{ route('tasks') }}" class="flex items-center @yield('tasks')">
-                                <i class="fal fa-tasks  pr-3"></i>
+                            <a href="{{ route('tasks') }}" class="flex items-center @yield('tasks') sidebar-gap-x">
+                                <!-- <i class="fal fa-tasks  pr-3"></i> -->
+                                <img class=" sidebar-img" src="{{ asset('img/icons8-task-50.png') }}" alt="">
                                 Tasks
                             </a>
                         </li>
 
                         <li>
-                            <a href="{{ route('custom_tasks') }}" class="flex items-center @yield('custom_tasks')">
-                                <i class="fal fa-tasks  pr-3"></i>
+                            <a href="{{ route('custom_tasks') }}" class="flex items-center @yield('custom_tasks') sidebar-gap-x">
+                                <!-- <i class="fal fa-tasks  pr-3"></i> -->
+                                <img class=" sidebar-img" src="{{ asset('img/icons8-task-50.png') }}" alt="">
                                 Custom Tasks
                             </a>
                         </li>
 
                         <li>
-                            <a href="{{ route('task_report') }}" class="flex items-center @yield('tasks_reports')">
-                                <i class="fal fa-tasks  pr-3"></i>
+                            <a href="{{ route('task_report') }}" class="flex items-center @yield('tasks_reports') sidebar-gap-x">
+                                <!-- <i class="fal fa-tasks  pr-3"></i> -->
+                                <img class=" sidebar-img" src="{{ asset('img/icons8-task-50.png') }}" alt="">
                                 Report Tasks
                             </a>
                         </li>
@@ -273,8 +285,9 @@
                     @endif
                     @if (checkFeaturePermission('area'))
                         <li>
-                            <a href="{{ route('areas') }}" class="flex items-center @yield('areas')">
-                                <i class="fal fa-network-wired  pr-3"></i>
+                            <a href="{{ route('areas') }}" class="flex items-center @yield('areas') sidebar-gap-x">
+                                <!-- <i class="fal fa-network-wired  pr-3"></i> -->
+                                <img class=" sidebar-img" src="{{ asset('img/icons8-area-50.png') }}" alt="">
                                 Areas
                             </a>
                         </li>
@@ -343,22 +356,25 @@
                         </li>
                         <li>
                             <a href="{{ route('menu_sale_report.index') }}"
-                                class="flex items-center @yield('menu_sale_report')">
-                                <i class="fal fa-clipboard-list  pr-3"></i>
+                                class="flex items-center @yield('menu_sale_report') sidebar-gap-x">
+                                <img class=" sidebar-img" src="{{ asset('img/icons8-report-50.png') }}" alt="">
+                                <!-- <i class="fal fa-clipboard-list  pr-3"></i> -->
                                 Menu Sale Report
                             </a>
                         </li>
                         <li>
-                            <a href="{{ route('menu_costing.index') }}" class="flex items-center @yield('menu_costing')">
-                                <i class="fal fa-clipboard-list  pr-3"></i>
+                            <a href="{{ route('menu_costing.index') }}" class="flex items-center @yield('menu_costing') sidebar-gap-x">
+                                <img class=" sidebar-img" src="{{ asset('img/icons8-estimate-50.png') }}" alt="">
+                                <!-- <i class="fal fa-clipboard-list  pr-3"></i> -->
                                 Menu Costing
                             </a>
                         </li>
                     @endif
                     @if (checkFeaturePermission('room'))
                         <li>
-                            <a href="{{ route('room') }}" class="flex items-center @yield('room')">
-                                <i class="fal fa-microphone-alt  pr-3"></i>
+                            <a href="{{ route('room') }}" class="flex items-center @yield('room') sidebar-gap-x">
+                                <!-- <i class="fal fa-microphone-alt  pr-3"></i> -->
+                                <img class=" sidebar-img" src="{{ asset('img/icons8-microphone-20.png') }}" alt="">
                                 Room
                             </a>
                         </li>
@@ -366,32 +382,36 @@
 
                     @if (checkFeaturePermission('table'))
                         <li>
-                            <a href="{{ route('table') }}" class="flex items-center @yield('table')">
-                                <i class="fal fa-utensils  pr-3"></i>
+                            <a href="{{ route('table') }}" class="flex items-center @yield('table') sidebar-gap-x">
+                                <!-- <i class="fal fa-utensils  pr-3"></i> -->
+                                <img class=" sidebar-img" src="{{ asset('img/icons8-table-50.png') }}" alt="">
                                 Table
                             </a>
                         </li>
                     @endif
                     @if (checkFeaturePermission('service'))
                         <li>
-                            <a href="{{ route('services') }}" class="flex items-center @yield('services')">
-                                <i class="fal fa-users-cog  pr-3"></i>
+                            <a href="{{ route('services') }}" class="flex items-center @yield('services') sidebar-gap-x">
+                                <!-- <i class="fal fa-users-cog  pr-3"></i> -->
+                                <img class=" sidebar-img" src="{{ asset('img/icons8-service-50.png') }}" alt="">
                                 Services
                             </a>
                         </li>
                     @endif
                     @if (checkFeaturePermission('complaint'))
                         <li>
-                            <a href="{{ route('complains') }}" class="flex items-center @yield('complains')">
-                                <i class="fal fa-envelope-open-text  pr-3"></i>
+                            <a href="{{ route('complains') }}" class="flex items-center @yield('complains') sidebar-gap-x">
+                                <!-- <i class="fal fa-envelope-open-text  pr-3"></i> -->
+                                <img class=" sidebar-img" src="{{ asset('img/icons8-complaint-50.png') }}" alt="">
                                 Complaints
                             </a>
                         </li>
                     @endif
                     @if (checkFeaturePermission('inventory'))
                         <li>
-                            <a href="{{ route('inventories') }}" class="flex items-center @yield('inventories')">
-                                <i class="fal fa-inventory  pr-3"></i>
+                            <a href="{{ route('inventories') }}" class="flex items-center @yield('inventories') sidebar-gap-x">
+                                <!-- <i class="fal fa-inventory  pr-3"></i> -->
+                                <img class=" sidebar-img" src="{{ asset('img/icons8-inventory-50.png') }}" alt="">
                                 Inventories
                             </a>
                         </li>

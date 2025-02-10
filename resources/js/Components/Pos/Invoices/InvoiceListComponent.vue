@@ -34,42 +34,82 @@
                             </thead>
                             <tbody>
                                 <tr class="" v-for="(invoice,index) in invoiceList">
-                                        <td class="whitespace-nowrap px-6 py-4 font-medium" @click="btnClickedInvoice(invoice)">
-                                            {{ invoice.invoice_id }}
-                                        </td>
-                                        <td class="whitespace-nowrap px-6 py-4">
-                                            {{ invoice.invoice_date }}
-                                        </td>
-                                        <td class="whitespace-nowrap px-6 py-4">
-                                            {{ invoice.customer.name }}
-                                        </td>
-                                        <td class="whitespace-nowrap px-6 py-4">
-                                            <span v-if="invoice.room">{{ invoice.room.name }}</span>
-                                            <span v-if="invoice.table">{{ invoice.table.name }}</span>
-                                        </td>
-                                        <td class="whitespace-nowrap px-6 py-4">
-                                            {{ invoice.total_session_price}}
-                                        </td>
-                                        <td class="whitespace-nowrap px-6 py-4">
-                                            {{ invoice.sub_total - invoice.total_session_price }}
-                                        </td>
-                                        <td class="whitespace-nowrap px-6 py-4">
-                                            Service?
-                                        </td>
-                                        <td class="whitespace-nowrap px-6 py-4">
-                                            {{ invoice.total }}
-                                        </td>
-                                        <td class="whitespace-nowrap px-6 py-4">
-                                            <select name=""
-                                                class="text-xs pl-0 border-0 focus:shadow-none focus:outline-none focus:ring-0 select-box area-select-box"
-                                                placeholder="Select Payment" :disabled="!isCashier">
-                                                <option disabled selected>Select Payment</option>
-                                                <option>Cash</option>
-                                                <option>Bank</option>
-                                            </select>
-                                            <button>Confirm</button>
-                                        </td>
+                                    <td class="whitespace-nowrap px-6 py-4 font-medium" @click="btnClickedInvoice(invoice)">
+                                        {{ invoice.invoice_id }}
+                                    </td>
+                                    <td class="whitespace-nowrap px-6 py-4">
+                                        {{ invoice.invoice_date }}
+                                    </td>
+                                    <td class="whitespace-nowrap px-6 py-4">
+                                        {{ invoice.customer.name }}
+                                    </td>
+                                    <td class="whitespace-nowrap px-6 py-4">
+                                        <span v-if="invoice.room">{{ invoice.room.name }}</span>
+                                        <span v-if="invoice.table">{{ invoice.table.name }}</span>
+                                    </td>
+                                    <td class="whitespace-nowrap px-6 py-4">
+                                        {{ invoice.total_session_price}}
+                                    </td>
+                                    <td class="whitespace-nowrap px-6 py-4">
+                                        {{ invoice.sub_total - invoice.total_session_price }}
+                                    </td>
+                                    <td class="whitespace-nowrap px-6 py-4">
+                                        Service?
+                                    </td>
+                                    <td class="whitespace-nowrap px-6 py-4">
+                                        {{ invoice.total }}
+                                    </td>
+                                    <td class="whitespace-nowrap px-6 py-4">
+                                        <select name=""
+                                            class="text-xs pl-0 border-0 focus:shadow-none focus:outline-none focus:ring-0 select-box area-select-box"
+                                            placeholder="Select Payment" :disabled="!isCashier">
+                                            <option disabled selected>Select Payment</option>
+                                            <option>Cash</option>
+                                            <option>Bank</option>
+                                        </select>
+                                        <button data-te-toggle="modal" data-te-target="#confirm_invoice_modal">Confirm</button>
+                                    </td>
                                 </tr>
+
+
+                                <tr>
+                                    <td class="whitespace-nowrap px-6 py-4 font-medium">
+                                        1
+                                    </td>
+                                    <td class="whitespace-nowrap px-6 py-4">
+                                        2
+                                    </td>
+                                    <td class="whitespace-nowrap px-6 py-4">
+                                        3
+                                    </td>
+                                    <td class="whitespace-nowrap px-6 py-4">
+                                        4
+                                    </td>
+                                    <td class="whitespace-nowrap px-6 py-4">
+                                        5
+                                    </td>
+                                    <td class="whitespace-nowrap px-6 py-4">
+                                        6
+                                    </td>
+                                    <td class="whitespace-nowrap px-6 py-4">
+                                        Service?
+                                    </td>
+                                    <td class="whitespace-nowrap px-6 py-4">
+                                        7
+                                    </td>
+                                    <td class="whitespace-nowrap px-6 py-4">
+                                        <select name=""
+                                            class="text-xs pl-0 border-0 focus:shadow-none focus:outline-none focus:ring-0 select-box area-select-box"
+                                            placeholder="Select Payment" :disabled="!isCashier">
+                                            <option disabled selected>Select Payment</option>
+                                            <option>Cash</option>
+                                            <option>Bank</option>
+                                        </select>
+                                        <button data-te-toggle="modal" data-te-target="#confirm_invoice_modal">Confirm</button>
+                                    </td>
+                                </tr>
+
+
 
                             </tbody>
                         </table>
@@ -183,6 +223,65 @@
                 </div>
             </div>
         </div>
+
+
+
+        <div data-te-modal-init
+            class="fixed left-0 top-0 z-[1055] hidden h-full w-full overflow-y-auto overflow-x-hidden outline-none"
+            id="confirm_invoice_modal" tabindex="-1" aria-labelledby="createCashbookModalLabel" aria-modal="true"
+            role="dialog">
+            <div data-te-modal-dialog-ref
+                class="pointer-events-none relative flex min-h-[calc(100%-1rem)] w-auto translate-y-[-50px] items-center opacity-0 transition-all duration-300 ease-in-out min-[576px]:mx-auto min-[576px]:mt-7 min-[576px]:min-h-[calc(100%-3.5rem)] min-[576px]:max-w-[500px]">
+                <div
+                    class="pointer-events-auto relative flex w-full flex-col rounded-md border-none bg-white bg-clip-padding text-current shadow-lg outline-none">
+                    <div class="relative  p-4">
+                        <p class="text-xl w-full text-center">
+                            Confirm Invoice
+                        </p>
+                        <button type="button" class="absolute top-4 right-4 focus:shadow-none focus:outline-none
+                        " id="closeModal" data-te-modal-dismiss aria-label="Close">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                                stroke="currentColor" class="h-5 w-5">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                        </button>
+                    </div>
+
+                    <div class="relative px-16 py-4" data-te-modal-body-ref>
+                        <div class="mb-4">
+                            <label for="" class="block text-sm text-black mb-3">
+                                Payment Type
+                            </label>
+                            <select name="" id="" v-model="selectedSubAccount"
+                                class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0"
+                                @change="subAccountSelectChanged">
+                                <option :value="subAccount" v-for="(subAccount, subAccountIndex) in subAccountList"
+                                    :key="subAccountIndex">
+                                    {{ subAccount.name }}
+                                </option>
+                            </select>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <label for="" class="block text-sm text-black mb-3">
+                                Paid Amount
+                            </label>
+                            <input type="text" placeholder="Amount" v-model="amount"
+                                class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
+                        </div>
+                    </div>
+
+                    <div class="flex justify-center px-12 mb-6">
+                        <button @click="createBtnClicked" class="pos-add-btn !px-16 focus:outline-none focus:ring-0 ">
+                            Create
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        
     </div>
 
 </template>
