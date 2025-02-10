@@ -23,14 +23,17 @@ use App\Events\OrderStatusNotificationRequest;
 use App\Events\KitchenNotificationRequestByArea;
 use App\Events\WaiterOrderConfirmNotificationRequest;
 use App\Http\Action\SendNotification\SendNotification;
+use App\Traits\CheckMenuPack;
 
 class OrderRepository implements OrderRepositoryInterface
 {
-    use SendNotification;
+    use SendNotification, CheckMenuPack;
     public function createOrder(array $data)
     {
         DB::beginTransaction();
         try {
+            //check and remove pack is enought for menu;
+            $this->removePackForMenu($data['menu_id'], $data['quantity']);
             $price = $data['original_price'] * $data['quantity'];
             // $data['invoice'] must be unsigned integer format , not 000023
             $order = Order::where('invoice_id', $data['invoice_id'])->first();

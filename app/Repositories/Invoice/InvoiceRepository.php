@@ -630,7 +630,6 @@ class InvoiceRepository implements InvoiceRepositoryInterface
                 ResponseData($updatedInvoice, 200);
             }
             $newEntity = Entity::find($data['entity_id']);
-
             if ($newEntity->is_active) {
                 ResponseMessage('Room is invalid', 422);
             }

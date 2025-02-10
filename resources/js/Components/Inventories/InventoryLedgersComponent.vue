@@ -579,9 +579,17 @@ export default {
             formData.append('destination_inventory_id', this.selectedDestinationInventory);
             formData.append('quantity', this.quantity);
             formData.append('item_id', this.itemId);
+            if(this.selectedUom.id == this.transferItem.base_unit_id){
+                formData.append('type', 'base_uom');
+            }
+            else{
+                formData.append('type', 'uom');
+            }
             formData.append('uom_id', this.selectedUom.id);
             formData.append('base_uom_id', this.transferItem.base_unit_id);
             formData.append('conversion_uom_id', this.transferItem.conversion_unit_id);
+            formData.append('uom_conversion', this.transferItem.conversion);
+
             let response = await postApiData({ url: '/api/transfers', form_data: formData, token: this.getToken() });
             if (response.success) {
                 // this.getInventoryLegderList(null);
@@ -591,6 +599,8 @@ export default {
                     text: `Success`,
                     type: 'info'
                 });
+                this.selectedUom = null;
+                this.transferItem = null;
             }
             else {
                 this.$notify({
@@ -599,8 +609,7 @@ export default {
                 });
             }
 
-            this.selectedUom = null;
-            this.transferItem = null;
+            
         },
 
         searchBtnClicked(){

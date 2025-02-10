@@ -11,14 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('packs', function (Blueprint $table) {
+        Schema::create('types', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('menu_id')->constrained()->onDelete('cascade');
-            $table->dateTime('date');
-            $table->date('expired_at');
-            $table->unsignedBigInteger('created_by');
-            $table->string('status');
-            $table->softDeletes();
+            $table->string('name');
+            $table->integer('typeable_id');
+            $table->string('typeable_type');
             $table->timestamps();
         });
     }
@@ -28,6 +25,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('packs');
+        Schema::dropIfExists('types');
     }
 };

@@ -62,11 +62,11 @@
             </div>
             <div class="mb-4 col-span-3 rounded-md">
                 <label for="" class="label-form mb-3">
-                    Menu Category
+                    MRP Category
                 </label>
                 <div class="bg-white mb-0 w-full text-sm inline-block h-[34px]"
                     data-te-select-wrapper-ref>
-                    <select data-te-select-init data-te-select-placeholder="Select Category" @change="menuCategoryChanged()"
+                    <select data-te-select-init data-te-select-placeholder="Select MRP Category"
                         data-te-select-filter="true" name="" id="" v-model="selectedMenuCategory" class="input-ui">
                         <option :value="menuCategory" v-for="(menuCategory, menuCategoryIndex) in menuCategoryList"
                             :key="menuCategoryIndex"> {{ menuCategory.name }} </option>
@@ -97,7 +97,19 @@
             </div>
             
             <div class="contents" v-if="selectedMenuType == 'menu'">
-                
+                <div class="mb-4 col-span-3 rounded-md">
+                    <label for="" class="label-form mb-3">
+                        Menu Category
+                    </label>
+                    <div class="bg-white mb-0 w-full text-sm inline-block h-[34px]"
+                        data-te-select-wrapper-ref>
+                        <select data-te-select-init data-te-select-placeholder="Select Category" @change="menuCategoryChanged()"
+                            data-te-select-filter="true" name="" id="" v-model="categoryMenu" class="input-ui">
+                            <option :value="menuCategory" v-for="(menuCategory, menuCategoryIndex) in menuCategoryList"
+                                :key="menuCategoryIndex"> {{ menuCategory.name }} </option>
+                        </select>
+                    </div>
+                </div>
                 <div class="mb-4 col-span-3 rounded-md">
                     <label for="" class="block text-sm text-black mb-3">
                         Menu
@@ -254,7 +266,7 @@
                         <select data-te-select-init data-te-select-placeholder="Select Category"
                             data-te-select-filter="true" name="" id="" v-model="selectedUom" class="input-ui">
                             <option :value="uom" v-for="(uom, uomIndex) in itemUoms"
-                                :key="uomIndex"> {{ uom.name }} </option>
+                                :key="uomIndex"> {{ uom.uom_name }} </option>
                         </select>
                     </div>
                 </div>
@@ -480,6 +492,7 @@ export default {
             code:null,
             selectedMenuType:null,
             selectedMenuCategory:null,
+            categoryMenu:null,
             selectedMenu:null,
             selectedLevel:null,
             selectedType:null,
@@ -573,7 +586,7 @@ export default {
             this.getMenuList();
         },
         async getMenuList() {
-            let response = await getApiData({ url: `/api/menu_categories/${this.selectedMenuCategory.id}/menus`, token: this.getToken() });
+            let response = await getApiData({ url: `/api/menu_categories/${this.categoryMenu.id}/menus`, token: this.getToken() });
             if (response.data) {
                 this.menuList = response.data;
             }
@@ -595,17 +608,32 @@ export default {
 
         itemSelectChanged() {
             this.itemUoms = [];
-            let index = this.uomList.findIndex(uom => uom.id == this.selectedItem.base_uom_id);
-            if (index != -1) {
-                let baseUom = this.uomList[index];
-                this.itemUoms.push(baseUom);
-            }
-            index = this.uomList.findIndex(uom => uom.id == this.selectedItem.uom_id);
-            if (index != -1) {
-                let itemUom = this.uomList[index];
-                this.itemUoms.push(itemUom);
-            }
-            console.log('uom test')
+            console.log(this.selectedItem)
+            this.itemUoms.push(
+                {
+                    id:this.selectedItem.base_uom_id,
+                    base_uom_id : this.selectedItem.base_uom_id,
+                    uom_name : this.selectedItem.base_uom_name,
+                    uom_conversion : this.selectedItem.uom_conversion
+                },
+                {
+                    id:this.selectedItem.uom_id,
+                    uom_id : this.selectedItem.uom_id,
+                    uom_name : this.selectedItem.item_uom,
+                    uom_conversion : this.selectedItem.uom_conversion
+                }
+            )
+            // let index = this.uomList.findIndex(uom => uom.id == this.selectedItem.base_uom_id);
+            // if (index != -1) {
+            //     let baseUom = this.uomList[index];
+            //     this.itemUoms.push(baseUom);
+            // }
+            // index = this.uomList.findIndex(uom => uom.id == this.selectedItem.uom_id);
+            // if (index != -1) {
+            //     let itemUom = this.uomList[index];
+            //     this.itemUoms.push(itemUom);
+            // }
+            // console.log('uom test')
         },
 
         async getUomList() {
@@ -714,6 +742,13 @@ export default {
                     return 1;
                 }
 
+                let uom_type = null;
+                if(this.selectedUom.base_uom_id){
+                    uom_type = 'base_uom'
+                }
+                if(this.selectedUom.uom_id){
+                    uom_type = 'uom'
+                }
                 if(this.menuLevel.item_menu.length < 1){
                     this.menuLevel.level = this.selectedLevel.id;
                     this.menuLevel.type = this.selectedType.id;
@@ -740,10 +775,10 @@ export default {
                         is_make_pack: this.isMakePack,
                         uom_id: this.selectedUom.id,
                         uom_name: this.selectedUom.name,
-                        quantity : this.null,
-                        uom_type: this.null,
-                        uom_conversion: this.null
+                        uom_type: uom_type,
+                        uom_conversion: this.selectedUom.uom_conversion
                     });
+                    
                 }
                 else{
                     this.menuLevel.item_menu.push({
@@ -753,7 +788,9 @@ export default {
                         weight: this.amount,
                         is_make_pack: this.isMakePack,
                         uom_id: this.selectedUom.id,
-                        uom_name: this.selectedUom.name
+                        uom_name: this.selectedUom.name,
+                        uom_type: uom_type,
+                        uom_conversion: this.selectedUom.uom_conversion
                     });
                 }
                 this.selectedItemCategory = null;

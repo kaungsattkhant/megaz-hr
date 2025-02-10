@@ -11,14 +11,13 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('packs', function (Blueprint $table) {
+        Schema::create('org_news', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('menu_id')->constrained()->onDelete('cascade');
-            $table->dateTime('date');
-            $table->date('expired_at');
-            $table->unsignedBigInteger('created_by');
-            $table->string('status');
-            $table->softDeletes();
+            $table->dateTime('date_time');
+            $table->foreignId('trained_by');
+            $table->longText('description');
+            $table->foreignId('created_by');
+            $table->string('org_news_type');
             $table->timestamps();
         });
     }
@@ -28,6 +27,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('packs');
+        Schema::dropIfExists('org_news');
     }
 };

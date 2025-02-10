@@ -18,7 +18,7 @@ return new class extends Migration
             $table->unsignedBigInteger('uom_id');
             $table->string('type');
             $table->double('uom_price');
-            $table->$table->timestamps();
+            $table->timestamps();
         });
     }
 
