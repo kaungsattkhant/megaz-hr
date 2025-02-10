@@ -176,6 +176,17 @@ class InvoiceModelService
         }
     }
 
+    public function defineActiveEntitySession($invoiceSession,$entitySesions){
+        $entitySesionIds=$entitySesions->pluck('id');
+        foreach($entitySesions as $entitySession){
+            $createRoomSession=$invoiceSession->roomSessions()->create([
+                'entity_session_id'=>$entitySession->id,
+            ]);
+            $entitySession->is_active=1;
+            $entitySession->save();
+        }
+    }
+
     public function getEntitySessionBySessionDuration($entityId, $startTime, $endTime)
     {
         $takeSessions = EntitySession::select('id', 'start_time', 'end_time', 'is_active', 'spans_midnight', 'entity_id')
@@ -243,6 +254,7 @@ class InvoiceModelService
         if($isEntity){
             ResponseMessage('Entity is not available now',419);
         }
+        return true;
     }
 
 }
