@@ -6,9 +6,10 @@ use App\Models\Entity;
 use App\Models\Account;
 use App\Models\RoomSession;
 use App\Models\EntitySession;
-use App\Models\InvoiceSession;
 use GuzzleHttp\Psr7\Response;
+use App\Models\InvoiceSession;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
 
@@ -217,6 +218,20 @@ class InvoiceModelService
             ResponseMessage('Entity Session is invalid', 200);
         }
         return $takeSessions;
+    }
+
+    public function getTotalInvoiceSession($invoiceId){
+        $invoiceSession=InvoiceSession::where('invoice_id',$invoiceId)
+        ->select(
+            'invoice_sessions.invoice_id',
+            DB::raw('SUM(invoice_sessions.total_session_duration) as total_duration'),
+            DB::raw('SUM(invoice_sessions.total_session_price) as total_session_value'),
+            // DB::raw('COALESCE(SUM(invoice_sessions.total_session_price), 0) as total_session_value')
+
+        )
+        ->groupBy('invoice_sessions.invoice_id')
+        ->first();
+        return $invoiceSession;
     }
 
 }

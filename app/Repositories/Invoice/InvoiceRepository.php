@@ -733,19 +733,20 @@ class InvoiceRepository implements InvoiceRepositoryInterface
             // $latestRoomSession = RoomSession::where('invoice_id', $invoice->id)->orderBy('created_at', 'desc')->first();
             // $roomSessions = RoomSession::where('invoice_id', $data['invoice_id'])->with(['entitySession.entity'])->get();
 
-            $invoiceSession=InvoiceSession::where('invoice_id',$invoice->id)
-            ->select(
-                'invoice_sessions.invoice_id',
-                DB::raw('SUM(invoice_sessions.total_session_duration) as total_duration'),
-                DB::raw('SUM(invoice_sessions.total_session_price) as total_session_value'),
-                // DB::raw('COALESCE(SUM(invoice_sessions.total_session_price), 0) as total_session_value')
+            $invoiceSession=$this->invoiceService->getTotalInvoiceSession($invoice->id);
+            // $invoiceSession=InvoiceSession::where('invoice_id',$invoice->id)
+            // ->select(
+            //     'invoice_sessions.invoice_id',
+            //     DB::raw('SUM(invoice_sessions.total_session_duration) as total_duration'),
+            //     DB::raw('SUM(invoice_sessions.total_session_price) as total_session_value'),
+            //     // DB::raw('COALESCE(SUM(invoice_sessions.total_session_price), 0) as total_session_value')
 
-            )
-            ->groupBy('invoice_sessions.invoice_id')
-            ->first();
-            if(!$invoiceSession){
-                ResponseMessage('Invoice is invalid during session',419);
-            }
+            // )
+            // ->groupBy('invoice_sessions.invoice_id')
+            // ->first();
+            // if(!$invoiceSession){
+            //     ResponseMessage('Invoice is invalid during session',419);
+            // }
             $total_session_value=$invoiceSession->total_session_value;
             $total_duration = 0;
             $total_service_value = 0;
@@ -951,14 +952,27 @@ class InvoiceRepository implements InvoiceRepositoryInterface
             }
             $customer = Customer::find($invoice->customer_id);
             $invoice_id = $invoice->invoice_id;
-            $lastRoomSession = $invoice->latestSession;
-            $entity = Entity::find($lastRoomSession->entitySession->entity_id);
-            $roomSessions = RoomSession::where('invoice_id', $data['invoice_id'])->get();
-            if ($invoice->invoice_type != 'package') {
-                foreach ($roomSessions as $room) {
-                    $total_session_price += $room->price;
-                }
-            }
+
+            $activeInvoiceSession=$invoice->activeInvoicesession;
+            $entity=$activeInvoiceSession->entity;
+
+            $totalInvoiceSession=$this->invoiceService->getTotalInvoiceSession($invoice->id);
+            $total_session_price=$totalInvoiceSession->total_session_value;
+            $roomSessionsByInvoice=$activeInvoiceSession->roomSessions;
+            
+            // $lastRoomSession = $invoice->latestSession;
+            // $entity = Entity::find($lastRoomSession->entitySession->entity_id);
+
+            //claculate total_session_price
+
+            // $roomSessions = RoomSession::where('invoice_id', $data['invoice_id'])->get();
+            // if ($invoice->invoice_type != 'package') {
+            //     foreach ($roomSessions as $room) {
+            //         $total_session_price += $room->price;
+            //     }
+            // }
+
+
             $order = Order::where('invoice_id', $invoice->id)->first();
             //temp command
             // if ($order) {
@@ -970,6 +984,8 @@ class InvoiceRepository implements InvoiceRepositoryInterface
             //     }
             // }
             //end temp
+         
+
             if (isset($data['discount_type'])) {
                 if ($data['discount_type'] == 'room_discount') {
                     $roomDiscount = RoomDiscount::find($data['room_discount_id']);
@@ -977,11 +993,17 @@ class InvoiceRepository implements InvoiceRepositoryInterface
                         ResponseMessage('Selected discount cannot be applied', 422);
                     }
 
-                    if ($roomDiscount->session <= $lastRoomSession->session_duration) {
+                    if ($roomDiscount->session <= $invoiceSession->total_duration) {
                         $room_discount_value = $total_session_price - $data['room_discount_amount'];
                         $total_session_price = $data['room_discount_amount'];
-                        $lastRoomSession->discount_session = $data['discount_session'];
-                        $lastRoomSession->save();
+                        $invoiceSession=InvoiceSession::where('invoice_id',$invoice->id)
+                        ->where('is_active',1)->first();
+
+                        //discount is not complete
+
+                        // $lastRoomSession->discount_session = $data['discount_session'];
+                        // $lastRoomSession->save();
+
                     } else {
                         ResponseMessage('Discount cannot be applied', 422);
                     }
@@ -1003,7 +1025,6 @@ class InvoiceRepository implements InvoiceRepositoryInterface
                 }
                 $total_service_value += $serviceValue;
             }
-
             $data['discount_value'] = $room_discount_value + $bdDiscount + $customerLevelDiscount + $discount_value;
             $data['discount_total'] = $room_discount_value + $bdDiscount + $customerLevelDiscount;
             $data['total'] -= $room_discount_value;
@@ -1018,21 +1039,29 @@ class InvoiceRepository implements InvoiceRepositoryInterface
             $data['invoice_id'] = $invoice_id;
             $invoice->update($data);
             //update is active  to room_session 
-            $this->invoiceService->updateIsActive($invoice->id, 0);
+            // $this->invoiceService->updateIsActive($invoice->id, 0);
             //customer deposit 
             $customerDepositData['customer_id'] = $invoice->customer_id;
             $customerDepositData['account_id'] = $invoice->customer->account_id;
             $customerDepositData['amount'] = $data['total'];
             $customerDepositData['deposit_balance'] = $this->getCustomerDepositBalance($customer->id);
             //end
-            foreach ($roomSessions as $session) {
-                $entitySession = $session->entitySession;
-                if ($entitySession) {
-                    $entitySession->is_active = 0;
-                    $entitySession->save();
-                    Log::info('it working on ' . $entitySession->id);
-                }
+            $activeInvoiceSession->is_active=0;
+            $activeInvoiceSession->save();
+            foreach($roomSessionsByInvoice as $roomSession){
+                $roomSession->is_active=0;
+                $roomSession->save();
+                Log::info('Room sesion is active updated ' );
             }
+            // foreach ($roomSessions as $session) {
+            //     $entitySession = $session->entitySession;
+            //     if ($entitySession) {
+            //         $entitySession->is_active = 0;
+            //         $entitySession->save();
+            //         Log::info('it working on ' . $entitySession->id);
+            //     }
+            // }
+            
             $soldStaff = Staff::find($invoice->created_by);
             $firstRole = $soldStaff->roles->first();
             TargetPositionResult::create([
