@@ -107,9 +107,9 @@ class TransferRepository implements TransferRepositoryInterface
             }
             $latest = Transfer::orderBy('created_at', 'desc')->first();
             $count = 4;
-            $uom_conversion = (new Conversion($request->uom_id, $request->base_uom_id))->run();
+            // $uom_conversion = (new Conversion($request->uom_id, $request->base_uom_id))->run();
             #check is enough transfer quantity
-            $quantity = $uom_conversion->conversion * $request->quantity;
+            $quantity=$data['type']=='base_uom' ? $data['uom_conversion'] * $request->quantity : $request->quantity;
             (new InventoryLedger($request->source_inventory_id))->isEnoughQuantityByItem($request->item_id, $quantity);
 
             $no = (new CommonPurchaseOrder())->getUniqueId($latest, 'transfer_id', $count);
@@ -118,7 +118,9 @@ class TransferRepository implements TransferRepositoryInterface
             $data['source_inventory_id'] = $request->source_inventory_id;
             $data['created_by'] = UserData()->id;
             $data['date'] = convertDateFormat(now());
-            $data['uom_conversion_id'] = $uom_conversion->id;
+            $data['quantity'] = $quantity;
+            $data['transfer_quantity'] = $request->quantity;
+            $data['uom_conversion_id'] = $data['conversion_uom_id'];
             $data['uom_id'] = $request->uom_id;
             $transfer = Transfer::updateOrCreate(
                 ['id' => $data['id']],
@@ -177,7 +179,6 @@ class TransferRepository implements TransferRepositoryInterface
                 $inventoryId = $transfer->source_inventory_id;
                 $inventoryLedger = (new StoreInventory($inventoryId))->storeToInventoryLedger($transfer, 'transfer', 'out');
                 (new StoreInventory($inventoryId))->storeItemToInventory($inventoryLedger, $transfer);
-
                 #in
                 $inventoryId = $transfer->destination_inventory_id;
                 $inventoryLedger = (new StoreInventory($inventoryId))->storeToInventoryLedger($transfer, 'transfer', 'in');

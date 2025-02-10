@@ -16,7 +16,8 @@ return new class extends Migration
             $table->string('transfer_id')->nullable();
             $table->unsignedBigInteger('source_inventory_id');
             $table->unsignedBigInteger('destination_inventory_id');
-            $table->double('quantity');
+            $table->double('transfer_quantity')->default(0);
+            $table->double('quantity')->default(0);
             $table->foreignId('item_id')->constrained();
             $table->foreignId('uom_id')->constrained();
             $table->foreignId('uom_conversion_id')->constrained();

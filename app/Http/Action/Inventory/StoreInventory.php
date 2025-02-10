@@ -41,7 +41,7 @@ class StoreInventory
     public function storeItemToInventory($inventoryLedger,$item){
         return $inventoryLedger->inventory_ledger_items()->create([
             'item_id'=>$item->item_id,
-            'quantity'=>$item->quantity*$item->uomConversion->conversion,
+            'quantity'=>$item->quantity,
             'inventory_ledger_id'=>$inventoryLedger->id,
         ]);
     }
