@@ -1264,10 +1264,9 @@ class InvoiceRepository implements InvoiceRepositoryInterface
                 $entitySession=$roomSession->entitySession;
                 $entitySession->is_active = 0;
                 $entitySession->save();
-                dd($entitySession);
+                // dd($entitySession);
                 Log::info('Room sesion is active updated ');
             }
-            dd('abc');
             // foreach ($roomSessions as $session) {
             //     $entitySession = $session->entitySession;
             //     if ($entitySession) {
