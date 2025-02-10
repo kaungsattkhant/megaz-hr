@@ -1542,18 +1542,18 @@
                     if(response.data.deposit_balance > 0){
                         this.depositBalance = response.data.deposit_balance;
                     }
+                    // if (response.data.invoice) {
+                    //     this.purchaseMenuList = response.data.invoice.orders;
+                    //     if (response.data.invoice.orders) {
+                    //         if (response.data.invoice.orders[0].total_discount_price) {
+                    //             this.foodDiscount = response.data.invoice.orders[0].total_discount_price
+                    //         }
+                    //     }
+                    // }
                     if (response.data.invoice) {
                         this.purchaseMenuList = response.data.invoice.orders;
-                        if (response.data.invoice.orders) {
-                            if (response.data.invoice.orders[0].total_discount_price) {
-                                this.foodDiscount = response.data.invoice.orders[0].total_discount_price
-                            }
-                        }
-                    }
-                    if (response.data.invoice) {
-                        this.purchaseMenuList = response.data.invoice.orders;
-                        if (response.data.invoice.orders) {
-                            this.foodDiscount = response.data.invoice.total_discount_price
+                        if (response.data.invoice.orders.length > 0) {
+                            this.foodDiscount = response.data.invoice.orders[0].total_discount_price
                         }
                     }
                     console.log('get purchase menu')
@@ -1608,7 +1608,7 @@
                     this.printInvoiceData.accessory_total_value = response.data.total_accessory_value;
                     this.printInvoiceData.food = response.data.total_order_value;
                     // this.depositBalance = null;
-                    this.foodDiscount = response.data.total_order_discount_value;
+                    this.foodDiscount = response.data.total_order_discount_price;
                 }
                 else {
                     this.$notify({
