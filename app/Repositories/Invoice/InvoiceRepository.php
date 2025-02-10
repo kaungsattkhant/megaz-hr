@@ -41,6 +41,8 @@ use App\Http\Action\Transaction\PurchaseOrderTransaction;
 use App\Models\CustomerDeposit;
 use App\Models\InvoiceSession;
 
+use App\Models\AreaType;
+
 use App\Http\Action\Common\AccountFetcher;
 
 class InvoiceRepository implements InvoiceRepositoryInterface
@@ -1005,8 +1007,11 @@ class InvoiceRepository implements InvoiceRepositoryInterface
             }
 
             if ($invoice->order) {
-                $foodMenusKTV = $this->getOrderedMenusSummary($invoice->id, [1, 2, 3, 4], 2);
-                $beverageMenusKTV = $this->getOrderedMenusSummary($invoice->id, [5], 2);
+                $RtAreaTypeId = AreaType::where('type','bar_and_restaurant')->first()->id;
+                $KtvAreaTypeId = AreaType::where('type', 'ktv')->first()->id;
+
+                $foodMenusKTV = $this->getOrderedMenusSummary($invoice->id, [1, 2, 3, 4], $KtvAreaTypeId);
+                $beverageMenusKTV = $this->getOrderedMenusSummary($invoice->id, [5], $KtvAreaTypeId);
 
                 if (($foodMenusKTV)->count() > 0) {
                     $foodTotal = $foodMenusKTV->sum('total_price');
@@ -1025,8 +1030,8 @@ class InvoiceRepository implements InvoiceRepositoryInterface
                     ], $transaction->id);
                 }
 
-                $foodMenusRT = $this->getOrderedMenusSummary($invoice->id, [1, 2, 3, 4], 1);
-                $beverageMenusRT = $this->getOrderedMenusSummary($invoice->id, [5], 1);
+                $foodMenusRT = $this->getOrderedMenusSummary($invoice->id, [1, 2, 3, 4], $RtAreaTypeId);
+                $beverageMenusRT = $this->getOrderedMenusSummary($invoice->id, [5], $RtAreaTypeId);
 
                 if (($foodMenusRT)->count() > 0) {
                     $foodTotal = $foodMenusRT->sum('total_price');
@@ -1249,9 +1254,9 @@ class InvoiceRepository implements InvoiceRepositoryInterface
             $data['complete_date'] = CurrentTime();
             $data['invoice_id'] = $invoice_id;
             $invoice->update($data);
-            //update is active  to room_session 
+            //update is active  to room_session
             // $this->invoiceService->updateIsActive($invoice->id, 0);
-            //customer deposit 
+            //customer deposit
 
             $customerDepositData['customer_id'] = $invoice->customer_id;
             $customerDepositData['account_id'] = $invoice->customer->account_id;
