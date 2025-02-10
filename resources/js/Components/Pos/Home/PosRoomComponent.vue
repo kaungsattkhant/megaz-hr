@@ -227,16 +227,17 @@
                                 <div class="flex justify-between font-semibold mb-2">
                                     <p class="text-sm text-black" v-if="selectedRoom.room_sessions.length > 0">
                                         Invoice Id
-                                        {{ selectedRoom.room_sessions[0] ? (selectedRoom.room_sessions[0].invoice ?
-                                            selectedRoom.room_sessions[0].invoice.invoice_id : '')
+                                        {{ selectedRoom.invoice ? (selectedRoom.invoice.invoice_id ?
+                                            selectedRoom.invoice.invoice_id : '')
                                         : '' }}
 
                                     </p>
                                     <p class="text-sm text-black font-semibold" v-if="selectedRoom">
-                                        {{ selectedRoom.room_sessions[0] ?
+                                        {{ selectedRoom.total_session_price ? selectedRoom.total_session_price : '' }}
+                                        <!-- {{ selectedRoom.room_sessions[0] ?
                                             (selectedRoom.room_sessions[0].invoice.total_session_price ?
                                                 selectedRoom.room_sessions[0].invoice.total_session_price : '' )
-                                        : '' }}
+                                        : '' }} -->
 
                                         MMKs
                                     </p>
@@ -249,12 +250,12 @@
                                 </div>
                                 <div class="">
                                     <p class="text-sm text-black mb-2">
-                                        Start Time : {{ selectedRoom.room_sessions.length > 0 ?
-                                            selectedRoom.room_sessions[0].start_date : '' }}
+                                        Start Time : {{ selectedRoom.start_date_time ?
+                                            selectedRoom.start_date_time : '' }}
                                     </p>
                                     <p class="text-sm text-black">
-                                        End Time : {{ selectedRoom.room_sessions.length > 0 ?
-                                            selectedRoom.room_sessions[0].end_date : '' }}
+                                        End Time : {{ selectedRoom.end_date_time ?
+                                            selectedRoom.end_date_time : '' }}
                                     </p>
                                 </div>
                             </div>
@@ -389,19 +390,19 @@
                                         (selectedRoom ?
                                             ((purchaseMenuList.length > 0 ?
                                                 (
-                                                    (selectedRoom.room_sessions[0].invoice.total_session_price ?
-                                                        selectedRoom.room_sessions[0].invoice.total_session_price : 0)
+                                                    (selectedRoom.total_session_price ?
+                                                        selectedRoom.total_session_price : 0)
                                                     +
                                                     (purchaseMenuList.length > 0 ? purchaseMenuList[0].total : 0)
-                                                    - (selectedRoom.room_sessions[0].invoice.package ? selectedRoom.room_sessions[0].invoice.package.package_discount : 0)
+                                                    - (selectedRoom.invoice.package ? selectedRoom.invoice.package.package_discount : 0)
                                                 )
                                                 :
                                                 (
-                                                    (selectedRoom.room_sessions[0].invoice.total_session_price ?
-                                                        selectedRoom.room_sessions[0].invoice.total_session_price : 0)
-                                                    - (selectedRoom.room_sessions[0].invoice.package ? selectedRoom.room_sessions[0].invoice.package.package_discount : 0)
+                                                    (selectedRoom.total_session_price ?
+                                                        selectedRoom.invoice.total_session_price : 0)
+                                                    - (selectedRoom.invoice.package ? selectedRoom.invoice.package.package_discount : 0)
                                                 )
-                                            ) + selectedRoom.total_service_value+selectedRoom.total_accessory_value).toLocaleString()
+                                            ) + selectedRoom.total_service_value + selectedRoom.total_accessory_value).toLocaleString()
                                             : 0
                                         )
 
@@ -1541,12 +1542,18 @@
                     if(response.data.deposit_balance > 0){
                         this.depositBalance = response.data.deposit_balance;
                     }
-                    if (response.data.room_sessions.length > 0) {
-                        this.purchaseMenuList = response.data.room_sessions[0].invoice.orders;
-                        if (response.data.room_sessions[0].invoice.orders) {
-                            if (response.data.room_sessions[0].invoice.orders[0]) {
-                                this.foodDiscount = response.data.room_sessions[0].invoice.orders[0].total_discount_price
+                    if (response.data.invoice) {
+                        this.purchaseMenuList = response.data.invoice.orders;
+                        if (response.data.invoice.orders) {
+                            if (response.data.invoice.orders[0].total_discount_price) {
+                                this.foodDiscount = response.data.invoice.orders[0].total_discount_price
                             }
+                        }
+                    }
+                    if (response.data.invoice) {
+                        this.purchaseMenuList = response.data.invoice.orders;
+                        if (response.data.invoice.orders) {
+                            this.foodDiscount = response.data.invoice.total_discount_price
                         }
                     }
 
@@ -1561,7 +1568,7 @@
                         }
                         this.selectedRoom = response.data;
                         this.serviceList = response.data.services;
-                        this.purchaseMenuList = response.data.room_sessions[0].invoice.orders
+                        this.purchaseMenuList = response.data.invoice.orders
                     }
             },
 
@@ -1993,7 +2000,7 @@
                 }
             },
             btnClickAddMenu() {
-                this.invoiceId = this.selectedRoom.room_sessions[0].invoice.id;
+                this.invoiceId = this.selectedRoom.invoice.id;
                 console.log('invoice id ' + this.invoiceId)
                 this.getMenuList();
             },
@@ -2016,6 +2023,11 @@
                     this.getPurchaseMenuList();
                 }
                 else {
+                    this.$notify({
+                        title: `Not valid`,
+                        text: response.message,
+                        type: "warn"
+                    });
                     console.log('some errors occur');
                 }
             },
