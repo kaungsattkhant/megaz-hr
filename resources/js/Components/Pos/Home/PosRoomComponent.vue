@@ -1757,10 +1757,10 @@
 
                 else if (this.discount_type == 'customer_level') {
 
-                    if (this.selectedRoom.room_sessions[0].invoice.invoice_type == 'package') {
+                    if (this.selectedRoom.invoice.invoice_type == 'package') {
                         // this.printInvoiceData.room = this.selectedRoom.room_sessions[0].invoice.package.pay_session * this.selectedRoom.room_sessions[0].invoice.package.session_price;
                         // this.printInvoiceData.customer_discount = this.roomSessionData.customer_level_discount_value + this.selectedRoom.room_sessions[0].invoice.package.package_discount + this.selectedRoom.room_sessions[0].invoice.orders[0].total_discount_price;
-                    this.printInvoiceData.customer_discount = this.roomSessionData.customer_level_discount_value;
+                        this.printInvoiceData.customer_discount = this.roomSessionData.customer_level_discount_value;
                         this.printInvoiceData.total = (this.roomSessionData.total_session_price + this.printInvoiceData.food) - (this.printInvoiceData.package_discount + this.foodDiscount + this.printInvoiceData.customer_discount);
                     }
                     else {
@@ -1775,10 +1775,10 @@
                     let roomChargeTotal = 0;
                     let roomSessions = this.roomSessionData;
                     // roomSessions.forEach(roomSession => {
-                    roomChargeTotal = roomSessions.room_sessions.price;
+                    roomChargeTotal = roomSessions.total_session_price;
                     // });
-                    if (this.selectedRoom.room_sessions[0].invoice.invoice_type == 'package') {
-                        this.printInvoiceData.room = (this.roomSessionData.total_session_price - this.selectedRoom.room_sessions[0].invoice.package.package_discount);
+                    if (this.selectedRoom.invoice.invoice_type == 'package') {
+                        this.printInvoiceData.room = (this.roomSessionData.total_session_price - this.selectedRoom.invoice.package.package_discount);
                     }
                     else {
                         // this.printInvoiceData.room = roomChargeTotal;
@@ -1871,7 +1871,7 @@
                     formData.append('room_discount_amount', this.printInvoiceData.roomDiscountAmount);
                     formData.append('discount_session', this.printInvoiceData.discountSession);
                 }
-                if (this.selectedRoom.room_sessions[0].invoice.invoice_type == 'package') {
+                if (this.selectedRoom.invoice.invoice_type == 'package') {
                     if(this.discount_type == 'percentage'){
                         allTotalDiscounts = this.foodDiscount + this.printInvoiceData.package_discount + this.printInvoiceData.percent_discount_amount
                     }
