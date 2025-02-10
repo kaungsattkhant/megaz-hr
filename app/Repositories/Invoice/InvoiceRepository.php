@@ -995,11 +995,13 @@ class InvoiceRepository implements InvoiceRepositoryInterface
                 'account_id' => $cashAccount->id
             ], $transaction->id);
 
-            $ledgerTransactionWriter->storeLedger([
-                'value' => $invoice->total_session_price,
-                'action' => 'credit',
-                'account_id' => $accountFetcher->getAccountByCode('5-0103')->id,
-            ], $transaction->id);
+            if($invoice->total_session_price > 0){
+                $ledgerTransactionWriter->storeLedger([
+                    'value' => $invoice->total_session_price,
+                    'action' => 'credit',
+                    'account_id' => $accountFetcher->getAccountByCode('5-0103')->id,
+                ], $transaction->id);
+            }
 
             if ($invoice->service_charge > 0) {
                 $ledgerTransactionWriter->storeLedger([
@@ -1016,7 +1018,7 @@ class InvoiceRepository implements InvoiceRepositoryInterface
                 ], $transaction->id);
             }
 
-            if ($invoice->total_service_value) {
+            if ($invoice->total_service_value > 0) {
                 $ledgerTransactionWriter->storeLedger([
                     'value' => $invoice->total_service_value,
                     'action' => 'credit',
@@ -1024,7 +1026,7 @@ class InvoiceRepository implements InvoiceRepositoryInterface
                 ], $transaction->id);
             }
 
-            if ($invoice->total_accessory_value) {
+            if ($invoice->total_accessory_value > 0) {
                 $ledgerTransactionWriter->storeLedger([
                     'value' => $invoice->total_accessory_value,
                     'action' => 'credit',
@@ -1041,23 +1043,43 @@ class InvoiceRepository implements InvoiceRepositoryInterface
             }
 
             if ($invoice->order) {
-                $foodMenus = $this->getOrderedMenusSummary($invoice->id, [1, 2, 3, 4]);
-                $beverageMenus = $this->getOrderedMenusSummary($invoice->id, [5]);
+                $foodMenusKTV = $this->getOrderedMenusSummary($invoice->id, [1, 2, 3, 4], 2);
+                $beverageMenusKTV = $this->getOrderedMenusSummary($invoice->id, [5], 2);
 
-                if (($foodMenus)->count() > 0) {
-                    $foodTotal = $foodMenus->sum('total_price');
+                if (($foodMenusKTV)->count() > 0) {
+                    $foodTotal = $foodMenusKTV->sum('total_price');
                     $ledgerTransactionWriter->storeLedger([
                         'value' => $foodTotal,
                         'action' => 'credit',
                         'account_id' => $accountFetcher->getAccountByCode('5-0101')->id, // Income - Food (KTV)
                     ], $transaction->id);
                 }
-                if (($beverageMenus->count() > 0)) {
-                    $beverageTotal = $beverageMenus->sum('total_price');
+                if (($beverageMenusKTV->count() > 0)) {
+                    $beverageTotal = $beverageMenusKTV->sum('total_price');
                     $ledgerTransactionWriter->storeLedger([
                         'value' => $beverageTotal,
                         'action' => 'credit',
                         'account_id' => $accountFetcher->getAccountByCode('5-0102')->id, // Income - Beverages (KTV)
+                    ], $transaction->id);
+                }
+
+                $foodMenusRT = $this->getOrderedMenusSummary($invoice->id, [1, 2, 3, 4], 1);
+                $beverageMenusRT = $this->getOrderedMenusSummary($invoice->id, [5], 1);
+
+                if (($foodMenusRT)->count() > 0) {
+                    $foodTotal = $foodMenusRT->sum('total_price');
+                    $ledgerTransactionWriter->storeLedger([
+                        'value' => $foodTotal,
+                        'action' => 'credit',
+                        'account_id' => $accountFetcher->getAccountByCode('5-0001')->id, // Income - Food (RT)
+                    ], $transaction->id);
+                }
+                if (($beverageMenusRT->count() > 0)) {
+                    $beverageTotal = $beverageMenusRT->sum('total_price');
+                    $ledgerTransactionWriter->storeLedger([
+                        'value' => $beverageTotal,
+                        'action' => 'credit',
+                        'account_id' => $accountFetcher->getAccountByCode('5-0002')->id, // Income - Beverages (RT)
                     ], $transaction->id);
                 }
             }
@@ -1076,21 +1098,33 @@ class InvoiceRepository implements InvoiceRepositoryInterface
         }
     }
 
-    private function getOrderedMenusSummary($invoiceId, array $categoryIds)
+    private function getOrderedMenusSummary($invoiceId, array $menuCategoryIds, $areaTypeId)
     {
         $menus = Invoice::where('invoices.id', $invoiceId)
-            ->whereIn('menu_categories.id', $categoryIds)
+            ->whereIn('menu_categories.id', $menuCategoryIds)
+            ->where('areas.area_type_id', $areaTypeId)
             ->join('orders', 'invoices.id', '=', 'orders.invoice_id') // Join orders
             ->join('order_items', 'orders.id', '=', 'order_items.order_id') // Join order items
             ->join('menus', 'order_items.menu_id', '=', 'menus.id') // Join menus
             ->join('menu_categories', 'menus.menu_category_id', '=', 'menu_categories.id') // Join menu categories
+            ->join('areas', 'order_items.area_id', '=', 'areas.id') // Join areas
+            ->join('area_types', 'areas.area_type_id', '=', 'area_types.id') // Join area types
             ->select(
                 'menu_categories.id as category_id',
                 'menu_categories.name as category_name',
+                'areas.id as area_id',
+                'areas.name AS area_name',
+                'areas.area_type_id as area_type_id',
+                'area_types.name AS area_type_name',
+                'area_types.type AS area_type',
                 DB::raw('COUNT(order_items.id) as menu_count'), // Count number of menu items in each category
                 DB::raw('SUM(order_items.price) as total_price') // Sum of order item prices per category
             )
-            ->groupBy('menu_categories.id', 'menu_categories.name') // Group by category
+            ->groupBy(
+                'menu_categories.id',
+                'areas.id',
+                'areas.area_type_id',
+            ) // Group by category
             ->orderBy('menu_categories.name')
             ->get();
 
