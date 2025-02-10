@@ -41,6 +41,8 @@ use App\Http\Action\Transaction\PurchaseOrderTransaction;
 use App\Models\CustomerDeposit;
 use App\Models\InvoiceSession;
 
+use App\Models\AreaType;
+
 use App\Http\Action\Common\AccountFetcher;
 
 class InvoiceRepository implements InvoiceRepositoryInterface
@@ -56,7 +58,7 @@ class InvoiceRepository implements InvoiceRepositoryInterface
     public function listAllData(Request $request)
     {
         if ($request->per_page || $request->page) {
-            $totalCount = Invoice::count();
+            $totalCount = Invoice::where('payment_status', 'checkout')->count();
             $pageNumber = 1;
             $perPage = 20;
             if ($request->page) {
@@ -76,6 +78,7 @@ class InvoiceRepository implements InvoiceRepositoryInterface
                     ->get();
             } else {
                 $invoices = Invoice::with(['customer'])
+                    ->where('payment_status', 'checkout')
                     ->orderBy('created_at', 'desc')
                     ->skip($skip)
                     ->take($perPage)
@@ -91,10 +94,13 @@ class InvoiceRepository implements InvoiceRepositoryInterface
             if ($request->date) {
                 $invoices = Invoice::with(['customer'])
                     ->whereBetween('created_at', [$request->date . ' 00:00:00', $request->date . ' 23:59:59'])
+                    ->where('payment_status', 'checkout')
                     ->orderBy('created_at', 'desc')
                     ->get();
             } else {
-                $invoices = Invoice::with(['customer'])->get();
+                $invoices = Invoice::with(['customer'])
+                ->where('payment_status', 'checkout')
+                ->get();
             }
 
             foreach ($invoices as $invoice) {
@@ -1093,8 +1099,11 @@ class InvoiceRepository implements InvoiceRepositoryInterface
             }
 
             if ($invoice->order) {
-                $foodMenusKTV = $this->getOrderedMenusSummary($invoice->id, [1, 2, 3, 4], 2);
-                $beverageMenusKTV = $this->getOrderedMenusSummary($invoice->id, [5], 2);
+                $RtAreaTypeId = AreaType::where('type','bar_and_restaurant')->first()->id;
+                $KtvAreaTypeId = AreaType::where('type', 'ktv')->first()->id;
+
+                $foodMenusKTV = $this->getOrderedMenusSummary($invoice->id, [1, 2, 3, 4], $KtvAreaTypeId);
+                $beverageMenusKTV = $this->getOrderedMenusSummary($invoice->id, [5], $KtvAreaTypeId);
 
                 if (($foodMenusKTV)->count() > 0) {
                     $foodTotal = $foodMenusKTV->sum('total_price');
@@ -1113,8 +1122,8 @@ class InvoiceRepository implements InvoiceRepositoryInterface
                     ], $transaction->id);
                 }
 
-                $foodMenusRT = $this->getOrderedMenusSummary($invoice->id, [1, 2, 3, 4], 1);
-                $beverageMenusRT = $this->getOrderedMenusSummary($invoice->id, [5], 1);
+                $foodMenusRT = $this->getOrderedMenusSummary($invoice->id, [1, 2, 3, 4], $RtAreaTypeId);
+                $beverageMenusRT = $this->getOrderedMenusSummary($invoice->id, [5], $RtAreaTypeId);
 
                 if (($foodMenusRT)->count() > 0) {
                     $foodTotal = $foodMenusRT->sum('total_price');
@@ -1337,9 +1346,9 @@ class InvoiceRepository implements InvoiceRepositoryInterface
             $data['complete_date'] = CurrentTime();
             $data['invoice_id'] = $invoice_id;
             $invoice->update($data);
-            //update is active  to room_session 
+            //update is active  to room_session
             // $this->invoiceService->updateIsActive($invoice->id, 0);
-            //customer deposit 
+            //customer deposit
 
             $customerDepositData['customer_id'] = $invoice->customer_id;
             $customerDepositData['account_id'] = $invoice->customer->account_id;
@@ -1424,6 +1433,9 @@ class InvoiceRepository implements InvoiceRepositoryInterface
             $entity->is_active = 0;
             $entity->status = 'inactive';
             $entity->save();
+
+            $invoice->payment_status = 'checkout';
+            $invoice->save();
             DB::commit();
             return $invoice;
         } catch (\Exception $e) {
