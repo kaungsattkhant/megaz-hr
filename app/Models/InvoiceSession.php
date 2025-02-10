@@ -30,4 +30,7 @@ class InvoiceSession extends Model
     public function invoice(){
         return $this->belongsTo(Invoice::class);
     }
+    public function entity(){
+        return $this->belongsTo(Entity::class);
+    }
 }

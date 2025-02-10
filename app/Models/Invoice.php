@@ -114,4 +114,11 @@ class Invoice extends Model
     {
         return $this->hasMany(InvoiceAccessory::class);
     }
+
+    public function activeInvoiceSession(){
+        return $this->hasOne(InvoiceSession::class)->where('is_active');
+    }
+    public function invoiceSessions(){
+        return $this->hasMany(InvoiceSession::class);
+    }
 }
