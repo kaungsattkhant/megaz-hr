@@ -1,237 +1,213 @@
 <template>
-    <div class="flex justify-between mb-3">
-        <div class=" flex">
-            <div>
-                <label for="search" class="search-input mx-2 px-2 py-1"> From Date </label>
-                <input type="date" v-model="fromDate" class="search-input rounded">
-            </div>
-
-            <div>
-                <label for="search" class="search-input mx-2 px-2 py-1"> To Date </label>
-                <input type="date" v-model="toDate" class="search-input rounded">
-            </div>
-            <div class="ml-2 px-2">
-                <button class="mx-1 add-btn h-8 text-[13px] font-inter" @click="searchBtnClicked">Filter</button>
-                <button class="mx-1 add-btn h-8 text-[13px] font-inter" @click="clearSearchBtnClicked">Clear</button>
-            </div>
-
-        </div>
-        <!-- <div class="flex justify-end flex-col">
-
-            <button type="button" class="add-btn transition duration-150 ease-in-out focus:outline-none focus:ring-0 "
-                data-te-toggle="modal" data-te-target="#checkModal">
-                Add New
-            </button>
-        </div> -->
+    <div>
+        <p class=" text-lg font-semibold font-inter">
+            Items
+        </p>
     </div>
-    <div class="block rounded-xl">
+    <div class="mt-4 bg-white">
+        <div class="btn-container">
+            <div class=" flex">
+                <div>
+                    <label for="search" class="search-input mx-2 px-2 py-1"> From Date </label>
+                    <input type="date" v-model="fromDate" class="search-input rounded">
+                </div>
 
-        <div class="overflow-x-auto">
-            <!-- <div class="inline-block min-w-full py-2 sm:px-6 lg:px-8"> -->
-            <div class="overflow-hidden ">
-                <table class="min-w-full primary-table rounded-xl text-center text-sm font-light ">
-                    <thead class="border-b font-medium ">
-                        <tr>
-                            <th scope="col" class=" px-6 py-4 ">
-                                #
-                            </th>
-                            <th scope="col" class=" px-6 py-4 ">
-                                Item
-                            </th>
-                            <th scope="col" class=" px-6 py-4 ">
-                                Opening
-                            </th>
-                            <th scope="col" class=" px-6 py-4 ">
-                                In
-                            </th>
-                            <th scope="col" class=" px-6 py-4 ">
-                                Out
-                            </th>
-                            <th scope="col" class=" px-6 py-4 ">
-                                Balance
-                            </th>
-                            <th scope="col" class=" px-6 py-4 ">
-                                Total Balance
-                            </th>
-                            <th scope="col" class=" px-6 py-4 ">
-                                Valuation
-                            </th>
-                            <th scope="col" class="px-6 py-4">
+                <div>
+                    <label for="search" class="search-input mx-2 px-2 py-1"> To Date </label>
+                    <input type="date" v-model="toDate" class="search-input rounded">
+                </div>
+                <div class="ml-2 px-2">
+                    <button class="mx-1 add-btn h-8 text-[13px] font-inter" @click="searchBtnClicked">Filter</button>
+                    <button class="mx-1 add-btn h-8 text-[13px] font-inter" @click="clearSearchBtnClicked">Clear</button>
+                </div>
 
-                            </th>
-                        </tr>
-                    </thead>
-                    <tbody>
-
-                        <div class="contents" v-for="(ledger, index) in inventoryLegderList" :key="index">
-                            <tr class="bg-white rounded-lg overflow-hidden shadow-lg">
-                                <td class=" px-6 py-4 font-medium ">
-                                    {{ ++index }}
-                                </td>
-                                <td class="whitespace-nowrap px-6 py-4 ">
-                                    {{ ledger.name }}
-                                </td>
-                                <td class="whitespace-nowrap px-6 py-4 ">
-                                    {{ ledger.opening_balance }} {{ ledger.conversion_uom_name }}
-                                </td>
-                                <td class="whitespace-nowrap px-6 py-4 ">
-                                    {{ ledger.in_balance }} {{ ledger.conversion_uom_name }}
-                                </td>
-                                <td class="whitespace-nowrap px-6 py-4 ">
-                                    {{ (ledger.out_balance).toLocaleString() }} {{ ledger.conversion_uom_name }}
-                                </td>
-                                <td class="whitespace-nowrap px-6 py-4 ">
-                                    {{ (ledger.closing_balance).toLocaleString() }} {{ ledger.conversion_uom_name }}
-                                </td>
-                                <td class="whitespace-nowrap px-6 py-4 ">
-                                    {{ ledger.base_balance }} {{ ledger.conversion_balance }}
-                                </td>
-                                <td class="whitespace-nowrap px-6 py-4 ">
-                                    {{ (ledger.total_value).toLocaleString() }}
-                                </td>
-                                <td class="whitespace-nowrap px-6 py-4">
-                                    <button id="edit-btn" class="pr-1" @click="transferBtnClicked(ledger.item_id, index-1)"
-                                        data-te-toggle="modal" data-te-target="#transfer_modal">
-                                        <i class="fas fa-exchange-alt"></i>
-                                    </button>
-                                    <button class="pl-2" @click="addDefectBtnClicked(ledger.item_id, index-1)"
-                                    data-te-toggle="modal" data-te-target="#add_defect_modal">
-                                        <i class="fas fa-exclamation-triangle"></i>
-                                    </button>
-                                </td>
-                            </tr>
-                            <tr class="">
-                                <td class=" col-span-full py-2 "></td>
-                            </tr>
-                        </div>
-
-                        <!-- <div class="contents" > -->
-                            <tr class="bg-white rounded-lg overflow-hidden shadow-lg">
-                                <td class=" px-6 py-4 font-medium ">
-                                    &nbsp;
-                                </td>
-                                <td class=" px-6 py-4 font-medium ">
-                                    &nbsp;
-                                </td>
-                                <td class=" px-6 py-4 font-medium ">
-                                    &nbsp;
-                                </td>
-                                <td class=" px-6 py-4 font-medium ">
-                                    &nbsp;
-                                </td>
-                                <td class=" px-6 py-4 font-medium ">
-                                    &nbsp;
-                                </td>
-                                <td class=" px-6 py-4 font-medium ">
-                                    &nbsp;
-                                </td>
-                                <td class=" px-6 py-4 font-medium ">
-                                    &nbsp;
-                                </td>
-                                <td class=" px-6 py-4 font-medium ">
-                                    {{ (totalValuation).toLocaleString() }}
-                                </td>
-                                <td class=" px-6 py-4 font-medium ">
-                                    &nbsp;
-                                </td>
-                            </tr>
-                            <tr class="">
-                                <td class=" col-span-full py-2 "></td>
-                            </tr>
-                        <!-- </div> -->
-
-                        <!-- looping end -->
-                    </tbody>
-                </table>
             </div>
+            <div></div>
         </div>
+        <div class="box-container-table">
 
+            <div class="overflow-x-auto">
+                <!-- <div class="inline-block min-w-full py-2 sm:px-6 lg:px-8"> -->
+                <div class="table-container">
+                    <table class="primary-table">
+                        <thead>
+                            <tr>
+                                <th scope="col">
+                                    #
+                                </th>
+                                <th scope="col">
+                                    Item
+                                </th>
+                                <th scope="col">
+                                    Opening
+                                </th>
+                                <th scope="col">
+                                    In
+                                </th>
+                                <th scope="col">
+                                    Out
+                                </th>
+                                <th scope="col">
+                                    Balance
+                                </th>
+                                <th scope="col">
+                                    Total Balance
+                                </th>
+                                <th scope="col">
+                                    Valuation
+                                </th>
+                                <th scope="col">
 
-        <!-- Transfer Modal -->
-        <div data-te-modal-init
-            class="fixed left-0 top-0 z-[1055] hidden h-full w-full overflow-y-auto overflow-x-hidden outline-none"
-            id="transfer_modal" tabindex="-1" aria-labelledby="transfer_modalLabel" aria-hidden="true">
-            <div data-te-modal-dialog-ref
-                class="pointer-events-none relative w-auto mb-12 translate-y-[-50px] opacity-0 transition-all duration-300 ease-in-out min-[576px]:mx-auto min-[576px]:mt-7 min-[576px]:max-w-[500px]">
-                <div
-                    class="min-[576px]:shadow-[0_0.5rem_1rem_rgba(#000, 0.15)] pointer-events-auto relative flex w-full flex-col rounded-md border-none bg-white bg-clip-padding text-current shadow-lg outline-none">
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
 
-                    <div class="relative  p-4">
-                        <h5 class="text-xl text-center mt-2 font-medium leading-normal text-black"
-                            id="create_modalLabel">
-                            Transfer
-                        </h5>
-                        <button type="button" id="close"
-                            class="absolute top-4 right-4 focus:shadow-none focus:outline-none" data-te-modal-dismiss
-                            aria-label="Close">
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
-                                stroke="currentColor" class="h-5 w-5">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
-                            </svg>
-                        </button>
-                    </div>
-                    <div class="relative px-12 py-4" data-te-modal-body-ref>
-
-                        <div class="mb-4">
-                            <label for="" class="block text-sm text-black mb-3">
-                                Source Inventory
-                            </label>
-                            <div class="bg-white mb-0 w-full text-sm inline-block" data-te-select-wrapper-ref>
-                                <select data-te-select-init data-te-select-placeholder="Select Source Inventory"
-                                data-te-select-filter="true" v-model="selectedSourceInventory">
-                                    <option :value="sourceInventory.id" v-for="(sourceInventory, sourceInventoryIndex) in sourceInventories">
-                                        {{ sourceInventory.name }}
-                                    </option>
-                                </select>
+                            <div class="contents" v-for="(ledger, index) in inventoryLegderList" :key="index">
+                                <tr>
+                                    <td>
+                                        {{ ++index }}
+                                    </td>
+                                    <td>
+                                        {{ ledger.name }}
+                                    </td>
+                                    <td>
+                                        {{ ledger.opening_balance }} {{ ledger.conversion_uom_name }}
+                                    </td>
+                                    <td>
+                                        {{ ledger.in_balance }} {{ ledger.conversion_uom_name }}
+                                    </td>
+                                    <td>
+                                        {{ (ledger.out_balance).toLocaleString() }} {{ ledger.conversion_uom_name }}
+                                    </td>
+                                    <td>
+                                        {{ (ledger.closing_balance).toLocaleString() }} {{ ledger.conversion_uom_name }}
+                                    </td>
+                                    <td>
+                                        {{ ledger.base_balance }} {{ ledger.conversion_balance }}
+                                    </td>
+                                    <td>
+                                        {{ (ledger.total_value).toLocaleString() }}
+                                    </td>
+                                    <td class="whitespace-nowrap px-6 py-4">
+                                        <button id="edit-btn" class="pr-1" @click="transferBtnClicked(ledger.item_id, index-1)"
+                                            data-te-toggle="modal" data-te-target="#transfer_modal">
+                                            <i class="fas fa-exchange-alt"></i>
+                                        </button>
+                                        <button class="pl-2" @click="addDefectBtnClicked(ledger.item_id, index-1)"
+                                        data-te-toggle="modal" data-te-target="#add_defect_modal">
+                                            <i class="fas fa-exclamation-triangle"></i>
+                                        </button>
+                                    </td>
+                                </tr>
                             </div>
-                        </div>
-                        <div class="mb-4">
-                            <label for="" class="block text-sm text-black mb-3">
-                                Destination Inventory
-                            </label>
-                            <div class="bg-white mb-0 w-full text-sm inline-block" data-te-select-wrapper-ref>
-                                <select data-te-select-init data-te-select-placeholder="Select Destination Inventory"
-                                data-te-select-filter="true" v-model="selectedDestinationInventory">
-                                    <option :value="destinationInventory.id" v-for="(destinationInventory, destinationInventoryIndex) in destinationInventories">
-                                        {{ destinationInventory.name }}
-                                    </option>
-                                </select>
-                            </div>
-                        </div>
-                        <div class="mb-4">
-                            <label for="" class="block text-sm text-black mb-3">
-                                Quantity
-                            </label>
-                            <input type="number" placeholder="Quantity" v-model="quantity" class="text-sm border border-gray-300
-                            input-ui w-full bg-transparent rounded-lg focus:ring-0">
-                        </div>
 
-                        <div class="mb-4">
-                            <label for="" class="block text-sm text-black mb-3">
-                                UOM
-                            </label>
-                            <div class="bg-white mb-0 w-full text-sm inline-block" data-te-select-wrapper-ref>
-                                <select data-te-select-init data-te-select-placeholder="Select UOM"
-                                data-te-select-filter="true" v-model="selectedUom">
-                                    <option :value="uom" v-for="(uom, uomIndex) in itemUoms">
-                                        {{ uom.name }}
-                                    </option>
-                                </select>
-                            </div>
-                        </div>
+                            <!-- <div class="contents" > -->
+                                <tr class="bg-white rounded-lg overflow-hidden shadow-lg">
+                                    <td colspan="7" class=" px-6 py-4 font-medium ">
+                                        &nbsp;
+                                    </td>
+                                    <td class=" px-6 py-4 font-medium ">
+                                        {{ (totalValuation).toLocaleString() }}
+                                    </td>
+                                    <td class=" px-6 py-4 font-medium ">
+                                        &nbsp;
+                                    </td>
+                                </tr>
+                            <!-- </div> -->
 
-                    </div>
-                    <div class="flex justify-center px-12 mb-6">
-                        <button type="button" @click="confirmTransferBtnClicked"
-                            class="add-btn focus:outline-none focus:ring-0 ">
-                            Transfer
-                        </button>
+                            <!-- looping end -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+
+            <!-- Transfer Modal -->
+            <div data-te-modal-init
+                class="fixed left-0 top-0 z-[1055] hidden h-full w-full overflow-y-auto overflow-x-hidden outline-none"
+                id="transfer_modal" tabindex="-1" aria-labelledby="transfer_modalLabel" aria-hidden="true">
+                <div data-te-modal-dialog-ref
+                    class="pointer-events-none relative w-auto mb-12 translate-y-[-50px] opacity-0 transition-all duration-300 ease-in-out min-[576px]:mx-auto min-[576px]:mt-7 min-[576px]:max-w-[500px]">
+                    <div
+                        class="min-[576px]:shadow-[0_0.5rem_1rem_rgba(#000, 0.15)] pointer-events-auto relative flex w-full flex-col rounded-md border-none bg-white bg-clip-padding text-current shadow-lg outline-none">
+
+                        <div class="relative  p-4">
+                            <h5 class="text-xl text-center mt-2 font-medium leading-normal text-black"
+                                id="create_modalLabel">
+                                Transfer
+                            </h5>
+                            <button type="button" id="close"
+                                class="absolute top-4 right-4 focus:shadow-none focus:outline-none" data-te-modal-dismiss
+                                aria-label="Close">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                                    stroke="currentColor" class="h-5 w-5">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                                </svg>
+                            </button>
+                        </div>
+                        <div class="relative px-12 py-4" data-te-modal-body-ref>
+
+                            <div class="mb-4">
+                                <label for="" class="block text-sm text-black mb-3">
+                                    Source Inventory
+                                </label>
+                                <div class="bg-white mb-0 w-full text-sm inline-block" data-te-select-wrapper-ref>
+                                    <select data-te-select-init data-te-select-placeholder="Select Source Inventory"
+                                    data-te-select-filter="true" v-model="selectedSourceInventory">
+                                        <option :value="sourceInventory.id" v-for="(sourceInventory, sourceInventoryIndex) in sourceInventories">
+                                            {{ sourceInventory.name }}
+                                        </option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="mb-4">
+                                <label for="" class="block text-sm text-black mb-3">
+                                    Destination Inventory
+                                </label>
+                                <div class="bg-white mb-0 w-full text-sm inline-block" data-te-select-wrapper-ref>
+                                    <select data-te-select-init data-te-select-placeholder="Select Destination Inventory"
+                                    data-te-select-filter="true" v-model="selectedDestinationInventory">
+                                        <option :value="destinationInventory.id" v-for="(destinationInventory, destinationInventoryIndex) in destinationInventories">
+                                            {{ destinationInventory.name }}
+                                        </option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="mb-4">
+                                <label for="" class="block text-sm text-black mb-3">
+                                    Quantity
+                                </label>
+                                <input type="number" placeholder="Quantity" v-model="quantity" class="text-sm border border-gray-300
+                                input-ui w-full bg-transparent rounded-lg focus:ring-0">
+                            </div>
+
+                            <div class="mb-4">
+                                <label for="" class="block text-sm text-black mb-3">
+                                    UOM
+                                </label>
+                                <div class="bg-white mb-0 w-full text-sm inline-block" data-te-select-wrapper-ref>
+                                    <select data-te-select-init data-te-select-placeholder="Select UOM"
+                                    data-te-select-filter="true" v-model="selectedUom">
+                                        <option :value="uom" v-for="(uom, uomIndex) in itemUoms">
+                                            {{ uom.name }}
+                                        </option>
+                                    </select>
+                                </div>
+                            </div>
+
+                        </div>
+                        <div class="flex justify-center px-12 mb-6">
+                            <button type="button" @click="confirmTransferBtnClicked"
+                                class="add-btn focus:outline-none focus:ring-0 ">
+                                Transfer
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-
     <!--Check Modal -->
     <div data-te-modal-init
         class="fixed left-0 top-0 z-[1055] hidden h-full w-full overflow-y-auto overflow-x-hidden outline-none"
