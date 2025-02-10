@@ -699,7 +699,8 @@ class InvoiceRepository implements InvoiceRepositoryInterface
 
     public function modifyEntityChange($data){
 
-        dd($data);
+        // dd($data);   
+        $this->invoiceService->checkIsActiveChangeRoom();
     }
 
     public function changeTable($invoice, $newEntityId)
