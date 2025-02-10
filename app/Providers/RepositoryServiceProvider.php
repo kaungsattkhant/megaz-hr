@@ -160,7 +160,9 @@ use App\Repositories\AccountReceivable\AccountReceivableRepositoryInterface;
 use App\Repositories\BirthdayPromotion\BirthdayPromotionRepositoryInterface;
 use App\Repositories\PurchaseOrderItem\PurchaseOrderItemRepositoryInterface;
 use App\Repositories\FixedAssetPurchase\FixedAssetPurchaseRepositoryInterface;
+use App\Repositories\ParticipantNotification\ParticipantNotificationInterface;
 use App\Repositories\SaleTargetPosition\SaleTargetPositionRepositoryInterface;
+use App\Repositories\ParticipantNotification\ParticipantNotificationRepository;
 use App\Repositories\MenuServiceDiscount\MenuServiceDiscountRepositoryInterface;
 use App\Repositories\CustomerLevelDiscount\CustomerLevelDiscountRepositoryInterface;
 use App\Repositories\MaterialRequirementsPlanning\MaterialRequirementsPlanningInterface;
@@ -248,5 +250,6 @@ class RepositoryServiceProvider extends ServiceProvider
         $this->app->bind(TimeShiftRepositoryInterface::class, TimeShiftRepository::class);
         $this->app->bind(ContactRepositoryInterface::class, ContactRepository::class);
         $this->app->bind(PoOrderRepositoryInterface::class, PoOrderRepository::class);
+        $this->app->bind(ParticipantNotificationInterface::class, ParticipantNotificationRepository::class);
     }
 }
