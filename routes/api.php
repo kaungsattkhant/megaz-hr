@@ -120,7 +120,7 @@ Route::get('/service_categories', function () {
 Route::get('/area_categories', function (Request $request) {
     ResponseData(
         AreaCategory::when($request->area_type, function ($query, $areaType) {
-            $query->where('name', $areaType);
+            // $query->where('name', $areaType);
         })->get()
     );
 });
