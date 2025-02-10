@@ -252,13 +252,12 @@
                             <label for="" class="block text-sm text-black mb-3">
                                 Payment Type
                             </label>
-                            <select name="" id="" v-model="selectedSubAccount"
+                            <select name="" id="" v-model="selectedPayment"
                                 class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0"
-                                @change="subAccountSelectChanged">
-                                <option :value="subAccount" v-for="(subAccount, subAccountIndex) in subAccountList"
-                                    :key="subAccountIndex">
-                                    {{ subAccount.name }}
-                                </option>
+                                >
+                                    <option disabled selected>Select Payment</option>
+                                    <option value="bank"> Bank </option>
+                                    <option value="cash" selected> Cash </option>
                             </select>
                         </div>
                         
@@ -266,7 +265,7 @@
                             <label for="" class="block text-sm text-black mb-3">
                                 Paid Amount
                             </label>
-                            <input type="text" placeholder="Amount" v-model="amount"
+                            <input type="text" placeholder="Amount" v-model="paidAmount"
                                 class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
                         </div>
                     </div>
@@ -301,6 +300,9 @@
                 isDetail:false,
                 invoice_date:null,
 
+                selectedInvoice:null,
+                paidAmount: 0,
+                selectedPayment: null,
                 isCashier: false,
             };
         },
@@ -338,15 +340,15 @@
             dateChange(){
                 this.getDateInvoiceList();
             },
-            async getDateInvoiceList(){
-                const response = await getApiData({ url: '/api/invoices?date='+ this.invoice_date , token: this.getToken()});
-                if(response.data){
-                    this.invoiceList = response.data;
-                }
-                else{
-                    this.invoiceList = 'test'
-                }
-            },
+            // async getDateInvoiceList(){
+            //     const response = await getApiData({ url: '/api/invoices?date='+ this.invoice_date , token: this.getToken()});
+            //     if(response.data){
+            //         this.invoiceList = response.data;
+            //     }
+            //     else{
+            //         this.invoiceList = 'test'
+            //     }
+            // },
 
             isCateringCashier(){
                 let cashierRole = this.getRoles().find((role)=>role.name == 'Cashier');
@@ -355,6 +357,23 @@
                 else
                     return false;
             },
+            confirmBtnClicked(invoice){
+                this.selectedInvoice = invoice;
+                this.selectedPayment = null;
+                this.paidAmount = 0;
+            },
+            async confirmInvoice(){
+                console.log('test confirm invoice')
+                let formData = new FormData();
+                formData.append('id', this.selectedInvoice.id);
+                formData.append('paid_amount', this.selectedPayment);
+                formData.append('payment_type', this.paidAmount);
+                let response = await postApiData({ url: '/api/pos/invoicessss', form_data: formData, token: this.getToken() });
+                if (response.success) {
+                    this.getInvoiceList();
+                }
+
+            }
         },
         mounted()
         {

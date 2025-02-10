@@ -1519,8 +1519,8 @@
                 }
                 let response = await postApiData({ url: '/api/entities/start', form_data: formData, token: this.getToken() });
                 if (response.success) {
-                    this.getRoomList();
-                    this.getSelectedRoom();
+                    // this.getRoomList();
+                    // this.getSelectedRoom();
                     this.isOpenRoomStep('detail');
 
                     if (this.selectedRoom.room_sessions.length > 0) {
