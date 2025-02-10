@@ -2,8 +2,10 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
+use App\Models\Staff;
+use App\Models\Department;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Participant extends Model
 {
@@ -15,4 +17,21 @@ class Participant extends Model
         'participantable_id',
         'participantable_type'
     ];
+
+    public function participantable()
+    {
+        return $this->morphTo();
+    }
+    public function department()
+    {
+        return $this->belongsTo(Department::class);
+    }
+    public function role()
+    {
+        return $this->belongsTo(Role::class);
+    }
+    public function staff()
+    {
+        return $this->belongsTo(Staff::class);
+    }
 }

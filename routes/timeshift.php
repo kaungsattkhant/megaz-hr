@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\API\ContactController;
+use App\Http\Controllers\API\ParticipantNotificationController;
 use App\Http\Controllers\API\PoOrderController;
 use App\Http\Controllers\API\TimeShiftController;
 
@@ -49,5 +50,12 @@ Route::middleware('auth:api')->group(function () {
     Route::get('/supplier_lead_time/{supplierId}', 'getSupplierLeadTime');
     Route::get('/invoices', 'getInvoices');
     Route::post('/invoices', 'storeInvoices');
+  });
+
+  Route::controller(ParticipantNotificationController::class)->group(function () {
+    Route::get('/staff_by_department/{departmentId}/role/{roleId}', 'getStaffByDepartmentRole');
+    Route::post('/meetings', 'storeMeetings');
+    Route::get('/meetings/{meetingId}', 'showMeetings');
+    Route::get('/meetings', 'getMeetings');
   });
 });
