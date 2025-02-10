@@ -2,6 +2,8 @@
 
 namespace App\Repositories\Invoice;
 
+use Exception;
+
 use Carbon\Carbon;
 use App\Models\Role;
 use App\Models\User;
@@ -38,6 +40,8 @@ use App\Http\Action\Transaction\StoreTransactionLedger;
 use App\Http\Action\Transaction\PurchaseOrderTransaction;
 use App\Models\CustomerDeposit;
 use App\Models\InvoiceSession;
+
+use App\Http\Action\Common\AccountFetcher;
 
 class InvoiceRepository implements InvoiceRepositoryInterface
 {
@@ -159,7 +163,7 @@ class InvoiceRepository implements InvoiceRepositoryInterface
                 //         ->whereTime('end_time', '>=', $current_time) // Check if end_time is greater than or equal to current time
                 //         ->first();
                 //     $entity = Entity::find($data['entity_id']);
-                // } 
+                // }
                 else if (isset($data['entity_session_id'])) {
                     $entitySession = EntitySession::find($data['entity_session_id']);
                     $entity = Entity::find($entitySession->entity_id);
@@ -202,7 +206,7 @@ class InvoiceRepository implements InvoiceRepositoryInterface
                 $invoice = Invoice::create($data);
 
                 $invoiceSession=$this->invoiceService->storeInvoiceSession($invoice->id,$entitySession->entity_id,$data['session_duration'],$entity->price_per_hour,$discountId=null);
-                //create deposit 
+                //create deposit
                 $this->storeCustomerDeposit($data, UserData()->id);
                 //
                 $invoice->invoice_id = sprintf('%05d', $invoice->id);
@@ -248,7 +252,7 @@ class InvoiceRepository implements InvoiceRepositoryInterface
 
     //                 })
     //                 ->orderByRaw("
-    //     CASE 
+    //     CASE
     //         WHEN start_time >= '00:00:00' AND start_time < '12:00:00' THEN 2 -- Sessions after midnight (00:xx)
     //         WHEN spans_midnight = 1 THEN 1 -- Sessions spanning midnight (23:xx - 00:xx)
     //         ELSE 0 -- Sessions before midnight (22:xx)
@@ -285,7 +289,7 @@ class InvoiceRepository implements InvoiceRepositoryInterface
     //                 $session->is_active = 1;
     //                 $session->save();
     //             }
-               
+
                 if ($data['is_waiter'] == 1) {
                     $entity->is_active = 0;
                     $entity->status = 'pending';
@@ -400,7 +404,7 @@ class InvoiceRepository implements InvoiceRepositoryInterface
                 'account_id' => $cash_account_id,
                 'action' => 'debit',
             ]);
-            #store credit ledger 
+            #store credit ledger
             $creditLedger = (new StoreTransactionLedger())->storeLedger([
                 'date' => now(),
                 'value' => $data['deposit'],
@@ -568,7 +572,7 @@ class InvoiceRepository implements InvoiceRepositoryInterface
             if ($newEntity->is_active) {
                 ResponseMessage('Room is invalid', 422);
             }
-            //current comment 
+            //current comment
             // if ($invoice->invoice_type == 'endless_time') {
             //     return $this->invoiceService->changeRoomForEndlessTime($invoice, $newEntity);
             // }
@@ -588,7 +592,7 @@ class InvoiceRepository implements InvoiceRepositoryInterface
                 ->whereTime('start_time', '<=', $current_time)
                 ->whereTime('end_time', '>=', $current_time)
                 ->first();
-            //end 
+            //end
             $previousEntity = Entity::find($entitySession->entity_id);
             $endTime = Carbon::parse($latestRoomSession->end_date);
             $sessionStartTime = Carbon::parse($firstRoomSession->start_date);
@@ -881,6 +885,215 @@ class InvoiceRepository implements InvoiceRepositoryInterface
         // dd($totalDiscount);
     }
 
+    public function paidInvoice(Request $request)
+    {
+        $invoice = Invoice::find($request->id);
+        $customer = $invoice->customer;
+        $depositBalance = $this->getCustomerDepositBalance($customer->id);
+        try {
+            DB::beginTransaction();
+            if ($depositBalance < 1 && $request->paid_amount < 1) {
+                ResponseMessage('Paid amout must be entered', 400);
+            }
+
+            if ($depositBalance > 0) {
+                $withdrawalAmt = $invoice->sub_total;
+                $updatedCustomerDepositBalance = $depositBalance - $invoice->sub_total;
+                $ApOrAr = null;
+                if ($updatedCustomerDepositBalance != 0) {
+                    $ApOrAr = ($updatedCustomerDepositBalance > 0) ? 'ap' : 'ar';
+                    if ($ApOrAr == 'ap') {
+                        // stores AP transaction for customer deposit balance
+                        // deposit credit
+                        $withdrawalAmt = $invoice->sub_total;
+                    }
+                    if ($ApOrAr == 'ar') {
+                        // stores AR transaction for receivable from customer
+                        $withdrawalAmt = $depositBalance;
+                    }
+                }
+
+                // ဖြတ်ရမယ့် အမောင့်က
+                // ကျသင့်ငွေက balance ထက်များနေရင် ရှိသလောက် balance အကုန်ဖြတ်
+                // ကျသင့်ငွေက balance ထက်နည်းနေရင်တော့ ရှင်းရမယ့် အမောင့်တိုင်း ဖြတ်
+                $customerDeposit = CustomerDeposit::create([
+                    'type' => 'withdrawal',
+                    'date_time' => now(),
+                    'amount' => $withdrawalAmt, // **
+                    'account_id' => CustomerDeposit::where('customer_id', $customer->id)->first()->account_id,
+                    'cash_account_id' => CustomerDeposit::where('customer_id', $customer->id)->first()->cash_account_id,
+                    'customer_id' => $customer->id,
+                ]);
+            }
+
+            // debit cash bank
+            // credit menu (inv food)
+
+            // credit service charge
+            // credit tax
+            // credit services
+            // credit accessory
+            // credit room
+
+            // debit discount
+            // credit cash
+
+            // credit deposit
+
+            $accountFetcher = new AccountFetcher();
+            $cashAccount = ($request->payment_type == 'bank') ? $accountFetcher->getAccountByName('POS Bank') : $accountFetcher->getAccountByName('POS Cash');
+
+            $ledgerTransactionWriter = new StoreTransactionLedger();
+            $transaction = $ledgerTransactionWriter->createTransaction([
+                'date' => now(),
+                'created_by' => UserData()->id,
+                'transactionable_id' => $invoice->id,
+                'transactionable_type' => 'invoice',
+                'is_confirmed' => 1,
+            ]);
+
+            $ledgerTransactionWriter->storeLedger([
+                'value' => $request->paid_amount,
+                'action' => 'debit',
+                'account_id' => $cashAccount->id
+            ], $transaction->id);
+
+            if($invoice->total_session_price > 0){
+                $ledgerTransactionWriter->storeLedger([
+                    'value' => $invoice->total_session_price,
+                    'action' => 'credit',
+                    'account_id' => $accountFetcher->getAccountByCode('5-0103')->id,
+                ], $transaction->id);
+            }
+
+            if ($invoice->service_charge > 0) {
+                $ledgerTransactionWriter->storeLedger([
+                    'value' => $invoice->service_charge,
+                    'action' => 'credit',
+                    'account_id' => $accountFetcher->getAccountByCode('5-1009')->id, // Service Charges(8%)
+                ], $transaction->id);
+            }
+            if ($invoice->tax > 0) {
+                $ledgerTransactionWriter->storeLedger([
+                    'value' => $invoice->tax,
+                    'action' => 'credit',
+                    'account_id' => $accountFetcher->getAccountByCode('2-1057')->id, // Receivable 5% Tax
+                ], $transaction->id);
+            }
+
+            if ($invoice->total_service_value > 0) {
+                $ledgerTransactionWriter->storeLedger([
+                    'value' => $invoice->total_service_value,
+                    'action' => 'credit',
+                    'account_id' => $accountFetcher->getAccountByCode('5-1014')->id, // Event/Function-Service Fees
+                ], $transaction->id);
+            }
+
+            if ($invoice->total_accessory_value > 0) {
+                $ledgerTransactionWriter->storeLedger([
+                    'value' => $invoice->total_accessory_value,
+                    'action' => 'credit',
+                    'account_id' => $accountFetcher->getAccountByCode('5-1014')->id, // should be the account for accessory sales
+                ], $transaction->id);
+            }
+
+            if ($invoice->total_discount > 0) {
+                $ledgerTransactionWriter->storeLedger([
+                    'value' => $invoice->total_discount,
+                    'action' => 'debit',
+                    'account_id' => $accountFetcher->getAccountByCode('6-2003')->id, // Discount Allowed
+                ], $transaction->id);
+            }
+
+            if ($invoice->order) {
+                $foodMenusKTV = $this->getOrderedMenusSummary($invoice->id, [1, 2, 3, 4], 2);
+                $beverageMenusKTV = $this->getOrderedMenusSummary($invoice->id, [5], 2);
+
+                if (($foodMenusKTV)->count() > 0) {
+                    $foodTotal = $foodMenusKTV->sum('total_price');
+                    $ledgerTransactionWriter->storeLedger([
+                        'value' => $foodTotal,
+                        'action' => 'credit',
+                        'account_id' => $accountFetcher->getAccountByCode('5-0101')->id, // Income - Food (KTV)
+                    ], $transaction->id);
+                }
+                if (($beverageMenusKTV->count() > 0)) {
+                    $beverageTotal = $beverageMenusKTV->sum('total_price');
+                    $ledgerTransactionWriter->storeLedger([
+                        'value' => $beverageTotal,
+                        'action' => 'credit',
+                        'account_id' => $accountFetcher->getAccountByCode('5-0102')->id, // Income - Beverages (KTV)
+                    ], $transaction->id);
+                }
+
+                $foodMenusRT = $this->getOrderedMenusSummary($invoice->id, [1, 2, 3, 4], 1);
+                $beverageMenusRT = $this->getOrderedMenusSummary($invoice->id, [5], 1);
+
+                if (($foodMenusRT)->count() > 0) {
+                    $foodTotal = $foodMenusRT->sum('total_price');
+                    $ledgerTransactionWriter->storeLedger([
+                        'value' => $foodTotal,
+                        'action' => 'credit',
+                        'account_id' => $accountFetcher->getAccountByCode('5-0001')->id, // Income - Food (RT)
+                    ], $transaction->id);
+                }
+                if (($beverageMenusRT->count() > 0)) {
+                    $beverageTotal = $beverageMenusRT->sum('total_price');
+                    $ledgerTransactionWriter->storeLedger([
+                        'value' => $beverageTotal,
+                        'action' => 'credit',
+                        'account_id' => $accountFetcher->getAccountByCode('5-0002')->id, // Income - Beverages (RT)
+                    ], $transaction->id);
+                }
+            }
+
+            $invoice->paid_amount = $request->paid_amount;
+            $invoice->payment_status = 'paid';
+            $invoice->payment_type = $request->payment_type;
+            $invoice->save();
+
+            DB::commit();
+
+            ResponseData($invoice);
+        } catch (Exception $e) {
+            DB::rollBack();
+            ResponseMessage($e->getMessage(), 500);
+        }
+    }
+
+    private function getOrderedMenusSummary($invoiceId, array $menuCategoryIds, $areaTypeId)
+    {
+        $menus = Invoice::where('invoices.id', $invoiceId)
+            ->whereIn('menu_categories.id', $menuCategoryIds)
+            ->where('areas.area_type_id', $areaTypeId)
+            ->join('orders', 'invoices.id', '=', 'orders.invoice_id') // Join orders
+            ->join('order_items', 'orders.id', '=', 'order_items.order_id') // Join order items
+            ->join('menus', 'order_items.menu_id', '=', 'menus.id') // Join menus
+            ->join('menu_categories', 'menus.menu_category_id', '=', 'menu_categories.id') // Join menu categories
+            ->join('areas', 'order_items.area_id', '=', 'areas.id') // Join areas
+            ->join('area_types', 'areas.area_type_id', '=', 'area_types.id') // Join area types
+            ->select(
+                'menu_categories.id as category_id',
+                'menu_categories.name as category_name',
+                'areas.id as area_id',
+                'areas.name AS area_name',
+                'areas.area_type_id as area_type_id',
+                'area_types.name AS area_type_name',
+                'area_types.type AS area_type',
+                DB::raw('COUNT(order_items.id) as menu_count'), // Count number of menu items in each category
+                DB::raw('SUM(order_items.price) as total_price') // Sum of order item prices per category
+            )
+            ->groupBy(
+                'menu_categories.id',
+                'areas.id',
+                'areas.area_type_id',
+            ) // Group by category
+            ->orderBy('menu_categories.name')
+            ->get();
+
+        return $menus;
+    }
+
     public function doneEntityWithInvoice(array $data)
     {
         //payload
@@ -890,7 +1103,7 @@ class InvoiceRepository implements InvoiceRepositoryInterface
 // total: 10000
 // order_discount: 0
 // discount_total: 0
-// end_date: null 
+// end_date: null
         //end
         DB::beginTransaction();
         try {
@@ -1017,9 +1230,9 @@ class InvoiceRepository implements InvoiceRepositoryInterface
             $data['complete_date'] = CurrentTime();
             $data['invoice_id'] = $invoice_id;
             $invoice->update($data);
-            //update is active  to room_session 
+            //update is active  to room_session
             $this->invoiceService->updateIsActive($invoice->id, 0);
-            //customer deposit 
+            //customer deposit
             $customerDepositData['customer_id'] = $invoice->customer_id;
             $customerDepositData['account_id'] = $invoice->customer->account_id;
             $customerDepositData['amount'] = $data['total'];
@@ -1367,7 +1580,7 @@ class InvoiceRepository implements InvoiceRepositoryInterface
     }
 
 
-    //add service 
+    //add service
     public function addService($request)
     {
 
