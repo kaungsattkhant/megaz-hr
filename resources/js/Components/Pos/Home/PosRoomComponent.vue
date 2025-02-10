@@ -1831,7 +1831,7 @@
                 let totalAmount = this.printInvoiceData.total;
                 let allTotalDiscounts = 0;
                 let formData = new FormData();
-                formData.append('invoice_id', this.selectedRoom.room_sessions[0].invoice.id);
+                formData.append('invoice_id', this.selectedRoom.invoice.id);
                 // formData.append('payment_type', this.selectedPaymentMethod);
                 if(this.discount_type){
                     formData.append('discount_type', this.discount_type);
