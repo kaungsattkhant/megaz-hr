@@ -58,7 +58,7 @@ class InvoiceRepository implements InvoiceRepositoryInterface
     public function listAllData(Request $request)
     {
         if ($request->per_page || $request->page) {
-            $totalCount = Invoice::count();
+            $totalCount = Invoice::where('payment_status', 'checkout')->count();
             $pageNumber = 1;
             $perPage = 20;
             if ($request->page) {
@@ -78,6 +78,7 @@ class InvoiceRepository implements InvoiceRepositoryInterface
                     ->get();
             } else {
                 $invoices = Invoice::with(['customer'])
+                    ->where('payment_status', 'checkout')
                     ->orderBy('created_at', 'desc')
                     ->skip($skip)
                     ->take($perPage)
@@ -93,10 +94,13 @@ class InvoiceRepository implements InvoiceRepositoryInterface
             if ($request->date) {
                 $invoices = Invoice::with(['customer'])
                     ->whereBetween('created_at', [$request->date . ' 00:00:00', $request->date . ' 23:59:59'])
+                    ->where('payment_status', 'checkout')
                     ->orderBy('created_at', 'desc')
                     ->get();
             } else {
-                $invoices = Invoice::with(['customer'])->get();
+                $invoices = Invoice::with(['customer'])
+                ->where('payment_status', 'checkout')
+                ->get();
             }
 
             foreach ($invoices as $invoice) {
@@ -1341,6 +1345,9 @@ class InvoiceRepository implements InvoiceRepositoryInterface
             $entity->is_active = 0;
             $entity->status = 'inactive';
             $entity->save();
+
+            $invoice->payment_status = 'checkout';
+            $invoice->save();
             DB::commit();
             return $invoice;
         } catch (\Exception $e) {
