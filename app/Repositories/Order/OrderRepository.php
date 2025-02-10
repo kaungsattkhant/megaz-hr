@@ -105,7 +105,7 @@ class OrderRepository implements OrderRepositoryInterface
                 //     $entity = $order->invoice->table;
                 // }
                 // broadcast(new KitchenNotificationRequest($entity, $order, null, $order_items, 7));
-                // DB::commit();
+                DB::commit();
                 return $order;
             }
         } catch (\Exception $e) {

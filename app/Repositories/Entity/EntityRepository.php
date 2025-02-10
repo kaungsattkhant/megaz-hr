@@ -12,6 +12,7 @@ use App\Models\RoomSession;
 use Illuminate\Http\Request;
 use App\Models\EntitySession;
 use App\Models\InvoiceService;
+use App\Models\InvoiceSession;
 use Illuminate\Support\Facades\DB;
 use App\Services\InvoiceModelService;
 
@@ -216,7 +217,7 @@ class EntityRepository implements EntityRepositoryInterface
         $entitySession->customer_id = $customer->id;
         $entitySession->account_id = $customer->account_id;
         $entitySession->total_session_price = $invoice->total_session_price;
-        $entitySession->invoice=$invoice;
+        $entitySession->invoice = $invoice;
         return $entitySession;
     }
 
@@ -225,19 +226,22 @@ class EntityRepository implements EntityRepositoryInterface
     {
         $entity = Entity::find($entityId);
         if ($entity->entity_type == 'room') {
-            $entitySession = EntitySession::where('is_active', 1)
-                ->with(['entity', 'roomSessions', 'roomSession.invoice'])
-                ->where('entity_id', $entityId)->first();
-            if (!$entitySession) {
-                ResponseMessage('Entity have no invic ', 404);
-            }
-            $invoiceId = $entitySession->roomSession->invoice_id;
-            $invoice = Invoice::find($invoiceId);
-            $roomSessions = RoomSession::where('invoice_id', $invoiceId)
-                ->orderBy('created_at')
-                ->get();
-            $firstRoomSession = $roomSessions->first();
-            $lastRoomSession = $roomSessions->last();
+            $activeInvoiceSession = InvoiceSession::where('is_active', 1)->where('entity_id', $entityId);
+            $invoice = $activeInvoiceSession->invoice;
+
+            // $entitySession = EntitySession::where('is_active', 1)
+            //     ->with(['entity', 'roomSessions', 'roomSession.invoice'])
+            //     ->where('entity_id', $entityId)->first();
+            // if (!$entitySession) {
+            //     ResponseMessage('Entity have no invic ', 404);
+            // }
+            // $invoiceId = $entitySession->roomSession->invoice_id;
+            // $invoice = Invoice::find($invoiceId);
+            // $roomSessions = RoomSession::where('invoice_id', $invoiceId)
+            //     ->orderBy('created_at')
+            //     ->get();
+            // $firstRoomSession = $roomSessions->first();
+            // $lastRoomSession = $roomSessions->last();
 
             $invoiceServiceCollection = collect();
             $total_service_value = 0;
@@ -290,8 +294,10 @@ class EntityRepository implements EntityRepositoryInterface
                 }
             }
             // }
-            $entitySession['start_date'] = $firstRoomSession->start_date;
-            $entitySession['end_date'] = $lastRoomSession->end_date;
+            // $entitySession['start_date'] = $firstRoomSession->start_date;
+            // $entitySession['end_date'] = $lastRoomSession->end_date;
+            $entitySession['start_date']=$activeInvoiceSession->start_date_time;
+            $entitySession['end_date']=$activeInvoiceSession->start_date_time;
             $entitySession['invoice'] = $invoice;
             //service add response
             $entitySession['services'] = $invoiceServiceCollection;
