@@ -88,7 +88,6 @@ class InvoiceRepository implements InvoiceRepositoryInterface
             $paginationData['invoices'] = $invoices;
             $paginationData = MakePaginationData($request, $totalCount, 'invoices');
             $paginationData['invoices'] = $invoices;
-
             return $paginationData;
         } else {
             if ($request->date) {
@@ -104,11 +103,10 @@ class InvoiceRepository implements InvoiceRepositoryInterface
             }
 
             foreach ($invoices as $invoice) {
-                $lastRoomSession = $invoice->roomSession()->get()->last();
-                $lastRoom = $lastRoomSession->entitySession->entity;
-                $invoice->room = $lastRoom;
+                // $lastRoomSession = $invoice->roomSession()->get()->last();
+                // $lastRoom = $lastRoomSession->entitySession->entity;
+                // $invoice->room = $lastRoom;
             }
-
             return $invoices;
         }
     }
