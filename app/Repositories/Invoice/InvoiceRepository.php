@@ -1206,7 +1206,7 @@ class InvoiceRepository implements InvoiceRepositoryInterface
                         ResponseMessage('Selected discount cannot be applied', 422);
                     }
 
-                    if ($roomDiscount->session <= $invoiceSession->total_duration) {
+                    if ($roomDiscount->session <= $totalInvoiceSession->total_duration) {
                         $room_discount_value = $total_session_price - $data['room_discount_amount'];
                         $total_session_price = $data['room_discount_amount'];
                         $invoiceSession = InvoiceSession::where('invoice_id', $invoice->id)
@@ -1316,7 +1316,6 @@ class InvoiceRepository implements InvoiceRepositoryInterface
             //store customer deposit
             $this->storeInvoiceCustomerDeposit($customerDepositData, UserData()->id);
             //store invoice transaction
-
             $this->ledgerAndTransactionForInvoice([
                 'payment_type' => 'cash',
                 'invoice_id' => $invoice->id,
