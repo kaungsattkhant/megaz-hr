@@ -30,6 +30,7 @@ class RoomNotificationRequest implements ShouldBroadcast
     public $roomSession;
     public $order;
     public $orderItem;
+    public $invoice;
 
     public function __construct(Customer $customer,Entity $entity, Invoice $invoice,$department_id,Order $order=null, array $orderItem)
     {
@@ -40,6 +41,7 @@ class RoomNotificationRequest implements ShouldBroadcast
         $this->roomName = $entity->name;
         $this->order = $order;
         $this->orderItem = $orderItem;
+        $this->invoice=$invoice;
 
 
     }
@@ -57,11 +59,13 @@ class RoomNotificationRequest implements ShouldBroadcast
     }
     public function broadcastWith()
     {
-        $roomSession = RoomSession::where('invoice_id',$this->invoice_id)->get();
+        // $roomSession = RoomSession::where('invoice_id',$this->invoice_id)->get();
 
-        $totalDuration = $roomSession->sum('session_duration');
-        $firstRoomSession = $roomSession->first();
-        $lastRoomSession = $roomSession->last();
+        // $totalDuration = $roomSession->sum('session_duration');
+        // $firstRoomSession = $roomSession->first();
+        // $lastRoomSession = $roomSession->last();
+        $invoice=Invoice::find($this->invoice_id);
+        $invoiceSession=$invoice->activeInvoiceSession;
         $data= [
             'department_id' => $this->department_id,
             'invoice_id' => $this->invoice_id,
@@ -69,11 +73,10 @@ class RoomNotificationRequest implements ShouldBroadcast
             'room_name' => $this->roomName,
             'order' => $this->order,
             'orderItem' => $this->orderItem,
-            'start_time' => $firstRoomSession->start_date,
-            'end_time' => $lastRoomSession->end_date,
-            'session_duration' => $totalDuration
+            'start_time' => $invoiceSession->start_date_time,
+            'end_time' => $invoiceSession->end_date_time,
+            'session_duration' => $invoiceSession->total_session_duration,
         ];
-
         return $data;
 
     }
