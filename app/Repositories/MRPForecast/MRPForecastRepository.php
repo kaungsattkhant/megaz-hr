@@ -168,7 +168,8 @@ class MRPForecastRepository implements MRPForecastRepositoryInterface
                   $balanceQuery->whereHas('inventory_ledger', function ($q) use ($inventoryId) {
                     $q->where('inventory_id', $inventoryId);
                   });
-                }
+                },
+                'brands'
               ]);
             },
             'uom'
@@ -196,13 +197,16 @@ class MRPForecastRepository implements MRPForecastRepositoryInterface
                   $balanceQuery->whereHas('inventory_ledger', function ($q) use ($inventoryId) {
                     $q->where('inventory_id', $inventoryId);
                   });
-                }
+                },
+                'brands'
               ]);
             },
             'uom'
           ]);
         }
       ])->get();
+
+
     $result = $menuStepDatas->flatMap(function ($mStepdata) use ($quantity) {
       return $mStepdata->menuStepItem->map(function ($data) use ($quantity) {
         return $this->processMenuStepItem($data, $quantity);
@@ -235,10 +239,12 @@ class MRPForecastRepository implements MRPForecastRepositoryInterface
                     $balanceQuery->whereHas('inventory_ledger', function ($q) use ($inventoryId) {
                       $q->where('inventory_id', $inventoryId);
                     });
-                  }
+                  },
+                  'brands'
                 ]);
               },
-              'uom'
+              'uom',
+
             ]);
           }
         ])
@@ -264,23 +270,22 @@ class MRPForecastRepository implements MRPForecastRepositoryInterface
                     $balanceQuery->whereHas('inventory_ledger', function ($q) use ($inventoryId) {
                       $q->where('inventory_id', $inventoryId);
                     });
-                  }
+                  },
+                  'brands'
                 ]);
               },
-              'uom'
+              'uom',
+
             ]);
           }
         ])
         ->get();
-
 
       $menuStepDataProcessed = $menuStepDatas->flatMap(function ($mStepdata) use ($quantity) {
         return $mStepdata->menuStepItem->map(function ($data) use ($quantity) {
           return $this->processMenuStepItem($data, $quantity);
         })->filter();
       });
-
-
 
       $result = $result->merge($menuStepDataProcessed);
     }
@@ -314,7 +319,7 @@ class MRPForecastRepository implements MRPForecastRepositoryInterface
       'code' => $data->item->code ?? 'null',
       'base_uom_id' => $data->item->base_uom_id,
       'base_uom_name' => $data->item->base_uom_name ?? 'null',
-      'item_uom' => $data->item->item_uom ?? 'null',
+      'uom_name' => $data->item->item_uom ?? 'null',
       'weight' => $data->weight,
       'uom_conversion_id' => $data->item->uom_conversion_id,
       'uom_conversion' => $conversionRate,
@@ -327,20 +332,25 @@ class MRPForecastRepository implements MRPForecastRepositoryInterface
       'in_balance' => $inBalance,
       'out_balance' => $outBalance,
       'closing_balance' => $closingBalance,
-      'current_holdings' => $currentHolding
+      'current_holdings' => $currentHolding,
+      'minimum_holding_amount' =>  $data->item->minimum_holding_amount,
+      'min_holding_base_uom_quantity' => $data->item->min_holding_base_uom_quantity,
+      'min_holding_uom_quantity' => $data->item->min_holding_uom_quantity,
+      'brands'             => isset($data->item->brands) ? $data->item->brands->toArray() : []
     ];
   }
 
   private function groupMenuStepItems($result)
   {
     return $result->groupBy('item_id')->map(function ($items) {
+      $first = $items->first();
       return [
         'item_id' => $items->first()['item_id'],
         'name' => $items->first()['name'],
         'code' => $items->first()['code'],
         'base_uom_id' =>  $items->first()['base_uom_id'],
         'base_uom_name' => $items->first()['base_uom_name'],
-        'item_uom' => $items->first()['item_uom'],
+        'uom_name' => $items->first()['uom_name'],
         'weight' => $items->sum('weight'),
         'uom_conversion_id' =>  $items->first()['uom_conversion_id'],
         'uom_conversion' => $items->first()['uom_conversion'],
@@ -364,6 +374,16 @@ class MRPForecastRepository implements MRPForecastRepositoryInterface
         'current_holdings' => $items->sum(function ($item) {
           return $item['current_holdings'];
         }),
+        'minimum_holding_amount' => $items->sum(function ($item) {
+          return $item['minimum_holding_amount'];
+        }),
+        'min_holding_base_uom_quantity' => $items->sum(function ($item) {
+          return $item['min_holding_base_uom_quantity'];
+        }),
+        'min_holding_uom_quantity' => $items->sum(function ($item) {
+          return $item['min_holding_uom_quantity'];
+        }),
+        'brands'            => $first['brands']
       ];
     })->values();
   }
@@ -632,6 +652,7 @@ class MRPForecastRepository implements MRPForecastRepositoryInterface
           'quantity' => $data['quantity'],
           'purchase_order_id' => $po->id,
           'item_id' => $itemId,
+          'brand_id' => $data['brand_id'],
           'amount' => $data['quantity'],
           'original_quantity' => $data['quantity'],
           'uom_id' => $data['uom_id'],
@@ -652,6 +673,7 @@ class MRPForecastRepository implements MRPForecastRepositoryInterface
           'quantity' => $data['quantity'],
           'purchase_order_id' => $po->id,
           'item_id' => $itemId,
+          'brand_id' => $data['brand_id'],
           'amount' => $data['quantity'],
           'original_quantity' => $data['quantity'],
           'uom_id' => $data['uom_id'],

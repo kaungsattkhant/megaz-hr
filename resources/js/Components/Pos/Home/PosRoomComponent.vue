@@ -25,7 +25,9 @@
                             </div>
                             <!-- <div :class="[time.is_active == 0 ? 'bg-[#4fe0b7]' : 'bg-[#FF7675]', parseInt(time.start_time.split(':')) < currentTime ? 'opacity-70' : 'opacity-100' ]" v-for="(time,timeIndex) in room.entity_sessions" :key="index"
                                 class=" flex-shrink-0 flex-grow w-40 max-w-44 h-40"> -->
-                            <div :class="time.is_active == 0 ? 'bg-[#4fe0b7]' : 'bg-[#FF7675]'" v-for="(time,timeIndex) in room.entity_sessions" :key="timeIndex"
+                            <div
+                                :class="isTimeActive(time)"
+                                v-for="(time,timeIndex) in room.entity_sessions" :key="timeIndex"
                                 class=" flex-shrink-0 flex-grow w-40 max-w-44 h-40">
                                 <!-- <button @click="btnClickedSession(time, timeIndex, room, roomIndex)" :disabled="parseInt(time.start_time.split(':')) < currentTime" :class="parseInt(time.start_time.split(':')) < currentTime ? ' cursor-not-allowed' : ''"
                                     class="relative flex flex-col justify-between h-full w-full p-6"> -->
@@ -133,14 +135,14 @@
                                     </label>
                                     <input type="checkbox" v-model="isPreDeposit" class="rounded" >
                                 </div>
-                                <div class="mb-4">
+                                <div class="mb-4" v-if="isPreDeposit">
                                     <label for="" class="block text-sm text-black mb-3">
                                         Deposit
                                     </label>
                                     <input type="text" placeholder="Deposit Amount" v-model="deposit" :disabled="!isPreDeposit"
                                         class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
                                 </div>
-                                <div class="mb-4">
+                                <div class="mb-4" v-if="isPreDeposit">
                                     <label for="" class="block text-sm text-black mb-3">
                                         Cash Account
                                     </label>
@@ -225,7 +227,7 @@
                         <div class="small-scrollbar overflow-y-auto" style="height:calc(100% - 195px)">
                             <div class="padding-section border-b    " v-if="selectedRoom">
                                 <div class="flex justify-between font-semibold mb-2">
-                                    <p class="text-sm text-black" v-if="selectedRoom.room_sessions.length > 0">
+                                    <p class="text-sm text-black" v-if="selectedRoom">
                                         Invoice Id
                                         {{ selectedRoom.invoice ? (selectedRoom.invoice.invoice_id ?
                                             selectedRoom.invoice.invoice_id : '')
@@ -386,7 +388,7 @@
                             <div class=" text-right pr-3 mb-3">
                                 <p class="">
                                     Total
-                                    {{
+                                    <!-- {{
                                         (selectedRoom ?
                                             ((purchaseMenuList.length > 0 ?
                                                 (
@@ -407,7 +409,8 @@
                                         )
 
 
-                                    }}
+                                    }} -->
+                                        {{ (total_room_price + (selectedRoom ? selectedRoom.total_service_value : 0) + (selectedRoom ? selectedRoom.total_accessory_value : 0)).toLocaleString() }}
                                     MMKs
                                 </p>
                             </div>
@@ -1141,9 +1144,11 @@
     import { mapGetters } from "vuex";
     import { getCurrentTime, getCurretDateTime } from "../../../utilities/datetime-helpers";
     import Multiselect from 'vue-multiselect';
+    import moment from "moment";
+    
 
     export default {
-        name:'PosRoomCompnent',
+        name:'PosRoomComponent',
         props:{
             roomAreaId:{
                 type: Number,
@@ -1312,6 +1317,8 @@
                 selectedCashAccount: null,
 
                 depositBalance: null,
+
+                total_room_price:0,
             };
         },
 
@@ -1321,7 +1328,7 @@
                 this.$emit('callParent');
             },
             async getRoomList(area){
-                if(area.area_type.type == 'ktv'){
+                if(this.area.area_type.type == 'ktv'){
                     const response = await getApiData({ url: '/api/areas/' + this.roomAreaId + '/entities' , token: this.getToken()});
                     if(response.data){
                         this.roomList = response.data;
@@ -1338,7 +1345,7 @@
                 this.selectedRoomId = room.id;
                 // this.getSelectedRoom();
                 if (this.roomList[roomIndex].entity_sessions[timeIndex].is_active == 1) {
-                    this.isOpenRoomStep('detail');
+                    
                     this.getPurchaseMenuList(); // why is this called
                     const response = await getApiData({ url: '/api/entities_sessions/'+ this.selectedTime.id, token: this.getToken() });
                     if (response.data) {
@@ -1348,12 +1355,15 @@
                         this.selectedRoom = response.data;
                         this.serviceList = response.data.services;
                         this.accessoryListSidebar = response.data.invoice_accessories;
+                        this.getTotal(response.data);
+                        this.isOpenRoomStep('detail');
                     }
                 }
                 else {
 
                     this.selectedRoom = this.roomList[roomIndex];
                     this.isOpenRoomStep('open_1');
+                    console.log('open 1')
                 };
             },
 
@@ -1522,23 +1532,46 @@
                     this.getRoomList();
                     this.getSelectedRoom();
                     this.isOpenRoomStep('detail');
-
-                    if (this.selectedRoom.room_sessions.length > 0) {
-                        if (this.selectedRoom.room_sessions[0].invoice.orders.length > 0) {
-                            this.getPurchaseMenuList();
-                        }
-                    }
-                    if (this.selectedRoom.room_sessions.length < 1) {
-                        if (this.selectedRoom.room_sessions[0].invoice.orders.length < 1) {
-                            this.purchaseMenuList = [];
-                        }
-                    }
+                    
+                    // if (this.selectedRoom.room_sessions.length > 0) {
+                    //     if (this.selectedRoom.room_sessions[0].invoice.orders.length > 0) {
+                    //         this.getPurchaseMenuList();
+                    //     }
+                    // }
+                    // if (this.selectedRoom.room_sessions.length < 1) {
+                    //     if (this.selectedRoom.room_sessions[0].invoice.orders.length < 1) {
+                    //         this.purchaseMenuList = [];
+                    //     }
+                    // }
                     this.food_total_package = 0
+                    // this.uiInShow = 
+
+                    // (selectedRoom ?
+                    //     ((purchaseMenuList.length > 0 ?
+                    //         (
+                    //             (selectedRoom.total_session_price ? selectedRoom.total_session_price : 0)
+                    //             + (purchaseMenuList.length > 0 ? purchaseMenuList[0].total : 0)
+                    //             - (selectedRoom.invoice.package ? selectedRoom.invoice.package.package_discount : 0)
+                    //         )
+                    //         :
+                    //         (
+                    //             (selectedRoom.total_session_price ? selectedRoom.invoice.total_session_price : 0)
+                    //             - (selectedRoom.invoice.package ? selectedRoom.invoice.package.package_discount : 0)
+                    //         )
+                    //     ) + selectedRoom.total_service_value + selectedRoom.total_accessory_value).toLocaleString()
+                    //     : 0
+                    // )
+                    
+                    
                     // console.log("success")
-                    window.location.reload()
+                    // window.location.reload()
                 }
                 else {
-                    console.log('some errors occur')
+                    this.$notify({
+                        title: `Not valid`,
+                        text: response.message,
+                        type: "warn"
+                    });
                 }
             },
             async getPurchaseMenuList() {
@@ -1561,6 +1594,7 @@
                             this.foodDiscount = response.data.invoice.orders[0].total_discount_price
                         }
                     }
+                    this.getTotal(response.data)
                     console.log('get purchase menu')
                 }
             },
@@ -1575,9 +1609,28 @@
                         this.serviceList = response.data.services;
                         this.purchaseMenuList = response.data.invoice.orders
                         console.log('get selected room')
+                        this.getTotal(response.data);
+                        
                     }
             },
-
+            getTotal(roomData){
+                let totalSessionPrice = 0;
+                let totalOrderPrice = 0 ;
+                let packageDiscount = 0;
+                if(roomData.total_session_price){
+                    totalSessionPrice = roomData.total_session_price
+                    console.log('totalSessionprice = ' + totalSessionPrice)
+                };
+                if(roomData.invoice.orders.length > 0){
+                    totalOrderPrice = roomData.invoice.orders[0].total
+                    console.log('totalOrderPrice = ' + totalOrderPrice)
+                }
+                if(roomData.invoice.package){
+                    packageDiscount = roomData.invoice.package.package_discount
+                    console.log('packageDiscount = ' + packageDiscount)
+                }
+                this.total_room_price = totalSessionPrice + totalOrderPrice - packageDiscount
+            },
             //invoice or done
             btnBackToDetail() {
                 this.isOpenRoomStep('detail');
@@ -1908,18 +1961,15 @@
                 formData.append('order_discount', this.foodDiscount);
                 formData.append('discount_total', allTotalDiscounts);
                 formData.append('end_date', this.serviceEndDate);
-
-
                 console.log(formData)
-
                 let response = await postApiData({ url: '/api/entities/done', form_data: formData, token: this.getToken() });
                 if (response.success) {
                     await this.getRoomList();
                     // this.selectedRoom = await this.roomList[this.selectedRoomIndex];
                     this.isOpenRoom.step_1 = true;
                     this.isOpenRoom.step_2 = false;
-                    this.isOpenRoom.step_detail = false;
-                    this.isOpenRoom.step_invoice = false;
+                    this.isOpenRoom.detail = false;
+                    this.isOpenRoom.invoice = false;
 
                     console.log("success");
                     window.location.reload();
@@ -2314,9 +2364,11 @@
                 for (let key in this.isOpenRoom) {
                     if (key === selectedKey) {
                         this.isOpenRoom[key] = true;
+                        console.log('is open room true')
                     }
                     else {
                         this.isOpenRoom[key] = false;
+                        console.log('is open room false')
                     }
                 }
             },
@@ -2342,6 +2394,20 @@
                     this.cashAccounts = response.data;
                 }
             },
+            isTimeActive(time){
+                let currentTime = moment().format("HH:mm:ss");
+                if(time.is_active == 1){
+                    return 'bg-[#FF7675]';
+                }
+                else{
+                    if(moment(time.end_time, "HH:mm:ss").isBefore(moment(), "second")){
+                        return 'bg-[#eed202]';
+                    }
+                    else{
+                        return 'bg-[#4fe0b7]';
+                    }
+                }
+            }
         },
 
         watch: {

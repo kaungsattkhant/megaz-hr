@@ -5,6 +5,7 @@ namespace App\Repositories\ParticipantNotification;
 use App\Models\Staff;
 use App\Models\Meeting;
 use App\Models\Participant;
+use App\Models\Training;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Request;
 
@@ -26,54 +27,230 @@ class ParticipantNotificationRepository implements ParticipantNotificationInterf
     try {
       $data['created_by'] = UserData()->id;
       $meeting = Meeting::create($data);
-      $participants = json_decode($data['participant'], true);
-      if (isset($data['meeting_type'])) {
 
-        foreach ($participants as $participant) {
+
+      if (isset($data['meeting_type']) && isset($data['department']) && $data['meeting_type'] === "dep_type") {
+
+        foreach ($data['department'] as $dep) {
           $participantData = [
             'participantable_id' => $meeting->id,
-            'participantable_type' => 'meeting'
+            'participantable_type' => 'meeting',
+            'department_id' => $dep
           ];
-
-          if ($data['meeting_type'] === "staff_type") {
-
-            $participantData['staff_id'] = $participant['staff_id'];
-          } elseif ($data['meeting_type'] === "role_type") {
-            $participantData['department_id'] = $participant['department_id'];
-            $participantData['role_id'] = $participant['role_id'];
-          } elseif ($data['meeting_type'] === "dep_type") {
-            $participantData['department_id'] = $participant['department_id'];
-          }
-
           Participant::create($participantData);
         }
       }
 
+      if (isset($data['meeting_type']) && isset($data['role']) && $data['meeting_type'] === "role_type") {
+
+        foreach ($data['role'] as $role) {
+          $participantData = [
+            'participantable_id' => $meeting->id,
+            'participantable_type' => 'meeting',
+            'role_id' => $role
+          ];
+          Participant::create($participantData);
+        }
+      }
+
+
+      if (isset($data['meeting_type']) && isset($data['staff']) && $data['meeting_type'] === "staff_type") {
+
+        foreach ($data['staff'] as $staff) {
+          $participantData = [
+            'participantable_id' => $meeting->id,
+            'participantable_type' => 'meeting',
+            'staff_id' => $staff
+          ];
+          Participant::create($participantData);
+        }
+      }
       DB::commit();
-      return ResponseData($meeting, 200, true, "Meeting created successfully.");
+      return ResponseData($meeting, 201, true, "Meeting created successfully.");
     } catch (\Exception $e) {
       DB::rollBack();
       return ResponseData($data = null, $status_code = 422, false, $extra_message = "An error occurred Meeting stored.");
     }
   }
 
-  public function getMeetings($meetingId = null)
+  public function getMeetings()
+  {
+    $meeting = Meeting::with([
+      'chairedBy',
+      'createdBy',
+      'participants' => function ($query) {
+        $query->where('participantable_type', 'meeting');
+      },
+      'participants.staff',
+      'participants.department',
+      'participants.role',
+      // 'participants.staff.department',
+      // 'participants.staff.roles',
+      // 'participants.department.roles',
+      // 'participants.department.staffs',
+      // 'participants.role.department',
+      // 'participants.role.staffs',
+    ])->orderBy('created_at', 'desc')->get();
+    return $meeting;
+  }
+
+  public function showMeeting($meetingId)
   {
     $meeting = Meeting::with([
       'participants' => function ($query) {
         $query->where('participantable_type', 'meeting');
       },
-      'participants.staff.department',
-      'participants.staff.roles',
-      'participants.department.roles',
-      'participants.department.staffs',
-      'participants.role.department',
-      'participants.role.staffs',
-    ])->orderBy('created_at', 'desc');
-    if ($meetingId) {
-      $meeting->where('id', $meetingId);
+      'participants.staff',
+      // 'participants.staff.department',
+      // 'participants.staff.roles',
+      'participants.department',
+      'participants.role',
+      // 'participants.department.roles',
+      // 'participants.department.staffs',
+      // 'participants.role.department',
+      // 'participants.role.staffs',
+    ])->find($meetingId);
+    if (!$meeting) {
+      return ResponseData(null, 404, false, 'Meeting not found.');
     }
-
-    return  $meeting->get();
+    return ResponseData($meeting, 200, true, 'Meeting details retrieved successfully.');
   }
+
+  public function updateMeeting($meetingId)
+  {
+    DB::beginTransaction();
+
+    try {
+
+      $meeting = Meeting::find($meetingId);
+      if (!$meeting) {
+        return ResponseData(null, 404, false, 'Meeting not found.');
+      }
+
+      $data = Request::all();
+      $data['created_by'] = UserData()->id;
+      $meeting->update($data);
+      $meeting->participants()->where('participantable_type', 'meeting')->delete();
+      if (isset($data['meeting_type']) && isset($data['department']) && $data['meeting_type'] === "dep_type") {
+        // $meeting->participants()->where('participantable_type', 'meeting')->whereNotNull('department_id')->delete();
+
+        foreach ($data['department'] as $dep) {
+          $participantData = [
+            'participantable_id' => $meeting->id,
+            'participantable_type' => 'meeting',
+            'department_id' => $dep
+          ];
+          Participant::create($participantData);
+        }
+      }
+
+      if (isset($data['meeting_type']) && isset($data['role']) && $data['meeting_type'] === "role_type") {
+        // $meeting->participants()->where('participantable_type', 'meeting')->whereNotNull('role_id')->delete();
+
+        foreach ($data['role'] as $role) {
+          $participantData = [
+            'participantable_id' => $meeting->id,
+            'participantable_type' => 'meeting',
+            'role_id' => $role
+          ];
+          Participant::create($participantData);
+        }
+      }
+
+      if (isset($data['meeting_type']) && isset($data['staff']) && $data['meeting_type'] === "staff_type") {
+        // $meeting->participants()->where('participantable_type', 'meeting')->whereNotNull('staff_id')->delete();
+
+        foreach ($data['staff'] as $staff) {
+          $participantData = [
+            'participantable_id' => $meeting->id,
+            'participantable_type' => 'meeting',
+            'staff_id' => $staff
+          ];
+          Participant::create($participantData);
+        }
+      }
+      DB::commit();
+      return ResponseData($meeting, 200, true, 'Meeting updated successfully.');
+    } catch (\Exception $e) {
+      DB::rollBack();
+      return ResponseData(null, 422, false, 'An error occurred while updating the meeting. ' . $e->getMessage());
+    }
+  }
+
+  public function deleteMeeting($meetingId)
+  {
+    DB::beginTransaction();
+    try {
+      $meeting = Meeting::find($meetingId);
+      if (!$meeting) {
+        return ResponseData(null, 404, false, 'Meeting not found.');
+      }
+      $meeting->participants()->where('participantable_type', 'meeting')->delete();
+      $meeting->delete();
+      DB::commit();
+      return ResponseData(null, 200, true, 'Meeting deleted successfully.');
+    } catch (\Exception $e) {
+      DB::rollBack();
+      return ResponseData(null, 422, false, 'An error occurred while deleting the meeting. ' . $e->getMessage());
+    }
+  }
+
+
+
+
+  public function storeTraining($data)
+  {
+    DB::beginTransaction();
+
+    try {
+      $data['created_by'] = UserData()->id;
+      $training = Training::create($data);
+
+
+      if (isset($data['training_type']) && isset($data['department']) && $data['training_type'] === "dep_type") {
+
+        foreach ($data['department'] as $dep) {
+          $participantData = [
+            'participantable_id' => $training->id,
+            'participantable_type' => 'training',
+            'department_id' => $dep
+          ];
+          Participant::create($participantData);
+        }
+      }
+
+      if (isset($data['training_type']) && isset($data['role']) && $data['training_type'] === "role_type") {
+
+        foreach ($data['role'] as $role) {
+          $participantData = [
+            'participantable_id' => $training->id,
+            'participantable_type' => 'training',
+            'role_id' => $role
+          ];
+          Participant::create($participantData);
+        }
+      }
+
+
+      if (isset($data['training_type']) && isset($data['staff']) && $data['training_type'] === "staff_type") {
+
+        foreach ($data['staff'] as $staff) {
+          $participantData = [
+            'participantable_id' => $training->id,
+            'participantable_type' => 'training',
+            'staff_id' => $staff
+          ];
+          Participant::create($participantData);
+        }
+      }
+      DB::commit();
+      return ResponseData($training, 201, true, "Training created successfully.");
+    } catch (\Exception $e) {
+      DB::rollBack();
+      return ResponseData($data = null, $status_code = 422, false, $extra_message = "An error occurred Training stored.");
+    }
+  }
+
+
+  public function getTrainings() {}
 }
