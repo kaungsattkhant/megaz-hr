@@ -588,7 +588,7 @@ class InvoiceRepository implements InvoiceRepositoryInterface
         try {
             $entity=Entity::find($data['entity']);
             $invoice = Invoice::find($data['invoice_id']);
-            if ($entity->type=='table') {
+            if ($entity->entity_type=='table') {
                 $updatedInvoice = $this->changeTable($invoice, $data['entity_id']);
                 DB::commit();
                 ResponseData($updatedInvoice, 200);
