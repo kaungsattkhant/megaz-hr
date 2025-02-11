@@ -100,6 +100,15 @@ class InvoiceAPIController extends Controller
         $catering_department = Department::where('name', 'Catering')->first();
         $invoice = Invoice::find($request->invoice_id);
 
+        // {
+        //     "invoice_id": widget.invoiceId,
+        //     "discount_value": discount,
+        //     "payment_type": paymentType,
+        //     "service_charge": serviceCharge,
+        //     "tax": tax,
+        //     "order_categories": foodEncoded,
+        //   }
+
         //end invoice for table
         if($invoice->entity_id!=null){
             $entity=Entity::find($invoice->entity_id);
@@ -135,7 +144,6 @@ class InvoiceAPIController extends Controller
                 // broadcast(new RoomDoneNotificationRequest($entity, $msg, $role->id));
                 // ResponseMessage($msg);
             }
-
             broadcast(new RoomDoneNotificationRequest($entity, $msg, $role->id));
             ResponseMessage($msg);
         }
