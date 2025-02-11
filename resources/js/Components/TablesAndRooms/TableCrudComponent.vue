@@ -36,11 +36,11 @@
                                     #
                                 </th>
                                 <th scope="col" class="  ">
-                                    Room
+                                    Table
                                 </th>
-                                <th scope="col" class="">
+                                <!-- <th scope="col" class="">
                                     Category
-                                </th>
+                                </th> -->
                                 <th scope="col" class="">
                                     Price Per Hour
                                 </th>
@@ -60,9 +60,9 @@
                                     <td class="whitespace-nowrap  ">
                                         {{ room.name }}
                                     </td>
-                                    <td class="whitespace-nowrap  ">
+                                    <!-- <td class="whitespace-nowrap  ">
                                         <div v-if="room.service_category"> {{ room.service_category.name }} </div>
-                                    </td>
+                                    </td> -->
                                     <td class="whitespace-nowrap  ">
                                         {{ room.price_per_hour }}
                                     </td>
@@ -125,7 +125,7 @@
                         <div class="relative flex justify-between py-2 px-6 border-b">
                             <h5 class="text-base text-center mt-2 font-semibold leading-normal font-inter"
                                 id="create_modalLabel">
-                                Create Room / Table
+                                Create Table
                             </h5>
                             <button type="button" class="text-xs focus:shadow-none focus:outline-none" id="close_create_modal"
                                 data-te-modal-dismiss aria-label="Close">
@@ -138,9 +138,9 @@
                         <div class="relative px-6 py-4 border-b" data-te-modal-body-ref>
                             <div class="mb-4">
                                 <label for="" class="label-form mb-3">
-                                    Room / Table Name
+                                    Table Name
                                 </label>
-                                <input type="text" placeholder="Room / Table Name" v-model="name" class="input-ui ">
+                                <input type="text" placeholder="Table Name" v-model="name" class="input-ui ">
                             </div>
                             <!-- <div class="mb-4">
                             <label for="" class="label-form mb-3">
@@ -256,7 +256,7 @@ export default {
             areaList: [],
 
             name: null,
-            pricePerHour: null,
+            pricePerHour: 0,
             entityType: 'table',
             area_id: null,
             service_category_id: null,
@@ -292,8 +292,13 @@ export default {
         async getAreaList() {
             const response = await getApiData({ url: '/api/areas', token: this.getToken() });
             if (response.data) {
-                this.areaList = response.data;
-                console.log(this.areaList)
+                // this.areaList = response.data;
+                // console.log(this.areaList)
+                response.data.forEach(area => {
+                    if(area.area_category_id == '2'){
+                        this.areaList.push(area)
+                    }
+                });
             }
         },
         async getServiceCategoryList() {
@@ -341,7 +346,7 @@ export default {
 
         clearForm() {
             this.name = null,
-            this.pricePerHour = null,
+            this.pricePerHour = 0,
             this.area_id = null
         },
 

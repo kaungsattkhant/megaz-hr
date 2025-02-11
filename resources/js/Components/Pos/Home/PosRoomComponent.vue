@@ -25,7 +25,9 @@
                             </div>
                             <!-- <div :class="[time.is_active == 0 ? 'bg-[#4fe0b7]' : 'bg-[#FF7675]', parseInt(time.start_time.split(':')) < currentTime ? 'opacity-70' : 'opacity-100' ]" v-for="(time,timeIndex) in room.entity_sessions" :key="index"
                                 class=" flex-shrink-0 flex-grow w-40 max-w-44 h-40"> -->
-                            <div :class="time.is_active == 0 ? 'bg-[#4fe0b7]' : 'bg-[#FF7675]'" v-for="(time,timeIndex) in room.entity_sessions" :key="timeIndex"
+                            <div
+                                :class="isTimeActive(time)"
+                                v-for="(time,timeIndex) in room.entity_sessions" :key="timeIndex"
                                 class=" flex-shrink-0 flex-grow w-40 max-w-44 h-40">
                                 <!-- <button @click="btnClickedSession(time, timeIndex, room, roomIndex)" :disabled="parseInt(time.start_time.split(':')) < currentTime" :class="parseInt(time.start_time.split(':')) < currentTime ? ' cursor-not-allowed' : ''"
                                     class="relative flex flex-col justify-between h-full w-full p-6"> -->
@@ -1142,6 +1144,7 @@
     import { mapGetters } from "vuex";
     import { getCurrentTime, getCurretDateTime } from "../../../utilities/datetime-helpers";
     import Multiselect from 'vue-multiselect';
+    import moment from "moment";
     
 
     export default {
@@ -1563,9 +1566,13 @@
                     // console.log("success")
                     // window.location.reload()
                 }
-                // else {
-                //     console.log('some errors occur')
-                // }
+                else {
+                    this.$notify({
+                        title: `Not valid`,
+                        text: response.message,
+                        type: "warn"
+                    });
+                }
             },
             async getPurchaseMenuList() {
                 const response = await getApiData({ url: '/api/entities_sessions/'+ this.selectedTime.id, token: this.getToken() }); // and why is this api also called
@@ -1587,6 +1594,7 @@
                             this.foodDiscount = response.data.invoice.orders[0].total_discount_price
                         }
                     }
+                    this.getTotal(response.data)
                     console.log('get purchase menu')
                 }
             },
@@ -1953,10 +1961,7 @@
                 formData.append('order_discount', this.foodDiscount);
                 formData.append('discount_total', allTotalDiscounts);
                 formData.append('end_date', this.serviceEndDate);
-
-
                 console.log(formData)
-
                 let response = await postApiData({ url: '/api/entities/done', form_data: formData, token: this.getToken() });
                 if (response.success) {
                     await this.getRoomList();
@@ -2389,6 +2394,20 @@
                     this.cashAccounts = response.data;
                 }
             },
+            isTimeActive(time){
+                let currentTime = moment().format("HH:mm:ss");
+                if(time.is_active == 1){
+                    return 'bg-[#FF7675]';
+                }
+                else{
+                    if(moment(time.end_time, "HH:mm:ss").isBefore(moment(), "second")){
+                        return 'bg-[#eed202]';
+                    }
+                    else{
+                        return 'bg-[#4fe0b7]';
+                    }
+                }
+            }
         },
 
         watch: {

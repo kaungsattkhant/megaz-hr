@@ -6,105 +6,107 @@
             </p>
         </div>
 
-        <div class="grid grid-cols-12 gap-x-8 gap-y-6 bg-white pt-4 pb-8 px-4 rounded-md shadow-md mb-8">
-            <div class="col-span-3">
-                <label for="" class="label-form mb-3">
-                    Date
-                </label>
-                <input type="date" v-model="date" class="input-ui">
-            </div>
-            <div class="col-span-9"></div>
-
-            <div class="col-span-3">
-                <label for="" class="label-form mb-3">
-                    Item Name
-                </label>
-                <select name="" id="" v-model="selectedItem" class="input-ui" @change="itemSelectChanged">
-                    <option :value="item" v-for="(item, itemIndex) in itemList" :key="itemIndex">
-                        {{ item.name }}
-                    </option>
-                </select>
-
-            </div>
-            <div class="col-span-3">
-                <label for="" class="label-form mb-3">
-                    Brand
-                </label>
-                <select name="" id="" v-model="selectedBrand" class="input-ui" @change="selectedBrandChange()">
-                    <option :value="brand" v-for="(brand, brandIndex) in brandList" :key="brandIndex">
-                        {{ brand.name }}
-                    </option>
-                </select>
-
-            </div>
-            <div class="col-span-6"></div>
-            <div class="col-span-6 grid grid-cols-4 gap-x-8">
-                <div class="col-span-1">
+        <div class="bg-white pt-4 pb-8 px-4 rounded-md shadow-md mb-8">
+            <div class="grid grid-cols-9 w-3/5 min-w-fit gap-x-8 gap-y-6 ">
+                <div class="col-span-4">
                     <label for="" class="label-form mb-3">
-                        Base UOM Qty
+                        Date
                     </label>
-                    <input type="number" v-model="baseQuantity" class="input-ui" placeholder="Base Qty">
+                    <input type="date" v-model="date" class="input-ui">
                 </div>
-    
-                <div class="col-span-1">
-                    <label for="" class="block text-sm text-black mb-3">
-                        Base UOM
+                <div class="col-span-5"></div>
+
+                <div class="col-span-4">
+                    <label for="" class="label-form mb-3">
+                        Item Name
                     </label>
-                    <select name="" id="" v-model="selectedBaseUom" class="input-ui" disabled>
-                        <option :value="uom" v-for="(uom, uomIndex) in itemUoms" :key="uomIndex">
-                            {{ uom.name }}
+                    <select name="" id="" v-model="selectedItem" class="input-ui" @change="itemSelectChanged">
+                        <option :value="item" v-for="(item, itemIndex) in itemList" :key="itemIndex">
+                            {{ item.name }}
                         </option>
                     </select>
-                    <!-- <div class="bg-white mb-0 w-full text-xs h-8 border-b border-black rounded-bl-[4px] rounded-br-[4px] overflow-hidden inline-block"
-                        data-te-select-wrapper-ref>
-                        <select data-te-select-init data-te-select-placeholder="Select UOM" data-te-select-filter="true"
-                            name="" id="" v-model="selectedBaseUom"
-                            class="">
+
+                </div>
+                <div class="col-span-4">
+                    <label for="" class="label-form mb-3">
+                        Brand
+                    </label>
+                    <select name="" id="" v-model="selectedBrand" class="input-ui" @change="selectedBrandChange()">
+                        <option :value="brand" v-for="(brand, brandIndex) in brandList" :key="brandIndex">
+                            {{ brand.name }}
+                        </option>
+                    </select>
+
+                </div>
+                <div class="col-span-1"></div>
+                <div class="col-span-8 grid grid-cols-4 gap-x-8">
+                    <div class="col-span-1">
+                        <label for="" class="label-form mb-3">
+                            Base UOM Qty
+                        </label>
+                        <input type="number" v-model="baseQuantity" class="input-ui" placeholder="Base Qty">
+                    </div>
+        
+                    <div class="col-span-1">
+                        <label for="" class="block text-sm text-black mb-3">
+                            Base UOM
+                        </label>
+                        <select name="" id="" v-model="selectedBaseUom" class="input-ui" disabled>
                             <option :value="uom" v-for="(uom, uomIndex) in itemUoms" :key="uomIndex">
                                 {{ uom.name }}
                             </option>
                         </select>
-                    </div> -->
-                </div>
-                <div class="col-span-1">
-                    <label for="" class="label-form mb-3">
-                        Qty
-                    </label>
-                    <input type="number" v-model="quantity" class="input-ui" placeholder="Qty">
-                </div>
-    
-                <div class="col-span-1">
-                    <label for="" class="block text-sm text-black mb-3">
-                        UOM
-                    </label>
-                    <select name="" id="" v-model="selectedUom" class="input-ui" disabled>
-                        <option :value="uom" v-for="(uom, uomIndex) in itemUoms" :key="uomIndex">
-                            {{ uom.name }}
-                        </option>
-                    </select>
-                    <!-- <div class="bg-white mb-0 w-full text-xs h-8 border-b border-black rounded-bl-[4px] rounded-br-[4px] overflow-hidden inline-block"
-                        data-te-select-wrapper-ref>
-                        <select data-te-select-init data-te-select-placeholder="Select UOM" data-te-select-filter="true"
-                            name="" id="" v-model="selectedUom"
-                            class="">
+                        <!-- <div class="bg-white mb-0 w-full text-xs h-8 border-b border-black rounded-bl-[4px] rounded-br-[4px] overflow-hidden inline-block"
+                            data-te-select-wrapper-ref>
+                            <select data-te-select-init data-te-select-placeholder="Select UOM" data-te-select-filter="true"
+                                name="" id="" v-model="selectedBaseUom"
+                                class="">
+                                <option :value="uom" v-for="(uom, uomIndex) in itemUoms" :key="uomIndex">
+                                    {{ uom.name }}
+                                </option>
+                            </select>
+                        </div> -->
+                    </div>
+                    <div class="col-span-1">
+                        <label for="" class="label-form mb-3">
+                            Qty
+                        </label>
+                        <input type="number" v-model="quantity" class="input-ui" placeholder="Qty">
+                    </div>
+        
+                    <div class="col-span-1">
+                        <label for="" class="block text-sm text-black mb-3">
+                            UOM
+                        </label>
+                        <select name="" id="" v-model="selectedUom" class="input-ui" disabled>
                             <option :value="uom" v-for="(uom, uomIndex) in itemUoms" :key="uomIndex">
                                 {{ uom.name }}
                             </option>
                         </select>
-                    </div> -->
+                        <!-- <div class="bg-white mb-0 w-full text-xs h-8 border-b border-black rounded-bl-[4px] rounded-br-[4px] overflow-hidden inline-block"
+                            data-te-select-wrapper-ref>
+                            <select data-te-select-init data-te-select-placeholder="Select UOM" data-te-select-filter="true"
+                                name="" id="" v-model="selectedUom"
+                                class="">
+                                <option :value="uom" v-for="(uom, uomIndex) in itemUoms" :key="uomIndex">
+                                    {{ uom.name }}
+                                </option>
+                            </select>
+                        </div> -->
+                    </div>
+                    <!-- <div class="col-span-6"></div> -->
+        
+                    
                 </div>
-                <!-- <div class="col-span-6"></div> -->
-    
-                
-            </div>
 
-            <div class="col-span-3">
-                <label for="" class="block text-sm text-black mb-3">
-                    &nbsp;
-                </label>
-                <button class="add-btn" @click="addItemBtnClicked"> Add </button>
-            </div>
+                <div class="col-span-1">
+                    <label for="" class="block text-sm text-black mb-3">
+                        &nbsp;
+                    </label>
+                    <button class="add-btn" @click="addItemBtnClicked"> Add </button>
+                </div>
 
+            </div>
         </div>
 
         <div class="bg-white px-4 py-4 rounded-md shadow-md mb-8">
