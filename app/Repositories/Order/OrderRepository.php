@@ -213,6 +213,7 @@ class OrderRepository implements OrderRepositoryInterface
                     broadcast(new WaiterOrderConfirmNotificationRequest($entity, $order, $orderItemsArray, null, 5));
                 }
             }
+            //current close because ,i got an error
             // broadcast(new KitchenNotificationRequest($entity, $order, $orderItemsArray, null, 7));
             DB::commit();
             $data['order'] = $order;
@@ -244,11 +245,16 @@ class OrderRepository implements OrderRepositoryInterface
                 }
             }
             $invoice = Invoice::find($orderItem->order->invoice_id);
-            $activeInvoiceSession=$invoice->activeInvoiceSession;
-            if(!$activeInvoiceSession){
-                ResponseMessage('Active Invioce Session not found',419);
-            }
+            //must be check entity or room
+            if($invoice->entity_id!=null){
+                $entity=$invoice->entity;
+            }else{
+                $activeInvoiceSession=$invoice->activeInvoiceSession;
+                if(!$activeInvoiceSession){
+                    ResponseMessage('Active Invioce Session not found',419);
+                }
             $entity=$activeInvoiceSession->entity;
+            }
             // $latestRoomSession = RoomSession::where('invoice_id', $invoice->id)->orderBy('created_at', 'desc')->first();
             // $entity = $latestRoomSession->entitySession->entity;
             // $entity = Entity::find($latestRoomSession->entitySession->entity_id);
