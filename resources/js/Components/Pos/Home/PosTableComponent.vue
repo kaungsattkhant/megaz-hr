@@ -1360,6 +1360,7 @@
                 if (this.child > 0) {
                     formData.append('child', +this.child);
                 }
+                formData.append('entity_type', this.roomList[0].entity_type);
                 let response = await postApiData({ url: '/api/entities/start', form_data: formData, token: this.getToken() });
                 if (response.success) {
                     this.getTableList();
