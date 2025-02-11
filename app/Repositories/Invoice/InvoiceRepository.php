@@ -142,7 +142,7 @@ class InvoiceRepository implements InvoiceRepositoryInterface
         DB::beginTransaction();
         try {
             // if ($data['entity_id'] != null && !$data['is_waiter']) { //create table invoice
-            if ($data['entity_id'] != null || (isset($data['entity_type'])  && $data['entity_type'] == 'table')) { //create table invoice
+            if ($data['entity_id'] != null && (isset($data['entity_type'])  && $data['entity_type'] == 'table')) { //create table invoice
                 $tableInvoice = $this->createInvoiceForTable($data);
                 DB::commit();
                 return $tableInvoice;
