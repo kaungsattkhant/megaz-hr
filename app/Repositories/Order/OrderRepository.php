@@ -240,8 +240,13 @@ class OrderRepository implements OrderRepositoryInterface
                 }
             }
             $invoice = Invoice::find($orderItem->order->invoice_id);
-            $latestRoomSession = RoomSession::where('invoice_id', $invoice->id)->orderBy('created_at', 'desc')->first();
-            $entity = $latestRoomSession->entitySession->entity;
+            $activeInvoiceSession=$invoice->activeInvoiceSession;
+            if(!$activeInvoiceSession){
+                ResponseMessage('Active Invioce Session not found',419);
+            }
+            $entity=$activeInvoiceSession->entity;
+            // $latestRoomSession = RoomSession::where('invoice_id', $invoice->id)->orderBy('created_at', 'desc')->first();
+            // $entity = $latestRoomSession->entitySession->entity;
             // $entity = Entity::find($latestRoomSession->entitySession->entity_id);
             if ($data['status'] == 'done' && $orderItem->status == 'in progress') {
                 $packs = Pack::where('menu_id', $orderItem->menu_id)->where('status', 'ready')->where('expired_at', '>', CurrentTime())->orderBy('expired_at', 'asc')->take($orderItem->quantity)->get();
