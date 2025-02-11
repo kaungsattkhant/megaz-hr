@@ -124,7 +124,7 @@ class OrderRepository implements OrderRepositoryInterface
             $categorySums = [];
             $totalDiscount = 0;
             $invoice = Invoice::find($data['invoice_id']);
-            if($invoice->entity!=null){
+            if($invoice->entity_id!=null){
                 $entity=$invoice->entity;
             }else{
                 $activeInvoiceSession=$invoice->activeInvoiceSession;
