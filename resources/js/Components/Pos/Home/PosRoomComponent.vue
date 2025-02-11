@@ -408,7 +408,7 @@
 
 
                                     }} -->
-                                        {{ (total_room_price + selectedRoom.total_service_value + selectedRoom.total_accessory_value).toLocaleString() }}
+                                        {{ (total_room_price + (selectedRoom ? selectedRoom.total_service_value : 0) + (selectedRoom ? selectedRoom.total_accessory_value : 0)).toLocaleString() }}
                                     MMKs
                                 </p>
                             </div>
