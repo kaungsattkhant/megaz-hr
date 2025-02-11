@@ -8,6 +8,7 @@ use App\Events\RoomNotificationRequest;
 use Illuminate\Http\Request;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Room\EntityValidationRequest;
 use App\Http\Requests\RoomSession\EndRoomSessionRequest;
 use App\Models\Department;
 use App\Models\Entity;
@@ -31,7 +32,7 @@ class InvoiceAPIController extends Controller
         $this->orderRepo = $orderRepo;
     }
 
-    public function startEntity(Request $request)
+    public function startEntity(EntityValidationRequest $request)
     {
         DB::beginTransaction();
         try {
@@ -88,13 +89,13 @@ class InvoiceAPIController extends Controller
         ResponseData($roomAndSession);
     }
 
-    public function changeRoom(Request $request)
+    public function changeRoom(EntityValidationRequest $request)
     {
         $changeRoom = $this->invoiceRepo->invoiceEntityChange($request->all());
         ResponseData($changeRoom);
     }
 
-    public function endRoom(Request $request)
+    public function endRoom(EntityValidationRequest $request)
     {
         // dd($request->all());
         $catering_department = Department::where('name', 'Catering')->first();
@@ -145,7 +146,7 @@ class InvoiceAPIController extends Controller
                 $entity->status = 'inactive';
                 $entity->is_active = 0;
                 $entity->save();
-                // broadcast(new RoomDoneNotificationRequest($entity, $msg, $role->id));
+                broadcast(new RoomDoneNotificationRequest($entity, $msg, $role->id));
                 // ResponseMessage($msg);
             }
             broadcast(new RoomDoneNotificationRequest($entity, $msg, $role->id));

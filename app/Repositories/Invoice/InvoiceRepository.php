@@ -142,12 +142,12 @@ class InvoiceRepository implements InvoiceRepositoryInterface
         DB::beginTransaction();
         try {
             // if ($data['entity_id'] != null && !$data['is_waiter']) { //create table invoice
-            if ($data['entity_id'] != null && (isset($data['entity_type'])  && $data['entity_type'] == 'table')) { //create table invoice
+            if ($data['entity_type'] == 'table') { //create table invoice
                 $tableInvoice = $this->createInvoiceForTable($data);
                 DB::commit();
                 return $tableInvoice;
             }
-            if ((isset($data['entity_session_id']) && $data['entity_session_id'] != null) || $data['is_waiter']) { // create room invoice
+            if ($data['room'] || $data['is_waiter']) { // create room invoice
                 $entitySession = null;
                 if (isset($data['entity_id']) && $data['entity_id'] != null) {
                     $entity = Entity::find($data['entity_id']);
@@ -1252,7 +1252,7 @@ class InvoiceRepository implements InvoiceRepositoryInterface
                 ResponseMessage('Invoice not found', 404);
             }
             //added end_invoice for table oct 25 2024
-            if ($invoice && $invoice->entity_id != null) {
+            if ($invoice && $data['entity_type']=='table') {
                 $invoice = $this->doneTableForInvoice($data, $invoice);
                 $this->invoiceService->updateEntityStatus($invoice->entity_id, 'inactive'); // after done invoice ,update entity staus to inactive
                 $this->addTargetPosition($invoice->id, $invoice->created_by, $data['total']); //add sale target position for related role
