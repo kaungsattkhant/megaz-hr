@@ -6,9 +6,10 @@ use App\Models\Entity;
 use App\Models\Account;
 use App\Models\RoomSession;
 use App\Models\EntitySession;
-use App\Models\InvoiceSession;
 use GuzzleHttp\Psr7\Response;
+use App\Models\InvoiceSession;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
 
@@ -175,6 +176,17 @@ class InvoiceModelService
         }
     }
 
+    public function defineActiveEntitySession($invoiceSession,$entitySesions){
+        $entitySesionIds=$entitySesions->pluck('id');
+        foreach($entitySesions as $entitySession){
+            $createRoomSession=$invoiceSession->roomSessions()->create([
+                'entity_session_id'=>$entitySession->id,
+            ]);
+            $entitySession->is_active=1;
+            $entitySession->save();
+        }
+    }
+
     public function getEntitySessionBySessionDuration($entityId, $startTime, $endTime)
     {
         $takeSessions = EntitySession::select('id', 'start_time', 'end_time', 'is_active', 'spans_midnight', 'entity_id')
@@ -217,6 +229,32 @@ class InvoiceModelService
             ResponseMessage('Entity Session is invalid', 200);
         }
         return $takeSessions;
+    }
+
+    public function getTotalInvoiceSession($invoiceId){
+        $invoiceSession=InvoiceSession::where('invoice_id',$invoiceId)
+        ->select(
+            'invoice_sessions.invoice_id',
+            DB::raw('SUM(invoice_sessions.total_session_duration) as total_duration'),
+            DB::raw('SUM(invoice_sessions.total_session_price) as total_session_value'),
+            // DB::raw('COALESCE(SUM(invoice_sessions.total_session_price), 0) as total_session_value')
+
+        )
+        ->groupBy('invoice_sessions.invoice_id')
+        ->first();
+        return $invoiceSession;
+    }
+
+    public function checkIsActiveChangeRoom($entityId)
+    {
+
+        $isEntity=Entity::where('is_active',1)
+        ->where('id',$entityId)
+        ->first();
+        if($isEntity){
+            ResponseMessage('Entity is not available now',419);
+        }
+        return true;
     }
 
 }

@@ -104,8 +104,13 @@ class InvoiceAPIController extends Controller
         if($invoice->entity_id!=null){
             $entity=Entity::find($invoice->entity_id);
         }else{
-            $latestRoomSession = RoomSession::where('invoice_id', $invoice->id)->orderBy('created_at', 'desc')->first();
-            $entity = Entity::find($latestRoomSession->entitySession->entity_id);
+            $activeInvoiceSession=$invoice->activeInvoiceSession;
+            if(!$activeInvoiceSession){
+                ResponseMessage('Room is invalid',419);
+            }
+            $entity=$activeInvoiceSession->entity;
+            // $latestRoomSession = RoomSession::where('invoice_id', $invoice->id)->orderBy('created_at', 'desc')->first();
+            // $entity = Entity::find($latestRoomSession->entitySession->entity_id);
         }
         //end invoice for room
         if (isset($request->waiter)) {
