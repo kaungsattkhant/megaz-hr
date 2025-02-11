@@ -123,13 +123,17 @@ class OrderRepository implements OrderRepositoryInterface
             $order = Order::where('invoice_id', $invoiceId)->first();
             $categorySums = [];
             $totalDiscount = 0;
-
             $invoice = Invoice::find($data['invoice_id']);
-            $activeInvoiceSession=$invoice->activeInvoiceSession;
-            if(!$activeInvoiceSession){
-                ResponseMessage('Active Entity Session not found',419);
+            if($invoice->entity_id!=null){
+                $entity=$invoice->entity;
+            }else{
+                $activeInvoiceSession=$invoice->activeInvoiceSession;
+                if(!$activeInvoiceSession){
+                    ResponseMessage('Active Entity Session not found',419);
+                }
+                $entity=$activeInvoiceSession->entity;
             }
-            $entity=$activeInvoiceSession->entity;
+          
             // $latestRoomSession = RoomSession::where('invoice_id', $invoice->id)->orderBy('created_at', 'desc')->first();
             // $entity = Entity::find($latestRoomSession->entitySession->entity_id);
 
@@ -209,7 +213,7 @@ class OrderRepository implements OrderRepositoryInterface
                     broadcast(new WaiterOrderConfirmNotificationRequest($entity, $order, $orderItemsArray, null, 5));
                 }
             }
-            broadcast(new KitchenNotificationRequest($entity, $order, $orderItemsArray, null, 7));
+            // broadcast(new KitchenNotificationRequest($entity, $order, $orderItemsArray, null, 7));
             DB::commit();
             $data['order'] = $order;
             $data['orderItems'] = $orderItemsArray;
