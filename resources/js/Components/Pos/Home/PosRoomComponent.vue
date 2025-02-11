@@ -1319,6 +1319,7 @@
                 depositBalance: null,
 
                 total_room_price:0,
+                entityType: null,
             };
         },
 
@@ -1333,6 +1334,7 @@
                     if(response.data){
                         this.roomList = response.data;
                         console.log(response.data)
+                        this.entityType = response.data[0].entity_type
                     }
                 }
                 
@@ -1527,7 +1529,7 @@
                 if (this.child > 0) {
                     formData.append('child', +this.child);
                 }
-                formData.append('entity_type', this.roomList[0].entity_type);
+                formData.append('entity_type', this.entityType);
                 let response = await postApiData({ url: '/api/entities/start', form_data: formData, token: this.getToken() });
                 if (response.success) {
                     this.getRoomList();
@@ -1654,6 +1656,7 @@
                 let formData = new FormData();
                 let roomSessions = [];
                 formData.append('invoice_id', this.selectedRoom.invoice.id);
+                formData.append('entity_type', this.entityType);
                 // if(this.depositBalance > 0){
                 //     formData.append('deposit_balance', this.depositBalance);
                 // }
@@ -1891,6 +1894,7 @@
                 let allTotalDiscounts = 0;
                 let formData = new FormData();
                 formData.append('invoice_id', this.selectedRoom.invoice.id);
+                formData.append('entity_type', this.entityType);
                 // formData.append('payment_type', this.selectedPaymentMethod);
                 if(this.discount_type){
                     formData.append('discount_type', this.discount_type);
@@ -2122,6 +2126,7 @@
                 formData.append('invoice_id', this.selectedRoom.invoice.id);
                 formData.append('entity_id', this.change_room.id);
                 formData.append('start_date_time', this.start_date_time);
+                formData.append('entity_type', this.entityType);
                 let response = await postApiData({ url: '/api/entities/change', form_data: formData, token: this.getToken() });
                 console.log('change room ' + this.selectedRoom.invoice.invoice_id + ',' + this.change_room.id)
                 if (response.success) {
