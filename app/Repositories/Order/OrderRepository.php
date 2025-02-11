@@ -213,7 +213,7 @@ class OrderRepository implements OrderRepositoryInterface
                     broadcast(new WaiterOrderConfirmNotificationRequest($entity, $order, $orderItemsArray, null, 5));
                 }
             }
-            broadcast(new KitchenNotificationRequest($entity, $order, $orderItemsArray, null, 7));
+            // broadcast(new KitchenNotificationRequest($entity, $order, $orderItemsArray, null, 7));
             DB::commit();
             $data['order'] = $order;
             $data['orderItems'] = $orderItemsArray;
