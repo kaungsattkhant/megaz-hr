@@ -149,61 +149,70 @@ class InvoiceRepository implements InvoiceRepositoryInterface
             }
             if ($data['entity_type'] == 'room' || $data['is_waiter']) { // create room invoice
                 $entitySession = null;
-                if (isset($data['entity_id']) && $data['entity_id'] != null) {
-                    $entity = Entity::find($data['entity_id']);
-                    $currentTime = Carbon::parse(now())->format('H:i');
-                    // $entitySession = $entity->currentEntitySession($currentTime)->first();
-                    $entitySession = EntitySession::where('id', $data['entity_session_id'])
-                        ->where(function ($query) use ($currentTime) {
-                            $query->whereRaw('? BETWEEN start_time AND end_time', [$currentTime])
-                                ->orWhere(function ($subQuery) use ($currentTime) {
-                                    $subQuery->whereRaw('start_time > end_time') // Handles sessions that cross midnight
-                                        ->where(function ($innerQuery) use ($currentTime) {
-                                            $innerQuery->whereRaw('? >= start_time', [$currentTime])
-                                                ->orWhereRaw('? <= end_time', [$currentTime]);
-                                        });
-                                });
-                        })
-                        ->first();
-                    if (!$entitySession) {
-                        ResponseMessage('Entity is invalid', 422);
+                $currentTime = Carbon::parse(now())->format('H:i');
+                $entitySession = EntitySession::where('id', $data['entity_session_id'])
+                    ->where(function ($query) use ($currentTime) {
+                        $query->whereRaw('? BETWEEN start_time AND end_time', [$currentTime])
+                            ->orWhere(function ($subQuery) use ($currentTime) {
+                                $subQuery->whereRaw('start_time > end_time') // Handles sessions that cross midnight
+                                    ->where(function ($innerQuery) use ($currentTime) {
+                                        $innerQuery->whereRaw('? >= start_time', [$currentTime])
+                                            ->orWhereRaw('? <= end_time', [$currentTime]);
+                                    });
+                            });
+                    })
+                    ->first();
+
+                    if(!$entitySession){
+                        ResponseMessage('Entity Session is invalid',419);
                     }
-                    $data['entity_session_id'] = $entitySession->id;
-                    $entity = $entitySession->entity;
+                    $entity=$entitySession->entity;
 
-                }
-
-
-                // if ($data['is_waiter'] === 1) {
-                //     $current_time = Carbon::now()->format('H:i');
-                //     $entitySession = EntitySession::where('entity_id', $data['entity_id'])
-                //         ->whereTime('start_time', operator: '<=', $current_time) // Check if start_time is less than or equal to current time
-                //         ->whereTime('end_time', '>=', $current_time) // Check if end_time is greater than or equal to current time
-                //         ->first();
+                // if ($data['is_waiter']) {
                 //     $entity = Entity::find($data['entity_id']);
+                //     $currentTime = Carbon::parse(now())->format('H:i');
+                //     // $entitySession = $entity->currentEntitySession($currentTime)->first();
+                //     $entitySession = EntitySession::where('id', $data['entity_session_id'])
+                //         ->where(function ($query) use ($currentTime) {
+                //             $query->whereRaw('? BETWEEN start_time AND end_time', [$currentTime])
+                //                 ->orWhere(function ($subQuery) use ($currentTime) {
+                //                     $subQuery->whereRaw('start_time > end_time') // Handles sessions that cross midnight
+                //                         ->where(function ($innerQuery) use ($currentTime) {
+                //                             $innerQuery->whereRaw('? >= start_time', [$currentTime])
+                //                                 ->orWhereRaw('? <= end_time', [$currentTime]);
+                //                         });
+                //                 });
+                //         })
+                //         ->first();
+                //     if (!$entitySession) {
+                //         ResponseMessage('Entity is invalid', 422);
+                //     }
+                //     // $data['entity_session_id'] = $entitySession->id;
+                //     $entity = $entitySession->entity;
+
                 // }
-                else if (isset($data['entity_session_id'])) {
-                    $currentTime = Carbon::parse(now())->format('H:i');
-                    $entitySession = EntitySession::where('id', $data['entity_session_id'])
-                        ->where(function ($query) use ($currentTime) {
-                            $query->whereRaw('? BETWEEN start_time AND end_time', [$currentTime])
-                                ->orWhere(function ($subQuery) use ($currentTime) {
-                                    $subQuery->whereRaw('start_time > end_time') // Handles sessions that cross midnight
-                                        ->where(function ($innerQuery) use ($currentTime) {
-                                            $innerQuery->whereRaw('? >= start_time', [$currentTime])
-                                                ->orWhereRaw('? <= end_time', [$currentTime]);
-                                        });
-                                });
-                        })
-                        ->first();
-                    // $entitySession = EntitySession::where('id', $data['entity_session_id'])
-                    //     ->whereRaw('? BETWEEN start_time AND end_time', [$currentTime])
-                    //     ->first();
-                    if (!$entitySession) {
-                        ResponseMessage('Session can open at this time', 419);
-                    }
-                    $entity = Entity::find($entitySession->entity_id);
-                }
+                // else if (isset($data['entity_session_id'])) {
+                //     $currentTime = Carbon::parse(now())->format('H:i');
+                //     $entitySession = EntitySession::where('id', $data['entity_session_id'])
+                //         ->where(function ($query) use ($currentTime) {
+                //             $query->whereRaw('? BETWEEN start_time AND end_time', [$currentTime])
+                //                 ->orWhere(function ($subQuery) use ($currentTime) {
+                //                     $subQuery->whereRaw('start_time > end_time') // Handles sessions that cross midnight
+                //                         ->where(function ($innerQuery) use ($currentTime) {
+                //                             $innerQuery->whereRaw('? >= start_time', [$currentTime])
+                //                                 ->orWhereRaw('? <= end_time', [$currentTime]);
+                //                         });
+                //                 });
+                //         })
+                //         ->first();
+                //     // $entitySession = EntitySession::where('id', $data['entity_session_id'])
+                //     //     ->whereRaw('? BETWEEN start_time AND end_time', [$currentTime])
+                //     //     ->first();
+                //     if (!$entitySession) {
+                //         ResponseMessage('Session can open at this time', 419);
+                //     }
+                //     $entity = Entity::find($entitySession->entity_id);
+                // }
                 if (!isset($data['head_count_id'])) {
                     $headCount = $this->headCountCreate($data);
                     $data['head_count_id'] = $headCount->id;
