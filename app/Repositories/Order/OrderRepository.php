@@ -34,7 +34,7 @@ class OrderRepository implements OrderRepositoryInterface
         DB::beginTransaction();
         try {
             //check and remove pack is enought for menu;
-            // $this->removePackForMenu($data['menu_id'], $data['quantity']);
+            $this->removePackForMenu($data['menu_id'], $data['quantity']);
 
             $price = $data['original_price'] * $data['quantity'];
             // $data['invoice'] must be unsigned integer format , not 000023
