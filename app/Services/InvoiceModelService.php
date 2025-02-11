@@ -172,6 +172,7 @@ class InvoiceModelService
             ]);
             if(!$isWaiter){
                 $entitySession->is_active=1;
+                $entitySession->save();
             }
         }
         return $invoiceSession;
