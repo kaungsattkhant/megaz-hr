@@ -133,14 +133,14 @@
                                     </label>
                                     <input type="checkbox" v-model="isPreDeposit" class="rounded" >
                                 </div>
-                                <div class="mb-4">
+                                <div class="mb-4" v-if="isPreDeposit">
                                     <label for="" class="block text-sm text-black mb-3">
                                         Deposit
                                     </label>
                                     <input type="text" placeholder="Deposit Amount" v-model="deposit" :disabled="!isPreDeposit"
                                         class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
                                 </div>
-                                <div class="mb-4">
+                                <div class="mb-4" v-if="isPreDeposit">
                                     <label for="" class="block text-sm text-black mb-3">
                                         Cash Account
                                     </label>
@@ -225,7 +225,7 @@
                         <div class="small-scrollbar overflow-y-auto" style="height:calc(100% - 195px)">
                             <div class="padding-section border-b    " v-if="selectedRoom">
                                 <div class="flex justify-between font-semibold mb-2">
-                                    <p class="text-sm text-black" v-if="selectedRoom.room_sessions.length > 0">
+                                    <p class="text-sm text-black" v-if="selectedRoom">
                                         Invoice Id
                                         {{ selectedRoom.invoice ? (selectedRoom.invoice.invoice_id ?
                                             selectedRoom.invoice.invoice_id : '')
@@ -386,7 +386,7 @@
                             <div class=" text-right pr-3 mb-3">
                                 <p class="">
                                     Total
-                                    {{
+                                    <!-- {{
                                         (selectedRoom ?
                                             ((purchaseMenuList.length > 0 ?
                                                 (
@@ -407,7 +407,8 @@
                                         )
 
 
-                                    }}
+                                    }} -->
+                                        {{ (total_room_price + selectedRoom.total_service_value + selectedRoom.total_accessory_value).toLocaleString() }}
                                     MMKs
                                 </p>
                             </div>
@@ -1312,6 +1313,8 @@
                 selectedCashAccount: null,
 
                 depositBalance: null,
+
+                total_room_price:0,
             };
         },
 
@@ -1321,7 +1324,7 @@
                 this.$emit('callParent');
             },
             async getRoomList(area){
-                if(area.area_type.type == 'ktv'){
+                if(this.area.area_type.type == 'ktv'){
                     const response = await getApiData({ url: '/api/areas/' + this.roomAreaId + '/entities' , token: this.getToken()});
                     if(response.data){
                         this.roomList = response.data;
@@ -1348,12 +1351,14 @@
                         this.selectedRoom = response.data;
                         this.serviceList = response.data.services;
                         this.accessoryListSidebar = response.data.invoice_accessories;
+                        this.getTotal(response.data);
                     }
                 }
                 else {
 
                     this.selectedRoom = this.roomList[roomIndex];
                     this.isOpenRoomStep('open_1');
+                    console.log('open 1')
                 };
             },
 
@@ -1519,27 +1524,46 @@
                 }
                 let response = await postApiData({ url: '/api/entities/start', form_data: formData, token: this.getToken() });
                 if (response.success) {
-                    // this.getRoomList();
-                    // this.getSelectedRoom();
+                    this.getRoomList();
+                    this.getSelectedRoom();
                     this.isOpenRoomStep('detail');
-
-                    if (this.selectedRoom.room_sessions.length > 0) {
-                        if (this.selectedRoom.room_sessions[0].invoice.orders.length > 0) {
-                            this.getPurchaseMenuList();
-                        }
-                    }
-                    if (this.selectedRoom.room_sessions.length < 1) {
-                        if (this.selectedRoom.room_sessions[0].invoice.orders.length < 1) {
-                            this.purchaseMenuList = [];
-                        }
-                    }
+                    
+                    // if (this.selectedRoom.room_sessions.length > 0) {
+                    //     if (this.selectedRoom.room_sessions[0].invoice.orders.length > 0) {
+                    //         this.getPurchaseMenuList();
+                    //     }
+                    // }
+                    // if (this.selectedRoom.room_sessions.length < 1) {
+                    //     if (this.selectedRoom.room_sessions[0].invoice.orders.length < 1) {
+                    //         this.purchaseMenuList = [];
+                    //     }
+                    // }
                     this.food_total_package = 0
+                    // this.uiInShow = 
+
+                    // (selectedRoom ?
+                    //     ((purchaseMenuList.length > 0 ?
+                    //         (
+                    //             (selectedRoom.total_session_price ? selectedRoom.total_session_price : 0)
+                    //             + (purchaseMenuList.length > 0 ? purchaseMenuList[0].total : 0)
+                    //             - (selectedRoom.invoice.package ? selectedRoom.invoice.package.package_discount : 0)
+                    //         )
+                    //         :
+                    //         (
+                    //             (selectedRoom.total_session_price ? selectedRoom.invoice.total_session_price : 0)
+                    //             - (selectedRoom.invoice.package ? selectedRoom.invoice.package.package_discount : 0)
+                    //         )
+                    //     ) + selectedRoom.total_service_value + selectedRoom.total_accessory_value).toLocaleString()
+                    //     : 0
+                    // )
+                    
+                    
                     // console.log("success")
-                    window.location.reload()
+                    // window.location.reload()
                 }
-                else {
-                    console.log('some errors occur')
-                }
+                // else {
+                //     console.log('some errors occur')
+                // }
             },
             async getPurchaseMenuList() {
                 const response = await getApiData({ url: '/api/entities_sessions/'+ this.selectedTime.id, token: this.getToken() }); // and why is this api also called
@@ -1575,9 +1599,28 @@
                         this.serviceList = response.data.services;
                         this.purchaseMenuList = response.data.invoice.orders
                         console.log('get selected room')
+                        this.getTotal(response.data);
+                        
                     }
             },
-
+            getTotal(roomData){
+                let totalSessionPrice = 0;
+                let totalOrderPrice = 0 ;
+                let packageDiscount = 0;
+                if(roomData.total_session_price){
+                    totalSessionPrice = roomData.total_session_price
+                    console.log('totalSessionprice = ' + totalSessionPrice)
+                };
+                if(roomData.invoice.orders.length > 0){
+                    totalOrderPrice = roomData.invoice.orders[0].total
+                    console.log('totalOrderPrice = ' + totalOrderPrice)
+                }
+                if(roomData.invoice.package){
+                    packageDiscount = roomData.invoice.package.package_discount
+                    console.log('packageDiscount = ' + packageDiscount)
+                }
+                this.total_room_price = totalSessionPrice + totalOrderPrice - packageDiscount
+            },
             //invoice or done
             btnBackToDetail() {
                 this.isOpenRoomStep('detail');
@@ -1918,8 +1961,8 @@
                     // this.selectedRoom = await this.roomList[this.selectedRoomIndex];
                     this.isOpenRoom.step_1 = true;
                     this.isOpenRoom.step_2 = false;
-                    this.isOpenRoom.step_detail = false;
-                    this.isOpenRoom.step_invoice = false;
+                    this.isOpenRoom.detail = false;
+                    this.isOpenRoom.invoice = false;
 
                     console.log("success");
                     window.location.reload();
@@ -2314,9 +2357,11 @@
                 for (let key in this.isOpenRoom) {
                     if (key === selectedKey) {
                         this.isOpenRoom[key] = true;
+                        console.log('is open room true')
                     }
                     else {
                         this.isOpenRoom[key] = false;
+                        console.log('is open room false')
                     }
                 }
             },
