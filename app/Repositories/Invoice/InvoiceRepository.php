@@ -147,7 +147,7 @@ class InvoiceRepository implements InvoiceRepositoryInterface
                 DB::commit();
                 return $tableInvoice;
             }
-                if ((isset($data['entity_session_id']) && $data['entity_session_id'] != null) || $data['is_waiter']) { // create room invoice
+            if ((isset($data['entity_session_id']) && $data['entity_session_id'] != null) || $data['is_waiter']) { // create room invoice
                 $entitySession = null;
                 if (isset($data['entity_id']) && $data['entity_id'] != null) {
                     $entity = Entity::find($data['entity_id']);
@@ -229,7 +229,7 @@ class InvoiceRepository implements InvoiceRepositoryInterface
                 $data['invoice_date'] = Carbon::now();
                 $invoice = Invoice::create($data);
 
-                $invoiceSession = $this->invoiceService->storeInvoiceSession($invoice->id, $entitySession->entity_id, $data['session_duration'], $entity->price_per_hour, $discountId = null);
+                $invoiceSession = $this->invoiceService->storeInvoiceSession($invoice->id, $entitySession->entity_id, $data['session_duration'], $entity->price_per_hour, $c['is_waiter'],$discountId = null);
                 //create deposit
                 $this->storeCustomerDeposit($data, UserData()->id);
                 //
@@ -1577,25 +1577,44 @@ class InvoiceRepository implements InvoiceRepositoryInterface
         DB::beginTransaction();
         try {
             $invoice = Invoice::find($data['invoice_id']);
-            $latestSession = RoomSession::where('invoice_id', $data['invoice_id'])->latest()->first();
-            $entity = Entity::find($latestSession->entitySession->entity_id);
-            $roomSession = RoomSession::where('invoice_id', $data['invoice_id'])->get();
 
             if ($data['is_confirm'] == 1) {
-                foreach ($roomSession as $session) {
-                    $session->entitySession->is_active = 1;
-                    $session->save();
+                $activeInvoiceSession = $invoice->activeInvoiceSession;
+                $activeInvoiceSession->is_active = 1;
+                $activeInvoiceSession->save();
+                //update active sesion
+                $roomSessions = $activeInvoiceSession->roomSessions;
+                foreach ($roomSessions as $roomSession) {
+                    $entitySesion = $roomSession->entitySession;
+                    $entitySesion->is_active = 1;
+                    $entitySesion->save();
+                    $entity=$entitySesion->entity;
+                    $entity->is_active=1;
+                    $entity->status='active';
+                    $entity->save();
                 }
-                $entity->is_active = 1;
-                $entity->status = 'active';
-            } else {
-                foreach ($roomSession as $session) {
-                    $session->entitySession->is_active = 0;
-                    $session->entitySession->save();
-                }
-                $entity->is_active = 0;
-                $entity->status = 'inactive';
             }
+
+            // $latestSession = RoomSession::where('invoice_id', $data['invoice_id'])->latest()->first();
+            // $entity = Entity::find($latestSession->entitySession->entity_id);
+
+            // $roomSession = RoomSession::where('invoice_id', $data['invoice_id'])->get();
+
+            // if ($data['is_confirm'] == 1) {
+            //     foreach ($roomSession as $session) {
+            //         $session->entitySession->is_active = 1;
+            //         $session->save();
+            //     }
+            //     $entity->is_active = 1;
+            //     $entity->status = 'active';
+            // } else {
+            //     foreach ($roomSession as $session) {
+            //         $session->entitySession->is_active = 0;
+            //         $session->entitySession->save();
+            //     }
+            //     $entity->is_active = 0;
+            //     $entity->status = 'inactive';
+            // }
             $entity->save();
             DB::commit();
             broadcast(new WaiterNotificationRequest($entity, UserData()->department_id));
