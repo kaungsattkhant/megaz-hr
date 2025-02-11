@@ -153,11 +153,11 @@
                                             {{ sessionRequest.customer_name }}
                                         </td> -->
                                         <td class="whitespace-nowrap border-r px-6 py-4">
-                                            <button :disabled="sessionRequest2.status != 'received'" @click="btnRejectSession2(sessionRequest2.invoice_id)"
+                                            <button :disabled="sessionRequest2.status != 'received'" @click="btnRejectSession2(sessionRequest2.invoice_id, sessionRequest2)"
                                                 class="px-3 py-2 bg-red-600 text-white rounded-md mr-2">
                                                 Reject
                                             </button>
-                                            <button :disabled="sessionRequest2.status != 'received'" @click="btnConfirmSession2(sessionRequest2.invoice_id, sessionRequest2.entity.entity_type)"
+                                            <button :disabled="sessionRequest2.status != 'received'" @click="btnConfirmSession2(sessionRequest2.invoice_id, sessionRequest2)"
                                                 class="px-3 py-2 bg-green-600 text-white rounded-md">
                                                 Confirm
                                             </button>
@@ -470,6 +470,7 @@
                     console.log(`room done data`, response);
                     let newSessionRequest = {
                         room_name: response.entity.name,
+                        entity_type: response.entity.entity_type,
                         invoice_id: response.invoice_id,
                         status: 'received'
                     };
@@ -484,10 +485,10 @@
                 });
             },
 
-            async btnConfirmSession2(id,entity_type){
+            async btnConfirmSession2(id,entity){
                 let formData = new FormData();
                 formData.append("invoice_id", id);
-                formData.append('entity_type', entity_type);
+                formData.append('entity_type', entity.entity_type);
                 let response = await postApiData({ url: `/api/entities/done?is_confirm=1`, form_data: formData, token: this.getToken() });
                 if (response.data) {
                     console.log('confirm success')
@@ -503,9 +504,10 @@
                 this.notiModalOpen2();
             },
 
-            async btnRejectSession2(id){
+            async btnRejectSession2(id,entity){
                 let formData = new FormData();
                 formData.append("invoice_id", id);
+                formData.append('entity_type', entity.entity_type);
                 let response = await postApiData({ url: `/api/entities/done?is_confirm=0`, form_data: formData, token: this.getToken() });
                 if (response.data) {
                     console.log('reject success')
