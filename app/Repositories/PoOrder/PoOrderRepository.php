@@ -822,6 +822,7 @@ class PoOrderRepository implements PoOrderRepositoryInterface
         // 'arrival_items.po_order_ids',
         // 'poOrder.brand_id',
       )
+      ->having('total_quantity', '>', 0) // Filter out records where quantity <= 0
       ->paginate(config('common.list_count'));
 
     return $poOrders;
