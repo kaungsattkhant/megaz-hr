@@ -350,7 +350,7 @@ class OrderRepository implements OrderRepositoryInterface
                     ->whereBetween('date', [$startTime, $endTime])->get();
             } else {
                 $orderItems = OrderItem::with('menu', 'order.invoice.latestSession.entity', 'area')
-                    ->whereIn('status', ['pos_confirmed', 'in_progress', 'done'])
+                    ->whereIn('status', ['pos_confirmed', 'in progress', 'done'])
                     ->get();
             }
             return $orderItems;
