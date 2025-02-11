@@ -111,7 +111,7 @@ class InvoiceAPIController extends Controller
         //   }
 
         //end invoice for table
-        if($invoice->entity_id!=null){
+        if($request->entity_type=='table'){
             $entity=Entity::find($invoice->entity_id);
         }else{
             $activeInvoiceSession=$invoice->activeInvoiceSession;
@@ -136,7 +136,7 @@ class InvoiceAPIController extends Controller
             $msg = '';
             if ($request->is_confirm != 1) {
                 $msg = "The request to quit the room {$entity->name} has been rejected. Thank you for your understanding.";
-                $entity->status = 'active';
+                // $entity->status = 'active';
                 $entity->is_active = 1;
                 $entity->save();
                 // broadcast(new RoomDoneNotificationRequest($entity, $msg, $role->id));
