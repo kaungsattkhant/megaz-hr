@@ -43,4 +43,24 @@ class ParticipantNotificationController extends Controller
         $data = $this->ParticipantNotificationRepository->updateMeeting($meetingId);
         ResponseData($data);
     }
+
+    public function deleteMeeting($meetingId)
+    {
+        $data = $this->ParticipantNotificationRepository->deleteMeeting($meetingId);
+        ResponseData($data);
+    }
+
+    public function storeTraining(Request $request)
+    {
+        $data = $this->ParticipantNotificationRepository->storeTraining($request->all());
+        ResponseData($data);
+    }
+
+
+
+    public function getTrainings()
+    {
+        $data = $this->ParticipantNotificationRepository->getTrainings();
+        ResponseData($data);
+    }
 }

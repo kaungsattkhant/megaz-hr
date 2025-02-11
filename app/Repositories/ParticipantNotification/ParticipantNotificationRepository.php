@@ -5,6 +5,7 @@ namespace App\Repositories\ParticipantNotification;
 use App\Models\Staff;
 use App\Models\Meeting;
 use App\Models\Participant;
+use App\Models\Training;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Request;
 
@@ -65,7 +66,7 @@ class ParticipantNotificationRepository implements ParticipantNotificationInterf
         }
       }
       DB::commit();
-      return ResponseData($meeting, 200, true, "Meeting created successfully.");
+      return ResponseData($meeting, 201, true, "Meeting created successfully.");
     } catch (\Exception $e) {
       DB::rollBack();
       return ResponseData($data = null, $status_code = 422, false, $extra_message = "An error occurred Meeting stored.");
@@ -175,4 +176,81 @@ class ParticipantNotificationRepository implements ParticipantNotificationInterf
       return ResponseData(null, 422, false, 'An error occurred while updating the meeting. ' . $e->getMessage());
     }
   }
+
+  public function deleteMeeting($meetingId)
+  {
+    DB::beginTransaction();
+    try {
+      $meeting = Meeting::find($meetingId);
+      if (!$meeting) {
+        return ResponseData(null, 404, false, 'Meeting not found.');
+      }
+      $meeting->participants()->where('participantable_type', 'meeting')->delete();
+      $meeting->delete();
+      DB::commit();
+      return ResponseData(null, 200, true, 'Meeting deleted successfully.');
+    } catch (\Exception $e) {
+      DB::rollBack();
+      return ResponseData(null, 422, false, 'An error occurred while deleting the meeting. ' . $e->getMessage());
+    }
+  }
+
+
+
+
+  public function storeTraining($data)
+  {
+    DB::beginTransaction();
+
+    try {
+      $data['created_by'] = UserData()->id;
+      $training = Training::create($data);
+
+
+      if (isset($data['training_type']) && isset($data['department']) && $data['training_type'] === "dep_type") {
+
+        foreach ($data['department'] as $dep) {
+          $participantData = [
+            'participantable_id' => $training->id,
+            'participantable_type' => 'training',
+            'department_id' => $dep
+          ];
+          Participant::create($participantData);
+        }
+      }
+
+      if (isset($data['training_type']) && isset($data['role']) && $data['training_type'] === "role_type") {
+
+        foreach ($data['role'] as $role) {
+          $participantData = [
+            'participantable_id' => $training->id,
+            'participantable_type' => 'training',
+            'role_id' => $role
+          ];
+          Participant::create($participantData);
+        }
+      }
+
+
+      if (isset($data['training_type']) && isset($data['staff']) && $data['training_type'] === "staff_type") {
+
+        foreach ($data['staff'] as $staff) {
+          $participantData = [
+            'participantable_id' => $training->id,
+            'participantable_type' => 'training',
+            'staff_id' => $staff
+          ];
+          Participant::create($participantData);
+        }
+      }
+      DB::commit();
+      return ResponseData($training, 201, true, "Training created successfully.");
+    } catch (\Exception $e) {
+      DB::rollBack();
+      return ResponseData($data = null, $status_code = 422, false, $extra_message = "An error occurred Training stored.");
+    }
+  }
+
+
+  public function getTrainings() {}
 }

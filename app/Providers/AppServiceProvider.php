@@ -54,6 +54,8 @@ class AppServiceProvider extends ServiceProvider
             'arrival_item' => 'App\Models\ArrivalItem',
             'po_invoice' => 'App\Models\PoInvoice',
             'meeting' => 'App\Models\Meeting',
+            'training' => 'App\Models\Training',
+
 
         ]);
     }
