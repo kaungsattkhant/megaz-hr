@@ -170,16 +170,14 @@
                             </a>
                         </li>
                     @endif
-                    @if (checkFeaturePermission('room'))
+                    <!-- @if (checkFeaturePermission('room'))
                         <li>
                             <a href="{{ route('room') }}" class="flex items-center @yield('room') sidebar-gap-x">
                                 <img class=" sidebar-img" src="{{ asset('img/icons8-microphone-20.png') }}" alt="">
-                                <!-- <i class="fal fa-microphone-alt  pr-3"></i> -->
                                 Room
                             </a>
                         </li>
-                    @endif
-                    <!-- >>>>>>> origin/thhs/okr-backend -->
+                    @endif -->
 
                     @if(checkFeaturePermission('journal'))
                         <li>
