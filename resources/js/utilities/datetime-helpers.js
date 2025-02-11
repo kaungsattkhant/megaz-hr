@@ -112,3 +112,9 @@ export function getElapsedMoments(dbDateTimeString)
         return 'just now';
     }
 }
+
+export function convertMinutesToHoursMinutes(minutes) {
+    const hours = Math.floor(minutes / 60);
+    const remainingMinutes = minutes % 60;
+    return `${hours} hour${hours !== 1 ? 's' : ''} ${remainingMinutes} minute${remainingMinutes !== 1 ? 's' : ''}`;
+}
