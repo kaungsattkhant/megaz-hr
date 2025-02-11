@@ -1142,9 +1142,10 @@
     import { mapGetters } from "vuex";
     import { getCurrentTime, getCurretDateTime } from "../../../utilities/datetime-helpers";
     import Multiselect from 'vue-multiselect';
+    
 
     export default {
-        name:'PosRoomCompnent',
+        name:'PosRoomComponent',
         props:{
             roomAreaId:{
                 type: Number,
