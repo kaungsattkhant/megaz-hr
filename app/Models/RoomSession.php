@@ -31,4 +31,8 @@ class RoomSession extends Model
         return $this->belongsTo(EntitySession::class,'entity_session_id');
     }
 
+    public function invoiceSession()
+    {
+        return $this->belongsTo(InvoiceSession::class,'invoice_session_id');
+    }
 }

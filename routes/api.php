@@ -120,7 +120,7 @@ Route::get('/service_categories', function () {
 Route::get('/area_categories', function (Request $request) {
     ResponseData(
         AreaCategory::when($request->area_type, function ($query, $areaType) {
-            $query->where('name', $areaType);
+            // $query->where('name', $areaType);
         })->get()
     );
 });
@@ -608,7 +608,7 @@ Route::get('/menu_costing', [MenuAPIController::class, 'costingMenu']);
 //     Route::post('entities/add_service', 'addService');
 //     Route::post('entities/end_service', 'endService');
 // });
-Route::get('/pos/invoices', [InvoiceAPIController::class, 'getInvoiceData']);
+// Route::get('/pos/invoices', [InvoiceAPIController::class, 'getInvoiceData']);
 
 //end moved api
 

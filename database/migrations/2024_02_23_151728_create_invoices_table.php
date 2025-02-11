@@ -29,7 +29,7 @@ return new class extends Migration
             $table->double('service_charge')->default(0);
             $table->unsignedBigInteger('head_count_id')->nullable();
             $table->unsignedInteger('entity_id')->nullable(); //readd for requirement
-            $table->string('payment_status')->nullable();
+            $table->string('payment_status')->default('invoice_initialized'); // invoice_initialized, checkout, paid
             $table->string('payment_type')->nullable();
             $table->double('discount_value')->default(0);
             $table->double('order_discount_value')->default(0);
