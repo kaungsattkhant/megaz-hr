@@ -157,7 +157,7 @@
                                                 class="px-3 py-2 bg-red-600 text-white rounded-md mr-2">
                                                 Reject
                                             </button>
-                                            <button :disabled="sessionRequest2.status != 'received'" @click="btnConfirmSession2(sessionRequest2.invoice_id)"
+                                            <button :disabled="sessionRequest2.status != 'received'" @click="btnConfirmSession2(sessionRequest2.invoice_id, sessionRequest2.entity.entity_type)"
                                                 class="px-3 py-2 bg-green-600 text-white rounded-md">
                                                 Confirm
                                             </button>
@@ -484,9 +484,10 @@
                 });
             },
 
-            async btnConfirmSession2(id){
+            async btnConfirmSession2(id,entity_type){
                 let formData = new FormData();
                 formData.append("invoice_id", id);
+                formData.append('entity_type', entity_type);
                 let response = await postApiData({ url: `/api/entities/done?is_confirm=1`, form_data: formData, token: this.getToken() });
                 if (response.data) {
                     console.log('confirm success')

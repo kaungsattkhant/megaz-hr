@@ -26,7 +26,12 @@
                                     <th scope="col" class="px-6 py-4">
                                         Status
                                     </th>
-
+                                    <th scope="col" class="px-6 py-4">
+                                        Cooking Place
+                                    </th>
+                                    <th scope="col" class="px-6 py-4">
+                                        Quantity
+                                    </th>
                                     <th scope="col" class="px-6 py-4">Total</th>
                                     <th scope="col" class="px-6 py-4"></th>
                                 </tr>
@@ -62,7 +67,6 @@
                                         </td>
 
                                         <td
-                                            colspan="3"
                                             class="whitespace-nowrap px-6 py-3 select-parent"
                                         >
                                             <select
@@ -96,7 +100,11 @@
                                                  All items are Rejected
                                             </div>
                                         </td> -->
-
+                                        <td
+                                            class="whitespace-nowrap pl-8 pt-4 pb-3" 
+                                        >
+                                            {{ foodOrder.quantity }}
+                                        </td>
                                         <td
                                             class="whitespace-nowrap px-6 pt-4 pb-3"
                                         >

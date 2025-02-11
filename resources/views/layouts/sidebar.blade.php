@@ -623,29 +623,33 @@
                     @if (checkFeaturePermission('inventory-stocks'))
                         <li>
                             <a href="{{ route('inventory_stocks.index') }}"
-                                class="flex items-center @yield('inventory_stocks')">
-                                <i class="fal fa-truck-loading  pr-3"></i>
+                                class="flex items-center @yield('inventory_stocks') sidebar-gap-x">
+                                <!-- <i class="fal fa-truck-loading  pr-3"></i> -->
+                                <img class=" sidebar-img" src="{{ asset('img/icons8-inventory-50.png') }}" alt="">
                                 Inventory Stocks
                             </a>
                         </li>
                     @endif
                     @if (checkFeaturePermission('inventory-transfer-list'))
                         <li>
-                            <a href="{{ route('transfers.index') }}" class="flex items-center @yield('inventory_histories')">
-                                <i class="fal fa-user  pr-3"></i>
+                            <a href="{{ route('transfers.index') }}" class="flex items-center @yield('inventory_histories') sidebar-gap-x">
+                                <!-- <i class="fal fa-user  pr-3"></i> -->
+                                <img class=" sidebar-img" src="{{ asset('img/icons8-inventory-50.png') }}" alt="">
                                 Inventory Transfer Histories
                             </a>
                         </li>
                         <li>
-                            <a href="{{ route('transfers.receives') }}" class="flex items-center @yield('inventory_receives')">
-                                <i class="fal fa-user  pr-3"></i>
+                            <a href="{{ route('transfers.receives') }}" class="flex items-center @yield('inventory_receives') sidebar-gap-x">
+                                <!-- <i class="fal fa-user  pr-3"></i> -->
+                                <img class=" sidebar-img" src="{{ asset('img/icons8-inventory-50.png') }}" alt="">
                                 Inventory Receives List
                             </a>
                         </li>
                         <li>
                             <a href="{{ route('transfers.transfers') }}"
-                                class="flex items-center @yield('inventory_transfers')">
-                                <i class="fal fa-user  pr-3"></i>
+                                class="flex items-center @yield('inventory_transfers') sidebar-gap-x">
+                                <!-- <i class="fal fa-user  pr-3"></i> -->
+                                <img class=" sidebar-img" src="{{ asset('img/icons8-inventory-50.png') }}" alt="">
                                 Inventory Transfers List
                             </a>
                         </li>
@@ -679,8 +683,9 @@
 
                     @if (checkFeaturePermission('package'))
                         <li>
-                            <a href="{{ route('packages.index') }}" class="flex items-center @yield('packages')">
-                                <i class="fal fa-truck-loading  pr-3"></i>
+                            <a href="{{ route('packages.index') }}" class="flex items-center @yield('packages') sidebar-gap-x">
+                                <!-- <i class="fal fa-truck-loading  pr-3"></i> -->
+                                <img class="sidebar-img " src="{{ asset('img/icons8-packages-50.png') }}" alt="">
                                 Packages
                             </a>
                         </li>
@@ -745,6 +750,15 @@
                         </li>
                     @endif
 
+                    @if(checkFeaturePermission('ktv-product-tree'))
+                        <li>
+                            <a href="/ktv_product_tree" class="flex items-center @yield('ktv_product_tree') sidebar-gap-x">
+                                <!-- <i class="fal fa-braille pr-3"></i> -->
+                                <img class="sidebar-img " src="{{ asset('img/icons8-product-tree-64.png') }}" alt="">
+                                Product Tree
+                            </a>
+                        </li>
+                    @endif
                     <!-- @if(checkFeaturePermission('accessory')) -->
                     <li>
                         <a href="/menu_forecasting" class="flex items-center @yield('menu_forecasting') sidebar-gap-x">
@@ -762,14 +776,7 @@
                     </li>
                     <!-- @endif -->
 
-                    @if(checkFeaturePermission('ktv-product-tree'))
-                        <li>
-                            <a href="/ktv_product_tree" class="flex items-center @yield('ktv_product_tree')">
-                                <i class="fal fa-braille pr-3"></i>
-                                Product Tree
-                            </a>
-                        </li>
-                    @endif
+                    
                     
                     <li>
                         <a href="/okr_duty" class="flex items-center @yield('OKR_duty') sidebar-gap-x">
