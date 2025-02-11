@@ -55,7 +55,15 @@ Route::middleware('auth:api')->group(function () {
   Route::controller(ParticipantNotificationController::class)->group(function () {
     Route::get('/staff_by_department/{departmentId}/role/{roleId}', 'getStaffByDepartmentRole');
     Route::post('/meetings', 'storeMeetings');
-    Route::get('/meetings/{meetingId}', 'showMeetings');
+    Route::get('/meetings/{meetingId}', 'showMeeting');
     Route::get('/meetings', 'getMeetings');
+    Route::post('/meetings/{meetingId}', 'updateMeeting');
+    Route::delete('/meetings/{meetingId}', 'deleteMeeting');
+
+    Route::get('/trainings', 'getTrainings');
+    Route::get('/trainings/{trainingId}', 'getTrainingById');
+    Route::post('/trainings', 'storeTraining');
+    Route::post('/trainings/{trainingId}', 'updateTraining');
+    Route::delete('/trainings/{trainingId}', 'deleteTraining');
   });
 });

@@ -2,8 +2,9 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Training extends Model
 {
@@ -19,4 +20,21 @@ class Training extends Model
         'created_by',
         'training_type'
     ];
+
+    public function trainedBy()
+    {
+        return $this->belongsTo(Staff::class, 'trained_by');
+    }
+
+
+    public function createdBy()
+    {
+        return $this->belongsTo(Staff::class, 'created_by');
+    }
+
+
+    public function participants(): MorphMany
+    {
+        return $this->morphMany(Participant::class, 'participantable');
+    }
 }

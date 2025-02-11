@@ -23,12 +23,12 @@ class Meeting extends Model
 
     public function chairedBy()
     {
-        return $this->belongsTo(User::class, 'chaired_by');
+        return $this->belongsTo(Staff::class,  'chaired_by');
     }
 
     public function createdBy()
     {
-        return $this->belongsTo(User::class, 'created_by');
+        return $this->belongsTo(Staff::class,  'created_by');
     }
 
     public function participants(): MorphMany

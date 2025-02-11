@@ -168,7 +168,8 @@ class MRPForecastRepository implements MRPForecastRepositoryInterface
                   $balanceQuery->whereHas('inventory_ledger', function ($q) use ($inventoryId) {
                     $q->where('inventory_id', $inventoryId);
                   });
-                }
+                },
+                'brands'
               ]);
             },
             'uom'
@@ -196,13 +197,16 @@ class MRPForecastRepository implements MRPForecastRepositoryInterface
                   $balanceQuery->whereHas('inventory_ledger', function ($q) use ($inventoryId) {
                     $q->where('inventory_id', $inventoryId);
                   });
-                }
+                },
+                'brands'
               ]);
             },
             'uom'
           ]);
         }
       ])->get();
+
+
     $result = $menuStepDatas->flatMap(function ($mStepdata) use ($quantity) {
       return $mStepdata->menuStepItem->map(function ($data) use ($quantity) {
         return $this->processMenuStepItem($data, $quantity);
@@ -235,10 +239,12 @@ class MRPForecastRepository implements MRPForecastRepositoryInterface
                     $balanceQuery->whereHas('inventory_ledger', function ($q) use ($inventoryId) {
                       $q->where('inventory_id', $inventoryId);
                     });
-                  }
+                  },
+                  'brands'
                 ]);
               },
-              'uom'
+              'uom',
+
             ]);
           }
         ])
@@ -264,23 +270,22 @@ class MRPForecastRepository implements MRPForecastRepositoryInterface
                     $balanceQuery->whereHas('inventory_ledger', function ($q) use ($inventoryId) {
                       $q->where('inventory_id', $inventoryId);
                     });
-                  }
+                  },
+                  'brands'
                 ]);
               },
-              'uom'
+              'uom',
+
             ]);
           }
         ])
         ->get();
-
 
       $menuStepDataProcessed = $menuStepDatas->flatMap(function ($mStepdata) use ($quantity) {
         return $mStepdata->menuStepItem->map(function ($data) use ($quantity) {
           return $this->processMenuStepItem($data, $quantity);
         })->filter();
       });
-
-
 
       $result = $result->merge($menuStepDataProcessed);
     }
@@ -327,13 +332,16 @@ class MRPForecastRepository implements MRPForecastRepositoryInterface
       'in_balance' => $inBalance,
       'out_balance' => $outBalance,
       'closing_balance' => $closingBalance,
-      'current_holdings' => $currentHolding
+      'current_holdings' => $currentHolding,
+      'minimum_holding_amount' =>  $data->item->minimum_holding_amount,
+      'brands'             => isset($data->item->brands) ? $data->item->brands->toArray() : []
     ];
   }
 
   private function groupMenuStepItems($result)
   {
     return $result->groupBy('item_id')->map(function ($items) {
+      $first = $items->first();
       return [
         'item_id' => $items->first()['item_id'],
         'name' => $items->first()['name'],
@@ -364,6 +372,10 @@ class MRPForecastRepository implements MRPForecastRepositoryInterface
         'current_holdings' => $items->sum(function ($item) {
           return $item['current_holdings'];
         }),
+        'minimum_holding_amount' => $items->sum(function ($item) {
+          return $item['minimum_holding_amount'];
+        }),
+        'brands'            => $first['brands']
       ];
     })->values();
   }
