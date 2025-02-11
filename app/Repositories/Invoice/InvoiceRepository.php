@@ -142,7 +142,7 @@ class InvoiceRepository implements InvoiceRepositoryInterface
         DB::beginTransaction();
         try {
             // if ($data['entity_id'] != null && !$data['is_waiter']) { //create table invoice
-            if ($data['entity_id'] != null && (isset($data['entity']) && $data['entity_type'] == 'table')) { //create table invoice
+            if ($data['entity_id'] != null && (isset($data['entity_id']) && $data['entity_type'] == 'table')) { //create table invoice
                 $tableInvoice = $this->createInvoiceForTable($data);
                 DB::commit();
                 return $tableInvoice;
@@ -586,8 +586,9 @@ class InvoiceRepository implements InvoiceRepositoryInterface
     {
         DB::beginTransaction();
         try {
+            $entity=Entity::find($data['entity_id']);
             $invoice = Invoice::find($data['invoice_id']);
-            if ($invoice->entity_id != null) {
+            if ($entity->entity_type=='table') {
                 $updatedInvoice = $this->changeTable($invoice, $data['entity_id']);
                 DB::commit();
                 ResponseData($updatedInvoice, 200);
@@ -746,11 +747,9 @@ class InvoiceRepository implements InvoiceRepositoryInterface
             //end
             // $previousSessionPerPrice=$activeInvoiceSession->session_unit_price;
             // $previousUsedSessionPrice=$remainSession*$previousSessionPerPrice;
-
             //update active session after room change
             $activeInvoiceSession->total_session_duration = round($usedSessionHour, 2);
             $activeInvoiceSession->total_session_price = round(($usedSessionHour * $activeInvoiceSession->session_unit_price), 2);
-
             $activeInvoiceSession->is_active = 0;
             $activeInvoiceSession->save();
 
@@ -770,6 +769,7 @@ class InvoiceRepository implements InvoiceRepositoryInterface
 
             $previousEntity = $invoice->activeInvoiceSession->entity;
             $previousEntity->is_active = 0;
+            $previousEntity->status='inactive';
             $previousEntity->save();
 
 
@@ -783,10 +783,10 @@ class InvoiceRepository implements InvoiceRepositoryInterface
 
 
             // session for new room
-
             //update new entiy
             $newEntity = Entity::find($entityId); //new entity
             $newEntity->is_active = 1;
+            $newEntity->status='active';
             $newEntity->save();
             $newSessionDate = Carbon::parse($data['start_date_time']);
             $startTime = Carbon::parse($data['start_date_time'])->format('H:i');
@@ -805,6 +805,14 @@ class InvoiceRepository implements InvoiceRepositoryInterface
 
             $totalNewSessionPrice = $remainSession * $sessionPerPrice;
             //create new invoice session
+            // $activeInvoiceSession->start_date_time=$startDateTime;
+            // $activeInvoiceSession->end_date_time=$endDateTime;
+            // $activeInvoiceSession->total_session_duration=$remainSession;
+            // $activeInvoiceSession->total_session_price=$totalNewSessionPrice;
+            // $activeInvoiceSession->session_unit_price=$sessionPerPrice;
+            // $activeInvoiceSession->invoice_id=$invoiceId;
+            // $activeInvoiceSession->entity_id=$newEntity->id;
+            // $activeInvoiceSession->save();
             $invoiceSession = InvoiceSession::create([
                 'start_date_time' => $startDateTime,
                 'end_date_time' => $endDateTime,
@@ -812,7 +820,7 @@ class InvoiceRepository implements InvoiceRepositoryInterface
                 'total_session_price' => $totalNewSessionPrice,
                 'session_unit_price' => $sessionPerPrice,
                 'invoice_id' => $invoiceId,
-                'entity_id' => $entityId,
+                'entity_id' => $newEntity->id,
             ]);
 
             //update session price for invoice
