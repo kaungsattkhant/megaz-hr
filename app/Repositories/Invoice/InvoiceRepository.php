@@ -586,8 +586,9 @@ class InvoiceRepository implements InvoiceRepositoryInterface
     {
         DB::beginTransaction();
         try {
+            $entity=Entity::find($data['entity']);
             $invoice = Invoice::find($data['invoice_id']);
-            if ($invoice->entity_id != null) {
+            if ($entity->entity_type=='table') {
                 $updatedInvoice = $this->changeTable($invoice, $data['entity_id']);
                 DB::commit();
                 ResponseData($updatedInvoice, 200);
@@ -746,11 +747,9 @@ class InvoiceRepository implements InvoiceRepositoryInterface
             //end
             // $previousSessionPerPrice=$activeInvoiceSession->session_unit_price;
             // $previousUsedSessionPrice=$remainSession*$previousSessionPerPrice;
-
             //update active session after room change
             $activeInvoiceSession->total_session_duration = round($usedSessionHour, 2);
             $activeInvoiceSession->total_session_price = round(($usedSessionHour * $activeInvoiceSession->session_unit_price), 2);
-
             $activeInvoiceSession->is_active = 0;
             $activeInvoiceSession->save();
 
@@ -805,6 +804,14 @@ class InvoiceRepository implements InvoiceRepositoryInterface
 
             $totalNewSessionPrice = $remainSession * $sessionPerPrice;
             //create new invoice session
+            // $activeInvoiceSession->start_date_time=$startDateTime;
+            // $activeInvoiceSession->end_date_time=$endDateTime;
+            // $activeInvoiceSession->total_session_duration=$remainSession;
+            // $activeInvoiceSession->total_session_price=$totalNewSessionPrice;
+            // $activeInvoiceSession->session_unit_price=$sessionPerPrice;
+            // $activeInvoiceSession->invoice_id=$invoiceId;
+            // $activeInvoiceSession->entity_id=$newEntity->id;
+            // $activeInvoiceSession->save();
             $invoiceSession = InvoiceSession::create([
                 'start_date_time' => $startDateTime,
                 'end_date_time' => $endDateTime,
@@ -812,7 +819,7 @@ class InvoiceRepository implements InvoiceRepositoryInterface
                 'total_session_price' => $totalNewSessionPrice,
                 'session_unit_price' => $sessionPerPrice,
                 'invoice_id' => $invoiceId,
-                'entity_id' => $entityId,
+                'entity_id' => $newEntity->id,
             ]);
 
             //update session price for invoice
