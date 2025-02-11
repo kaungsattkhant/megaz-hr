@@ -769,6 +769,7 @@ class InvoiceRepository implements InvoiceRepositoryInterface
 
             $previousEntity = $invoice->activeInvoiceSession->entity;
             $previousEntity->is_active = 0;
+            $previousEntity->status='inactive';
             $previousEntity->save();
 
 
@@ -782,10 +783,10 @@ class InvoiceRepository implements InvoiceRepositoryInterface
 
 
             // session for new room
-
             //update new entiy
             $newEntity = Entity::find($entityId); //new entity
             $newEntity->is_active = 1;
+            $newEntity->status='active';
             $newEntity->save();
             $newSessionDate = Carbon::parse($data['start_date_time']);
             $startTime = Carbon::parse($data['start_date_time'])->format('H:i');
