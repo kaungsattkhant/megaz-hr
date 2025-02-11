@@ -251,7 +251,7 @@
                                               {{ raw.total_uom_amt }}
                                         </td>
                                         <td class="">
-                                            {{ raw.item_uom }}
+                                            {{ raw.uom_name }}
                                         </td>
                                         <td class="">
                                             {{ raw.average_price * raw.total_uom_amt }}
@@ -261,7 +261,8 @@
                                             {{ ( (parseInt(raw.current_holdings)/raw.uom_conversion) - (parseInt(parseInt(raw.current_holdings)/raw.uom_conversion)))*raw.uom_conversion  }} {{ raw.uom_name }}
                                         </td>
                                         <td class="">
-                                            {{ raw.name }}
+                                            {{ raw.min_holding_base_uom_quantity }}{{ raw.base_uom_name }}
+                                            {{ raw.min_holding_uom_quantity }}{{ raw.uom_name }}
                                         </td>
                                         <td class="">
                                             {{ raw.total_uom_amt > raw.current_holdings ? parseInt(parseInt(raw.total_uom_amt-raw.current_holdings)/raw.uom_conversion) : '' }} {{ raw.base_uom_name }}
@@ -298,7 +299,7 @@
                                             {{ hr.position }}
                                         </td>
                                         <td class="">
-                                            {{ hr.total_working_hour }}
+                                            {{ convertMinutesToHoursMinutes(hr.total_working_hour) }}
                                         </td>
                                     </tr>
                                 </tbody>
@@ -403,6 +404,19 @@
                             </div>
                         </div>
                         <div class="mb-4">
+                            <label for="" class="label-form mb-3">
+                                Brand
+                            </label>
+                            <div class="bg-white mb-0 w-full text-sm inline-block"
+                                data-te-select-wrapper-ref>
+                                <select data-te-select-init data-te-select-placeholder="Select Brand"
+                                    data-te-select-filter="true" name="" id="" v-model="po_brand" class="input-ui">
+                                    <option :value="brand" v-for="(brand, brandIndex) in itemBrands"
+                                        :key="brandIndex"> {{ brand.name }} </option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="mb-4">
                             <label class="label-form mb-3">PO Number</label>
                             <div class="bg-white mb-0 w-full text-sm inline-block"
                                 data-te-select-wrapper-ref>
@@ -479,8 +493,10 @@ export default {
             poList:[],
             uomList:[],
             itemUoms:[],
+            itemBrands:[],
             po_quantity:null,
             po_uom:null,
+            po_brand:null,
             selectedPo:null,
 
             selectedItem:null,
@@ -676,18 +692,35 @@ export default {
             }
         },
         btnClickPoModal(raw){
-            this.selectedItem = raw
+            this.selectedItem = raw;
+            this.itemBrands = raw.brands;
             this.itemSelectChanged();
         },
         btnClickedCreatePo(){
+            if(!this.quantity){
+                this.alertValidationMessage('Date');
+                return 1;
+            }
+            if(!this.uom_id){
+                this.alertValidationMessage('Date');
+                return 1;
+            }
+            if(!this.date){
+                this.alertValidationMessage('Date');
+                return 1;
+            }
+            if(!this.date){
+                this.alertValidationMessage('Date');
+                return 1;
+            }
             this.createPo();
         },
         async createPo(){
             let formData = new FormData();
             formData.append("quantity", this.po_quantity);
-            
             formData.append("uom_id", this.po_uom.id);
             formData.append("uom_conversion_id", this.selectedItem.uom_conversion_id);
+            formData.append("brand_id", this.po_brand.id);
             if(!this.isNewPo){
                 formData.append("purchase_order_id", this.selectedPo.id);
             }
@@ -748,6 +781,11 @@ export default {
                 text: `You forgot to provide ${field}, please try again`,
                 type: "warn"
             });
+        },
+        convertMinutesToHoursMinutes(minutes) {
+            const hours = Math.floor(minutes / 60);
+            const mins = minutes % 60;
+            return `${hours}h ${mins}m`;
         },
 
     },
