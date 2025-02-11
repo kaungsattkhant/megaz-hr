@@ -35,7 +35,7 @@ class OrderRepository implements OrderRepositoryInterface
         try {
             //check and remove pack is enought for menu;
             // $this->removePackForMenu($data['menu_id'], $data['quantity']);
-            
+
             $price = $data['original_price'] * $data['quantity'];
             // $data['invoice'] must be unsigned integer format , not 000023
             $order = Order::where('invoice_id', $data['invoice_id'])->first();
@@ -125,8 +125,13 @@ class OrderRepository implements OrderRepositoryInterface
             $totalDiscount = 0;
 
             $invoice = Invoice::find($data['invoice_id']);
-            $latestRoomSession = RoomSession::where('invoice_id', $invoice->id)->orderBy('created_at', 'desc')->first();
-            $entity = Entity::find($latestRoomSession->entitySession->entity_id);
+            $activeInvoiceSession=$invoice->activeInvoiceSession;
+            if(!$activeInvoiceSession){
+                ResponseMessage('Active Entity Session not found',419);
+            }
+            $entity=$activeInvoiceSession->entity;
+            // $latestRoomSession = RoomSession::where('invoice_id', $invoice->id)->orderBy('created_at', 'desc')->first();
+            // $entity = Entity::find($latestRoomSession->entitySession->entity_id);
 
             $orderItemsArray = [];
             $focTotal = 0;
