@@ -140,11 +140,10 @@ class InvoiceModelService
 
     }
 
-    public function storeInvoiceSession($invoiceId, $entityId, $sessionDuration, $sessionPerPrice, $discountId)
+    public function storeInvoiceSession($invoiceId, $entityId, $sessionDuration, $sessionPerPrice,$isWaiter, $discountId)
     {
         // $startTime="22:10";
         // $endTime="00:10";
-
         $now = now();
         $startTime = now()->format('H:i');
         $endTime = $now->copy()->addHours((int) $sessionDuration)->format('H:i');
@@ -171,8 +170,9 @@ class InvoiceModelService
             $createRoomSession=$invoiceSession->roomSessions()->create([
                 'entity_session_id'=>$entitySession->id,
             ]);
-            $entitySession->is_active=1;
-            $entitySession->save();
+            if(!$isWaiter){
+                $entitySession->is_active=1;
+            }
         }
         return $invoiceSession;
     }
