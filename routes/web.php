@@ -130,7 +130,6 @@ Route::middleware(['departments:purchase-order'])->group(function () {
     Route::view('/purchase_orders/{poId}/confirm', 'purchase_orders.confirm')->name('purchase_orders.confirm');
     Route::view('/purchase_orders/{poId}/buy', 'purchase_orders.buy')->name('purchase_orders.buy');
 });
-
 Route::middleware(['departments:purchase-order-confirmation'])->group(function () {
     Route::view('/confirm_purchase_order_items', 'purchase_orders.confirm_poitems')->name('purchase_orders.confirm_poitems');
 });

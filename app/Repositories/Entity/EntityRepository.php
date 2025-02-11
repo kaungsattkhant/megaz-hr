@@ -226,9 +226,8 @@ class EntityRepository implements EntityRepositoryInterface
     {
         $entity = Entity::find($entityId);
         if ($entity->entity_type == 'room') {
-            $activeInvoiceSession = InvoiceSession::where('is_active', 1)->where('entity_id', $entityId);
+            $activeInvoiceSession = InvoiceSession::where('is_active', 1)->where('entity_id', $entityId)->first();
             $invoice = $activeInvoiceSession->invoice;
-
             // $entitySession = EntitySession::where('is_active', 1)
             //     ->with(['entity', 'roomSessions', 'roomSession.invoice'])
             //     ->where('entity_id', $entityId)->first();
