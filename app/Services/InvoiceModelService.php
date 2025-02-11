@@ -174,6 +174,7 @@ class InvoiceModelService
             $entitySession->is_active=1;
             $entitySession->save();
         }
+        return $invoiceSession;
     }
 
     public function defineActiveEntitySession($invoiceSession,$entitySesions){
