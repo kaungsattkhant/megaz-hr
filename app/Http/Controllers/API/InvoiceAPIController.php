@@ -142,8 +142,8 @@ class InvoiceAPIController extends Controller
                 // ResponseMessage($msg);
             } else {
                 $msg = "The request to quit the room {$entity->name} has been confirmed. The room will be quit and will soon close. Thank you.";
-                $entity->status = 'active';
-                $entity->is_active = 1;
+                $entity->status = 'inactive';
+                $entity->is_active = 0;
                 $entity->save();
                 // broadcast(new RoomDoneNotificationRequest($entity, $msg, $role->id));
                 // ResponseMessage($msg);
