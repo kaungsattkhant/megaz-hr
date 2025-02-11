@@ -1563,9 +1563,13 @@
                     // console.log("success")
                     // window.location.reload()
                 }
-                // else {
-                //     console.log('some errors occur')
-                // }
+                else {
+                    this.$notify({
+                        title: `Not valid`,
+                        text: response.message,
+                        type: "warn"
+                    });
+                }
             },
             async getPurchaseMenuList() {
                 const response = await getApiData({ url: '/api/entities_sessions/'+ this.selectedTime.id, token: this.getToken() }); // and why is this api also called
