@@ -100,6 +100,15 @@ class InvoiceAPIController extends Controller
         $catering_department = Department::where('name', 'Catering')->first();
         $invoice = Invoice::find($request->invoice_id);
 
+        // {
+        //     "invoice_id": widget.invoiceId,
+        //     "discount_value": discount,
+        //     "payment_type": paymentType,
+        //     "service_charge": serviceCharge,
+        //     "tax": tax,
+        //     "order_categories": foodEncoded,
+        //   }
+
         //end invoice for table
         if($invoice->entity_id!=null){
             $entity=Entity::find($invoice->entity_id);
@@ -127,15 +136,18 @@ class InvoiceAPIController extends Controller
             if ($request->is_confirm != 1) {
                 $msg = "The request to quit the room {$entity->name} has been rejected. Thank you for your understanding.";
                 $entity->status = 'active';
+                $entity->is_active = 1;
                 $entity->save();
                 // broadcast(new RoomDoneNotificationRequest($entity, $msg, $role->id));
                 // ResponseMessage($msg);
             } else {
                 $msg = "The request to quit the room {$entity->name} has been confirmed. The room will be quit and will soon close. Thank you.";
+                $entity->status = 'inactive';
+                $entity->is_active = 0;
+                $entity->save();
                 // broadcast(new RoomDoneNotificationRequest($entity, $msg, $role->id));
                 // ResponseMessage($msg);
             }
-
             broadcast(new RoomDoneNotificationRequest($entity, $msg, $role->id));
             ResponseMessage($msg);
         }

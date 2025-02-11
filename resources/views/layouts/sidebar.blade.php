@@ -1,4 +1,4 @@
-<nav id="sidebar_admin" class="side-bar w-fit pt-0 h-[100vh]">
+<nav id="sidebar_admin" class="side-bar w-fit !pt-0 h-[100vh]">
     <div class="relative">
         <button type="button" id="toggleBtn" class="py-3 px-2 absolute left-full top-8 bg-[#fafafa] text-black rounded-tr-md rounded-br-md border-gray-400 ">
             <i class="fas fa-chevron-double-left ease-linear" style="transition:transform 0.5s ease;"></i>
@@ -170,16 +170,14 @@
                             </a>
                         </li>
                     @endif
-                    @if (checkFeaturePermission('room'))
+                    <!-- @if (checkFeaturePermission('room'))
                         <li>
                             <a href="{{ route('room') }}" class="flex items-center @yield('room') sidebar-gap-x">
                                 <img class=" sidebar-img" src="{{ asset('img/icons8-microphone-20.png') }}" alt="">
-                                <!-- <i class="fal fa-microphone-alt  pr-3"></i> -->
                                 Room
                             </a>
                         </li>
-                    @endif
-                    <!-- >>>>>>> origin/thhs/okr-backend -->
+                    @endif -->
 
                     @if(checkFeaturePermission('journal'))
                         <li>

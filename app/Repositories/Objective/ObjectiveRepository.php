@@ -63,7 +63,7 @@ class ObjectiveRepository implements ObjectiveInterface
             ->when(($from_date == null && $to_date), function ($q) use ($to_date) {
                 $q->whereBetween('objective_key_duties.assign_date', [now(), $to_date]);
             })
-            // ->whereNotNull('objectivekey_staff.completed_at')
+            ->where('objectivekey_staff.status', 'approved')
             // ->whereNotNull('objectivekey_staff.completed_at')
             ->groupBy(
                 'objectivekey_staff.staff_id',

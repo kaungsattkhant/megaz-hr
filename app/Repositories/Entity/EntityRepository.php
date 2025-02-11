@@ -90,42 +90,52 @@ class EntityRepository implements EntityRepositoryInterface
 
         foreach ($entities as $entity) {
             if ($entity->entity_type == 'room' && $entity->is_active == 1) {
-                $roomSessions = collect();
-                $startTimes = collect();
-                $endTimes = collect();
-                $entitySessions = $entity->entitySessions()
-                    ->where('is_active', 1)
-                    ->get();
-                foreach ($entitySessions as $entitySession) {
-                    foreach ($entitySession->roomSessions()->where('is_active', 1)->get() as $roomSession) {
-                        // dd($roomSession->invoice->payment_status);
-                        $roomSessions->push($roomSession);
-                        $startTimes->push($roomSession->start_date);
-                        $endTimes->push($roomSession->end_date);
-                    }
+                $invoiceSession = InvoiceSession::where('is_active', 1)->where('entity_id', $entity->id)->first();
+
+                if ($invoiceSession) {
+                    $entity->start_time = $invoiceSession->start_date_time;
+                    $entity->end_time = $invoiceSession->end_date_time;
+                } else {
+                    $entity->start_time = null;
+                    $entity->end_time = null;
                 }
-                $entity->start_time = CurrentTime();
-                $entity->end_time = CurrentTime();
-                $totalSessionDuration = (float) number_format($roomSessions->sum('session_duration'), 2);
-                $startTimes = $startTimes->sortBy(function ($timestamp) {
-                    return strtotime($timestamp);
-                })->values(); // Re-index the collection
-                $endTimes = $endTimes->sortByDesc(function ($timestamp) {
-                    return strtotime($timestamp);
-                })->values(); // Re-index the collection
-
-                $firstStartTime = $startTimes->isNotEmpty() ? $startTimes[0] : null;
-
-                $calculatedEndTime = Carbon::parse($firstStartTime)->addHours($totalSessionDuration)->format('Y-m-d H:i:s');
-                $lastEndTime = $endTimes->isNotEmpty() ? $endTimes[0] : null;
-                $entity->start_time = $firstStartTime;
-                $entity->end_time = $calculatedEndTime;
-
-                // dd($startTimes);
-            } else {
-                $entity->start_time = null;
-                $entity->end_time = null;
             }
+            //     $roomSessions = collect();
+            //     $startTimes = collect();
+            //     $endTimes = collect();
+            //     $entitySessions = $entity->entitySessions()
+            //         ->where('is_active', 1)
+            //         ->get();
+            //     foreach ($entitySessions as $entitySession) {
+            //         foreach ($entitySession->roomSessions()->where('is_active', 1)->get() as $roomSession) {
+            //             // dd($roomSession->invoice->payment_status);
+            //             $roomSessions->push($roomSession);
+            //             $startTimes->push($roomSession->start_date);
+            //             $endTimes->push($roomSession->end_date);
+            //         }
+            //     }
+            //     $entity->start_time = CurrentTime();
+            //     $entity->end_time = CurrentTime();
+            //     $totalSessionDuration = (float) number_format($roomSessions->sum('session_duration'), 2);
+            //     $startTimes = $startTimes->sortBy(function ($timestamp) {
+            //         return strtotime($timestamp);
+            //     })->values(); // Re-index the collection
+            //     $endTimes = $endTimes->sortByDesc(function ($timestamp) {
+            //         return strtotime($timestamp);
+            //     })->values(); // Re-index the collection
+
+            //     $firstStartTime = $startTimes->isNotEmpty() ? $startTimes[0] : null;
+
+            //     $calculatedEndTime = Carbon::parse($firstStartTime)->addHours($totalSessionDuration)->format('Y-m-d H:i:s');
+            //     $lastEndTime = $endTimes->isNotEmpty() ? $endTimes[0] : null;
+            //     $entity->start_time = $firstStartTime;
+            //     $entity->end_time = $calculatedEndTime;
+
+            //     // dd($startTimes);
+            // } else {
+            //     $entity->start_time = null;
+            //     $entity->end_time = null;
+            // }
 
             // ResponseData($roomSessions);
         }
@@ -228,6 +238,9 @@ class EntityRepository implements EntityRepositoryInterface
         if ($entity->entity_type == 'room') {
             $activeInvoiceSession = InvoiceSession::where('is_active', 1)->where('entity_id', $entityId)->first();
             $invoice = $activeInvoiceSession->invoice;
+            if(!$invoice){
+                ResponseMessage('Active Invoice Not Found',419);
+            }
             // $entitySession = EntitySession::where('is_active', 1)
             //     ->with(['entity', 'roomSessions', 'roomSession.invoice'])
             //     ->where('entity_id', $entityId)->first();
@@ -295,8 +308,8 @@ class EntityRepository implements EntityRepositoryInterface
             // }
             // $entitySession['start_date'] = $firstRoomSession->start_date;
             // $entitySession['end_date'] = $lastRoomSession->end_date;
-            $entitySession['start_date']=$activeInvoiceSession->start_date_time;
-            $entitySession['end_date']=$activeInvoiceSession->start_date_time;
+            $entitySession['start_date'] = $activeInvoiceSession->start_date_time;
+            $entitySession['end_date'] = $activeInvoiceSession->start_date_time;
             $entitySession['invoice'] = $invoice;
             //service add response
             $entitySession['services'] = $invoiceServiceCollection;

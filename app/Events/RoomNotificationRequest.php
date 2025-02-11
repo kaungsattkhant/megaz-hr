@@ -30,6 +30,8 @@ class RoomNotificationRequest implements ShouldBroadcast
     public $roomSession;
     public $order;
     public $orderItem;
+    public $invoice;
+    public  $entity_type;
 
     public function __construct(Customer $customer,Entity $entity, Invoice $invoice,$department_id,Order $order=null, array $orderItem)
     {
@@ -38,8 +40,10 @@ class RoomNotificationRequest implements ShouldBroadcast
         $this->invoice_id = $invoice->id;
         $this->customerName = $customer->name;
         $this->roomName = $entity->name;
+        $this->entity_type=$entity->entity_type;
         $this->order = $order;
         $this->orderItem = $orderItem;
+        $this->invoice=$invoice;
 
 
     }
@@ -57,11 +61,16 @@ class RoomNotificationRequest implements ShouldBroadcast
     }
     public function broadcastWith()
     {
-        $roomSession = RoomSession::where('invoice_id',$this->invoice_id)->get();
+        $invoice=Invoice::find($this->invoice_id);
 
-        $totalDuration = $roomSession->sum('session_duration');
-        $firstRoomSession = $roomSession->first();
-        $lastRoomSession = $roomSession->last();
+        $invoiceSession=$invoice->activeInvoiceSession;
+        if($this->entity_type=='table'){
+            $startDateTime=null;
+            $endDateTime=null;
+        }else{
+            $startDateTime=$invoiceSession->start_date_time;
+            $endDateTime=$invoiceSession->end_date_time;
+        }
         $data= [
             'department_id' => $this->department_id,
             'invoice_id' => $this->invoice_id,
@@ -69,11 +78,10 @@ class RoomNotificationRequest implements ShouldBroadcast
             'room_name' => $this->roomName,
             'order' => $this->order,
             'orderItem' => $this->orderItem,
-            'start_time' => $firstRoomSession->start_date,
-            'end_time' => $lastRoomSession->end_date,
-            'session_duration' => $totalDuration
+            'start_time' => $startDateTime,
+            'end_time' =>$endDateTime ,
+            'session_duration' =>$this->entity_type=='table' ? 1 : $invoiceSession->total_session_duration,
         ];
-
         return $data;
 
     }
