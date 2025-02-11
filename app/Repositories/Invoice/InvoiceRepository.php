@@ -818,7 +818,7 @@ class InvoiceRepository implements InvoiceRepositoryInterface
             //update session price for invoice
             $invoice->total = ($invoice->total - $priviousTotalSessionPrice) + $totalNewSessionPrice;
             $invoice->sub_total = ($invoice->sub_total - $priviousTotalSessionPrice) + $activeInvoiceSession->total_session_price + $totalNewSessionPrice;
-            $invoice->total_session_price = $$activeInvoiceSession->total_session_price + $totalNewSessionPrice; //previous used session price+ new session price(new room)
+            $invoice->total_session_price = $activeInvoiceSession->total_session_price + $totalNewSessionPrice; //previous used session price+ new session price(new room)
             $invoice->save();
             //end
 
