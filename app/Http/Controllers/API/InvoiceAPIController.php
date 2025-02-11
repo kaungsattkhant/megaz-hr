@@ -136,11 +136,15 @@ class InvoiceAPIController extends Controller
             if ($request->is_confirm != 1) {
                 $msg = "The request to quit the room {$entity->name} has been rejected. Thank you for your understanding.";
                 $entity->status = 'active';
+                $entity->is_active = 1;
                 $entity->save();
                 // broadcast(new RoomDoneNotificationRequest($entity, $msg, $role->id));
                 // ResponseMessage($msg);
             } else {
                 $msg = "The request to quit the room {$entity->name} has been confirmed. The room will be quit and will soon close. Thank you.";
+                $entity->status = 'active';
+                $entity->is_active = 1;
+                $entity->save();
                 // broadcast(new RoomDoneNotificationRequest($entity, $msg, $role->id));
                 // ResponseMessage($msg);
             }
