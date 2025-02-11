@@ -5,7 +5,7 @@
             <div class="opacity-100 transition-opacity duration-150 ease-linear overflow-x-auto hidden-scrollbar" :style="isShowSidebar == true ? 'width:calc(100% - 375px)' : 'width:100%' ">
                 <div class="flex flex-wrap gap-x-4 gap-y-4">
                     <div class="flex flex-col mb-4" v-for="(room, roomIndex) in roomList" :key="roomIndex">
-                        <div class="flex flex-row gap-x-4">
+                        <div class="flex flex-row gap-x-4 pr-6">
                             <div :class="room.is_active == 0 ? 'bg-[#4fe0b7]' : 'bg-[#FF7675]'"
                                 class=" flex-shrink-0 flex-grow p-6 w-40 max-w-44 h-40">
                                 <button
