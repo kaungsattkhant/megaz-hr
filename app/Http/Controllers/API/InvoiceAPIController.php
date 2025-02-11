@@ -84,7 +84,7 @@ class InvoiceAPIController extends Controller
 
     public function addMoreSessions(Request $request)
     {
-
+        ResponseMessage('Add Sesion is invalid',419);
         $roomAndSession = $this->invoiceRepo->addSessionDuration($request->all());
         ResponseData($roomAndSession);
     }
@@ -163,7 +163,7 @@ class InvoiceAPIController extends Controller
         ResponseData($invoice);
     }
 
-    public function doneRoom(Request $request)
+    public function doneRoom(EntityValidationRequest $request)
     {
         $invoice = $this->invoiceRepo->doneRoom($request->all());
         ResponseData($invoice);
