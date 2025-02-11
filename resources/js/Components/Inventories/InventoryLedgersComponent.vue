@@ -148,7 +148,7 @@
                         </div>
                         <div class="relative px-12 py-4" data-te-modal-body-ref>
 
-                            <!-- <div class="mb-4">
+                            <div class="mb-4">
                                 <label for="" class="block text-sm text-black mb-3">
                                     Source Inventory
                                 </label>
@@ -160,7 +160,7 @@
                                         </option>
                                     </select>
                                 </div>
-                            </div> -->
+                            </div>
                             <div class="mb-4">
                                 <label for="" class="block text-sm text-black mb-3">
                                     Destination Inventory
@@ -530,10 +530,10 @@ export default {
         },
 
         confirmTransferBtnClicked() {
-            // if (!this.selectedSourceInventory) {
-            //     this.alertValidationMessage(`source inventory`);
-            //     return 1;
-            // }
+            if (!this.selectedSourceInventory) {
+                this.alertValidationMessage(`source inventory`);
+                return 1;
+            }
             if (!this.selectedDestinationInventory) {
                 this.alertValidationMessage(`destination inventory`);
                 return 1;
@@ -551,7 +551,7 @@ export default {
 
         async transferInventory() {
             let formData = new FormData();
-            // formData.append('source_inventory_id', this.selectedSourceInventory);
+            formData.append('source_inventory_id', this.selectedSourceInventory);
             formData.append('destination_inventory_id', this.selectedDestinationInventory);
             formData.append('quantity', this.quantity);
             formData.append('item_id', this.itemId);
