@@ -1310,7 +1310,9 @@ class InvoiceRepository implements InvoiceRepositoryInterface
 
             $activeInvoiceSession = $invoice->activeInvoicesession;
             $entity = $activeInvoiceSession->entity;
-
+            $activeInvoiceSession->is_active = 0;
+            $activeInvoiceSession->save();
+            
             $totalInvoiceSession = $this->invoiceService->getTotalInvoiceSession($invoice->id);
             $total_session_price = $totalInvoiceSession->total_session_value;
             $roomSessionsByInvoice = $activeInvoiceSession->roomSessions;
@@ -1402,8 +1404,7 @@ class InvoiceRepository implements InvoiceRepositoryInterface
             $customerDepositData['amount'] = $data['total'];
             $customerDepositData['deposit_balance'] = $this->getCustomerDepositBalance($customer->id);
             //end
-            $activeInvoiceSession->is_active = 0;
-            $activeInvoiceSession->save();
+        
             foreach ($roomSessionsByInvoice as $roomSession) {
                 $entitySession = $roomSession->entitySession;
                 $entitySession->is_active = 0;
