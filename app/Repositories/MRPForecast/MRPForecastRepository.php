@@ -915,7 +915,8 @@ class MRPForecastRepository implements MRPForecastRepositoryInterface
               $balanceQuery->whereHas('inventory_ledger', function ($q) use ($inventoryId) {
                 $q->where('inventory_id', $inventoryId);
               });
-            }
+            },
+            'brands'
           ]);
         }
       ])
@@ -928,6 +929,7 @@ class MRPForecastRepository implements MRPForecastRepositoryInterface
         $item = $ktvItem->item;
         $processedData = $this->processKTVItem($ktvItem, $item,  $quantity);
         $processedData['entity_id'] = $entityId;
+        $processedData['brands'] = isset($item->brands) ? $item->brands->toArray() : [];
         return $processedData;
       });
       $result = $result->merge($processedItems);
@@ -947,7 +949,8 @@ class MRPForecastRepository implements MRPForecastRepositoryInterface
             $balanceQuery->whereHas('inventory_ledger', function ($q) use ($inventoryId) {
               $q->where('inventory_id', $inventoryId);
             });
-          }
+          },
+          'brands'
         ]);
       }
     ])
@@ -960,6 +963,7 @@ class MRPForecastRepository implements MRPForecastRepositoryInterface
       $item = $ktvItem->item;
       $processedData = $this->processKTVItem($ktvItem, $item,  $quantity);
       $processedData['entity_id'] = $entityId;
+      $processedData['brands'] = isset($item->brands) ? $item->brands->toArray() : [];
       return $processedData;
     });
     return $this->groupMenuStepItems($processedItems);
@@ -995,7 +999,7 @@ class MRPForecastRepository implements MRPForecastRepositoryInterface
       'base_uom_id' => $item->base_uom_id ?? null,
       'base_uom_name' => $item->base_uom_name ?? 'null',
       'uom_id' => $item->uom_id ?? 0,
-      'item_uom' => $item->item_uom ?? 'null',
+      'uom_name' => $item->item_uom ?? 'null',
       'weight' => $ktvItem->quantity ?? 0,
       'uom_conversion_id' => $item->uom_conversion_id,
       'uom_conversion' => $conversionRate ?? 0,
@@ -1006,7 +1010,11 @@ class MRPForecastRepository implements MRPForecastRepositoryInterface
       'in_balance' => $inBalance,
       'out_balance' => $outBalance,
       'closing_balance' => $closingBalance ?? 0,
-      'current_holdings' => $currentHolding ?? 0
+      'current_holdings' => $currentHolding ?? 0,
+      'minimum_holding_amount' => $item->minimum_holding_amount ?? 0,
+      'min_holding_base_uom_quantity' => $item->min_holding_base_uom_quantity ?? 0,
+      'min_holding_uom_quantity' => $item->min_holding_uom_quantity ?? 0,
+      'brands'             => isset($data->item->brands) ? $item->brands->toArray() : []
     ];
   }
 
