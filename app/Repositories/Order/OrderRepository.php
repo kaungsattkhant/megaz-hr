@@ -299,8 +299,8 @@ class OrderRepository implements OrderRepositoryInterface
             }
             // $startTime = $date . ' 00:00:00';
             // $endTime = $date . ' 23:59:59';
-            $order_items = OrderItem::whereIn('status', ['pos_confirmed', 'in_progress', 'done'])
-                ->with('menu', 'order:id,order_id,invoice_id', 'order.invoice:id,entity_id', 'order.invoice.roomSession.entitySession.entity', 'area', 'order.invoice.table') // change entiy to entitySession
+            $order_items = OrderItem::whereIn('status', ['pos_confirmed', 'in progress', 'done'])
+                ->with('menu', 'order:id,order_id,invoice_id', 'order.invoice:id,entity_id', 'area', 'order.invoice.table') // change entiy to entitySession
                 // ->whereBetween('date', [$startTime, $endTime])
                 ->where('area_id', $areaId)
                 ->orderBy('id', 'desc')
@@ -313,20 +313,29 @@ class OrderRepository implements OrderRepositoryInterface
                     // Unset roomSession and table from the invoice
                     // Determine entity_name based on entity_id
                     if ($invoice->entity_id !== null) {
-                        // If entity_id is not null, use the table name
                         $orderItem->entity_name = $invoice->table->name ?? '';
-                    } else {
-                        // If entity_id is null, derive from roomSessions
-                        $roomSessions = $invoice->roomSession ?? [];
-                        $uniqueEntities = collect($roomSessions)
-                            ->pluck('entitySession.entity.name')
-                            ->unique()
-                            ->join(', '); // Join unique entity names
-
-                        $orderItem->entity_name = $uniqueEntities;
+                    }else{
+                        $activeInvoiceSession=$invoice->activeInvoiceSession;
+                        if(!$activeInvoiceSession){
+                            ResponseMessage('Not found',419);
+                        }
+                        $orderItem->entity_name=$activeInvoiceSession->entity->name;
                     }
-                    unset($invoice->roomSession);
-                    unset($invoice->table);
+                    // if ($invoice->entity_id !== null) {
+                    //     // If entity_id is not null, use the table name
+                    //     $orderItem->entity_name = $invoice->table->name ?? '';
+                    // } else {
+                    //     // If entity_id is null, derive from roomSessions
+                    //     $roomSessions = $invoice->roomSession ?? [];
+                    //     $uniqueEntities = collect($roomSessions)
+                    //         ->pluck('entitySession.entity.name')
+                    //         ->unique()
+                    //         ->join(', '); // Join unique entity names
+
+                    //     $orderItem->entity_name = $uniqueEntities;
+                    // }
+                    // unset($invoice->roomSession);
+                    // unset($invoice->table);
                 }
 
                 return $orderItem;
