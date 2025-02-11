@@ -1342,7 +1342,7 @@
                 this.selectedRoomId = room.id;
                 // this.getSelectedRoom();
                 if (this.roomList[roomIndex].entity_sessions[timeIndex].is_active == 1) {
-                    this.isOpenRoomStep('detail');
+                    
                     this.getPurchaseMenuList(); // why is this called
                     const response = await getApiData({ url: '/api/entities_sessions/'+ this.selectedTime.id, token: this.getToken() });
                     if (response.data) {
@@ -1353,6 +1353,7 @@
                         this.serviceList = response.data.services;
                         this.accessoryListSidebar = response.data.invoice_accessories;
                         this.getTotal(response.data);
+                        this.isOpenRoomStep('detail');
                     }
                 }
                 else {
