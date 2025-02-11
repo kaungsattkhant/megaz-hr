@@ -229,7 +229,7 @@ class InvoiceRepository implements InvoiceRepositoryInterface
                 $data['invoice_date'] = Carbon::now();
                 $invoice = Invoice::create($data);
 
-                $invoiceSession = $this->invoiceService->storeInvoiceSession($invoice->id, $entitySession->entity_id, $data['session_duration'], $entity->price_per_hour, $c['is_waiter'],$discountId = null);
+                $invoiceSession = $this->invoiceService->storeInvoiceSession($invoice->id, $entitySession->entity_id, $data['session_duration'], $entity->price_per_hour, $data['is_waiter'],$discountId = null);
                 //create deposit
                 $this->storeCustomerDeposit($data, UserData()->id);
                 //
