@@ -27,7 +27,7 @@ class OrderStatusNotificationRequest implements ShouldBroadcast
     public $entity;
 
 
-    public function __construct(Entity $entity,OrderItem $order_item,$department_id)
+    public function __construct($entity,OrderItem $order_item,$department_id)
     {
         //
         $this->order_item = $order_item;
