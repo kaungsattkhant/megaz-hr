@@ -152,7 +152,19 @@ class InvoiceRepository implements InvoiceRepositoryInterface
                 if (isset($data['entity_id']) && $data['entity_id'] != null) {
                     $entity = Entity::find($data['entity_id']);
                     $currentTime = Carbon::parse(now())->format('H:i');
-                    $entitySession = $entity->currentEntitySession($currentTime)->first();
+                    // $entitySession = $entity->currentEntitySession($currentTime)->first();
+                    $entitySession = EntitySession::where('id', $data['entity_session_id'])
+                        ->where(function ($query) use ($currentTime) {
+                            $query->whereRaw('? BETWEEN start_time AND end_time', [$currentTime])
+                                ->orWhere(function ($subQuery) use ($currentTime) {
+                                    $subQuery->whereRaw('start_time > end_time') // Handles sessions that cross midnight
+                                        ->where(function ($innerQuery) use ($currentTime) {
+                                            $innerQuery->whereRaw('? >= start_time', [$currentTime])
+                                                ->orWhereRaw('? <= end_time', [$currentTime]);
+                                        });
+                                });
+                        })
+                        ->first();
                     if (!$entitySession) {
                         ResponseMessage('Entity is invalid', 422);
                     }
