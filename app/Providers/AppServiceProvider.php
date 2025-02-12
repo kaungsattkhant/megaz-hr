@@ -55,8 +55,7 @@ class AppServiceProvider extends ServiceProvider
             'po_invoice' => 'App\Models\PoInvoice',
             'meeting' => 'App\Models\Meeting',
             'training' => 'App\Models\Training',
-
-
+            'orgNew' => 'App\Models\OrgNew',
         ]);
     }
 }

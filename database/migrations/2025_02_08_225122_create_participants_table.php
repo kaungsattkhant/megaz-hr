@@ -16,7 +16,7 @@ return new class extends Migration
             $table->foreignId('department_id')->nullable();
             $table->foreignId('role_id')->nullable();
             $table->foreignId('staff_id')->nullable();
-            $table->integer('participantable_id');
+            $table->unsignedBigInteger('participantable_id');
             $table->string('participantable_type');
             $table->timestamps();
         });

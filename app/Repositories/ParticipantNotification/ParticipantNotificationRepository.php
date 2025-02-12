@@ -2,10 +2,12 @@
 
 namespace App\Repositories\ParticipantNotification;
 
+use App\Models\Type;
 use App\Models\Staff;
 use App\Models\Meeting;
-use App\Models\Participant;
+use App\Models\OrgNew;
 use App\Models\Training;
+use App\Models\Participant;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Request;
 
@@ -52,7 +54,6 @@ class ParticipantNotificationRepository implements ParticipantNotificationInterf
           Participant::create($participantData);
         }
       }
-
 
       if (isset($data['meeting_type']) && isset($data['staff']) && $data['meeting_type'] === "staff_type") {
 
@@ -202,8 +203,14 @@ class ParticipantNotificationRepository implements ParticipantNotificationInterf
     try {
       $data['created_by'] = UserData()->id;
       $training = Training::create($data);
-
-
+      if (isset($data['type'])) {
+        $typeData = [
+          'name' => $data['type'],
+          'typeable_id' => $training->id,
+          'typeable_type' => 'training',
+        ];
+        Type::create($typeData);
+      }
       if (isset($data['training_type']) && isset($data['department']) && $data['training_type'] === "dep_type") {
 
         foreach ($data['department'] as $dep) {
@@ -251,8 +258,11 @@ class ParticipantNotificationRepository implements ParticipantNotificationInterf
 
   public function getTrainings()
   {
-    $meeting = Training::with([
-      'trained_by',
+    $training = Training::with([
+      'type' => function ($query) {
+        $query->where('typeable_type', 'training');
+      },
+      'trainedBy',
       'createdBy',
       'participants' => function ($query) {
         $query->where('participantable_type', 'training');
@@ -267,15 +277,20 @@ class ParticipantNotificationRepository implements ParticipantNotificationInterf
       // 'participants.role.department',
       // 'participants.role.staffs',
     ])->orderBy('created_at', 'desc')->get();
-    return $meeting;
+    return $training;
   }
 
   public function getTrainingById($trainingId)
   {
     $training = Training::with([
+      'type' => function ($query) {
+        $query->where('typeable_type', 'training');
+      },
       'participants' => function ($query) {
         $query->where('participantable_type', 'training');
       },
+      'trainedBy',
+      'createdBy',
       'participants.staff',
       // 'participants.staff.department',
       // 'participants.staff.roles',
@@ -307,7 +322,18 @@ class ParticipantNotificationRepository implements ParticipantNotificationInterf
       $data = Request::all();
       $data['created_by'] = UserData()->id;
       $training->update($data);
+      $training->type()->where('typeable_type', 'training')->where('typeable_id', $training->id)->delete();
       $training->participants()->where('participantable_type', 'training')->delete();
+
+      if (isset($data['type'])) {
+        $typeData = [
+          'name' => $data['type'],
+          'typeable_id' => $training->id,
+          'typeable_type' => 'training',
+        ];
+        Type::create($typeData);
+      }
+
       if (isset($data['training_type']) && isset($data['department']) && $data['training_type'] === "dep_type") {
         foreach ($data['department'] as $dep) {
           $participantData = [
@@ -357,9 +383,10 @@ class ParticipantNotificationRepository implements ParticipantNotificationInterf
     DB::beginTransaction();
     try {
       $training = Training::find($trainingId);
-      if (! $training) {
+      if (!$training) {
         return ResponseData(null, 404, false, 'Meeting not found.');
       }
+      $training->type()->where('typeable_type', 'training')->where('typeable_id', $training->id)->delete();
       $training->participants()->where('participantable_type', 'training')->delete();
       $training->delete();
       DB::commit();
@@ -367,6 +394,200 @@ class ParticipantNotificationRepository implements ParticipantNotificationInterf
     } catch (\Exception $e) {
       DB::rollBack();
       return ResponseData(null, 422, false, 'An error occurred while deleting the training. ' . $e->getMessage());
+    }
+  }
+
+  public function getOrgNews()
+  {
+    $orgNew = OrgNew::with([
+      'type' => function ($query) {
+        $query->where('typeable_type', 'orgNew');
+      },
+      'orgNewsBy',
+      'createdBy',
+      'participants' => function ($query) {
+        $query->where('participantable_type', 'orgNew');
+      },
+      'participants.staff',
+      'participants.department',
+      'participants.role',
+      // 'participants.staff.department',
+      // 'participants.staff.roles',
+      // 'participants.department.roles',
+      // 'participants.department.staffs',
+      // 'participants.role.department',
+      // 'participants.role.staffs',
+    ])->orderBy('created_at', 'desc')->get();
+    return  $orgNew;
+  }
+  public function getOrgNewsById($orgNewsId)
+  {
+    $orgNew = OrgNew::with([
+      'type' => function ($query) {
+        $query->where('typeable_type', 'orgNew');
+      },
+      'orgNewsBy',
+      'createdBy',
+      'participants' => function ($query) {
+        $query->where('participantable_type', 'orgNew');
+      },
+      'participants.staff',
+      // 'participants.staff.department',
+      // 'participants.staff.roles',
+      'participants.department',
+      'participants.role',
+      // 'participants.department.roles',
+      // 'participants.department.staffs',
+      // 'participants.role.department',
+      // 'participants.role.staffs',
+    ])->find($orgNewsId);
+    if (!$orgNew) {
+      return ResponseData(null, 404, false, 'OrgNew not found.');
+    }
+    return ResponseData($orgNew, 200, true, 'OrgNew details retrieved successfully.');
+  }
+  public function storeOrgNews($data)
+  {
+    DB::beginTransaction();
+
+    try {
+      $data['created_by'] = UserData()->id;
+      $orgNew = OrgNew::create($data);
+      if (isset($data['type'])) {
+        $typeData = [
+          'name' => $data['type'],
+          'typeable_id' =>  $orgNew->id,
+          'typeable_type' => 'orgNew',
+        ];
+        Type::create($typeData);
+      }
+      if (isset($data['org_news_type']) && isset($data['department']) && $data['org_news_type'] === "dep_type") {
+
+        foreach ($data['department'] as $dep) {
+          $participantData = [
+            'participantable_id' =>  $orgNew->id,
+            'participantable_type' => 'orgNew',
+            'department_id' => $dep
+          ];
+          Participant::create($participantData);
+        }
+      }
+
+      if (isset($data['org_news_type']) && isset($data['role']) && $data['org_news_type'] === "role_type") {
+
+        foreach ($data['role'] as $role) {
+          $participantData = [
+            'participantable_id' =>  $orgNew->id,
+            'participantable_type' => 'orgNew',
+            'role_id' => $role
+          ];
+          Participant::create($participantData);
+        }
+      }
+
+
+      if (isset($data['org_news_type']) && isset($data['staff']) && $data['org_news_type'] === "staff_type") {
+
+        foreach ($data['staff'] as $staff) {
+          $participantData = [
+            'participantable_id' =>  $orgNew->id,
+            'participantable_type' => 'orgNew',
+            'staff_id' => $staff
+          ];
+          Participant::create($participantData);
+        }
+      }
+      DB::commit();
+      return ResponseData($orgNew, 201, true, "Training created successfully.");
+    } catch (\Exception $e) {
+      DB::rollBack();
+      return ResponseData($data = null, $status_code = 422, false, $extra_message = "An error occurred Training stored.");
+    }
+  }
+  public function  updateOrgNews($orgNewsId)
+  {
+    DB::beginTransaction();
+
+    try {
+
+      $orgNew = OrgNew::find($orgNewsId);
+      if (!$orgNew) {
+        return ResponseData(null, 404, false, 'orgNew not found.');
+      }
+
+      $data = Request::all();
+      $data['created_by'] = UserData()->id;
+      $orgNew->update($data);
+      $orgNew->type()->where('typeable_type', 'orgNew')->where('typeable_id', $orgNew->id)->delete();
+      $orgNew->participants()->where('participantable_type', 'orgNew')->delete();
+
+      if (isset($data['type'])) {
+        $typeData = [
+          'name' => $data['type'],
+          'typeable_id' => $orgNew->id,
+          'typeable_type' => 'orgNew',
+        ];
+        Type::create($typeData);
+      }
+
+      if (isset($data['org_news_type']) && isset($data['department']) && $data['org_news_type'] === "dep_type") {
+        foreach ($data['department'] as $dep) {
+          $participantData = [
+            'participantable_id' => $orgNew->id,
+            'participantable_type' => 'orgNew',
+            'department_id' => $dep
+          ];
+          Participant::create($participantData);
+        }
+      }
+
+      if (isset($data['org_news_type']) && isset($data['role']) && $data['org_news_type'] === "role_type") {
+
+        foreach ($data['role'] as $role) {
+          $participantData = [
+            'participantable_id' => $orgNew->id,
+            'participantable_type' => 'orgNew',
+            'role_id' => $role
+          ];
+          Participant::create($participantData);
+        }
+      }
+
+      if (isset($data['org_news_type']) && isset($data['staff']) && $data['org_news_type'] === "staff_type") {
+
+        foreach ($data['staff'] as $staff) {
+          $participantData = [
+            'participantable_id' => $orgNew->id,
+            'participantable_type' => 'orgNew',
+            'staff_id' => $staff
+          ];
+          Participant::create($participantData);
+        }
+      }
+      DB::commit();
+      return ResponseData($orgNew, 200, true, 'orgNew updated successfully.');
+    } catch (\Exception $e) {
+      DB::rollBack();
+      return ResponseData(null, 422, false, 'An error occurred while updating the orgNew. ' . $e->getMessage());
+    }
+  }
+
+  public function deleteOrgNews($orgNewsId)
+  {
+    DB::beginTransaction();
+    try {
+      $orgNew = OrgNew::find($orgNewsId);
+      if (!$orgNew) {
+        return ResponseData(null, 404, false, 'OrgNews not found.');
+      }
+      $orgNew->type()->where('typeable_type', 'orgNew')->where('typeable_id', $orgNew->id)->delete();
+      $orgNew->participants()->where('participantable_type', 'orgNew')->delete();
+      $orgNew->delete();
+      DB::commit();
+      return ResponseData(null, 200, true, 'orgNew deleted successfully.');
+    } catch (\Exception $e) {
+      DB::rollBack();
+      return ResponseData(null, 422, false, 'An error occurred while deleting the orgNew. ' . $e->getMessage());
     }
   }
 }

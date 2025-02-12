@@ -73,11 +73,39 @@ class ParticipantNotificationController extends Controller
         ResponseData($data);
     }
 
-
-
     public function deleteTraining($trainingId)
     {
         $data = $this->ParticipantNotificationRepository->deleteTraining($trainingId);
+        ResponseData($data);
+    }
+
+    public function getOrgNews()
+    {
+        $data = $this->ParticipantNotificationRepository->getOrgNews();
+        ResponseData($data);
+    }
+
+    public function storeOrgNews(Request $request)
+    {
+        $data = $this->ParticipantNotificationRepository->storeOrgNews($request->all());
+        ResponseData($data);
+    }
+
+    public function updateOrgNews($orgNewsId)
+    {
+        $data = $this->ParticipantNotificationRepository->updateOrgNews($orgNewsId);
+        ResponseData($data);
+    }
+
+    public function getOrgNewsById($orgNewsId)
+    {
+        $data = $this->ParticipantNotificationRepository->getTrainingById($orgNewsId);
+        ResponseData($data);
+    }
+
+    public function deleteOrgNews($orgNewsId)
+    {
+        $data = $this->ParticipantNotificationRepository->deleteOrgNews($orgNewsId);
         ResponseData($data);
     }
 }
