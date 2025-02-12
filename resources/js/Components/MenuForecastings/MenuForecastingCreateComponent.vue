@@ -398,7 +398,7 @@
                                 </label>
                                 <div class="bg-white mb-0 w-full text-sm inline-block"
                                     data-te-select-wrapper-ref>
-                                    <select data-te-select-init data-te-select-placeholder="Select UOM"
+                                    <select data-te-select-init data-te-select-placeholder="Select UOM" disabled
                                         data-te-select-filter="true" name="" id="" v-model="po_base_uom" class="input-ui">
                                         <option :value="uom" v-for="(uom, uomIndex) in itemUoms"
                                             :key="uomIndex"> {{ uom.name }} </option>
@@ -419,7 +419,7 @@
                                 </label>
                                 <div class="bg-white mb-0 w-full text-sm inline-block"
                                     data-te-select-wrapper-ref>
-                                    <select data-te-select-init data-te-select-placeholder="Select UOM"
+                                    <select data-te-select-init data-te-select-placeholder="Select UOM" disabled
                                         data-te-select-filter="true" name="" id="" v-model="po_uom" class="input-ui">
                                         <option :value="uom" v-for="(uom, uomIndex) in itemUoms"
                                             :key="uomIndex"> {{ uom.name }} </option>
@@ -781,7 +781,7 @@ export default {
             else{
                 formData.append("status", 'created');
             }
-            
+
             let url = '/api/forecasts/purchase_orders_item/' + this.selectedItem.item_id;
             let response = await postApiData({url: url, form_data: formData, token: this.getToken()});
             if(response.success){
