@@ -781,6 +781,7 @@ export default {
             else{
                 formData.append("status", 'created');
             }
+            
             let url = '/api/forecasts/purchase_orders_item/' + this.selectedItem.item_id;
             let response = await postApiData({url: url, form_data: formData, token: this.getToken()});
             if(response.success){
