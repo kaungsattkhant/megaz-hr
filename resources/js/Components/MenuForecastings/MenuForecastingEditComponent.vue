@@ -697,20 +697,16 @@ export default {
             this.itemSelectChanged();
         },
         btnClickedCreatePo(){
-            if(!this.quantity){
-                this.alertValidationMessage('Date');
+            if(!this.po_quantity){
+                this.alertValidationMessage('Quantiy');
                 return 1;
             }
-            if(!this.uom_id){
-                this.alertValidationMessage('Date');
+            if(!this.po_uom){
+                this.alertValidationMessage('Uom');
                 return 1;
             }
-            if(!this.date){
-                this.alertValidationMessage('Date');
-                return 1;
-            }
-            if(!this.date){
-                this.alertValidationMessage('Date');
+            if(!this.po_brand){
+                this.alertValidationMessage('Brand');
                 return 1;
             }
             this.createPo();
