@@ -21,8 +21,15 @@ interface ParticipantNotificationInterface
   public function deleteTraining($trainingId);
 
   public function storeOrgNews($data);
-  public function  updateOrgNews($orgNewsId);
+  public function updateOrgNews($orgNewsId);
   public function getOrgNews();
   public function getOrgNewsById($orgNewsId);
   public function deleteOrgNews($orgNewsId);
+
+
+  public function getWarnings($request);
+  public function getWarningById($warningId);
+  public function storeWarning($data);
+  public function updateWarning($warningId);
+  public function deleteWarning($warningId);
 }

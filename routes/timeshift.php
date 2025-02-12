@@ -71,5 +71,11 @@ Route::middleware('auth:api')->group(function () {
     Route::post('/orgNews', 'storeOrgNews');
     Route::post('/orgNews/{orgNewsId}', 'updateOrgNews');
     Route::delete('/orgNews/{orgNewsId}', 'deleteOrgNews');
+
+    Route::get('/warnings', 'getWarnings');
+    Route::get('/warnings/{warningId}', 'getWarningById');
+    Route::post('/warnings', 'storeWarning');
+    Route::post('/warnings/{warningId}', 'updateWarning');
+    Route::delete('/warnings/{warningId}', 'deleteWarning');
   });
 });

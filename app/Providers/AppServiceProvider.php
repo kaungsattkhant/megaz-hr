@@ -56,6 +56,7 @@ class AppServiceProvider extends ServiceProvider
             'meeting' => 'App\Models\Meeting',
             'training' => 'App\Models\Training',
             'orgNew' => 'App\Models\OrgNew',
+            'warning' => 'App\Models\Warning',
         ]);
     }
 }

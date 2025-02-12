@@ -108,4 +108,33 @@ class ParticipantNotificationController extends Controller
         $data = $this->ParticipantNotificationRepository->deleteOrgNews($orgNewsId);
         ResponseData($data);
     }
+
+    public function getWarnings(Request $request)
+    {
+        $data = $this->ParticipantNotificationRepository->getWarnings($request);
+        ResponseData($data);
+    }
+
+    public function getWarningById($warningId)
+    {
+        $data = $this->ParticipantNotificationRepository->getWarningById($warningId);
+        ResponseData($data);
+    }
+
+    public function storeWarning(Request $request)
+    {
+        $data = $this->ParticipantNotificationRepository->storeWarning($request->all());
+        ResponseData($data);
+    }
+
+    public function updateWarning($warningId)
+    {
+        $data = $this->ParticipantNotificationRepository->updateWarning($warningId);
+        ResponseData($data);
+    }
+    public function deleteWarning($warningId)
+    {
+        $data = $this->ParticipantNotificationRepository->deleteWarning($warningId);
+        ResponseData($data);
+    }
 }
