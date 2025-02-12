@@ -5,7 +5,7 @@
             <div class="opacity-100 transition-opacity duration-150 ease-linear overflow-x-auto hidden-scrollbar" :style="isShowSidebar == true ? 'width:calc(100% - 375px)' : 'width:100%' ">
                 <div class="flex flex-wrap gap-x-4 gap-y-4">
                     <div class="flex flex-col mb-4" v-for="(room, roomIndex) in roomList" :key="roomIndex">
-                        <div class="flex flex-row gap-x-4">
+                        <div class="flex flex-row gap-x-4 pr-6">
                             <div :class="room.is_active == 0 ? 'bg-[#4fe0b7]' : 'bg-[#FF7675]'"
                                 class=" flex-shrink-0 flex-grow p-6 w-40 max-w-44 h-40">
                                 <button
@@ -1319,6 +1319,7 @@
                 depositBalance: null,
 
                 total_room_price:0,
+                entityType: null,
             };
         },
 
@@ -1332,7 +1333,8 @@
                     const response = await getApiData({ url: '/api/areas/' + this.roomAreaId + '/entities' , token: this.getToken()});
                     if(response.data){
                         this.roomList = response.data;
-                        console.log('get room list')
+                        console.log(response.data)
+                        this.entityType = response.data[0].entity_type
                     }
                 }
                 
@@ -1527,6 +1529,7 @@
                 if (this.child > 0) {
                     formData.append('child', +this.child);
                 }
+                formData.append('entity_type', this.entityType);
                 let response = await postApiData({ url: '/api/entities/start', form_data: formData, token: this.getToken() });
                 if (response.success) {
                     this.getRoomList();
@@ -1653,6 +1656,7 @@
                 let formData = new FormData();
                 let roomSessions = [];
                 formData.append('invoice_id', this.selectedRoom.invoice.id);
+                formData.append('entity_type', this.entityType);
                 // if(this.depositBalance > 0){
                 //     formData.append('deposit_balance', this.depositBalance);
                 // }
@@ -1890,6 +1894,7 @@
                 let allTotalDiscounts = 0;
                 let formData = new FormData();
                 formData.append('invoice_id', this.selectedRoom.invoice.id);
+                formData.append('entity_type', this.entityType);
                 // formData.append('payment_type', this.selectedPaymentMethod);
                 if(this.discount_type){
                     formData.append('discount_type', this.discount_type);
@@ -2121,6 +2126,7 @@
                 formData.append('invoice_id', this.selectedRoom.invoice.id);
                 formData.append('entity_id', this.change_room.id);
                 formData.append('start_date_time', this.start_date_time);
+                formData.append('entity_type', this.entityType);
                 let response = await postApiData({ url: '/api/entities/change', form_data: formData, token: this.getToken() });
                 console.log('change room ' + this.selectedRoom.invoice.invoice_id + ',' + this.change_room.id)
                 if (response.success) {

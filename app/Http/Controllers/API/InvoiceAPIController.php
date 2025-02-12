@@ -8,6 +8,7 @@ use App\Events\RoomNotificationRequest;
 use Illuminate\Http\Request;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Room\EntityValidationRequest;
 use App\Http\Requests\RoomSession\EndRoomSessionRequest;
 use App\Models\Department;
 use App\Models\Entity;
@@ -31,7 +32,7 @@ class InvoiceAPIController extends Controller
         $this->orderRepo = $orderRepo;
     }
 
-    public function startEntity(Request $request)
+    public function startEntity(EntityValidationRequest $request)
     {
         DB::beginTransaction();
         try {
@@ -83,18 +84,18 @@ class InvoiceAPIController extends Controller
 
     public function addMoreSessions(Request $request)
     {
-
+        ResponseMessage('Add Sesion is invalid',419);
         $roomAndSession = $this->invoiceRepo->addSessionDuration($request->all());
         ResponseData($roomAndSession);
     }
 
-    public function changeRoom(Request $request)
+    public function changeRoom(EntityValidationRequest $request)
     {
         $changeRoom = $this->invoiceRepo->invoiceEntityChange($request->all());
         ResponseData($changeRoom);
     }
 
-    public function endRoom(Request $request)
+    public function endRoom(EntityValidationRequest $request)
     {
         // dd($request->all());
         $catering_department = Department::where('name', 'Catering')->first();
@@ -110,7 +111,7 @@ class InvoiceAPIController extends Controller
         //   }
 
         //end invoice for table
-        if($invoice->entity_id!=null){
+        if($request->entity_type=='table'){
             $entity=Entity::find($invoice->entity_id);
         }else{
             $activeInvoiceSession=$invoice->activeInvoiceSession;
@@ -135,7 +136,7 @@ class InvoiceAPIController extends Controller
             $msg = '';
             if ($request->is_confirm != 1) {
                 $msg = "The request to quit the room {$entity->name} has been rejected. Thank you for your understanding.";
-                $entity->status = 'active';
+                // $entity->status = 'active';
                 $entity->is_active = 1;
                 $entity->save();
                 // broadcast(new RoomDoneNotificationRequest($entity, $msg, $role->id));
@@ -145,7 +146,7 @@ class InvoiceAPIController extends Controller
                 $entity->status = 'inactive';
                 $entity->is_active = 0;
                 $entity->save();
-                // broadcast(new RoomDoneNotificationRequest($entity, $msg, $role->id));
+                broadcast(new RoomDoneNotificationRequest($entity, $msg, $role->id));
                 // ResponseMessage($msg);
             }
             broadcast(new RoomDoneNotificationRequest($entity, $msg, $role->id));
@@ -162,7 +163,7 @@ class InvoiceAPIController extends Controller
         ResponseData($invoice);
     }
 
-    public function doneRoom(Request $request)
+    public function doneRoom(EntityValidationRequest $request)
     {
         $invoice = $this->invoiceRepo->doneRoom($request->all());
         ResponseData($invoice);
