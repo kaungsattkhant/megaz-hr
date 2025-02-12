@@ -403,21 +403,21 @@ class PurchaseOrderRepository implements PurchaseOrderRepositoryInterface
                     if ($model->procurement_manager_check_id != null) {
                         ResponseMessage('This Purchase Order is already checked By Procurement Manager', 422);
                     }
-                    if ($model->manager_check_id == null || $model->manager_check_time==null) {
+                    if ($model->manager_check_id == null || $model->manager_check_time == null) {
                         ResponseMessage('Required confirmation from HR(Manager) ! ', 422);
                     }
                 } else if (checkDepartmentAndRoles('Finance', ['Manager'])) {
                     if ($model->financial_check_id != null) {
                         ResponseMessage('This Purchase Order is already checked By Financial', 422);
                     }
-                    if ($model->procurement_manager_check_id == null || $model->procurement_manager_check_time==null) {
+                    if ($model->procurement_manager_check_id == null || $model->procurement_manager_check_time == null) {
                         ResponseMessage('Required confirmation from Procurement', 422);
                     }
                 } else if (checkDepartmentAndRoles('Management', ['MD'])) {
                     if ($model->is_md_checked) {
                         ResponseMessage('This Purchase Order is already checked By MD', 422);
                     }
-                    if ($model->financial_check_id == null || $model->financial_check_time==null) {
+                    if ($model->financial_check_id == null || $model->financial_check_time == null) {
                         ResponseMessage('Required confirmation from Finance', 422);
                     }
                     // if (!$model->createdBy->department->inventory) {
@@ -478,7 +478,7 @@ class PurchaseOrderRepository implements PurchaseOrderRepositoryInterface
             ->with('item_price') // Load the related item_price
             ->join('item_prices', 'supplier_items.id', '=', 'item_prices.supplier_item_id') // Join with item_prices
             ->avg('item_prices.price'); // Calculate average price
-        return $avgItemPrice ? (float) $avgItemPrice : 0; 
+        return $avgItemPrice ? (float) $avgItemPrice : 0;
 
         // $supplierItems = SupplierItem::where('item_id', $itemId)
         //     ->where('brand_id', $brandId)

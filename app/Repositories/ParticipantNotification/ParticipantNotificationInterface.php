@@ -15,4 +15,7 @@ interface ParticipantNotificationInterface
 
   public function storeTraining($data);
   public function getTrainings();
+  public function getTrainingById($trainingId);
+  public function updateTraining($trainingId);
+  public function deleteTraining($trainingId);
 }

@@ -635,7 +635,6 @@ class MRPForecastRepository implements MRPForecastRepositoryInterface
     if (isset($data['status'])) {
       DB::beginTransaction();
       try {
-
         $latest = PurchaseOrder::orderBy('created_at', 'desc')->first();
         $count = 4;
         $no = (new CommonPurchaseOrder())->getUniqueId($latest, 'po_id', $count);
@@ -649,14 +648,18 @@ class MRPForecastRepository implements MRPForecastRepositoryInterface
           'status' => $data['status']
         ]);
         $poItem = PurchaseOrderItem::create([
+          'base_uom_id' => $data['base_uom_id'],
+          'base_uom_quantity' => $data['base_uom_quantity'],
+          'uom_id' => $data['uom_id'],
+          'uom_quantity' => $data['uom_quantity'],
           'quantity' => $data['quantity'],
           'purchase_order_id' => $po->id,
           'item_id' => $itemId,
           'brand_id' => $data['brand_id'],
-          'amount' => $data['quantity'],
+          'amount' => $data['amount'],
           'original_quantity' => $data['quantity'],
-          'uom_id' => $data['uom_id'],
-          'uom_conversion_id' => $data['uom_conversion_id']
+          'uom_conversion_id' => $data['uom_conversion_id'],
+          'unit_price' => $data['unit_price']
         ]);
         DB::commit();
         return $poItem;
@@ -670,14 +673,18 @@ class MRPForecastRepository implements MRPForecastRepositoryInterface
       $po->increment('total_price', $totalPrice);
       return PurchaseOrderItem::create(
         [
-          'quantity' => $data['quantity'],
+          'base_uom_id' => $data['base_uom_id'],
+          'base_uom_quantity' => $data['base_uom_quantity'],
+          'uom_quantity' => $data['uom_quantity'],
           'purchase_order_id' => $po->id,
           'item_id' => $itemId,
           'brand_id' => $data['brand_id'],
-          'amount' => $data['quantity'],
+          'amount' => $data['amount'],
           'original_quantity' => $data['quantity'],
+          'quantity' => $data['quantity'],
           'uom_id' => $data['uom_id'],
-          'uom_conversion_id' => $data['uom_conversion_id']
+          'uom_conversion_id' => $data['uom_conversion_id'],
+          'unit_price' => $data['unit_price']
         ]
       );
     }

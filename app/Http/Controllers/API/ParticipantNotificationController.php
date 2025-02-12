@@ -56,11 +56,28 @@ class ParticipantNotificationController extends Controller
         ResponseData($data);
     }
 
-
-
     public function getTrainings()
     {
         $data = $this->ParticipantNotificationRepository->getTrainings();
+        ResponseData($data);
+    }
+    public function getTrainingById($trainingId)
+    {
+        $data = $this->ParticipantNotificationRepository->getTrainingById($trainingId);
+        ResponseData($data);
+    }
+
+    public function updateTraining($trainingId)
+    {
+        $data = $this->ParticipantNotificationRepository->updateTraining($trainingId);
+        ResponseData($data);
+    }
+
+
+
+    public function deleteTraining($trainingId)
+    {
+        $data = $this->ParticipantNotificationRepository->deleteTraining($trainingId);
         ResponseData($data);
     }
 }
