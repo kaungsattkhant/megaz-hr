@@ -493,13 +493,14 @@
                 let response = await postApiData({ url: `/api/entities/done?is_confirm=1`, form_data: formData, token: this.getToken() });
                 if (response.data) {
                     console.log('confirm success')
+                    window.location.reload();
                 }
                 let index = this.sessionRequests2.findIndex(sessionRequest => sessionRequest.invoice_id == id);
                 if (index != -1) {
                     this.sessionRequests2[index].status = 'confirmed';
                     this.sessionRequests2.splice(index, 1);
                 }
-                // window.location.reload();
+                
                 this.emitRoomListUpdate();
 
                 this.notiModalOpen2();
@@ -513,13 +514,14 @@
                 let response = await postApiData({ url: `/api/entities/done?is_confirm=0`, form_data: formData, token: this.getToken() });
                 if (response.data) {
                     console.log('reject success')
+                    window.location.reload();
                 }
                 let index = this.sessionRequests2.findIndex(sessionRequest => sessionRequest.invoice_id == id);
                 if (index != -1) {
                     this.sessionRequests2[index].status = 'rejected';
                     this.sessionRequests2.splice(index, 1);
                 }
-                // window.location.reload();
+                
                 this.emitRoomListUpdate();
 
                 this.notiModalOpen2();

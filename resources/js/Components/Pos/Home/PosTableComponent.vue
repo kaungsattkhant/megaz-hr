@@ -1208,6 +1208,7 @@
                 this.isShowSidebar = true;
                 this.selectedRoom = null;
                 this.selectedRoomId = room.id;
+                console.log('btnClickedIsOpenRoom',this.roomList[roomIndex].is_active)
                 // this.getSelectedRoom();
                 if (this.roomList[roomIndex].is_active == 1) {
                     this.isOpenRoomStep('detail');
