@@ -65,5 +65,17 @@ Route::middleware('auth:api')->group(function () {
     Route::post('/trainings', 'storeTraining');
     Route::post('/trainings/{trainingId}', 'updateTraining');
     Route::delete('/trainings/{trainingId}', 'deleteTraining');
+
+    Route::get('/orgNews', 'getOrgNews');
+    Route::get('/orgNews/{orgNewsId}', 'getOrgNewsById');
+    Route::post('/orgNews', 'storeOrgNews');
+    Route::post('/orgNews/{orgNewsId}', 'updateOrgNews');
+    Route::delete('/orgNews/{orgNewsId}', 'deleteOrgNews');
+
+    Route::get('/warnings', 'getWarnings');
+    Route::get('/warnings/{warningId}', 'getWarningById');
+    Route::post('/warnings', 'storeWarning');
+    Route::post('/warnings/{warningId}', 'updateWarning');
+    Route::delete('/warnings/{warningId}', 'deleteWarning');
   });
 });

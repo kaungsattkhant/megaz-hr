@@ -14,4 +14,9 @@ class Type extends Model
         'typeable_id',
         'typeable_type'
     ];
+
+    public function typeable()
+    {
+        return $this->morphTo();
+    }
 }

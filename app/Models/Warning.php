@@ -2,31 +2,21 @@
 
 namespace App\Models;
 
-use App\Models\Staff;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
-class Training extends Model
+class Warning extends Model
 {
     use HasFactory;
 
     protected $fillable = [
         'date_time',
-        'from_date',
-        'to_date',
-        'place',
-        'trained_by',
         'description',
         'created_by',
-        'training_type'
+        'warning_type',
     ];
-
-    public function trainedBy()
-    {
-        return $this->belongsTo(Staff::class, 'trained_by');
-    }
 
     public function createdBy()
     {
