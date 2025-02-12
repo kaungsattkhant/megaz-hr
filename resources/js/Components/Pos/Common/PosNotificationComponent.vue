@@ -489,6 +489,7 @@
                 let formData = new FormData();
                 formData.append("invoice_id", id);
                 formData.append('entity_type', entity.entity_type);
+                
                 let response = await postApiData({ url: `/api/entities/done?is_confirm=1`, form_data: formData, token: this.getToken() });
                 if (response.data) {
                     console.log('confirm success')
@@ -508,6 +509,7 @@
                 let formData = new FormData();
                 formData.append("invoice_id", id);
                 formData.append('entity_type', entity.entity_type);
+                
                 let response = await postApiData({ url: `/api/entities/done?is_confirm=0`, form_data: formData, token: this.getToken() });
                 if (response.data) {
                     console.log('reject success')

@@ -21,7 +21,7 @@
             </div>
             <div class="mb-4 col-span-3 rounded-md">
                 <label for="" class="block text-sm text-black mb-3">
-                    Cooking Areas
+                    Cooking Places
                 </label>
                 <div class="bg-white mb-0 w-full text-sm inline-block h-[34px]"
                     data-te-select-wrapper-ref>
