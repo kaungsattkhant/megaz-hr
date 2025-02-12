@@ -195,9 +195,6 @@ class ParticipantNotificationRepository implements ParticipantNotificationInterf
     }
   }
 
-
-
-
   public function storeTraining($data)
   {
     DB::beginTransaction();
@@ -252,5 +249,124 @@ class ParticipantNotificationRepository implements ParticipantNotificationInterf
   }
 
 
-  public function getTrainings() {}
+  public function getTrainings()
+  {
+    $meeting = Training::with([
+      'trained_by',
+      'createdBy',
+      'participants' => function ($query) {
+        $query->where('participantable_type', 'training');
+      },
+      'participants.staff',
+      'participants.department',
+      'participants.role',
+      // 'participants.staff.department',
+      // 'participants.staff.roles',
+      // 'participants.department.roles',
+      // 'participants.department.staffs',
+      // 'participants.role.department',
+      // 'participants.role.staffs',
+    ])->orderBy('created_at', 'desc')->get();
+    return $meeting;
+  }
+
+  public function getTrainingById($trainingId)
+  {
+    $training = Training::with([
+      'participants' => function ($query) {
+        $query->where('participantable_type', 'training');
+      },
+      'participants.staff',
+      // 'participants.staff.department',
+      // 'participants.staff.roles',
+      'participants.department',
+      'participants.role',
+      // 'participants.department.roles',
+      // 'participants.department.staffs',
+      // 'participants.role.department',
+      // 'participants.role.staffs',
+    ])->find($trainingId);
+    if (!$training) {
+      return ResponseData(null, 404, false, 'Training not found.');
+    }
+    return ResponseData($training, 200, true, 'Training details retrieved successfully.');
+  }
+
+
+  public function updateTraining($trainingId)
+  {
+    DB::beginTransaction();
+
+    try {
+
+      $training = Training::find($trainingId);
+      if (!$training) {
+        return ResponseData(null, 404, false, 'Training not found.');
+      }
+
+      $data = Request::all();
+      $data['created_by'] = UserData()->id;
+      $training->update($data);
+      $training->participants()->where('participantable_type', 'training')->delete();
+      if (isset($data['training_type']) && isset($data['department']) && $data['training_type'] === "dep_type") {
+        foreach ($data['department'] as $dep) {
+          $participantData = [
+            'participantable_id' => $training->id,
+            'participantable_type' => 'training',
+            'department_id' => $dep
+          ];
+          Participant::create($participantData);
+        }
+      }
+
+      if (isset($data['training_type']) && isset($data['role']) && $data['training_type'] === "role_type") {
+        // $training->participants()->where('participantable_type', 'training')->whereNotNull('role_id')->delete();
+
+        foreach ($data['role'] as $role) {
+          $participantData = [
+            'participantable_id' => $training->id,
+            'participantable_type' => 'training',
+            'role_id' => $role
+          ];
+          Participant::create($participantData);
+        }
+      }
+
+      if (isset($data['training_type']) && isset($data['staff']) && $data['training_type'] === "staff_type") {
+        // $training->participants()->where('participantable_type', 'training')->whereNotNull('staff_id')->delete();
+
+        foreach ($data['staff'] as $staff) {
+          $participantData = [
+            'participantable_id' => $training->id,
+            'participantable_type' => 'training',
+            'staff_id' => $staff
+          ];
+          Participant::create($participantData);
+        }
+      }
+      DB::commit();
+      return ResponseData($training, 200, true, 'Training updated successfully.');
+    } catch (\Exception $e) {
+      DB::rollBack();
+      return ResponseData(null, 422, false, 'An error occurred while updating the training. ' . $e->getMessage());
+    }
+  }
+
+  public function deleteTraining($trainingId)
+  {
+    DB::beginTransaction();
+    try {
+      $training = Training::find($trainingId);
+      if (! $training) {
+        return ResponseData(null, 404, false, 'Meeting not found.');
+      }
+      $training->participants()->where('participantable_type', 'training')->delete();
+      $training->delete();
+      DB::commit();
+      return ResponseData(null, 200, true, 'Training deleted successfully.');
+    } catch (\Exception $e) {
+      DB::rollBack();
+      return ResponseData(null, 422, false, 'An error occurred while deleting the training. ' . $e->getMessage());
+    }
+  }
 }
