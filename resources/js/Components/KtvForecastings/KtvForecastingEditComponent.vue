@@ -221,7 +221,7 @@
                                               {{ raw.total_uom_amt }}
                                         </td>
                                         <td class="">
-                                            {{ raw.item_uom }}
+                                            {{ raw.uom_name }}
                                         </td>
                                         <td class="">
                                             {{ raw.average_price * raw.total_uom_amt }}
@@ -231,7 +231,8 @@
                                             {{ ( (parseInt(raw.current_holdings)/raw.uom_conversion) - (parseInt(parseInt(raw.current_holdings)/raw.uom_conversion)))*raw.uom_conversion  }} {{ raw.uom_name }}
                                         </td>
                                         <td class="">
-                                            {{ raw.name }}
+                                            {{ raw.min_holding_base_uom_quantity }}{{ raw.base_uom_name }}
+                                            {{ raw.min_holding_uom_quantity }}{{ raw.uom_name }}
                                         </td>
                                         <td class="">
                                             {{ raw.total_uom_amt > raw.current_holdings ? parseInt(parseInt(raw.total_uom_amt-raw.current_holdings)/raw.uom_conversion) : '' }} {{ raw.base_uom_name }}
@@ -355,22 +356,58 @@
                         </button>
                     </div>
                     <div class="relative px-6 py-4 border-b" data-te-modal-body-ref>
-                        <div class="mb-4">
-                            <label for="" class="label-form mb-3">
-                                Quantity
-                            </label>
-                            <input type="text" placeholder="Quantity" v-model="po_quantity" class="input-ui">
+                        <div class="grid grid-cols-3 gap-x-4">
+                            <div class="mb-4">
+                                <label for="" class="label-form mb-3">
+                                    Base Qty
+                                </label>
+                                <input type="number" placeholder="Quantity" v-model="po_base_quantity" class="input-ui">
+                            </div>
+                            <div class="mb-4 col-span-2">
+                                <label for="" class="label-form mb-3">
+                                    Base UOM
+                                </label>
+                                <div class="bg-white mb-0 w-full text-sm inline-block"
+                                    data-te-select-wrapper-ref>
+                                    <select data-te-select-init data-te-select-placeholder="Select UOM" disabled
+                                        data-te-select-filter="true" name="" id="" v-model="po_base_uom" class="input-ui">
+                                        <option :value="uom" v-for="(uom, uomIndex) in itemUoms"
+                                            :key="uomIndex"> {{ uom.name }} </option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-3 gap-x-4">
+                            <div class="mb-4">
+                                <label for="" class="label-form mb-3">
+                                    Qty
+                                </label>
+                                <input type="number" placeholder="Quantity" v-model="po_quantity" class="input-ui">
+                            </div>
+                            <div class="mb-4 col-span-2">
+                                <label for="" class="label-form mb-3">
+                                    UOM
+                                </label>
+                                <div class="bg-white mb-0 w-full text-sm inline-block"
+                                    data-te-select-wrapper-ref>
+                                    <select data-te-select-init data-te-select-placeholder="Select UOM" disabled
+                                        data-te-select-filter="true" name="" id="" v-model="po_uom" class="input-ui">
+                                        <option :value="uom" v-for="(uom, uomIndex) in itemUoms"
+                                            :key="uomIndex"> {{ uom.name }} </option>
+                                    </select>
+                                </div>
+                            </div>
                         </div>
                         <div class="mb-4">
                             <label for="" class="label-form mb-3">
-                                UOM
+                                Brand
                             </label>
                             <div class="bg-white mb-0 w-full text-sm inline-block"
                                 data-te-select-wrapper-ref>
-                                <select data-te-select-init data-te-select-placeholder="Select UOM"
-                                    data-te-select-filter="true" name="" id="" v-model="po_uom" class="input-ui">
-                                    <option :value="uom" v-for="(uom, uomIndex) in itemUoms"
-                                        :key="uomIndex"> {{ uom.name }} </option>
+                                <select data-te-select-init data-te-select-placeholder="Select Brand" @change="selectedBrandChange"
+                                    data-te-select-filter="true" name="" id="" v-model="po_brand" class="input-ui">
+                                    <option :value="brand" v-for="(brand, brandIndex) in itemBrands"
+                                        :key="brandIndex"> {{ brand.name }} </option>
                                 </select>
                             </div>
                         </div>
@@ -446,8 +483,13 @@ export default {
             poList:[],
             uomList:[],
             itemUoms:[],
-            po_quantity:null,
+            itemBrands:[],
+            po_base_quantity:0,
+            po_base_uom:null,
+            po_quantity:0,
             po_uom:null,
+            po_brand:null,
+            unit_price:null,
             selectedPo:null,
 
             selectedItem:null,
@@ -672,16 +714,53 @@ export default {
         },
         btnClickPoModal(raw){
             this.selectedItem = raw
+            this.itemBrands = raw.brands;
             this.itemSelectChanged();
+            this.po_base_uom = this.itemUoms.find(uom => uom.id === this.selectedItem.base_uom_id)
+            this.po_uom = this.itemUoms.find(uom => uom.id === this.selectedItem.uom_id)
+        },
+        async selectedBrandChange(){
+            console.log('brand change')
+            let response = await getApiData({url: '/api/items/' + this.selectedItem.item_id + '/brands/' + this.po_brand.id, token: this.getToken()});
+            if(response.data){
+                this.unit_price = response.data;
+                console.log(response)
+            }
         },
         btnClickedCreatePo(){
+            if(this.po_base_quantity < 1 && this.po_quantity < 1){
+                this.alertValidationMessage('Quantiy');
+                return 1;
+            }
+            if(!this.po_base_uom){
+                this.alertValidationMessage('Base Uom');
+                return 1;
+            }
+            if(!this.po_uom){
+                this.alertValidationMessage('Uom');
+                return 1;
+            }
+            if(!this.po_brand){
+                this.alertValidationMessage('Brand');
+                return 1;
+            }
             this.createPo();
         },
         async createPo(){
+            let quantity = (this.po_base_quantity * this.selectedItem.uom_conversion) + this.po_quantity
+            let amount = quantity * (this.unit_price / this.selectedItem.uom_conversion);
+            let unitPrice = this.unit_price / this.selectedItem.uom_conversion;
+
             let formData = new FormData();
-            formData.append("quantity", this.po_quantity);
-            
+            formData.append("base_uom_id", this.po_base_uom.id);
+            formData.append("base_uom_quantity", this.po_base_quantity);
+            formData.append("uom_quantity", this.po_quantity);
             formData.append("uom_id", this.po_uom.id);
+            formData.append("item_id", this.selectedItem.item_id);
+            formData.append("amount", amount);
+            formData.append("quantity", quantity);
+            formData.append("unit_price", unitPrice);
+            formData.append("brand_id", this.po_brand.id);
             formData.append("uom_conversion_id", this.selectedItem.uom_conversion_id);
             if(!this.isNewPo){
                 formData.append("purchase_order_id", this.selectedPo.id);

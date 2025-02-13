@@ -11,13 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('participants', function (Blueprint $table) {
+        Schema::create('warnings', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('department_id')->nullable();
-            $table->foreignId('role_id')->nullable();
-            $table->foreignId('staff_id')->nullable();
-            $table->unsignedBigInteger('participantable_id');
-            $table->string('participantable_type');
+            $table->dateTime('date_time');
+            $table->longText('description');
+            $table->foreignId('created_by');
+            $table->string('warning_type');
             $table->timestamps();
         });
     }
@@ -27,6 +26,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('participants');
+        Schema::dropIfExists('warnings');
     }
 };
