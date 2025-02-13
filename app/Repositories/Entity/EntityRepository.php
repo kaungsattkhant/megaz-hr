@@ -241,19 +241,7 @@ class EntityRepository implements EntityRepositoryInterface
             if(!$invoice){
                 ResponseMessage('Active Invoice Not Found',419);
             }
-            // $entitySession = EntitySession::where('is_active', 1)
-            //     ->with(['entity', 'roomSessions', 'roomSession.invoice'])
-            //     ->where('entity_id', $entityId)->first();
-            // if (!$entitySession) {
-            //     ResponseMessage('Entity have no invic ', 404);
-            // }
-            // $invoiceId = $entitySession->roomSession->invoice_id;
-            // $invoice = Invoice::find($invoiceId);
-            // $roomSessions = RoomSession::where('invoice_id', $invoiceId)
-            //     ->orderBy('created_at')
-            //     ->get();
-            // $firstRoomSession = $roomSessions->first();
-            // $lastRoomSession = $roomSessions->last();
+       
 
             $invoiceServiceCollection = collect();
             $total_service_value = 0;
@@ -309,7 +297,7 @@ class EntityRepository implements EntityRepositoryInterface
             // $entitySession['start_date'] = $firstRoomSession->start_date;
             // $entitySession['end_date'] = $lastRoomSession->end_date;
             $entitySession['start_date'] = $activeInvoiceSession->start_date_time;
-            $entitySession['end_date'] = $activeInvoiceSession->start_date_time;
+            $entitySession['end_date'] = $activeInvoiceSession->end_date_time;
             $entitySession['invoice'] = $invoice;
             //service add response
             $entitySession['services'] = $invoiceServiceCollection;

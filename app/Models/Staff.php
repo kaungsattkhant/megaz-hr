@@ -116,6 +116,13 @@ class Staff extends Authenticatable
         })->get();
     }
 
+    public static function staffByRoleName($roleId)
+    {
+        return self::whereHas('roles', function ($query) use ($roleId) {
+            $query->where('id', $roleId);
+        })->get();
+    }
+
     public function permissions()
     {
         return $this->belongsToMany(Permission::class);

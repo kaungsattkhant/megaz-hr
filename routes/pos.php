@@ -26,6 +26,8 @@ Route::middleware('auth:api')->group(function () {
         Route::post('/entities/done', 'endRoom');
         Route::post('/room_done', 'doneRoom');
         Route::post('/entities/confirm','roomConfirm');
+        Route::post('/clear_invioces','clearInvoice'); //for only developer testing
+
     });
     Route::controller(NotificationController::class)->group(function () {
         Route::post('pos/send_notification', 'sendPosNotification');
