@@ -471,6 +471,7 @@
                     let newSessionRequest = {
                         room_name: response.entity.name,
                         entity_type: response.entity.entity_type,
+                        entity_id: response.entity.id,
                         invoice_id: response.invoice_id,
                         status: 'received'
                     };
@@ -489,6 +490,7 @@
                 let formData = new FormData();
                 formData.append("invoice_id", id);
                 formData.append('entity_type', entity.entity_type);
+                formData.append('entity_id', entity.entity_id);
                 
                 let response = await postApiData({ url: `/api/entities/done?is_confirm=1`, form_data: formData, token: this.getToken() });
                 if (response.data) {
@@ -510,6 +512,7 @@
                 let formData = new FormData();
                 formData.append("invoice_id", id);
                 formData.append('entity_type', entity.entity_type);
+                formData.append('entity_id', entity.entity_id);
                 
                 let response = await postApiData({ url: `/api/entities/done?is_confirm=0`, form_data: formData, token: this.getToken() });
                 if (response.data) {
@@ -651,7 +654,8 @@
 
         mounted(){
             initTE({ Dropdown, Modal, Select, Ripple });
-            let channelName = `room-notification-request.${this.department.id}`;
+            // let channelName = `room-notification-request.${this.department.id}`;
+            let channelName = `room-notification-request.${this.role[0].id}`;
             let eventName = `RoomNotificationRequest`;
             this.listenRoomOpenNotifications(channelName, eventName);
 
