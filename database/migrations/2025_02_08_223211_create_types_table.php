@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('types', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            $table->integer('typeable_id');
+            $table->unsignedBigInteger('typeable_id');
             $table->string('typeable_type');
             $table->timestamps();
         });

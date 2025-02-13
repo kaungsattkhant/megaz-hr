@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('org_news', function (Blueprint $table) {
             $table->id();
             $table->dateTime('date_time');
-            $table->foreignId('trained_by');
+            $table->foreignId('orgnews_by');
             $table->longText('description');
             $table->foreignId('created_by');
             $table->string('org_news_type');

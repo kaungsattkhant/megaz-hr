@@ -1532,6 +1532,7 @@
                     formData.append('child', +this.child);
                 }
                 formData.append('entity_type', this.entityType);
+                formData.append('entity_id',this.selectedRoom.id);
                 let response = await postApiData({ url: '/api/entities/start', form_data: formData, token: this.getToken() });
                 if (response.success) {
                     this.getRoomList();
@@ -1659,6 +1660,8 @@
                 let roomSessions = [];
                 formData.append('invoice_id', this.selectedRoom.invoice.id);
                 formData.append('entity_type', this.entityType);
+                formData.append('entity_id',this.selectedRoom.entity_id);
+                console.log('entity id ',this.selectedRoom.entity_id)
                 // if(this.depositBalance > 0){
                 //     formData.append('deposit_balance', this.depositBalance);
                 // }
@@ -1897,6 +1900,7 @@
                 let formData = new FormData();
                 formData.append('invoice_id', this.selectedRoom.invoice.id);
                 formData.append('entity_type', this.entityType);
+                formData.append('entity_id',this.selectedRoom.entity_id);
                 // formData.append('payment_type', this.selectedPaymentMethod);
                 if(this.discount_type){
                     formData.append('discount_type', this.discount_type);
@@ -2129,6 +2133,8 @@
                 formData.append('entity_id', this.change_room.id);
                 formData.append('start_date_time', this.start_date_time);
                 formData.append('entity_type', this.entityType);
+                formData.append('previous_entity_id',this.selectedRoom.entity_id);
+                console.log('previous entity id ',this.selectedRoom.entity_id)
                 let response = await postApiData({ url: '/api/entities/change', form_data: formData, token: this.getToken() });
                 console.log('change room ' + this.selectedRoom.invoice.invoice_id + ',' + this.change_room.id)
                 if (response.success) {
