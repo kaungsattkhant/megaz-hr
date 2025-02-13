@@ -142,12 +142,13 @@ class InvoiceRepository implements InvoiceRepositoryInterface
         DB::beginTransaction();
         try {
             // if ($data['entity_id'] != null && !$data['is_waiter']) { //create table invoice
-            if ($data['entity_id'] != null || (isset($data['entity_type'])  && $data['entity_type'] == 'table')) { //create table invoice
+            if ($data['entity_type'] == 'table') { //create table invoice
                 $tableInvoice = $this->createInvoiceForTable($data);
                 DB::commit();
                 return $tableInvoice;
             }
-            if ((isset($data['entity_session_id']) && $data['entity_session_id'] != null) || $data['is_waiter']) { // create room invoice
+
+            if ($data['entity_type'] == 'room' || $data['is_waiter']) { // create room invoice
                 $entitySession = null;
                 if (isset($data['entity_id']) && $data['entity_id'] != null) {
                     $entity = Entity::find($data['entity_id']);
@@ -229,7 +230,7 @@ class InvoiceRepository implements InvoiceRepositoryInterface
                 $data['invoice_date'] = Carbon::now();
                 $invoice = Invoice::create($data);
 
-                $invoiceSession = $this->invoiceService->storeInvoiceSession($invoice->id, $entitySession->entity_id, $data['session_duration'], $entity->price_per_hour, $data['is_waiter'],$discountId = null);
+                $invoiceSession = $this->invoiceService->storeInvoiceSession($invoice->id, $entitySession->entity_id, $data['session_duration'], $entity->price_per_hour, $data['is_waiter'], $discountId = null);
                 //create deposit
                 $this->storeCustomerDeposit($data, UserData()->id);
                 //
@@ -586,9 +587,11 @@ class InvoiceRepository implements InvoiceRepositoryInterface
     {
         DB::beginTransaction();
         try {
-            $entity=Entity::find($data['entity_id']);
-            $invoice = Invoice::find($data['invoice_id']);
-            if ($entity->entity_type=='table') {
+            $entity = Entity::find($data['entity_id']);
+            if ($entity->entity_type == 'table') {
+                $invoice = Invoice::find($data['invoice_id']);
+                $invoice->entity_id = $data['entity_id'];
+                $invoice->save();
                 $updatedInvoice = $this->changeTable($invoice, $data['entity_id']);
                 DB::commit();
                 ResponseData($updatedInvoice, 200);
@@ -769,7 +772,7 @@ class InvoiceRepository implements InvoiceRepositoryInterface
 
             $previousEntity = $invoice->activeInvoiceSession->entity;
             $previousEntity->is_active = 0;
-            $previousEntity->status='inactive';
+            $previousEntity->status = 'inactive';
             $previousEntity->save();
 
 
@@ -786,7 +789,7 @@ class InvoiceRepository implements InvoiceRepositoryInterface
             //update new entiy
             $newEntity = Entity::find($entityId); //new entity
             $newEntity->is_active = 1;
-            $newEntity->status='active';
+            $newEntity->status = 'active';
             $newEntity->save();
             $newSessionDate = Carbon::parse($data['start_date_time']);
             $startTime = Carbon::parse($data['start_date_time'])->format('H:i');
@@ -860,7 +863,7 @@ class InvoiceRepository implements InvoiceRepositoryInterface
         DB::beginTransaction();
         try {
             $invoice = Invoice::find($data['invoice_id']);
-            if ($invoice->entity_id != null) {
+            if ($data['entity_type'] == 'table') {
                 $tableResponseData = $this->doneInvoiceForTable($invoice);
                 DB::commit();
                 ResponseData($tableResponseData);
@@ -1252,7 +1255,7 @@ class InvoiceRepository implements InvoiceRepositoryInterface
                 ResponseMessage('Invoice not found', 404);
             }
             //added end_invoice for table oct 25 2024
-            if ($invoice && $invoice->entity_id != null) {
+            if ($invoice && $data['entity_type'] == 'table') {
                 $invoice = $this->doneTableForInvoice($data, $invoice);
                 $this->invoiceService->updateEntityStatus($invoice->entity_id, 'inactive'); // after done invoice ,update entity staus to inactive
                 $this->addTargetPosition($invoice->id, $invoice->created_by, $data['total']); //add sale target position for related role
@@ -1596,9 +1599,9 @@ class InvoiceRepository implements InvoiceRepositoryInterface
                     $entitySesion = $roomSession->entitySession;
                     $entitySesion->is_active = 1;
                     $entitySesion->save();
-                    $entity=$entitySesion->entity;
-                    $entity->is_active=1;
-                    $entity->status='active';
+                    $entity = $entitySesion->entity;
+                    $entity->is_active = 1;
+                    $entity->status = 'active';
                     $entity->save();
                 }
             }

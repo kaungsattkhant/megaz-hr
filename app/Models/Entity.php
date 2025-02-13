@@ -68,11 +68,28 @@ class Entity extends BaseModel
 
     public function currentEntitySession($currentTime)
     {
+        // return $this->hasOne(EntitySession::class)
+        //     ->where('is_active', 0)
+        //     ->where('is_available', 1)
+        //     ->whereTime('start_time', '<=', $currentTime)
+        //     ->whereTime('end_time', '>=', $currentTime);
         return $this->hasOne(EntitySession::class)
-            ->where('is_active', 0)
-            ->where('is_available', 1)
-            ->whereTime('start_time', '<=', $currentTime)
-            ->whereTime('end_time', '>=', $currentTime);
+        ->where('is_active', 0)
+        ->where('is_available', 1)
+        ->where(function ($query) use ($currentTime) {
+            $query->where(function ($q) use ($currentTime) {
+                // Normal sessions (same day)
+                $q->whereTime('start_time', '<=', $currentTime)
+                  ->whereTime('end_time', '>=', $currentTime);
+            })->orWhere(function ($q) use ($currentTime) {
+                // Sessions that cross midnight (start > end)
+                $q->whereRaw('TIME(start_time) > TIME(end_time)')
+                  ->where(function ($innerQ) use ($currentTime) {
+                      $innerQ->whereTime('start_time', '<=', $currentTime)  // If current time is after start
+                             ->orWhereTime('end_time', '>=', $currentTime); // Or before end
+                  });
+            });
+        });
     }
 
     public function ktvProductTree(): HasMany

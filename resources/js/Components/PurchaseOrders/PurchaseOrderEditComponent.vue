@@ -404,20 +404,20 @@
                 }
             },
             addDetail(){
-                this.data = this.poDetail.date;
+                this.date = this.poDetail.date;
                 this.poDetail.items.forEach(po => {
-                    let quantity = (po.base_uom_quantity * po.uom_conversion.conversion) + po.uom_quantity
+                    // let quantity = (po.base_uom_quantity * po.uom_conversion.conversion) + po.uom_quantity
                     // let price = ((po.base_uom_quantity * po.uom_conversion.conversion) + po.uom_quantity) * po.item.average_price
-                    let price = quantity * po.unit_price;
-                    let big_uom_quantity = Math.floor(quantity / po.uom_conversion.conversion);
-                    let small_uom_quantity = quantity % po.uom_conversion.conversion;
+                    // let price = quantity * po.unit_price;
+                    // let big_uom_quantity = Math.floor(quantity / po.uom_conversion.conversion);
+                    // let small_uom_quantity = quantity % po.uom_conversion.conversion;
                     this.purchaseOrderItems.push({
                         id:po.id,
                         item_id: po.item_id,
                         brand_name:po.brand.name,
                         brand_id:po.brand_id,
                         quantity: po.quantity,
-                        amount: price,
+                        amount: po.amount,
                         unit_price: po.unit_price,
                         uom_id: po.uom_id,
                         uom_quantity: po.uom_quantity,
@@ -427,8 +427,8 @@
                         base_uom_quantity: po.base_uom_quantity,
                         base_uom_name: po.base_uom.name,
                         name: po.item.name,
-                        small_quantity: small_uom_quantity,
-                        big_quantity: big_uom_quantity
+                        // small_quantity: small_uom_quantity,
+                        // big_quantity: big_uom_quantity
                     });
                 });
                 this.updateTotalPrice(this.purchaseOrderItems);
@@ -497,35 +497,7 @@
                     this.alertValidationMessage('base uom');
                     return 1;
                 }
-                // if(this.baseQuantity < 1){
-                //     this.alertValidationMessage('quantity');
-                //     return 1;
-                // }
                 let floatItemPrice = parseFloat(this.selectedItem.average_price)
-                console.log(floatItemPrice)
-                // let url = `/api/get_uom_conversion_by_uom?po_uom_id=${this.selectedUom.id}&item_uom_id=${this.selectedItem.uom_id}&item_price=${floatItemPrice}&base_uom_id=${this.selectedItem.base_uom_id}`;
-                // let response = await getApiData({url: url, token: this.getToken()});
-                // let uomConversion = null;
-                // let amount = 0;
-                // let price = 0;
-                // if(response.data){
-                //     uomConversion = response.data;
-                //     amount = parseInt(response.data.price);
-                //     price = this.quantity * amount;
-                //     this.$notify({
-                //         text: `Uom conversion by uom value ${amount}`,
-                //         type: 'info'
-                //     });
-                // }
-                // else{
-                //     this.$notify({
-                //         title: 'Error',
-                //         text: response.message,
-                //         type: 'error'
-                //     });
-
-                //     return 1;
-                // }
                 // amount = (this.selectedItem.item_prices)? this.selectedItem.item_prices.price: 0;
                 let quantity = (this.baseQuantity * this.selectedItem.uom_conversion) + this.quantity
                 // let price = ((this.baseQuantity * this.selectedItem.uom_conversion) + this.quantity) * this.selectedItem.average_price
@@ -541,7 +513,7 @@
                     this.purchaseOrderItems.push({
                         item_id: this.selectedItem.id,
                         brand_id: this.selectedBrand.id,
-                        bradn_name: this.selectedBrand.name,
+                        brand_name: this.selectedBrand.name,
                         quantity: quantity,
                         amount: price,
                         unit_price: this.unitPrice / this.selectedItem.uom_conversion,
@@ -588,9 +560,9 @@
                     this.purchaseOrderItems[index].uom_quantity = this.quantityEdit;
                     this.purchaseOrderItems[index].base_uom_quantity = this.baseQuantityEdit;
                     this.purchaseOrderItems[index].quantity = (this.baseQuantityEdit * this.selectedItem.uom_conversion) + this.quantityEdit
-                    this.purchaseOrderItems[index].price = ((this.baseQuantityEdit * this.selectedItem.uom_conversion) + this.quantityEdit) * this.selectedItem.average_price
+                    this.purchaseOrderItems[index].amount = ((this.baseQuantityEdit * this.selectedItem.uom_conversion) + this.quantityEdit) * this.purchaseOrderItems[index].unit_price
                     this.purchaseOrderItems[index].later_buy = (this.isLaterBuy)? 1: 0;
-                    console.log(this.purchaseOrderItems[index]);
+                    console.log(this.purchaseOrderItems[index].price);
                 }
 
                 this.updateTotalPrice(this.purchaseOrderItems);

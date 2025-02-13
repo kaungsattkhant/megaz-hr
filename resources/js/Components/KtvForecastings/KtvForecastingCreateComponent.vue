@@ -509,6 +509,13 @@ export default {
                 this.session = null;
                 this.hour = null;
             }
+            else{
+                this.$notify({
+                    title: 'Error',
+                    text: response.message,
+                    type: 'error'
+                });
+            }
         },
 
 
