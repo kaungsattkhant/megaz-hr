@@ -580,7 +580,7 @@ class ParticipantNotificationRepository implements ParticipantNotificationInterf
         'body' => 'A new' . $typeName . ' has been scheduled. Please check the details.',
       ];
 
-      $this->send($object, $users, $notificationData);
+      $this->sendParticipantNoti($object, $users, $notificationData, $type);
     }
   }
 
