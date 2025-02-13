@@ -224,8 +224,6 @@ class InvoiceRepository implements InvoiceRepositoryInterface
                 //
                 $invoice->invoice_id = sprintf('%05d', $invoice->id);
                 $invoice->save();
-
-
                 // $roomSessionData['invoice_id'] = $invoice->id;
                 // $roomSessionData['entity_session_id'] = $entitySession->id;
                 // $roomSessionData['session_duration'] = $data['session_duration'] ?? null;
@@ -586,9 +584,9 @@ class InvoiceRepository implements InvoiceRepositoryInterface
                 $invoice = Invoice::find($data['invoice_id']);
                 $invoice->entity_id = $data['entity_id'];
                 $invoice->save();
-                $updatedInvoice = $this->changeTable($invoice, $data['entity_id']);
+                $this->changeTable($data['previous_entity_id'], $data['entity_id']);
                 DB::commit();
-                ResponseData($updatedInvoice, 200);
+                ResponseData($invoice, 200);
             }
             $invoice = $this->modifyEntityChange($data);
             // $newEntity = Entity::find($data['entity_id']);
@@ -721,6 +719,7 @@ class InvoiceRepository implements InvoiceRepositoryInterface
     public function modifyEntityChange($data)
     {
         $entityId = $data['entity_id'];
+        $previousEntityId=$data['previous_entity_id'];
         $invoiceId = $data['invoice_id'];
         $start_date_time = Carbon::parse($data['start_date_time']);
         $isAvailableEntity = $this->invoiceService->checkIsActiveChangeRoom($entityId);
@@ -765,7 +764,8 @@ class InvoiceRepository implements InvoiceRepositoryInterface
                 ResponseMessage('Active Invoice Session not found', 419);
             }
 
-            $previousEntity = $invoice->activeInvoiceSession->entity;
+            $previousEntity= Entity::find($previousEntityId);
+            // $previousEntity = $invoice->activeInvoiceSession->entity;
             $previousEntity->is_active = 0;
             $previousEntity->status = 'inactive';
             $previousEntity->save();
@@ -835,21 +835,16 @@ class InvoiceRepository implements InvoiceRepositoryInterface
         }
     }
 
-    public function changeTable($invoice, $newEntityId)
+    public function changeTable( $newEntityId,$previousEntityId)
     {
-
         Entity::where('id', $newEntityId)->update([
             'status' => 'active',
             'is_active' => 1,
         ]);
-        Entity::where('id', $invoice->entity_id)->update([
+        Entity::where('id', $previousEntityId)->update([
             'status' => 'inactive',
             'is_active' => 0,
         ]);
-
-        $invoice->entity_id = $newEntityId;
-        $invoice->save();
-        return $invoice;
     }
 
 

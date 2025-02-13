@@ -21,6 +21,7 @@ use App\Repositories\Order\OrderRepositoryInterface;
 use App\Http\Requests\Room\EntityEndValidationRequest;
 use App\Http\Requests\RoomSession\EndRoomSessionRequest;
 use App\Repositories\Invoice\InvoiceRepositoryInterface;
+use App\Http\Requests\Room\EntityChangeValidationRequest;
 
 class InvoiceAPIController extends Controller
 {
@@ -98,7 +99,7 @@ class InvoiceAPIController extends Controller
         ResponseData($roomAndSession);
     }
 
-    public function changeRoom(EntityValidationRequest $request)
+    public function changeRoom(EntityChangeValidationRequest $request)
     {
         $changeRoom = $this->invoiceRepo->invoiceEntityChange($request->all());
         ResponseData($changeRoom);
