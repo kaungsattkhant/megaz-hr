@@ -111,10 +111,14 @@
                     </table>
                 </div>
             </div>
-            <div>
+            <div class="flex gap-x-4">
                 <button class="add-btn" @click="clickedBtnCreate()">
                     Continue
                 </button>
+                <a href="/menu_forecasting" class="text-[13px] py-[8px] px-4 focus:shadow-none focus:outline-none bg-gray-200 border border-gray-200 rounded" 
+                    >
+                    Cancel
+                </a>
             </div>
         </div>
         <div v-show="is_step == 2">
