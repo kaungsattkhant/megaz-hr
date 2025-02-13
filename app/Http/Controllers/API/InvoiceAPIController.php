@@ -14,6 +14,7 @@ use App\Models\Department;
 use App\Models\Entity;
 use App\Models\EntitySession;
 use App\Models\Invoice;
+use App\Models\InvoiceSession;
 use App\Models\Package;
 use App\Models\Role;
 use App\Models\RoomSession;
@@ -38,7 +39,7 @@ class InvoiceAPIController extends Controller
         DB::beginTransaction();
         try {
             $data = $request->all();
-            $data['is_waiter'] = (($request->waiter) || $request->waiter=="1")  ? 1 : 0;
+            $data['is_waiter'] = (($request->waiter) || $request->waiter == "1") ? 1 : 0;
             if (isset($data['male'])) {
                 $data['male'] = (int) $data['male'];
             } else {
@@ -67,10 +68,12 @@ class InvoiceAPIController extends Controller
                 //         broadcast(new RoomNotificationRequest($returnData['customer'], $returnData['entity'], $returnData['invoice'], UserData()->department_id,$order['order'], $order['orderItems']));
                 //     }
                 // }
-            }else{
+            } else {
                 if (isset($data['is_waiter'])) {
                     if ($data['is_waiter'] == 1) {
-                        broadcast(new RoomNotificationRequest($returnData['customer'], $returnData['entity'], $returnData['invoice'], UserData()->department_id,null, []));
+                        //change noti requset from department to receptionist role
+                        // $getRoleByName='Receptionist';
+                        broadcast(new RoomNotificationRequest($returnData['customer'], $returnData['entity'], $returnData['invoice'], UserData()->department_id, null, []));
                     }
                 }
             }
@@ -85,7 +88,7 @@ class InvoiceAPIController extends Controller
 
     public function addMoreSessions(Request $request)
     {
-        ResponseMessage('Add Sesion is invalid',419);
+        ResponseMessage('Add Sesion is invalid', 419);
         $roomAndSession = $this->invoiceRepo->addSessionDuration($request->all());
         ResponseData($roomAndSession);
     }
@@ -112,14 +115,14 @@ class InvoiceAPIController extends Controller
         //   }
 
         //end invoice for table
-        if($request->entity_type=='table'){
-            $entity=Entity::find($invoice->entity_id);
-        }else{
-            $activeInvoiceSession=$invoice->activeInvoiceSession;
-            if(!$activeInvoiceSession){
-                ResponseMessage('Room is invalid',419);
+        if ($request->entity_type == 'table') {
+            $entity = Entity::find($invoice->entity_id);
+        } else {
+            $activeInvoiceSession = $invoice->activeInvoiceSession;
+            if (!$activeInvoiceSession) {
+                ResponseMessage('Room is invalid', 419);
             }
-            $entity=$activeInvoiceSession->entity;
+            $entity = $activeInvoiceSession->entity;
             // $latestRoomSession = RoomSession::where('invoice_id', $invoice->id)->orderBy('created_at', 'desc')->first();
             // $entity = Entity::find($latestRoomSession->entitySession->entity_id);
         }
@@ -181,18 +184,66 @@ class InvoiceAPIController extends Controller
         $invoice = $this->invoiceRepo->invoiceConfirm($request->all());
     }
 
-    public function addService(Request $request){
-        $data=$this->invoiceRepo->addService($request);
+    public function addService(Request $request)
+    {
+        $data = $this->invoiceRepo->addService($request);
         ResponseData($data);
     }
 
-    public function endService(Request $request){
-        $data=$this->invoiceRepo->endService($request);
+    public function endService(Request $request)
+    {
+        $data = $this->invoiceRepo->endService($request);
         ResponseData($data);
     }
 
     public function settleInvoice(Request $request)
     {
         $this->invoiceRepo->paidInvoice($request);
+    }
+
+    public function clearInvoice(Request $request)
+    {
+        if (!isset($request->entity_id)) {
+            ResponseMessage('Something is wrong', 419);
+        }
+        $entityId = $request->entity_id;
+        // DB::beginTransaction();
+        // try {
+            DB::statement('SET FOREIGN_KEY_CHECKS=0;');
+            DB::table('invoices')->truncate();
+            DB::table('invoice_sessions')->truncate();
+            DB::statement('SET FOREIGN_KEY_CHECKS=1;');
+            if ($entityId == 0) {
+                Entity::orderBy('id', 'desc')
+                    ->when($entityId == 0, function ($q) {
+                        $q->where('id', '>', 0);
+                    })
+                    ->when($entityId != 0, function ($q) use ($entityId) {
+                        $q->where('id', $entityId);
+                    })
+                    ->update(
+                        [
+                            'is_active' => 0,
+                            'status' => 'inactive',
+                        ]
+                    );
+                EntitySession::orderBy('id', 'desc')
+                    ->when($entityId == 0, function ($q) {
+                        $q->where('id', '>', 0);
+                    })
+                    ->when($entityId != 0, function ($q) use ($entityId) {
+                        $q->where('entity_id', $entityId);
+                    })
+                    ->update([
+                        'is_active' => 0,
+                    ]);
+            }
+            // DB::commit();
+            Responsemessage('Successfully');
+        // } catch (\Exception $e) {
+        //     DB::rollBack();
+        //     ResponseMessage($e->getMessage(), 422);
+        //     throw $e;
+        // }
     }
 }

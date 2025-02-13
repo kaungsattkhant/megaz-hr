@@ -150,6 +150,7 @@ class InvoiceRepository implements InvoiceRepositoryInterface
 
             if ($data['entity_type'] == 'room' || $data['is_waiter']) { // create room invoice
                 $entitySession = null;
+
                 if (isset($data['entity_id']) && $data['entity_id'] != null) {
                     $entity = Entity::find($data['entity_id']);
                     $currentTime = Carbon::parse(now())->format('H:i');
@@ -159,18 +160,7 @@ class InvoiceRepository implements InvoiceRepositoryInterface
                     }
                     $data['entity_session_id'] = $entitySession->id;
                     $entity = $entitySession->entity;
-
                 }
-
-
-                // if ($data['is_waiter'] === 1) {
-                //     $current_time = Carbon::now()->format('H:i');
-                //     $entitySession = EntitySession::where('entity_id', $data['entity_id'])
-                //         ->whereTime('start_time', operator: '<=', $current_time) // Check if start_time is less than or equal to current time
-                //         ->whereTime('end_time', '>=', $current_time) // Check if end_time is greater than or equal to current time
-                //         ->first();
-                //     $entity = Entity::find($data['entity_id']);
-                // }
                 else if (isset($data['entity_session_id'])) {
                     $currentTime = Carbon::parse(now())->format('H:i');
                     $entitySession = EntitySession::where('id', $data['entity_session_id'])

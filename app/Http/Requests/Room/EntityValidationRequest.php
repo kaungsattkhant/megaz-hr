@@ -11,6 +11,7 @@ class EntityValidationRequest extends APIRequest
     {
         return [
             'entity_type'=>'required',
+            'entity_id'=>'required|exists:entities,id',
         ];
     }
     public function authorize()
