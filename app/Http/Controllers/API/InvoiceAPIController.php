@@ -148,16 +148,16 @@ class InvoiceAPIController extends Controller
                 $entity->is_active = 0;
                 $entity->save();
 
-                $entitySessions = EntitySession::where('entity_id', $entity->id)->get();
-                foreach($entitySessions as $entitySession){
-                    $entitySession->is_active = 0;
-                    $entitySession->save();
-                }
+                // $entitySessions = EntitySession::where('entity_id', $entity->id)->get();
+                // foreach($entitySessions as $entitySession){
+                //     $entitySession->is_active = 0;
+                //     $entitySession->save();
+                // }
                 broadcast(new RoomDoneNotificationRequest($entity, $msg, $role->id));
                 // ResponseMessage($msg);
             }
-            broadcast(new RoomDoneNotificationRequest($entity, $msg, $role->id));
-            ResponseMessage($msg);
+            // broadcast(new RoomDoneNotificationRequest($entity, $msg, $role->id));
+            // ResponseMessage($msg);
         }
         $endRoom = $this->invoiceRepo->doneEntityWithInvoice($request->all());
         ResponseData($endRoom);
