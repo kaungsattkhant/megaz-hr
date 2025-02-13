@@ -72,8 +72,14 @@ class InvoiceAPIController extends Controller
                 if (isset($data['is_waiter'])) {
                     if ($data['is_waiter'] == 1) {
                         //change noti requset from department to receptionist role
+                        // broadcast(new RoomNotificationRequest($returnData['customer'], $returnData['entity'], $returnData['invoice'], UserData()->department_id, null, []));
                         // $getRoleByName='Receptionist';
-                        broadcast(new RoomNotificationRequest($returnData['customer'], $returnData['entity'], $returnData['invoice'], UserData()->department_id, null, []));
+                        //send not package
+                        $receptionistRole=Role::getRoleByName('Receptionist');
+                        if(!$receptionistRole){
+                            ResponseMessage('Reception Role Not found',419);
+                        }
+                        broadcast(new RoomNotificationRequest($returnData['customer'], $returnData['entity'], $returnData['invoice'], $receptionistRole->id, null, []));
                     }
                 }
             }
@@ -104,7 +110,6 @@ class InvoiceAPIController extends Controller
         // dd($request->all());
         $catering_department = Department::where('name', 'Catering')->first();
         $invoice = Invoice::find($request->invoice_id);
-
         // {
         //     "invoice_id": widget.invoiceId,
         //     "discount_value": discount,
@@ -127,39 +132,43 @@ class InvoiceAPIController extends Controller
             // $entity = Entity::find($latestRoomSession->entitySession->entity_id);
         }
         //end invoice for room
+        $receptionistRole=Role::getRoleByName('Receptionist');
         if (isset($request->waiter)) {
-            $managerRole = Role::where('name', 'Manager')
-                ->where('department_id', $catering_department->id)
-                ->first();
+             $receptionistRole=Role::getRoleByName('Receptionist');
+            // $managerRole = Role::where('name', 'Manager')
+            //     ->where('department_id', $catering_department->id)
+            //     ->first();
+            
             $entity->status = 'done_pending';
             $entity->save();
-            broadcast(new PosRoomDoneNotification($invoice, $entity, $managerRole->id));
+            broadcast(new PosRoomDoneNotification($invoice, $entity, $receptionistRole->id));
             ResponseMessage("The request to quit the room {$entity->name} has been sent. Please wait for the confirmation from the catering department.");
         } else if (isset($request->is_confirm)) {
-            $role = Role::where('name', 'Staff')->where('department_id', $catering_department->id)->first();
+            // $role = Role::where('name', 'Staff')
+            // ->where('department_id', $catering_department->id)
+            // ->first();
             $msg = '';
             if ($request->is_confirm != 1) {
                 $msg = "The request to quit the room {$entity->name} has been rejected. Thank you for your understanding.";
                 // $entity->status = 'active';
-                $entity->is_active = 1;
-                $entity->save();
+                // $entity->is_active = 1;
+                // $entity->save();
                 // broadcast(new RoomDoneNotificationRequest($entity, $msg, $role->id));
                 // ResponseMessage($msg);
             } else {
                 $msg = "The request to quit the room {$entity->name} has been confirmed. The room will be quit and will soon close. Thank you.";
-                $entity->status = 'inactive';
-                $entity->is_active = 0;
-                $entity->save();
-
+                // $entity->status = 'inactive';
+                // $entity->is_active = 0;
+                // $entity->save();
                 // $entitySessions = EntitySession::where('entity_id', $entity->id)->get();
                 // foreach($entitySessions as $entitySession){
                 //     $entitySession->is_active = 0;
                 //     $entitySession->save();
                 // }
-                broadcast(new RoomDoneNotificationRequest($entity, $msg, $role->id));
+                broadcast(new RoomDoneNotificationRequest($entity, $msg, $receptionistRole->id));
                 // ResponseMessage($msg);
             }
-            // broadcast(new RoomDoneNotificationRequest($entity, $msg, $role->id));
+            // broadcast(new RoomDoneNotificationRequest($entity, $msg, $receptionistRole->id));
             // ResponseMessage($msg);
         }
         $endRoom = $this->invoiceRepo->doneEntityWithInvoice($request->all());

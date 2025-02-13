@@ -160,8 +160,7 @@ class InvoiceRepository implements InvoiceRepositoryInterface
                     }
                     $data['entity_session_id'] = $entitySession->id;
                     $entity = $entitySession->entity;
-                }
-                else if (isset($data['entity_session_id'])) {
+                } else if (isset($data['entity_session_id'])) {
                     $currentTime = Carbon::parse(now())->format('H:i');
                     $entitySession = EntitySession::where('id', $data['entity_session_id'])
                         ->where(function ($query) use ($currentTime) {
@@ -323,6 +322,11 @@ class InvoiceRepository implements InvoiceRepositoryInterface
                     $order = $this->orderService->createMultipleOrder($orderData);
                     if (isset($data['is_waiter'])) {
                         if ($data['is_waiter'] == 1) {
+                            //send only package
+                            $receptionistRole=Role::getRoleByName('Receptionist');
+                            if(!$receptionistRole){
+                                ResponseMessage('Reception Role Not found',419);
+                            }
                             broadcast(new RoomNotificationRequest($customer, $entity, $invoice, UserData()->department_id, $order['order'], $order['orderItems']));
                         }
                     }
@@ -1393,7 +1397,7 @@ class InvoiceRepository implements InvoiceRepositoryInterface
             $customerDepositData['amount'] = $data['total'];
             $customerDepositData['deposit_balance'] = $this->getCustomerDepositBalance($customer->id);
             //end
-        
+
             foreach ($roomSessionsByInvoice as $roomSession) {
                 $entitySession = $roomSession->entitySession;
                 $entitySession->is_active = 0;
@@ -1807,10 +1811,10 @@ class InvoiceRepository implements InvoiceRepositoryInterface
                 $this->invoiceService->calculateInvoiceService($existingService, $request->end_date);
                 $updatedInvoiceService = InvoiceService::where('id', $request->invoice_service_id)
                     ->update([
-                        'end_date' => $request->end_date,
-                        'service_value' => $existingService->service_value,
-                        'is_active' => 0,
-                    ]);
+                    'end_date' => $request->end_date,
+                    'service_value' => $existingService->service_value,
+                    'is_active' => 0,
+                ]);
                 // dd($existingService->service_value);
                 DB::commit();
                 ResponseMessage('InvoiceService End successfully', 200);

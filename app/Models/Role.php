@@ -56,6 +56,16 @@ class Role extends BaseModel
         return $role ? $role->id : null;
     }
 
+    public static function getRoleByName($name)
+    {
+        $role= self::where('name', $name)
+            ->first();
+        if(!$role){
+            ResponseMessage('Reception Role not found',419);
+        }
+        return $role;
+    }
+
     public function mrpHrs()
     {
         return $this->hasMany(MrpHr::class, 'role_id');
