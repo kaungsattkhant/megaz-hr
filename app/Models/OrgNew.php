@@ -13,16 +13,10 @@ class OrgNew extends Model
 
     protected $fillable = [
         'date_time',
-        'orgnews_by',
         'description',
         'created_by',
         'org_news_type',
     ];
-
-    public function orgNewsBy()
-    {
-        return $this->belongsTo(Staff::class, 'orgnews_by');
-    }
 
     public function createdBy()
     {

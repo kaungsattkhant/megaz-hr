@@ -99,7 +99,7 @@ class ParticipantNotificationController extends Controller
 
     public function getOrgNewsById($orgNewsId)
     {
-        $data = $this->ParticipantNotificationRepository->getTrainingById($orgNewsId);
+        $data = $this->ParticipantNotificationRepository->getOrgNewsById($orgNewsId);
         ResponseData($data);
     }
 
