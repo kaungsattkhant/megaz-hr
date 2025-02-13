@@ -20,6 +20,7 @@ return new class extends Migration
             $table->foreignId('chaired_by');
             $table->longText('description');
             $table->foreignId('created_by');
+            $table->string('title');
             $table->string('meeting_type');
             $table->timestamps();
         });

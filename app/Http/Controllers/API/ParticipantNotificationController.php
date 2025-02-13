@@ -4,6 +4,7 @@ namespace App\Http\Controllers\API;
 
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\NotiType\NotiTypeRequest;
 use App\Repositories\ParticipantNotification\ParticipantNotificationInterface;
 
 class ParticipantNotificationController extends Controller
@@ -135,6 +136,18 @@ class ParticipantNotificationController extends Controller
     public function deleteWarning($warningId)
     {
         $data = $this->ParticipantNotificationRepository->deleteWarning($warningId);
+        ResponseData($data);
+    }
+
+    public function storeTypes(NotiTypeRequest $request)
+    {
+        $data = $this->ParticipantNotificationRepository->storeTypes($request->validated());
+        ResponseData($data);
+    }
+
+    public function getTypes(Request $request)
+    {
+        $data = $this->ParticipantNotificationRepository->getTypes($request);
         ResponseData($data);
     }
 }

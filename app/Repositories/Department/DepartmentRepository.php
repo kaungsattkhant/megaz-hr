@@ -11,11 +11,11 @@ class DepartmentRepository implements DepartmentRepositoryInterface
     public function listAllData(Request $request)
     {
         if ($request->per_page || $request->page) {
-            $departments = Department::with('inventory.inventory','features')->orderBy('created_at','desc')->paginate(config('common.list_count'));
+            $departments = Department::with('inventory.inventory', 'features', 'roles')->orderBy('created_at', 'desc')->paginate(config('common.list_count'));
             return $departments;
         } else {
-            $departments = Department::with('inventory.inventory','features')->get();
-            foreach($departments as $department){
+            $departments = Department::with('inventory.inventory', 'features', 'roles')->get();
+            foreach ($departments as $department) {
                 // return $department;
             }
             return $departments;
@@ -28,7 +28,7 @@ class DepartmentRepository implements DepartmentRepositoryInterface
         try {
             $department = Department::create($data);
             $featureIds = json_decode($data['featureIds'], true);
-            foreach ($featureIds as $feature) { 
+            foreach ($featureIds as $feature) {
                 $department->features()->attach($feature);
             }
             DB::commit();
@@ -49,7 +49,7 @@ class DepartmentRepository implements DepartmentRepositoryInterface
                 $data = RemoveNullValues($data);
                 $department->update($data);
                 if (!empty($data['featureIds'])) {
-                    $featureIds = json_decode($data['featureIds'],true);
+                    $featureIds = json_decode($data['featureIds'], true);
                     $department->features()->sync($featureIds);
                 }
             }
