@@ -12,6 +12,7 @@ use App\Http\Requests\Room\EntityValidationRequest;
 use App\Http\Requests\RoomSession\EndRoomSessionRequest;
 use App\Models\Department;
 use App\Models\Entity;
+use App\Models\EntitySession;
 use App\Models\Invoice;
 use App\Models\Package;
 use App\Models\Role;
@@ -146,11 +147,17 @@ class InvoiceAPIController extends Controller
                 $entity->status = 'inactive';
                 $entity->is_active = 0;
                 $entity->save();
+
+                // $entitySessions = EntitySession::where('entity_id', $entity->id)->get();
+                // foreach($entitySessions as $entitySession){
+                //     $entitySession->is_active = 0;
+                //     $entitySession->save();
+                // }
                 broadcast(new RoomDoneNotificationRequest($entity, $msg, $role->id));
                 // ResponseMessage($msg);
             }
-            broadcast(new RoomDoneNotificationRequest($entity, $msg, $role->id));
-            ResponseMessage($msg);
+            // broadcast(new RoomDoneNotificationRequest($entity, $msg, $role->id));
+            // ResponseMessage($msg);
         }
         $endRoom = $this->invoiceRepo->doneEntityWithInvoice($request->all());
         ResponseData($endRoom);

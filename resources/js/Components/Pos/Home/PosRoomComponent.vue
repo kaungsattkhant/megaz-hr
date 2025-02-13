@@ -5,7 +5,7 @@
             <div class="opacity-100 transition-opacity duration-150 ease-linear overflow-x-auto hidden-scrollbar" :style="isShowSidebar == true ? 'width:calc(100% - 375px)' : 'width:100%' ">
                 <div class="flex flex-wrap gap-x-4 gap-y-4">
                     <div class="flex flex-col mb-4" v-for="(room, roomIndex) in roomList" :key="roomIndex">
-                        <div class="flex flex-row gap-x-4">
+                        <div class="flex flex-row gap-x-4 pr-6">
                             <div :class="room.is_active == 0 ? 'bg-[#4fe0b7]' : 'bg-[#FF7675]'"
                                 class=" flex-shrink-0 flex-grow p-6 w-40 max-w-44 h-40">
                                 <button
@@ -25,9 +25,11 @@
                             </div>
                             <!-- <div :class="[time.is_active == 0 ? 'bg-[#4fe0b7]' : 'bg-[#FF7675]', parseInt(time.start_time.split(':')) < currentTime ? 'opacity-70' : 'opacity-100' ]" v-for="(time,timeIndex) in room.entity_sessions" :key="index"
                                 class=" flex-shrink-0 flex-grow w-40 max-w-44 h-40"> -->
-                            <div
+                            <!-- <div
                                 :class="isTimeActive(time)"
                                 v-for="(time,timeIndex) in room.entity_sessions" :key="timeIndex"
+                                class=" flex-shrink-0 flex-grow w-40 max-w-44 h-40"> -->
+                            <div :class="time.is_active == 0 ? 'bg-[#4fe0b7]' : 'bg-[#FF7675]'" v-for="(time,timeIndex) in room.entity_sessions" :key="timeIndex"
                                 class=" flex-shrink-0 flex-grow w-40 max-w-44 h-40">
                                 <!-- <button @click="btnClickedSession(time, timeIndex, room, roomIndex)" :disabled="parseInt(time.start_time.split(':')) < currentTime" :class="parseInt(time.start_time.split(':')) < currentTime ? ' cursor-not-allowed' : ''"
                                     class="relative flex flex-col justify-between h-full w-full p-6"> -->
@@ -2099,7 +2101,7 @@
             },
             async addHour() {
                 let formData = new FormData();
-                formData.append('invoice_id', this.selectedRoom.room_sessions[0].invoice.id);
+                formData.append('invoice_id', this.selectedRoom.invoice.id);
                 formData.append('session_duration', this.sessionDuration);
                 let response = await postApiData({ url: '/api/entities/add_more_sessions', form_data: formData, token: this.getToken() });
                 if (response.success) {
@@ -2198,7 +2200,7 @@
             },
             async addService() {   // invoice pay yan
                 let formData = new FormData();
-                formData.append('invoice_id', this.selectedRoom.room_sessions[0].invoice.id);
+                formData.append('invoice_id', this.selectedRoom.invoice.id);
                 // formData.append('invoice_id', this.selectedServiceCategory);
                 if(this.selectedServiceCategory.name == 'Lady'){
                     formData.append('service_id', this.selectedLady.id);
@@ -2284,7 +2286,7 @@
             },
             async addAccessory() {   // invoice pay yan
                 let formData = new FormData();
-                formData.append('invoice_id', this.selectedRoom.room_sessions[0].invoice.id);
+                formData.append('invoice_id', this.selectedRoom.invoice.id);
                 formData.append('accessory_id', this.selectedAccessory.id);
                 formData.append('quantity', this.selectedAccessoryQuantity);
                 let response = await postApiData({ url: '/api/pos/add_accessory', form_data: formData, token: this.getToken() });

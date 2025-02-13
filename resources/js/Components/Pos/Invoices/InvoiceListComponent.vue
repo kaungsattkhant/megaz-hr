@@ -27,7 +27,7 @@
                                     <th scope="col" class="px-6 py-4">Room/Table</th>
                                     <th scope="col" class="px-6 py-4">Room Charges</th>
                                     <th scope="col" class="px-6 py-4">Food</th>
-                                    <th scope="col" class="px-6 py-4">Services</th>
+                                    <!-- <th scope="col" class="px-6 py-4">Services</th> -->
                                     <th scope="col" class="px-6 py-4">Amount</th>
                                     <th scope="col" class="px-6 py-4">Action</th>
                                 </tr>
@@ -53,9 +53,9 @@
                                     <td class="whitespace-nowrap px-6 py-4">
                                         {{ invoice.sub_total - invoice.total_session_price }}
                                     </td>
-                                    <td class="whitespace-nowrap px-6 py-4">
+                                    <!-- <td class="whitespace-nowrap px-6 py-4">
                                         Service?
-                                    </td>
+                                    </td> -->
                                     <td class="whitespace-nowrap px-6 py-4">
                                         {{ invoice.total }}
                                     </td>
