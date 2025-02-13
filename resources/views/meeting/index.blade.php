@@ -1,7 +1,7 @@
 @extends('layouts.main')
 
-@section('page_title', 'meeting')
-@section('Meeting', 'active-link')
+@section('page_title', 'Meeting')
+@section('meeting', 'active-link')
 @section('content')
 
 <div id="app">

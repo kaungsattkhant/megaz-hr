@@ -16,7 +16,7 @@
                 <button class="add-btn h-8 text-[13px] font-inter" @click="clearSearchBtnClicked()">Clear</button>
             </div>
             <div class="flex justify-end flex-col">
-                <a href="/suppliers/create" class="add-btn ">
+                <a href="/meeting/create" class="add-btn ">
                     Add New
                 </a>
 
