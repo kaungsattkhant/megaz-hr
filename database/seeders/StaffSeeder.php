@@ -135,9 +135,17 @@ class StaffSeeder extends Seeder
                             $featureIds = Feature::whereIn('slug', $entertainment_features)->pluck('id')->toArray();
                             $staff->features()->sync($featureIds);
                             break;
+                        case 'Kitchen':
+                            $featureIds = Feature::whereIn('slug', $management_features)->pluck('id')->toArray();
+                            $staff->features()->sync($featureIds);
+                            $inventoryIds = Inventory::whereIn('name', 'Kitchen Inventory')->pluck('id')->toArray();
+                            $staff->inventories()->sync($inventoryIds);
+                            break;
                         case 'Procurement':
                             $featureIds = Feature::whereIn('slug', $procurement_features)->pluck('id')->toArray();
                             $staff->features()->sync($featureIds);
+                            $inventoryIds = Inventory::whereIn('name', 'Main Inventory')->pluck('id')->toArray();
+                            $staff->inventories()->sync($inventoryIds);
                             break;
                         default:
                             $featureIds = Feature::whereIn('slug', $management_features)->pluck('id')->toArray();

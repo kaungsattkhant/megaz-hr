@@ -83,14 +83,14 @@ class ParticipantNotificationRepository implements ParticipantNotificationInterf
       'participants' => function ($query) {
         $query->where('participantable_type', 'meeting');
       },
-      'participants.staff',
-      'participants.department',
-      'participants.role',
-      // 'participants.staff.department',
-      // 'participants.staff.roles',
-      // 'participants.department.roles',
-      // 'participants.department.staffs',
-      // 'participants.role.department',
+      // 'participants.staff',
+      // 'participants.department',
+      // 'participants.role',
+      'participants.staff.department',
+      'participants.staff.roles',
+      'participants.department.roles',
+      'participants.department.staffs',
+      'participants.role.department',
       // 'participants.role.staffs',
     ])->orderBy('created_at', 'desc')->get();
     return $meeting;
@@ -103,13 +103,13 @@ class ParticipantNotificationRepository implements ParticipantNotificationInterf
         $query->where('participantable_type', 'meeting');
       },
       'participants.staff',
-      // 'participants.staff.department',
-      // 'participants.staff.roles',
+      'participants.staff.department',
+      'participants.staff.roles',
       'participants.department',
       'participants.role',
-      // 'participants.department.roles',
-      // 'participants.department.staffs',
-      // 'participants.role.department',
+      'participants.department.roles',
+      'participants.department.staffs',
+      'participants.role.department',
       // 'participants.role.staffs',
     ])->find($meetingId);
     if (!$meeting) {
