@@ -66,25 +66,30 @@
 
                                     </td>
                                     <td class="whitespace-nowrap  ">
-                                        {{ meeting }}
+                                        {{ meeting.date_time }}
                                     </td>
                                     <td class="whitespace-nowrap  ">
-                                        --
+                                        title ??
                                     </td>
                                     <td class="whitespace-nowrap  ">
-                                        --
+                                        <!-- {{ meeting.date_time }} -->
+                                          department
                                     </td>
                                     <td class="whitespace-nowrap  ">
-                                        --
+                                        
+                                        {{ meeting.place }}
                                     </td>
                                     <td class="whitespace-nowrap  ">
-                                        --
+                                        
+                                        {{ meeting.from_date }}
                                     </td>
                                     <td class="whitespace-nowrap  ">
-                                        --
+                                        
+                                        {{ meeting.to_date }}
                                     </td>
                                     <td class="whitespace-nowrap  ">
-                                        --
+                                        
+                                        {{ meeting.chaired_by.name }}
                                     </td>
                                     <td class="whitespace-nowrap ">
                                         <a class="pr-2" :href="'/meeting/' + meeting.id + '/edit'">
@@ -149,17 +154,14 @@ export default {
         ...mapGetters(['getToken']),
 
         async getMeetingList(pageNumber) {
-            let url = `/api/meetings?page=${pageNumber}`;
-            if(this.searchInput){
-                url = '/api/meetings?page=' + pageNumber + '&search=' + this.searchInput;
-            }
+            let url = `/api/meetings`;
             let response = await getApiData({ url: url, token: this.getToken() });
             if (response.data) {
-                this.supplierList = response.data.data;
-                this.lastPage = response.data.last_page;
-                this.currentPage = pageNumber;
-                this.perPage = response.data.per_page;
-                this.totalData = response.data.total;
+                this.meetingList = response.data;
+                // this.lastPage = response.data.last_page;
+                // this.currentPage = pageNumber;
+                // this.perPage = response.data.per_page;
+                // this.totalData = response.data.total;
 
             }
         },
