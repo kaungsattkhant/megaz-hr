@@ -1276,7 +1276,6 @@ class InvoiceRepository implements InvoiceRepositoryInterface
             $bdDiscount = 0;
             $customerLevelDiscount = 0;
             $discount_value = 0;
-
             if (isset($data['customer_level_discount'])) {
                 $customerLevelDiscount = $data['customer_level_discount'] ?? 0;
             }
@@ -1312,7 +1311,7 @@ class InvoiceRepository implements InvoiceRepositoryInterface
             $entity = $activeInvoiceSession->entity;
             $activeInvoiceSession->is_active = 0;
             $activeInvoiceSession->save();
-            
+
             $totalInvoiceSession = $this->invoiceService->getTotalInvoiceSession($invoice->id);
             $total_session_price = $totalInvoiceSession->total_session_value;
             $roomSessionsByInvoice = $activeInvoiceSession->roomSessions;
