@@ -2,25 +2,25 @@
 
 namespace App\Http\Controllers\API;
 
-use App\Events\PosRoomDoneNotification;
-use App\Events\RoomDoneNotificationRequest;
-use App\Events\RoomNotificationRequest;
-use Illuminate\Http\Request;
-
-use App\Http\Controllers\Controller;
-use App\Http\Requests\Room\EntityValidationRequest;
-use App\Http\Requests\RoomSession\EndRoomSessionRequest;
-use App\Models\Department;
-use App\Models\Entity;
-use App\Models\EntitySession;
-use App\Models\Invoice;
-use App\Models\InvoiceSession;
-use App\Models\Package;
 use App\Models\Role;
+use App\Models\Entity;
+use App\Models\Invoice;
+use App\Models\Package;
+use App\Models\Department;
 use App\Models\RoomSession;
-use App\Repositories\Invoice\InvoiceRepositoryInterface;
-use App\Repositories\Order\OrderRepositoryInterface;
+use Illuminate\Http\Request;
+use App\Models\EntitySession;
+use App\Models\InvoiceSession;
 use Illuminate\Support\Facades\DB;
+use App\Http\Controllers\Controller;
+use App\Events\PosRoomDoneNotification;
+use App\Events\RoomNotificationRequest;
+use App\Events\RoomDoneNotificationRequest;
+use App\Http\Requests\Room\EntityValidationRequest;
+use App\Repositories\Order\OrderRepositoryInterface;
+use App\Http\Requests\Room\EntityEndValidationRequest;
+use App\Http\Requests\RoomSession\EndRoomSessionRequest;
+use App\Repositories\Invoice\InvoiceRepositoryInterface;
 
 class InvoiceAPIController extends Controller
 {
@@ -55,7 +55,6 @@ class InvoiceAPIController extends Controller
             } else {
                 $data['child'] = 0;
             }
-
             $data['entity_id'] = $request->entity_id;
             $returnData = $this->invoiceRepo->createData($data);
             if (isset($data['type']) && $data['type'] == 'package') {
@@ -75,9 +74,9 @@ class InvoiceAPIController extends Controller
                         // broadcast(new RoomNotificationRequest($returnData['customer'], $returnData['entity'], $returnData['invoice'], UserData()->department_id, null, []));
                         // $getRoleByName='Receptionist';
                         //send not package
-                        $receptionistRole=Role::getRoleByName('Receptionist');
-                        if(!$receptionistRole){
-                            ResponseMessage('Reception Role Not found',419);
+                        $receptionistRole = Role::getRoleByName('Receptionist');
+                        if (!$receptionistRole) {
+                            ResponseMessage('Reception Role Not found', 419);
                         }
                         broadcast(new RoomNotificationRequest($returnData['customer'], $returnData['entity'], $returnData['invoice'], $receptionistRole->id, null, []));
                     }
@@ -107,9 +106,11 @@ class InvoiceAPIController extends Controller
 
     public function endRoom(EntityValidationRequest $request)
     {
-        // dd($request->all());
-        $catering_department = Department::where('name', 'Catering')->first();
+        // $catering_department = Department::where('name', 'Catering')->first();
         $invoice = Invoice::find($request->invoice_id);
+        if (!$invoice) {
+            ResponseMessage('Invoice Not Found at End Room', 419);
+        }
         // {
         //     "invoice_id": widget.invoiceId,
         //     "discount_value": discount,
@@ -132,13 +133,15 @@ class InvoiceAPIController extends Controller
             // $entity = Entity::find($latestRoomSession->entitySession->entity_id);
         }
         //end invoice for room
-        $receptionistRole=Role::getRoleByName('Receptionist');
+        $receptionistRole = Role::getRoleByName('Receptionist');
         if (isset($request->waiter)) {
-             $receptionistRole=Role::getRoleByName('Receptionist');
+            if(!isset($request->total)){
+                ResponseMessage('Total Field is required',422);
+            }
+            $receptionistRole = Role::getRoleByName('Receptionist');
             // $managerRole = Role::where('name', 'Manager')
             //     ->where('department_id', $catering_department->id)
             //     ->first();
-            
             $entity->status = 'done_pending';
             $entity->save();
             broadcast(new PosRoomDoneNotification($invoice, $entity, $receptionistRole->id));
@@ -218,37 +221,37 @@ class InvoiceAPIController extends Controller
         $entityId = $request->entity_id;
         // DB::beginTransaction();
         // try {
-            DB::statement('SET FOREIGN_KEY_CHECKS=0;');
-            DB::table('invoices')->truncate();
-            DB::table('invoice_sessions')->truncate();
-            DB::statement('SET FOREIGN_KEY_CHECKS=1;');
-            if ($entityId == 0) {
-                Entity::orderBy('id', 'desc')
-                    ->when($entityId == 0, function ($q) {
-                        $q->where('id', '>', 0);
-                    })
-                    ->when($entityId != 0, function ($q) use ($entityId) {
-                        $q->where('id', $entityId);
-                    })
-                    ->update(
-                        [
-                            'is_active' => 0,
-                            'status' => 'inactive',
-                        ]
-                    );
-                EntitySession::orderBy('id', 'desc')
-                    ->when($entityId == 0, function ($q) {
-                        $q->where('id', '>', 0);
-                    })
-                    ->when($entityId != 0, function ($q) use ($entityId) {
-                        $q->where('entity_id', $entityId);
-                    })
-                    ->update([
+        DB::statement('SET FOREIGN_KEY_CHECKS=0;');
+        DB::table('invoices')->truncate();
+        DB::table('invoice_sessions')->truncate();
+        DB::statement('SET FOREIGN_KEY_CHECKS=1;');
+        if ($entityId == 0) {
+            Entity::orderBy('id', 'desc')
+                ->when($entityId == 0, function ($q) {
+                    $q->where('id', '>', 0);
+                })
+                ->when($entityId != 0, function ($q) use ($entityId) {
+                    $q->where('id', $entityId);
+                })
+                ->update(
+                    [
                         'is_active' => 0,
-                    ]);
-            }
-            // DB::commit();
-            Responsemessage('Successfully');
+                        'status' => 'inactive',
+                    ]
+                );
+            EntitySession::orderBy('id', 'desc')
+                ->when($entityId == 0, function ($q) {
+                    $q->where('id', '>', 0);
+                })
+                ->when($entityId != 0, function ($q) use ($entityId) {
+                    $q->where('entity_id', $entityId);
+                })
+                ->update([
+                    'is_active' => 0,
+                ]);
+        }
+        // DB::commit();
+        Responsemessage('Successfully');
         // } catch (\Exception $e) {
         //     DB::rollBack();
         //     ResponseMessage($e->getMessage(), 422);

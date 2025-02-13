@@ -150,7 +150,6 @@ class InvoiceRepository implements InvoiceRepositoryInterface
 
             if ($data['entity_type'] == 'room' || $data['is_waiter']) { // create room invoice
                 $entitySession = null;
-
                 if (isset($data['entity_id']) && $data['entity_id'] != null) {
                     $entity = Entity::find($data['entity_id']);
                     $currentTime = Carbon::parse(now())->format('H:i');
@@ -217,8 +216,8 @@ class InvoiceRepository implements InvoiceRepositoryInterface
                 $data['area_id'] = $entity->area_id;
                 $data['created_by'] = UserData()->id;
                 $data['invoice_date'] = Carbon::now();
+                $data['sub_total']=$data['total_session_price'];
                 $invoice = Invoice::create($data);
-
                 $invoiceSession = $this->invoiceService->storeInvoiceSession($invoice->id, $entitySession->entity_id, $data['session_duration'], $entity->price_per_hour, $data['is_waiter'], $discountId = null);
                 //create deposit
                 $this->storeCustomerDeposit($data, UserData()->id);
@@ -304,15 +303,16 @@ class InvoiceRepository implements InvoiceRepositoryInterface
                 //                 $session->save();
                 //             }
 
-                if ($data['is_waiter'] == 1) {
-                    $entity->is_active = 0;
-                    $entity->status = 'pending';
-                    $entity->save();
-                } else {
-                    $entity->is_active = 1;
-                    $entity->status = 'active';
-                    $entity->save();
-                }
+                // if ($data['is_waiter'] == 1) {
+                //     $entity->is_active = 0;
+                //     $entity->status = 'pending';
+                //     $entity->save();
+                // } else {
+                //     $entity->is_active = 1;
+                //     $entity->status = 'active';
+                //     $entity->save();
+                // }
+
                 // $invoice->room_session = $roomSession;
                 $customer = Customer::find($invoice->customer_id);
                 //change ksk
@@ -323,9 +323,9 @@ class InvoiceRepository implements InvoiceRepositoryInterface
                     if (isset($data['is_waiter'])) {
                         if ($data['is_waiter'] == 1) {
                             //send only package
-                            $receptionistRole=Role::getRoleByName('Receptionist');
-                            if(!$receptionistRole){
-                                ResponseMessage('Reception Role Not found',419);
+                            $receptionistRole = Role::getRoleByName('Receptionist');
+                            if (!$receptionistRole) {
+                                ResponseMessage('Reception Role Not found', 419);
                             }
                             broadcast(new RoomNotificationRequest($customer, $entity, $invoice, UserData()->department_id, $order['order'], $order['orderItems']));
                         }
@@ -728,6 +728,7 @@ class InvoiceRepository implements InvoiceRepositoryInterface
             $now = now();
             //get reamin session duration from previous room
             $invoice = Invoice::find($invoiceId);
+            $invoice->save();
             if (!$invoice) {
                 ResponseMessage('Invoice not found', 419);
             }
@@ -821,6 +822,7 @@ class InvoiceRepository implements InvoiceRepositoryInterface
             ]);
 
             //update session price for invoice
+            $invoice->entity_id=$entityId;
             $invoice->total = ($invoice->total - $priviousTotalSessionPrice) + $totalNewSessionPrice;
             $invoice->sub_total = ($invoice->sub_total - $priviousTotalSessionPrice) + $activeInvoiceSession->total_session_price + $totalNewSessionPrice;
             $invoice->total_session_price = $activeInvoiceSession->total_session_price + $totalNewSessionPrice; //previous used session price+ new session price(new room)
@@ -1245,6 +1247,7 @@ class InvoiceRepository implements InvoiceRepositoryInterface
         DB::beginTransaction();
         try {
             $invoice = Invoice::find($data['invoice_id']);
+            $data['total']=$invoice['total'];
             if (!$invoice) {
                 ResponseMessage('Invoice not found', 404);
             }
@@ -1582,7 +1585,6 @@ class InvoiceRepository implements InvoiceRepositoryInterface
         DB::beginTransaction();
         try {
             $invoice = Invoice::find($data['invoice_id']);
-
             if ($data['is_confirm'] == 1) {
                 $activeInvoiceSession = $invoice->activeInvoiceSession;
                 $activeInvoiceSession->is_active = 1;
@@ -1811,10 +1813,10 @@ class InvoiceRepository implements InvoiceRepositoryInterface
                 $this->invoiceService->calculateInvoiceService($existingService, $request->end_date);
                 $updatedInvoiceService = InvoiceService::where('id', $request->invoice_service_id)
                     ->update([
-                    'end_date' => $request->end_date,
-                    'service_value' => $existingService->service_value,
-                    'is_active' => 0,
-                ]);
+                        'end_date' => $request->end_date,
+                        'service_value' => $existingService->service_value,
+                        'is_active' => 0,
+                    ]);
                 // dd($existingService->service_value);
                 DB::commit();
                 ResponseMessage('InvoiceService End successfully', 200);

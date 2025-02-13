@@ -170,9 +170,17 @@ class InvoiceModelService
             $createRoomSession=$invoiceSession->roomSessions()->create([
                 'entity_session_id'=>$entitySession->id,
             ]);
+            $entity=$entitySession->entity;
             if(!$isWaiter){
                 $entitySession->is_active=1;
                 $entitySession->save();
+                $entity->status='active';
+                $entity->is_active=1;
+                $entity->save();
+            }else{
+                $entity->is_active = 0;
+                $entity->status = 'pending';
+                $entity->save();
             }
         }
         return $invoiceSession;
