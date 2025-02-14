@@ -142,9 +142,9 @@ class ParticipantNotificationRepository implements ParticipantNotificationInterf
     try {
       $data['created_by'] = UserData()->id;
       $training = Training::create($data);
-      if (isset($data['type'])) {
-        $this->createType($data, $training, 'training');
-      }
+      // if (isset($data['type'])) {
+      //   $this->createType($data, $training, 'training');
+      // }
       if (isset($data['training_type'])) {
         $this->addParticipantsAndSendNotification($training, $data, $data['training_type']);
       }
@@ -222,9 +222,9 @@ class ParticipantNotificationRepository implements ParticipantNotificationInterf
       $training->update($data);
 
       $training->participants()->where('participantable_type', 'training')->where('participantable_id', $training->id)->delete();
-      if (isset($data['type'])) {
-        $this->createType($data, $training, 'training');
-      }
+      // if (isset($data['type'])) {
+      //   $this->createType($data, $training, 'training');
+      // }
 
       if (isset($data['training_type'])) {
         $this->addParticipantsAndSendNotification($training, $data, $data['training_type']);
@@ -311,9 +311,9 @@ class ParticipantNotificationRepository implements ParticipantNotificationInterf
     try {
       $data['created_by'] = UserData()->id;
       $orgNew = OrgNew::create($data);
-      if (isset($data['type'])) {
-        $this->createType($data, $orgNew, 'orgNew');
-      }
+      // if (isset($data['type'])) {
+      //   $this->createType($data, $orgNew, 'orgNew');
+      // }
       if (isset($data['org_news_type'])) {
         $this->addParticipantsAndSendNotification($orgNew, $data, $data['org_news_type']);
       }
@@ -342,9 +342,9 @@ class ParticipantNotificationRepository implements ParticipantNotificationInterf
 
       $orgNew->participants()->where('participantable_type', 'orgNew')->where('participantable_id', $orgNew->id)->delete();
 
-      if (isset($data['type'])) {
-        $this->createType($data, $orgNew, 'orgNew');
-      }
+      // if (isset($data['type'])) {
+      //   $this->createType($data, $orgNew, 'orgNew');
+      // }
 
       if (isset($data['org_news_type'])) {
         $this->addParticipantsAndSendNotification($orgNew, $data, $data['org_news_type']);
@@ -440,9 +440,9 @@ class ParticipantNotificationRepository implements ParticipantNotificationInterf
     try {
       $data['created_by'] = UserData()->id;
       $warning = Warning::create($data);
-      if (isset($data['type'])) {
-        $this->createType($data, $warning, 'warning');
-      }
+      // if (isset($data['type'])) {
+      //   $this->createType($data, $warning, 'warning');
+      // }
       if (isset($data['warning_type'])) {
         $this->addParticipantsAndSendNotification($warning, $data, $data['warning_type']);
       }
@@ -470,9 +470,9 @@ class ParticipantNotificationRepository implements ParticipantNotificationInterf
       $data['created_by'] = UserData()->id;
       $warning->update($data);
       $warning->participants()->where('participantable_type', 'warning')->where('participantable_id', $warning->id)->delete();
-      if (isset($data['type'])) {
-        $this->createType($data, $warning, 'warning');
-      }
+      // if (isset($data['type'])) {
+      //   $this->createType($data, $warning, 'warning');
+      // }
       if (isset($data['warning_type'])) {
         $this->addParticipantsAndSendNotification($warning, $data, $data['warning_type']);
       }
@@ -504,19 +504,23 @@ class ParticipantNotificationRepository implements ParticipantNotificationInterf
     }
   }
 
-  private function createType($data, $model, $typeableType)
+  public function storeTypes($data)
   {
-    // if (isset($data['type'])) {
-    $typeData = [
-      'name' => $data['type'],
-      'typeable_id' =>   $model->id,
-      'typeable_type' => $typeableType,
-    ];
-    Type::updateOrCreate(
-      ['typeable_id' => $model->id, 'typeable_type' => $typeableType],
-      $typeData
-    );
-    // }
+    DB::beginTransaction();
+    try {
+      // $typeData = [
+      //   'name' => $data['name'],
+      //   'typeable_type' => $data['typeable_type'],
+      // ];
+      $type = Type::create(
+        $data
+      );
+      DB::commit();
+      return ResponseData($type, 201, true, "Type created successfully.");
+    } catch (\Exception $e) {
+      DB::rollBack();
+      return ResponseData(null, 422, false, 'An error occurred while stored the Type. ' . $e->getMessage());
+    }
   }
 
   private function addParticipantsAndSendNotification($object, $data, $type)
@@ -578,5 +582,10 @@ class ParticipantNotificationRepository implements ParticipantNotificationInterf
 
       $this->send($object, $users, $notificationData);
     }
+  }
+
+  public function getTypes($request)
+  {
+    return Type::where('typeable_type', $request->type)->orderBy('created_at', 'desc')->get();
   }
 }

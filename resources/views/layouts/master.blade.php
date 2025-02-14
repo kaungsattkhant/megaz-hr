@@ -78,18 +78,11 @@
                     $(this).addClass("active-link"); // Add 'active' to the matching link
                 }
             });
-
-        scrollToActiveLink();
-        // $("#sidebar a").on("click", function (e) {
-        //     e.preventDefault();
-        //     const target = $(this).attr("href");
-        //     $("#sidebar a").removeClass("active-link");
-        //     $(this).addClass("active-link   "); 
-        //     scrollToActiveLink();
-        //     setTimeout(() => {
-        //         window.location.href = target;
-        //     }, 300);
-        // });
+        console.log(currentPath)
+        $(window).on('load', function() {
+            scrollToActiveLink();
+        });
+        
     });
 </script>
 </html>

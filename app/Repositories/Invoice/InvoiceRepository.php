@@ -835,7 +835,7 @@ class InvoiceRepository implements InvoiceRepositoryInterface
         }
     }
 
-    public function changeTable( $newEntityId,$previousEntityId)
+    public function changeTable( $previousEntityId,$newEntityId)
     {
         Entity::where('id', $newEntityId)->update([
             'status' => 'active',
@@ -1242,7 +1242,7 @@ class InvoiceRepository implements InvoiceRepositoryInterface
         DB::beginTransaction();
         try {
             $invoice = Invoice::find($data['invoice_id']);
-            $data['total']=$invoice['total'];
+            $data['total']=$invoice['total']!=null? $invoice['total']:0;
             if (!$invoice) {
                 ResponseMessage('Invoice not found', 404);
             }
@@ -1423,10 +1423,17 @@ class InvoiceRepository implements InvoiceRepositoryInterface
 
             if ($order != null) {
                 $orderItems = $order->orderItems;
+                if($orderItems->isNotEmpty()){
+                    $unChooseOrderItemByArea=$orderItems->where('area_id',null)->first();
+                    if($unChooseOrderItemByArea){
+                        ResponseMessage('Area need to conifirm by area',419);
+                    }
+                }
                 // $groupedOrderItems = $orderItems->groupBy('menu_id')->map(function ($items) {
                 //     return $items->sum('quantity');
                 // });
                 // dd($groupedOrderItems);
+                // $checkAreaId=
                 $groupedOrderItems = $orderItems
                     ->groupBy(function ($item) {
                         return $item['menu_id'] . '-' . $item['area_id'];

@@ -11,7 +11,6 @@ class Type extends Model
 
     protected $fillable = [
         'name',
-        'typeable_id',
         'typeable_type'
     ];
 

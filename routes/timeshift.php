@@ -77,5 +77,8 @@ Route::middleware('auth:api')->group(function () {
     Route::post('/warnings', 'storeWarning');
     Route::post('/warnings/{warningId}', 'updateWarning');
     Route::delete('/warnings/{warningId}', 'deleteWarning');
+
+    Route::post('/noti_types', 'storeTypes');
+    Route::get('/noti_types', 'getTypes');
   });
 });
