@@ -434,7 +434,7 @@ export default {
             let url = `/api/trainings`;
             let response = await postApiData({url: url, form_data: formData, token: this.getToken()});
             if(response.success){
-                window.location.replace("/training");
+                // window.location.replace("/training");
             }
         },
 
