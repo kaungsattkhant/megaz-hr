@@ -143,18 +143,19 @@ class InvoiceAPIController extends Controller
             // $managerRole = Role::where('name', 'Manager')
             //     ->where('department_id', $catering_department->id)
             //     ->first();
-            $entity->status = 'done_pending';
-            $entity->save();
+
             $order = $invoice->order;
             if ($order) {
                 $orderItems = $order->orderItems;
                 if ($orderItems->isNotEmpty()) {
                     $unChooseOrderItemByArea = $orderItems->where('area_id', null)->first();
                     if ($unChooseOrderItemByArea) {
-                        ResponseMessage('Area need to conifirm by area', 419);
+                        ResponseMessage( 'Area need to conifirm by area', 419);
                     }
                 }
             }
+            $entity->status = 'done_pending';
+            $entity->save();
 
             broadcast(new PosRoomDoneNotification($invoice, $entity, $receptionistRole->id));
             ResponseMessage("The request to quit the room {$entity->name} has been sent. Please wait for the confirmation from the catering department.");
