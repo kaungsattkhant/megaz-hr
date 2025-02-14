@@ -139,11 +139,6 @@ class InvoiceAPIController extends Controller
             if (!isset($request->total)) {
                 ResponseMessage('Total Field is required', 422);
             }
-            $receptionistRole = Role::getRoleByName('Receptionist');
-            // $managerRole = Role::where('name', 'Manager')
-            //     ->where('department_id', $catering_department->id)
-            //     ->first();
-
             $order = $invoice->order;
             if ($order) {
                 $orderItems = $order->orderItems;
@@ -156,13 +151,10 @@ class InvoiceAPIController extends Controller
             }
             $entity->status = 'done_pending';
             $entity->save();
-
             broadcast(new PosRoomDoneNotification($invoice, $entity, $receptionistRole->id));
             ResponseMessage("The request to quit the room {$entity->name} has been sent. Please wait for the confirmation from the catering department.");
-        } else if (isset($request->is_confirm)) {
-            // $role = Role::where('name', 'Staff')
-            // ->where('department_id', $catering_department->id)
-            // ->first();
+        } 
+        else if (isset($request->is_confirm)) {
             $msg = '';
             if ($request->is_confirm != 1) {
                 $msg = "The request to quit the room {$entity->name} has been rejected. Thank you for your understanding.";
@@ -175,17 +167,9 @@ class InvoiceAPIController extends Controller
                 $msg = "The request to quit the room {$entity->name} has been confirmed. The room will be quit and will soon close. Thank you.";
                 $entity->status = 'inactive';
                 $entity->is_active = 0;
-                $entity->save();
-                // $entitySessions = EntitySession::where('entity_id', $entity->id)->get();
-                // foreach($entitySessions as $entitySession){
-                //     $entitySession->is_active = 0;
-                //     $entitySession->save();
-                // }
+                // $entity->save();
                 broadcast(new RoomDoneNotificationRequest($entity, $msg, $receptionistRole->id));
-                // ResponseMessage($msg);
             }
-            // broadcast(new RoomDoneNotificationRequest($entity, $msg, $receptionistRole->id));
-            // ResponseMessage($msg);
         }
         $endRoom = $this->invoiceRepo->doneEntityWithInvoice($request->all());
         ResponseData($endRoom);
