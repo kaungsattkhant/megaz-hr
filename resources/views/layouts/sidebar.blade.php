@@ -1,4 +1,4 @@
-<nav id="sidebar_admin" class="side-bar w-fit !pt-0 h-[100vh]">
+<nav id="sidebar_admin" class="side-bar w-fit pt-0 h-[100vh]">
     <div class="relative">
         <button type="button" id="toggleBtn" class="py-3 px-2 absolute left-full top-8 bg-[#fafafa] text-black rounded-tr-md rounded-br-md border-gray-400 ">
             <i class="fas fa-chevron-double-left ease-linear" style="transition:transform 0.5s ease;"></i>

@@ -355,3 +355,4 @@ Route::view('/okr_dashboard', 'okr_dashboard.index')->name('okr_dashboard');
 Route::view('/purchase_orders/{id}/edit', 'purchase_orders.edit');
 Route::view('/meeting', 'meeting.index')->name('meeting');
 Route::view('/meeting/create', 'meeting.create')->name('meeting.create');
+Route::view('/meeting/{id}/edit', 'meeting.edit');

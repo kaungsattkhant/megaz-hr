@@ -178,6 +178,7 @@ export default {
     components: {
         Multiselect
     },
+    props: ["meetingId"],
     data() {
         return {
             departmentList:[],
@@ -199,6 +200,8 @@ export default {
             selectedChairedBy:null,
             description:null,
 
+            meetingDetail:null,
+
             typeList:[
                 {value:'phone',name:'Phone'},
                 {value:'kpay',name:'Kpay'}
@@ -209,44 +212,78 @@ export default {
     methods: {
         ...mapGetters(['getToken']),
 
-        
+        async getMeetingDetail(){
+            let url = `/api/meetings/${this.meetingId}`;
+            let response = await getApiData({url: url, token: this.getToken()});
+            if(response.data){
+                this.meetingDetail = response.data;
+                this.addDetail(response.data)
+            }
+        },
+        addDetail(data){
+            this.title = data.title;
+            this.selectedDate = data.date_time;
+            this.selectedFrom = data.from_date;
+            this.selectedTo = data.to_date;
+            this.selectedPlace = data.place;
+            this.selectedChairedBy = this.staffList.find(chairman => chairman.id == data.chaired_by);
+            this.description = data.description;
+            if(data.meeting_type === 'dep_type'){
+                let departments = []
+                data.participants.forEach(participant => {
+                    departments.push(this.allDepartmentList.find(department => department.id == participant.department_id))
+                });
+                this.selectedDepartment = departments
+            }
+            if(data.meeting_type === 'role_type'){
+                let roles = []
+                data.participants.forEach(participant => {
+                    roles.push(this.allRoleList.find(role => role.id == participant.role_id))
+                });
+                this.selectedRole = roles
+            }
+            if(data.meeting_type === 'staff_type'){
+                let roles = []
+                data.participants.forEach(participant => {
+                    roles.push(this.allRoleList.find(role => role.id == participant.role_id))
+                });
+                this.selectedRole = roles
+            }
+        },
 
         async getDepartmentList(){
             let url = `/api/departments`;
             let response = await getApiData({url: url, token: this.getToken()});
             if(response.data){
+                this.allDepartmentList = response.data;
                 this.departmentList = [{
                     title: 'all',
                     data: response.data
                 }] 
+                response.data.forEach(department => {
+                    department.roles.forEach(role => {
+                        this.allRoleList.push(role)
+                    });
+                });
                 this.getRoleList();
             }
         },
         departmentChange(){
             if(this.selectedDepartment.length > 0){
                 this.roleList = [];
-                this.selectedRole = null;
+                this.selectedRole = [];
                 this.selectedDepartment.forEach(department => {
                     this.roleList.push({
                         title: department.name,
                         roles:department.roles
                     })
                 });
-                
             }
             else{
                 this.getRoleList();
             }
-            // this.selectedStaff = this.staffList
-            // this.selectedDepartment.forEach(department => {
-                //     department.roles.forEach(role => {
-                //         this.roleList.push(role)
-                //         console.log(role)
-                //     });
-                // });
-            
         },
-        async getRoleList(){
+        getRoleList(){
             this.roleList = [];
             this.departmentList[0].data.forEach(department => {
                 this.roleList.push({
@@ -259,9 +296,6 @@ export default {
             // if(response.data){
             //     this.roleList = response.data;
             // }
-        },
-        roleChange(){
-            this.getStaffList()
         },
         async getStaffList(){
             // let url = `/api/staff_by_department/`+this.selectedDepartment.id+`/role/`+this.selectedRole.id;
@@ -345,7 +379,7 @@ export default {
                 });
             }
             
-            let url = `/api/meetings`;
+            let url = `/api/meetings/${this.meetingId}`;
             let response = await postApiData({url: url, form_data: formData, token: this.getToken()});
             if(response.success){
                 window.location.replace("/meeting");
@@ -368,6 +402,8 @@ export default {
         this.getDepartmentList();
         // this.getRoleList();
         this.getStaffList();
+        // this.getAllRoleList();
+        this.getMeetingDetail();
     },
 
     mounted() {
