@@ -1364,7 +1364,7 @@ class InvoiceRepository implements InvoiceRepositoryInterface
             $total_service_value = 0;
             $invoiceServices = $invoice->invoiceService;
             foreach ($invoiceServices as $invoiceService) {
-                $serviceValue = $this->invoiceService->getServiceValue($invoiceService, $data['end_date']);
+                $serviceValue = $this->invoiceService->getServiceValue($invoiceService, now());
                 if ($invoiceService->is_active == 1) {
                     $invoiceService->end_date = $data['end_date'];
                     $invoiceService->service_value = $serviceValue;
@@ -1457,18 +1457,18 @@ class InvoiceRepository implements InvoiceRepositoryInterface
                 }
             }
             //store customer deposit
-            $this->storeInvoiceCustomerDeposit($customerDepositData, UserData()->id);
-            //store invoice transaction
-            $this->ledgerAndTransactionForInvoice([
-                'payment_type' => 'cash',
-                'invoice_id' => $invoice->id,
-                // 'food_charge' => $foodCharge,
-                // 'beverage_charge' => $beverageCharge,
-                'total_session_price' => $total_session_price,
-                'service_charge' => $service_charge,
-                'tax' => $tax,
-                'discount_total' => $data['discount_total'],
-            ]);
+            // $this->storeInvoiceCustomerDeposit($customerDepositData, UserData()->id);
+            // //store invoice transaction
+            // $this->ledgerAndTransactionForInvoice([
+            //     'payment_type' => 'cash',
+            //     'invoice_id' => $invoice->id,
+            //     // 'food_charge' => $foodCharge,
+            //     // 'beverage_charge' => $beverageCharge,
+            //     'total_session_price' => $total_session_price,
+            //     'service_charge' => $service_charge,
+            //     'tax' => $tax,
+            //     'discount_total' => $data['discount_total'],
+            // ]);
 
             $catering_department = Department::where('name', 'Catering')->first();
             $msg = "The {$entity->name} is now closed. Thank you.";
@@ -1496,7 +1496,7 @@ class InvoiceRepository implements InvoiceRepositoryInterface
         $total_service_value = 0;
         $invoiceServices = $invoice->invoiceService;
         foreach ($invoiceServices as $invoiceService) {
-            $serviceValue = $this->invoiceService->getServiceValue($invoiceService, $data['end_date']);
+            $serviceValue = $this->invoiceService->getServiceValue($invoiceService, now());
             if ($invoiceService->is_active == 1) {
                 $invoiceService->end_date = $data['end_date'];
                 $invoiceService->service_value = $serviceValue;
