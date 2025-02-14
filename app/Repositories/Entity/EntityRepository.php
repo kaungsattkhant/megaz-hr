@@ -147,27 +147,27 @@ class EntityRepository implements EntityRepositoryInterface
     {
         $entitySession = EntitySession::where('is_available', 1)
             ->with([
-                'roomSessions' => function ($query) {
-                    $query->latest()->first();
-                }
-                ,
                 'entity'
             ])
             ->find($entitySessionId);
         $invoiceServiceCollection = collect();
         $invoiceAccessoryCollection = collect();
         $total_service_value = $total_accessory_value = 0;
-        //deposit customer 
-        $firstRoomSession = $entitySession->roomSessions->first();
-        if (!$firstRoomSession) {
-            ResponseMessage('Invoice Room Session is invalid', 419);
-        }
-        $customer = $firstRoomSession->invoiceSession->invoice->customer;
-
+        $roomSession = RoomSession::whereHas('invoiceSession', function ($q) {
+            $q->where('is_active', 1);
+        })
+            ->where('entity_session_id', $entitySessionId)
+            ->first();
+        if ($roomSession)
+            //deposit customer 
+            // $firstRoomSession = $entitySession->roomSessions->first();
+            if (!$roomSession) {
+                ResponseMessage('Invoice Room Session is invalid', 419);
+            }
+        $customer = $roomSession->invoiceSession->invoice->customer;
         $customerDepositBalance = $this->getCustomerDepositBalance($customer->id);
         //end deposit
-        // foreach ($entitySession->roomSessions as $roomSession) {
-        $invoice = $firstRoomSession->invoiceSession->invoice;
+        $invoice = $roomSession->invoiceSession->invoice;
         $invoice->package;
         if ($invoice) {
             //service
@@ -177,14 +177,15 @@ class EntityRepository implements EntityRepositoryInterface
                 $this->invoiceModelService->calculateInvoiceService($invoiceService, $time);
                 $total_service_value += $invoiceService->service_value;
             }
-            $invoiceServiceCollection = $invoiceServiceCollection->merge($invoice->invoiceService);
+            // $invoiceServiceCollection = $invoiceServiceCollection->merge($invoice->invoiceService);
             //serice
+
             //accesory
             $invoiceAccessories = $invoice->accessories;
             foreach ($invoiceAccessories as $invoiceAccessorie) {
                 $total_accessory_value += $invoiceAccessorie->accessory->accessory_price->price * $invoiceAccessorie->quantity;
             }
-            $invoiceAccessoryCollection = $invoiceAccessoryCollection->merge($invoice->invoiceAccessories);
+            // $invoiceAccessoryCollection = $invoiceAccessoryCollection->merge($invoice->invoiceAccessories);
             //end_accessoryI
             $consolidatedOrderItems = [];
             foreach ($invoice->orders as $order) {
@@ -213,14 +214,18 @@ class EntityRepository implements EntityRepositoryInterface
                     }
                 }
             }
+            unset($invoice['accessories']);
+            unset($invoice['invoice_service']);
+            unset($invoice['total_accessory_value']);
+            unset($invoice['total_service_value']);
+            // unset($invoice,'invoice.accessories');
             //service list
         }
         // }
-        // dd($invoiceServiceCollection);
-        $entitySession->start_date_time = $firstRoomSession->invoiceSession->start_date_time;
-        $entitySession->end_date_time = $firstRoomSession->invoiceSession->end_date_time;
-        $entitySession->services = $invoiceServiceCollection;
-        $entitySession->invoice_accessories = $invoiceAccessoryCollection;
+        $entitySession->start_date_time = $roomSession->invoiceSession->start_date_time;
+        $entitySession->end_date_time = $roomSession->invoiceSession->end_date_time;
+        $entitySession->services = $invoiceServices;
+        $entitySession->invoice_accessories = $invoiceAccessories;
         $entitySession->total_service_value = $total_service_value;
         $entitySession->total_accessory_value = $total_accessory_value;
         $entitySession->deposit_balance = $customerDepositBalance;
@@ -238,10 +243,10 @@ class EntityRepository implements EntityRepositoryInterface
         if ($entity->entity_type == 'room') {
             $activeInvoiceSession = InvoiceSession::where('is_active', 1)->where('entity_id', $entityId)->first();
             $invoice = $activeInvoiceSession->invoice;
-            if(!$invoice){
-                ResponseMessage('Active Invoice Not Found',419);
+            if (!$invoice) {
+                ResponseMessage('Active Invoice Not Found', 419);
             }
-       
+
 
             $invoiceServiceCollection = collect();
             $total_service_value = 0;
@@ -292,6 +297,10 @@ class EntityRepository implements EntityRepositoryInterface
                         }
                     }
                 }
+                unset($invoice['accessories']);
+                unset($invoice['invoice_service']);
+                unset($invoice['total_accessory_value']);
+                unset($invoice['total_service_value']);
             }
             // }
             // $entitySession['start_date'] = $firstRoomSession->start_date;
@@ -365,7 +374,7 @@ class EntityRepository implements EntityRepositoryInterface
             $responseData = [];
             $responseData['entity_id'] = $entity->id;
             $responseData['room_sessions'] = $entity;
-            $responseData['services'] = $invoiceServiceCollection;
+            $responseData['services'] = $invoiceServices;
             $responseData['invoice_accessories'] = $invoiceAccessories;
             $responseData['total_service_value'] = $total_service_value;
             $responseData['total_accessory_value'] = $total_accessory_value;

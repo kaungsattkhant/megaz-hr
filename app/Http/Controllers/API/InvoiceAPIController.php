@@ -225,6 +225,7 @@ class InvoiceAPIController extends Controller
         DB::statement('SET FOREIGN_KEY_CHECKS=0;');
         DB::table('invoices')->truncate();
         DB::table('invoice_sessions')->truncate();
+        DB::table('room_sessions')->truncate();
         DB::statement('SET FOREIGN_KEY_CHECKS=1;');
         if ($entityId == 0) {
             Entity::orderBy('id', 'desc')
