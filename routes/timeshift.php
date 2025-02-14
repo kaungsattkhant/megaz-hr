@@ -80,5 +80,8 @@ Route::middleware('auth:api')->group(function () {
 
     Route::post('/noti_types', 'storeTypes');
     Route::get('/noti_types', 'getTypes');
+
+    //mobile
+    Route::get('/noties/{staffId}', 'getallNoties');
   });
 });

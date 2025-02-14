@@ -580,12 +580,39 @@ class ParticipantNotificationRepository implements ParticipantNotificationInterf
         'body' => 'A new' . $typeName . ' has been scheduled. Please check the details.',
       ];
 
-      $this->send($object, $users, $notificationData);
+      $this->sendParticipantNoti($object, $users, $notificationData, $type);
     }
   }
 
   public function getTypes($request)
   {
     return Type::where('typeable_type', $request->type)->orderBy('created_at', 'desc')->get();
+  }
+
+  public function getallNoties($request, $staffId)
+  {
+    // $staffId = UserData()->id;
+    $participants =  Participant::with(['participantable'])->where('staff_id', $staffId)->orderBy('created_at', 'desc')->get();
+    // return $participants;
+    $relatedModels = [
+      'meetings' => [],
+      'trainings' => [],
+      'warnings' => [],
+      'orgnews' => [],
+    ];
+    foreach ($participants as $participant) {
+      $model = $participant->participantable;
+
+      if ($model instanceof \App\Models\Meeting) {
+        $relatedModels['meetings'][] = $model;
+      } elseif ($model instanceof \App\Models\Training) {
+        $relatedModels['trainings'][] = $model;
+      } elseif ($model instanceof \App\Models\Warning) {
+        $relatedModels['warnings'][] = $model;
+      } elseif ($model instanceof \App\Models\OrgNew) {
+        $relatedModels['orgnews'][] = $model;
+      }
+    }
+    return ResponseData($relatedModels, 200, true, "Notifications retrieved successfully.");
   }
 }

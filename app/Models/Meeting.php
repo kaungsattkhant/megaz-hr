@@ -16,8 +16,8 @@ class Meeting extends Model
         'to_date',
         'place',
         'chaired_by',
-        'description',
         'title',
+        'description',
         'created_by',
         'meeting_type' //dep_type,role_type,staff
     ];
