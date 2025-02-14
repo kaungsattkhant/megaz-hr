@@ -835,7 +835,7 @@ class InvoiceRepository implements InvoiceRepositoryInterface
         }
     }
 
-    public function changeTable( $newEntityId,$previousEntityId)
+    public function changeTable( $previousEntityId,$newEntityId)
     {
         Entity::where('id', $newEntityId)->update([
             'status' => 'active',
@@ -1242,7 +1242,7 @@ class InvoiceRepository implements InvoiceRepositoryInterface
         DB::beginTransaction();
         try {
             $invoice = Invoice::find($data['invoice_id']);
-            $data['total']=$invoice['total'];
+            $data['total']=$invoice['total']!=null? $invoice['total']:0;
             if (!$invoice) {
                 ResponseMessage('Invoice not found', 404);
             }
