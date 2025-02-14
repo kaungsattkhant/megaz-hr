@@ -63,11 +63,9 @@ trait SendNotification
         }
         if ($users->isNotEmpty()) {
             if ($type === "dep_type") {
-
                 $department_id = $users->first()->department_id;
                 broadcast(new SendDepartmentNotification($notification, $department_id));
             } elseif ($type === "role_type") {
-
                 $role_id = $users->pluck('roles.*.id')->flatten()->first();
                 broadcast(new SendRoleNotification($notification, $role_id));
             } elseif ($type === "staff_type") {
@@ -78,7 +76,6 @@ trait SendNotification
                 }
             }
         }
-        Log::info('Broadcasting department notification', ['department_id' => $department_id]);
     }
 
 
