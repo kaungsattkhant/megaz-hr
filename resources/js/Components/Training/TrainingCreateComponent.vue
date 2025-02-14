@@ -393,16 +393,16 @@ export default {
                 this.alertValidationMessage(`Trained By`);
                 return 1;
             }
-            let meetingType = null;
+            let trainingType = null;
             if(this.selectedStaff.length > 0){
-                meetingType = 'staff_type'
+                trainingType = 'staff_type'
             }
             else {
                 if(this.selectedRole.length > 0){
-                    meetingType = 'role_type'
+                    trainingType = 'role_type'
                 }
                 else{
-                    meetingType = 'dep_type'
+                    trainingType = 'dep_type'
                 }
             }
             let formData = new FormData();
@@ -414,7 +414,7 @@ export default {
             formData.append("place", this.selectedPlace);
             formData.append("trained_by", this.selectedTrainedBy.id);
             formData.append("description", this.description);
-            formData.append("meeting_type", meetingType);
+            formData.append("training_type", trainingType);
             if(this.selectedDepartment.length > 0){
                 this.selectedDepartment.forEach((item)=>{
                     formData.append('department[]', item.id);
