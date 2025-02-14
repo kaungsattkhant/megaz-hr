@@ -1346,7 +1346,6 @@
             async createRoom() {
                 let formData = new FormData();
                 // formData.append('entity_id', this.selectedRoom.id);
-                formData.append('entity_id', this.selectedRoom.id);
                 formData.append('customer_id', this.selectedCustomer.id);
                 if (this.type == 'package') {
                     formData.append('package_id', this.selectedPackage.id);
@@ -1364,6 +1363,7 @@
                     formData.append('child', +this.child);
                 }
                 formData.append('entity_type', this.entityType);
+                formData.append('entity_id', this.selectedRoom.id);
                 let response = await postApiData({ url: '/api/entities/start', form_data: formData, token: this.getToken() });
                 if (response.success) {
                     this.getTableList();
@@ -1437,6 +1437,7 @@
                 let roomSessions = [];
                 formData.append('invoice_id', this.selectedRoom.room_sessions.latest_invoice.invoice_id);
                 formData.append('entity_type', this.entityType);
+                formData.append('entity_id',this.selectedRoom.entity_id);
                 let response = await postApiData({ url: '/api/room_done', form_data: formData, token: this.getToken() });
                 if (response.success) {
                     this.roomSessionData = response.data;
@@ -1649,6 +1650,7 @@
                 formData.append('discount_total', allTotalDiscounts);
                 formData.append('end_date', this.serviceEndDate);
                 formData.append('entity_type', this.entityType);
+                formData.append('entity_id',this.selectedRoom.entity_id);
 
 
                 console.log(formData)
@@ -1805,18 +1807,19 @@
             },
             async changeRoom() {
                 let formData = new FormData();
-                formData.append('invoice_id', this.selectedRoom.room_sessions.invoice.id);
+                formData.append('invoice_id', this.selectedRoom.room_sessions.latest_invoice.id);
                 formData.append('entity_id', this.change_room.id);
                 formData.append('entity_type', this.entityType);
+                formData.append('previous_entity_id',this.selectedRoom.entity_id);
                 let response = await postApiData({ url: '/api/entities/change', form_data: formData, token: this.getToken() });
-                console.log('change room ' + this.selectedRoom.room_sessions.invoice.id + ',' + this.change_room.id)
+                console.log('change room ' + this.selectedRoom.room_sessions.latest_invoice.id + ',' + this.change_room.id)
                 if (response.success) {
                     console.log("success");
                     await this.getTableList();
                     // this.selectedRoom = this.roomList.find(x => x.id === this.change_room.id);
                     this.selectedRoomId = this.change_room.id;
                     this.getSelectedRoom();
-                    this.closeModal('close_change_room_modal');
+                    this.closeModal('change_table_modal');
                     this.clearChangeRoomForm();
                 }
                 else {

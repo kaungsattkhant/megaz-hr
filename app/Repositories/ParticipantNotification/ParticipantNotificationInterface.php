@@ -26,10 +26,12 @@ interface ParticipantNotificationInterface
   public function getOrgNewsById($orgNewsId);
   public function deleteOrgNews($orgNewsId);
 
-
   public function getWarnings($request);
   public function getWarningById($warningId);
   public function storeWarning($data);
   public function updateWarning($warningId);
   public function deleteWarning($warningId);
+
+  public function storeTypes($data);
+  public function getTypes($request);
 }

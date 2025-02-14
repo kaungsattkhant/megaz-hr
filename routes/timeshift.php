@@ -66,16 +66,19 @@ Route::middleware('auth:api')->group(function () {
     Route::post('/trainings/{trainingId}', 'updateTraining');
     Route::delete('/trainings/{trainingId}', 'deleteTraining');
 
-    Route::get('/orgNews', 'getOrgNews');
-    Route::get('/orgNews/{orgNewsId}', 'getOrgNewsById');
-    Route::post('/orgNews', 'storeOrgNews');
-    Route::post('/orgNews/{orgNewsId}', 'updateOrgNews');
-    Route::delete('/orgNews/{orgNewsId}', 'deleteOrgNews');
+    Route::get('/org_news', 'getOrgNews');
+    Route::get('/org_news/{orgNewsId}', 'getOrgNewsById');
+    Route::post('/org_news', 'storeOrgNews');
+    Route::post('/org_news/{orgNewsId}', 'updateOrgNews');
+    Route::delete('/org_news/{orgNewsId}', 'deleteOrgNews');
 
     Route::get('/warnings', 'getWarnings');
     Route::get('/warnings/{warningId}', 'getWarningById');
     Route::post('/warnings', 'storeWarning');
     Route::post('/warnings/{warningId}', 'updateWarning');
     Route::delete('/warnings/{warningId}', 'deleteWarning');
+
+    Route::post('/noti_types', 'storeTypes');
+    Route::get('/noti_types', 'getTypes');
   });
 });

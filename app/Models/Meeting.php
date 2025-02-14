@@ -17,6 +17,7 @@ class Meeting extends Model
         'place',
         'chaired_by',
         'description',
+        'title',
         'created_by',
         'meeting_type' //dep_type,role_type,staff
     ];

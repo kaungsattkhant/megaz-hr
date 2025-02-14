@@ -11,9 +11,13 @@ use App\Models\Training;
 use App\Models\Participant;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Request;
+use App\Http\Action\SendNotification\SendNotification;
+
 
 class ParticipantNotificationRepository implements ParticipantNotificationInterface
 {
+  use SendNotification;
+
   public function getStaffByDepartmentRole($depId, $roleId)
   {
     return Staff::with('department', 'roles')
@@ -23,6 +27,7 @@ class ParticipantNotificationRepository implements ParticipantNotificationInterf
       })
       ->get();
   }
+
   public function storeMeetings($data)
   {
     DB::beginTransaction();
@@ -31,47 +36,15 @@ class ParticipantNotificationRepository implements ParticipantNotificationInterf
       $data['created_by'] = UserData()->id;
       $meeting = Meeting::create($data);
 
-
-      if (isset($data['meeting_type']) && isset($data['department']) && $data['meeting_type'] === "dep_type") {
-
-        foreach ($data['department'] as $dep) {
-          $participantData = [
-            'participantable_id' => $meeting->id,
-            'participantable_type' => 'meeting',
-            'department_id' => $dep
-          ];
-          Participant::create($participantData);
-        }
+      if (isset($data['meeting_type'])) {
+        $this->addParticipantsAndSendNotification($meeting, $data, $data['meeting_type']);
       }
 
-      if (isset($data['meeting_type']) && isset($data['role']) && $data['meeting_type'] === "role_type") {
-
-        foreach ($data['role'] as $role) {
-          $participantData = [
-            'participantable_id' => $meeting->id,
-            'participantable_type' => 'meeting',
-            'role_id' => $role
-          ];
-          Participant::create($participantData);
-        }
-      }
-
-      if (isset($data['meeting_type']) && isset($data['staff']) && $data['meeting_type'] === "staff_type") {
-
-        foreach ($data['staff'] as $staff) {
-          $participantData = [
-            'participantable_id' => $meeting->id,
-            'participantable_type' => 'meeting',
-            'staff_id' => $staff
-          ];
-          Participant::create($participantData);
-        }
-      }
       DB::commit();
       return ResponseData($meeting, 201, true, "Meeting created successfully.");
     } catch (\Exception $e) {
       DB::rollBack();
-      return ResponseData($data = null, $status_code = 422, false, $extra_message = "An error occurred Meeting stored.");
+      return ResponseData($data = null, $status_code = 422, false,  $e->getMessage());
     }
   }
 
@@ -79,18 +52,17 @@ class ParticipantNotificationRepository implements ParticipantNotificationInterf
   {
     $meeting = Meeting::with([
       'chairedBy',
-      'createdBy',
       'participants' => function ($query) {
         $query->where('participantable_type', 'meeting');
       },
-      'participants.staff',
-      'participants.department',
-      'participants.role',
-      // 'participants.staff.department',
-      // 'participants.staff.roles',
-      // 'participants.department.roles',
-      // 'participants.department.staffs',
-      // 'participants.role.department',
+      // 'participants.staff',
+      // 'participants.department',
+      // 'participants.role',
+      'participants.staff.department',
+      'participants.staff.roles',
+      'participants.department.roles',
+      'participants.department.staffs',
+      'participants.role.department',
       // 'participants.role.staffs',
     ])->orderBy('created_at', 'desc')->get();
     return $meeting;
@@ -103,13 +75,13 @@ class ParticipantNotificationRepository implements ParticipantNotificationInterf
         $query->where('participantable_type', 'meeting');
       },
       'participants.staff',
-      // 'participants.staff.department',
-      // 'participants.staff.roles',
+      'participants.staff.department',
+      'participants.staff.roles',
       'participants.department',
       'participants.role',
-      // 'participants.department.roles',
-      // 'participants.department.staffs',
-      // 'participants.role.department',
+      'participants.department.roles',
+      'participants.department.staffs',
+      'participants.role.department',
       // 'participants.role.staffs',
     ])->find($meetingId);
     if (!$meeting) {
@@ -132,44 +104,10 @@ class ParticipantNotificationRepository implements ParticipantNotificationInterf
       $data = Request::all();
       $data['created_by'] = UserData()->id;
       $meeting->update($data);
-      $meeting->participants()->where('participantable_type', 'meeting')->delete();
-      if (isset($data['meeting_type']) && isset($data['department']) && $data['meeting_type'] === "dep_type") {
-        // $meeting->participants()->where('participantable_type', 'meeting')->whereNotNull('department_id')->delete();
+      $meeting->participants()->where('participantable_type', 'meeting')->where('participantable_id', $meeting->id)->delete();
 
-        foreach ($data['department'] as $dep) {
-          $participantData = [
-            'participantable_id' => $meeting->id,
-            'participantable_type' => 'meeting',
-            'department_id' => $dep
-          ];
-          Participant::create($participantData);
-        }
-      }
-
-      if (isset($data['meeting_type']) && isset($data['role']) && $data['meeting_type'] === "role_type") {
-        // $meeting->participants()->where('participantable_type', 'meeting')->whereNotNull('role_id')->delete();
-
-        foreach ($data['role'] as $role) {
-          $participantData = [
-            'participantable_id' => $meeting->id,
-            'participantable_type' => 'meeting',
-            'role_id' => $role
-          ];
-          Participant::create($participantData);
-        }
-      }
-
-      if (isset($data['meeting_type']) && isset($data['staff']) && $data['meeting_type'] === "staff_type") {
-        // $meeting->participants()->where('participantable_type', 'meeting')->whereNotNull('staff_id')->delete();
-
-        foreach ($data['staff'] as $staff) {
-          $participantData = [
-            'participantable_id' => $meeting->id,
-            'participantable_type' => 'meeting',
-            'staff_id' => $staff
-          ];
-          Participant::create($participantData);
-        }
+      if (isset($data['meeting_type'])) {
+        $this->addParticipantsAndSendNotification($meeting, $data, $data['meeting_type']);
       }
       DB::commit();
       return ResponseData($meeting, 200, true, 'Meeting updated successfully.');
@@ -204,58 +142,19 @@ class ParticipantNotificationRepository implements ParticipantNotificationInterf
     try {
       $data['created_by'] = UserData()->id;
       $training = Training::create($data);
-      if (isset($data['type'])) {
-        $typeData = [
-          'name' => $data['type'],
-          'typeable_id' => $training->id,
-          'typeable_type' => 'training',
-        ];
-        Type::create($typeData);
-      }
-      if (isset($data['training_type']) && isset($data['department']) && $data['training_type'] === "dep_type") {
-
-        foreach ($data['department'] as $dep) {
-          $participantData = [
-            'participantable_id' => $training->id,
-            'participantable_type' => 'training',
-            'department_id' => $dep
-          ];
-          Participant::create($participantData);
-        }
-      }
-
-      if (isset($data['training_type']) && isset($data['role']) && $data['training_type'] === "role_type") {
-
-        foreach ($data['role'] as $role) {
-          $participantData = [
-            'participantable_id' => $training->id,
-            'participantable_type' => 'training',
-            'role_id' => $role
-          ];
-          Participant::create($participantData);
-        }
-      }
-
-
-      if (isset($data['training_type']) && isset($data['staff']) && $data['training_type'] === "staff_type") {
-
-        foreach ($data['staff'] as $staff) {
-          $participantData = [
-            'participantable_id' => $training->id,
-            'participantable_type' => 'training',
-            'staff_id' => $staff
-          ];
-          Participant::create($participantData);
-        }
+      // if (isset($data['type'])) {
+      //   $this->createType($data, $training, 'training');
+      // }
+      if (isset($data['training_type'])) {
+        $this->addParticipantsAndSendNotification($training, $data, $data['training_type']);
       }
       DB::commit();
       return ResponseData($training, 201, true, "Training created successfully.");
     } catch (\Exception $e) {
       DB::rollBack();
-      return ResponseData($data = null, $status_code = 422, false, $extra_message = "An error occurred Training stored.");
+      return ResponseData($data = null, $status_code = 422, false,  $e->getMessage());
     }
   }
-
 
   public function getTrainings()
   {
@@ -264,7 +163,6 @@ class ParticipantNotificationRepository implements ParticipantNotificationInterf
         $query->where('typeable_type', 'training');
       },
       'trainedBy',
-      'createdBy',
       'participants' => function ($query) {
         $query->where('participantable_type', 'training');
       },
@@ -291,7 +189,6 @@ class ParticipantNotificationRepository implements ParticipantNotificationInterf
         $query->where('participantable_type', 'training');
       },
       'trainedBy',
-      'createdBy',
       'participants.staff',
       // 'participants.staff.department',
       // 'participants.staff.roles',
@@ -323,54 +220,16 @@ class ParticipantNotificationRepository implements ParticipantNotificationInterf
       $data = Request::all();
       $data['created_by'] = UserData()->id;
       $training->update($data);
-      $training->type()->where('typeable_type', 'training')->where('typeable_id', $training->id)->delete();
-      $training->participants()->where('participantable_type', 'training')->delete();
 
-      if (isset($data['type'])) {
-        $typeData = [
-          'name' => $data['type'],
-          'typeable_id' => $training->id,
-          'typeable_type' => 'training',
-        ];
-        Type::create($typeData);
+      $training->participants()->where('participantable_type', 'training')->where('participantable_id', $training->id)->delete();
+      // if (isset($data['type'])) {
+      //   $this->createType($data, $training, 'training');
+      // }
+
+      if (isset($data['training_type'])) {
+        $this->addParticipantsAndSendNotification($training, $data, $data['training_type']);
       }
 
-      if (isset($data['training_type']) && isset($data['department']) && $data['training_type'] === "dep_type") {
-        foreach ($data['department'] as $dep) {
-          $participantData = [
-            'participantable_id' => $training->id,
-            'participantable_type' => 'training',
-            'department_id' => $dep
-          ];
-          Participant::create($participantData);
-        }
-      }
-
-      if (isset($data['training_type']) && isset($data['role']) && $data['training_type'] === "role_type") {
-        // $training->participants()->where('participantable_type', 'training')->whereNotNull('role_id')->delete();
-
-        foreach ($data['role'] as $role) {
-          $participantData = [
-            'participantable_id' => $training->id,
-            'participantable_type' => 'training',
-            'role_id' => $role
-          ];
-          Participant::create($participantData);
-        }
-      }
-
-      if (isset($data['training_type']) && isset($data['staff']) && $data['training_type'] === "staff_type") {
-        // $training->participants()->where('participantable_type', 'training')->whereNotNull('staff_id')->delete();
-
-        foreach ($data['staff'] as $staff) {
-          $participantData = [
-            'participantable_id' => $training->id,
-            'participantable_type' => 'training',
-            'staff_id' => $staff
-          ];
-          Participant::create($participantData);
-        }
-      }
       DB::commit();
       return ResponseData($training, 200, true, 'Training updated successfully.');
     } catch (\Exception $e) {
@@ -404,8 +263,7 @@ class ParticipantNotificationRepository implements ParticipantNotificationInterf
       'type' => function ($query) {
         $query->where('typeable_type', 'orgNew');
       },
-      'orgNewsBy',
-      'createdBy',
+
       'participants' => function ($query) {
         $query->where('participantable_type', 'orgNew');
       },
@@ -414,9 +272,9 @@ class ParticipantNotificationRepository implements ParticipantNotificationInterf
       'participants.role',
       // 'participants.staff.department',
       // 'participants.staff.roles',
-      // 'participants.department.roles',
+      'participants.department.roles',
       // 'participants.department.staffs',
-      // 'participants.role.department',
+      'participants.role.department',
       // 'participants.role.staffs',
     ])->orderBy('created_at', 'desc')->get();
     return  $orgNew;
@@ -427,19 +285,18 @@ class ParticipantNotificationRepository implements ParticipantNotificationInterf
       'type' => function ($query) {
         $query->where('typeable_type', 'orgNew');
       },
-      'orgNewsBy',
-      'createdBy',
+
       'participants' => function ($query) {
         $query->where('participantable_type', 'orgNew');
       },
       'participants.staff',
-      // 'participants.staff.department',
-      // 'participants.staff.roles',
+      'participants.staff.department',
+      'participants.staff.roles',
       'participants.department',
       'participants.role',
-      // 'participants.department.roles',
+      'participants.department.roles',
       // 'participants.department.staffs',
-      // 'participants.role.department',
+      'participants.role.department',
       // 'participants.role.staffs',
     ])->find($orgNewsId);
     if (!$orgNew) {
@@ -454,55 +311,18 @@ class ParticipantNotificationRepository implements ParticipantNotificationInterf
     try {
       $data['created_by'] = UserData()->id;
       $orgNew = OrgNew::create($data);
-      if (isset($data['type'])) {
-        $typeData = [
-          'name' => $data['type'],
-          'typeable_id' =>  $orgNew->id,
-          'typeable_type' => 'orgNew',
-        ];
-        Type::create($typeData);
-      }
-      if (isset($data['org_news_type']) && isset($data['department']) && $data['org_news_type'] === "dep_type") {
-
-        foreach ($data['department'] as $dep) {
-          $participantData = [
-            'participantable_id' =>  $orgNew->id,
-            'participantable_type' => 'orgNew',
-            'department_id' => $dep
-          ];
-          Participant::create($participantData);
-        }
+      // if (isset($data['type'])) {
+      //   $this->createType($data, $orgNew, 'orgNew');
+      // }
+      if (isset($data['org_news_type'])) {
+        $this->addParticipantsAndSendNotification($orgNew, $data, $data['org_news_type']);
       }
 
-      if (isset($data['org_news_type']) && isset($data['role']) && $data['org_news_type'] === "role_type") {
-
-        foreach ($data['role'] as $role) {
-          $participantData = [
-            'participantable_id' =>  $orgNew->id,
-            'participantable_type' => 'orgNew',
-            'role_id' => $role
-          ];
-          Participant::create($participantData);
-        }
-      }
-
-
-      if (isset($data['org_news_type']) && isset($data['staff']) && $data['org_news_type'] === "staff_type") {
-
-        foreach ($data['staff'] as $staff) {
-          $participantData = [
-            'participantable_id' =>  $orgNew->id,
-            'participantable_type' => 'orgNew',
-            'staff_id' => $staff
-          ];
-          Participant::create($participantData);
-        }
-      }
       DB::commit();
-      return ResponseData($orgNew, 201, true, "Training created successfully.");
+      return ResponseData($orgNew, 201, true, "OrgNews created successfully.");
     } catch (\Exception $e) {
       DB::rollBack();
-      return ResponseData($data = null, $status_code = 422, false, $extra_message = "An error occurred Training stored.");
+      return ResponseData($data = null, $status_code = 422, false, $e->getMessage());
     }
   }
   public function  updateOrgNews($orgNewsId)
@@ -519,52 +339,17 @@ class ParticipantNotificationRepository implements ParticipantNotificationInterf
       $data = Request::all();
       $data['created_by'] = UserData()->id;
       $orgNew->update($data);
-      $orgNew->type()->where('typeable_type', 'orgNew')->where('typeable_id', $orgNew->id)->delete();
-      $orgNew->participants()->where('participantable_type', 'orgNew')->delete();
 
-      if (isset($data['type'])) {
-        $typeData = [
-          'name' => $data['type'],
-          'typeable_id' => $orgNew->id,
-          'typeable_type' => 'orgNew',
-        ];
-        Type::create($typeData);
+      $orgNew->participants()->where('participantable_type', 'orgNew')->where('participantable_id', $orgNew->id)->delete();
+
+      // if (isset($data['type'])) {
+      //   $this->createType($data, $orgNew, 'orgNew');
+      // }
+
+      if (isset($data['org_news_type'])) {
+        $this->addParticipantsAndSendNotification($orgNew, $data, $data['org_news_type']);
       }
 
-      if (isset($data['org_news_type']) && isset($data['department']) && $data['org_news_type'] === "dep_type") {
-        foreach ($data['department'] as $dep) {
-          $participantData = [
-            'participantable_id' => $orgNew->id,
-            'participantable_type' => 'orgNew',
-            'department_id' => $dep
-          ];
-          Participant::create($participantData);
-        }
-      }
-
-      if (isset($data['org_news_type']) && isset($data['role']) && $data['org_news_type'] === "role_type") {
-
-        foreach ($data['role'] as $role) {
-          $participantData = [
-            'participantable_id' => $orgNew->id,
-            'participantable_type' => 'orgNew',
-            'role_id' => $role
-          ];
-          Participant::create($participantData);
-        }
-      }
-
-      if (isset($data['org_news_type']) && isset($data['staff']) && $data['org_news_type'] === "staff_type") {
-
-        foreach ($data['staff'] as $staff) {
-          $participantData = [
-            'participantable_id' => $orgNew->id,
-            'participantable_type' => 'orgNew',
-            'staff_id' => $staff
-          ];
-          Participant::create($participantData);
-        }
-      }
       DB::commit();
       return ResponseData($orgNew, 200, true, 'orgNew updated successfully.');
     } catch (\Exception $e) {
@@ -598,8 +383,6 @@ class ParticipantNotificationRepository implements ParticipantNotificationInterf
       'type' => function ($query) {
         $query->where('typeable_type', 'warning');
       },
-
-      'createdBy',
       'participants' => function ($query) {
         $query->where('participantable_type', 'warning');
       },
@@ -631,8 +414,6 @@ class ParticipantNotificationRepository implements ParticipantNotificationInterf
       'type' => function ($query) {
         $query->where('typeable_type', 'warning');
       },
-
-      'createdBy',
       'participants' => function ($query) {
         $query->where('participantable_type', 'warning');
       },
@@ -659,56 +440,21 @@ class ParticipantNotificationRepository implements ParticipantNotificationInterf
     try {
       $data['created_by'] = UserData()->id;
       $warning = Warning::create($data);
-      if (isset($data['type'])) {
-        $typeData = [
-          'name' => $data['type'],
-          'typeable_id' =>  $warning->id,
-          'typeable_type' => 'warning',
-        ];
-        Type::create($typeData);
-      }
-      if (isset($data['warning_type']) && isset($data['department']) && $data['warning_type'] === "dep_type") {
-
-        foreach ($data['department'] as $dep) {
-          $participantData = [
-            'participantable_id' =>  $warning->id,
-            'participantable_type' => 'warning',
-            'department_id' => $dep
-          ];
-          Participant::create($participantData);
-        }
+      // if (isset($data['type'])) {
+      //   $this->createType($data, $warning, 'warning');
+      // }
+      if (isset($data['warning_type'])) {
+        $this->addParticipantsAndSendNotification($warning, $data, $data['warning_type']);
       }
 
-      if (isset($data['warning_type']) && isset($data['role']) && $data['warning_type'] === "role_type") {
-
-        foreach ($data['role'] as $role) {
-          $participantData = [
-            'participantable_id' =>  $warning->id,
-            'participantable_type' => 'warning',
-            'role_id' => $role
-          ];
-          Participant::create($participantData);
-        }
-      }
-
-      if (isset($data['warning_type']) && isset($data['staff']) && $data['warning_type'] === "staff_type") {
-
-        foreach ($data['staff'] as $staff) {
-          $participantData = [
-            'participantable_id' =>  $warning->id,
-            'participantable_type' => 'warning',
-            'staff_id' => $staff
-          ];
-          Participant::create($participantData);
-        }
-      }
       DB::commit();
       return ResponseData($warning, 201, true, "Warning created successfully.");
     } catch (\Exception $e) {
       DB::rollBack();
-      return ResponseData($data = null, $status_code = 422, false, $extra_message = "An error occurred Warning stored.");
+      return ResponseData($data = null, $status_code = 422, false, $e->getMessage());
     }
   }
+
   public function updateWarning($warningId)
   {
     DB::beginTransaction();
@@ -723,54 +469,14 @@ class ParticipantNotificationRepository implements ParticipantNotificationInterf
       $data = Request::all();
       $data['created_by'] = UserData()->id;
       $warning->update($data);
-      // $warning->type()->where('typeable_type', 'orgNew')->where('typeable_id', $warning->id)->delete();
-      $warning->participants()->where('participantable_type', 'orgNew')->delete();
-      if (isset($data['type'])) {
-        $typeData = [
-          'name'             => $data['type'],
-          'typeable_id'      =>  $warning->id,
-          'typeable_type'    => 'warning',
-        ];
-        Type::updateOrCreate(
-          ['typeable_id' => $warning->id, 'typeable_type' => 'warning'],
-          $typeData
-        );
-      }
-      if (isset($data['warning_type']) && isset($data['department']) && $data['warning_type'] === "dep_type") {
-
-        foreach ($data['department'] as $dep) {
-          $participantData = [
-            'participantable_id' =>  $warning->id,
-            'participantable_type' => 'warning',
-            'department_id' => $dep
-          ];
-          Participant::create($participantData);
-        }
+      $warning->participants()->where('participantable_type', 'warning')->where('participantable_id', $warning->id)->delete();
+      // if (isset($data['type'])) {
+      //   $this->createType($data, $warning, 'warning');
+      // }
+      if (isset($data['warning_type'])) {
+        $this->addParticipantsAndSendNotification($warning, $data, $data['warning_type']);
       }
 
-      if (isset($data['warning_type']) && isset($data['role']) && $data['warning_type'] === "role_type") {
-
-        foreach ($data['role'] as $role) {
-          $participantData = [
-            'participantable_id' =>  $warning->id,
-            'participantable_type' => 'warning',
-            'role_id' => $role
-          ];
-          Participant::create($participantData);
-        }
-      }
-
-      if (isset($data['warning_type']) && isset($data['staff']) && $data['warning_type'] === "staff_type") {
-
-        foreach ($data['staff'] as $staff) {
-          $participantData = [
-            'participantable_id' =>  $warning->id,
-            'participantable_type' => 'warning',
-            'staff_id' => $staff
-          ];
-          Participant::create($participantData);
-        }
-      }
       DB::commit();
       return ResponseData($warning, 200, true, 'Warning updated successfully.');
     } catch (\Exception $e) {
@@ -796,5 +502,90 @@ class ParticipantNotificationRepository implements ParticipantNotificationInterf
       DB::rollBack();
       return ResponseData(null, 422, false, 'An error occurred while deleting the warning. ' . $e->getMessage());
     }
+  }
+
+  public function storeTypes($data)
+  {
+    DB::beginTransaction();
+    try {
+      // $typeData = [
+      //   'name' => $data['name'],
+      //   'typeable_type' => $data['typeable_type'],
+      // ];
+      $type = Type::create(
+        $data
+      );
+      DB::commit();
+      return ResponseData($type, 201, true, "Type created successfully.");
+    } catch (\Exception $e) {
+      DB::rollBack();
+      return ResponseData(null, 422, false, 'An error occurred while stored the Type. ' . $e->getMessage());
+    }
+  }
+
+  private function addParticipantsAndSendNotification($object, $data, $type)
+  {
+
+    $users = collect();
+    $typeName = strtolower(class_basename($object));
+    // Check for dep
+    if (isset($data['department']) && $type === "dep_type") {
+
+      foreach ($data['department'] as $dep) {
+        $participantData = [
+          'participantable_id' => $object->id,
+          'participantable_type' => $typeName,
+          'department_id' => $dep
+        ];
+        Participant::create($participantData);
+        $departmentStaff = Staff::where('department_id', $dep)->get();
+        $users = $users->merge($departmentStaff);
+      }
+    }
+    // Check for roles
+    if (isset($data['role']) && $type === "role_type") {
+      foreach ($data['role'] as $role) {
+        $participantData = [
+          'participantable_id' => $object->id,
+          'participantable_type' => $typeName,
+          'role_id' => $role
+        ];
+        Participant::create($participantData);
+
+        $roleStaff = Staff::whereHas('roles', function ($query) use ($role) {
+          $query->where('id', $role);
+        })->get();
+        $users = $users->merge($roleStaff);
+      }
+    }
+    // Check for specific staff
+    if (isset($data['staff']) && $type === "staff_type") {
+      foreach ($data['staff'] as $staff) {
+        $participantData = [
+          'participantable_id' => $object->id,
+          'participantable_type' => $typeName,
+          'staff_id' => $staff
+        ];
+        Participant::create($participantData);
+
+        $staffMember = Staff::find($staff);
+        if ($staffMember) {
+          $users->push($staffMember);
+        }
+      }
+    }
+    if ($users->isNotEmpty()) {
+      $notificationData = [
+        'title' => ucfirst($typeName)  . 'Scheduled',
+        'body' => 'A new' . $typeName . ' has been scheduled. Please check the details.',
+      ];
+
+      $this->send($object, $users, $notificationData);
+    }
+  }
+
+  public function getTypes($request)
+  {
+    return Type::where('typeable_type', $request->type)->orderBy('created_at', 'desc')->get();
   }
 }
