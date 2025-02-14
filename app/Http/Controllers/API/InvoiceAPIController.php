@@ -173,9 +173,9 @@ class InvoiceAPIController extends Controller
                 // ResponseMessage($msg);
             } else {
                 $msg = "The request to quit the room {$entity->name} has been confirmed. The room will be quit and will soon close. Thank you.";
-                // $entity->status = 'inactive';
-                // $entity->is_active = 0;
-                // $entity->save();
+                $entity->status = 'inactive';
+                $entity->is_active = 0;
+                $entity->save();
                 // $entitySessions = EntitySession::where('entity_id', $entity->id)->get();
                 // foreach($entitySessions as $entitySession){
                 //     $entitySession->is_active = 0;
