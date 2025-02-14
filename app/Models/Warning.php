@@ -13,6 +13,7 @@ class Warning extends Model
 
     protected $fillable = [
         'date_time',
+        'title',
         'description',
         'created_by',
         'warning_type',

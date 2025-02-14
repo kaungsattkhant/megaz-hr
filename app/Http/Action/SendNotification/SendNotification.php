@@ -5,6 +5,7 @@ namespace App\Http\Action\SendNotification;
 use App\Models\Staff;
 use App\Models\Notification;
 use App\Models\StaffFcmToken;
+use Illuminate\Support\Facades\Log;
 use App\Events\SendRoleNotification;
 use App\Events\SendStaffNotification;
 use App\Events\SendDepartmentNotification;
@@ -77,6 +78,7 @@ trait SendNotification
                 }
             }
         }
+        Log::info('Broadcasting department notification', ['department_id' => $department_id]);
     }
 
 

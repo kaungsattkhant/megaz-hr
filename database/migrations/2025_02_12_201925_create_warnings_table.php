@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('warnings', function (Blueprint $table) {
             $table->id();
             $table->dateTime('date_time');
+            $table->longText('title');
             $table->longText('description');
             $table->foreignId('created_by');
             $table->string('warning_type');

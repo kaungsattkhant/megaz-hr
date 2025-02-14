@@ -13,6 +13,7 @@ class OrgNew extends Model
 
     protected $fillable = [
         'date_time',
+        'title',
         'description',
         'created_by',
         'org_news_type',
@@ -31,5 +32,10 @@ class OrgNew extends Model
     public function participants(): MorphMany
     {
         return $this->morphMany(Participant::class, 'participantable');
+    }
+
+    public function getMorphClass()
+    {
+        return 'orgnew';
     }
 }

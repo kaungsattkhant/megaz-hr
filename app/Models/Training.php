@@ -16,6 +16,7 @@ class Training extends Model
         'date_time',
         'from_date',
         'to_date',
+        'title',
         'place',
         'trained_by',
         'description',

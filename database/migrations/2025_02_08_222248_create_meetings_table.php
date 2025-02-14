@@ -18,9 +18,9 @@ return new class extends Migration
             $table->dateTime('to_date');
             $table->longText('place');
             $table->foreignId('chaired_by');
+            $table->longText('title');
             $table->longText('description');
             $table->foreignId('created_by');
-            $table->string('title');
             $table->string('meeting_type');
             $table->timestamps();
         });

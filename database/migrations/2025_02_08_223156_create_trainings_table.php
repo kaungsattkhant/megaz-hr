@@ -18,6 +18,7 @@ return new class extends Migration
             $table->dateTime('to_date');
             $table->longText('place');
             $table->foreignId('trained_by');
+            $table->longText('title');
             $table->longText('description');
             $table->foreignId('created_by');
             $table->string('training_type');
