@@ -1423,10 +1423,17 @@ class InvoiceRepository implements InvoiceRepositoryInterface
 
             if ($order != null) {
                 $orderItems = $order->orderItems;
+                if($orderItems->isNotEmpty()){
+                    $unChooseOrderItemByArea=$orderItems->where('area_id',null)->first();
+                    if($unChooseOrderItemByArea){
+                        ResponseMessage('Area need to conifirm by area',419);
+                    }
+                }
                 // $groupedOrderItems = $orderItems->groupBy('menu_id')->map(function ($items) {
                 //     return $items->sum('quantity');
                 // });
                 // dd($groupedOrderItems);
+                // $checkAreaId=
                 $groupedOrderItems = $orderItems
                     ->groupBy(function ($item) {
                         return $item['menu_id'] . '-' . $item['area_id'];

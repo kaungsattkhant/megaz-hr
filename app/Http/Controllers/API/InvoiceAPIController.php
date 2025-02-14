@@ -136,8 +136,8 @@ class InvoiceAPIController extends Controller
         //end invoice for room
         $receptionistRole = Role::getRoleByName('Receptionist');
         if (isset($request->waiter)) {
-            if(!isset($request->total)){
-                ResponseMessage('Total Field is required',422);
+            if (!isset($request->total)) {
+                ResponseMessage('Total Field is required', 422);
             }
             $receptionistRole = Role::getRoleByName('Receptionist');
             // $managerRole = Role::where('name', 'Manager')
@@ -145,6 +145,17 @@ class InvoiceAPIController extends Controller
             //     ->first();
             $entity->status = 'done_pending';
             $entity->save();
+            $order = $invoice->order;
+            if ($order) {
+                $orderItems = $order->orderItems;
+                if ($orderItems->isNotEmpty()) {
+                    $unChooseOrderItemByArea = $orderItems->where('area_id', null)->first();
+                    if ($unChooseOrderItemByArea) {
+                        ResponseMessage('Area need to conifirm by area', 419);
+                    }
+                }
+            }
+
             broadcast(new PosRoomDoneNotification($invoice, $entity, $receptionistRole->id));
             ResponseMessage("The request to quit the room {$entity->name} has been sent. Please wait for the confirmation from the catering department.");
         } else if (isset($request->is_confirm)) {
