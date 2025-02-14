@@ -34,9 +34,13 @@ class Training extends Model
         return $this->belongsTo(Staff::class, 'created_by');
     }
 
-    public function type(): MorphOne
+    // public function type(): MorphOne
+    // {
+    //     return $this->morphOne(Type::class, 'typeable');
+    // }
+    public function type()
     {
-        return $this->morphOne(Type::class, 'typeable');
+        return $this->morphMany(Type::class, 'typeable');
     }
 
     public function participants(): MorphMany
