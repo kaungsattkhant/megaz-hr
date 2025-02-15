@@ -8,26 +8,41 @@ use LaravelFCM\Message\OptionsBuilder;
 use LaravelFCM\Message\PayloadDataBuilder;
 use LaravelFCM\Message\PayloadNotificationBuilder;
 use FCM;
+
 class Notification extends Model
 {
     use HasFactory;
-    protected $fillable=['title','preview','notificationable_id','notificationable_type','created_by','date_time'];
+    protected $fillable = [
+        'title',
+        'preview',
+        'notificationable_id',
+        'notificationable_type',
+        'created_by',
+        'date_time'
+    ];
 
-    public function notificationUsers(){
+    public function notificationUsers()
+    {
         return $this->hasMany(\App\Models\NotificationUser::class);
     }
 
-    public  function toUserMultipleDevice($tokens=null,$add_data){
-        $click_action='http://127.0.0.1:8080';
-        $icon=null;
+    // public function notificationable()
+    // {
+    //     return $this->morphTo();
+    // }
+
+    public  function toUserMultipleDevice($tokens = null, $add_data)
+    {
+        $click_action = 'http://127.0.0.1:8080';
+        $icon = null;
         $optionBuilder = new OptionsBuilder();
-        $optionBuilder->setTimeToLive(60*20);
+        $optionBuilder->setTimeToLive(60 * 20);
         $notificationBuilder = new PayloadNotificationBuilder($add_data['title']);
         $notificationBuilder->setBody($add_data['body'])
-                            ->setSound('default')
-                            ->setBadge(1)
-                            ->setIcon($icon)
-                            ->setClickAction($click_action);
+            ->setSound('default')
+            ->setBadge(1)
+            ->setIcon($icon)
+            ->setClickAction($click_action);
 
         $dataBuilder = new PayloadDataBuilder();
         $dataBuilder->addData($add_data);

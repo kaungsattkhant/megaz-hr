@@ -2,17 +2,20 @@
 
 namespace App\Repositories\ParticipantNotification;
 
+use App\Models\Role;
 use App\Models\Type;
 use App\Models\Staff;
 use App\Models\OrgNew;
 use App\Models\Meeting;
 use App\Models\Warning;
 use App\Models\Training;
+use App\Models\Department;
 use App\Models\Participant;
+use App\Models\Notification;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Request;
 use App\Http\Action\SendNotification\SendNotification;
-
+use App\Models\NotificationUser;
 
 class ParticipantNotificationRepository implements ParticipantNotificationInterface
 {
@@ -159,9 +162,9 @@ class ParticipantNotificationRepository implements ParticipantNotificationInterf
   public function getTrainings()
   {
     $training = Training::with([
-      'type' => function ($query) {
-        $query->where('typeable_type', 'training');
-      },
+      // 'type' => function ($query) {
+      //   $query->where('typeable_type', 'training');
+      // },
       'trainedBy',
       'participants' => function ($query) {
         $query->where('participantable_type', 'training');
@@ -182,9 +185,9 @@ class ParticipantNotificationRepository implements ParticipantNotificationInterf
   public function getTrainingById($trainingId)
   {
     $training = Training::with([
-      'type' => function ($query) {
-        $query->where('typeable_type', 'training');
-      },
+      // 'type' => function ($query) {
+      //   $query->where('typeable_type', 'training');
+      // },
       'participants' => function ($query) {
         $query->where('participantable_type', 'training');
       },
@@ -260,9 +263,9 @@ class ParticipantNotificationRepository implements ParticipantNotificationInterf
   public function getOrgNews()
   {
     $orgNew = OrgNew::with([
-      'type' => function ($query) {
-        $query->where('typeable_type', 'orgNew');
-      },
+      // 'type' => function ($query) {
+      //   $query->where('typeable_type', 'orgNew');
+      // },
 
       'participants' => function ($query) {
         $query->where('participantable_type', 'orgNew');
@@ -282,10 +285,6 @@ class ParticipantNotificationRepository implements ParticipantNotificationInterf
   public function getOrgNewsById($orgNewsId)
   {
     $orgNew = OrgNew::with([
-      'type' => function ($query) {
-        $query->where('typeable_type', 'orgNew');
-      },
-
       'participants' => function ($query) {
         $query->where('participantable_type', 'orgNew');
       },
@@ -380,9 +379,6 @@ class ParticipantNotificationRepository implements ParticipantNotificationInterf
   public function getWarnings($request)
   {
     $query = Warning::with([
-      'type' => function ($query) {
-        $query->where('typeable_type', 'warning');
-      },
       'participants' => function ($query) {
         $query->where('participantable_type', 'warning');
       },
@@ -411,9 +407,6 @@ class ParticipantNotificationRepository implements ParticipantNotificationInterf
   public function getWarningById($warningId)
   {
     $warning = Warning::with([
-      'type' => function ($query) {
-        $query->where('typeable_type', 'warning');
-      },
       'participants' => function ($query) {
         $query->where('participantable_type', 'warning');
       },
@@ -529,6 +522,7 @@ class ParticipantNotificationRepository implements ParticipantNotificationInterf
     $users = collect();
     $typeName = strtolower(class_basename($object));
     // Check for dep
+
     if (isset($data['department']) && $type === "dep_type") {
 
       foreach ($data['department'] as $dep) {
@@ -567,7 +561,6 @@ class ParticipantNotificationRepository implements ParticipantNotificationInterf
           'staff_id' => $staff
         ];
         Participant::create($participantData);
-
         $staffMember = Staff::find($staff);
         if ($staffMember) {
           $users->push($staffMember);
@@ -580,12 +573,56 @@ class ParticipantNotificationRepository implements ParticipantNotificationInterf
         'body' => 'A new' . $typeName . ' has been scheduled. Please check the details.',
       ];
 
-      $this->send($object, $users, $notificationData);
+      $this->sendParticipantNoti($object, $users, $notificationData, $type);
     }
   }
 
   public function getTypes($request)
   {
     return Type::where('typeable_type', $request->type)->orderBy('created_at', 'desc')->get();
+  }
+
+  public function getallNoties($request, $staffId)
+  {
+    $notifications = NotificationUser::join('notifications', 'notification_users.notification_id', '=', 'notifications.id')
+      ->join('meetings', 'notifications.notificationable_id', '=', 'meetings.id')
+      ->join('participants', function ($join) {
+        $join->on('participants.participantable_id', '=', 'meetings.id')
+          ->where('participants.participantable_type', '=', 'meeting');
+      })
+      ->leftJoin('departments', function ($join) {
+        $join->on('participants.department_id', '=', 'departments.id')
+          ->whereNotNull('participants.department_id');
+      })
+      ->leftjoin(
+        'roles',
+        function ($join) {
+          $join->on('participants.role_id', '=', 'roles.id')
+            ->whereNotNull('participants.role_id');
+        }
+      )
+      ->leftjoin(
+        'staff',
+        function ($join) {
+          $join->on('participants.staff_id', '=', 'staff.id')
+            ->whereNotNull('participants.staff_id');
+        }
+      )
+
+      ->leftJoin('staff as created_by_staff', 'meetings.created_by', '=', 'created_by_staff.id')
+      ->where('notification_users.staff_id', '=', $staffId)
+      ->select(
+        // 'notification_users.*',
+        // 'notifications.*',
+        'meetings.*',
+        'participants.*',
+        'departments.name AS department_name',
+        'roles.name AS role_name',
+        'staff.name AS role_name',
+        'created_by_staff.name AS created_by_name',
+      )
+      ->get();
+
+    return ResponseData($notifications, 200, true, "Notifications retrieved successfully.");
   }
 }

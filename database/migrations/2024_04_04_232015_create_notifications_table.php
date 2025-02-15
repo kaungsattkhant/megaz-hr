@@ -17,7 +17,7 @@ return new class extends Migration
             $table->string('preview')->nullable();
             $table->dateTime('date_time');
             $table->unsignedBigInteger('notificationable_id');
-            $table->char('notificationable_type');
+            $table->string('notificationable_type');
             $table->unsignedBigInteger('created_by');
             $table->timestamps();
         });

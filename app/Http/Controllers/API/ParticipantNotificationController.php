@@ -150,4 +150,11 @@ class ParticipantNotificationController extends Controller
         $data = $this->ParticipantNotificationRepository->getTypes($request);
         ResponseData($data);
     }
+
+
+    public function getallNoties(Request $request, $staffId)
+    {
+        $data = $this->ParticipantNotificationRepository->getallNoties($request, $staffId);
+        ResponseData($data);
+    }
 }
