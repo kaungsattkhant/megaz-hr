@@ -216,7 +216,7 @@ class InvoiceRepository implements InvoiceRepositoryInterface
                 $data['area_id'] = $entity->area_id;
                 $data['created_by'] = UserData()->id;
                 $data['invoice_date'] = Carbon::now();
-                $data['sub_total']=$data['total_session_price'];
+                $data['sub_total'] = $data['total_session_price'];
                 $invoice = Invoice::create($data);
                 $invoiceSession = $this->invoiceService->storeInvoiceSession($invoice->id, $entitySession->entity_id, $data['session_duration'], $entity->price_per_hour, $data['is_waiter'], $discountId = null);
                 //create deposit
@@ -719,7 +719,7 @@ class InvoiceRepository implements InvoiceRepositoryInterface
     public function modifyEntityChange($data)
     {
         $entityId = $data['entity_id'];
-        $previousEntityId=$data['previous_entity_id'];
+        $previousEntityId = $data['previous_entity_id'];
         $invoiceId = $data['invoice_id'];
         $start_date_time = Carbon::parse($data['start_date_time']);
         $isAvailableEntity = $this->invoiceService->checkIsActiveChangeRoom($entityId);
@@ -764,7 +764,7 @@ class InvoiceRepository implements InvoiceRepositoryInterface
                 ResponseMessage('Active Invoice Session not found', 419);
             }
 
-            $previousEntity= Entity::find($previousEntityId);
+            $previousEntity = Entity::find($previousEntityId);
             // $previousEntity = $invoice->activeInvoiceSession->entity;
             $previousEntity->is_active = 0;
             $previousEntity->status = 'inactive';
@@ -822,7 +822,7 @@ class InvoiceRepository implements InvoiceRepositoryInterface
             ]);
 
             //update session price for invoice
-            $invoice->entity_id=$entityId;
+            $invoice->entity_id = $entityId;
             $invoice->total = ($invoice->total - $priviousTotalSessionPrice) + $totalNewSessionPrice;
             $invoice->sub_total = ($invoice->sub_total - $priviousTotalSessionPrice) + $activeInvoiceSession->total_session_price + $totalNewSessionPrice;
             $invoice->total_session_price = $activeInvoiceSession->total_session_price + $totalNewSessionPrice; //previous used session price+ new session price(new room)
@@ -835,7 +835,7 @@ class InvoiceRepository implements InvoiceRepositoryInterface
         }
     }
 
-    public function changeTable( $previousEntityId,$newEntityId)
+    public function changeTable($previousEntityId, $newEntityId)
     {
         Entity::where('id', $newEntityId)->update([
             'status' => 'active',
@@ -1242,18 +1242,18 @@ class InvoiceRepository implements InvoiceRepositoryInterface
         DB::beginTransaction();
         try {
             $invoice = Invoice::find($data['invoice_id']);
-            $data['total']=$invoice['total']!=null? $invoice['total']:0;
+            $data['total'] = $invoice['total'] != null ? $invoice['total'] : 0;
             if (!$invoice) {
                 ResponseMessage('Invoice not found', 404);
             }
             //added end_invoice for table oct 25 2024
             if ($invoice && $data['entity_type'] == 'table') {
-                $invoice = $this->doneTableForInvoice($data, $invoice);
-                $this->invoiceService->updateEntityStatus($invoice->entity_id, 'inactive'); // after done invoice ,update entity staus to inactive
-                $this->addTargetPosition($invoice->id, $invoice->created_by, $data['total']); //add sale target position for related role
-                $this->addTargetMenu($invoice->id); //add sale target position for related role
-                $this->broadcastNotification($invoice->entity_id); //send notifcation;
-                DB::commit();
+                    $invoice = $this->doneTableForInvoice($data, $invoice);
+                    $this->invoiceService->updateEntityStatus($invoice->entity_id, 'inactive'); // after done invoice ,update entity staus to inactive
+                    $this->addTargetPosition($invoice->id, $invoice->created_by, $data['total']); //add sale target position for related role
+                    $this->addTargetMenu($invoice->id); //add sale target position for related role
+                    $this->broadcastNotification($invoice->entity_id); //send notifcation;
+                    DB::commit();
                 return $invoice;
             }
             $foodCharge = 0;
@@ -1423,10 +1423,10 @@ class InvoiceRepository implements InvoiceRepositoryInterface
 
             if ($order != null) {
                 $orderItems = $order->orderItems;
-                if($orderItems->isNotEmpty()){
-                    $unChooseOrderItemByArea=$orderItems->where('area_id',null)->first();
-                    if($unChooseOrderItemByArea){
-                        ResponseMessage('Area need to conifirm by area',419);
+                if ($orderItems->isNotEmpty()) {
+                    $unChooseOrderItemByArea = $orderItems->where('area_id', null)->first();
+                    if ($unChooseOrderItemByArea) {
+                        ResponseMessage('Area need to conifirm by area', 419);
                     }
                 }
                 // $groupedOrderItems = $orderItems->groupBy('menu_id')->map(function ($items) {
@@ -1505,6 +1505,26 @@ class InvoiceRepository implements InvoiceRepositoryInterface
             }
             $total_service_value += $serviceValue;
         }
+
+        if(!isset($data['birthday_discount'])){
+            $data['birthday_discount']=0;
+        }
+        if(!isset($data['discount_value'])){
+            $data['discount_value']=0;
+        }
+        if(!isset($data['order_discount'])){
+            $data['order_discount']=0;
+        }
+        if(!isset($data['customer_level_discount'])){
+            $data['customer_level_discount']=0;
+        }
+        if(!isset($data['tax'])){
+            $data['tax']=0;
+        }
+        if(!isset($data['service_charge'])){
+            $data['service_charge']=0;
+        }
+        
         if (isset($data['discount_type'])) {
             $data['discount_value'] = $data['discount_type'] == null || $data['discount_type'] == "null" ? 0 : $data['discount_value'];
         }
