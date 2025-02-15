@@ -1505,6 +1505,26 @@ class InvoiceRepository implements InvoiceRepositoryInterface
             }
             $total_service_value += $serviceValue;
         }
+
+        if(!isset($data['birthday_discount'])){
+            $data['birthday_discount']=0;
+        }
+        if(!isset($data['discount_value'])){
+            $data['discount_value']=0;
+        }
+        if(!isset($data['order_discount'])){
+            $data['order_discount']=0;
+        }
+        if(!isset($data['customer_level_discount'])){
+            $data['customer_level_discount']=0;
+        }
+        if(!isset($data['tax'])){
+            $data['tax']=0;
+        }
+        if(!isset($data['service_charge'])){
+            $data['service_charge']=0;
+        }
+        
         if (isset($data['discount_type'])) {
             $data['discount_value'] = $data['discount_type'] == null || $data['discount_type'] == "null" ? 0 : $data['discount_value'];
         }
