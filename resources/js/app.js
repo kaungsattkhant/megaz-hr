@@ -184,6 +184,9 @@ import PosOrderItemList from './Components/Pos/OrderItem/PosOrderItemList.vue';
 import MeetingListComponent from './Components/Meeting/MeetingListComponent.vue';
 import MeetingCreateComponent from './Components/Meeting/MeetingCreateComponent.vue';
 import MeetingEditComponent from './Components/Meeting/MeetingEditComponent.vue';
+import TrainingListComponent from './Components/Training/TrainingListComponent.vue';
+import TrainingCreateComponent from './Components/Training/TrainingCreateComponent.vue';
+import TrainingEditComponent from './Components/Training/TrainingEditComponent.vue';
 
 import PosTableComponent from './Components/Pos/Home/PosTableComponent.vue';
 import PosRoomComponent from './Components/Pos/Home/PosRoomComponent.vue';
@@ -350,6 +353,9 @@ app.component('PosOrderItemList',PosOrderItemList);
 app.component('MeetingListComponent',MeetingListComponent);
 app.component('MeetingCreateComponent',MeetingCreateComponent);
 app.component('MeetingEditComponent',MeetingEditComponent);
+app.component('TrainingListComponent',TrainingListComponent);
+app.component('TrainingCreateComponent',TrainingCreateComponent);
+app.component('TrainingEditComponent',TrainingEditComponent);
 
 app.component('PosTableComponent',PosTableComponent);
 app.component('PosRoomComponent',PosRoomComponent);
