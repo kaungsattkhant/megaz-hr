@@ -1524,7 +1524,7 @@ class InvoiceRepository implements InvoiceRepositoryInterface
         if(!isset($data['service_charge'])){
             $data['service_charge']=0;
         }
-        
+
         if (isset($data['discount_type'])) {
             $data['discount_value'] = $data['discount_type'] == null || $data['discount_type'] == "null" ? 0 : $data['discount_value'];
         }
@@ -1607,21 +1607,33 @@ class InvoiceRepository implements InvoiceRepositoryInterface
         DB::beginTransaction();
         try {
             $invoice = Invoice::find($data['invoice_id']);
+            $entity=$invoice->entity;
+            if(!$entity){
+                ResponseMessage('Entity is not found to confirm',419);
+            }
             if ($data['is_confirm'] == 1) {
-                $activeInvoiceSession = $invoice->activeInvoiceSession;
-                $activeInvoiceSession->is_active = 1;
-                $activeInvoiceSession->save();
-                //update active sesion
-                $roomSessions = $activeInvoiceSession->roomSessions;
-                foreach ($roomSessions as $roomSession) {
-                    $entitySesion = $roomSession->entitySession;
-                    $entitySesion->is_active = 1;
-                    $entitySesion->save();
-                    $entity = $entitySesion->entity;
-                    $entity->is_active = 1;
-                    $entity->status = 'active';
+                if($entity->type=='room'){
+                    $activeInvoiceSession = $invoice->activeInvoiceSession;
+                    $activeInvoiceSession->is_active = 1;
+                    $activeInvoiceSession->save();
+                    //update active sesion
+                    $roomSessions = $activeInvoiceSession->roomSessions;
+                    foreach ($roomSessions as $roomSession) {
+                        $entitySesion = $roomSession->entitySession;
+                        $entitySesion->is_active = 1;
+                        $entitySesion->save();
+                        $entity = $entitySesion->entity;
+                        $entity->is_active = 1;
+                        $entity->status = 'active';
+                        $entity->save();
+                    }
+                }elseif($entity->type=='table')
+                {
+                    $entity->is_active=1;
+                    $entity->status='active';
                     $entity->save();
                 }
+               
             }
 
             // $latestSession = RoomSession::where('invoice_id', $data['invoice_id'])->latest()->first();
