@@ -1616,7 +1616,7 @@ class InvoiceRepository implements InvoiceRepositoryInterface
                 ResponseMessage('Entity is not found to confirm',419);
             }
             if ($data['is_confirm'] == 1) {
-                if($entity->type=='room'){
+                if($entity->entity_type=='room'){
                     $activeInvoiceSession = $invoice->activeInvoiceSession;
                     $activeInvoiceSession->is_active = 1;
                     $activeInvoiceSession->save();
@@ -1631,7 +1631,7 @@ class InvoiceRepository implements InvoiceRepositoryInterface
                         $entity->status = 'active';
                         $entity->save();
                     }
-                }elseif($entity->type=='table')
+                }elseif($entity->entity_type=='table')
                 {
                     $entity->is_active=1;
                     $entity->status='active';
