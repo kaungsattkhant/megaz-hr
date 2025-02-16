@@ -2,18 +2,19 @@
 
 namespace App\Events;
 
-use App\Models\Customer;
 use App\Models\Entity;
 use App\Models\Invoice;
+use App\Models\Customer;
 use App\Models\OrderItem;
 use App\Models\RoomSession;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Broadcasting\Channel;
-use Illuminate\Broadcasting\InteractsWithSockets;
-use Illuminate\Broadcasting\PresenceChannel;
-use Illuminate\Broadcasting\PrivateChannel;
-use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
-use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Broadcasting\PrivateChannel;
+use Illuminate\Broadcasting\PresenceChannel;
+use Illuminate\Foundation\Events\Dispatchable;
+use Illuminate\Broadcasting\InteractsWithSockets;
+use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 
 class RoomDoneNotificationRequest implements ShouldBroadcast
 {
@@ -50,6 +51,10 @@ class RoomDoneNotificationRequest implements ShouldBroadcast
     }
     public function broadcastWith()
     {
+        Log::info($this->msg);
+        Log::info('role_id', ['status' => $this->role_id]);
+        Log::info('status', ['status' => $this->entity->status]);
+        Log::info('is_active', ['is_active' => $this->entity->is_active]);
         $data = [
             'role_id' => $this->role_id,
             'entity' => $this->entity,

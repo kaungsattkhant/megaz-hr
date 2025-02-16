@@ -1469,12 +1469,11 @@ class InvoiceRepository implements InvoiceRepositoryInterface
             //     'tax' => $tax,
             //     'discount_total' => $data['discount_total'],
             // ]);
-
             $catering_department = Department::where('name', 'Catering')->first();
             $msg = "The {$entity->name} is now closed. Thank you.";
             $role = Role::where('name', 'Staff')->where('department_id', $catering_department->id)->first();
             broadcast(new RoomDoneNotificationRequest($entity, $msg, $role->id));
-
+            
             $entity->is_active = 0;
             $entity->status = 'inactive';
             $entity->save();
