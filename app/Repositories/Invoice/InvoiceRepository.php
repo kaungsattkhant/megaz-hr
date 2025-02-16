@@ -1472,7 +1472,6 @@ class InvoiceRepository implements InvoiceRepositoryInterface
 
             $catering_department = Department::where('name', 'Catering')->first();
             $msg = "The {$entity->name} is now closed. Thank you.";
-
             $role = Role::where('name', 'Staff')->where('department_id', $catering_department->id)->first();
             broadcast(new RoomDoneNotificationRequest($entity, $msg, $role->id));
 
@@ -1595,10 +1594,15 @@ class InvoiceRepository implements InvoiceRepositoryInterface
         }
         $msg = "The {$entity->name} is now closed. Thank you.";
         //i think this role is not reliable to send notification
+        //need to confirm  which role to send notification Catering'staff of Catering'waiter
         $role = Role::where('name', 'Staff')->where('department_id', $catering_department->id)->first();
         if (!$role) {
             ResponseMessage('Role not found', 404);
         }
+        // $catering_department = Department::where('name', 'Catering')->first();
+        // $msg = "The {$entity->name} is now closed. Thank you.";
+        // $role = Role::where('name', 'Staff')->where('department_id', $catering_department->id)->first();
+        // broadcast(new RoomDoneNotificationRequest($entity, $msg, $role->id));
         broadcast(new RoomDoneNotificationRequest($entity, $msg, $role->id));
     }
 
@@ -1612,7 +1616,7 @@ class InvoiceRepository implements InvoiceRepositoryInterface
                 ResponseMessage('Entity is not found to confirm',419);
             }
             if ($data['is_confirm'] == 1) {
-                if($entity->type=='room'){
+                if($entity->entity_type=='room'){
                     $activeInvoiceSession = $invoice->activeInvoiceSession;
                     $activeInvoiceSession->is_active = 1;
                     $activeInvoiceSession->save();
@@ -1627,7 +1631,7 @@ class InvoiceRepository implements InvoiceRepositoryInterface
                         $entity->status = 'active';
                         $entity->save();
                     }
-                }elseif($entity->type=='table')
+                }elseif($entity->entity_type=='table')
                 {
                     $entity->is_active=1;
                     $entity->status='active';
