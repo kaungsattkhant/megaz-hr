@@ -1472,7 +1472,6 @@ class InvoiceRepository implements InvoiceRepositoryInterface
 
             $catering_department = Department::where('name', 'Catering')->first();
             $msg = "The {$entity->name} is now closed. Thank you.";
-
             $role = Role::where('name', 'Staff')->where('department_id', $catering_department->id)->first();
             broadcast(new RoomDoneNotificationRequest($entity, $msg, $role->id));
 
@@ -1595,10 +1594,15 @@ class InvoiceRepository implements InvoiceRepositoryInterface
         }
         $msg = "The {$entity->name} is now closed. Thank you.";
         //i think this role is not reliable to send notification
+        //need to confirm  which role to send notification Catering'staff of Catering'waiter
         $role = Role::where('name', 'Staff')->where('department_id', $catering_department->id)->first();
         if (!$role) {
             ResponseMessage('Role not found', 404);
         }
+        // $catering_department = Department::where('name', 'Catering')->first();
+        // $msg = "The {$entity->name} is now closed. Thank you.";
+        // $role = Role::where('name', 'Staff')->where('department_id', $catering_department->id)->first();
+        // broadcast(new RoomDoneNotificationRequest($entity, $msg, $role->id));
         broadcast(new RoomDoneNotificationRequest($entity, $msg, $role->id));
     }
 
