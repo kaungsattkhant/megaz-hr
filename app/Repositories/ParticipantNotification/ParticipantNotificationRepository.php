@@ -12,10 +12,11 @@ use App\Models\Training;
 use App\Models\Department;
 use App\Models\Participant;
 use App\Models\Notification;
+use App\Models\NotificationUser;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Request;
+use App\Http\Resources\NotificationUserResource;
 use App\Http\Action\SendNotification\SendNotification;
-use App\Models\NotificationUser;
 
 class ParticipantNotificationRepository implements ParticipantNotificationInterface
 {
@@ -263,10 +264,6 @@ class ParticipantNotificationRepository implements ParticipantNotificationInterf
   public function getOrgNews()
   {
     $orgNew = OrgNew::with([
-      // 'type' => function ($query) {
-      //   $query->where('typeable_type', 'orgNew');
-      // },
-
       'participants' => function ($query) {
         $query->where('participantable_type', 'orgNew');
       },
@@ -310,9 +307,6 @@ class ParticipantNotificationRepository implements ParticipantNotificationInterf
     try {
       $data['created_by'] = UserData()->id;
       $orgNew = OrgNew::create($data);
-      // if (isset($data['type'])) {
-      //   $this->createType($data, $orgNew, 'orgNew');
-      // }
       if (isset($data['org_news_type'])) {
         $this->addParticipantsAndSendNotification($orgNew, $data, $data['org_news_type']);
       }
@@ -569,7 +563,7 @@ class ParticipantNotificationRepository implements ParticipantNotificationInterf
     }
     if ($users->isNotEmpty()) {
       $notificationData = [
-        'title' => ucfirst($typeName)  . 'Scheduled',
+        'title' => ucfirst($typeName),
         'body' => 'A new' . $typeName . ' has been scheduled. Please check the details.',
       ];
 
@@ -584,45 +578,34 @@ class ParticipantNotificationRepository implements ParticipantNotificationInterf
 
   public function getallNoties($request, $staffId)
   {
-    $notifications = NotificationUser::join('notifications', 'notification_users.notification_id', '=', 'notifications.id')
-      ->join('meetings', 'notifications.notificationable_id', '=', 'meetings.id')
-      ->join('participants', function ($join) {
-        $join->on('participants.participantable_id', '=', 'meetings.id')
-          ->where('participants.participantable_type', '=', 'meeting');
-      })
-      ->leftJoin('departments', function ($join) {
-        $join->on('participants.department_id', '=', 'departments.id')
-          ->whereNotNull('participants.department_id');
-      })
-      ->leftjoin(
-        'roles',
-        function ($join) {
-          $join->on('participants.role_id', '=', 'roles.id')
-            ->whereNotNull('participants.role_id');
-        }
-      )
-      ->leftjoin(
-        'staff',
-        function ($join) {
-          $join->on('participants.staff_id', '=', 'staff.id')
-            ->whereNotNull('participants.staff_id');
-        }
-      )
 
-      ->leftJoin('staff as created_by_staff', 'meetings.created_by', '=', 'created_by_staff.id')
-      ->where('notification_users.staff_id', '=', $staffId)
-      ->select(
-        // 'notification_users.*',
-        // 'notifications.*',
-        'meetings.*',
-        'participants.*',
-        'departments.name AS department_name',
-        'roles.name AS role_name',
-        'staff.name AS role_name',
-        'created_by_staff.name AS created_by_name',
-      )
+    $type = $request->query('type');
+    $notifications = NotificationUser::with([
+      'notification.notificationable',
+      'notification.notificationable.participants',
+      'notification.notificationable.participants.department',
+      'notification.notificationable.participants.role',
+      'notification.notificationable.participants.staff',
+    ])
+      ->join('notifications', 'notification_users.notification_id', '=', 'notifications.id')
+      ->where('notification_users.staff_id', '=', $staffId) // Filter by staff_id
+      ->when($type, function ($query) use ($type) {
+
+        if (in_array($type, ['meeting', 'training', 'warning', 'orgNew'])) {
+          return $query->where('notifications.notificationable_type', $type);
+        }
+      })
       ->get();
+    foreach ($notifications as $notification) {
+      if ($notification->notification->notificationable_type == 'meeting') {
+        $notification->notification->notificationable->load('chairedBy');
+      }
 
-    return ResponseData($notifications, 200, true, "Notifications retrieved successfully.");
+      if ($notification->notification->notificationable_type == 'training') {
+        $notification->notification->notificationable->load('trainedBy');
+      }
+    }
+    // return NotificationUserResource::collection($notifications);
+    return ResponseData(NotificationUserResource::collection($notifications), 200, true, "Notifications retrieved successfully.");
   }
 }

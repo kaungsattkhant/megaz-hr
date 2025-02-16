@@ -20,17 +20,14 @@ class Notification extends Model
         'created_by',
         'date_time'
     ];
-
+    public function notificationable()
+    {
+        return $this->morphTo();
+    }
     public function notificationUsers()
     {
         return $this->hasMany(\App\Models\NotificationUser::class);
     }
-
-    // public function notificationable()
-    // {
-    //     return $this->morphTo();
-    // }
-
     public  function toUserMultipleDevice($tokens = null, $add_data)
     {
         $click_action = 'http://127.0.0.1:8080';

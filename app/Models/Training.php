@@ -47,4 +47,9 @@ class Training extends Model
     {
         return $this->morphMany(Participant::class, 'participantable');
     }
+
+    public function notification()
+    {
+        return $this->morphOne(Notification::class, 'notificationable');
+    }
 }
