@@ -1366,7 +1366,7 @@ class InvoiceRepository implements InvoiceRepositoryInterface
             foreach ($invoiceServices as $invoiceService) {
                 $serviceValue = $this->invoiceService->getServiceValue($invoiceService, now());
                 if ($invoiceService->is_active == 1) {
-                    $invoiceService->end_date = $data['end_date'];
+                    $invoiceService->end_date = isset($data['end_date']) ? $data['end_date'] : now();
                     $invoiceService->service_value = $serviceValue;
                     $invoiceService->is_active = 0;
                     $invoiceService->save();
@@ -1469,12 +1469,11 @@ class InvoiceRepository implements InvoiceRepositoryInterface
             //     'tax' => $tax,
             //     'discount_total' => $data['discount_total'],
             // ]);
-
             $catering_department = Department::where('name', 'Catering')->first();
             $msg = "The {$entity->name} is now closed. Thank you.";
             $role = Role::where('name', 'Staff')->where('department_id', $catering_department->id)->first();
             broadcast(new RoomDoneNotificationRequest($entity, $msg, $role->id));
-
+            
             $entity->is_active = 0;
             $entity->status = 'inactive';
             $entity->save();
@@ -1497,7 +1496,7 @@ class InvoiceRepository implements InvoiceRepositoryInterface
         foreach ($invoiceServices as $invoiceService) {
             $serviceValue = $this->invoiceService->getServiceValue($invoiceService, now());
             if ($invoiceService->is_active == 1) {
-                $invoiceService->end_date = $data['end_date'];
+                $invoiceService->end_date = isset($data['end_date']) ? $data['end_date'] : now() ;
                 $invoiceService->service_value = $serviceValue;
                 $invoiceService->is_active = 0;
                 $invoiceService->save();
