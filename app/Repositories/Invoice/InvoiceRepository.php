@@ -1366,7 +1366,7 @@ class InvoiceRepository implements InvoiceRepositoryInterface
             foreach ($invoiceServices as $invoiceService) {
                 $serviceValue = $this->invoiceService->getServiceValue($invoiceService, now());
                 if ($invoiceService->is_active == 1) {
-                    $invoiceService->end_date = $data['end_date'];
+                    $invoiceService->end_date = isset($data['end_date']) ? $data['end_date'] : now();
                     $invoiceService->service_value = $serviceValue;
                     $invoiceService->is_active = 0;
                     $invoiceService->save();
@@ -1496,7 +1496,7 @@ class InvoiceRepository implements InvoiceRepositoryInterface
         foreach ($invoiceServices as $invoiceService) {
             $serviceValue = $this->invoiceService->getServiceValue($invoiceService, now());
             if ($invoiceService->is_active == 1) {
-                $invoiceService->end_date = $data['end_date'];
+                $invoiceService->end_date = isset($data['end_date']) ? $data['end_date'] : now() ;
                 $invoiceService->service_value = $serviceValue;
                 $invoiceService->is_active = 0;
                 $invoiceService->save();
