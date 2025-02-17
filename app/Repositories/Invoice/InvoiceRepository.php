@@ -128,20 +128,8 @@ class InvoiceRepository implements InvoiceRepositoryInterface
 
     public function createData(array $data)
     {
-        // "entity_session_id" => "15"
-        // "customer_id" => "1"
-        // "start_time" => "2024-10-31T14:13"
-        // "session_duration" => "2"
-        // "type" => "session"
-        // "deposit" => "null"
-        // "female" => 3
-        // "male" => 2
-        // "child" => 1
-        // "is_waiter" => 0
-        // "entity_id" => null
         DB::beginTransaction();
         try {
-            // if ($data['entity_id'] != null && !$data['is_waiter']) { //create table invoice
             if ($data['entity_type'] == 'table') { //create table invoice
                 $tableInvoice = $this->createInvoiceForTable($data);
                 DB::commit();
@@ -534,14 +522,13 @@ class InvoiceRepository implements InvoiceRepositoryInterface
 
     public function addSessionDuration(array $data)
     {
+        ResponseMessage('Add Session duration is not available now',419);
         DB::beginTransaction();
         try {
             $invoice = Invoice::find($data['invoice_id']);
-
             if ($invoice->invoice_type == 'endless_time') {
                 ResponseMessage('Room with session and package can only be added duration', 422);
             }
-
             $roomSession = $invoice->latestSession;
 
             $nextSessions = EntitySession::where('id', '>', $roomSession->entity_session_id)
