@@ -255,7 +255,6 @@ class MenuRepository implements MenuRepositoryInterface
 
         // Execute query and paginate results
         $orderSummary = $orderSummaryQuery->paginate(config('common.list_count'));
-
         // Initialize the report_months array and monthly totals
         $start = Carbon::createFromFormat('Y-m', $fromMonthInput);
         $end = Carbon::createFromFormat('Y-m', $toMonthInput);
