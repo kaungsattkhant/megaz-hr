@@ -178,7 +178,7 @@ export default {
     components: {
         Multiselect
     },
-    props: ["meetingId"],
+    props: ["trainingId"],
     data() {
         return {
             departmentList:[],
@@ -310,7 +310,7 @@ export default {
         
         async createBtnClicked(){
             if(!this.title){
-                this.alertValidationMessage(`MeetingTitle`);
+                this.alertValidationMessage(`Training Title`);
                 return 1;
             }
             if(!this.selectedDate){
@@ -331,26 +331,22 @@ export default {
             }
             if(this.selectedDepartment.length <1 && this.selectedRole.length <1 && this.selectedStaff.length <1){
                 this.alertValidationMessage(`Particant`);
-                console.log('d ',this.selectedDepartment.length);
-                console.log('r ',this.selectedRole.length);
-                console.log('s ',this.selectedDepartment.length);
-
                 return 1;
             }
             if(!this.selectedChairedBy){
                 this.alertValidationMessage(`Chaired By`);
                 return 1;
             }
-            let meetingType = null;
+            let trainingType = null;
             if(this.selectedStaff.length > 0){
-                meetingType = 'staff_type'
+                trainingType = 'staff_type'
             }
             else {
                 if(this.selectedRole.length > 0){
-                    meetingType = 'role_type'
+                    trainingType = 'role_type'
                 }
                 else{
-                    meetingType = 'dep_type'
+                    trainingType = 'dep_type'
                 }
             }
             let formData = new FormData();
@@ -362,7 +358,7 @@ export default {
             formData.append("place", this.selectedPlace);
             formData.append("chaired_by", this.selectedChairedBy.id);
             formData.append("description", this.description);
-            formData.append("meeting_type", meetingType);
+            formData.append("meeting_type", trainingType);
             if(this.selectedDepartment.length > 0){
                 this.selectedDepartment.forEach((item)=>{
                     formData.append('department[]', item.id);
@@ -379,10 +375,10 @@ export default {
                 });
             }
             
-            let url = `/api/meetings/${this.meetingId}`;
+            let url = `/api/trainings/${this.meetingId}`;
             let response = await postApiData({url: url, form_data: formData, token: this.getToken()});
             if(response.success){
-                window.location.replace("/meeting");
+                window.location.replace("/training");
             }
         },
 

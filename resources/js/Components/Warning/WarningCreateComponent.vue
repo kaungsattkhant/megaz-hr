@@ -2,7 +2,7 @@
     <div class="px-0">
         <div class="mb-4">
             <p class="text-lg font-semibold font-inter">
-                Create Org News
+                Create Warning
             </p>
         </div>
         
@@ -143,7 +143,7 @@
         </div>
         <div>
             <button class="add-btn" @click="createBtnClicked">
-                Create Org News
+                Create Warning
             </button>
         </div>
     </div>
@@ -275,7 +275,7 @@ export default {
             }
         },
         async getTypeList(){
-            let url = `/api/noti_types?type=orgNew`;
+            let url = `/api/noti_types?type=warning`;
             let response = await getApiData({url: url, token: this.getToken()});
             if(response.data){
                 this.typeList = response.data;
@@ -288,7 +288,7 @@ export default {
             }
             let formData = new FormData();
             formData.append("name", this.newType);
-            formData.append("typeable_type", 'orgNew');
+            formData.append("typeable_type", 'warning');
             let url = `/api/noti_types`;
             let response = await postApiData({url: url, form_data: formData, token: this.getToken()});
             if(response.success){
@@ -314,23 +314,23 @@ export default {
                 console.log('s ',this.selectedDepartment.length);
                 return 1;
             }
-            let orgNewsType = null;
+            let warningType = null;
             if(this.selectedStaff.length > 0){
-                orgNewsType = 'staff_type'
+                warningType = 'staff_type'
             }
             else {
                 if(this.selectedRole.length > 0){
-                    orgNewsType = 'role_type'
+                    warningType = 'role_type'
                 }
                 else{
-                    orgNewsType = 'dep_type'
+                    warningType = 'dep_type'
                 }
             }
             let formData = new FormData();
             formData.append("title", this.title);
             formData.append("date_time", this.selectedDate);
             formData.append("description", this.description);
-            formData.append("org_news_type", orgNewsType);
+            formData.append("warning_type", warningType);
             if(this.selectedDepartment.length > 0){
                 this.selectedDepartment.forEach((item)=>{
                     formData.append('department[]', item.id);
@@ -347,10 +347,10 @@ export default {
                 });
             }
             
-            let url = `/api/org_news`;
+            let url = `/api/warnings`;
             let response = await postApiData({url: url, form_data: formData, token: this.getToken()});
             if(response.success){
-                window.location.replace("/org_news");
+                window.location.replace("/warning");
             }
         },
 

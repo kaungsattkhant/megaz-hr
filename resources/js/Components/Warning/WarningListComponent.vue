@@ -1,7 +1,7 @@
 <template>
     <div>
         <p class=" text-lg font-semibold font-inter">
-            Org News
+            Warnings
         </p>
     </div>
     <div class="mt-4 bg-white">
@@ -16,7 +16,7 @@
                 <button class="add-btn h-8 text-[13px] font-inter" @click="clearSearchBtnClicked()">Clear</button>
             </div>
             <div class="flex justify-end flex-col">
-                <a href="/org_news/create" class="add-btn ">
+                <a href="/warning/create" class="add-btn ">
                     Add New
                 </a>
 
@@ -35,13 +35,16 @@
                                     Date
                                 </th>
                                 <th scope="col" class=" ">
-                                    Type
+                                    Title
                                 </th>
                                 <th scope="col" class=" ">
                                     Department
                                 </th>
                                 <th scope="col" class=" ">
                                     Role
+                                </th>
+                                <th scope="col" class=" ">
+                                    Staff
                                 </th>
                                 <th scope="col" class="">
 
@@ -50,35 +53,40 @@
                         </thead>
                         <tbody>
                             <!-- looping start -->
-                            <div class="contents" v-for="(news, newsIndex) in newsList" :key="newsIndex">
+                            <div class="contents" v-for="(warning, warningIndex) in warningList" :key="warningIndex">
                                 <tr class="">
                                     <td class="  font-medium ">
-                                        {{ perPage * (currentPage - 1) + (++newsIndex) }}
+                                        {{ perPage * (currentPage - 1) + (++warningIndex) }}
 
                                     </td>
                                     <td class="whitespace-nowrap  ">
-                                        {{ news.date_time }}
+                                        {{ warning.date_time }}
                                     </td>
                                     <td class="whitespace-nowrap  ">
-                                        Type
+                                        {{ warning.title }}
                                     </td>
                                     <td class="whitespace-nowrap  ">
-                                        <span v-for="department in news.participants" :class="department.department ? 'after-coma' : ''" class=" pr-1">
+                                        <span v-for="department in warning.participants" :class="department.department ? 'after-coma' : ''" class=" pr-1">
                                             {{ department.department ? department.department.name : ''}}
                                         </span>
                                     </td>
                                     <td class="whitespace-nowrap  ">
-                                        <span v-for="role in news.participants" :class="role.role ? 'after-coma' : ''" class="pr-1">
+                                        <span v-for="role in warning.participants" :class="role.role ? 'after-coma' : ''" class="pr-1">
                                             {{ role.role ? role.role.name : ''}} 
                                         </span>
                                     </td>
+                                    <td class="whitespace-nowrap  ">
+                                        <span v-for="staff in warning.participants" :class="staff.staff ? 'after-coma' : ''" class="pr-1">
+                                            {{ staff.staff ? staff.staff.name : ''}} 
+                                        </span>
+                                    </td>
                                     <td class="whitespace-nowrap ">
-                                        <a class="pr-2" :href="'/org_news/' + news.id + '/edit'">
+                                        <a class="pr-2" :href="'/warning/' + warning.id + '/edit'">
                                             <i class="fal fa-pen"></i>
                                         </a>
 
                                         <button data-te-toggle="modal" data-te-target="#deleteModal" id="edit-btn"
-                                            @click="deleteBtnClicked(news.id)"
+                                            @click="deleteBtnClicked(warning.id)"
                                             class="pl-2">
                                             <i class="fas fa-trash-alt"></i>
                                         </button>
@@ -93,7 +101,7 @@
 
                         <div v-if="totalData != 0" class=" bg-white  flex justify-center mt-5 py-3">
                             <button class="rounded px-6 py-1 border  hover:bg-slate-200" :disabled="currentPage === 1"
-                                @click="getNewsList(currentPage - 1)">«</button>
+                                @click="getWarningList(currentPage - 1)">«</button>
 
                             <button class=" text-sm px-5 border">
                                 Page <span @dblclick="showInput">{{ currentPage }}</span> / <span class="text-gray-400">{{
@@ -101,7 +109,7 @@
                             </button>
 
                             <button class=" rounded px-6  py-1 border  hover:bg-slate-200"
-                                :disabled="currentPage === lastPage" @click="getNewsList(currentPage + 1)">
+                                :disabled="currentPage === lastPage" @click="getWarningList(currentPage + 1)">
                                 »</button>
                         </div>
                     </div>
@@ -169,7 +177,7 @@ import { getApiData, deleteApiData } from '../../utilities/ajax-helpers';
 export default {
     data() {
         return {
-            newsList: [],
+            warningList: [],
 
             searchInput:null,
 
@@ -185,11 +193,11 @@ export default {
     methods: {
         ...mapGetters(['getToken']),
 
-        async getNewsList(pageNumber) {
-            let url = `/api/org_news`;
+        async getWarningList(pageNumber) {
+            let url = `/api/warnings`;
             let response = await getApiData({ url: url, token: this.getToken() });
             if (response.data) {
-                this.newsList = response.data;
+                this.warningList = response.data;
                 // this.lastPage = response.data.last_page;
                 // this.currentPage = pageNumber;
                 // this.perPage = response.data.per_page;
@@ -202,7 +210,7 @@ export default {
         },
 
         async confirmDeleteBtnClicked() {
-            let url = `/api/org_news/${this.deleteId}`;
+            let url = `/api/warnings/${this.deleteId}`;
             let response = await deleteApiData({ url: url, token: this.getToken() });
             if (response.success) {
                 this.getMeetingList()
@@ -211,7 +219,7 @@ export default {
     },
 
     created() {
-        this.getNewsList(1);
+        this.getWarningList(1);
     },
 
     mounted() {
