@@ -18,6 +18,7 @@ return new class extends Migration
             $table->longText('description');
             $table->foreignId('created_by');
             $table->string('org_news_type');
+            $table->foreignId('type_id');
             $table->timestamps();
         });
     }

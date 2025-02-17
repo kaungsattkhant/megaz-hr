@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Models\Staff;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
@@ -21,7 +22,8 @@ class Training extends Model
         'trained_by',
         'description',
         'created_by',
-        'training_type'
+        'training_type',
+        'type_id'
     ];
 
     protected $hidden = ['created_at', 'updated_at'];
@@ -36,13 +38,9 @@ class Training extends Model
         return $this->belongsTo(Staff::class, 'created_by');
     }
 
-    // public function type(): MorphOne
-    // {
-    //     return $this->morphOne(Type::class, 'typeable');
-    // }
-    public function type()
+    public function type(): BelongsTo
     {
-        return $this->morphMany(Type::class, 'typeable');
+        return $this->belongsTo(Type::class);
     }
 
     public function participants(): MorphMany

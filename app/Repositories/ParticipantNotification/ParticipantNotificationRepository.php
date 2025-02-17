@@ -154,9 +154,7 @@ class ParticipantNotificationRepository implements ParticipantNotificationInterf
     try {
       $data['created_by'] = UserData()->id;
       $training = Training::create($data);
-      // if (isset($data['type'])) {
-      //   $this->createType($data, $training, 'training');
-      // }
+
       if (isset($data['training_type'])) {
         $this->addParticipantsAndSendNotification($training, $data, $data['training_type']);
       }
@@ -171,9 +169,7 @@ class ParticipantNotificationRepository implements ParticipantNotificationInterf
   public function getTrainings()
   {
     $training = Training::with([
-      // 'type' => function ($query) {
-      //   $query->where('typeable_type', 'training');
-      // },
+      'type',
       'trainedBy',
       'participants' => function ($query) {
         $query->where('participantable_type', 'training');
@@ -194,9 +190,7 @@ class ParticipantNotificationRepository implements ParticipantNotificationInterf
   public function getTrainingById($trainingId)
   {
     $training = Training::with([
-      // 'type' => function ($query) {
-      //   $query->where('typeable_type', 'training');
-      // },
+      'type',
       'participants' => function ($query) {
         $query->where('participantable_type', 'training');
       },
@@ -277,6 +271,7 @@ class ParticipantNotificationRepository implements ParticipantNotificationInterf
   public function getOrgNews()
   {
     $orgNew = OrgNew::with([
+      'type',
       'participants' => function ($query) {
         $query->where('participantable_type', 'orgNew');
       },
@@ -295,6 +290,7 @@ class ParticipantNotificationRepository implements ParticipantNotificationInterf
   public function getOrgNewsById($orgNewsId)
   {
     $orgNew = OrgNew::with([
+      'type',
       'participants' => function ($query) {
         $query->where('participantable_type', 'orgNew');
       },
@@ -393,6 +389,7 @@ class ParticipantNotificationRepository implements ParticipantNotificationInterf
   public function getWarnings($request)
   {
     $query = Warning::with([
+      'type',
       'participants' => function ($query) {
         $query->where('participantable_type', 'warning');
       },
@@ -421,6 +418,7 @@ class ParticipantNotificationRepository implements ParticipantNotificationInterf
   public function getWarningById($warningId)
   {
     $warning = Warning::with([
+      'type',
       'participants' => function ($query) {
         $query->where('participantable_type', 'warning');
       },

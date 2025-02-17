@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
 
 class OrgNew extends Model
@@ -17,6 +18,7 @@ class OrgNew extends Model
         'description',
         'created_by',
         'org_news_type',
+        'type_id'
     ];
 
     protected $hidden = ['created_at', 'updated_at'];
@@ -26,9 +28,9 @@ class OrgNew extends Model
         return $this->belongsTo(Staff::class, 'created_by');
     }
 
-    public function type(): morphMany
+    public function type(): BelongsTo
     {
-        return $this->morphMany(Type::class, 'typeable');
+        return $this->belongsTo(Type::class);
     }
 
     public function participants(): MorphMany
