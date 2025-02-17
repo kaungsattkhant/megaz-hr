@@ -21,7 +21,7 @@ class NotificationableResource extends JsonResource
             'date_time' => $this->date_time,
             'from_date' => $this->from_date ?? null,
             'to_date' => $this->to_date ?? null,
-            'place' => $this->place || null,
+            'place' => $this->place ?? null,
             'description' => $this->description ?? null,
             'type' => $this->notification->notificationable_type ?? null,
             'warning_type' => $this->warning_type ?? null,
