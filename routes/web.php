@@ -359,3 +359,5 @@ Route::view('/meeting/{id}/edit', 'meeting.edit');
 Route::view('/training', 'training.index')->name('training');
 Route::view('/training/create', 'training.create')->name('training.create');
 Route::view('/training/{id}/edit', 'training.edit');
+Route::view('/org_news', 'org_news.index')->name('org_news');
+Route::view('/org_news/create', 'org_news.create')->name('org_news.create');

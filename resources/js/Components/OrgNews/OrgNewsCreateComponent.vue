@@ -2,7 +2,7 @@
     <div class="px-0">
         <div class="mb-4">
             <p class="text-lg font-semibold font-inter">
-                Create Meeting
+                Create Training
             </p>
         </div>
         
@@ -135,10 +135,10 @@
             </div>
             <div class="mb-4 col-span-3 pb-0 rounded-md">
                 <label for="" class="block text-sm text-black mb-3">
-                    Chaired By
+                    Trained By
                 </label>
                 <div class="bg-white mb-0 w-full text-sm inline-block h-[34px] select-custom2" data-te-select-wrapper-ref>
-                    <select data-te-select-init data-te-select-placeholder="Select" v-model="selectedChairedBy" class="input-ui !text-black"
+                    <select data-te-select-init data-te-select-placeholder="Select" v-model="selectedTrainedBy" class="input-ui !text-black"
                     data-te-select-filter="true">
                         <option :value="item" v-for="(item, itemIndex) in staffList" :key="itemIndex">
                             {{ item.name }}
@@ -146,7 +146,28 @@
                     </select>
                 </div>
             </div>
-            <div class="col-span-6"></div>
+            <div class="mb-4 col-span-3 pb-0 rounded-md">
+                <label for="" class="block text-sm text-black mb-3">
+                    Type
+                </label>
+                <div class="bg-white mb-0 w-full text-sm inline-block h-[34px] select-custom2" data-te-select-wrapper-ref>
+                    <select data-te-select-init data-te-select-placeholder="Select" v-model="selectedType" class="input-ui !text-black"
+                    data-te-select-filter="true">
+                        <option :value="type" v-for="(type, typeIndex) in typeList" :key="typeIndex">
+                            {{ type.name }}
+                        </option>
+                    </select>
+                </div>
+            </div>
+            <div>
+                <label for="" class="block text-sm text-black mb-3">
+                    &nbsp;
+                </label>
+                <button data-te-toggle="modal" data-te-target="#add_type_modal" class=" py-2">
+                    <i class="fal fa-plus  pr-3"></i>
+                </button>
+            </div>
+            <div class="col-span-2"></div>
 
 
 
@@ -161,10 +182,56 @@
         </div>
         <div>
             <button class="add-btn" @click="createBtnClicked">
-                Create Meeting
+                Create Training
             </button>
         </div>
     </div>
+
+
+    <!-- type Modal -->
+    <div data-te-modal-init
+        class="fixed left-0 top-0 z-[1055] hidden h-full w-full overflow-y-auto overflow-x-hidden outline-none"
+        id="add_type_modal" tabindex="-1" aria-labelledby="create_modalLabel" aria-hidden="true">
+        <div data-te-modal-dialog-ref
+            class="pointer-events-none relative w-auto mb-12 translate-y-[-50px] opacity-0 transition-all duration-300 ease-in-out min-[576px]:mx-auto min-[576px]:mt-7 min-[576px]:max-w-[500px]">
+            <div class="min-[576px]:shadow-[0_0.5rem_1rem_rgba(#000, 0.15)] pointer-events-auto relative flex w-full flex-col rounded-md border-none bg-white bg-clip-padding text-current shadow-lg outline-none">
+                <div class="relative flex justify-between py-2 px-6 border-b">
+                    <h5 class="text-base text-center mt-2 font-semibold leading-normal font-inter"
+                        id="create_modalLabel">
+                        Add Type
+                    </h5>
+                    <button type="button" class="text-xs focus:shadow-none focus:outline-none"
+                        data-te-modal-dismiss aria-label="Close" id="close_type_modal">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                            stroke-width="1.5" stroke="currentColor" class="h-4 w-4">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </button>
+                </div>
+                <div class="relative px-6 py-4 border-b" data-te-modal-body-ref>
+                    <div class="mb-4">
+                        <label for="" class="label-form mb-3">
+                            Type
+                        </label>
+                        <input type="text" placeholder="Session" v-model="newType" class="input-ui">
+                    </div>
+                </div>
+                <div class="flex justify-end gap-x-4 px-6 mb-6 pt-4">
+                    <button type="button" class="cancel-btn focus:shadow-none focus:outline-none"
+                        data-te-modal-dismiss aria-label="Close">
+                        Cancel
+                    </button>
+                    <button type="button" @click="addType()"
+                        class="add-btn focus:outline-none focus:ring-0 ">
+                        Create
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
     
 </template>
 
@@ -186,7 +253,8 @@ export default {
             allRoleList:[],
             staffList:[],
             placeList:[],
-            chairedByList:[],
+            trainedByList:[],
+            typeList:[],
 
             title:null,
             selectedDate:null,
@@ -196,13 +264,10 @@ export default {
             selectedRole:[],
             selectedStaff:[],
             selectedPlace:null,
-            selectedChairedBy:null,
+            selectedTrainedBy:null,
+            selectedType:null,
             description:null,
-
-            typeList:[
-                {value:'phone',name:'Phone'},
-                {value:'kpay',name:'Kpay'}
-            ]
+            newType:null,
         };
     },
 
@@ -271,8 +336,29 @@ export default {
                 this.staffList = response.data;
             }
         },
-
-        
+        async getTypeList(){
+            let url = `/api/noti_types?type=training`;
+            let response = await getApiData({url: url, token: this.getToken()});
+            if(response.data){
+                this.typeList = response.data;
+            }
+        },
+        async addType(){
+            if(!this.newType){
+                this.alertValidationMessage(`Type`);
+                return 1;
+            }
+            let formData = new FormData();
+            formData.append("name", this.newType);
+            formData.append("typeable_type", 'training');
+            let url = `/api/noti_types`;
+            let response = await postApiData({url: url, form_data: formData, token: this.getToken()});
+            if(response.success){
+                this.getTypeList();
+                document.getElementById('close_type_modal').click();
+                this.newType = null;
+            }
+        },
         
         async createBtnClicked(){
             if(!this.title){
@@ -303,20 +389,20 @@ export default {
 
                 return 1;
             }
-            if(!this.selectedChairedBy){
-                this.alertValidationMessage(`Chaired By`);
+            if(!this.selectedTrainedBy){
+                this.alertValidationMessage(`Trained By`);
                 return 1;
             }
-            let meetingType = null;
+            let trainingType = null;
             if(this.selectedStaff.length > 0){
-                meetingType = 'staff_type'
+                trainingType = 'staff_type'
             }
             else {
                 if(this.selectedRole.length > 0){
-                    meetingType = 'role_type'
+                    trainingType = 'role_type'
                 }
                 else{
-                    meetingType = 'dep_type'
+                    trainingType = 'dep_type'
                 }
             }
             let formData = new FormData();
@@ -326,9 +412,9 @@ export default {
             formData.append("from_date", this.selectedFrom);
             formData.append("to_date", this.selectedTo);
             formData.append("place", this.selectedPlace);
-            formData.append("chaired_by", this.selectedChairedBy.id);
+            formData.append("trained_by", this.selectedTrainedBy.id);
             formData.append("description", this.description);
-            formData.append("meeting_type", meetingType);
+            formData.append("training_type", trainingType);
             if(this.selectedDepartment.length > 0){
                 this.selectedDepartment.forEach((item)=>{
                     formData.append('department[]', item.id);
@@ -345,10 +431,10 @@ export default {
                 });
             }
             
-            let url = `/api/meetings`;
+            let url = `/api/trainings`;
             let response = await postApiData({url: url, form_data: formData, token: this.getToken()});
             if(response.success){
-                window.location.replace("/meeting");
+                // window.location.replace("/training");
             }
         },
 
@@ -368,6 +454,7 @@ export default {
         this.getDepartmentList();
         // this.getRoleList();
         this.getStaffList();
+        this.getTypeList();
     },
 
     mounted() {
