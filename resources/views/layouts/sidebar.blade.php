@@ -842,7 +842,7 @@
                         </a>
                     </li>
                     <li>
-                        <a href="/okr_dashboard" class="flex items-center @yield('okr_dashboard') sidebar-gap-x">
+                        <a href="/org_news" class="flex items-center @yield('org_news') sidebar-gap-x">
                             <!-- <i class="fal fa-braille pr-3"></i> -->
                             <img class="sidebar-img " src="{{ asset('img/icons8-dashboard-48.png') }}" alt="">
                             OrgNews
