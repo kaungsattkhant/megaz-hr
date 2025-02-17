@@ -24,6 +24,8 @@ class Training extends Model
         'training_type'
     ];
 
+    protected $hidden = ['created_at', 'updated_at'];
+
     public function trainedBy()
     {
         return $this->belongsTo(Staff::class, 'trained_by');
@@ -46,5 +48,10 @@ class Training extends Model
     public function participants(): MorphMany
     {
         return $this->morphMany(Participant::class, 'participantable');
+    }
+
+    public function notification()
+    {
+        return $this->morphOne(Notification::class, 'notificationable');
     }
 }

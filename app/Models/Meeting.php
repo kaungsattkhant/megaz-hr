@@ -22,6 +22,8 @@ class Meeting extends Model
         'meeting_type' //dep_type,role_type,staff
     ];
 
+    protected $hidden = ['created_at', 'updated_at'];
+
     public function chairedBy()
     {
         return $this->belongsTo(Staff::class,  'chaired_by');
@@ -35,5 +37,10 @@ class Meeting extends Model
     public function participants(): MorphMany
     {
         return $this->morphMany(Participant::class, 'participantable');
+    }
+
+    public function notification()
+    {
+        return $this->morphOne(Notification::class, 'notificationable');
     }
 }
