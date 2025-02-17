@@ -22,6 +22,8 @@ class Meeting extends Model
         'meeting_type' //dep_type,role_type,staff
     ];
 
+    protected $hidden = ['created_at', 'updated_at'];
+
     public function chairedBy()
     {
         return $this->belongsTo(Staff::class,  'chaired_by');

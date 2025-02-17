@@ -19,6 +19,8 @@ class Warning extends Model
         'warning_type',
     ];
 
+    protected $hidden = ['created_at', 'updated_at'];
+
     public function createdBy()
     {
         return $this->belongsTo(Staff::class, 'created_by');

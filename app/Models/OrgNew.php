@@ -19,6 +19,8 @@ class OrgNew extends Model
         'org_news_type',
     ];
 
+    protected $hidden = ['created_at', 'updated_at'];
+
     public function createdBy()
     {
         return $this->belongsTo(Staff::class, 'created_by');

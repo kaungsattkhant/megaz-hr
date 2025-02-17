@@ -68,7 +68,7 @@ class ParticipantNotificationRepository implements ParticipantNotificationInterf
       'participants.department.staffs',
       'participants.role.department',
       // 'participants.role.staffs',
-    ])->orderBy('created_at', 'desc')->get();
+    ])->orderBy('id', 'desc')->get();
     return $meeting;
   }
 
@@ -179,7 +179,7 @@ class ParticipantNotificationRepository implements ParticipantNotificationInterf
       // 'participants.department.staffs',
       // 'participants.role.department',
       // 'participants.role.staffs',
-    ])->orderBy('created_at', 'desc')->get();
+    ])->orderBy('id', 'desc')->get();
     return $training;
   }
 
@@ -276,7 +276,7 @@ class ParticipantNotificationRepository implements ParticipantNotificationInterf
       // 'participants.department.staffs',
       'participants.role.department',
       // 'participants.role.staffs',
-    ])->orderBy('created_at', 'desc')->get();
+    ])->orderBy('id', 'desc')->get();
     return  $orgNew;
   }
   public function getOrgNewsById($orgNewsId)
@@ -385,7 +385,7 @@ class ParticipantNotificationRepository implements ParticipantNotificationInterf
       // 'participants.department.staffs',
       // 'participants.role.department',
       // 'participants.role.staffs',
-    ])->orderBy('created_at', 'desc');
+    ])->orderBy('id', 'desc');
 
     if ($request->has('from_date') && $request->has('to_date')) {
       $fromDate = $request->input('from_date');

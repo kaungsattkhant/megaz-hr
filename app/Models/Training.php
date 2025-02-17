@@ -24,6 +24,8 @@ class Training extends Model
         'training_type'
     ];
 
+    protected $hidden = ['created_at', 'updated_at'];
+
     public function trainedBy()
     {
         return $this->belongsTo(Staff::class, 'trained_by');
