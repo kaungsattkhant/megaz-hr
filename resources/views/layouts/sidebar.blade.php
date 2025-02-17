@@ -827,6 +827,27 @@
                             OKR Dashboard
                         </a>
                     </li>
+                    <li>
+                        <a href="/meeting" class="flex items-center @yield('meeting') sidebar-gap-x">
+                            <!-- <i class="fal fa-braille pr-3"></i> -->
+                            <img class="sidebar-img " src="{{ asset('img/icons8-dashboard-48.png') }}" alt="">
+                            Meeting
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/training" class="flex items-center @yield('training') sidebar-gap-x">
+                            <!-- <i class="fal fa-braille pr-3"></i> -->
+                            <img class="sidebar-img " src="{{ asset('img/icons8-dashboard-48.png') }}" alt="">
+                            Training
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/okr_dashboard" class="flex items-center @yield('okr_dashboard') sidebar-gap-x">
+                            <!-- <i class="fal fa-braille pr-3"></i> -->
+                            <img class="sidebar-img " src="{{ asset('img/icons8-dashboard-48.png') }}" alt="">
+                            OrgNews
+                        </a>
+                    </li>
                     
 
                 </ul>
