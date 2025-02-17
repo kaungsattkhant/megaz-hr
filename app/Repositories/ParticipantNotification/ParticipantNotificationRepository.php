@@ -111,7 +111,7 @@ class ParticipantNotificationRepository implements ParticipantNotificationInterf
       $meeting->participants()->where('participantable_type', 'meeting')->where('participantable_id', $meeting->id)->delete();
 
       if (isset($data['meeting_type'])) {
-        $this->addParticipantsAndSendNotification($meeting, $data, $data['meeting_type']);
+        $this->updateParticipantsAndSendNotification($meeting, $data, $data['meeting_type']);
       }
       DB::commit();
       return ResponseData($meeting, 200, true, 'Meeting updated successfully.');
@@ -226,12 +226,8 @@ class ParticipantNotificationRepository implements ParticipantNotificationInterf
       $training->update($data);
 
       $training->participants()->where('participantable_type', 'training')->where('participantable_id', $training->id)->delete();
-      // if (isset($data['type'])) {
-      //   $this->createType($data, $training, 'training');
-      // }
-
       if (isset($data['training_type'])) {
-        $this->addParticipantsAndSendNotification($training, $data, $data['training_type']);
+        $this->updateParticipantsAndSendNotification($training, $data, $data['training_type']);
       }
 
       DB::commit();
@@ -335,12 +331,8 @@ class ParticipantNotificationRepository implements ParticipantNotificationInterf
 
       $orgNew->participants()->where('participantable_type', 'orgNew')->where('participantable_id', $orgNew->id)->delete();
 
-      // if (isset($data['type'])) {
-      //   $this->createType($data, $orgNew, 'orgNew');
-      // }
-
       if (isset($data['org_news_type'])) {
-        $this->addParticipantsAndSendNotification($orgNew, $data, $data['org_news_type']);
+        $this->updateParticipantsAndSendNotification($orgNew, $data, $data['org_news_type']);
       }
 
       DB::commit();
@@ -461,7 +453,7 @@ class ParticipantNotificationRepository implements ParticipantNotificationInterf
       //   $this->createType($data, $warning, 'warning');
       // }
       if (isset($data['warning_type'])) {
-        $this->addParticipantsAndSendNotification($warning, $data, $data['warning_type']);
+        $this->updateParticipantsAndSendNotification($warning, $data, $data['warning_type']);
       }
 
       DB::commit();
@@ -568,6 +560,65 @@ class ParticipantNotificationRepository implements ParticipantNotificationInterf
       ];
 
       $this->sendParticipantNoti($object, $users, $notificationData, $type);
+    }
+  }
+
+  private function updateParticipantsAndSendNotification($object, $data, $type)
+  {
+
+    $users = collect();
+    $typeName = strtolower(class_basename($object));
+    // Check for dep
+
+    if (isset($data['department']) && $type === "dep_type") {
+
+      foreach ($data['department'] as $dep) {
+        $participantData = [
+          'participantable_id' => $object->id,
+          'participantable_type' => $typeName,
+          'department_id' => $dep
+        ];
+        Participant::create($participantData);
+        $departmentStaff = Staff::where('department_id', $dep)->get();
+        $users = $users->merge($departmentStaff);
+      }
+    }
+    // Check for roles
+    if (isset($data['role']) && $type === "role_type") {
+      foreach ($data['role'] as $role) {
+        $participantData = [
+          'participantable_id' => $object->id,
+          'participantable_type' => $typeName,
+          'role_id' => $role
+        ];
+        Participant::create($participantData);
+
+        $roleStaff = Staff::whereHas('roles', function ($query) use ($role) {
+          $query->where('id', $role);
+        })->get();
+        $users = $users->merge($roleStaff);
+      }
+    }
+    // Check for specific staff
+    if (isset($data['staff']) && $type === "staff_type") {
+      foreach ($data['staff'] as $staff) {
+        $participantData = [
+          'participantable_id' => $object->id,
+          'participantable_type' => $typeName,
+          'staff_id' => $staff
+        ];
+        Participant::create($participantData);
+        $staffMember = Staff::find($staff);
+        if ($staffMember) {
+          $users->push($staffMember);
+        }
+      }
+    }
+    if ($users->isNotEmpty()) {
+      $notificationData = [
+        'title' => ucfirst($typeName),
+        'body' => 'A new' . $typeName . ' has been scheduled. Please check the details.',
+      ];
     }
   }
 
