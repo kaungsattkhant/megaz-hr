@@ -594,7 +594,7 @@ class ParticipantNotificationRepository implements ParticipantNotificationInterf
         if (in_array($type, ['meeting', 'training', 'warning', 'orgNew'])) {
           return $query->where('notifications.notificationable_type', $type);
         }
-      })
+      })->orderBy('notifications.created_at', 'desc')
       ->get();
     foreach ($notifications as $notification) {
       if ($notification->notification->notificationable_type == 'meeting') {
