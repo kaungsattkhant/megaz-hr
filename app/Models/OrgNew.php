@@ -24,9 +24,9 @@ class OrgNew extends Model
         return $this->belongsTo(Staff::class, 'created_by');
     }
 
-    public function type(): MorphOne
+    public function type(): morphMany
     {
-        return $this->morphOne(Type::class, 'typeable');
+        return $this->morphMany(Type::class, 'typeable');
     }
 
     public function participants(): MorphMany
@@ -34,8 +34,8 @@ class OrgNew extends Model
         return $this->morphMany(Participant::class, 'participantable');
     }
 
-    public function getMorphClass()
+    public function notification()
     {
-        return 'orgnew';
+        return $this->morphOne(Notification::class, 'notificationable');
     }
 }
