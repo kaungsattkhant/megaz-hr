@@ -16,14 +16,14 @@ class ParticipantResource extends JsonResource
     {
         return [
             'id' => $this->id,
-            'department_id' => $this->department_id,
-            'role_id' => $this->role_id,
-            'staff_id' => $this->staff_id,
-            'participantable_id' => $this->participantable_id,
-            'participantable_type' => $this->participantable_type,
+            'department_id' => $this->department_id ?? null,
             'department_name' => $this->department->name ?? null,
+            'role_id' => $this->role_id ?? null,
             'role' => $this->role->name ?? null,
+            'staff_id' => $this->staff_id ?? null,
             'staff' => $this->staff->name ?? null,
+            // 'participantable_id' => $this->participantable_id,
+            // 'participantable_type' => $this->participantable_type,
         ];
     }
 }

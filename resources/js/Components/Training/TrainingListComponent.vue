@@ -92,7 +92,11 @@
                                     </td>
                                     <td class="whitespace-nowrap  ">
                                         
-                                        {{ training.chaired_by.name }}
+                                        type --
+                                    </td>
+                                    <td class="whitespace-nowrap  ">
+                                        
+                                        {{ training.trained_by.name }}
                                     </td>
                                     <td class="whitespace-nowrap ">
                                         <a class="pr-2" :href="'/training/' + training.id + '/edit'">

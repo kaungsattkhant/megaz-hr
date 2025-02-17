@@ -23,11 +23,11 @@ class NotificationUserResource extends JsonResource
                 //    'read_at' => $this->read_at,
                 'title' => $this->title,
                 'preview' => $this->preview,
-                'staff_id' => $this->staff_id,
-                'notification_id' => $this->notification_id,
-                'date_time' => $this->date_time,
-                'notificationable_id' => $this->notificationable_id,
-                'notificationable_type' => $this->notificationable_type,
+                // 'staff_id' => $this->staff_id,
+                // 'notification_id' => $this->notification_id,
+                // 'date_time' => $this->date_time,
+                // 'notificationable_id' => $this->notificationable_id,
+                // 'notificationable_type' => $this->notificationable_type,
                 'notification' => new NotificationResource($this->whenLoaded('notification')),
             ];
     }
