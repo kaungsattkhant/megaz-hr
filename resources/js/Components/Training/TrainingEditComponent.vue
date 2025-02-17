@@ -213,7 +213,7 @@ export default {
         ...mapGetters(['getToken']),
 
         async getMeetingDetail(){
-            let url = `/api/meetings/${this.meetingId}`;
+            let url = `/api/meetings/${this.trainingId}`;
             let response = await getApiData({url: url, token: this.getToken()});
             if(response.data){
                 this.meetingDetail = response.data;
