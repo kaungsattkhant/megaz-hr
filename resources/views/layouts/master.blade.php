@@ -9,7 +9,7 @@
 
 	<link rel="preconnect" href="https://fonts.gstatic.com">
 
-	<title> test</title>
+	<title> {{Config::get('app.name')}} | @yield('page_title') </title>
     @vite('resources/js/app.js')
 
     <link rel="stylesheet" href="{{asset('css/style_web.css')}}">
