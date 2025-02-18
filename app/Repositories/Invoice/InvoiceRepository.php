@@ -138,7 +138,7 @@ class InvoiceRepository implements InvoiceRepositoryInterface
 
             if ($data['entity_type'] == 'room' || $data['is_waiter']) { // create room invoice
                 $entitySession = null;
-                if (isset($data['entity_id']) && $data['entity_id'] != null) {
+                if (isset($data['entity_id']) && $data['entity_id'] != null && $data['is_waiter']) {
                     $entity = Entity::find($data['entity_id']);
                     $currentTime = Carbon::parse(now())->format('H:i');
                     $entitySession = $entity->currentEntitySession($currentTime)->first();
@@ -929,10 +929,10 @@ class InvoiceRepository implements InvoiceRepositoryInterface
             // $roomDoneResponse['room_sessions'] = $latestRoomSession;
             // $roomDoneResponse['rooms_sessions'] = $roomSessions;
             $roomDoneResponse['total_order_value'] = 0;
-            $roomDoneResponse['total_order_discount_price'] = 0;
+            // $roomDoneResponse['total_order_discount_price'] = 0;
             if ($invoice->order) {
                 $roomDoneResponse['total_order_value'] = $invoice->order->total;
-                $roomDoneResponse['total_order_discount_value'] = $invoice->order->total_discount_price;
+                $roomDoneResponse['total_order_discount_price'] = $invoice->order->total_discount_price;
             }
             $roomDoneResponse['total_session_value'] = $total_session_value;
             $roomDoneResponse['total_service_value'] = $total_service_value;
