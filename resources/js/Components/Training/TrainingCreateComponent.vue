@@ -213,7 +213,7 @@
                         <label for="" class="label-form mb-3">
                             Type
                         </label>
-                        <input type="text" placeholder="Session" v-model="newType" class="input-ui">
+                        <input type="text" placeholder="Type" v-model="newType" class="input-ui">
                     </div>
                 </div>
                 <div class="flex justify-end gap-x-4 px-6 mb-6 pt-4">
@@ -377,6 +377,10 @@ export default {
                 this.alertValidationMessage(`To`);
                 return 1;
             }
+            if(!this.selectedType){
+                this.alertValidationMessage(`Type`);
+                return 1;
+            }
             if(!this.selectedPlace){
                 this.alertValidationMessage(`place`);
                 return 1;
@@ -415,6 +419,7 @@ export default {
             formData.append("trained_by", this.selectedTrainedBy.id);
             formData.append("description", this.description);
             formData.append("training_type", trainingType);
+            formData.append("type_id", this.selectedType.id);
             if(this.selectedDepartment.length > 0){
                 this.selectedDepartment.forEach((item)=>{
                     formData.append('department[]', item.id);
@@ -430,17 +435,12 @@ export default {
                     formData.append('staff[]', item.id);
                 });
             }
-            
             let url = `/api/trainings`;
             let response = await postApiData({url: url, form_data: formData, token: this.getToken()});
             if(response.success){
-                // window.location.replace("/training");
+                window.location.replace("/training");
             }
         },
-
-        
-
-        
         alertValidationMessage(field) {
             this.$notify({
                 title: `Input validation`,

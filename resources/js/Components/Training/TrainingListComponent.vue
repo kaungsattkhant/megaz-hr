@@ -91,8 +91,7 @@
                                         {{ training.to_date }}
                                     </td>
                                     <td class="whitespace-nowrap  ">
-                                        
-                                        type --
+                                        {{ training.type ? training.type.name : '' }}                                        
                                     </td>
                                     <td class="whitespace-nowrap  ">
                                         

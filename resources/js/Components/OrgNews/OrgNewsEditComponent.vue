@@ -2,19 +2,18 @@
     <div class="px-0">
         <div class="mb-4">
             <p class="text-lg font-semibold font-inter">
-                Edit Training
+                Update Org News
             </p>
         </div>
         
-        <div class="grid !grid-cols-12 gap-x-4 mb-6 bg-white p-8 rounded-md">
-            <div class="mb-4 col-span-9 rounded-md">
+        <div class="grid !grid-cols-12 gap-x-4 gap-y-3 mb-6 bg-white p-8 rounded-md">
+            <div class="mb-4 col-span-3 rounded-md">
                 <label for="" class="block text-sm text-black mb-3">
                     Title
                 </label>
                 <input type="text" v-model="title"
                     class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
             </div>
-            <div class="col-span-3"></div>
             <div class="mb-4 col-span-3 rounded-md">
                 <label for="" class="block text-sm text-black mb-3">
                     Date
@@ -22,21 +21,28 @@
                 <input type="datetime-local" v-model="selectedDate"
                     class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
             </div>
-            <div class="mb-4 col-span-3 rounded-md">
+            <div class="mb-4 col-span-3 pb-0 rounded-md">
                 <label for="" class="block text-sm text-black mb-3">
-                    From
+                    Type
                 </label>
-                <input type="datetime-local" v-model="selectedFrom"
-                    class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
+                <div class="bg-white mb-0 w-full text-sm inline-block h-[34px] select-custom2" data-te-select-wrapper-ref>
+                    <select data-te-select-init data-te-select-placeholder="Select" v-model="selectedType" class="input-ui !text-black"
+                    data-te-select-filter="true">
+                        <option :value="type" v-for="(type, typeIndex) in typeList" :key="typeIndex">
+                            {{ type.name }}
+                        </option>
+                    </select>
+                </div>
             </div>
-            <div class="mb-4 col-span-3 rounded-md">
+            <div>
                 <label for="" class="block text-sm text-black mb-3">
-                    To
+                    &nbsp;
                 </label>
-                <input type="datetime-local" v-model="selectedTo"
-                    class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
+                <button data-te-toggle="modal" data-te-target="#add_type_modal" class=" py-2">
+                    <i class="fal fa-plus  pr-3"></i>
+                </button>
             </div>
-            <div class="col-span-3"></div>
+            <div class="col-span-2"></div>
             <div class="mb-4 col-span-3 pb-0 rounded-md">
                 <label for="" class="block text-sm text-black mb-3">
                     Department
@@ -94,17 +100,7 @@
                         Role selected</span>
                     </template>
                 </multiselect>
-
-                <!-- <div class="bg-white mb-0 w-full text-sm inline-block h-[34px] select-custom2" data-te-select-wrapper-ref>
-                    <select data-te-select-init data-te-select-placeholder="Select Role" v-model="selectedRole" class="input-ui !text-black"
-                    data-te-select-filter="true" @change="roleChange()" >
-                        <option :value="role" v-for="(role, roleIndex) in roleList" :key="roleIndex">
-                            {{ role.name }}
-                        </option>
-                    </select>
-                </div> -->
             </div>
-
             <div class="mb-4 col-span-3 pb-0 rounded-md">
                 <label class="label-form mb-3">Staff</label>
                 <multiselect
@@ -124,50 +120,16 @@
                     </template>
                 </multiselect>
             </div>
-            <div class="col-span-3"></div>
-
-            <div class="mb-6 col-span-3 pb-0 rounded-md">
+            
+            <!-- <div class="mb-6 col-span-3 pb-0 rounded-md">
                 <label for="" class="block text-sm text-black mb-3">
                     Place
                 </label>
                 <input type="text" v-model="selectedPlace"
                     class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
-            </div>
-            <div class="mb-4 col-span-3 pb-0 rounded-md">
-                <label for="" class="block text-sm text-black mb-3">
-                    Trained By
-                </label>
-                <div class="bg-white mb-0 w-full text-sm inline-block h-[34px] select-custom2" data-te-select-wrapper-ref>
-                    <select data-te-select-init data-te-select-placeholder="Select" v-model="selectedTrainedBy" class="input-ui !text-black"
-                    data-te-select-filter="true">
-                        <option :value="staff" v-for="(staff, staffIndex) in staffList" :key="staffIndex">
-                            {{ staff.name }}
-                        </option>
-                    </select>
-                </div>
-            </div>
-            <div class="mb-4 col-span-3 pb-0 rounded-md">
-                <label for="" class="block text-sm text-black mb-3">
-                    Type
-                </label>
-                <div class="bg-white mb-0 w-full text-sm inline-block h-[34px] select-custom2" data-te-select-wrapper-ref>
-                    <select data-te-select-init data-te-select-placeholder="Select" v-model="selectedType" class="input-ui !text-black"
-                    data-te-select-filter="true">
-                        <option :value="type" v-for="(type, typeIndex) in typeList" :key="typeIndex">
-                            {{ type.name }}
-                        </option>
-                    </select>
-                </div>
-            </div>
-            <div>
-                <label for="" class="block text-sm text-black mb-3">
-                    &nbsp;
-                </label>
-                <button data-te-toggle="modal" data-te-target="#add_type_modal" class=" py-2">
-                    <i class="fal fa-plus  pr-3"></i>
-                </button>
-            </div>
-            <div class="col-span-2"></div>
+            </div> -->
+            
+            <div class="col-span-3"></div>
 
 
 
@@ -179,13 +141,15 @@
                     class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg" id="" cols="30"
                     rows="6"></textarea>
             </div>
+            
         </div>
         <div>
             <button class="add-btn" @click="createBtnClicked">
-                Create Training
+                Create Org News
             </button>
         </div>
     </div>
+
 
     <!-- type Modal -->
     <div data-te-modal-init
@@ -212,7 +176,7 @@
                         <label for="" class="label-form mb-3">
                             Type
                         </label>
-                        <input type="text" placeholder="Type" v-model="newType" class="input-ui">
+                        <input type="text" placeholder="Session" v-model="newType" class="input-ui">
                     </div>
                 </div>
                 <div class="flex justify-end gap-x-4 px-6 mb-6 pt-4">
@@ -228,6 +192,9 @@
             </div>
         </div>
     </div>
+
+
+
     
 </template>
 
@@ -241,7 +208,7 @@ export default {
     components: {
         Multiselect
     },
-    props: ["trainingId"],
+    props: ["orgNewsId"],
     data() {
         return {
             departmentList:[],
@@ -249,36 +216,29 @@ export default {
             roleList:[],
             allRoleList:[],
             staffList:[],
-            placeList:[],
-            chairedByList:[],
+            typeList:[],
 
             title:null,
             selectedDate:null,
-            selectedFrom:null,
-            selectedTo:null,
             selectedDepartment:[],
             selectedRole:[],
             selectedStaff:[],
-            selectedPlace:null,
-            selectedTrainedBy:null,
-            description:null,
-
-            trainingDetail:null,
-
-            newType:null,
-            typeList:[],
             selectedType:null,
+            description:null,
+            newType:null,
+
+            orgNewsDetail:null,
         };
     },
 
     methods: {
         ...mapGetters(['getToken']),
 
-        async getTrainingDetail(){
-            let url = `/api/trainings/${this.trainingId}`;
+        async getOrgNewsDetail(){
+            let url = `/api/org_news/${this.orgNewsId}`;
             let response = await getApiData({url: url, token: this.getToken()});
             if(response.data){
-                this.trainingDetail = response.data;
+                this.orgNewsDetail = response.data;
                 this.addDetail(response.data)
             }
         },
@@ -288,29 +248,29 @@ export default {
             this.selectedFrom = data.from_date;
             this.selectedTo = data.to_date;
             this.selectedPlace = data.place;
+            console.log('type id ',data.type.id);
             this.selectedType = this.typeList.find(type => type.id == data.type.id);
-            this.selectedTrainedBy = this.staffList.find(chairman => chairman.id == data.trained_by.id);
             this.description = data.description;
-            if(data.training_type === 'dep_type'){
+            if(data.org_news_type === 'dep_type'){
                 let departments = []
                 data.participants.forEach(participant => {
                     departments.push(this.allDepartmentList.find(department => department.id == participant.department_id))
                 });
                 this.selectedDepartment = departments
             }
-            if(data.training_type === 'role_type'){
+            if(data.org_news_type === 'role_type'){
                 let roles = []
                 data.participants.forEach(participant => {
                     roles.push(this.allRoleList.find(role => role.id == participant.role_id))
                 });
                 this.selectedRole = roles
             }
-            if(data.training_type === 'staff_type'){
-                let staff = []
+            if(data.org_news_type === 'staff_type'){
+                let staffs = []
                 data.participants.forEach(participant => {
-                    staff.push(this.staffList.find(staff => staff.id == participant.staff_id))
+                    staffs.push(this.staffList.find(staff => staff.id == participant.staff_id))
                 });
-                this.selectedStaff = staff
+                this.selectedStaff = staffs
             }
         },
 
@@ -346,7 +306,7 @@ export default {
                 this.getRoleList();
             }
         },
-        getRoleList(){
+        async getRoleList(){
             this.roleList = [];
             this.departmentList[0].data.forEach(department => {
                 this.roleList.push({
@@ -354,14 +314,11 @@ export default {
                     roles:department.roles
                 })
             });
-            // let url = `/api/roles`;
-            // let response = await getApiData({url: url, token: this.getToken()});
-            // if(response.data){
-            //     this.roleList = response.data;
-            // }
+        },
+        roleChange(){
+            this.getStaffList()
         },
         async getStaffList(){
-            // let url = `/api/staff_by_department/`+this.selectedDepartment.id+`/role/`+this.selectedRole.id;
             let url = `/api/staffs`;
             let response = await getApiData({url: url, token: this.getToken()});
             if(response.data){
@@ -369,7 +326,7 @@ export default {
             }
         },
         async getTypeList(){
-            let url = `/api/noti_types?type=training`;
+            let url = `/api/noti_types?type=orgNew`;
             let response = await getApiData({url: url, token: this.getToken()});
             if(response.data){
                 this.typeList = response.data;
@@ -382,7 +339,7 @@ export default {
             }
             let formData = new FormData();
             formData.append("name", this.newType);
-            formData.append("typeable_type", 'training');
+            formData.append("typeable_type", 'orgNew');
             let url = `/api/noti_types`;
             let response = await postApiData({url: url, form_data: formData, token: this.getToken()});
             if(response.success){
@@ -392,62 +349,40 @@ export default {
             }
         },
         
-        
         async createBtnClicked(){
-            if(!this.title){
-                this.alertValidationMessage(`Training Title`);
-                return 1;
-            }
             if(!this.selectedDate){
                 this.alertValidationMessage(`Date`);
                 return 1;
             }
-            if(!this.selectedFrom){
-                this.alertValidationMessage(`From`);
-                return 1;
-            }
-            if(!this.selectedTo){
-                this.alertValidationMessage(`To`);
-                return 1;
-            }
-            if(!this.selectedPlace){
-                this.alertValidationMessage(`place`);
+            if(!this.title){
+                this.alertValidationMessage(`Title`);
                 return 1;
             }
             if(!this.selectedType){
-                this.alertValidationMessage(`place`);
+                this.alertValidationMessage(`Type`);
                 return 1;
             }
             if(this.selectedDepartment.length <1 && this.selectedRole.length <1 && this.selectedStaff.length <1){
                 this.alertValidationMessage(`Particant`);
                 return 1;
             }
-            if(!this.selectedTrainedBy){
-                this.alertValidationMessage(`Trained By`);
-                return 1;
-            }
-            let trainingType = null;
+            let orgNewsType = null;
             if(this.selectedStaff.length > 0){
-                trainingType = 'staff_type'
+                orgNewsType = 'staff_type'
             }
             else {
                 if(this.selectedRole.length > 0){
-                    trainingType = 'role_type'
+                    orgNewsType = 'role_type'
                 }
                 else{
-                    trainingType = 'dep_type'
+                    orgNewsType = 'dep_type'
                 }
             }
             let formData = new FormData();
             formData.append("title", this.title);
             formData.append("date_time", this.selectedDate);
-            // formData.append("phone_number", this.phoneNumber);
-            formData.append("from_date", this.selectedFrom);
-            formData.append("to_date", this.selectedTo);
-            formData.append("place", this.selectedPlace);
-            formData.append("chaired_by", this.selectedTrainedBy.id);
             formData.append("description", this.description);
-            formData.append("training_type", trainingType);
+            formData.append("org_news_type", orgNewsType);
             formData.append("type_id", this.selectedType.id);
             if(this.selectedDepartment.length > 0){
                 this.selectedDepartment.forEach((item)=>{
@@ -465,10 +400,10 @@ export default {
                 });
             }
             
-            let url = `/api/trainings/${this.trainingId}`;
+            let url = `/api/org_news`;
             let response = await postApiData({url: url, form_data: formData, token: this.getToken()});
             if(response.success){
-                window.location.replace("/training");
+                window.location.replace("/org_news");
             }
         },
 
@@ -487,10 +422,9 @@ export default {
     created(){
         this.getDepartmentList();
         // this.getRoleList();
-        this.getTypeList();
         this.getStaffList();
-        // this.getAllRoleList();
-        this.getTrainingDetail();
+        this.getTypeList();
+        this.getOrgNewsDetail();
     },
 
     mounted() {
