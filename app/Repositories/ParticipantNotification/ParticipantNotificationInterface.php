@@ -34,4 +34,7 @@ interface ParticipantNotificationInterface
 
   public function storeTypes($data);
   public function getTypes($request);
+
+  //mobile
+  public function getallNoties($request, $staffId);
 }

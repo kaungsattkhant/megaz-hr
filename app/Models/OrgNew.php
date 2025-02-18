@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
 
 class OrgNew extends Model
@@ -13,23 +14,32 @@ class OrgNew extends Model
 
     protected $fillable = [
         'date_time',
+        'title',
         'description',
         'created_by',
         'org_news_type',
+        'type_id'
     ];
+
+    protected $hidden = ['created_at', 'updated_at'];
 
     public function createdBy()
     {
         return $this->belongsTo(Staff::class, 'created_by');
     }
 
-    public function type(): MorphOne
+    public function type(): BelongsTo
     {
-        return $this->morphOne(Type::class, 'typeable');
+        return $this->belongsTo(Type::class);
     }
 
     public function participants(): MorphMany
     {
         return $this->morphMany(Participant::class, 'participantable');
+    }
+
+    public function notification()
+    {
+        return $this->morphOne(Notification::class, 'notificationable');
     }
 }

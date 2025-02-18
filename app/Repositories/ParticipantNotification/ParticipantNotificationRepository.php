@@ -2,17 +2,21 @@
 
 namespace App\Repositories\ParticipantNotification;
 
+use App\Models\Role;
 use App\Models\Type;
 use App\Models\Staff;
 use App\Models\OrgNew;
 use App\Models\Meeting;
 use App\Models\Warning;
 use App\Models\Training;
+use App\Models\Department;
 use App\Models\Participant;
+use App\Models\Notification;
+use App\Models\NotificationUser;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Request;
+use App\Http\Resources\NotificationUserResource;
 use App\Http\Action\SendNotification\SendNotification;
-
 
 class ParticipantNotificationRepository implements ParticipantNotificationInterface
 {
@@ -64,7 +68,7 @@ class ParticipantNotificationRepository implements ParticipantNotificationInterf
       'participants.department.staffs',
       'participants.role.department',
       // 'participants.role.staffs',
-    ])->orderBy('created_at', 'desc')->get();
+    ])->orderBy('id', 'desc')->get();
     return $meeting;
   }
 
@@ -105,7 +109,11 @@ class ParticipantNotificationRepository implements ParticipantNotificationInterf
       $data['created_by'] = UserData()->id;
       $meeting->update($data);
       $meeting->participants()->where('participantable_type', 'meeting')->where('participantable_id', $meeting->id)->delete();
-
+      $existingNotification =  $meeting->notification()->where('notificationable_id', $meeting->id)
+        ->where('notificationable_type',  'meeting')
+        ->first();
+      $existingNotification->notificationUsers()->delete();
+      $existingNotification->delete();
       if (isset($data['meeting_type'])) {
         $this->addParticipantsAndSendNotification($meeting, $data, $data['meeting_type']);
       }
@@ -125,7 +133,11 @@ class ParticipantNotificationRepository implements ParticipantNotificationInterf
       if (!$meeting) {
         return ResponseData(null, 404, false, 'Meeting not found.');
       }
-      $meeting->participants()->where('participantable_type', 'meeting')->delete();
+      $meeting->participants()->where('participantable_type', 'meeting')->where('participantable_id', $meeting->id)->delete();
+      $existingNotification = Notification::where('notificationable_id', $meeting->id)
+        ->where('notificationable_type',  'meeting')
+        ->first();
+      $existingNotification->notificationUsers()->delete();
       $meeting->delete();
       DB::commit();
       return ResponseData(null, 200, true, 'Meeting deleted successfully.');
@@ -142,9 +154,7 @@ class ParticipantNotificationRepository implements ParticipantNotificationInterf
     try {
       $data['created_by'] = UserData()->id;
       $training = Training::create($data);
-      // if (isset($data['type'])) {
-      //   $this->createType($data, $training, 'training');
-      // }
+
       if (isset($data['training_type'])) {
         $this->addParticipantsAndSendNotification($training, $data, $data['training_type']);
       }
@@ -159,9 +169,7 @@ class ParticipantNotificationRepository implements ParticipantNotificationInterf
   public function getTrainings()
   {
     $training = Training::with([
-      'type' => function ($query) {
-        $query->where('typeable_type', 'training');
-      },
+      'type',
       'trainedBy',
       'participants' => function ($query) {
         $query->where('participantable_type', 'training');
@@ -175,16 +183,14 @@ class ParticipantNotificationRepository implements ParticipantNotificationInterf
       // 'participants.department.staffs',
       // 'participants.role.department',
       // 'participants.role.staffs',
-    ])->orderBy('created_at', 'desc')->get();
+    ])->orderBy('id', 'desc')->get();
     return $training;
   }
 
   public function getTrainingById($trainingId)
   {
     $training = Training::with([
-      'type' => function ($query) {
-        $query->where('typeable_type', 'training');
-      },
+      'type',
       'participants' => function ($query) {
         $query->where('participantable_type', 'training');
       },
@@ -222,10 +228,11 @@ class ParticipantNotificationRepository implements ParticipantNotificationInterf
       $training->update($data);
 
       $training->participants()->where('participantable_type', 'training')->where('participantable_id', $training->id)->delete();
-      // if (isset($data['type'])) {
-      //   $this->createType($data, $training, 'training');
-      // }
-
+      $existingNotification =  $training->notification()->where('notificationable_id',  $training->id)
+        ->where('notificationable_type',  'training')
+        ->first();
+      $existingNotification->notificationUsers()->delete();
+      $existingNotification->delete();
       if (isset($data['training_type'])) {
         $this->addParticipantsAndSendNotification($training, $data, $data['training_type']);
       }
@@ -244,10 +251,14 @@ class ParticipantNotificationRepository implements ParticipantNotificationInterf
     try {
       $training = Training::find($trainingId);
       if (!$training) {
-        return ResponseData(null, 404, false, 'Meeting not found.');
+        return ResponseData(null, 404, false, 'Training not found.');
       }
-      $training->type()->where('typeable_type', 'training')->where('typeable_id', $training->id)->delete();
       $training->participants()->where('participantable_type', 'training')->delete();
+      $existingNotification = Notification::where('notificationable_id',  $training->id)
+        ->where('notificationable_type',  'training')
+        ->first();
+      $existingNotification->notificationUsers()->delete();
+      $existingNotification->delete();
       $training->delete();
       DB::commit();
       return ResponseData(null, 200, true, 'Training deleted successfully.');
@@ -260,10 +271,7 @@ class ParticipantNotificationRepository implements ParticipantNotificationInterf
   public function getOrgNews()
   {
     $orgNew = OrgNew::with([
-      'type' => function ($query) {
-        $query->where('typeable_type', 'orgNew');
-      },
-
+      'type',
       'participants' => function ($query) {
         $query->where('participantable_type', 'orgNew');
       },
@@ -276,16 +284,13 @@ class ParticipantNotificationRepository implements ParticipantNotificationInterf
       // 'participants.department.staffs',
       'participants.role.department',
       // 'participants.role.staffs',
-    ])->orderBy('created_at', 'desc')->get();
+    ])->orderBy('id', 'desc')->get();
     return  $orgNew;
   }
   public function getOrgNewsById($orgNewsId)
   {
     $orgNew = OrgNew::with([
-      'type' => function ($query) {
-        $query->where('typeable_type', 'orgNew');
-      },
-
+      'type',
       'participants' => function ($query) {
         $query->where('participantable_type', 'orgNew');
       },
@@ -311,9 +316,6 @@ class ParticipantNotificationRepository implements ParticipantNotificationInterf
     try {
       $data['created_by'] = UserData()->id;
       $orgNew = OrgNew::create($data);
-      // if (isset($data['type'])) {
-      //   $this->createType($data, $orgNew, 'orgNew');
-      // }
       if (isset($data['org_news_type'])) {
         $this->addParticipantsAndSendNotification($orgNew, $data, $data['org_news_type']);
       }
@@ -338,14 +340,16 @@ class ParticipantNotificationRepository implements ParticipantNotificationInterf
 
       $data = Request::all();
       $data['created_by'] = UserData()->id;
-      $orgNew->update($data);
+
 
       $orgNew->participants()->where('participantable_type', 'orgNew')->where('participantable_id', $orgNew->id)->delete();
+      $existingNotification = $orgNew->notification()->where('notificationable_id',  $orgNew->id)
+        ->where('notificationable_type',  'orgNew')
+        ->first();
+      $existingNotification->notificationUsers()->delete();
+      $existingNotification->delete();
 
-      // if (isset($data['type'])) {
-      //   $this->createType($data, $orgNew, 'orgNew');
-      // }
-
+      $orgNew->update($data);
       if (isset($data['org_news_type'])) {
         $this->addParticipantsAndSendNotification($orgNew, $data, $data['org_news_type']);
       }
@@ -366,8 +370,13 @@ class ParticipantNotificationRepository implements ParticipantNotificationInterf
       if (!$orgNew) {
         return ResponseData(null, 404, false, 'OrgNews not found.');
       }
-      $orgNew->type()->where('typeable_type', 'orgNew')->where('typeable_id', $orgNew->id)->delete();
       $orgNew->participants()->where('participantable_type', 'orgNew')->delete();
+      $existingNotification = Notification::where('notificationable_id',  $orgNew->id)
+        ->where('notificationable_type',  'orgNew')
+        ->first();
+      $existingNotification->notificationUsers()->delete();
+      $existingNotification->delete();
+
       $orgNew->delete();
       DB::commit();
       return ResponseData(null, 200, true, 'orgNew deleted successfully.');
@@ -380,9 +389,7 @@ class ParticipantNotificationRepository implements ParticipantNotificationInterf
   public function getWarnings($request)
   {
     $query = Warning::with([
-      'type' => function ($query) {
-        $query->where('typeable_type', 'warning');
-      },
+      'type',
       'participants' => function ($query) {
         $query->where('participantable_type', 'warning');
       },
@@ -395,7 +402,7 @@ class ParticipantNotificationRepository implements ParticipantNotificationInterf
       // 'participants.department.staffs',
       // 'participants.role.department',
       // 'participants.role.staffs',
-    ])->orderBy('created_at', 'desc');
+    ])->orderBy('id', 'desc');
 
     if ($request->has('from_date') && $request->has('to_date')) {
       $fromDate = $request->input('from_date');
@@ -411,9 +418,7 @@ class ParticipantNotificationRepository implements ParticipantNotificationInterf
   public function getWarningById($warningId)
   {
     $warning = Warning::with([
-      'type' => function ($query) {
-        $query->where('typeable_type', 'warning');
-      },
+      'type',
       'participants' => function ($query) {
         $query->where('participantable_type', 'warning');
       },
@@ -470,9 +475,13 @@ class ParticipantNotificationRepository implements ParticipantNotificationInterf
       $data['created_by'] = UserData()->id;
       $warning->update($data);
       $warning->participants()->where('participantable_type', 'warning')->where('participantable_id', $warning->id)->delete();
-      // if (isset($data['type'])) {
-      //   $this->createType($data, $warning, 'warning');
-      // }
+
+      $existingNotification = $warning->notification()->where('notificationable_id',  $warning->id)
+        ->where('notificationable_type',  'warning')
+        ->first();
+      $existingNotification->notificationUsers()->delete();
+      $existingNotification->delete();
+
       if (isset($data['warning_type'])) {
         $this->addParticipantsAndSendNotification($warning, $data, $data['warning_type']);
       }
@@ -493,7 +502,11 @@ class ParticipantNotificationRepository implements ParticipantNotificationInterf
       if (!$warning) {
         return ResponseData(null, 404, false, 'Warning not found.');
       }
-      $warning->type()->where('typeable_type', 'warning')->where('typeable_id', $warning->id)->delete();
+      $existingNotification = $warning->notification()->where('notificationable_id',  $warning->id)
+        ->where('notificationable_type',  'warning')
+        ->first();
+      $existingNotification->notificationUsers()->delete();
+      $existingNotification->delete();
       $warning->participants()->where('participantable_type', 'warning')->delete();
       $warning->delete();
       DB::commit();
@@ -529,6 +542,7 @@ class ParticipantNotificationRepository implements ParticipantNotificationInterf
     $users = collect();
     $typeName = strtolower(class_basename($object));
     // Check for dep
+
     if (isset($data['department']) && $type === "dep_type") {
 
       foreach ($data['department'] as $dep) {
@@ -567,7 +581,6 @@ class ParticipantNotificationRepository implements ParticipantNotificationInterf
           'staff_id' => $staff
         ];
         Participant::create($participantData);
-
         $staffMember = Staff::find($staff);
         if ($staffMember) {
           $users->push($staffMember);
@@ -576,16 +589,48 @@ class ParticipantNotificationRepository implements ParticipantNotificationInterf
     }
     if ($users->isNotEmpty()) {
       $notificationData = [
-        'title' => ucfirst($typeName)  . 'Scheduled',
+        'title' => ucfirst($typeName),
         'body' => 'A new' . $typeName . ' has been scheduled. Please check the details.',
       ];
 
-      $this->send($object, $users, $notificationData);
+      $this->sendParticipantNoti($object, $users, $notificationData, $type);
     }
   }
 
   public function getTypes($request)
   {
     return Type::where('typeable_type', $request->type)->orderBy('created_at', 'desc')->get();
+  }
+
+  public function getallNoties($request, $staffId)
+  {
+
+    $type = $request->query('type');
+    $notifications = NotificationUser::with([
+      'notification.notificationable',
+      'notification.notificationable.participants',
+      'notification.notificationable.participants.department',
+      'notification.notificationable.participants.role',
+      'notification.notificationable.participants.staff',
+    ])
+      ->join('notifications', 'notification_users.notification_id', '=', 'notifications.id')
+      ->where('notification_users.staff_id', '=', $staffId)
+      ->when($type, function ($query) use ($type) {
+
+        if (in_array($type, ['meeting', 'training', 'warning', 'orgNew'])) {
+          return $query->where('notifications.notificationable_type', $type);
+        }
+      })->orderBy('notifications.created_at', 'desc')
+      ->get();
+    foreach ($notifications as $notification) {
+      if ($notification->notification->notificationable_type == 'meeting') {
+        $notification->notification->notificationable->load('chairedBy');
+      }
+
+      if ($notification->notification->notificationable_type == 'training') {
+        $notification->notification->notificationable->load('trainedBy');
+      }
+    }
+    return ResponseData(NotificationUserResource::collection($notifications), 200, true, "Notifications retrieved successfully.");
   }
 }
