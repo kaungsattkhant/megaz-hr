@@ -35,9 +35,8 @@ class StaffSeeder extends Seeder
         $entertainment_features = config('common.entertainment_feature_slug');
         $management_features = config('common.management_feature_slug');
         $procurement_features = config('common.procurement_feature_slug');
-
-        DB::beginTransaction();
-        try {
+        // DB::beginTransaction();
+        // try {
             foreach ($departments as $i => $department) {
                 foreach ($department->roles as $departmentRole) {
                     if ($departmentRole->name == 'Staff') {
@@ -164,12 +163,12 @@ class StaffSeeder extends Seeder
                     }
                 }
             }
-            DB::commit();
-        } catch (\Exception $e) {
-            DB::rollback();
-            ResponseMessage($e->getMessage(), 402);
-            throw $e;
-        }
+        //     DB::commit();
+        // } catch (\Exception $e) {
+        //     DB::rollback();
+        //     ResponseMessage($e->getMessage(), 402);
+        //     throw $e;
+        // }
         //end ksk
 
         // ****pks*****

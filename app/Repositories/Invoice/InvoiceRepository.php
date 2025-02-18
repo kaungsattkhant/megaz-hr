@@ -522,7 +522,7 @@ class InvoiceRepository implements InvoiceRepositoryInterface
 
     public function addSessionDuration(array $data)
     {
-        ResponseMessage('Add Session duration is not available now',419);
+        ResponseMessage('Add Session duration is not available now', 419);
         DB::beginTransaction();
         try {
             $invoice = Invoice::find($data['invoice_id']);
@@ -1235,12 +1235,12 @@ class InvoiceRepository implements InvoiceRepositoryInterface
             }
             //added end_invoice for table oct 25 2024
             if ($invoice && $data['entity_type'] == 'table') {
-                    $invoice = $this->doneTableForInvoice($data, $invoice);
-                    $this->invoiceService->updateEntityStatus($invoice->entity_id, 'inactive'); // after done invoice ,update entity staus to inactive
-                    $this->addTargetPosition($invoice->id, $invoice->created_by, $data['total']); //add sale target position for related role
-                    $this->addTargetMenu($invoice->id); //add sale target position for related role
-                    $this->broadcastNotification($invoice->entity_id); //send notifcation;
-                    DB::commit();
+                $invoice = $this->doneTableForInvoice($data, $invoice);
+                $this->invoiceService->updateEntityStatus($invoice->entity_id, 'inactive'); // after done invoice ,update entity staus to inactive
+                $this->addTargetPosition($invoice->id, $invoice->created_by, $data['total']); //add sale target position for related role
+                $this->addTargetMenu($invoice->id); //add sale target position for related role
+                $this->broadcastNotification($invoice->entity_id); //send notifcation;
+                DB::commit();
                 return $invoice;
             }
             $foodCharge = 0;
@@ -1411,37 +1411,35 @@ class InvoiceRepository implements InvoiceRepositoryInterface
             if ($order != null) {
                 $orderItems = $order->orderItems;
                 if ($orderItems->isNotEmpty()) {
-                    $unChooseOrderItemByArea = $orderItems->where('area_id', null)->first();
+                    $unChooseOrderItemByArea = $orderItems
+                        ->where('area_id', null)
+                        ->first();
                     if ($unChooseOrderItemByArea) {
                         ResponseMessage('Area need to conifirm by area', 419);
                     }
                 }
-                // $groupedOrderItems = $orderItems->groupBy('menu_id')->map(function ($items) {
-                //     return $items->sum('quantity');
-                // });
-                // dd($groupedOrderItems);
-                // $checkAreaId=
-                $groupedOrderItems = $orderItems
-                    ->groupBy(function ($item) {
-                        return $item['menu_id'] . '-' . $item['area_id'];
-                    })
-                    ->map(function ($items) {
-                        return [
-                            'menu_id' => $items->first()->menu_id, // Access as an object
-                            'area_id' => $items->first()->area_id, // Access as an object
-                            'quantity' => $items->sum('quantity'),  // Sum the quantities
-                        ];
-                    })
-                    ->values();
-                foreach ($groupedOrderItems as $orderItem) {
-                    TargetMenuResult::create([
-                        'date_time' => CurrentTime(),
-                        'invoice_id' => $invoice->id,
-                        'area_id' => $orderItem['area_id'],
-                        'menu_id' => $orderItem['menu_id'],
-                        'quantity' => $orderItem['quantity'],
-                    ]);
-                }
+                $this->addTargetMenu($invoice->id);
+                // $groupedOrderItems = $orderItems
+                //     ->groupBy(function ($item) {
+                //         return $item['menu_id'] . '-' . $item['area_id'];
+                //     })
+                //     ->map(function ($items) {
+                //         return [
+                //             'menu_id' => $items->first()->menu_id, // Access as an object
+                //             'area_id' => $items->first()->area_id, // Access as an object
+                //             'quantity' => $items->sum('quantity'),  // Sum the quantities
+                //         ];
+                //     })
+                //     ->values();
+                // foreach ($groupedOrderItems as $orderItem) {
+                //     TargetMenuResult::create([
+                //         'date_time' => CurrentTime(),
+                //         'invoice_id' => $invoice->id,
+                //         'area_id' => $orderItem['area_id'],
+                //         'menu_id' => $orderItem['menu_id'],
+                //         'quantity' => $orderItem['quantity'],
+                //     ]);
+                // }
             }
             //store customer deposit
             // $this->storeInvoiceCustomerDeposit($customerDepositData, UserData()->id);
@@ -1460,7 +1458,7 @@ class InvoiceRepository implements InvoiceRepositoryInterface
             $msg = "The {$entity->name} is now closed. Thank you.";
             $role = Role::where('name', 'Staff')->where('department_id', $catering_department->id)->first();
             broadcast(new RoomDoneNotificationRequest($entity, $msg, $role->id));
-            
+
             $entity->is_active = 0;
             $entity->status = 'inactive';
             $entity->save();
@@ -1483,7 +1481,7 @@ class InvoiceRepository implements InvoiceRepositoryInterface
         foreach ($invoiceServices as $invoiceService) {
             $serviceValue = $this->invoiceService->getServiceValue($invoiceService, now());
             if ($invoiceService->is_active == 1) {
-                $invoiceService->end_date = isset($data['end_date']) ? $data['end_date'] : now() ;
+                $invoiceService->end_date = isset($data['end_date']) ? $data['end_date'] : now();
                 $invoiceService->service_value = $serviceValue;
                 $invoiceService->is_active = 0;
                 $invoiceService->save();
@@ -1491,23 +1489,23 @@ class InvoiceRepository implements InvoiceRepositoryInterface
             $total_service_value += $serviceValue;
         }
 
-        if(!isset($data['birthday_discount'])){
-            $data['birthday_discount']=0;
+        if (!isset($data['birthday_discount'])) {
+            $data['birthday_discount'] = 0;
         }
-        if(!isset($data['discount_value'])){
-            $data['discount_value']=0;
+        if (!isset($data['discount_value'])) {
+            $data['discount_value'] = 0;
         }
-        if(!isset($data['order_discount'])){
-            $data['order_discount']=0;
+        if (!isset($data['order_discount'])) {
+            $data['order_discount'] = 0;
         }
-        if(!isset($data['customer_level_discount'])){
-            $data['customer_level_discount']=0;
+        if (!isset($data['customer_level_discount'])) {
+            $data['customer_level_discount'] = 0;
         }
-        if(!isset($data['tax'])){
-            $data['tax']=0;
+        if (!isset($data['tax'])) {
+            $data['tax'] = 0;
         }
-        if(!isset($data['service_charge'])){
-            $data['service_charge']=0;
+        if (!isset($data['service_charge'])) {
+            $data['service_charge'] = 0;
         }
 
         if (isset($data['discount_type'])) {
@@ -1542,30 +1540,51 @@ class InvoiceRepository implements InvoiceRepositoryInterface
 
     public function addTargetMenu($invoiceId)
     {
-        $order = Order::where('invoice_id', $invoiceId)->first();
+        $order = Order::where('invoice_id', $invoiceId)
+            ->first();
         if ($order) {
-            $orderItems = $order->orderItems;
-            $groupedOrderItems = $orderItems
-                ->groupBy(function ($item) {
-                    return $item['menu_id'] . '-' . $item['area_id'];
-                })
-                ->map(function ($items) {
-                    return [
-                        'menu_id' => $items->first()->menu_id, // Access as an object
-                        'area_id' => $items->first()->area_id, // Access as an object
-                        'quantity' => $items->sum('quantity'),  // Sum the quantities
-                    ];
-                })
+            // $groupedOrderItems = $orderItems
+            //     ->groupBy(function ($item) {
+            //         return $item['menu_id'] . '-' . $item['area_id'];
+            //     })
+            //     ->map(function ($items) {
+            //         return [
+            //             'menu_id' => $items->first()->menu_id, // Access as an object
+            //             'area_id' => $items->first()->area_id, // Access as an object
+            //             'quantity' => $items->sum('quantity'),  // Sum the quantities
+            //         ];
+            //     })
+            //     ->values();
+            // $orderItems = $order->orderItems->where('status','pos_confirmed');
+            $orderItems = $order->orderItems->filter(fn($item) => $item->status === 'pos_confirmed');
+
+            $groupedOrderItems = $orderItems->groupBy(fn($item) => $item['menu_id'] . '-' . $item['area_id'])
+                ->map(fn($items) => [
+                    'menu_id' => $items->first()->menu_id,
+                    'area_id' => $items->first()->area_id,
+                    'quantity' => $items->sum('quantity'),
+                ])
                 ->values();
-            foreach ($groupedOrderItems as $orderItem) {
-                TargetMenuResult::create([
-                    'date_time' => CurrentTime(),
-                    'invoice_id' => $invoiceId,
-                    'area_id' => $orderItem['area_id'],
-                    'menu_id' => $orderItem['menu_id'],
-                    'quantity' => $orderItem['quantity'],
-                ]);
-            }
+            // Prepare data for bulk insert
+            $insertData = $groupedOrderItems->map(fn($orderItem) => [
+                'date_time' => CurrentTime(),
+                'invoice_id' => $invoiceId,
+                'area_id' => $orderItem['area_id'],
+                'menu_id' => $orderItem['menu_id'],
+                'quantity' => $orderItem['quantity'],
+            ])->toArray();
+
+            // Bulk insert for better performance
+            TargetMenuResult::insert($insertData);
+            // foreach ($groupedOrderItems as $orderItem) {
+            //     TargetMenuResult::create([
+            //         'date_time' => CurrentTime(),
+            //         'invoice_id' => $invoiceId,
+            //         'area_id' => $orderItem['area_id'],
+            //         'menu_id' => $orderItem['menu_id'],
+            //         'quantity' => $orderItem['quantity'],
+            //     ]);
+            // }
         }
     }
     public function broadcastNotification($entityId)
@@ -1597,12 +1616,12 @@ class InvoiceRepository implements InvoiceRepositoryInterface
         DB::beginTransaction();
         try {
             $invoice = Invoice::find($data['invoice_id']);
-            $entity=$invoice->entity;
-            if(!$entity){
-                ResponseMessage('Entity is not found to confirm',419);
+            $entity = $invoice->entity;
+            if (!$entity) {
+                ResponseMessage('Entity is not found to confirm', 419);
             }
             if ($data['is_confirm'] == 1) {
-                if($entity->entity_type=='room'){
+                if ($entity->entity_type == 'room') {
                     $activeInvoiceSession = $invoice->activeInvoiceSession;
                     $activeInvoiceSession->is_active = 1;
                     $activeInvoiceSession->save();
@@ -1617,13 +1636,12 @@ class InvoiceRepository implements InvoiceRepositoryInterface
                         $entity->status = 'active';
                         $entity->save();
                     }
-                }elseif($entity->entity_type=='table')
-                {
-                    $entity->is_active=1;
-                    $entity->status='active';
+                } elseif ($entity->entity_type == 'table') {
+                    $entity->is_active = 1;
+                    $entity->status = 'active';
                     $entity->save();
                 }
-               
+
             }
 
             // $latestSession = RoomSession::where('invoice_id', $data['invoice_id'])->latest()->first();
