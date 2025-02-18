@@ -135,7 +135,7 @@ class InvoiceRepository implements InvoiceRepositoryInterface
                 DB::commit();
                 return $tableInvoice;
             }
-
+            // dd($data);
             if ($data['entity_type'] == 'room' || $data['is_waiter']) { // create room invoice
                 $entitySession = null;
                 if (isset($data['entity_id']) && $data['entity_id'] != null && $data['is_waiter']) {
@@ -147,7 +147,7 @@ class InvoiceRepository implements InvoiceRepositoryInterface
                     }
                     $data['entity_session_id'] = $entitySession->id;
                     $entity = $entitySession->entity;
-                } else if (isset($data['entity_session_id'])) {
+                } else if (isset($data['entity_session_id']) && !$data['is_waiter']) {
                     $currentTime = Carbon::parse(now())->format('H:i');
                     $entitySession = EntitySession::where('id', $data['entity_session_id'])
                         ->where(function ($query) use ($currentTime) {
@@ -929,12 +929,12 @@ class InvoiceRepository implements InvoiceRepositoryInterface
             // $roomDoneResponse['room_sessions'] = $latestRoomSession;
             // $roomDoneResponse['rooms_sessions'] = $roomSessions;
             $roomDoneResponse['total_order_value'] = 0;
-            // $roomDoneResponse['total_order_discount_price'] = 0;
+            $roomDoneResponse['total_order_discount_price'] = 0;
             if ($invoice->order) {
                 $roomDoneResponse['total_order_value'] = $invoice->order->total;
                 $roomDoneResponse['total_order_discount_price'] = $invoice->order->total_discount_price;
             }
-            $roomDoneResponse['total_session_value'] = $total_session_value;
+            // $roomDoneResponse['total_session_value'] = $total_session_value;
             $roomDoneResponse['total_service_value'] = $total_service_value;
             $roomDoneResponse['total_accessory_value'] = $total_accessory_value;
             DB::commit();
