@@ -6,7 +6,7 @@
             </p>
         </div>
         
-        <div class="grid !grid-cols-12 gap-x-4 mb-6 bg-white p-8 rounded-md">
+        <div class="grid !grid-cols-12 gap-x-4 gap-y-3 mb-6 bg-white p-8 rounded-md">
             <div class="mb-4 col-span-3 rounded-md">
                 <label for="" class="block text-sm text-black mb-3">
                     Title
@@ -21,7 +21,28 @@
                 <input type="datetime-local" v-model="selectedDate"
                     class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
             </div>
-            <div class="col-span-6"></div>
+            <div class="mb-4 col-span-3 pb-0 rounded-md">
+                <label for="" class="block text-sm text-black mb-3">
+                    Type
+                </label>
+                <div class="bg-white mb-0 w-full text-sm inline-block h-[34px] select-custom2" data-te-select-wrapper-ref>
+                    <select data-te-select-init data-te-select-placeholder="Select" v-model="selectedType" class="input-ui !text-black"
+                    data-te-select-filter="true">
+                        <option :value="type" v-for="(type, typeIndex) in typeList" :key="typeIndex">
+                            {{ type.name }}
+                        </option>
+                    </select>
+                </div>
+            </div>
+            <div>
+                <label for="" class="block text-sm text-black mb-3">
+                    &nbsp;
+                </label>
+                <button data-te-toggle="modal" data-te-target="#add_type_modal" class=" py-2">
+                    <i class="fal fa-plus  pr-3"></i>
+                </button>
+            </div>
+            <div class="col-span-2"></div>
             <div class="mb-4 col-span-3 pb-0 rounded-md">
                 <label for="" class="block text-sm text-black mb-3">
                     Department
@@ -99,7 +120,7 @@
                     </template>
                 </multiselect>
             </div>
-
+            
             <!-- <div class="mb-6 col-span-3 pb-0 rounded-md">
                 <label for="" class="block text-sm text-black mb-3">
                     Place
@@ -108,27 +129,7 @@
                     class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
             </div> -->
             
-            <div class="mb-4 col-span-2 pb-0 rounded-md">
-                <label for="" class="block text-sm text-black mb-3">
-                    Type
-                </label>
-                <div class="bg-white mb-0 w-full text-sm inline-block h-[34px] select-custom2" data-te-select-wrapper-ref>
-                    <select data-te-select-init data-te-select-placeholder="Select" v-model="selectedType" class="input-ui !text-black"
-                    data-te-select-filter="true">
-                        <option :value="type" v-for="(type, typeIndex) in typeList" :key="typeIndex">
-                            {{ type.name }}
-                        </option>
-                    </select>
-                </div>
-            </div>
-            <div>
-                <label for="" class="block text-sm text-black mb-3">
-                    &nbsp;
-                </label>
-                <button data-te-toggle="modal" data-te-target="#add_type_modal" class=" py-2">
-                    <i class="fal fa-plus  pr-3"></i>
-                </button>
-            </div>
+            <div class="col-span-3"></div>
 
 
 
@@ -140,6 +141,7 @@
                     class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg" id="" cols="30"
                     rows="6"></textarea>
             </div>
+            
         </div>
         <div>
             <button class="add-btn" @click="createBtnClicked">
@@ -246,7 +248,8 @@ export default {
             this.selectedFrom = data.from_date;
             this.selectedTo = data.to_date;
             this.selectedPlace = data.place;
-            // this.selectedTrainedBy = this.staffList.find(chairman => chairman.id == data.trained_by.id);
+            console.log('type id ',data.type.id);
+            this.selectedType = this.typeList.find(type => type.id == data.type.id);
             this.description = data.description;
             if(data.org_news_type === 'dep_type'){
                 let departments = []
@@ -263,11 +266,11 @@ export default {
                 this.selectedRole = roles
             }
             if(data.org_news_type === 'staff_type'){
-                let roles = []
+                let staffs = []
                 data.participants.forEach(participant => {
-                    roles.push(this.allRoleList.find(role => role.id == participant.role_id))
+                    staffs.push(this.staffList.find(staff => staff.id == participant.staff_id))
                 });
-                this.selectedRole = roles
+                this.selectedStaff = staffs
             }
         },
 
@@ -275,10 +278,16 @@ export default {
             let url = `/api/departments`;
             let response = await getApiData({url: url, token: this.getToken()});
             if(response.data){
+                this.allDepartmentList = response.data;
                 this.departmentList = [{
                     title: 'all',
                     data: response.data
                 }] 
+                response.data.forEach(department => {
+                    department.roles.forEach(role => {
+                        this.allRoleList.push(role)
+                    });
+                });
                 this.getRoleList();
             }
         },
@@ -349,11 +358,12 @@ export default {
                 this.alertValidationMessage(`Title`);
                 return 1;
             }
+            if(!this.selectedType){
+                this.alertValidationMessage(`Type`);
+                return 1;
+            }
             if(this.selectedDepartment.length <1 && this.selectedRole.length <1 && this.selectedStaff.length <1){
                 this.alertValidationMessage(`Particant`);
-                console.log('d ',this.selectedDepartment.length);
-                console.log('r ',this.selectedRole.length);
-                console.log('s ',this.selectedDepartment.length);
                 return 1;
             }
             let orgNewsType = null;
@@ -373,6 +383,7 @@ export default {
             formData.append("date_time", this.selectedDate);
             formData.append("description", this.description);
             formData.append("org_news_type", orgNewsType);
+            formData.append("type_id", this.selectedType.id);
             if(this.selectedDepartment.length > 0){
                 this.selectedDepartment.forEach((item)=>{
                     formData.append('department[]', item.id);

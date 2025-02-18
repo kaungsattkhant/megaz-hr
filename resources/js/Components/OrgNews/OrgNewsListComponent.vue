@@ -60,7 +60,7 @@
                                         {{ news.date_time }}
                                     </td>
                                     <td class="whitespace-nowrap  ">
-                                        Type
+                                        {{ news.type ? news.type.name : '' }}
                                     </td>
                                     <td class="whitespace-nowrap  ">
                                         <span v-for="department in news.participants" :class="department.department ? 'after-coma' : ''" class=" pr-1">
