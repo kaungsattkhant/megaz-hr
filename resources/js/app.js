@@ -189,6 +189,8 @@ import TrainingCreateComponent from './Components/Training/TrainingCreateCompone
 import TrainingEditComponent from './Components/Training/TrainingEditComponent.vue';
 import OrgNewsListComponent from './Components/OrgNews/OrgNewsListComponent.vue';
 import OrgNewsCreateComponent from './Components/OrgNews/OrgNewsCreateComponent.vue';
+import WarningListComponent from './Components/Warning/WarningListComponent.vue';
+import WarningCreateComponent from './Components/Warning/WarningCreateComponent.vue';
 
 import PosTableComponent from './Components/Pos/Home/PosTableComponent.vue';
 import PosRoomComponent from './Components/Pos/Home/PosRoomComponent.vue';
@@ -360,6 +362,8 @@ app.component('TrainingCreateComponent',TrainingCreateComponent);
 app.component('TrainingEditComponent',TrainingEditComponent);
 app.component('OrgNewsListComponent',OrgNewsListComponent);
 app.component('OrgNewsCreateComponent',OrgNewsCreateComponent);
+app.component('WarningListComponent',WarningListComponent);
+app.component('WarningCreateComponent',WarningCreateComponent);
 
 app.component('PosTableComponent',PosTableComponent);
 app.component('PosRoomComponent',PosRoomComponent);
