@@ -10,7 +10,7 @@ class RoomDiscountRepository implements RoomDiscountRepositoryInterface
 {
     public function listAllData(Request $request)
     {
-        $roomDiscounts = RoomDiscount::with('rooms')->orderBy('created_at','desc')->paginate(config('common.list_count'));
+        $roomDiscounts = RoomDiscount::with('rooms')->orderBy('created_at', 'desc')->paginate(config('common.list_count'));
         ResponseData($roomDiscounts);
     }
 
@@ -20,11 +20,10 @@ class RoomDiscountRepository implements RoomDiscountRepositoryInterface
         try {
             $data['created_by'] = UserData()->id;
             $roomIds = json_decode($data['roomIds']);
-            $isValid = $this->validateRoomDiscountDates($roomIds, $data['from_date'], $data['to_date']);
-
-            if ($isValid==true) {
-                ResponseMessage('RoomDiscount dates overlap with existing discounts for the specified rooms.', 422);
-            }
+            // $isValid = $this->validateRoomDiscountDates($roomIds, $data['from_date'], $data['to_date']);
+            // if ($isValid==true) {
+            //     ResponseMessage('RoomDiscount dates overlap with existing discounts for the specified rooms.', 422);
+            // }
             $roomDiscount = RoomDiscount::create($data);
             if ($data['roomIds']) {
                 $roomIds = json_decode($data['roomIds']);
@@ -52,13 +51,15 @@ class RoomDiscountRepository implements RoomDiscountRepositoryInterface
                         ->where('to_date', '>=', $fromDate);
                 })->first();
 
-            if ($overlappingDiscount==null) {
+            if ($overlappingDiscount == null) {
                 return false;
             }
         }
 
         return true;
     }
+
+
 
 
     public function editData(int $id, array $data)
@@ -93,5 +94,18 @@ class RoomDiscountRepository implements RoomDiscountRepositoryInterface
             ResponseMessage($e->getMessage(), 422);
             throw $e;
         }
+    }
+    public function getRoomDiscountList($roomId)
+    {
+        $currentDate = now();
+        $roomDiscountList = RoomDiscount::whereHas('rooms', function ($query) use ($roomId) {
+            $query->where('entities.id', $roomId);
+        })
+            ->where(function ($query) use ($currentDate) {
+                $query->whereDate('from_date', '<=', $currentDate)
+                    ->whereDate('to_date', '>=', $currentDate);
+            })
+            ->get();
+        return $roomDiscountList;
     }
 }

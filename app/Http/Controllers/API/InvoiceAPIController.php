@@ -108,89 +108,105 @@ class InvoiceAPIController extends Controller
     public function endRoom(EntityValidationRequest $request)
     {
         // $catering_department = Department::where('name', 'Catering')->first();
-        $invoice = Invoice::find($request->invoice_id);
-        if (!$invoice) {
-            ResponseMessage('Invoice Not Found at End Room', 419);
-        }
-        // {
-        //     "invoice_id": widget.invoiceId,
-        //     "discount_value": discount,
-        //     "payment_type": paymentType,
-        //     "service_charge": serviceCharge,
-        //     "tax": tax,
-        //     "order_categories": foodEncoded,
-        //   }
-
-        //end invoice for table
-        if ($request->entity_type == 'table') {
-            $entity = Entity::find($invoice->entity_id);
-        } else {
-            $activeInvoiceSession = $invoice->activeInvoiceSession;
-            if (!$activeInvoiceSession) {
-                ResponseMessage('Room is invalid', 419);
+        DB::beginTransaction();
+        try {
+            $invoice = Invoice::find($request->invoice_id);
+            if (!$invoice) {
+                ResponseMessage('Invoice Not Found at End Room', 419);
             }
-            $entity = $activeInvoiceSession->entity;
-            // $latestRoomSession = RoomSession::where('invoice_id', $invoice->id)->orderBy('created_at', 'desc')->first();
-            // $entity = Entity::find($latestRoomSession->entitySession->entity_id);
-        }
-        //end invoice for room
-        $receptionistRole = Role::getRoleByName('Receptionist');
-        if (isset($request->waiter)) {
-            if (!isset($request->total)) {
-                ResponseMessage('Total Field is required', 422);
+            //end invoice for table
+            if ($request->entity_type == 'table') {
+                $entity = Entity::find($invoice->entity_id);
+            } else {
+                $activeInvoiceSession = $invoice->activeInvoiceSession;
+                if (!$activeInvoiceSession) {
+                    ResponseMessage('Room is invalid', 419);
+                }
+                $entity = $activeInvoiceSession->entity;
             }
+            //end invoice for room
             $receptionistRole = Role::getRoleByName('Receptionist');
-            // $managerRole = Role::where('name', 'Manager')
-            //     ->where('department_id', $catering_department->id)
-            //     ->first();
-
-            $order = $invoice->order;
-            if ($order) {
-                $orderItems = $order->orderItems;
-                if ($orderItems->isNotEmpty()) {
-                    $unChooseOrderItemByArea = $orderItems->where('area_id', null)->first();
-                    if ($unChooseOrderItemByArea) {
-                        ResponseMessage( 'Area need to conifirm by area', 419);
+            $waiterRole = Role::getRoleByName('Waiter');
+            if (isset($request->waiter)) {
+                if (!isset($request->total)) {
+                    ResponseMessage('Total Field is required', 422);
+                }
+                $order = $invoice->order;
+                if ($order) {
+                    $orderItems = $order->orderItems;
+                    if ($orderItems->isNotEmpty()) {
+                        $unChooseOrderItemByArea = $orderItems->where('area_id', null)->first();
+                        if ($unChooseOrderItemByArea) {
+                            ResponseMessage('Area need to conifirm by area', 419);
+                        }
                     }
                 }
-            }
-            $entity->status = 'done_pending';
-            $entity->save();
-
-            broadcast(new PosRoomDoneNotification($invoice, $entity, $receptionistRole->id));
-            ResponseMessage("The request to quit the room {$entity->name} has been sent. Please wait for the confirmation from the catering department.");
-        } else if (isset($request->is_confirm)) {
-            // $role = Role::where('name', 'Staff')
-            // ->where('department_id', $catering_department->id)
-            // ->first();
-            $msg = '';
-            if ($request->is_confirm != 1) {
-                $msg = "The request to quit the room {$entity->name} has been rejected. Thank you for your understanding.";
-                // $entity->status = 'active';
-                // $entity->is_active = 1;
-                // $entity->save();
-                // broadcast(new RoomDoneNotificationRequest($entity, $msg, $role->id));
-                // ResponseMessage($msg);
-            } else {
-                $msg = "The request to quit the room {$entity->name} has been confirmed. The room will be quit and will soon close. Thank you.";
-                $entity->status = 'inactive';
-                $entity->is_active = 0;
+                $entity->status = 'done_pending';
                 $entity->save();
-                // $entitySessions = EntitySession::where('entity_id', $entity->id)->get();
-                // foreach($entitySessions as $entitySession){
-                //     $entitySession->is_active = 0;
-                //     $entitySession->save();
-                // }
-                broadcast(new RoomDoneNotificationRequest($entity, $msg, $receptionistRole->id));
-                // ResponseMessage($msg);
+                broadcast(new PosRoomDoneNotification($invoice, $entity, $receptionistRole->id));
+                ResponseMessage("The request to quit the room {$entity->name} has been sent. Please wait for the confirmation from the catering department.");
             }
-            // broadcast(new RoomDoneNotificationRequest($entity, $msg, $receptionistRole->id));
-            // ResponseMessage($msg);
+            // if (isset($request->is_confirm)) {
+            //     $this->confirmEndRoom($request, $entity);
+            // }
+            else if (isset($request->is_confirm)) {
+                $msg = '';
+                if ($request->is_confirm != 1) {
+                    $msg = "The request to quit the room {$entity->name} has been rejected. Thank you for your understanding.";
+                    // $entity->status = 'active';
+                    // $entity->is_active = 1;
+                    // $entity->save();
+                    broadcast(new RoomDoneNotificationRequest($entity, $msg, $waiterRole->id));
+                    ResponseMessage($msg);
+                } else {
+                    $msg = "The request to quit the room {$entity->name} has been confirmed. The room will be quit and will soon close. Thank you.";
+                    $entity->status = 'inactive';
+                    $entity->is_active = 0;
+                    $entity->save();
+                    broadcast(new RoomDoneNotificationRequest($entity, $msg, $waiterRole->id));
+                }
+            }
+            $endRoom = $this->invoiceRepo->doneEntityWithInvoice($request->all());
+            DB::commit();
+            ResponseData($endRoom);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            ResponseMessage($e->getMessage(), 422);
+            throw $e;
         }
-        $endRoom = $this->invoiceRepo->doneEntityWithInvoice($request->all());
-        ResponseData($endRoom);
     }
 
+    public function confirmEndRoom($request, $entity)
+    {
+        DB::beginTransaction();
+        try {
+            $waiterRole = Role::getRoleByName('Waiter');
+            if (isset($request->is_confirm)) {
+                $msg = '';
+                if ($request->is_confirm != 1) {
+                    $msg = "The request to quit the room {$entity->name} has been rejected. Thank you for your understanding.";
+                    $entity->status = 'active';
+                    $entity->is_active = 1;
+                    $entity->save();
+                    broadcast(new RoomDoneNotificationRequest($entity, $msg, $waiterRole->id));
+                    ResponseMessage($msg);
+                } else {
+                    $msg = "The request to quit the room {$entity->name} has been confirmed. The room will be quit and will soon close. Thank you.";
+                    $entity->status = 'inactive';
+                    $entity->is_active = 0;
+                    $entity->save();
+                    broadcast(new RoomDoneNotificationRequest($entity, $msg, $waiterRole->id));
+                }
+            }
+            $endRoom = $this->invoiceRepo->doneEntityWithInvoice($request->all());
+            ResponseData($endRoom);
+            DB::commit();
+        } catch (\Exception $e) {
+            DB::rollBack();
+            ResponseMessage($e->getMessage(), 422);
+            throw $e;
+        }
+    }
 
     public function getInvoiceData(Request $request)
     {
@@ -238,6 +254,10 @@ class InvoiceAPIController extends Controller
         DB::table('invoices')->truncate();
         DB::table('invoice_sessions')->truncate();
         DB::table('room_sessions')->truncate();
+        DB::table('invoice_services')->truncate();
+        DB::table('invoice_accessories')->truncate();
+        DB::table('orders')->truncate();
+        DB::table('order_items')->truncate();
         DB::statement('SET FOREIGN_KEY_CHECKS=1;');
         if ($entityId == 0) {
             Entity::orderBy('id', 'desc')

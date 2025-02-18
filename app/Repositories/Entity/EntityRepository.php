@@ -221,13 +221,20 @@ class EntityRepository implements EntityRepositoryInterface
             // unset($invoice,'invoice.accessories');
             //service list
         }
+        $order = $invoice->order;
+        $total_order_discount_price = 0;
+        if ($order) {
+            $total_order_discount_price = $order->total_discount_price;
+        }
         // }
         $entitySession->start_date_time = $roomSession->invoiceSession->start_date_time;
         $entitySession->end_date_time = $roomSession->invoiceSession->end_date_time;
         $entitySession->services = $invoiceServices;
+        // $entitySession->total_order_discount_value = $invoice->order->total_discount_price;
         $entitySession->invoice_accessories = $invoiceAccessories;
         $entitySession->total_service_value = $total_service_value;
         $entitySession->total_accessory_value = $total_accessory_value;
+        $entitySession->total_order_discount_price = $total_order_discount_price;
         $entitySession->deposit_balance = $customerDepositBalance;
         $entitySession->customer_id = $customer->id;
         $entitySession->account_id = $customer->account_id;
@@ -255,53 +262,59 @@ class EntityRepository implements EntityRepositoryInterface
             // foreach ($roomSessions as $roomSession) {don't need
             // $invoice = $roomSession->invoice; // 'don't need'
             $invoice->package;
-            if ($invoice) {
-                //service
-                // $entitySession['invoice']=$invoice;
-                $invoiceServices = $invoice->invoiceService;
-                foreach ($invoiceServices as $invoiceService) {
-                    $time = $invoiceService->end_date != null ? $invoiceService->end_date : now();
-                    $this->invoiceModelService->calculateInvoiceService($invoiceService, $time);
-                    $total_service_value += $invoiceService->service_value;
-                }
-                $invoiceServiceCollection = $invoiceServiceCollection->merge($invoice->invoiceService);
-                // end service
-                // invoice accessory
-                $invoiceAccessories = $invoice->accessories;
-                foreach ($invoiceAccessories as $invoiceAccessorie) {
-                    $total_accessory_value += $invoiceAccessorie->accessory->accessory_price->price * $invoiceAccessorie->quantity;
-                }
-                $consolidatedOrderItems = [];
-                foreach ($invoice->orders as $order) {
-                    $orderItems = OrderItem::where('order_id', $order->id)->get();
-                    foreach ($orderItems as $orderItem) {
-                        $menuId = $orderItem->menu_id;
-                        $status = $orderItem->status;
-                        if (isset($consolidatedOrderItems[$menuId][$status])) {
-                            $consolidatedOrderItems[$menuId][$status]->quantity += $orderItem->quantity;
-                            $consolidatedOrderItems[$menuId][$status]->price += $orderItem->price;
-                            $consolidatedOrderItems[$menuId][$status]->discount_price += $orderItem->discount_price;
-                        } else {
-                            $consolidatedOrderItems[$menuId][$status] = $orderItem;
-                        }
-                    }
-                }
-
-                foreach ($invoice->orders as $order) {
-                    $order->order_items = collect();
-
-                    foreach ($consolidatedOrderItems as $menuId => $itemsByStatus) {
-                        foreach ($itemsByStatus as $status => $order_items) {
-                            $order_items->menu;
-                            $order->order_items->push($order_items);
-                        }
-                    }
-                }
-                unset($invoice['accessories']);
-                unset($invoice['invoice_service']);
-                unset($invoice['total_accessory_value']);
-                unset($invoice['total_service_value']);
+            // if ($invoice) {
+            //service
+            // $entitySession['invoice']=$invoice;
+            $invoiceServices = $invoice->invoiceService;
+            foreach ($invoiceServices as $invoiceService) {
+                $time = $invoiceService->end_date != null ? $invoiceService->end_date : now();
+                $this->invoiceModelService->calculateInvoiceService($invoiceService, $time);
+                $total_service_value += $invoiceService->service_value;
             }
+            $invoiceServiceCollection = $invoiceServiceCollection->merge($invoice->invoiceService);
+            // end service
+            // invoice accessory
+            $invoiceAccessories = $invoice->accessories;
+            foreach ($invoiceAccessories as $invoiceAccessorie) {
+                $total_accessory_value += $invoiceAccessorie->accessory->accessory_price->price * $invoiceAccessorie->quantity;
+            }
+            $consolidatedOrderItems = [];
+            foreach ($invoice->orders as $order) {
+                $orderItems = OrderItem::where('order_id', $order->id)->get();
+                foreach ($orderItems as $orderItem) {
+                    $menuId = $orderItem->menu_id;
+                    $status = $orderItem->status;
+                    if (isset($consolidatedOrderItems[$menuId][$status])) {
+                        $consolidatedOrderItems[$menuId][$status]->quantity += $orderItem->quantity;
+                        $consolidatedOrderItems[$menuId][$status]->price += $orderItem->price;
+                        $consolidatedOrderItems[$menuId][$status]->discount_price += $orderItem->discount_price;
+                    } else {
+                        $consolidatedOrderItems[$menuId][$status] = $orderItem;
+                    }
+                }
+            }
+
+            foreach ($invoice->orders as $order) {
+                $order->order_items = collect();
+
+                foreach ($consolidatedOrderItems as $menuId => $itemsByStatus) {
+                    foreach ($itemsByStatus as $status => $order_items) {
+                        $order_items->menu;
+                        $order->order_items->push($order_items);
+                    }
+                }
+            }
+            unset($invoice['accessories']);
+            unset($invoice['invoice_service']);
+            unset($invoice['total_accessory_value']);
+            unset($invoice['total_service_value']);
+            // }
+            $order = $invoice->order;
+            $total_order_discount_price = 0;
+            if ($order) {
+                $total_order_discount_price = $order->total_discount_price;
+            }
+            unset($invoice['order']);
             // }
             // $entitySession['start_date'] = $firstRoomSession->start_date;
             // $entitySession['end_date'] = $lastRoomSession->end_date;
@@ -313,6 +326,7 @@ class EntityRepository implements EntityRepositoryInterface
             $entitySession['invoice_accessories'] = $invoiceAccessories;
             $entitySession['total_service_value'] = $total_service_value;
             $entitySession['total_accessory_value'] = $total_accessory_value;
+            $entitySession['total_order_discount_price'] = $total_order_discount_price;
             //service add response
             return $entitySession;
         }
@@ -371,6 +385,12 @@ class EntityRepository implements EntityRepositoryInterface
                 $invoice->orders = $orders;
                 $entity->invoice = $invoice;
             }
+            $order = $invoice->order;
+            $total_order_discount_price = 0;
+            if ($order) {
+                $total_order_discount_price = $order->total_discount_price;
+            }
+            unset($invoice['order']);
             $responseData = [];
             $responseData['entity_id'] = $entity->id;
             $responseData['room_sessions'] = $entity;
@@ -378,6 +398,7 @@ class EntityRepository implements EntityRepositoryInterface
             $responseData['invoice_accessories'] = $invoiceAccessories;
             $responseData['total_service_value'] = $total_service_value;
             $responseData['total_accessory_value'] = $total_accessory_value;
+            $responseData['total_order_discount_price'] = $total_accessory_value;
             return $responseData;
         }
     }

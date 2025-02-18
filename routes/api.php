@@ -386,7 +386,7 @@ Route::middleware('auth:api')->group(function () {
         Route::get('/duties/{id}', 'dutyDetail');
     });
     Route::resource('canteens', CanteenController::class)->only(['index', 'store', 'show']);
-    Route::controller(CanteenController::class)->group(function () {});
+    Route::controller(CanteenController::class)->group(function () { });
     //service
     Route::resource('services', ServiceController::class)->only(['index', 'store', 'show']);
 
@@ -448,12 +448,13 @@ Route::middleware('auth:api')->group(function () {
         Route::get('item_price_list_by_item/{item_id}', 'getItemPriceListByItem');
         Route::get('brand_by_supplier', 'brandBySupplier');
         Route::get('supplier_by_item/{item_id}', 'supplierByItem');
-        Route::get('brand_list_of_supplier_by_item/{item_id}','brandlistOfSupplierByItem');
-        Route::get('brand_list_of_by_item/{item_id}','brandlistOfSupplierByItem');
+        Route::get('brand_list_of_supplier_by_item/{item_id}', 'brandlistOfSupplierByItem');
+        Route::get('brand_list_of_by_item/{item_id}', 'brandlistOfSupplierByItem');
 
     });
     //invoice transaction
     Route::post('/invoice_transaction', [PoOrderController::class, 'processInvoiceTransaction']);
+    Route::get('/sale_target_results', [SaleTargetResultAPIController::class, 'getSaleTargetResult']);
 });
 Route::get('/features', [FeatureAPIController::class, 'getFeatureData']);
 
@@ -484,7 +485,6 @@ Route::controller(SaleTargetMenuAPIController::class)->group(function () {
     Route::delete('/sale_target_menus/{id}', 'deleteSaleTargetMenu');
 });
 
-Route::get('/sale_target_results', [SaleTargetResultAPIController::class, 'getSaleTargetResult']);
 
 Route::controller(PackageAPIController::class)->group(function () {
     Route::get('/packages', 'getPackage');

@@ -35,4 +35,11 @@ class RoomDiscountAPIController extends Controller
     {
         $roomDiscount = $this->roomDiscountRepo->deleteData($id);
     }
+    public function getRoomDiscountList(Request $request){
+        if(!isset($request->room_id) && $request->room_id==null){
+            ResponseMessage('Room Id is requred',422);
+        }
+        $data = $this->roomDiscountRepo->getRoomDiscountList($request->room_id);
+        ResponseData($data,200);
+    }
 }

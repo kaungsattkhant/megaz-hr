@@ -128,20 +128,8 @@ class InvoiceRepository implements InvoiceRepositoryInterface
 
     public function createData(array $data)
     {
-        // "entity_session_id" => "15"
-        // "customer_id" => "1"
-        // "start_time" => "2024-10-31T14:13"
-        // "session_duration" => "2"
-        // "type" => "session"
-        // "deposit" => "null"
-        // "female" => 3
-        // "male" => 2
-        // "child" => 1
-        // "is_waiter" => 0
-        // "entity_id" => null
         DB::beginTransaction();
         try {
-            // if ($data['entity_id'] != null && !$data['is_waiter']) { //create table invoice
             if ($data['entity_type'] == 'table') { //create table invoice
                 $tableInvoice = $this->createInvoiceForTable($data);
                 DB::commit();
@@ -150,7 +138,7 @@ class InvoiceRepository implements InvoiceRepositoryInterface
 
             if ($data['entity_type'] == 'room' || $data['is_waiter']) { // create room invoice
                 $entitySession = null;
-                if (isset($data['entity_id']) && $data['entity_id'] != null) {
+                if (isset($data['entity_id']) && $data['entity_id'] != null && $data['is_waiter']) {
                     $entity = Entity::find($data['entity_id']);
                     $currentTime = Carbon::parse(now())->format('H:i');
                     $entitySession = $entity->currentEntitySession($currentTime)->first();
@@ -216,7 +204,7 @@ class InvoiceRepository implements InvoiceRepositoryInterface
                 $data['area_id'] = $entity->area_id;
                 $data['created_by'] = UserData()->id;
                 $data['invoice_date'] = Carbon::now();
-                $data['sub_total']=$data['total_session_price'];
+                $data['sub_total'] = $data['total_session_price'];
                 $invoice = Invoice::create($data);
                 $invoiceSession = $this->invoiceService->storeInvoiceSession($invoice->id, $entitySession->entity_id, $data['session_duration'], $entity->price_per_hour, $data['is_waiter'], $discountId = null);
                 //create deposit
@@ -534,14 +522,13 @@ class InvoiceRepository implements InvoiceRepositoryInterface
 
     public function addSessionDuration(array $data)
     {
+        ResponseMessage('Add Session duration is not available now', 419);
         DB::beginTransaction();
         try {
             $invoice = Invoice::find($data['invoice_id']);
-
             if ($invoice->invoice_type == 'endless_time') {
                 ResponseMessage('Room with session and package can only be added duration', 422);
             }
-
             $roomSession = $invoice->latestSession;
 
             $nextSessions = EntitySession::where('id', '>', $roomSession->entity_session_id)
@@ -719,7 +706,7 @@ class InvoiceRepository implements InvoiceRepositoryInterface
     public function modifyEntityChange($data)
     {
         $entityId = $data['entity_id'];
-        $previousEntityId=$data['previous_entity_id'];
+        $previousEntityId = $data['previous_entity_id'];
         $invoiceId = $data['invoice_id'];
         $start_date_time = Carbon::parse($data['start_date_time']);
         $isAvailableEntity = $this->invoiceService->checkIsActiveChangeRoom($entityId);
@@ -764,7 +751,7 @@ class InvoiceRepository implements InvoiceRepositoryInterface
                 ResponseMessage('Active Invoice Session not found', 419);
             }
 
-            $previousEntity= Entity::find($previousEntityId);
+            $previousEntity = Entity::find($previousEntityId);
             // $previousEntity = $invoice->activeInvoiceSession->entity;
             $previousEntity->is_active = 0;
             $previousEntity->status = 'inactive';
@@ -822,7 +809,7 @@ class InvoiceRepository implements InvoiceRepositoryInterface
             ]);
 
             //update session price for invoice
-            $invoice->entity_id=$entityId;
+            $invoice->entity_id = $entityId;
             $invoice->total = ($invoice->total - $priviousTotalSessionPrice) + $totalNewSessionPrice;
             $invoice->sub_total = ($invoice->sub_total - $priviousTotalSessionPrice) + $activeInvoiceSession->total_session_price + $totalNewSessionPrice;
             $invoice->total_session_price = $activeInvoiceSession->total_session_price + $totalNewSessionPrice; //previous used session price+ new session price(new room)
@@ -835,7 +822,7 @@ class InvoiceRepository implements InvoiceRepositoryInterface
         }
     }
 
-    public function changeTable( $previousEntityId,$newEntityId)
+    public function changeTable($previousEntityId, $newEntityId)
     {
         Entity::where('id', $newEntityId)->update([
             'status' => 'active',
@@ -942,10 +929,10 @@ class InvoiceRepository implements InvoiceRepositoryInterface
             // $roomDoneResponse['room_sessions'] = $latestRoomSession;
             // $roomDoneResponse['rooms_sessions'] = $roomSessions;
             $roomDoneResponse['total_order_value'] = 0;
-            $roomDoneResponse['total_order_discount_price'] = 0;
+            // $roomDoneResponse['total_order_discount_price'] = 0;
             if ($invoice->order) {
                 $roomDoneResponse['total_order_value'] = $invoice->order->total;
-                $roomDoneResponse['total_order_discount_value'] = $invoice->order->total_discount_price;
+                $roomDoneResponse['total_order_discount_price'] = $invoice->order->total_discount_price;
             }
             $roomDoneResponse['total_session_value'] = $total_session_value;
             $roomDoneResponse['total_service_value'] = $total_service_value;
@@ -1242,7 +1229,7 @@ class InvoiceRepository implements InvoiceRepositoryInterface
         DB::beginTransaction();
         try {
             $invoice = Invoice::find($data['invoice_id']);
-            $data['total']=$invoice['total']!=null? $invoice['total']:0;
+            $data['total'] = $invoice['total'] != null ? $invoice['total'] : 0;
             if (!$invoice) {
                 ResponseMessage('Invoice not found', 404);
             }
@@ -1364,9 +1351,9 @@ class InvoiceRepository implements InvoiceRepositoryInterface
             $total_service_value = 0;
             $invoiceServices = $invoice->invoiceService;
             foreach ($invoiceServices as $invoiceService) {
-                $serviceValue = $this->invoiceService->getServiceValue($invoiceService, $data['end_date']);
+                $serviceValue = $this->invoiceService->getServiceValue($invoiceService, now());
                 if ($invoiceService->is_active == 1) {
-                    $invoiceService->end_date = $data['end_date'];
+                    $invoiceService->end_date = isset($data['end_date']) ? $data['end_date'] : now();
                     $invoiceService->service_value = $serviceValue;
                     $invoiceService->is_active = 0;
                     $invoiceService->save();
@@ -1423,56 +1410,52 @@ class InvoiceRepository implements InvoiceRepositoryInterface
 
             if ($order != null) {
                 $orderItems = $order->orderItems;
-                if($orderItems->isNotEmpty()){
-                    $unChooseOrderItemByArea=$orderItems->where('area_id',null)->first();
-                    if($unChooseOrderItemByArea){
-                        ResponseMessage('Area need to conifirm by area',419);
+                if ($orderItems->isNotEmpty()) {
+                    $unChooseOrderItemByArea = $orderItems
+                        ->where('area_id', null)
+                        ->first();
+                    if ($unChooseOrderItemByArea) {
+                        ResponseMessage('Area need to conifirm by area', 419);
                     }
                 }
-                // $groupedOrderItems = $orderItems->groupBy('menu_id')->map(function ($items) {
-                //     return $items->sum('quantity');
-                // });
-                // dd($groupedOrderItems);
-                // $checkAreaId=
-                $groupedOrderItems = $orderItems
-                    ->groupBy(function ($item) {
-                        return $item['menu_id'] . '-' . $item['area_id'];
-                    })
-                    ->map(function ($items) {
-                        return [
-                            'menu_id' => $items->first()->menu_id, // Access as an object
-                            'area_id' => $items->first()->area_id, // Access as an object
-                            'quantity' => $items->sum('quantity'),  // Sum the quantities
-                        ];
-                    })
-                    ->values();
-                foreach ($groupedOrderItems as $orderItem) {
-                    TargetMenuResult::create([
-                        'date_time' => CurrentTime(),
-                        'invoice_id' => $invoice->id,
-                        'area_id' => $orderItem['area_id'],
-                        'menu_id' => $orderItem['menu_id'],
-                        'quantity' => $orderItem['quantity'],
-                    ]);
-                }
+                $this->addTargetMenu($invoice->id);
+                // $groupedOrderItems = $orderItems
+                //     ->groupBy(function ($item) {
+                //         return $item['menu_id'] . '-' . $item['area_id'];
+                //     })
+                //     ->map(function ($items) {
+                //         return [
+                //             'menu_id' => $items->first()->menu_id, // Access as an object
+                //             'area_id' => $items->first()->area_id, // Access as an object
+                //             'quantity' => $items->sum('quantity'),  // Sum the quantities
+                //         ];
+                //     })
+                //     ->values();
+                // foreach ($groupedOrderItems as $orderItem) {
+                //     TargetMenuResult::create([
+                //         'date_time' => CurrentTime(),
+                //         'invoice_id' => $invoice->id,
+                //         'area_id' => $orderItem['area_id'],
+                //         'menu_id' => $orderItem['menu_id'],
+                //         'quantity' => $orderItem['quantity'],
+                //     ]);
+                // }
             }
             //store customer deposit
-            $this->storeInvoiceCustomerDeposit($customerDepositData, UserData()->id);
-            //store invoice transaction
-            $this->ledgerAndTransactionForInvoice([
-                'payment_type' => 'cash',
-                'invoice_id' => $invoice->id,
-                // 'food_charge' => $foodCharge,
-                // 'beverage_charge' => $beverageCharge,
-                'total_session_price' => $total_session_price,
-                'service_charge' => $service_charge,
-                'tax' => $tax,
-                'discount_total' => $data['discount_total'],
-            ]);
-
+            // $this->storeInvoiceCustomerDeposit($customerDepositData, UserData()->id);
+            // //store invoice transaction
+            // $this->ledgerAndTransactionForInvoice([
+            //     'payment_type' => 'cash',
+            //     'invoice_id' => $invoice->id,
+            //     // 'food_charge' => $foodCharge,
+            //     // 'beverage_charge' => $beverageCharge,
+            //     'total_session_price' => $total_session_price,
+            //     'service_charge' => $service_charge,
+            //     'tax' => $tax,
+            //     'discount_total' => $data['discount_total'],
+            // ]);
             $catering_department = Department::where('name', 'Catering')->first();
             $msg = "The {$entity->name} is now closed. Thank you.";
-
             $role = Role::where('name', 'Staff')->where('department_id', $catering_department->id)->first();
             broadcast(new RoomDoneNotificationRequest($entity, $msg, $role->id));
 
@@ -1496,15 +1479,35 @@ class InvoiceRepository implements InvoiceRepositoryInterface
         $total_service_value = 0;
         $invoiceServices = $invoice->invoiceService;
         foreach ($invoiceServices as $invoiceService) {
-            $serviceValue = $this->invoiceService->getServiceValue($invoiceService, $data['end_date']);
+            $serviceValue = $this->invoiceService->getServiceValue($invoiceService, now());
             if ($invoiceService->is_active == 1) {
-                $invoiceService->end_date = $data['end_date'];
+                $invoiceService->end_date = isset($data['end_date']) ? $data['end_date'] : now();
                 $invoiceService->service_value = $serviceValue;
                 $invoiceService->is_active = 0;
                 $invoiceService->save();
             }
             $total_service_value += $serviceValue;
         }
+
+        if (!isset($data['birthday_discount'])) {
+            $data['birthday_discount'] = 0;
+        }
+        if (!isset($data['discount_value'])) {
+            $data['discount_value'] = 0;
+        }
+        if (!isset($data['order_discount'])) {
+            $data['order_discount'] = 0;
+        }
+        if (!isset($data['customer_level_discount'])) {
+            $data['customer_level_discount'] = 0;
+        }
+        if (!isset($data['tax'])) {
+            $data['tax'] = 0;
+        }
+        if (!isset($data['service_charge'])) {
+            $data['service_charge'] = 0;
+        }
+
         if (isset($data['discount_type'])) {
             $data['discount_value'] = $data['discount_type'] == null || $data['discount_type'] == "null" ? 0 : $data['discount_value'];
         }
@@ -1537,30 +1540,51 @@ class InvoiceRepository implements InvoiceRepositoryInterface
 
     public function addTargetMenu($invoiceId)
     {
-        $order = Order::where('invoice_id', $invoiceId)->first();
+        $order = Order::where('invoice_id', $invoiceId)
+            ->first();
         if ($order) {
-            $orderItems = $order->orderItems;
-            $groupedOrderItems = $orderItems
-                ->groupBy(function ($item) {
-                    return $item['menu_id'] . '-' . $item['area_id'];
-                })
-                ->map(function ($items) {
-                    return [
-                        'menu_id' => $items->first()->menu_id, // Access as an object
-                        'area_id' => $items->first()->area_id, // Access as an object
-                        'quantity' => $items->sum('quantity'),  // Sum the quantities
-                    ];
-                })
+            // $groupedOrderItems = $orderItems
+            //     ->groupBy(function ($item) {
+            //         return $item['menu_id'] . '-' . $item['area_id'];
+            //     })
+            //     ->map(function ($items) {
+            //         return [
+            //             'menu_id' => $items->first()->menu_id, // Access as an object
+            //             'area_id' => $items->first()->area_id, // Access as an object
+            //             'quantity' => $items->sum('quantity'),  // Sum the quantities
+            //         ];
+            //     })
+            //     ->values();
+            // $orderItems = $order->orderItems->where('status','pos_confirmed');
+            $orderItems = $order->orderItems->filter(fn($item) => $item->status === 'pos_confirmed');
+
+            $groupedOrderItems = $orderItems->groupBy(fn($item) => $item['menu_id'] . '-' . $item['area_id'])
+                ->map(fn($items) => [
+                    'menu_id' => $items->first()->menu_id,
+                    'area_id' => $items->first()->area_id,
+                    'quantity' => $items->sum('quantity'),
+                ])
                 ->values();
-            foreach ($groupedOrderItems as $orderItem) {
-                TargetMenuResult::create([
-                    'date_time' => CurrentTime(),
-                    'invoice_id' => $invoiceId,
-                    'area_id' => $orderItem['area_id'],
-                    'menu_id' => $orderItem['menu_id'],
-                    'quantity' => $orderItem['quantity'],
-                ]);
-            }
+            // Prepare data for bulk insert
+            $insertData = $groupedOrderItems->map(fn($orderItem) => [
+                'date_time' => CurrentTime(),
+                'invoice_id' => $invoiceId,
+                'area_id' => $orderItem['area_id'],
+                'menu_id' => $orderItem['menu_id'],
+                'quantity' => $orderItem['quantity'],
+            ])->toArray();
+
+            // Bulk insert for better performance
+            TargetMenuResult::insert($insertData);
+            // foreach ($groupedOrderItems as $orderItem) {
+            //     TargetMenuResult::create([
+            //         'date_time' => CurrentTime(),
+            //         'invoice_id' => $invoiceId,
+            //         'area_id' => $orderItem['area_id'],
+            //         'menu_id' => $orderItem['menu_id'],
+            //         'quantity' => $orderItem['quantity'],
+            //     ]);
+            // }
         }
     }
     public function broadcastNotification($entityId)
@@ -1575,10 +1599,15 @@ class InvoiceRepository implements InvoiceRepositoryInterface
         }
         $msg = "The {$entity->name} is now closed. Thank you.";
         //i think this role is not reliable to send notification
+        //need to confirm  which role to send notification Catering'staff of Catering'waiter
         $role = Role::where('name', 'Staff')->where('department_id', $catering_department->id)->first();
         if (!$role) {
             ResponseMessage('Role not found', 404);
         }
+        // $catering_department = Department::where('name', 'Catering')->first();
+        // $msg = "The {$entity->name} is now closed. Thank you.";
+        // $role = Role::where('name', 'Staff')->where('department_id', $catering_department->id)->first();
+        // broadcast(new RoomDoneNotificationRequest($entity, $msg, $role->id));
         broadcast(new RoomDoneNotificationRequest($entity, $msg, $role->id));
     }
 
@@ -1587,21 +1616,32 @@ class InvoiceRepository implements InvoiceRepositoryInterface
         DB::beginTransaction();
         try {
             $invoice = Invoice::find($data['invoice_id']);
+            $entity = $invoice->entity;
+            if (!$entity) {
+                ResponseMessage('Entity is not found to confirm', 419);
+            }
             if ($data['is_confirm'] == 1) {
-                $activeInvoiceSession = $invoice->activeInvoiceSession;
-                $activeInvoiceSession->is_active = 1;
-                $activeInvoiceSession->save();
-                //update active sesion
-                $roomSessions = $activeInvoiceSession->roomSessions;
-                foreach ($roomSessions as $roomSession) {
-                    $entitySesion = $roomSession->entitySession;
-                    $entitySesion->is_active = 1;
-                    $entitySesion->save();
-                    $entity = $entitySesion->entity;
+                if ($entity->entity_type == 'room') {
+                    $activeInvoiceSession = $invoice->activeInvoiceSession;
+                    $activeInvoiceSession->is_active = 1;
+                    $activeInvoiceSession->save();
+                    //update active sesion
+                    $roomSessions = $activeInvoiceSession->roomSessions;
+                    foreach ($roomSessions as $roomSession) {
+                        $entitySesion = $roomSession->entitySession;
+                        $entitySesion->is_active = 1;
+                        $entitySesion->save();
+                        $entity = $entitySesion->entity;
+                        $entity->is_active = 1;
+                        $entity->status = 'active';
+                        $entity->save();
+                    }
+                } elseif ($entity->entity_type == 'table') {
                     $entity->is_active = 1;
                     $entity->status = 'active';
                     $entity->save();
                 }
+
             }
 
             // $latestSession = RoomSession::where('invoice_id', $data['invoice_id'])->latest()->first();

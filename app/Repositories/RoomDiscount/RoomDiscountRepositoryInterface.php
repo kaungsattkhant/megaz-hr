@@ -13,4 +13,6 @@ interface RoomDiscountRepositoryInterface
     public function editData(int $id, array $data);
 
     public function deleteData(int $id);
+
+    public function getRoomDiscountList(int $roomId);
 }

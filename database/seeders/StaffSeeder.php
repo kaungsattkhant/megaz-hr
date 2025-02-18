@@ -35,137 +35,140 @@ class StaffSeeder extends Seeder
         $entertainment_features = config('common.entertainment_feature_slug');
         $management_features = config('common.management_feature_slug');
         $procurement_features = config('common.procurement_feature_slug');
-
-        foreach ($departments as $i => $department) {
-            foreach ($department->roles as $departmentRole) {
-                if ($departmentRole->name == 'Staff') {
-                    $phoneNumber = str_repeat($department->id, 2);
-                } elseif ($departmentRole->name == 'Supervisor') {
-                    $phoneNumber = str_repeat($department->id, 3);
-                } elseif ($departmentRole->name == 'Manager') {
-                    $phoneNumber = str_repeat($department->id, 4);
-                }
-                elseif ($departmentRole->name == 'Waiter') {
-                    $phoneNumber = str_repeat($department->id, 5);
-                }
-                elseif ($departmentRole->name == 'Cashier') {
-                    $phoneNumber = str_repeat($department->id, 6);
-                }
-                 elseif ($departmentRole->name == 'MD'|| $departmentRole->name == 'Supervisor') {
-                    $phoneNumber = str_repeat($department->id, 1);
-                }
-                try {
-                    DB::beginTransaction();
-                    $faker = Faker::create();
-                    // $phoneNumber = '09' . str_repeat($department->id, 2) . sprintf('%02d',$departmentRole->id);
-                    $phoneNumber = '09' . $phoneNumber;
-                    $staff = Staff::create([
-                        'gender_id' => $faker->numberBetween(1, 2),
-                        'department_id' => $department->id,
-                        'name' => $faker->name,
-                        'phone_number' => $phoneNumber,
-                        'password' => 'password',
-                        'joined_date' => now(),
-                        'alt_phone_number' => $phoneNumber,
-                        'email' => $faker->email,
-                        'nrc_number' => $this->generateNRCNumber(),
-                        'birthdate' => '1990-12-12',
-                        'father_name' => 'U Aung',
-                        'mother_name' => 'Daw Moe',
-                        'state' => 'Mandalay',
-                        'city' => 'myitnge',
-                        'zip_code' => 'address',
-                        'address' => 'Mandalay/Myitnge',
-                        'bank_account_number' => '0002 0331 9933 8423',
-                        'nrc_front_url' => 'test',
-                        'nrc_front_path' => '/path',
-                        'nrc_back_url' => 'test-back',
-                        'nrc_back_path' => '/path/back',
-                        'household_registration_url' => '/household_registration_url',
-                        'household_registration_path' => '/household_registration_path',
-                    ]);
-                    $staff->emergencyContacts()->create([
-                        'primary_name' => $faker->name,
-                        'primary_phone' => $phoneNumber,
-                        'primary_relationship' => 'None',
-                        'secondary_name' => 'None',
-                        'secondary_phone' => $phoneNumber,
-                        'secondary_relationship' => 'None'
-                    ]);
-                    $department_id = $department->id;
-                    $name = $department->name;
-                    // switch ($department_id) {
-                    //     case 1:
-                    //         $staff->features()->sync($hr_features);
-                    //         break;
-                    //     case 2:
-                    //         $staff->features()->sync($finance_features);
-                    //         break;
-                    //     case 4:
-                    //         $staff->features()->sync($management_features);
-                    //         break;
-                    //     case 5:
-                    //         $staff->features()->sync($catering_features);
-                    //         break;
-                    //     case 6:
-                    //         $staff->features()->sync($inventory_features);
-                    //         break;
-
-                    //     default:
-                    //         $staff->features()->sync($hr_features);
-                    // }
-                    switch ($name) {
-                        case 'HR':
-                            $featureIds = Feature::whereIn('slug', $hr_features)->pluck('id')->toArray();
-                            $staff->features()->sync($featureIds);
-                            break;
-                        case 'Finance':
-                            $featureIds = Feature::whereIn('slug', $finance_features)->pluck('id')->toArray();
-                            $staff->features()->sync($featureIds);
-                            break;
-                        case 'Management':
-                            $featureIds = Feature::whereIn('slug', $management_features)->pluck('id')->toArray();
-                            $staff->features()->sync($featureIds);
-                            break;
-                        // case 'Inventory':
-                        //     $featureIds = Feature::whereIn('slug', $inventory_features)->pluck('id')->toArray();
-                        //     $staff->features()->sync($featureIds);
-                        case 'Catering':
-                            $featureIds = Feature::whereIn('slug', $catering_features)->pluck('id')->toArray();
-                            $staff->features()->sync($featureIds);
-                            break;
-                        case 'Canteen':
-                            $featureIds = Feature::whereIn('slug', $hr_features)->pluck('id')->toArray();
-                            $staff->features()->sync($featureIds);
-                            break;
-                        case 'Entertainement':
-                            $featureIds = Feature::whereIn('slug', $entertainment_features)->pluck('id')->toArray();
-                            $staff->features()->sync($featureIds);
-                            break;
-                        case 'Kitchen':
-                            $featureIds = Feature::whereIn('slug', $management_features)->pluck('id')->toArray();
-                            $staff->features()->sync($featureIds);
-                            $inventoryIds = Inventory::whereIn('name', 'Kitchen Inventory')->pluck('id')->toArray();
-                            $staff->inventories()->sync($inventoryIds);
-                            break;
-                        case 'Procurement':
-                            $featureIds = Feature::whereIn('slug', $procurement_features)->pluck('id')->toArray();
-                            $staff->features()->sync($featureIds);
-                            $inventoryIds = Inventory::whereIn('name', 'Main Inventory')->pluck('id')->toArray();
-                            $staff->inventories()->sync($inventoryIds);
-                            break;
-                        default:
-                            $featureIds = Feature::whereIn('slug', $management_features)->pluck('id')->toArray();
-                            $staff->features()->sync($featureIds);
+        // DB::beginTransaction();
+        // try {
+            foreach ($departments as $i => $department) {
+                foreach ($department->roles as $departmentRole) {
+                    if ($departmentRole->name == 'Staff') {
+                        $phoneNumber = str_repeat($department->id, 2);
+                    } elseif ($departmentRole->name == 'Supervisor') {
+                        $phoneNumber = str_repeat($department->id, 3);
+                    } elseif ($departmentRole->name == 'Manager') {
+                        $phoneNumber = str_repeat($department->id, 4);
+                    } elseif ($departmentRole->name == 'Waiter') {
+                        $phoneNumber = str_repeat($department->id, 5);
+                    } elseif ($departmentRole->name == 'Cashier') {
+                        $phoneNumber = str_repeat($department->id, 6);
+                    } elseif ($departmentRole->name == 'MD' || $departmentRole->name == 'Supervisor') {
+                        $phoneNumber = str_repeat($department->id, 1);
                     }
-                    $staff->roles()->sync([$departmentRole->id]);
-                    DB::commit();
-                } catch (Exception $e) {
-                    DB::rollBack();
+                    try {
+                        DB::beginTransaction();
+                        $faker = Faker::create();
+                        // $phoneNumber = '09' . str_repeat($department->id, 2) . sprintf('%02d',$departmentRole->id);
+                        $phoneNumber = '09' . $phoneNumber;
+                        $staff = Staff::create([
+                            'gender_id' => $faker->numberBetween(1, 2),
+                            'department_id' => $department->id,
+                            'name' => $faker->name,
+                            'phone_number' => $phoneNumber,
+                            'password' => 'password',
+                            'joined_date' => now(),
+                            'alt_phone_number' => $phoneNumber,
+                            'email' => $faker->email,
+                            'nrc_number' => $this->generateNRCNumber(),
+                            'birthdate' => '1990-12-12',
+                            'father_name' => 'U Aung',
+                            'mother_name' => 'Daw Moe',
+                            'state' => 'Mandalay',
+                            'city' => 'myitnge',
+                            'zip_code' => 'address',
+                            'address' => 'Mandalay/Myitnge',
+                            'bank_account_number' => '0002 0331 9933 8423',
+                            'nrc_front_url' => 'test',
+                            'nrc_front_path' => '/path',
+                            'nrc_back_url' => 'test-back',
+                            'nrc_back_path' => '/path/back',
+                            'household_registration_url' => '/household_registration_url',
+                            'household_registration_path' => '/household_registration_path',
+                        ]);
+                        $staff->emergencyContacts()->create([
+                            'primary_name' => $faker->name,
+                            'primary_phone' => $phoneNumber,
+                            'primary_relationship' => 'None',
+                            'secondary_name' => 'None',
+                            'secondary_phone' => $phoneNumber,
+                            'secondary_relationship' => 'None'
+                        ]);
+                        $department_id = $department->id;
+                        $name = $department->name;
+                        // switch ($department_id) {
+                        //     case 1:
+                        //         $staff->features()->sync($hr_features);
+                        //         break;
+                        //     case 2:
+                        //         $staff->features()->sync($finance_features);
+                        //         break;
+                        //     case 4:
+                        //         $staff->features()->sync($management_features);
+                        //         break;
+                        //     case 5:
+                        //         $staff->features()->sync($catering_features);
+                        //         break;
+                        //     case 6:
+                        //         $staff->features()->sync($inventory_features);
+                        //         break;
+
+                        //     default:
+                        //         $staff->features()->sync($hr_features);
+                        // }
+                        switch ($name) {
+                            case 'HR':
+                                $featureIds = Feature::whereIn('slug', $hr_features)->pluck('id')->toArray();
+                                $staff->features()->sync($featureIds);
+                                break;
+                            case 'Finance':
+                                $featureIds = Feature::whereIn('slug', $finance_features)->pluck('id')->toArray();
+                                $staff->features()->sync($featureIds);
+                                break;
+                            case 'Management':
+                                $featureIds = Feature::whereIn('slug', $management_features)->pluck('id')->toArray();
+                                $staff->features()->sync($featureIds);
+                                break;
+                            // case 'Inventory':
+                            //     $featureIds = Feature::whereIn('slug', $inventory_features)->pluck('id')->toArray();
+                            //     $staff->features()->sync($featureIds);
+                            case 'Catering':
+                                $featureIds = Feature::whereIn('slug', $catering_features)->pluck('id')->toArray();
+                                $staff->features()->sync($featureIds);
+                                break;
+                            case 'Canteen':
+                                $featureIds = Feature::whereIn('slug', $hr_features)->pluck('id')->toArray();
+                                $staff->features()->sync($featureIds);
+                                break;
+                            case 'Entertainement':
+                                $featureIds = Feature::whereIn('slug', $entertainment_features)->pluck('id')->toArray();
+                                $staff->features()->sync($featureIds);
+                                break;
+                            case 'Kitchen':
+                                $featureIds = Feature::whereIn('slug', $management_features)->pluck('id')->toArray();
+                                $staff->features()->sync($featureIds);
+                                $inventoryIds = Inventory::whereIn('name', ['Kitchen Inventory'])->pluck('id')->toArray();
+                                $staff->inventories()->sync($inventoryIds);
+                                break;
+                            case 'Procurement':
+                                $featureIds = Feature::whereIn('slug', $procurement_features)->pluck('id')->toArray();
+                                $staff->features()->sync($featureIds);
+                                $inventoryIds = Inventory::whereIn('name', ['Main Inventory'])->pluck('id')->toArray();
+                                $staff->inventories()->sync($inventoryIds);
+                                break;
+                            default:
+                                $featureIds = Feature::whereIn('slug', $management_features)->pluck('id')->toArray();
+                                $staff->features()->sync($featureIds);
+                        }
+                        $staff->roles()->sync([$departmentRole->id]);
+                        DB::commit();
+                    } catch (Exception $e) {
+                        DB::rollBack();
+                    }
                 }
             }
-        }
-
+        //     DB::commit();
+        // } catch (\Exception $e) {
+        //     DB::rollback();
+        //     ResponseMessage($e->getMessage(), 402);
+        //     throw $e;
+        // }
         //end ksk
 
         // ****pks*****

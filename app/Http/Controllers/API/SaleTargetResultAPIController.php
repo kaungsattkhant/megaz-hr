@@ -14,6 +14,9 @@ class SaleTargetResultAPIController extends Controller
 {
     public function getSaleTargetResult(Request $request)
     {
+        if(!UserData()){
+            ResponseMessage('Unauthenticated',401);
+        }
         $role = UserData()->roles->first();
         $roleId = $role->id;
 

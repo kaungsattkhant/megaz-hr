@@ -72,6 +72,11 @@ class Invoice extends Model
         return $this->belongsTo(Entity::class, 'entity_id');
     }
 
+    public function entity()
+    {
+        return $this->belongsTo(Entity::class, 'entity_id');
+    }
+
     public function customer()
     {
         return $this->belongsTo(Customer::class);

@@ -6,6 +6,7 @@ use App\Http\Controllers\API\OrderAPIController;
 use App\Http\Controllers\API\EntityAPIController;
 use App\Http\Controllers\API\InvoiceAPIController;
 use App\Http\Controllers\API\NotificationController;
+use App\Http\Controllers\API\RoomDiscountAPIController;
 
 Route::middleware('auth:api')->group(function () {
     Route::controller(EntityAPIController::class)->group(function () {
@@ -45,9 +46,12 @@ Route::middleware('auth:api')->group(function () {
 
     });
     //ksk
-    Route::prefix('pos')->controller(AccessoryController::class)->group(function () {
+    Route::prefix(prefix: 'pos')->controller(AccessoryController::class)->group(function () {
         Route::get('accessory_by_category/{accessory_category}', 'getAccessoryByCategory');
         Route::get('/get_accessory_category', 'getAccessoryCategory');
         Route::post('/add_accessory', 'createInvoiceAccessory');
+    });
+    Route::prefix('pos')->controller(RoomDiscountAPIController::class)->group(function () {
+        Route::get('/get_room_discount_list', 'getRoomDiscountList');
     });
 });
