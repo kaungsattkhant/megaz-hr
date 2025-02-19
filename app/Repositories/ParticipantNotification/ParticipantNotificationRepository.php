@@ -145,15 +145,16 @@ class ParticipantNotificationRepository implements ParticipantNotificationInterf
                 ['participantable_id' => $meeting->id, 'participantable_type' => 'meeting', 'department_id' => $dep],
                 $participantData
               );
-            }
-            // if ($users->isNotEmpty()) {
-            //   $notificationData = [
-            //     'title' => ucfirst($typeName),
-            //     'body' => 'A new' . $typeName . ' has been scheduled. Please check the details.',
-            //   ];
 
-            //   $this->sendParticipantNoti($object, $users, $notificationData, $type);
-            // }
+              $staffIds = Staff::where('department_id', $dep)->pluck('id');
+              $users = Staff::whereIn('id', $staffIds)->get();
+
+              $notificationData = [
+                'title' => 'Department Update for Meeting',
+                'body' => 'A participant’s department has been updated for the meeting. Please check the details.',
+              ];
+              $this->sendParticipantNoti($meeting, $users, $notificationData, 'dep_type');
+            }
           }
           if (isset($data['meeting_type']) && $data['meeting_type'] === "role_type" && isset($data['role'])) {
 
