@@ -4,9 +4,6 @@
             <p class="text-lg font-semibold font-inter">
                 Create Meeting 
             </p>
-            <button class="px-4 py-2 bg-black text-white" @click="checkDeletedId">
-                filter missing number
-            </button>
         </div>
         
         <div class="grid !grid-cols-12 gap-x-4 mb-6 bg-white p-8 rounded-md">
@@ -399,6 +396,7 @@ export default {
             formData.append("chaired_by", this.selectedChairedBy.id);
             formData.append("description", this.description);
             formData.append("meeting_type", meetingType);
+            formData.append("previous_meeting_type", this.meetingDetail.meeting_type);
             if(this.meetingDetail.meeting_type != meetingType){
                 if(this.meetingDetail.meeting_type == 'dep_type'){
                     formData.append("deleted_department_ids", JSON.stringify(this.previous_dep_id));
@@ -437,10 +435,10 @@ export default {
                 });
             }
             
-            let url = `/api/meetingswwww/${this.meetingId}`;
+            let url = `/api/meetings/${this.meetingId}`;
             let response = await postApiData({url: url, form_data: formData, token: this.getToken()});
             if(response.success){
-                // window.location.replace("/meeting");
+                window.location.replace("/meeting");
             }
         },
 
