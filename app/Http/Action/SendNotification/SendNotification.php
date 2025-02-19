@@ -48,13 +48,19 @@ trait SendNotification
         $morphMapName = RelationMorphName($object);
         $user_ids = $users->pluck('id');
         // $tokens=$this->getTokensByStaff($user_ids);
-        $notification = Notification::create([
-            'title' => $data['title'],
-            'preview' => $data['body'],
-            'date_time' => now(),
-            'notificationable_id' => $object->id,
-            'notificationable_type' => $morphMapName,
-            'created_by' => UserData()->id,
+        $notification = Notification::firstOrCreate([
+            [
+                'notificationable_id' => $object->id,
+                'notificationable_type' => $morphMapName,
+            ],
+            [
+                'title' => $data['title'],
+                'preview' => $data['body'],
+                'date_time' => now(),
+
+                'created_by' => UserData()->id,
+            ]
+
         ]);
         foreach ($user_ids as $user_id) {
             $notification->notificationUsers()->create([
