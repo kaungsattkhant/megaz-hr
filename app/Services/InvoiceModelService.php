@@ -140,7 +140,7 @@ class InvoiceModelService
 
     }
 
-    public function storeInvoiceSession($invoiceId, $entityId, $sessionDuration, $sessionPerPrice,$isWaiter, $discountId)
+    public function storeInvoiceSession($invoiceId, $entityId, $sessionDuration,$freeDiscountSession, $sessionPerPrice,$isWaiter, $discountId)
     {
         // $startTime="22:10";
         // $endTime="00:10";
@@ -158,8 +158,10 @@ class InvoiceModelService
         $invoiceSession = InvoiceSession::create([
             'start_date_time' => $startDateTime,
             'end_date_time' => $endDateTime,
-            'total_session_duration' => $sessionDuration,
-            'total_session_price' => $sessionDuration * $sessionPerPrice,
+            'total_session_duration' => $sessionDuration-$freeDiscountSession,
+            'total_session_price' => ($sessionDuration-$freeDiscountSession) * $sessionPerPrice,
+            'discount_session' => $freeDiscountSession,
+            'discount_session_price' =>$freeDiscountSession* $sessionPerPrice,
             'session_unit_price' => $sessionPerPrice,
             'invoice_id' => $invoiceId,
             'entity_id' => $entityId,

@@ -14,6 +14,7 @@ class OrderItem extends Model
         'menu_id',
         'quantity',
         'original_price',
+        'sub_total_price',
         'discount_value',
         'price',
         'is_foc',

@@ -15,7 +15,7 @@ class InvoiceSession extends Model
         'total_session_duration',
         'total_session_price',
         'session_unit_price',
-        'session_unit_price',
+        'discount_session',
         'discount_session_price',
         'discount_id',
         'change_room_order',

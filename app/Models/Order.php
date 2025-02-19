@@ -12,6 +12,7 @@ class Order extends Model
     use HasFactory;
     protected $fillable =[
         'order_id','total_quantity','date','total', 'foc_total',
+        'order_sub_total',
         'total_discount_price',
         'invoice_id','is_complete'
     ];

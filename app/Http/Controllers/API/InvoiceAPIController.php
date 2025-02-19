@@ -19,6 +19,7 @@ use App\Events\RoomDoneNotificationRequest;
 use App\Http\Requests\Room\EntityValidationRequest;
 use App\Repositories\Order\OrderRepositoryInterface;
 use App\Http\Requests\Room\EntityEndValidationRequest;
+use App\Http\Requests\Room\EntityStartValidationRequest;
 use App\Http\Requests\RoomSession\EndRoomSessionRequest;
 use App\Repositories\Invoice\InvoiceRepositoryInterface;
 use App\Http\Requests\Room\EntityChangeValidationRequest;
@@ -35,7 +36,7 @@ class InvoiceAPIController extends Controller
         $this->orderRepo = $orderRepo;
     }
 
-    public function startEntity(EntityValidationRequest $request)
+    public function startEntity(EntityStartValidationRequest $request)
     {
         DB::beginTransaction();
         try {
