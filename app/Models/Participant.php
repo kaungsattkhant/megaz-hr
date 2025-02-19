@@ -17,7 +17,7 @@ class Participant extends Model
         'participantable_id',
         'participantable_type'
     ];
-
+    protected $hidden = ['created_at', 'updated_at'];
     public function participantable()
     {
         return $this->morphTo();
