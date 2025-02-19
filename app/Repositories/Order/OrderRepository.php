@@ -386,6 +386,9 @@ class OrderRepository implements OrderRepositoryInterface
         try {
             $orderItem = OrderItem::with('menu', 'order:id,order_id,invoice_id', 'order.invoice:id,entity_id', 'order.invoice', 'area', 'order.invoice.table')
                 ->find($id);
+            if($orderItem->status!='not yet'){
+                return ResponseMessage('Item already confirmed', 419);
+            }
             if (!$orderItem) {
                 ResponseMessage('Order Item not found', 404);
             }

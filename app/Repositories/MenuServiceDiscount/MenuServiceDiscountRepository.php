@@ -21,6 +21,7 @@ class MenuServiceDiscountRepository implements MenuServiceDiscountRepositoryInte
 
     public function createData(array $data)
     {
+        dd($data);
         DB::beginTransaction();
         try {
             $data['created_by'] = UserData()->id;

@@ -254,6 +254,10 @@ class InvoiceAPIController extends Controller
         DB::table('invoices')->truncate();
         DB::table('invoice_sessions')->truncate();
         DB::table('room_sessions')->truncate();
+        DB::table('invoice_services')->truncate();
+        DB::table('invoice_accessories')->truncate();
+        DB::table('orders')->truncate();
+        DB::table('order_items')->truncate();
         DB::statement('SET FOREIGN_KEY_CHECKS=1;');
         if ($entityId == 0) {
             Entity::orderBy('id', 'desc')

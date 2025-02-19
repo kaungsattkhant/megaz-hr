@@ -361,5 +361,7 @@ Route::view('/training/create', 'training.create')->name('training.create');
 Route::view('/training/{id}/edit', 'training.edit');
 Route::view('/org_news', 'org_news.index')->name('org_news');
 Route::view('/org_news/create', 'org_news.create')->name('org_news.create');
+Route::view('/org_news/{id}/edit', 'org_news.edit');
 Route::view('/warning', 'warning.index')->name('warning');
 Route::view('/warning/create', 'warning.create')->name('warning.create');
+Route::view('/warning/{id}/edit', 'warning.edit');

@@ -107,6 +107,17 @@
                                 </div>
                                 <div class="mb-4">
                                     <label for="" class="block text-sm text-black mb-3">
+                                        Discount Type
+                                    </label>
+                                    <div class="relative">
+                                        <select name="" id="" v-model="selectedDiscountType"
+                                            class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
+                                            <option v-for="discount in discountTypeList" :value="discount">{{ discount.name }} </option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="mb-4">
+                                    <label for="" class="block text-sm text-black mb-3">
                                         Type
                                     </label>
                                     <div class="relative">
@@ -1200,7 +1211,9 @@
                 // open_2's data
                 customerList:[],
                 packageList:[],
+                discountTypeList:[],
 
+                selectedDiscountType:null,
                 selectedCustomer:null,
                 invoice_date:null,
                 type:'session',
@@ -1387,6 +1400,8 @@
                 this.female = null;
                 this.male = null;
                 this.child = null;
+                this.selectedDiscountType = null;
+                this.getDiscountTypeList();
             },
 
             // step 2's methods
@@ -1394,6 +1409,12 @@
                 const response = await getApiData({ url: '/api/customers', token: this.getToken() });
                 if (response.data) {
                     this.customerList = response.data;
+                }
+            },
+            async getDiscountTypeList(id) {
+                const response = await getApiData({ url: '/api/pos/get_room_discount_list?room_id=' + this.selectedRoom.id, token: this.getToken() });
+                if (response.data) {
+                    this.discountTypeList = response.data;
                 }
             },
             async getPackageList(time) {
@@ -1504,6 +1525,7 @@
                 formData.append('entity_session_id', this.selectedTime.id);
                 formData.append('customer_id', this.selectedCustomer.id);
                 formData.append('start_time', this.invoice_date);
+                formData.append('room_discount_id', this.selectedDiscountType.id);
                 if (this.type == 'session') {
                     formData.append('session_duration', this.duration);
                 }

@@ -836,16 +836,20 @@
                     </li>
                     <li>
                         <a href="/training" class="flex items-center @yield('training') sidebar-gap-x">
-                            <!-- <i class="fal fa-braille pr-3"></i> -->
                             <img class="sidebar-img " src="{{ asset('img/icons8-dashboard-48.png') }}" alt="">
                             Training
                         </a>
                     </li>
                     <li>
                         <a href="/org_news" class="flex items-center @yield('org_news') sidebar-gap-x">
-                            <!-- <i class="fal fa-braille pr-3"></i> -->
                             <img class="sidebar-img " src="{{ asset('img/icons8-dashboard-48.png') }}" alt="">
                             OrgNews
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/warning" class="flex items-center @yield('warning') sidebar-gap-x">
+                            <img class="sidebar-img " src="{{ asset('img/icons8-dashboard-48.png') }}" alt="">
+                            Warning
                         </a>
                     </li>
                     
