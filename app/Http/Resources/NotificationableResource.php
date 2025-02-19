@@ -29,20 +29,20 @@ class NotificationableResource extends JsonResource
         ];
 
         if ($this->notification->notificationable_type === "meeting") {
-            $notificationable['meeting_type'] = $this->meeting_type ?? null;
+            $notificationable['type'] = $this->meeting_type ?? null;
             $notificationable['chaired_by_id'] = optional($this->chairedBy)->id;
-            $notificationable['chaired_by_name'] = optional($this->chairedBy)->name;
+            $notificationable['name'] = optional($this->chairedBy)->name;
         }
         if ($this->notification->notificationable_type === "training") {
-            $notificationable['training_type'] = $this->training_type ?? null;
+            $notificationable['type'] = $this->training_type ?? null;
             $notificationable['trained_by_id'] = optional($this->trainedBy)->id;
-            $notificationable['trained_by_name'] = optional($this->trainedBy)->name;
+            $notificationable['name'] = optional($this->trainedBy)->name;
         }
         if ($this->notification->notificationable_type === "warning") {
-            $notificationable['warning_type'] = $this->warning_type ?? null;
+            $notificationable['type'] = $this->warning_type ?? null;
         }
         if ($this->notification->notificationable_type === "orgNew") {
-            $notificationable['org_news_type'] = $this->org_news_type ?? null;
+            $notificationable['type'] = $this->org_news_type ?? null;
         }
         return $notificationable;
     }
