@@ -180,7 +180,10 @@
                     rows="6"></textarea>
             </div>
         </div>
-        <div>
+        <div class="flex gap-x-4">
+            <a href="/training" class="cancel-btn focus:shadow-none focus:outline-none ">
+                Cancel
+            </a>
             <button class="add-btn" @click="createBtnClicked">
                 Create Training
             </button>
