@@ -20,6 +20,7 @@ class Notification extends Model
         'created_by',
         'date_time'
     ];
+    protected $hidden = ['created_at', 'updated_at'];
     public function notificationable()
     {
         return $this->morphTo();

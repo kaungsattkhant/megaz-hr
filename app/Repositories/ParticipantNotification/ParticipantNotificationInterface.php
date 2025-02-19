@@ -11,7 +11,7 @@ interface ParticipantNotificationInterface
   public function getMeetings();
   public function showMeeting($meetingId);
   public function storeMeetings($data);
-  public function updateMeeting($meetingId);
+  public function updateMeeting($meetingId, $request);
   public function deleteMeeting($meetingId);
 
   public function getTrainings();

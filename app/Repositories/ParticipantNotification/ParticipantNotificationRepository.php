@@ -94,28 +94,156 @@ class ParticipantNotificationRepository implements ParticipantNotificationInterf
     return ResponseData($meeting, 200, true, 'Meeting details retrieved successfully.');
   }
 
-  public function updateMeeting($meetingId)
+  public function updateMeeting($meetingId, $request)
   {
     DB::beginTransaction();
 
     try {
-
+      $users = collect();
+      $data = Request::all();
+      $meeting_type = $data['meeting_type'];
+      $previous_meeting_type = $data['previous_meeting_type'];
       $meeting = Meeting::find($meetingId);
+
+      if (isset($data['previous_meeting_type'])) {
+      }
       if (!$meeting) {
         return ResponseData(null, 404, false, 'Meeting not found.');
       }
-
-      $data = Request::all();
       $data['created_by'] = UserData()->id;
       $meeting->update($data);
-      $meeting->participants()->where('participantable_type', 'meeting')->where('participantable_id', $meeting->id)->delete();
-      $existingNotification =  $meeting->notification()->where('notificationable_id', $meeting->id)
-        ->where('notificationable_type',  'meeting')
-        ->first();
-      $existingNotification->notificationUsers()->delete();
-      $existingNotification->delete();
-      if (isset($data['meeting_type'])) {
-        $this->addParticipantsAndSendNotification($meeting, $data, $data['meeting_type']);
+
+      if (isset($data['previous_meeting_type'])) {
+        if ($previous_meeting_type === $meeting_type) { //for checking the same dep_type update or not 
+
+          if (isset($data['meeting_type']) && $data['meeting_type'] === "dep_type" && isset($data['department'])) {
+
+            if (isset($data['deleted_department_ids'])) {
+              $depIds = json_decode($data['deleted_department_ids'], true);
+              foreach ($depIds as $deleted_department_id) {
+                $staffIds = Staff::where('department_id', $deleted_department_id)
+                  ->pluck('id');
+                $meeting->participants()->where('participantable_type', 'meeting')
+                  ->where('participantable_id', $meeting->id)
+                  ->where('department_id', $deleted_department_id)->delete();
+
+
+                NotificationUser::whereHas('notification', function ($query) use ($meeting) {
+                  $query->where('notificationable_type', 'meeting')
+                    ->where('notificationable_id', $meeting->id);
+                })
+                  ->whereIn('staff_id', $staffIds)
+                  ->delete();
+              }
+            }
+            foreach ($data['department'] as $dep) {
+              $participantData = [
+                'participantable_id' =>   $meeting->id,
+                'participantable_type' => 'meeting',
+                'department_id' => $dep
+              ];
+              Participant::updateOrCreate(
+                ['participantable_id' => $meeting->id, 'participantable_type' => 'meeting', 'department_id' => $dep],
+                $participantData
+              );
+
+              $staffIds = Staff::where('department_id', $dep)->pluck('id');
+              $users = Staff::whereIn('id', $staffIds)->get();
+
+              $notificationData = [
+                'title' => 'Department Update for Meeting',
+                'body' => 'A participant’s department has been updated for the meeting. Please check the details.',
+              ];
+              $this->sendParticipantNoti($meeting, $users, $notificationData, 'dep_type');
+            }
+          }
+          if (isset($data['meeting_type']) && $data['meeting_type'] === "role_type" && isset($data['role'])) {
+
+            if (isset($data['deleted_role_ids'])) {
+              $delRoleIds = json_decode($data['deleted_role_ids'], true);
+              foreach ($delRoleIds as $deleted_role_id) {
+                $staffIds = Staff::whereHas('roles', function ($query) use ($deleted_role_id) {
+                  $query->where('roles.id', $deleted_role_id);
+                })->pluck('id');
+                $meeting->participants()->where('participantable_type', 'meeting')->where('participantable_id', $meeting->id)->where('role_id', $deleted_role_id)->delete();
+
+                NotificationUser::whereHas('notification', function ($query) use ($meeting) {
+                  $query->where('notificationable_type', 'meeting')
+                    ->where('notificationable_id', $meeting->id);
+                })
+                  ->whereIn('staff_id', $staffIds)
+                  ->delete();
+              }
+            }
+            foreach ($data['role'] as $role) {
+              $participantData = [
+                'participantable_id' =>   $meeting->id,
+                'participantable_type' => 'meeting',
+                'role_id' => $role
+              ];
+              Participant::updateOrCreate(
+                ['participantable_id' => $meeting->id, 'participantable_type' => 'meeting', 'role_id' => $role],
+                $participantData
+              );
+
+              $roleStaff = Staff::whereHas('roles', function ($query) use ($role) {
+                $query->where('id', $role);
+              })->get();
+              $users = $users->merge($roleStaff);
+
+              $notificationData = [
+                'title' => 'Role Update for Meeting',
+                'body' => 'A participant’s role has been updated for the meeting. Please check the details.',
+              ];
+              $this->sendParticipantNoti($meeting, $users, $notificationData, 'role_type');
+            }
+          }
+          if (isset($data['meeting_type']) && $data['meeting_type'] === "staff_type" && isset($data['staff'])) {
+
+            if (isset($data['deleted_staff_ids'])) {
+              $delStaffIds = json_decode($data['deleted_staff_ids'], true);
+              foreach ($delStaffIds as $deleted_staff_id) {
+                $staffIds = Staff::whereHas('id', $deleted_staff_id)->pluck('id');
+                $meeting->participants()->where('participantable_type', 'meeting')->where('participantable_id', $meeting->id)->where('staff_id', $deleted_staff_id)->delete();
+
+                NotificationUser::whereHas('notification', function ($query) use ($meeting) {
+                  $query->where('notificationable_type', 'meeting')
+                    ->where('notificationable_id', $meeting->id);
+                })
+                  ->whereIn('staff_id', $staffIds)
+                  ->delete();
+              }
+            }
+            foreach ($data['staff'] as $staff) {
+              $participantData = [
+                'participantable_id' =>   $meeting->id,
+                'participantable_type' => 'meeting',
+                'staff_id' => $staff
+              ];
+              Participant::updateOrCreate(
+                ['participantable_id' => $meeting->id, 'participantable_type' => 'meeting', 'staff_id' => $staff],
+                $participantData
+              );
+              $staffMember = Staff::find($staff);
+              if ($staffMember) {
+                $users->push($staffMember);
+              }
+
+              $notificationData = [
+                'title' => 'Staff Update for Meeting',
+                'body' => 'A participant’s department has been updated for the meeting. Please check the details.',
+              ];
+              $this->sendParticipantNoti($meeting, $users, $notificationData, 'staff_type');
+            }
+          }
+        } else {
+
+          $meeting->participants()->where('participantable_type', 'meeting')->where('participantable_id', $meeting->id)->delete();
+          $meeting->notification()->delete();
+          if (isset($data['meeting_type'])) {
+            $this->addParticipantsAndSendNotification($meeting, $data, $data['meeting_type']);
+          }
+        }
       }
       DB::commit();
       return ResponseData($meeting, 200, true, 'Meeting updated successfully.');
@@ -590,7 +718,7 @@ class ParticipantNotificationRepository implements ParticipantNotificationInterf
     if ($users->isNotEmpty()) {
       $notificationData = [
         'title' => ucfirst($typeName),
-        'body' => 'A new' . $typeName . ' has been scheduled. Please check the details.',
+        'body' => 'A new ' . $typeName . ' has been scheduled. Please check the details.',
       ];
 
       $this->sendParticipantNoti($object, $users, $notificationData, $type);
@@ -609,26 +737,31 @@ class ParticipantNotificationRepository implements ParticipantNotificationInterf
     $notifications = NotificationUser::with([
       'notification.notificationable',
       'notification.notificationable.participants',
-      'notification.notificationable.participants.department',
-      'notification.notificationable.participants.role',
-      'notification.notificationable.participants.staff',
+      'notification.notificationable.participants.department.roles',
+      'notification.notificationable.participants.role.department',
+      'notification.notificationable.participants.staff.department',
+      'notification.notificationable.participants.staff.roles',
     ])
       ->join('notifications', 'notification_users.notification_id', '=', 'notifications.id')
       ->where('notification_users.staff_id', '=', $staffId)
       ->when($type, function ($query) use ($type) {
-
-        if (in_array($type, ['meeting', 'training', 'warning', 'orgNew'])) {
-          return $query->where('notifications.notificationable_type', $type);
-        }
+        return $query->whereIn('notifications.notificationable_type', ['meeting', 'training', 'warning', 'orgNew'])
+          ->where('notifications.notificationable_type', $type);
+      }, function ($query) {
+        return $query->whereIn('notifications.notificationable_type', ['meeting', 'training', 'warning', 'orgNew']);
       })->orderBy('notifications.created_at', 'desc')
       ->get();
     foreach ($notifications as $notification) {
-      if ($notification->notification->notificationable_type == 'meeting') {
-        $notification->notification->notificationable->load('chairedBy');
-      }
-
-      if ($notification->notification->notificationable_type == 'training') {
-        $notification->notification->notificationable->load('trainedBy');
+      $notificationable = $notification->notification->notificationable;
+      if ($notificationable) {
+        switch ($notification->notification->notificationable_type) {
+          case 'meeting':
+            $notificationable->load('chairedBy');
+            break;
+          case 'training':
+            $notificationable->load('trainedBy');
+            break;
+        }
       }
     }
     return ResponseData(NotificationUserResource::collection($notifications), 200, true, "Notifications retrieved successfully.");
