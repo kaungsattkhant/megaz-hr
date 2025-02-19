@@ -176,7 +176,7 @@
                         <label for="" class="label-form mb-3">
                             Type
                         </label>
-                        <input type="text" placeholder="Session" v-model="newType" class="input-ui">
+                        <input type="text" placeholder="Type" v-model="newType" class="input-ui">
                     </div>
                 </div>
                 <div class="flex justify-end gap-x-4 px-6 mb-6 pt-4">
