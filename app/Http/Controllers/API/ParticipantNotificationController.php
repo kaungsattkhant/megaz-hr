@@ -39,9 +39,9 @@ class ParticipantNotificationController extends Controller
     }
 
 
-    public function updateMeeting($meetingId)
+    public function updateMeeting($meetingId, Request $request)
     {
-        $data = $this->ParticipantNotificationRepository->updateMeeting($meetingId);
+        $data = $this->ParticipantNotificationRepository->updateMeeting($meetingId, $request);
         ResponseData($data);
     }
 
