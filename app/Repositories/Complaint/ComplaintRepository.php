@@ -77,8 +77,6 @@ class ComplaintRepository implements ComplaintRepositoryInterface
                             'staff_id' => $responsible,
                             'complaint_id' => $complaint->id
                         ]);
-
-
                         $msg = 'You are responsible. Please Check';
                         broadcast(new ComplaintNotificationRequest($complaint, $msg, $responsible));
                     }
