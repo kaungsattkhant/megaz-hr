@@ -146,14 +146,14 @@ class ParticipantNotificationRepository implements ParticipantNotificationInterf
                 $participantData
               );
             }
-            if ($users->isNotEmpty()) {
-              $notificationData = [
-                'title' => ucfirst($typeName),
-                'body' => 'A new' . $typeName . ' has been scheduled. Please check the details.',
-              ];
+            // if ($users->isNotEmpty()) {
+            //   $notificationData = [
+            //     'title' => ucfirst($typeName),
+            //     'body' => 'A new' . $typeName . ' has been scheduled. Please check the details.',
+            //   ];
 
-              $this->sendParticipantNoti($object, $users, $notificationData, $type);
-            }
+            //   $this->sendParticipantNoti($object, $users, $notificationData, $type);
+            // }
           }
           if (isset($data['meeting_type']) && $data['meeting_type'] === "role_type" && isset($data['role'])) {
 
