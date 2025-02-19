@@ -181,5 +181,47 @@ class OrderService
         $data['orderItems'] = $orderItemsArray;
         return $data;
     }
+
+    public function updateOrderItemAmountToOrder($action,$orderModel,$originalPrice,$quantity,$discountAmount){
+        if($action=='add'){
+            $orderModel->total_quantity += $quantity;
+            $orderModel->total_discount_price += $discountAmount;
+            $orderModel->total += $originalPrice * $quantity;
+            $orderModel->order_sub_total +=($originalPrice * $quantity)-$discountAmount;
+        }
+        else if($action=='subtract'){
+            $orderModel->total_quantity -= $quantity;
+            $orderModel->total_discount_price -= $discountAmount;
+            $orderModel->total -= $originalPrice * $quantity;
+            $orderModel->order_sub_total -=($originalPrice * $quantity)-$discountAmount;
+        }else{
+            ResponseMessage('Action is invalid',419);
+        }
+       
+        $orderModel->save();
+        return $orderModel;
+    }
+
+    public function updateOrderItemAmountToInvoice($action,$invoiceModel,$originalPrice,$quantity,$discountAmount){
+  
+
+        if($action=='add'){
+            $invoiceModel->total +=$originalPrice* $quantity;
+            $invoiceModel->sub_total += ($originalPrice * $quantity)-$discountAmount;
+            $invoiceModel->order_discount_value += $discountAmount;
+            $invoiceModel->total_discount+=$discountAmount;
+        }
+        else if($action=='subtract'){
+            $invoiceModel->total -=$originalPrice* $quantity;
+            $invoiceModel->sub_total -= ($originalPrice * $quantity)-$discountAmount;
+            $invoiceModel->order_discount_value -= $discountAmount;
+            $invoiceModel->total_discount-=$discountAmount;
+        }else{
+            ResponseMessage('Action is invalid',419);
+        }
+        $invoiceModel->save();
+        return $invoiceModel;
+       
+    }
     
 }
