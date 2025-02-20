@@ -347,6 +347,7 @@ class ParticipantNotificationRepository implements ParticipantNotificationInterf
     DB::beginTransaction();
 
     try {
+      $users = collect();
 
       $training = Training::find($trainingId);
       if (!$training) {
@@ -354,6 +355,7 @@ class ParticipantNotificationRepository implements ParticipantNotificationInterf
       }
 
       $data = $request->all();
+
       $data['created_by'] = UserData()->id;
       $training->update($data);
       if (isset($data['previous_training_type']) && isset($data['training_type'])) {
@@ -867,6 +869,7 @@ class ParticipantNotificationRepository implements ParticipantNotificationInterf
       }
       $data['created_by'] = UserData()->id;
       $warning->update($data);
+
       if (isset($data['previous_warning_type']) && isset($data['warning_type'])) {
         if ($data['previous_warning_type'] ===  $data['warning_type']) {
 
@@ -895,7 +898,7 @@ class ParticipantNotificationRepository implements ParticipantNotificationInterf
                 'participantable_type' => 'warning',
                 'department_id' => $dep
               ];
-              Participant::updateOrCreate(
+              $updatedata = Participant::updateOrCreate(
                 ['participantable_id' => $warning->id, 'participantable_type' => 'warning', 'department_id' => $dep],
                 $participantData
               );
@@ -1108,7 +1111,7 @@ class ParticipantNotificationRepository implements ParticipantNotificationInterf
     }
     if ($users->isNotEmpty()) {
       $notificationData = [
-        'title' => ucfirst($typeName),
+        'title' => $typeName,
         'body' => 'A new ' . $typeName . ' has been scheduled. Please check the details.',
       ];
 
