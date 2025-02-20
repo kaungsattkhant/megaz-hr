@@ -460,7 +460,7 @@ export default {
                 });
             }
             
-            let url = `/api/warnings`;
+            let url = `/api/warnings/${this.warningId}`;
             let response = await postApiData({url: url, form_data: formData, token: this.getToken()});
             if(response.success){
                 window.location.replace("/warning");
