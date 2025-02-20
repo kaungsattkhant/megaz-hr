@@ -17,11 +17,11 @@ interface ParticipantNotificationInterface
   public function getTrainings();
   public function getTrainingById($trainingId);
   public function storeTraining($data);
-  public function updateTraining($trainingId);
+  public function updateTraining($trainingId, $request);
   public function deleteTraining($trainingId);
 
   public function storeOrgNews($data);
-  public function updateOrgNews($orgNewsId);
+  public function updateOrgNews($orgNewsId, $data);
   public function getOrgNews();
   public function getOrgNewsById($orgNewsId);
   public function deleteOrgNews($orgNewsId);
@@ -29,7 +29,7 @@ interface ParticipantNotificationInterface
   public function getWarnings($request);
   public function getWarningById($warningId);
   public function storeWarning($data);
-  public function updateWarning($warningId);
+  public function updateWarning($warningId, $data);
   public function deleteWarning($warningId);
 
   public function storeTypes($data);
