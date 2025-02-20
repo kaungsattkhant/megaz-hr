@@ -355,7 +355,7 @@ export default {
             let url = `/api/org_news`;
             let response = await postApiData({url: url, form_data: formData, token: this.getToken()});
             if(response.success){
-                // window.location.replace("/org_news");
+                window.location.replace("/org_news");
             }
         },
 

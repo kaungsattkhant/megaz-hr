@@ -53,7 +53,7 @@
                                     Type
                                 </th>
                                 <th scope="col" class=" ">
-                                    Chaired By
+                                    Trained By
                                 </th>
                                 <th scope="col" class="">
 
