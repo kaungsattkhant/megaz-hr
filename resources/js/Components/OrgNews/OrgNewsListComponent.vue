@@ -35,6 +35,9 @@
                                     Date
                                 </th>
                                 <th scope="col" class=" ">
+                                    Title
+                                </th>
+                                <th scope="col" class=" ">
                                     Type
                                 </th>
                                 <th scope="col" class=" ">
@@ -58,6 +61,9 @@
                                     </td>
                                     <td class="whitespace-nowrap  ">
                                         {{ news.date_time }}
+                                    </td>
+                                    <td class="whitespace-nowrap  ">
+                                        {{ news.title }}
                                     </td>
                                     <td class="whitespace-nowrap  ">
                                         {{ news.type ? news.type.name : '' }}

@@ -47,8 +47,7 @@ trait SendNotification
     {
         $morphMapName = RelationMorphName($object);
         $user_ids = $users->pluck('id');
-        // $tokens=$this->getTokensByStaff($user_ids);
-        $notification = Notification::firstOrCreate(
+        $notification = Notification::updateOrCreate(
             [
                 'notificationable_id' => $object->id,
                 'notificationable_type' => $morphMapName,
@@ -57,13 +56,12 @@ trait SendNotification
                 'title' => $data['title'],
                 'preview' => $data['body'],
                 'date_time' => now(),
-
                 'created_by' => UserData()->id,
             ]
         );
 
         foreach ($user_ids as $user_id) {
-            $notification->notificationUsers()->firstOrCreate([
+            $notification->notificationUsers()->updateOrCreate([
                 'staff_id' => $user_id,
             ]);
         }
@@ -83,8 +81,6 @@ trait SendNotification
             }
         }
     }
-
-
     public function getTokensByStaff($user_ids)
     {
         return StaffFcmToken::whereIn('id', $user_ids)->pluck('fcm_token')->toArray();

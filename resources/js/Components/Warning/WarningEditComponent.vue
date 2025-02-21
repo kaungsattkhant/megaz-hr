@@ -141,9 +141,12 @@
                     rows="6"></textarea>
             </div>
         </div>
-        <div>
+        <div class="flex gap-x-4">
+            <a href="/warning" class="cancel-btn focus:shadow-none focus:outline-none ">
+                Cancel
+            </a>
             <button class="add-btn" @click="createBtnClicked">
-                Create Warning
+                Update Warning
             </button>
         </div>
     </div>
@@ -226,6 +229,16 @@ export default {
             newType:null,
 
             warningDetail:null,
+
+            previous_dep_id:[],
+            previous_role_id:[],
+            previous_staff_id:[],
+            new_dep_id:[],
+            new_role_id:[],
+            new_staff_id:[],
+            deleted_dep_id:[],
+            deleted_role_id:[],
+            deleted_staff_id:[],
         };
     },
 
@@ -251,21 +264,24 @@ export default {
             if(data.warning_type === 'dep_type'){
                 let departments = []
                 data.participants.forEach(participant => {
-                    departments.push(this.allDepartmentList.find(department => department.id == participant.department_id))
+                    departments.push(this.allDepartmentList.find(department => department.id == participant.department_id));
+                    this.previous_dep_id.push(participant.department_id);
                 });
                 this.selectedDepartment = departments
             }
             if(data.warning_type === 'role_type'){
                 let roles = []
                 data.participants.forEach(participant => {
-                    roles.push(this.allRoleList.find(role => role.id == participant.role_id))
+                    roles.push(this.allRoleList.find(role => role.id == participant.role_id));
+                    this.previous_role_id.push(participant.role_id);
                 });
                 this.selectedRole = roles
             }
             if(data.warning_type === 'staff_type'){
                 let staff = []
                 data.participants.forEach(participant => {
-                    staff.push(this.staffList.find(staff => staff.id == participant.staff_id))
+                    staff.push(this.staffList.find(staff => staff.id == participant.staff_id));
+                    this.previous_staff_id.push(participant.staff_id)
                 });
                 this.selectedStaff = staff
             }
@@ -344,8 +360,30 @@ export default {
                 this.newType = null;
             }
         },
+
+        checkDeletedId(){
+            if(this.warningDetail.warning_type == 'dep_type'){
+                this.selectedDepartment.forEach((item)=>{
+                    this.new_dep_id.push(item.id);
+                });
+                this.deleted_dep_id = this.previous_dep_id.filter(id => !this.new_dep_id.includes(id))
+            }
+            if(this.warningDetail.warning_type == 'role_type'){
+                this.selectedRole.forEach((item)=>{
+                    this.new_role_id.push(item.id);
+                });
+                this.deleted_role_id = this.previous_role_id.filter(id => !this.new_role_id.includes(id))
+            }
+            if(this.warningDetail.warning_type == 'staff_type'){
+                this.selectedStaff.forEach((item)=>{
+                    this.new_staff_id.push(item.id);
+                });
+                this.deleted_staff_id = this.previous_staff_id.filter(id => !this.new_staff_id.includes(id))
+            }
+        },
         
         async createBtnClicked(){
+            this.checkDeletedId();
             if(!this.selectedDate){
                 this.alertValidationMessage(`Date`);
                 return 1;
@@ -383,6 +421,29 @@ export default {
             formData.append("description", this.description);
             formData.append("warning_type", warningType);
             formData.append("type_id", this.selectedType.id);
+            formData.append("previous_warning_type", this.warningDetail.warning_type);
+            if(this.warningDetail.warning_type != warningType){
+                if(this.warningDetail.warning_type == 'dep_type'){
+                    formData.append("deleted_department_ids", JSON.stringify(this.previous_dep_id));
+                }
+                if(this.warningDetail.warning_type == 'role_type'){
+                    formData.append("deleted_role_ids", JSON.stringify(this.previous_role_id));
+                }
+                if(this.warningDetail.warning_type == 'staff_type'){
+                    formData.append("deleted_staff_ids", JSON.stringify(this.previous_staff_id));
+                }
+            }
+            else{
+                if(warningType == 'dep_type'){
+                    formData.append("deleted_department_ids", JSON.stringify(this.deleted_dep_id));
+                }
+                if(warningType == 'role_type'){
+                    formData.append("deleted_role_ids", JSON.stringify(this.deleted_role_id));
+                }
+                if(warningType == 'staff_type'){
+                    formData.append("deleted_staff_ids", JSON.stringify(this.deleted_staff_id));
+                }
+            }
             if(this.selectedDepartment.length > 0){
                 this.selectedDepartment.forEach((item)=>{
                     formData.append('department[]', item.id);
