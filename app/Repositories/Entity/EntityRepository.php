@@ -2,18 +2,20 @@
 
 namespace App\Repositories\Entity;
 
-use App\Traits\CustomerTrait;
 use Carbon\Carbon;
 use App\Models\Area;
 use App\Models\Entity;
 use App\Models\Invoice;
+use App\Models\Customer;
 use App\Models\OrderItem;
 use App\Models\RoomSession;
 use Illuminate\Http\Request;
 use App\Models\EntitySession;
+use App\Traits\CustomerTrait;
 use App\Models\InvoiceService;
 use App\Models\InvoiceSession;
 use Illuminate\Support\Facades\DB;
+use App\Models\CustomerLevelDiscount;
 use App\Services\InvoiceModelService;
 
 class EntityRepository implements EntityRepositoryInterface
@@ -150,191 +152,220 @@ class EntityRepository implements EntityRepositoryInterface
                 'entity'
             ])
             ->find($entitySessionId);
-        $invoiceServiceCollection = collect();
-        $invoiceAccessoryCollection = collect();
-        $total_service_value = $total_accessory_value = 0;
+        if (!$entitySession) {
+            ResponseMessage('Entity Session not found', 419);
+        }
         $roomSession = RoomSession::whereHas('invoiceSession', function ($q) {
             $q->where('is_active', 1);
         })
             ->where('entity_session_id', $entitySessionId)
             ->first();
-        if ($roomSession)
-            //deposit customer 
-            // $firstRoomSession = $entitySession->roomSessions->first();
-            if (!$roomSession) {
-                ResponseMessage('Invoice Room Session is invalid', 419);
-            }
-        $customer = $roomSession->invoiceSession->invoice->customer;
-        $customerDepositBalance = $this->getCustomerDepositBalance($customer->id);
-        //end deposit
+        //deposit customer 
+        // $firstRoomSession = $entitySession->roomSessions->first();
+        if (!$roomSession) {
+            ResponseMessage('Invoice Room Session is invalid', 419);
+        }
+        if (!$roomSession->invoiceSession) {
+            ResponseMessage('Invoice Session is invalid', 419);
+        }
         $invoice = $roomSession->invoiceSession->invoice;
-        $invoice->package;
-        if ($invoice) {
-            //service
-            $invoiceServices = $invoice->invoiceService;
-            foreach ($invoiceServices as $invoiceService) {
-                $time = $invoiceService->end_date != null ? $invoiceService->end_date : now();
-                $this->invoiceModelService->calculateInvoiceService($invoiceService, $time);
-                $total_service_value += $invoiceService->service_value;
-            }
-            // $invoiceServiceCollection = $invoiceServiceCollection->merge($invoice->invoiceService);
-            //serice
+        $entityDetail = $this->entityDetailByEntityId($invoice, $entitySession->entity_id, $roomSession->invoiceSession->start_date_time, $roomSession->invoiceSession->end_date_time);
+        return $entityDetail;
 
-            //accesory
-            $invoiceAccessories = $invoice->accessories;
-            foreach ($invoiceAccessories as $invoiceAccessorie) {
-                $total_accessory_value += $invoiceAccessorie->accessory->accessory_price->price * $invoiceAccessorie->quantity;
-            }
-            // $invoiceAccessoryCollection = $invoiceAccessoryCollection->merge($invoice->invoiceAccessories);
-            //end_accessoryI
-            $consolidatedOrderItems = [];
-            foreach ($invoice->orders as $order) {
-                $orderItems = OrderItem::where('order_id', $order->id)->get();
-
-                foreach ($orderItems as $orderItem) {
-                    $menuId = $orderItem->menu_id;
-                    $status = $orderItem->status;
-
-                    if (isset($consolidatedOrderItems[$menuId][$status])) {
-                        $consolidatedOrderItems[$menuId][$status]->quantity += $orderItem->quantity;
-                        $consolidatedOrderItems[$menuId][$status]->price += $orderItem->price;
-                        $consolidatedOrderItems[$menuId][$status]->discount_price += $orderItem->discount_price;
-                    } else {
-                        $consolidatedOrderItems[$menuId][$status] = $orderItem;
-                    }
-                }
-            }
-            foreach ($invoice->orders as $order) {
-                $order->order_items = collect();
-
-                foreach ($consolidatedOrderItems as $menuId => $itemsByStatus) {
-                    foreach ($itemsByStatus as $status => $order_items) {
-                        $order_items->menu;
-                        $order->order_items->push($order_items);
-                    }
-                }
-            }
-            unset($invoice['accessories']);
-            unset($invoice['invoice_service']);
-            unset($invoice['total_accessory_value']);
-            unset($invoice['total_service_value']);
-            // unset($invoice,'invoice.accessories');
-            //service list
-        }
-        $order = $invoice->order;
-        $total_order_discount_price = 0;
-        if ($order) {
-            $total_order_discount_price = $order->total_discount_price;
-        }
+        // $invoiceServiceCollection = collect();
+        // $invoiceAccessoryCollection = collect();
+        // $total_service_value = $total_accessory_value = 0;
+        // $roomSession = RoomSession::whereHas('invoiceSession', function ($q) {
+        //     $q->where('is_active', 1);
+        // })
+        //     ->where('entity_session_id', $entitySessionId)
+        //     ->first();
+        // //deposit customer 
+        // // $firstRoomSession = $entitySession->roomSessions->first();
+        // if (!$roomSession) {
+        //     ResponseMessage('Invoice Room Session is invalid', 419);
         // }
-        $entitySession->start_date_time = $roomSession->invoiceSession->start_date_time;
-        $entitySession->end_date_time = $roomSession->invoiceSession->end_date_time;
-        $entitySession->services = $invoiceServices;
-        // $entitySession->total_order_discount_value = $invoice->order->total_discount_price;
-        $entitySession->invoice_accessories = $invoiceAccessories;
-        $entitySession->total_service_value = $total_service_value;
-        $entitySession->total_accessory_value = $total_accessory_value;
-        $entitySession->total_order_discount_price = $total_order_discount_price;
-        $entitySession->deposit_balance = $customerDepositBalance;
-        $entitySession->customer_id = $customer->id;
-        $entitySession->account_id = $customer->account_id;
-        $entitySession->total_session_price = $invoice->total_session_price;
-        $entitySession->invoice = $invoice;
-        return $entitySession;
-    }
+        // $customer = $roomSession->invoiceSession->invoice->customer;
+        // $customerDepositBalance = $this->getCustomerDepositBalance($customer->id);
+        // //end deposit
+        // $invoice = $roomSession->invoiceSession->invoice;
+        // $invoice->package;
+        // if ($invoice) {
+        //     //service
+        //     $invoiceServices = $invoice->invoiceService;
+        //     foreach ($invoiceServices as $invoiceService) {
+        //         $time = $invoiceService->end_date != null ? $invoiceService->end_date : now();
+        //         $this->invoiceModelService->calculateInvoiceService($invoiceService, $time);
+        //         $total_service_value += $invoiceService->service_value;
+        //     }
+        //     // $invoiceServiceCollection = $invoiceServiceCollection->merge($invoice->invoiceService);
+        //     //serice
 
+        //     //accesory
+        //     $invoiceAccessories = $invoice->accessories;
+        //     foreach ($invoiceAccessories as $invoiceAccessorie) {
+        //         $total_accessory_value += $invoiceAccessorie->accessory->accessory_price->price * $invoiceAccessorie->quantity;
+        //     }
+        //     // $invoiceAccessoryCollection = $invoiceAccessoryCollection->merge($invoice->invoiceAccessories);
+        //     //end_accessoryI
+        //     $consolidatedOrderItems = [];
+        //     foreach ($invoice->orders as $order) {
+        //         $orderItems = OrderItem::where('order_id', $order->id)->get();
+
+        //         foreach ($orderItems as $orderItem) {
+        //             $menuId = $orderItem->menu_id;
+        //             $status = $orderItem->status;
+
+        //             if (isset($consolidatedOrderItems[$menuId][$status])) {
+        //                 $consolidatedOrderItems[$menuId][$status]->quantity += $orderItem->quantity;
+        //                 $consolidatedOrderItems[$menuId][$status]->price += $orderItem->price;
+        //                 $consolidatedOrderItems[$menuId][$status]->discount_price += $orderItem->discount_price;
+        //             } else {
+        //                 $consolidatedOrderItems[$menuId][$status] = $orderItem;
+        //             }
+        //         }
+        //     }
+        //     foreach ($invoice->orders as $order) {
+        //         $order->order_items = collect();
+
+        //         foreach ($consolidatedOrderItems as $menuId => $itemsByStatus) {
+        //             foreach ($itemsByStatus as $status => $order_items) {
+        //                 $order_items->menu;
+        //                 $order->order_items->push($order_items);
+        //             }
+        //         }
+        //     }
+        //     unset($invoice['accessories']);
+        //     unset($invoice['invoice_service']);
+        //     unset($invoice['total_accessory_value']);
+        //     unset($invoice['total_service_value']);
+        //     // unset($invoice,'invoice.accessories');
+        //     //service list
+        // }
+        // $order = $invoice->order;
+        // $total_order_discount_price = 0;
+        // if ($order) {
+        //     $total_order_discount_price = $order->total_discount_price;
+        // }
+        // // }
+        // $entitySession->start_date_time = $roomSession->invoiceSession->start_date_time;
+        // $entitySession->end_date_time = $roomSession->invoiceSession->end_date_time;
+        // $entitySession->services = $invoiceServices;
+        // // $entitySession->total_order_discount_value = $invoice->order->total_discount_price;
+        // $entitySession->invoice_accessories = $invoiceAccessories;
+        // $entitySession->total_service_value = $total_service_value;
+        // $entitySession->total_accessory_value = $total_accessory_value;
+        // $entitySession->total_order_discount_price = $total_order_discount_price;
+        // $entitySession->deposit_balance = $customerDepositBalance;
+        // $entitySession->customer_id = $customer->id;
+        // $entitySession->account_id = $customer->account_id;
+        // $entitySession->total_session_price = $invoice->total_session_price;
+        // $entitySession->invoice = $invoice;
+        // return $entitySession;
+    }
 
     public function entitySessionWithInvoice(array $data, int $entityId)
     {
         $entity = Entity::find($entityId);
         if ($entity->entity_type == 'room') {
+
             $activeInvoiceSession = InvoiceSession::where('is_active', 1)->where('entity_id', $entityId)->first();
+            if (!$activeInvoiceSession) {
+                ResponseMessage('Active Invoice Not Found', 419);
+            }
             $invoice = $activeInvoiceSession->invoice;
             if (!$invoice) {
                 ResponseMessage('Active Invoice Not Found', 419);
             }
+            $entityDetail = $this->entityDetailByEntityId($invoice, $entityId, $activeInvoiceSession->start_date_time, $activeInvoiceSession->end_date_time);
+            return $entityDetail;
 
+            // $invoiceServiceCollection = collect();
+            // $total_service_value = 0;
+            // $total_accessory_value = 0;
 
-            $invoiceServiceCollection = collect();
-            $total_service_value = 0;
-            $total_accessory_value = 0;
-
-            // foreach ($roomSessions as $roomSession) {don't need
-            // $invoice = $roomSession->invoice; // 'don't need'
-            $invoice->package;
-            // if ($invoice) {
-            //service
-            // $entitySession['invoice']=$invoice;
-            $invoiceServices = $invoice->invoiceService;
-            foreach ($invoiceServices as $invoiceService) {
-                $time = $invoiceService->end_date != null ? $invoiceService->end_date : now();
-                $this->invoiceModelService->calculateInvoiceService($invoiceService, $time);
-                $total_service_value += $invoiceService->service_value;
-            }
-            $invoiceServiceCollection = $invoiceServiceCollection->merge($invoice->invoiceService);
-            // end service
-            // invoice accessory
-            $invoiceAccessories = $invoice->accessories;
-            foreach ($invoiceAccessories as $invoiceAccessorie) {
-                $total_accessory_value += $invoiceAccessorie->accessory->accessory_price->price * $invoiceAccessorie->quantity;
-            }
-            $consolidatedOrderItems = [];
-            foreach ($invoice->orders as $order) {
-                $orderItems = OrderItem::where('order_id', $order->id)->get();
-                foreach ($orderItems as $orderItem) {
-                    $menuId = $orderItem->menu_id;
-                    $status = $orderItem->status;
-                    if (isset($consolidatedOrderItems[$menuId][$status])) {
-                        $consolidatedOrderItems[$menuId][$status]->quantity += $orderItem->quantity;
-                        $consolidatedOrderItems[$menuId][$status]->price += $orderItem->price;
-                        $consolidatedOrderItems[$menuId][$status]->discount_price += $orderItem->discount_price;
-                    } else {
-                        $consolidatedOrderItems[$menuId][$status] = $orderItem;
-                    }
-                }
-            }
-
-            foreach ($invoice->orders as $order) {
-                $order->order_items = collect();
-
-                foreach ($consolidatedOrderItems as $menuId => $itemsByStatus) {
-                    foreach ($itemsByStatus as $status => $order_items) {
-                        $order_items->menu;
-                        $order->order_items->push($order_items);
-                    }
-                }
-            }
-            unset($invoice['accessories']);
-            unset($invoice['invoice_service']);
-            unset($invoice['total_accessory_value']);
-            unset($invoice['total_service_value']);
+            // // foreach ($roomSessions as $roomSession) {don't need
+            // // $invoice = $roomSession->invoice; // 'don't need'
+            // $invoice->package;
+            // // if ($invoice) {
+            // //service
+            // // $entitySession['invoice']=$invoice;
+            // $invoiceServices = $invoice->invoiceService;
+            // foreach ($invoiceServices as $invoiceService) {
+            //     $time = $invoiceService->end_date != null ? $invoiceService->end_date : now();
+            //     $this->invoiceModelService->calculateInvoiceService($invoiceService, $time);
+            //     $total_service_value += $invoiceService->service_value;
             // }
-            $order = $invoice->order;
-            $total_order_discount_price = 0;
-            if ($order) {
-                $total_order_discount_price = $order->total_discount_price;
-            }
-            unset($invoice['order']);
+            // $invoiceServiceCollection = $invoiceServiceCollection->merge($invoice->invoiceService);
+            // // end service
+            // // invoice accessory
+            // $invoiceAccessories = $invoice->accessories;
+            // foreach ($invoiceAccessories as $invoiceAccessorie) {
+            //     $total_accessory_value += $invoiceAccessorie->accessory->accessory_price->price * $invoiceAccessorie->quantity;
             // }
-            // $entitySession['start_date'] = $firstRoomSession->start_date;
-            // $entitySession['end_date'] = $lastRoomSession->end_date;
-            $entitySession['start_date'] = $activeInvoiceSession->start_date_time;
-            $entitySession['end_date'] = $activeInvoiceSession->end_date_time;
-            $entitySession['invoice'] = $invoice;
-            //service add response
-            $entitySession['services'] = $invoiceServiceCollection;
-            $entitySession['invoice_accessories'] = $invoiceAccessories;
-            $entitySession['total_service_value'] = $total_service_value;
-            $entitySession['total_accessory_value'] = $total_accessory_value;
-            $entitySession['total_order_discount_price'] = $total_order_discount_price;
-            //service add response
-            return $entitySession;
+            // $consolidatedOrderItems = [];
+            // foreach ($invoice->orders as $order) {
+            //     $orderItems = OrderItem::where('order_id', $order->id)->get();
+            //     foreach ($orderItems as $orderItem) {
+            //         $menuId = $orderItem->menu_id;
+            //         $status = $orderItem->status;
+            //         if (isset($consolidatedOrderItems[$menuId][$status])) {
+            //             $consolidatedOrderItems[$menuId][$status]->quantity += $orderItem->quantity;
+            //             $consolidatedOrderItems[$menuId][$status]->price += $orderItem->price;
+            //             $consolidatedOrderItems[$menuId][$status]->discount_price += $orderItem->discount_price;
+            //         } else {
+            //             $consolidatedOrderItems[$menuId][$status] = $orderItem;
+            //         }
+            //     }
+            // }
+
+            // foreach ($invoice->orders as $order) {
+            //     $order->order_items = collect();
+
+            //     foreach ($consolidatedOrderItems as $menuId => $itemsByStatus) {
+            //         foreach ($itemsByStatus as $status => $order_items) {
+            //             $order_items->menu;
+            //             $order->order_items->push($order_items);
+            //         }
+            //     }
+            // }
+            // unset($invoice['accessories']);
+            // unset($invoice['invoice_service']);
+            // unset($invoice['total_accessory_value']);
+            // unset($invoice['total_service_value']);
+            // // }
+            // $order = $invoice->order;
+            // $total_order_discount_price = 0;
+            // if ($order) {
+            //     $total_order_discount_price = $order->total_discount_price;
+            // }
+            // unset($invoice['order']);
+            // // }
+            // // $entitySession['start_date'] = $firstRoomSession->start_date;
+            // // $entitySession['end_date'] = $lastRoomSession->end_date;
+            // $entitySession['start_date'] = $activeInvoiceSession->start_date_time;
+            // $entitySession['end_date'] = $activeInvoiceSession->end_date_time;
+            // $entitySession['invoice'] = $invoice;
+            // //service add response
+            // $entitySession['services'] = $invoiceServiceCollection;
+            // $entitySession['invoice_accessories'] = $invoiceAccessories;
+            // $entitySession['total_service_value'] = $total_service_value;
+            // $entitySession['total_accessory_value'] = $total_accessory_value;
+            // $entitySession['total_order_discount_price'] = $total_order_discount_price;
+            // //service add response
+            // return $entitySession;
         }
+
         if ($entity->entity_type == 'table') {
             if (!$entity->latestInvoice) {
                 ResponseMessage('Invoice Detail is invalid', 419);
             }
             $invoice = $entity->latestInvoice;
+            //Entity Detail changed 
+            $entityDetail = $this->entityDetailByEntityId($invoice, $entityId);
+            return $entityDetail;
+            //entity detail
+
             $total_service_value = 0;
             $total_accessory_value = 0;
             $invoiceServiceCollection = collect();
@@ -401,6 +432,172 @@ class EntityRepository implements EntityRepositoryInterface
             $responseData['total_order_discount_price'] = $total_accessory_value;
             return $responseData;
         }
+    }
+
+
+    public function entityDetailByEntityId($invoice, $entityId, $startDateTime = null, $endDateTime = null)
+    {
+        $entity = Entity::find(id: $entityId);
+        if (!$entity) {
+            ResponseMessage('Entity is invalid');
+        }
+        $invoiceServiceCollection = collect();
+        $invoiceAccessoryCollection = collect();
+        $total_service_value = $total_accessory_value = 0;
+        // $roomSession = RoomSession::whereHas('invoiceSession', function ($q) {
+        //     $q->where('is_active', 1);
+        // })
+        //     ->where('entity_session_id', $entitySessionId)
+        //     ->first();
+        // if ($roomSession)
+        //     //deposit customer 
+        //     // $firstRoomSession = $entitySession->roomSessions->first();
+        //     if (!$roomSession) {
+        //         ResponseMessage('Invoice Room Session is invalid', 419);
+        //     }
+        $customer = $invoice->customer;
+        $customerDepositBalance = $this->getCustomerDepositBalance($customer->id);
+        //end deposit
+        // $invoice = $roomSession->invoiceSession->invoice;
+        $invoice->package;
+        if ($invoice) {
+            //service
+            $invoiceServices = $invoice->invoiceService;
+            if ($invoice->order) {
+                $this->invoiceModelService->checkOrderStatus($invoice->order->orderItems);
+            }
+            $entity->is_service = 1;
+            if ($invoiceServices->isEmpty()) {
+                $entity->is_service = 0;
+            }
+            foreach ($invoiceServices as $invoiceService) {
+                $time = $invoiceService->end_date != null ? $invoiceService->end_date : now();
+                $this->invoiceModelService->calculateInvoiceService($invoiceService, $time);
+                $total_service_value += $invoiceService->service_value;
+            }
+            // $invoiceServiceCollection = $invoiceServiceCollection->merge($invoice->invoiceService);
+            //serice
+
+            //accesory
+            $invoiceAccessories = $invoice->accessories;
+            foreach ($invoiceAccessories as $invoiceAccessorie) {
+                $total_accessory_value += $invoiceAccessorie->accessory->accessory_price->price * $invoiceAccessorie->quantity;
+            }
+            // $invoiceAccessoryCollection = $invoiceAccessoryCollection->merge($invoice->invoiceAccessories);
+            //end_accessoryI
+
+            //customer level , birthday discount
+            $today = Carbon::today();
+            $customer = Customer::find($invoice->customer_id);
+            $customerTotal = 0;
+            if ($customer->invoices) {
+                foreach ($customer->invoices as $customerInvoice) {
+                    $customerTotal += $customerInvoice->total;
+                }
+            }
+
+            $levels = CustomerLevelDiscount::all();
+            $customerLevel = null;
+            foreach ($levels as $level) {
+                if ($customerTotal >= $level->amount) {
+                    $customerLevel = $level;
+                } else {
+                    break;
+                }
+            }
+            if ($customerLevel !== null) {
+                // $roomDoneResponse['customer_level'] = $customerLevel->name;
+                // $roomDoneResponse['customer_level_discount_value'] = $customerLevel->promotion_value;
+                $entity->customer_level = $customerLevel->name;
+                $entity->customer_level_discount_value = $customerLevel->promotion_value;
+            } else {
+                // $roomDoneResponse['customer_level'] = 'no customer level';
+                $entity->customer_level = 'no customer level';
+            }
+
+            // $roomDoneResponse['customer_total'] = $customerTotal;
+            if ($customer) {
+                $birthdate = Carbon::parse($customer->birthdate);
+                // $roomDoneResponse['is_birthday'] = $birthdate->isBirthday($today);
+                $entity->is_birthday = $birthdate->isBirthday($today);
+
+            } else {
+                $entity->is_birthday = false;
+                // $roomDoneResponse['is_birthday'] = false;
+            }
+
+            //end 
+
+
+            $consolidatedOrderItems = [];
+            $total=0;
+            $totalDiscount=0;
+            foreach ($invoice->orders as $order) {
+                $orderItems = OrderItem::where('order_id', $order->id)->get();
+                foreach ($order->orderItems as $orderItem) {
+                    // if ($orderItem->status == 'done') {
+                    $total += $orderItem->price;
+                    $totalDiscount += $orderItem->discount_value;
+                    // }
+                }
+                foreach ($orderItems as $orderItem) {
+                    $menuId = $orderItem->menu_id;
+                    $status = $orderItem->status;
+                    if (isset($consolidatedOrderItems[$menuId][$status])) {
+                        $consolidatedOrderItems[$menuId][$status]->quantity += $orderItem->quantity;
+                        $consolidatedOrderItems[$menuId][$status]->price += $orderItem->price;
+                        $consolidatedOrderItems[$menuId][$status]->discount_price += $orderItem->discount_price;
+                    } else {
+                        $consolidatedOrderItems[$menuId][$status] = $orderItem;
+                    }
+                }
+            }
+            foreach ($invoice->orders as $order) {
+
+                $order->order_items = collect();
+
+                foreach ($consolidatedOrderItems as $menuId => $itemsByStatus) {
+                    foreach ($itemsByStatus as $status => $order_items) {
+                        $order_items->menu;
+                        $order->order_items->push($order_items);
+                    }
+                }
+            }
+            unset($invoice['accessories']);
+            unset($invoice['invoice_service']);
+            unset($invoice['total_accessory_value']);
+            unset($invoice['total_service_value']);
+            // unset($invoice,'invoice.accessories');
+            //service list
+        }
+        $order = $invoice->order;
+        $total_order_discount_price = 0;
+        $total_order_value = 0;
+        if ($order) {
+            $total_order_discount_price = $order->total_discount_price;
+            $total_order_value = $order->total;
+        }
+        // }
+        $entity->entity_id=$entity->id;
+        $entity->invoice_id=$invoice->id;
+        $entity->start_date_time = $startDateTime;
+        $entity->end_date_time = $endDateTime;
+        $entity->services = $invoiceServices;
+        $entity->customer_total = $customerTotal;
+        $entity->food_discount=$totalDiscount;
+        $entity->total=$totalDiscount;
+        $entity->invoice_accessories = $invoiceAccessories;
+        $entity->total_service_value = $total_service_value;
+        $entity->total_accessory_value = $total_accessory_value;
+        $entity->total_order_discount_price = $total_order_discount_price;
+        $entity->food_discount = $total_order_discount_price;
+        $entity->total = $total_order_value;
+        $entity->deposit_balance = $customerDepositBalance;
+        $entity->customer_id = $customer->id;
+        $entity->account_id = $customer->account_id;
+        $entity->total_session_price = $invoice->total_session_price;
+        $entity->invoice = $invoice;
+        return $entity;
     }
     public function tableWithInvoiceDetail(array $data, int $entityId)
     {

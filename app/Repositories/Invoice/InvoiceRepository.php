@@ -903,6 +903,7 @@ class InvoiceRepository implements InvoiceRepositoryInterface
         foreach ($invoiceAccessories as $invoiceAccessorie) {
             $total_accessory_value += $invoiceAccessorie->accessory->accessory_price->price * $invoiceAccessorie->quantity;
         }
+        
         foreach ($invoice->orders as $order) {
             if (existOrderItemByStatus($order->orderItems, 'not_yet')) {
                 ResponseMessage('Some items still cooking', 419);
