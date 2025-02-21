@@ -16,7 +16,6 @@ return new class extends Migration
             $table->string('name', 45);
             $table->string('code');
             $table->foreignId('category_id')->constrained();
-            $table->foreignId('brand_id')->constrained('brands');
             $table->unsignedInteger('item_type_id');
             $table->unsignedBigInteger('base_uom_id'); //base uom mean large unit
             $table->unsignedBigInteger('uom_id'); //inventory store unit

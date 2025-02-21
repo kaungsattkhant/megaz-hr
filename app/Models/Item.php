@@ -20,7 +20,6 @@ class Item extends BaseModel
         'name',
         'code',
         'category_id',
-        'brand_id',
         'item_type_id',
         'base_uom_id',
         'uom_id',
