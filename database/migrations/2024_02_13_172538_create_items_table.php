@@ -16,15 +16,18 @@ return new class extends Migration
             $table->string('name', 45);
             $table->string('code');
             $table->foreignId('category_id')->constrained();
-            $table->foreignId('brand_id')->constrained();
+            $table->foreignId('brand_id')->constrained('brands');
             $table->unsignedInteger('item_type_id');
-            $table->unsignedBigInteger('base_uom_id')->constrained(); //base uom mean large unit
-            $table->unsignedBigInteger('uom_id')->constrained(); //inventory store unit
+            $table->unsignedBigInteger('base_uom_id'); //base uom mean large unit
+            $table->unsignedBigInteger('uom_id'); //inventory store unit
             $table->boolean('is_active')->default(1);
             $table->double('min_holding_base_uom_quantity');
             $table->double('min_holding_uom_quantity');
             $table->double('minimum_holding_amount');
             $table->timestamps();
+
+            $table->foreign('base_uom_id')->references('id')->on('uoms')->onDelete('cascade');
+            $table->foreign('uom_id')->references('id')->on('uoms')->onDelete('cascade');
         });
     }
 
