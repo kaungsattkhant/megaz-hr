@@ -30,6 +30,7 @@ return new class extends Migration
             $table->boolean('is_md_checked')->default(0);
             $table->boolean('is_procurement_manager_checked')->default(0);
             $table->boolean('is_confirmed')->default(0);
+            $table->string('remark')->nullable();
             $table->timestamps();
         });
     }

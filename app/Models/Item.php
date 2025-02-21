@@ -20,14 +20,14 @@ class Item extends BaseModel
         'name',
         'code',
         'category_id',
+        'brand_id',
         'item_type_id',
         'base_uom_id',
         'uom_id',
         'is_active',
-        'lead_time',
-        'minimum_holding_amount',
         'min_holding_base_uom_quantity',
         'min_holding_uom_quantity',
+        'minimum_holding_amount',
 
     ];
 
@@ -304,8 +304,6 @@ class Item extends BaseModel
                 'base_uom.name'
             );
     }
-
-
 
     public function MrpRawMaterials()
     {

@@ -143,6 +143,7 @@ class PurchaseOrderRepository implements PurchaseOrderRepositoryInterface
                 $item_data['base_uom_id'] = $item->base_uom_id;
                 $item_data['base_uom_quantity'] = $item->base_uom_quantity;
                 $item_data['uom_quantity'] = $item->uom_quantity;
+                $item_data['remark'] = $item->remark;
                 if (isset($item->later_buy) && $item->later_buy) {
 
                     $purchaseOrderItem = $po->items()->where('id', $item_data['id'])->first();
