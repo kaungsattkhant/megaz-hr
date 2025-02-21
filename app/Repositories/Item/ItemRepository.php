@@ -129,12 +129,12 @@ class ItemRepository implements ItemRepositoryInterface
                     }
                 }
                 $item->update($data);
-                if (isset($data['brands'])) {
-                    $item->brands()->sync($data['brands']);
+                if (isset($data['brand_id'])) {
+                    $item->brands()->sync($data['brand_id']);
                 }
             }
             DB::commit();
-            return $item;
+            ResponseData($item);
         } catch (\Exception $e) {
             DB::rollback();
             ResponseMessage($e->getMessage(), 402);
@@ -227,7 +227,6 @@ class ItemRepository implements ItemRepositoryInterface
             'name',
             'code',
             'category_id',
-            'brand_id',
             'item_type_id',
             'base_uom_id',
             'uom_id',
