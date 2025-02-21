@@ -25,9 +25,6 @@ return new class extends Migration
             $table->double('min_holding_uom_quantity');
             $table->double('minimum_holding_amount');
             $table->timestamps();
-
-            $table->foreign('base_uom_id')->references('id')->on('uoms')->onDelete('cascade');
-            $table->foreign('uom_id')->references('id')->on('uoms')->onDelete('cascade');
         });
     }
 
