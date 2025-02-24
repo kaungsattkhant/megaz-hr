@@ -48,8 +48,9 @@ class PoInvoiceResource extends JsonResource
                     'purchase_order_id' => $arrivalItem->purchase_order_id,
                     'uom_conversion_unit_id' => $arrivalItem->uom_conversion_unit_id,
                     'brand_id' => $arrivalItem->brand->id,
-                    'brand_name' => $arrivalItem->brand->name
-
+                    'brand_name' => $arrivalItem->brand->name,
+                    'supplier_id' => $arrivalItem->supplier_id,
+                    'supplier_name' =>  $arrivalItem->supplier_name,
                     // 'unit_price',
                     // 'po_invoice_id',
                     // 'item_id',
