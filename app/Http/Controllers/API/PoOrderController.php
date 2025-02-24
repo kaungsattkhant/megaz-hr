@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\PoOrder\ArrivalItemRequest;
 use App\Http\Requests\PoOrder\PoOrderItemRequest;
+use App\Http\Requests\PoOrder\UpdateArrivalRequest;
 use App\Http\Requests\Admin\PoInvoiceTransactionRequest;
 use App\Repositories\PoOrder\PoOrderRepositoryInterface;
 
@@ -71,6 +72,12 @@ class PoOrderController extends Controller
     public function processInvoiceTransaction(PoInvoiceTransactionRequest $request)
     {
         $data =  $this->PoOrderRepository->processInvoiceTransaction($request);
+        ResponseData($data);
+    }
+
+    public function updateArrivalList($arrivalId, UpdateArrivalRequest $request)
+    {
+        $data =  $this->PoOrderRepository->updateArrivalList($arrivalId, $request->validated());
         ResponseData($data);
     }
 }

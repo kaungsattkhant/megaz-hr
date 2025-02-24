@@ -1348,6 +1348,7 @@ class PoOrderRepository implements PoOrderRepositoryInterface
       'po_invoices.invoice_no',
       'po_invoices.date_time',
       'po_invoices.total_invoice_amount',
+      'po_invoices.sub_total',
       'ai.supplier_id',
       's.name as supplier_name',
       'i.name as i_name',
@@ -1367,6 +1368,7 @@ class PoOrderRepository implements PoOrderRepositoryInterface
         'po_invoices.invoice_no',
         'po_invoices.date_time',
         'po_invoices.total_invoice_amount',
+        'po_invoices.sub_total',
         'ai.supplier_id',
         's.name',
         'i.name',
@@ -1386,6 +1388,7 @@ class PoOrderRepository implements PoOrderRepositoryInterface
     $supplierAccountId = $request->supplier_account_id;
     $apAmount = $request->ap_amount;
     $cashAccountId = $request->cash_account_id;
+    $discountValue = (float) $request->discount_value;
     $poInvoice = PoInvoice::find($poInvoiceId);
     if (!$poInvoice) {
       ResponseMessage('Po Invoice not found', 404);
@@ -1401,6 +1404,10 @@ class PoOrderRepository implements PoOrderRepositoryInterface
       }
       $poInvoice->is_complete = 1;
       $poInvoice->completed_at = now();
+      $poInvoice->discount_value = $discountValue;
+      $poInvoice->sub_total = (float)$poInvoice->total_invoice_amount -  $discountValue;
+      $poInvoice->paid_amount = $request->paid_amount;
+      $poInvoice->cash_account_id = $cashAccountId;
       $poInvoice->save();
       DB::commit();
       return ResponseMessage('Transaction created successfully', 200);
@@ -1408,6 +1415,39 @@ class PoOrderRepository implements PoOrderRepositoryInterface
       DB::rollback();
       ResponseMessage($e->getMessage(), 402);
       throw $e;
+    }
+  }
+
+  public function updateArrivalList($arrivalId, $validatedData)
+  {
+
+    DB::beginTransaction();
+
+    try {
+
+      $arrivalItem = ArrivalItem::findOrFail($arrivalId);
+      if (!$arrivalItem) {
+        return ResponseMessage('No arrival items found for this item', 404);
+      }
+
+      if (isset($validatedData['unit_price'])) {
+        $arrivalItem->unit_price = $validatedData['unit_price'];
+        $arrivalItem->amount = $validatedData['unit_price'] * $arrivalItem->quantity;
+        $arrivalItem->save();
+      }
+
+      $poInvoice = $arrivalItem->poInvoice;
+      if ($poInvoice) {
+        $totalAmount = $poInvoice->arrivalItems->sum('amount');
+        $poInvoice->total_invoice_amount = $totalAmount;
+        $poInvoice->save();
+      }
+
+      DB::commit();
+      return ResponseData($arrivalItem, 200, true, 'Unit price updated successfully.');
+    } catch (\Exception $e) {
+      DB::rollBack();
+      return ResponseMessage('Error updating unit price: ' . $e->getMessage(), 500);
     }
   }
 }
