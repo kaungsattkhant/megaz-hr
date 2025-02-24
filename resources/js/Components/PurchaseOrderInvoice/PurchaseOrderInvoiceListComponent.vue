@@ -31,6 +31,9 @@
                                     Item(s)
                                 </th>
                                 <th scope="col" class="">
+                                    Brand
+                                </th>
+                                <th scope="col" class="">
                                     Supplier
                                 </th>
                                 <!-- <th scope="col" class="">
@@ -55,6 +58,9 @@
                                     </td>
                                     <td class="whitespace-nowrap" @click="toggleItems(index)">
                                         {{ item.item_names }}
+                                    </td>
+                                    <td class="whitespace-nowrap">
+                                        {{ item.brands }}
                                     </td>
                                     <td class="whitespace-nowrap">
                                         {{ item.supplier_name }}
