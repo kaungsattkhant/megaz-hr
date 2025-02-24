@@ -68,6 +68,11 @@ class PoOrderController extends Controller
         $data =  $this->PoOrderRepository->getInvoices($request);
         ResponseData($data);
     }
+    public function getInvoiceById($invoiceId)
+    {
+        $data =  $this->PoOrderRepository->getInvoiceById($invoiceId);
+        ResponseData($data);
+    }
 
     public function processInvoiceTransaction(PoInvoiceTransactionRequest $request)
     {

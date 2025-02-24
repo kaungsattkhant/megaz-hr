@@ -50,6 +50,7 @@ Route::middleware('auth:api')->group(function () {
     Route::post('/po_arrival_items', 'storePoArrivalItems');
     Route::get('/supplier_lead_time/{supplierId}', 'getSupplierLeadTime');
     Route::get('/invoices', 'getInvoices');
+    Route::get('/invoices/{invoiceId}', 'getInvoiceById');
     Route::post('/invoices', 'storeInvoices');
     Route::post('/po_arrival_list/{arrivalId}', 'updateArrivalList');
   });

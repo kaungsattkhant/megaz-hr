@@ -1356,7 +1356,7 @@ class PoOrderRepository implements PoOrderRepositoryInterface
       'po_invoices.is_complete',
       'po_invoices.completed_at',
       DB::raw('GROUP_CONCAT(DISTINCT b.name SEPARATOR ", ") as brands'),
-      DB::raw('GROUP_CONCAT(DISTINCT i.name SEPARATOR ", ") as item_names'),
+      // DB::raw('GROUP_CONCAT(DISTINCT i.name SEPARATOR ", ") as item_names'),
       DB::raw('CAST(SUM(ai.quantity) AS SIGNED) as total_invoice_quantity')
     ])
       ->join('arrival_items as ai', 'po_invoices.id', '=', 'ai.po_invoice_id')
@@ -1378,8 +1378,52 @@ class PoOrderRepository implements PoOrderRepositoryInterface
       )
       ->where('is_complete', 0)
       ->paginate(config('common.list_count'));
+    $poInvoices->getCollection()->each(function ($invoice) {
+      $invoice->item_names = $invoice->arrivalItems->pluck('item.name')->unique()->implode(', ');
+    });
     return PoInvoiceResource::collection($poInvoices);
   }
+  public function getInvoiceById($invoiceId)
+  {
+    $poInvoices = PoInvoice::select([
+      'po_invoices.id',
+      'po_invoices.invoice_no',
+      'po_invoices.date_time',
+      'po_invoices.total_invoice_amount',
+      'po_invoices.sub_total',
+      'ai.supplier_id',
+      's.name as supplier_name',
+      'i.name as i_name',
+      's.account_id',
+      'po_invoices.is_complete',
+      'po_invoices.completed_at',
+      DB::raw('GROUP_CONCAT(DISTINCT b.name SEPARATOR ", ") as brands'),
+      DB::raw('GROUP_CONCAT(DISTINCT i.name SEPARATOR ", ") as item_names'),
+      DB::raw('CAST(SUM(ai.quantity) AS SIGNED) as total_invoice_quantity')
+    ])
+      ->join('arrival_items as ai', 'po_invoices.id', '=', 'ai.po_invoice_id')
+      ->join('suppliers as s', 'ai.supplier_id', '=', 's.id')
+      ->join('items as i', 'ai.item_id', '=', 'i.id')
+      ->join('brands as b', 'ai.brand_id', '=', 'b.id')
+      ->groupBy(
+        'po_invoices.id',
+        'po_invoices.invoice_no',
+        'po_invoices.date_time',
+        'po_invoices.total_invoice_amount',
+        'po_invoices.sub_total',
+        'ai.supplier_id',
+        's.name',
+        'i.name',
+        's.account_id',
+        'po_invoices.is_complete',
+        'po_invoices.completed_at',
+      )
+      ->where('po_invoices.is_complete', 0)
+      ->where('po_invoices.id', $invoiceId)
+      ->paginate(config('common.list_count'));
+    return PoInvoiceResource::collection($poInvoices);
+  }
+
 
   public function processInvoiceTransaction($request)
   {

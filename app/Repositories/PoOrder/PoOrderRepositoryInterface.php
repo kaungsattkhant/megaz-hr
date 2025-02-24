@@ -18,4 +18,6 @@ interface PoOrderRepositoryInterface
   public function getInvoices(Request $request);
   public function processInvoiceTransaction($request);
   public function updateArrivalList($arrivalId, $validatedData);
+
+  public function getInvoiceById($invoiceId);
 }
