@@ -742,7 +742,6 @@ class InvoiceRepository implements InvoiceRepositoryInterface
             $invoice->total_session_price = $activeInvoiceSession->total_session_price + $totalNewSessionPrice; //previous used session price+ new session price(new room)
             $invoice->save();
             //end
-
             $entitySesions = $this->invoiceService->getEntitySessionBySessionDuration($entityId, $startTime, $endTime);
             $this->invoiceService->defineActiveEntitySession($invoiceSession, $entitySesions); //update is_active related entity session
             return $invoice;
@@ -773,23 +772,7 @@ class InvoiceRepository implements InvoiceRepositoryInterface
                 DB::commit();
                 ResponseData($tableResponseData);
             }
-            // $latestRoomSession = RoomSession::where('invoice_id', $invoice->id)->orderBy('created_at', 'desc')->first();
-            // $roomSessions = RoomSession::where('invoice_id', $data['invoice_id'])->with(['entitySession.entity'])->get();
-
             $invoiceSession = $this->invoiceService->getTotalInvoiceSession($invoice->id);
-            // $invoiceSession=InvoiceSession::where('invoice_id',$invoice->id)
-            // ->select(
-            //     'invoice_sessions.invoice_id',
-            //     DB::raw('SUM(invoice_sessions.total_session_duration) as total_duration'),
-            //     DB::raw('SUM(invoice_sessions.total_session_price) as total_session_value'),
-            //     // DB::raw('COALESCE(SUM(invoice_sessions.total_session_price), 0) as total_session_value')
-
-            // )
-            // ->groupBy('invoice_sessions.invoice_id')
-            // ->first();
-            // if(!$invoiceSession){
-            //     ResponseMessage('Invoice is invalid during session',419);
-            // }
             $total_session_value = $invoiceSession->total_session_value;
             $total_duration = 0;
             $total_service_value = 0;
@@ -808,53 +791,47 @@ class InvoiceRepository implements InvoiceRepositoryInterface
                 $serviceValue = $this->invoiceService->getServiceValue($invoiceService, $time);
                 $total_service_value += $serviceValue;
             }
-            // foreach ($roomSessions as $room) {
-            //     $total_session_value += $room->price;
-            //     $total_duration += $room->session_duration ?? 0;
-            // }
 
             foreach ($invoiceAccessories as $invoiceAccessorie) {
                 $total_accessory_value += $invoiceAccessorie->accessory->accessory_price->price * $invoiceAccessorie->quantity;
             }
 
-            // $entity = Entity::find($latestRoomSession->entitySession->entity_id);
+            $roomDoneResponse['total_session_price'] = $invoiceSession->total_session_value;
+            //current comment for birthday discount
+            // $today = Carbon::today();
+            // $customer = Customer::find($invoice->customer_id);
+            // $customerTotal = 0;
+            // if ($customer->invoices) {
+            //     foreach ($customer->invoices as $customerInvoice) {
+            //         $customerTotal += $customerInvoice->total;
+            //     }
+            // }
 
-            $roomDoneResponse['total_session_price'] = $invoice->total_session_price;
+            // $levels = CustomerLevelDiscount::all();
+            // $customerLevel = null;
+            // foreach ($levels as $level) {
+            //     if ($customerTotal >= $level->amount) {
+            //         $customerLevel = $level;
+            //     } else {
+            //         break;
+            //     }
+            // }
+            // if ($customerLevel !== null) {
+            //     $roomDoneResponse['customer_level'] = $customerLevel->name;
+            //     $roomDoneResponse['customer_level_discount_value'] = $customerLevel->promotion_value;
+            // } else {
+            //     $roomDoneResponse['customer_level'] = 'no customer level';
+            // }
 
-            $today = Carbon::today();
-            $customer = Customer::find($invoice->customer_id);
-            $customerTotal = 0;
-            if ($customer->invoices) {
-                foreach ($customer->invoices as $customerInvoice) {
-                    $customerTotal += $customerInvoice->total;
-                }
-            }
+            // $roomDoneResponse['customer_total'] = $customerTotal;
+            // if ($customer) {
+            //     $birthdate = Carbon::parse($customer->birthdate);
+            //     $roomDoneResponse['is_birthday'] = $birthdate->isBirthday($today);
+            // } else {
+            //     $roomDoneResponse['is_birthday'] = false;
+            // }
+            //end
 
-            $levels = CustomerLevelDiscount::all();
-            $customerLevel = null;
-            foreach ($levels as $level) {
-                if ($customerTotal >= $level->amount) {
-                    $customerLevel = $level;
-                } else {
-                    break;
-                }
-            }
-            if ($customerLevel !== null) {
-                $roomDoneResponse['customer_level'] = $customerLevel->name;
-                $roomDoneResponse['customer_level_discount_value'] = $customerLevel->promotion_value;
-            } else {
-                $roomDoneResponse['customer_level'] = 'no customer level';
-            }
-
-            $roomDoneResponse['customer_total'] = $customerTotal;
-            if ($customer) {
-                $birthdate = Carbon::parse($customer->birthdate);
-                $roomDoneResponse['is_birthday'] = $birthdate->isBirthday($today);
-            } else {
-                $roomDoneResponse['is_birthday'] = false;
-            }
-            // $roomDoneResponse['room_sessions'] = $latestRoomSession;
-            // $roomDoneResponse['rooms_sessions'] = $roomSessions;
             $roomDoneResponse['total_order_value'] = 0;
             $roomDoneResponse['total_order_discount_price'] = 0;
             if ($invoice->order) {
@@ -903,7 +880,7 @@ class InvoiceRepository implements InvoiceRepositoryInterface
         foreach ($invoiceAccessories as $invoiceAccessorie) {
             $total_accessory_value += $invoiceAccessorie->accessory->accessory_price->price * $invoiceAccessorie->quantity;
         }
-        
+
         foreach ($invoice->orders as $order) {
             if (existOrderItemByStatus($order->orderItems, 'not_yet')) {
                 ResponseMessage('Some items still cooking', 419);
@@ -1273,6 +1250,7 @@ class InvoiceRepository implements InvoiceRepositoryInterface
                     }
                 }
             }
+
             // $data['room_discount_value'] = $room_discount_value;
             if (isset($data['discount_value'])) {
                 $discount_value = $data['discount_value'];
@@ -1312,7 +1290,6 @@ class InvoiceRepository implements InvoiceRepositoryInterface
             $customerDepositData['amount'] = $data['total'];
             $customerDepositData['deposit_balance'] = $this->getCustomerDepositBalance($customer->id);
             //end
-
             foreach ($roomSessionsByInvoice as $roomSession) {
                 $entitySession = $roomSession->entitySession;
                 $entitySession->is_active = 0;

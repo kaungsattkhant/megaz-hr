@@ -463,9 +463,9 @@ class EntityRepository implements EntityRepositoryInterface
         if ($invoice) {
             //service
             $invoiceServices = $invoice->invoiceService;
-            if ($invoice->order) {
-                $this->invoiceModelService->checkOrderStatus($invoice->order->orderItems);
-            }
+            // if ($invoice->order) {
+            //     $this->invoiceModelService->checkOrderStatus($invoice->order->orderItems);
+            // }
             $entity->is_service = 1;
             if ($invoiceServices->isEmpty()) {
                 $entity->is_service = 0;
