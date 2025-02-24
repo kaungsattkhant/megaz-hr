@@ -1421,7 +1421,7 @@ class PoOrderRepository implements PoOrderRepositoryInterface
       ->where('po_invoices.is_complete', 0)
       ->where('po_invoices.id', $invoiceId)
       ->paginate(config('common.list_count'));
-    return $poInvoices;
+    return PoInvoiceResource::collection($poInvoices);
   }
 
 
