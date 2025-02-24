@@ -1,7 +1,7 @@
 <template>
     <div>
         <p class=" text-lg font-semibold font-inter">
-            Items
+            Inventory Stocks
         </p>
     </div>
     <div class="mt-4 bg-white">
@@ -90,7 +90,7 @@
                                         {{ (ledger.total_value).toLocaleString() }}
                                     </td>
                                     <td class="whitespace-nowrap px-6 py-4">
-                                        <button id="edit-btn" class="pr-1" @click="transferBtnClicked(ledger.item_id, index-1)"
+                                        <button id="edit-btn" class="pr-1" @click="transferBtnClicked(ledger, index-1)"
                                             data-te-toggle="modal" data-te-target="#transfer_modal">
                                             <i class="fas fa-exchange-alt"></i>
                                         </button>
@@ -135,7 +135,7 @@
                         <div class="relative  p-4">
                             <h5 class="text-xl text-center mt-2 font-medium leading-normal text-black"
                                 id="create_modalLabel">
-                                Transfer
+                                Transfer 
                             </h5>
                             <button type="button" id="close"
                                 class="absolute top-4 right-4 focus:shadow-none focus:outline-none" data-te-modal-dismiss
@@ -378,6 +378,7 @@ export default {
 
             fromDate: null,
             toDate: null,
+            ledger:null,
 
             per_page: 20,
             pageNumbers: [],
@@ -506,8 +507,9 @@ export default {
             this.defectItem = null;
         },
 
-        async transferBtnClicked(id, ledgerIndex) {
-            this.itemId = id;
+        async transferBtnClicked(ledger, ledgerIndex) {
+            this.ledger = ledger
+            this.itemId = ledger.item_id;
             this.transferItem = this.inventoryLegderList[ledgerIndex];
             let url = `/api/inventory_list`;
             let response = await getApiData({ url: url, token: this.getToken() });

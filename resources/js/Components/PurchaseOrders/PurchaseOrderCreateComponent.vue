@@ -7,25 +7,48 @@
         </div>
 
         <div class="bg-white pt-4 pb-8 px-4 rounded-md shadow-md mb-8">
-            <div class="grid grid-cols-9 w-3/5 min-w-fit gap-x-8 gap-y-6 ">
+            <div class="grid grid-cols-12 w-3/5 min-w-fit gap-x-8 gap-y-6 ">
                 <div class="col-span-4">
                     <label for="" class="label-form mb-3">
                         Date
                     </label>
                     <input type="date" v-model="date" class="input-ui">
                 </div>
-                <div class="col-span-5"></div>
+                <div class="col-span-8"></div>
 
                 <div class="col-span-4">
                     <label for="" class="label-form mb-3">
                         Item Name
                     </label>
-                    <select name="" id="" v-model="selectedItem" class="input-ui" @change="itemSelectChanged">
+                    <div class="bg-white mb-0 w-full text-sm inline-block h-[34px]"
+                        data-te-select-wrapper-ref>
+                        <select data-te-select-init data-te-select-placeholder="Select Category"
+                            data-te-select-filter="true" name="" id="" v-model="selectedItem" class="input-ui" @change="itemSelectChanged">
+                            <option :value="item" v-for="(item, itemIndex) in itemList" :key="item.code">
+                                {{ item.name }}
+                            </option>
+                        </select>
+                    </div>
+                    <!-- <select name="" id="" v-model="selectedItem" class="input-ui" @change="itemSelectChanged">
                         <option :value="item" v-for="(item, itemIndex) in itemList" :key="itemIndex">
                             {{ item.name }}
                         </option>
-                    </select>
+                    </select> -->
 
+                </div>
+                <div class="col-span-4">
+                    <label for="" class="label-form mb-3">
+                        Item Code
+                    </label>
+                    <div class="bg-white mb-0 w-full text-sm inline-block h-[34px]"
+                        data-te-select-wrapper-ref>
+                        <select data-te-select-init data-te-select-placeholder="Select Category"
+                            data-te-select-filter="true" name="" id="" v-model="selectedItem" class="input-ui" @change="itemSelectChanged">
+                            <option :value="item" v-for="(item, itemIndex) in itemList" :key="item.code">
+                                {{ item.code }}
+                            </option>
+                        </select>
+                    </div>
                 </div>
                 <div class="col-span-4">
                     <label for="" class="label-form mb-3">
@@ -38,8 +61,7 @@
                     </select>
 
                 </div>
-                <div class="col-span-1"></div>
-                <div class="col-span-8 grid grid-cols-4 gap-x-8">
+                <div class="col-span-8 grid grid-cols-2 gap-y-8 gap-x-8">
                     <div class="col-span-1">
                         <label for="" class="label-form mb-3">
                             Base UOM Qty
@@ -98,8 +120,14 @@
         
                     
                 </div>
-
-                <div class="col-span-1">
+                <div class="col-span-4 row-span-2">
+                    <label for="" class="block text-sm text-black mb-3">
+                        Remark
+                    </label>
+                    <textarea v-model="remark" class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0"
+                         name="" id="" cols="30" rows="6"></textarea>
+                </div>
+                <div class="col-span-12 justify-end flex">
                     <label for="" class="block text-sm text-black mb-3">
                         &nbsp;
                     </label>
@@ -215,6 +243,7 @@ import { find } from "lodash";
                 selectedBaseUom: null,
                 baseQuantity: 0,
                 purchaseOrderItems: [],
+                remark:null,
 
                 unitPrice:null,
                 totalPrice: 0,
@@ -295,6 +324,10 @@ import { find } from "lodash";
                     this.alertValidationMessage('Base UOM');
                     return 1;
                 }
+                if(!this.remark){
+                    this.alertValidationMessage('Remark');
+                    return 1;
+                }
                 // if(this.baseQuantity < 1){
                 //     this.alertValidationMessage('Base Quantity');
                 //     return 1;
@@ -313,6 +346,7 @@ import { find } from "lodash";
                     this.purchaseOrderItems[index].amount += price;
                     this.purchaseOrderItems[index].uom_quantity += this.quantity;
                     this.purchaseOrderItems[index].base_uom_quantity += this.baseQuantity;
+                    this.purchaseOrderItems[index].remark = this.remark;
                 }
                 else{
                     this.purchaseOrderItems.push({
@@ -331,6 +365,7 @@ import { find } from "lodash";
                         base_uom_quantity: this.baseQuantity,
                         base_uom_name: this.selectedBaseUom.name,
                         name: this.selectedItem.name,
+                        remark: this.remark,
                         // unit_price:this.unitPrice,
                         // total_unit_price:this.unitPrice*quantity
                     });
@@ -343,6 +378,7 @@ import { find } from "lodash";
                 this.selectedBaseUom = null;
                 this.baseQuantity = 0;
                 this.selectedBrand = null;
+                this.remark = null;
                 // this.unitPrice = null;
             },
 

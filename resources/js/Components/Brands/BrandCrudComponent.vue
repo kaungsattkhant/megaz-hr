@@ -20,7 +20,7 @@
 
                 <button type="button"
                     class="add-btn transition duration-150 ease-in-out focus:outline-none focus:ring-0 "
-                    data-te-toggle="modal" data-te-target="#create_modal">
+                    data-te-toggle="modal" data-te-target="#create_modal" @click="createBtnClicked">
                     Add New
                 </button>
             </div>
@@ -98,7 +98,7 @@
                     </h5>
                     <!--Close button-->
                     <button type="button" class="text-xs focus:shadow-none focus:outline-none" data-te-modal-dismiss
-                        aria-label="Close">
+                        aria-label="Close" id="closeModal">
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
                             stroke="currentColor" class="h-4 w-4">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
@@ -140,8 +140,7 @@
                         aria-label="Close">
                         Cancel
                     </button>
-                    <button type="button" class="add-btn focus:outline-none focus:ring-0 " @click="createBtnClicked"
-                        data-te-modal-dismiss>
+                    <button type="button" class="add-btn focus:outline-none focus:ring-0 " @click="createBrand" >
                         Confirm
                     </button>
                 </div>
@@ -150,7 +149,7 @@
     </div>
 
     <!-- Modal -->
-    <div data-te-modal-init
+    <!-- <div data-te-modal-init
         class="fixed left-0 top-0 z-[1055] hidden h-full w-full overflow-y-auto overflow-x-hidden outline-none"
         id="priceUpdateModal" tabindex="-1" aria-labelledby="create_modalLabel" aria-hidden="true">
         <div data-te-modal-dialog-ref
@@ -187,13 +186,13 @@
                         Cancel
                     </button>
                     <button type="button" class="add-btn focus:outline-none focus:ring-0 "
-                        @click="confirmUpdatePriceBtnClicked" data-te-modal-dismiss>
+                        @click="confirmUpdatePriceBtnClicked">
                         Update Price
                     </button>
                 </div>
             </div>
         </div>
-    </div>
+    </div> -->
 </template>
 
 <script>
@@ -226,7 +225,7 @@ export default {
             selectedBrands: [],
 
             itemList:[],
-            selectedItem:null,
+            selectedItem:[],
 
             editId: null,
         };
@@ -254,20 +253,26 @@ export default {
                 this.totalData = response.data.total;
             }
         },
-
-        async createBtnClicked() {
+        createBtnClicked(){
+            this.name = null;
+            this.editId = null;
+            this.selectedItem = []
+        },
+        async createBrand() {
             if (!this.name) {
                 this.alertValiationMessage('required Brand Name');
                 return false;
             }
-            if (!this.selectedItem) {
-                this.alertValiationMessage('required Item');
-                return false;
-            }
+            // if (!this.selectedItem) {
+            //     this.alertValiationMessage('required Item');
+            //     return false;
+            // }
             let items = [];
-            this.selectedItem.forEach((item) => {
-                items.push(item.id)
-            })
+            if(this.selectedItem.length > 0){
+                this.selectedItem.forEach((item) => {
+                    items.push(item.id)
+                })
+            }
 
             let url = `/api/brands`;
             let formData = new FormData();
@@ -282,6 +287,7 @@ export default {
             }
             let response = await postApiData({ url: url, form_data: formData, token: this.getToken() });
             if (response.success) {
+                document.getElementById("closeModal").click();
                 this.name = null;
                 this.editId = null;
                 this.getBrandList(1);
