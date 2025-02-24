@@ -1348,6 +1348,7 @@ class PoOrderRepository implements PoOrderRepositoryInterface
       'po_invoices.invoice_no',
       'po_invoices.date_time',
       'po_invoices.total_invoice_amount',
+      'po_invoices.sub_total',
       'ai.supplier_id',
       's.name as supplier_name',
       'i.name as i_name',
@@ -1367,6 +1368,7 @@ class PoOrderRepository implements PoOrderRepositoryInterface
         'po_invoices.invoice_no',
         'po_invoices.date_time',
         'po_invoices.total_invoice_amount',
+        'po_invoices.sub_total',
         'ai.supplier_id',
         's.name',
         'i.name',
@@ -1386,6 +1388,7 @@ class PoOrderRepository implements PoOrderRepositoryInterface
     $supplierAccountId = $request->supplier_account_id;
     $apAmount = $request->ap_amount;
     $cashAccountId = $request->cash_account_id;
+    $discountValue = (float) $request->discount_value;
     $poInvoice = PoInvoice::find($poInvoiceId);
     if (!$poInvoice) {
       ResponseMessage('Po Invoice not found', 404);
@@ -1401,6 +1404,10 @@ class PoOrderRepository implements PoOrderRepositoryInterface
       }
       $poInvoice->is_complete = 1;
       $poInvoice->completed_at = now();
+      $poInvoice->discount_value = $discountValue;
+      $poInvoice->sub_total = (float)$poInvoice->total_invoice_amount -  $discountValue;
+      $poInvoice->paid_amount = $request->paid_amount;
+      $poInvoice->cash_account_id = $cashAccountId;
       $poInvoice->save();
       DB::commit();
       return ResponseMessage('Transaction created successfully', 200);
@@ -1411,154 +1418,33 @@ class PoOrderRepository implements PoOrderRepositoryInterface
     }
   }
 
-
-  public function getPoOrderArrivalListByInvoiceId($invoiceId)
-  {
-    $leftsSubquery = DB::table('item_lefts')
-      ->join('arrival_items', function ($join) {
-        $join
-          ->on('item_lefts.item_leftable_id', '=', 'arrival_items.id')
-          ->where('item_lefts.item_leftable_type', '=', 'arrival_item');
-      })
-      ->select(
-        'arrival_items.item_id',
-        DB::raw('SUM(item_lefts.quantity) as left_quantity'),
-        DB::raw('SUM(item_lefts.amount) as left_amount'),
-        DB::raw('GROUP_CONCAT(item_lefts.id SEPARATOR ", ") as item_left_ids')
-      )
-      ->groupBy(
-        'arrival_items.item_id',
-      );
-
-    $arrivalSubQuery = DB::table('arrival_items')
-      ->select(
-        'arrival_items.item_id',
-        DB::raw('SUM(arrival_items.quantity) as arrival_quantity'),
-        DB::raw('SUM(arrival_items.amount) as arrival_amount'),
-        DB::raw('GROUP_CONCAT(arrival_items.purchase_order_id SEPARATOR ",") as po_order_ids')
-      )
-      ->groupBy(
-        'arrival_items.item_id',
-      );
-
-    $arrivalSubQuery = DB::table('arrival_items')
-      ->select(
-        'arrival_items.item_id',
-        'arrival_items.supplier_id',
-        'arrival_items.brand_id',
-        DB::raw('SUM(arrival_items.quantity) as arrival_quantity'),
-        DB::raw('SUM(arrival_items.amount) as arrival_amount'),
-        DB::raw('GROUP_CONCAT(arrival_items.purchase_order_id SEPARATOR ",") as po_order_ids')
-      )
-      ->where('arrival_items.po_invoice_id', $invoiceId)
-      ->groupBy(
-        'arrival_items.item_id',
-        'arrival_items.supplier_id',
-        'arrival_items.brand_id',
-        'arrival_items.purchase_order_id',
-        'arrival_items.unit_price'
-      );
-
-    $poOrders = DB::table('po_orders as poOrder')
-      ->join('purchase_orders as po', 'poOrder.purchase_order_id', '=', 'po.id')
-      ->join('items as i', 'poOrder.item_id', '=', 'i.id')
-      ->join('suppliers as s', 'poOrder.supplier_id', '=', 's.id')
-      ->join('item_prices as ip', 'poOrder.item_price_id', '=', 'ip.id')
-      ->leftJoinSub($leftsSubquery, 'item_lefts', function ($join) {
-        $join->on('poOrder.item_id', '=', 'item_lefts.item_id');
-      })
-      ->leftJoinSub($arrivalSubQuery, 'arrival_items', function ($join) {
-        $join->on('poOrder.item_id', '=', 'arrival_items.item_id')
-          ->on('poOrder.supplier_id', '=', 'arrival_items.supplier_id')
-          ->on('poOrder.brand_id', '=', 'arrival_items.brand_id')
-          ->on('poOrder.purchase_order_id', '=', 'arrival_items.purchase_order_id');
-      })
-      ->select(
-        'i.id as item_id',
-        'i.name as item_name',
-        's.id as supplier_id',
-        's.name as supplier_name',
-        'poOrder.purchase_order_id',
-        'poOrder.brand_id',
-        'arrival_items.unit_price',
-        DB::raw('COALESCE(SUM(poOrder.quantity), 0) AS total_po_order_quantity'),
-        DB::raw('COALESCE(SUM(poOrder.amount), 0) AS total_po_order_amount'),
-        DB::raw('COALESCE(arrival_items.arrival_quantity, 0) as total_arrival_quantity'),
-        DB::raw('COALESCE(item_lefts.left_quantity, 0) as total_left_quantity'),
-        DB::raw('COALESCE(item_lefts.item_left_ids, "null") as item_left_ids'),
-        DB::raw('COALESCE(arrival_items.arrival_amount, 0) as total_arrival_amount'),
-        DB::raw('COALESCE(SUM(poOrder.quantity), 0) - COALESCE(arrival_items.arrival_quantity, 0) AS total_quantity'),
-        DB::raw('COALESCE(item_lefts.left_amount, 0) as total_left_amount'),
-        DB::raw('COUNT(DISTINCT poOrder.id) AS row_count')
-      )
-      ->groupBy(
-        'i.id',
-        'i.name',
-        's.id',
-        's.name',
-        'poOrder.purchase_order_id',
-        'poOrder.brand_id',
-        'arrival_items.unit_price',
-        'arrival_items.arrival_quantity',
-        'arrival_items.arrival_amount',
-        'item_lefts.left_quantity',
-        'item_lefts.left_amount',
-        'item_lefts.item_left_ids'
-      )
-      ->having('total_quantity', '>', 0)
-      ->paginate(config('common.list_count'));
-
-    return $poOrders;
-  }
-
-
-  public function updateArrivalListByItemId($itemId, $request)
+  public function updateArrivalList($arrivalId, $validatedData)
   {
 
     DB::beginTransaction();
 
     try {
 
-      $arrivalItems = ArrivalItem::where('item_id', $itemId)->get();
-
-      if ($arrivalItems->isEmpty()) {
+      $arrivalItem = ArrivalItem::findOrFail($arrivalId);
+      if (!$arrivalItem) {
         return ResponseMessage('No arrival items found for this item', 404);
       }
 
-      if (isset($request->unit_price)) {
-        foreach ($arrivalItems as $arrivalItem) {
-          $arrivalItem->update([
-            'unit_price' => $request->unit_price
-          ]);
-        }
+      if (isset($validatedData['unit_price'])) {
+        $arrivalItem->unit_price = $validatedData['unit_price'];
+        $arrivalItem->amount = $validatedData['unit_price'] * $arrivalItem->quantity;
+        $arrivalItem->save();
+      }
+
+      $poInvoice = $arrivalItem->poInvoice;
+      if ($poInvoice) {
+        $totalAmount = $poInvoice->arrivalItems->sum('amount');
+        $poInvoice->total_invoice_amount = $totalAmount;
+        $poInvoice->save();
       }
 
       DB::commit();
-
-      return ResponseData($arrivalItems, 200, true, 'Unit price updated successfully.');
-    } catch (\Exception $e) {
-      DB::rollBack();
-      return ResponseMessage('Error updating unit price: ' . $e->getMessage(), 500);
-    }
-  }
-
-
-  public function updateInvoice($invoiceId, $request)
-  {
-    DB::beginTransaction();
-
-    try {
-      $poInvoice = PoInvoice::find($invoiceId);
-      if (!$poInvoice) {
-        return ResponseMessage('Po Invoice not found', 404);
-      }
-      $poInvoice->discount_value = $request->discount_value;
-      $poInvoice->sub_total = $poInvoice->total_invoice_amount -  $request->discount_value;
-      $poInvoice->paid_amount = $request->paid_amount;
-      $poInvoice->save();
-
-      DB::commit();
-      return ResponseMessage('Invoice status updated successfully', 200);
+      return ResponseData($arrivalItem, 200, true, 'Unit price updated successfully.');
     } catch (\Exception $e) {
       DB::rollBack();
       return ResponseMessage('Error updating unit price: ' . $e->getMessage(), 500);
