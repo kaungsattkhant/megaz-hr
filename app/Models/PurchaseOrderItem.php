@@ -29,7 +29,8 @@ class PurchaseOrderItem extends BaseModel
         'is_financial_checked',
         'is_md_checked',
         'is_procurement_manager_checked',
-        'is_confirmed'
+        'is_confirmed',
+        'remark'
     ];
 
     public function getCreatedAt()

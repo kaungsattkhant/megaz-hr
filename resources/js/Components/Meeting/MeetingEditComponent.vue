@@ -2,7 +2,7 @@
     <div class="px-0">
         <div class="mb-4">
             <p class="text-lg font-semibold font-inter">
-                Create Meeting
+                Create Meeting 
             </p>
         </div>
         
@@ -159,7 +159,10 @@
                     rows="6"></textarea>
             </div>
         </div>
-        <div>
+        <div class="flex gap-x-4">
+            <a href="/meeting" class="cancel-btn focus:shadow-none focus:outline-none ">
+                Cancel
+            </a>
             <button class="add-btn" @click="createBtnClicked">
                 Create Meeting
             </button>
@@ -202,6 +205,15 @@ export default {
 
             meetingDetail:null,
 
+            previous_dep_id:[],
+            previous_role_id:[],
+            previous_staff_id:[],
+            new_dep_id:[],
+            new_role_id:[],
+            new_staff_id:[],
+            deleted_dep_id:[],
+            deleted_role_id:[],
+            deleted_staff_id:[],
             typeList:[
                 {value:'phone',name:'Phone'},
                 {value:'kpay',name:'Kpay'}
@@ -232,6 +244,7 @@ export default {
                 let departments = []
                 data.participants.forEach(participant => {
                     departments.push(this.allDepartmentList.find(department => department.id == participant.department_id))
+                    this.previous_dep_id.push(participant.department_id)
                 });
                 this.selectedDepartment = departments
             }
@@ -239,6 +252,7 @@ export default {
                 let roles = []
                 data.participants.forEach(participant => {
                     roles.push(this.allRoleList.find(role => role.id == participant.role_id))
+                    this.previous_role_id.push(participant.role_id)
                 });
                 this.selectedRole = roles
             }
@@ -246,6 +260,7 @@ export default {
                 let roles = []
                 data.participants.forEach(participant => {
                     roles.push(this.allRoleList.find(role => role.id == participant.role_id))
+                    this.previous_staff_id.push(participant.staff_id)
                 });
                 this.selectedRole = roles
             }
@@ -306,9 +321,29 @@ export default {
             }
         },
 
-        
+        checkDeletedId(){
+            if(this.meetingDetail.meeting_type == 'dep_type'){
+                this.selectedDepartment.forEach((item)=>{
+                    this.new_dep_id.push(item.id);
+                });
+                this.deleted_dep_id = this.previous_dep_id.filter(id => !this.new_dep_id.includes(id))
+            }
+            if(this.meetingDetail.meeting_type == 'role_type'){
+                this.selectedRole.forEach((item)=>{
+                    this.new_role_id.push(item.id);
+                });
+                this.deleted_role_id = this.previous_role_id.filter(id => !this.new_role_id.includes(id))
+            }
+            if(this.meetingDetail.meeting_type == 'staff_type'){
+                this.selectedStaff.forEach((item)=>{
+                    this.new_staff_id.push(item.id);
+                });
+                this.deleted_staff_id = this.previous_staff_id.filter(id => !this.new_staff_id.includes(id))
+            }
+        },
         
         async createBtnClicked(){
+            this.checkDeletedId();
             if(!this.title){
                 this.alertValidationMessage(`MeetingTitle`);
                 return 1;
@@ -353,6 +388,7 @@ export default {
                     meetingType = 'dep_type'
                 }
             }
+            
             let formData = new FormData();
             formData.append("title", this.title);
             formData.append("date_time", this.selectedDate);
@@ -363,17 +399,40 @@ export default {
             formData.append("chaired_by", this.selectedChairedBy.id);
             formData.append("description", this.description);
             formData.append("meeting_type", meetingType);
-            if(this.selectedDepartment.length > 0){
+            formData.append("previous_meeting_type", this.meetingDetail.meeting_type);
+            if(this.meetingDetail.meeting_type != meetingType){
+                if(this.meetingDetail.meeting_type == 'dep_type'){
+                    formData.append("deleted_department_ids", JSON.stringify(this.previous_dep_id));
+                }
+                if(this.meetingDetail.meeting_type == 'role_type'){
+                    formData.append("deleted_role_ids", JSON.stringify(this.previous_role_id));
+                }
+                if(this.meetingDetail.meeting_type == 'staff_type'){
+                    formData.append("deleted_staff_ids", JSON.stringify(this.previous_staff_id));
+                }
+            }
+            else{
+                if(meetingType == 'dep_type'){
+                    formData.append("deleted_department_ids", JSON.stringify(this.deleted_dep_id));
+                }
+                if(meetingType == 'role_type'){
+                    formData.append("deleted_role_ids", JSON.stringify(this.deleted_role_id));
+                }
+                if(meetingType == 'staff_type'){
+                    formData.append("deleted_staff_ids", JSON.stringify(this.deleted_staff_id));
+                }
+            }
+            if(this.selectedDepartment.length > 0 && meetingType == 'dep_type'){
                 this.selectedDepartment.forEach((item)=>{
                     formData.append('department[]', item.id);
                 });
             }
-            if(this.selectedRole.length > 0){
+            if(this.selectedRole.length > 0 && meetingType == 'role_type'){
                 this.selectedRole.forEach((item)=>{
                     formData.append('role[]', item.id);
                 });
             }
-            if(this.selectedStaff.length > 0){
+            if(this.selectedStaff.length > 0 && meetingType == 'staff_type'){
                 this.selectedStaff.forEach((item)=>{
                     formData.append('staff[]', item.id);
                 });

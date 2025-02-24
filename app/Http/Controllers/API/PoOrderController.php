@@ -73,4 +73,21 @@ class PoOrderController extends Controller
         $data =  $this->PoOrderRepository->processInvoiceTransaction($request);
         ResponseData($data);
     }
+
+    public function getPoOrderArrivalListByInvoiceId($invoiceId)
+    {
+        $data =  $this->PoOrderRepository->getPoOrderArrivalListByInvoiceId($invoiceId);
+        ResponseData($data);
+    }
+
+    public function updateArrivalListByItemId($itemId, Request $request)
+    {
+        $data =  $this->PoOrderRepository->updateArrivalListByItemId($itemId, $request);
+        ResponseData($data);
+    }
+    public function updateInvoice($invoiceId, Request $request)
+    {
+        $data =  $this->PoOrderRepository->updateInvoice($invoiceId, $request);
+        ResponseData($data);
+    }
 }

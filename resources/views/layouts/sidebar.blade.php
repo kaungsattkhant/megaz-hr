@@ -830,25 +830,25 @@
                     <li>
                         <a href="/meeting" class="flex items-center @yield('meeting') sidebar-gap-x">
                             <!-- <i class="fal fa-braille pr-3"></i> -->
-                            <img class="sidebar-img " src="{{ asset('img/icons8-dashboard-48.png') }}" alt="">
+                            <img class="sidebar-img " src="{{ asset('img/icons8-meeting-50.png') }}" alt="">
                             Meeting
                         </a>
                     </li>
                     <li>
                         <a href="/training" class="flex items-center @yield('training') sidebar-gap-x">
-                            <img class="sidebar-img " src="{{ asset('img/icons8-dashboard-48.png') }}" alt="">
+                            <img class="sidebar-img " src="{{ asset('img/icons8-training-50.png') }}" alt="">
                             Training
                         </a>
                     </li>
                     <li>
                         <a href="/org_news" class="flex items-center @yield('org_news') sidebar-gap-x">
-                            <img class="sidebar-img " src="{{ asset('img/icons8-dashboard-48.png') }}" alt="">
+                            <img class="sidebar-img " src="{{ asset('img/icons8-news-50.png') }}" alt="">
                             OrgNews
                         </a>
                     </li>
                     <li>
                         <a href="/warning" class="flex items-center @yield('warning') sidebar-gap-x">
-                            <img class="sidebar-img " src="{{ asset('img/icons8-dashboard-48.png') }}" alt="">
+                            <img class="sidebar-img " src="{{ asset('img/icons8-warning-64.png') }}" alt="">
                             Warning
                         </a>
                     </li>

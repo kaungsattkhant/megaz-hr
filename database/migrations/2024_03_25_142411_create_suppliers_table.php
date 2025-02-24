@@ -20,7 +20,9 @@ return new class extends Migration
             $table->longText('address')->nullable();
             $table->string('email')->nullable();
             $table->integer('credit_limit');
-            $table->double('lead_time');
+            $table->integer('lead_time_day')->nullable();
+            $table->float('lead_time_hour', 8, 2)->nullable();
+            $table->integer('lead_time_minutes')->nullable();
             $table->longText('credit_terms');
             $table->timestamps();
         });

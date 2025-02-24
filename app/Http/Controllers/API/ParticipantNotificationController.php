@@ -68,9 +68,9 @@ class ParticipantNotificationController extends Controller
         ResponseData($data);
     }
 
-    public function updateTraining($trainingId)
+    public function updateTraining($trainingId, Request $request)
     {
-        $data = $this->ParticipantNotificationRepository->updateTraining($trainingId);
+        $data = $this->ParticipantNotificationRepository->updateTraining($trainingId, $request);
         ResponseData($data);
     }
 
@@ -92,9 +92,9 @@ class ParticipantNotificationController extends Controller
         ResponseData($data);
     }
 
-    public function updateOrgNews($orgNewsId)
+    public function updateOrgNews($orgNewsId, Request $request)
     {
-        $data = $this->ParticipantNotificationRepository->updateOrgNews($orgNewsId);
+        $data = $this->ParticipantNotificationRepository->updateOrgNews($orgNewsId, $request->all());
         ResponseData($data);
     }
 
@@ -128,9 +128,9 @@ class ParticipantNotificationController extends Controller
         ResponseData($data);
     }
 
-    public function updateWarning($warningId)
+    public function updateWarning($warningId, Request $request)
     {
-        $data = $this->ParticipantNotificationRepository->updateWarning($warningId);
+        $data = $this->ParticipantNotificationRepository->updateWarning($warningId, $request->all());
         ResponseData($data);
     }
     public function deleteWarning($warningId)

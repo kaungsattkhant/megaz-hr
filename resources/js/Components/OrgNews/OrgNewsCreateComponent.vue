@@ -142,7 +142,10 @@
                     rows="6"></textarea>
             </div>
         </div>
-        <div>
+        <div class="flex gap-x-4">
+            <a href="/org_news" class="cancel-btn focus:shadow-none focus:outline-none ">
+                Cancel
+            </a>
             <button class="add-btn" @click="createBtnClicked">
                 Create Org News
             </button>
@@ -352,7 +355,7 @@ export default {
             let url = `/api/org_news`;
             let response = await postApiData({url: url, form_data: formData, token: this.getToken()});
             if(response.success){
-                // window.location.replace("/org_news");
+                window.location.replace("/org_news");
             }
         },
 

@@ -20,7 +20,9 @@ class Supplier extends Model
         'address',
         'email',
         'credit_limit',
-        'lead_time',
+        'lead_time_day',
+        'lead_time_hour',
+        'lead_time_minutes',
         'credit_terms'
     ];
 
