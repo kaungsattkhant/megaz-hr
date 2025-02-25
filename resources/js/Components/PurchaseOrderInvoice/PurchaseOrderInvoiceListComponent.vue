@@ -36,9 +36,9 @@
                                 <th scope="col" class="">
                                     Supplier
                                 </th>
-                                <!-- <th scope="col" class="">
-                                    Qty ( UOM )
-                                </th> -->
+                                <th scope="col" class="">
+                                    Qty
+                                </th>
                                 <th scope="col" class="">
                                     Amount
                                 </th>
@@ -65,6 +65,9 @@
                                     <td class="whitespace-nowrap">
                                         {{ item.supplier_name }}
                                     </td>
+                                    <td class="whitespace-nowrap">
+                                        
+                                    </td>
                                     <!-- <td class="whitespace-nowrap">
                                         <span v-if="item.total_invoice_quantity"> {{ item.total_invoice_quantity.toLocaleString() }} </span>
                                     </td> -->
@@ -80,6 +83,9 @@
                                             @click="checkBtnClicked(item.arrival_items[0], index, item)">
                                                 <i class="fal fa-check"></i>
                                             </button>
+                                            <a class="pr-2" :href="'/purchase_order_invoices/' + item.id + '/confirm'">
+                                                <i class="fal fa-pen"></i>
+                                            </a>
                                         </div>
                                     </td>
                                 </tr>
@@ -87,8 +93,12 @@
                                     <!-- <td> &nbsp; </td> -->
                                     <td colspan="2" class="whitespace-nowrap"> &nbsp; </td>
                                     <td class="whitespace-nowrap"> {{ arrival.item_name }} </td>
+                                    <td class="whitespace-nowrap"> {{ arrival.brand_name }} </td>
                                     <td class="whitespace-nowrap"> {{ item.supplier_name }} </td>
-                                    <!-- <td class="whitespace-nowrap"> {{ arrival.quantity.toLocaleString() }} </td> -->
+                                    <td class="whitespace-nowrap"> 
+                                        {{ arrival.uom_quantity > 0 ? arrival.uom_quantity : '' }} {{ arrival.uom_quantity > 0 ? arrival.uom_name : '' }}  
+                                        {{ arrival.base_uom_quantity > 0 ? arrival.base_uom_quantity : '' }}  {{ arrival.base_uom_quantity > 0 ? arrival.base_uom_name : '' }}     
+                                    </td>
                                     <td class="whitespace-nowrap"> {{ arrival.amount.toLocaleString() }} </td>
                                     <td class="whitespace-nowrap">
                                         <!-- <button data-te-toggle="modal" data-te-target="#edit_modal" id="edit-btn" class="pr-3">

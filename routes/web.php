@@ -365,3 +365,4 @@ Route::view('/org_news/{id}/edit', 'org_news.edit');
 Route::view('/warning', 'warning.index')->name('warning');
 Route::view('/warning/create', 'warning.create')->name('warning.create');
 Route::view('/warning/{id}/edit', 'warning.edit');
+Route::view('/purchase_order_invoices/{id}/confirm', 'purchase_order_invoices.confirm')->name('purchase_order_invoices.confirm');
