@@ -1133,6 +1133,7 @@ class InvoiceRepository implements InvoiceRepositoryInterface
         //end
         DB::beginTransaction();
         try {
+            // dd($data);
             $invoice = Invoice::find($data['invoice_id']);
             $data['total'] = $invoice['total'] != null ? $invoice['total'] : 0;
             if (!$invoice) {
@@ -1155,7 +1156,7 @@ class InvoiceRepository implements InvoiceRepositoryInterface
             $service_charge = 0;
             $tax = 0;
             $foodDrink = 0;
-            $discount_value = 0;
+            // $discount_value = 0;
             $room_discount_value = 0;
             $bdDiscount = 0;
             $customerLevelDiscount = 0;
@@ -1252,9 +1253,11 @@ class InvoiceRepository implements InvoiceRepositoryInterface
             }
 
             // $data['room_discount_value'] = $room_discount_value;
-            if (isset($data['discount_value'])) {
-                $discount_value = $data['discount_value'];
-            }
+            //doesn't have discount value when done session
+            // if (isset($data['discount_value'])) {
+            //     $discount_value = $data['discount_value'];
+            // }
+            //end
             $total_service_value = 0;
             $invoiceServices = $invoice->invoiceService;
             foreach ($invoiceServices as $invoiceService) {
@@ -1267,20 +1270,18 @@ class InvoiceRepository implements InvoiceRepositoryInterface
                 }
                 $total_service_value += $serviceValue;
             }
-            // $data['discount_value'] = $room_discount_value + $bdDiscount + $customerLevelDiscount + $discount_value;
-            $data['discount_value'] = $discount_value;
-            $data['discount_total'] = $room_discount_value + $bdDiscount + $customerLevelDiscount + $discount_value +$order_discount;
-            $data['total'] -= $room_discount_value;
-            $data['tax'] = $tax;
-            $data['service_charge'] = $service_charge;
+            // $data['discount_value'] = $discount_value;
+            $data['discount_total'] = $room_discount_value + $bdDiscount + $customerLevelDiscount  +$order_discount;
+            // $data['tax'] = $tax;
+            // $data['service_charge'] = $service_charge;
             $data['total_session_price'] = $total_session_price;
-            $data['order_discount_value'] = $order_discount;
+            // $data['order_discount_value'] = $order_discount;
             $data['total_service_value'] = $total_service_value;
-            $data['sub_total'] = ($data['total']) - ($tax + $service_charge);
             $data['payment_status'] = 'received';
             $data['complete_date'] = CurrentTime();
             $data['invoice_id'] = $invoice_id;
             $invoice->update($data);
+
             //update is active  to room_session
             // $this->invoiceService->updateIsActive($invoice->id, 0);
             //customer deposit
