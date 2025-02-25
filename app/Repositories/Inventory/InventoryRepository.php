@@ -149,7 +149,7 @@ class InventoryRepository implements InventoryRepositoryInterface
         DB::beginTransaction();
         try {
 
-            $minQty = (int) $validatedData['base_uom_min_quantity'] * (int) $validatedData['conversion'] + (int) $validatedData['uom_min'];
+            $minQty = ((int) $validatedData['base_uom_min_quantity'] * (int) $validatedData['conversion']) + (int) $validatedData['uom_min_quantity'];
             $inventoryitem = InventoryItem::create([
                 'inventory_id' => $validatedData['inventory_id'],
                 'item_id' => $validatedData['item_id'],
@@ -160,7 +160,7 @@ class InventoryRepository implements InventoryRepositoryInterface
                 'min_quantity' => $minQty
             ]);
             DB::commit();
-            ResponseMessage($inventoryitem, 'InventoryItem created successfully.', 201);
+            return ResponseData($inventoryitem, 201, true, 'InventoryItem created successfully.');
         } catch (\Exception $e) {
             DB::rollback();
             ResponseMessage($e->getMessage(), 402);

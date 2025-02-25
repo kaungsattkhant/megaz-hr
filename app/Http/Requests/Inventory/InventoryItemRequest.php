@@ -29,7 +29,7 @@ class InventoryItemRequest extends APIRequest
             'base_uom_min_quantity' => 'required|numeric',
             'uom_id' => 'required|integer|exists:uoms,id',
             'uom_min_quantity' => 'required|numeric',
-            'conversion' => 'required|integer|  exists:uom_conversions,id',
+            'conversion' => 'required',
         ];
     }
 
