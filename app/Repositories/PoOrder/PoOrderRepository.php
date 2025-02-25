@@ -1092,6 +1092,7 @@ class PoOrderRepository implements PoOrderRepositoryInterface
       ->whereHas('arrivalItems', function ($q) use ($supplierId) {
         $q->where('supplier_id', $supplierId);
       })
+      ->where('is_complete', 0)
       ->get();
     return $invoices;
   }
@@ -1351,7 +1352,7 @@ class PoOrderRepository implements PoOrderRepositoryInterface
       'po_invoices.sub_total',
       'ai.supplier_id',
       's.name as supplier_name',
-      'i.name as i_name',
+      // 'i.name as i_name',
       's.account_id',
       'po_invoices.is_complete',
       'po_invoices.completed_at',
@@ -1371,12 +1372,12 @@ class PoOrderRepository implements PoOrderRepositoryInterface
         'po_invoices.sub_total',
         'ai.supplier_id',
         's.name',
-        'i.name',
+        // 'i.name',
         's.account_id',
         'po_invoices.is_complete',
         'po_invoices.completed_at',
       )
-      ->where('is_complete', 0)
+      // ->where('is_complete', 0) // retriev all invoice
       ->paginate(config('common.list_count'));
     $poInvoices->getCollection()->each(function ($invoice) {
       $invoice->item_names = $invoice->arrivalItems->pluck('item.name')->unique()->implode(', ');
@@ -1449,7 +1450,7 @@ class PoOrderRepository implements PoOrderRepositoryInterface
       $poInvoice->is_complete = 1;
       $poInvoice->completed_at = now();
       $poInvoice->discount_value = $discountValue;
-      $poInvoice->sub_total = (float)$poInvoice->total_invoice_amount -  $discountValue;
+      $poInvoice->sub_total = (float) $poInvoice->total_invoice_amount - $discountValue;
       $poInvoice->paid_amount = $request->paid_amount;
       $poInvoice->cash_account_id = $cashAccountId;
       $poInvoice->save();
