@@ -1372,7 +1372,6 @@ class PoOrderRepository implements PoOrderRepositoryInterface
         'po_invoices.sub_total',
         'ai.supplier_id',
         's.name',
-        // 'i.name',
         's.account_id',
         'po_invoices.is_complete',
         'po_invoices.completed_at',

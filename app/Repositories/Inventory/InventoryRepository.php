@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\Models\Inventoryable;
 use Illuminate\Support\Facades\DB;
 use App\Actions\Inventory\GetInventoryStockAction;
+use App\Models\InventoryItem;
 
 class InventoryRepository implements InventoryRepositoryInterface
 {
@@ -140,5 +141,30 @@ class InventoryRepository implements InventoryRepositoryInterface
             'source_inventories' => UserData()->inventories,
             'destination_inventories' => $toInventory,
         ];
+    }
+
+    public function createInventoryItem($validatedData)
+    {
+
+        DB::beginTransaction();
+        try {
+
+            $minQty = ((int) $validatedData['base_uom_min_quantity'] * (int) $validatedData['conversion']) + (int) $validatedData['uom_min_quantity'];
+            $inventoryitem = InventoryItem::create([
+                'inventory_id' => $validatedData['inventory_id'],
+                'item_id' => $validatedData['item_id'],
+                'base_uom_id' => $validatedData['base_uom_id'],
+                'base_uom_min_quantity' => $validatedData['base_uom_min_quantity'],
+                'uom_id' => $validatedData['uom_id'],
+                'uom_min_quantity' => $validatedData['uom_min_quantity'],
+                'min_quantity' => $minQty
+            ]);
+            DB::commit();
+            return ResponseData($inventoryitem, 201, true, 'InventoryItem created successfully.');
+        } catch (\Exception $e) {
+            DB::rollback();
+            ResponseMessage($e->getMessage(), 402);
+            throw $e;
+        }
     }
 }

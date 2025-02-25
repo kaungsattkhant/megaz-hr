@@ -117,6 +117,9 @@ class GetInventoryStockAction
         $to_date = convertDateFormat($request->to_date);
         $itemBalances = DB::table('inventory_ledger_items')
             ->join('items', 'inventory_ledger_items.item_id', '=', 'items.id')
+            ->leftJoin('inventory_items', function ($join) {
+                $join->on('inventory_ledger_items.item_id', '=', 'inventory_items.item_id');
+            })
             ->join(DB::raw('(SELECT si.item_id, 
                             CAST(AVG(ip.price) AS DECIMAL(10,2)) AS average_price                          
                     FROM supplier_items si
@@ -141,7 +144,8 @@ class GetInventoryStockAction
                 'items.name',
                 'inventory_ledger_items.item_id',
                 'items.uom_id as item_uom_id',
-                // 'latest_prices.base_uom_id as base_uom_id',
+                'inventory_ledgers.inventory_id',
+                'inventory_items.min_quantity',
                 'latest_prices.average_price as price',
                 'items.base_uom_id as base_unit_id',
                 'item_uom.name as conversion_uom_name',
@@ -160,7 +164,7 @@ class GetInventoryStockAction
                 SUM(CASE WHEN action = "in" AND DATE(date) = CURDATE() THEN quantity ELSE 0 END) -
                 SUM(CASE WHEN action = "out" AND DATE(date) <= CURDATE() THEN quantity ELSE 0 END))) as total_value')
             )
-            ->where('inventory_id', $this->inventoryId)
+            ->where('inventory_ledgers.inventory_id', $this->inventoryId)
             ->when(($request->from_date && $request->to_date), function ($q) use ($from_date, $to_date) {
                 $q->whereBetween(DB::raw('DATE(inventory_ledgers.created_at)'), [$from_date, $to_date]);
             })
@@ -175,12 +179,13 @@ class GetInventoryStockAction
                 'items.name',
                 'items.uom_id',
                 'latest_prices.average_price',
-                // 'latest_prices.base_uom_id',
+                'inventory_items.min_quantity',
                 'items.base_uom_id',
                 'uom_conversions.conversion',
                 'uom_conversions.id',
                 'item_uom.name',
-                'base_uom.name'
+                'base_uom.name',
+                'inventory_ledgers.inventory_id',
             )
             ->orderByRaw('CASE WHEN 
         (SUM(CASE WHEN action = "in" AND DATE(date) < CURDATE() THEN quantity ELSE 0 END) +

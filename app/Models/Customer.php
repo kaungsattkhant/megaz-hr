@@ -21,7 +21,7 @@ class Customer extends Authenticatable
         'otp'
     ];
 
-    protected $fillable=[
+    protected $fillable = [
         'gender_id',
         'name',
         'phone_number',
@@ -36,6 +36,9 @@ class Customer extends Authenticatable
         'is_active',
         'is_verified',
         'account_id',
+        'credit_limit',
+        'credit_opening_date',
+        'credit_opening_amount'
     ];
 
     public function setPasswordAttribute($value)
@@ -72,6 +75,4 @@ class Customer extends Authenticatable
     {
         return $this->hasMany(CustomerAddress::class);
     }
-
-
 }

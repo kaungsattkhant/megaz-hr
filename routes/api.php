@@ -300,6 +300,7 @@ Route::middleware('auth:api')->group(function () {
     Route::get('inventory_list', [InventoryAPIController::class, 'inventoryList']);
     Route::controller(InventoryAPIController::class)->group(function () {
         Route::get('inventory_ledger_list', 'getInventoryLedgerList');
+        Route::post('inventory_item', 'createInventoryItem');
     });
 
     Route::get('/uoms', [UomAPIController::class, 'getUomData']);
@@ -386,7 +387,7 @@ Route::middleware('auth:api')->group(function () {
         Route::get('/duties/{id}', 'dutyDetail');
     });
     Route::resource('canteens', CanteenController::class)->only(['index', 'store', 'show']);
-    Route::controller(CanteenController::class)->group(function () { });
+    Route::controller(CanteenController::class)->group(function () {});
     //service
     Route::resource('services', ServiceController::class)->only(['index', 'store', 'show']);
 
@@ -450,7 +451,6 @@ Route::middleware('auth:api')->group(function () {
         Route::get('supplier_by_item/{item_id}', 'supplierByItem');
         Route::get('brand_list_of_supplier_by_item/{item_id}', 'brandlistOfSupplierByItem');
         Route::get('brand_list_of_by_item/{item_id}', 'brandlistOfSupplierByItem');
-
     });
     //invoice transaction
     Route::post('/invoice_transaction', [PoOrderController::class, 'processInvoiceTransaction']);
