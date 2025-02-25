@@ -1654,6 +1654,9 @@
                     this.getRoomList();
                     this.getSelectedRoom();
                     this.isOpenRoomStep('detail');
+                    this.printInvoiceData.room = response.data.total_session_price
+                    this.printInvoiceData.food = response.data.total_order_value
+                    this.printInvoiceData.total = response.data.invoice_total - response.data.total_order_discount_price
                     
                     // if (this.selectedRoom.room_sessions.length > 0) {
                     //     if (this.selectedRoom.room_sessions[0].invoice.orders.length > 0) {
