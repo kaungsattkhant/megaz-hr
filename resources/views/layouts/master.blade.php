@@ -78,7 +78,7 @@
                     $(this).addClass("active-link"); // Add 'active' to the matching link
                 }
             });
-        console.log(currentPath)
+        // console.log(currentPath)
         $(window).on('load', function() {
             scrollToActiveLink();
         });

@@ -17,8 +17,7 @@ interface PoOrderRepositoryInterface
   public function getSupplierLeadTime($supplierId);
   public function getInvoices(Request $request);
   public function processInvoiceTransaction($request);
+  public function updateArrivalList($arrivalId, $validatedData);
 
-  public function updateInvoice($invoiceId, $request);
-  public function getPoOrderArrivalListByInvoiceId($invoiceId);
-  public function updateArrivalListByItemId($itemId, $request);
+  public function getInvoiceById($invoiceId);
 }

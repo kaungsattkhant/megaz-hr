@@ -39,7 +39,7 @@
                 </button> -->
                 <button type="button"
                     class="add-btn transition duration-150 ease-in-out focus:outline-none focus:ring-0 "
-                    data-te-toggle="modal" data-te-target="#create_modal">
+                    data-te-toggle="modal" data-te-target="#create_modal" @click="step = 1">
                     Add New
                 </button>
             </div>
@@ -250,123 +250,167 @@
             class="pointer-events-none relative w-auto mb-12 translate-y-[-50px] opacity-0 transition-all duration-300 ease-in-out min-[576px]:mx-auto min-[576px]:mt-7 min-[576px]:max-w-[500px]">
             <div
                 class="min-[576px]:shadow-[0_0.5rem_1rem_rgba(#000, 0.15)] pointer-events-auto relative flex w-full flex-col rounded-md border-none bg-white bg-clip-padding text-current shadow-lg outline-none">
-
-                <div class="relative flex justify-between py-2 px-6 border-b">
-                    <!--Modal title-->
-                    <h5 class="text-base text-center mt-2 font-semibold leading-normal font-inter"
-                        id="create_modalLabel">
-                        Create Item
-                    </h5>
-                    <!--Close button-->
-                    <button type="button" class="text-xs focus:shadow-none focus:outline-none" data-te-modal-dismiss
-                        aria-label="Close">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
-                            stroke="currentColor" class="h-4 w-4">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
-                        </svg>
-                    </button>
-                </div>
-
-                <!--Modal body-->
-                <div class="relative px-6 py-4 border-b" data-te-modal-body-ref>
-                    <div class="mb-4">
-                        <label for="" class="label-form mb-3">
-                            Item Name
-                        </label>
-                        <input type="text" placeholder="Item Name" v-model="name" class="input-ui">
+                <div v-show="step == '1'">
+                    <div class="relative flex justify-between py-2 px-6 border-b">
+                        <!--Modal title-->
+                        <h5 class="text-base text-center mt-2 font-semibold leading-normal font-inter"
+                            id="create_modalLabel">
+                            Create Item
+                        </h5>
+                        <!--Close button-->
+                        <button type="button" class="text-xs focus:shadow-none focus:outline-none" data-te-modal-dismiss
+                            aria-label="Close">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                                stroke="currentColor" class="h-4 w-4">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                        </button>
                     </div>
 
-                    <div class="mb-4">
-                        <label for="" class="label-form mb-3">
-                            Code
-                        </label>
-                        <input type="text" placeholder="Code" v-model="code" class="input-ui">
-                    </div>
+                    <!--Modal body-->
+                    <div class="relative px-12 py-4 border-b" data-te-modal-body-ref>
+                        <div class="mb-4">
+                            <label for="" class="label-form mb-3">
+                                Item Name
+                            </label>
+                            <input type="text" placeholder="Item Name" v-model="name" class="input-ui">
+                        </div>
 
-                    <div class="mb-4">
-                        <label for="" class="label-form mb-3">
-                            Item Type
-                        </label>
-                        <select name="" id="" v-model="itemType" class="input-ui">
-                            <option :value="item_type" v-for="(item_type, index) in itemTypeList" :key="index"> {{ item_type.name }}
-                            </option>
-                        </select>
-                    </div>
+                        <div class="mb-4">
+                            <label for="" class="label-form mb-3">
+                                Code
+                            </label>
+                            <input type="text" placeholder="Code" v-model="code" class="input-ui">
+                        </div>
 
-                    <div class="mb-4">
-                        <label for="" class="label-form mb-3">
-                            Category
-                        </label>
-                        <select name="" id="" v-model="selectedCategory" class="input-ui">
-                            <option :value="category" v-for="(category, categoryIndex) in itemCategoryList"
-                                :key="categoryIndex"> {{ category.name }} </option>
-                        </select>
+                        <div class="mb-4">
+                            <label for="" class="label-form mb-3">
+                                Item Type
+                            </label>
+                            <select name="" id="" v-model="itemType" class="input-ui">
+                                <option :value="item_type" v-for="(item_type, index) in itemTypeList" :key="index"> {{ item_type.name }}
+                                </option>
+                            </select>
+                        </div>
+
+                        <div class="mb-4">
+                            <label for="" class="label-form mb-3">
+                                Category
+                            </label>
+                            <select name="" id="" v-model="selectedCategory" class="input-ui">
+                                <option :value="category" v-for="(category, categoryIndex) in itemCategoryList"
+                                    :key="categoryIndex"> {{ category.name }} </option>
+                            </select>
+                        </div>
+                        <!-- <div class="mb-4">
+                            <label class="label-form mb-3">Brands</label>
+                            <multiselect
+                            v-model="selectedBrands"
+                            :options="brandsList"
+                            :multiple="true"
+                            :close-on-select="false"
+                            :clear-on-select="false"
+                            :preserve-search="true"
+                            placeholder="Select Brands"
+                            label="name"
+                            track-by="id"
+                            :preselect-first="false">
+                                <template #selection="{ values, search, isOpen }">
+                                    <span class="multiselect__single" v-if="values.length" v-show="!isOpen">{{ values.length }}
+                                        brands selected</span>
+                                </template>
+                            </multiselect>
+                        </div> -->
+                        <div class="mb-4">
+                            <label for="" class="label-form mb-3">
+                                Base UOM (အကြီး)
+                            </label>
+                            <select name="" id="" v-model="selectedBaseUom" class="input-ui">
+                                <option :value="uom" v-for="(uom, uomIndex) in uomList" :key="uomIndex"> {{ uom.name }}
+                                </option>
+                            </select>
+                        </div>
+                        <div class="mb-4">
+                            <label for="" class="label-form mb-3">
+                                Uom အသေး (Inventory သိမ်းဆည်း unit)
+                            </label>
+                            <select name="" id="" v-model="selectedUOM" class="input-ui">
+                                <option :value="uom" v-for="(uom, uomIndex) in uomList" :key="uomIndex"> {{ uom.name }}
+                                </option>
+                            </select>
+                        </div>
+                        <!-- <div class="mb-4">
+                            <label for="" class="label-form mb-3">
+                                Lead Time
+                            </label>
+                            <input type="text" placeholder="Lead Time" v-model="lead_time" class="input-ui">
+                        </div> -->
+                        <div class="mb-4 relative">
+                            <label for="" class="label-form mb-3">
+                                Brand
+                            </label>
+                            <select name="" id="" v-model="selectedBrand" class="input-ui">
+                                <option :value="brand" v-for="(brand, brandIndex) in brandList" :key="brandIndex"> {{ brand.name }}
+                                </option>
+                            </select>
+                            <button type="button" class="text-xs absolute -right-6 top-1/2 pt-2" @click="step = 2">
+                                <i class="fal fa-plus"></i>
+                            </button>
+                        </div>
+                        <div class="mb-4">
+                            <label for="" class="label-form mb-3">
+                                Minimum Holding Amount ( Base UOM - အကြီး )
+                            </label>
+                            <input type="text" placeholder="Minimum Holding Amount" v-model="base_min_amount" class="input-ui">
+                        </div>
+                        <div class="mb-4">
+                            <label for="" class="label-form mb-3">
+                                Minimum Holding Amount ( UOM - အသေး )
+                            </label>
+                            <input type="text" placeholder="Minimum Holding Amount" v-model="min_amount" class="input-ui">
+                        </div>
                     </div>
-                    <!-- <div class="mb-4">
-                        <label class="label-form mb-3">Brands</label>
-                        <multiselect
-                        v-model="selectedBrands"
-                        :options="brandsList"
-                        :multiple="true"
-                        :close-on-select="false"
-                        :clear-on-select="false"
-                        :preserve-search="true"
-                        placeholder="Select Brands"
-                        label="name"
-                        track-by="id"
-                        :preselect-first="false">
-                            <template #selection="{ values, search, isOpen }">
-                                <span class="multiselect__single" v-if="values.length" v-show="!isOpen">{{ values.length }}
-                                    brands selected</span>
-                            </template>
-                        </multiselect>
-                    </div> -->
-                    <div class="mb-4">
-                        <label for="" class="label-form mb-3">
-                            Base UOM (အကြီး)
-                        </label>
-                        <select name="" id="" v-model="selectedBaseUom" class="input-ui">
-                            <option :value="uom" v-for="(uom, uomIndex) in uomList" :key="uomIndex"> {{ uom.name }}
-                            </option>
-                        </select>
+                    <!--Modal footer-->
+                    <div class="flex justify-end gap-x-4 px-6 mb-6 pt-4">
+                        <button type="button" class="cancel-btn focus:shadow-none focus:outline-none" data-te-modal-dismiss
+                            aria-label="Close">
+                            Cancel
+                        </button>
+                        <button type="button" class="add-btn focus:outline-none focus:ring-0 " @click="createBtnClicked">
+                            Create
+                        </button>
                     </div>
-                    <div class="mb-4">
-                        <label for="" class="label-form mb-3">
-                            Uom အသေး (Inventory သိမ်းဆည်း unit)
-                        </label>
-                        <select name="" id="" v-model="selectedUOM" class="input-ui">
-                            <option :value="uom" v-for="(uom, uomIndex) in uomList" :key="uomIndex"> {{ uom.name }}
-                            </option>
-                        </select>
+                </div>    
+                <div v-show="step == '2'">
+                    <div class="relative flex justify-between py-2 px-6 border-b">
+                        <button @click="[step = 1, brandName = null]">
+                            <i class="fas fa-chevron-left"></i>
+                        </button>
+                        <h5 class="text-base text-center mt-2 font-semibold leading-normal font-inter">
+                            Create Brand
+                        </h5>
+                        <div>
+
+                        </div>
                     </div>
-                    <div class="mb-4">
-                        <label for="" class="label-form mb-3">
-                            Lead Time
-                        </label>
-                        <input type="text" placeholder="Lead Time" v-model="lead_time" class="input-ui">
+                    <div class="relative px-12 py-4 border-b" data-te-modal-body-ref>
+                        <div class="mb-4">
+                            <label for="" class="label-form mb-3">
+                                Name
+                            </label>
+                            <input type="text" placeholder="Name" v-model="brandName" class="input-ui">
+                        </div>
                     </div>
-                    <div class="mb-4">
-                        <label for="" class="label-form mb-3">
-                            Minimum Holding Amount ( Base UOM - အကြီး )
-                        </label>
-                        <input type="text" placeholder="Minimum Holding Amount" v-model="base_min_amount" class="input-ui">
+                    <div class="flex justify-end gap-x-4 px-6 mb-6 pt-4">
+                        <button type="button" class="cancel-btn focus:shadow-none focus:outline-none"
+                            data-te-modal-dismiss aria-label="Close" @click="stpe = 1">
+                            Cancel
+                        </button>
+                        <button type="button" @click="createBrand()"
+                            class="add-btn focus:outline-none focus:ring-0 ">
+                            Create
+                        </button>
                     </div>
-                    <div class="mb-4">
-                        <label for="" class="label-form mb-3">
-                            Minimum Holding Amount ( UOM - အသေး )
-                        </label>
-                        <input type="text" placeholder="Minimum Holding Amount" v-model="min_amount" class="input-ui">
-                    </div>
-                </div>
-                <!--Modal footer-->
-                <div class="flex justify-end gap-x-4 px-6 mb-6 pt-4">
-                    <button type="button" class="cancel-btn focus:shadow-none focus:outline-none" data-te-modal-dismiss
-                        aria-label="Close">
-                        Cancel
-                    </button>
-                    <button type="button" class="add-btn focus:outline-none focus:ring-0 " @click="createBtnClicked">
-                        Create
-                    </button>
                 </div>
             </div>
         </div>
@@ -484,12 +528,17 @@ export default {
             itemList: [],
             uomList: [],
             itemTypeList:[],
+            brandList: [],
             name: '',
             price: null,
             selectedUOM: null,
-            lead_time:null,
+            // lead_time:null,
+            selectedBrand:null,
             base_min_amount:0,
             min_amount:0,
+
+            brandName:null,
+            step: 1,
 
             selectedCategory: null,
             searchInput: null,
@@ -562,6 +611,14 @@ export default {
                 this.itemTypeList = response.data;
             }
         },
+        async getbrandList()
+        {
+            let url = `/api/brands`;
+            let response = await getApiData({url:url, token: this.getToken()});
+            if(response.data){
+                this.brandList = response.data;
+            }
+        },
 
 
         async getUomList() {
@@ -571,15 +628,6 @@ export default {
                 this.uomList = response.data;
             }
         },
-
-        // async getBrandList(){
-        //     let url = `/api/brands`;
-        //     let response = await getApiData({ url: url, token: this.getToken() });
-        //     if (response.success) {
-        //         this.brandsList = response.data;
-        //     }
-        // },
-
         async getItemList(pageNumber) {
             let url = `/api/items?page=${pageNumber}`;
             let response = await getApiData({ url: url, token: this.getToken() });
@@ -591,9 +639,23 @@ export default {
                 this.totalData = response.data.total;
             }
         },
-
+        async createBrand(){
+            if(!this.brandName){
+                this.alertValiationMessage('Brand Name');
+                return false;
+            }
+            let url = `/api/brands`;
+            let formData = new FormData();
+            formData.append('name', this.brandName);
+            let response = await postApiData({ url: url, form_data: formData, token: this.getToken() });
+            if (response.success) {
+                this.brandName = null;
+                this.getbrandList();
+                this.step = 1;
+            }
+        },
         async createBtnClicked() {
-            if (!this.selectedUOM || !this.name || !this.selectedCategory ||!this.selectedBaseUom || !this.code || !this.itemType || !this.lead_time || !this.base_min_amount || !this.min_amount) {
+            if (!this.selectedUOM || !this.name || !this.selectedCategory ||!this.selectedBaseUom || !this.code || !this.itemType || !this.selectedBrand || !this.base_min_amount || !this.min_amount) {
                 this.alertValiationMessage('required data');
                 return false;
             }
@@ -605,7 +667,7 @@ export default {
             formData.append('category_id', this.selectedCategory.id);
             formData.append('base_uom_id',this.selectedBaseUom.id);
             formData.append('item_type_id',this.itemType.id);
-            formData.append('lead_time',this.lead_time);
+            formData.append('brand_id',this.selectedBrand.id);
             formData.append('min_holding_base_uom_quantity',this.base_min_amount);
             formData.append('min_holding_uom_quantity',this.min_amount);
             // if(this.selectedBrands.length > 0){
@@ -702,6 +764,7 @@ export default {
         // this.getBrandList();
         this.getItemList(1);
         this.getItemTypeList();
+        this.getbrandList();
     },
 
     mounted() {

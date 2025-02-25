@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\PoOrder\ArrivalItemRequest;
 use App\Http\Requests\PoOrder\PoOrderItemRequest;
+use App\Http\Requests\PoOrder\UpdateArrivalRequest;
 use App\Http\Requests\Admin\PoInvoiceTransactionRequest;
 use App\Repositories\PoOrder\PoOrderRepositoryInterface;
 
@@ -67,6 +68,11 @@ class PoOrderController extends Controller
         $data =  $this->PoOrderRepository->getInvoices($request);
         ResponseData($data);
     }
+    public function getInvoiceById($invoiceId)
+    {
+        $data =  $this->PoOrderRepository->getInvoiceById($invoiceId);
+        ResponseData($data);
+    }
 
     public function processInvoiceTransaction(PoInvoiceTransactionRequest $request)
     {
@@ -74,20 +80,9 @@ class PoOrderController extends Controller
         ResponseData($data);
     }
 
-    public function getPoOrderArrivalListByInvoiceId($invoiceId)
+    public function updateArrivalList($arrivalId, UpdateArrivalRequest $request)
     {
-        $data =  $this->PoOrderRepository->getPoOrderArrivalListByInvoiceId($invoiceId);
-        ResponseData($data);
-    }
-
-    public function updateArrivalListByItemId($itemId, Request $request)
-    {
-        $data =  $this->PoOrderRepository->updateArrivalListByItemId($itemId, $request);
-        ResponseData($data);
-    }
-    public function updateInvoice($invoiceId, Request $request)
-    {
-        $data =  $this->PoOrderRepository->updateInvoice($invoiceId, $request);
+        $data =  $this->PoOrderRepository->updateArrivalList($arrivalId, $request->validated());
         ResponseData($data);
     }
 }
