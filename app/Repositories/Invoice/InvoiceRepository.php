@@ -130,7 +130,6 @@ class InvoiceRepository implements InvoiceRepositoryInterface
     {
         DB::beginTransaction();
         try {
-            dd($data['room_discount_id']);
             $roomDiscountId = $data['room_discount_id'];
             $roomDiscount = null;
             if ($roomDiscountId) {
