@@ -1618,7 +1618,7 @@
                     formData.append('room_discount_id', this.selectedDiscountType.id);
                 }
                 else{
-                    formData.append('room_discount_id', null);
+                    formData.append('room_discount_id', );
                 }
                 if (this.type == 'session') {
                     formData.append('session_duration', this.duration);
