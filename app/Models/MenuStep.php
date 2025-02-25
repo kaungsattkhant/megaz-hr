@@ -18,7 +18,8 @@ class MenuStep extends Model
         'order_time',
         'expected_quantity',
         'level',
-        'type'
+        'type',
+        'expired_at'
     ];
 
     public function menu(): BelongsTo

@@ -5,6 +5,7 @@ namespace App\Http\Controllers\API;
 use App\Models\Inventory;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Inventory\InventoryItemRequest;
 use App\Http\Requests\Inventory\InventoryCreateRequest;
 use App\Http\Requests\Inventory\InventoryUpdateRequest;
 use App\Repositories\Inventory\InventoryRepositoryInterface;
@@ -18,7 +19,8 @@ class InventoryAPIController extends Controller
         $this->inventoryRepo = $inventoryRepo;
     }
 
-    public function getInventory(Request $request){
+    public function getInventory(Request $request)
+    {
         $inventories = $this->inventoryRepo->getInventory($request);
         ResponseData($inventories);
     }
@@ -34,9 +36,9 @@ class InventoryAPIController extends Controller
         ResponseData($inventory);
     }
 
-    public function updateInventory(InventoryUpdateRequest $request,$id)
+    public function updateInventory(InventoryUpdateRequest $request, $id)
     {
-        $inventory = $this->inventoryRepo->updateData($request->all(),$id);
+        $inventory = $this->inventoryRepo->updateData($request->all(), $id);
         ResponseData($inventory);
     }
 
@@ -49,29 +51,35 @@ class InventoryAPIController extends Controller
     public function deleteInventory($id)
     {
         $inventory = $this->inventoryRepo->deleteData($id);
-        if($inventory==true)
-        {
+        if ($inventory == true) {
             ResponseMessage('Inventory deleted');
-        }else{
+        } else {
             ResponseMessage('Inventory not found or some error occur');
         }
     }
 
     public function getInventoryLedgers(Request $request, int $inventoryId)
     {
-        $ledgers = $this->inventoryRepo->getInventoryLedgers($inventoryId,$request);
+        $ledgers = $this->inventoryRepo->getInventoryLedgers($inventoryId, $request);
 
         ResponseData($ledgers);
     }
 
-    public function inventoryList(){
+    public function inventoryList()
+    {
         $data = $this->inventoryRepo->inventoryList();
         ResponseData($data);
     }
 
-    public function getInventoryLedgerList(Request $request){
+    public function getInventoryLedgerList(Request $request)
+    {
         $data = $this->inventoryRepo->getInventoryLedgerList($request);
         ResponseData($data);
     }
 
+    public function createInventoryItem(InventoryItemRequest $request)
+    {
+        $inventory = $this->inventoryRepo->createInventoryItem($request->validated());
+        ResponseData($inventory);
+    }
 }
