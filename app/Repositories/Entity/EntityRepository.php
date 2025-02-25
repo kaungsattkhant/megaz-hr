@@ -591,7 +591,8 @@ class EntityRepository implements EntityRepositoryInterface
         $entity->total_accessory_value = $total_accessory_value;
         $entity->total_order_discount_price = $total_order_discount_price;
         $entity->food_discount = $total_order_discount_price;
-        $entity->total = $total_order_value;
+        $entity->invoice_total = $invoice->total;
+        $entity->total_order_value = $total_order_value;
         $entity->deposit_balance = $customerDepositBalance;
         $entity->customer_id = $customer->id;
         $entity->account_id = $customer->account_id;
