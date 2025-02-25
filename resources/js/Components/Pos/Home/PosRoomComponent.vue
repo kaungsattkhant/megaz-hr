@@ -398,10 +398,96 @@
                         </div>
 
                         <div class="absolute bottom-0 border-t-2 border-gray-200 w-full padding-section">
+                            <!-- <div v-if="isPackage" class=" text-sm text-right flex gap-x-2 justify-end pr-2 mb-2">
+                                <p>
+                                    Package Price
+                                </p>
+                                <p class=" w-28">
+                                    {{ selectedRoom.room_sessions[0].invoice.package.name }}
+                                </p>
+                            </div> -->
+                            <div v-if="!isPackage" class=" text-sm text-right flex gap-x-2 justify-end pr-2 mb-2">
+                                <p>
+                                    Room
+                                </p>
+                                <p class=" w-28">
+                                    {{ printInvoiceData.room ? printInvoiceData.room.toLocaleString() : 0 }} MMKs
+                                </p>
+                            </div>
+                            <div class=" text-sm text-right flex gap-x-2 justify-end pr-2 mb-2">
+                                <p>
+                                    Food
+                                </p>
+                                <p class=" w-28">
+                                    {{ printInvoiceData.food ? printInvoiceData.food.toLocaleString() : 0 }} MMks
+                                </p>
+                            </div>
+                            <div class="text-sm text-right flex gap-x-2 justify-end pr-2 mb-2">
+                                <p>
+                                    Food Discount
+                                </p>
+                                <p class="w-28">
+                                    {{ foodDiscount > 0 ? '- ' : '' }} {{ foodDiscount }}
+                                </p>
+                            </div>
+                            <!-- <div v-if="isPackage" class=" text-sm text-right flex gap-x-2 justify-end pr-2 mb-2">
+                                <p>
+                                    Package Discount
+                                </p>
+                                <p class=" w-28">
+                                    {{ selectedRoom.room_sessions[0].invoice.package.package_discount > 0 ? '- ' : '' }}  {{ selectedRoom.room_sessions[0].invoice.package.package_discount }}
+                                </p>
+                            </div> -->
+                            <div v-show="discount_type != 'customer_level'" class=" text-sm text-right flex gap-x-2 justify-end pr-2 mb-2">
+                                <p>
+                                    Discount
+                                </p>
+                                <p class=" w-28">
+                                    {{ printInvoiceData.discount > 0 ? '- ' : '' }} {{ printInvoiceData.discount }} {{
+                                        this.discount_type == 'percentage' ? '%' : 'MMKs' }}
+                                </p>
+                            </div>
+                            <!-- <div v-show="discount_type == 'customer_level'" class=" text-sm text-right flex gap-x-2 justify-end pr-2 mb-2">
+                                <p>
+                                    Customer Discount
+                                </p>
+                                <p class=" w-28">
+                                    {{ printInvoiceData.customer_discount > 0 ? '- ' : '' }} {{ printInvoiceData.customer_discount }} MMKs
+                                </p>
+                            </div> -->
+                            <!-- <div v-show="roomSessionData.is_service == 1" class=" text-sm text-right flex gap-x-2 justify-end pr-2 mb-2">
+                                <p>
+                                    Service Price
+                                </p>
+                                <p class=" w-28">
+                                    {{ printInvoiceData.service_total_value.toLocaleString() }} MMKs
+                                </p>
+                            </div> -->
+                            <!-- <div v-show="roomSessionData.total_accessory_value > 0" class=" text-sm text-right flex gap-x-2 justify-end pr-2 mb-2">
+                                <p>
+                                    Accessories Price
+                                </p>
+                                <p class=" w-28">
+                                    {{ printInvoiceData.accessory_total_value.toLocaleString() }} MMKs
+                                </p>
+                            </div> -->
                             <div class=" text-right pr-3 mb-3">
+                                <p class="font-semibold">
+                                    Total &nbsp;
+                                    {{  (printInvoiceData.total ? printInvoiceData.total : 0).toLocaleString() }} MMKs
+                                </p>
+                            </div>
+                            <div class="">
+                                <button @click="btnClickedEndRoom()"
+                                    class="bg-[#55EFC4] text-black text-center text-sm font-semibold w-full py-3">
+                                    Print Invoice
+                                </button>
+                            </div>
+
+                            <!-- <div class=" text-right pr-3 mb-3">
                                 <p class="">
                                     Total
-                                    <!-- {{
+                                    {{
                                         (selectedRoom ?
                                             ((purchaseMenuList.length > 0 ?
                                                 (
@@ -422,17 +508,17 @@
                                         )
 
 
-                                    }} -->
+                                    }}
                                         {{ (total_room_price + (selectedRoom ? selectedRoom.total_service_value : 0) + (selectedRoom ? selectedRoom.total_accessory_value : 0)).toLocaleString() }}
-                                    MMKs
+                                        MMKs
                                 </p>
-                            </div>
-                            <div class="" >
+                            </div> -->
+                            <!-- <div class="" >
                                 <button @click="btnClickedDoneSession()"
                                     class="bg-[#55EFC4] text-black text-center text-sm font-semibold w-full py-3">
                                     Done Session
                                 </button>
-                            </div>
+                            </div> -->
                         </div>
                     </div>
                     <!-- invoice right sidebar -->
@@ -1242,6 +1328,7 @@
                     percent_discount_amount:0,
                     service_total_value:0,
                     accessory_total_value:0,
+                    total:0,
                 },
                 room_discount: null,
                 birthday_discount: null,
@@ -1362,7 +1449,6 @@
                 this.selectedRoomId = room.id;
                 // this.getSelectedRoom();
                 if (this.roomList[roomIndex].entity_sessions[timeIndex].is_active == 1) {
-                    
                     this.getPurchaseMenuList(); // why is this called
                     const response = await getApiData({ url: '/api/entities_sessions/'+ this.selectedTime.id, token: this.getToken() });
                     if (response.data) {
@@ -1374,10 +1460,13 @@
                         this.accessoryListSidebar = response.data.invoice_accessories;
                         this.getTotal(response.data);
                         this.isOpenRoomStep('detail');
+
+                        this.printInvoiceData.room = response.data.total_session_price
+                        this.printInvoiceData.food = response.data.total_order_value
+                        this.printInvoiceData.total = response.data.invoice_total - response.data.total_order_discount_price
                     }
                 }
                 else {
-
                     this.selectedRoom = this.roomList[roomIndex];
                     this.isOpenRoomStep('open_1');
                     console.log('open 1')
@@ -1525,7 +1614,12 @@
                 formData.append('entity_session_id', this.selectedTime.id);
                 formData.append('customer_id', this.selectedCustomer.id);
                 formData.append('start_time', this.invoice_date);
-                formData.append('room_discount_id', this.selectedDiscountType.id);
+                if(this.selectedDiscountType != null){
+                    formData.append('room_discount_id', this.selectedDiscountType.id);
+                }
+                else{
+                    formData.append('room_discount_id', null);
+                }
                 if (this.type == 'session') {
                     formData.append('session_duration', this.duration);
                 }
@@ -2005,7 +2099,6 @@
                     this.isOpenRoom.invoice = false;
 
                     console.log("success");
-                    window.location.reload();
                 }
                 else {
                     console.log('some errors occur');
