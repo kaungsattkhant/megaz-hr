@@ -160,8 +160,8 @@ class MaterialRequirementsPlanningRepository implements MaterialRequirementsPlan
       $menuSteps = json_decode($validatedData['menu_steps']);
 
       foreach ($menuSteps as $step) {
-        if ($step['type'] === "ready_to_sale") {
-          if (!isset($step['expired_at']) || empty($step['expired_at'])) {
+        if ($step->type === "ready_to_sale") {
+          if (!isset($step->expired_at) || empty($step->expired_at)) {
             return ResponseMessage("The 'expired_at' field is required for  type 'ready_to_sale'.", 402);
           }
         }
