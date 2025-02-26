@@ -88,6 +88,15 @@ class AccountPayableRepository implements AccountPayableInterface
     {
         DB::beginTransaction();
         try {
+            // $accountPayable = AccountPayable::create([
+            //     'type' => 'addition',
+            //     'date_time' => now(),
+            //     'amount' => $ap_amount,
+            //     'supplier_id' => $supplier_id,
+            //     'account_id' => $supplier_account_id,
+            //     'cash_account_id' => $cash_account_id,
+            //     'created_by' => UserData()->id,
+            // ]);
             $data = $request->all();
             $data['created_by'] = UserData()->id;
             $data['is_confirmed'] = 1;
