@@ -470,6 +470,7 @@ export default {
                 text: `You forgot to provide ${field}, please try again`,
                 type: 'warn'
             });
+
         },
 
         async getInventoryLegderList(pageNumber) {
@@ -511,7 +512,7 @@ export default {
             }
         },
 
-        btnClickedAddMinimum(leger, index){
+        btnClickedAddMinimum(ledger, index){
             this.minimumLedger = ledger;
         },
         addDefectBtnClicked(id, ledgerIndex){
