@@ -150,15 +150,19 @@ class InventoryRepository implements InventoryRepositoryInterface
         try {
 
             $minQty = ((int) $validatedData['base_uom_min_quantity'] * (int) $validatedData['conversion']) + (int) $validatedData['uom_min_quantity'];
-            $inventoryitem = InventoryItem::create([
-                'inventory_id' => $validatedData['inventory_id'],
-                'item_id' => $validatedData['item_id'],
-                'base_uom_id' => $validatedData['base_uom_id'],
-                'base_uom_min_quantity' => $validatedData['base_uom_min_quantity'],
-                'uom_id' => $validatedData['uom_id'],
-                'uom_min_quantity' => $validatedData['uom_min_quantity'],
-                'min_quantity' => $minQty
-            ]);
+            $inventoryitem = InventoryItem::updateOrCreate(
+                [
+                    'inventory_id' => $validatedData['inventory_id'],
+                    'item_id' => $validatedData['item_id'],
+                ],
+                [
+                    'base_uom_id' => $validatedData['base_uom_id'],
+                    'base_uom_min_quantity' => $validatedData['base_uom_min_quantity'],
+                    'uom_id' => $validatedData['uom_id'],
+                    'uom_min_quantity' => $validatedData['uom_min_quantity'],
+                    'min_quantity' => $minQty
+                ]
+            );
             DB::commit();
             return ResponseData($inventoryitem, 201, true, 'InventoryItem created successfully.');
         } catch (\Exception $e) {

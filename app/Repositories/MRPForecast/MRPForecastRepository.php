@@ -8,6 +8,7 @@ use App\Models\Menu;
 use App\Models\MrpHr;
 use App\Models\KtvItem;
 use App\Models\MenuStep;
+use App\Models\Inventory;
 use App\Models\ItemPrice;
 use App\Models\MrpForecast;
 use App\Models\KtvObjective;
@@ -156,7 +157,11 @@ class MRPForecastRepository implements MRPForecastRepositoryInterface
   public function getForcastRawMaterialByMenuId($request, $menuId)
   {
     $quantity = $request->quantity;
-    $inventoryId = 6;
+    // $inventoryId = Inventory::where('name', '=', 'Main Inventory')->pluck('id')->first();
+    $inventoryId = Inventory::whereRaw('LOWER(REPLACE(name, " ", "")) = ?', [strtolower(str_replace(' ', '', 'Main Inventory'))])->pluck('id')->first();
+    if (!$inventoryId) {
+      ResponseMessage('Main Inventory not found.', 404);
+    }
     $menu = Menu::where('id', $menuId)
       ->with([
         'subMenus',
