@@ -139,7 +139,7 @@
                         <div class="relative  p-4">
                             <h5 class="text-xl text-center mt-2 font-medium leading-normal text-black"
                                 id="create_modalLabel">
-                                Transfer 
+                                Transfer ( {{ ledger ? ledger.name : '' }} )
                             </h5>
                             <button type="button" id="close"
                                 class="absolute top-4 right-4 focus:shadow-none focus:outline-none" data-te-modal-dismiss
@@ -367,30 +367,46 @@
                     </button>
                 </div>
                 <div class="relative px-6 py-4 border-b" data-te-modal-body-ref>
-                    <!-- <div class="mb-4 ">
-                        <label for="total-amount" class="text-sm">Invoice Amount: {{ totalInvoiceAmount.toLocaleString() }}</label>
-                    </div> -->
-                    <!-- <div class="mb-4 ">
-                        <label for="amount" class="text-sm">Amount</label>
-                        <input type="number" id="amount" placeholder="Invoice Amount" v-model="invoiceAmount" @input="invoiceAmountChange()" class="input-ui">
+                    <div class="mb-4">
+                        <label for="" class="label-form mb-3">
+                            Minimum Holding Amount ( Base UOM - အကြီး )
+                        </label>
+                        <input type="number" placeholder="Minimum Holding Amount" min="0" v-model="base_min_amount" class="input-ui">
                     </div>
-                    <div class="mb-4 ml-6">
-
+                    <div class="mb-4">
+                        <label for="" class="label-form mb-3">
+                            Base UOM (အကြီး)
+                        </label>
+                        <!-- <select name="" id="" v-model="selectedBaseUom" class="input-ui">
+                            <option :value="uom" v-for="(uom, uomIndex) in itemUoms" :key="uomIndex"> {{ uom.name }}
+                            </option>
+                        </select> -->
+                        <p class="input-ui">
+                            {{ minimumLedger ? minimumLedger.base_uom_name : '' }}
+                        </p>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <label for="" class="label-form mb-3">
+                            Minimum Holding Amount ( UOM - အသေး )
+                        </label>
+                        <input type="number" placeholder="Minimum Holding Amount" min="0" v-model="min_amount" class="input-ui">
                     </div>
 
                     <div class="mb-4">
-                        <label for="cashbook" class="text-sm">Cash Book</label>
-                        <select id="cashbook" v-model="selectedCashAccount"
-                        class="text-sm border border-gray-300 input-ui w-12
-                        bg-transparent rounded-lg focus:ring-0">
-                            <option :value="cashAccount" v-for="(cashAccount, cashAccountIndex) in cashAccountList" :key="cashAccountIndex">
-                                {{ cashAccount.name }}
+                        <label for="" class="label-form mb-3">
+                            Uom အသေး (Inventory သိမ်းဆည်း unit)
+                        </label>
+                        <!-- <select name="" id="" v-model="selectedUOM" class="input-ui">
+                            <option :value="uom" v-for="(uom, uomIndex) in uomList" :key="uomIndex"> {{ uom.name }}
                             </option>
-                        </select>
+                        </select> -->
+
+                        <p class="input-ui">
+                            {{ minimumLedger ? minimumLedger.conversion_uom_name : '' }}
+                        </p>
                     </div>
-                    <div class="mb-4 ">
-                        <label for="total-amount" class="text-sm">AP Amount: {{ apAmount.toLocaleString() }}</label>
-                    </div> -->
+                    
                 </div>
                 <div class="flex justify-end gap-x-4 px-6 mb-6 pt-4">
                     <button type="button" class="cancel-btn focus:shadow-none focus:outline-none"
@@ -399,7 +415,7 @@
                     </button>
                     <button type="button"
                     class="add-btn focus:outline-none focus:ring-0 "
-                    @click="confirmBtnClicked">
+                    @click="addMinimumAmount">
                         Create
                     </button>
                 </div>
@@ -447,6 +463,8 @@ export default {
             toDate: null,
             ledger:null,
             minimumLedger:null,
+            base_min_amount:0,
+            min_amount:0,
 
             per_page: 20,
             pageNumbers: [],
@@ -514,6 +532,39 @@ export default {
 
         btnClickedAddMinimum(ledger, index){
             this.minimumLedger = ledger;
+        },
+        async addMinimumAmount(){
+            if(this.min_amount < 1 && this.base_min_amount < 1){
+                this.alertValidationMessage(`Minimum amount`);
+                return 1;
+            }
+            let formData = new FormData();
+            formData.append('inventory_id', this.minimumLedger.inventory_id);
+            // formData.append('inventory_id', this.inventory_id);/
+            formData.append('item_id', this.minimumLedger.item_id);
+            formData.append('base_uom_id', this.minimumLedger.base_unit_id);
+            formData.append('base_uom_min_quantity', this.base_min_amount);
+            formData.append('uom_id', this.minimumLedger.item_uom_id);
+            formData.append('uom_min_quantity', this.min_amount);
+            formData.append('conversion', this.minimumLedger.conversion);
+            let url = `/api/inventory_item`;
+            let response = await postApiData({url: url, form_data: formData, token: this.getToken()});
+            if(response.success){
+                this.$notify({
+                    text: `Success`,
+                    type: 'info'
+                });
+                this.getInventoryLegderList();
+                document.getElementById('close_add_minimum_modal').click();
+                this.base_min_amount = 0;
+                this.min_amount = 0;
+            }
+            else{
+                this.$notify({
+                    text: response.message,
+                    type: 'info'
+                });
+            }
         },
         addDefectBtnClicked(id, ledgerIndex){
             this.defectItemId = id;
