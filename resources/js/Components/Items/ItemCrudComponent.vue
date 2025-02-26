@@ -361,13 +361,13 @@
                             <label for="" class="label-form mb-3">
                                 Minimum Holding Amount ( Base UOM - အကြီး )
                             </label>
-                            <input type="text" placeholder="Minimum Holding Amount" v-model="base_min_amount" class="input-ui">
+                            <input type="number" placeholder="Minimum Holding Amount" min="0" v-model="base_min_amount" class="input-ui">
                         </div>
                         <div class="mb-4">
                             <label for="" class="label-form mb-3">
                                 Minimum Holding Amount ( UOM - အသေး )
                             </label>
-                            <input type="text" placeholder="Minimum Holding Amount" v-model="min_amount" class="input-ui">
+                            <input type="number" placeholder="Minimum Holding Amount" min="0" v-model="min_amount" class="input-ui">
                         </div>
                     </div>
                     <!--Modal footer-->
@@ -655,8 +655,12 @@ export default {
             }
         },
         async createBtnClicked() {
-            if (!this.selectedUOM || !this.name || !this.selectedCategory ||!this.selectedBaseUom || !this.code || !this.itemType || !this.selectedBrand || !this.base_min_amount || !this.min_amount) {
+            if (!this.selectedUOM || !this.name || !this.selectedCategory ||!this.selectedBaseUom || !this.code || !this.itemType || !this.selectedBrand ) {
                 this.alertValiationMessage('required data');
+                return false;
+            }
+            if(this.base_min_amount < 1 && this.min_amount < 1){
+                this.alertValiationMessage('Amount');
                 return false;
             }
             let url = `/api/items`;
