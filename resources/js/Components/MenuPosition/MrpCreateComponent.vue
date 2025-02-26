@@ -715,11 +715,11 @@ export default {
                 this.alertValidationMessage('Order Time');
                 return 1;
             }
-            else if(this.selectedType.name == 'Portion' && !this.orderTime){
-                this.alertValidationMessage('Order Time');
+            else if(this.selectedType.name == 'Portion' && !this.expectedQuantity){
+                this.alertValidationMessage('Expected Quantity');
                 return 1;
             }
-            else if(this.selectedType.name == 'Ready To Sale' && !this.expireDate){
+            else if(this.selectedType.id == 'ready_to_sale' && !this.expireDate){
                 this.alertValidationMessage('Expired Date');
                 return 1;
             }
@@ -787,7 +787,7 @@ export default {
                         this.menuLevel.expected_quantity = this.expectedQuantity;
                     }
                     if(this.selectedType.id == 'ready_to_sale'){
-                        this.menuLevel.expire_at = this.expireDate;
+                        this.menuLevel.expired_at = this.expireDate;
                     }
                     // else{
                     //     this.menuLevel.order_time = 0;
