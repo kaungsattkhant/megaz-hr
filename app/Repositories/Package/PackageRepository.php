@@ -16,18 +16,20 @@ class PackageRepository implements PackageRepositoryInterface
         // if(isset($request->perPage))
         $validateDate = $request->date ?? CurrentDate();
         $packages = Package::with(['menuPackages.menu.areas'])->where('from_date', '<=', $validateDate)
-            ->orderBy('created_at','desc')
-            ->when($request->has('search'), function($q) use ($request)
-            {
-                $q->where('name','LIKE','%'.$request->search.'%')
-                  ->orWhere('price','LIKE','%'.$request->search.'%');
+            ->orderBy('created_at', 'desc')
+            ->when($request->has('search'), function ($q) use ($request) {
+                $q->where('name', 'LIKE', '%' . $request->search . '%')
+                    ->orWhere('price', 'LIKE', '%' . $request->search . '%');
             })
             ->where('to_date', '>=', $validateDate)
-            ->with(['menuPackages.menu.prices', 'menuPackages.menu.menuServiceDiscounts' => function ($query) use ($validateDate) {
-                $query->where('from_date', '<=', $validateDate)
-                    ->where('to_date', '>=', $validateDate)
-                    ->first();
-            }])
+            ->with([
+                    'menuPackages.menu.prices',
+                    'menuPackages.menu.menuServiceDiscounts' => function ($query) use ($validateDate) {
+                        $query->where('from_date', '<=', $validateDate)
+                            ->where('to_date', '>=', $validateDate)
+                            ->first();
+                    }
+                ])
             ->paginate(config('common.list_count'));
 
         ResponseData($packages);
@@ -78,7 +80,7 @@ class PackageRepository implements PackageRepositoryInterface
             }
             $package_original_price = $menuPrice + $sessionPrice;
             if ($package_original_price > $data['price']) {
-                $data['package_discount'] = $package_original_price - $data['price'] ;
+                $data['package_discount'] = $package_original_price - $data['price'];
                 $package->package_discount = $data['package_discount'];
                 $package->save();
             } else {
@@ -154,7 +156,7 @@ class PackageRepository implements PackageRepositoryInterface
 
             $package_original_price = $sessionPrice + $menuPrice;
             if ($package_original_price > $data['price']) {
-                $data['package_discount'] = $package_original_price - $data['price'] ;
+                $data['package_discount'] = $package_original_price - $data['price'];
                 $package->package_discount = $data['package_discount'];
                 $package->save();
             } else {
@@ -190,10 +192,13 @@ class PackageRepository implements PackageRepositoryInterface
     public function listAllPackage(Request $request)
     {
         $validateDate = $request->date ?? CurrentDate();
-        $packages = Package::with(['menuPackages.menu.prices', 'menuPackages.menu.menuServiceDiscounts' => function ($query) use ($validateDate) {
-            $query->where('from_date', '<=', $validateDate)
-                ->where('to_date', '>=', $validateDate);
-        }])
+        $packages = Package::with([
+            'menuPackages.menu.prices',
+            'menuPackages.menu.menuServiceDiscounts' => function ($query) use ($validateDate) {
+                $query->where('from_date', '<=', $validateDate)
+                    ->where('to_date', '>=', $validateDate);
+            }
+        ])
             ->paginate(config('common.list_count'));
 
         ResponseData($packages);

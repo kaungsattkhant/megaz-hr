@@ -512,7 +512,6 @@ class InvoiceRepository implements InvoiceRepositoryInterface
                     'entity_session_id'=>$addedEntitySessionId,
                 ]);
             }
-
         }
         return $addedSessions;
     }
