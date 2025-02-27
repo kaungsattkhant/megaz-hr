@@ -195,6 +195,7 @@ Route::group(['prefix' => 'pos'], function () {
     Route::view('/cashbook/detail', 'pos.cashbook.detail')->name('pos.cashbooks.detail');
     Route::view('/invoices', 'pos.invoices.index')->name('pos.invoices');
     Route::view('/invoices/detail', 'pos.invoices.detail')->name('pos.invoices.detail');
+    Route::view('/customer_deposit', 'pos.customer_deposit.index')->name('pos.customer_deposit');
     // });
 });
 

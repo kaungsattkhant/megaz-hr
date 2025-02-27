@@ -819,8 +819,8 @@ export default {
             formData.append("address", this.address);
             formData.append("account_id", this.selectedAccount.id);
             formData.append("creditor_account_id", this.selectedCreditAccount.id);
-            formData.append("amount", this.amount);
-            formData.append("date", this.date);
+            formData.append("credit_opening_amount", this.amount);
+            formData.append("credit_opening_date", this.date);
             let itemBrandList = [];
             this.selectedItemList.forEach((item)=>{
                 itemBrandList.push({
