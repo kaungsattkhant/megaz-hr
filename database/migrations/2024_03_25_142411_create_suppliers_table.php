@@ -21,7 +21,7 @@ return new class extends Migration
             $table->string('email')->nullable();
             $table->integer('credit_limit');
             $table->longText('credit_terms');
-            $table->double('credit_opening_date');
+            $table->date('credit_opening_date');
             $table->double('credit_opening_amount');
             $table->integer('lead_time_day')->nullable();
             $table->float('lead_time_hour', 8, 2)->nullable();

@@ -26,7 +26,6 @@ class Supplier extends Model
         'lead_time_day',
         'lead_time_hour',
         'lead_time_minutes',
-        'credit_terms'
     ];
 
     public function items()

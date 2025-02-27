@@ -1795,6 +1795,7 @@ class InvoiceRepository implements InvoiceRepositoryInterface
             $customerDeposit->save();
             $data['date'] = now();
             $data['created_by'] = UserData()->id;
+            $data['is_confirmed'] = 1;
             $transaction = (new StoreTransactionLedger())->createTransaction($data);
             $debitLedger = (new StoreTransactionLedger())->storeLedger([
                 'date' => now(),
@@ -1804,8 +1805,7 @@ class InvoiceRepository implements InvoiceRepositoryInterface
                 'transaction_id' => $transaction->id,
                 'account_id' => $customerDeposit->cash_account_id,
                 'action' => 'debit',
-                'is_cashier_confirmed' =>  $customerDeposit->is_cashier_confirmed
-            ]);
+            ], null, true);
             #store credit ledger
             $creditLedger = (new StoreTransactionLedger())->storeLedger([
                 'date' => now(),
@@ -1815,8 +1815,7 @@ class InvoiceRepository implements InvoiceRepositoryInterface
                 'transaction_id' => $transaction->id,
                 'account_id' => $customerDeposit->account_id,
                 'action' => 'credit',
-                'is_cashier_confirmed' =>  $customerDeposit->is_cashier_confirmed
-            ]);
+            ], null, true);
             DB::commit();
             ResponseMessage('Customer Deposit confirmed', 200);
         } catch (\Exception $e) {

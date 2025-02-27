@@ -29,7 +29,7 @@ class StoreTransactionLedger
                 ResponseMessage('Transaction id must be present');
             $data['transaction_id'] = $transactionId;
         }
-        // $data['is_cashier_confirmed'] = ($isCashierConfirmed) ? 1 : 0;
+        $data['is_cashier_confirmed'] = ($isCashierConfirmed) ? 1 : 0;
 
         return Ledger::updateOrCreate(
             ['id' => $data['id']],
