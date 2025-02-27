@@ -28,4 +28,16 @@ class MenuCategory extends BaseModel
     {
         return $this->hasMany(Menu::class);
     }
+
+    public function areas()
+    {
+        return $this->hasManyThrough(
+            Area::class,
+            CookingPlace::class,
+            'area_id',
+            'id',
+            'id',
+            'area_id'
+        )->distinct();
+    }
 }

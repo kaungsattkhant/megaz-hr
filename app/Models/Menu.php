@@ -62,20 +62,20 @@ class Menu extends BaseModel
         return $this->morphMany(MenuServiceDiscount::class, 'discountable');
     }
 
-    public function areas()
-    {
-        return $this->belongsToMany(Area::class, 'menu_area');
-    }
+    // public function areas()
+    // {
+    //     return $this->belongsToMany(Area::class, 'menu_area');
+    // }
 
     public function menuPlaces()
     {
         return $this->belongsToMany(CookingPlace::class, 'menu_places');
     }
 
-    public function availableCookingPlaces()
-    {
-        return $this->morphMany(AvailableCookingPlace::class, 'cooking_placeable');
-    }
+    // public function availableCookingPlaces()
+    // {
+    //     return $this->morphMany(AvailableCookingPlace::class, 'cooking_placeable');
+    // }
 
 
     public function menuSteps(): HasMany

@@ -23,4 +23,10 @@ interface MaterialRequirementsPlanningInterface
   public function getCookingPlace(Request $request);
 
   public function getRoles(Request $request);
+
+  public function getMenuCategoryCookingAreas(Request $request);
+
+  public function createMenuCategoryCookingAreas($request);
+
+  public function getAreaCategories(Request $request);
 }

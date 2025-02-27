@@ -9,9 +9,12 @@ use App\Models\SubMenu;
 use App\Models\MenuStep;
 use App\Models\MenuPrice;
 use App\Models\Department;
+use App\Models\AreaCategory;
 use App\Models\CookingPlace;
+use App\Models\MenuCategory;
 use App\Models\MenuStepItem;
 use Illuminate\Http\Request;
+use App\Models\MenuCategoryArea;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 
@@ -285,5 +288,46 @@ class MaterialRequirementsPlanningRepository implements MaterialRequirementsPlan
       return response()->json(['message' => 'Department data not found!'], 404);
     }
     return Role::where('department_id', $department->id)->with('department')->get();
+  }
+
+  public function getMenuCategoryCookingAreas(Request $request)
+  {
+    $menuCategoriesQuery = MenuCategory::with('areas.areaCategory');
+
+    if ($request->has('area_category_id')) {
+      $areaCategoryId = $request->input('area_category_id');
+
+      $menuCategoriesQuery->whereHas('areas', function ($query) use ($areaCategoryId) {
+        $query->where('area_category_id', $areaCategoryId);
+      });
+    }
+    return $menuCategoriesQuery->get();
+  }
+
+  public function createMenuCategoryCookingAreas($request)
+  {
+    DB::beginTransaction();
+    try {
+      $data = $request->all();
+      if (isset($data['id'])) {
+        $menuCategoryArea = MenuCategoryArea::updateOrCreate(
+          ['id' => $data['id']],
+          $data
+        );
+      } else {
+        $menuCategoryArea = MenuCategoryArea::create($data);
+      }
+      DB::commit();
+      ResponseData($menuCategoryArea, 201, 'MenuCategoryArea saved successfully!');
+    } catch (\Exception $e) {
+      DB::rollback();
+      ResponseMessage($e->getMessage(), 402);
+      throw $e;
+    }
+  }
+  public function getAreaCategories(Request $request)
+  {
+    $areaCategory = AreaCategory::whereRaw('LOWER(REPLACE(name, " ", "")) = ?', [strtolower(str_replace(' ', '', 'Selling Area'))])->get();
+    ResponseData($areaCategory);
   }
 }

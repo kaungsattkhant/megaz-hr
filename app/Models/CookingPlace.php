@@ -20,10 +20,10 @@ class CookingPlace extends Model
         return $this->belongsTo(Area::class);
     }
 
-    public function availableCookingPlaces()
-    {
-        return $this->hasMany(AvailableCookingPlace::class, 'cooking_place_id');
-    }
+    // public function availableCookingPlaces()
+    // {
+    //     return $this->hasMany(AvailableCookingPlace::class, 'cooking_place_id');
+    // }
 
     public function menus()
     {
