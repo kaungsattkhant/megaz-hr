@@ -1778,7 +1778,7 @@ class InvoiceRepository implements InvoiceRepositoryInterface
 
     public function getCustomerDeposits($request)
     {
-        return CustomerDeposit::orderBy('created_at', 'desc')->get();
+        return CustomerDeposit::with(['account', 'customer'])->orderBy('created_at', 'desc')->get();
     }
 
     public function cashierConfirm($request, $customerDepositId)
