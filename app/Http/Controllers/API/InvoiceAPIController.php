@@ -293,4 +293,15 @@ class InvoiceAPIController extends Controller
         //     throw $e;
         // }
     }
+    public function getCustomerDeposits(Request $request)
+    {
+        $data = $this->invoiceRepo->getCustomerDeposits($request);
+        ResponseData($data);
+    }
+
+    public function cashierConfirm(Request $request, $customerDepositId)
+    {
+        $data = $this->invoiceRepo->cashierConfirm($request, $customerDepositId);
+        ResponseData($data);
+    }
 }

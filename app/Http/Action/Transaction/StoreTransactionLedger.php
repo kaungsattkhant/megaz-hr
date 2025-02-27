@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Http\Action\Transaction;
 
 use App\Models\Ledger;
@@ -18,17 +19,17 @@ class StoreTransactionLedger
         );
     }
 
-    public function storeLedger($data, $transactionId=null, $isCashierConfirmed=false): Ledger
+    public function storeLedger($data, $transactionId = null, $isCashierConfirmed = false): Ledger
     {
         if (!isset($data->id)) {
             $data['id'] = null;
         }
-        if(!isset($data['transaction_id'])){
-            if(!$transactionId)
+        if (!isset($data['transaction_id'])) {
+            if (!$transactionId)
                 ResponseMessage('Transaction id must be present');
             $data['transaction_id'] = $transactionId;
         }
-        $data['is_cashier_confirmed'] = ($isCashierConfirmed)? 1: 0;
+        // $data['is_cashier_confirmed'] = ($isCashierConfirmed) ? 1 : 0;
 
         return Ledger::updateOrCreate(
             ['id' => $data['id']],

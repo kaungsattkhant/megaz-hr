@@ -29,7 +29,8 @@ Route::middleware('auth:api')->group(function () {
         Route::post('/room_done', 'doneRoom');
         Route::post('/entities/confirm', 'roomConfirm');
         Route::post('/clear_invioces', 'clearInvoice'); //for only developer testing
-
+        Route::get('/customer_deposits', 'getCustomerDeposits');
+        Route::post('/customer_deposits/{id}/confirm', 'cashierConfirm');
     });
     Route::controller(NotificationController::class)->group(function () {
         Route::post('pos/send_notification', 'sendPosNotification');
@@ -44,7 +45,6 @@ Route::middleware('auth:api')->group(function () {
         Route::post('/pos_orders/check_foc_supervision', 'checkFocSupervision');
         Route::post('combine_order_items', 'combineOrderItem');
         Route::get('/order_item_group_list', 'getOrderItemGroupList');
-
     });
     //ksk
     Route::prefix(prefix: 'pos')->controller(AccessoryController::class)->group(function () {

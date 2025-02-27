@@ -15,6 +15,7 @@ class CustomerDeposit extends Model
         'cash_account_id',
         'amount',
         'type',
+        'is_cashier_confirmed',
         'customer_id'
     ];
 
