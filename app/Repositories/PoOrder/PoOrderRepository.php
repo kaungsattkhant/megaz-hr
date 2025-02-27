@@ -1234,12 +1234,13 @@ class PoOrderRepository implements PoOrderRepositoryInterface
   private function storeInventoryLedger($validatedData, $arrivalItem)
   {
 
-    $inventory = Inventory::where('name', '=', 'Main Inventory')->first();
-    if (!$inventory) {
+    // $inventory = Inventory::where('name', '=', 'Main Inventory')->first();
+    $inventoryId = Inventory::whereRaw('LOWER(REPLACE(name, " ", "")) = ?', [strtolower(str_replace(' ', '', 'Main Inventory'))])->pluck('id')->first();
+    if (!$inventoryId) {
       ResponseMessage('Main Inventory not found.', 404);
     }
     $inventoryLedger = InventoryLedger::create([
-      'inventory_id' => $inventory->id,
+      'inventory_id' =>  $inventoryId,
       'date' => now()->format('Y-m-d'),
       'ledgerable_id' => $arrivalItem->id,
       'ledgerable_type' => 'arrival_item',
@@ -1372,7 +1373,6 @@ class PoOrderRepository implements PoOrderRepositoryInterface
         'po_invoices.sub_total',
         'ai.supplier_id',
         's.name',
-        // 'i.name',
         's.account_id',
         'po_invoices.is_complete',
         'po_invoices.completed_at',

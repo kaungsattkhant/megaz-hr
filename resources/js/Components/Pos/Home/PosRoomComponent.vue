@@ -478,7 +478,7 @@
                                 </p>
                             </div>
                             <div class="">
-                                <button @click="btnClickedEndRoom()"
+                                <button data-te-toggle="modal" data-te-target="#end_room_modal"
                                     class="bg-[#55EFC4] text-black text-center text-sm font-semibold w-full py-3">
                                     Print Invoice
                                 </button>
@@ -1234,6 +1234,41 @@
         </div>
 
 
+            <!-- add accessory modal -->
+        <div data-te-modal-init
+            class="fixed left-0 top-0 z-[1055] hidden h-full w-full overflow-y-auto overflow-x-hidden outline-none"
+            id="end_room_modal" tabindex="-1" aria-labelledby="addAccessoryModalLabel" aria-modal="true" role="dialog">
+            <div data-te-modal-dialog-ref
+                class="pointer-events-none relative flex min-h-[calc(100%-1rem)] w-auto translate-y-[-50px] items-center opacity-0 transition-all duration-300 ease-in-out min-[576px]:mx-auto min-[576px]:mt-7 min-[576px]:min-h-[calc(100%-3.5rem)] min-[576px]:max-w-[500px]">
+                <div
+                    class="pointer-events-auto relative flex w-full flex-col rounded-md border-none bg-white bg-clip-padding text-current shadow-lg outline-none py-4">
+                    <div class="relative  p-4 mb-4">
+                        <p class="text-xl w-full text-center">
+                            End Room ( {{ selectedRoom ? selectedRoom.name : ''}} )
+                        </p>
+                        <button type="button" id="closeEndRoomModal"
+                            class="absolute top-4 right-4 focus:shadow-none focus:outline-none" data-te-modal-dismiss
+                            aria-label="Close">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                                stroke="currentColor" class="h-5 w-5">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                        </button>
+                    </div>
+
+
+                    <div class="flex justify-center gap-x-8 px-12 mb-6">
+                        <button data-te-modal-dismiss>Cancel</button>
+                        <button  @click="btnClickedEndRoom()" class="pos-add-btn focus:outline-none focus:ring-0 ">
+                            End Room
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+
     </div>
 
 </template>
@@ -1655,6 +1690,7 @@
                     this.getSelectedRoom();
                     this.isOpenRoomStep('detail');
                     
+                    
                     // if (this.selectedRoom.room_sessions.length > 0) {
                     //     if (this.selectedRoom.room_sessions[0].invoice.orders.length > 0) {
                     //         this.getPurchaseMenuList();
@@ -1732,6 +1768,9 @@
                         this.purchaseMenuList = response.data.invoice.orders
                         console.log('get selected room')
                         this.getTotal(response.data);
+                        this.printInvoiceData.room = this.selectedRoom.total_session_price
+                        this.printInvoiceData.food = this.selectedRoom.total_order_value
+                        this.printInvoiceData.total = this.selectedRoom.invoice_total - this.selectedRoom.total_order_discount_price
                         
                     }
             },
@@ -2097,10 +2136,17 @@
                     this.isOpenRoom.step_2 = false;
                     this.isOpenRoom.detail = false;
                     this.isOpenRoom.invoice = false;
+                    this.isShowSidebar = false;
 
                     console.log("success");
+                    document.getElementById('closeEndRoomModal').click();
                 }
                 else {
+                    this.$notify({
+                        title: `Not valid`,
+                        text: response.message,
+                        type: "warn"
+                    });
                     console.log('some errors occur');
                 }
             },
@@ -2205,6 +2251,7 @@
                     this.closeModal('closeAddMenuModal');
                     this.clearMenuForm();
                     this.getPurchaseMenuList();
+                    this.getSelectedRoom();
                 }
                 else {
                     this.$notify({
@@ -2493,11 +2540,11 @@
                 for (let key in this.isOpenRoom) {
                     if (key === selectedKey) {
                         this.isOpenRoom[key] = true;
-                        console.log('is open room true')
+                        // console.log('is open room true')
                     }
                     else {
                         this.isOpenRoom[key] = false;
-                        console.log('is open room false')
+                        // console.log('is open room false')
                     }
                 }
             },

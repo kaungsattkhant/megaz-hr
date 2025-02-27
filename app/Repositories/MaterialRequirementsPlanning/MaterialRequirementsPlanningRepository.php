@@ -60,6 +60,11 @@ class MaterialRequirementsPlanningRepository implements MaterialRequirementsPlan
       // if (!empty($validatedData['menu_steps'])) {
       $menuSteps = json_decode($validatedData['menu_steps']);
       foreach ($menuSteps as $step) {
+        if ($step->type === "ready_to_sale") {
+          if (!isset($step->expired_at)) {
+            return ResponseMessage("The 'expired_at' field is required for type 'ready_to_sale'.", 402);
+          }
+        }
         $menuStep = MenuStep::create([
           'menu_id' => $menu->id,
           'role_id' => $step->role_id,
@@ -67,7 +72,8 @@ class MaterialRequirementsPlanningRepository implements MaterialRequirementsPlan
           'order_time' => $step->order_time,
           'expected_quantity' => $step->expected_quantity,
           'level' => $step->level,
-          'type' => $step->type
+          'type' => $step->type,
+          'expired_at' => $step->expired_at ?? null,
         ]);
 
         // if (!empty($step['item_menu'])) {
@@ -154,6 +160,11 @@ class MaterialRequirementsPlanningRepository implements MaterialRequirementsPlan
       $menuSteps = json_decode($validatedData['menu_steps']);
 
       foreach ($menuSteps as $step) {
+        if ($step['type'] === "ready_to_sale") {
+          if (!isset($step['expired_at']) || empty($step['expired_at'])) {
+            return ResponseMessage("The 'expired_at' field is required for  type 'ready_to_sale'.", 402);
+          }
+        }
         $menuStep =  $menu->menuSteps()->updateOrCreate(
           [
             'id' => $step->id ?? null,
@@ -165,7 +176,8 @@ class MaterialRequirementsPlanningRepository implements MaterialRequirementsPlan
             'order_time' => $step->order_time,
             'expected_quantity' => $step->expected_quantity,
             'level' => $step->level,
-            'type' => $step->type
+            'type' => $step->type,
+            'expired_at' => $step->expired_at ?? null,
           ]
         );
 

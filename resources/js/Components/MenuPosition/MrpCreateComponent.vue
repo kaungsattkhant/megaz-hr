@@ -155,6 +155,16 @@
                         </select>
                     </div>
                 </div>
+                <div class="contents" v-show="isReadyToSale">
+                    <div class="mb-4 col-span-3 rounded-md">
+                        <label for="" class="block text-sm text-black mb-3">
+                            Expire Date
+                        </label>
+                        <input type='date' v-model="expireDate" class="input-ui w-full !p-1 text-xs" />
+                    </div>
+                    <div class="col-span-3"  v-show="isReadyToSale"></div>
+                </div>
+                <div class="col-span-6" v-show="!isReadyToSale"></div>
                 <!-- <div class="mb-4 col-span-3 rounded-md">
                     <label for="" class="block text-sm text-black mb-3">
                         Position
@@ -209,6 +219,7 @@
                     </label>
                     <input type="number" v-model="duration" class="input-ui" :disabled="is_disable_custom" :class="is_disable_custom ? 'cursor-not-allowed !bg-gray-200 rounded' : ''">
                 </div>
+                <div class="col-span-3" v-show="is_show"></div>
                 <div class="contents" v-show="is_show">
                     <div class="mb-4 col-span-3 rounded-md">
                         <label for="" class="label-form mb-3">
@@ -221,9 +232,10 @@
                             Expected Quantity
                         </label>
                         <input type="number" v-model="expectedQuantity" class="input-ui" :disabled="is_disable_custom" :class="is_disable_custom ? 'cursor-not-allowed !bg-gray-200 rounded' : ''">
-                    </div><div class="col-span-3"></div>
+                    </div><div class="col-span-6"></div>
                 </div>
-                <div  v-show="!is_show" class="col-span-9"></div>
+                
+                <div  v-show="!is_show" class="col-span-3"></div>
                 <div class="mb-0 col-span-3 rounded-md">
                     <label for="" class="label-form mb-3">
                         Item Category
@@ -508,6 +520,7 @@ export default {
             selectedUom:null,
             description:null,
             selectedImage:null,
+            expireDate:null,
 
             menuLevel:{
                 level : null,
@@ -530,6 +543,7 @@ export default {
 
             is_disable_custom:false,
             is_show:false,
+            isReadyToSale:false,
 
         };
     },
@@ -571,9 +585,15 @@ export default {
         typeChange(){
             if(this.selectedType.name == 'Portion'){
                 this.is_show = true;
+                this.isReadyToSale = false;
+            }
+            else if(this.selectedType.name == 'Ready To Sale'){
+                this.isReadyToSale = true;
+                this.is_show = false;
             }
             else{
                 this.is_show = false;
+                this.isReadyToSale = false;
             }
         },
         async getMenuCategoryList() {
@@ -699,6 +719,10 @@ export default {
                 this.alertValidationMessage('Expected Quantity');
                 return 1;
             }
+            else if(this.selectedType.id == 'ready_to_sale' && !this.expireDate){
+                this.alertValidationMessage('Expired Date');
+                return 1;
+            }
             else if(!this.selectedItemCategory){
                 this.alertValidationMessage('Item Category');
                 return 1;
@@ -761,6 +785,9 @@ export default {
                     if(this.selectedType.name == 'Portion'){
                         this.menuLevel.order_time = this.orderTime;
                         this.menuLevel.expected_quantity = this.expectedQuantity;
+                    }
+                    if(this.selectedType.id == 'ready_to_sale'){
+                        this.menuLevel.expired_at = this.expireDate;
                     }
                     // else{
                     //     this.menuLevel.order_time = 0;
