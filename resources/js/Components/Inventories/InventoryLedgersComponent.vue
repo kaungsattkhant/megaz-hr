@@ -1,7 +1,7 @@
 <template>
     <div>
         <p class=" text-lg font-semibold font-inter">
-            Items
+            Inventory Stocks
         </p>
     </div>
     <div class="mt-4 bg-white">
@@ -90,13 +90,17 @@
                                         {{ (ledger.total_value).toLocaleString() }}
                                     </td>
                                     <td class="whitespace-nowrap px-6 py-4">
-                                        <button id="edit-btn" class="pr-1" @click="transferBtnClicked(ledger.item_id, index-1)"
+                                        <button id="edit-btn" class="pr-1" @click="transferBtnClicked(ledger, index-1)"
                                             data-te-toggle="modal" data-te-target="#transfer_modal">
                                             <i class="fas fa-exchange-alt"></i>
                                         </button>
                                         <button class="pl-2" @click="addDefectBtnClicked(ledger.item_id, index-1)"
                                         data-te-toggle="modal" data-te-target="#add_defect_modal">
                                             <i class="fas fa-exclamation-triangle"></i>
+                                        </button>
+                                        <button class="pl-2" @click="btnClickedAddMinimum(ledger,index-1)"
+                                        data-te-toggle="modal" data-te-target="#add_minimum_modal">
+                                            <i class="fas fa-plus"></i>
                                         </button>
                                     </td>
                                 </tr>
@@ -135,7 +139,7 @@
                         <div class="relative  p-4">
                             <h5 class="text-xl text-center mt-2 font-medium leading-normal text-black"
                                 id="create_modalLabel">
-                                Transfer
+                                Transfer ( {{ ledger ? ledger.name : '' }} )
                             </h5>
                             <button type="button" id="close"
                                 class="absolute top-4 right-4 focus:shadow-none focus:outline-none" data-te-modal-dismiss
@@ -342,6 +346,85 @@
     </div>
 
 
+    <div data-te-modal-init
+        class="fixed left-0 top-0 z-[1055] hidden h-full w-full overflow-y-auto overflow-x-hidden outline-none"
+        id="add_minimum_modal" tabindex="-1" aria-labelledby="add_minimum_modalLabel" aria-hidden="true">
+        <div data-te-modal-dialog-ref
+            class="pointer-events-none relative w-auto mb-12 translate-y-[-50px] opacity-0 transition-all duration-300 ease-in-out min-[576px]:mx-auto min-[576px]:mt-7 min-[576px]:max-w-[500px]">
+            <div
+                class="min-[576px]:shadow-[0_0.5rem_1rem_rgba(#000, 0.15)] pointer-events-auto relative flex w-full flex-col rounded-md border-none bg-white bg-clip-padding text-current shadow-lg outline-none">
+                <div class="relative flex justify-between py-2 px-6 border-b">
+                    <h5 class="text-base text-center mt-2 font-semibold leading-normal font-inter"
+                        id="add_minimum_modalLabel">
+                        Add Minimum Holding Amount
+                    </h5>
+                    <button type="button" class="text-xs focus:shadow-none focus:outline-none" data-te-modal-dismiss id="close_add_minimum_modal"
+                        aria-label="Close">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                            stroke="currentColor" class="h-4 w-4">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </button>
+                </div>
+                <div class="relative px-6 py-4 border-b" data-te-modal-body-ref>
+                    <div class="mb-4">
+                        <label for="" class="label-form mb-3">
+                            Minimum Holding Amount ( Base UOM - အကြီး )
+                        </label>
+                        <input type="number" placeholder="Minimum Holding Amount" min="0" v-model="base_min_amount" class="input-ui">
+                    </div>
+                    <div class="mb-4">
+                        <label for="" class="label-form mb-3">
+                            Base UOM (အကြီး)
+                        </label>
+                        <!-- <select name="" id="" v-model="selectedBaseUom" class="input-ui">
+                            <option :value="uom" v-for="(uom, uomIndex) in itemUoms" :key="uomIndex"> {{ uom.name }}
+                            </option>
+                        </select> -->
+                        <p class="input-ui">
+                            {{ minimumLedger ? minimumLedger.base_uom_name : '' }}
+                        </p>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <label for="" class="label-form mb-3">
+                            Minimum Holding Amount ( UOM - အသေး )
+                        </label>
+                        <input type="number" placeholder="Minimum Holding Amount" min="0" v-model="min_amount" class="input-ui">
+                    </div>
+
+                    <div class="mb-4">
+                        <label for="" class="label-form mb-3">
+                            Uom အသေး (Inventory သိမ်းဆည်း unit)
+                        </label>
+                        <!-- <select name="" id="" v-model="selectedUOM" class="input-ui">
+                            <option :value="uom" v-for="(uom, uomIndex) in uomList" :key="uomIndex"> {{ uom.name }}
+                            </option>
+                        </select> -->
+
+                        <p class="input-ui">
+                            {{ minimumLedger ? minimumLedger.conversion_uom_name : '' }}
+                        </p>
+                    </div>
+                    
+                </div>
+                <div class="flex justify-end gap-x-4 px-6 mb-6 pt-4">
+                    <button type="button" class="cancel-btn focus:shadow-none focus:outline-none"
+                    data-te-modal-dismiss aria-label="Close">
+                        Cancel
+                    </button>
+                    <button type="button"
+                    class="add-btn focus:outline-none focus:ring-0 "
+                    @click="addMinimumAmount">
+                        Create
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    
+
 </template>
 
 <script>
@@ -378,6 +461,10 @@ export default {
 
             fromDate: null,
             toDate: null,
+            ledger:null,
+            minimumLedger:null,
+            base_min_amount:0,
+            min_amount:0,
 
             per_page: 20,
             pageNumbers: [],
@@ -401,6 +488,7 @@ export default {
                 text: `You forgot to provide ${field}, please try again`,
                 type: 'warn'
             });
+
         },
 
         async getInventoryLegderList(pageNumber) {
@@ -442,6 +530,42 @@ export default {
             }
         },
 
+        btnClickedAddMinimum(ledger, index){
+            this.minimumLedger = ledger;
+        },
+        async addMinimumAmount(){
+            if(this.min_amount < 1 && this.base_min_amount < 1){
+                this.alertValidationMessage(`Minimum amount`);
+                return 1;
+            }
+            let formData = new FormData();
+            formData.append('inventory_id', this.minimumLedger.inventory_id);
+            // formData.append('inventory_id', this.inventory_id);/
+            formData.append('item_id', this.minimumLedger.item_id);
+            formData.append('base_uom_id', this.minimumLedger.base_unit_id);
+            formData.append('base_uom_min_quantity', this.base_min_amount);
+            formData.append('uom_id', this.minimumLedger.item_uom_id);
+            formData.append('uom_min_quantity', this.min_amount);
+            formData.append('conversion', this.minimumLedger.conversion);
+            let url = `/api/inventory_item`;
+            let response = await postApiData({url: url, form_data: formData, token: this.getToken()});
+            if(response.success){
+                this.$notify({
+                    text: `Success`,
+                    type: 'info'
+                });
+                this.getInventoryLegderList();
+                document.getElementById('close_add_minimum_modal').click();
+                this.base_min_amount = 0;
+                this.min_amount = 0;
+            }
+            else{
+                this.$notify({
+                    text: response.message,
+                    type: 'info'
+                });
+            }
+        },
         addDefectBtnClicked(id, ledgerIndex){
             this.defectItemId = id;
             this.defectItem = this.inventoryLegderList[ledgerIndex];
@@ -506,8 +630,9 @@ export default {
             this.defectItem = null;
         },
 
-        async transferBtnClicked(id, ledgerIndex) {
-            this.itemId = id;
+        async transferBtnClicked(ledger, ledgerIndex) {
+            this.ledger = ledger
+            this.itemId = ledger.item_id;
             this.transferItem = this.inventoryLegderList[ledgerIndex];
             let url = `/api/inventory_list`;
             let response = await getApiData({ url: url, token: this.getToken() });

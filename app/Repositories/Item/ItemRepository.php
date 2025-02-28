@@ -60,6 +60,14 @@ class ItemRepository implements ItemRepositoryInterface
     {
         DB::beginTransaction();
         try {
+
+            if (!isset($data['base_uom_id']) || !isset($data['uom_id'])) {
+                return ResponseMessage('Required UOM data is missing.', 400);
+            }
+            if (!isset($data['min_holding_base_uom_quantity']) || !isset($data['min_holding_uom_quantity'])) {
+                return ResponseMessage('Required holding quantities are missing.', 400);
+            }
+
             $baseUomId = $data['base_uom_id'];
             $uomId = $data['uom_id'];
             $uomConversion = UomConversion::where('base_unit_id', $baseUomId)
@@ -72,14 +80,19 @@ class ItemRepository implements ItemRepositoryInterface
             }
 
             $conversionRate = $uomConversion->conversion;
-
-            $minimumHoldingAmount = ($data['min_holding_base_uom_quantity'] * $conversionRate) + $data['min_holding_uom_quantity'];
+            $minimumHoldingAmount = $this->calculateMinimumHoldingAmount(
+                $data['min_holding_base_uom_quantity'],
+                $data['min_holding_uom_quantity'],
+                $conversionRate
+            );
             $data['minimum_holding_amount'] = $minimumHoldingAmount;
 
             $item = Item::create($data);
-
+            if (isset($data['brand_id'])) {
+                $item->brands()->sync($data['brand_id']);
+            }
             DB::commit();
-            return $item;
+            ResponseData($item);
         } catch (\Exception $e) {
             DB::rollback();
             ResponseMessage($e->getMessage(), 402);
@@ -107,22 +120,36 @@ class ItemRepository implements ItemRepositoryInterface
                     $conversionRate = $uomConversion->conversion;
 
                     if (isset($data['min_holding_base_uom_quantity']) && isset($data['min_holding_uom_quantity'])) {
-                        $minimumHoldingAmount = ($data['min_holding_base_uom_quantity'] * $conversionRate) + $data['min_holding_uom_quantity'];
+                        $minimumHoldingAmount = $this->calculateMinimumHoldingAmount(
+                            $data['min_holding_base_uom_quantity'],
+                            $data['min_holding_uom_quantity'],
+                            $conversionRate
+                        );
                         $data['minimum_holding_amount'] = $minimumHoldingAmount;
                     }
                 }
                 $item->update($data);
-                if (isset($data['brands'])) {
-                    $item->brands()->sync($data['brands']);
+                if (isset($data['brand_id'])) {
+                    $item->brands()->sync($data['brand_id']);
                 }
             }
             DB::commit();
-            return $item;
+            ResponseData($item);
         } catch (\Exception $e) {
             DB::rollback();
             ResponseMessage($e->getMessage(), 402);
             throw $e;
         }
+    }
+
+
+    private function calculateMinimumHoldingAmount($minHoldingBaseUomQuantity, $minHoldingUomQuantity, $conversionRate)
+    {
+        $minHoldingBaseUomQuantity = (float) $minHoldingBaseUomQuantity;
+        $minHoldingUomQuantity = (float) $minHoldingUomQuantity;
+        $conversionRate = (float) $conversionRate;
+
+        return ($minHoldingBaseUomQuantity * $conversionRate) + $minHoldingUomQuantity;
     }
 
     public function addPriceItem($request)
@@ -203,10 +230,9 @@ class ItemRepository implements ItemRepositoryInterface
             'item_type_id',
             'base_uom_id',
             'uom_id',
-            'lead_time',
-            'minimum_holding_amount',
             'min_holding_base_uom_quantity',
             'min_holding_uom_quantity',
+            'minimum_holding_amount',
         ];
         $actualHeadings = $headings[0][0];
         foreach ($expectedHeadings as $heading) {

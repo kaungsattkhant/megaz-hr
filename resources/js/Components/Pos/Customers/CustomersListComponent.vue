@@ -33,7 +33,7 @@
                             <tbody>
                                 <tr class="" v-for="(customer,index) in customerList" :key="index">
                                     <td class="whitespace-nowrap px-6 py-4 font-medium">
-                                        {{ index++ }}
+                                        {{ index+1 }}
                                     </td>
                                     <td class="whitespace-nowrap px-6 py-4">
                                         {{ customer.name }}

@@ -15,9 +15,9 @@ return new class extends Migration
             $table->id();
             $table->double('amount');
             $table->dateTime('date_time');
-            $table->unsignedInteger('supplier_id');
+            $table->unsignedInteger('supplier_id')->nullable();
             $table->unsignedInteger('account_id');
-            $table->unsignedInteger('cash_account_id');
+            $table->unsignedInteger('cash_account_id')->nullable();
             $table->char('type'); //settlement & addition 
             $table->unsignedInteger('created_by');
             $table->timestamps();

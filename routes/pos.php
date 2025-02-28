@@ -1,8 +1,9 @@
 <?php
 
-use App\Http\Controllers\API\AccessoryController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\API\MenuAPIController;
 use App\Http\Controllers\API\OrderAPIController;
+use App\Http\Controllers\API\AccessoryController;
 use App\Http\Controllers\API\EntityAPIController;
 use App\Http\Controllers\API\InvoiceAPIController;
 use App\Http\Controllers\API\NotificationController;
@@ -14,7 +15,7 @@ Route::middleware('auth:api')->group(function () {
         Route::get('/entities_sessions/{id}', 'getEntitySessionDetail');
         Route::get('/entities/{id}', 'entitySessionWithInvoiceDetail');
         Route::get('/table/{id}', 'tableWithInvoiceDetail');
-        Route::get('/areas/{id}/inactive_entities','getOnlyInactiveEntities');
+        Route::get('/areas/{id}/inactive_entities', 'getOnlyInactiveEntities');
     });
     Route::controller(InvoiceAPIController::class)->group(function () {
         Route::post('entities/add_service', 'addService');
@@ -26,9 +27,10 @@ Route::middleware('auth:api')->group(function () {
         Route::post('/entities/change', 'changeRoom');
         Route::post('/entities/done', 'endRoom');
         Route::post('/room_done', 'doneRoom');
-        Route::post('/entities/confirm','roomConfirm');
-        Route::post('/clear_invioces','clearInvoice'); //for only developer testing
-
+        Route::post('/entities/confirm', 'roomConfirm');
+        Route::post('/clear_invioces', 'clearInvoice'); //for only developer testing
+        Route::get('/customer_deposits', 'getCustomerDeposits');
+        Route::post('/customer_deposits/{id}/confirm', 'cashierConfirm');
     });
     Route::controller(NotificationController::class)->group(function () {
         Route::post('pos/send_notification', 'sendPosNotification');
@@ -41,9 +43,8 @@ Route::middleware('auth:api')->group(function () {
         Route::get('/pos_order_items', 'getOrderItemForPOS');
         Route::post('/pos_order_items/{order_item_id}/status', 'orderItemAreaConfirm');
         Route::post('/pos_orders/check_foc_supervision', 'checkFocSupervision');
-        Route::post('combine_order_items','combineOrderItem');
+        Route::post('combine_order_items', 'combineOrderItem');
         Route::get('/order_item_group_list', 'getOrderItemGroupList');
-
     });
     //ksk
     Route::prefix(prefix: 'pos')->controller(AccessoryController::class)->group(function () {

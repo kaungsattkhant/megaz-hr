@@ -19,6 +19,7 @@ return new class extends Migration
             $table->unsignedBigInteger('cash_account_id')->nullable();
             $table->double('amount');
             $table->string('type'); //deposit || withdrawl
+            $table->boolean('is_cashier_confirmed')->default(0);
             $table->timestamps();
         });
     }

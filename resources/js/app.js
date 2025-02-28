@@ -120,6 +120,7 @@ import LeadTimeComponent from './Components/LeadTime/LeadTimeComponent.vue';
 import ProcurementOrderItemsComponent from './Components/ProcurementOrderItems/ProcurementOrderItemsComponent.vue';
 import ArrivalItemsComponent from './Components/ArrivalItems/ArrivalItemsComponent.vue';
 import PurchaseOrderInvoiceListComponent from './Components/PurchaseOrderInvoice/PurchaseOrderInvoiceListComponent.vue';
+import PurchaseOrderInvoiceDetailComponent from './Components/PurchaseOrderInvoice/PurchaseOrderInvoiceDetailComponent.vue';
 import WorkingCapitalComponent from './Components/WorkingCapital/WorkingCapitalComponent.vue';
 import ApBalancesComponent from './Components/ApBalances/ApBalancesComponent.vue';
 import CreditorBalancesComponent from './Components/CreditorBalances/CreditorBalancesComponent.vue';
@@ -141,6 +142,7 @@ import PosBookingCreateComponent from './Components/Pos/Booking/PosBookingCreate
 import PosMenuOrderComponent from './Components/Pos/MenuOrder/PosMenuOrderComponent.vue';
 import PosMenuOrderCreateComponent from './Components/Pos/MenuOrder/PosMenuOrderCreateComponent.vue';
 import UomCrudComponent from './Components/Uoms/UomCrudComponent.vue';
+import PosCustomerDepositComponent from './Components/Pos/CustomerDeposit/PosCustomerDepositComponent.vue';
 
 import LoginComponentPos from './Components/Pos/Auth/LoginComponentPos.vue';
 import LogoutComponentPos from './Components/Pos/Auth/LogoutComponentPos.vue';
@@ -265,6 +267,7 @@ app.component('LeadTimeComponent', LeadTimeComponent);
 app.component('ProcurementOrderItemsComponent', ProcurementOrderItemsComponent);
 app.component('ArrivalItemsComponent', ArrivalItemsComponent);
 app.component('PurchaseOrderInvoiceListComponent', PurchaseOrderInvoiceListComponent);
+app.component('PurchaseOrderInvoiceDetailComponent', PurchaseOrderInvoiceDetailComponent);
 app.component('WorkingCapitalComponent', WorkingCapitalComponent);
 app.component('ApBalancesComponent', ApBalancesComponent);
 app.component('CreditorBalancesComponent', CreditorBalancesComponent);
@@ -317,6 +320,7 @@ app.component('PosBookingListComponent', PosBookingListComponent);
 app.component('PosBookingCreateComponent', PosBookingCreateComponent);
 app.component('PosMenuOrderComponent', PosMenuOrderComponent);
 app.component('PosMenuOrderCreateComponent', PosMenuOrderCreateComponent);
+app.component('PosCustomerDepositComponent', PosCustomerDepositComponent);
 
 app.component('LoginComponentPos', LoginComponentPos);
 app.component('LogoutComponentPos', LogoutComponentPos);

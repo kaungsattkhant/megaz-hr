@@ -40,6 +40,7 @@ class OrderItem extends Model
         'group_order_id',
     ];
 
+    protected $with=['menu'];
     public function area()
     {
         return $this->belongsTo(Area::class);

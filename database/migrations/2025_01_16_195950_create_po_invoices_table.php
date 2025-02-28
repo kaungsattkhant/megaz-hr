@@ -15,6 +15,10 @@ return new class extends Migration
             $table->id();
             $table->string('invoice_no', 255);
             $table->date('date_time');
+            $table->integer('cash_account_id')->nullable();
+            $table->double('discount_value')->nullable();
+            $table->double('sub_total')->nullable();
+            $table->double('paid_amount')->nullable();
             $table->double('total_invoice_amount');
             $table->integer('created_by');
             $table->boolean('is_complete')->default(0);

@@ -1092,6 +1092,7 @@ class PoOrderRepository implements PoOrderRepositoryInterface
       ->whereHas('arrivalItems', function ($q) use ($supplierId) {
         $q->where('supplier_id', $supplierId);
       })
+      ->where('is_complete', 0)
       ->get();
     return $invoices;
   }
@@ -1233,12 +1234,13 @@ class PoOrderRepository implements PoOrderRepositoryInterface
   private function storeInventoryLedger($validatedData, $arrivalItem)
   {
 
-    $inventory = Inventory::where('name', '=', 'Main Inventory')->first();
-    if (!$inventory) {
+    // $inventory = Inventory::where('name', '=', 'Main Inventory')->first();
+    $inventoryId = Inventory::whereRaw('LOWER(REPLACE(name, " ", "")) = ?', [strtolower(str_replace(' ', '', 'Main Inventory'))])->pluck('id')->first();
+    if (!$inventoryId) {
       ResponseMessage('Main Inventory not found.', 404);
     }
     $inventoryLedger = InventoryLedger::create([
-      'inventory_id' => $inventory->id,
+      'inventory_id' =>  $inventoryId,
       'date' => now()->format('Y-m-d'),
       'ledgerable_id' => $arrivalItem->id,
       'ledgerable_type' => 'arrival_item',
@@ -1348,6 +1350,48 @@ class PoOrderRepository implements PoOrderRepositoryInterface
       'po_invoices.invoice_no',
       'po_invoices.date_time',
       'po_invoices.total_invoice_amount',
+      'po_invoices.sub_total',
+      'ai.supplier_id',
+      's.name as supplier_name',
+      // 'i.name as i_name',
+      's.account_id',
+      'po_invoices.is_complete',
+      'po_invoices.completed_at',
+      DB::raw('GROUP_CONCAT(DISTINCT b.name SEPARATOR ", ") as brands'),
+      // DB::raw('GROUP_CONCAT(DISTINCT i.name SEPARATOR ", ") as item_names'),
+      DB::raw('CAST(SUM(ai.quantity) AS SIGNED) as total_invoice_quantity')
+    ])
+      ->join('arrival_items as ai', 'po_invoices.id', '=', 'ai.po_invoice_id')
+      ->join('suppliers as s', 'ai.supplier_id', '=', 's.id')
+      ->join('items as i', 'ai.item_id', '=', 'i.id')
+      ->join('brands as b', 'ai.brand_id', '=', 'b.id')
+      ->groupBy(
+        'po_invoices.id',
+        'po_invoices.invoice_no',
+        'po_invoices.date_time',
+        'po_invoices.total_invoice_amount',
+        'po_invoices.sub_total',
+        'ai.supplier_id',
+        's.name',
+        's.account_id',
+        'po_invoices.is_complete',
+        'po_invoices.completed_at',
+      )
+      // ->where('is_complete', 0) // retriev all invoice
+      ->paginate(config('common.list_count'));
+    $poInvoices->getCollection()->each(function ($invoice) {
+      $invoice->item_names = $invoice->arrivalItems->pluck('item.name')->unique()->implode(', ');
+    });
+    return PoInvoiceResource::collection($poInvoices);
+  }
+  public function getInvoiceById($invoiceId)
+  {
+    $poInvoices = PoInvoice::select([
+      'po_invoices.id',
+      'po_invoices.invoice_no',
+      'po_invoices.date_time',
+      'po_invoices.total_invoice_amount',
+      'po_invoices.sub_total',
       'ai.supplier_id',
       's.name as supplier_name',
       'i.name as i_name',
@@ -1367,6 +1411,7 @@ class PoOrderRepository implements PoOrderRepositoryInterface
         'po_invoices.invoice_no',
         'po_invoices.date_time',
         'po_invoices.total_invoice_amount',
+        'po_invoices.sub_total',
         'ai.supplier_id',
         's.name',
         'i.name',
@@ -1374,10 +1419,12 @@ class PoOrderRepository implements PoOrderRepositoryInterface
         'po_invoices.is_complete',
         'po_invoices.completed_at',
       )
-      ->where('is_complete', 0)
+      ->where('po_invoices.is_complete', 0)
+      ->where('po_invoices.id', $invoiceId)
       ->paginate(config('common.list_count'));
     return PoInvoiceResource::collection($poInvoices);
   }
+
 
   public function processInvoiceTransaction($request)
   {
@@ -1386,6 +1433,7 @@ class PoOrderRepository implements PoOrderRepositoryInterface
     $supplierAccountId = $request->supplier_account_id;
     $apAmount = $request->ap_amount;
     $cashAccountId = $request->cash_account_id;
+    $discountValue = (float) $request->discount_value;
     $poInvoice = PoInvoice::find($poInvoiceId);
     if (!$poInvoice) {
       ResponseMessage('Po Invoice not found', 404);
@@ -1401,6 +1449,10 @@ class PoOrderRepository implements PoOrderRepositoryInterface
       }
       $poInvoice->is_complete = 1;
       $poInvoice->completed_at = now();
+      $poInvoice->discount_value = $discountValue;
+      $poInvoice->sub_total = (float) $poInvoice->total_invoice_amount - $discountValue;
+      $poInvoice->paid_amount = $request->paid_amount;
+      $poInvoice->cash_account_id = $cashAccountId;
       $poInvoice->save();
       DB::commit();
       return ResponseMessage('Transaction created successfully', 200);
@@ -1408,6 +1460,39 @@ class PoOrderRepository implements PoOrderRepositoryInterface
       DB::rollback();
       ResponseMessage($e->getMessage(), 402);
       throw $e;
+    }
+  }
+
+  public function updateArrivalList($arrivalId, $validatedData)
+  {
+
+    DB::beginTransaction();
+
+    try {
+
+      $arrivalItem = ArrivalItem::findOrFail($arrivalId);
+      if (!$arrivalItem) {
+        return ResponseMessage('No arrival items found for this item', 404);
+      }
+
+      if (isset($validatedData['unit_price'])) {
+        $arrivalItem->unit_price = $validatedData['unit_price'];
+        $arrivalItem->amount = $validatedData['unit_price'] * $arrivalItem->quantity;
+        $arrivalItem->save();
+      }
+
+      $poInvoice = $arrivalItem->poInvoice;
+      if ($poInvoice) {
+        $totalAmount = $poInvoice->arrivalItems->sum('amount');
+        $poInvoice->total_invoice_amount = $totalAmount;
+        $poInvoice->save();
+      }
+
+      DB::commit();
+      return ResponseData($arrivalItem, 200, true, 'Unit price updated successfully.');
+    } catch (\Exception $e) {
+      DB::rollBack();
+      return ResponseMessage('Error updating unit price: ' . $e->getMessage(), 500);
     }
   }
 }

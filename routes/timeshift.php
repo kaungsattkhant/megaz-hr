@@ -45,11 +45,14 @@ Route::middleware('auth:api')->group(function () {
     Route::post('/po_items', 'storePoOrderItems');
     Route::get('/po_arrival_list', 'getPoOrderArrivalList');
     Route::get('/po_arrival_list/{itemId}', 'getPoOrderArrivalListByItemId');
+
     Route::get('/invoice_by_supplier/{supplierId}', 'getInvoiceBySupplier');
     Route::post('/po_arrival_items', 'storePoArrivalItems');
     Route::get('/supplier_lead_time/{supplierId}', 'getSupplierLeadTime');
     Route::get('/invoices', 'getInvoices');
+    Route::get('/invoices/{invoiceId}', 'getInvoiceById');
     Route::post('/invoices', 'storeInvoices');
+    Route::post('/po_arrival_list/{arrivalId}', 'updateArrivalList');
   });
 
   Route::controller(ParticipantNotificationController::class)->group(function () {

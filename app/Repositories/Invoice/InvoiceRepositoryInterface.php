@@ -10,7 +10,7 @@ interface InvoiceRepositoryInterface
 
     public function createData(array $data);
 
-    public function updateData(array $data,int $id);
+    public function updateData(array $data, int $id);
 
     public function deleteData(int $id);
 
@@ -31,5 +31,8 @@ interface InvoiceRepositoryInterface
     public function addService($request);
 
     public function endService($request);
-}
 
+    public function getCustomerDeposits($request);
+
+    public function cashierConfirm($request, $customerDepositId);
+}

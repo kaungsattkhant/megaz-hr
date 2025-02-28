@@ -34,32 +34,68 @@
                 <input type="number" v-model="maxCredit"
                     class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
             </div>
-            <div class="mb-4 col-span-3 pb-6 rounded-md">
-                <label for="" class="block text-sm text-black mb-3">
-                    Lead Time
+            <div class="mb-4 col-span-3 pb-6 relative">
+                <label for="" class="block text-sm text-black mb-3 absolute -top-6 text-center w-full">
+                    (Lead Time)
                 </label>
-                <input type="text" v-model="lead_time"
-                    class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
+                <div class="grid grid-cols-3 gap-x-4">
+                    <div>
+                        <label for="" class="block text-sm text-black mb-3">
+                            Day
+                        </label>
+                        <input type="number" v-model="lead_time_day" min="0"
+                        class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
+                    </div>
+                    <div>
+                        <label for="" class="block text-sm text-black mb-3">
+                            Hour
+                        </label>
+                        <input type="number" v-model="lead_time_hour" min="0" max="24"
+                        class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
+                    </div>
+                    <div>
+                        <label for="" class="block text-sm text-black mb-3">
+                            Min 
+                        </label>
+                        <input type="number" v-model="lead_time_min" min="0" max="60"
+                        class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
+                    </div>
+                </div>
+                
             </div>
-            <div class="mb-4 col-span-3 pb-6 rounded-md">
+            <div class="mb-4 col-span-3 pb-6 rounded-md row-span-2">
                 <label for="" class="block text-sm text-black mb-3">
                     Credit Terms
                 </label>
                 <textarea name="" v-model="credit_terms"
                     class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg" id="" cols="30"
-                    rows="6"></textarea>
+                    rows="7"></textarea>
             </div>
-            <div class="mb-4 col-span-3 pb-6 rounded-md">
+            <div class="mb-4 col-span-3 pb-6 rounded-md row-span-2">
                 <label for="" class="block text-sm text-black mb-3">
                     Address
                 </label>
                 <textarea name="" v-model="address"
                     class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg" id="" cols="30"
-                    rows="6"></textarea>
+                    rows="7"></textarea>
+            </div>
+            <div class="mb-1 col-span-3 rounded-md pl-4">
+                <label for="" class="block text-sm text-black mb-3">
+                    Amount
+                </label>
+                <input type="number" v-model="amount"
+                    class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
+            </div>
+            <div class="mb-1 col-span-3 rounded-md">
+                <label for="" class="block text-sm text-black mb-3">
+                    Date
+                </label>
+                <input type="date" v-model="date"
+                    class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
             </div>
             <div class="col-span-6 px-4">
-                <div class="flex justify-between mb-4">
-                    <label for="" class="block text-base text-black mb-3">
+                <div class="flex justify-between mb-2">
+                    <label for="" class="block text-base text-black mb-0">
                         Account
                     </label>
                     <button class="add-btn mt-0.5" data-te-toggle="modal" data-te-target="#create_modal">
@@ -483,8 +519,12 @@ export default {
             shopName: null,
             address: null,
             maxCredit: null,
-            lead_time:null,
+            lead_time_day:0,
+            lead_time_hour:0,
+            lead_time_min:0,
             credit_terms:null,
+            amount:null,
+            date:null,
 
             ph_number: null,
             selectedType:null,
@@ -557,7 +597,9 @@ export default {
                 this.phoneNumber = this.supplier.phone_number;
                 this.maxCredit = this.supplier.credit_limit;
                 this.address = this.supplier.address;
-                this.lead_time = this.supplier.lead_time;
+                this.lead_time_day = this.supplier.lead_time_day;
+                this.lead_time_hour = this.supplier.lead_time_hour;
+                this.lead_time_min = this.supplier.lead_time_minutes;
                 this.credit_terms = this.supplier.credit_terms;
                 // this.existingItems = this.supplier.items;
                 this.selectedAccount = this.apAccountList.find(ap => ap.id === this.supplier.account_id )
@@ -747,6 +789,22 @@ export default {
                 this.alertValidationMessage(`supplier credit limit`);
                 return 1;
             }
+            if(!this.selectedAccount){
+                this.alertValidationMessage(`Supplier Account Payable`);
+                return 1;
+            }
+            if(this.lead_time_day < 1 && this.lead_time_hour < 1 && this.lead_time_min < 1){
+                this.alertValidationMessage(`Lead Time`);
+                return 1;
+            }
+            if(!this.credit_terms){
+                this.alertValidationMessage(`Credit Terms`);
+                return 1;
+            }
+            if(!this.selectedCreditAccount){
+                this.alertValidationMessage(`Credit account`);
+                return 1;
+            }
 
             let formData = new FormData();
             formData.append("id", this.supplierId);
@@ -754,11 +812,15 @@ export default {
             formData.append("shop_name", this.shopName);
             // formData.append("phone_number", this.phoneNumber);
             formData.append("credit_limit", this.maxCredit);
-            formData.append("lead_time", this.lead_time);
+            formData.append("lead_time_day", this.lead_time_day);
+            formData.append("lead_time_hour", this.lead_time_hour);
+            formData.append("lead_time_minutes", this.lead_time_min);
             formData.append("credit_terms", this.credit_terms);
             formData.append("address", this.address);
             formData.append("account_id", this.selectedAccount.id);
             formData.append("creditor_account_id", this.selectedCreditAccount.id);
+            formData.append("credit_opening_amount", this.amount);
+            formData.append("credit_opening_date", this.date);
             let itemBrandList = [];
             this.selectedItemList.forEach((item)=>{
                 itemBrandList.push({

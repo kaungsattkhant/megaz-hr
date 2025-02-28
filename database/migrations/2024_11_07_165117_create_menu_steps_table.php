@@ -20,6 +20,7 @@ return new class extends Migration
             $table->double('expected_quantity')->nullable();
             $table->string('level');
             $table->string('type');
+            $table->date('expired_at')->nullable();
             $table->timestamps();
         });
     }

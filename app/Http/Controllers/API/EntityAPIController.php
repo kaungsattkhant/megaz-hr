@@ -83,6 +83,9 @@ class EntityAPIController extends Controller
 
     public function getEntitySessionDetail(Request $request, int $id)
     {
+        // if(!isset($request->invoice_id)){
+        //     ResponseMessage('Invoice Id is required',419);
+        // }
         $data = $request->all();
         $entity = $this->entityRepo->entityDetail($data, $id);
 
