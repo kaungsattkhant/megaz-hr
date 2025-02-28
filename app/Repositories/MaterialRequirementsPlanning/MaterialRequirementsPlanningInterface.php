@@ -26,7 +26,7 @@ interface MaterialRequirementsPlanningInterface
 
   public function getMenuCategoryCookingAreas(Request $request);
 
-  public function createMenuCategoryCookingAreas($request);
+  public function updateMenuCategoryCookingAreas($menuAreaId);
 
-  public function getAreaCategories(Request $request);
+  public function getSellingAreas(Request $request);
 }

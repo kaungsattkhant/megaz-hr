@@ -414,8 +414,8 @@ Route::middleware('auth:api')->group(function () {
         Route::post('/mrp/{id}', 'updateMrpList');
         Route::get('/roles', 'getRoles');
         Route::get('/menu_category_cooking_areas', 'getMenuCategoryCookingAreas');
-        Route::post('/menu_category_cooking_areas', 'createMenuCategoryCookingAreas');
-        Route::get('/area_categories', 'getAreaCategories');
+        Route::post('/menu_area/{menuAreaId}', 'updateMenuCategoryCookingAreas');
+        Route::get('/menu_selling_area', 'getSellingAreas');
     });
 
     Route::controller(CreditorController::class)->group(function () {

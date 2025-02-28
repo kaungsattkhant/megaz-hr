@@ -72,10 +72,16 @@ class Menu extends BaseModel
         return $this->belongsToMany(CookingPlace::class, 'menu_places');
     }
 
-    // public function availableCookingPlaces()
-    // {
-    //     return $this->morphMany(AvailableCookingPlace::class, 'cooking_placeable');
-    // }
+    public function cookingAreas()
+    {
+        return $this->belongsToMany(CookingPlace::class, 'menu_areas', 'menu_category_area_id', 'cooking_area_id')
+            ->withTimestamps();
+    }
+
+    public function availableCookingPlaces()
+    {
+        return $this->morphMany(AvailableCookingPlace::class, 'cooking_placeable');
+    }
 
 
     public function menuSteps(): HasMany

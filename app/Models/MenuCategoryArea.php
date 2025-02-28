@@ -12,9 +12,8 @@ class MenuCategoryArea extends Model
     protected $fillable = [
         'menu_category_id',
         'selling_area_id',
-        'cooking_area_id'
     ];
-
+    protected $hidden = ['created_at', 'updated_at'];
     public function menuCategory()
     {
         return $this->belongsTo(MenuCategory::class);
@@ -22,11 +21,11 @@ class MenuCategoryArea extends Model
 
     public function sellingArea()
     {
-        return $this->belongsTo(Area::class, 'area_category_id');
+        return $this->belongsTo(Area::class, 'selling_area_id');
     }
 
-    public function cookingArea()
+    public function menuAreas()
     {
-        return $this->belongsTo(Area::class, 'department_id');
+        return $this->hasMany(MenuArea::class);
     }
 }

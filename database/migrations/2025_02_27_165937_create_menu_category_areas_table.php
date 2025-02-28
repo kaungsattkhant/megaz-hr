@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->unsignedBigInteger('menu_category_id');
             $table->unsignedBigInteger('selling_area_id');
-            $table->unsignedBigInteger('cooking_area_id');
+            // $table->unsignedBigInteger('cooking_area_id');
             $table->timestamps();
         });
     }

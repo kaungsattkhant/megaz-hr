@@ -79,15 +79,15 @@ class MaterialRequirementsPlanningAPIController extends Controller
         ResponseData($data);
     }
 
-    public function createMenuCategoryCookingAreas(Request $request)
+    public function updateMenuCategoryCookingAreas($menuAreaId)
     {
-        $data = $this->MaterialRequirementsPlanningRepository->createMenuCategoryCookingAreas($request);
+        $data = $this->MaterialRequirementsPlanningRepository->updateMenuCategoryCookingAreas($menuAreaId);
         ResponseData($data);
     }
 
-    public function getAreaCategories(Request $request)
+    public function getSellingAreas(Request $request)
     {
-        $data = $this->MaterialRequirementsPlanningRepository->getAreaCategories($request);
+        $data = $this->MaterialRequirementsPlanningRepository->getSellingAreas($request);
         ResponseData($data);
     }
 }
