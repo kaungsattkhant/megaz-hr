@@ -24,41 +24,46 @@ class RoleSeeder extends Seeder
         // $inventoryDept = Department::where('name', 'Inventory')->first();
         $kitchenDept = Department::where('name', 'Kitchen')->first();
         $barDept = Department::where('name', 'Bar')->first();
-        $procurementDept = Department::where( 'name', 'Procurement')->first();
+        $procurementDept = Department::where('name', 'Procurement')->first();
 
         $basicRoles = ['Staff', 'Supervisor', 'Manager'];
-        $cateringRoles =['Staff','Supervisor','Manager','Waiter','Receptionist','Cashier'];
+        $cateringRoles = ['Staff', 'Supervisor', 'Manager', 'Waiter', 'Receptionist', 'Cashier'];
 
-        foreach($basicRoles as $roleName){
+        foreach ($basicRoles as $roleName) {
             Role::create([
                 'department_id' => $hrDept->id,
-                'name' => $roleName
+                'name' => $roleName,
+                'is_available' => 1
             ]);
         }
 
-        foreach($basicRoles as $roleName){
+        foreach ($basicRoles as $roleName) {
             Role::create([
                 'department_id' => $financeDept->id,
-                'name' => $roleName
+                'name' => $roleName,
+                'is_available' => 1
             ]);
         }
 
-        foreach($basicRoles as $roleName){
+        foreach ($basicRoles as $roleName) {
             Role::create([
                 'department_id' => $managementDept->id,
-                'name' => $roleName
+                'name' => $roleName,
+                'is_available' => 1
             ]);
         }
 
         Role::create([
             'department_id' => $managementDept->id,
-            'name' => 'MD'
+            'name' => 'MD',
+            'is_available' => 1
         ]);
 
-        foreach($cateringRoles as $roleName){
+        foreach ($cateringRoles as $roleName) {
             Role::create([
                 'department_id' => $cateringDept->id,
-                'name' => $roleName
+                'name' => $roleName,
+                'is_available' => 1
             ]);
         }
 
@@ -69,24 +74,27 @@ class RoleSeeder extends Seeder
         //     ]);
         // }
 
-        foreach($basicRoles as $roleName){
+        foreach ($basicRoles as $roleName) {
             Role::create([
                 'department_id' => $kitchenDept->id,
-                'name' => $roleName
+                'name' => $roleName,
+                'is_available' => 1
             ]);
         }
 
 
-        foreach($basicRoles as $roleName){
+        foreach ($basicRoles as $roleName) {
             Role::create([
                 'department_id' => $barDept->id,
-                'name' => $roleName
+                'name' => $roleName,
+                'is_available' => 1
             ]);
         }
-        foreach($basicRoles as $roleName){
+        foreach ($basicRoles as $roleName) {
             Role::create([
                 'department_id' => $procurementDept->id,
-                'name' => $roleName
+                'name' => $roleName,
+                'is_available' => 1
             ]);
         }
 

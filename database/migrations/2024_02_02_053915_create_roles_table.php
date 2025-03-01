@@ -14,7 +14,8 @@ return new class extends Migration
         Schema::create('roles', function (Blueprint $table) {
             $table->id();
             $table->foreignId('department_id')->nullable()->constrained()->onDelete('cascade');
-            $table->string('name',45);
+            $table->string('name', 45);
+            $table->boolean('is_available')->default(1);
             $table->timestamps();
         });
     }

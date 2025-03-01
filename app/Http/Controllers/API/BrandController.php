@@ -12,15 +12,16 @@ class BrandController extends Controller
     //
     public function index(Request $request)
     {
-        $brandQuery=Brand::with('items')->orderBy('id','desc');
-        if(isset($request->page)){
+        $brandQuery = Brand::with('items')->orderBy('id', 'desc');
+        if (isset($request->page)) {
             return ResponseData($brandQuery->paginate(config('common.list_count')));
         }
         return ResponseData($brandQuery->get());
     }
 
-    public function createBrand(Request $request){
-        $data=$request->all();
+    public function createBrand(Request $request)
+    {
+        $data = $request->all();
         DB::beginTransaction();
         try {
             if (!isset($request->id)) {
@@ -44,11 +45,10 @@ class BrandController extends Controller
 
     public function getBrandByItem(Request $request)
     {
-        $itemIds=$request->item_ids;
-        $brands=Brand::whereHas('items',function($query)use($itemIds){
-            $query->whereIn('item_id',$itemIds);
+        $itemIds = $request->item_ids;
+        $brands = Brand::whereHas('items', function ($query) use ($itemIds) {
+            $query->whereIn('item_id', $itemIds);
         })->get();
         return ResponseData($brands);
     }
-
 }

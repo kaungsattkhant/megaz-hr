@@ -4,6 +4,7 @@ namespace App\Repositories\Item;
 
 use Exception;
 use App\Models\Item;
+use App\Models\Category;
 use App\Models\ItemType;
 use App\Models\ItemPrice;
 use App\Imports\ItemsImport;
@@ -257,5 +258,46 @@ class ItemRepository implements ItemRepositoryInterface
         // ->where('item_id', $itemId)->get();
         // $brands = $supplierByItems->pluck('brand')->unique('id')->values();
         return $brands;
+    }
+
+    public function createCategory(Request $request)
+    {
+        $data = $request->all();
+        DB::beginTransaction();
+        try {
+            if (!isset($request->id)) {
+                $data['id'] = null;
+            }
+            $category = Category::updateOrCreate(
+                ['id' => $data['id']],
+                $data
+            );
+            DB::commit();
+            ResponseData($category);
+        } catch (\Exception $e) {
+            DB::rollback();
+            ResponseMessage($e->getMessage(), 402);
+            throw $e;
+        }
+    }
+    public function createItemType(Request $request)
+    {
+        $data = $request->all();
+        DB::beginTransaction();
+        try {
+            if (!isset($request->id)) {
+                $data['id'] = null;
+            }
+            $itemType = ItemType::updateOrCreate(
+                ['id' => $data['id']],
+                $data
+            );
+            DB::commit();
+            ResponseData($itemType);
+        } catch (\Exception $e) {
+            DB::rollback();
+            ResponseMessage($e->getMessage(), 402);
+            throw $e;
+        }
     }
 }
