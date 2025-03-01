@@ -7,10 +7,17 @@
     <div class="mt-4 bg-white">
         <div class="btn-container">
             <div class=" flex">
-                <label for="search" class="search-input">
+                <!-- <label for="search" class="search-input">
                     <input type="text" class="input-search" placeholder="Search">
                     <i class="fal fa-search"></i>
-                </label>
+                </label> -->
+                <div class="w-full multiselect-fontsize" data-te-select-wrapper-ref>
+                    <select data-te-select-init data-te-select-placeholder="Select Department" v-model="filterDepartment"
+                    data-te-select-filter="true" @change="filterDepartmentChange()" class="input-ui w-full !text-sm">
+                        <!-- <option value="all">All</option> -->
+                        <option v-for="(department,index) in departmentList" :key="index" :value="department"> {{ department.name }} </option>
+                    </select>
+                </div>
             </div>
             <div class="flex justify-end flex-col">
 
@@ -62,10 +69,24 @@
                                             data-te-toggle="modal" data-te-target="#edit_modal" @click="editRolesBtnClicked(role)">
                                             <i class="fas fa-pen"></i>
                                         </button>
-                                        <button @click="deleteBtnClicked(role.id)" data-te-toggle="modal"
+                                        <input :checked="role.is_available == 1" @change="isActiveToggled(role.id)"
+                                            class="me-2 mt-[0.3rem] h-3.5 w-8 appearance-none rounded-[0.4375rem] bg-black/25 before:pointer-events-none before:absolute before:h-3.5
+                                            before:w-3.5 before:rounded-full before:bg-transparent before:content-[''] after:absolute after:z-[2] after:-mt-[0.1875rem] after:h-5
+                                            after:w-5 after:rounded-full after:border-none after:bg-white after:shadow-switch-2 after:transition-[background-color_0.2s,transform_0.2s]
+                                            after:content-[''] checked:bg-primary checked:after:absolute checked:after:z-[2] checked:after:-mt-[3px] checked:after:ms-[1.0625rem]
+                                            checked:after:h-5 checked:after:w-5 checked:after:rounded-full checked:after:border-none checked:after:bg-primary checked:after:shadow-switch-1
+                                            checked:after:transition-[background-color_0.2s,transform_0.2s] checked:after:content-[''] hover:cursor-pointer focus:outline-none focus:before:scale-100
+                                            focus:before:opacity-[0.12] focus:before:shadow-switch-3 focus:before:shadow-black/60 focus:before:transition-[box-shadow_0.2s,transform_0.2s]
+                                            focus:after:absolute focus:after:z-[1] focus:after:block focus:after:h-5 focus:after:w-5 focus:after:rounded-full focus:after:content-['']
+                                            checked:focus:border-primary checked:focus:bg-primary checked:focus:before:ms-[1.0625rem] checked:focus:before:scale-100 checked:focus:before:shadow-switch-3
+                                            checked:focus:before:transition-[box-shadow_0.2s,transform_0.2s] "
+                                            type="checkbox" role="switch" />
+
+
+                                        <!-- <button @click="deleteBtnClicked(role.id)" data-te-toggle="modal"
                                             data-te-target="#deleteModal" id="delete-btn">
                                             <i class="fas fa-trash-alt"></i>
-                                        </button>
+                                        </button> -->
                                     </td>
                                 </tr>
                             </div>
@@ -282,11 +303,14 @@ export default {
             nameEdit:null,
             selectedDepartmentEdit:null,
 
+            filterDepartment:null,
+
             currentPage: 0,
             perPage: 0,
             lastPage: 0,
             totalData: 0,
 
+            department_url:''
         };
     },
 
@@ -299,9 +323,16 @@ export default {
                 this.departmentList = response.data;
             }
         },
-
+        async filterDepartmentChange(){
+            // const response = await getApiData({ url: `/api/roles?department_id=${this.filterDepartment.id}&page=2`, token: this.getToken() });
+            // if (response.data) {
+            //     this.roleList = response.data;
+            // }
+            this.department_url = 'department_id='+this.filterDepartment.id+'&'
+            this.getRolesList(1);
+        },
         async getRolesList(pageNumber) {
-            const response = await getApiData({ url: `/api/roles?page=${pageNumber}`, token: this.getToken() });
+            const response = await getApiData({ url: `/api/roles?${this.department_url}page=${pageNumber}`, token: this.getToken() });
             if (response.data) {
                 this.roleList = response.data.data;
 
@@ -322,7 +353,12 @@ export default {
             formData.append('department_id', this.selectedDepartment);
             let response = await postApiData({ url: '/api/roles', form_data: formData, token: this.getToken() });
             if (response.success) {
-                this.getRolesList(1);
+                if(this.filterDepartment){
+                    this.filterDepartmentChange();
+                }
+                else{
+                    this.getRolesList(1);
+                }
                 console.log("success")
             }
             else {
@@ -342,7 +378,12 @@ export default {
             formData.append('department_id', this.selectedDepartmentEdit);
             let response = await postApiData({ url: '/api/roles/'+this.selectedRole.id, form_data: formData, token: this.getToken() });
             if (response.success) {
-                this.getRolesList(1);
+                if(this.filterDepartment){
+                    this.filterDepartmentChange();
+                }
+                else{
+                    this.getRolesList(1);
+                }
                 console.log("success")
             }
             else {
@@ -350,17 +391,48 @@ export default {
             }
         },
 
-        deleteBtnClicked(id) {
-            this.deleteId = id;
-        },
 
-        async confirmDeleteBtnClicked() {
-            let url = `/api/roles/${this.deleteId}`;
-            let response = await deleteApiData({ url: url, token: this.getToken() });
-            if (response.success) {
-                alert(`deleted`);
+        async isActiveToggled(id) {
+            let index = this.roleList.findIndex(role => role.id == id);
+            if (index != -1) {
+                let url = `/api/roles/${id}/available_toggle`;
+                let formData = new FormData();
+                let response = await postApiData({ url: url, form_data: formData, token: this.getToken() });
+                if(response.success){
+                    if (this.roleList[index].is_available == 1) {
+                        this.roleList[index].is_available = 0;
+                    }
+                    else {
+                        this.roleList[index].is_available = 1;
+                    }
+                }
+                else{
+                    if (this.roleList[index].is_available == 0) {
+                        this.roleList[index].is_available = 1;
+                    }
+                    else {
+                        this.roleList[index].is_available = 0;
+                    }
+                    this.$notify({
+                        title: 'Error',
+                        text: response.message,
+                        type: 'error'
+                    });
+                }
+                this.getRolesList();
             }
-        }
+        },
+        // deleteBtnClicked(id) {
+        //     this.deleteId = id;
+        // },
+
+        // async confirmDeleteBtnClicked() {
+        //     let url = `/api/roles/${this.deleteId}`;
+        //     let response = await deleteApiData({ url: url, token: this.getToken() });
+        //     if (response.success) {
+        //         alert(`deleted`);
+        //     }
+        // }
 
     },
     mounted() {

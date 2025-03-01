@@ -19,9 +19,9 @@
                 <!-- <a href="/warning/create" class="add-btn ">
                     Add New
                 </a> -->
-                <div class="w-full" data-te-select-wrapper-ref>
+                <div class="w-full multiselect-fontsize" data-te-select-wrapper-ref>
                     <select data-te-select-init data-te-select-placeholder="Select Selling Area" v-model="selectedSellingArea"
-                    data-te-select-filter="true" @change="selectedSellingAreaChanged()" class="input-ui w-full">
+                    data-te-select-filter="true" @change="selectedSellingAreaChanged()" class="input-ui w-full !text-sm">
                         <!-- <option value="all">All</option> -->
                         <option v-for="(sellingArea,index) in sellingAreaList" :key="index" :value="sellingArea"> {{ sellingArea.name }} </option>
                     </select>
