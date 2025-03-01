@@ -333,6 +333,7 @@ class MaterialRequirementsPlanningRepository implements MaterialRequirementsPlan
     $sellingAreaId = $request->input('selling_area_id');
     $menuCategoriesQuery = MenuCategoryArea::with([
       'menuCategory',
+      'sellingArea',
       'menuAreas.cookingArea',
     ]);
 
