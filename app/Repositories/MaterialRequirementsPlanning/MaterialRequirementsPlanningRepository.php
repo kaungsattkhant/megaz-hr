@@ -121,10 +121,12 @@ class MaterialRequirementsPlanningRepository implements MaterialRequirementsPlan
         $menuCategoryAreas = MenuCategoryArea::where('menu_category_id', $menuCategory->id)
           ->get();
         foreach ($menuCategoryAreas as $menuCategoryArea) {
-          MenuArea::updateOrCreate([
-            'menu_category_area_id' => $menuCategoryArea->id,
-            'cooking_area_id' =>  $areaId,
-          ]);
+          MenuArea::updateOrCreate(
+            [
+              'menu_category_area_id' => $menuCategoryArea->id
+            ],
+            ['cooking_area_id' =>  $areaId],
+          );
         }
       }
 
@@ -236,10 +238,12 @@ class MaterialRequirementsPlanningRepository implements MaterialRequirementsPlan
           $menuCategoryAreas = MenuCategoryArea::where('menu_category_id', $menuCategory->id)
             ->get();
           foreach ($menuCategoryAreas as $menuCategoryArea) {
-            MenuArea::updateOrCreate([
-              'menu_category_area_id' => $menuCategoryArea->id,
-              'cooking_area_id' =>  $areaId,
-            ]);
+            MenuArea::updateOrCreate(
+              [
+                'menu_category_area_id' => $menuCategoryArea->id
+              ],
+              ['cooking_area_id' =>  $areaId],
+            );
           }
         }
       } else {
