@@ -27,4 +27,8 @@ interface ItemRepositoryInterface
     public function itemImport($request);
 
     public function brandlistOfSupplierByItem($itemId);
+
+    public function createCategory(Request $request);
+
+    public function createItemType(Request $request);
 }

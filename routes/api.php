@@ -562,6 +562,8 @@ Route::post('/items/imports', [ItemAPIController::class, 'itemImport']);
 Route::post('/add_item_price_by_supplier_item', [ItemAPIController::class, 'addItemPrice']);
 Route::get('/get_uom_conversion_by_uom', [UomAPIController::class, 'getUomConversionByUom']);
 Route::get('/get_item_type', [ItemAPIController::class, 'getItemType']);
+Route::post('/categories', [ItemAPIController::class, 'createCategory']);
+Route::post('/item_types', [ItemAPIController::class, 'createItemType']);
 // Route::get('/transfers', [TransferAPIController::class, 'getTransferData']);
 // Route::post('/transfers', [TransferAPIController::class, 'createTransfer']);
 // Route::put('/transfers/{id}', [TransferAPIController::class, 'updateTransfer']);
