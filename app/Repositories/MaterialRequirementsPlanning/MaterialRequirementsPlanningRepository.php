@@ -118,11 +118,11 @@ class MaterialRequirementsPlanningRepository implements MaterialRequirementsPlan
         $place = CookingPlace::findOrFail($place);
 
         $areaId = $place->area_id;
-        $menuCategoryArea = MenuCategoryArea::where('menu_category_id', $menuCategory->id)
+        $menuCategoryAreas = MenuCategoryArea::where('menu_category_id', $menuCategory->id)
           ->get();
-        foreach ($menuCategoryArea as $area) {
+        foreach ($menuCategoryAreas as $menuCategoryArea) {
           MenuArea::updateOrCreate([
-            'menu_category_area_id' => $area->id,
+            'menu_category_area_id' => $menuCategoryArea->id,
             'cooking_area_id' =>  $areaId,
           ]);
         }
@@ -233,11 +233,11 @@ class MaterialRequirementsPlanningRepository implements MaterialRequirementsPlan
         foreach ($cookingPlace as $place) {
           $place = CookingPlace::findOrFail($place);
           $areaId = $place->area_id;
-          $menuCategoryArea = MenuCategoryArea::where('menu_category_id', $menuCategory->id)
+          $menuCategoryAreas = MenuCategoryArea::where('menu_category_id', $menuCategory->id)
             ->get();
-          foreach ($menuCategoryArea as $area) {
+          foreach ($menuCategoryAreas as $menuCategoryArea) {
             MenuArea::updateOrCreate([
-              'menu_category_area_id' => $area->id,
+              'menu_category_area_id' => $menuCategoryArea->id,
               'cooking_area_id' =>  $areaId,
             ]);
           }
