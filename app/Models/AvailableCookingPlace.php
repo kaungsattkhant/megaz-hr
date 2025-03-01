@@ -9,8 +9,10 @@ class AvailableCookingPlace extends Model
 {
     use HasFactory;
 
-    protected $fillable =[
-        'cooking_place_id','cooking_placeable_type','cooking_placeable_id'
+    protected $fillable = [
+        'cooking_place_id',
+        'cooking_placeable_type',
+        'cooking_placeable_id'
     ];
 
     public function cookingPlace()
@@ -22,5 +24,4 @@ class AvailableCookingPlace extends Model
     {
         return $this->morphTo();
     }
-
 }

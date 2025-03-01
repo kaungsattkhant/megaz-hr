@@ -3,15 +3,20 @@
 namespace App\Repositories\MaterialRequirementsPlanning;
 
 use Exception;
+use App\Models\Area;
 use App\Models\Menu;
 use App\Models\Role;
 use App\Models\SubMenu;
+use App\Models\MenuArea;
 use App\Models\MenuStep;
 use App\Models\MenuPrice;
 use App\Models\Department;
+use App\Models\AreaCategory;
 use App\Models\CookingPlace;
+use App\Models\MenuCategory;
 use App\Models\MenuStepItem;
 use Illuminate\Http\Request;
+use App\Models\MenuCategoryArea;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 
@@ -104,9 +109,27 @@ class MaterialRequirementsPlanningRepository implements MaterialRequirementsPlan
       }
 
       $cookingPlace = json_decode($validatedData['cooking_place_id']);
-      // if (!empty($validatedData['cooking_place_id'])) {
       $menu->menuPlaces()->sync($cookingPlace);
-      // }
+
+
+      $menuCategory = MenuCategory::findOrFail($validatedData['menu_category_id']);
+
+      foreach ($cookingPlace  as $place) {
+        $place = CookingPlace::findOrFail($place);
+
+        $areaId = $place->area_id;
+        $menuCategoryAreas = MenuCategoryArea::where('menu_category_id', $menuCategory->id)
+          ->get();
+        foreach ($menuCategoryAreas as $menuCategoryArea) {
+          MenuArea::updateOrCreate(
+            [
+              'menu_category_area_id' => $menuCategoryArea->id
+            ],
+            ['cooking_area_id' =>  $areaId],
+          );
+        }
+      }
+
 
       // if (!isset($validatedData['sub_menu_id'])) {
       $submenu = json_decode($validatedData['sub_menu_id']);
@@ -208,6 +231,21 @@ class MaterialRequirementsPlanningRepository implements MaterialRequirementsPlan
       $cookingPlace = json_decode($validatedData['cooking_place_id']);
       if (!empty($cookingPlace)) {
         $menu->menuPlaces()->sync($cookingPlace);
+        $menuCategory = MenuCategory::findOrFail($validatedData['menu_category_id']);
+        foreach ($cookingPlace as $place) {
+          $place = CookingPlace::findOrFail($place);
+          $areaId = $place->area_id;
+          $menuCategoryAreas = MenuCategoryArea::where('menu_category_id', $menuCategory->id)
+            ->get();
+          foreach ($menuCategoryAreas as $menuCategoryArea) {
+            MenuArea::updateOrCreate(
+              [
+                'menu_category_area_id' => $menuCategoryArea->id
+              ],
+              ['cooking_area_id' =>  $areaId],
+            );
+          }
+        }
       } else {
         $menu->menuPlaces()->detach();
       }
@@ -285,5 +323,47 @@ class MaterialRequirementsPlanningRepository implements MaterialRequirementsPlan
       return response()->json(['message' => 'Department data not found!'], 404);
     }
     return Role::where('department_id', $department->id)->with('department')->get();
+  }
+
+  public function getMenuCategoryCookingAreas(Request $request)
+  {
+    $sellingAreaId = $request->input('selling_area_id');
+    $menuCategoriesQuery = MenuCategoryArea::with([
+      'menuCategory',
+      'sellingArea',
+      'menuAreas.cookingArea',
+    ]);
+
+    if ($sellingAreaId) {
+      $menuCategoriesQuery->where('selling_area_id', $sellingAreaId);
+    }
+    if ($request->has('per_page') || $request->has('page')) {
+      return  $menuCategoriesQuery->paginate(config('common.list_count'));
+    }
+    return $menuCategoriesQuery->get();
+  }
+
+  public function updateMenuCategoryCookingAreas($menuAreaId)
+  {
+    DB::beginTransaction();
+    try {
+      $menuArea = MenuArea::findOrFail($menuAreaId);
+      $menuArea->is_default = $menuArea->is_default == 1 ? 0 : 1;
+      $menuArea->save();
+      DB::commit();
+      ResponseData($menuArea, 201, 'MenuCategoryArea updated successfully!');
+    } catch (\Exception $e) {
+      DB::rollback();
+      ResponseMessage($e->getMessage(), 402);
+      throw $e;
+    }
+  }
+  public function getSellingAreas(Request $request)
+  {
+    $areaCategory = Area::with('areaCategory')
+      ->whereHas('areaCategory', function ($query) {
+        $query->whereRaw('LOWER(REPLACE(name, " ", "")) = ?', [strtolower(str_replace(' ', '', 'Selling Area'))]);
+      })->get();
+    ResponseData($areaCategory);
   }
 }
