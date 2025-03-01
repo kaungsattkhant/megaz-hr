@@ -120,13 +120,6 @@ class MaterialRequirementsPlanningRepository implements MaterialRequirementsPlan
         $areaId = $place->area_id;
         $menuCategoryArea = MenuCategoryArea::where('menu_category_id', $menuCategory->id)
           ->get();
-
-        // if (!$menuCategoryArea) {
-        //   $menuCategoryArea = MenuCategoryArea::create([
-        //     'menu_category_id' => $menuCategory->id,
-        //     'selling_area_id' =>  $areaId,
-        //   ]);
-        // }
         foreach ($menuCategoryArea as $area) {
           MenuArea::updateOrCreate([
             'menu_category_area_id' => $area->id,
