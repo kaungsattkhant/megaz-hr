@@ -13,12 +13,12 @@ class AreaRepository implements AreaRepositoryInterface
     public function getAreas(Request $request)
     {
 
-        $areasQuery = Area::with('areaType')->where('is_active', 1)->orderBy('created_at', 'desc');
+        $areasQuery = Area::with(['areaType', 'areaCategory'])->where('is_active', 1)->orderBy('created_at', 'desc');
 
         if ($request->department_id) {
             $areas = $areasQuery->where('department_id', $request->department_id)->get();
         } elseif ($request->area_category_id) {
-            $areas = $areasQuery->with('areaCategory')
+            $areas = $areasQuery
                 ->whereHas('areaCategory', function ($query) use ($request) {
                     $query->where('id', $request->area_category_id);
                 })

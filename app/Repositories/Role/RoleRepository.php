@@ -66,4 +66,20 @@ class RoleRepository implements RoleRepositoryInterface
     {
         return Role::where('department_id', $department_id)->with('skills')->get();
     }
+
+    public function roleAvailableToggle($roleId)
+    {
+        DB::beginTransaction();
+        try {
+            $role = Role::findOrFail($roleId);
+            $role->is_available = $role->is_available ? 0 : 1;
+            $role->save();
+            DB::commit();
+            return $role;
+        } catch (\Exception $e) {
+            DB::rollback();
+            ResponseMessage($e->getMessage(), 402);
+            throw $e;
+        }
+    }
 }
