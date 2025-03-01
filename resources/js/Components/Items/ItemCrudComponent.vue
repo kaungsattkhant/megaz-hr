@@ -28,9 +28,9 @@
 
             </div>
             <div class="flex justify-end gap-x-4">
-                <label for="excel_import" class="add-btn">
+                <label for="excel_import" class="add-btn h-8 cursor-pointer">
                     Excel Import
-                    <input type="file" placeholder="Excel" id="excel_import" class="opacity-0 w-0"  @change="handleFileChange">
+                    <input type="file" placeholder="Excel" id="excel_import" class="opacity-0 w-0 h-0 hidden"  @change="handleFileChange">
                 </label>
                 <!-- <button type="button"
                     class="add-btn transition duration-150 ease-in-out focus:outline-none focus:ring-0 "
@@ -38,7 +38,7 @@
                     Excel Import
                 </button> -->
                 <button type="button"
-                    class="add-btn transition duration-150 ease-in-out focus:outline-none focus:ring-0 "
+                    class="add-btn transition duration-150 ease-in-out focus:outline-none focus:ring-0 h-8"
                     data-te-toggle="modal" data-te-target="#create_modal" @click="step = 1">
                     Add New
                 </button>
@@ -283,7 +283,7 @@
                             <input type="text" placeholder="Code" v-model="code" class="input-ui">
                         </div>
 
-                        <div class="mb-4">
+                        <div class="mb-4 relative">
                             <label for="" class="label-form mb-3">
                                 Item Type
                             </label>
@@ -291,9 +291,12 @@
                                 <option :value="item_type" v-for="(item_type, index) in itemTypeList" :key="index"> {{ item_type.name }}
                                 </option>
                             </select>
+                            <button type="button" class="text-xs absolute -right-6 top-1/2 pt-2" @click="[step = 'type', brandName = null]">
+                                <i class="fal fa-plus"></i>
+                            </button>
                         </div>
 
-                        <div class="mb-4">
+                        <div class="mb-4 relative">
                             <label for="" class="label-form mb-3">
                                 Category
                             </label>
@@ -301,6 +304,9 @@
                                 <option :value="category" v-for="(category, categoryIndex) in itemCategoryList"
                                     :key="categoryIndex"> {{ category.name }} </option>
                             </select>
+                            <button type="button" class="text-xs absolute -right-6 top-1/2 pt-2" @click="[step = 'category', brandName = null]">
+                                <i class="fal fa-plus"></i>
+                            </button>
                         </div>
                         <!-- <div class="mb-4">
                             <label class="label-form mb-3">Brands</label>
@@ -353,7 +359,7 @@
                                 <option :value="brand" v-for="(brand, brandIndex) in brandList" :key="brandIndex"> {{ brand.name }}
                                 </option>
                             </select>
-                            <button type="button" class="text-xs absolute -right-6 top-1/2 pt-2" @click="step = 2">
+                            <button type="button" class="text-xs absolute -right-6 top-1/2 pt-2" @click="[step = 2, brandName = null]">
                                 <i class="fal fa-plus"></i>
                             </button>
                         </div>
@@ -399,6 +405,62 @@
                                 Name
                             </label>
                             <input type="text" placeholder="Name" v-model="brandName" class="input-ui">
+                        </div>
+                    </div>
+                    <div class="flex justify-end gap-x-4 px-6 mb-6 pt-4">
+                        <button type="button" class="cancel-btn focus:shadow-none focus:outline-none"
+                            data-te-modal-dismiss aria-label="Close" @click="stpe = 1">
+                            Cancel
+                        </button>
+                        <button type="button" @click="createBrand()"
+                            class="add-btn focus:outline-none focus:ring-0 ">
+                            Create
+                        </button>
+                    </div>
+                </div>
+                <div v-show="step == 'type'">
+                    <div class="relative flex justify-between py-2 px-6 border-b">
+                        <button @click="[step = 1, itemTypeName = null]">
+                            <i class="fas fa-chevron-left"></i>
+                        </button>
+                        <h5 class="text-base text-center mt-2 font-semibold leading-normal font-inter">
+                            Create Item Type
+                        </h5><div></div>
+                    </div>
+                    <div class="relative px-12 py-4 border-b" data-te-modal-body-ref>
+                        <div class="mb-4">
+                            <label for="" class="label-form mb-3">
+                                Name
+                            </label>
+                            <input type="text" placeholder="Name" v-model="itemTypeName" class="input-ui">
+                        </div>
+                    </div>
+                    <div class="flex justify-end gap-x-4 px-6 mb-6 pt-4">
+                        <button type="button" class="cancel-btn focus:shadow-none focus:outline-none"
+                            data-te-modal-dismiss aria-label="Close" @click="stpe = 1">
+                            Cancel
+                        </button>
+                        <button type="button" @click="createBrand()"
+                            class="add-btn focus:outline-none focus:ring-0 ">
+                            Create
+                        </button>
+                    </div>
+                </div>
+                <div v-show="step == 'category'">
+                    <div class="relative flex justify-between py-2 px-6 border-b">
+                        <button @click="[step = 1, itemCategoryName = null]">
+                            <i class="fas fa-chevron-left"></i>
+                        </button>
+                        <h5 class="text-base text-center mt-2 font-semibold leading-normal font-inter">
+                            Create Item Category
+                        </h5><div></div>
+                    </div>
+                    <div class="relative px-12 py-4 border-b" data-te-modal-body-ref>
+                        <div class="mb-4">
+                            <label for="" class="label-form mb-3">
+                                Name
+                            </label>
+                            <input type="text" placeholder="Name" v-model="itemCategoryName" class="input-ui">
                         </div>
                     </div>
                     <div class="flex justify-end gap-x-4 px-6 mb-6 pt-4">
@@ -538,6 +600,8 @@ export default {
             min_amount:0,
 
             brandName:null,
+            itemTypeName:null,
+            itemCategoryName:null,
             step: 1,
 
             selectedCategory: null,

@@ -16,7 +16,7 @@
 
                 <button type="button"
                     class="add-btn transition duration-150 ease-in-out focus:outline-none focus:ring-0 "
-                    data-te-toggle="modal" data-te-target="#create_modal">
+                    data-te-toggle="modal" data-te-target="#create_modal" @click="name = null, selectedDepartment = null">
                     Add New
                 </button>
             </div>
@@ -58,8 +58,12 @@
                                         {{ role.department.name }}
                                     </td>
                                     <td class="whitespace-nowrap">
+                                        <button type="button" class="pr-3"
+                                            data-te-toggle="modal" data-te-target="#edit_modal" @click="editRolesBtnClicked(role)">
+                                            <i class="fas fa-pen"></i>
+                                        </button>
                                         <button @click="deleteBtnClicked(role.id)" data-te-toggle="modal"
-                                            data-te-target="#deleteModal" id="edit-btn" class="pr-1">
+                                            data-te-target="#deleteModal" id="delete-btn">
                                             <i class="fas fa-trash-alt"></i>
                                         </button>
                                     </td>
@@ -146,6 +150,59 @@
                 </div>
             </div>
 
+            <div data-te-modal-init
+                class="fixed left-0 top-0 z-[1055] hidden h-full w-full overflow-y-auto overflow-x-hidden outline-none"
+                id="edit_modal" tabindex="-1" aria-labelledby="edit_modalLabel" aria-hidden="true">
+                <div data-te-modal-dialog-ref
+                    class="pointer-events-none relative w-auto mb-12 translate-y-[-50px] opacity-0 transition-all duration-300 ease-in-out min-[576px]:mx-auto min-[576px]:mt-7 min-[576px]:max-w-[500px]">
+                    <div
+                        class="min-[576px]:shadow-[0_0.5rem_1rem_rgba(#000, 0.15)] pointer-events-auto relative flex w-full flex-col rounded-md border-none bg-white bg-clip-padding text-current shadow-lg outline-none">
+
+                        <div class="relative flex justify-between py-2 px-6 border-b">
+                            <h5 class="text-base text-center mt-2 font-semibold leading-normal font-inter"
+                                id="edit_modalLabel">
+                                Update Role
+                            </h5>
+                            <button type="button" class="text-xs focus:shadow-none focus:outline-none"
+                                data-te-modal-dismiss aria-label="Close">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                    stroke-width="1.5" stroke="currentColor" class="h-4 w-4">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                                </svg>
+                            </button>
+                        </div>
+                        <div class="relative px-6 py-4 border-b" data-te-modal-body-ref>
+                            <div class="mb-4">
+                                <label for="" class="label-form mb-3">
+                                    Role Name
+                                </label>
+                                <input type="text" placeholder="Role Name" v-model="nameEdit" class="input-ui">
+                            </div>
+                            <div class="mb-4">
+                                <label for="" class="label-form mb-3">
+                                    Department
+                                </label>
+                                <select name="" id="" v-model="selectedDepartmentEdit" class="input-ui">
+                                    <option :value="department.id"
+                                        v-for="(department, departmentIndex) in departmentList" :key="departmentIndex">
+                                        {{ department.name }} </option>
+                                </select>
+                            </div>
+
+                        </div>
+                        <div class="flex justify-end gap-x-4 px-6 mb-6 pt-4">
+                            <button type="button" class="cancel-btn focus:shadow-none focus:outline-none"
+                                data-te-modal-dismiss aria-label="Close">
+                                Cancel
+                            </button>
+                            <button type="button" @click="editRole"
+                                class="add-btn focus:outline-none focus:ring-0 " data-te-modal-dismiss>
+                                Create
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
 
 
@@ -221,6 +278,10 @@ export default {
             selectedDepartment: null,
             deleteId: null,
 
+            selectedRole:null,
+            nameEdit:null,
+            selectedDepartmentEdit:null,
+
             currentPage: 0,
             perPage: 0,
             lastPage: 0,
@@ -252,7 +313,6 @@ export default {
         },
 
         createRolesBtnClicked() {
-
             this.createRole();
         },
 
@@ -261,6 +321,26 @@ export default {
             formData.append('name', this.name);
             formData.append('department_id', this.selectedDepartment);
             let response = await postApiData({ url: '/api/roles', form_data: formData, token: this.getToken() });
+            if (response.success) {
+                this.getRolesList(1);
+                console.log("success")
+            }
+            else {
+                alert('some errors occur');
+            }
+        },
+        editRolesBtnClicked(role) {
+            this.selectedRole = role;
+            this.nameEdit = role.name;
+            this.selectedDepartmentEdit = role.department.id
+            // this.editRole();
+        },
+
+        async editRole() {
+            let formData = new FormData();
+            formData.append('name', this.nameEdit);
+            formData.append('department_id', this.selectedDepartmentEdit);
+            let response = await postApiData({ url: '/api/roles/'+this.selectedRole.id, form_data: formData, token: this.getToken() });
             if (response.success) {
                 this.getRolesList(1);
                 console.log("success")

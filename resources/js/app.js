@@ -195,6 +195,7 @@ import OrgNewsEditComponent from './Components/OrgNews/OrgNewsEditComponent.vue'
 import WarningListComponent from './Components/Warning/WarningListComponent.vue';
 import WarningCreateComponent from './Components/Warning/WarningCreateComponent.vue';
 import WarningEditComponent from './Components/Warning/WarningEditComponent.vue';
+import MenuAreaComponent from './Components/MenuArea/MenuAreaComponent.vue';
 
 import PosTableComponent from './Components/Pos/Home/PosTableComponent.vue';
 import PosRoomComponent from './Components/Pos/Home/PosRoomComponent.vue';
@@ -372,6 +373,7 @@ app.component('OrgNewsEditComponent',OrgNewsEditComponent);
 app.component('WarningListComponent',WarningListComponent);
 app.component('WarningCreateComponent',WarningCreateComponent);
 app.component('WarningEditComponent',WarningEditComponent);
+app.component('MenuAreaComponent',MenuAreaComponent);
 
 app.component('PosTableComponent',PosTableComponent);
 app.component('PosRoomComponent',PosRoomComponent);
