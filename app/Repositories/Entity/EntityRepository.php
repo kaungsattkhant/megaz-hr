@@ -93,13 +93,14 @@ class EntityRepository implements EntityRepositoryInterface
         foreach ($entities as $entity) {
             if ($entity->entity_type == 'room' && $entity->is_active == 1) {
                 $invoiceSession = InvoiceSession::where('is_active', 1)->where('entity_id', $entity->id)->first();
-
                 if ($invoiceSession) {
                     $entity->start_time = $invoiceSession->start_date_time;
                     $entity->end_time = $invoiceSession->end_date_time;
+                    $entity->invoice=$invoiceSession;
                 } else {
                     $entity->start_time = null;
                     $entity->end_time = null;
+                    $entity->invoice=null;
                 }
             }
             //     $roomSessions = collect();
