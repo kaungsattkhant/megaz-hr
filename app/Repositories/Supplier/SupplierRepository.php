@@ -7,6 +7,7 @@ use App\Models\Supplier;
 use App\Models\SupplierItem;
 use Illuminate\Http\Request;
 use App\Models\SupplierPhone;
+use App\Models\AccountPayable;
 use PhpParser\Node\Expr\Isset_;
 use Illuminate\Support\Facades\DB;
 use App\Models\SupplierBankAccount;
@@ -129,6 +130,9 @@ class SupplierRepository implements SupplierInterface
                     );
                 }
             }
+            if (isset($request->credit_opening_amount) && isset($request->credit_opening_date)) {
+                $this->createPayableTransaction($supplier);
+            }
 
             DB::commit();
             return $supplier;
@@ -166,6 +170,57 @@ class SupplierRepository implements SupplierInterface
                 return ['other_payable' => $otherPayable, 'creditor' => $creditor];
             }
             ResponseMessage('Something is wrong', 419);
+        } catch (\Exception $e) {
+            DB::rollback();
+            ResponseMessage($e->getMessage(), 402);
+            throw $e;
+        }
+    }
+
+    public function createPayableTransaction($supplier)
+    {
+        DB::beginTransaction();
+        try {
+
+            $accountPayable = AccountPayable::updateOrCreate(
+                [
+                    'supplier_id' => $supplier->id,
+                    'account_id' => $supplier->account_id
+                ],
+                [
+                    'type' => 'addition',
+                    'date_time' => now(),
+                    'amount' => $supplier->credit_opening_amount,
+                    'supplier_id' => $supplier->id,
+                    'account_id' => $supplier->account_id,
+                    'created_by' => UserData()->id,
+                ]
+            );
+            // $data = $request->all();
+            // $data['created_by'] = UserData()->id;
+            // $data['is_confirmed'] = 1;
+            // $transaction = (new StoreTransactionLedger())->createTransaction($data);
+            // $creditLedger = (new StoreTransactionLedger())->storeLedger([
+            //     'date' => now(),
+            //     'value' => $request->value,
+            //     'transaction_id' => $transaction->id,
+            //     'account_id' => $request->cash_account_id,
+            //     'personable_id' => $request->supplier_id,
+            //     'personable_type' => 'supplier',
+            //     'action' => 'credit',
+            // ]);
+
+            // #debit
+            // $debitLedger = (new StoreTransactionLedger())->storeLedger([
+            //     'value' => $request->value,
+            //     'transaction_id' => $transaction->id,
+            //     'account_id' => $request->account_id,
+            //     'personable_id' => $request->supplier_id,
+            //     'personable_type' => 'supplier',
+            //     'action' => 'debit',
+            // ]);
+            DB::commit();
+            return $accountPayable;
         } catch (\Exception $e) {
             DB::rollback();
             ResponseMessage($e->getMessage(), 402);

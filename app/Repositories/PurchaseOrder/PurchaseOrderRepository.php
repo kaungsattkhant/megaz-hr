@@ -43,6 +43,8 @@ class PurchaseOrderRepository implements PurchaseOrderRepositoryInterface
     public function listAllData(Request $request)
     {
         $staff = UserData();
+        $date = $request->date;
+        $po_id = $request->po_id;
         $purchaseOrders = PurchaseOrder::with([
             'items.item',
             'items.baseUom',
@@ -51,7 +53,11 @@ class PurchaseOrderRepository implements PurchaseOrderRepositoryInterface
             'managerCheckedBy',
             'financialCheckedBy',
             'procurementCheckedBy'
-        ])
+        ])->when((isset($date)), function ($q) use ($date) {
+            $q->where('date', $date);
+        })->when((isset($po_id)), function ($q) use ($po_id) {
+            $q->where('po_id', $po_id);
+        })
             ->orderBy('id', 'desc');
 
         if (checkRoles(['Staff'])) {

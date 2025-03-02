@@ -140,7 +140,7 @@ class InvoiceRepository implements InvoiceRepositoryInterface
                 DB::commit();
                 return $tableInvoice;
             }
-            // dd($data);
+
             if ($data['entity_type'] == 'room' || $data['is_waiter']) { // create room invoice
                 $entitySession = null;
                 if (isset($data['entity_id']) && $data['entity_id'] != null && $data['is_waiter']) {
@@ -203,7 +203,6 @@ class InvoiceRepository implements InvoiceRepositoryInterface
                         $freeDiscountSession = (int) $freeSessionCount * $roomDiscount->free_session;
                     }
                     $data['session_duration'] = $data['session_duration'] + $freeDiscountSession;
-
                 } else if ($data['type'] == 'endless_time') {
                     $end_date = Carbon::now()->addMinute(1 * 60);
                     $data['session_duration'] = 1;
@@ -323,27 +322,26 @@ class InvoiceRepository implements InvoiceRepositoryInterface
             $cash_account_id = $data['cash_account_id'];
             $data['date'] = now();
             $data['created_by'] = $userId;
-            $transaction = (new StoreTransactionLedger())->createTransaction($data);
-            // $depositTransaction(new PurchaseOrderTransaction())->createTransaction($po, $morphMapName, $cash_account_id); #create transaction
-            $debitLedger = (new StoreTransactionLedger())->storeLedger([
-                'date' => now(),
-                'value' => $data['deposit'],
-                'personable_id' => $data['customer_id'],
-                'personable_type' => 'customer',
-                'transaction_id' => $transaction->id,
-                'account_id' => $cash_account_id,
-                'action' => 'debit',
-            ]);
-            #store credit ledger
-            $creditLedger = (new StoreTransactionLedger())->storeLedger([
-                'date' => now(),
-                'value' => $data['deposit'],
-                'personable_id' => $data['customer_id'],
-                'personable_type' => 'customer',
-                'transaction_id' => $transaction->id,
-                'account_id' => $data['account_id'],
-                'action' => 'credit',
-            ]);
+            // $transaction = (new StoreTransactionLedger())->createTransaction($data);
+            // $debitLedger = (new StoreTransactionLedger())->storeLedger([
+            //     'date' => now(),
+            //     'value' => $data['deposit'],
+            //     'personable_id' => $data['customer_id'],
+            //     'personable_type' => 'customer',
+            //     'transaction_id' => $transaction->id,
+            //     'account_id' => $cash_account_id,
+            //     'action' => 'debit',
+            // ]);
+            // #store credit ledger
+            // $creditLedger = (new StoreTransactionLedger())->storeLedger([
+            //     'date' => now(),
+            //     'value' => $data['deposit'],
+            //     'personable_id' => $data['customer_id'],
+            //     'personable_type' => 'customer',
+            //     'transaction_id' => $transaction->id,
+            //     'account_id' => $data['account_id'],
+            //     'action' => 'credit',
+            // ]);
             return $customerDeposit;
         }
     }
@@ -381,13 +379,9 @@ class InvoiceRepository implements InvoiceRepositoryInterface
             ]);
             return $customerDeposit;
         }
-
     }
 
-    public function storeInvoiceTransaction($data)
-    {
-
-    }
+    public function storeInvoiceTransaction($data) {}
 
     public function deleteData(int $id)
     {
@@ -1151,12 +1145,12 @@ class InvoiceRepository implements InvoiceRepositoryInterface
     {
         //payload
         //invoice_id: 36
-// discount_type: null
-// order_categories: []
-// total: 10000
-// order_discount: 0
-// discount_total: 0
-// end_date: null
+        // discount_type: null
+        // order_categories: []
+        // total: 10000
+        // order_discount: 0
+        // discount_total: 0
+        // end_date: null
         //end
         DB::beginTransaction();
         try {
@@ -1299,6 +1293,7 @@ class InvoiceRepository implements InvoiceRepositoryInterface
             }
             // $data['discount_value'] = $discount_value;
             $data['discount_total'] = $room_discount_value + $bdDiscount + $customerLevelDiscount + $order_discount;
+
             // $data['tax'] = $tax;
             // $data['service_charge'] = $service_charge;
             $data['total_session_price'] = $total_session_price;
@@ -1576,7 +1571,6 @@ class InvoiceRepository implements InvoiceRepositoryInterface
                     $entity->status = 'active';
                     $entity->save();
                 }
-
             }
 
             // $latestSession = RoomSession::where('invoice_id', $data['invoice_id'])->latest()->first();
@@ -1803,6 +1797,55 @@ class InvoiceRepository implements InvoiceRepositoryInterface
             }
             // If it doesn't exist, create a new InvoiceService
 
+        } catch (\Exception $e) {
+            DB::rollback();
+            ResponseMessage($e->getMessage(), 402);
+            throw $e;
+        }
+    }
+
+    public function getCustomerDeposits($request)
+    {
+        return CustomerDeposit::with(['account', 'customer'])->orderBy('created_at', 'desc')->get();
+    }
+
+    public function cashierConfirm($request, $customerDepositId)
+    {
+        DB::beginTransaction();
+        try {
+
+            $customerDeposit = CustomerDeposit::findOrFail($customerDepositId);
+            if (!$customerDeposit) {
+                ResponseMessage('Customer Deposit not found', 404);
+            }
+
+            $customerDeposit->is_cashier_confirmed = 1;
+            $customerDeposit->save();
+            $data['date'] = now();
+            $data['created_by'] = UserData()->id;
+            $data['is_confirmed'] = 1;
+            $transaction = (new StoreTransactionLedger())->createTransaction($data);
+            $debitLedger = (new StoreTransactionLedger())->storeLedger([
+                'date' => now(),
+                'value' => $customerDeposit->amount,
+                'personable_id' => $customerDeposit->customer_id,
+                'personable_type' => 'customer',
+                'transaction_id' => $transaction->id,
+                'account_id' => $customerDeposit->cash_account_id,
+                'action' => 'debit',
+            ], null, true);
+            #store credit ledger
+            $creditLedger = (new StoreTransactionLedger())->storeLedger([
+                'date' => now(),
+                'value' => $customerDeposit->amount,
+                'personable_id' => $customerDeposit->customer_id,
+                'personable_type' => 'customer',
+                'transaction_id' => $transaction->id,
+                'account_id' => $customerDeposit->account_id,
+                'action' => 'credit',
+            ], null, true);
+            DB::commit();
+            ResponseMessage('Customer Deposit confirmed', 200);
         } catch (\Exception $e) {
             DB::rollback();
             ResponseMessage($e->getMessage(), 402);

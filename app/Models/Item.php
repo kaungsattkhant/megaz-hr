@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\ItemType;
 use App\Models\ItemPrice;
 use App\Models\UomConversion;
 use App\Models\MrpRawMaterial;
@@ -44,6 +45,10 @@ class Item extends BaseModel
     public function category()
     {
         return $this->belongsTo(Category::class);
+    }
+    public function item_type()
+    {
+        return $this->belongsTo(ItemType::class);
     }
 
     public function PurchaseOrderItem()

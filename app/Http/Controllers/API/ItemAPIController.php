@@ -85,4 +85,16 @@ class ItemAPIController extends Controller
         $item = $this->itemRepo->brandlistOfSupplierByItem($itemId);
         return $item;
     }
+
+    public function createCategory(Request $request)
+    {
+        $item = $this->itemRepo->createCategory($request);
+        return $item;
+    }
+
+    public function createItemType(Request $request)
+    {
+        $item = $this->itemRepo->createItemType($request);
+        return $item;
+    }
 }

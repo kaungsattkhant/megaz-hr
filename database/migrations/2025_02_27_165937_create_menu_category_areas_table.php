@@ -11,11 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('roles', function (Blueprint $table) {
+        Schema::create('menu_category_areas', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('department_id')->nullable()->constrained()->onDelete('cascade');
-            $table->string('name', 45);
-            $table->boolean('is_available')->default(1);
+            $table->unsignedBigInteger('menu_category_id');
+            $table->unsignedBigInteger('selling_area_id');
+            // $table->unsignedBigInteger('cooking_area_id');
             $table->timestamps();
         });
     }
@@ -25,6 +25,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('roles');
+        Schema::dropIfExists('menu_category_areas');
     }
 };

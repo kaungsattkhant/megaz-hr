@@ -21,7 +21,7 @@ class RoleRepository implements RoleRepositoryInterface
             return $paginatedRoles;
         } else {
             if ($request->department_id) {
-                $roles = Role::where('department_id', $request->department_id)->with('department','skills')->get();
+                $roles = Role::where('department_id', $request->department_id)->with('department', 'skills')->get();
             } else {
                 $roles = Role::with('department')->get();
             }
@@ -47,7 +47,8 @@ class RoleRepository implements RoleRepositoryInterface
     {
         DB::beginTransaction();
         try {
-            $role = Role::find($id);
+
+            $role = Role::findOrFail($id);
             if ($role) {
                 $data = RemoveNullValues($data);
                 $role->update($data);
@@ -61,7 +62,24 @@ class RoleRepository implements RoleRepositoryInterface
         }
     }
 
-    public function getRoleByDepartment($department_id){
-        return Role::where('department_id',$department_id)->with('skills')->get();
+    public function getRoleByDepartment($department_id)
+    {
+        return Role::where('department_id', $department_id)->with('skills')->get();
+    }
+
+    public function roleAvailableToggle($roleId)
+    {
+        DB::beginTransaction();
+        try {
+            $role = Role::findOrFail($roleId);
+            $role->is_available = $role->is_available ? 0 : 1;
+            $role->save();
+            DB::commit();
+            return $role;
+        } catch (\Exception $e) {
+            DB::rollback();
+            ResponseMessage($e->getMessage(), 402);
+            throw $e;
+        }
     }
 }
