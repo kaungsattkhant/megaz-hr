@@ -38,9 +38,9 @@ class InventoryRepository implements InventoryRepositoryInterface
         // }
 
         $query = Inventory::where('is_active', 1)
-            ->whereHas('staff', function ($query) {
-                $query->where('id', UserData()->id);
-            })
+            // ->whereHas('staff', function ($query) {
+            //     $query->where('id', UserData()->id);
+            // })
             ->whereIn('id', $inventory_ids)
             ->with(['inventoryable']);
 
