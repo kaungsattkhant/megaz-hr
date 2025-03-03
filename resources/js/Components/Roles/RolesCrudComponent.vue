@@ -55,7 +55,7 @@
                             <div class="contents" v-for="(role, index) in roleList" :key="index">
                                 <tr class="">
                                     <td class="">
-                                        {{ perPage * (currentPage - 1) + (++index) }}
+                                        {{ perPage * (currentPage - 1) + (index+1) }}
                                     </td>
                                     <td class="whitespace-nowrap ">
                                         {{ role.name }}
@@ -419,7 +419,7 @@ export default {
                         type: 'error'
                     });
                 }
-                this.getRolesList();
+                this.getRolesList(1);
             }
         },
         // deleteBtnClicked(id) {

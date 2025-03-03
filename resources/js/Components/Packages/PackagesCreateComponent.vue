@@ -94,45 +94,93 @@
                     placeholder="Free Sessions">
             </div>
 
-            <div class="mb-3 col-span-3 rounded-md">
+            <!-- <div class="mb-3 col-span-3 rounded-md">
                 <label for="" class="label-form mb-3">
                     Session Price
                 </label>
                 <input type="number" class="input-ui" :disabled="!isKTVPackage" v-model="sessionPrice"
                     placeholder="Session Price">
+            </div> -->
+            <div class="mb-0 col-span-3 rounded-md">
+                <label class="label-form mb-3"> Room </label>
+                <multiselect v-model="selectedRoom" :options="roomlist" :close-on-select="true"
+                    :clear-on-select="false" :preserve-search="true" placeholder="Select Room" label="name"
+                    track-by="id" :preselect-first="true" @select="selectedRoomChanged()"></multiselect>
             </div>
-
             <div class="mb-3 col-span-3"></div>
-
             <div class="mb-0 col-span-3 rounded-md">
-                <div>
-                    <label class="label-form mb-3"> Menu Category </label>
-                    <multiselect v-model="selectedMenuCategory" :options="menuCategoryList" :close-on-select="true"
-                        :clear-on-select="false" :preserve-search="true" placeholder="Select Category" label="name"
-                        track-by="id" :preselect-first="true" @select="menuCategorySelectChanged()"></multiselect>
+                <label class="label-form mb-3"> Type </label>
+                <div class="w-full !text-sm" data-te-select-wrapper-ref>
+                    <select data-te-select-init data-te-select-placeholder="Select Inventory" @change="selectedTypeChanged"
+                        data-te-select-filter="true" name="" id="" v-model="selectedType" class="input-ui">
+                        <option value="menu"> Menu </option>
+                        <option value="accessory"> Accessory </option>
+                    </select>
+                </div>
+            </div><div class="col-span-9"></div>
+            <div v-show="selectedType == 'menu'" class="contents">
+                <div class="mb-0 col-span-3 rounded-md" v-show="selectedType == 'menu'">
+                    <div>
+                        <label class="label-form mb-3"> Menu Category </label>
+                        <multiselect v-model="selectedMenuCategory" :options="menuCategoryList" :close-on-select="true"
+                            :clear-on-select="false" :preserve-search="true" placeholder="Select Category" label="name"
+                            track-by="id" :preselect-first="true" @select="menuCategorySelectChanged()"></multiselect>
+                    </div>
+                </div>
+
+                <div class="mb-0 col-span-3 rounded-md">
+                    <div>
+                        <label class="label-form mb-3"> Menu </label>
+                        <multiselect v-model="selectedMenu" :options="menuList" :close-on-select="true"
+                            :clear-on-select="false" :preserve-search="true" placeholder="Select Category" label="name"
+                            track-by="id" :preselect-first="true"></multiselect>
+                    </div>
+                </div>
+
+                <div class="mb-3 col-span-3 rounded-md">
+                    <label for="" class="label-form mb-3">
+                        Package Quantity
+                    </label>
+                    <input type="text" class="input-ui" v-model="menuQty" placeholder="Menu Package Qty">
+                </div>
+
+                <div class="col-span-12 flex justify-end pt-8">
+                    <button class="add-btn" @click="addMenuBtnClicked">
+                        Add Menu
+                    </button>
                 </div>
             </div>
-
-            <div class="mb-0 col-span-3 rounded-md">
-                <div>
-                    <label class="label-form mb-3"> Menu </label>
-                    <multiselect v-model="selectedMenu" :options="menuList" :close-on-select="true"
-                        :clear-on-select="false" :preserve-search="true" placeholder="Select Category" label="name"
-                        track-by="id" :preselect-first="true"></multiselect>
+            <div v-show="selectedType == 'accessory'" class="contents">
+                <div class="mb-0 col-span-3 rounded-md">
+                    <div>
+                        <label class="label-form mb-3"> Accessory Category </label>
+                        <multiselect v-model="selectedAccessoryCategory" :options="accessoryCategoryList" :close-on-select="true"
+                            :clear-on-select="false" :preserve-search="true" placeholder="Select Category" label="name"
+                            track-by="id" :preselect-first="true" @select="selectedAccessoryCategoryChange()"></multiselect>
+                    </div>
                 </div>
-            </div>
 
-            <div class="mb-3 col-span-3 rounded-md">
-                <label for="" class="label-form mb-3">
-                    Package Quantity
-                </label>
-                <input type="text" class="input-ui" v-model="menuQty" placeholder="Menu Package Qty">
-            </div>
+                <div class="mb-0 col-span-3 rounded-md">
+                    <div>
+                        <label class="label-form mb-3"> Accessory </label>
+                        <multiselect v-model="selectedAccessory" :options="accessoryList" :close-on-select="true"
+                            :clear-on-select="false" :preserve-search="true" placeholder="Select Accessory" label="name"
+                            track-by="id" :preselect-first="true"></multiselect>
+                    </div>
+                </div>
 
-            <div class="col-span-12 flex justify-end pt-8">
-                <button class="add-btn" @click="addMenuBtnClicked">
-                    Add Menu
-                </button>
+                <div class="mb-3 col-span-3 rounded-md">
+                    <label for="" class="label-form mb-3">
+                        Accessory Quantity
+                    </label>
+                    <input type="text" class="input-ui" v-model="accessoryQuantity" placeholder="Menu Package Qty">
+                </div>
+
+                <div class="col-span-12 flex justify-end pt-8">
+                    <button class="add-btn" @click="addAccessoryBtnClicked">
+                        Add Accessory
+                    </button>
+                </div>
             </div>
 
         </div>
@@ -205,11 +253,13 @@ export default {
             menuList: [],
             selectedMenu: null,
             selectedMenus: [],
+            roomlist:[],
 
             sessionDuration: null,
             paySession: null,
             freeSession: null,
             sessionPrice: null,
+            selectedRoom:null,
 
             name: null,
             price: null,
@@ -217,6 +267,14 @@ export default {
             endDate: null,
 
             menuQty: null,
+            selectedType:null,
+
+            accessoryCategoryList:[],
+            accessoryList:[],
+
+            selectedAccessoryCategory:null,
+            selectedAccessory:null,
+            accessoryQuantity:0,
 
             selectedImage: null,
         };
@@ -276,6 +334,20 @@ export default {
         removePackageMenuBtnClicked(menuIndex) {
             this.selectedMenus.splice(menuIndex, 1);
         },
+
+        async getAccessoryCategoryList() {
+            const response = await getApiData({ url: '/api/get_accessory_category', token: this.getToken() });
+            if (response.data) {
+                this.accessoryCategoryList = response.data;
+            }
+        },
+        async selectedAccessoryCategoryChange(){ //get accessory list
+            // const response = await getApiData({ url: '/api/accessories', token: this.getToken() });
+            // if (response.data) {
+            //     this.accessoryList = response.data;
+            // }
+        },
+
 
         async createBtnClicked() {
             let formData = new FormData();
@@ -363,6 +435,7 @@ export default {
 
     created() {
         this.getMenuCategoryList();
+        this.getAccessoryCategoryList();
     },
 
     mounted() {
