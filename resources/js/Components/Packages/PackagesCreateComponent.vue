@@ -47,6 +47,7 @@
 
             <div class="mb-3 col-span-3 rounded-md">
                 <div class="block ps-[1.5rem]">
+                    <label for="" class="label-from mb-3 block relative">&nbsp;</label>
                     <input
                         class="relative float-left -ms-[1.5rem] me-[6px] mt-[0.15rem] h-[1.125rem] w-[1.125rem]
                         appearance-none rounded-[0.25rem] border-[0.125rem] border-solid border-secondary-500 outline-none before:pointer-events-none before:absolute before:h-[0.875rem] before:w-[0.875rem] before:scale-0 before:rounded-full before:bg-transparent before:opacity-0 before:shadow-checkbox before:shadow-transparent before:content-[''] checked:border-primary checked:bg-primary checked:before:opacity-[0.16] checked:after:absolute checked:after:-mt-px checked:after:ms-[0.25rem] checked:after:block checked:after:h-[0.8125rem] checked:after:w-[0.375rem] checked:after:rotate-45 checked:after:border-[0.125rem] checked:after:border-l-0 checked:after:border-t-0 checked:after:border-solid checked:after:border-white checked:after:bg-transparent checked:after:content-[''] hover:cursor-pointer hover:before:opacity-[0.04] hover:before:shadow-black/60 focus:shadow-none focus:transition-[border-color_0.2s] focus:before:scale-100 focus:before:opacity-[0.12] focus:before:shadow-black/60 focus:before:transition-[box-shadow_0.2s,transform_0.2s] focus:after:absolute focus:after:z-[1] focus:after:block focus:after:h-[0.875rem] focus:after:w-[0.875rem] focus:after:rounded-[0.125rem] focus:after:content-[''] checked:focus:before:scale-100 checked:focus:before:shadow-checkbox checked:focus:before:transition-[box-shadow_0.2s,transform_0.2s] checked:focus:after:-mt-px checked:focus:after:ms-[0.25rem] checked:focus:after:h-[0.8125rem] checked:focus:after:w-[0.375rem] checked:focus:after:rotate-45 checked:focus:after:rounded-none checked:focus:after:border-[0.125rem] checked:focus:after:border-l-0 checked:focus:after:border-t-0 checked:focus:after:border-solid checked:focus:after:border-white checked:focus:after:bg-transparent rtl:float-right dark:border-neutral-400 dark:checked:border-primary dark:checked:bg-primary"
@@ -59,6 +60,7 @@
 
             <div class="mb-3 col-span-3 rounded-md">
                 <div class="block ps-[1.5rem]">
+                    <label for="" class="label-from mb-3 block relative">&nbsp;</label>
                     <input
                         class="relative float-left -ms-[1.5rem] me-[6px] mt-[0.15rem] h-[1.125rem] w-[1.125rem]
                         appearance-none rounded-[0.25rem] border-[0.125rem] border-solid border-secondary-500 outline-none before:pointer-events-none before:absolute before:h-[0.875rem] before:w-[0.875rem] before:scale-0 before:rounded-full before:bg-transparent before:opacity-0 before:shadow-checkbox before:shadow-transparent before:content-[''] checked:border-primary checked:bg-primary checked:before:opacity-[0.16] checked:after:absolute checked:after:-mt-px checked:after:ms-[0.25rem] checked:after:block checked:after:h-[0.8125rem] checked:after:w-[0.375rem] checked:after:rotate-45 checked:after:border-[0.125rem] checked:after:border-l-0 checked:after:border-t-0 checked:after:border-solid checked:after:border-white checked:after:bg-transparent checked:after:content-[''] hover:cursor-pointer hover:before:opacity-[0.04] hover:before:shadow-black/60 focus:shadow-none focus:transition-[border-color_0.2s] focus:before:scale-100 focus:before:opacity-[0.12] focus:before:shadow-black/60 focus:before:transition-[box-shadow_0.2s,transform_0.2s] focus:after:absolute focus:after:z-[1] focus:after:block focus:after:h-[0.875rem] focus:after:w-[0.875rem] focus:after:rounded-[0.125rem] focus:after:content-[''] checked:focus:before:scale-100 checked:focus:before:shadow-checkbox checked:focus:before:transition-[box-shadow_0.2s,transform_0.2s] checked:focus:after:-mt-px checked:focus:after:ms-[0.25rem] checked:focus:after:h-[0.8125rem] checked:focus:after:w-[0.375rem] checked:focus:after:rotate-45 checked:focus:after:rounded-none checked:focus:after:border-[0.125rem] checked:focus:after:border-l-0 checked:focus:after:border-t-0 checked:focus:after:border-solid checked:focus:after:border-white checked:focus:after:bg-transparent rtl:float-right dark:border-neutral-400 dark:checked:border-primary dark:checked:bg-primary"
@@ -101,23 +103,30 @@
                 <input type="number" class="input-ui" :disabled="!isKTVPackage" v-model="sessionPrice"
                     placeholder="Session Price">
             </div> -->
+            
+            <div class="mb-3 col-span-6"></div>
             <div class="mb-0 col-span-3 rounded-md">
                 <label class="label-form mb-3"> Room </label>
-                <multiselect v-model="selectedRoom" :options="roomlist" :close-on-select="true"
+                <multiselect v-model="selectedRoom" :options="roomList" :close-on-select="false"
+                    :multiple="true"
                     :clear-on-select="false" :preserve-search="true" placeholder="Select Room" label="name"
-                    track-by="id" :preselect-first="true" @select="selectedRoomChanged()"></multiselect>
+                    track-by="id" :preselect-first="true">
+                    <template #selection="{ values, search, isOpen }">
+                        <span class="multiselect__single" v-if="values.length" v-show="!isOpen">{{ values.length }}
+                        Room selected</span>
+                    </template>
+                </multiselect>
             </div>
-            <div class="mb-3 col-span-3"></div>
-            <div class="mb-0 col-span-3 rounded-md">
+            <div class="mb-3 col-span-3 rounded-md">
                 <label class="label-form mb-3"> Type </label>
                 <div class="w-full !text-sm" data-te-select-wrapper-ref>
-                    <select data-te-select-init data-te-select-placeholder="Select Inventory" @change="selectedTypeChanged"
+                    <select data-te-select-init data-te-select-placeholder="Select Type" @change="selectedTypeChanged"
                         data-te-select-filter="true" name="" id="" v-model="selectedType" class="input-ui">
                         <option value="menu"> Menu </option>
                         <option value="accessory"> Accessory </option>
                     </select>
                 </div>
-            </div><div class="col-span-9"></div>
+            </div><div class="col-span-6"></div>
             <div v-show="selectedType == 'menu'" class="contents">
                 <div class="mb-0 col-span-3 rounded-md" v-show="selectedType == 'menu'">
                     <div>
@@ -141,11 +150,14 @@
                     <label for="" class="label-form mb-3">
                         Package Quantity
                     </label>
-                    <input type="text" class="input-ui" v-model="menuQty" placeholder="Menu Package Qty">
+                    <input type="number" class="input-ui" v-model="menuQty" placeholder="Menu Package Qty" min="0">
                 </div>
 
-                <div class="col-span-12 flex justify-end pt-8">
-                    <button class="add-btn" @click="addMenuBtnClicked">
+                <div class="col-span-3">
+                    <label for="" class="label-form mb-3">
+                        &nbsp;
+                    </label>
+                    <button class="add-btn py-2.5" @click="addMenuBtnClicked">
                         Add Menu
                     </button>
                 </div>
@@ -173,7 +185,7 @@
                     <label for="" class="label-form mb-3">
                         Accessory Quantity
                     </label>
-                    <input type="text" class="input-ui" v-model="accessoryQuantity" placeholder="Menu Package Qty">
+                    <input type="number" class="input-ui" v-model="accessoryQuantity" placeholder="Accessory Qty" min="0">
                 </div>
 
                 <div class="col-span-12 flex justify-end pt-8">
@@ -201,7 +213,7 @@
                         aria-controls="tabs-material" aria-selected="true">Raw Material</a> -->
                     <button
                         class="z-20 mt-2 block px-7 pb-3.5 pt-3 rounded-tr-md rounded-tl-md font-inter text-xs font-medium  leading-tight text-neutral-500  focus:isolate data-[te-nav-active]:text-[#fff] data-[te-nav-active]:bg-[#845adf]  bg-white custom-shadow-tab relative"
-                        data-te-toggle="pill" data-te-target="#tabs-accessory" role="tab"
+                        data-te-toggle="pill" data-te-target="#tabs-accessory" role="tab" id="accessory_tab_btn"
                         aria-controls="tabs-accessory" aria-selected="true">Accessories</button>
                 </li>
             </ul>
@@ -287,7 +299,7 @@
 
 
 
-        <div class=" bg-white py-4 px-4 rounded-md shadow-md mb-8">
+        <!-- <div class=" bg-white py-4 px-4 rounded-md shadow-md mb-8">
             <div class="table-container">
                 <table class="primary-table">
                     <thead class="">
@@ -322,7 +334,7 @@
                     </tbody>
                 </table>
             </div>
-        </div>
+        </div> -->
 
         <div>
             <button class="add-btn" @click="createBtnClicked">
@@ -355,7 +367,7 @@ export default {
             menuList: [],
             selectedMenu: null,
             selectedMenus: [],
-            roomlist:[],
+            roomList:[],
 
             sessionDuration: null,
             paySession: null,
@@ -368,7 +380,7 @@ export default {
             startDate: null,
             endDate: null,
 
-            menuQty: null,
+            menuQty: 0,
             selectedType:null,
 
             accessoryCategoryList:[],
@@ -395,6 +407,12 @@ export default {
             });
         },
 
+        async getRoomList(){
+            const response = await getApiData({ url: '/api/entities?type=room' , token: this.getToken()});
+            if(response.data){
+                this.roomList = response.data;
+            }
+        },
         async getMenuCategoryList() {
             let url = `/api/menu_categories`;
             let response = await getApiData({ url: url, token: this.getToken() });
@@ -421,7 +439,7 @@ export default {
                 this.alertValiationMessage(`package menu`);
                 return 1;
             }
-            if (!this.menuQty) {
+            if (this.menuQty < 1) {
                 this.alertValiationMessage(`package menu quantity`);
                 return 1;
             }
@@ -430,8 +448,11 @@ export default {
                 name: this.selectedMenu.name,
                 quantity: this.menuQty
             });
+            if(this.selectedMenuCategory && this.selectedMenu && this.menuQty > 0){
+                document.getElementById('menu_tab_btn').click();
+            }
             this.selectedMenu = null;
-            this.menuQty = null;
+            this.menuQty = 0;
             this.menuPrice = null;
         },
 
@@ -456,7 +477,7 @@ export default {
                 this.alertValiationMessage(`Accessory`);
                 return 1;
             }
-            if (!this.accessoryQuantity) {
+            if (this.accessoryQuantity < 1) {
                 this.alertValiationMessage(`Accessory quantity`);
                 return 1;
             }
@@ -465,6 +486,9 @@ export default {
                 name: this.selectedAccessory.name,
                 quantity: this.accessoryQuantity
             });
+            if(this.selectedAccessoryCategory && this.selectedAccessory && this.accessoryQuantity > 0){
+                document.getElementById('accessory_tab_btn').click();
+            }
             this.selectedAccessory = null;
             this.accessoryQuantity = null;
         },
@@ -492,7 +516,7 @@ export default {
                 this.alertValiationMessage(`package price`);
                 return 1;
             }
-            if (this.selectedMenus.length < 1) {
+            if (this.selectedMenus.length < 1 && this.selectedAccessoryList.length < 1) {
                 this.alertValiationMessage(`package menus`);
                 return 1;
             }
@@ -521,23 +545,34 @@ export default {
                     this.alertValiationMessage(`free sessions`);
                     return 1;
                 }
-                if (!this.sessionPrice) {
-                    this.alertValiationMessage(`session price`);
-                    return 1;
-                }
+                // if (!this.sessionPrice) {
+                //     this.alertValiationMessage(`session price`);
+                //     return 1;
+                // }
 
                 // formData.append('session', this.sessionDuration);
                 formData.append('pay_session', this.paySession);
                 formData.append('free_session', this.freeSession);
-                formData.append('session_price', this.sessionPrice);
+                // formData.append('session_price', this.sessionPrice);
             }
 
             let menuIds = [];
             this.selectedMenus.forEach((menu) => {
                 menuIds.push({ menu_id: menu.id, quantity: menu.quantity });
             });
-
             formData.append('menuIds', JSON.stringify(menuIds));
+            let accessoryIds = [];
+            this.selectedAccessoryList.forEach((accessory) => {
+                accessoryIds.push({ accessory_id: accessory.id, quantity: accessory.quantity });
+            });
+
+            formData.append('accessories', JSON.stringify(accessoryIds));
+            let room_ids = [];
+            this.selectedRoom.forEach((room) => {
+                room_ids.push(room.id)
+                formData.append('rooms[]', room.id);
+            });
+            // formData.append('rooms', room_ids);
 
             let url = `/api/packages`;
             let response = await postApiData({ url: url, form_data: formData, token: this.getToken() });
@@ -559,6 +594,7 @@ export default {
     },
 
     created() {
+        this.getRoomList();
         this.getMenuCategoryList();
         this.getAccessoryCategoryList();
     },
