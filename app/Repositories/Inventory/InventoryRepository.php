@@ -13,29 +13,48 @@ class InventoryRepository implements InventoryRepositoryInterface
 {
     public function listAllData(Request $request)
     {
-        $name = $request->name ?? '';
+        $inventory_id = $request->inventory_id ?? '';
         $inventory_ids = UserData()->inventories->pluck('id')->toArray();
-        if ($request->per_page || $request->page) {
-            $inventories = Inventory::where('is_active', 1)
-                ->whereHas('staff', function ($query) {
-                    $query->where('id', UserData()->id);
-                })
-                ->whereIn('id', $inventory_ids)
-                ->where('name', 'like', '%' . $name . '%')
-                ->with(['inventoryable'])
-                ->paginate(config('common.list_count'));
-            return $inventories;
-        } else {
-            $inventories = Inventory::where('is_active', 1)
-                ->whereHas('staff', function ($query) {
-                    $query->where('id', UserData()->id);
-                })
-                ->whereIn('id', $inventory_ids)
-                ->where('name', 'like', '%' . $name . '%')
-                ->with(['inventoryable'])
-                ->get();
-            return $inventories;
+        // if ($request->per_page || $request->page) {
+        //     $inventories = Inventory::where('is_active', 1)
+        //         ->whereHas('staff', function ($query) {
+        //             $query->where('id', UserData()->id);
+        //         })
+        //         ->whereIn('id', $inventory_ids)
+        //         ->where('name', 'like', '%' . $name . '%')
+        //         ->with(['inventoryable'])
+        //         ->paginate(config('common.list_count'));
+        //     return $inventories;
+        // } else {
+        //     $inventories = Inventory::where('is_active', 1)
+        //         ->whereHas('staff', function ($query) {
+        //             $query->where('id', UserData()->id);
+        //         })
+        //         ->whereIn('id', $inventory_ids)
+        //         ->where('name', 'like', '%' . $name . '%')
+        //         ->with(['inventoryable'])
+        //         ->get();
+        //     return $inventories;
+        // }
+
+        $query = Inventory::where('is_active', 1)
+            ->whereHas('staff', function ($query) {
+                $query->where('id', UserData()->id);
+            })
+            ->whereIn('id', $inventory_ids)
+            ->with(['inventoryable']);
+
+        if ($inventory_id && in_array($inventory_id, $inventory_ids)) {
+            $query->where('id', $inventory_id);
         }
+
+        if ($request->per_page || $request->page) {
+            $inventories = $query->paginate(config('common.list_count'));
+        } else {
+            $inventories = $query->get();
+        }
+
+        return $inventories;
     }
 
     public function getInventory($request)
