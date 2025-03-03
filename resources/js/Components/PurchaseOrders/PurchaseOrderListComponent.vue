@@ -392,7 +392,7 @@ export default {
             }
         },
         searchBtnClicked(){
-            this.url_search = 'po_id' + this.searchInput
+            this.url_search = 'po_id=' + this.searchInput
             this.getPurhaseOrderList();
             this.url_date = '';
             this.fromDate = null;
