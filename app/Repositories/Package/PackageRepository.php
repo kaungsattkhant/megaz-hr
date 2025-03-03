@@ -15,7 +15,7 @@ class PackageRepository implements PackageRepositoryInterface
     {
         // if(isset($request->perPage))
         $validateDate = $request->date ?? CurrentDate();
-        $packages = Package::with(['menuPackages.menu.areas'])->where('from_date', '<=', $validateDate)
+        $packages = Package::with(['menuPackages.menu'])->where('from_date', '<=', $validateDate)
             ->orderBy('created_at', 'desc')
             ->when($request->has('search'), function ($q) use ($request) {
                 $q->where('name', 'LIKE', '%' . $request->search . '%')
