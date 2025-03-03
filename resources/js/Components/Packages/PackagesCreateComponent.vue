@@ -185,6 +185,108 @@
 
         </div>
 
+
+        <div class=" ">
+            <ul class="mb-0 flex list-none flex-row flex-wrap border-b-0 pl-0" role="tablist" data-te-nav-ref>
+                <li role="presentation" class="group">
+                    <button
+                        class="z-20 mt-2 block px-7 pb-3.5 pt-3 rounded-tr-md rounded-tl-md font-inter text-xs font-medium  leading-tight text-neutral-500  focus:isolate data-[te-nav-active]:text-[#fff] data-[te-nav-active]:bg-[#845adf]  bg-white custom-shadow-tab relative"
+                        data-te-toggle="pill" data-te-target="#tabs-menu" role="tab" data-te-nav-active
+                        aria-controls="tabs-menu" aria-selected="true">Menus</button>
+                </li>
+                <li role="presentation" class="-ml-0.5 group">
+                    <!-- <a href="#tabs-material" @click="getRawMaterialList()"
+                        class="z-[19] mt-2 block px-7 pb-3.5 pt-3 rounded-tr-md rounded-tl-md font-inter text-xs font-medium  leading-tight text-neutral-500  focus:isolate data-[te-nav-active]:text-[#fff] data-[te-nav-active]:bg-[#845adf] bg-white custom-shadow-tab relative"
+                        data-te-toggle="pill" data-te-target="#tabs-material" role="tab"
+                        aria-controls="tabs-material" aria-selected="true">Raw Material</a> -->
+                    <button
+                        class="z-20 mt-2 block px-7 pb-3.5 pt-3 rounded-tr-md rounded-tl-md font-inter text-xs font-medium  leading-tight text-neutral-500  focus:isolate data-[te-nav-active]:text-[#fff] data-[te-nav-active]:bg-[#845adf]  bg-white custom-shadow-tab relative"
+                        data-te-toggle="pill" data-te-target="#tabs-accessory" role="tab"
+                        aria-controls="tabs-accessory" aria-selected="true">Accessories</button>
+                </li>
+            </ul>
+
+            <div class="bg-white py-4 px-8 rounded-tr-md rounded-bl-md rounded-br-md shadow-md mb-8 -mt-0.5 z-30 relative">
+                <div class="hidden opacity-100 transition-opacity duration-150 ease-linear data-[te-tab-active]:block"
+                    id="tabs-menu" role="tabpanel" aria-labelledby="tabs-menu-tab" data-te-tab-active>
+                    <div class="table-container">
+                        <table class="primary-table">
+                            <thead class="">
+                                <tr>
+                                    <th scope="col" class=" text-left ">
+                                        Menu Name
+                                    </th>
+                                    <th scope="col" class="  ">
+                                        Qty
+                                    </th>
+                                    <th scope="col" class="  ">
+        
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <div class="contents" v-for="(promotionMenu, menuIndex) in selectedMenus" :key="menuIndex">
+                                    <tr class="">
+                                        <td class="text-left">
+                                            {{ promotionMenu.name }}
+                                        </td>
+                                        <td class="  ">
+                                            {{ promotionMenu.quantity }}
+                                        </td>
+                                        <td class="  ">
+                                            <button @click="removePackageMenuBtnClicked(menuIndex)">
+                                                <i class="fal fa-trash  pr-3"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                </div>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="hidden opacity-0 transition-opacity duration-150 ease-linear data-[te-tab-active]:block"
+                    id="tabs-accessory" role="tabpanel" aria-labelledby="tabs-accessory-tab">
+                    <div class="table-container">
+                        <table class="primary-table">
+                            <thead class="">
+                                <tr>
+                                    <th scope="col" class=" text-left ">
+                                        Accessory Name
+                                    </th>
+                                    <th scope="col" class="  ">
+                                        Qty
+                                    </th>
+                                    <th scope="col" class="  ">
+        
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <div class="contents" v-for="(accessory, accessoryIndex) in selectedAccessoryList" :key="accessoryIndex">
+                                    <tr class="">
+                                        <td class="text-left">
+                                            {{ accessory.name }}
+                                        </td>
+                                        <td class="  ">
+                                            {{ accessory.quantity }}
+                                        </td>
+                                        <td class="  ">
+                                            <button @click="removeAccessoryBtnClicked(accessoryIndex)">
+                                                <i class="fal fa-trash  pr-3"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                </div>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+
+
         <div class=" bg-white py-4 px-4 rounded-md shadow-md mb-8">
             <div class="table-container">
                 <table class="primary-table">
@@ -276,6 +378,8 @@ export default {
             selectedAccessory:null,
             accessoryQuantity:0,
 
+            selectedAccessoryList:[],
+
             selectedImage: null,
         };
     },
@@ -342,10 +446,31 @@ export default {
             }
         },
         async selectedAccessoryCategoryChange(){ //get accessory list
-            // const response = await getApiData({ url: '/api/accessories', token: this.getToken() });
-            // if (response.data) {
-            //     this.accessoryList = response.data;
-            // }
+            const response = await getApiData({ url: `/api/get_accessory_by_category/${this.selectedAccessoryCategory.id}`, token: this.getToken() });
+            if (response.data) {
+                this.accessoryList = response.data;
+            }
+        },
+        addAccessoryBtnClicked() {
+            if (!this.selectedAccessory) {
+                this.alertValiationMessage(`Accessory`);
+                return 1;
+            }
+            if (!this.accessoryQuantity) {
+                this.alertValiationMessage(`Accessory quantity`);
+                return 1;
+            }
+            this.selectedAccessoryList.push({
+                id: this.selectedAccessory.id,
+                name: this.selectedAccessory.name,
+                quantity: this.accessoryQuantity
+            });
+            this.selectedAccessory = null;
+            this.accessoryQuantity = null;
+        },
+
+        removeAccessoryBtnClicked(accIndex) {
+            this.selectedAccessoryList.splice(accIndex, 1);
         },
 
 
