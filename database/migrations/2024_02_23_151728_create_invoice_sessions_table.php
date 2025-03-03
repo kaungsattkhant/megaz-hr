@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->dateTime('start_date_time');
             $table->dateTime('end_date_time');
+            $table->double('total_session')->default(0);
             $table->double('total_session_duration')->default(0);
             $table->double('total_session_price')->default(0);
             $table->double('session_unit_price')->default(0);

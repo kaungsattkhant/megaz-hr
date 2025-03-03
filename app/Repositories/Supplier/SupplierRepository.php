@@ -14,7 +14,6 @@ use App\Models\SupplierBankAccount;
 
 class SupplierRepository implements SupplierInterface
 {
-
     public function list($request)
     {
         $query = Supplier::with(['account', 'items', 'supplierPhone', 'supplierBankAccount'])->orderBy('id', 'DESC');

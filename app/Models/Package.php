@@ -19,6 +19,9 @@ class Package extends Model
         return $this->belongsToMany(Entity::class, 'package_room', 'package_id', 'room_id');
     }
 
+    public function accessories(){
+        return $this->hasMany(AccessoryPackage::class);
+    }
     public function menuPackages()
     {
         return $this->hasMany(MenuPackage::class);

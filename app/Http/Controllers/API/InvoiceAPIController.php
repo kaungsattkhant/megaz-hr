@@ -23,6 +23,7 @@ use App\Http\Requests\Room\EntityStartValidationRequest;
 use App\Http\Requests\RoomSession\EndRoomSessionRequest;
 use App\Repositories\Invoice\InvoiceRepositoryInterface;
 use App\Http\Requests\Room\EntityChangeValidationRequest;
+use App\Http\Requests\RoomSession\AddSessionDurationRequest;
 
 class InvoiceAPIController extends Controller
 {
@@ -93,9 +94,9 @@ class InvoiceAPIController extends Controller
         }
     }
 
-    public function addMoreSessions(Request $request)
+    public function addMoreSessions(AddSessionDurationRequest $request)
     {
-        ResponseMessage('Add Sesion is invalid', 419);
+        // ResponseMessage('Add Sesion is invalid', 419);
         $roomAndSession = $this->invoiceRepo->addSessionDuration($request->all());
         ResponseData($roomAndSession);
     }

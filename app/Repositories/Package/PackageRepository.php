@@ -3,9 +3,12 @@
 namespace App\Repositories\Package;
 
 use App\Models\Menu;
-use App\Models\MenuPackage;
+use App\Models\Entity;
 use App\Models\Package;
+use App\Models\Accessory;
+use App\Models\MenuPackage;
 use Illuminate\Http\Request;
+use App\Models\AccessoryPackage;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 
@@ -15,19 +18,21 @@ class PackageRepository implements PackageRepositoryInterface
     {
         // if(isset($request->perPage))
         $validateDate = $request->date ?? CurrentDate();
-        $packages = Package::with(['menuPackages.menu.areas'])->where('from_date', '<=', $validateDate)
-            ->orderBy('created_at','desc')
-            ->when($request->has('search'), function($q) use ($request)
-            {
-                $q->where('name','LIKE','%'.$request->search.'%')
-                  ->orWhere('price','LIKE','%'.$request->search.'%');
+        $packages = Package::with(['menuPackages.menu'])->where('from_date', '<=', $validateDate)
+            ->orderBy('created_at', 'desc')
+            ->when($request->has('search'), function ($q) use ($request) {
+                $q->where('name', 'LIKE', '%' . $request->search . '%')
+                    ->orWhere('price', 'LIKE', '%' . $request->search . '%');
             })
             ->where('to_date', '>=', $validateDate)
-            ->with(['menuPackages.menu.prices', 'menuPackages.menu.menuServiceDiscounts' => function ($query) use ($validateDate) {
-                $query->where('from_date', '<=', $validateDate)
-                    ->where('to_date', '>=', $validateDate)
-                    ->first();
-            }])
+            ->with([
+                'menuPackages.menu.prices',
+                'menuPackages.menu.menuServiceDiscounts' => function ($query) use ($validateDate) {
+                    $query->where('from_date', '<=', $validateDate)
+                        ->where('to_date', '>=', $validateDate)
+                        ->first();
+                }
+            ])
             ->paginate(config('common.list_count'));
 
         ResponseData($packages);
@@ -55,16 +60,28 @@ class PackageRepository implements PackageRepositoryInterface
             $imageData = $data['image'];
             $extension = $imageData->getClientOriginalExtension();
             $hashedName = md5(uniqid() . microtime()) . '.' . $extension;
+            if (isset($data['rooms']) && is_array($data['rooms'])) {
+                $maxSessionPrice = Entity::where('entity_type', 'room')->whereIn('id', $data['rooms'])->max('price_per_hour');
+                if ($maxSessionPrice < 0) {
+                    ResponseMessage('Room price is invalid', 419);
+                }
+            } else {
+                ResponseMessage('Room Ids must be array format', 422);
+            }
+
+
             $data['image_path'] = $imageData->storeAs('images/package_images', $hashedName, 'public');
             $data['image_url'] = Storage::url($data['image_path']);
 
             $data['session'] = $data['pay_session'] + $data['free_session'];
             $data['package_discount'] = 0;
-            $sessionPrice = $data['pay_session'] * $data['session_price'];
+            $data['session_price'] = 10000;
+            $sessionPrice = $data['pay_session'] * $maxSessionPrice;
             $package = Package::create($data);
             $menuPrice = 0;
-            if (isset($data['menuIds'])) {
+            $accessoryPrice = 0;
 
+            if (isset($data['menuIds'])) {
                 $menuIds = json_decode($data['menuIds']);
                 foreach ($menuIds as $menu) {
                     $foodMenu = Menu::find($menu->menu_id);
@@ -76,21 +93,37 @@ class PackageRepository implements PackageRepositoryInterface
                     ]);
                 }
             }
-            $package_original_price = $menuPrice + $sessionPrice;
+            if (isset($data['accessories'])) {
+                $accessories = json_decode($data['accessories'], true); // Decode as an associative array
+
+                if (empty($accessories)) {
+                    // Accessories are empty or null
+                    return response()->json(['message' => 'No accessories provided'], 400);
+                }
+                foreach ($accessories as $accessory_array) {
+                    $accessory = Accessory::find($accessory_array['accessory_id']);
+                    $accessoryPrice += $accessory->accessory_price->price * $accessory_array['quantity'];
+                    $accessoryPackage = AccessoryPackage::create([
+                        'accessory_id' => $accessory->id,
+                        'quantity' => $accessory_array['quantity'],
+                        'package_id' => $package->id
+                    ]);
+                }
+            }
+            $package_original_price = $menuPrice + $sessionPrice + $accessoryPrice;
             if ($package_original_price > $data['price']) {
-                $data['package_discount'] = $package_original_price - $data['price'] ;
+                $data['package_discount'] = $package_original_price - $data['price'];
                 $package->package_discount = $data['package_discount'];
                 $package->save();
             } else {
                 ResponseMessage('Package original price  shoud be more than the package price', 422);
             }
-            // if(isset($data['roomIds'])){
-            //     $rooms = json_decode($data['roomIds']);
-            //     foreach($rooms as $room)
-            //     {
-            //         $package->rooms()->attach($room);
-            //     }
-            // }
+            if (isset($data['rooms']) && is_array($data['rooms'])) {
+                $roomIds = $data['rooms'];
+                $package->rooms()->sync($roomIds);
+            } else {
+                ResponseMessage('Room Ids must be array format', 422);
+            }
             DB::commit();
             ResponseData($package);
         } catch (\Exception $e) {
@@ -154,7 +187,7 @@ class PackageRepository implements PackageRepositoryInterface
 
             $package_original_price = $sessionPrice + $menuPrice;
             if ($package_original_price > $data['price']) {
-                $data['package_discount'] = $package_original_price - $data['price'] ;
+                $data['package_discount'] = $package_original_price - $data['price'];
                 $package->package_discount = $data['package_discount'];
                 $package->save();
             } else {
@@ -190,10 +223,13 @@ class PackageRepository implements PackageRepositoryInterface
     public function listAllPackage(Request $request)
     {
         $validateDate = $request->date ?? CurrentDate();
-        $packages = Package::with(['menuPackages.menu.prices', 'menuPackages.menu.menuServiceDiscounts' => function ($query) use ($validateDate) {
-            $query->where('from_date', '<=', $validateDate)
-                ->where('to_date', '>=', $validateDate);
-        }])
+        $packages = Package::with([
+            'menuPackages.menu.prices',
+            'menuPackages.menu.menuServiceDiscounts' => function ($query) use ($validateDate) {
+                $query->where('from_date', '<=', $validateDate)
+                    ->where('to_date', '>=', $validateDate);
+            }
+        ])
             ->paginate(config('common.list_count'));
 
         ResponseData($packages);

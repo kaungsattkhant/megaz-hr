@@ -12,6 +12,7 @@ class InvoiceSession extends Model
     protected $fillable=[
         'start_date_time',
         'end_date_time',
+        'total_session',
         'total_session_duration',
         'total_session_price',
         'session_unit_price',
