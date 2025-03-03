@@ -27,6 +27,8 @@ class PackageRepository implements PackageRepositoryInterface
             ->where('to_date', '>=', $validateDate)
             ->with([
                 'menuPackages.menu.prices',
+                'rooms',
+                'accessories',
                 'menuPackages.menu.menuServiceDiscounts' => function ($query) use ($validateDate) {
                     $query->where('from_date', '<=', $validateDate)
                         ->where('to_date', '>=', $validateDate)
