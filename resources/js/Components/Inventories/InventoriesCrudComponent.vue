@@ -59,7 +59,7 @@
                             <div class="contents" v-for="(inventory, index) in inventoryList" :key="index">
                                 <tr class="">
                                     <td class="">
-                                        {{ perPage * (currentPage - 1) + (++index) }}
+                                        {{ perPage * (currentPage - 1) + (index+1) }}
                                     </td>
                                     <td class="whitespace-nowrap">
                                         {{ inventory.name }}
@@ -425,7 +425,12 @@ export default {
             }
             const response = await getApiData({ url: `/api/inventories?${this.url_inventory}${url_page}`, token: this.getToken() });
             if (response.data) {
-                this.inventoryList = response.data.data;
+                if(pageNumber){
+                    this.inventoryList = response.data.data;
+                }
+                else{
+                    this.inventoryList = response.data;
+                }
                 this.lastPage = response.data.last_page;
                 this.currentPage = pageNumber;
                 this.perPage = response.data.per_page;
@@ -590,7 +595,7 @@ export default {
             this.url_inventory = 'inventory_id=' + this.searchInventory.id
             this.fromDate = null;
             this.toDate = null;
-            this.getInventoryList();
+            this.getInventoryList(1);
         },
     },
 
