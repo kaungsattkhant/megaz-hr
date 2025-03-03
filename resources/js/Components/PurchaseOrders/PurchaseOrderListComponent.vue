@@ -5,18 +5,32 @@
         </p>
     </div>
     <div class="mt-4 bg-white">
-        <div class="btn-container">
-            <div class=" flex">
+        <div class="btn-container pt-10">
+            <notifications position="top center" />
+            <div class=" flex gap-x-4">
                 <label for="search" class="search-input">
-                    <input type="text" class="input-search" placeholder="Search">
+                    <input type="text" class="input-search" placeholder="Search" v-model="searchInput">
                     <i class="fal fa-search"></i>
                 </label>
+                <button class="add-btn h-8" @click="searchBtnClicked()">Search</button>
+                <button class="add-btn h-8" @click="clearSearchBtnClicked()">Clear</button>
             </div>
-            <div class="flex justify-end flex-col">
-                <a href="/purchase_orders/create" class="add-btn ">
-                    Add New
-                </a>
+            <div class="flex pr-0 gap-x-4">
+                <div class="relative">
+                    <label for="search" class="border border-gray-200 rounded bg-white text-xs mx-2 px-2 py-2 absolute left-0 ml-0 -top-[90%] border-b-0"> From </label>
+                    <input type="date" v-model="fromDate" class="search-input rounded " @change="dateChange()">
+                </div>
 
+                <div class="relative">
+                    <label for="search" class="border border-gray-200 rounded bg-white text-xs mx-2 px-2 py-2 absolute left-0 ml-0 -top-[90%] border-b-0"> To </label>
+                    <input type="date" v-model="toDate" class="search-input rounded" @change="dateChange()">
+                </div>
+                <div class="flex justify-end flex-col">
+                    <a href="/purchase_orders/create" class="add-btn ">
+                        Add New
+                    </a>
+    
+                </div>
             </div>
         </div>
         <div class="box-container-table">
@@ -63,7 +77,8 @@
                             <div class="contents" v-for="(purchaseOrder, index) in purchaseOrderList" :key="index">
                                 <tr class="">
                                     <td class=" ">
-                                        {{ perPage * (currentPage - 1) + (++index) }}
+                                        {{ perPage * (currentPage - 1) + (index+1) }}
+                                        <!-- {{ index+1 }} -->
                                     </td>
                                     <td class="whitespace-nowrap  ">
                                         {{ purchaseOrder.date }}
@@ -269,6 +284,15 @@ export default {
             lastPage: 0,
             totalData: 0,
             isStaff: false,
+
+            searchInput:null,
+            fromDate:null,
+            toDate:null,
+
+            url_search:'',
+            url_from:'',
+            ur_to:'',
+            url_date:'',
         };
     },
 
@@ -276,13 +300,17 @@ export default {
         ...mapGetters(['getToken', 'getUser', 'getRoles', 'getDepartment']),
 
         async getPurhaseOrderList(pageNumber) {
-            let url = `/api/purchase_orders?page=${pageNumber}`;
+            let url_page = '';
+            if(pageNumber){
+                url_page = 'page='+pageNumber
+            }
+            let url = `/api/purchase_orders?${this.url_date}${this.url_search}${url_page}`;
 
             let response = await getApiData({ url: url, token: this.getToken() });
             if (response.data) {
                 this.purchaseOrderList = response.data.data;
                 this.lastPage = response.data.last_page;
-                this.currentPage = pageNumber;
+                this.currentPage = response.data.current_page;
                 this.perPage = response.data.per_page;
                 this.totalData = response.data.total;
                 this.purchaseOrderList.forEach((po) => {
@@ -353,6 +381,31 @@ export default {
 
             this.checkId = null;
         },
+
+
+        dateChange(){
+            if(this.fromDate && this.toDate){
+                this.url_date = 'from_date='+this.fromDate+'&to_date='+this.toDate
+                this.getPurhaseOrderList();
+                this.searchInput = null;
+                this.url_search = ''
+            }
+        },
+        searchBtnClicked(){
+            this.url_search = 'po_id' + this.searchInput
+            this.getPurhaseOrderList();
+            this.url_date = '';
+            this.fromDate = null;
+            this.toDate = null;
+        },
+        clearSearchBtnClicked(){
+            this.url_date = '';
+            this.url_search = '';
+            this.fromDate = null;
+            this.toDate = null;
+            this.searchInput = null;
+            this.getPurhaseOrderList(1)
+        }
     },
 
     created() {
