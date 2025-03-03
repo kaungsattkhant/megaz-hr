@@ -399,6 +399,7 @@ Route::middleware('auth:api')->group(function () {
     Route::resource('accessories', AccessoryController::class)->only(['index', 'store', 'show']);
     Route::controller(AccessoryController::class)->group(function () {
         Route::get('/get_accessory_category', 'getAccessoryCategory');
+        Route::get('/get_accessory_by_category/{accessory_category}', 'getAccessoryByCategory');
         Route::delete('/accessory_item/{id}', 'deleteAccessoryItem');
     });
 

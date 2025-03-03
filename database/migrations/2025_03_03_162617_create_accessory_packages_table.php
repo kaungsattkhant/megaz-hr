@@ -13,6 +13,9 @@ return new class extends Migration
     {
         Schema::create('accessory_packages', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('accessory_id')->constrained()->onDelete('cascade');
+            $table->foreignId('package_id')->constrained()->onDelete('cascade');
+            $table->double('quantity')->default(0);
             $table->timestamps();
         });
     }

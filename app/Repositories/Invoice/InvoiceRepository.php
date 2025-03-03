@@ -186,7 +186,7 @@ class InvoiceRepository implements InvoiceRepositoryInterface
                         ResponseMessage('Package not found', 404);
                     }
                     // $end_date = Carbon::now()->addHours($package->free_session + $package->pay_session);
-                    $data['total_session_price'] = $package->pay_session * $package->session_price;
+                    $data['total_session_price'] = $package->pay_session * $entity->price_per_hour;
                     // $data['paid_amount'] = $package->price;
                     $data['package_id'] = $package->id;
                     $data['session_duration'] = $package->pay_session + $package->free_session; // nullable
