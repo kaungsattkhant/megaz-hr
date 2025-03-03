@@ -13,8 +13,7 @@ class InventoryRepository implements InventoryRepositoryInterface
 {
     public function listAllData(Request $request)
     {
-        $name = $request->name ?? '';
-        $search = strtolower(str_replace(' ', '', $name));
+        $inventory_id = $request->inventory_id ?? '';
         $inventory_ids = UserData()->inventories->pluck('id')->toArray();
         // if ($request->per_page || $request->page) {
         //     $inventories = Inventory::where('is_active', 1)
@@ -45,8 +44,8 @@ class InventoryRepository implements InventoryRepositoryInterface
             ->whereIn('id', $inventory_ids)
             ->with(['inventoryable']);
 
-        if ($name) {
-            $query->whereRaw("LOWER(REPLACE(name, ' ', '')) LIKE ?", ['%' . $search . '%']);
+        if ($inventory_id && in_array($inventory_id, $inventory_ids)) {
+            $query->where('id', $inventory_id);
         }
 
         if ($request->per_page || $request->page) {

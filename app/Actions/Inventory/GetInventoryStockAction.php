@@ -115,7 +115,7 @@ class GetInventoryStockAction
     {
         $from_date = convertDateFormat($request->from_date);
         $to_date = convertDateFormat($request->to_date);
-        $inventory_name = $request->inventory_name;
+        $inventory_id = $request->inventory_id;
         $itemBalances = DB::table('inventory_ledger_items')
             ->join('items', 'inventory_ledger_items.item_id', '=', 'items.id')
             ->leftJoin('inventory_items', function ($join) {
@@ -140,7 +140,7 @@ class GetInventoryStockAction
                 $join->on('items.base_uom_id', '=', 'uom_conversions.base_unit_id')
                     ->on('items.uom_id', '=', 'uom_conversions.conversion_unit_id')
                     ->where('uom_conversions.is_active', 1);
-            })->join('inventories', 'inventory_ledgers.inventory_id', '=', 'inventories.id')
+            })
             ->select(
                 'items.name',
                 'inventory_ledger_items.item_id',
@@ -175,8 +175,8 @@ class GetInventoryStockAction
             ->when(($request->from_date == null && $request->to_date), function ($q) use ($to_date) {
                 $q->whereDate('inventory_ledgers.created_at', '<=', $to_date);
             })
-            ->when($inventory_name, function ($q) use ($inventory_name) {
-                $q->where('inventories.name', 'like', '%' . $inventory_name . '%');
+            ->when($inventory_id, function ($q) use ($inventory_id) {
+                $q->where('inventory_ledgers.inventory_id', $inventory_id);
             })
             ->groupBy(
                 'inventory_ledger_items.item_id',
