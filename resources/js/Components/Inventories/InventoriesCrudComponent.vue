@@ -587,7 +587,7 @@ export default {
             }
         },
         selectedInventoryChanged(){
-            this.url_inventory = '?inventory_id=' + this.searchInventory.id
+            this.url_inventory = 'inventory_id=' + this.searchInventory.id
             this.fromDate = null;
             this.toDate = null;
             this.getInventoryList();
