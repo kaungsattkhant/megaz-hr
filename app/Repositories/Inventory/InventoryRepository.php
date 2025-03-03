@@ -44,7 +44,7 @@ class InventoryRepository implements InventoryRepositoryInterface
             ->whereIn('id', $inventory_ids)
             ->with(['inventoryable']);
 
-        if ($inventory_id && in_array($inventory_id, $inventory_ids)) {
+        if ($inventory_id) {
             $query->where('id', $inventory_id);
         }
 
