@@ -179,24 +179,27 @@ class InvoiceRepository implements InvoiceRepositoryInterface
                     $data['head_count_id'] = $headCount->id;
                 }
                 $freeDiscountSession = 0;
+                $startTime=$data['start_time'];
                 if ($data['type'] == 'package') {
                     $package = Package::find($data['package_id']);
                     if (!$package) {
                         ResponseMessage('Package not found', 404);
                     }
-                    $end_date = Carbon::now()->addHours($package->free_session + $package->pay_session);
+                    // $end_date = Carbon::now()->addHours($package->free_session + $package->pay_session);
                     $data['total_session_price'] = $package->pay_session * $package->session_price;
-                    $data['paid_amount'] = $package->price;
+                    // $data['paid_amount'] = $package->price;
                     $data['package_id'] = $package->id;
                     $data['session_duration'] = $package->pay_session + $package->free_session; // nullable
-                    $roomSessionData['price'] = $package->pay_session * $package->session_price; // room session
+                    $freeDiscountSession=$package->free_session;
                     $data['invoice_type'] = 'package';
-                    $data['total'] = 0;
+                    $data['total'] = $package->price;
+                    $data['sub_total'] = $package->price;
                 } else if ($data['type'] == 'session') {
                     // $end_date = Carbon::now()->addMinutes($data['session_duration'] * 60);
                     $data['total_session_price'] = $data['session_duration'] * $entity->price_per_hour;
-                    $roomSessionData['price'] = $data['total_session_price'];
+                    // $roomSessionData['price'] = $data['total_session_price'];
                     $data['total'] = $data['total_session_price'];
+                    $data['sub_total'] = $data['total_session_price'];
                     $data['invoice_type'] = 'session';
                     if ($roomDiscount) {
                         $freeSessionCount = intdiv($data['session_duration'], $roomDiscount->session);
@@ -204,21 +207,23 @@ class InvoiceRepository implements InvoiceRepositoryInterface
                     }
                     $data['session_duration'] = $data['session_duration'] + $freeDiscountSession;
                 } else if ($data['type'] == 'endless_time') {
-                    $end_date = Carbon::now()->addMinute(1 * 60);
+                    // $end_date = Carbon::now()->addMinute(1 * 60);
                     $data['session_duration'] = 1;
                     $data['total_session_price'] = $data['session_duration'] * $entity->price_per_hour;
                     $roomSessionData['price'] = $data['total_session_price'];
                     $data['total'] = $data['total_session_price'];
+                    $data['sub_total'] = $data['total_session_price'];
                     $data['invoice_type'] = 'endless_time';
                     $data['session_duration'] = 1;
                 }
                 $data['area_id'] = $entity->area_id;
                 $data['created_by'] = UserData()->id;
                 $data['invoice_date'] = Carbon::now();
-                $data['sub_total'] = $data['total_session_price'];
+                // $data['sub_total'] = $data['total_session_price'];
                 $data['room_discount_value'] = $freeDiscountSession * $entity->price_per_hour;
                 $invoice = Invoice::create($data);
-                $invoiceSession = $this->invoiceService->storeInvoiceSession($invoice->id, $entitySession->entity_id, $data['session_duration'], $freeDiscountSession, $entity->price_per_hour, $data['is_waiter'], $discountId = null);
+                dd($invoice);
+                $invoiceSession = $this->invoiceService->storeInvoiceSession($invoice->id,$startTime, $entitySession->entity_id, $data['session_duration'], $freeDiscountSession, $entity->price_per_hour, $data['is_waiter'], $discountId = null);
                 //create deposit
                 $this->storeCustomerDeposit($data, UserData()->id);
                 //
@@ -241,6 +246,7 @@ class InvoiceRepository implements InvoiceRepositoryInterface
                         }
                     }
                 }
+                dd('abc');
                 DB::commit();
                 $returnData = [
                     'customer' => $customer,

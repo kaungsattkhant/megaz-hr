@@ -140,12 +140,11 @@ class InvoiceModelService
 
     }
 
-    public function storeInvoiceSession($invoiceId, $entityId, $sessionDuration,$freeDiscountSession, $sessionPerPrice,$isWaiter, $discountId)
+    public function storeInvoiceSession($invoiceId, $startDateTime, $entityId, $sessionDuration, $freeDiscountSession, $sessionPerPrice, $isWaiter, $discountId)
     {
-        // $startTime="22:10";
-        // $endTime="00:10";
-        $now = now();
-        $startTime = now()->format('H:i');
+        // $now = now();
+        $now = Carbon::parse($startDateTime);
+        $startTime = Carbon::parse($startDateTime)->format('H:i');
         $endTime = $now->copy()->addHours((int) $sessionDuration)->format('H:i');
         // Check if endTime goes past midnight
         if ($startTime > $endTime) {
@@ -158,28 +157,30 @@ class InvoiceModelService
         $invoiceSession = InvoiceSession::create([
             'start_date_time' => $startDateTime,
             'end_date_time' => $endDateTime,
-            'total_session_duration' => $sessionDuration-$freeDiscountSession,
-            'total_session_price' => ($sessionDuration-$freeDiscountSession) * $sessionPerPrice,
+            'total_session' => $sessionDuration ,
+            'total_session_duration' => $sessionDuration - $freeDiscountSession,
+            'total_session_price' => ($sessionDuration - $freeDiscountSession) * $sessionPerPrice,
             'discount_session' => $freeDiscountSession,
-            'discount_session_price' =>$freeDiscountSession* $sessionPerPrice,
+            'discount_session_price' => $freeDiscountSession * $sessionPerPrice,
             'session_unit_price' => $sessionPerPrice,
             'invoice_id' => $invoiceId,
             'entity_id' => $entityId,
         ]);
+        dd($invoiceSession);
         $entitySesions = $this->getEntitySessionBySessionDuration($entityId, $startTime, $endTime);
-        $entitySesionIds=$entitySesions->pluck('id');
-        foreach($entitySesions as $entitySession){
-            $createRoomSession=$invoiceSession->roomSessions()->create([
-                'entity_session_id'=>$entitySession->id,
+        $entitySesionIds = $entitySesions->pluck('id');
+        foreach ($entitySesions as $entitySession) {
+            $createRoomSession = $invoiceSession->roomSessions()->create([
+                'entity_session_id' => $entitySession->id,
             ]);
-            $entity=$entitySession->entity;
-            if(!$isWaiter){
-                $entitySession->is_active=1;
+            $entity = $entitySession->entity;
+            if (!$isWaiter) {
+                $entitySession->is_active = 1;
                 $entitySession->save();
-                $entity->status='active';
-                $entity->is_active=1;
+                $entity->status = 'active';
+                $entity->is_active = 1;
                 $entity->save();
-            }else{
+            } else {
                 $entity->is_active = 0;
                 $entity->status = 'pending';
                 $entity->save();
@@ -188,13 +189,14 @@ class InvoiceModelService
         return $invoiceSession;
     }
 
-    public function defineActiveEntitySession($invoiceSession,$entitySesions){
-        $entitySesionIds=$entitySesions->pluck('id');
-        foreach($entitySesions as $entitySession){
-            $createRoomSession=$invoiceSession->roomSessions()->create([
-                'entity_session_id'=>$entitySession->id,
+    public function defineActiveEntitySession($invoiceSession, $entitySesions)
+    {
+        $entitySesionIds = $entitySesions->pluck('id');
+        foreach ($entitySesions as $entitySession) {
+            $createRoomSession = $invoiceSession->roomSessions()->create([
+                'entity_session_id' => $entitySession->id,
             ]);
-            $entitySession->is_active=1;
+            $entitySession->is_active = 1;
             $entitySession->save();
         }
     }
@@ -243,28 +245,29 @@ class InvoiceModelService
         return $takeSessions;
     }
 
-    public function getTotalInvoiceSession($invoiceId){
-        $invoiceSession=InvoiceSession::where('invoice_id',$invoiceId)
-        ->select(
-            'invoice_sessions.invoice_id',
-            DB::raw('SUM(invoice_sessions.total_session_duration) as total_duration'),
-            DB::raw('SUM(invoice_sessions.total_session_price) as total_session_value'),
-            // DB::raw('COALESCE(SUM(invoice_sessions.total_session_price), 0) as total_session_value')
+    public function getTotalInvoiceSession($invoiceId)
+    {
+        $invoiceSession = InvoiceSession::where('invoice_id', $invoiceId)
+            ->select(
+                'invoice_sessions.invoice_id',
+                DB::raw('SUM(invoice_sessions.total_session_duration) as total_duration'),
+                DB::raw('SUM(invoice_sessions.total_session_price) as total_session_value'),
+                // DB::raw('COALESCE(SUM(invoice_sessions.total_session_price), 0) as total_session_value')
 
-        )
-        ->groupBy('invoice_sessions.invoice_id')
-        ->first();
+            )
+            ->groupBy('invoice_sessions.invoice_id')
+            ->first();
         return $invoiceSession;
     }
 
     public function checkIsActiveChangeRoom($entityId)
     {
 
-        $isEntity=Entity::where('is_active',1)
-        ->where('id',$entityId)
-        ->first();
-        if($isEntity){
-            ResponseMessage('Entity is not available now',419);
+        $isEntity = Entity::where('is_active', 1)
+            ->where('id', $entityId)
+            ->first();
+        if ($isEntity) {
+            ResponseMessage('Entity is not available now', 419);
         }
         return true;
     }
