@@ -48,10 +48,38 @@
                                     <td class="whitespace-nowrap">
                                         {{ department.name }}
                                     </td>
-                                    <td class="whitespace-nowrap">
-                                        <div v-for="feature in department.features">
-                                            {{ feature.name }},
+                                    <!-- <td class="whitespace-nowrap">
+                                        <div class=" h-14 overflow-hidden relative feature-list">
+                                            <div v-for="feature in department.features">
+                                                {{ feature.name }},
+                                            </div>
+                                            <div class="absolute bottom-0 left-0 right-0 h-5 blur-box" style="background-image: linear-gradient(#fff0, #fffa);"></div>
                                         </div>
+                                        <button @click="seeMore($event,index)" class="see-more">See More</button>
+                                        <button @click="seeLess($event,index)" class="hidden see-less">See Less</button>
+                                    </td> -->
+                                    <td>
+                                        <div class="relative inline-block">
+                                            <span class="" v-for="(item, itemIndex) in getVisibleItems(department.features, index)" :key="itemIndex">
+                                                {{ item.name }}<span v-if="itemIndex < getVisibleItems(department.features, index).length - 1">, </span>
+                                            </span>
+                                            <div v-if="department.features.length > defaultVisibleCount && !expandedRows.includes(index)" class="absolute bottom-0 left-0 right-0 h-5 blur-box" style="background-image: linear-gradient(to right,#fff0, #fffa);"></div>
+                                        </div>
+                                        <button
+                                          v-if="department.features.length > defaultVisibleCount && !expandedRows.includes(index)"
+                                          @click="expandRow(index)"
+                                          class="see-more-button pt-2"
+                                        >
+                                          ... See More
+                                        </button>
+                                        <!-- "See Less" button for expanded rows -->
+                                        <button
+                                          v-if="expandedRows.includes(index)"
+                                          @click="collapseRow(index)"
+                                          class="see-less-button pt-2"
+                                        >
+                                          See Less
+                                        </button>
                                     </td>
                                     <td class="whitespace-nowrap">
                                         <button @click="editBtnClicked(department.id)" data-te-toggle="modal"
@@ -65,6 +93,7 @@
                                         <i class="fas fa-trash-alt"></i>
                                     </button> -->
                                     </td>
+                                    
                                 </tr>
                             </div>
                         </tbody>
@@ -298,6 +327,9 @@
                 perPage: 0,
                 lastPage: 0,
                 totalData:0,
+
+                defaultVisibleCount: 3, // Number of items to show by default
+                expandedRows: [], // Tracks which rows are expanded
             };
         },
 
@@ -419,7 +451,42 @@
                 if(response.success){
                     alert(`deleted`);
                 }
-            }
+            },
+
+
+
+            getVisibleItems(items, rowIndex) {
+                if (this.expandedRows.includes(rowIndex)) {
+                    return items;
+                }
+                return items.slice(0, this.defaultVisibleCount); // Show only the first few items
+            },
+            expandRow(rowIndex) {
+                if (!this.expandedRows.includes(rowIndex)) {
+                    this.expandedRows.push(rowIndex);
+                }
+            },
+            collapseRow(rowIndex) {
+                this.expandedRows = this.expandedRows.filter((index) => index !== rowIndex);
+            },
+            // seeMore(event){
+            //     console.log("hello")
+            //     const button = $(event.target);
+            //     const row = button.closest("tr");
+            //     row.find(".feature-list").removeClass('overflow-hidden h-14')
+            //     row.find(".blur-box").addClass('hidden')
+            //     $(event.target).addClass('hidden')
+            //     row.find('.see-less').removeClass('hidden')
+            // },
+            // seeLess(event){
+            //     console.log("hello")
+            //     const button = $(event.target);
+            //     const row = button.closest("tr");
+            //     row.find(".feature-list").addClass('overflow-hidden h-14')
+            //     row.find(".blur-box").removeClass('hidden')
+            //     $(event.target).addClass('hidden')
+            //     row.find('.see-more').removeClass('hidden')
+            // }
 
         },
         mounted()

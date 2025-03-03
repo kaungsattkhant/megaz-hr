@@ -852,6 +852,12 @@
                             Warning
                         </a>
                     </li>
+                    <li>
+                        <a href="/menu_area" class="flex items-center @yield('menu_area') sidebar-gap-x">
+                            <img class="sidebar-img " src="{{ asset('img/icons8-warning-64.png') }}" alt="">
+                            Menu Area
+                        </a>
+                    </li>
                     
 
                 </ul>

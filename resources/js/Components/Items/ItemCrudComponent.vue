@@ -28,9 +28,9 @@
 
             </div>
             <div class="flex justify-end gap-x-4">
-                <label for="excel_import" class="add-btn">
+                <label for="excel_import" class="add-btn h-8 cursor-pointer">
                     Excel Import
-                    <input type="file" placeholder="Excel" id="excel_import" class="opacity-0 w-0"  @change="handleFileChange">
+                    <input type="file" placeholder="Excel" id="excel_import" class="opacity-0 w-0 h-0 hidden"  @change="handleFileChange">
                 </label>
                 <!-- <button type="button"
                     class="add-btn transition duration-150 ease-in-out focus:outline-none focus:ring-0 "
@@ -38,7 +38,7 @@
                     Excel Import
                 </button> -->
                 <button type="button"
-                    class="add-btn transition duration-150 ease-in-out focus:outline-none focus:ring-0 "
+                    class="add-btn transition duration-150 ease-in-out focus:outline-none focus:ring-0 h-8"
                     data-te-toggle="modal" data-te-target="#create_modal" @click="step = 1">
                     Add New
                 </button>
@@ -283,7 +283,7 @@
                             <input type="text" placeholder="Code" v-model="code" class="input-ui">
                         </div>
 
-                        <div class="mb-4">
+                        <div class="mb-4 relative">
                             <label for="" class="label-form mb-3">
                                 Item Type
                             </label>
@@ -291,9 +291,12 @@
                                 <option :value="item_type" v-for="(item_type, index) in itemTypeList" :key="index"> {{ item_type.name }}
                                 </option>
                             </select>
+                            <button type="button" class="text-xs absolute -right-6 top-1/2 pt-2" @click="[step = 'type', brandName = null]">
+                                <i class="fal fa-plus"></i>
+                            </button>
                         </div>
 
-                        <div class="mb-4">
+                        <div class="mb-4 relative">
                             <label for="" class="label-form mb-3">
                                 Category
                             </label>
@@ -301,6 +304,9 @@
                                 <option :value="category" v-for="(category, categoryIndex) in itemCategoryList"
                                     :key="categoryIndex"> {{ category.name }} </option>
                             </select>
+                            <button type="button" class="text-xs absolute -right-6 top-1/2 pt-2" @click="[step = 'category', brandName = null]">
+                                <i class="fal fa-plus"></i>
+                            </button>
                         </div>
                         <!-- <div class="mb-4">
                             <label class="label-form mb-3">Brands</label>
@@ -349,11 +355,28 @@
                             <label for="" class="label-form mb-3">
                                 Brand
                             </label>
-                            <select name="" id="" v-model="selectedBrand" class="input-ui">
+                            <!-- <select name="" id="" v-model="selectedBrand" class="input-ui">
                                 <option :value="brand" v-for="(brand, brandIndex) in brandList" :key="brandIndex"> {{ brand.name }}
                                 </option>
-                            </select>
-                            <button type="button" class="text-xs absolute -right-6 top-1/2 pt-2" @click="step = 2">
+                            </select> -->
+                            <multiselect
+                                v-model="selectedBrand"
+                                :options="brandList"
+                                :multiple="true"
+                                :close-on-select="false"
+                                :clear-on-select="false"
+                                :preserve-search="true"
+                                :custom-label="selectedBrand.name"
+                                placeholder="Select Brand"
+                                label="name"
+                                track-by="id"
+                                :preselect-first="false">
+                                <template #selection="{ values, search, isOpen }">
+                                    <span class="multiselect__single" v-if="values.length" v-show="!isOpen">{{ values.length }}
+                                    Brand selected</span>
+                                </template>
+                            </multiselect>
+                            <button type="button" class="text-xs absolute -right-6 top-1/2 pt-2" @click="[step = 2, brandName = null]">
                                 <i class="fal fa-plus"></i>
                             </button>
                         </div>
@@ -407,6 +430,62 @@
                             Cancel
                         </button>
                         <button type="button" @click="createBrand()"
+                            class="add-btn focus:outline-none focus:ring-0 ">
+                            Create
+                        </button>
+                    </div>
+                </div>
+                <div v-show="step == 'type'">
+                    <div class="relative flex justify-between py-2 px-6 border-b">
+                        <button @click="[step = 1, itemTypeName = null]">
+                            <i class="fas fa-chevron-left"></i>
+                        </button>
+                        <h5 class="text-base text-center mt-2 font-semibold leading-normal font-inter">
+                            Create Item Type
+                        </h5><div></div>
+                    </div>
+                    <div class="relative px-12 py-4 border-b" data-te-modal-body-ref>
+                        <div class="mb-4">
+                            <label for="" class="label-form mb-3">
+                                Name
+                            </label>
+                            <input type="text" placeholder="Name" v-model="itemTypeName" class="input-ui">
+                        </div>
+                    </div>
+                    <div class="flex justify-end gap-x-4 px-6 mb-6 pt-4">
+                        <button type="button" class="cancel-btn focus:shadow-none focus:outline-none"
+                            data-te-modal-dismiss aria-label="Close" @click="stpe = 1">
+                            Cancel
+                        </button>
+                        <button type="button" @click="createType()"
+                            class="add-btn focus:outline-none focus:ring-0 ">
+                            Create
+                        </button>
+                    </div>
+                </div>
+                <div v-show="step == 'category'">
+                    <div class="relative flex justify-between py-2 px-6 border-b">
+                        <button @click="[step = 1, itemCategoryName = null]">
+                            <i class="fas fa-chevron-left"></i>
+                        </button>
+                        <h5 class="text-base text-center mt-2 font-semibold leading-normal font-inter">
+                            Create Item Category
+                        </h5><div></div>
+                    </div>
+                    <div class="relative px-12 py-4 border-b" data-te-modal-body-ref>
+                        <div class="mb-4">
+                            <label for="" class="label-form mb-3">
+                                Name
+                            </label>
+                            <input type="text" placeholder="Name" v-model="itemCategoryName" class="input-ui">
+                        </div>
+                    </div>
+                    <div class="flex justify-end gap-x-4 px-6 mb-6 pt-4">
+                        <button type="button" class="cancel-btn focus:shadow-none focus:outline-none"
+                            data-te-modal-dismiss aria-label="Close" @click="stpe = 1">
+                            Cancel
+                        </button>
+                        <button type="button" @click="createCategory()"
                             class="add-btn focus:outline-none focus:ring-0 ">
                             Create
                         </button>
@@ -533,11 +612,13 @@ export default {
             price: null,
             selectedUOM: null,
             // lead_time:null,
-            selectedBrand:null,
+            selectedBrand:[],
             base_min_amount:0,
             min_amount:0,
 
             brandName:null,
+            itemTypeName:null,
+            itemCategoryName:null,
             step: 1,
 
             selectedCategory: null,
@@ -650,8 +731,41 @@ export default {
             let response = await postApiData({ url: url, form_data: formData, token: this.getToken() });
             if (response.success) {
                 this.brandName = null;
-                this.getbrandList();
+                await this.getbrandList();
                 this.step = 1;
+                this.selectedBrand.push(this.brandList.find(brand => brand.id == response.data.id))
+            }
+        },
+        async createType(){
+            if(!this.itemTypeName){
+                this.alertValiationMessage('Brand Name');
+                return false;
+            }
+            let url = `/api/item_types`;
+            let formData = new FormData();
+            formData.append('name', this.itemTypeName);
+            let response = await postApiData({ url: url, form_data: formData, token: this.getToken() });
+            if (response.success) {
+                this.itemTypeName = null;
+                await this.getItemTypeList();
+                this.step = 1;
+                this.itemType = this.itemTypeList.find(item => item.id == response.data.id)
+            }
+        },
+        async createCategory(){
+            if(!this.itemCategoryName){
+                this.alertValiationMessage('Brand Name');
+                return false;
+            }
+            let url = `/api/categories`;
+            let formData = new FormData();
+            formData.append('name', this.itemCategoryName);
+            let response = await postApiData({ url: url, form_data: formData, token: this.getToken() });
+            if (response.success) {
+                this.itemCategoryName = null;
+                await this.getItemCategoryList();
+                this.step = 1;
+                this.selectedCategory = this.itemCategoryList.find(category => category.id == response.data.id)
             }
         },
         async createBtnClicked() {
@@ -671,14 +785,14 @@ export default {
             formData.append('category_id', this.selectedCategory.id);
             formData.append('base_uom_id',this.selectedBaseUom.id);
             formData.append('item_type_id',this.itemType.id);
-            formData.append('brand_id',this.selectedBrand.id);
+            // formData.append('brand_id',this.selectedBrand.id);
             formData.append('min_holding_base_uom_quantity',this.base_min_amount);
             formData.append('min_holding_uom_quantity',this.min_amount);
-            // if(this.selectedBrands.length > 0){
-            //     this.selectedBrands.forEach((item)=>{
-            //         formData.append('brands[]', item.id);
-            //     });
-            // }
+            if(this.selectedBrand.length > 0){
+                this.selectedBrand.forEach((brand)=>{
+                    formData.append('brand_id[]', brand.id);
+                });
+            }
             let response = await postApiData({ url: url, form_data: formData, token: this.getToken() });
             if (response.success) {
                 // this.getItemList(this.currentPage);

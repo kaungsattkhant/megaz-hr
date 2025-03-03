@@ -5,15 +5,16 @@
         </p>
     </div>
     <div class="mt-4 bg-white">
-        <div class="btn-container">
-            <div class=" flex">
-                <div>
-                    <label for="search" class="search-input mx-2 px-2 py-1"> From Date </label>
+        
+        <div class="btn-container pt-10">
+           
+            <div class=" flex pr-0 gap-x-4">
+                <div class="relative">
+                    <label for="search" class="border border-gray-200 rounded bg-white text-xs mx-2 px-2 py-2 absolute left-0 ml-0 -top-[90%] border-b-0"> From </label>
                     <input type="date" v-model="fromDate" class="search-input rounded">
                 </div>
-
-                <div>
-                    <label for="search" class="search-input mx-2 px-2 py-1"> To Date </label>
+                <div class="relative">
+                    <label for="search" class="border border-gray-200 rounded bg-white text-xs mx-2 px-2 py-2 absolute left-0 ml-0 -top-[90%] border-b-0"> To </label>
                     <input type="date" v-model="toDate" class="search-input rounded">
                 </div>
                 <div class="ml-2 px-2">
@@ -22,7 +23,17 @@
                 </div>
 
             </div>
-            <div></div>
+            <div>
+
+                <div class="w-full !text-sm" data-te-select-wrapper-ref>
+                    <select data-te-select-init data-te-select-placeholder="Select Inventory" @change="selectedInventoryChanged"
+                        data-te-select-filter="true" name="" id="" v-model="searchInventory" class="input-ui">
+                        <option :value="inventory" v-for="(inventory, inventoryIndex) in searchInventoryList"
+                            :key="inventoryIndex"> {{ inventory.name }} </option>
+                    </select>
+                </div>
+    
+            </div>
         </div>
         <div class="box-container-table">
 
@@ -139,7 +150,7 @@
                         <div class="relative  p-4">
                             <h5 class="text-xl text-center mt-2 font-medium leading-normal text-black"
                                 id="create_modalLabel">
-                                Transfer 
+                                Transfer ( {{ ledger ? ledger.name : '' }} )
                             </h5>
                             <button type="button" id="close"
                                 class="absolute top-4 right-4 focus:shadow-none focus:outline-none" data-te-modal-dismiss
@@ -367,30 +378,46 @@
                     </button>
                 </div>
                 <div class="relative px-6 py-4 border-b" data-te-modal-body-ref>
-                    <!-- <div class="mb-4 ">
-                        <label for="total-amount" class="text-sm">Invoice Amount: {{ totalInvoiceAmount.toLocaleString() }}</label>
-                    </div> -->
-                    <!-- <div class="mb-4 ">
-                        <label for="amount" class="text-sm">Amount</label>
-                        <input type="number" id="amount" placeholder="Invoice Amount" v-model="invoiceAmount" @input="invoiceAmountChange()" class="input-ui">
+                    <div class="mb-4">
+                        <label for="" class="label-form mb-3">
+                            Minimum Holding Amount ( Base UOM - အကြီး )
+                        </label>
+                        <input type="number" placeholder="Minimum Holding Amount" min="0" v-model="base_min_amount" class="input-ui">
                     </div>
-                    <div class="mb-4 ml-6">
-
+                    <div class="mb-4">
+                        <label for="" class="label-form mb-3">
+                            Base UOM (အကြီး)
+                        </label>
+                        <!-- <select name="" id="" v-model="selectedBaseUom" class="input-ui">
+                            <option :value="uom" v-for="(uom, uomIndex) in itemUoms" :key="uomIndex"> {{ uom.name }}
+                            </option>
+                        </select> -->
+                        <p class="input-ui">
+                            {{ minimumLedger ? minimumLedger.base_uom_name : '' }}
+                        </p>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <label for="" class="label-form mb-3">
+                            Minimum Holding Amount ( UOM - အသေး )
+                        </label>
+                        <input type="number" placeholder="Minimum Holding Amount" min="0" v-model="min_amount" class="input-ui">
                     </div>
 
                     <div class="mb-4">
-                        <label for="cashbook" class="text-sm">Cash Book</label>
-                        <select id="cashbook" v-model="selectedCashAccount"
-                        class="text-sm border border-gray-300 input-ui w-12
-                        bg-transparent rounded-lg focus:ring-0">
-                            <option :value="cashAccount" v-for="(cashAccount, cashAccountIndex) in cashAccountList" :key="cashAccountIndex">
-                                {{ cashAccount.name }}
+                        <label for="" class="label-form mb-3">
+                            Uom အသေး (Inventory သိမ်းဆည်း unit)
+                        </label>
+                        <!-- <select name="" id="" v-model="selectedUOM" class="input-ui">
+                            <option :value="uom" v-for="(uom, uomIndex) in uomList" :key="uomIndex"> {{ uom.name }}
                             </option>
-                        </select>
+                        </select> -->
+
+                        <p class="input-ui">
+                            {{ minimumLedger ? minimumLedger.conversion_uom_name : '' }}
+                        </p>
                     </div>
-                    <div class="mb-4 ">
-                        <label for="total-amount" class="text-sm">AP Amount: {{ apAmount.toLocaleString() }}</label>
-                    </div> -->
+                    
                 </div>
                 <div class="flex justify-end gap-x-4 px-6 mb-6 pt-4">
                     <button type="button" class="cancel-btn focus:shadow-none focus:outline-none"
@@ -399,7 +426,7 @@
                     </button>
                     <button type="button"
                     class="add-btn focus:outline-none focus:ring-0 "
-                    @click="confirmBtnClicked">
+                    @click="addMinimumAmount">
                         Create
                     </button>
                 </div>
@@ -447,6 +474,8 @@ export default {
             toDate: null,
             ledger:null,
             minimumLedger:null,
+            base_min_amount:0,
+            min_amount:0,
 
             per_page: 20,
             pageNumbers: [],
@@ -457,6 +486,12 @@ export default {
             currentGroup: 0,
             isFirstGroup: true,
             isLastGroup: false,
+
+            searchInventoryList:[],
+            searchInventory:null,
+            url_inventory:'',
+            url_date:'',
+            
         };
     },
     // props: ['inventory_id'],
@@ -481,6 +516,9 @@ export default {
             if(this.fromDate && this.toDate){
                 url = `${url}?from_date=${this.fromDate}&to_date=${this.toDate}`;
             }
+            if(this.searchInventory){
+                url = `${url}?${this.url_inventory}`;
+            }
             const response = await getApiData({ url: url, token: this.getToken() });
             if (response.data) {
                 this.totalValuation = 0;
@@ -504,6 +542,7 @@ export default {
             }
         },
 
+
         async getUomList() {
             let url = `/api/uoms`;
             let response = await getApiData({ url: url, token: this.getToken() });
@@ -514,6 +553,39 @@ export default {
 
         btnClickedAddMinimum(ledger, index){
             this.minimumLedger = ledger;
+        },
+        async addMinimumAmount(){
+            if(this.min_amount < 1 && this.base_min_amount < 1){
+                this.alertValidationMessage(`Minimum amount`);
+                return 1;
+            }
+            let formData = new FormData();
+            formData.append('inventory_id', this.minimumLedger.inventory_id);
+            // formData.append('inventory_id', this.inventory_id);/
+            formData.append('item_id', this.minimumLedger.item_id);
+            formData.append('base_uom_id', this.minimumLedger.base_unit_id);
+            formData.append('base_uom_min_quantity', this.base_min_amount);
+            formData.append('uom_id', this.minimumLedger.item_uom_id);
+            formData.append('uom_min_quantity', this.min_amount);
+            formData.append('conversion', this.minimumLedger.conversion);
+            let url = `/api/inventory_item`;
+            let response = await postApiData({url: url, form_data: formData, token: this.getToken()});
+            if(response.success){
+                this.$notify({
+                    text: `Success`,
+                    type: 'info'
+                });
+                this.getInventoryLegderList();
+                document.getElementById('close_add_minimum_modal').click();
+                this.base_min_amount = 0;
+                this.min_amount = 0;
+            }
+            else{
+                this.$notify({
+                    text: response.message,
+                    type: 'info'
+                });
+            }
         },
         addDefectBtnClicked(id, ledgerIndex){
             this.defectItemId = id;
@@ -662,6 +734,19 @@ export default {
             
         },
 
+
+        async getSearchInventoryList(){
+            const response = await getApiData({ url: '/api/get_inventory', token: this.getToken() });
+            if (response.data) {
+                this.searchInventoryList = response.data;
+            }
+        },
+        selectedInventoryChanged(){
+            this.url_inventory = '?inventory_id=' + this.searchInventory.id
+            this.fromDate = null;
+            this.toDate = null;
+            this.getInventoryLegderList();
+        },
         searchBtnClicked(){
             this.getInventoryLegderList();
         },
@@ -686,6 +771,7 @@ export default {
         this.getInventoryLegderList(null);
         this.getInventoryList();
         this.getUomList();
+        this.getSearchInventoryList();
     },
 
     mounted() {

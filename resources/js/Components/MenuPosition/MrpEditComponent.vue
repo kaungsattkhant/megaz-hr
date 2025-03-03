@@ -5,11 +5,6 @@
                 Edit MRP
             </p>
         </div>
-        <ul>
-            <li v-for="lev in levelTable">
-                {{ lev.expired_at }}
-            </li>
-        </ul>
 
         <div class="grid !grid-cols-12 gap-x-8 gap-y-2 bg-white p-8 rounded-md shadow-md mb-8">
             <div class="mb-4 col-span-3 rounded-md">

@@ -21,6 +21,14 @@
                         </span>
                     </a>
                 </li>
+                <li>
+                    <a href="/pos/customer_deposit" class="flex items-center flex-col  rounded-lg px-0 py-12 @yield('customer_deposit')">
+                        <i class="fas fa-users mb-1.5 text-2xl"></i>
+                        <span class="">
+                            Customer Deposit
+                        </span>
+                    </a>
+                </li>
                 <!-- <li>
                     <a href="/pos/cashbook" class="flex items-center flex-col  rounded-lg px-6 py-12 @yield('cashbook')">
                         <i class="fas fa-users mb-1.5 text-2xl"></i>
