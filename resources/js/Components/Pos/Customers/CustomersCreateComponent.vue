@@ -49,6 +49,27 @@
                             <input type="date" placeholder="2000-02-02" v-model="date"
                                 class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
                         </div>
+                        <div class="mb-4">
+                            <label for="" class="block text-sm text-black mb-3">
+                                Credit Limit
+                            </label>
+                            <input type="text" placeholder="Credit Limit" v-model="credit_limit"
+                                class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
+                        </div>
+                        <div class="mb-4">
+                            <label for="" class="block text-sm text-black mb-3">
+                                Credit Opening Date
+                            </label>
+                            <input type="date" placeholder="2000-02-02" v-model="credit_opening_date"
+                                class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
+                        </div>
+                        <div class="mb-4">
+                            <label for="" class="block text-sm text-black mb-3">
+                                Credit Opening Amount
+                            </label>
+                            <input type="text" placeholder="Credit Opening Amount" v-model="credit_opening_amount"
+                                class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
+                        </div>
                         <div class=" mb-4">
                                 <label for="" class="text-sm text-black mb-2 block">
                                     Division
@@ -125,6 +146,9 @@ import { Modal, Ripple, Select, Datepicker, initTE, Input } from "tw-elements";
                 email:null,
                 genderList: [],
                 date:null,
+                credit_limit:null,
+                credit_opening_date:null,
+                credit_opening_amount:null,
                 address:null,
                 selectedGender:null,
                 deleteId: null,
@@ -172,6 +196,9 @@ import { Modal, Ripple, Select, Datepicker, initTE, Input } from "tw-elements";
                 formData.append('address_name', this.address_name);
                 formData.append('address', this.address);
                 formData.append('birthdate', this.date);
+                formData.append('credit_limit', this.credit_limit);
+                formData.append('credit_opening_date', this.credit_opening_date);
+                formData.append('credit_opening_amount', this.credit_opening_amount);
                 formData.append('township_id', this.selectedTownship.id);
                 let response = await postApiData({url: '/api/customers', form_data: formData, token: this.getToken()});
                 console.log(this.selectedGender+','+this.name+','+this.email+','+this.ph_number+','+this.address+','+this.date)

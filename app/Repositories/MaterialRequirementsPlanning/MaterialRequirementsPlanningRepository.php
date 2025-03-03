@@ -37,7 +37,7 @@ class MaterialRequirementsPlanningRepository implements MaterialRequirementsPlan
       'menuSteps.menuStepItem.uom',
       'subMenus.menuSteps.menuStepItem.item',
       'subMenus.menuSteps.menuStepItem.uom',
-    ])->paginate(config('common.list_count'));
+    ])->orderByDesc('id')->paginate(config('common.list_count'));
     return $menuList;
   }
   public function store($validatedData)
@@ -121,9 +121,15 @@ class MaterialRequirementsPlanningRepository implements MaterialRequirementsPlan
         $menuCategoryAreas = MenuCategoryArea::where('menu_category_id', $menuCategory->id)
           ->get();
         foreach ($menuCategoryAreas as $menuCategoryArea) {
-          MenuArea::updateOrCreate([
+          MenuArea::where('menu_category_area_id', $menuCategoryArea->id)
+            ->update(['is_default' => 0]);
+          $menuArea = MenuArea::updateOrCreate([
             'menu_category_area_id' => $menuCategoryArea->id,
             'cooking_area_id' =>  $areaId,
+          ], [
+            'menu_category_area_id' => $menuCategoryArea->id,
+            'cooking_area_id' =>  $areaId,
+            'is_default' => 1,
           ]);
         }
       }
@@ -236,9 +242,15 @@ class MaterialRequirementsPlanningRepository implements MaterialRequirementsPlan
           $menuCategoryAreas = MenuCategoryArea::where('menu_category_id', $menuCategory->id)
             ->get();
           foreach ($menuCategoryAreas as $menuCategoryArea) {
+            MenuArea::where('menu_category_area_id', $menuCategoryArea->id)
+              ->update(['is_default' => 0]);
             MenuArea::updateOrCreate([
               'menu_category_area_id' => $menuCategoryArea->id,
               'cooking_area_id' =>  $areaId,
+            ], [
+              'menu_category_area_id' => $menuCategoryArea->id,
+              'cooking_area_id' =>  $areaId,
+              'is_default' => 1,
             ]);
           }
         }
@@ -344,7 +356,10 @@ class MaterialRequirementsPlanningRepository implements MaterialRequirementsPlan
     DB::beginTransaction();
     try {
       $menuArea = MenuArea::findOrFail($menuAreaId);
-      $menuArea->is_default = $menuArea->is_default == 1 ? 0 : 1;
+      MenuArea::where('menu_category_area_id', $menuArea->menu_category_area_id)
+        ->update(['is_default' => 0]);
+      // $menuArea->is_default = $menuArea->is_default == 1 ? 0 : 1;
+      $menuArea->is_default = 1;
       $menuArea->save();
       DB::commit();
       ResponseData($menuArea, 201, 'MenuCategoryArea updated successfully!');

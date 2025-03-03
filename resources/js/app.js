@@ -142,6 +142,7 @@ import PosBookingCreateComponent from './Components/Pos/Booking/PosBookingCreate
 import PosMenuOrderComponent from './Components/Pos/MenuOrder/PosMenuOrderComponent.vue';
 import PosMenuOrderCreateComponent from './Components/Pos/MenuOrder/PosMenuOrderCreateComponent.vue';
 import UomCrudComponent from './Components/Uoms/UomCrudComponent.vue';
+import PosCustomerDepositComponent from './Components/Pos/CustomerDeposit/PosCustomerDepositComponent.vue';
 
 import LoginComponentPos from './Components/Pos/Auth/LoginComponentPos.vue';
 import LogoutComponentPos from './Components/Pos/Auth/LogoutComponentPos.vue';
@@ -194,6 +195,7 @@ import OrgNewsEditComponent from './Components/OrgNews/OrgNewsEditComponent.vue'
 import WarningListComponent from './Components/Warning/WarningListComponent.vue';
 import WarningCreateComponent from './Components/Warning/WarningCreateComponent.vue';
 import WarningEditComponent from './Components/Warning/WarningEditComponent.vue';
+import MenuAreaComponent from './Components/MenuArea/MenuAreaComponent.vue';
 
 import PosTableComponent from './Components/Pos/Home/PosTableComponent.vue';
 import PosRoomComponent from './Components/Pos/Home/PosRoomComponent.vue';
@@ -319,6 +321,7 @@ app.component('PosBookingListComponent', PosBookingListComponent);
 app.component('PosBookingCreateComponent', PosBookingCreateComponent);
 app.component('PosMenuOrderComponent', PosMenuOrderComponent);
 app.component('PosMenuOrderCreateComponent', PosMenuOrderCreateComponent);
+app.component('PosCustomerDepositComponent', PosCustomerDepositComponent);
 
 app.component('LoginComponentPos', LoginComponentPos);
 app.component('LogoutComponentPos', LogoutComponentPos);
@@ -370,6 +373,7 @@ app.component('OrgNewsEditComponent',OrgNewsEditComponent);
 app.component('WarningListComponent',WarningListComponent);
 app.component('WarningCreateComponent',WarningCreateComponent);
 app.component('WarningEditComponent',WarningEditComponent);
+app.component('MenuAreaComponent',MenuAreaComponent);
 
 app.component('PosTableComponent',PosTableComponent);
 app.component('PosRoomComponent',PosRoomComponent);

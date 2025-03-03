@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('menu_category_area_id');
             $table->foreignId('cooking_area_id');
-            $table->boolean('is_default')->default(1);
+            $table->boolean('is_default')->default(0);
             $table->timestamps();
         });
     }
