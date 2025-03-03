@@ -77,7 +77,6 @@ class OrderRepository implements OrderRepositoryInterface
                 //add menu for existing order
                 $order = $this->orderService->updateOrderItemAmountToOrder('add', $order, $data['original_price'], $data['quantity'], $discountAmount);
                 $invoice = $this->orderService->updateOrderItemAmountToInvoice('add', $invoice, $data['original_price'], $data['quantity'], $discountAmount);
-
                 // $data['date'] = currentTime();
                 // $data['order_id'] = $order->id;
                 // $data['price'] = $data['original_price'] * $data['quantity'];
@@ -88,11 +87,21 @@ class OrderRepository implements OrderRepositoryInterface
                 $data['price'] = $data['original_price'] * $defaultQuantity;
                 $data['sub_total_price'] = ($data['original_price'] * $defaultQuantity) - $defaultDiscountAmont;
 
+                $orderItemData['order_id'] = $order->id;
+                $orderItemData['menu_id'] = $data['menu_id'];
+                $orderItemData['date'] = now();
+                $orderItemData['quantity'] = $defaultQuantity;
+                $orderItemData['remark'] = $data['remark'];
+                $orderItemData['menu_service_discount_id'] = $latestMenuServiceDiscount ? $latestMenuServiceDiscount->id : null;
+                $orderItemData['original_price'] = $data['original_price'];
+                $orderItemData['discount_value'] = $defaultDiscountAmont;
+                $orderItemData['sub_total_price'] = ($data['original_price']) - $defaultDiscountAmont; //after  
+                $orderItemData['price'] = $data['original_price']; //after  
+
                 $insertData = [];
                 for ($i = 0; $i < (int) $quantityCount; $i++) {
-                    $insertData[] = $data;
+                    $insertData[] = $orderItemData;
                 }
-                dd($insertData);
 
                 OrderItem::insert($insertData);
 
@@ -116,7 +125,6 @@ class OrderRepository implements OrderRepositoryInterface
                 $data['total_discount_price'] = $discountAmount;
                 $order = Order::create($data);
                 $order->update(['order_id' => sprintf('%05d', $order->id)]);
-
                 //close for order item create default 1
                 // $data['order_id'] = $order->id;
                 // $data['sub_total_price'] = ($data['original_price'] * $data['quantity']) - $discountAmount; //after  
@@ -127,7 +135,6 @@ class OrderRepository implements OrderRepositoryInterface
 
                 //update order amount to invoice   
                 $invoice = $this->orderService->updateOrderItemAmountToInvoice('add', $invoice, $data['original_price'], $data['quantity'], $discountAmount);
-
                 // change order item creat depend on quantity , like quantity=2 , create order two time, quantity=3 ,creat 3 time
 
                 $orderItemData['order_id'] = $order->id;
