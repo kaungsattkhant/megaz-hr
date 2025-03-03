@@ -37,7 +37,7 @@ class MaterialRequirementsPlanningRepository implements MaterialRequirementsPlan
       'menuSteps.menuStepItem.uom',
       'subMenus.menuSteps.menuStepItem.item',
       'subMenus.menuSteps.menuStepItem.uom',
-    ])->paginate(config('common.list_count'));
+    ])->orderByDesc('id')->paginate(config('common.list_count'));
     return $menuList;
   }
   public function store($validatedData)
