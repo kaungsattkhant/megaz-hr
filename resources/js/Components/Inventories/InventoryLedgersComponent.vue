@@ -757,6 +757,7 @@ export default {
             this.fromDate = null;
             this.toDate = null;
             this.getInventoryLegderList();
+            
         },
 
         closeModal() {
