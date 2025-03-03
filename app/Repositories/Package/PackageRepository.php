@@ -2,6 +2,7 @@
 
 namespace App\Repositories\Package;
 
+use App\Models\AccessoryPackage;
 use App\Models\Menu;
 use App\Models\MenuPackage;
 use App\Models\Package;
@@ -23,13 +24,13 @@ class PackageRepository implements PackageRepositoryInterface
             })
             ->where('to_date', '>=', $validateDate)
             ->with([
-                    'menuPackages.menu.prices',
-                    'menuPackages.menu.menuServiceDiscounts' => function ($query) use ($validateDate) {
-                        $query->where('from_date', '<=', $validateDate)
-                            ->where('to_date', '>=', $validateDate)
-                            ->first();
-                    }
-                ])
+                'menuPackages.menu.prices',
+                'menuPackages.menu.menuServiceDiscounts' => function ($query) use ($validateDate) {
+                    $query->where('from_date', '<=', $validateDate)
+                        ->where('to_date', '>=', $validateDate)
+                        ->first();
+                }
+            ])
             ->paginate(config('common.list_count'));
 
         ResponseData($packages);
@@ -45,7 +46,6 @@ class PackageRepository implements PackageRepositoryInterface
     {
         DB::beginTransaction();
         try {
-            dd($data);
             $data['created_by'] = UserData()->id;
             // $isValid = false;
             // if(isset($data['roomIds'])){
@@ -66,8 +66,9 @@ class PackageRepository implements PackageRepositoryInterface
             $sessionPrice = $data['pay_session'] * $data['session_price'];
             $package = Package::create($data);
             $menuPrice = 0;
-            if (isset($data['menuIds'])) {
+            $accessoryPrice=0;
 
+            if (isset($data['menuIds'])) {
                 $menuIds = json_decode($data['menuIds']);
                 foreach ($menuIds as $menu) {
                     $foodMenu = Menu::find($menu->menu_id);
@@ -79,7 +80,24 @@ class PackageRepository implements PackageRepositoryInterface
                     ]);
                 }
             }
-            $package_original_price = $menuPrice + $sessionPrice;
+            if (isset($data['accessories'])) {
+                $accessories = json_decode($data['accessories'], true); // Decode as an associative array
+
+                if (empty($accessories)) {
+                    // Accessories are empty or null
+                    return response()->json(['message' => 'No accessories provided'], 400);
+                }
+                foreach ($accessories as $accessory) {
+                    $foodMenu = Menu::find($accessory->accessory_id);
+                    $accessoryPrice += $accessory->accessory_price->price * $accessory->quantity;
+                    $accessoryPackage = AccessoryPackage::create([
+                        'accessory_id' => $accessory->accessory_id,
+                        'quantity' => $accessory->quantity,
+                        'package_id' => $package->id
+                    ]);
+                }
+            }
+            $package_original_price = $menuPrice + $sessionPrice+ $accessoryPrice;
             if ($package_original_price > $data['price']) {
                 $data['package_discount'] = $package_original_price - $data['price'];
                 $package->package_discount = $data['package_discount'];
@@ -87,13 +105,17 @@ class PackageRepository implements PackageRepositoryInterface
             } else {
                 ResponseMessage('Package original price  shoud be more than the package price', 422);
             }
-            // if(isset($data['roomIds'])){
+            if(isset($data['room_ids']) && is_array($data['room_ids']){
+                $roomIds=$data['room_ids'];
+                $package->rooms()->sync($roomIds);
             //     $rooms = json_decode($data['roomIds']);
             //     foreach($rooms as $room)
             //     {
             //         $package->rooms()->attach($room);
             //     }
-            // }
+            }else{
+                ResponseMessage('Room Ids must be array format', 422);
+            }
             DB::commit();
             ResponseData($package);
         } catch (\Exception $e) {
