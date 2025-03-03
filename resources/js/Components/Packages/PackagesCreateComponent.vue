@@ -201,7 +201,7 @@
         <div class=" ">
             <ul class="mb-0 flex list-none flex-row flex-wrap border-b-0 pl-0" role="tablist" data-te-nav-ref>
                 <li role="presentation" class="group">
-                    <button
+                    <button id="menu_tab_btn"
                         class="z-20 mt-2 block px-7 pb-3.5 pt-3 rounded-tr-md rounded-tl-md font-inter text-xs font-medium  leading-tight text-neutral-500  focus:isolate data-[te-nav-active]:text-[#fff] data-[te-nav-active]:bg-[#845adf]  bg-white custom-shadow-tab relative"
                         data-te-toggle="pill" data-te-target="#tabs-menu" role="tab" data-te-nav-active
                         aria-controls="tabs-menu" aria-selected="true">Menus</button>
@@ -586,8 +586,9 @@ export default {
             }
             else {
                 this.$notify({
-                    text: `Package create failed`,
-                    type: "error"
+                    title: `Package Create Failed`,
+                    text: response.message,
+                    type: "warn"
                 });
             }
         },
