@@ -43,9 +43,12 @@ class PurchaseOrderRepository implements PurchaseOrderRepositoryInterface
     public function listAllData(Request $request)
     {
         $staff = UserData();
-        $from_date = $request->from_date;  // Assuming from_date and to_date are sent in the request
+        $from_date = $request->from_date;
         $to_date = $request->to_date;
-        $po_id = $request->po_id;  // 
+        $po_id = $request->po_id;
+        if ($po_id) {
+            $po_id = str_replace(' ', '', $po_id);
+        }
         $purchaseOrders = PurchaseOrder::with([
             'items.item',
             'items.baseUom',
