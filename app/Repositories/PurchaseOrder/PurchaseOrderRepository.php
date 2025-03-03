@@ -43,8 +43,9 @@ class PurchaseOrderRepository implements PurchaseOrderRepositoryInterface
     public function listAllData(Request $request)
     {
         $staff = UserData();
-        $date = $request->date;
-        $po_id = $request->po_id;
+        $from_date = $request->from_date;  // Assuming from_date and to_date are sent in the request
+        $to_date = $request->to_date;
+        $po_id = $request->po_id;  // 
         $purchaseOrders = PurchaseOrder::with([
             'items.item',
             'items.baseUom',
@@ -53,11 +54,17 @@ class PurchaseOrderRepository implements PurchaseOrderRepositoryInterface
             'managerCheckedBy',
             'financialCheckedBy',
             'procurementCheckedBy'
-        ])->when((isset($date)), function ($q) use ($date) {
-            $q->where('date', $date);
-        })->when((isset($po_id)), function ($q) use ($po_id) {
-            $q->where('po_id', $po_id);
+        ])->when((isset($from_date) && !empty($from_date)), function ($q) use ($from_date) {
+            $q->where('date', '>=', $from_date);
+        })->when((isset($to_date) && !empty($to_date)), function ($q) use ($to_date) {
+            $q->where('date', '<=', $to_date);
         })
+            ->when((isset($from_date) && isset($to_date) && !empty($from_date) && !empty($to_date)), function ($q) use ($from_date, $to_date) {
+
+                $q->whereBetween('date', [$from_date, $to_date]);
+            })->when((isset($po_id) && !empty($po_id)), function ($q) use ($po_id) {
+                $q->where('po_id', 'like', '%' . $po_id . '%');
+            })
             ->orderBy('id', 'desc');
 
         if (checkRoles(['Staff'])) {
