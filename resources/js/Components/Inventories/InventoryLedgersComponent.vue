@@ -5,15 +5,16 @@
         </p>
     </div>
     <div class="mt-4 bg-white">
-        <div class="btn-container">
-            <div class=" flex">
-                <div>
-                    <label for="search" class="search-input mx-2 px-2 py-1"> From Date </label>
+        
+        <div class="btn-container pt-10">
+           
+            <div class=" flex pr-0 gap-x-4">
+                <div class="relative">
+                    <label for="search" class="border border-gray-200 rounded bg-white text-xs mx-2 px-2 py-2 absolute left-0 ml-0 -top-[90%] border-b-0"> From </label>
                     <input type="date" v-model="fromDate" class="search-input rounded">
                 </div>
-
-                <div>
-                    <label for="search" class="search-input mx-2 px-2 py-1"> To Date </label>
+                <div class="relative">
+                    <label for="search" class="border border-gray-200 rounded bg-white text-xs mx-2 px-2 py-2 absolute left-0 ml-0 -top-[90%] border-b-0"> To </label>
                     <input type="date" v-model="toDate" class="search-input rounded">
                 </div>
                 <div class="ml-2 px-2">
@@ -22,7 +23,17 @@
                 </div>
 
             </div>
-            <div></div>
+            <div>
+
+                <div class="w-full !text-sm" data-te-select-wrapper-ref>
+                    <select data-te-select-init data-te-select-placeholder="Select Inventory" @change="selectedInventoryChanged"
+                        data-te-select-filter="true" name="" id="" v-model="searchInventory" class="input-ui">
+                        <option :value="inventory" v-for="(inventory, inventoryIndex) in searchInventoryList"
+                            :key="inventoryIndex"> {{ inventory.name }} </option>
+                    </select>
+                </div>
+    
+            </div>
         </div>
         <div class="box-container-table">
 
@@ -475,6 +486,12 @@ export default {
             currentGroup: 0,
             isFirstGroup: true,
             isLastGroup: false,
+
+            searchInventoryList:[],
+            searchInventory:null,
+            url_inventory:'',
+            url_date:'',
+            
         };
     },
     // props: ['inventory_id'],
@@ -499,6 +516,9 @@ export default {
             if(this.fromDate && this.toDate){
                 url = `${url}?from_date=${this.fromDate}&to_date=${this.toDate}`;
             }
+            if(this.searchInventory){
+                url = `${url}?${this.url_inventory}`;
+            }
             const response = await getApiData({ url: url, token: this.getToken() });
             if (response.data) {
                 this.totalValuation = 0;
@@ -521,6 +541,7 @@ export default {
                 this.inventoryList = response.data;
             }
         },
+
 
         async getUomList() {
             let url = `/api/uoms`;
@@ -713,6 +734,19 @@ export default {
             
         },
 
+
+        async getSearchInventoryList(){
+            const response = await getApiData({ url: '/api/get_inventory', token: this.getToken() });
+            if (response.data) {
+                this.searchInventoryList = response.data;
+            }
+        },
+        selectedInventoryChanged(){
+            this.url_inventory = '?inventory_id=' + this.searchInventory.id
+            this.fromDate = null;
+            this.toDate = null;
+            this.getInventoryLegderList();
+        },
         searchBtnClicked(){
             this.getInventoryLegderList();
         },
@@ -737,6 +771,7 @@ export default {
         this.getInventoryLegderList(null);
         this.getInventoryList();
         this.getUomList();
+        this.getSearchInventoryList();
     },
 
     mounted() {
