@@ -190,7 +190,7 @@ class SupplierRepository implements SupplierInterface
                 ],
                 [
                     'type' => 'addition',
-                    'date_time' => now(),
+                    'date_time' => $supplier->credit_opening_date,
                     'amount' => $supplier->credit_opening_amount,
                     'supplier_id' => $supplier->id,
                     'account_id' => $supplier->account_id,
