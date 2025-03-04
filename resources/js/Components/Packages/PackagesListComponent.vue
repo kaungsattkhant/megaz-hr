@@ -82,8 +82,8 @@
                                             </span>
                                         </div>
                                         <div class="block mb-2">
-                                            <!-- Accessories: <span v-for="accessory in promotionPackage.accessories"> {{
-                                                accessory.menu.name }}, </span> -->
+                                            Accessories: <span v-for="accessory in promotionPackage.accessories"> {{
+                                                accessory.accessory.name }}, </span>
                                         </div>
                                         <div v-if="promotionPackage.rooms.length > 0">
                                             <span class="mr-2">
