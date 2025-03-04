@@ -13,7 +13,6 @@ class Package extends Model
         'name','from_date','to_date','price','pay_session','free_session','session','session_price','package_discount','is_ktv','is_active','created_by','image_url','image_path','is_changeable'
     ];
 
-
     public function rooms()
     {
         return $this->belongsToMany(Entity::class, 'package_room', 'package_id', 'room_id');
