@@ -96,7 +96,7 @@
 
                                     </td>
                                     <td class="whitespace-nowrap   relative">
-                                        <!-- <a href="#" class="pr-2 ">
+                                        <!-- <a :href="'/packages/'+promotionPackage.id+'/edit'" class="pr-2 ">
                                             <i class="fal fa-pen"></i>
                                         </a> -->
                                     </td>

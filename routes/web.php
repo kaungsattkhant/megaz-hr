@@ -207,6 +207,7 @@ Route::middleware(['departments:inventory-stocks'])->group(function () {
 Route::middleware(['departments:package'])->group(function () {
     Route::view('/packages', 'packages.index')->name('packages.index');
     Route::view('/packages/create', 'packages.create')->name('packages.create');
+    Route::view('/packages/{id}/edit', 'packages.edit')->name('packages.edit');
 });
 
 Route::middleware(['departments:menu-service-discount'])->group(function () {
