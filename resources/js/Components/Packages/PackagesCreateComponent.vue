@@ -451,6 +451,7 @@ export default {
             if(this.selectedMenuCategory && this.selectedMenu && this.menuQty > 0){
                 document.getElementById('menu_tab_btn').click();
             }
+            this.selectedMenuCategory = null;
             this.selectedMenu = null;
             this.menuQty = 0;
             this.menuPrice = null;
@@ -489,6 +490,7 @@ export default {
             if(this.selectedAccessoryCategory && this.selectedAccessory && this.accessoryQuantity > 0){
                 document.getElementById('accessory_tab_btn').click();
             }
+            this.selectedAccessoryCategory = null;
             this.selectedAccessory = null;
             this.accessoryQuantity = null;
         },
