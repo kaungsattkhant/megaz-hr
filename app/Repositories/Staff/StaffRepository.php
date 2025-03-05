@@ -221,10 +221,10 @@ class StaffRepository implements StaffRepositoryInterface
 
     public function getStaffByDepartment(Request $request, int $departmentId, array $roles = null)
     {
-        
+
         $allowedRoles = $roles ? (in_array('Manager', $roles)
             ? ['Supervisor', 'Staff']
-            : ['Staff']) : null ;
+            : ['Staff']) : null;
         if ($request->per_page || $request->page) {
             // $totalCount = Staff::where('department_id', $departmentId)->where('is_active', 1)->count();
             // $pageNumber = 1;
@@ -259,9 +259,9 @@ class StaffRepository implements StaffRepositoryInterface
                         $query->whereIn('name', $allowedRoles);
                     });
                 })
-                    // ->whereHas('roles', function ($query) use ($allowedRoles) {
-                    //     $query->whereIn('name', $allowedRoles);
-                    // })
+                // ->whereHas('roles', function ($query) use ($allowedRoles) {
+                //     $query->whereIn('name', $allowedRoles);
+                // })
                 ->where('department_id', $departmentId)
                 ->where('is_active', 1)
                 ->get();

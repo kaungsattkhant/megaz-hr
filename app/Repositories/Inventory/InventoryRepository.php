@@ -38,6 +38,9 @@ class InventoryRepository implements InventoryRepositoryInterface
         // }
 
         $query = Inventory::where('is_active', 1)
+            ->whereHas('staff', function ($query) {
+                $query->where('id', UserData()->id);
+            })
             ->with(['inventoryable']);
         if ($inventory_id) {
             $query->where('id', $inventory_id);
@@ -52,7 +55,11 @@ class InventoryRepository implements InventoryRepositoryInterface
 
     public function getInventory($request)
     {
+        $staffId = UserData()->id;
         $inventories = Inventory::where('is_active', 1)
+            ->whereHas('staff', function ($query) use ($staffId) {
+                $query->where('staff_id', $staffId);
+            })
             ->with(['inventoryable'])
             ->get();
         return $inventories;
@@ -156,6 +163,18 @@ class InventoryRepository implements InventoryRepositoryInterface
             'source_inventories' => UserData()->inventories,
             'destination_inventories' => $toInventory,
         ];
+    }
+
+    public function getallInventories($request)
+    {
+        $query = Inventory::where('is_active', 1)
+            ->with(['inventoryable']);
+        if ($request->per_page || $request->page) {
+            $inventories = $query->paginate(config('common.list_count'));
+        } else {
+            $inventories = $query->get();
+        }
+        return $inventories;
     }
 
     public function createInventoryItem($validatedData)
