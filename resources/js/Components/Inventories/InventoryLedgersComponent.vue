@@ -739,6 +739,9 @@ export default {
             const response = await getApiData({ url: '/api/get_inventory', token: this.getToken() });
             if (response.data) {
                 this.searchInventoryList = response.data;
+                this.searchInventory = response.data[0]
+                this.url_inventory = 'inventory_id=' + this.searchInventory.id
+                this.getInventoryLegderList();
             }
         },
         selectedInventoryChanged(){
@@ -771,7 +774,7 @@ export default {
     },
 
     created() {
-        this.getInventoryLegderList(null);
+        // this.getInventoryLegderList(null);
         this.getInventoryList();
         this.getUomList();
         this.getSearchInventoryList();

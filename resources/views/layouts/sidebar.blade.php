@@ -876,7 +876,7 @@
         </div>
     </div>
 </nav>
-<script>
+<!-- <script>
     $(document).ready(function () {
         $("#sidebar-search").on("keyup", function () {
             var value = $(this).val().toLowerCase();
@@ -885,4 +885,4 @@
             });
         });
     });
-</script>
+</script> -->
