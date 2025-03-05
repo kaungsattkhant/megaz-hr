@@ -25,4 +25,6 @@ interface InventoryRepositoryInterface
     public function getInventoryLedgerList($request);
 
     public function createInventoryItem($validatedData);
+
+    public function getallInventories($request);
 }

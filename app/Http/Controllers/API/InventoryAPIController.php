@@ -19,6 +19,12 @@ class InventoryAPIController extends Controller
         $this->inventoryRepo = $inventoryRepo;
     }
 
+    public function getallInventories(Request $request)
+    {
+        $inventories = $this->inventoryRepo->getallInventories($request);
+        ResponseData($inventories);
+    }
+
     public function getInventory(Request $request)
     {
         $inventories = $this->inventoryRepo->getInventory($request);

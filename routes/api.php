@@ -289,7 +289,7 @@ Route::middleware('auth:api')->group(function () {
         Route::get('/confirm_transfer_item', 'confirmTransferItem');
         Route::get('/cancel_transfer_item', 'cancelTransferItem');
     });
-
+    Route::get('/inventory/all', [InventoryAPIController::class, 'getallInventories']);
     Route::get('/inventories', [InventoryAPIController::class, 'getInventoryData']);
     Route::get('/get_inventory', [InventoryAPIController::class, 'getInventory']);
     Route::post('/inventories', [InventoryAPIController::class, 'createInventory']);

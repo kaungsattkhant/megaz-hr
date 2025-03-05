@@ -165,6 +165,18 @@ class InventoryRepository implements InventoryRepositoryInterface
         ];
     }
 
+    public function getallInventories($request)
+    {
+        $query = Inventory::where('is_active', 1)
+            ->with(['inventoryable']);
+        if ($request->per_page || $request->page) {
+            $inventories = $query->paginate(config('common.list_count'));
+        } else {
+            $inventories = $query->get();
+        }
+        return $inventories;
+    }
+
     public function createInventoryItem($validatedData)
     {
 
