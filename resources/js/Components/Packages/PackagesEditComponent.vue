@@ -355,6 +355,7 @@ export default {
     components: {
         Multiselect
     },
+    props: ["packageId"],
     data() {
         return {
             today: getCurrentDate(),
@@ -393,6 +394,8 @@ export default {
             selectedAccessoryList:[],
 
             selectedImage: null,
+
+            packageDetail:null,
         };
     },
 
@@ -405,6 +408,45 @@ export default {
                 text: `You forgot to provide ${field}, please try again`,
                 type: "warn"
             });
+        },
+        async getPackageDetail(){
+            let url = `/api/packages/${this.packageId}`;
+            let response = await getApiData({url: url, token: this.getToken()});
+            if(response.data){
+                this.packageDetail = response.data;
+                this.addDetail(response.data)
+            }
+        },
+        addDetail(data){
+            this.name = data.name;
+            this.price = data.price;
+            this.startDate = data.from_date;
+            this.endDate = data.to_date;
+            // img ...
+            if(data.is_ktv == 1){
+                this.isKTVPackage = true;
+            }
+            else{
+                this.isKTVPackage = false;
+            }
+            if(data.is_changeable == 1){
+                this.isChangeable = true;
+            }
+            else{
+                this.isChangeable = false;
+            }
+            this.paySession = data.pay_session;
+            this.freeSession = data.free_session;
+            this.selectedRoom = [];
+
+            data.menu_packages.forEach(menu => {
+                this.selectedMenus.push({
+                    id: menu.id,
+                    name: menu.menu.name,
+                    quantity: menu.quantity
+                });
+            });
+            
         },
 
         async getRoomList(){
@@ -600,6 +642,7 @@ export default {
         this.getRoomList();
         this.getMenuCategoryList();
         this.getAccessoryCategoryList();
+        this.getPackageDetail();
     },
 
     mounted() {

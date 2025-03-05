@@ -85,6 +85,7 @@ import AssetCrudComponent from './Components/FixedAssets/AssetCrudComponent.vue'
 import TableCrudComponent from './Components/TablesAndRooms/TableCrudComponent.vue';
 import PackagesListComponent from './Components/Packages/PackagesListComponent.vue';
 import PackagesCreateComponent from './Components/Packages/PackagesCreateComponent.vue';
+import PackagesEditComponent from './Components/Packages/PackagesEditComponent.vue';
 import MenuAndServiceDiscountCrudComponent from './Components/MenuAndServiceDiscount/MenuAndServiceDiscountCrudComponent.vue';
 import RoomDiscountCrudComponent from './Components/RoomDiscount/RoomDiscountCrudComponent.vue';
 import DeliveryChargesCrudComponent from './Components/DeliveryCharges/DeliveryChargesCrudComponent.vue';
@@ -233,6 +234,7 @@ app.component('ArHistoryComponent', ArHistoryComponent);
 app.component('ArPaidComponent', ArPaidComponent);
 app.component('PackagesListComponent', PackagesListComponent);
 app.component('PackagesCreateComponent', PackagesCreateComponent);
+app.component('PackagesEditComponent', PackagesEditComponent);
 app.component('MenuAndServiceDiscountCrudComponent', MenuAndServiceDiscountCrudComponent);
 app.component('RoomDiscountCrudComponent', RoomDiscountCrudComponent);
 app.component('DeliveryChargesCrudComponent', DeliveryChargesCrudComponent);

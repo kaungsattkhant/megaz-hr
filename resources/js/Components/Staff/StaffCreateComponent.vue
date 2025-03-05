@@ -537,7 +537,7 @@ export default {
 
         async departmentSelectChanged() {
             this.featureList = [];
-            this.inventories = [];
+            // this.inventories = [];
             this.selectedRoles = [];
             this.selectedFeatures = [];
             this.selectedInventories = [];
@@ -550,9 +550,9 @@ export default {
                 this.featureList = this.selectedDepartment.features;
             }
 
-            if(this.selectedDepartment.inventory){
-                this.inventories.push(this.selectedDepartment.inventory.inventory);
-            }
+            // if(this.selectedDepartment.inventory){
+            //    this.inventories.push(this.selectedDepartment.inventory.inventory);
+            // }
         },
 
         async getInventoryList() {
@@ -822,6 +822,7 @@ export default {
         // this.getRoleList();
         // this.getInventoryList();
         this.getStateList();
+        this.getInventoryList();
     },
 
     mounted() {
