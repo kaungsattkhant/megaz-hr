@@ -122,10 +122,10 @@ class OrderRepository implements OrderRepositoryInterface
                 for ($i = 0; $i < (int) $quantityCount; $i++) {
                     $insertData[] = $orderItemData;
                     $createdOrderItem=OrderItem::create($orderItemData);
-                    dd($createdOrderItem);
+                    $insertData[]=$createdOrderItem;
                 }
-                OrderItem::insert($insertData);
-                broadcast(new KitchenNotificationRequestByArea(null, $cookingAreaId));
+                // OrderItem::insert($insertData);
+                broadcast(new KitchenNotificationRequestByArea($insertData, $cookingAreaId));
                 dd('existing order');
                 DB::commit();
                 return $order;
