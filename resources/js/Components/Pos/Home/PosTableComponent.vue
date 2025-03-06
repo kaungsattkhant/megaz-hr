@@ -696,7 +696,7 @@
 
                     <div class="relative px-16 py-4" data-te-modal-body-ref>
                         <div class="mb-4">
-                            <multiselect v-model="selectedMenu" :options="menuList" :close-on-select="true" @select="selectedMenuChange()"
+                            <multiselect v-model="selectedMenu" :options="menuList" :close-on-select="true"
                                 class=" h-10"
                                 :clear-on-select="false" :preserve-search="true" placeholder="Select Menu" label="name"
                                 track-by="id" :preselect-first="false"></multiselect>
@@ -1216,7 +1216,7 @@
                     const response = await getApiData({ url: '/api/entities/'+ this.selectedRoomId, token: this.getToken() });
                     if (response.data) {
                         this.selectedRoom = response.data;
-                        this.purchaseMenuList = response.data.room_sessions.latest_invoice.orders
+                        this.purchaseMenuList = response.data.invoice.orders
                         this.serviceList = response.data.services;
                         this.accessoryListSidebar = response.data.invoice_accessories;
                     }
@@ -1743,15 +1743,15 @@
                     this.menuList = response.data;
                 }
             },
-            async selectedMenuChange() {
-                const response = await getApiData({ url: '/api/menus/' + this.selectedMenu.id + '/areas', token: this.getToken() });
-                if (response.data) {
-                    this.menuAreaList = response.data.areas;
-                    this.menuQuantity = 1;
-                }
-            },
+            // async selectedMenuChange() {
+            //     const response = await getApiData({ url: '/api/menus/' + this.selectedMenu.id + '/areas', token: this.getToken() });
+            //     if (response.data) {
+            //         this.menuAreaList = response.data.areas;
+            //         this.menuQuantity = 1;
+            //     }
+            // },
             btnClickAddMenu() {
-                this.invoiceId = this.selectedRoom.room_sessions.latest_invoice.id;
+                this.invoiceId = this.selectedRoom.invoice.id;
                 console.log('invoice id ' + this.invoiceId)
                 this.getMenuList();
             },
@@ -1766,6 +1766,7 @@
                 formData.append('quantity', this.menuQuantity);
                 formData.append('original_price', this.selectedMenu.prices[0].price);
                 formData.append('remark', this.remark);
+                formData.append('selling_area_id', this.area.id);
                 let response = await postApiData({ url: '/api/entities/orders', form_data: formData, token: this.getToken() });
                 // console.log(this.invoiceId+','+this.selectedMenu.id + ','+ this.menuQuantity +','+this.selectedMenu.prices[0].price)
                 if (response.success) {
