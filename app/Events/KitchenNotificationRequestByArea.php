@@ -23,14 +23,14 @@ class KitchenNotificationRequestByArea implements ShouldBroadcast
     public $orderItems;
     public $entity;
 
-    public function __construct( $orderItems=null,$areaId)
+    public function __construct( $orderItems,$areaId)
     {
         $this->area_id = $areaId;
         // $this->order = $order;                          
         // $this->entity = $entityName;                                                                                                                                                
         // $this->orderItems=$orderItems;
-        if ($orderItems !== null) {
-            $this->orderItems = [$orderItems];
+        if (count($orderItems)>0) {
+            $this->orderItems = $orderItems;
         } else {
             $this->orderItems = [];
         }
