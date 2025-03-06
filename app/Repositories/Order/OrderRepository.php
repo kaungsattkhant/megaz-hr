@@ -53,6 +53,7 @@ class OrderRepository implements OrderRepositoryInterface
                 ResponseMessage('Invoice Not found', 419);
             }
             $menu = Menu::find($data['menu_id']);
+            dd($menu);
             if (!$menu) {
                 ResponseMessage('Menu not found', 404);
             }
@@ -65,7 +66,7 @@ class OrderRepository implements OrderRepositoryInterface
             $quantityCount = (int) $data['quantity'];
             $defaultQuantity = 1;
             $discountAmount = 0;
-            $defaultDiscountAmont=0;
+            $defaultDiscountAmont = 0;
             if ($latestMenuServiceDiscount) {
                 $discountAmount = $latestMenuServiceDiscount->discount_price * $data['quantity'];
                 $data['menu_service_discount_id'] = $latestMenuServiceDiscount->id;
@@ -101,10 +102,11 @@ class OrderRepository implements OrderRepositoryInterface
                 $insertData = [];
                 for ($i = 0; $i < (int) $quantityCount; $i++) {
                     $insertData[] = $orderItemData;
+                    // broadcast(new KitchenNotificationRequestByArea($orderItem, $request->area_id));
                 }
 
                 OrderItem::insert($insertData);
-
+                // broadcast(new KitchenNotificationRequestByArea([], $request->area_id));
                 DB::commit();
                 return $order;
                 // $order->total_quantity += $data['quantity'];
