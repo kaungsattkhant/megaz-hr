@@ -16,8 +16,9 @@ return new class extends Migration
             $table->foreignId('area_type_id')->constrained()->onDelete('cascade');
             $table->foreignId('area_category_id')->constrained()->onDelete('cascade');
             $table->foreignId('department_id')->constrained()->onDelete('cascade');
-            $table->string('name',45);
+            $table->string('name', 45);
             $table->boolean('is_active')->default(1);
+            $table->boolean('is_pos')->default(0);
             $table->timestamps();
         });
     }

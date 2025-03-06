@@ -17,7 +17,8 @@ class Area extends BaseModel
         'area_type_id',
         'is_active',
         'area_category_id',
-        'department_id'
+        'department_id',
+        'is_pos',
     ];
 
 
