@@ -1,11 +1,33 @@
-@extends('pos.layouts.main')
 
-@section('page_title', 'Area')
-@section('home', 'pos-active-link')
-@section('content')
-<div id="app" class=" h-full">
-    <pos-selling-areas-component>
-</div>
-    
+<!DOCTYPE html>
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 
-@endsection
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=yes">
+    <meta name="csrf-token" content="{{ csrf_token() }}"/>
+
+	<link rel="preconnect" href="https://fonts.gstatic.com">
+
+	<title> POS Login </title>
+    @vite('resources/js/app.js')
+
+    <link rel="stylesheet" href="{{asset('css/style_web.css')}}">
+    <link rel="stylesheet" href="{{asset('fontawesome/css/all.css')}}">
+    <link rel="stylesheet" href="{{asset('css/normalize.css')}}">
+
+    <script src="{{asset('js/jquery.js')}}"></script>
+</head>
+
+<body class="small-scrollbar h-[100vh]">
+
+    <div id="app" class=" h-full w-10/12 mx-auto">
+        <pos-selling-areas-component>
+    </div>
+
+</body>
+{{-- <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/forms@0.5.7/src/index.min.js"></script> --}}
+
+</html>
+

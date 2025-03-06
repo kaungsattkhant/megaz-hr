@@ -2,23 +2,31 @@
     <div class="h-full">
         <notifications position="top center" />
         <div class="h-full">
-            <div class="flex flex-wrap gap-x-4 gap-y-4 items-center  h-full">
-                <div 
-                    class=" flex-shrink-0 flex-grow-0 p-6 w-1/4 aspect-[5/4] h-fit rounded-lg" >
-                    <button 
-                        class="relative flex flex-col justify-between h-full w-full bg-black rounded-lg">
-                        <div class=" flex justify-between flex-col h-full">
-                            <div>
-                                <p class="text-sm text-white">Start Time :  </p>
-                                <p class="text-sm text-white">Start Time :  </p>
-                            </div>
-                            <p class="text-base text-left text-white">
-                                asdf
-                            </p>
-                        </div>
-                        <div class="absolute bottom-0 w-full flex justify-end">
-                            <p class="text-base text-white font-semibold">
-                                asdf
+
+            <div class="text-center mt-[10%]">
+                <p class="mb-2 text-xl text-black">
+                    Choose Area
+                </p>
+                <p class="mb-2 text-base text-gray-400">
+                    Click Area You have to take care
+                </p>
+            </div>
+            <p>
+                {{ selectedAreaId }}
+            </p>
+
+
+
+
+            <div class="grid grid-cols-4">
+                <div v-for="(area,index) in areaList" :key="index"
+                    class="p-6 aspect-[5/4] h-fit rounded-lg" >
+                    <button @click="btnClickedArea(area)"
+                        class="relative flex flex-col justify-between h-full w-full bg-[#BD127959] rounded-lg">
+                        
+                        <div class="flex justify-end items-end  text-right h-full w-full">
+                            <p class="text-base text-white font-semibold p-4">
+                                {{ area.name }}
                             </p>
                         </div>
                     </button>
@@ -44,8 +52,10 @@ export default {
     data() {
         return {
             areaList: [],
+            selectedArea:null,
             selectedAreaId: null,
-            
+            typeList: [],
+            selectedAreaType:null,
         };
     },
 
@@ -65,43 +75,37 @@ export default {
         },
 
         async getAreaList() {
-            let url = '/api/sellings_areas'
+            let url = '/api/sellings_areas?is_pos=1'
             const response = await getApiData({ url: url, token: this.getToken() });
             if (response.data) {
-                this.areaList = response.data;
+                this.areaList = response.data.data;
             }
         },
-        
-        
-        
-        async createCustomer() {
-            let formData = new FormData();
-            formData.append('gender_id', this.selectedGender);
-            formData.append('township_id', this.selectedTownship.id);
-            let response = await postApiData({ url: '/api/sellings_areas', form_data: formData, token: this.getToken() });
-            console.log(this.selectedGender + ',' + this.name + ',' + this.email + ',' + this.ph_number + ',' + this.address + ',' + this.date)
-            if (response.success) {
-                this.customerList.push(response.data);
-                this.selectedCustomer = response.data;
-                console.log("success customer")
-                this.closeCustomerModal();
-                this.clearCustomerForm();
-            }
-            else {
-                console.log('some errors occur');
+        btnClickedArea(area){
+            this.selectedAreaId = area;
+            localStorage.setItem('local_area_id', area.id);
+            let areaType = null;
+            areaType = this.typeList.find(id => id.id == area.area_type_id)
+            this.selectedAreaType = areaType
+            localStorage.setItem('local_area_type', JSON.stringify(areaType));
+            this.selectedArea = area;
+            localStorage.setItem('local_selected_area', JSON.stringify(area));
+
+        },
+        async getTypeList() {
+            const response = await getApiData({ url: '/api/area_types', token: this.getToken() });
+            if (response.data) {
+                this.typeList = response.data;
             }
         },
-
-
-
-        
     },
     watch: {
         
     },
     mounted() {
-        // this.getAreaList();
+        this.getAreaList();
         this.getAuthUser();
+        this.getTypeList();
         initTE({ Modal, Select, Ripple, Tab });
 
     }
