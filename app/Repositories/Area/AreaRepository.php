@@ -101,4 +101,23 @@ class AreaRepository implements AreaRepositoryInterface
     {
         return Area::where('department_id', $department_id)->get();
     }
+
+    public function getSellingAreas($request)
+    {
+        if (isset($request->is_pos) && $request->is_pos) {
+            $areas = Area::where('is_active', 1)
+                ->whereHas('areaCategory', function ($query) {
+                    $query->where('name', 'Selling Area');
+                })->where('is_pos', 1)
+                ->paginate(config('common.list_count'));
+        } else {
+            $areas = Area::where('is_active', 1)
+                ->whereHas('areaCategory', function ($query) {
+                    $query->where('name', 'Selling Area');
+                })
+                ->where('is_pos', 0)
+                ->paginate(config('common.list_count'));
+        }
+        return $areas;
+    }
 }

@@ -505,7 +505,7 @@ Route::post('/areas', [AreaController::class, 'createArea']);
 Route::put('/areas/{id}', [AreaController::class, 'updateArea']);
 Route::delete('/areas/{id}', [AreaController::class, 'deleteArea']);
 Route::get('areas_by_department/{department_id}', [AreaController::class, 'getAreaByDepartment']);
-
+Route::get('/sellings_areas', [AreaController::class, 'getSellingAreas']);
 
 Route::get('/departments', [DepartmentAPIController::class, 'getDepartmentData']);
 Route::post('/departments', [DepartmentAPIController::class, 'createDepartment']);
