@@ -27,6 +27,8 @@ use App\Events\OrderStatusNotificationRequest;
 use App\Events\KitchenNotificationRequestByArea;
 use App\Events\WaiterOrderConfirmNotificationRequest;
 use App\Http\Action\SendNotification\SendNotification;
+use App\Models\MenuArea;
+use App\Models\MenuCategoryArea;
 
 class OrderRepository implements OrderRepositoryInterface
 {
@@ -53,7 +55,20 @@ class OrderRepository implements OrderRepositoryInterface
                 ResponseMessage('Invoice Not found', 419);
             }
             $menu = Menu::find($data['menu_id']);
-            dd($menu);
+            $menuCategoryArea = MenuCategoryArea::where('menu_category_id', $menu->menu_category_id)
+                ->where('selling_area_id', 5)
+                ->first();
+            if (!$menuCategoryArea) {
+                ResponseMessage('Menu Category Area not found', 404);
+            }
+            $menuArea = MenuArea::where('menu_category_area_id', $menuCategoryArea->id)
+                ->where('is_default', 1)
+                ->first();
+            if (!$menuArea) {
+                ResponseMessage('Menu Area not found', 404);
+            }
+            $sellingAreaId = $menuArea->cooking_area_id;
+            // dd($menu);
             if (!$menu) {
                 ResponseMessage('Menu not found', 404);
             }
@@ -102,11 +117,10 @@ class OrderRepository implements OrderRepositoryInterface
                 $insertData = [];
                 for ($i = 0; $i < (int) $quantityCount; $i++) {
                     $insertData[] = $orderItemData;
-                    // broadcast(new KitchenNotificationRequestByArea($orderItem, $request->area_id));
                 }
-
                 OrderItem::insert($insertData);
-                // broadcast(new KitchenNotificationRequestByArea([], $request->area_id));
+                broadcast(new KitchenNotificationRequestByArea(null, $sellingAreaId));
+                dd('existing order');
                 DB::commit();
                 return $order;
                 // $order->total_quantity += $data['quantity'];
@@ -153,8 +167,12 @@ class OrderRepository implements OrderRepositoryInterface
                 for ($i = 0; $i < (int) $quantityCount; $i++) {
                     $insertData[] = $orderItemData;
                 }
-                OrderItem::insert($insertData);
+                $orderItems=OrderItem::insert($insertData);
+                dd($orderItems);
                 // broadcast(new KitchenNotificationRequest($entity, $order, null, $order_items, 7));
+                broadcast(new KitchenNotificationRequestByArea(null, $sellingAreaId));
+
+                dd('new order');
                 DB::commit();
                 return $order;
             }

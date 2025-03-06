@@ -57,6 +57,7 @@ class KitchenNotificationRequestByArea implements ShouldBroadcast
     public function broadcastWith()
     {
         $data['order_items']=$this->orderItems;
+        $data['message']='New Order arrived';
         // $data= [
         //     'area_id' => $this->area_id,
         //     'order' => $this->order,
