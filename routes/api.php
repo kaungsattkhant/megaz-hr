@@ -289,7 +289,7 @@ Route::middleware('auth:api')->group(function () {
         Route::get('/confirm_transfer_item', 'confirmTransferItem');
         Route::get('/cancel_transfer_item', 'cancelTransferItem');
     });
-
+    Route::get('/inventory/all', [InventoryAPIController::class, 'getallInventories']);
     Route::get('/inventories', [InventoryAPIController::class, 'getInventoryData']);
     Route::get('/get_inventory', [InventoryAPIController::class, 'getInventory']);
     Route::post('/inventories', [InventoryAPIController::class, 'createInventory']);
@@ -399,6 +399,7 @@ Route::middleware('auth:api')->group(function () {
     Route::resource('accessories', AccessoryController::class)->only(['index', 'store', 'show']);
     Route::controller(AccessoryController::class)->group(function () {
         Route::get('/get_accessory_category', 'getAccessoryCategory');
+        Route::get('/get_accessory_by_category/{accessory_category}', 'getAccessoryByCategory');
         Route::delete('/accessory_item/{id}', 'deleteAccessoryItem');
     });
 
@@ -504,7 +505,7 @@ Route::post('/areas', [AreaController::class, 'createArea']);
 Route::put('/areas/{id}', [AreaController::class, 'updateArea']);
 Route::delete('/areas/{id}', [AreaController::class, 'deleteArea']);
 Route::get('areas_by_department/{department_id}', [AreaController::class, 'getAreaByDepartment']);
-
+Route::get('/sellings_areas', [AreaController::class, 'getSellingAreas']);
 
 Route::get('/departments', [DepartmentAPIController::class, 'getDepartmentData']);
 Route::post('/departments', [DepartmentAPIController::class, 'createDepartment']);

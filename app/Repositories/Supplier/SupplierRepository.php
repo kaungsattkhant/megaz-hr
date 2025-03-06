@@ -14,7 +14,6 @@ use App\Models\SupplierBankAccount;
 
 class SupplierRepository implements SupplierInterface
 {
-
     public function list($request)
     {
         $query = Supplier::with(['account', 'items', 'supplierPhone', 'supplierBankAccount'])->orderBy('id', 'DESC');
@@ -190,7 +189,7 @@ class SupplierRepository implements SupplierInterface
                 ],
                 [
                     'type' => 'addition',
-                    'date_time' => now(),
+                    'date_time' => $supplier->credit_opening_date,
                     'amount' => $supplier->credit_opening_amount,
                     'supplier_id' => $supplier->id,
                     'account_id' => $supplier->account_id,

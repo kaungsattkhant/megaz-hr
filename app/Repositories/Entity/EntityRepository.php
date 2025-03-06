@@ -93,13 +93,14 @@ class EntityRepository implements EntityRepositoryInterface
         foreach ($entities as $entity) {
             if ($entity->entity_type == 'room' && $entity->is_active == 1) {
                 $invoiceSession = InvoiceSession::where('is_active', 1)->where('entity_id', $entity->id)->first();
-
                 if ($invoiceSession) {
                     $entity->start_time = $invoiceSession->start_date_time;
                     $entity->end_time = $invoiceSession->end_date_time;
+                    $entity->invoice=$invoiceSession;
                 } else {
                     $entity->start_time = null;
                     $entity->end_time = null;
+                    $entity->invoice=null;
                 }
             }
             //     $roomSessions = collect();
@@ -530,8 +531,8 @@ class EntityRepository implements EntityRepositoryInterface
 
 
             $consolidatedOrderItems = [];
-            $total=0;
-            $totalDiscount=0;
+            $total = 0;
+            $totalDiscount = 0;
             foreach ($invoice->orders as $order) {
                 $orderItems = OrderItem::where('order_id', $order->id)->get();
                 foreach ($order->orderItems as $orderItem) {
@@ -578,14 +579,14 @@ class EntityRepository implements EntityRepositoryInterface
             $total_order_value = $order->total;
         }
         // }
-        $entity->entity_id=$entity->id;
-        $entity->invoice_id=$invoice->id;
+        $entity->entity_id = $entity->id;
+        $entity->invoice_id = $invoice->id;
         $entity->start_date_time = $startDateTime;
         $entity->end_date_time = $endDateTime;
         $entity->services = $invoiceServices;
         $entity->customer_total = $customerTotal;
-        $entity->food_discount=$totalDiscount;
-        $entity->total=$totalDiscount;
+        $entity->food_discount = $totalDiscount;
+        $entity->total = $totalDiscount;
         $entity->invoice_accessories = $invoiceAccessories;
         $entity->total_service_value = $total_service_value;
         $entity->total_accessory_value = $total_accessory_value;

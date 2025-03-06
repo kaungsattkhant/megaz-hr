@@ -137,13 +137,13 @@
                         :key="roleIndex"> {{ role.name }} </option>
                     </select> -->
 
-                    <select name="" id="" v-model="selectedRole" class="input-ui" @change="getSkillByRole(selectedRole)">
-                        <option :value="role.id" v-for="(role, roleIndex) in roleList"
-                            :key="roleIndex">
-                            {{ role.name }}
-                        </option>
-                    </select>
-                </div>
+                        <select name="" id="" v-model="selectedRole" class="input-ui" @change="getSkillByRole(selectedRole)">
+                            <option :value="role.id" v-for="(role, roleIndex) in roleList"
+                                :key="roleIndex">
+                                {{ role.name }}
+                            </option>
+                        </select>
+                    </div>
                 </div>
             </div>
 
@@ -159,7 +159,7 @@
                         </template>
                     </multiselect>
                     <div class="flex gap-x-2 flex-wrap mt-1">
-                    <span class="font-inter after-coma" v-for="selectedFeature in selectedFeatures">{{ selectedFeature.name }}</span>
+                    <span class="font-inter after-coma text-sm" v-for="selectedFeature in selectedFeatures">{{ selectedFeature.name }}</span>
                     </div>
                 </div>
             </div>
@@ -176,7 +176,7 @@
                         </template>
                     </multiselect>
                     <div class="flex gap-x-2 flex-wrap mt-1">
-                        <span class="font-inter after-coma" v-for="selectedInventorie in selectedInventories">{{ selectedInventorie.name }}</span>
+                        <span class="font-inter after-coma text-sm" v-for="selectedInventorie in selectedInventories">{{ selectedInventorie.name }}</span>
                     </div>
                 </div>
 
@@ -601,9 +601,9 @@ export default {
         async departmentSelectChanged() {
             this.featureList = [];
             this.inventories = [];
-            this.selectedRoles = [];
+            this.selectedRoles = null;
             this.selectedFeatures = [];
-            this.selectedInventories = [];
+            // this.selectedInventories = [];
             this.areaList = [];
             this.selectedArea = null;
             let rolesResponse = await getApiData({ url: `/api/roles?department_id=${this.selectedDepartment.id}`, token: this.getToken() });
@@ -616,9 +616,9 @@ export default {
 
             this.areaList = this.selectedDepartment.areas;
 
-            if(this.selectedDepartment.inventory){
-                this.inventories.push(this.selectedDepartment.inventory.inventory);
-            }
+            // if(this.selectedDepartment.inventory){
+            //     this.inventories.push(this.selectedDepartment.inventory.inventory);
+            // }
         },
 
         async getStateList() {
@@ -670,11 +670,11 @@ export default {
             }
         },
 
-        async getInventoryList(departmentId) {
-            let url = `/api/get_inventory`;
-            if (departmentId) {
-                url = `${url}?department_id=${departmentId}`;
-            }
+        async getInventoryList() {
+            let url = `/api/inventory/all`;
+            // if (departmentId) {
+            //     url = `${url}?department_id=${departmentId}`;
+            // }
             let response = await getApiData({ url: url, token: this.getToken() });
             if (response.data) {
                 this.inventories = response.data;
@@ -694,7 +694,7 @@ export default {
             this.featureIds = [];
             this.inventoryIds = [];
 
-            this.roleIds = [this.selectedRole];
+            
 
             if ((this.selectedDepartment.name == 'Catering' || this.selectedDepartment.name == 'Kitchent') && !this.selectedArea) {
                 this.alertValiationMessage('area');
@@ -714,11 +714,13 @@ export default {
             console.log(this.skillIds);
 
 
-            if (this.selectedRoles.length > 0) {
-                this.selectedRoles.forEach((item) => {
-                    this.roleIds.push(item.id);
-                });
-            }
+            // if (this.selectedRoles.length > 0) {
+            //     this.selectedRoles.forEach((item) => {
+            //         this.roleIds.push(item.id);
+            //     });
+            // }
+            this.roleIds = [this.selectedRoles.id];
+            // this.roleIds = [this.selectedRole];
 
             console.log(this.selectedRoles);
 
@@ -873,11 +875,13 @@ export default {
             if (this.featureIds.length > 0) {
                 formData.append('featureIds', JSON.stringify(this.featureIds));
             }
-            if (this.roleIds.length > 0) {
-                this.roleIds.forEach(roleId => {
-                    formData.append('roles[]', roleId);
-                });
-            }
+            // if (this.roleIds.length > 0) {
+            //     this.roleIds.forEach(roleId => {
+            //         formData.append('roles[]', roleId);
+            //     });
+            // }
+
+            formData.append('roles', this.roleIds);
 
             formData.append('skills',JSON.stringify(this.skillIds));
 
@@ -929,6 +933,7 @@ export default {
         this.getDepartmentList();
         this.getStateList();
         this.getStaffDetail();
+        this.getInventoryList();
     },
 
     mounted() {

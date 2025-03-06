@@ -50,7 +50,7 @@ class AreaController extends Controller
     {
         $data = $request->all();
         $area = $this->areaRepo->updateData($data, $id);
-        if($area){
+        if ($area) {
             ResponseData($area);
         }
 
@@ -60,14 +60,22 @@ class AreaController extends Controller
     public function deleteArea(int $id)
     {
         $isDeleted = $this->areaRepo->deleteData($id);
-        if($isDeleted){
+        if ($isDeleted) {
             ResponseMessage('Area deleted');
         }
         ResponseMessage('Area not deleted', 404);
     }
 
-    public function getAreaByDepartment($department_id){
-        $data=$this->areaRepo->getAreaByDepartment($department_id);
+    public function getAreaByDepartment($department_id)
+    {
+        $data = $this->areaRepo->getAreaByDepartment($department_id);
+        ResponseData($data);
+    }
+
+
+    public function getSellingAreas(Request $request)
+    {
+        $data = $this->areaRepo->getSellingAreas($request);
         ResponseData($data);
     }
 }

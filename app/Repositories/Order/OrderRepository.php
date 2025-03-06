@@ -38,7 +38,7 @@ class OrderRepository implements OrderRepositoryInterface
         $this->orderService = $orderService;
         $this->invoiceService = $invoiceService;
     }
-   
+
     public function createOrder(array $data)
     {
         DB::beginTransaction();
@@ -48,9 +48,9 @@ class OrderRepository implements OrderRepositoryInterface
             $price = $data['original_price'] * $data['quantity'];
             // $data['invoice'] must be unsigned integer format , not 000023
             $order = Order::where('invoice_id', $data['invoice_id'])->first();
-            $invoice=Invoice::find($data['invoice_id']);
-            if(!$invoice){
-                ResponseMessage('Invoice Not found',419);
+            $invoice = Invoice::find($data['invoice_id']);
+            if (!$invoice) {
+                ResponseMessage('Invoice Not found', 419);
             }
             $menu = Menu::find($data['menu_id']);
             if (!$menu) {
@@ -62,16 +62,51 @@ class OrderRepository implements OrderRepositoryInterface
                 ->orderBy('created_at', 'desc')
                 ->where('type', 'menu')
                 ->first();
-                $discountAmount=0;
+            $quantityCount = (int) $data['quantity'];
+            $defaultQuantity = 1;
+            $discountAmount = 0;
+            $defaultDiscountAmont=0;
             if ($latestMenuServiceDiscount) {
                 $discountAmount = $latestMenuServiceDiscount->discount_price * $data['quantity'];
                 $data['menu_service_discount_id'] = $latestMenuServiceDiscount->id;
-                $data['discount_value'] = $latestMenuServiceDiscount->discount_price * $data['quantity'];
-            } 
+                $data['discount_value'] = $latestMenuServiceDiscount->discount_price * $defaultQuantity; //discount value for one quantity
+                $defaultDiscountAmont = $latestMenuServiceDiscount->discount_price * $defaultQuantity;
+
+            }
             if ($order) {
                 //add menu for existing order
-                $order=$this->orderService->updateOrderItemAmountToOrder('add',$order,$data['original_price'],$data['quantity'],$discountAmount);
-                $invoice=$this->orderService->updateOrderItemAmountToInvoice('add',$invoice,$data['original_price'],$data['quantity'],$discountAmount);
+                $order = $this->orderService->updateOrderItemAmountToOrder('add', $order, $data['original_price'], $data['quantity'], $discountAmount);
+                $invoice = $this->orderService->updateOrderItemAmountToInvoice('add', $invoice, $data['original_price'], $data['quantity'], $discountAmount);
+                // $data['date'] = currentTime();
+                // $data['order_id'] = $order->id;
+                // $data['price'] = $data['original_price'] * $data['quantity'];
+                // $data['sub_total_price'] =($data['original_price'] * $data['quantity'])-$discountAmount;
+                // $order_items = OrderItem::create($data);
+                $data['date'] = currentTime();
+                $data['order_id'] = $order->id;
+                $data['price'] = $data['original_price'] * $defaultQuantity;
+                $data['sub_total_price'] = ($data['original_price'] * $defaultQuantity) - $defaultDiscountAmont;
+
+                $orderItemData['order_id'] = $order->id;
+                $orderItemData['menu_id'] = $data['menu_id'];
+                $orderItemData['date'] = now();
+                $orderItemData['quantity'] = $defaultQuantity;
+                $orderItemData['remark'] = $data['remark'];
+                $orderItemData['menu_service_discount_id'] = $latestMenuServiceDiscount ? $latestMenuServiceDiscount->id : null;
+                $orderItemData['original_price'] = $data['original_price'];
+                $orderItemData['discount_value'] = $defaultDiscountAmont;
+                $orderItemData['sub_total_price'] = ($data['original_price']) - $defaultDiscountAmont; //after  
+                $orderItemData['price'] = $data['original_price']; //after  
+
+                $insertData = [];
+                for ($i = 0; $i < (int) $quantityCount; $i++) {
+                    $insertData[] = $orderItemData;
+                }
+
+                OrderItem::insert($insertData);
+
+                DB::commit();
+                return $order;
                 // $order->total_quantity += $data['quantity'];
                 // $order->total_discount_price += $discountAmount;
                 // $order->total += $data['original_price'] * $data['quantity'];
@@ -81,42 +116,42 @@ class OrderRepository implements OrderRepositoryInterface
                 // $invoice->sub_total += ($data['original_price'] * $data['quantity'])-$discountAmount;
                 // $invoice->order_discount_value += $discountAmount;
                 // $invoice->total_discount+=$discountAmount;
-                $data['date'] = currentTime();
-                $data['order_id'] = $order->id;
-                $data['price'] = $data['original_price'] * $data['quantity'];
-                $data['sub_total_price'] =($data['original_price'] * $data['quantity'])-$discountAmount;
-                $order_items = OrderItem::create($data);
-                DB::commit();
-                return $order;
             } else {
                 //new order
                 $data['date'] = currentTime();
                 $data['total'] = $data['original_price'] * $data['quantity'];
-                $data['order_sub_total']=($data['original_price'] * $data['quantity'])-$discountAmount;
+                $data['order_sub_total'] = ($data['original_price'] * $data['quantity']) - $discountAmount;
                 $data['total_quantity'] = $data['quantity'];
                 $data['total_discount_price'] = $discountAmount;
                 $order = Order::create($data);
                 $order->update(['order_id' => sprintf('%05d', $order->id)]);
-                $data['order_id'] = $order->id;
-                $data['sub_total_price'] = ($data['original_price'] * $data['quantity'])-$discountAmount; //after  
-                $data['price'] = ($data['original_price'] * $data['quantity']); //after  
-                $order_items = OrderItem::create($data);
+                //close for order item create default 1
+                // $data['order_id'] = $order->id;
+                // $data['sub_total_price'] = ($data['original_price'] * $data['quantity']) - $discountAmount; //after  
+                // $data['price'] = ($data['original_price'] * $data['quantity']); //after  
+                // $order_items = OrderItem::create($data);
+                //end
+
+
                 //update order amount to invoice   
-                $invoice=$this->orderService->updateOrderItemAmountToInvoice('add',$invoice,$data['original_price'],$data['quantity'],$discountAmount);
-               
-                // $invoice->total+=$data['price'] ;
-                // $invoice->order_discount_value+=$discountAmount;
-                // $invoice->total_discount+=$discountAmount;
-                // $invoice->sub_total+=$data['sub_total_price'];
-                // $invoice->save();
-                //
-                // $entity=$order->invoice->activeInvoiceSession ? $order->invoice->activeInvoiceSession->entity:null;
-                //current clost for error
-                // if ($order->invoice->entity_id == null) {
-                //     $entity = $order->invoice->activeInvoiceSession ? $order->invoice->activeInvoiceSession->entity : null;
-                // } else {
-                //     $entity = $order->invoice->table;
-                // }
+                $invoice = $this->orderService->updateOrderItemAmountToInvoice('add', $invoice, $data['original_price'], $data['quantity'], $discountAmount);
+                // change order item creat depend on quantity , like quantity=2 , create order two time, quantity=3 ,creat 3 time
+
+                $orderItemData['order_id'] = $order->id;
+                $orderItemData['menu_id'] = $data['menu_id'];
+                $orderItemData['date'] = now();
+                $orderItemData['quantity'] = $defaultQuantity;
+                $orderItemData['remark'] = $data['remark'];
+                $orderItemData['menu_service_discount_id'] = $latestMenuServiceDiscount ? $latestMenuServiceDiscount->id : null;
+                $orderItemData['original_price'] = $data['original_price'];
+                $orderItemData['discount_value'] = $defaultDiscountAmont;
+                $orderItemData['sub_total_price'] = ($data['original_price']) - $defaultDiscountAmont; //after  
+                $orderItemData['price'] = $data['original_price']; //after  
+                $insertData = [];
+                for ($i = 0; $i < (int) $quantityCount; $i++) {
+                    $insertData[] = $orderItemData;
+                }
+                OrderItem::insert($insertData);
                 // broadcast(new KitchenNotificationRequest($entity, $order, null, $order_items, 7));
                 DB::commit();
                 return $order;
@@ -137,16 +172,16 @@ class OrderRepository implements OrderRepositoryInterface
             $categorySums = [];
             $totalDiscount = 0;
             $invoice = Invoice::find($data['invoice_id']);
-            if($invoice->entity_id!=null){
-                $entity=$invoice->entity;
-            }else{
-                $activeInvoiceSession=$invoice->activeInvoiceSession;
-                if(!$activeInvoiceSession){
-                    ResponseMessage('Active Entity Session not found',419);
+            if ($invoice->entity_id != null) {
+                $entity = $invoice->entity;
+            } else {
+                $activeInvoiceSession = $invoice->activeInvoiceSession;
+                if (!$activeInvoiceSession) {
+                    ResponseMessage('Active Entity Session not found', 419);
                 }
-                $entity=$activeInvoiceSession->entity;
+                $entity = $activeInvoiceSession->entity;
             }
-          
+
             // $latestRoomSession = RoomSession::where('invoice_id', $invoice->id)->orderBy('created_at', 'desc')->first();
             // $entity = Entity::find($latestRoomSession->entitySession->entity_id);
 
@@ -259,14 +294,14 @@ class OrderRepository implements OrderRepositoryInterface
             }
             $invoice = Invoice::find($orderItem->order->invoice_id);
             //must be check entity or room
-            if($invoice->entity_id!=null){
-                $entity=$invoice->entity;
-            }else{
-                $activeInvoiceSession=$invoice->activeInvoiceSession;
-                if(!$activeInvoiceSession){
-                    ResponseMessage('Active Invioce Session not found',419);
+            if ($invoice->entity_id != null) {
+                $entity = $invoice->entity;
+            } else {
+                $activeInvoiceSession = $invoice->activeInvoiceSession;
+                if (!$activeInvoiceSession) {
+                    ResponseMessage('Active Invioce Session not found', 419);
                 }
-            $entity=$activeInvoiceSession->entity;
+                $entity = $activeInvoiceSession->entity;
             }
             // $latestRoomSession = RoomSession::where('invoice_id', $invoice->id)->orderBy('created_at', 'desc')->first();
             // $entity = $latestRoomSession->entitySession->entity;
@@ -337,12 +372,12 @@ class OrderRepository implements OrderRepositoryInterface
                     // Determine entity_name based on entity_id
                     if ($invoice->entity_id !== null) {
                         $orderItem->entity_name = $invoice->table->name ?? '';
-                    }else{
-                        $activeInvoiceSession=$invoice->activeInvoiceSession;
-                        if(!$activeInvoiceSession){
-                            ResponseMessage('Not found',419);
+                    } else {
+                        $activeInvoiceSession = $invoice->activeInvoiceSession;
+                        if (!$activeInvoiceSession) {
+                            ResponseMessage('Not found', 419);
                         }
-                        $orderItem->entity_name=$activeInvoiceSession->entity->name;
+                        $orderItem->entity_name = $activeInvoiceSession->entity->name;
                     }
                     // if ($invoice->entity_id !== null) {
                     //     // If entity_id is not null, use the table name
@@ -395,24 +430,24 @@ class OrderRepository implements OrderRepositoryInterface
 
     public function orderItemAreaConfirm(int $id, $request)
     {
-        if(!UserData()){
-            ResponseMessage('Unauthenticated user',401);
+        if (!UserData()) {
+            ResponseMessage('Unauthenticated user', 401);
         }
         DB::beginTransaction();
         try {
             $orderItem = OrderItem::with('menu', 'order', 'order.invoice', 'area', 'order.invoice.table')
                 ->find($id);
-            if($orderItem->status!='not yet'){
-                 ResponseMessage('Item already confirmed', 419);
-            }else if($request->status==$orderItem->status){
-                 ResponseMessage('Item status already updated', 419);
+            if ($orderItem->status != 'not yet') {
+                ResponseMessage('Item already confirmed', 419);
+            } else if ($request->status == $orderItem->status) {
+                ResponseMessage('Item status already updated', 419);
             }
             if (!$orderItem) {
                 ResponseMessage('Order Item not found', 404);
             }
             $order = $orderItem->order;
-            if(!$order){
-                ResponseMessage('Order not found',419);
+            if (!$order) {
+                ResponseMessage('Order not found', 419);
             }
             $invoice = $order->invoice ?? null;
             if (!$invoice) {
@@ -428,25 +463,25 @@ class OrderRepository implements OrderRepositoryInterface
             if (!$entity) {
                 return ResponseMessage('Entity not found', 404);
             }
-           
+
             $orderItem->update([
                 'area_id' => $request->area_id,
                 'status' => $request->status,
-                'cancelled_at'=>now(),
-                'cancelled_by'=>UserData()->id,
+                'cancelled_at' => now(),
+                'cancelled_by' => UserData()->id,
             ]);
-            if($request->status=='rejected'){
+            if ($request->status == 'rejected') {
                 $orderItem->entity_name = $entity->name;
                 //update order amount to invoice and order
-                $order->total-=$orderItem->price;
-                $order->order_sub_total-=$orderItem->sub_total_price;
-                $order->total_discount_price-=$orderItem->discount_value;
+                $order->total -= $orderItem->price;
+                $order->order_sub_total -= $orderItem->sub_total_price;
+                $order->total_discount_price -= $orderItem->discount_value;
                 $order->save();
-    
-                $invoice->total-=$orderItem->price;
-                $invoice->sub_total-=$orderItem->sub_total_price;
-                $invoice->order_discount_value-=$orderItem->discount_value;
-                $invoice->total_discount-=$orderItem->discount_value;
+
+                $invoice->total -= $orderItem->price;
+                $invoice->sub_total -= $orderItem->sub_total_price;
+                $invoice->order_discount_value -= $orderItem->discount_value;
+                $invoice->total_discount -= $orderItem->discount_value;
                 $invoice->save();
             }
             // broadcast(new KitchenNotificationRequest($entity, $order, null, $orderItem, 7));

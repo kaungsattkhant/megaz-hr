@@ -68,25 +68,37 @@
                                                 :src="promotionPackage.image_url" alt="Menu image">
                                         </div>
                                     </td>
-                                    <td class="whitespace-nowrap text-left  ">
+                                    <td class="whitespace-nowrap text-left align-top">
                                         {{ (promotionPackage.price).toLocaleString() }}
                                     </td>
-                                    <td class="   ">
-                                        <div>
-                                            Menus: <span v-for="menuPackage in promotionPackage.menu_packages"> {{
-                                                menuPackage.menu.name }}, </span>
+                                    <td class=" align-top">
+                                        <div class="block mb-2" v-if="promotionPackage.menu_packages.length > 0">
+                                            <span class="mr-2">
+                                                Menus
+                                            </span>
+                                            : 
+                                            <span v-for="menuPackage in promotionPackage.menu_packages"> {{
+                                                menuPackage.menu.name }} {{ promotionPackage.menu_packages.length-1 < promotionPackage.menu_packages.length ? ',' : '' }}
+                                            </span>
                                         </div>
-                                        <hr>
-                                        <div>
-                                            Rooms: <span v-for="room in promotionPackage.rooms"> {{ room.name }},
+                                        <div class="block mb-2">
+                                            Accessories: <span v-for="accessory in promotionPackage.accessories"> {{
+                                                accessory.accessory.name }}, </span>
+                                        </div>
+                                        <div v-if="promotionPackage.rooms.length > 0">
+                                            <span class="mr-2">
+                                                Rooms
+                                            </span>
+                                            : 
+                                             <span v-for="room in promotionPackage.rooms"> {{ room.name }},
                                             </span>
                                         </div>
 
                                     </td>
                                     <td class="whitespace-nowrap   relative">
-                                        <a href="#" class="pr-2 ">
+                                        <!-- <a :href="'/packages/'+promotionPackage.id+'/edit'" class="pr-2 ">
                                             <i class="fal fa-pen"></i>
-                                        </a>
+                                        </a> -->
                                     </td>
                                 </tr>
                             </div>

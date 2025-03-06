@@ -3,6 +3,11 @@
         <button type="button" id="toggleBtn" class="py-3 px-2 absolute left-full top-8 bg-[#fafafa] text-black rounded-tr-md rounded-br-md border-gray-400 ">
             <i class="fas fa-chevron-double-left ease-linear" style="transition:transform 0.5s ease;"></i>
         </button>
+
+        
+
+        <!-- <input type="text" id="sidebar-search" placeholder="Search links..." class="mx-2 mt-4 rounded-md"> -->
+
         <div class="relative pb-20 small-scrollbar h-[100vh]" onmouseover="this.style.overflowY='scroll'"
             onmouseout="this.style.overflowY='hidden'">
             
@@ -871,3 +876,13 @@
         </div>
     </div>
 </nav>
+<!-- <script>
+    $(document).ready(function () {
+        $("#sidebar-search").on("keyup", function () {
+            var value = $(this).val().toLowerCase();
+            $("#sidebar_admin li").filter(function () {
+                $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1);
+            });
+        });
+    });
+</script> -->

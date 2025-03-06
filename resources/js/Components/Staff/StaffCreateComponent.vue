@@ -148,7 +148,7 @@
                         </template>
                     </multiselect>
                     <div class="flex gap-x-2 flex-wrap mt-1">
-                        <span class="font-inter after-coma" v-for="selectedFeature in selectedFeatures">{{ selectedFeature.name }}</span>
+                        <span class="font-inter after-coma text-sm" v-for="selectedFeature in selectedFeatures">{{ selectedFeature.name }}</span>
                     </div>
                 </div>
             </div>
@@ -165,7 +165,7 @@
                         </template>
                     </multiselect>
                     <div class="flex gap-x-2 flex-wrap mt-1">
-                        <span class="font-inter after-coma" v-for="selectedInventorie in selectedInventories">{{ selectedInventorie.name }}</span>
+                        <span class="font-inter after-coma text-sm" v-for="selectedInventorie in selectedInventories">{{ selectedInventorie.name }}</span>
                     </div>
                 </div>
             </div>
@@ -537,8 +537,8 @@ export default {
 
         async departmentSelectChanged() {
             this.featureList = [];
-            this.inventories = [];
-            this.selectedRoles = [];
+            // this.inventories = [];
+            this.selectedRoles = null;
             this.selectedFeatures = [];
             this.selectedInventories = [];
             this.roleList = [];
@@ -550,13 +550,13 @@ export default {
                 this.featureList = this.selectedDepartment.features;
             }
 
-            if(this.selectedDepartment.inventory){
-                this.inventories.push(this.selectedDepartment.inventory.inventory);
-            }
+            // if(this.selectedDepartment.inventory){
+            //    this.inventories.push(this.selectedDepartment.inventory.inventory);
+            // }
         },
 
         async getInventoryList() {
-            let response = await getApiData({ url: `/api/get_inventory`, token: this.getToken() });
+            let response = await getApiData({ url: `/api/inventory/all`, token: this.getToken() });
             if (response.data) {
                 this.inventories = response.data;
             }
@@ -822,6 +822,7 @@ export default {
         // this.getRoleList();
         // this.getInventoryList();
         this.getStateList();
+        this.getInventoryList();
     },
 
     mounted() {

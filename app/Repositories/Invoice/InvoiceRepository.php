@@ -179,48 +179,51 @@ class InvoiceRepository implements InvoiceRepositoryInterface
                     $data['head_count_id'] = $headCount->id;
                 }
                 $freeDiscountSession = 0;
+                $startTime=$data['start_time'];
                 if ($data['type'] == 'package') {
                     $package = Package::find($data['package_id']);
                     if (!$package) {
                         ResponseMessage('Package not found', 404);
                     }
-                    $end_date = Carbon::now()->addHours($package->free_session + $package->pay_session);
-                    $data['total_session_price'] = $package->pay_session * $package->session_price;
-                    $data['paid_amount'] = $package->price;
+                    // $end_date = Carbon::now()->addHours($package->free_session + $package->pay_session);
+                    $data['total_session_price'] = $package->pay_session * $entity->price_per_hour;
+                    // $data['paid_amount'] = $package->price;
                     $data['package_id'] = $package->id;
                     $data['session_duration'] = $package->pay_session + $package->free_session; // nullable
-                    $roomSessionData['price'] = $package->pay_session * $package->session_price; // room session
+                    $freeDiscountSession=$package->free_session;
                     $data['invoice_type'] = 'package';
-                    $data['total'] = 0;
+                    $data['total'] = $package->price;
+                    $data['sub_total'] = $package->price;
                 } else if ($data['type'] == 'session') {
                     // $end_date = Carbon::now()->addMinutes($data['session_duration'] * 60);
-
                     $data['total_session_price'] = $data['session_duration'] * $entity->price_per_hour;
-                    $roomSessionData['price'] = $data['total_session_price'];
+                    // $roomSessionData['price'] = $data['total_session_price'];
                     $data['total'] = $data['total_session_price'];
+                    $data['sub_total'] = $data['total_session_price'];
                     $data['invoice_type'] = 'session';
-                    // if
                     if ($roomDiscount) {
                         $freeSessionCount = intdiv($data['session_duration'], $roomDiscount->session);
                         $freeDiscountSession = (int) $freeSessionCount * $roomDiscount->free_session;
                     }
                     $data['session_duration'] = $data['session_duration'] + $freeDiscountSession;
                 } else if ($data['type'] == 'endless_time') {
-                    $end_date = Carbon::now()->addMinute(1 * 60);
+                    // $end_date = Carbon::now()->addMinute(1 * 60);
                     $data['session_duration'] = 1;
                     $data['total_session_price'] = $data['session_duration'] * $entity->price_per_hour;
                     $roomSessionData['price'] = $data['total_session_price'];
                     $data['total'] = $data['total_session_price'];
+                    $data['sub_total'] = $data['total_session_price'];
                     $data['invoice_type'] = 'endless_time';
                     $data['session_duration'] = 1;
                 }
                 $data['area_id'] = $entity->area_id;
                 $data['created_by'] = UserData()->id;
                 $data['invoice_date'] = Carbon::now();
-                $data['sub_total'] = $data['total_session_price'];
+                // $data['sub_total'] = $data['total_session_price'];
                 $data['room_discount_value'] = $freeDiscountSession * $entity->price_per_hour;
                 $invoice = Invoice::create($data);
-                $invoiceSession = $this->invoiceService->storeInvoiceSession($invoice->id, $entitySession->entity_id, $data['session_duration'], $freeDiscountSession, $entity->price_per_hour, $data['is_waiter'], $discountId = null);
+                dd($invoice);
+                $invoiceSession = $this->invoiceService->storeInvoiceSession($invoice->id,$startTime, $entitySession->entity_id, $data['session_duration'], $freeDiscountSession, $entity->price_per_hour, $data['is_waiter'], $discountId = null);
                 //create deposit
                 $this->storeCustomerDeposit($data, UserData()->id);
                 //
@@ -243,6 +246,7 @@ class InvoiceRepository implements InvoiceRepositoryInterface
                         }
                     }
                 }
+                dd('abc');
                 DB::commit();
                 $returnData = [
                     'customer' => $customer,
@@ -443,44 +447,73 @@ class InvoiceRepository implements InvoiceRepositoryInterface
 
     public function addSessionDuration(array $data)
     {
-        ResponseMessage('Add Session duration is not available now', 419);
+        // ResponseMessage('Add Session duration is not available now', 419);
         DB::beginTransaction();
         try {
             $invoice = Invoice::find($data['invoice_id']);
+            $addedSessionDuration = $data['session_duration'];
             if ($invoice->invoice_type == 'endless_time') {
                 ResponseMessage('Room with session and package can only be added duration', 422);
             }
-            $roomSession = $invoice->latestSession;
-
-            $nextSessions = EntitySession::where('id', '>', $roomSession->entity_session_id)
-                ->orderBy('id')
-                ->take($data['session_duration'])
-                ->get();
-            foreach ($nextSessions as $session) {
-                if ($session->is_active == 1) {
-                    ResponseMessage('Session is not available', 422);
-                }
-                $session->update(['is_active' => 1]);
+            // dd($invoice->activeInvoiceSession);
+            $activeInvoiceSession = $invoice->activeInvoiceSession;
+            if (!$activeInvoiceSession) {
+                ResponseMessage('Active Invoice Session is invalid', 422);
             }
-            $durations = array_fill(0, $data['session_duration'], 1);
-            foreach ($nextSessions as $index => $session) {
-                RoomSession::create([
-                    'price' => $roomSession->entitySession->entity->price_per_hour * $durations[$index],
-                    'invoice_id' => $invoice->id,
-                    'entity_session_id' => $session->id,
-                    'start_date' => $roomSession->end_date,
-                    'end_date' => Carbon::parse($roomSession->end_date)->addHours($durations[$index]),
-                    'session_duration' => $durations[$index]
-                ]);
+            $lastEntitySession = $activeInvoiceSession->roomSessions->sortByDesc('entity_session_id')->first();
+            if (!$lastEntitySession) {
+                ResponseMessage('Entity Session is invalid', 422);
             }
+            $addedEntitySessions = $this->getAddedEntitySession($addedSessionDuration, $lastEntitySession);
+            $addedSessionPrice = $addedSessionDuration * $activeInvoiceSession->entity->price_per_hour;
+            
+            // $activeInvoiceSession->total_session_duration += $addedSessionDuration;
+            // $activeInvoiceSession->total_session_price += $addedSessionPrice;
+            // $activeInvoiceSession->end_date_time = Carbon::parse($activeInvoiceSession->end_date_time)
+            //     ->addHours((int) $addedSessionDuration);
+            // $activeInvoiceSession->save();
+            // $invoice->total += $addedSessionPrice;
+            // $invoice->sub_total += $addedSessionPrice;
+            // $invoice->total_session_price += $addedSessionPrice;
+            // $invoice->save();
 
-            $invoice->increment('total_session_price', $data['session_duration'] * $roomSession->entitySession->entity->price_per_hour);
+            $activeInvoiceSession->update([
+                'total_session_duration' => $activeInvoiceSession->total_session_duration + $addedSessionDuration,
+                'total_session_price'    => $activeInvoiceSession->total_session_price + $addedSessionPrice,
+                'end_date_time'          => Carbon::parse($activeInvoiceSession->end_date_time)->addHours((int)$addedSessionDuration),
+            ]);
+            $invoice->update([
+                'total'               => $invoice->total + $addedSessionPrice,
+                'sub_total'           => $invoice->sub_total + $addedSessionPrice,
+                'total_session_price' => $invoice->total_session_price + $addedSessionPrice,
+            ]);
             DB::commit();
-            return $roomSession;
+            return $invoice;
         } catch (\Exception $e) {
             DB::rollBack();
             return ResponseMessage($e->getMessage(), 402);
         }
+    }
+
+    public function getAddedEntitySession($sessionDuration, $lastEntitySession)
+    {
+        $addedSessions = [];
+        $entityId = $lastEntitySession->entitySession->entity_id;
+        for ($i = 1; $i <= $sessionDuration; $i++) {
+            $addedEntitySessionId = $lastEntitySession->entity_session_id + $i;
+            $addedEntitySession = EntitySession::where('entity_id', $entityId)
+                ->whereId($addedEntitySessionId)
+                ->first();
+            if ($addedEntitySession) {
+                $addedEntitySession->update(['is_active' => 1]);
+                $addedSessions[] = $addedEntitySession;
+                $roomSession=RoomSession::create([
+                    'invoice_session_id'=>$lastEntitySession->invoice_session_id,
+                    'entity_session_id'=>$addedEntitySessionId,
+                ]);
+            }
+        }
+        return $addedSessions;
     }
 
     public function invoiceEntityChange(array $data)
@@ -1265,7 +1298,8 @@ class InvoiceRepository implements InvoiceRepositoryInterface
                 $total_service_value += $serviceValue;
             }
             // $data['discount_value'] = $discount_value;
-            $data['discount_total'] = $room_discount_value + $bdDiscount + $customerLevelDiscount  + $order_discount;
+            $data['discount_total'] = $room_discount_value + $bdDiscount + $customerLevelDiscount + $order_discount;
+
             // $data['tax'] = $tax;
             // $data['service_charge'] = $service_charge;
             $data['total_session_price'] = $total_session_price;

@@ -17,7 +17,7 @@
             <div class="flex justify-end flex-col">
     
                 <button type="button" class="add-btn transition duration-150 ease-in-out focus:outline-none focus:ring-0 "
-                    data-te-toggle="modal" data-te-target="#create_modal">
+                    data-te-toggle="modal" data-te-target="#create_modal" @click="[skill = null, selectedRole = null, selectedDepartment = null]">
                     Add New
                 </button>
             </div>
