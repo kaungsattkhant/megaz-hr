@@ -130,7 +130,7 @@ class InvoiceRepository implements InvoiceRepositoryInterface
     {
         DB::beginTransaction();
         try {
-            $roomDiscountId = $data['room_discount_id'];
+            $roomDiscountId = isset($data['room_discount_id']) ? $data['room_discount_id']: null ;
             $roomDiscount = null;
             if ($roomDiscountId) {
                 $roomDiscount = RoomDiscount::where('is_active', 1)->find($roomDiscountId);
