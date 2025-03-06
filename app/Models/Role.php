@@ -14,7 +14,8 @@ class Role extends BaseModel
 
     protected $fillable = [
         'name',
-        'department_id'
+        'department_id',
+        'is_available'
     ];
 
     protected $hidden = [
@@ -58,10 +59,10 @@ class Role extends BaseModel
 
     public static function getRoleByName($name)
     {
-        $role= self::where('name', $name)
+        $role = self::where('name', $name)
             ->first();
-        if(!$role){
-            ResponseMessage('Reception Role not found',419);
+        if (!$role) {
+            ResponseMessage('Reception Role not found', 419);
         }
         return $role;
     }

@@ -413,6 +413,9 @@ Route::middleware('auth:api')->group(function () {
         Route::get('/cooking_place', 'getCookingPlace');
         Route::post('/mrp/{id}', 'updateMrpList');
         Route::get('/roles', 'getRoles');
+        Route::get('/menu_category_cooking_areas', 'getMenuCategoryCookingAreas');
+        Route::post('/menu_area/{menuAreaId}', 'updateMenuCategoryCookingAreas');
+        Route::get('/menu_selling_areas', 'getSellingAreas');
     });
 
     Route::controller(CreditorController::class)->group(function () {
@@ -510,7 +513,8 @@ Route::post('/departments/{id}', [DepartmentAPIController::class, 'updateDepartm
 Route::get('/roles', [RoleAPIController::class, 'getRoleData']);
 Route::get('/role_by_department/{department_id}', [RoleAPIController::class, 'getRoleByDepartment']);
 Route::post('/roles', [RoleAPIController::class, 'createRole']);
-Route::put('/roles/{id}', [RoleAPIController::class, 'updateRole']);
+Route::post('/roles/{id}', [RoleAPIController::class, 'updateRole']);
+Route::post('/roles/{roleId}/available_toggle', [RoleAPIController::class, 'roleAvailableToggle']);
 
 Route::get('/staff_reports', [StaffAPIController::class, 'staffReport']);
 Route::get('/staffs', [StaffAPIController::class, 'getStaffData']);
@@ -558,6 +562,8 @@ Route::post('/items/imports', [ItemAPIController::class, 'itemImport']);
 Route::post('/add_item_price_by_supplier_item', [ItemAPIController::class, 'addItemPrice']);
 Route::get('/get_uom_conversion_by_uom', [UomAPIController::class, 'getUomConversionByUom']);
 Route::get('/get_item_type', [ItemAPIController::class, 'getItemType']);
+Route::post('/categories', [ItemAPIController::class, 'createCategory']);
+Route::post('/item_types', [ItemAPIController::class, 'createItemType']);
 // Route::get('/transfers', [TransferAPIController::class, 'getTransferData']);
 // Route::post('/transfers', [TransferAPIController::class, 'createTransfer']);
 // Route::put('/transfers/{id}', [TransferAPIController::class, 'updateTransfer']);

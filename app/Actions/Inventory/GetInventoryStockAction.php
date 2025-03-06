@@ -115,6 +115,7 @@ class GetInventoryStockAction
     {
         $from_date = convertDateFormat($request->from_date);
         $to_date = convertDateFormat($request->to_date);
+        $inventory_id = $request->inventory_id;
         $itemBalances = DB::table('inventory_ledger_items')
             ->join('items', 'inventory_ledger_items.item_id', '=', 'items.id')
             ->leftJoin('inventory_items', function ($join) {
@@ -173,6 +174,9 @@ class GetInventoryStockAction
             })
             ->when(($request->from_date == null && $request->to_date), function ($q) use ($to_date) {
                 $q->whereDate('inventory_ledgers.created_at', '<=', $to_date);
+            })
+            ->when($inventory_id, function ($q) use ($inventory_id) {
+                $q->where('inventory_ledgers.inventory_id', $inventory_id);
             })
             ->groupBy(
                 'inventory_ledger_items.item_id',

@@ -3,6 +3,8 @@
 namespace App\Repositories\Area;
 
 use App\Models\Area;
+use App\Models\AreaCategory;
+use App\Models\MenuCategory;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -11,12 +13,12 @@ class AreaRepository implements AreaRepositoryInterface
     public function getAreas(Request $request)
     {
 
-        $areasQuery = Area::with('areaType')->where('is_active', 1)->orderBy('created_at', 'desc');
+        $areasQuery = Area::with(['areaType', 'areaCategory'])->where('is_active', 1)->orderBy('created_at', 'desc');
 
         if ($request->department_id) {
             $areas = $areasQuery->where('department_id', $request->department_id)->get();
         } elseif ($request->area_category_id) {
-            $areas = $areasQuery->with('areaCategory')
+            $areas = $areasQuery
                 ->whereHas('areaCategory', function ($query) use ($request) {
                     $query->where('id', $request->area_category_id);
                 })
@@ -34,7 +36,15 @@ class AreaRepository implements AreaRepositoryInterface
     {
         DB::beginTransaction();
         try {
+
             $area = Area::create($data);
+            $sellingAreaCategory = AreaCategory::whereRaw('LOWER(REPLACE(name, " ", "")) = ?', [strtolower(str_replace(' ', '', 'Selling Area'))])
+                ->first();
+            if (($area->areaCategory->id === $sellingAreaCategory->id) && ($area->areaCategory->name === $sellingAreaCategory->name)) {
+                $menuCategoryIds = MenuCategory::all()->pluck('id')->toArray();
+                $area->menuCategories()->sync($menuCategoryIds);
+            }
+
             DB::commit();
             return $area;
         } catch (\Exception $e) {
@@ -47,8 +57,8 @@ class AreaRepository implements AreaRepositoryInterface
     public function getAreaByAreaCategory(int $id)
     {
         $areas = Area::where('is_active', 1)
-        ->where('area_category_id', $id)
-        ->get();
+            ->where('area_category_id', $id)
+            ->get();
         return $areas;
     }
     public function getAreaByAreaType(int $id)

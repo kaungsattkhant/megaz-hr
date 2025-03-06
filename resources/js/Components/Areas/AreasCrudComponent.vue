@@ -7,11 +7,17 @@
     <div class="mt-4 bg-white">
         <div class="btn-container">
             <div class=" flex">
-                <label for="search" class="search-input">
+                <!-- <label for="search" class="search-input">
                     <input type="text" class="input-search" placeholder="Search">
 
                     <i class="fal fa-search"></i>
-                </label>
+                </label> -->
+                <div class="w-full multiselect-fontsize" data-te-select-wrapper-ref>
+                    <select data-te-select-init data-te-select-placeholder="Select Category" v-model="filterCategory" @change="filterCategoryChange()" class="input-ui w-full !text-sm">
+                        <!-- <option value="all">All</option> -->
+                        <option v-for="(category,index) in categoryList" :key="index" :value="category"> {{ category.name }} </option>
+                    </select>
+                </div>
             </div>
             <div class="flex justify-end flex-col">
 
@@ -36,7 +42,10 @@
                                     Name
                                 </th>
                                 <th scope="col" class="">
-                                    Area Type
+                                    Type
+                                </th>
+                                <th scope="col" class="">
+                                    Category
                                 </th>
                                 <th scope="col" class="">
 
@@ -49,7 +58,7 @@
                             <div class="contents" v-for="(area, index) in areaList" :key="index">
                                 <tr class="">
                                     <td>
-                                        {{ (currentPage - 1) * perPage + index + 1 }}
+                                        {{ perPage ? (currentPage - 1) * perPage + index + 1 : index+1 }}
                                     </td>
                                     <td class="whitespace-nowrap  ">
                                         {{ area.name }}
@@ -57,6 +66,9 @@
 
                                     <td class="whitespace-nowrap  ">
                                         {{ area.area_type.name }}
+                                    </td>
+                                    <td class="whitespace-nowrap  ">
+                                        {{ area.area_category.name }}
                                     </td>
                                     <td class="whitespace-nowrap ">
                                         <!-- <button @click="deleteBtnClicked(area.id)"
@@ -255,19 +267,29 @@ export default {
             currentPage: 0,
             perPage: 0,
             lastPage: 0,
-            totalData:0
-
+            totalData:0,
+            
+            filterCategory:null,
+            category_url:'',
         };
     },
 
     methods: {
         ...mapGetters(['getToken']),
-
+        async filterCategoryChange(){
+            this.category_url = 'area_category_id='+this.filterCategory.id+'&'
+            this.getAreasList(1);
+        },
         async getAreasList(pageNumber) {
-            let url = `/api/areas?page=${pageNumber}`
+            let url = `/api/areas?${this.category_url}page=${pageNumber}`
             const response = await getApiData({ url: url, token: this.getToken() });
             if (response.data) {
-                this.areaList = response.data.data;
+                if(response.data.data){
+                    this.areaList = response.data.data;
+                }
+                else{
+                    this.areaList = response.data;
+                }
                 this.lastPage = response.data.last_page;
                 this.currentPage = pageNumber;
                 this.perPage = response.data.per_page;

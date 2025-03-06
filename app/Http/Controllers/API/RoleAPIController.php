@@ -37,8 +37,16 @@ class RoleAPIController extends Controller
         ResponseData($role);
     }
 
-    public function getRoleByDepartment($department_id){
+    public function getRoleByDepartment($department_id)
+    {
         $data = $this->roleRepo->getRoleByDepartment($department_id);
         ResponseData($data);
+    }
+
+
+    public function roleAvailableToggle($roleId)
+    {
+        $role = $this->roleRepo->roleAvailableToggle($roleId);
+        ResponseData($role);
     }
 }
