@@ -105,14 +105,14 @@ class AreaRepository implements AreaRepositoryInterface
     public function getSellingAreas($request)
     {
         if (isset($request->is_pos) && $request->is_pos) {
-            $areas = Area::where('is_active', 1)
+            $areas = Area::with(['areaCategory','areaType'])->where('is_active', 1)
                 ->whereHas('areaCategory', function ($query) {
                     $query->where('name', 'Selling Area');
                 })->where('is_pos', 1)
                 ->get();
                 // ->paginate(config('common.list_count'));
         } else {
-            $areas = Area::where('is_active', 1)
+            $areas = Area::with(['areaCategory','areaType'])->where('is_active', 1)
                 ->whereHas('areaCategory', function ($query) {
                     $query->where('name', 'Selling Area');
                 })
