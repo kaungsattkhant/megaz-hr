@@ -108,7 +108,8 @@ class AreaRepository implements AreaRepositoryInterface
             $areas = Area::with(['areaCategory','areaType'])->where('is_active', 1)
                 ->whereHas('areaCategory', function ($query) {
                     $query->where('name', 'Selling Area');
-                })->where('is_pos', 1)
+                })
+                // ->where('is_pos', 1)
                 ->get();
                 // ->paginate(config('common.list_count'));
         } else {
@@ -116,7 +117,7 @@ class AreaRepository implements AreaRepositoryInterface
                 ->whereHas('areaCategory', function ($query) {
                     $query->where('name', 'Selling Area');
                 })
-                ->where('is_pos', 0)
+                // ->where('is_pos', 0)
                 ->get();
                 // ->paginate(config('common.list_count'));
         }

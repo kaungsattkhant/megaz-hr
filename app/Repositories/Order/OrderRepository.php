@@ -49,6 +49,9 @@ class OrderRepository implements OrderRepositoryInterface
             // $this->removePackForMenu($data['menu_id'], $data['quantity']);
             $price = $data['original_price'] * $data['quantity'];
             // $data['invoice'] must be unsigned integer format , not 000023
+            if(!isset($data['selling_area_id'])|| $data['selling_area_id']==null){
+                ResponseMessage('Selling Area is required', 419);
+            }
             $order = Order::where('invoice_id', $data['invoice_id'])->first();
             $invoice = Invoice::find($data['invoice_id']);
             if (!$invoice) {
@@ -67,7 +70,8 @@ class OrderRepository implements OrderRepositoryInterface
             if (!$menuArea) {
                 ResponseMessage('Menu Area not found', 404);
             }
-            $sellingAreaId = $menuArea->cooking_area_id;
+            $sellingAreaId=$data['selling_area_id'];
+            $cookingAreaId = $menuArea->cooking_area_id;
             // dd($menu);
             if (!$menu) {
                 ResponseMessage('Menu not found', 404);
@@ -119,7 +123,7 @@ class OrderRepository implements OrderRepositoryInterface
                     $insertData[] = $orderItemData;
                 }
                 OrderItem::insert($insertData);
-                broadcast(new KitchenNotificationRequestByArea(null, $sellingAreaId));
+                broadcast(new KitchenNotificationRequestByArea(null, $cookingAreaId));
                 dd('existing order');
                 DB::commit();
                 return $order;
@@ -170,7 +174,7 @@ class OrderRepository implements OrderRepositoryInterface
                 $orderItems=OrderItem::insert($insertData);
                 dd($orderItems);
                 // broadcast(new KitchenNotificationRequest($entity, $order, null, $order_items, 7));
-                broadcast(new KitchenNotificationRequestByArea(null, $sellingAreaId));
+                broadcast(new KitchenNotificationRequestByArea(null, $cookingAreaId));
 
                 dd('new order');
                 DB::commit();
