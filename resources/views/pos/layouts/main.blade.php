@@ -7,7 +7,7 @@
         <div class="pos-main-content">
             <!-- @include('layouts.navbar') -->
 
-            <main class="pos-inner-container bg-gray-100">
+            <main class="pos-inner-container bg-gray-100 h-full">
                 @yield('content')
             </main>
         </div>
