@@ -911,7 +911,8 @@
                 this.getDivisionList();
             },
             async getAreaList() {
-                let url = '/api/areas?area_category_id=2'
+                // let url = '/api/areas?area_category_id=2'
+                let url = '/api/sellings_areas?is_pos=1'
                 const response = await getApiData({ url: url, token: this.getToken() });
                 if (response.data) {
                     this.areaList = response.data;

@@ -198,6 +198,7 @@ import WarningCreateComponent from './Components/Warning/WarningCreateComponent.
 import WarningEditComponent from './Components/Warning/WarningEditComponent.vue';
 import MenuAreaComponent from './Components/MenuArea/MenuAreaComponent.vue';
 
+import PosSellingAreasComponent from './Components/Pos/Areas/PosSellingAreasComponent.vue';
 import PosTableComponent from './Components/Pos/Home/PosTableComponent.vue';
 import PosRoomComponent from './Components/Pos/Home/PosRoomComponent.vue';
 
@@ -377,6 +378,7 @@ app.component('WarningCreateComponent',WarningCreateComponent);
 app.component('WarningEditComponent',WarningEditComponent);
 app.component('MenuAreaComponent',MenuAreaComponent);
 
+app.component('PosSellingAreasComponent',PosSellingAreasComponent);
 app.component('PosTableComponent',PosTableComponent);
 app.component('PosRoomComponent',PosRoomComponent);
 
