@@ -16,7 +16,8 @@ return new class extends Migration
             $table->string('order_id')->nullable();
             $table->integer('total_quantity');
             $table->dateTime('date');
-            $table->integer('total');
+            $table->double('total')->default(0);
+            $table->double('order_sub_total')->default(0);
             $table->double('total_discount_price')->default(0);
             $table->unsignedBigInteger('invoice_id');
             $table->boolean('is_complete')->default(0);

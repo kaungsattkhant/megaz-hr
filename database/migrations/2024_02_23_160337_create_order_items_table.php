@@ -17,6 +17,7 @@ return new class extends Migration {
             $table->integer('quantity');
             $table->foreignId('area_id')->nullable()->constrained()->onDelete('cascade');
             $table->integer('original_price');
+            $table->double('sub_total_price')->default(0);
             $table->integer("discount_value")->default(0);
             $table->integer('price');
             $table->unsignedBigInteger('order_id');
