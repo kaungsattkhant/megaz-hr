@@ -333,14 +333,17 @@ class OrderRepository implements OrderRepositoryInterface
                 // dd($order_item);
 
             }
-
+            broadcast(new KitchenNotificationRequestByArea($orderItemsArray, $cookingAreaId));
             $order->foc_total += $focTotal;
             $order->save();
-            if (isset($data['is_waiter'])) {
-                if ($data['is_waiter'] == 1) {
-                    broadcast(new WaiterOrderConfirmNotificationRequest($entity, $order, $orderItemsArray, null, 5));
-                }
-            }
+            //doesn't need to do waiter
+            // if (isset($data['is_waiter'])) {
+            //     if ($data['is_waiter'] == 1) {
+            //         broadcast(new WaiterOrderConfirmNotificationRequest($entity, $order, $orderItemsArray, null, 5));
+            //     }
+            // }
+            //end waiter
+
             //current close because ,i got an error
             // broadcast(new KitchenNotificationRequest($entity, $order, $orderItemsArray, null, 7));
             DB::commit();

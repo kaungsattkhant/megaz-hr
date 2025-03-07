@@ -56,7 +56,7 @@ class KitchenNotificationRequestByArea implements ShouldBroadcast
 
     public function broadcastWith()
     {
-        Log::info('Reach related cooking area');
+        Log::info('Reach send related cooking area');
         $data['order_items']=$this->orderItems;
         $data['message']='New Order arrived';
         // $data= [
