@@ -166,7 +166,6 @@ class InvoiceModelService
             'invoice_id' => $invoiceId,
             'entity_id' => $entityId,
         ]);
-        dd($invoiceSession);
         $entitySesions = $this->getEntitySessionBySessionDuration($entityId, $startTime, $endTime);
         $entitySesionIds = $entitySesions->pluck('id');
         foreach ($entitySesions as $entitySession) {
