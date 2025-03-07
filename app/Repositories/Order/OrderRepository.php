@@ -121,7 +121,7 @@ class OrderRepository implements OrderRepositoryInterface
 
                 $insertData = [];
                 for ($i = 0; $i < (int) $quantityCount; $i++) {
-                    $insertData[] = $orderItemData;
+                    // $insertData[] = $orderItemData;
                     $createdOrderItem = OrderItem::create($orderItemData);
                     $createdOrderItem->order=$createdOrderItem->order;
                     $createdOrderItem->menu=$createdOrderItem->menu;
@@ -166,6 +166,7 @@ class OrderRepository implements OrderRepositoryInterface
                 $orderItemData['date'] = now();
                 $orderItemData['quantity'] = $defaultQuantity;
                 $orderItemData['remark'] = $data['remark'];
+                $orderItemData['area_id'] = $cookingAreaId;
                 $orderItemData['status'] = 'pos_confirmed'; //defulat
                 $orderItemData['menu_service_discount_id'] = $latestMenuServiceDiscount ? $latestMenuServiceDiscount->id : null;
                 $orderItemData['original_price'] = $data['original_price'];
