@@ -111,6 +111,7 @@ class OrderRepository implements OrderRepositoryInterface
                 $orderItemData['date'] = now();
                 $orderItemData['quantity'] = $defaultQuantity;
                 $orderItemData['remark'] = $data['remark'];
+                $orderItemData['status'] = 'pos_confirmed'; //default
                 $orderItemData['area_id'] = $cookingAreaId;
                 $orderItemData['menu_service_discount_id'] = $latestMenuServiceDiscount ? $latestMenuServiceDiscount->id : null;
                 $orderItemData['original_price'] = $data['original_price'];
@@ -163,6 +164,7 @@ class OrderRepository implements OrderRepositoryInterface
                 $orderItemData['date'] = now();
                 $orderItemData['quantity'] = $defaultQuantity;
                 $orderItemData['remark'] = $data['remark'];
+                $orderItemData['status'] = 'pos_confirmed'; //defulat
                 $orderItemData['menu_service_discount_id'] = $latestMenuServiceDiscount ? $latestMenuServiceDiscount->id : null;
                 $orderItemData['original_price'] = $data['original_price'];
                 $orderItemData['discount_value'] = $defaultDiscountAmont;
@@ -195,6 +197,7 @@ class OrderRepository implements OrderRepositoryInterface
         try {
             $invoiceId = $data['invoice_id'];
             $order = Order::where('invoice_id', $invoiceId)->first();
+            $sellingAreaId=$data['selling_area_id'];
             $categorySums = [];
             $totalDiscount = 0;
             $invoice = Invoice::find($data['invoice_id']);
@@ -217,6 +220,20 @@ class OrderRepository implements OrderRepositoryInterface
 
                 $menuData['invoice_id'] = $invoiceId;
                 $menu = Menu::find($menuData['menu_id']);
+                $menu = Menu::find($menuData['menu_id']);
+                $menuCategoryArea = MenuCategoryArea::where('menu_category_id', $menu->menu_category_id)
+                    ->where('selling_area_id', $sellingAreaId)
+                    ->first();
+                if (!$menuCategoryArea) {
+                    ResponseMessage('Menu Category Area not found', 404);
+                }
+                $menuArea = MenuArea::where('menu_category_area_id', $menuCategoryArea->id)
+                    ->where('is_default', 1)
+                    ->first();
+                if (!$menuArea) {
+                    ResponseMessage('Menu Area not found', 404);
+                }
+                $cookingAreaId = $menuArea->cooking_area_id;
                 $quantityCount = (int) $menuData['quantity'];
                 $defaultQuantity = 1;
 
@@ -261,6 +278,8 @@ class OrderRepository implements OrderRepositoryInterface
                     $menuData['date'] = CurrentTime();
                     $menuData['order_id'] = $order->id;
                     $menuData['price'] = $menuData['original_price'];
+                    $menuData['status'] = 'pos_confirmed';
+                    $menuData['area_id'] = $cookingAreaId;
                     $menuData['sub_total_price'] = ($menuData['original_price']) - $defaultDiscountAmont; //after  
                     $menuData['discount_value'] = $defaultDiscountAmont;
                     // $order_items = OrderItem::create($menuData);
@@ -281,11 +300,13 @@ class OrderRepository implements OrderRepositoryInterface
                     $menuData['order_id'] = $order->id;
                     $menuData['date'] = now();
                     $menuData['quantity'] = $defaultQuantity;
+                    $menuData['status'] = 'pos_confirmed';
                     // $menuData['remark'] = $menuData['remark'];
                     // $menuData['original_price'] = $data['original_price'];
                     // $menuData['menu_id'] = $data['menu_id'];
                     $menuData['menu_service_discount_id'] = $latestMenuServiceDiscount ? $latestMenuServiceDiscount->id : null;
                     $menuData['discount_value'] = $defaultDiscountAmont;
+                    $menuData['area_id'] = $cookingAreaId;
                     $menuData['sub_total_price'] = ($menuData['original_price']) - $defaultDiscountAmont; //after  
                     $menuData['price'] = $menuData['original_price']; //after  
 
