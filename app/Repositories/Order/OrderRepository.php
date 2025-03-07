@@ -123,6 +123,8 @@ class OrderRepository implements OrderRepositoryInterface
                 for ($i = 0; $i < (int) $quantityCount; $i++) {
                     $insertData[] = $orderItemData;
                     $createdOrderItem = OrderItem::create($orderItemData);
+                    $createdOrderItem->order=$createdOrderItem->order;
+                    $createdOrderItem->menu=$createdOrderItem->menu;
                     $insertData[] = $createdOrderItem;
                 }
                 // OrderItem::insert($insertData);
@@ -174,6 +176,8 @@ class OrderRepository implements OrderRepositoryInterface
                 for ($i = 0; $i < (int) $quantityCount; $i++) {
                     // $insertData[] = $orderItemData;
                     $createdOrderItem = OrderItem::create($orderItemData);
+                    $createdOrderItem->order=$createdOrderItem->order;
+                    $createdOrderItem->menu=$createdOrderItem->menu;
                     $insertData[] = $createdOrderItem;
                     // dd($createdOrderItem);
                 }
@@ -325,6 +329,7 @@ class OrderRepository implements OrderRepositoryInterface
                         $focTotal += $order_item->price;
                     }
                     $order_item->menu = $order_item->menu;
+                    $order_item->order=$order_item->order;
                     array_push($orderItemsArray, $order_item);
                 }
                 // dd($insertData);
