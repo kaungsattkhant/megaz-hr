@@ -85,8 +85,7 @@
                     this.setRoles(roles);
                     this.$refs.signinForm.submit();
 
-                    // return true;
-                    window.location.replace(`/pos/selling_areas`);
+                    return true;
                 }
                 else {
                     return false;

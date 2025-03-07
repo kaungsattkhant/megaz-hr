@@ -112,6 +112,7 @@ class OrderRepository implements OrderRepositoryInterface
                 $orderItemData['date'] = now();
                 $orderItemData['quantity'] = $defaultQuantity;
                 $orderItemData['remark'] = $data['remark'];
+                $orderItemData['area_id']=$cookingAreaId;
                 $orderItemData['menu_service_discount_id'] = $latestMenuServiceDiscount ? $latestMenuServiceDiscount->id : null;
                 $orderItemData['original_price'] = $data['original_price'];
                 $orderItemData['discount_value'] = $defaultDiscountAmont;
