@@ -49,10 +49,10 @@ class OrderRepository implements OrderRepositoryInterface
             // $this->removePackForMenu($data['menu_id'], $data['quantity']);
             $price = $data['original_price'] * $data['quantity'];
             // $data['invoice'] must be unsigned integer format , not 000023
-            if(!isset($data['selling_area_id'])|| $data['selling_area_id']==null){
+            if (!isset($data['selling_area_id']) || $data['selling_area_id'] == null) {
                 ResponseMessage('Selling Area is required', 419);
             }
-            $sellingAreaId=$data['selling_area_id'];
+            $sellingAreaId = $data['selling_area_id'];
             $order = Order::where('invoice_id', $data['invoice_id'])->first();
             $invoice = Invoice::find($data['invoice_id']);
             if (!$invoice) {
@@ -111,7 +111,7 @@ class OrderRepository implements OrderRepositoryInterface
                 $orderItemData['date'] = now();
                 $orderItemData['quantity'] = $defaultQuantity;
                 $orderItemData['remark'] = $data['remark'];
-                $orderItemData['area_id']=$cookingAreaId;
+                $orderItemData['area_id'] = $cookingAreaId;
                 $orderItemData['menu_service_discount_id'] = $latestMenuServiceDiscount ? $latestMenuServiceDiscount->id : null;
                 $orderItemData['original_price'] = $data['original_price'];
                 $orderItemData['discount_value'] = $defaultDiscountAmont;
@@ -121,8 +121,8 @@ class OrderRepository implements OrderRepositoryInterface
                 $insertData = [];
                 for ($i = 0; $i < (int) $quantityCount; $i++) {
                     $insertData[] = $orderItemData;
-                    $createdOrderItem=OrderItem::create($orderItemData);
-                    $insertData[]=$createdOrderItem;
+                    $createdOrderItem = OrderItem::create($orderItemData);
+                    $insertData[] = $createdOrderItem;
                 }
                 // OrderItem::insert($insertData);
                 broadcast(new KitchenNotificationRequestByArea($insertData, $cookingAreaId));
@@ -171,8 +171,8 @@ class OrderRepository implements OrderRepositoryInterface
                 $insertData = [];
                 for ($i = 0; $i < (int) $quantityCount; $i++) {
                     // $insertData[] = $orderItemData;
-                    $createdOrderItem=OrderItem::create($orderItemData);
-                    $insertData[]=$createdOrderItem;
+                    $createdOrderItem = OrderItem::create($orderItemData);
+                    $insertData[] = $createdOrderItem;
                     // dd($createdOrderItem);
                 }
                 // $orderItems=OrderItem::insert($insertData);
@@ -217,6 +217,9 @@ class OrderRepository implements OrderRepositoryInterface
 
                 $menuData['invoice_id'] = $invoiceId;
                 $menu = Menu::find($menuData['menu_id']);
+                $quantityCount = (int) $menuData['quantity'];
+                $defaultQuantity = 1;
+
                 if (!isset($menuData['discount_value'])) {
                     $latestMenuServiceDiscount = $menu->menuServiceDiscounts()
                         ->whereDate('from_date', '<=', CurrentDate())
@@ -224,59 +227,92 @@ class OrderRepository implements OrderRepositoryInterface
                         ->orderBy('created_at', 'desc')
                         ->where('type', 'menu')
                         ->first();
-
+                    $discountAmount = 0;
                     if ($latestMenuServiceDiscount != null) {
                         $discountAmount = $latestMenuServiceDiscount->discount_price * $menuData['quantity'];
                         $totalDiscount += $discountAmount;
                         $menuData['menu_service_discount_id'] = $latestMenuServiceDiscount->id;
                         $menuData['discount_value'] = $discountAmount; // Store the calculated discount value
-                    } else {
-                        $discountAmount = ($menuData['discount_value'] ?? 0) * $menuData['quantity'];
+                        $defaultDiscountAmont = $latestMenuServiceDiscount->discount_price * $defaultQuantity;
+
                     }
+                    // dd($defaultDiscountAmont);
+                    //  else {
+                    //     $discountAmount = ($menuData['discount_value'] ?? 0) * $menuData['quantity'];
+                    // }
+                    // dd('abc');
                 } else {
                     $discountAmount = $menuData['discount_value'] * $menuData['quantity'];
                     $totalDiscount += $discountAmount;
                 }
-
+                // dd($order);
                 if ($order) {
-                    $order->total_quantity += $menuData['quantity'];
-                    $order->total_discount_price += $discountAmount; // update total discount only for this order
-                    $order->total += $menuData['original_price'] * $menuData['quantity'];
-                    $order->update($menuData);
+                    // $order->total_quantity += $menuData['quantity'];
+                    // $order->total_discount_price += $discountAmount; // update total discount only for this order
+                    // $order->total += $menuData['original_price'] * $menuData['quantity'];
+                    // $order->order_sub_total += $menuData['original_price'] * $menuData['quantity'];
+                    // $order->update($menuData);
+                    $order = $this->orderService->updateOrderItemAmountToOrder('add', $order, $menuData['original_price'], $menuData['quantity'], $discountAmount);
+                    $invoice = $this->orderService->updateOrderItemAmountToInvoice('add', $invoice, $menuData['original_price'], $menuData['quantity'], $discountAmount);
                     $originalOrderItem = OrderItem::where('menu_id', $menuData['menu_id'])
                         ->where('order_id', $order->id)
                         ->first();
 
                     $menuData['date'] = CurrentTime();
                     $menuData['order_id'] = $order->id;
-                    $menuData['price'] = $menuData['original_price'] * $menuData['quantity'];
+                    $menuData['price'] = $menuData['original_price'];
+                    $menuData['sub_total_price'] = ($menuData['original_price']) - $defaultDiscountAmont; //after  
+                    $menuData['discount_value'] = $defaultDiscountAmont;
                     // $order_items = OrderItem::create($menuData);
                     // $orderItems = OrderItem::find($order_items->id);
                     // $orderItems->menu = $orderItems->menu;
                     // $orderItemsArray[] = $orderItems;
                 } else {
-                    $menuData['date'] = CurrentTime();
-                    $menuData['total'] = $menuData['original_price'] * $menuData['quantity'];
-                    $menuData['total_quantity'] = $menuData['quantity'];
-                    $menuData['total_discount_price'] = $discountAmount; // update total discount only for this order
-                    $order = Order::create($menuData);
+                    $orderData['date'] = CurrentTime();
+                    $orderData['total'] = $menuData['original_price'] * $menuData['quantity'];
+                    $orderData['order_sub_total'] = ($menuData['original_price'] * $menuData['quantity']) - $discountAmount;
+                    $orderData['total_quantity'] = $menuData['quantity'];
+                    $orderData['total_discount_price'] = $discountAmount; // update total discount only for this order
+                    $order = Order::create($orderData);
                     $order->update(['order_id' => sprintf('%05d', $order->id)]);
+                    $invoice = $this->orderService->updateOrderItemAmountToInvoice('add', $invoice, $menuData['original_price'], $menuData['quantity'], $discountAmount);
+
 
                     $menuData['order_id'] = $order->id;
-                    $menuData['price'] = $menuData['original_price'] * $menuData['quantity'];
+                    $menuData['date'] = now();
+                    $menuData['quantity'] = $defaultQuantity;
+                    // $menuData['remark'] = $menuData['remark'];
+                    // $menuData['original_price'] = $data['original_price'];
+                    // $menuData['menu_id'] = $data['menu_id'];
+                    $menuData['menu_service_discount_id'] = $latestMenuServiceDiscount ? $latestMenuServiceDiscount->id : null;
+                    $menuData['discount_value'] = $defaultDiscountAmont;
+                    $menuData['sub_total_price'] = ($menuData['original_price']) - $defaultDiscountAmont; //after  
+                    $menuData['price'] = $menuData['original_price']; //after  
+
+                    // $menuData['order_id'] = $order->id;
+                    // $menuData['price'] = $menuData['original_price'] * $menuData['quantity'];
 
                     // $order_items = OrderItem::create($menuData);
                     // $orderItems = OrderItem::find($order_items->id);
                     // $orderItems->menu = $orderItems->menu;
                     // $orderItemsArray[] = $orderItems;
                 }
-
-                $order_item = OrderItem::create($menuData);
-                if ($order_item->is_foc == 1) {
-                    $focTotal += $order_item->price;
+                $insertData = [];
+                for ($i = 0; $i < (int) $quantityCount; $i++) {
+                    // $insertData[] = $orderItemData;
+                    $order_item = OrderItem::create($menuData);
+                    $insertData[] = $order_item;
+                    if ($order_item->is_foc == 1) {
+                        $focTotal += $order_item->price;
+                    }
+                    $order_item->menu = $order_item->menu;
+                    array_push($orderItemsArray, $order_item);
                 }
-                $order_item->menu = $order_item->menu;
-                array_push($orderItemsArray, $order_item);
+                // dd($insertData);
+                // dd($menuData);
+                // $order_item = OrderItem::create($menuData);
+                // dd($order_item);
+
             }
 
             $order->foc_total += $focTotal;
