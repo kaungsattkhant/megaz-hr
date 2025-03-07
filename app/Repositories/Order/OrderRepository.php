@@ -106,7 +106,6 @@ class OrderRepository implements OrderRepositoryInterface
                 $data['order_id'] = $order->id;
                 $data['price'] = $data['original_price'] * $defaultQuantity;
                 $data['sub_total_price'] = ($data['original_price'] * $defaultQuantity) - $defaultDiscountAmont;
-
                 $orderItemData['order_id'] = $order->id;
                 $orderItemData['menu_id'] = $data['menu_id'];
                 $orderItemData['date'] = now();
@@ -127,7 +126,6 @@ class OrderRepository implements OrderRepositoryInterface
                 }
                 // OrderItem::insert($insertData);
                 broadcast(new KitchenNotificationRequestByArea($insertData, $cookingAreaId));
-                dd('existing order');
                 DB::commit();
                 return $order;
                 // $order->total_quantity += $data['quantity'];
@@ -245,7 +243,6 @@ class OrderRepository implements OrderRepositoryInterface
                     $order->total_discount_price += $discountAmount; // update total discount only for this order
                     $order->total += $menuData['original_price'] * $menuData['quantity'];
                     $order->update($menuData);
-
                     $originalOrderItem = OrderItem::where('menu_id', $menuData['menu_id'])
                         ->where('order_id', $order->id)
                         ->first();
