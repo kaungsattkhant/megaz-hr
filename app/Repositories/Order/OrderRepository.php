@@ -220,7 +220,6 @@ class OrderRepository implements OrderRepositoryInterface
 
                 $menuData['invoice_id'] = $invoiceId;
                 $menu = Menu::find($menuData['menu_id']);
-                $menu = Menu::find($menuData['menu_id']);
                 $menuCategoryArea = MenuCategoryArea::where('menu_category_id', $menu->menu_category_id)
                     ->where('selling_area_id', $sellingAreaId)
                     ->first();
@@ -245,13 +244,13 @@ class OrderRepository implements OrderRepositoryInterface
                         ->where('type', 'menu')
                         ->first();
                     $discountAmount = 0;
+                    $defaultDiscountAmont=0;
                     if ($latestMenuServiceDiscount != null) {
                         $discountAmount = $latestMenuServiceDiscount->discount_price * $menuData['quantity'];
                         $totalDiscount += $discountAmount;
                         $menuData['menu_service_discount_id'] = $latestMenuServiceDiscount->id;
                         $menuData['discount_value'] = $discountAmount; // Store the calculated discount value
                         $defaultDiscountAmont = $latestMenuServiceDiscount->discount_price * $defaultQuantity;
-
                     }
                     // dd($defaultDiscountAmont);
                     //  else {
@@ -287,6 +286,7 @@ class OrderRepository implements OrderRepositoryInterface
                     // $orderItems->menu = $orderItems->menu;
                     // $orderItemsArray[] = $orderItems;
                 } else {
+                    $orderData['invoice_id'] = $invoiceId;
                     $orderData['date'] = CurrentTime();
                     $orderData['total'] = $menuData['original_price'] * $menuData['quantity'];
                     $orderData['order_sub_total'] = ($menuData['original_price'] * $menuData['quantity']) - $discountAmount;
@@ -295,7 +295,6 @@ class OrderRepository implements OrderRepositoryInterface
                     $order = Order::create($orderData);
                     $order->update(['order_id' => sprintf('%05d', $order->id)]);
                     $invoice = $this->orderService->updateOrderItemAmountToInvoice('add', $invoice, $menuData['original_price'], $menuData['quantity'], $discountAmount);
-
 
                     $menuData['order_id'] = $order->id;
                     $menuData['date'] = now();
