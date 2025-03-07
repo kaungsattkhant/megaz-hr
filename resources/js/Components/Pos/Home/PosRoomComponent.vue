@@ -1471,7 +1471,9 @@
                     if(response.data){
                         this.roomList = response.data;
                         console.log(response.data)
-                        this.entityType = response.data[0].entity_type
+                        if(response.data[0]){
+                            this.entityType = response.data[0].entity_type
+                        }
                     }
                 }
                 
