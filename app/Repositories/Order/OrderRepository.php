@@ -273,7 +273,6 @@ class OrderRepository implements OrderRepositoryInterface
                     $originalOrderItem = OrderItem::where('menu_id', $menuData['menu_id'])
                         ->where('order_id', $order->id)
                         ->first();
-
                     $menuData['date'] = CurrentTime();
                     $menuData['order_id'] = $order->id;
                     $menuData['price'] = $menuData['original_price'];

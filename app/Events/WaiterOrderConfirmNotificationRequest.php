@@ -2,16 +2,17 @@
 
 namespace App\Events;
 
-use App\Models\Entity;
 use App\Models\Order;
+use App\Models\Entity;
 use App\Models\OrderItem;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Broadcasting\Channel;
-use Illuminate\Broadcasting\InteractsWithSockets;
-use Illuminate\Broadcasting\PresenceChannel;
-use Illuminate\Broadcasting\PrivateChannel;
-use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
-use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Broadcasting\PrivateChannel;
+use Illuminate\Broadcasting\PresenceChannel;
+use Illuminate\Foundation\Events\Dispatchable;
+use Illuminate\Broadcasting\InteractsWithSockets;
+use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 
 class WaiterOrderConfirmNotificationRequest implements ShouldBroadcast
 {
@@ -53,10 +54,10 @@ class WaiterOrderConfirmNotificationRequest implements ShouldBroadcast
 
     public function broadcastWith()
     {
+        Log::find('reach waiter confirmation request');
         $orderItemsWithMenu = collect($this->orderItems)->map(function ($orderItem) {
-            return $orderItem->load('menu.areas');
+            return $orderItem->load('area');
         });
-
         $data= [
             'department_id' => $this->department_id,
             'order' => $this->order,
