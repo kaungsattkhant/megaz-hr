@@ -22,7 +22,4 @@ interface OrderRepositoryInterface
 
     public function checkFocSupervision(Request $request);
 
-    public function combineOrderItem($request);
-
-    public function getOrderItemGroupList($request);
 }
