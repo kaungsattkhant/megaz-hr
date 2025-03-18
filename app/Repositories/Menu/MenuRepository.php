@@ -16,7 +16,7 @@ class MenuRepository implements MenuRepositoryInterface
     public function listAllData(Request $request)
     {
         $validateDate = $request->date ?? CurrentDate();
-
+        $sellingAreaId= isset($request->selling_area_id) ? $request->selling_area_id : null;
         if ($request->per_page || $request->page) {
             $menu_category_id = $request->menu_category_id;
 
@@ -31,9 +31,26 @@ class MenuRepository implements MenuRepositoryInterface
                 })
                 ->paginate(config('common.list_count'));
         } else {
-            $menus = Menu::with(['menu_category', 'prices', 'items', 'menuServiceDiscounts' => function ($query) use ($validateDate) {
-                $query->where('from_date', '<=', $validateDate)->where('to_date', '>=', $validateDate);
-            }])->where('is_active', 1)->get();
+            // $menus = Menu::with(['menu_category', 'prices', 'items', 'menuServiceDiscounts' => function ($query) use ($validateDate) {
+            //     $query->where('from_date', '<=', $validateDate)->where('to_date', '>=', $validateDate);
+            // }])->where('is_active', 1)->get();
+            // $sellingAreaId=7;
+            $menus = Menu::with([
+                'menu_category', 
+                'prices', 
+                'items', 
+                'menuServiceDiscounts' => function ($query) use ($validateDate) {
+                    $query->where('from_date', '<=', $validateDate)->where('to_date', '>=', $validateDate);
+                }
+            ])
+            ->leftJoin('menu_category_areas', 'menus.menu_category_id', '=', 'menu_category_areas.menu_category_id')
+            ->leftJoin('menu_areas', 'menu_category_areas.id', '=', 'menu_areas.menu_category_area_id')
+            ->where('menu_category_areas.selling_area_id', $sellingAreaId)
+            ->where('menu_areas.is_default', 1)
+            ->where('menus.is_active', 1)
+            ->select('menus.*', 'menu_areas.cooking_area_id')
+            ->get();
+            
             return $menus;
         }
     }
