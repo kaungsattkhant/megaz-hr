@@ -1757,6 +1757,9 @@
             },
             getSelectedPackage(){
                 // this.packageMenuList = this.selectedPackage;
+
+
+                
             },
             confirmRoomBtnClicked() {
                 // this.getPurchaseMenuList();
