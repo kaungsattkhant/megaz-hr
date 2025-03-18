@@ -865,11 +865,12 @@
                                                             {{ pm.quantity }}
                                                         </td>
                                                         <td class=" py-4 text-sm  ">
-                                                            {{ (pm.original_price - pm.discount_value) * pm.quantity  }}
+                                                            <!-- {{ (pm.original_price - pm.discount_value) * pm.quantity  }} -->
+                                                            --
                                                         </td>
                                                         <td class=" py-4 text-sm  text-center">
                                                             <button
-                                                                @click="removePackageMenu(index)">
+                                                                @click="removePackageAccessory(index)">
                                                                 <i class="fal fa-times  pr-3"></i>
                                                             </button>
                                                         </td>
@@ -1428,7 +1429,7 @@
                     </div>
 
                     <div class="flex justify-center px-12 mb-6">
-                        <button @click="btnConfirmAddAccessory()" class="pos-add-btn focus:outline-none focus:ring-0 ">
+                        <button @click="btnConfirmAddPackageAccessory()" class="pos-add-btn focus:outline-none focus:ring-0 ">
                             Add Accessory
                         </button>
                     </div>
@@ -1437,7 +1438,7 @@
         </div>
 
 
-            <!-- add accessory modal -->
+            <!--  modal -->
         <div data-te-modal-init
             class="fixed left-0 top-0 z-[1055] hidden h-full w-full overflow-y-auto overflow-x-hidden outline-none"
             id="end_room_modal" tabindex="-1" aria-labelledby="addAccessoryModalLabel" aria-modal="true" role="dialog">
@@ -1585,6 +1586,7 @@
                 menuQuantityForPackage:null,
                 is_menu_discount:0,
                 food_total_package:0,
+                accessory_total_package:0,
                 total_package_menu_price:0,
                 package_total:0,
 
@@ -1771,7 +1773,7 @@
                             discount_value: is_dis_menu_price,
                             menu_id : packageMenu.menu_id,
                             is_package : 1,
-                            area_id: null,
+                            // area_id: null,
                             areas : packageMenu.menu.areas
                         });
 
@@ -1847,6 +1849,29 @@
                 this.food_total_package -= (this.packageMenuList[index].original_price - this.packageMenuList[index].discount_value) * this.packageMenuList[index].quantity;
                 this.packageMenuList.splice(index, 1);
             },
+            
+            btnConfirmAddPackageAccessory() {
+                this.packageAccessoriesList.push({
+                    quantity: this.selectedAccessoryQuantity,
+                    name: this.selectedAccessory.name,
+                    // original_price:this.selectedMenuForPackage.prices[0].price,
+                    price:this.selectedAccessory.accessory_price.price * this.selectedAccessoryQuantity,
+                    unit_price:this.selectedAccessory.accessory_price.price,
+                    accessory_id : this.selectedAccessory.accessory_id,
+                    is_package : 0,
+                });
+                this.accessory_total_package += (this.selectedAccessory.accessory_price.price) * this.selectedAccessoryQuantity;
+                this.selectedAccessoryCategory = null
+                this.selectedAccessory = null
+                this.accessoryList = []
+                this.selectedAccessoryQuantity = null;
+                document.getElementById('add_package_accessory_modal').click();
+            },
+            removePackageAccessory(index){
+
+                this.accessory_total_package -= this.packageAccessoriesList[index].price;
+                this.packageAccessoriesList.splice(index, 1);
+            },
 
             createRoomForPackage(){
 
@@ -1889,6 +1914,7 @@
                 if (this.type == 'package') {
                     formData.append('package_id', this.selectedPackage.id);
                     formData.append('orders', JSON.stringify(this.packageMenuList));
+                    formData.append('accessories', JSON.stringify(this.packageAccessoriesList));
                 }
                 formData.append('type', this.type);
                 let isDeposit = (this.isPreDeposit)? 1: 0;
@@ -2451,11 +2477,12 @@
                 }
             },
             async selectedMenuChange() {
-                const response = await getApiData({ url: '/api/menus/' + this.selectedMenu.id + '/areas', token: this.getToken() });
-                if (response.data) {
-                    this.menuAreaList = response.data.areas;
-                    this.menuQuantity = 1;
-                }
+                // const response = await getApiData({ url: '/api/menus/' + this.selectedMenu.id + '/areas', token: this.getToken() });
+                // if (response.data) {
+                //     this.menuAreaList = response.data.areas;
+                //     this.menuQuantity = 1;
+                // }
+                this.menuQuantity = 1;
             },
             btnClickAddMenu() {
                 this.invoiceId = this.selectedRoom.invoice.id;
