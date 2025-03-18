@@ -145,6 +145,7 @@ class InvoiceAPIController extends Controller
                 }
                 $entity->status = 'done_pending';
                 $entity->save();
+                DB::commit();
                 broadcast(new PosRoomDoneNotification($invoice, $entity, $receptionistRole->id));
                 ResponseMessage("The request to quit the room {$entity->name} has been sent. Please wait for the confirmation from the catering department.");
             }

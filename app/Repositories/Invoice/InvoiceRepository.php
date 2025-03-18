@@ -222,7 +222,6 @@ class InvoiceRepository implements InvoiceRepositoryInterface
                 // $data['sub_total'] = $data['total_session_price'];
                 $data['room_discount_value'] = $freeDiscountSession * $entity->price_per_hour;
                 $invoice = Invoice::create($data);
-                dd($invoice);
                 $invoiceSession = $this->invoiceService->storeInvoiceSession($invoice->id,$startTime, $entitySession->entity_id, $data['session_duration'], $freeDiscountSession, $entity->price_per_hour, $data['is_waiter'], $discountId = null);
                 //create deposit
                 $this->storeCustomerDeposit($data, UserData()->id);
@@ -246,7 +245,6 @@ class InvoiceRepository implements InvoiceRepositoryInterface
                         }
                     }
                 }
-                dd('abc');
                 DB::commit();
                 $returnData = [
                     'customer' => $customer,
