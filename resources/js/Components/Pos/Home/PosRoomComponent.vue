@@ -743,86 +743,229 @@
                     </div>
 
 
-                    <div v-if="isOpenRoom.is_package == true" class="relative h-full">
-                        <div class="flex justify-center padding-section ">
-
+                    <div v-if="isOpenRoom.is_package == true" class="relative h-full pb-[75px]">
+                        <div class="relative h-full overflow-y-auto small-scrollbar">
                             <div>
-                                <p class="text-black text-lg">
-                                    Confirm Menu
-                                </p>
-                            </div>
-                        </div>
-                        <div class="small-scrollbar overflow-y-auto" style="height:calc(100% - 329px)">
-                            <div class="padding-section ">
-                                <div class="table-container px-2">
-                                    <table class=" w-full">
-                                        <thead class="">
-                                            <tr class="border-b">
-                                                <th scope="col" class="text-left   py-4">
-                                                    Menu
-                                                </th>
-                                                <th scope="col" class="text-left   py-4">
-                                                    Area
-                                                </th>
-                                                <th scope="col" class="text-left   py-4">
-                                                    Qty
-                                                </th>
-                                                <th scope="col" class="text-left   py-4">
-                                                    Price
-                                                </th>
-                                                <th scope="col" class="text-left   py-4">
-
-                                                </th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            <tr class="" v-for="(pm,index) in packageMenuList" :key=index>
-                                                <td class=" py-4 text-sm  ">
-                                                    {{ pm.name }}
-                                                </td>
-                                                <td class=" py-4 text-sm  ">
-                                                    <select name="" :class="pm.is_package == 0 ? 'hidden' : ''"
-                                                        class="text-xs pl-0 border-0 focus:shadow-none focus:outline-none focus:ring-0 select-box area-select-box !pr-6"
-                                                        placeholder="Select Area" @change="packageCookingAreaChange(area,index)" v-model="pm.area_id">
-                                                        <option disabled selected>Select Area</option>
-                                                        <option v-for="(area, index) in pm.areas" :key="index"
-                                                            :value="area.id" class="">
-                                                            {{ area.name }}
-                                                        </option>
-                                                    </select>
-                                                </td>
-                                                <td class=" py-4 text-sm  ">
-                                                    {{ pm.quantity }}
-                                                </td>
-                                                <td class=" py-4 text-sm  ">
-                                                    {{ (pm.original_price - pm.discount_value) * pm.quantity  }}
-                                                </td>
-                                                <td class=" py-4 text-sm  text-center">
-                                                    <button
-                                                        @click="removePackageMenu(index)">
-                                                        <i class="fal fa-times  pr-3"></i>
-                                                    </button>
-                                                </td>
-                                            </tr>
-
-                                        </tbody>
-                                    </table>
+                                <div class="flex justify-center padding-section !pt-0 !pb-2">
+                                    <p class="text-black text-lg">
+                                        Menus
+                                    </p>
                                 </div>
-
+                                <div class="relative pb-20 overflow-y-auto min-h-[40vh]" style="height:calc(100% - 329px)">
+                                    <div class="padding-section !pt-0">
+                                        <div class="table-container px-2">
+                                            <table class=" w-full">
+                                                <thead class="">
+                                                    <tr class="border-b">
+                                                        <th scope="col" class="text-left   py-4">
+                                                            Menu
+                                                        </th>
+                                                        <!-- <th scope="col" class="text-left   py-4">
+                                                            Area
+                                                        </th> -->
+                                                        <th scope="col" class="text-left   py-4">
+                                                            Qty
+                                                        </th>
+                                                        <th scope="col" class="text-left   py-4">
+                                                            Price
+                                                        </th>
+                                                        <th scope="col" class="text-left   py-4">
+        
+                                                        </th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr class="" v-for="(pm,index) in packageMenuList" :key="index">
+                                                        <td class=" py-4 text-sm  ">
+                                                            {{ pm.name }}
+                                                        </td>
+                                                        <!-- <td class=" py-4 text-sm  ">
+                                                            <select name="" :class="pm.is_package == 0 ? 'hidden' : ''"
+                                                                class="text-xs pl-0 border-0 focus:shadow-none focus:outline-none focus:ring-0 select-box area-select-box !pr-6"
+                                                                placeholder="Select Area" @change="packageCookingAreaChange(area,index)" v-model="pm.area_id">
+                                                                <option disabled selected>Select Area</option>
+                                                                <option v-for="(area, index) in pm.areas" :key="index"
+                                                                    :value="area.id" class="">
+                                                                    {{ area.name }}
+                                                                </option>
+                                                            </select>
+                                                        </td> -->
+                                                        <td class=" py-4 text-sm  ">
+                                                            {{ pm.quantity }}
+                                                        </td>
+                                                        <td class=" py-4 text-sm  ">
+                                                            {{ (pm.original_price - pm.discount_value) * pm.quantity  }}
+                                                        </td>
+                                                        <td class=" py-4 text-sm  text-center">
+                                                            <button
+                                                                @click="removePackageMenu(index)">
+                                                                <i class="fal fa-times  pr-3"></i>
+                                                            </button>
+                                                        </td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+        
+                                    </div>
+                                    <div class="absolute bottom-0 left-0 right-0 border-b border-gray-200 mb-10">
+                                        <button class="w-full text-center mb-4 font-semibold text-sm focus:outline-none focus:ring-0" 
+                                        data-te-toggle="modal" data-te-target="#add_package_menu_modal" @click="btnClickAddPackageMenuModal">
+                                            Add More Menu
+                                        </button>
+                                    </div>
+                                </div>
                             </div>
+                            <div class="">
+                                <div class="flex justify-center padding-section !pt-0 !pb-2">
+                                    <p class="text-black text-lg">
+                                        Accessories
+                                    </p>
+                                </div>
+                                <div class="small-scrollbar overflow-y-auto min-h-[40vh] relative pb-20" style="height:calc(100% - 329px)">
+                                    <div class="padding-section !pt-0">
+                                        <div class="table-container px-2">
+                                            <table class=" w-full">
+                                                <thead class="">
+                                                    <tr class="border-b">
+                                                        <th scope="col" class="text-left   py-4">
+                                                            Accessories
+                                                        </th>
+                                                        <!-- <th scope="col" class="text-left   py-4">
+                                                            Area
+                                                        </th> -->
+                                                        <th scope="col" class="text-left   py-4">
+                                                            Qty
+                                                        </th>
+                                                        <th scope="col" class="text-left   py-4">
+                                                            Price
+                                                        </th>
+                                                        <th scope="col" class="text-left   py-4">
+        
+                                                        </th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr class="" v-for="(pm,index) in packageAccessoriesList" :key=index>
+                                                        <td class=" py-4 text-sm  ">
+                                                            {{ pm.name }}
+                                                        </td>
+                                                        <!-- <td class=" py-4 text-sm  ">
+                                                            <select name="" :class="pm.is_package == 0 ? 'hidden' : ''"
+                                                                class="text-xs pl-0 border-0 focus:shadow-none focus:outline-none focus:ring-0 select-box area-select-box !pr-6"
+                                                                placeholder="Select Area" @change="packageCookingAreaChange(area,index)" v-model="pm.area_id">
+                                                                <option disabled selected>Select Area</option>
+                                                                <option v-for="(area, index) in pm.areas" :key="index"
+                                                                    :value="area.id" class="">
+                                                                    {{ area.name }}
+                                                                </option>
+                                                            </select>
+                                                        </td> -->
+                                                        <td class=" py-4 text-sm  ">
+                                                            {{ pm.quantity }}
+                                                        </td>
+                                                        <td class=" py-4 text-sm  ">
+                                                            {{ (pm.original_price - pm.discount_value) * pm.quantity  }}
+                                                        </td>
+                                                        <td class=" py-4 text-sm  text-center">
+                                                            <button
+                                                                @click="removePackageMenu(index)">
+                                                                <i class="fal fa-times  pr-3"></i>
+                                                            </button>
+                                                        </td>
+                                                    </tr>
+        
+                                                </tbody>
+                                            </table>
+                                        </div>
+        
+                                    </div>
+                                    <div class="absolute bottom-0 left-0 right-0 border-b border-gray-200 focus:outline-none focus:ring-0 ">
+                                        <button class="w-full text-center mb-4 font-semibold text-sm"
+                                        data-te-toggle="modal" data-te-target="#add_package_accessory_modal" @click="btnClickedAddAccessory">
+                                            Add More Accessories
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            
+
+                            <!-- <div class="flex justify-center padding-section ">
+
+                                <div>
+                                    <p class="text-black text-lg">
+                                        Confirm Menu
+                                    </p>
+                                </div>
+                            </div>
+                            <div class="small-scrollbar overflow-y-auto" style="height:calc(100% - 329px)">
+                                <div class="padding-section ">
+                                    <div class="table-container px-2">
+                                        <table class=" w-full">
+                                            <thead class="">
+                                                <tr class="border-b">
+                                                    <th scope="col" class="text-left   py-4">
+                                                        Menu
+                                                    </th>
+                                                    <th scope="col" class="text-left   py-4">
+                                                        Area
+                                                    </th>
+                                                    <th scope="col" class="text-left   py-4">
+                                                        Qty
+                                                    </th>
+                                                    <th scope="col" class="text-left   py-4">
+                                                        Price
+                                                    </th>
+                                                    <th scope="col" class="text-left   py-4">
+
+                                                    </th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr class="" v-for="(pm,index) in packageMenuList" :key=index>
+                                                    <td class=" py-4 text-sm  ">
+                                                        {{ pm.name }}
+                                                    </td>
+                                                    <td class=" py-4 text-sm  ">
+                                                        <select name="" :class="pm.is_package == 0 ? 'hidden' : ''"
+                                                            class="text-xs pl-0 border-0 focus:shadow-none focus:outline-none focus:ring-0 select-box area-select-box !pr-6"
+                                                            placeholder="Select Area" @change="packageCookingAreaChange(area,index)" v-model="pm.area_id">
+                                                            <option disabled selected>Select Area</option>
+                                                            <option v-for="(area, index) in pm.areas" :key="index"
+                                                                :value="area.id" class="">
+                                                                {{ area.name }}
+                                                            </option>
+                                                        </select>
+                                                    </td>
+                                                    <td class=" py-4 text-sm  ">
+                                                        {{ pm.quantity }}
+                                                    </td>
+                                                    <td class=" py-4 text-sm  ">
+                                                        {{ (pm.original_price - pm.discount_value) * pm.quantity  }}
+                                                    </td>
+                                                    <td class=" py-4 text-sm  text-center">
+                                                        <button
+                                                            @click="removePackageMenu(index)">
+                                                            <i class="fal fa-times  pr-3"></i>
+                                                        </button>
+                                                    </td>
+                                                </tr>
+
+                                            </tbody>
+                                        </table>
+                                    </div>
+
+                                </div>
+                            </div> -->
+
+                            
                         </div>
-
-                        <div class="absolute bottom-0 border-t-2 border-gray-200 w-full padding-section !pt-3">
-                            <div>
-                                <button class="w-full text-center mb-3 font-semibold text-sm"
-                                data-te-toggle="modal" data-te-target="#add_package_menu_modal">
-                                    Add More Menu
-                                </button>
-                            </div>
+                        <div class="absolute bottom-0 border-t-2 border-gray-200 w-full padding-section !pt-3 bg-white">
+                            
                             <div class="">
                                 <button @click="createRoomForPackage()"
                                     class="bg-[#55EFC4] text-gray-700 text-center text-sm font-semibold w-full py-3">
-                                    Confirm Menu
+                                    Confirm Package
                                 </button>
                             </div>
                         </div>
@@ -1233,6 +1376,66 @@
             </div>
         </div>
 
+            <!-- add package accessory modal -->
+        <div data-te-modal-init
+            class="fixed left-0 top-0 z-[1055] hidden h-full w-full overflow-y-auto overflow-x-hidden outline-none"
+            id="add_package_accessory_modal" tabindex="-1" aria-labelledby="addAccessoryModalLabel" aria-modal="true" role="dialog">
+            <div data-te-modal-dialog-ref
+                class="pointer-events-none relative flex min-h-[calc(100%-1rem)] w-auto translate-y-[-50px] items-center opacity-0 transition-all duration-300 ease-in-out min-[576px]:mx-auto min-[576px]:mt-7 min-[576px]:min-h-[calc(100%-3.5rem)] min-[576px]:max-w-[500px]">
+                <div
+                    class="pointer-events-auto relative flex w-full flex-col rounded-md border-none bg-white bg-clip-padding text-current shadow-lg outline-none">
+                    <div class="relative  p-4">
+                        <p class="text-xl w-full text-center">
+                            Add Accessory
+                        </p>
+                        <button type="button" id="closeAccessoryModalRoom"
+                            class="absolute top-4 right-4 focus:shadow-none focus:outline-none" data-te-modal-dismiss
+                            aria-label="Close">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                                stroke="currentColor" class="h-5 w-5">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                        </button>
+                    </div>
+
+                    <div class="relative px-16 py-4" data-te-modal-body-ref>
+                        <div class="mb-4">
+                            <label for="" class="label-form mb-3">
+                                Accessory Category
+                            </label>
+                            <select name="" id="" v-model="selectedAccessoryCategory" class="input-ui" @change="accessoryCategoryChange()">
+                                <option :value="accessory" v-for="(accessory, index) in accessoryCategoryList"
+                                    :key="index">{{
+                                        accessory.name }}</option>
+                            </select>
+                        </div>
+                        <div class="mb-4">
+                            <label for="" class="label-form mb-3">
+                                Accessory
+                            </label>
+                            <select name="" id="" v-model="selectedAccessory" class="input-ui">
+                                <option :value="accessory" v-for="(accessory, index) in accessoryList"
+                                    :key="index">
+                                    {{ accessory.name }}</option>
+                            </select>
+                        </div>
+                        <div class="mb-4">
+                            <label for="" class="label-form mb-3">
+                                Quantity
+                            </label>
+                            <input type="number" v-model="selectedAccessoryQuantity" class="input-ui mb-2">
+                        </div>
+                    </div>
+
+                    <div class="flex justify-center px-12 mb-6">
+                        <button @click="btnConfirmAddAccessory()" class="pos-add-btn focus:outline-none focus:ring-0 ">
+                            Add Accessory
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
 
             <!-- add accessory modal -->
         <div data-te-modal-init
@@ -1375,6 +1578,7 @@
                 isActive: true,
 
                 packageMenuList:[],
+                packageAccessoriesList:[],
                 menuAreaListForPackage:[],
                 selectedMenuForPackage:null,
                 selectedMenuAreaForPackage:null,
@@ -1572,12 +1776,33 @@
                         });
 
                     });
+                    let accessoriesOfselectedPackage = this.selectedPackage.accessories;
+                    accessoriesOfselectedPackage.forEach((accessories)=>{
+                        // let is_dis_menu_price = 0;
+                        // this.food_total_package += (packageMenu.menu.prices[0].price - is_dis_menu_price) * packageMenu.quantity;
+                        this.packageAccessoriesList.push({
+                            quantity : accessories.quantity,
+                            name : accessories.accessory.name,
+                            // original_price : accessories.menu.prices[0].price,
+                            // discount_value: is_dis_menu_price,
+                            accessory_id : accessories.accessory_id,
+                            is_package : 1,
+                            // area_id: null,
+                            // areas : accessories.menu.areas
+                        });
+
+                    });
 
                     console.log('package')
                 }
                 else{
                     this.createRoom();
                 }
+            },
+            btnClickAddPackageMenuModal(){
+                this.getMenuList();
+                this.selectedMenuForPackage = null;
+                this.menuQuantityForPackage = null;
             },
             async selectedPackageMenuChange() {
                 const response = await getApiData({ url: '/api/menus/' + this.selectedMenuForPackage.id + '/areas', token: this.getToken() });
@@ -1615,6 +1840,7 @@
                 this.menuAreaListForPackage = []
                 // this.selectedMenuAreaForPackage = null;
                 this.menuQuantityForPackage = null;
+                document.getElementById('add_package_menu_modal').click();
             },
             removePackageMenu(index){
 
@@ -2421,6 +2647,12 @@
 
 
             // add accessory
+            btnClickedAddAccessory(){
+                this.selectedAccessoryCategory = null;
+                this.accessoryList = [];
+                this.selectedAccessoryQuantity = 0;
+                this.getAccessoryCategoryList();
+            },
             async getAccessoryCategoryList() {
                 const response = await getApiData({ url: '/api/pos/get_accessory_category', token: this.getToken() });
                 if (response.data) {
