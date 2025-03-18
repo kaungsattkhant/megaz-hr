@@ -865,8 +865,7 @@
                                                             {{ pm.quantity }}
                                                         </td>
                                                         <td class=" py-4 text-sm  ">
-                                                            <!-- {{ (pm.original_price - pm.discount_value) * pm.quantity  }} -->
-                                                            --
+                                                            {{ pm.unit_price * pm.quantity  }}
                                                         </td>
                                                         <td class=" py-4 text-sm  text-center">
                                                             <button
@@ -1759,7 +1758,7 @@
                 // this.packageMenuList = this.selectedPackage;
 
 
-                
+
             },
             confirmRoomBtnClicked() {
                 // this.getPurchaseMenuList();
@@ -1777,7 +1776,8 @@
                             menu_id : packageMenu.menu_id,
                             is_package : 1,
                             // area_id: null,
-                            areas : packageMenu.menu.areas
+                            areas : packageMenu.menu.areas,
+                            cooking_area_id: packageMenu.menu.cooking_area_id
                         });
 
                     });
@@ -1792,6 +1792,7 @@
                             // discount_value: is_dis_menu_price,
                             accessory_id : accessories.accessory_id,
                             is_package : 1,
+                            unit_price: accessories.accessory.accessory_price.price
                             // area_id: null,
                             // areas : accessories.menu.areas
                         });
@@ -1838,6 +1839,7 @@
                     menu_id : this.selectedMenuForPackage.prices[0].menu_id,
                     discount_value: this.is_menu_discount,
                     is_package : 0,
+                    cooking_area_id:this.selectedMenuForPackage.cooking_area_id
                     // area_id: this.selectedMenuAreaForPackage.id
                 });
                 this.food_total_package += (this.selectedMenuForPackage.prices[0].price - this.is_menu_discount) * this.menuQuantityForPackage;
