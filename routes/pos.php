@@ -47,7 +47,7 @@ Route::middleware('auth:api')->group(function () {
         Route::get('/order_item_group_list', 'getOrderItemGroupList');
     });
     //ksk
-    Route::prefix(prefix: 'pos')->controller(AccessoryController::class)->group(function () {
+    Route::prefix('pos')->controller(AccessoryController::class)->group(function () {
         Route::get('accessory_by_category/{accessory_category}', 'getAccessoryByCategory');
         Route::get('/get_accessory_category', 'getAccessoryCategory');
         Route::post('/add_accessory', 'createInvoiceAccessory');
