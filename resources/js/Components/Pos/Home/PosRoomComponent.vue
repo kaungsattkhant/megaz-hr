@@ -1750,7 +1750,7 @@
                 }
             },
             async getPackageList(time) {
-                const response = await getApiData({ url: '/api/packages?date='+time, token: this.getToken() });
+                const response = await getApiData({ url: '/api/packages?date='+ time + '&selling_area_id=' + this.area.id, token: this.getToken() });
                 if (response.data) {
                     this.packageList = response.data.data;
                 }
@@ -2471,7 +2471,7 @@
 
             // add menu
             async getMenuList() {
-                const response = await getApiData({ url: '/api/menus', token: this.getToken() });
+                const response = await getApiData({ url: '/api/menus?selling_area_id=' + this.area.id, token: this.getToken() });
                 if (response.data) {
                     this.menuList = response.data;
                 }
