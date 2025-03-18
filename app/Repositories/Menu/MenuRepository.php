@@ -40,8 +40,8 @@ class MenuRepository implements MenuRepositoryInterface
                 'prices', 
                 'items', 
                 'menuServiceDiscounts' => function ($query) use ($validateDate) {
-                    $query->where('from_date', '<=', $validateDate)->where('to_date', '>=', $validateDate);
-                }
+                    $query->where('from_date', '<=', $validateDate)->where('to_date', '>=', $validateDate);                                                                                                                                                                                                                                                                                                                                                                                                                     
+                }                                                                                                                                                                                               
             ])
             ->leftJoin('menu_category_areas', 'menus.menu_category_id', '=', 'menu_category_areas.menu_category_id')
             ->leftJoin('menu_areas', 'menu_category_areas.id', '=', 'menu_areas.menu_category_area_id')
