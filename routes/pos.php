@@ -45,6 +45,7 @@ Route::middleware('auth:api')->group(function () {
         Route::post('/pos_orders/check_foc_supervision', 'checkFocSupervision');
         Route::post('combine_order_items', 'combineOrderItem');
         Route::get('/order_item_group_list', 'getOrderItemGroupList');
+        Route::get('/order_items_group_by_menu', 'getOrderItemsGroupByMenu');
     });
     //ksk
     Route::prefix(prefix: 'pos')->controller(AccessoryController::class)->group(function () {

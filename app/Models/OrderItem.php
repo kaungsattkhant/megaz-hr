@@ -2,8 +2,11 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
+use App\Models\Area;
+use App\Models\Menu;
+use App\Models\Order;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class OrderItem extends Model
 {
@@ -19,7 +22,7 @@ class OrderItem extends Model
         'price',
         'is_foc',
         'order_id',
-        'status', 
+        'status',
         'is_complete',
         'menu_service_discount_id',
         'price',
@@ -37,10 +40,10 @@ class OrderItem extends Model
         'completed_by',
         'placed_at',
         'placed_by',
-        'group_order_id',
+        'group_order_id'
     ];
 
-    protected $with=['menu','area'];
+    // protected $with = ['menu', 'area'];
     public function area()
     {
         return $this->belongsTo(Area::class);
@@ -55,5 +58,4 @@ class OrderItem extends Model
     {
         return $this->belongsTo(Menu::class);
     }
-   
 }
