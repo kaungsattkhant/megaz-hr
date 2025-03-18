@@ -10,6 +10,7 @@ use App\Models\Staff;
 
 use App\Models\Entity;
 use App\Models\Invoice;
+use App\Models\MenuArea;
 use App\Models\OrderItem;
 use App\Models\Department;
 use App\Models\RoomSession;
@@ -17,6 +18,7 @@ use Illuminate\Http\Request;
 use App\Traits\CheckMenuPack;
 use App\Models\InvoiceSession;
 use App\Services\OrderService;
+use App\Models\MenuCategoryArea;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use App\Services\InvoiceModelService;
@@ -25,10 +27,9 @@ use App\Http\Resources\OrderItemResource;
 use App\Events\KitchenNotificationRequest;
 use App\Events\OrderStatusNotificationRequest;
 use App\Events\KitchenNotificationRequestByArea;
+use App\Events\OrderItemCombineNotificationRequest;
 use App\Events\WaiterOrderConfirmNotificationRequest;
 use App\Http\Action\SendNotification\SendNotification;
-use App\Models\MenuArea;
-use App\Models\MenuCategoryArea;
 
 class OrderRepository implements OrderRepositoryInterface
 {
@@ -72,7 +73,6 @@ class OrderRepository implements OrderRepositoryInterface
                 ResponseMessage('Menu Area not found', 404);
             }
             $cookingAreaId = $menuArea->cooking_area_id;
-            // dd($menu);
             if (!$menu) {
                 ResponseMessage('Menu not found', 404);
             }
@@ -616,13 +616,14 @@ class OrderRepository implements OrderRepositoryInterface
             ->where('status', 'pos_confirmed')
             ->whereNull('group_order_id');
         $getOrderItem = $orderItemQuery->get();
-
+        $cookingAreaId = $getOrderItem->first()->area_id;
         if ($getOrderItem->isNotEmpty()) {
             $orderItemQuery->update(
                 [
                     'group_order_id' => $generateUniqueId,
                 ]
             );
+            broadcast(new OrderItemCombineNotificationRequest($cookingAreaId));
             ResponseMessage('Grouped is successfully', 200);
         }
         ResponseMessage('Grouped Order Item fail!', 200);
@@ -659,13 +660,17 @@ class OrderRepository implements OrderRepositoryInterface
                         ",\"room_name\":\"", entities.name, "\"",
                         ",\"status\":\"", order_items.status, "\"",
                         ",\"remark\":\"", order_items.remark, "\"",
-                         ",\"group_order_id\":\"", order_items.group_order_id, "\"",
+                        ",\"group_order_id\":\"", order_items.group_order_id, "\"",
                         "}"
                     )
                 ) as order_items_details')
             )->groupBy('menus.id', 'menus.name')
-            ->groupBy('group_order_id')
-            ->get();
+            ->groupBy('group_order_id');
+        if ($request->has('area_id') && $request->area_id) {
+            $groupedOrderItem->where('order_items.area_id', $request->area_id);
+        }
+
+        $groupedOrderItem = $groupedOrderItem->get();
         $groupedOrderItem->transform(function ($item) {
             $item->order_items_details = json_decode('[' . $item->order_items_details . ']', true);
             return $item;
