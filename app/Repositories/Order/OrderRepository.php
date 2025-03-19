@@ -610,23 +610,32 @@ class OrderRepository implements OrderRepositoryInterface
 
     public function combineOrderItem($request)
     {
-        $orderItemIds = $request->order_item_ids;
-        $generateUniqueId = now()->format('YmdHis') . '_' . implode('_', $orderItemIds) . '_' . rand(1000000, 9999999);
-        $orderItemQuery = OrderItem::whereIn('id', $orderItemIds)
-            ->where('status', 'pos_confirmed')
-            ->whereNull('group_order_id');
-        $getOrderItem = $orderItemQuery->get();
-        $cookingAreaId = $getOrderItem->first()->area_id;
-        if ($getOrderItem->isNotEmpty()) {
-            $orderItemQuery->update(
-                [
-                    'group_order_id' => $generateUniqueId,
-                ]
-            );
-            broadcast(new OrderItemCombineNotificationRequest($cookingAreaId));
-            ResponseMessage('Grouped is successfully', 200);
+        DB::beginTransaction();
+        try {
+            $orderItemIds = $request->order_item_ids;
+            $generateUniqueId = now()->format('YmdHis') . '_' . implode('_', $orderItemIds) . '_' . rand(1000000, 9999999);
+            $orderItemQuery = OrderItem::whereIn('id', $orderItemIds)
+                ->where('status', 'pos_confirmed')
+                ->whereNull('group_order_id');
+            $getOrderItem = $orderItemQuery->get();
+            $cookingAreaId = $getOrderItem->first()->area_id;
+            if ($getOrderItem->isNotEmpty()) {
+                $orderItemQuery->update(
+                    [
+                        'group_order_id' => $generateUniqueId,
+                    ]
+                );
+                broadcast(new OrderItemCombineNotificationRequest($cookingAreaId));
+                DB::commit();
+                ResponseMessage('Grouped is successfully', 200);
+            } else {
+                ResponseMessage('Grouped Order Item fail!', 200);
+            }
+        } catch (\Exception $e) {
+            DB::rollBack();
+            ResponseMessage($e->getMessage(), 422);
+            throw $e;
         }
-        ResponseMessage('Grouped Order Item fail!', 200);
     }
     public function getOrderItemGroupList($request)
     {
@@ -670,13 +679,13 @@ class OrderRepository implements OrderRepositoryInterface
             $groupedOrderItem->where('order_items.area_id', $request->area_id);
         }
 
-        $groupedOrderItem = $groupedOrderItem->get();
+        $groupedOrderItem = $groupedOrderItem->paginate(config('common.list_count'));
         $groupedOrderItem->transform(function ($item) {
             $item->order_items_details = json_decode('[' . $item->order_items_details . ']', true);
             return $item;
         });
 
-        return $groupedOrderItem;
+        return ResponseData($groupedOrderItem, 200, true, 'Order reterived successfully.');
     }
 
 
@@ -716,12 +725,11 @@ class OrderRepository implements OrderRepositoryInterface
             )
             ->groupBy('menus.id', 'menus.name')
             ->whereNull('order_items.group_order_id')
-            ->get();
+            ->paginate(config('common.list_count'));
         $groupedOrderItem->transform(function ($item) {
             $item->order_items_details = json_decode('[' . $item->order_items_details . ']', true);
             return $item;
         });
-
-        return $groupedOrderItem;
+        return ResponseData($groupedOrderItem, 200, true, 'Order reterived successfully.');
     }
 }
