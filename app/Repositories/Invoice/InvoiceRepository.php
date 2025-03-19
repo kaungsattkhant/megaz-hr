@@ -245,7 +245,6 @@ class InvoiceRepository implements InvoiceRepositoryInterface
                         }
                     }
                 }
-                dd('abc');
                 DB::commit();
                 $returnData = [
                     'customer' => $customer,

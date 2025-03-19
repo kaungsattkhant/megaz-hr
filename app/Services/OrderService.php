@@ -256,7 +256,6 @@ class OrderService
                     $discountAmount = $menuData['discount_value'] * $menuData['quantity'];
                     $totalDiscount += $discountAmount;
                 }
-                dd('he');
                 // dd($order);
                 if ($order) {
                     // $order->total_quantity += $menuData['quantity'];
@@ -316,7 +315,6 @@ class OrderService
                 for ($i = 0; $i < (int) $quantityCount; $i++) {
                     // $insertData[] = $orderItemData;
                     $order_item = OrderItem::create($menuData);
-                    dd($order_item);
                     $insertData[] = $order_item;
                     if ($order_item->is_foc == 1) {
                         $focTotal += $order_item->price;
