@@ -134,7 +134,6 @@ class OrderService
                 // $order_items = OrderItem::create($data);
                 //end
 
-
                 //update order amount to invoice   
                 $invoice = $this->updateOrderItemAmountToInvoice('add', $invoice, $data['original_price'], $data['quantity'], $discountAmount);
                 // change order item creat depend on quantity , like quantity=2 , create order two time, quantity=3 ,creat 3 time
