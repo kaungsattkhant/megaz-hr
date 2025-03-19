@@ -37,6 +37,7 @@ return new class extends Migration {
             $table->integer('placed_by')->nullable();
             $table->foreignId('menu_service_discount_id')->nullable()->foreignId()->constrained()->onDelete('cascade');
             $table->string('remark')->nullable();
+            $table->string('group_order_id')->nullable();
             $table->timestamps();
         });
     }

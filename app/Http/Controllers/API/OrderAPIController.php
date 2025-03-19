@@ -62,13 +62,22 @@ class OrderAPIController extends Controller
         $this->orderRepo->checkFocSupervision($request);
     }
 
-    public function combineOrderItem(Request $request){
-        $data=$this->orderRepo->combineOrderItem($request);
+    public function combineOrderItem(Request $request)
+    {
+        $data = $this->orderRepo->combineOrderItem($request);
         ResponseData($data);
     }
 
-    public function getOrderItemGroupList(Request $request){
-        $data=$this->orderRepo->getOrderItemGroupList($request);
+    public function getOrderItemGroupList(Request $request)
+    {
+        $data = $this->orderRepo->getOrderItemGroupList($request);
+        ResponseData($data);
+    }
+
+
+    public function getOrderItemsGroupByMenu(Request $request)
+    {
+        $data = $this->orderRepo->getOrderItemsGroupByMenu($request);
         ResponseData($data);
     }
 }

@@ -760,7 +760,6 @@ class EntityRepository implements EntityRepositoryInterface
     {
         DB::beginTransaction();
         try {
-
             $entity = Entity::create($data);
             if ($data['entity_type'] == 'room') {
                 for ($hour = 0; $hour < 24; $hour++) {

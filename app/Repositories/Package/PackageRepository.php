@@ -18,27 +18,79 @@ class PackageRepository implements PackageRepositoryInterface
     {
         // if(isset($request->perPage))
         $validateDate = $request->date ?? CurrentDate();
-        $packages = Package::with(['menuPackages.menu'])->where('from_date', '<=', $validateDate)
+        // $packages = Package::with(['menuPackages.menu'])->where('from_date', '<=', $validateDate)
+        //     ->orderBy('created_at', 'desc')
+        //     ->when($request->has('search'), function ($q) use ($request) {
+        //         $q->where('name', 'LIKE', '%' . $request->search . '%')
+        //             ->orWhere('price', 'LIKE', '%' . $request->search . '%');
+        //     })
+        //     ->where('to_date', '>=', $validateDate)
+        //     ->with([
+        //         'menuPackages.menu.prices',
+        //         'rooms',
+        //         'accessories.accessory',
+        //         'menuPackages.menu.menuServiceDiscounts' => function ($query) use ($validateDate) {
+        //             $query->where('from_date', '<=', $validateDate)
+        //                 ->where('to_date', '>=', $validateDate)
+        //                 ->first();
+        //         }
+        //     ])
+        //     ->paginate(config('common.list_count'));
+        $sellingAreaId= isset($request->selling_area_id) ? $request->selling_area_id : null;
+        $packageQuery = Package::with([
+            'menuPackages.menu' => function ($query) use ($sellingAreaId) {
+                $query->leftJoinSub(
+                    DB::table('menu_category_areas')
+                        ->leftJoin('menu_areas', 'menu_category_areas.id', '=', 'menu_areas.menu_category_area_id')
+                        ->where('menu_category_areas.selling_area_id', $sellingAreaId)
+                        ->where(function ($subQuery) {
+                            $subQuery->where('menu_areas.is_default', 1)
+                                ->orWhereNull('menu_areas.is_default');
+                        })
+                        ->select([
+                            'menu_category_areas.menu_category_id', // Needed for join
+                            DB::raw('COALESCE(menu_areas.cooking_area_id, NULL) as cooking_area_id') // Avoids NULL cooking_area_id
+                        ]),
+                    'menu_area_data',
+                    'menus.menu_category_id',
+                    '=',
+                    'menu_area_data.menu_category_id'
+                )->select('menus.*', 'menu_area_data.cooking_area_id');
+            },
+            // 'menuPackages.menu' => function ($query) use ($sellingAreaId) {
+            //     $query->when(isset($sellingAreaId), function ($q) use ($sellingAreaId) {
+            //         $q->leftJoin('menu_category_areas', 'menus.menu_category_id', '=', 'menu_category_areas.menu_category_id')
+            //           ->leftJoin('menu_areas', 'menu_category_areas.id', '=', 'menu_areas.menu_category_area_id')
+            //           ->where('menu_category_areas.selling_area_id', $sellingAreaId)
+            //           ->where('menu_areas.is_default', 1)
+            //           ->select('menus.*', 'menu_areas.cooking_area_id'); // Include cooking_area_id
+            //     });
+            // },
+
+            'menuPackages.menu.prices',
+            'rooms',
+            'accessories.accessory',
+            'menuPackages.menu.menuServiceDiscounts' => function ($query) use ($validateDate) {
+                $query->where('from_date', '<=', $validateDate)
+                    ->where('to_date', '>=', $validateDate);
+            }
+        ])->where('from_date', '<=', $validateDate)
+            ->where('to_date', '>=', $validateDate)
             ->orderBy('created_at', 'desc')
             ->when($request->has('search'), function ($q) use ($request) {
                 $q->where('name', 'LIKE', '%' . $request->search . '%')
                     ->orWhere('price', 'LIKE', '%' . $request->search . '%');
-            })
-            ->where('to_date', '>=', $validateDate)
-            ->with([
-                'menuPackages.menu.prices',
-                'rooms',
-                'accessories.accessory',
-                'menuPackages.menu.menuServiceDiscounts' => function ($query) use ($validateDate) {
-                    $query->where('from_date', '<=', $validateDate)
-                        ->where('to_date', '>=', $validateDate)
-                        ->first();
-                }
-            ])
-            ->paginate(config('common.list_count'));
-
+            });
+        // if (isset($request->page)) {
+        $packages = $packageQuery->paginate(config('common.list_count'));
         ResponseData($packages);
+        // } else {
+        // $packages = $packageQuery->get();
+        // ResponseData($packages);
+        // }
+
     }
+
 
     public function detailPackage(int $id)
     {

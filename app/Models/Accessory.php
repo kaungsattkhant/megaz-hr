@@ -12,6 +12,7 @@ class Accessory extends Model
     use HasFactory;
     protected $fillable=['code','accessory_category_id','name','image_url','image_path','is_feature','is_active','created_by'];
     
+    protected $with=['accessory_price'];
     public function accessory_category(){
         return $this->belongsTo(AccessoryCategory::class);
     }
