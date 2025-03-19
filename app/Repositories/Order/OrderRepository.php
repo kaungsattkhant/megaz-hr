@@ -614,6 +614,7 @@ class OrderRepository implements OrderRepositoryInterface
         try {
             $orderItemIds = $request->order_item_ids;
             $generateUniqueId = now()->format('YmdHis') . '_' . implode('_', $orderItemIds) . '_' . rand(1000000, 9999999);
+
             $orderItemQuery = OrderItem::whereIn('id', $orderItemIds)
                 ->where('status', 'pos_confirmed')
                 ->whereNull('group_order_id');
