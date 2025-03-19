@@ -619,14 +619,16 @@ class OrderRepository implements OrderRepositoryInterface
                 ->where('status', 'pos_confirmed')
                 ->whereNull('group_order_id');
             $getOrderItem = $orderItemQuery->get();
-            $cookingAreaId = $getOrderItem->first()->area_id;
+            $cookingAreaIds = $getOrderItem->pluck('area_id')->unique();
             if ($getOrderItem->isNotEmpty()) {
                 $orderItemQuery->update(
                     [
                         'group_order_id' => $generateUniqueId,
                     ]
                 );
-                broadcast(new OrderItemCombineNotificationRequest($cookingAreaId));
+                foreach ($cookingAreaIds as $cookingAreaId) {
+                    broadcast(new OrderItemCombineNotificationRequest($cookingAreaId));
+                }
                 DB::commit();
                 ResponseMessage('Grouped is successfully', 200);
             } else {
