@@ -72,7 +72,7 @@ class OrderRepository implements OrderRepositoryInterface
                 ResponseMessage('Menu Area not found', 404);
             }
             $cookingAreaId = $menuArea->cooking_area_id;
-            // dd($menu);
+            
             if (!$menu) {
                 ResponseMessage('Menu not found', 404);
             }
