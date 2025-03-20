@@ -557,7 +557,6 @@ class EntityRepository implements EntityRepositoryInterface
                 }
             }
             foreach ($invoice->orders as $order) {
-
                 $order->order_items = collect();
 
                 foreach ($consolidatedOrderItems as $menuId => $itemsByStatus) {
