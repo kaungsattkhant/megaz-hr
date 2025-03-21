@@ -645,9 +645,10 @@ class OrderRepository implements OrderRepositoryInterface
         $groupedOrderItem = OrderItem::whereNotNull('group_order_id')
             ->join('menus', 'order_items.menu_id', 'menus.id')
             ->join('orders', 'order_items.order_id', 'orders.id')
-            ->join('invoices', 'orders.invoice_id', 'invoices.id')
-            ->join('entities', 'invoices.entity_id', 'entities.id')
             ->join('areas', 'order_items.area_id', 'areas.id')
+            ->join('invoices', 'orders.invoice_id', 'invoices.id')
+            ->leftJoin('entities', 'invoices.entity_id', 'entities.id')
+
             ->select(
                 'menus.id as menu_id',
                 'menus.name as menu_name',
@@ -696,7 +697,7 @@ class OrderRepository implements OrderRepositoryInterface
             ->join('orders', 'order_items.order_id', 'orders.id')
             ->join('areas', 'order_items.area_id', 'areas.id')
             ->join('invoices', 'orders.invoice_id', 'invoices.id')
-            ->join('entities', 'invoices.entity_id', 'entities.id')
+            ->leftJoin('entities', 'invoices.entity_id', 'entities.id')
 
             ->select(
                 'menus.id as menu_id',
