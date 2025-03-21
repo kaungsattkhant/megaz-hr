@@ -15,6 +15,7 @@ use App\Models\MenuCategoryArea;
 use Illuminate\Support\Facades\DB;
 use App\Events\KitchenNotificationRequest;
 use App\Events\KitchenNotificationRequestByArea;
+use App\Events\OrderNotificationByArea;
 use App\Events\WaiterOrderConfirmNotificationRequest;
 
 class OrderService
@@ -106,7 +107,8 @@ class OrderService
                     $insertData[] = $createdOrderItem;
                 }
                 // OrderItem::insert($insertData);
-                broadcast(new KitchenNotificationRequestByArea($insertData, $cookingAreaId));
+                // broadcast(new KitchenNotificationRequestByArea($insertData, $cookingAreaId));
+                broadcast(new OrderNotificationByArea( $cookingAreaId)); //send notifcation to checker list
                 DB::commit();
                 return $order;
                 // $order->total_quantity += $data['quantity'];
@@ -162,7 +164,9 @@ class OrderService
                 // $orderItems=OrderItem::insert($insertData);
                 // dd($orderItems);
                 // broadcast(new KitchenNotificationRequest($entity, $order, null, $order_items, 7));
-                broadcast(new KitchenNotificationRequestByArea($insertData, $cookingAreaId));
+                
+                // broadcast(new KitchenNotificationRequestByArea($insertData, $cookingAreaId));
+                broadcast(new OrderNotificationByArea( $cookingAreaId)); //send notifcation to checker list
                 DB::commit();
                 return $order;
             }
@@ -328,7 +332,8 @@ class OrderService
                 // dd($order_item);
 
             }
-            broadcast(new KitchenNotificationRequestByArea($orderItemsArray, $cookingAreaId));
+            broadcast(new OrderNotificationByArea( $cookingAreaId)); //send notifcation to checker list
+            // broadcast(new KitchenNotificationRequestByArea($orderItemsArray, $cookingAreaId));
             $order->foc_total += $focTotal;
             $order->save();
             //doesn't need to do waiter
