@@ -44,6 +44,8 @@ class OrderRepository implements OrderRepositoryInterface
 
     public function createOrder(array $data)
     {
+        return $this->orderService->createOrder($data);
+
         DB::beginTransaction();
         try {
             //check and remove pack is enought for menu;
@@ -198,6 +200,8 @@ class OrderRepository implements OrderRepositoryInterface
 
     public function createMultipleOrder(array $data)
     {
+        return $this->orderService->createMultipleOrder($data);
+        
         DB::beginTransaction();
         try {
             $invoiceId = $data['invoice_id'];
