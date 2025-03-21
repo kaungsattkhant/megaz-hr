@@ -671,13 +671,12 @@ class OrderRepository implements OrderRepositoryInterface
                         ",\"room_id\":\"", entities.id, "\"",
                         ",\"room_name\":\"", entities.name, "\"",
                         ",\"status\":\"", order_items.status, "\"",
-                        ",\"remark\":\"", order_items.remark, "\"",
+                        ",\"remark\":\"", IFNULL(order_items.remark, ""), "\"",
                         ",\"group_order_id\":\"", order_items.group_order_id, "\"",
                         "}"
                     )
                 ) as order_items_details')
-            )->groupBy('menus.id', 'menus.name')
-            ->groupBy('group_order_id');
+            )->groupBy('menus.id', 'menus.name', 'group_order_id');
         if ($request->has('area_id') && $request->area_id) {
             $groupedOrderItem->where('order_items.area_id', $request->area_id);
         }
@@ -685,45 +684,45 @@ class OrderRepository implements OrderRepositoryInterface
         $groupedOrderItem = $groupedOrderItem->paginate(config('common.list_count'));
         $groupedOrderItem->transform(function ($item) {
             $item->order_items_details = json_decode('[' . $item->order_items_details . ']', true);
-            $item->total_quantity = array_sum(array_column($item->order_items_details, 'quantity'));
             return $item;
         });
 
         return ResponseData($groupedOrderItem, 200, true, 'Order reterived successfully.');
     }
 
-
     public function getOrderItemsGroupByMenu($request)
     {
         $groupedOrderItem = OrderItem::join('menus', 'order_items.menu_id', 'menus.id')
             ->join('orders', 'order_items.order_id', 'orders.id')
+            ->join('areas', 'order_items.area_id', 'areas.id')
             ->join('invoices', 'orders.invoice_id', 'invoices.id')
             ->join('entities', 'invoices.entity_id', 'entities.id')
-            ->join('areas', 'order_items.area_id', 'areas.id')
+
             ->select(
                 'menus.id as menu_id',
                 'menus.name as menu_name',
                 DB::raw('MIN(order_items.date) as date'),
-                DB::raw('GROUP_CONCAT(DISTINCT order_items.order_id) as order_ids'),
+                DB::raw('GROUP_CONCAT(DISTINCT order_items.order_id ORDER BY order_items.order_id) as order_ids'),
                 DB::raw('SUM(order_items.quantity) as total_quantity'),
                 // DB::raw('GROUP_CONCAT(DISTINCT areas.name) as area_name'),
                 // DB::raw('GROUP_CONCAT(order_items.area_id) as areas_ids'),
-                DB::raw('GROUP_CONCAT(DISTINCT entities.name) as room_name'),
+                DB::raw('GROUP_CONCAT(DISTINCT entities.name ORDER BY entities.name) as room_name'),
                 DB::raw('GROUP_CONCAT(
                     CONCAT(
-                        "{\"order_item_id\":", order_items.id,
-                        ",\"order_id\":", order_items.order_id,
-                        ",\"date\":\"", order_items.date, "\"",
-                        ",\"menu_id\":", order_items.menu_id,
-                        ",\"menu_name\":\"", menus.name, "\"",
-                        ",\"quantity\":", order_items.quantity,
-                        ",\"area_id\":", order_items.area_id,
-                        ",\"area_name\":\"", areas.name, "\"",
-                        ",\"room_id\":\"", entities.id, "\"",
-                        ",\"room_name\":\"", entities.name, "\"",
-                        ",\"status\":\"", order_items.status, "\"",
-                        ",\"remark\":\"", order_items.remark, "\"",
-                        "}"
+                    "{\"order_item_id\":", IFNULL(order_items.id, ""),
+                    ",\"order_id\":", IFNULL(order_items.order_id, ""),
+                    ",\"date\":\"", IFNULL(order_items.date, ""), "\"",
+                    ",\"menu_id\":", IFNULL(order_items.menu_id, ""),
+                    ",\"menu_name\":\"", IFNULL(menus.name, ""), "\"",
+                    ",\"quantity\":", IFNULL(order_items.quantity, ""),
+                    ",\"area_id\":", IFNULL(order_items.area_id, ""),
+                    ",\"area_name\":\"", IFNULL(areas.name, ""), "\"",
+                    ",\"room_id\":\"", IFNULL(entities.id, ""), "\"",
+                    ",\"room_name\":\"", IFNULL(entities.name, ""), "\"",
+                    ",\"status\":\"", IFNULL(order_items.status, ""), "\"",
+                    ",\"remark\":\"", IFNULL(order_items.remark, ""), "\"",
+                    "}"
+                    
                     )
                 ) as order_items_details')
             )
@@ -732,8 +731,6 @@ class OrderRepository implements OrderRepositoryInterface
             ->paginate(config('common.list_count'));
         $groupedOrderItem->transform(function ($item) {
             $item->order_items_details = json_decode('[' . $item->order_items_details . ']', true);
-            $item->total_quantity = array_sum(array_column($item->order_items_details, 'quantity'));
-
             return $item;
         });
         return ResponseData($groupedOrderItem, 200, true, 'Order reterived successfully.');
