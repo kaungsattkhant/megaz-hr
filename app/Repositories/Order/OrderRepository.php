@@ -686,6 +686,7 @@ class OrderRepository implements OrderRepositoryInterface
         $groupedOrderItem = $groupedOrderItem->paginate(config('common.list_count'));
         $groupedOrderItem->transform(function ($item) {
             $item->order_items_details = json_decode('[' . $item->order_items_details . ']', true);
+            $item->total_quantity = array_sum(array_column($item->order_items_details, 'quantity'));
             return $item;
         });
 
@@ -732,6 +733,8 @@ class OrderRepository implements OrderRepositoryInterface
             ->paginate(config('common.list_count'));
         $groupedOrderItem->transform(function ($item) {
             $item->order_items_details = json_decode('[' . $item->order_items_details . ']', true);
+            $item->total_quantity = array_sum(array_column($item->order_items_details, 'quantity'));
+
             return $item;
         });
         return ResponseData($groupedOrderItem, 200, true, 'Order reterived successfully.');
