@@ -10,7 +10,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 class InvoiceAccessory extends Model
 {
     use HasFactory;
-    protected $fillable=['quantity','accessory_id','invoice_id'];
+    protected $fillable=['quantity','accessory_id','invoice_id','is_package','accessory_price'];
 
     public function invoice(){
         return $this->belongsTo(Invoice::class);

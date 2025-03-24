@@ -11,11 +11,12 @@ use App\Models\MenuArea;
 use App\Models\OrderItem;
 use App\Models\RoomSession;
 use GuzzleHttp\Psr7\Response;
+use App\Models\InvoiceAccessory;
 use App\Models\MenuCategoryArea;
 use Illuminate\Support\Facades\DB;
+use App\Events\OrderNotificationByArea;
 use App\Events\KitchenNotificationRequest;
 use App\Events\KitchenNotificationRequestByArea;
-use App\Events\OrderNotificationByArea;
 use App\Events\WaiterOrderConfirmNotificationRequest;
 
 class OrderService
@@ -108,7 +109,7 @@ class OrderService
                 }
                 // OrderItem::insert($insertData);
                 // broadcast(new KitchenNotificationRequestByArea($insertData, $cookingAreaId));
-                broadcast(new OrderNotificationByArea( $cookingAreaId)); //send notifcation to checker list
+                broadcast(new OrderNotificationByArea($cookingAreaId)); //send notifcation to checker list
                 DB::commit();
                 return $order;
                 // $order->total_quantity += $data['quantity'];
@@ -164,9 +165,9 @@ class OrderService
                 // $orderItems=OrderItem::insert($insertData);
                 // dd($orderItems);
                 // broadcast(new KitchenNotificationRequest($entity, $order, null, $order_items, 7));
-                
+
                 // broadcast(new KitchenNotificationRequestByArea($insertData, $cookingAreaId));
-                broadcast(new OrderNotificationByArea( $cookingAreaId)); //send notifcation to checker list
+                broadcast(new OrderNotificationByArea($cookingAreaId)); //send notifcation to checker list
                 DB::commit();
                 return $order;
             }
@@ -182,7 +183,7 @@ class OrderService
         DB::beginTransaction();
         try {
             $invoiceId = $data['invoice_id'];
-            $order = Order::where('invoice_id', $invoiceId)->first();
+            $order = Order::where('invoice_id', operator: $invoiceId)->first();
             // $sellingAreaId = $data['selling_area_id'];
             $categorySums = [];
             $totalDiscount = 0;
@@ -255,7 +256,7 @@ class OrderService
                     // }
                     // dd('abc');
                 } else {
-                    $latestMenuServiceDiscount=null;
+                    $latestMenuServiceDiscount = null;
                     $discountAmount = $menuData['discount_value'] * $menuData['quantity'];
                     $totalDiscount += $discountAmount;
                 }
@@ -266,8 +267,10 @@ class OrderService
                     // $order->total += $menuData['original_price'] * $menuData['quantity'];
                     // $order->order_sub_total += $menuData['original_price'] * $menuData['quantity'];
                     // $order->update($menuData);
-                    $order = $this->updateOrderItemAmountToOrder('add', $order, $menuData['original_price'], $menuData['quantity'], $discountAmount);
-                    $invoice = $this->updateOrderItemAmountToInvoice('add', $invoice, $menuData['original_price'], $menuData['quantity'], $discountAmount);
+                    // if ($invoice->type != 'package') {
+                        $order = $this->updateOrderItemAmountToOrder('add', $order, $menuData['original_price'], $menuData['quantity'], $discountAmount);
+                        $invoice = $this->updateOrderItemAmountToInvoice('add', $invoice, $menuData['original_price'], $menuData['quantity'], $discountAmount);
+                    // }
                     $originalOrderItem = OrderItem::where('menu_id', $menuData['menu_id'])
                         ->where('order_id', $order->id)
                         ->first();
@@ -285,14 +288,19 @@ class OrderService
                 } else {
                     $orderData['invoice_id'] = $invoiceId;
                     $orderData['date'] = CurrentTime();
-                    $orderData['total'] = $menuData['original_price'] * $menuData['quantity'];
-                    $orderData['order_sub_total'] = ($menuData['original_price'] * $menuData['quantity']) - $discountAmount;
+                    $orderData['total'] =(isset($menuData['is_package']) && $menuData['is_package']) 
+                    ? 0 
+                    : $menuData['original_price'] * $menuData['quantity'];
+                    $orderData['order_sub_total'] =  (isset($menuData['is_package']) && $menuData['is_package']) 
+                    ? 0 
+                    : ($menuData['original_price'] * $menuData['quantity']) - $discountAmount;
                     $orderData['total_quantity'] = $menuData['quantity'];
                     $orderData['total_discount_price'] = $discountAmount; // update total discount only for this order
                     $order = Order::create($orderData);
                     $order->update(['order_id' => sprintf('%05d', $order->id)]);
-                    $invoice = $this->updateOrderItemAmountToInvoice('add', $invoice, $menuData['original_price'], $menuData['quantity'], $discountAmount);
-
+                    if ($invoice->invoice_type != 'package') {
+                        $invoice = $this->updateOrderItemAmountToInvoice('add', $invoice, $menuData['original_price'], $menuData['quantity'], $discountAmount);
+                    }
                     $menuData['order_id'] = $order->id;
                     $menuData['date'] = now();
                     $menuData['quantity'] = $defaultQuantity;
@@ -303,8 +311,12 @@ class OrderService
                     $menuData['menu_service_discount_id'] = $latestMenuServiceDiscount ? $latestMenuServiceDiscount->id : null;
                     $menuData['discount_value'] = $defaultDiscountAmont;
                     $menuData['area_id'] = $cookingAreaId;
-                    $menuData['sub_total_price'] = ($menuData['original_price']) - $defaultDiscountAmont; //after  
-                    $menuData['price'] = $menuData['original_price']; //after  
+                    $menuData['sub_total_price'] =(isset($menuData['is_package']) && $menuData['is_package']) 
+                    ? 0 
+                    :  ($menuData['original_price']) - $defaultDiscountAmont; //after  
+                    $menuData['price'] = (isset($menuData['is_package']) && $menuData['is_package']) 
+                    ? 0 
+                    : $menuData['original_price']; //after  
 
                     // $menuData['order_id'] = $order->id;
                     // $menuData['price'] = $menuData['original_price'] * $menuData['quantity'];
@@ -326,13 +338,9 @@ class OrderService
                     $order_item->order = $order_item->order;
                     array_push($orderItemsArray, $order_item);
                 }
-                // dd($insertData);
-                // dd($menuData);
-                // $order_item = OrderItem::create($menuData);
-                // dd($order_item);
 
             }
-            broadcast(new OrderNotificationByArea( $cookingAreaId)); //send notifcation to checker list
+            broadcast(new OrderNotificationByArea($cookingAreaId)); //send notifcation to checker list
             // broadcast(new KitchenNotificationRequestByArea($orderItemsArray, $cookingAreaId));
             $order->foc_total += $focTotal;
             $order->save();
@@ -545,6 +553,7 @@ class OrderService
         return $data;
     }
 
+
     public function updateOrderItemAmountToOrder($action, $orderModel, $originalPrice, $quantity, $discountAmount)
     {
         if ($action == 'add') {
@@ -587,4 +596,18 @@ class OrderService
 
     }
 
+    public function createAccessorty($invoice, $accessories)
+    {
+        $invoiceId = $invoice->id;
+        foreach ($accessories as $accessory) {
+            $invoiceAccessory = InvoiceAccessory::create([
+                'quantity' => $accessory['quantity'],
+                'accessory_id' => $accessory['accessory_id'],
+                'invoice_id' => $invoiceId,
+                'is_package'=>$accessory['is_package'],
+                'accessory_price'=>$accessory['is_package'] ? 0 : $accessory['unit_price'],
+            ]);
+        }
+        return true;
+    }
 }

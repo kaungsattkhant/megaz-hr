@@ -14,8 +14,10 @@ return new class extends Migration
         Schema::create('invoice_accessories', function (Blueprint $table) {
             $table->id();
             $table->integer('quantity');
+            $table->double('accessory_price')->default(0);
             $table->unsignedInteger('accessory_id');
             $table->foreignId('invoice_id')->constrained()->onDelete('cascade');
+            $table->boolean('is_package')->default(0);
             $table->timestamps();
         });
     }
