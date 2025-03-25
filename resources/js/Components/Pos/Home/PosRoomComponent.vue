@@ -387,7 +387,7 @@
                                             {{ menu2.status }}
                                         </p> -->
                                         <p class=" col-span-4 text-sm text-right">
-                                            {{ (accessory.accessory.accessory_price.price * accessory.quantity).toLocaleString() }} MMKs
+                                            {{ (accessory.accessory_price * accessory.quantity).toLocaleString() }} MMKs
                                         </p>
                                     </div>
                                 </div>
