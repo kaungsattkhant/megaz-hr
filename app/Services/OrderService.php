@@ -605,7 +605,7 @@ class OrderService
                 'accessory_id' => $accessory['accessory_id'],
                 'invoice_id' => $invoiceId,
                 'is_package'=>$accessory['is_package'],
-                'accessory_price'=>$accessory['is_package'] ? 0 : $accessory['unit_price'],
+                'accessory_price'=>$accessory['is_package'] ? 0 : $accessory['unit_price']* (int)$accessory['quantity'],
             ]);
         }
         return true;

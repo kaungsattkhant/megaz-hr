@@ -238,6 +238,7 @@ class InvoiceRepository implements InvoiceRepositoryInterface
                     $orderData['invoice_id'] = $invoice->id;
                     $orderData['menuArray'] = json_decode($data['orders'], true);
                     $decodedAccessories = json_decode($data['accessories'], true);
+                    dd($orderData['menuArray']);
                     if (!empty($orderData['menuArray'])) {
                         $order = $this->orderService->createMultipleOrder($orderData);
                     }

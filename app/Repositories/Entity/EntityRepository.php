@@ -485,8 +485,8 @@ class EntityRepository implements EntityRepositoryInterface
             //accesory
             $invoiceAccessories = $invoice->accessories;
             foreach ($invoiceAccessories as $invoiceAccessorie) {
-                
-                $total_accessory_value += $invoiceAccessorie->accessory->accessory_price->price * $invoiceAccessorie->quantity;
+                $invoiceAccessorie->load('accessory');
+                $total_accessory_value += $invoiceAccessorie->is_package ? 0 : $invoiceAccessorie->accessory_price;
             }
             // $invoiceAccessoryCollection = $invoiceAccessoryCollection->merge($invoice->invoiceAccessories);
             //end_accessoryI
