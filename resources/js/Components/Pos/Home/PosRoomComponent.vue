@@ -237,7 +237,7 @@
                                 </button>
                             </div>
                         </div>
-                        <div class="small-scrollbar overflow-y-auto" style="height:calc(100% - 195px)">
+                        <div class="small-scrollbar overflow-y-auto" style="height:calc(100% - 300px)">
                             <div class="padding-section border-b    " v-if="selectedRoom">
                                 <div class="flex justify-between font-semibold mb-2">
                                     <p class="text-sm text-black" v-if="selectedRoom">
@@ -397,7 +397,7 @@
 
                         </div>
 
-                        <div class="absolute bottom-0 border-t-2 border-gray-200 w-full padding-section">
+                        <div class="absolute bottom-0 border-t-2 border-gray-200 w-full padding-section bg-white">
                             <!-- <div v-if="isPackage" class=" text-sm text-right flex gap-x-2 justify-end pr-2 mb-2">
                                 <p>
                                     Package Price
@@ -775,34 +775,36 @@
                                                     </tr>
                                                 </thead>
                                                 <tbody>
-                                                    <tr class="" v-for="(pm,index) in packageMenuList" :key="index">
-                                                        <td class=" py-4 text-sm  ">
-                                                            {{ pm.name }}
-                                                        </td>
-                                                        <!-- <td class=" py-4 text-sm  ">
-                                                            <select name="" :class="pm.is_package == 0 ? 'hidden' : ''"
-                                                                class="text-xs pl-0 border-0 focus:shadow-none focus:outline-none focus:ring-0 select-box area-select-box !pr-6"
-                                                                placeholder="Select Area" @change="packageCookingAreaChange(area,index)" v-model="pm.area_id">
-                                                                <option disabled selected>Select Area</option>
-                                                                <option v-for="(area, index) in pm.areas" :key="index"
-                                                                    :value="area.id" class="">
-                                                                    {{ area.name }}
-                                                                </option>
-                                                            </select>
-                                                        </td> -->
-                                                        <td class=" py-4 text-sm  ">
-                                                            {{ pm.quantity }}
-                                                        </td>
-                                                        <td class=" py-4 text-sm  ">
-                                                            {{ (pm.original_price - pm.discount_value) * pm.quantity  }}
-                                                        </td>
-                                                        <td class=" py-4 text-sm  text-center">
-                                                            <button
-                                                                @click="removePackageMenu(index)">
-                                                                <i class="fal fa-times  pr-3"></i>
-                                                            </button>
-                                                        </td>
-                                                    </tr>
+                                                    <div class="contents" v-for="(pm,index) in packageMenuList" :key="index">
+                                                        <tr class="" v-if="pm.is_package != -1">
+                                                            <td class=" py-4 text-sm  ">
+                                                                {{ pm.name }}
+                                                            </td>
+                                                            <!-- <td class=" py-4 text-sm  ">
+                                                                <select name="" :class="pm.is_package == 0 ? 'hidden' : ''"
+                                                                    class="text-xs pl-0 border-0 focus:shadow-none focus:outline-none focus:ring-0 select-box area-select-box !pr-6"
+                                                                    placeholder="Select Area" @change="packageCookingAreaChange(area,index)" v-model="pm.area_id">
+                                                                    <option disabled selected>Select Area</option>
+                                                                    <option v-for="(area, index) in pm.areas" :key="index"
+                                                                        :value="area.id" class="">
+                                                                        {{ area.name }}
+                                                                    </option>
+                                                                </select>
+                                                            </td> -->
+                                                            <td class=" py-4 text-sm  ">
+                                                                {{ pm.quantity }}
+                                                            </td>
+                                                            <td class=" py-4 text-sm  ">
+                                                                {{ (pm.original_price - pm.discount_value) * pm.quantity  }}
+                                                            </td>
+                                                            <td class=" py-4 text-sm  text-center">
+                                                                <button
+                                                                    @click="removePackageMenu(index)">
+                                                                    <i class="fal fa-times  pr-3"></i>
+                                                                </button>
+                                                            </td>
+                                                        </tr>
+                                                    </div>
                                                 </tbody>
                                             </table>
                                         </div>
@@ -1852,7 +1854,8 @@
             removePackageMenu(index){
 
                 this.food_total_package -= (this.packageMenuList[index].original_price - this.packageMenuList[index].discount_value) * this.packageMenuList[index].quantity;
-                this.packageMenuList.splice(index, 1);
+                // this.packageMenuList.splice(index, 1);
+                this.packageMenuList[index].is_package = -1
             },
             
             btnConfirmAddPackageAccessory() {
