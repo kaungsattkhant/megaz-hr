@@ -1765,6 +1765,8 @@
             confirmRoomBtnClicked() {
                 // this.getPurchaseMenuList();
                 if(this.type == 'package' && this.selectedPackage){
+                    this.packageMenuList = [];
+                    this.packageAccessoriesList = [];
                     this.isOpenRoomStep('is_package');
                     let menuOfselectedPackage = this.selectedPackage.menu_packages;
                     menuOfselectedPackage.forEach((packageMenu)=>{
