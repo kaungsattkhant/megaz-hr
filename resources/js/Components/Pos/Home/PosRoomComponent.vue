@@ -1813,10 +1813,10 @@
                 this.menuQuantityForPackage = null;
             },
             async selectedPackageMenuChange() {
-                const response = await getApiData({ url: '/api/menus/' + this.selectedMenuForPackage.id + '/areas', token: this.getToken() });
-                if (response.data) {
-                    this.menuAreaListForPackage = response.data.areas;
-                }
+                // const response = await getApiData({ url: '/api/menus/' + this.selectedMenuForPackage.id + '/areas', token: this.getToken() });
+                // if (response.data) {
+                //     this.menuAreaListForPackage = response.data.areas;
+                // }
             },
 
             btnConfirmAddPackageMenu() {
@@ -1854,8 +1854,12 @@
             removePackageMenu(index){
 
                 this.food_total_package -= (this.packageMenuList[index].original_price - this.packageMenuList[index].discount_value) * this.packageMenuList[index].quantity;
-                // this.packageMenuList.splice(index, 1);
-                this.packageMenuList[index].is_package = -1
+                if(this.packageMenuList[index].is_package == '0'){
+                    this.packageMenuList.splice(index, 1);
+                }
+                else{
+                    this.packageMenuList[index].is_package = -1
+                }
             },
             
             btnConfirmAddPackageAccessory() {
