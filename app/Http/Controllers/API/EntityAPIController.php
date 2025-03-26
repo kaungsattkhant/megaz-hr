@@ -88,7 +88,7 @@ class EntityAPIController extends Controller
         // }
         $data = $request->all();
         $entity = $this->entityRepo->entityDetail($data, $id);
-
+        // dd($entity->invoice->orders[0]->order_items[0]->menu);
         ResponseData($entity);
     }
 

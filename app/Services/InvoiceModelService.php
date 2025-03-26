@@ -140,9 +140,9 @@ class InvoiceModelService
 
     }
 
-    public function storeInvoiceSession($invoiceId, $startDateTime, $entityId, $sessionDuration, $freeDiscountSession, $sessionPerPrice, $isWaiter, $discountId)
+    public function storeInvoiceSession($invoice, $startDateTime, $entityId, $sessionDuration, $freeDiscountSession, $sessionPerPrice, $isWaiter, $discountId)
     {
-        // $now = now();
+        $invoiceId=$invoice->id;
         $now = Carbon::parse($startDateTime);
         $startTime = Carbon::parse($startDateTime)->format('H:i');
         $endTime = $now->copy()->addHours((int) $sessionDuration)->format('H:i');
@@ -154,14 +154,21 @@ class InvoiceModelService
         }
         $startDateTime = Carbon::parse($now->toDateString() . ' ' . $startTime);
         $endDateTime = Carbon::parse($endDate->toDateString() . ' ' . $endTime);
+        $totalSessionDuration=$sessionDuration - $freeDiscountSession;
+        $totalSessionPrice=($sessionDuration - $freeDiscountSession) * $sessionPerPrice;
+        $discountSessionPrice=$freeDiscountSession * $sessionPerPrice;
+        if($invoice->invoice_type=='package'){
+            $totalSessionPrice=0;
+            $discountSessionPrice=0;
+        }
         $invoiceSession = InvoiceSession::create([
             'start_date_time' => $startDateTime,
             'end_date_time' => $endDateTime,
             'total_session' => $sessionDuration ,
-            'total_session_duration' => $sessionDuration - $freeDiscountSession,
-            'total_session_price' => ($sessionDuration - $freeDiscountSession) * $sessionPerPrice,
+            'total_session_duration' => $totalSessionDuration,
+            'total_session_price' => $totalSessionPrice,
             'discount_session' => $freeDiscountSession,
-            'discount_session_price' => $freeDiscountSession * $sessionPerPrice,
+            'discount_session_price' => $discountSessionPrice,
             'session_unit_price' => $sessionPerPrice,
             'invoice_id' => $invoiceId,
             'entity_id' => $entityId,

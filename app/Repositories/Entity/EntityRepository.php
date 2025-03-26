@@ -485,7 +485,8 @@ class EntityRepository implements EntityRepositoryInterface
             //accesory
             $invoiceAccessories = $invoice->accessories;
             foreach ($invoiceAccessories as $invoiceAccessorie) {
-                $total_accessory_value += $invoiceAccessorie->accessory->accessory_price->price * $invoiceAccessorie->quantity;
+                $invoiceAccessorie->load('accessory');
+                $total_accessory_value += $invoiceAccessorie->is_package ? 0 : $invoiceAccessorie->accessory_price;
             }
             // $invoiceAccessoryCollection = $invoiceAccessoryCollection->merge($invoice->invoiceAccessories);
             //end_accessoryI
@@ -539,9 +540,13 @@ class EntityRepository implements EntityRepositoryInterface
             foreach ($invoice->orders as $order) {
                 $orderItems = OrderItem::where('order_id', $order->id)->get();
                 foreach ($order->orderItems as $orderItem) {
+                    $orderItem->load('menu');
                     // if ($orderItem->status == 'done') {
-                    $total += $orderItem->price;
-                    $totalDiscount += $orderItem->discount_value;
+                    if($invoice->invoice_type!='package'){
+                        $total += $orderItem->price;
+                        $totalDiscount += $orderItem->discount_value;
+                    }
+                   
                     // }
                 }
                 foreach ($orderItems as $orderItem) {
@@ -601,6 +606,7 @@ class EntityRepository implements EntityRepositoryInterface
         $entity->account_id = $customer->account_id;
         $entity->total_session_price = $invoice->total_session_price;
         $entity->invoice = $invoice;
+        // dd($invoiec)
         return $entity;
     }
     public function tableWithInvoiceDetail(array $data, int $entityId)

@@ -40,7 +40,6 @@ class AccessoryRepository implements AccessoryInterface
         try {
             if (!isset($request->id)) {
                 $data['id'] = null;
-              
             }
             if(isset($data['image'])){
                 $imageData = $data['image'];
