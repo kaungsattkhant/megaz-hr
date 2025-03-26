@@ -669,7 +669,7 @@ class OrderRepository implements OrderRepositoryInterface
                 // DB::raw('GROUP_CONCAT(DISTINCT areas.name) as area_name'),
                 // DB::raw('GROUP_CONCAT(order_items.area_id) as areas_ids'),
                 DB::raw('GROUP_CONCAT(DISTINCT entities.name) as room_name'),
-                DB::raw('GROUP_CONCAT(DISTINCT order_items.group_order_id) as combine_unique_ids'),
+                DB::raw('GROUP_CONCAT(DISTINCT order_items.group_order_id) as group_order_id'),
                 DB::raw('JSON_ARRAYAGG(
                     JSON_OBJECT(
                         "order_item_id", order_items.id,
