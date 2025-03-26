@@ -222,8 +222,6 @@ class InvoiceRepository implements InvoiceRepositoryInterface
                 $data['area_id'] = $entity->area_id;
                 $data['created_by'] = UserData()->id;
                 $data['invoice_date'] = Carbon::now();
-                // $data['sub_total'] = $data['total_session_price'];
-
                 $invoice = Invoice::create($data);
                 $invoice->invoice_id = sprintf('%05d', $invoice->id);
                 $invoice->save();
