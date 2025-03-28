@@ -17,6 +17,7 @@ return new class extends Migration
             $table->unsignedBigInteger('offdayable_id')->nullable();
             $table->string('offdayable_type')->nullable();
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

@@ -16,6 +16,7 @@ return new class extends Migration
             $table->enum('day', ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday', 'Sabbath-day']);
             $table->foreignId('off_day_id');
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

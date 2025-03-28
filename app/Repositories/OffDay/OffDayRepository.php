@@ -54,4 +54,20 @@ class OffDayRepository implements OffDayRepositoryInterface
       throw $e;
     }
   }
+
+  public function deleteOffDay($dayInOffDayId)
+  {
+    DB::beginTransaction();
+    try {
+      $dayInOffDay = DayInOffDay::find($dayInOffDayId);
+      if ($dayInOffDay) {
+        $dayInOffDay->delete();
+      }
+      DB::commit();
+      ResponseData($dayInOffDay);
+    } catch (Exception $e) {
+      DB::rollBack();
+      throw $e;
+    }
+  }
 }

@@ -6,6 +6,5 @@ interface OffDayRepositoryInterface
 {
   public function getOffDays();
   public function createOffDay($data);
-  // public function deleteOffDay($id);
-  // public function updateOffDay($id, $data);
+  public function deleteOffDay($id);
 }
