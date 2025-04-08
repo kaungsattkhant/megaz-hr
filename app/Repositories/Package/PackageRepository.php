@@ -141,7 +141,6 @@ class PackageRepository implements PackageRepositoryInterface
             $package = Package::create($data);
             $menuPrice = 0;
             $accessoryPrice = 0;
-
             if (isset($data['menuIds'])) {
                 $menuIds = json_decode($data['menuIds']);
                 foreach ($menuIds as $menu) {
@@ -172,6 +171,7 @@ class PackageRepository implements PackageRepositoryInterface
                 }
             }
             $package_original_price = $menuPrice + $sessionPrice + $accessoryPrice;
+            // dd($package_original_price);
             if ($package_original_price > $data['price']) {
                 $data['package_discount'] = $package_original_price - $data['price'];
                 $package->package_discount = $data['package_discount'];
