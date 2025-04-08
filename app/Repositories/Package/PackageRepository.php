@@ -18,6 +18,7 @@ class PackageRepository implements PackageRepositoryInterface
     {
         // if(isset($request->perPage))
         $validateDate = $request->date ?? CurrentDate();
+        $roomId=isset($request->room_id) ? $request->room_id  :null;
         // $packages = Package::with(['menuPackages.menu'])->where('from_date', '<=', $validateDate)
         //     ->orderBy('created_at', 'desc')
         //     ->when($request->has('search'), function ($q) use ($request) {
@@ -74,7 +75,13 @@ class PackageRepository implements PackageRepositoryInterface
                 $query->where('from_date', '<=', $validateDate)
                     ->where('to_date', '>=', $validateDate);
             }
-        ])->where('from_date', '<=', $validateDate)
+        ])
+        ->when($roomId,function($q)use($roomId){
+            $q->whereHas('rooms',function($roomQuery)use($roomId){
+                $roomQuery->where('id',$roomId);
+            });
+        })
+        ->where('from_date', '<=', $validateDate)
             ->where('to_date', '>=', $validateDate)
             ->orderBy('created_at', 'desc')
             ->when($request->has('search'), function ($q) use ($request) {

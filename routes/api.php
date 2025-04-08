@@ -667,3 +667,7 @@ Route::controller(DeliveryChargeAPIController::class)->group(function () {
     Route::get('/delivery_charges', 'getDeliveryChargeData');
     Route::post('/delivery_charges', 'createDeliveryCharge');
 });
+
+Route::controller(TestController::class)->group(function () {
+    Route::get('/get_holidays', 'getHolidays');
+});

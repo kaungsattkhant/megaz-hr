@@ -13,7 +13,8 @@
         "laravel/sanctum": "^4.0",
         "laravel/tinker": "^2.8",
         "maatwebsite/excel": "^3.1",
-        "mrlinnth/mm-regions-cities": "^0.1.1"
+        "mrlinnth/mm-regions-cities": "^0.1.1",
+        "reinbier/laravel-holiday": "^2.2"
     },
     "require-dev": {
         "fakerphp/faker": "^1.23",
