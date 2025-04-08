@@ -287,7 +287,7 @@ class OrderService
                     if ($invoice->invoice_type == 'package' && !$menuData['is_package']) {
                         $order = $this->updateOrderItemAmountToOrder('add', $order, $menuData['original_price'], $menuData['quantity'], $discountAmount);
                     }
-                    if ($invoice->invoice_type == 'session' && $invoice->invoice_type == 'endless_time') {
+                    if (($invoice->invoice_type == 'session' && $invoice->invoice_type == 'endless_time') || ($invoice->invoice_type == 'package' && !$menuData['is_package']) ) {
                         $invoice = $this->updateOrderItemAmountToInvoice('add', $invoice, $menuData['original_price'], $menuData['quantity'], $discountAmount);
                     }
                     // }
