@@ -37,6 +37,11 @@ class LeaveController extends Controller
         $data = $this->leaveRepository->getLeaveAllowance($request);
         ResponseData($data);
     }
+    public function deleteLeaveAllowance($id)
+    {
+        $data = $this->leaveRepository->deleteLeaveAllowance($id);
+        ResponseData($data);
+    }
     public function createLeave(Request $request)
     {
         $data = $this->leaveRepository->createLeave($request->all());

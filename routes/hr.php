@@ -16,6 +16,7 @@ Route::middleware('auth:api')->group(function () {
     Route::post('/leave_categories', 'createLeaveCategory');
     Route::post('/leave_allowances', 'createLeaveAllowance');
     Route::get('/leave_allowances', 'getLeaveAllowance');
+    Route::delete('/leave_allowances/{id}', 'deleteLeaveAllowance');
     Route::post('/leaves', 'createLeave');
     Route::get('/leaves', 'getLeave');
   });

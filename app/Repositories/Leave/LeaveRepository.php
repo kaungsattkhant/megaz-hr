@@ -73,6 +73,20 @@ class LeaveRepository implements LeaveRepositoryInterface
     }
     return $query->paginate(config('common.list_count'));
   }
+  public function deleteLeaveAllowance($id)
+  {
+    DB::beginTransaction();
+    try {
+      $leaveAllowance = LeaveAllowance::findOrFail($id);
+      $leaveAllowance->delete();
+      DB::commit();
+      ResponseData($leaveAllowance);
+    } catch (\Exception $e) {
+      DB::rollback();
+      ResponseMessage($e->getMessage(), 402);
+      throw $e;
+    }
+  }
 
   public function createLeave($data)
   {
