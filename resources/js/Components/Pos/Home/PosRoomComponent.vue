@@ -1625,6 +1625,7 @@
 
 
                 currentTime:parseInt(getCurrentTime().split(':')),
+                currentTimeForPackage: getCurretDateTime(),
                 start_date_time:getCurretDateTime(),
                 isShowSidebar:false,
                 testbro:null,
@@ -1708,6 +1709,7 @@
                         this.printInvoiceData.room = response.data.total_session_price
                         this.printInvoiceData.food = response.data.total_order_value
                         this.printInvoiceData.total = response.data.invoice_total - response.data.total_order_discount_price
+
                     }
                 }
                 else {
@@ -1715,6 +1717,8 @@
                     this.isOpenRoomStep('open_1');
                     console.log('open 1')
                 };
+                this.getPackageList(this.currentTimeForPackage);
+
             },
 
             btnClickedOpenRoom() {
@@ -1751,7 +1755,7 @@
                 }
             },
             async getPackageList(time) {
-                const response = await getApiData({ url: '/api/packages?date='+ time + '&selling_area_id=' + this.area.id, token: this.getToken() });
+                const response = await getApiData({ url: '/api/packages?date='+ time + '&selling_area_id=' + this.area.id +  '&room_id=' + this.selectedRoom.id, token: this.getToken() });
                 if (response.data) {
                     this.packageList = response.data.data;
                 }

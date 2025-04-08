@@ -201,7 +201,7 @@ class OrderRepository implements OrderRepositoryInterface
     public function createMultipleOrder(array $data)
     {
         return $this->orderService->createMultipleOrder($data);
-        
+
         DB::beginTransaction();
         try {
             $invoiceId = $data['invoice_id'];
@@ -371,65 +371,72 @@ class OrderRepository implements OrderRepositoryInterface
     {
         DB::beginTransaction();
         try {
-            $orderItem = OrderItem::find($data['id']);
-            if ($data['status'] == 'cancelled') {
-                if (!checkDepartmentAndRoles('Catering', ['Staff', 'Waiter'])) {
-                    ResponseMessage("Permission doesn't allow", 422);
-                }
-                $nonCancellableStatuses = [
-                    'in progress' => "Order item can't be canceled because it is already in progress.",
-                    'done' => "Order item can't be canceled because it is already done.",
-                    'pos_confirmed' => "Order item can't be canceled because it is already confirmed.",
-                ];
-                if (isset($nonCancellableStatuses[$orderItem->status])) {
-                    ResponseMessage($nonCancellableStatuses[$orderItem->status], 422);
-                }
+            $orderItems = OrderItem::where('group_order_id',  $data['group_order_id'])->get();
+            if (!$orderItems) {
+                ResponseMessage('Order Item not found', 404);
             }
-            $invoice = Invoice::find($orderItem->order->invoice_id);
-            //must be check entity or room
-            if ($invoice->entity_id != null) {
-                $entity = $invoice->entity;
-            } else {
-                $activeInvoiceSession = $invoice->activeInvoiceSession;
-                if (!$activeInvoiceSession) {
-                    ResponseMessage('Active Invioce Session not found', 419);
-                }
-                $entity = $activeInvoiceSession->entity;
-            }
-            // $latestRoomSession = RoomSession::where('invoice_id', $invoice->id)->orderBy('created_at', 'desc')->first();
-            // $entity = $latestRoomSession->entitySession->entity;
-            // $entity = Entity::find($latestRoomSession->entitySession->entity_id);
-            if ($data['status'] == 'done' && $orderItem->status == 'in progress') {
-                $packs = Pack::where('menu_id', $orderItem->menu_id)->where('status', 'ready')->where('expired_at', '>', CurrentTime())->orderBy('expired_at', 'asc')->take($orderItem->quantity)->get();
-                if (count($packs) < $orderItem->quantity) {
-                    ResponseMessage('Not enough packs to sell', 402);
-                }
-                foreach ($packs as $pack) {
-                    if ($pack->status == 'ready') {
-                        $pack->status = 'sold';
-                        $pack->save();
+            foreach ($orderItems as $orderItem) {
+                if ($data['status'] == 'cancelled') {
+                    if (!checkDepartmentAndRoles('Catering', ['Staff', 'Waiter'])) {
+                        ResponseMessage("Permission doesn't allow", 422);
+                    }
+                    $nonCancellableStatuses = [
+                        'in progress' => "Order item can't be canceled because it is already in progress.",
+                        'done' => "Order item can't be canceled because it is already done.",
+                        'pos_confirmed' => "Order item can't be canceled because it is already confirmed.",
+                    ];
+                    if (isset($nonCancellableStatuses[$orderItem->status])) {
+                        ResponseMessage($nonCancellableStatuses[$orderItem->status], 422);
                     }
                 }
-                $orderItem->completed_at = now();
-                $orderItem->completed_by = UserData()->id;
             }
-            //tem command 
-            elseif ($data['status'] == 'in progress' && $orderItem->status == 'pos_confirmed') {
-                $orderItem->progressed_at = now();
-                $orderItem->progressed_by = UserData()->id;
-            } elseif ($data['status'] == 'cancelled') {
-                $orderItem->cancelled_at = now();
-                $orderItem->cancelled_by = UserData()->id;
-            } elseif ($data['status'] == 'placed' && $orderItem->status == 'done') {
-                $orderItem->placed_at = now();
-                $orderItem->placed_by = UserData()->id;
-            } else {
-                ResponseMessage("Order can't place at this moment ", 422);
+            foreach ($orderItems as $orderItem) {
+                $invoice = Invoice::find($orderItem->order->invoice_id);
+                //must be check entity or room
+                if ($invoice->entity_id != null) {
+                    $entity = $invoice->entity;
+                } else {
+                    $activeInvoiceSession = $invoice->activeInvoiceSession;
+                    if (!$activeInvoiceSession) {
+                        ResponseMessage('Active Invioce Session not found', 419);
+                    }
+                    $entity = $activeInvoiceSession->entity;
+                }
+                // $latestRoomSession = RoomSession::where('invoice_id', $invoice->id)->orderBy('created_at', 'desc')->first();
+                // $entity = $latestRoomSession->entitySession->entity;
+                // $entity = Entity::find($latestRoomSession->entitySession->entity_id);
+                if ($data['status'] == 'done' && $orderItem->status == 'in progress') {
+                    $packs = Pack::where('menu_id', $orderItem->menu_id)->where('status', 'ready')->where('expired_at', '>', CurrentTime())->orderBy('expired_at', 'asc')->take($orderItem->quantity)->get();
+                    if (count($packs) < $orderItem->quantity) {
+                        ResponseMessage('Not enough packs to sell', 402);
+                    }
+                    foreach ($packs as $pack) {
+                        if ($pack->status == 'ready') {
+                            $pack->status = 'sold';
+                            $pack->save();
+                        }
+                    }
+                    $orderItem->completed_at = now();
+                    $orderItem->completed_by = UserData()->id;
+                }
+                //tem command 
+                elseif ($data['status'] == 'in progress' && $orderItem->status == 'pos_confirmed') {
+                    $orderItem->progressed_at = now();
+                    $orderItem->progressed_by = UserData()->id;
+                } elseif ($data['status'] == 'cancelled') {
+                    $orderItem->cancelled_at = now();
+                    $orderItem->cancelled_by = UserData()->id;
+                } elseif ($data['status'] == 'placed' && $orderItem->status == 'done') {
+                    $orderItem->placed_at = now();
+                    $orderItem->placed_by = UserData()->id;
+                } else {
+                    ResponseMessage("Order can't place at this moment ", 422);
+                }
+                $orderItem->status = $data['status'];
+                $orderItem->update();
+                $orderItem->menu = $orderItem->menu;
+                broadcast(new OrderStatusNotificationRequest($entity, $orderItem, 5));
             }
-            $orderItem->status = $data['status'];
-            $orderItem->update();
-            $orderItem->menu = $orderItem->menu;
-            broadcast(new OrderStatusNotificationRequest($entity, $orderItem, 5));
             DB::commit();
             ResponseMessage('Order Item status is changed successfully');
         } catch (\Exception $e) {
@@ -637,7 +644,7 @@ class OrderRepository implements OrderRepositoryInterface
                 DB::commit();
                 ResponseMessage('Grouped is successfully', 200);
             } else {
-                ResponseMessage('Grouped Order Item fail!', 200);
+                ResponseMessage('Order Item not found or already grouped!', 404);
             }
         } catch (\Exception $e) {
             DB::rollBack();
@@ -660,9 +667,9 @@ class OrderRepository implements OrderRepositoryInterface
                 DB::raw('GROUP_CONCAT(DISTINCT order_items.order_id) as order_ids'),
                 DB::raw('SUM(order_items.quantity) as total_quantity'),
                 // DB::raw('GROUP_CONCAT(DISTINCT areas.name) as area_name'),
-                // DB::raw('GROUP_CONCAT(order_items.area_id) as areas_ids'),
+                DB::raw('GROUP_CONCAT(DISTINCT order_items.status) as status'),
                 DB::raw('GROUP_CONCAT(DISTINCT entities.name) as room_name'),
-                DB::raw('GROUP_CONCAT(DISTINCT order_items.group_order_id) as combine_unique_ids'),
+                DB::raw('GROUP_CONCAT(DISTINCT order_items.group_order_id) as group_order_id'),
                 DB::raw('JSON_ARRAYAGG(
                     JSON_OBJECT(
                         "order_item_id", order_items.id,
