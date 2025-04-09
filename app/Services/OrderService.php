@@ -629,7 +629,6 @@ class OrderService
     {
         $invoiceId = $invoice->id;
         foreach ($accessories as $accessory) {
-            dd($accessory);
             $invoiceAccessory = InvoiceAccessory::create([
                 'quantity' => $accessory['quantity'],
                 'accessory_id' => $accessory['accessory_id'],
@@ -637,7 +636,6 @@ class OrderService
                 'is_package' => $accessory['is_package'],
                 'accessory_price' => $accessory['is_package'] ? 0 : $accessory['unit_price'] * (int) $accessory['quantity'],
             ]);
-            dd($invoiceAccessory);
         }
         return true;
     }
