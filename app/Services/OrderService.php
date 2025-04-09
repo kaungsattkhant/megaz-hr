@@ -628,14 +628,34 @@ class OrderService
     public function createAccessorty($invoice, $accessories)
     {
         $invoiceId = $invoice->id;
-        foreach ($accessories as $accessory) {
+
+        if ($invoice->invoice_type == 'package') {
+            $filterAccessory = array_filter($accessories, function ($accessory) {
+                return isset($accessory['is_package']) && in_array($accessory['is_package'], [0, 1]);
+            });
+        } else {
+            $filterAccessory = $accessories;
+        }
+
+        $cancelledAccessory = array_filter($accessories, function ($accessory) {
+            return isset($accessory['is_package']) && in_array($accessory['is_package'], [-1]);
+        });
+        foreach ($filterAccessory as $accessory) {
             $invoiceAccessory = InvoiceAccessory::create([
                 'quantity' => $accessory['quantity'],
                 'accessory_id' => $accessory['accessory_id'],
                 'invoice_id' => $invoiceId,
                 'is_package' => $accessory['is_package'],
-                'accessory_price' => $accessory['is_package'] ? 0 : $accessory['unit_price'] * (int) $accessory['quantity'],
+                'accessory_price' => $accessory['is_package'] ? 0 : $accessory['unit_price'],
             ]);
+            if(!$accessory['is_package']){
+                $invoice = $this->updateOrderItemAmountToInvoice('add', $invoice, $accessory['unit_price'], $accessory['quantity'], $discount = 0);
+            }
+        }
+        if (count($cancelledAccessory) > 0) {
+            foreach ($cancelledAccessory as $cancelData) {
+                $invoice = $this->updateOrderItemAmountToInvoice('subtract', $invoice, $cancelData['unit_price'], $cancelData['quantity'], $discount = 0);
+            }
         }
         return true;
     }
