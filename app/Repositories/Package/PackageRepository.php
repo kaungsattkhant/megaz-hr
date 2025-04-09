@@ -18,6 +18,7 @@ class PackageRepository implements PackageRepositoryInterface
     {
         // if(isset($request->perPage))
         $validateDate = $request->date ?? CurrentDate();
+        $roomId=isset($request->room_id) ? $request->room_id  :null;
         // $packages = Package::with(['menuPackages.menu'])->where('from_date', '<=', $validateDate)
         //     ->orderBy('created_at', 'desc')
         //     ->when($request->has('search'), function ($q) use ($request) {
@@ -74,7 +75,13 @@ class PackageRepository implements PackageRepositoryInterface
                 $query->where('from_date', '<=', $validateDate)
                     ->where('to_date', '>=', $validateDate);
             }
-        ])->where('from_date', '<=', $validateDate)
+        ])
+        ->when($roomId,function($q)use($roomId){
+            $q->whereHas('rooms',function($roomQuery)use($roomId){
+                $roomQuery->where('id',$roomId);
+            });
+        })
+        ->where('from_date', '<=', $validateDate)
             ->where('to_date', '>=', $validateDate)
             ->orderBy('created_at', 'desc')
             ->when($request->has('search'), function ($q) use ($request) {
@@ -134,7 +141,6 @@ class PackageRepository implements PackageRepositoryInterface
             $package = Package::create($data);
             $menuPrice = 0;
             $accessoryPrice = 0;
-
             if (isset($data['menuIds'])) {
                 $menuIds = json_decode($data['menuIds']);
                 foreach ($menuIds as $menu) {
@@ -165,6 +171,7 @@ class PackageRepository implements PackageRepositoryInterface
                 }
             }
             $package_original_price = $menuPrice + $sessionPrice + $accessoryPrice;
+            // dd($package_original_price);
             if ($package_original_price > $data['price']) {
                 $data['package_discount'] = $package_original_price - $data['price'];
                 $package->package_discount = $data['package_discount'];

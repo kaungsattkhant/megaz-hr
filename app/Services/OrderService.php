@@ -269,9 +269,9 @@ class OrderService
                 } else {
                     $latestMenuServiceDiscount = null;
                     // dd($invoice->invoice_type);
-                    if($invoice->invoice_type=='package'){
+                    if ($invoice->invoice_type == 'package') {
                         $discountAmount = 0;
-                    }else{
+                    } else {
                         $discountAmount = $menuData['discount_value'] * $menuData['quantity'];
                         $totalDiscount += $discountAmount;
                     }
@@ -284,8 +284,12 @@ class OrderService
                     // $order->order_sub_total += $menuData['original_price'] * $menuData['quantity'];
                     // $order->update($menuData);
                     // if ($invoice->type != 'package') {
-                    $order = $this->updateOrderItemAmountToOrder('add', $order, $menuData['original_price'], $menuData['quantity'], $discountAmount);
-                    $invoice = $this->updateOrderItemAmountToInvoice('add', $invoice, $menuData['original_price'], $menuData['quantity'], $discountAmount);
+                    if ($invoice->invoice_type == 'package' && !$menuData['is_package']) {
+                        $order = $this->updateOrderItemAmountToOrder('add', $order, $menuData['original_price'], $menuData['quantity'], $discountAmount);
+                    }
+                    if (($invoice->invoice_type == 'session' && $invoice->invoice_type == 'endless_time') || ($invoice->invoice_type == 'package' && !$menuData['is_package']) ) {
+                        $invoice = $this->updateOrderItemAmountToInvoice('add', $invoice, $menuData['original_price'], $menuData['quantity'], $discountAmount);
+                    }
                     // }
                     $originalOrderItem = OrderItem::where('menu_id', $menuData['menu_id'])
                         ->where('order_id', $order->id)
@@ -312,6 +316,7 @@ class OrderService
                         : ($menuData['original_price'] * $menuData['quantity']) - $discountAmount;
                     $orderData['total_quantity'] = $menuData['quantity'];
                     $orderData['total_discount_price'] = $discountAmount; // update total discount only for this order
+
                     $order = Order::create($orderData);
                     $order->update(['order_id' => sprintf('%05d', $order->id)]);
                     if ($invoice->invoice_type == 'package' && !$menuData['is_package']) {

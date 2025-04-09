@@ -1065,8 +1065,9 @@
                         <div class="mb-4">
                             <multiselect v-model="selectedMenu" :options="menuList" :close-on-select="true" @select="selectedMenuChange()"
                                 class=" h-10"
-                                :clear-on-select="false" :preserve-search="true" placeholder="Select Menu" label="name"
-                                track-by="id" :preselect-first="false"></multiselect>
+                                :clear-on-select="false" :preserve-search="true" placeholder="Select Menu" label="name" :custom-label="nameWithPrice"
+                                track-by="id" :preselect-first="false">
+                            </multiselect>
 
                             <!-- <select name="" id="" placeholder="Menu" v-model="selectedMenu" @change="selectedMenuChange()"
                                 class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
@@ -1625,6 +1626,7 @@
 
 
                 currentTime:parseInt(getCurrentTime().split(':')),
+                currentTimeForPackage: getCurretDateTime(),
                 start_date_time:getCurretDateTime(),
                 isShowSidebar:false,
                 testbro:null,
@@ -1708,6 +1710,7 @@
                         this.printInvoiceData.room = response.data.total_session_price
                         this.printInvoiceData.food = response.data.total_order_value
                         this.printInvoiceData.total = response.data.invoice_total - response.data.total_order_discount_price
+
                     }
                 }
                 else {
@@ -1715,6 +1718,8 @@
                     this.isOpenRoomStep('open_1');
                     console.log('open 1')
                 };
+                this.getPackageList(this.currentTimeForPackage);
+
             },
 
             btnClickedOpenRoom() {
@@ -1751,7 +1756,7 @@
                 }
             },
             async getPackageList(time) {
-                const response = await getApiData({ url: '/api/packages?date='+ time + '&selling_area_id=' + this.area.id, token: this.getToken() });
+                const response = await getApiData({ url: '/api/packages?date='+ time + '&selling_area_id=' + this.area.id +  '&room_id=' + this.selectedRoom.id, token: this.getToken() });
                 if (response.data) {
                     this.packageList = response.data.data;
                 }
@@ -1788,7 +1793,7 @@
                     let accessoriesOfselectedPackage = this.selectedPackage.accessories;
                     accessoriesOfselectedPackage.forEach((accessories)=>{
                         // let is_dis_menu_price = 0;
-                        // this.food_total_package += (packageMenu.menu.prices[0].price - is_dis_menu_price) * packageMenu.quantity;
+                        this.accessory_total_package +=  accessories.accessory.accessory_price.price * accessories.quantity;
                         this.packageAccessoriesList.push({
                             quantity : accessories.quantity,
                             name : accessories.accessory.name,
@@ -1892,8 +1897,9 @@
                 // this.packageMenuList.forEach((packageMenu)=>{
                 //     this.total_package_menu_price += (packageMenu.original_price - packageMenu.discount_value ) * packageMenu.quantity;
                 // });
-                let packageActualTotal = this.food_total_package + (this.selectedPackage.session_price * this.selectedPackage.pay_session) - this.selectedPackage.package_discount;
-                if(packageActualTotal < this.selectedPackage.price){
+                let packageActualTotal = this.food_total_package + (this.selectedPackage.session_price * this.selectedPackage.pay_session) + this.accessory_total_package;
+                console.log('pack total = ' + packageActualTotal)
+                if(packageActualTotal < (this.selectedPackage.price - this.selectedPackage.package_discount) ){
                     this.$notify({
                         title: `Not valid`,
                         text: 'Your Total is Lower than Package Price',
@@ -2033,7 +2039,8 @@
                         }
                         this.selectedRoom = response.data;
                         this.serviceList = response.data.services;
-                        this.purchaseMenuList = response.data.invoice.orders
+                        this.purchaseMenuList = response.data.invoice.orders;
+                        this.accessoryListSidebar = response.data.invoice_accessories;
                         console.log('get selected room')
                         this.getTotal(response.data);
                         this.printInvoiceData.room = this.selectedRoom.total_session_price
@@ -2859,6 +2866,9 @@
                         return 'bg-[#4fe0b7]';
                     }
                 }
+            },
+            nameWithPrice ({name, prices}) {
+                return `${name} (${prices[0].price}Ks)`
             }
         },
 

@@ -197,6 +197,7 @@ import WarningListComponent from './Components/Warning/WarningListComponent.vue'
 import WarningCreateComponent from './Components/Warning/WarningCreateComponent.vue';
 import WarningEditComponent from './Components/Warning/WarningEditComponent.vue';
 import MenuAreaComponent from './Components/MenuArea/MenuAreaComponent.vue';
+import OffDayCrudComponent from './Components/OffDay/OffDayCrudComponent.vue';
 
 import PosSellingAreasComponent from './Components/Pos/Areas/PosSellingAreasComponent.vue';
 import PosTableComponent from './Components/Pos/Home/PosTableComponent.vue';
@@ -377,6 +378,7 @@ app.component('WarningListComponent',WarningListComponent);
 app.component('WarningCreateComponent',WarningCreateComponent);
 app.component('WarningEditComponent',WarningEditComponent);
 app.component('MenuAreaComponent',MenuAreaComponent);
+app.component('OffDayCrudComponent',OffDayCrudComponent);
 
 app.component('PosSellingAreasComponent',PosSellingAreasComponent);
 app.component('PosTableComponent',PosTableComponent);

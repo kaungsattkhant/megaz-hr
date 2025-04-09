@@ -863,6 +863,12 @@
                             Menu Area
                         </a>
                     </li>
+                    <li>
+                        <a href="/off_day" class="flex items-center @yield('off_day') sidebar-gap-x">
+                            <img class="sidebar-img " src="{{ asset('img/icons8-warning-64.png') }}" alt="">
+                            Off Day
+                        </a>
+                    </li>
                     
 
                 </ul>

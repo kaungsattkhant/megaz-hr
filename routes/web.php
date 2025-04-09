@@ -370,3 +370,4 @@ Route::view('/warning/create', 'warning.create')->name('warning.create');
 Route::view('/warning/{id}/edit', 'warning.edit');
 Route::view('/purchase_order_invoices/{id}/confirm', 'purchase_order_invoices.confirm')->name('purchase_order_invoices.confirm');
 Route::view('/menu_area', 'menu_area.index')->name('menu_area.index');
+Route::view('/off_day', 'off_day.index')->name('off_day.index');

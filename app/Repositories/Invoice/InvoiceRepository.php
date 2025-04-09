@@ -229,7 +229,7 @@ class InvoiceRepository implements InvoiceRepositoryInterface
                 //create deposit
                 $this->storeCustomerDeposit($data, UserData()->id);
                 //
-             
+
                 $customer = Customer::find($invoice->customer_id);
                 //change ksk
                 if ($data['type'] == 'package' && $invoice) {
