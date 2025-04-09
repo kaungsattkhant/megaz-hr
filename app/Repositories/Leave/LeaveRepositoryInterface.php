@@ -15,5 +15,4 @@ interface LeaveRepositoryInterface
   public function deleteLeave($id);
 
   public function getLeaveTotalByStaff($staffId);
-  public function getLeaveDetailsByStaff($staffId);
 }

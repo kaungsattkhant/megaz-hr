@@ -68,10 +68,4 @@ class LeaveController extends Controller
         $data = $this->leaveRepository->getLeaveTotalByStaff($staffId);
         ResponseData($data);
     }
-
-    public function getLeaveDetailsByStaff($staffId)
-    {
-        $data = $this->leaveRepository->getLeaveDetailsByStaff($staffId);
-        ResponseData($data);
-    }
 }

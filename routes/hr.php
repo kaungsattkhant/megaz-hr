@@ -22,6 +22,5 @@ Route::middleware('auth:api')->group(function () {
     Route::post('/leaves/{id}', 'updateLeave');
     Route::delete('/leaves/{id}', 'deleteLeave');
     Route::get('/leave_totals_by_staff/{staffId}', 'getLeaveTotalByStaff');
-    Route::get('/leave_details_by_staff/{staffId}', 'getLeaveDetailsByStaff');
   });
 });

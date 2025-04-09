@@ -293,13 +293,4 @@ class LeaveRepository implements LeaveRepositoryInterface
       ]
     ];
   }
-
-  public function getLeaveDetailsByStaff($staffId)
-  {
-    $staff = Staff::where('id', $staffId)->firstOrFail();
-    $roles = $staff->roles;
-    $leaveAllowances = LeaveAllowance::whereIn('role_id', $roles->pluck('id'))->get();
-    $leaveRecords = Leave::where('staff_id', $staffId)
-      ->get();
-  }
 }
