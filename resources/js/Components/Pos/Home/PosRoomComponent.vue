@@ -1128,7 +1128,8 @@
                         <div class="mb-4">
                             <select name="" id="" placeholder="Menu" v-model="selectedMenuForPackage" @change="selectedPackageMenuChange()"
                                 class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
-                                <option :value="menu" v-for="(menu, index) in menuList" :key="index">{{ menu.name }}</option>
+                                <option :value="menu" v-for="(menu, index) in menuList" :key="index">{{ menu.name }} ( {{ menu.prices[0].price }} Ks 
+                                )</option>
                             </select>
                         </div>
                         <!-- <div class="mb-4">
@@ -1876,7 +1877,7 @@
                     // original_price:this.selectedMenuForPackage.prices[0].price,
                     price:this.selectedAccessory.accessory_price.price * this.selectedAccessoryQuantity,
                     unit_price:this.selectedAccessory.accessory_price.price,
-                    accessory_id : this.selectedAccessory.accessory_id,
+                    accessory_id : this.selectedAccessory.id,
                     is_package : 0,
                 });
                 this.accessory_total_package += (this.selectedAccessory.accessory_price.price) * this.selectedAccessoryQuantity;
