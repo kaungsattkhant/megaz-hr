@@ -11,4 +11,9 @@ interface LeaveRepositoryInterface
   public function deleteLeaveAllowance($id);
   public function createLeave($data);
   public function getLeave($request);
+  public function updateLeave($data, $id);
+  public function deleteLeave($id);
+
+  public function getLeaveTotalByStaff($staffId);
+  public function getLeaveDetailsByStaff($staffId);
 }
