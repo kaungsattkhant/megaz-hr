@@ -66,7 +66,7 @@
             
 
             <div class="col-span-12">
-                <button class="add-btn py-[9px]" @click="btnClickedAddDuty()">
+                <button class="add-btn py-[9px]" @click="btnClickedAddLeave()">
                     Add Leave
                 </button>
             </div>
@@ -82,10 +82,13 @@
                                 Department
                             </th>
                             <th scope="col" class="">
-                                Staff Name
+                                Role
                             </th>
                             <th scope="col" class="">
-                                Key Result
+                                Leave Type
+                            </th>
+                            <th scope="col" class="">
+                                Days
                             </th>
                             <th scope="col" class="">
 
@@ -93,19 +96,22 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <tr class="" v-for="(duty, dutyIndex) in dutyList"
-                            :key="dutyIndex">
+                        <tr class="" v-for="(leave, leaveIndex) in leaveList"
+                            :key="leaveIndex">
                             <td class="">
-                                {{ duty.department_name }}
+                                {{ leave.department_name }}
                             </td>
                             <td class="">
-                                {{ duty.staff_name }}
+                                {{ leave.role_name }}
                             </td>
                             <td class="">
-                                {{ duty.objective_key_name }}
+                                {{ leave.leave_category_name }}
                             </td>
                             <td class="">
-                                <button @click="removeDuty(dutyIndex)">
+                                {{ leave.day }}
+                            </td>
+                            <td class="">
+                                <button @click="removeLeave(leaveIndex)">
                                     <i class="fal fa-trash  pr-3"></i>
                                 </button>
                             </td>
@@ -116,8 +122,8 @@
         </div>
 
         <div>
-            <button class="add-btn" @click="btnClickedCreateDuty()">
-                Create Duty
+            <button class="add-btn" @click="btnClickedCreateLeaveAllowance()">
+                Create Leave Allowance
             </button>
         </div>
 
@@ -132,11 +138,11 @@
                 <div class="min-[576px]:shadow-[0_0.5rem_1rem_rgba(#000, 0.15)] pointer-events-auto relative flex w-full flex-col rounded-md border-none bg-white bg-clip-padding text-current shadow-lg outline-none">
                     <div class="relative flex justify-between py-2 px-6 border-b">
                         <h5 class="text-base text-center mt-2 font-semibold leading-normal font-inter"
-                            id="add_duty_modalLabel">
+                            id="add_leave_modalLabel">
                             Create Leave Type
                         </h5>
                         <button type="button" class="text-xs focus:shadow-none focus:outline-none"
-                                data-te-modal-dismiss aria-label="Close" id="close_first_modal">
+                                data-te-modal-dismiss aria-label="Close" id="close_leave_type_modal">
                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
                                     stroke-width="1.5" stroke="currentColor" class="h-4 w-4">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
@@ -185,7 +191,7 @@ export default {
             roleList:[],
             leaveTypeList:[],
 
-            LeaveAllowanceList:[],
+            leaveList:[],
 
             selectedDepartment:null,
             selectedRole:null,
@@ -209,7 +215,12 @@ export default {
         changeDepartment(){
             this.roleList = this.selectedDepartment.roles;
         },
-
+        async getLeaveType(){
+            let response = await getApiData({ url: '/api/hr/leave_categories', token: this.getToken() });
+            if (response.data) {
+                this.leaveTypeList = response.data.data;
+            }
+        },
         
         btnClickedAddLeaveType(){
             if(!this.modalLeaveType){
@@ -222,77 +233,73 @@ export default {
         },
         async addLeaveType(){
             let formData = new FormData();
-            formData.append('modal_leave_type',this.selectedDate);
-            formData.append('due_date',this.selectedDueDate);
-            formData.append('assign_duty',JSON.stringify(this.dutyList));
-            let response = await postApiData({url:`/api/assign_duties`, form_data:formData, token:this.getToken()})
+            formData.append('name',this.modalLeaveType);
+            let response = await postApiData({url:`/api/hr/leave_categories`, form_data:formData, token:this.getToken()})
             if(response.success){
-                console.log('successed')
-                window.location.replace(`/okr_duty`);
+                this.getLeaveType();
+                this.modalLeaveType = null;
+                document.getElementById('close_leave_type_modal').click();
             }
         },
-        btnClickedAddDuty(){
+
+
+
+
+        btnClickedAddLeave(){
             if(!this.selectedDepartment){
                 this.alertValidationMessage(`Department`);
                 return 1;
             }
-            else if(!this.selectedStaff){
-                this.alertValidationMessage(`Staff`);
+            else if(!this.selectedRole){
+                this.alertValidationMessage(`Role`);
                 return 1;
             }
-            else if(!this.selectedOkr){
-                this.alertValidationMessage(`Okr`);
+            else if(!this.selectedDay){
+                this.alertValidationMessage(`Day`);
+                return 1;
+            }
+            else if(!this.selectedLeaveType){
+                this.alertValidationMessage(`Leave Type`);
                 return 1;
             }
             else{
-                this.assignDuty();
+                this.addLeave();
             }
         },
-        async assignDuty(){
-            this.dutyList.push({
-                department_name:this.selectedDepartment.name,
-                staff_name: this.selectedStaff.name,
-                staff_id: this.selectedStaff.id,
-                objective_key_name: this.selectedOkr.name,
-                objective_key_id: this.selectedOkr.id, // objective_id = objective_key_id ????
+        async addLeave(){
+            this.leaveList.push({
+                department_name: this.selectedDepartment.name,
+                role_name: this.selectedRole.name,
+                leave_category_name: this.selectedLeaveType.name,
+                role_id: this.selectedRole.id,
+                leave_category_id: this.selectedLeaveType.id,
+                day: this.selectedDay,
             })
-            this.selectedStaff = null
-            this.selectedDepartment = null
-            this.selectedOkr = null
+            this.selectedDepartment = null;
+            this.selectedRole = null;
+            this.selectedLeaveType = null;
+            this.selectedDay = null;
         },
-        
-
-
-        removeDuty(index){
-            this.dutyList.splice(index, 1);
+        removeLeave(index){
+            this.leaveList.splice(index, 1);
         },
 
-        btnClickedCreateDuty(){
-            if(!this.selectedDate){
-                this.alertValidationMessage(`Date`);
-                return 1;
-            }
-            else if(!this.selectedDueDate){
-                this.alertValidationMessage(`Due Date`);
-                return 1;
-            }
-            else if(this.dutyList.length < 1){
-                this.alertValidationMessage(`Duty`);
+        btnClickedCreateLeaveAllowance(){
+            if(this.leaveList.length < 1){
+                this.alertValidationMessage(`Leave`);
                 return 1;
             }
             else{
-                this.createDuty();
+                this.createLeaveAllowance();
             }
         },
-        async createDuty(){
+        async createLeaveAllowance(){
             let formData = new FormData();
-            formData.append('assign_date',this.selectedDate);
-            formData.append('due_date',this.selectedDueDate);
-            formData.append('assign_duty',JSON.stringify(this.dutyList));
-            let response = await postApiData({url:`/api/assign_duties`, form_data:formData, token:this.getToken()})
+            formData.append('leave_allowances', JSON.stringify(this.leaveList));
+            let response = await postApiData({url:`/api/hr/leave_allowances`, form_data:formData, token:this.getToken()})
             if(response.success){
                 console.log('successed')
-                window.location.replace(`/okr_duty`);
+                window.location.replace(`/leave_allowance`);
             }
         },
 
@@ -322,6 +329,7 @@ export default {
 
     mounted() {
         this.getDepartmentList();
+        this.getLeaveType();
         initTE({ Modal, Select, Tab, Ripple });
     }
 }

@@ -1890,7 +1890,13 @@
             removePackageAccessory(index){
 
                 this.accessory_total_package -= this.packageAccessoriesList[index].price;
-                this.packageAccessoriesList.splice(index, 1);
+                if(this.packageAccessoriesList[index].is_package == '0'){
+                    this.packageAccessoriesList.splice(index, 1);
+                }
+                else{
+                    this.packageAccessoriesList[index].is_package = -1
+                }
+                // this.packageAccessoriesList.splice(index, 1);
             },
 
             createRoomForPackage(){

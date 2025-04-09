@@ -1,29 +1,37 @@
 <template>
     <div>
         <p class=" text-lg font-semibold font-inter">
-            Assign Duties
+            Leave Allowance
         </p>
     </div>
     <div class="mt-4 bg-white">
         <div class="btn-container">
             <notifications position="top center" />
             <div class=" flex gap-x-4">
-                <label for="search" class="search-input">
+                <!-- <label for="search" class="search-input">
                     <input type="text" class="input-search" placeholder="Search" v-model="searchInput">
                     <i class="fal fa-search"></i>
                 </label>
                 <button class="add-btn h-8" @click="searchBtnClicked()">Search</button>
-                <button class="add-btn h-8" @click="clearSearchBtnClicked()">Clear</button>
+                <button class="add-btn h-8" @click="clearSearchBtnClicked()">Clear</button> -->
+                <div class="w-full !text-sm" data-te-select-wrapper-ref>
+                    <select data-te-select-init data-te-select-placeholder="Select Department" @change="selectedDepartmentChange()"
+                        data-te-select-filter="true" name="" id="" v-model="selectedDepartment" class="input-ui">
+                        <option :value="department" v-for="(department, departmentIndex) in departmentList"
+                            :key="departmentIndex"> {{ department.name }} </option>
+                    </select>
+                </div>
+                <div class="w-full !text-sm" data-te-select-wrapper-ref>
+                    <select data-te-select-init data-te-select-placeholder="Select Type" @change="selectedRoleChange()"
+                        data-te-select-filter="true" name="" id="" v-model="selectedRole" class="input-ui">
+                        <option :value="role" v-for="(role, roleIndex) in roleList"
+                            :key="roleIndex"> {{ role.name }} </option>
+                    </select>
+                </div>
             </div>
             <div class="flex pr-0 gap-x-4">
-                <!-- <div class="w-full !text-sm" data-te-select-wrapper-ref>
-                    <select data-te-select-init data-te-select-placeholder="Select Type" @change="selectedTypeChanged()"
-                        data-te-select-filter="true" name="" id="" v-model="selectedType" class="input-ui">
-                        <option :value="type.value" v-for="(type, typeIndex) in typeList"
-                            :key="typeIndex"> {{ type.name }} </option>
-                    </select>
-                </div> -->
-                <a href="/okr_duty/create"
+                
+                <a href="/leave_allowance/create"
                     class="add-btn  h-8 whitespace-nowrap">
                     Add New
                 </a>
@@ -39,7 +47,16 @@
                                     #
                                 </th>
                                 <th scope="col" class="">
-                                    Date
+                                    Leave Days
+                                </th>
+                                <th scope="col" class="">
+                                    Department
+                                </th>
+                                <th scope="col" class="">
+                                    Role
+                                </th>
+                                <th scope="col" class="">
+                                    Type
                                 </th>
                                 <th scope="col" class="">
                                     
@@ -48,20 +65,29 @@
                         </thead>
                         <tbody>
                             <!-- looping start -->
-                            <div class="contents" v-for="(duty, index) in dutyList" :key="index">
+                            <div class="contents" v-for="(leave, index) in leaveAllowanceList" :key="index">
                                 <tr class="">
                                     <td class=" font-medium ">
                                         <!-- {{ perPage * (currentPage - 1) + (++index) }} -->
                                         {{ index+1 }}
                                     </td>
                                     <td class="whitespace-nowrap">
-                                        {{ duty.assign_date }}
+                                        {{ leave.day }}
                                     </td>
                                     <td class="whitespace-nowrap">
-                                        <a :href="'/okr_duty/' + duty.id + '/edit'">
+                                        {{ leave.role.department.name }}
+                                    </td>
+                                    <td class="whitespace-nowrap">
+                                        {{ leave.role.name }}
+                                    </td>
+                                    <td class="whitespace-nowrap">
+                                        {{ leave.leave_category.name }}
+                                    </td>
+                                    <td class="whitespace-nowrap">
+                                        <!-- <a :href="'/okr_duty/' + duty.id + '/edit'">
                                             <i class="far fa-pen cursor-pointer mr-3"></i>
-                                        </a>
-                                        <button @click="deleteBtnClicked(duty.id)"
+                                        </a> -->
+                                        <button @click="deleteBtnClicked(leave.id)"
                                             data-te-toggle="modal" data-te-target="#deleteModal" id="delete-btn" class="pr-1">
                                             <i class="fas fa-trash-alt"></i>
                                         </button>
@@ -75,13 +101,13 @@
                     <div class="flex justify-center">
                         <div v-if="totalData != 0" class=" bg-white  flex justify-center mt-5 py-3">
                             <button class="rounded px-6 py-1 border  hover:bg-slate-200" :disabled="currentPage === 1"
-                                @click="getOkrList(currentPage - 1)">«</button>
+                                @click="leaveAllowanceList(currentPage - 1)">«</button>
                             <button class=" text-sm px-5 border">
                                 Page <span @dblclick="showInput">{{ currentPage }}</span> / <span class="text-gray-400">{{
                                     lastPage }}</span>
                             </button>
                             <button class=" rounded px-6  py-1 border  hover:bg-slate-200"
-                                :disabled="currentPage === lastPage" @click="getOkrList(currentPage + 1)">
+                                :disabled="currentPage === lastPage" @click="leaveAllowanceList(currentPage + 1)">
                                 »</button>
                         </div>
                     </div>
@@ -151,7 +177,12 @@ import { mapGetters } from "vuex";
 export default {
     data() {
         return {
-            dutyList: [],
+            leaveAllowanceList: [],
+            departmentList: [],
+            roleList: [],
+
+            selectedDepartment: null,
+            selectedRole: null,
             
             currentPage: 0,
             perPage: 0,
@@ -160,7 +191,7 @@ export default {
 
             searchInput:null,
 
-            url:'/api/assign_duties',
+            url:'/api/hr/leave_allowances',
             url_search:'',
             url_department:'',
             url_role:'',
@@ -171,37 +202,36 @@ export default {
     methods: {
         ...mapGetters(['getToken']),
 
-        async getDutyList(pageNumber) {
-            // let url = this.url + pageNumber + this.url_search + this.url_department + this.url_role;
-            let url = this.url;
-            // let url = `/api/objectives?page=${pageNumber}`;
-            // if (this.searchInput && this.searchCategory) {
-            //     url = `/api/objectives?search_input=${this.searchInput}&menu_category_id=${this.searchCategory.id}&page=${pageNumber}`;
-            // }
-            // if (this.searchInput && !this.searchCategory) {
-            //     url = `/api/objectives?search_input=${this.searchInput}&page=${pageNumber}`;
-            // }
-            // if ((!this.searchInput) && this.searchCategory) {
-            //     url = `/api/objectives?menu_category_id=${this.searchCategory.id}&page=${pageNumber}`;
-            // }
-            // let url = `/api/objectives`;
+        async getLeaveAllowanceList(pageNumber) {
+            let url = this.url + this.url_department + this.url_role;
             let response = await getApiData({ url: url, token: this.getToken() });
             if (response.data) {
-                this.dutyList = response.data.data;
-                // this.lastPage = response.data.last_page;
-                // this.currentPage = pageNumber;
-                // this.perPage = response.data.per_page;
+                this.leaveAllowanceList = response.data.data;
             }
         },
-
+        async getDepartmentList(){
+            let response = await getApiData({ url: '/api/departments', token: this.getToken() });
+            if (response.data) {
+                this.departmentList = response.data;
+            }
+        },
+        selectedDepartmentChange(){
+            this.url_department = '?department_id='+this.selectedDepartment.id;
+            this.roleList = this.selectedDepartment.roles;
+            this.getLeaveAllowanceList();
+        },
+        selectedRoleChange(){
+            this.url_role = '&role_id='+this.selectedRole.id;
+            this.getLeaveAllowanceList();
+        },
         async searchBtnClicked() {
             this.url_search = '&search=' + this.searchInput
-            this.getDutyList(1);
+            this.getLeaveAllowanceList(1);
         },
         clearSearchBtnClicked() {
             this.searchInput = null;
             this.url_search = '';
-            this.getDutyList(1);
+            this.getLeaveAllowanceList(1);
         },
 
 
@@ -210,9 +240,9 @@ export default {
             this.deleteId = id;
         },
         async deleteItem() {
-            let response = await deleteApiData({ url: `/api/assign_duties/` + this.deleteId, token: this.getToken() });
+            let response = await deleteApiData({ url: `/api/hr/leave_allowances/` + this.deleteId, token: this.getToken() });
             if (response.success) {
-                this.getDutyList(1);
+                this.getLeaveAllowanceList(1);
             }
             else {
                 this.$notify({
@@ -228,7 +258,8 @@ export default {
         initTE({ Modal, Select, Ripple });
     },
     created() {
-        this.getDutyList(1);
+        this.getLeaveAllowanceList(1);
+        this.getDepartmentList();
     }
 }
 </script>
