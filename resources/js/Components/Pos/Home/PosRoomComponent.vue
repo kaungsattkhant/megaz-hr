@@ -848,34 +848,36 @@
                                                     </tr>
                                                 </thead>
                                                 <tbody>
-                                                    <tr class="" v-for="(pm,index) in packageAccessoriesList" :key=index>
-                                                        <td class=" py-4 text-sm  ">
-                                                            {{ pm.name }}
-                                                        </td>
-                                                        <!-- <td class=" py-4 text-sm  ">
-                                                            <select name="" :class="pm.is_package == 0 ? 'hidden' : ''"
-                                                                class="text-xs pl-0 border-0 focus:shadow-none focus:outline-none focus:ring-0 select-box area-select-box !pr-6"
-                                                                placeholder="Select Area" @change="packageCookingAreaChange(area,index)" v-model="pm.area_id">
-                                                                <option disabled selected>Select Area</option>
-                                                                <option v-for="(area, index) in pm.areas" :key="index"
-                                                                    :value="area.id" class="">
-                                                                    {{ area.name }}
-                                                                </option>
-                                                            </select>
-                                                        </td> -->
-                                                        <td class=" py-4 text-sm  ">
-                                                            {{ pm.quantity }}
-                                                        </td>
-                                                        <td class=" py-4 text-sm  ">
-                                                            {{ pm.unit_price * pm.quantity  }}
-                                                        </td>
-                                                        <td class=" py-4 text-sm  text-center">
-                                                            <button
-                                                                @click="removePackageAccessory(index)">
-                                                                <i class="fal fa-times  pr-3"></i>
-                                                            </button>
-                                                        </td>
-                                                    </tr>
+                                                    <div class="contents" v-for="(pm,index) in packageAccessoriesList" :key="index">
+                                                        <tr class="" v-if="pm.is_package != -1">
+                                                            <td class=" py-4 text-sm  ">
+                                                                {{ pm.name }}
+                                                            </td>
+                                                            <!-- <td class=" py-4 text-sm  ">
+                                                                <select name="" :class="pm.is_package == 0 ? 'hidden' : ''"
+                                                                    class="text-xs pl-0 border-0 focus:shadow-none focus:outline-none focus:ring-0 select-box area-select-box !pr-6"
+                                                                    placeholder="Select Area" @change="packageCookingAreaChange(area,index)" v-model="pm.area_id">
+                                                                    <option disabled selected>Select Area</option>
+                                                                    <option v-for="(area, index) in pm.areas" :key="index"
+                                                                        :value="area.id" class="">
+                                                                        {{ area.name }}
+                                                                    </option>
+                                                                </select>
+                                                            </td> -->
+                                                            <td class=" py-4 text-sm  ">
+                                                                {{ pm.quantity }}
+                                                            </td>
+                                                            <td class=" py-4 text-sm  ">
+                                                                {{ pm.unit_price * pm.quantity  }}
+                                                            </td>
+                                                            <td class=" py-4 text-sm  text-center">
+                                                                <button
+                                                                    @click="removePackageAccessory(index)">
+                                                                    <i class="fal fa-times  pr-3"></i>
+                                                                </button>
+                                                            </td>
+                                                        </tr>
+                                                    </div>
         
                                                 </tbody>
                                             </table>
