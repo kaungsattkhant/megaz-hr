@@ -52,4 +52,20 @@ class LeaveController extends Controller
         $data = $this->leaveRepository->getLeave($request);
         ResponseData($data);
     }
+    public function updateLeave(Request $request, $id)
+    {
+        $data = $this->leaveRepository->updateLeave($request->all(), $id);
+        ResponseData($data);
+    }
+    public function deleteLeave($id)
+    {
+        $data = $this->leaveRepository->deleteLeave($id);
+        ResponseData($data);
+    }
+
+    public function getLeaveTotalByStaff($staffId)
+    {
+        $data = $this->leaveRepository->getLeaveTotalByStaff($staffId);
+        ResponseData($data);
+    }
 }
