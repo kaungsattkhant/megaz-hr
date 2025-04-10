@@ -99,7 +99,7 @@ class LeaveRepository implements LeaveRepositoryInterface
         $extension = $imageData->getClientOriginalExtension();
         $hashedName = md5(uniqid() . microtime()) . '.' . $extension;
         $image_path = $imageData->storeAs('leaveImgs', $hashedName, 'public');
-        $image_url = Storage::url($data['image_path']);
+        $image_url = Storage::url($image_path);
       }
       // Assume isIncludeWeekends == 1
       $startDate = \Carbon\Carbon::parse($data['start_date']);
