@@ -17,7 +17,9 @@ return new class extends Migration
             $table->longText('title')->nullable();
             $table->longText('detail')->nullable();
             $table->date('start_date');
+            $table->date('end_date');
             $table->integer('day');
+            $table->boolean('isIncludeWeekends');
             $table->foreignId('staff_id');
             $table->enum('status', ['received', 'confirmed', 'cancelled']);
             $table->foreignId('created_by');
