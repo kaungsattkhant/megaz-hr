@@ -160,7 +160,7 @@
             
                             <div class="bg-white mb-0 w-full inline-block h-[34px] dark:bg-white !text-black !text-sm"
                                 data-te-select-wrapper-ref>
-                                <select data-te-select-init data-te-select-placeholder="Select Department" @change="changeDepartment()"
+                                <select data-te-select-init data-te-select-placeholder="Select Department" @change="selectedDepartmentChange()"
                                     data-te-select-filter="true" name="" id="" v-model="selectedDepartment" class="input-ui !text-black text-sm">
                                     <option :value="department" v-for="(department, index) in departmentList"
                                         :key="index"> {{ department.name }} </option>
@@ -186,7 +186,7 @@
                             </label>
                             <div class="bg-white mb-0 w-full inline-block h-[34px] dark:bg-white !text-black !text-sm"
                                 data-te-select-wrapper-ref>
-                                <select data-te-select-init data-te-select-placeholder="Select Role" 
+                                <select data-te-select-init data-te-select-placeholder="Select Staff" 
                                     data-te-select-filter="true" name="" id="" v-model="selectedStaff" class="input-ui !text-black text-sm">
                                     <option :value="staff" v-for="(staff, index) in staffList"
                                         :key="index"> {{ staff.name }} </option>
@@ -221,6 +221,27 @@
                                 <textarea type='text' v-model='detail' class="input-ui w-full !p-1 text-xs" rows="8" placeholder="Description" ></textarea>
                             </div>
             
+                        </div>
+                        <div class="mb-4">
+                            <label for="" class="label-form mb-3">
+                                Status
+                            </label>
+                            <div class="bg-white mb-0 w-full inline-block h-[34px] dark:bg-white !text-black !text-sm"
+                                data-te-select-wrapper-ref>
+                                <select data-te-select-init data-te-select-placeholder="Select Staff" 
+                                    data-te-select-filter="true" name="" id="" v-model="selectedStatus" class="input-ui !text-black text-sm">
+                                    <option value="confirmed"> Confirmed </option>
+                                    <option value="received"> Received </option>
+                                    <option value="cancelled"> Cancelled </option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="mb-4">
+                            <label for="" class="label-form mb-3">
+                                Image
+                            </label>
+                            <input type="file" class="input-ui" @change="handleFileChange"
+                                accept="image/png, image/gif, image/jpeg" ref="image">
                         </div>
                         <div class="grid grid-cols-2 gap-x-4 mb-4">
                             <div>
@@ -347,6 +368,8 @@ export default {
             endDate: null,
             selectedDay: null,
             selectedStatus: null,
+            selectedImage: null,
+            selectedStatus: null,
             isIncludeWeekends: false,
 
             
@@ -366,7 +389,7 @@ export default {
     },
 
     methods: {
-        ...mapGetters(['getToken']),
+        ...mapGetters(['getUser', 'getDepartment','getToken']),
 
         async getLeaveList(pageNumber) {
             let url = this.url + this.url_department + this.url_role;
@@ -374,6 +397,7 @@ export default {
             if (response.data) {
                 this.leaveList = response.data.data;
             }
+            console.log(this.getUser());
         },
         async getDepartmentList(){
             let response = await getApiData({ url: '/api/departments', token: this.getToken() });
@@ -403,8 +427,24 @@ export default {
 
         selectedDepartmentChange(){
             this.roleList = this.selectedDepartment.roles;
+            this.getStaffList();
         },
-
+        async getStaffList(){
+                const response = await getApiData({ url: '/api/departments/' + this.selectedDepartment.id + '/staffs', token: this.getToken() });
+                if(response.data){
+                    this.staffList = response.data;
+                }
+            },
+        async getLeaveType(){
+            let response = await getApiData({ url: '/api/hr/leave_categories', token: this.getToken() });
+            if (response.data) {
+                this.leaveCategoryList = response.data.data;
+            }
+        },
+        handleFileChange(event) {
+            const selectedFile = event.target.files[0];
+            this.selectedImage = selectedFile;
+        },
 
         btnClickedCrateLeave(){
             // if(this.leaveList.length < 1){
@@ -418,15 +458,15 @@ export default {
         },
         async createLeave(){
             let formData = new FormData();
-            formData.append('staff_id', 1);
-            formData.append('leave_category_id', 1);
-            formData.append('title', 'test');
-            formData.append('detail', 'test');
-            formData.append('start_date', '2024-01-01');
-            formData.append('end_date', '2024-02-02');
-            formData.append('day', '03');
-            formData.append('status', 'received');
-            formData.append('image', 'Img.png');
+            formData.append('staff_id', this.selectedStaff.id);
+            formData.append('leave_category_id', this.selectedLeaveCategory.id);
+            formData.append('title', this.title);
+            formData.append('detail', this.detail);
+            formData.append('start_date', this.startDate);
+            formData.append('end_date', this.endDate);
+            formData.append('day', this.selectedDay);
+            formData.append('status', this.selectedStatus);
+            formData.append('image', this.selectedImage);
             if(this.isIncludeWeekends == false){
                 formData.append('isIncludeWeekends', 0);
             }
@@ -467,6 +507,7 @@ export default {
     created() {
         this.getLeaveList(1);
         this.getDepartmentList();
+        this.getLeaveType();
     }
 }
 </script>
