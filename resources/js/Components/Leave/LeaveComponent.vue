@@ -105,10 +105,18 @@
                                         <!-- <a :href="'/okr_duty/' + duty.id + '/edit'">
                                             <i class="far fa-pen cursor-pointer mr-3"></i>
                                         </a> -->
-                                        <button @click="deleteBtnClicked(leave.id)"
+                                        <button @click="deleteBtnClicked(leave.id)" v-if="leave.status != 'received'"
                                             data-te-toggle="modal" data-te-target="#deleteModal" id="delete-btn" class="pr-1">
-                                            <i class="fas fa-trash-alt"></i>
+                                            <i class="far fa-trash-alt"></i>
                                         </button>
+                                        <div class="contents" v-if="leave.status == 'received'">
+                                            <button @click="confirmedLeave(leave)">
+                                                <i class="far fa-check text-sm mr-3 p-1"></i>
+                                            </button>
+                                            <button @click="cancelledLeave(leave)">
+                                                <i class="far fa-times text-sm p-1"></i>
+                                            </button>
+                                        </div>
                                     </td>
                                 </tr>
                             </div>
@@ -226,13 +234,11 @@
                             <label for="" class="label-form mb-3">
                                 Status
                             </label>
-                            <div class="bg-white mb-0 w-full inline-block h-[34px] dark:bg-white !text-black !text-sm"
-                                data-te-select-wrapper-ref>
-                                <select data-te-select-init data-te-select-placeholder="Select Staff" 
-                                    data-te-select-filter="true" name="" id="" v-model="selectedStatus" class="input-ui !text-black text-sm">
-                                    <option value="confirmed"> Confirmed </option>
-                                    <option value="received"> Received </option>
-                                    <option value="cancelled"> Cancelled </option>
+                            <div class="bg-white mb-0 w-full inline-block h-[34px] !text-black !text-sm"
+                                data-te-select-wrapper-ref >
+                                <select data-te-select-init data-te-select-placeholder="Select Status" disabled
+                                    name="" id="" v-model="selectedStatus" class="input-ui !text-black text-sm">
+                                    <option :value="status" v-for="status in statusList">{{ status.name }}</option>
                                 </select>
                             </div>
                         </div>
@@ -259,7 +265,7 @@
                                     class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
                             </div>
                         </div>
-                        <div class="mb-4">
+                        <!-- <div class="mb-4">
                             <label for="" class="label-form mb-3">
                                 Day
                             </label>
@@ -268,7 +274,7 @@
                         <label for="isIncludeWeekends" class=" focus:outline-none focus:ring-0 focus:shadow-none cursor-pointer flex items-center gap-x-3 pl-1">
                             <input type="checkbox" id="isIncludeWeekends" v-model="isIncludeWeekends" class=" focus:outline-none focus:ring-0 focus:shadow-none">
                             Is Include Weekends
-                        </label>
+                        </label> -->
 
                     </div>
                     <div class="flex justify-end gap-x-4 px-6 mb-6 pt-4">
@@ -344,6 +350,7 @@
 import { Modal, Ripple, Select, initTE, Input } from "tw-elements";
 import { getApiData, postApiData, deleteApiData } from '../../utilities/ajax-helpers';
 import { mapGetters } from "vuex";
+import { getCurrentTime, getCurretDateTime } from "../../utilities/datetime-helpers";
 
 export default {
     data() {
@@ -354,6 +361,11 @@ export default {
             roleList: [],
             staffList: [],
             leaveCategoryList: [],
+            statusList: [
+                {value: 'received', name: 'Received'},
+                {value: 'confirmed', name: 'Confirmed'},
+                {value: 'cancelled', name: 'Cancelled'},
+            ],
 
             searchDepartment: null,
             searchRole: null,
@@ -367,11 +379,11 @@ export default {
             startDate: null,
             endDate: null,
             selectedDay: null,
-            selectedStatus: null,
             selectedImage: null,
-            selectedStatus: null,
+            selectedStatus: {value: 'confirmed', name: 'Confirmed'},
             isIncludeWeekends: false,
 
+            currentTime: getCurretDateTime(),
             
             currentPage: 0,
             perPage: 0,
@@ -460,21 +472,21 @@ export default {
             let formData = new FormData();
             formData.append('staff_id', this.selectedStaff.id);
             formData.append('leave_category_id', this.selectedLeaveCategory.id);
-            formData.append('title', this.title);
+            formData.append('title', this.selectedLeaveTitle);
             formData.append('detail', this.detail);
             formData.append('start_date', this.startDate);
             formData.append('end_date', this.endDate);
-            formData.append('day', this.selectedDay);
-            formData.append('status', this.selectedStatus);
+            // formData.append('day', this.selectedDay);
+            formData.append('status', this.selectedStatus.value);
             formData.append('image', this.selectedImage);
-            if(this.isIncludeWeekends == false){
-                formData.append('isIncludeWeekends', 0);
-            }
-            else{
-                formData.append('isIncludeWeekends', 1);
-            }
-            formData.append('confirmed_at', '2025-04-11');
-            formData.append('confirmed_by', '1');
+            // if(this.isIncludeWeekends == false){
+            //     formData.append('isIncludeWeekends', 0);
+            // }
+            // else{
+            //     formData.append('isIncludeWeekends', 1);
+            // }
+            formData.append('confirmed_at', this.currentTime);
+            formData.append('confirmed_by', this.getUser().id);
             let response = await postApiData({url:`/api/hr/leaves`, form_data:formData, token:this.getToken()})
             if(response.success){
                 console.log('successed')
@@ -482,6 +494,30 @@ export default {
             }
         },
 
+        async confirmedLeave(leave){
+            let formData = new FormData();
+            formData.append('status', 'confirmed');
+            formData.append('confirmed_at', this.currentTime);
+            formData.append('confirmed_by', this.getUser().id);
+            let response = await postApiData({url:`/api/hr/leaves/` + leave.id, form_data:formData, token:this.getToken()})
+            if(response.success){
+                console.log('successed')
+                // window.location.replace(`/leave`);
+                this.getLeaveList();
+            }
+        },
+        async cancelledLeave(leave){
+            let formData = new FormData();
+            formData.append('status', 'cancelled');
+            formData.append('cancelled_at', this.currentTime);
+            formData.append('cancelled_by', this.getUser().id);
+            let response = await postApiData({url:`/api/hr/leaves/` + leave.id, form_data:formData, token:this.getToken()})
+            if(response.success){
+                console.log('successed')
+                // window.location.replace(`/leave`);
+                this.getLeaveList();
+            }
+        },
 
         deleteBtnClicked(id) {
             this.deleteId = id;
