@@ -98,45 +98,29 @@ class LeaveRepository implements LeaveRepositoryInterface
         $imageData = $data['image'];
         $extension = $imageData->getClientOriginalExtension();
         $hashedName = md5(uniqid() . microtime()) . '.' . $extension;
-        $data['image_path'] = $imageData->storeAs('leaveImgs', $hashedName, 'public');
-        $data['image_url'] = Storage::url($data['image_path']);
+        $image_path = $imageData->storeAs('leaveImgs', $hashedName, 'public');
+        $image_url = Storage::url($image_path);
       }
-      if (isset($data['isIncludeWeekends'])) {
-        if ($data['isIncludeWeekends'] === "1") {
+      // Assume isIncludeWeekends == 1
+      $startDate = \Carbon\Carbon::parse($data['start_date']);
+      $endDate = \Carbon\Carbon::parse($data['end_date']);
+      $day = $startDate->diffInDays($endDate) + 1;
 
-          $startDate = \Carbon\Carbon::parse($data['start_date']);
-          $endDate = \Carbon\Carbon::parse($data['end_date']);
-          $data['day'] = $startDate->diffInDays($endDate) + 1;
-        } else {
-          // If weekends are not included, calculate only weekdays
-          $startDate = \Carbon\Carbon::parse($data['start_date']);
-          $endDate = \Carbon\Carbon::parse($data['end_date']);
-          $totalDays = $startDate->diffInDays($endDate) + 1;
-
-          // Exclude weekends (Saturday & Sunday)
-          $weekends = 0;
-          for ($date = $startDate; $date <= $endDate; $date->addDay()) {
-            if ($date->isWeekend()) {
-              $weekends++;
-            }
-          }
-          $data['day'] = $totalDays - $weekends;
-        }
-      }
       $leave = Leave::create([
         'leave_category_id' => $data['leave_category_id'],
         'title' => $data['title'],
         'detail' => $data['detail'] ?? null,
         'start_date' => $data['start_date'],
         'end_date' => $data['end_date'],
-        'day' => $data['day'],
+        'day' => $day,
         'staff_id' => $data['staff_id'],
         'created_by' => UserData()->id,
         'status' => $data['status'],
         'confirmed_at' => $data['confirmed_at'] ?? null,
         'confirmed_by' => $data['confirmed_by'] ?? null,
-        'image_path' => $data['image_path'] ?? null,
-        'image_url' => $data['image_url'] ?? null,
+        'image_path' => $image_path ?? null,
+        'image_url' => $image_url ?? null,
+        'isIncludeWeekends' => 1
       ]);
       DB::commit();
       ResponseData($leave);

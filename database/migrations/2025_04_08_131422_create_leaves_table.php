@@ -23,8 +23,8 @@ return new class extends Migration
             $table->foreignId('staff_id');
             $table->enum('status', ['received', 'confirmed', 'cancelled']);
             $table->foreignId('created_by');
-            $table->string('image_url');
-            $table->string('image_path');
+            $table->string('image_url')->nullable();
+            $table->string('image_path')->nullable();
             $table->dateTime('confirmed_at')->nullable();
             $table->foreignId('confirmed_by')->nullable();
             $table->dateTime('cancelled_at')->nullable();
