@@ -22,5 +22,14 @@ Route::middleware('auth:api')->group(function () {
     Route::post('/leaves/{id}', 'updateLeave');
     Route::delete('/leaves/{id}', 'deleteLeave');
     Route::get('/leave_totals_by_staff/{staffId}', 'getLeaveTotalByStaff');
+
+    Route::post('/exit_categories', 'createExitCategory');
+    Route::get('/exit_categories', 'getExitCategoryLists');
+    Route::post('/exit_passes', 'createExitPass');
+    Route::get('/exit_passes', 'getExitPass');
+    Route::post('/exit_passes/{id}', 'updateExitPass');
+    Route::delete('/exit_passes/{id}', 'deleteExitPass');
+    Route::get('/exit_passes_by_staff/{staffId}', 'getExitPassByStaff');
+    Route::get('/staff_lists_by_role/{roleId}/department/{departmentId}', 'getStaffListByRoleAndDepartment');
   });
 });
