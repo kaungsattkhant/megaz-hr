@@ -200,6 +200,7 @@ import MenuAreaComponent from './Components/MenuArea/MenuAreaComponent.vue';
 import OffDayCrudComponent from './Components/OffDay/OffDayCrudComponent.vue';
 import LeaveAllowanceComponent from './Components/LeaveAllowance/LeaveAllowanceComponent.vue';
 import LeaveAllowanceCreateComponent from './Components/LeaveAllowance/LeaveAllowanceCreateComponent.vue';
+import LeaveComponent from './Components/Leave/LeaveComponent.vue';
 
 import PosSellingAreasComponent from './Components/Pos/Areas/PosSellingAreasComponent.vue';
 import PosTableComponent from './Components/Pos/Home/PosTableComponent.vue';
@@ -383,6 +384,7 @@ app.component('MenuAreaComponent',MenuAreaComponent);
 app.component('OffDayCrudComponent',OffDayCrudComponent);
 app.component('LeaveAllowanceComponent',LeaveAllowanceComponent);
 app.component('LeaveAllowanceCreateComponent',LeaveAllowanceCreateComponent);
+app.component('LeaveComponent',LeaveComponent);
 
 app.component('PosSellingAreasComponent',PosSellingAreasComponent);
 app.component('PosTableComponent',PosTableComponent);

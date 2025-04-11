@@ -869,6 +869,18 @@
                             Off Day
                         </a>
                     </li>
+                    <li>
+                        <a href="/leave_allowance" class="flex items-center @yield('leave_allowance') sidebar-gap-x">
+                            <img class="sidebar-img " src="{{ asset('img/icons8-warning-64.png') }}" alt="">
+                            Leave Allowance
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/leave" class="flex items-center @yield('leave') sidebar-gap-x">
+                            <img class="sidebar-img " src="{{ asset('img/icons8-warning-64.png') }}" alt="">
+                            Leave
+                        </a>
+                    </li>
                     
 
                 </ul>
