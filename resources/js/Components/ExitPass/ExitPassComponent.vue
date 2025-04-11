@@ -81,35 +81,36 @@
                                         {{ index+1 }}
                                     </td>
                                     <td class="whitespace-nowrap">
-                                        {{ exit.start_date }}
+                                        date needed
                                     </td>
                                     <td class="whitespace-nowrap">
                                         {{ exit.staff.name }}
                                     </td>
                                     <td class="whitespace-nowrap">
-                                        {{ exit.leave_category.name }}
-                                    </td>
-                                    <td class="whitespace-nowrap">
-                                        {{ exit.day }}
-                                    </td>
-                                    <td class="whitespace-nowrap">
-                                        {{ exit.title }}
+                                        {{ exit.exit_category.name }}
                                     </td>
                                     <td class="whitespace-nowrap">
                                         {{ exit.detail }}
                                     </td>
                                     <td class="whitespace-nowrap">
-                                        {{ exit.confirmed_by.name }}
+                                        {{ exit.exit_date_time }}
                                     </td>
+                                    <td class="whitespace-nowrap">
+                                        {{ exit.arrival_date_time }}
+                                    </td>
+                                    <td class="whitespace-nowrap">
+                                        {{ exit.status }}
+                                    </td>
+                                    
                                     <td class="whitespace-nowrap">
                                         <!-- <a :href="'/okr_duty/' + duty.id + '/edit'">
                                             <i class="far fa-pen cursor-pointer mr-3"></i>
                                         </a> -->
-                                        <button @click="deleteBtnClicked(exit.id)" v-if="exit.status != 'received'"
+                                        <button @click="deleteBtnClicked(exit.id)" v-if="exit.status == 'confirmed' || exit.status == 'arrival_confirmed'"
                                             data-te-toggle="modal" data-te-target="#deleteModal" id="delete-btn" class="pr-1">
                                             <i class="far fa-trash-alt"></i>
                                         </button>
-                                        <div class="contents" v-if="exit.status == 'received'">
+                                        <div class="contents" v-if="exit.status != 'confirmed' && exit.status != 'arrival_confirmed'">
                                             <button @click="confirmedExit(exit)">
                                                 <i class="far fa-check text-sm mr-3 p-1"></i>
                                             </button>
@@ -153,7 +154,7 @@
                             {{ isExitCategory ? 'Create Exit Category' : 'Create Exit' }}
                         </h5>
                         <button type="button" class="text-xs focus:shadow-none focus:outline-none"
-                                data-te-modal-dismiss aria-label="Close" id="close_leave_type_modal">
+                                data-te-modal-dismiss aria-label="Close" id="close_exit_create_modal">
                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
                                     stroke-width="1.5" stroke="currentColor" class="h-4 w-4">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
@@ -182,7 +183,7 @@
                                 </label>
                                 <div class="bg-white mb-0 w-full inline-block h-[34px] dark:bg-white !text-black !text-sm"
                                     data-te-select-wrapper-ref>
-                                    <select data-te-select-init data-te-select-placeholder="Select Role" 
+                                    <select data-te-select-init data-te-select-placeholder="Select Role"
                                         data-te-select-filter="true" name="" id="" v-model="selectedRole" class="input-ui !text-black text-sm">
                                         <option :value="role" v-for="(role, index) in roleList"
                                             :key="index"> {{ role.name }} </option>
@@ -232,14 +233,14 @@
                                 <label for="" class="block text-sm text-black mb-3">
                                     Exit Time
                                 </label>
-                                <input type="date" v-model="exitTime"
+                                <input type="datetime-local" v-model="exitTime"
                                     class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
                             </div>
                             <div class="mb-4">
                                 <label for="" class="block text-sm text-black mb-3">
                                     Arrival Time
                                 </label>
-                                <input type="date" v-model="arrivalTime"
+                                <input type="datetime-local" v-model="arrivalTime"
                                     class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
                             </div>
                         </div>
@@ -361,6 +362,8 @@ export default {
 
             isExitCategory: false,
 
+            exitCategoryName: null,
+
             currentTime: getCurretDateTime(),
             
             currentPage: 0,
@@ -370,11 +373,13 @@ export default {
 
             searchInput:null,
 
-            url:'/api/hr/leaves',
+            url:'/api/hr/exit_passes',
             url_search:'',
             url_department:'',
             url_role:'',
             deleteId:null,
+
+            testdata: null,
         };
     },
 
@@ -419,14 +424,23 @@ export default {
             this.roleList = this.selectedDepartment.roles;
             this.getStaffList();
         },
+        // selectedRoleChange(){
+        //     this.getStaffList();
+        // },
         async getStaffList(){
-                const response = await getApiData({ url: '/api/departments/' + this.selectedDepartment.id + '/staffs', token: this.getToken() });
-                if(response.data){
-                    this.staffList = response.data;
-                }
-            },
+            const response = await getApiData({ url: '/api/departments/' + this.selectedDepartment.id + '/staffs', token: this.getToken() });
+            if(response.data){
+                this.staffList = response.data;
+            }
+        },
+        // async getStaffList(){
+        //     const response = await getApiData({ url: '/api/staff_lists_by_role/' + this.selectedRole.id + '/department/' +this.selectedDepartment.id, token: this.getToken() });
+        //     if(response.data){
+        //         this.staffList = response.data;
+        //     }
+        // },
         async getExitCategory(){
-            let response = await getApiData({ url: '/api/hr/leave_categories', token: this.getToken() });
+            let response = await getApiData({ url: '/api/hr/exit_categories', token: this.getToken() });
             if (response.data) {
                 this.exitCategoryList = response.data.data;
             }
@@ -446,66 +460,83 @@ export default {
             if(response.success){
                 console.log('successed')
                 this.isExitCategory = false;
+                this.getExitCategory();
+                this.selectedExitCategory = response.data;
             }
         },
 
         btnClickedCreateExit(){
-            // if(this.exitList.length < 1){
+            if(!this.selectedStaff){
+                this.alertValidationMessage(`Employee`);
+                return 1;
+            }
+            // else if(this.exitList.length < 1){
             //     this.alertValidationMessage(`Leave`);
             //     return 1;
             // }
-            // else{
-            //     this.createLeave();
-            // }
-            this.createExit();
+            else if(!this.selectedExitCategory){
+                this.alertValidationMessage(`Exit Category`);
+                return 1;
+            }
+            else if(!this.description){
+                this.alertValidationMessage(`Description`);
+                return 1;
+            }
+            else if(!this.exitTime){
+                this.alertValidationMessage(`Exit Time`);
+                return 1;
+            }
+            else if(!this.arrivalTime){
+                this.alertValidationMessage(`Arrival Time`);
+                return 1;
+            }
+            else{
+                this.createExit();
+            }
         },
         async createExit(){
             let formData = new FormData();
             formData.append('staff_id', this.selectedStaff.id);
-            formData.append('leave_category_id', this.selectedLeaveCategory.id);
-            formData.append('title', this.selectedLeaveTitle);
-            formData.append('detail', this.detail);
-            formData.append('start_date', this.startDate);
-            formData.append('end_date', this.endDate);
-            // formData.append('day', this.selectedDay);
-            formData.append('status', this.selectedStatus.value);
-            formData.append('image', this.selectedImage);
-            // if(this.isIncludeWeekends == false){
-            //     formData.append('isIncludeWeekends', 0);
-            // }
-            // else{
-            //     formData.append('isIncludeWeekends', 1);
-            // }
-            formData.append('confirmed_at', this.currentTime);
-            formData.append('confirmed_by', this.getUser().id);
-            let response = await postApiData({url:`/api/hr/leaves`, form_data:formData, token:this.getToken()})
+            formData.append('exit_category_id', this.selectedExitCategory.id);
+            formData.append('detail', this.description);
+            formData.append('exit_date_time', this.exitTime);
+            formData.append('arrival_date_time', this.arrivalTime);
+            formData.append('status', 'received');
+
+            // formData.append('confirmed_at', this.currentTime);
+            // formData.append('confirmed_by', this.getUser().id);
+            let response = await postApiData({url:`/api/hr/exit_passes`, form_data:formData, token:this.getToken()})
             if(response.success){
                 console.log('successed')
-                window.location.replace(`/leave`);
+                document.getElementById('close_exit_create_modal').click();
+                this.getExitList();
+            }
+            else {
+                this.$notify({
+                    text: response.message,
+                    type: "error"
+                });
             }
         },
 
-        async confirmedLeave(leave){
+        
+        async confirmedExit(exit){
             let formData = new FormData();
             formData.append('status', 'confirmed');
-            formData.append('confirmed_at', this.currentTime);
-            formData.append('confirmed_by', this.getUser().id);
-            let response = await postApiData({url:`/api/hr/leaves/` + leave.id, form_data:formData, token:this.getToken()})
+            let response = await postApiData({url:`/api/hr/exit_passes/` + exit.id, form_data:formData, token:this.getToken()})
             if(response.success){
                 console.log('successed')
-                // window.location.replace(`/leave`);
+                // window.location.replace(`/exit`);
                 this.getExitList();
             }
         },
-        async cancelledLeave(leave){
+        async cancelledExit(exit){
             let formData = new FormData();
-            formData.append('status', 'cancelled');
-            formData.append('cancelled_at', this.currentTime);
-            formData.append('cancelled_by', this.getUser().id);
-            let response = await postApiData({url:`/api/hr/leaves/` + leave.id, form_data:formData, token:this.getToken()})
+            formData.append('status', this.selectedStatus);
+            let response = await postApiData({url:`/api/hr/exit_passes/` + exit.id, form_data:formData, token:this.getToken()})
             if(response.success){
                 console.log('successed')
-                // window.location.replace(`/leave`);
+                // window.location.replace(`/exit`);
                 this.getExitList();
             }
         },

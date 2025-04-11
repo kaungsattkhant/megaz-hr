@@ -99,7 +99,7 @@
                                         {{ leave.detail }}
                                     </td>
                                     <td class="whitespace-nowrap">
-                                        {{ leave.confirmed_by.name }}
+                                        {{ leave.confirmed_by ? leave.confirmed_by.name : '--' }}
                                     </td>
                                     <td class="whitespace-nowrap">
                                         <!-- <a :href="'/okr_duty/' + duty.id + '/edit'">
@@ -169,7 +169,7 @@
                             <div class="bg-white mb-0 w-full inline-block h-[34px] dark:bg-white !text-black !text-sm"
                                 data-te-select-wrapper-ref>
                                 <select data-te-select-init data-te-select-placeholder="Select Department" @change="selectedDepartmentChange()"
-                                    data-te-select-filter="true" name="" id="" v-model="selectedDepartment" class="input-ui !text-black text-sm">
+                                    name="" id="" v-model="selectedDepartment" class="input-ui !text-black text-sm">
                                     <option :value="department" v-for="(department, index) in departmentList"
                                         :key="index"> {{ department.name }} </option>
                                 </select>
@@ -182,7 +182,7 @@
                             <div class="bg-white mb-0 w-full inline-block h-[34px] dark:bg-white !text-black !text-sm"
                                 data-te-select-wrapper-ref>
                                 <select data-te-select-init data-te-select-placeholder="Select Role" 
-                                    data-te-select-filter="true" name="" id="" v-model="selectedRole" class="input-ui !text-black text-sm">
+                                    name="" id="" v-model="selectedRole" class="input-ui !text-black text-sm">
                                     <option :value="role" v-for="(role, index) in roleList"
                                         :key="index"> {{ role.name }} </option>
                                 </select>
@@ -208,7 +208,7 @@
                             <div class="bg-white mb-0 w-full inline-block h-[34px] dark:bg-white !text-black !text-sm"
                                 data-te-select-wrapper-ref>
                                 <select data-te-select-init data-te-select-placeholder="Select Leave Type"
-                                    data-te-select-filter="true" name="" id="" v-model="selectedLeaveCategory" class="input-ui !text-black text-sm">
+                                    name="" id="" v-model="selectedLeaveCategory" class="input-ui !text-black text-sm">
                                     <option :value="leave" v-for="(leave, index) in leaveCategoryList"
                                         :key="index"> {{ leave.name }} </option>
                                 </select>
@@ -418,8 +418,8 @@ export default {
             }
         },
         searchDepartmentChange(){
-            this.url_department = '?department_id='+this.selectedDepartment.id;
-            this.roleList = this.selectedDepartment.roles;
+            this.url_department = '?department_id='+this.searchDepartment.id;
+            this.roleList = this.searchDepartment.roles;
             this.getLeaveList();
         },
         searchRoleChange(){
@@ -459,14 +459,41 @@ export default {
         },
 
         btnClickedCrateLeave(){
-            // if(this.leaveList.length < 1){
-            //     this.alertValidationMessage(`Leave`);
-            //     return 1;
-            // }
-            // else{
-            //     this.createLeave();
-            // }
-            this.createLeave();
+            if(!this.selectedStaff){
+                this.alertValidationMessage(`Employee`);
+                return 1;
+            }
+            else if(!this.selectedLeaveCategory){
+                this.alertValidationMessage(`Leave Category`);
+                return 1;
+            }
+            else if(!this.selectedLeaveTitle){
+                this.alertValidationMessage(`Title`);
+                return 1;
+            }
+            else if(!this.detail){
+                this.alertValidationMessage(`Detail`);
+                return 1;
+            }
+            else if(!this.startDate){
+                this.alertValidationMessage(`Start Date`);
+                return 1;
+            }
+            else if(!this.endDate){
+                this.alertValidationMessage(`End Date`);
+                return 1;
+            }
+            else if(!this.selectedStatus){
+                this.alertValidationMessage(`Status`);
+                return 1;
+            }
+            else if(!this.selectedImage){
+                this.alertValidationMessage(`Image`);
+                return 1;
+            }
+            else{
+                this.createLeave();
+            }
         },
         async createLeave(){
             let formData = new FormData();
@@ -492,6 +519,13 @@ export default {
                 console.log('successed')
                 window.location.replace(`/leave`);
             }
+            else {
+                console.log(response.message)
+                this.$notify({
+                    text: response.message,
+                    type: "error"
+                });
+            }
         },
 
         async confirmedLeave(leave){
@@ -505,6 +539,13 @@ export default {
                 // window.location.replace(`/leave`);
                 this.getLeaveList();
             }
+            else {
+                console.log(response.message)
+                this.$notify({
+                    text: response.message,
+                    type: "error"
+                });
+            }
         },
         async cancelledLeave(leave){
             let formData = new FormData();
@@ -516,6 +557,13 @@ export default {
                 console.log('successed')
                 // window.location.replace(`/leave`);
                 this.getLeaveList();
+            }
+            else {
+                console.log(response.message)
+                this.$notify({
+                    text: response.message,
+                    type: "error"
+                });
             }
         },
 
@@ -535,6 +583,16 @@ export default {
                 });
             }
         },
+
+
+        alertValidationMessage(field) {
+            this.$notify({
+                title: 'Input validation',
+                text: `You forgot to provide ${field}, please try again`,
+                type: 'warn'
+            });
+        },
+
 
     },
     mounted() {
