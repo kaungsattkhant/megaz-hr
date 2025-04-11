@@ -36,7 +36,7 @@ class Leave extends Model
     {
         return $this->belongsTo(LeaveCategory::class, 'leave_category_id');
     }
-    public function Staff(): BelongsTo
+    public function staff(): BelongsTo
     {
         return $this->belongsTo(Staff::class, 'staff_id');
     }
