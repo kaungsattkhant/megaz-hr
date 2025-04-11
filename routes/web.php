@@ -373,3 +373,5 @@ Route::view('/menu_area', 'menu_area.index')->name('menu_area.index');
 Route::view('/off_day', 'off_day.index')->name('off_day.index');
 Route::view('/leave_allowance', 'leave_allowance.index')->name('leave_allowance.index');
 Route::view('/leave_allowance/create', 'leave_allowance.create')->name('leave_allowance.create');
+Route::view('/leave', 'leave.index')->name('leave.index');
+Route::view('/exit_pass', 'exit_pass.index')->name('exit_pass.index');
