@@ -256,8 +256,6 @@ class InvoiceRepository implements InvoiceRepositoryInterface
                         }
                     }
                 }
-                // dd(Invoice::orderBy('id', 'desc')->first());
-                // dd('correct');
                 DB::commit();
                 $returnData = [
                     'customer' => $customer,

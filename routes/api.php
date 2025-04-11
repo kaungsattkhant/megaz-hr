@@ -167,7 +167,7 @@ Route::middleware('auth:api')->group(function () {
 
 
     Route::get('/staffs_by_role', [StaffAPIController::class, 'getStaffListBySupervisor']);
-    Route::get('/supervisor/staff/{staffId}/tasks', [TaskController::class, 'getStaffTasksBySupervisor']);
+    Route::get('/supervisor/staff/{staffId}/tasks', action: [TaskController::class, 'getStaffTasksBySupervisor']);
     // Route::get('/task_list', [TaskController::class, 'getStaffTasksBySupervisor']);
 
     Route::controller(TaskController::class)->group(function () {
