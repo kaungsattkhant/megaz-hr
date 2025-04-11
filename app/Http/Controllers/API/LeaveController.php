@@ -69,9 +69,51 @@ class LeaveController extends Controller
         ResponseData($data);
     }
 
-    public function getLeaveDetailsByStaff($staffId)
+    public function getExitCategoryLists(Request $request)
     {
-        $data = $this->leaveRepository->getLeaveDetailsByStaff($staffId);
+        $data = $this->leaveRepository->getExitCategoryLists($request);
+        ResponseData($data);
+    }
+
+    public function createExitCategory(Request $request)
+    {
+        $data = $this->leaveRepository->createExitCategory($request->all());
+        ResponseData($data);
+    }
+
+    public function createExitPass(Request $request)
+    {
+        $data = $this->leaveRepository->createExitPass($request->all());
+        ResponseData($data);
+    }
+
+    public function getExitPass(Request $request)
+    {
+        $data = $this->leaveRepository->getExitPass($request);
+        ResponseData($data);
+    }
+
+    public function updateExitPass(Request $request, $id)
+    {
+        $data = $this->leaveRepository->updateExitPass($request->all(), $id);
+        ResponseData($data);
+    }
+
+    public function deleteExitPass($id)
+    {
+        $data = $this->leaveRepository->deleteExitPass($id);
+        ResponseData($data);
+    }
+
+    public function getExitPassByStaff($staffId)
+    {
+        $data = $this->leaveRepository->getExitPassByStaff($staffId);
+        ResponseData($data);
+    }
+
+    public function getStaffListByRoleAndDepartment($roleId, $departmentId)
+    {
+        $data = $this->leaveRepository->getStaffListByRoleAndDepartment($roleId, $departmentId);
         ResponseData($data);
     }
 }

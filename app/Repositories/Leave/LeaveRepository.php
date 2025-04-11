@@ -4,11 +4,13 @@ namespace App\Repositories\Leave;
 
 use App\Models\Leave;
 use App\Models\Staff;
+use App\Models\ExitCategory;
 use App\Models\LeaveCategory;
 use App\Models\LeaveAllowance;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use App\Events\LeaveUpdateNotificationRequest;
+use App\Models\ExitPass;
 
 class LeaveRepository implements LeaveRepositoryInterface
 {
@@ -98,30 +100,36 @@ class LeaveRepository implements LeaveRepositoryInterface
         $imageData = $data['image'];
         $extension = $imageData->getClientOriginalExtension();
         $hashedName = md5(uniqid() . microtime()) . '.' . $extension;
-        $data['image_path'] = $imageData->storeAs('leaveImgs', $hashedName, 'public');
-        $data['image_url'] = Storage::url($data['image_path']);
+        $image_path = $imageData->storeAs('leaveImgs', $hashedName, 'public');
+        $image_url = Storage::url($image_path);
       }
-      if (isset($data['isIncludeWeekends'])) {
-        if ($data['isIncludeWeekends'] === "1") {
+      // Assume isIncludeWeekends == 1
+      $startDate = \Carbon\Carbon::parse($data['start_date']);
+      $endDate = \Carbon\Carbon::parse($data['end_date']);
+      $day = $startDate->diffInDays($endDate) + 1;
 
-          $startDate = \Carbon\Carbon::parse($data['start_date']);
-          $endDate = \Carbon\Carbon::parse($data['end_date']);
-          $data['day'] = $startDate->diffInDays($endDate) + 1;
-        } else {
-          // If weekends are not included, calculate only weekdays
-          $startDate = \Carbon\Carbon::parse($data['start_date']);
-          $endDate = \Carbon\Carbon::parse($data['end_date']);
-          $totalDays = $startDate->diffInDays($endDate) + 1;
+      $leaveCategoryId = $data['leave_category_id'];
+      $staffId = $data['staff_id'];
+      $staff = Staff::findOrFail($staffId);
+      $roles = $staff->roles;
+      $allowance = 0;
 
-          // Exclude weekends (Saturday & Sunday)
-          $weekends = 0;
-          for ($date = $startDate; $date <= $endDate; $date->addDay()) {
-            if ($date->isWeekend()) {
-              $weekends++;
-            }
-          }
-          $data['day'] = $totalDays - $weekends;
+      foreach ($roles as $role) {
+        $allowanceForRole = LeaveAllowance::where('role_id', $role->id)
+          ->where('leave_category_id', $leaveCategoryId)
+          ->value('day');
+
+        if ($allowanceForRole > $allowance) {
+          $allowance = $allowanceForRole;
         }
+      }
+      $totalTaken = Leave::where('staff_id', $staffId)
+        ->where('leave_category_id', $leaveCategoryId)
+        // ->where('status', 'confirmed')
+        ->sum('day');
+      $totalLeaveTakenByCategory = $totalTaken + $day;
+      if ($totalLeaveTakenByCategory > $allowance) {
+        ResponseMessage('You have exceeded your allowed leave days for this category.', 400);
       }
       $leave = Leave::create([
         'leave_category_id' => $data['leave_category_id'],
@@ -129,14 +137,15 @@ class LeaveRepository implements LeaveRepositoryInterface
         'detail' => $data['detail'] ?? null,
         'start_date' => $data['start_date'],
         'end_date' => $data['end_date'],
-        'day' => $data['day'],
+        'day' => $day,
         'staff_id' => $data['staff_id'],
         'created_by' => UserData()->id,
         'status' => $data['status'],
         'confirmed_at' => $data['confirmed_at'] ?? null,
         'confirmed_by' => $data['confirmed_by'] ?? null,
-        'image_path' => $data['image_path'] ?? null,
-        'image_url' => $data['image_url'] ?? null,
+        'image_path' => $image_path ?? null,
+        'image_url' => $image_url ?? null,
+        'isIncludeWeekends' => 1
       ]);
       DB::commit();
       ResponseData($leave);
@@ -179,7 +188,7 @@ class LeaveRepository implements LeaveRepositoryInterface
 
   public function getLeave($request)
   {
-    $query = Leave::with('leaveCategory', 'Staff', 'created_by', 'confirmed_by', 'cancelled_by')
+    $query = Leave::with('leaveCategory', 'staff', 'created_by', 'confirmed_by', 'cancelled_by')
       ->orderByDesc('id');
 
     if ($request->has('staff_id')) {
@@ -220,19 +229,19 @@ class LeaveRepository implements LeaveRepositoryInterface
       ->whereNotNull('confirmed_at')
       ->get();
     $totalLeaveRecords = Leave::where('staff_id', $staffId)
-      ->with(['leaveCategory', 'Staff'])
+      ->with(['leaveCategory', 'staff'])
       ->select('id', 'leave_category_id', 'title', 'start_date', 'end_date', 'staff_id', 'status')
       ->paginate(config('common.list_count'));
     $leaveTakenByCategory = [];
 
     foreach ($confirmedLeaveRecords as $leave) {
+
       if (!isset($leaveTakenByCategory[$leave->leave_category_id])) {
         $leaveTakenByCategory[$leave->leave_category_id] = 0;
       }
       $leaveTakenByCategory[$leave->leave_category_id] += $leave->day;
     }
 
-    $result = [];
     $totalLeaveAllowance = 0;
     $totalLeaveTaken = 0;
 
@@ -265,7 +274,7 @@ class LeaveRepository implements LeaveRepositoryInterface
         'start_date' => $leaveRecord->start_date,
         'end_date' => $leaveRecord->end_date,
         'staff_id' => $leaveRecord->staff_id,
-        'staff_name' => $leaveRecord->Staff->name,
+        'staff_name' => $leaveRecord->staff->name,
         'status' => $leaveRecord->status,
 
       ];
@@ -294,12 +303,124 @@ class LeaveRepository implements LeaveRepositoryInterface
     ];
   }
 
-  public function getLeaveDetailsByStaff($staffId)
+  public function createExitCategory($request)
+  {
+    DB::beginTransaction();
+    try {
+      $exitCategory = new ExitCategory();
+      $exitCategory->name = $request['name'];
+      $exitCategory->save();
+      DB::commit();
+      ResponseData($exitCategory);
+    } catch (\Exception $e) {
+      DB::rollback();
+      ResponseMessage($e->getMessage(), 402);
+      throw $e;
+    }
+  }
+
+  public function getExitCategoryLists($request)
+  {
+    return ExitCategory::orderByDesc('id')->paginate(config('common.list_count'));
+  }
+
+  public function createExitPass($request)
+  {
+    DB::beginTransaction();
+    try {
+      $exitPass = new ExitPass();
+      $exitPass->exit_category_id = $request['exit_category_id'];
+      $exitPass->staff_id = $request['staff_id'];
+      $exitPass->detail = $request['detail'] ?? null;
+      $exitPass->exit_date_time = $request['exit_date_time'];
+      $exitPass->arrival_date_time = $request['arrival_date_time'];
+      $exitPass->status = $request['status'];
+      $exitPass->save();
+
+      DB::commit();
+      ResponseData($exitPass);
+    } catch (\Exception $e) {
+      DB::rollback();
+      ResponseMessage($e->getMessage(), 402);
+      throw $e;
+    }
+  }
+  public function getExitPass($request)
+  {
+    return  ExitPass::with(['exitCategory', 'staff.department', 'staff.roles'])
+      ->orderByDesc('id')
+
+      ->when($request->status, function ($query) use ($request) {
+        $query->where('status', $request->status);
+      })
+      ->when($request->staff_id, function ($query) use ($request) {
+        $query->where('staff_id', $request->staff_id);
+      })
+      ->paginate(config('common.list_count'));
+  }
+
+  public function updateExitPass($request, $id)
+  {
+    DB::beginTransaction();
+    try {
+      $exitPass = ExitPass::findOrFail($id);
+      if (!$exitPass) {
+        ResponseMessage('ExitPass not found', 404);
+      }
+      if (isset($request['status'])) {
+        $exitPass->status = $request['status'];
+        if ($request['status'] === 'arrival_received') {
+          $exitPass->arrival_at = now();
+        }
+      }
+      $exitPass->save();
+
+      DB::commit();
+      ResponseData($exitPass);
+    } catch (\Exception $e) {
+      DB::rollback();
+      ResponseMessage($e->getMessage(), 402);
+      throw $e;
+    }
+  }
+
+  public function deleteExitPass($id)
+  {
+    DB::beginTransaction();
+    try {
+      $exitPass = ExitPass::findOrFail($id);
+      if (!$exitPass) {
+        ResponseMessage('ExitPass not found', 404);
+      }
+      $exitPass->delete();
+      DB::commit();
+      ResponseData($exitPass);
+    } catch (\Exception $e) {
+      DB::rollback();
+      ResponseMessage($e->getMessage(), 402);
+      throw $e;
+    }
+  }
+
+  public function getExitPassByStaff($staffId)
   {
     $staff = Staff::where('id', $staffId)->firstOrFail();
-    $roles = $staff->roles;
-    $leaveAllowances = LeaveAllowance::whereIn('role_id', $roles->pluck('id'))->get();
-    $leaveRecords = Leave::where('staff_id', $staffId)
-      ->get();
+    $exitPasses = ExitPass::where('staff_id', $staff->id)
+      ->with(['exitCategory'])
+      ->select('id', 'exit_category_id', 'staff_id', 'exit_date_time', 'arrival_date_time', 'status')
+      ->orderByDesc('id')
+      ->paginate(config('common.list_count'));
+    ResponseData($exitPasses);
+  }
+  public function getStaffListByRoleAndDepartment($roleId, $departmentId)
+  {
+    $staffs = Staff::whereHas('roles', function ($query) use ($roleId) {
+      $query->where('id', $roleId);
+    })
+      ->where('department_id', $departmentId)
+      ->with(['department', 'roles'])
+      ->orderByDesc('id')
+      ->paginate(config('common.list_count'));
+    ResponseData($staffs);
   }
 }

@@ -14,6 +14,16 @@ interface LeaveRepositoryInterface
   public function updateLeave($data, $id);
   public function deleteLeave($id);
 
-  public function getLeaveTotalByStaff($staffId);
-  public function getLeaveDetailsByStaff($staffId);
+  public function getLeaveTotalByStaff($staffId); //for mobile api
+
+  public function getExitCategoryLists($request);
+  public function createExitCategory($request);
+  public function getExitPass($request);
+  public function createExitPass($request);
+  public function updateExitPass($request, $id);
+  public function deleteExitPass($id);
+
+  public function getExitPassByStaff($staffId); //mobile api
+
+  public function getStaffListByRoleAndDepartment($roleId, $departmentId);
 }
