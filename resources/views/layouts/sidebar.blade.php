@@ -881,6 +881,12 @@
                             Leave
                         </a>
                     </li>
+                    <li>
+                        <a href="/exit_pass" class="flex items-center @yield('exit_pass') sidebar-gap-x">
+                            <img class="sidebar-img " src="{{ asset('img/icons8-warning-64.png') }}" alt="">
+                            Exit Pass
+                        </a>
+                    </li>
                     
 
                 </ul>
