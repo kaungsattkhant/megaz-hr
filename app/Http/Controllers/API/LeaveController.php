@@ -4,6 +4,8 @@ namespace App\Http\Controllers\API;
 
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Hr\ExitCategoryRequest;
+use App\Http\Requests\Hr\LeaveCategoryRequest;
 use App\Http\Requests\Hr\StoreLeaveAllowanceRequest;
 use App\Repositories\Leave\LeaveRepositoryInterface;
 
@@ -20,9 +22,9 @@ class LeaveController extends Controller
         $data = $this->leaveRepository->getLeaveCategoryLists($request);
         ResponseData($data);
     }
-    public function createLeaveCategory(Request $request)
+    public function createLeaveCategory(LeaveCategoryRequest $request)
     {
-        $data = $this->leaveRepository->createLeaveCategory($request->all());
+        $data = $this->leaveRepository->createLeaveCategory($request->validated());
         ResponseData($data);
     }
 
@@ -75,9 +77,9 @@ class LeaveController extends Controller
         ResponseData($data);
     }
 
-    public function createExitCategory(Request $request)
+    public function createExitCategory(ExitCategoryRequest $request)
     {
-        $data = $this->leaveRepository->createExitCategory($request->all());
+        $data = $this->leaveRepository->createExitCategory($request->validated());
         ResponseData($data);
     }
 
