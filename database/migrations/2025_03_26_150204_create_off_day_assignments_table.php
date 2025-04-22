@@ -16,6 +16,7 @@ return new class extends Migration
             $table->foreignId('off_day_id');
             $table->unsignedBigInteger('offdayable_id')->nullable();
             $table->string('offdayable_type')->nullable();
+
             $table->timestamps();
             $table->softDeletes();
         });

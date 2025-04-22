@@ -6,6 +6,7 @@ use Exception;
 use App\Models\OffDay;
 use App\Models\DayInOffDay;
 use App\Models\OffDayAssignment;
+use App\Models\PublicHoliday;
 use Illuminate\Support\Facades\DB;
 
 class OffDayRepository implements OffDayRepositoryInterface
@@ -65,6 +66,34 @@ class OffDayRepository implements OffDayRepositoryInterface
       }
       DB::commit();
       ResponseData($dayInOffDay);
+    } catch (Exception $e) {
+      DB::rollBack();
+      throw $e;
+    }
+  }
+
+  public function createPublicHoliday($data)
+  {
+    DB::beginTransaction();
+    try {
+      $dates = json_decode($data['date'], true);
+      $offDay = OffDay::create(
+        [
+          'repetition' => "Default",
+          'created_by' => UserData()->id,
+        ]
+      );
+
+      foreach ($dates as $date) {
+        DayInOffDay::create([
+          'day' => "Public-holiday",
+          'off_day_id' => $offDay->id,
+          'name' =>  $data['name'],
+          'date' => $date
+        ]);
+      }
+      DB::commit();
+      ResponseData($offDay);
     } catch (Exception $e) {
       DB::rollBack();
       throw $e;

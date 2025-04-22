@@ -6,10 +6,11 @@ use App\Http\Controllers\API\OffDayHrController;
 
 
 Route::middleware('auth:api')->group(function () {
-  Route::controller(OffDayHrController::class)->group(function () {
-    Route::get('/hr/off_days', 'getOffDays');
-    Route::post('/hr/off_days', 'createOffDay');
-    Route::delete('/hr/off_days/{dayInOffDayId}', 'deleteOffDay');
+  Route::prefix('hr')->controller(OffDayHrController::class)->group(function () {
+    Route::get('/off_days', 'getOffDays');
+    Route::post('/off_days', 'createOffDay');
+    Route::delete('/off_days/{dayInOffDayId}', 'deleteOffDay');
+    Route::post('/public_holidays', 'createPublicHoliday');
   });
   Route::prefix('hr')->controller(LeaveController::class)->group(function () {
     Route::get('/leave_categories', 'getLeaveCategoryLists');
