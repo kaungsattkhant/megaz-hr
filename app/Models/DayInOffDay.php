@@ -12,7 +12,9 @@ class DayInOffDay extends Model
 
     protected $fillable = [
         'day',
-        'off_day_id'
+        'off_day_id',
+        'name',
+        'date'
     ];
 
     protected $hidden = ['created_at', 'updated_at'];
