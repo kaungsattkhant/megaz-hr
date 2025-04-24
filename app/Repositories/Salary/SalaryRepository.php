@@ -5,8 +5,11 @@ namespace App\Repositories\Salary;
 use App\Models\Staff;
 use App\Models\Salary;
 use App\Models\Allowance;
+use App\Models\Overtime;
+use App\Models\OvertimeFee;
 use App\Models\SalarySetup;
 use App\Models\SalaryAllowance;
+use App\Models\OvertimeCategory;
 use Illuminate\Support\Facades\DB;
 
 class SalaryRepository implements SalaryRepositoryInterface
@@ -237,6 +240,156 @@ class SalaryRepository implements SalaryRepositoryInterface
       $salary->save();
       DB::commit();
       ResponseData($salary);
+    } catch (\Exception $e) {
+      DB::rollback();
+      ResponseMessage($e->getMessage(), 402);
+      throw $e;
+    }
+  }
+
+
+  public function getOvertimeFee($request)
+  {
+    $data = OvertimeFee::with('role.department')
+      // ->when($request->role_id, function ($query) use ($request) {
+      //   return $query->where('role_id', $request->role_id);
+      // })
+      ->orderBy('id', 'desc')
+      ->paginate(config('common.list_count'));
+
+    ResponseData($data);
+  }
+
+  public function createOvertimeFee($data)
+  {
+    DB::beginTransaction();
+    try {
+      $overtimeFee = OvertimeFee::updateOrCreate(
+        [
+          'id' => $data['id'] ?? null,
+        ],
+        [
+          'role_id' => $data['role_id'],
+          'fee' => $data['fee'],
+        ]
+      );
+      DB::commit();
+      ResponseData($overtimeFee);
+    } catch (\Exception $e) {
+      DB::rollback();
+      ResponseMessage($e->getMessage(), 402);
+      throw $e;
+    }
+  }
+
+  public function createOvertimeCategories($data)
+  {
+    DB::beginTransaction();
+    try {
+      $overtimeCategory = OvertimeCategory::updateOrCreate(
+        ['id' => $data['id'] ?? null],
+        [
+          'name' => $data['name']
+        ]
+      );
+      DB::commit();
+      ResponseData($overtimeCategory);
+    } catch (\Exception $e) {
+      DB::rollback();
+      ResponseMessage($e->getMessage(), 402);
+      throw $e;
+    }
+  }
+
+  public function getOvertimeCategories($request)
+  {
+    $data = OvertimeCategory::orderBy('id', 'desc')
+      ->paginate(config('common.list_count'));
+    ResponseData($data);
+  }
+
+  public function createOvertime($data)
+  {
+    DB::beginTransaction();
+    try {
+      $overtime = Overtime::updateOrCreate(
+        ['id' => $data['id'] ?? null],
+        [
+          'from_date' => $data['from_date'],
+          'to_date' => $data['to_date'],
+          'staff_id' => $data['staff_id'],
+          'overtime_category_id' => $data['overtime_category_id'],
+          'time_shift_id' => $data['time_shift_id'],
+          'from_time' => $data['from_time'],
+          'to_time' => $data['to_time'],
+          'remark' => $data['remark'] ?? null,
+          'status' => $data['status'],
+          'created_by' => UserData()->id,
+          'confirmed_at' => $data['confirmed_at'] ?? null,
+          'confirmed_by' => $data['confirmed_by'] ?? null,
+          'cancelled_at' => $data['cancelled_at'] ?? null,
+          'cancelled_by' => $data['cancelled_by'] ?? null,
+        ]
+      );
+      DB::commit();
+      ResponseData($overtime);
+    } catch (\Exception $e) {
+      DB::rollback();
+      ResponseMessage($e->getMessage(), 402);
+      throw $e;
+    }
+  }
+
+  public function getOvertimes($request)
+  {
+    $data = Overtime::with(['staff.department', 'overtimeCategory', 'timeShift.shift'])
+      ->when($request->role_id, function ($query) use ($request) {
+        return $query->whereHas('staff.roles', function ($query) use ($request) {
+          $query->where('id', $request->role_id);
+        });
+      })
+      ->when($request->department_id, function ($query) use ($request) {
+        return $query->whereHas('staff.department', function ($query) use ($request) {
+          $query->where('id', $request->department_id);
+        });
+      })
+      ->orderBy('id', 'desc')
+      ->paginate(config('common.list_count'));
+
+    ResponseData($data);
+  }
+
+  public function setOvertimeApproval($data, $id)
+  {
+    DB::beginTransaction();
+    try {
+      $overtime = Overtime::find($id);
+      if (!$overtime) {
+        ResponseMessage('Overtime not found.', 404);
+      }
+      if ($overtime->status === 'confirmed') {
+        ResponseMessage('Overtime already confirmed.', 409);
+      }
+
+      $status = $data['status'] ?? null;
+      if (!$status) {
+        ResponseMessage('Status is required.', 400);
+      }
+      if ($status === 'cancelled') {
+        $overtime->status = 'cancelled';
+        $overtime->cancelled_at = now();
+        $overtime->cancelled_by = UserData()->id;
+      }
+
+      if ($status === 'confirmed') {
+        $overtime->status = 'confirmed';
+        $overtime->confirmed_at = now();
+        $overtime->confirmed_by = UserData()->id;
+      }
+
+      $overtime->save();
+      DB::commit();
+      ResponseData($overtime);
     } catch (\Exception $e) {
       DB::rollback();
       ResponseMessage($e->getMessage(), 402);

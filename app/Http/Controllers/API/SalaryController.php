@@ -63,4 +63,46 @@ class SalaryController extends Controller
         $data = $this->salaryRepository->updateBasicSalary($request->all(), $id);
         ResponseData($data);
     }
+
+    public function createOvertimeFee(Request $request)
+    {
+        $data = $this->salaryRepository->createOvertimeFee($request->all());
+        ResponseData($data);
+    }
+
+    public function getOvertimeFee(Request $request)
+    {
+        $data = $this->salaryRepository->getOvertimeFee($request);
+        ResponseData($data);
+    }
+
+    public function createOvertimeCategories(Request $request)
+    {
+        $data = $this->salaryRepository->createOvertimeCategories($request->all());
+        ResponseData($data);
+    }
+
+    public function getOvertimeCategories(Request $request)
+    {
+        $data = $this->salaryRepository->getOvertimeCategories($request);
+        ResponseData($data);
+    }
+
+    public function createOvertime(Request $request)
+    {
+        $data = $this->salaryRepository->createOvertime($request->all());
+        ResponseData($data);
+    }
+
+    public function getOvertimes(Request $request)
+    {
+        $data = $this->salaryRepository->getOvertimes($request);
+        ResponseData($data);
+    }
+
+    public function setOvertimeApproval(Request $request, $id)
+    {
+        $data = $this->salaryRepository->setOvertimeApproval($request->all(), $id);
+        ResponseData($data);
+    }
 }
