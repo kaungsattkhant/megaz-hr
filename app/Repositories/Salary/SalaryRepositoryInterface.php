@@ -10,4 +10,5 @@ interface SalaryRepositoryInterface
   public function getSalarySetUp($request);
   public function getSalarySetUpById($id);
   public function updateSalarySetUp($data, $id);
+  public function deleteSalaryAllowance($salaryAllowanceId);
 }

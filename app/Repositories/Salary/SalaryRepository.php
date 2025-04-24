@@ -88,6 +88,14 @@ class SalaryRepository implements SalaryRepositoryInterface
   public function getSalarySetUp($request)
   {
     $data = SalarySetup::with(['salaryAllowances.allowance', 'role.department'])
+      ->when($request->role_id, function ($query) use ($request) {
+        return $query->where('role_id', $request->role_id);
+      })
+      ->when($request->department_id, function ($query) use ($request) {
+        return $query->whereHas('role', function ($query) use ($request) {
+          $query->where('department_id', $request->department_id);
+        });
+      })
       ->orderBy('id', 'desc')
       ->paginate(config('common.list_count'));
     $data->getCollection()->transform(function ($item) {
@@ -121,8 +129,14 @@ class SalaryRepository implements SalaryRepositoryInterface
       if (!$salarySetup) {
         ResponseMessage('Salary setup not found.', 404);
       }
-      $salarySetup->basic_salary = $data['basic_salary'];
-      $salarySetup->role_id = $data['role_id'];
+
+      if (isset($data['basic_salary']) && $salarySetup->basic_salary !== $data['basic_salary']) {
+        $salarySetup->basic_salary = $data['basic_salary'];
+      }
+
+      if (isset($data['role_id']) && $salarySetup->role_id !== $data['role_id']) {
+        $salarySetup->role_id = $data['role_id'];
+      }
       $salarySetup->save();
 
       if (isset($data['salary_allowances'])) {
@@ -130,7 +144,7 @@ class SalaryRepository implements SalaryRepositoryInterface
         foreach ($salary_allowances as $salary_allowance) {
           SalaryAllowance::updateOrCreate(
             [
-              'salary_setup_id' => $id,
+              'salary_setup_id' => $salarySetup->id,
               'allowance_id' => $salary_allowance['allowance_id'],
             ],
             [
@@ -142,6 +156,24 @@ class SalaryRepository implements SalaryRepositoryInterface
 
       DB::commit();
       ResponseData($salarySetup);
+    } catch (\Exception $e) {
+      DB::rollback();
+      ResponseMessage($e->getMessage(), 402);
+      throw $e;
+    }
+  }
+
+  public function deleteSalaryAllowance($salaryAllowanceId)
+  {
+    DB::beginTransaction();
+    try {
+      $salaryAllowance = SalaryAllowance::find($salaryAllowanceId);
+      if (!$salaryAllowance) {
+        ResponseMessage('Salary allowance not found.', 404);
+      }
+      $salaryAllowance->delete();
+      DB::commit();
+      ResponseMessage('Salary allowance deleted successfully.', 200);
     } catch (\Exception $e) {
       DB::rollback();
       ResponseMessage($e->getMessage(), 402);
