@@ -51,5 +51,6 @@ Route::middleware('auth:api')->group(function () {
     Route::post('/overtimes', 'createOvertime');
     Route::get('/overtimes', 'getOvertimes');
     Route::post('/approval/overtimes/{id}', 'setOvertimeApproval');
+    Route::get('/mobile/overtimes/{staffId}', 'getMobileOvertimesByStaffId');
   });
 });

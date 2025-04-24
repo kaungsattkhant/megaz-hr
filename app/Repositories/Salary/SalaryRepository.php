@@ -396,4 +396,16 @@ class SalaryRepository implements SalaryRepositoryInterface
       throw $e;
     }
   }
+
+  public function getMobileOvertimesByStaffId($request, $staffId)
+  {
+    $data = Overtime::with(['overtimeCategory', 'timeShift.shift'])
+      ->where('staff_id', $staffId)->orderBy('id', 'desc')
+      ->paginate(config('common.list_count'));
+
+    if ($data->isEmpty()) {
+      ResponseMessage('Overtime not found.', 404);
+    }
+    ResponseData($data);
+  }
 }

@@ -35,4 +35,6 @@ interface SalaryRepositoryInterface
   public function getOvertimes($request);
 
   public function setOvertimeApproval($data, $id);
+
+  public function getMobileOvertimesByStaffId($request, $staffId);
 }

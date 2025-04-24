@@ -105,4 +105,10 @@ class SalaryController extends Controller
         $data = $this->salaryRepository->setOvertimeApproval($request->all(), $id);
         ResponseData($data);
     }
+
+    public function getMobileOvertimesByStaffId(Request $request, $staffId)
+    {
+        $data = $this->salaryRepository->getMobileOvertimesByStaffId($request, $staffId);
+        ResponseData($data);
+    }
 }
