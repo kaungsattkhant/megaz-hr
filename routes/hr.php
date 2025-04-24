@@ -44,5 +44,12 @@ Route::middleware('auth:api')->group(function () {
     Route::delete('/salary_setup/salary_allowances/{salaryAllowanceId}', 'deleteSalaryAllowance');
     Route::get('/salaries', 'getSalaries');
     Route::post('/salaries/{id}', 'updateBasicSalary');
+    Route::get('/overtime_fees', 'getOvertimeFee');
+    Route::post('/overtime_fees', 'createOvertimeFee');
+    Route::get('/overtime_categories', 'getOvertimeCategories');
+    Route::post('/overtime_categories', 'createOvertimeCategories');
+    Route::post('/overtimes', 'createOvertime');
+    Route::get('/overtimes', 'getOvertimes');
+    Route::post('/approval/overtimes/{id}', 'setOvertimeApproval');
   });
 });

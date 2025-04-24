@@ -2,8 +2,10 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
+use App\Models\TimeShift;
+use App\Models\OvertimeCategory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Overtime extends Model
 {
@@ -28,4 +30,17 @@ class Overtime extends Model
         'created_at',
         'updated_at',
     ];
+
+    public function staff()
+    {
+        return $this->belongsTo(Staff::class);
+    }
+    public function timeShift()
+    {
+        return $this->belongsTo(TimeShift::class);
+    }
+    public function overtimeCategory()
+    {
+        return $this->belongsTo(OvertimeCategory::class);
+    }
 }
