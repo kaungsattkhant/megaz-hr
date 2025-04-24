@@ -3,7 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\API\LeaveController;
 use App\Http\Controllers\API\OffDayHrController;
-
+use App\Http\Controllers\API\SalaryController;
 
 Route::middleware('auth:api')->group(function () {
   Route::prefix('hr')->controller(OffDayHrController::class)->group(function () {
@@ -32,5 +32,14 @@ Route::middleware('auth:api')->group(function () {
     Route::delete('/exit_passes/{id}', 'deleteExitPass');
     Route::get('/exit_passes_by_staff/{staffId}', 'getExitPassByStaff');
     Route::get('/staff_lists_by_role/{roleId}/department/{departmentId}', 'getStaffListByRoleAndDepartment');
+  });
+
+  Route::prefix('hr')->controller(SalaryController::class)->group(function () {
+    Route::get('/salary_allowances', 'getAllowances');
+    Route::post('/salary_allowances', 'createAllowance');
+    Route::post('/salary_setups', 'storeSalarySetUp');
+    Route::get('/salary_setups', 'getSalarySetUp');
+    Route::get('/salary_setups/{id}', 'getSalarySetUpById');
+    Route::post('/salary_setups/{id}', 'updateSalarySetUp');
   });
 });
