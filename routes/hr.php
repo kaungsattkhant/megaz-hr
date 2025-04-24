@@ -42,5 +42,7 @@ Route::middleware('auth:api')->group(function () {
     Route::get('/salary_setups/{id}', 'getSalarySetUpById');
     Route::post('/salary_setups/{id}', 'updateSalarySetUp');
     Route::delete('/salary_setup/salary_allowances/{salaryAllowanceId}', 'deleteSalaryAllowance');
+    Route::get('/salaries', 'getSalaries');
+    Route::post('/salaries/{id}', 'updateBasicSalary');
   });
 });

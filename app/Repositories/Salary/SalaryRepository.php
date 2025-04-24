@@ -98,10 +98,20 @@ class SalaryRepository implements SalaryRepositoryInterface
       })
       ->orderBy('id', 'desc')
       ->paginate(config('common.list_count'));
+
     $data->getCollection()->transform(function ($item) {
-      $totalAllowance = (float) $item->salaryAllowances->sum('amount');
+      $totalAllowance = 0;
+      $totalDeduction = 0;
+      foreach ($item->salaryAllowances as $salaryAllowance) {
+        if ($salaryAllowance->allowance->type == 'allowance') {
+          $totalAllowance += (float) $salaryAllowance->amount;
+        } elseif ($salaryAllowance->allowance->type == 'deduction') {
+          $totalDeduction += (float) $salaryAllowance->amount;
+        }
+      }
       $item->total_allowances_amount = $totalAllowance;
-      $item->net_salary = (float) $item->basic_salary + $totalAllowance;
+      $item->total_deductions_amount = $totalDeduction;
+      $item->net_salary = (float) $item->basic_salary + $totalAllowance - $totalDeduction;
       return $item;
     });
     ResponseData($data);
@@ -174,6 +184,59 @@ class SalaryRepository implements SalaryRepositoryInterface
       $salaryAllowance->delete();
       DB::commit();
       ResponseMessage('Salary allowance deleted successfully.', 200);
+    } catch (\Exception $e) {
+      DB::rollback();
+      ResponseMessage($e->getMessage(), 402);
+      throw $e;
+    }
+  }
+
+  public function getSalaries($request)
+  {
+    $data = Salary::with(['staff.department', 'salarySetup.role.department', 'salarySetup.salaryAllowances.allowance'])
+      ->when($request->role_id, function ($query) use ($request) {
+        return $query->whereHas('salarySetup', function ($query) use ($request) {
+          $query->where('role_id', $request->role_id);
+        });
+      })
+      ->when($request->department_id, function ($query) use ($request) {
+        return $query->whereHas('salarySetup.role', function ($query) use ($request) {
+          $query->where('department_id', $request->department_id);
+        });
+      })
+      ->orderBy('id', 'desc')
+      ->paginate(config('common.list_count'));
+
+    $data->getCollection()->transform(function ($item) {
+      $totalAllowance = 0;
+      $totalDeduction = 0;
+      foreach ($item->salarySetup->salaryAllowances as $salaryAllowance) {
+        if ($salaryAllowance->allowance->type == 'allowance') {
+          $totalAllowance += (float) $salaryAllowance->amount;
+        } elseif ($salaryAllowance->allowance->type == 'deduction') {
+          $totalDeduction += (float) $salaryAllowance->amount;
+        }
+      }
+      $item->total_allowances_amount = $totalAllowance;
+      $item->total_deductions_amount = $totalDeduction;
+      $item->net_salary = (float) $item->basic_salary + $totalAllowance - $totalDeduction;
+      return $item;
+    });
+    ResponseData($data);
+  }
+
+  public function updateBasicSalary($request, $id)
+  {
+    DB::beginTransaction();
+    try {
+      $salary = Salary::find($id);
+      if (!$salary) {
+        ResponseMessage('Salary not found.', 404);
+      }
+      $salary->basic_salary = $request['basic_salary'];
+      $salary->save();
+      DB::commit();
+      ResponseData($salary);
     } catch (\Exception $e) {
       DB::rollback();
       ResponseMessage($e->getMessage(), 402);

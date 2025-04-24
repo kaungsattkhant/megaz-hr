@@ -52,4 +52,15 @@ class SalaryController extends Controller
         $data = $this->salaryRepository->deleteSalaryAllowance($salaryAllowanceId);
         ResponseData($data);
     }
+
+    public function getSalaries(Request $request)
+    {
+        $data = $this->salaryRepository->getSalaries($request);
+        ResponseData($data);
+    }
+    public function updateBasicSalary(Request $request, $id)
+    {
+        $data = $this->salaryRepository->updateBasicSalary($request->all(), $id);
+        ResponseData($data);
+    }
 }
