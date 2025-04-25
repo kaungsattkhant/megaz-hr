@@ -17,8 +17,12 @@
     <link rel="stylesheet" href="{{asset('css/normalize.css')}}">
 
     <script src="{{asset('js/jquery.js')}}"></script>
+    <script src="https://cdn.jsdelivr.net/npm/moment@2.29.1/moment.min.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.10.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.10.0/firebase-messaging-compat.js"></script>
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />
+    <script src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
 </head>
 
 <body>
@@ -85,4 +89,7 @@
         
     });
 </script>
+<script>
+        window.$ = window.jQuery;
+    </script>
 </html>
