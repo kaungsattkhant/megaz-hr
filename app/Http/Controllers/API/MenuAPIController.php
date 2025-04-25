@@ -45,11 +45,13 @@ class MenuAPIController extends Controller
         ResponseData($menuPrice);
     }
 
-    public function menuByMenuCategory(int $id)
+    public function menuByMenuCategory(Request $request,int $id)
     {
-        $menu = Menu::where('menu_category_id',$id)->with('prices','menuServiceDiscounts')->get();
-        // $menu = Menu::where('menu_category_id',$id)->with('prices')->get();
+        $menu = $this->menuRepo->menuByMenuCategory($id, $request);
         ResponseData($menu);
+        // $menu = Menu::where('menu_category_id',$id)->with('prices','menuServiceDiscounts')->get();
+        // // $menu = Menu::where('menu_category_id',$id)->with('prices')->get();
+        // ResponseData($menu);
     }
 
     public function menuByMenuCategoryBooking(int $id,Request $request)
