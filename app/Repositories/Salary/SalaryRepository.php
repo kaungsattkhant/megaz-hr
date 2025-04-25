@@ -4,12 +4,14 @@ namespace App\Repositories\Salary;
 
 use App\Models\Staff;
 use App\Models\Salary;
-use App\Models\Allowance;
 use App\Models\Overtime;
+use App\Models\Allowance;
 use App\Models\OvertimeFee;
+use App\Models\SalaryBatch;
 use App\Models\SalarySetup;
 use App\Models\SalaryAllowance;
 use App\Models\OvertimeCategory;
+use App\Models\SalaryBatchStaff;
 use Illuminate\Support\Facades\DB;
 
 class SalaryRepository implements SalaryRepositoryInterface
@@ -406,6 +408,51 @@ class SalaryRepository implements SalaryRepositoryInterface
     if ($data->isEmpty()) {
       ResponseMessage('Overtime not found.', 404);
     }
+    ResponseData($data);
+  }
+
+  public function createSalaryBatch($data)
+  {
+    DB::beginTransaction();
+    try {
+      $salaryBatch = SalaryBatch::create([
+        'name' => $data['name'],
+        'day_of_monthly' => $data['day_of_monthly'],
+        'created_by' => UserData()->id
+      ]);
+
+      if (isset($data['staff_ids'])) {
+        $staff_ids = json_decode($data['staff_ids'], true);
+
+        foreach ($staff_ids as $staffId) {
+          $existingBatch = SalaryBatchStaff::where('staff_id', $staffId)->first();
+          if ($existingBatch) {
+            DB::rollback();
+            ResponseMessage('Staff already exists in the batch.', 409);
+          }
+          SalaryBatchStaff::create([
+            'salary_batch_id' => $salaryBatch->id,
+            'staff_id' => $staffId,
+          ]);
+        }
+      }
+
+      DB::commit();
+      ResponseData($salaryBatch);
+    } catch (\Exception $e) {
+      DB::rollback();
+      ResponseMessage($e->getMessage(), 402);
+      throw $e;
+    }
+  }
+
+  public function getSalaryBatch($request)
+  {
+    $data = SalaryBatch::with(['salaryBatchStaff.staff'])
+      ->withCount('salaryBatchStaff')
+      ->orderBy('id', 'desc')
+      ->paginate(config('common.list_count'));
+
     ResponseData($data);
   }
 }

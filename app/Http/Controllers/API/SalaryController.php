@@ -111,4 +111,16 @@ class SalaryController extends Controller
         $data = $this->salaryRepository->getMobileOvertimesByStaffId($request, $staffId);
         ResponseData($data);
     }
+
+    public function createSalaryBatch(Request $request)
+    {
+        $data = $this->salaryRepository->createSalaryBatch($request->all());
+        ResponseData($data);
+    }
+
+    public function getSalaryBatch(Request $request)
+    {
+        $data = $this->salaryRepository->getSalaryBatch($request);
+        ResponseData($data);
+    }
 }
