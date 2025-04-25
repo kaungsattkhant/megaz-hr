@@ -383,3 +383,7 @@ Route::view('/salary_setup/create', 'salary_setup.create')->name('salary_setup.c
 Route::view('/salary_setup/{id}/edit', 'salary_setup.edit');
 Route::view('/salary', 'salary.index')->name('salary.index');
 Route::view('/allowance', 'allowance.index')->name('allowance.index');
+
+Route::view('/salary_batch', 'salary_batch.index')->name('salary_batch.index');
+Route::view('/salary_batch/create', 'salary_batch.create')->name('salary_batch.create');
+Route::view('/salary_batch/{id}/edit', 'salary_batch.edit');
