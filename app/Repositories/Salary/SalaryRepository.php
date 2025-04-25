@@ -455,4 +455,94 @@ class SalaryRepository implements SalaryRepositoryInterface
 
     ResponseData($data);
   }
+
+  public function getSalaryBatchById($id)
+  {
+    $data = SalaryBatch::with(['salaryBatchStaff.staff.department', 'salaryBatchStaff.staff.roles'])
+      ->where('id', $id)
+      ->get();
+    if ($data->isEmpty()) {
+      ResponseMessage('Salary batch not found.', 404);
+    }
+    ResponseData($data);
+  }
+
+  public function updateSalaryBatch($data, $id)
+  {
+    DB::beginTransaction();
+    try {
+      $salaryBatch = SalaryBatch::findOrFail($id);
+      if (!$salaryBatch) {
+        ResponseMessage('Salary batch not found.', 404);
+      }
+      $salaryBatch->name = $data['name'];
+      $salaryBatch->day_of_monthly = $data['day_of_monthly'];
+      $salaryBatch->save();
+
+      if (isset($data['salary_batch_staffs'])) {
+        $salary_batch_staffs = json_decode($data['salary_batch_staffs'], true);
+
+        foreach ($salary_batch_staffs as $salary_batch_staff) {
+          $existingBatch = SalaryBatchStaff::where('staff_id', $salary_batch_staff['staff_id'])->first();
+          if ($existingBatch) {
+            DB::rollback();
+            ResponseMessage('Staff already exists in the batch.', 409);
+          }
+          SalaryBatchStaff::updateOrCreate(
+            [
+              'id' => $salary_batch_staff['id'] ?? null,
+              'salary_batch_id' => $salaryBatch->id,
+            ],
+            [
+              'staff_id' => $salary_batch_staff['staff_id'],
+            ]
+          );
+        }
+      }
+
+      DB::commit();
+      ResponseData($salaryBatch);
+    } catch (\Exception $e) {
+      DB::rollback();
+      ResponseMessage($e->getMessage(), 402);
+      throw $e;
+    }
+  }
+
+  public function deleteSalaryBatch($id)
+  {
+    DB::beginTransaction();
+    try {
+      $salaryBatch = SalaryBatch::find($id);
+      if (!$salaryBatch) {
+        ResponseMessage('Salary batch not found.', 404);
+      }
+      $salaryBatch->salaryBatchStaff()->delete();
+      $salaryBatch->delete();
+      DB::commit();
+      ResponseMessage('Salary batch deleted successfully.', 200);
+    } catch (\Exception $e) {
+      DB::rollback();
+      ResponseMessage($e->getMessage(), 402);
+      throw $e;
+    }
+  }
+
+  public function deleteSalaryBatchStaff($id)
+  {
+    DB::beginTransaction();
+    try {
+      $salaryBatchStaff = SalaryBatchStaff::find($id);
+      if (!$salaryBatchStaff) {
+        ResponseMessage('Salary batch staff not found.', 404);
+      }
+      $salaryBatchStaff->delete();
+      DB::commit();
+      ResponseMessage('Salary batch staff deleted successfully.', 200);
+    } catch (\Exception $e) {
+      DB::rollback();
+      ResponseMessage($e->getMessage(), 402);
+      throw $e;
+    }
+  }
 }

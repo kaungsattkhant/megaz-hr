@@ -41,4 +41,12 @@ interface SalaryRepositoryInterface
   public function createSalaryBatch($data);
 
   public function getSalaryBatch($request);
+
+  public function getSalaryBatchById($id);
+
+  public function updateSalaryBatch($data, $id);
+
+  public function deleteSalaryBatch($id);
+
+  public function deleteSalaryBatchStaff($id);
 }
