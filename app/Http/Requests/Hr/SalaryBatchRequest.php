@@ -25,7 +25,7 @@ class SalaryBatchRequest extends APIRequest
         return [
             'name' => 'required|unique:salary_batches,name',
             'day_of_monthly' => 'required|integer|between:1,31',
-            'staff_ids' => 'nullable|string|json',
+            'staff_ids' => 'nullable',
             'staff_ids.*' => 'exists:staff,id',
         ];
     }
