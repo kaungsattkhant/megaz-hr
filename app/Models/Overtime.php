@@ -27,6 +27,11 @@ class Overtime extends Model
         'cancelled_by',
     ];
     protected $hidden = [
+        'created_by',
+        'confirmed_at',
+        'confirmed_by',
+        'cancelled_at',
+        'cancelled_by',
         'created_at',
         'updated_at',
     ];

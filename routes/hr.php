@@ -51,5 +51,13 @@ Route::middleware('auth:api')->group(function () {
     Route::post('/overtimes', 'createOvertime');
     Route::get('/overtimes', 'getOvertimes');
     Route::post('/approval/overtimes/{id}', 'setOvertimeApproval');
+    Route::get('/mobile/overtimes/{staffId}', 'getMobileOvertimesByStaffId');
+
+    Route::get('/salary_batches', 'getSalaryBatch');
+    Route::post('/salary_batches', 'createSalaryBatch');
+    Route::get('/salary_batches/{id}', 'getSalaryBatchById');
+    Route::post('/salary_batches/{id}', 'updateSalaryBatch');
+    Route::delete('/salary_batches/{id}', 'deleteSalaryBatch');
+    Route::delete('/salary_batch_staffs/{id}', 'deleteSalaryBatchStaff');
   });
 });

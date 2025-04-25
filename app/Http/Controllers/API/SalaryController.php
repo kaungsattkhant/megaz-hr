@@ -2,9 +2,10 @@
 
 namespace App\Http\Controllers\API;
 
-use App\Http\Controllers\Controller;
-use App\Repositories\Salary\SalaryRepositoryInterface;
 use Illuminate\Http\Request;
+use App\Http\Controllers\Controller;
+use App\Http\Requests\HR\SalaryBatchRequest;
+use App\Repositories\Salary\SalaryRepositoryInterface;
 
 class SalaryController extends Controller
 {
@@ -103,6 +104,48 @@ class SalaryController extends Controller
     public function setOvertimeApproval(Request $request, $id)
     {
         $data = $this->salaryRepository->setOvertimeApproval($request->all(), $id);
+        ResponseData($data);
+    }
+
+    public function getMobileOvertimesByStaffId(Request $request, $staffId)
+    {
+        $data = $this->salaryRepository->getMobileOvertimesByStaffId($request, $staffId);
+        ResponseData($data);
+    }
+
+    public function createSalaryBatch(SalaryBatchRequest $request)
+    {
+        $data = $this->salaryRepository->createSalaryBatch($request->validated());
+        ResponseData($data);
+    }
+
+    public function getSalaryBatch(Request $request)
+    {
+        $data = $this->salaryRepository->getSalaryBatch($request);
+        ResponseData($data);
+    }
+
+    public function getSalaryBatchById($id)
+    {
+        $data = $this->salaryRepository->getSalaryBatchById($id);
+        ResponseData($data);
+    }
+
+    public function updateSalaryBatch(Request $request, $id)
+    {
+        $data = $this->salaryRepository->updateSalaryBatch($request->all(), $id);
+        ResponseData($data);
+    }
+
+    public function deleteSalaryBatch($id)
+    {
+        $data = $this->salaryRepository->deleteSalaryBatch($id);
+        ResponseData($data);
+    }
+
+    public function deleteSalaryBatchStaff($id)
+    {
+        $data = $this->salaryRepository->deleteSalaryBatchStaff($id);
         ResponseData($data);
     }
 }
