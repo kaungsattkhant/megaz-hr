@@ -211,7 +211,7 @@ import SalarySetupEditComponent from './Components/SalarySetup/SalarySetupEditCo
 import SalaryCrudComponent from './Components/Salary/SalaryCrudComponent.vue';
 import AllowanceCrudComponent from './Components/Allowance/AllowanceCrudComponent.vue';
 import SalaryBatchListComponent from './Components/SalaryBatch/SalaryBatchListComponent.vue';
-// import SalaryBatchCreateComponent from './Components/SalaryBatch/SalaryBatchCreateComponent.vue';
+import SalaryBatchCreateComponent from './Components/SalaryBatch/SalaryBatchCreateComponent.vue';
 // import SalaryBatchEditComponent from './Components/SalaryBatch/SalaryBatchEditComponent.vue';
 
 import PosSellingAreasComponent from './Components/Pos/Areas/PosSellingAreasComponent.vue';
@@ -407,7 +407,7 @@ app.component('SalarySetupEditComponent',SalarySetupEditComponent);
 app.component('SalaryCrudComponent',SalaryCrudComponent);
 app.component('AllowanceCrudComponent',AllowanceCrudComponent);
 app.component('SalaryBatchListComponent',SalaryBatchListComponent);
-// app.component('SalaryBatchCreateComponent',SalaryBatchCreateComponent);
+app.component('SalaryBatchCreateComponent',SalaryBatchCreateComponent);
 // app.component('SalaryBatchEditComponent',SalaryBatchEditComponent);
 
 app.component('PosSellingAreasComponent',PosSellingAreasComponent);

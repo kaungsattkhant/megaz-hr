@@ -60,18 +60,20 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <div class="contents" v-for="(batch, index) in batchBatchList" :key="index">
+                            <div class="contents" v-for="(batch, index) in salaryBatchList" :key="index">
                                 <tr class="">
                                     <td class=" font-medium ">
                                         <!-- {{ perPage * (currentPage - 1) + (++index) }} -->
                                         {{ index+1 }}
                                     </td>
                                     <td class="whitespace-nowrap">
+                                        {{ batch.name }}
                                     </td>
                                     <td class="whitespace-nowrap">
+                                        {{ batch.salary_batch_staff_count }}
                                     </td>
                                     <td class="whitespace-nowrap">
-                                        {{ batch }}
+                                        {{ batch.day_of_monthly }}
                                     </td>
                                     <td class="whitespace-nowrap">
                                         <a :href="'/salary_batch/'+batch.id+'/edit'" class="pr-3">
@@ -185,7 +187,7 @@ export default {
             this.deleteId = id;
         },
         async deleteItem() {
-            let response = await deleteApiData({ url: `/api/hr/overtime_fees/` + this.deleteId, token: this.getToken() });
+            let response = await deleteApiData({ url: `/api/hr/salary_batches/` + this.deleteId, token: this.getToken() });
             if (response.success) {
                 this.getSalaryBatchList(1);
             }
