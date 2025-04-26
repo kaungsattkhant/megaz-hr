@@ -32,4 +32,10 @@ class OffDayHrController extends Controller
         $data =  $this->offDayRepository->deleteOffDay($dayInOffDayId);
         ResponseData($data);
     }
+
+    public function createPublicHoliday(Request $request)
+    {
+        $data = $this->offDayRepository->createPublicHoliday($request->all());
+        ResponseData($data);
+    }
 }

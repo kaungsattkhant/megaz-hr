@@ -402,9 +402,11 @@ class LeaveRepository implements LeaveRepositoryInterface
     $staff = Staff::where('id', $staffId)->firstOrFail();
     $exitPasses = ExitPass::where('staff_id', $staff->id)
       ->with(['exitCategory'])
-      ->select('id', 'exit_category_id', 'staff_id', 'exit_date_time', 'arrival_date_time', 'status')
       ->orderByDesc('id')
       ->paginate(config('common.list_count'));
+    if ($exitPasses->isEmpty()) {
+      ResponseMessage('ExitPasses not found.', 404);
+    }
     ResponseData($exitPasses);
   }
   public function getStaffListByRoleAndDepartment($roleId, $departmentId)

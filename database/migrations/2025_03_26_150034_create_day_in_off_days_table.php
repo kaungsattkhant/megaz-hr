@@ -13,8 +13,10 @@ return new class extends Migration
     {
         Schema::create('day_in_off_days', function (Blueprint $table) {
             $table->id();
-            $table->enum('day', ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday', 'Sabbath-day']);
+            $table->enum('day', ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday', 'Sabbath-day', 'Public-holiday']);
             $table->foreignId('off_day_id');
+            $table->string('name')->nullable();
+            $table->date('date')->nullable();
             $table->timestamps();
             $table->softDeletes();
         });

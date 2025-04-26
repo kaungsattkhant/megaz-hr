@@ -11,14 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('off_day_assignments', function (Blueprint $table) {
+        Schema::create('salary_setups', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('off_day_id');
-            $table->unsignedBigInteger('offdayable_id')->nullable();
-            $table->string('offdayable_type')->nullable();
-
+            $table->double('basic_salary', 8, 2);
+            $table->foreignId('role_id')->constrained()->onDelete('cascade');
             $table->timestamps();
-            $table->softDeletes();
         });
     }
 
@@ -27,6 +24,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('off_day_assignments');
+        Schema::dropIfExists('salary_setups');
     }
 };
