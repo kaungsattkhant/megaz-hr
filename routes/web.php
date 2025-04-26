@@ -375,3 +375,11 @@ Route::view('/leave_allowance', 'leave_allowance.index')->name('leave_allowance.
 Route::view('/leave_allowance/create', 'leave_allowance.create')->name('leave_allowance.create');
 Route::view('/leave', 'leave.index')->name('leave.index');
 Route::view('/exit_pass', 'exit_pass.index')->name('exit_pass.index');
+Route::view('/holiday', 'holiday.index')->name('holiday.index');
+Route::view('/overtime_fees', 'overtime_fees.index')->name('overtime_fees.index');
+Route::view('/overtime_confirmation', 'overtime_confirmation.index')->name('overtime_confirmation.index');
+Route::view('/salary_setup', 'salary_setup.index')->name('salary_setup.index');
+Route::view('/salary_setup/create', 'salary_setup.create')->name('salary_setup.create');
+Route::view('/salary_setup/{id}/edit', 'salary_setup.edit');
+Route::view('/salary', 'salary.index')->name('salary.index');
+Route::view('/allowance', 'allowance.index')->name('allowance.index');

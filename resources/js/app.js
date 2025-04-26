@@ -198,10 +198,18 @@ import WarningCreateComponent from './Components/Warning/WarningCreateComponent.
 import WarningEditComponent from './Components/Warning/WarningEditComponent.vue';
 import MenuAreaComponent from './Components/MenuArea/MenuAreaComponent.vue';
 import OffDayCrudComponent from './Components/OffDay/OffDayCrudComponent.vue';
+import HolidayCrudComponent from './Components/Holiday/HolidayCrudComponent.vue';
 import LeaveAllowanceComponent from './Components/LeaveAllowance/LeaveAllowanceComponent.vue';
 import LeaveAllowanceCreateComponent from './Components/LeaveAllowance/LeaveAllowanceCreateComponent.vue';
 import LeaveComponent from './Components/Leave/LeaveComponent.vue';
 import ExitPassComponent from './Components/ExitPass/ExitPassComponent.vue';
+import OvertimeFeesCrudComponent from './Components/OvertimeFees/OvertimeFeesCrudComponent.vue';
+import OvertimeConfirmationCrudComponent from './Components/OvertimeConfirmation/OvertimeConfirmationCrudComponent.vue';
+import SalarySetupListComponent from './Components/SalarySetup/SalarySetupListComponent.vue';
+import SalarySetupCreateComponent from './Components/SalarySetup/SalarySetupCreateComponent.vue';
+import SalarySetupEditComponent from './Components/SalarySetup/SalarySetupEditComponent.vue';
+import SalaryCrudComponent from './Components/Salary/SalaryCrudComponent.vue';
+import AllowanceCrudComponent from './Components/Allowance/AllowanceCrudComponent.vue';
 
 import PosSellingAreasComponent from './Components/Pos/Areas/PosSellingAreasComponent.vue';
 import PosTableComponent from './Components/Pos/Home/PosTableComponent.vue';
@@ -383,10 +391,18 @@ app.component('WarningCreateComponent',WarningCreateComponent);
 app.component('WarningEditComponent',WarningEditComponent);
 app.component('MenuAreaComponent',MenuAreaComponent);
 app.component('OffDayCrudComponent',OffDayCrudComponent);
+app.component('HolidayCrudComponent',HolidayCrudComponent);
 app.component('LeaveAllowanceComponent',LeaveAllowanceComponent);
 app.component('LeaveAllowanceCreateComponent',LeaveAllowanceCreateComponent);
 app.component('LeaveComponent',LeaveComponent);
 app.component('ExitPassComponent',ExitPassComponent);
+app.component('OvertimeFeesCrudComponent',OvertimeFeesCrudComponent);
+app.component('OvertimeConfirmationCrudComponent',OvertimeConfirmationCrudComponent);
+app.component('SalarySetupListComponent',SalarySetupListComponent);
+app.component('SalarySetupCreateComponent',SalarySetupCreateComponent);
+app.component('SalarySetupEditComponent',SalarySetupEditComponent);
+app.component('SalaryCrudComponent',SalaryCrudComponent);
+app.component('AllowanceCrudComponent',AllowanceCrudComponent);
 
 app.component('PosSellingAreasComponent',PosSellingAreasComponent);
 app.component('PosTableComponent',PosTableComponent);
