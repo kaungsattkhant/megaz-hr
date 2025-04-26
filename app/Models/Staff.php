@@ -7,10 +7,11 @@ use App\Models\Gender;
 use App\Models\Inventory;
 use App\Models\Department;
 use App\Models\TaskDetail;
+use App\Models\SalaryBatchStaff;
 use Laravel\Sanctum\HasApiTokens;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 
 class Staff extends Authenticatable
@@ -226,5 +227,10 @@ class Staff extends Authenticatable
     public function checkIns()
     {
         return $this->hasMany(CheckIn::class, 'staff_id');
+    }
+
+    public function salaryBatchStaff()
+    {
+        return $this->hasMany(SalaryBatchStaff::class);
     }
 }
