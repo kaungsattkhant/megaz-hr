@@ -139,6 +139,7 @@ export default {
     components: {
         Multiselect
     },
+    props: ["salaryBatchId"],
     data() {
         return {
             departmentList: [],
