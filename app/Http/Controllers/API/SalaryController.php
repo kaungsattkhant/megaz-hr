@@ -4,7 +4,7 @@ namespace App\Http\Controllers\API;
 
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
-use App\Http\Requests\HR\SalaryBatchRequest;
+use App\Http\Requests\Hr\SalaryBatchRequest;
 use App\Repositories\Salary\SalaryRepositoryInterface;
 
 class SalaryController extends Controller
@@ -146,6 +146,12 @@ class SalaryController extends Controller
     public function deleteSalaryBatchStaff($id)
     {
         $data = $this->salaryRepository->deleteSalaryBatchStaff($id);
+        ResponseData($data);
+    }
+
+    public function calculateSalary(Request $request)
+    {
+        $data = $this->salaryRepository->calculateSalary($request);
         ResponseData($data);
     }
 }
