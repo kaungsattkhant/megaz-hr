@@ -4,11 +4,13 @@ namespace App\Repositories\Salary;
 
 use App\Models\Staff;
 use App\Models\Salary;
+use App\Models\CheckIn;
 use App\Models\Overtime;
 use App\Models\Allowance;
 use App\Models\OvertimeFee;
 use App\Models\SalaryBatch;
 use App\Models\SalarySetup;
+use Illuminate\Support\Carbon;
 use App\Models\SalaryAllowance;
 use App\Models\OvertimeCategory;
 use App\Models\SalaryBatchStaff;
@@ -544,5 +546,102 @@ class SalaryRepository implements SalaryRepositoryInterface
       ResponseMessage($e->getMessage(), 402);
       throw $e;
     }
+  }
+
+
+  public function calculateSalary($request)
+  {
+    $salaryBatchStaffs = SalaryBatchStaff::where('salary_batch_id', $request->salary_batch_id)
+      ->with('staff.overtimes', 'staff.salary', 'staff.salary.salarySetup', 'staff.salary.salarySetup.salaryAllowances')
+      ->get();
+
+    if ($salaryBatchStaffs->isEmpty()) {
+      ResponseMessage('No staff found in this batch.', 404);
+    }
+
+    $salaryDetails = [];
+    foreach ($salaryBatchStaffs as $salaryBatchStaff) {
+      $staff = $salaryBatchStaff->staff; //stafflist based on batch
+      $salary = $staff->salary;   //basic salary
+      if ($salary) {
+        $totalAllowance = 0;
+        $totalDeduction = 0;
+        foreach ($salary->salarySetup->salaryAllowances as $salaryAllowance) {
+          if ($salaryAllowance->allowance->type == 'allowance') {
+            $totalAllowance += (float) $salaryAllowance->amount;
+          } elseif ($salaryAllowance->allowance->type == 'deduction') {
+            $totalDeduction += (float) $salaryAllowance->amount;
+          }
+        }
+
+        $checkIns = CheckIn::where('staff_id', $staff->id)
+          ->whereBetween('check_in_date_time', [$request->from_date, $request->to_date])
+          ->whereBetween('check_out_date_time', [$request->from_date, $request->to_date])
+          ->get();
+
+
+        $totalWorkedHours = 0;
+        $totalOvertimeHours = 0;
+        //to get total worked hours from request from date to to date
+        foreach ($checkIns as $checkIn) {
+          $checkInTime = Carbon::parse($checkIn->check_in_date_time);
+          $checkOutTime = Carbon::parse($checkIn->check_out_date_time);
+          if ($checkOutTime->gt($checkInTime)) {
+
+            $workedHours =  $checkInTime->diffInHours($checkOutTime);
+            $totalWorkedHours += (float) $workedHours;
+          }
+        }
+
+        $overtimes = Overtime::where('staff_id', $staff->id)
+          ->whereBetween('from_date', [$request->from_date, $request->to_date])
+          ->whereBetween('to_date', [$request->from_date, $request->to_date])
+          ->get();
+
+        foreach ($overtimes as $overtime) {
+          $actualOvertimes = CheckIn::where('staff_id', $overtime->staff_id)
+            ->where('time_shift_id', $overtime->time_shift_id)
+            ->get();
+          foreach ($actualOvertimes as $actualOvertime) {
+            $overtimeCheckIn = Carbon::parse($actualOvertime->check_in_date_time);
+            $overtimeCheckOut = Carbon::parse($actualOvertime->check_out_date_time);
+            if ($overtimeCheckOut->gt($overtimeCheckIn)) {
+              // Calculate the overtime worked hours
+              $overtimeWorkedHours = $overtimeCheckIn->diffInHours($overtimeCheckOut);
+              $totalOvertimeHours += (float)$overtimeWorkedHours;
+            }
+          }
+        }
+        $totalOvertimeHours = max(0, $totalOvertimeHours);
+        $actualWorkedHours = $totalWorkedHours - $totalOvertimeHours;
+        $hourlyRate = $salary->basic_salary / $actualWorkedHours;
+        $role = $staff->roles->first();
+        $overtimePay = 0;
+        if ($role) {
+          $overtimeFee = OvertimeFee::where('role_id', $role->id)->first();
+          $overtimePay = $overtimeFee ? $overtimeFee->fee * $hourlyRate * $totalOvertimeHours : 0;
+        } else {
+          $overtimePay = 0;
+        }
+        $netSalary = (float) ($salary->basic_salary - $totalDeduction) + ($totalAllowance + $overtimePay);
+        $salaryDetails[] = [
+          'staff_id' => $staff->id,
+          'staff_name' => $staff->name,
+          'department_id' => $staff->department->id,
+          'department_name' => $staff->department->name,
+          'role_id' => $staff->roles->first() ? $staff->roles->first()->id : null,
+          'role_name' => $staff->roles->first() ? $staff->roles->first()->name : null,
+          'salary_batch_id' => $request->salary_batch_id,
+          'salary_id' => $salary->id,
+          'basic_salary' =>  $salary->basic_salary,
+          'allowance' => $totalAllowance,
+          'deductions' => $totalDeduction,
+          'overtime_hours' => max(0, $totalOvertimeHours),
+          'overtime_pay' => max(0, $overtimePay),
+          'netSalary' => $netSalary
+        ];
+      }
+    }
+    return ResponseData($salaryDetails);
   }
 }

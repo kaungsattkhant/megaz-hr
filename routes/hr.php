@@ -59,5 +59,7 @@ Route::middleware('auth:api')->group(function () {
     Route::post('/salary_batches/{id}', 'updateSalaryBatch');
     Route::delete('/salary_batches/{id}', 'deleteSalaryBatch');
     Route::delete('/salary_batch_staffs/{id}', 'deleteSalaryBatchStaff');
+
+    Route::get('/calculate_salary', 'calculateSalary');
   });
 });

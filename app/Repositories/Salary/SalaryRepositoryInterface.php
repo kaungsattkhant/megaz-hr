@@ -49,4 +49,6 @@ interface SalaryRepositoryInterface
   public function deleteSalaryBatch($id);
 
   public function deleteSalaryBatchStaff($id);
+
+  public function calculateSalary($request);
 }
