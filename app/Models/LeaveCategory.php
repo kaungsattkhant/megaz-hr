@@ -14,4 +14,13 @@ class LeaveCategory extends Model
         'is_active'
     ];
     protected $hidden = ['created_at', 'updated_at'];
+
+    public function leaveAllowances()
+    {
+        return $this->hasMany(LeaveAllowance::class);
+    }
+    public function leaves()
+    {
+        return $this->hasMany(Leave::class);
+    }
 }
