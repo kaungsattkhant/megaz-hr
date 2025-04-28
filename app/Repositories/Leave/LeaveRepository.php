@@ -140,7 +140,8 @@ class LeaveRepository implements LeaveRepositoryInterface
         'confirmed_by' => $data['confirmed_by'] ?? null,
         'image_path' => $image_path ?? null,
         'image_url' => $image_url ?? null,
-        'isIncludeWeekends' => 1
+        'isIncludeWeekends' => 1,
+        'is_unpaid_leave' => $data['is_unpaid_leave'] ?? null,
       ]);
       DB::commit();
       ResponseData($leave);
@@ -167,6 +168,7 @@ class LeaveRepository implements LeaveRepositoryInterface
         'cancelled_at' => $wasCancelled ? $data['cancelled_at'] : $leave->cancelled_at,
         'cancelled_by' => $wasCancelled ? $data['cancelled_by'] : $leave->cancelled_by,
         'status' => $data['status'] ?? $leave->status,
+        'is_unpaid_leave' => $data['is_unpaid_leave'] ?? null,
       ]);
       if ($wasConfirmed || $wasCancelled) {
         broadcast(new LeaveUpdateNotificationRequest($leave, $leave->staff_id));
