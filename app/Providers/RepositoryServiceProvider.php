@@ -171,6 +171,8 @@ use App\Repositories\Leave\LeaveRepository;
 use App\Repositories\Leave\LeaveRepositoryInterface;
 use App\Repositories\MaterialRequirementsPlanning\MaterialRequirementsPlanningInterface;
 use App\Repositories\MaterialRequirementsPlanning\MaterialRequirementsPlanningRepository;
+use App\Repositories\Salary\SalaryRepository;
+use App\Repositories\Salary\SalaryRepositoryInterface;
 
 // >>>>>>> origin/k/backend-api-main
 
@@ -257,5 +259,6 @@ class RepositoryServiceProvider extends ServiceProvider
         $this->app->bind(ParticipantNotificationInterface::class, ParticipantNotificationRepository::class);
         $this->app->bind(OffDayRepositoryInterface::class, OffDayRepository::class);
         $this->app->bind(LeaveRepositoryInterface::class, LeaveRepository::class);
+        $this->app->bind(SalaryRepositoryInterface::class, SalaryRepository::class);
     }
 }

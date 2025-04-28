@@ -11,9 +11,15 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use App\Events\LeaveUpdateNotificationRequest;
 use App\Models\ExitPass;
+use App\Services\LeaveService;
 
 class LeaveRepository implements LeaveRepositoryInterface
 {
+  private LeaveService $leaveService;
+  public function __construct(LeaveService $leaveService)
+  {
+    $this->leaveService = $leaveService;
+  }
   public function getLeaveCategoryLists($request)
   {
     return LeaveCategory::orderByDesc('id')->paginate(config('common.list_count'));
@@ -42,6 +48,17 @@ class LeaveRepository implements LeaveRepositoryInterface
     try {
       if (isset($data['leave_allowances'])) {
         $leave_allowances  = json_decode($data['leave_allowances'], true);
+        $currentYear = date('Y');
+        foreach ($leave_allowances as $leave_allowance) {
+
+          $existingAllowance = LeaveAllowance::where('role_id', $leave_allowance['role_id'])
+            ->where('leave_category_id', $leave_allowance['leave_category_id'])
+            ->whereYear('created_at', $currentYear)
+            ->exists();
+          if ($existingAllowance) {
+            return ResponseMessage('This leave allowance already exists for this role and category in ' . $currentYear, 422);
+          }
+        }
         foreach ($leave_allowances as $leave_allowance) {
           $leave_allowance = LeaveAllowance::create([
             'role_id' => $leave_allowance['role_id'],
@@ -108,29 +125,7 @@ class LeaveRepository implements LeaveRepositoryInterface
       $endDate = \Carbon\Carbon::parse($data['end_date']);
       $day = $startDate->diffInDays($endDate) + 1;
 
-      $leaveCategoryId = $data['leave_category_id'];
-      $staffId = $data['staff_id'];
-      $staff = Staff::findOrFail($staffId);
-      $roles = $staff->roles;
-      $allowance = 0;
-
-      foreach ($roles as $role) {
-        $allowanceForRole = LeaveAllowance::where('role_id', $role->id)
-          ->where('leave_category_id', $leaveCategoryId)
-          ->value('day');
-
-        if ($allowanceForRole > $allowance) {
-          $allowance = $allowanceForRole;
-        }
-      }
-      $totalTaken = Leave::where('staff_id', $staffId)
-        ->where('leave_category_id', $leaveCategoryId)
-        // ->where('status', 'confirmed')
-        ->sum('day');
-      $totalLeaveTakenByCategory = $totalTaken + $day;
-      if ($totalLeaveTakenByCategory > $allowance) {
-        ResponseMessage('You have exceeded your allowed leave days for this category.', 400);
-      }
+      $this->leaveService->checkLeaveAllowance($data, $day);
       $leave = Leave::create([
         'leave_category_id' => $data['leave_category_id'],
         'title' => $data['title'],
@@ -407,9 +402,11 @@ class LeaveRepository implements LeaveRepositoryInterface
     $staff = Staff::where('id', $staffId)->firstOrFail();
     $exitPasses = ExitPass::where('staff_id', $staff->id)
       ->with(['exitCategory'])
-      ->select('id', 'exit_category_id', 'staff_id', 'exit_date_time', 'arrival_date_time', 'status')
       ->orderByDesc('id')
       ->paginate(config('common.list_count'));
+    if ($exitPasses->isEmpty()) {
+      ResponseMessage('ExitPasses not found.', 404);
+    }
     ResponseData($exitPasses);
   }
   public function getStaffListByRoleAndDepartment($roleId, $departmentId)
