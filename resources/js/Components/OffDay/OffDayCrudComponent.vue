@@ -240,7 +240,7 @@
                                 <option value="department"> Department </option>
                                 <option value="staff"> Staff </option>
                             </select>
-                        </div>
+                        </div> 
                     </div>
                     <div class="mb-4" v-show="selectedType == 'department'">
                         <label for="" class="label-form mb-3">
@@ -487,9 +487,9 @@ export default {
             if(this.selectedType == 'staff'){
                 let offdayable_id = [];
                 this.selectedStaff.forEach((staff) => {
-                    offdayable_id.push(staff.id)
+                    offdayable_id.push(String(staff.id))
                 })
-                formData.append('offdayable_id', offdayable_id);
+                formData.append('offdayable_id', JSON.stringify(offdayable_id));
             }
             let response = await postApiData({url:`/api/hr/off_days`, form_data:formData, token:this.getToken()})
             if(response.success){

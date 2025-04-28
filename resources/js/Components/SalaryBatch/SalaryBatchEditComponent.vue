@@ -130,7 +130,7 @@
 
 <script>
 import { Modal, Ripple, initTE, Tab, Select } from "tw-elements";
-import { getApiData, postApiData } from '../../utilities/ajax-helpers';
+import { getApiData, postApiData, deleteApiData } from '../../utilities/ajax-helpers';
 import { mapGetters } from "vuex";
 import Multiselect from 'vue-multiselect';
 import { each } from "lodash";
@@ -153,12 +153,38 @@ export default {
             selectedStaff: null,
 
             salaryBatchList: [],
+
+            detail:null,
         };
     },
 
     methods: {
         ...mapGetters(['getToken']),
+        async getSalaryBatchDetail() {
+            let response = await getApiData({ url: `/api/hr/salary_batches/` + this.salaryBatchId, token: this.getToken() });
+            if (response.data) {
+                this.detail = response.data[0];
+                this.addDetail(response.data[0]);
+            }
+        },
+        addDetail(detail){
+            this.batch_name = detail.name;
+            this.date = detail.day_of_monthly;
 
+            // this.selectedDepartment = this.departmentList.find(department => department.id == detail.role.department_id);
+            // this.roleList = this.selectedDepartment.roles;
+            // this.selectedRole = this.roleList.find(role => role.id == detail.role_id);
+            // this.basic_salary = detail.basic_salary;
+            detail.salary_batch_staff.forEach(batch => {
+                this.salaryBatchList.push({
+                    department_name: batch.staff.department.name,
+                    role_name: batch.staff.roles[0].name,
+                    staff_name: batch.staff.name,
+                    staff_id: batch.staff_id,
+                    id: batch.id,
+                }) 
+            });
+        },
         async getDepartmentList(){
             let response = await getApiData({ url: '/api/departments', token: this.getToken() });
             if (response.data) {
@@ -205,8 +231,26 @@ export default {
             this.selectedRole = null;
             this.selectedStaff = null;
         },
-        removeSalaryBatch(index){
-            this.salaryBatchList.splice(index, 1);
+        async removeSalaryBatch(index){
+            if(this.salaryBatchList[index].id){
+                console.log('id shi')
+                let response = await deleteApiData({ url: `/api/hr/salary_batch_staffs/` + this.salaryBatchList[index].id, token: this.getToken() });
+                if (response.success) {
+                    this.salaryBatchList.splice(index, 1);
+                }
+                else {
+                    this.$notify({
+                        title: `Input validation`,
+                        text: response.message,
+                        type: "warn"
+                    });
+                }
+            }
+            else{
+                console.log('id ma shi')
+                this.salaryBatchList.splice(index, 1);
+            }
+            // this.salaryBatchList.splice(index, 1);
         },
 
         btnClickedCreateSalaryBatch(){
@@ -229,17 +273,28 @@ export default {
         async createSalaryBatch(){
             let staff_ids = [];
             this.salaryBatchList.forEach(batch => {
-                staff_ids.push(String(batch.staff_id))
+                if(batch.id){
+                    staff_ids.push({
+                        id : batch.id,
+                        staff_id : batch.staff_id
+                    })
+                }
+                else{
+                    staff_ids.push({
+                        staff_id : batch.staff_id
+                    })
+                }
+                
             });
             console.log(staff_ids)
             let formData = new FormData();
             formData.append('name',this.batch_name);
             formData.append('day_of_monthly',this.date);
-            formData.append('staff_ids', JSON.stringify(staff_ids));
-            let response = await postApiData({url:`/api/hr/salary_batches`, form_data:formData, token:this.getToken()})
+            formData.append('salary_batch_staffs', JSON.stringify(staff_ids));
+            let response = await postApiData({url:`/api/hr/salary_batches/` + this.salaryBatchId, form_data:formData, token:this.getToken()})
             if(response.success){
                 console.log('successed')
-                // window.location.replace(`/salary_setup`);
+                // window.location.replace(`/salary_batch`);
             }
         },
 
@@ -260,6 +315,7 @@ export default {
     },
 
     mounted() {
+        this.getSalaryBatchDetail();
         this.getDepartmentList();
         initTE({ Modal, Select, Tab, Ripple });
     }

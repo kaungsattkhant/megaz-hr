@@ -181,7 +181,7 @@
                             </label>
                             <div class="bg-white mb-0 w-full inline-block h-[34px] dark:bg-white !text-black !text-sm"
                                 data-te-select-wrapper-ref>
-                                <select data-te-select-init data-te-select-placeholder="Select Role" 
+                                <select data-te-select-init data-te-select-placeholder="Select Role" @change="selectedRoleChange()"
                                     name="" id="" v-model="selectedRole" class="input-ui !text-black text-sm">
                                     <option :value="role" v-for="(role, index) in roleList"
                                         :key="index"> {{ role.name }} </option>
@@ -275,6 +275,10 @@
                             <input type="checkbox" id="isIncludeWeekends" v-model="isIncludeWeekends" class=" focus:outline-none focus:ring-0 focus:shadow-none">
                             Is Include Weekends
                         </label> -->
+                        <label for="unpaidLeave" class=" focus:outline-none focus:ring-0 focus:shadow-none cursor-pointer flex items-center gap-x-3 pl-1">
+                            <input type="checkbox" id="unpaidLeave" v-model="isUnpaid" class=" focus:outline-none focus:ring-0 focus:shadow-none">
+                            Unpaid Leave
+                        </label>
 
                     </div>
                     <div class="flex justify-end gap-x-4 px-6 mb-6 pt-4">
@@ -382,6 +386,7 @@ export default {
             selectedImage: null,
             selectedStatus: {value: 'confirmed', name: 'Confirmed'},
             isIncludeWeekends: false,
+            isUnpaid: false,
 
             currentTime: getCurretDateTime(),
             
@@ -439,14 +444,20 @@ export default {
 
         selectedDepartmentChange(){
             this.roleList = this.selectedDepartment.roles;
-            this.getStaffList();
+            // this.getStaffList();
         },
-        async getStaffList(){
-                const response = await getApiData({ url: '/api/departments/' + this.selectedDepartment.id + '/staffs', token: this.getToken() });
-                if(response.data){
-                    this.staffList = response.data;
-                }
-            },
+        async selectedRoleChange(){
+            let response = await getApiData({ url: '/api/hr/staff_lists_by_role/' + this.selectedRole.id + '/department/' + this.selectedDepartment.id, token: this.getToken() });
+            if (response.data) {
+                this.staffList = response.data.data;
+            }
+        },
+        // async getStaffList(){
+        //         const response = await getApiData({ url: '/api/departments/' + this.selectedDepartment.id + '/staffs', token: this.getToken() });
+        //         if(response.data){
+        //             this.staffList = response.data;
+        //         }
+        //     },
         async getLeaveType(){
             let response = await getApiData({ url: '/api/hr/leave_categories', token: this.getToken() });
             if (response.data) {
@@ -506,12 +517,12 @@ export default {
             // formData.append('day', this.selectedDay);
             formData.append('status', this.selectedStatus.value);
             formData.append('image', this.selectedImage);
-            // if(this.isIncludeWeekends == false){
-            //     formData.append('isIncludeWeekends', 0);
-            // }
-            // else{
-            //     formData.append('isIncludeWeekends', 1);
-            // }
+            if(this.isUnpaid == false){
+                formData.append('is_unpaid_leave', 0);
+            }
+            else{
+                formData.append('is_unpaid_leave', 1);
+            }
             formData.append('confirmed_at', this.currentTime);
             formData.append('confirmed_by', this.getUser().id);
             let response = await postApiData({url:`/api/hr/leaves`, form_data:formData, token:this.getToken()})

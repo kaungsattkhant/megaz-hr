@@ -238,7 +238,7 @@ export default {
             let response = await postApiData({url:`/api/hr/salary_batches`, form_data:formData, token:this.getToken()})
             if(response.success){
                 console.log('successed')
-                // window.location.replace(`/salary_setup`);
+                window.location.replace(`/salary_batch`);
             }
         },
 
