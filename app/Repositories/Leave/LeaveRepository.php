@@ -198,7 +198,6 @@ class LeaveRepository implements LeaveRepositoryInterface
     $staffRemainingLeave = [];
 
     foreach ($leaveRecords as $leave) {
-      dd($leave);
       $staffId = $leave->staff_id;
       if (!isset($staffRemainingLeave[$staffId])) {
         $staffRemainingLeave[$staffId] = [
