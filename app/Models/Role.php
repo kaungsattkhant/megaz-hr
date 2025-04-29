@@ -71,4 +71,9 @@ class Role extends BaseModel
     {
         return $this->hasMany(MrpHr::class, 'role_id');
     }
+
+    public function leaveAllowances()
+    {
+        return $this->hasMany(LeaveAllowance::class);
+    }
 }

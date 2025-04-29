@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Models\Role;
+use App\Models\Leave;
 use App\Models\Gender;
 use App\Models\Salary;
 use App\Models\Overtime;
@@ -244,5 +245,10 @@ class Staff extends Authenticatable
     public function overtimes()
     {
         return $this->hasMany(Overtime::class);
+    }
+
+    public function leaves()
+    {
+        return $this->hasMany(Leave::class);
     }
 }

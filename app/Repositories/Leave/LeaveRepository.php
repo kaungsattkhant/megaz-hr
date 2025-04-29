@@ -185,7 +185,7 @@ class LeaveRepository implements LeaveRepositoryInterface
 
   public function getLeave($request)
   {
-    $query = Leave::with('leaveCategory', 'staff', 'created_by', 'confirmed_by', 'cancelled_by')
+    $query = Leave::with('leaveCategory', 'staff.roles.leaveAllowances', 'confirmed_by', 'cancelled_by')
       ->orderByDesc('id');
 
     if ($request->has('staff_id')) {
@@ -194,7 +194,54 @@ class LeaveRepository implements LeaveRepositoryInterface
     if ($request->has('status')) {
       $query->where('status', $request->input('status'));
     }
-    return $query->paginate(config('common.list_count'));
+    $leaveRecords = $query->paginate(config('common.list_count'));
+    $staffRemainingLeave = [];
+
+    foreach ($leaveRecords as $leave) {
+      $staffId = $leave->staff_id;
+      if (!isset($staffRemainingLeave[$staffId])) {
+        $staffRemainingLeave[$staffId] = [
+          'total_leave_taken' => 0,
+          'total_leave_allowance' => 0,
+        ];
+
+        $staffRoles = $leave->staff->roles;
+        foreach ($staffRoles as $role) {
+          $leaveAllowances = $role->leaveAllowances;
+          foreach ($leaveAllowances as $leaveAllowance) {
+            $staffRemainingLeave[$staffId]['total_leave_allowance'] += $leaveAllowance->day;
+          }
+        }
+      }
+      if ($leave->status !== 'cancelled') {
+        $staffRemainingLeave[$staffId]['total_leave_taken'] += $leave->day;
+      }
+    }
+    $leaveRecordsModified = $leaveRecords->map(function ($leave) use ($staffRemainingLeave) {
+      $staffId = $leave->staff_id;
+      $remainingLeave = $staffRemainingLeave[$staffId]['total_leave_allowance'] - $staffRemainingLeave[$staffId]['total_leave_taken'];
+      $leave->total_remaining_leave_balance = $remainingLeave;
+
+      return $leave;
+    });
+    $pagination = $leaveRecords->toArray();
+    return [
+      'leave_records' => $leaveRecordsModified,
+      'pagination' => [
+        'total' => $pagination['total'],
+        'per_page' => $pagination['per_page'],
+        'current_page' => $pagination['current_page'],
+        'last_page' => $pagination['last_page'],
+        'from' => $pagination['from'],
+        'to' => $pagination['to'],
+        'first_page_url' => $pagination['first_page_url'],
+        'last_page_url' => $pagination['last_page_url'],
+        'next_page_url' => $pagination['next_page_url'],
+        'prev_page_url' => $pagination['prev_page_url'],
+        'path' => $pagination['path'],
+        'links' => $pagination['links'],
+      ]
+    ];
   }
 
   public function deleteLeave($id)

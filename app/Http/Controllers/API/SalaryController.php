@@ -154,4 +154,26 @@ class SalaryController extends Controller
         $data = $this->salaryRepository->calculateSalary($request);
         ResponseData($data);
     }
+    public function getAllowanceTypes(Request $request)
+    {
+        $data = $this->salaryRepository->getAllowanceTypes($request);
+        ResponseData($data);
+    }
+
+    public function createPaySlip(Request $request)
+    {
+        $data = $this->salaryRepository->createPaySlip($request->all());
+        ResponseData($data);
+    }
+    public function getPaySlips(Request $request)
+    {
+        $data = $this->salaryRepository->getPaySlips($request);
+        ResponseData($data);
+    }
+
+    public function deletePaySlip($id)
+    {
+        $data = $this->salaryRepository->deletePaySlip($id);
+        ResponseData($data);
+    }
 }
