@@ -51,4 +51,10 @@ interface SalaryRepositoryInterface
   public function deleteSalaryBatchStaff($id);
 
   public function calculateSalary($request);
+
+  public function getAllowanceTypes($request);
+
+  public function createPaySlip($data);
+
+  public function getPaySlips($request);
 }
