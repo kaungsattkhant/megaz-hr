@@ -4,7 +4,7 @@ namespace App\Repositories\Salary;
 
 interface SalaryRepositoryInterface
 {
-  public function getAllowances();
+  public function getAllowances($request);
 
   public function createAllowance($data);
 
@@ -51,4 +51,12 @@ interface SalaryRepositoryInterface
   public function deleteSalaryBatchStaff($id);
 
   public function calculateSalary($request);
+
+  public function getAllowanceTypes($request);
+
+  public function createPaySlip($data);
+
+  public function getPaySlips($request);
+
+  public function deletePaySlip($id);
 }

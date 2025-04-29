@@ -61,5 +61,9 @@ Route::middleware('auth:api')->group(function () {
     Route::delete('/salary_batch_staffs/{id}', 'deleteSalaryBatchStaff');
 
     Route::get('/calculate_salary', 'calculateSalary');
+    Route::get('/allowance_types', 'getAllowanceTypes');
+    Route::post('/pay_slips', 'createPaySlip');
+    Route::get('/pay_slips', 'getPaySlips');
+    Route::delete('/pay_slips/{id}', 'deletePaySlip');
   });
 });
