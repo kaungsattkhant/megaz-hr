@@ -170,4 +170,10 @@ class SalaryController extends Controller
         $data = $this->salaryRepository->getPaySlips($request);
         ResponseData($data);
     }
+
+    public function deletePaySlip($id)
+    {
+        $data = $this->salaryRepository->deletePaySlip($id);
+        ResponseData($data);
+    }
 }

@@ -837,4 +837,25 @@ class SalaryRepository implements SalaryRepositoryInterface
       ->orderBy('id', 'desc')
       ->paginate(config('common.list_count'));
   }
+
+  public function deletePaySlip($id)
+  {
+    DB::beginTransaction();
+    try {
+      $paySlip = PaySlip::find($id);
+      if (!$paySlip) {
+        ResponseMessage('Pay slip not found.', 404);
+      }
+      $paySlip->paySlipAllowances->each(function ($allowance) {
+        $allowance->delete();
+      });
+      $paySlip->delete();
+      DB::commit();
+      ResponseMessage('Pay slip deleted successfully.', 200);
+    } catch (\Exception $e) {
+      DB::rollback();
+      ResponseMessage($e->getMessage(), 402);
+      throw $e;
+    }
+  }
 }

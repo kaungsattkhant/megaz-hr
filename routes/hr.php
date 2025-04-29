@@ -64,5 +64,6 @@ Route::middleware('auth:api')->group(function () {
     Route::get('/allowance_types', 'getAllowanceTypes');
     Route::post('/pay_slips', 'createPaySlip');
     Route::get('/pay_slips', 'getPaySlips');
+    Route::delete('/pay_slips/{id}', 'deletePaySlip');
   });
 });
