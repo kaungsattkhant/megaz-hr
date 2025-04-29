@@ -22,9 +22,14 @@ use Illuminate\Support\Facades\DB;
 
 class SalaryRepository implements SalaryRepositoryInterface
 {
-  public function getAllowances()
+  public function getAllowances($request)
   {
-    return Allowance::with('role.department')->orderBy('id', 'desc')->paginate(config('common.list_count'));
+    $query =  Allowance::with('role.department')->orderBy('id', 'desc');
+    if ($request->has('role_id')) {
+      $query->where('role_id', $request->role_id);
+    }
+    $allowances = $query->paginate(config('common.list_count'));
+    return ResponseData($allowances);
   }
   public function createAllowance($data)
   {

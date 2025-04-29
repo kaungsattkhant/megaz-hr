@@ -4,7 +4,7 @@ namespace App\Repositories\Salary;
 
 interface SalaryRepositoryInterface
 {
-  public function getAllowances();
+  public function getAllowances($request);
 
   public function createAllowance($data);
 
