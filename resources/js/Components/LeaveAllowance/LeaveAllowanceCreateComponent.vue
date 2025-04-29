@@ -301,6 +301,13 @@ export default {
                 console.log('successed')
                 window.location.replace(`/leave_allowance`);
             }
+            else {
+                console.log(response.message)
+                this.$notify({
+                    text: response.message,
+                    type: "error"
+                });
+            }
         },
 
 

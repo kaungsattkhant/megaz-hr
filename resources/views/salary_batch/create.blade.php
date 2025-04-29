@@ -4,6 +4,6 @@
 
 @section('salary_batch', 'active-link')
 @section('content')
-    <salary-batch-list-component/>
+    <salary-batch-create-component/>
     
 @endsection
