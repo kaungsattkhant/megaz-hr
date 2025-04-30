@@ -338,7 +338,7 @@
                     </div>
                     <div class="relative flex-auto px-12 py-8 text-left" data-te-modal-body-ref>
                         <p class="mb-16">
-                            Leave Balance : 
+                            Leave Balance : {{ leaveDetail ? leaveDetail.total_remaining_leave_balance + ' Day': '' }} 
                         </p>
                         <label for="unpaidLeave"
                             class=" focus:outline-none focus:ring-0 focus:shadow-none cursor-pointer flex items-center gap-x-3 pl-1">
@@ -450,7 +450,7 @@ export default {
             endDate: null,
             selectedDay: null,
             selectedImage: null,
-            selectedStatus: {value: 'received', name: 'Confirmed'},
+            selectedStatus: {value: 'confirmed', name: 'Confirmed'},
             isIncludeWeekends: false,
             isUnpaid: false,
 
@@ -481,7 +481,11 @@ export default {
             let url = this.url + this.url_department + this.url_role;
             let response = await getApiData({ url: url, token: this.getToken() });
             if (response.data) {
-                this.leaveList = response.data.data;
+                this.leaveList = response.data.leave_records;
+                this.currentPage = response.data.pagination.current_page;
+                this.perPage = response.data.pagination.per_page;
+                this.lastPage = response.data.pagination.last_page;
+                this.totalData = response.data.pagination.total;
             }
             console.log(this.getUser());
         },
