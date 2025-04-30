@@ -223,7 +223,7 @@
 
 <script>
 import { Modal, Ripple, initTE, Tab, Select } from "tw-elements";
-import { getApiData, postApiData } from '../../utilities/ajax-helpers';
+import { getApiData, postApiData, deleteApiData } from '../../utilities/ajax-helpers';
 import { mapGetters } from "vuex";
 import Multiselect from 'vue-multiselect';
 import { each } from "lodash";
@@ -280,6 +280,7 @@ export default {
                     allowance_name: allowance.allowance.name,
                     allowance_id: allowance.allowance_id,
                     amount: allowance.amount,
+                    id:allowance.id
                 }) 
             });
         },
@@ -361,8 +362,26 @@ export default {
             this.selectedAllowanceType = null;
             this.amount = null;
         },
-        removeAllowance(index){
-            this.allowanceList.splice(index, 1);
+        async removeAllowance(index){
+            if(this.allowanceList[index].id){
+                console.log('id shi')
+                let response = await deleteApiData({ url: `/api/hr/salary_setup/salary_allowances/` + this.allowanceList[index].id, token: this.getToken() });
+                if (response.success) {
+                    this.allowanceList.splice(index, 1);
+                }
+                else {
+                    this.$notify({
+                        title: `Input validation`,
+                        text: response.message,
+                        type: "warn"
+                    });
+                }
+            }
+            else{
+                console.log('id ma shi')
+                this.allowanceList.splice(index, 1);
+            }
+            // this.allowanceList.splice(index, 1);
         },
 
         btnClickedEditSalarySetup(){

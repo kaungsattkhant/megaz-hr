@@ -4,6 +4,9 @@
 
 @section('salary_batch', 'active-link')
 @section('content')
-    <salary-batch-list-component/>
-    
+
+<div id="app">
+    <salary-batch-edit-component salary-batch-id={{$id}} />
+</div>
+
 @endsection

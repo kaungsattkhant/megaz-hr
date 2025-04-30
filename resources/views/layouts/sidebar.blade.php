@@ -923,6 +923,18 @@
                             Salary Batch
                         </a>
                     </li>
+                    <li>
+                        <a href="/salary_calculate" class="flex items-center @yield('salary_calculate') sidebar-gap-x">
+                            <img class="sidebar-img " src="{{ asset('img/icons8-warning-64.png') }}" alt="">
+                            Salary Calculate
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/pay_slip" class="flex items-center @yield('pay_slip') sidebar-gap-x">
+                            <img class="sidebar-img " src="{{ asset('img/icons8-warning-64.png') }}" alt="">
+                            Pay Slip
+                        </a>
+                    </li>
                     
 
                 </ul>
