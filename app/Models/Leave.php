@@ -25,6 +25,7 @@ class Leave extends Model
         'created_by',
         'image_url',
         'image_path',
+        'is_unpaid_leave',
         'confirmed_at',
         'confirmed_by',
         'cancelled_at',

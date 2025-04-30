@@ -4,21 +4,32 @@ namespace App\Repositories\Salary;
 
 use App\Models\Staff;
 use App\Models\Salary;
+use App\Models\CheckIn;
+use App\Models\PaySlip;
 use App\Models\Overtime;
 use App\Models\Allowance;
+use App\Models\DayInOffDay;
 use App\Models\OvertimeFee;
 use App\Models\SalaryBatch;
 use App\Models\SalarySetup;
+use Illuminate\Support\Carbon;
 use App\Models\SalaryAllowance;
+use App\Models\OffDayAssignment;
 use App\Models\OvertimeCategory;
+use App\Models\PaySlipAllowance;
 use App\Models\SalaryBatchStaff;
 use Illuminate\Support\Facades\DB;
 
 class SalaryRepository implements SalaryRepositoryInterface
 {
-  public function getAllowances()
+  public function getAllowances($request)
   {
-    return Allowance::with('role.department')->orderBy('id', 'desc')->paginate(config('common.list_count'));
+    $query =  Allowance::with('role.department')->orderBy('id', 'desc');
+    if ($request->has('role_id')) {
+      $query->where('role_id', $request->role_id);
+    }
+    $allowances = $query->paginate(config('common.list_count'));
+    return ResponseData($allowances);
   }
   public function createAllowance($data)
   {
@@ -539,6 +550,313 @@ class SalaryRepository implements SalaryRepositoryInterface
       $salaryBatchStaff->delete();
       DB::commit();
       ResponseMessage('Salary batch staff deleted successfully.', 200);
+    } catch (\Exception $e) {
+      DB::rollback();
+      ResponseMessage($e->getMessage(), 402);
+      throw $e;
+    }
+  }
+
+
+  public function calculateSalary($request)
+  {
+
+    $startDate = Carbon::parse($request->from_date);
+    $endDate = Carbon::parse($request->to_date);
+    $totalDays = $startDate->diffInDays($endDate) + 1;
+    $salaryBatchStaffs = SalaryBatchStaff::where('salary_batch_id', $request->salary_batch_id)
+      ->with([
+        'staff.overtimes',
+        'staff.salary',
+        'staff.salary.salarySetup',
+        'staff.salary.salarySetup.salaryAllowances',
+        'staff.leaves' => function ($query) use ($startDate, $endDate) {
+          $query->where('status', 'confirmed')->where('is_unpaid_leave', 1)
+            ->where(function ($q) use ($startDate, $endDate) {
+              $q->whereBetween('start_date', [$startDate, $endDate])
+                ->orWhereBetween('end_date', [$startDate, $endDate])
+                ->orWhere(function ($q) use ($startDate, $endDate) {
+                  $q->where('start_date', '<=', $startDate)
+                    ->where('end_date', '>=', $endDate);
+                });
+            });
+        }
+      ])
+      ->paginate(config('common.list_count'));
+
+    $publicHolidays = DayInOffDay::whereBetween('date', [$startDate, $endDate])->where('day', 'Public-holiday')->count();
+
+    if ($salaryBatchStaffs->isEmpty()) {
+      ResponseMessage('No staff found in this batch.', 404);
+    }
+
+    $salaryDetails = [];
+    foreach ($salaryBatchStaffs as $salaryBatchStaff) {
+      $staff = $salaryBatchStaff->staff; //stafflist based on batch
+      $salary = $staff->salary;   //basic salary
+      if ($salary) {
+        $totalAllowance = 0;
+        $totalDeduction = 0;
+        foreach ($salary->salarySetup->salaryAllowances as $salaryAllowance) {
+          if ($salaryAllowance->allowance->type == 'allowance') {
+            $totalAllowance += (float) $salaryAllowance->amount;
+          } elseif ($salaryAllowance->allowance->type == 'deduction') {
+            $totalDeduction += (float) $salaryAllowance->amount;
+          }
+        }
+        $offDayAssignments = OffDayAssignment::where(function ($query) use ($staff) {
+          $query->where('offdayable_id', $staff->id)
+            ->where('offdayable_type', 'staff');
+        })
+          ->orWhere(function ($query) use ($staff) {
+            $query->where('offdayable_id', $staff->department_id)
+              ->where('offdayable_type', 'department');
+          })
+          ->with('offDay.days')
+          ->get();
+        $offDayCount = 0;
+
+        foreach ($offDayAssignments as $assignment) {
+          $offDay = $assignment->offDay;
+
+          foreach ($offDay->days as $day) {
+            // if ($day->date) {
+            //   // For specific dated off days (like public holidays)
+            //   $offDayDate = Carbon::parse($day->date);
+            //   if ($offDayDate->between($startDate, $endDate)) {
+            //     $offDayCount++;
+            //   }
+            // } else {
+            // For weekly/bi-weekly off days
+            $dayName = $day->day;
+            $currentDate = $startDate->copy();
+            $weekCounter = 0;
+
+            while ($currentDate <= $endDate) {
+              if ($currentDate->englishDayOfWeek === $dayName) {
+                // For bi-weekly off days, only count every other week
+                if ($offDay->repetition === 'Bi-weekly') {
+                  if ($weekCounter % 2 === 0) {
+                    $offDayCount++;
+                  }
+                  $weekCounter++;
+                }
+                // For weekly off days, count every week
+                else if ($offDay->repetition === 'Weekly') {
+                  $offDayCount++;
+                }
+                // For monthly off days, count once per month
+                else if ($offDay->repetition === 'Monthly') {
+                  if ($currentDate->day <= 7) { // Count only if in first week of month
+                    $offDayCount++;
+                  }
+                }
+              }
+              $currentDate->addDay();
+            }
+            // }
+          }
+        }
+
+        $unpaidLeaveCount = 0;
+        foreach ($staff->leaves as $leave) {
+          if ($leave->is_unpaid_leave) {
+            // Count the number of unpaid leave days in the date range
+            $leaveStartDate = Carbon::parse($leave->start_date);
+            $leaveEndDate = Carbon::parse($leave->end_date);
+
+            // Ensure the leave period overlaps with the requested date range
+            if ($leaveStartDate->between($startDate, $endDate) || $leaveEndDate->between($startDate, $endDate) || ($leaveStartDate <= $startDate && $leaveEndDate >= $endDate)) {
+              $unpaidLeaveCount += $leaveStartDate->diffInDays($leaveEndDate) + 1;
+            }
+          }
+        }
+        $actualWorkDays = $totalDays - $offDayCount - $unpaidLeaveCount - $publicHolidays;
+        $actualBasicSalary = ($salary->basic_salary) / $actualWorkDays;
+        $checkIns = CheckIn::where('staff_id', $staff->id)
+          ->whereBetween('check_in_date_time', [$startDate, $endDate])
+          ->whereBetween('check_out_date_time', [$startDate, $endDate])
+          ->get();
+
+
+        $totalWorkedHours = 0;
+        $totalOvertimeHours = 0;
+        //to get total worked hours from request from date to to date
+        foreach ($checkIns as $checkIn) {
+          $checkInTime = Carbon::parse($checkIn->check_in_date_time);
+          $checkOutTime = Carbon::parse($checkIn->check_out_date_time);
+          if ($checkOutTime->gt($checkInTime)) {
+
+            $workedHours =  $checkInTime->diffInHours($checkOutTime);
+            $totalWorkedHours += (float) $workedHours;
+          }
+        }
+
+        $overtimes = Overtime::where('staff_id', $staff->id)
+          ->whereBetween('from_date', [$startDate, $endDate])
+          ->whereBetween('to_date', [$startDate, $endDate])
+          ->get();
+
+        foreach ($overtimes as $overtime) {
+          $actualOvertimes = CheckIn::where('staff_id', $overtime->staff_id)
+            ->where('time_shift_id', $overtime->time_shift_id)
+            ->get();
+          foreach ($actualOvertimes as $actualOvertime) {
+            $overtimeCheckIn = Carbon::parse($actualOvertime->check_in_date_time);
+            $overtimeCheckOut = Carbon::parse($actualOvertime->check_out_date_time);
+            if ($overtimeCheckOut->gt($overtimeCheckIn)) {
+              // Calculate the overtime worked hours
+              $overtimeWorkedHours = $overtimeCheckIn->diffInHours($overtimeCheckOut);
+              $totalOvertimeHours += (float)$overtimeWorkedHours;
+            }
+          }
+        }
+        $totalOvertimeHours = max(0, $totalOvertimeHours);
+        $actualWorkedHours = $totalWorkedHours - $totalOvertimeHours;
+        $hourlyRate = $salary->basic_salary / $actualWorkedHours > 0 ? $salary->basic_salary / $actualWorkedHours : 0;
+        $role = $staff->roles->first();
+        $overtimePay = 0;
+        if ($role) {
+          $overtimeFee = OvertimeFee::where('role_id', $role->id)->first();
+          $overtimePay = $overtimeFee ? $overtimeFee->fee * $hourlyRate * $totalOvertimeHours : 0;
+        } else {
+          $overtimePay = 0;
+        }
+        $netSalary = (float) ($actualBasicSalary - $totalDeduction) + ($totalAllowance + $overtimePay);
+        $salaryDetails[] = [
+          'staff_id' => $staff->id,
+          'staff_name' => $staff->name,
+          'department_id' => $staff->department->id,
+          'department_name' => $staff->department->name,
+          'role_id' => $staff->roles->first() ? $staff->roles->first()->id : null,
+          'role_name' => $staff->roles->first() ? $staff->roles->first()->name : null,
+          'salary_batch_id' => $request->salary_batch_id,
+          'salary_id' => $salary->id,
+          // 'basic_salary' =>  $salary->basic_salary,
+          'allowance' =>  round($totalAllowance, 2),
+          'deductions' => $totalDeduction,
+          'overtime_hours' => round(max(0, $totalOvertimeHours), 2) ?? null,
+          'overtime_pay' => max(0, $overtimePay) ?? null,
+          'off_day_count' => $offDayCount,
+          'basic_salary' => round($actualBasicSalary, 2),
+          'netSalary' => round($netSalary, 2),
+          'unpaid_leave_count' => $unpaidLeaveCount,
+          'actual_work_days' => $actualWorkDays,
+          // 'actual_worked_hours' => $actualWorkedHours,
+          'public_holidays' => $publicHolidays,
+          'total_days' => $totalDays,
+          // 'total_worked_hours' => $totalWorkedHours,
+          // 'total_overtime_hours' => $totalOvertimeHours,
+          // 'total_allowances_amount' => $totalAllowance,
+          // 'total_deductions_amount' => $totalDeduction,
+        ];
+      }
+    }
+
+    return ResponseData([
+      'data' => $salaryDetails,
+      'pagination' => [
+        'total' => $salaryBatchStaffs->total(),
+        'per_page' => $salaryBatchStaffs->perPage(),
+        'current_page' => $salaryBatchStaffs->currentPage(),
+        'last_page' => $salaryBatchStaffs->lastPage(),
+        'from' => $salaryBatchStaffs->firstItem(),
+        'to' => $salaryBatchStaffs->lastItem(),
+        'first_page_url' => $salaryBatchStaffs->url(1),
+        'last_page_url' => $salaryBatchStaffs->url($salaryBatchStaffs->lastPage()),
+        'next_page_url' => $salaryBatchStaffs->nextPageUrl(),
+        'prev_page_url' => $salaryBatchStaffs->previousPageUrl(),
+        'path' => $salaryBatchStaffs->path(),
+        'links' => $salaryBatchStaffs->links(), // This will give you pagination links
+      ]
+    ]);
+  }
+
+  public function getAllowanceTypes($request)
+  {
+    $data = Allowance::where('type', $request->type)->where('role_id', $request->role_id)->get();
+    if ($data->isEmpty()) {
+      ResponseMessage('Allowance types not found.', 404);
+    }
+    ResponseData($data);
+  }
+
+  public function createPaySlip($data)
+  {
+    DB::beginTransaction();
+    try {
+      if (isset($data['pay_slips'])) {
+        $pay_slips = json_decode($data['pay_slips'], true);
+        $paySlipIds = [];
+        foreach ($pay_slips as $pay_slip) {
+
+          $paySlip = PaySlip::create([
+            'staff_id' => $pay_slip['staff_id'],
+            'salary_batch_id' => $pay_slip['salary_batch_id'],
+            'salary_id' => $pay_slip['salary_id'],
+            'basic_salary' => $pay_slip['basic_salary'],
+            'allowance' => $pay_slip['allowance'],
+            'added_allowance' => $pay_slip['added_allowance_amount'] ?? 0,
+            'added_deduction' => $pay_slip['added_deduction_amount'] ?? 0,
+            'total_allowance' => $pay_slip['total_allowance'],
+            'overtime' => $pay_slip['overtime'],
+            'net_salary' => $pay_slip['net_salary'],
+            'created_by' => UserData()->id,
+          ]);
+
+          $paySlipIds[] = $paySlip->id;
+          if (isset($pay_slip['added_allowances'])) {
+            foreach ($pay_slip['added_allowances'] as $addedAllowance) {
+              PaySlipAllowance::create([
+                'pay_slip_id' => $paySlip->id,
+                'allowance_id' => $addedAllowance['id'],
+              ]);
+            }
+          }
+
+          if (isset($pay_slip['added_deductions'])) {
+            foreach ($pay_slip['added_deductions'] as $addedDeduction) {
+              PaySlipAllowance::create([
+                'pay_slip_id' => $paySlip->id,
+                'allowance_id' => $addedDeduction['id'],
+              ]);
+            }
+          }
+        }
+
+        DB::commit();
+        ResponseData($paySlipIds);
+      }
+    } catch (\Exception $e) {
+
+      DB::rollback();
+      ResponseMessage($e->getMessage(), 402);
+      throw $e;
+    }
+  }
+
+  public function getPaySlips($request)
+  {
+    return PaySlip::with(['staff.department', 'staff.roles'])
+
+      ->orderBy('id', 'desc')
+      ->paginate(config('common.list_count'));
+  }
+
+  public function deletePaySlip($id)
+  {
+    DB::beginTransaction();
+    try {
+      $paySlip = PaySlip::find($id);
+      if (!$paySlip) {
+        ResponseMessage('Pay slip not found.', 404);
+      }
+      $paySlip->paySlipAllowances->each(function ($allowance) {
+        $allowance->delete();
+      });
+      $paySlip->delete();
+      DB::commit();
+      ResponseMessage('Pay slip deleted successfully.', 200);
     } catch (\Exception $e) {
       DB::rollback();
       ResponseMessage($e->getMessage(), 402);

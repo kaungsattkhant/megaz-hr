@@ -887,6 +887,42 @@
                             Exit Pass
                         </a>
                     </li>
+                    <li>
+                        <a href="/overtime_fees" class="flex items-center @yield('overtime_fees') sidebar-gap-x">
+                            <img class="sidebar-img " src="{{ asset('img/icons8-warning-64.png') }}" alt="">
+                            Overtime Fees
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/overtime_confirmation" class="flex items-center @yield('overtime_confirmation') sidebar-gap-x">
+                            <img class="sidebar-img " src="{{ asset('img/icons8-warning-64.png') }}" alt="">
+                            Overtime
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/salary_setup" class="flex items-center @yield('salary_setup') sidebar-gap-x">
+                            <img class="sidebar-img " src="{{ asset('img/icons8-warning-64.png') }}" alt="">
+                            Salary Setup
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/salary" class="flex items-center @yield('salary') sidebar-gap-x">
+                            <img class="sidebar-img " src="{{ asset('img/icons8-warning-64.png') }}" alt="">
+                            Salary
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/allowance" class="flex items-center @yield('allowance') sidebar-gap-x">
+                            <img class="sidebar-img " src="{{ asset('img/icons8-warning-64.png') }}" alt="">
+                            Allowance
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/salary_batch" class="flex items-center @yield('salary_batch') sidebar-gap-x">
+                            <img class="sidebar-img " src="{{ asset('img/icons8-warning-64.png') }}" alt="">
+                            Salary Batch
+                        </a>
+                    </li>
                     
 
                 </ul>

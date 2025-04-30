@@ -153,7 +153,7 @@
                             id="add_exit_modalLabel">
                             {{ isExitCategory ? 'Create Exit Category' : 'Create Exit' }}
                         </h5>
-                        <button type="button" class="text-xs focus:shadow-none focus:outline-none"
+                        <button type="button" class="text-xs focus:shadow-none focus:outline-none" @click="closeExitCategoryWithDelay"
                                 data-te-modal-dismiss aria-label="Close" id="close_exit_create_modal">
                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
                                     stroke-width="1.5" stroke="currentColor" class="h-4 w-4">
@@ -557,6 +557,12 @@ export default {
                 });
             }
         },
+        closeExitCategoryWithDelay() {
+            setTimeout(() => {
+                this.isExitCategory = false;
+            }, 300); // 300ms delay (adjust as needed)
+        },
+
 
     },
     mounted() {

@@ -3,7 +3,10 @@
 namespace App\Models;
 
 use App\Models\Role;
+use App\Models\Leave;
 use App\Models\Gender;
+use App\Models\Salary;
+use App\Models\Overtime;
 use App\Models\Inventory;
 use App\Models\Department;
 use App\Models\TaskDetail;
@@ -232,5 +235,20 @@ class Staff extends Authenticatable
     public function salaryBatchStaff()
     {
         return $this->hasMany(SalaryBatchStaff::class);
+    }
+
+    public function salary()
+    {
+        return $this->hasOne(Salary::class);
+    }
+
+    public function overtimes()
+    {
+        return $this->hasMany(Overtime::class);
+    }
+
+    public function leaves()
+    {
+        return $this->hasMany(Leave::class);
     }
 }
