@@ -387,3 +387,4 @@ Route::view('/salary_batch', 'salary_batch.index')->name('salary_batch.index');
 Route::view('/salary_batch/create', 'salary_batch.create')->name('salary_batch.create');
 Route::view('/salary_batch/{id}/edit', 'salary_batch.edit');
 Route::view('/salary_calculate', 'salary_calculate.index')->name('salary_calculate.index');
+Route::view('/pay_slip', 'salary_calculate.pay_slip')->name('salary_calculate.pay_slip');

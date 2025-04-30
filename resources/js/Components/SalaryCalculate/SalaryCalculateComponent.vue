@@ -4,37 +4,46 @@
             Calculate Salary
         </p>
     </div>
-    <div class="mt-4 bg-white">
-        <div class="btn-container">
+    <div class="mt-4 bg-white ">
+        <div class="border-b py-3 px-8 mb-8">
             <notifications position="top center" />
-            <div class=" flex gap-x-4">
-                <label for="search" class="search-input">
-                    <input type="text" class="input-search" placeholder="Search" v-model="searchInput">
-                    <i class="fal fa-search"></i>
-                </label>
-                <button class="add-btn h-8" @click="searchBtnClicked()">Search</button>
-                <button class="add-btn h-8" @click="clearSearchBtnClicked()">Clear</button>
-            </div>
-            <div class="flex pr-0 gap-x-4">
-                <div class=" !text-sm" data-te-select-wrapper-ref>
-                    <select data-te-select-init data-te-select-placeholder="Select Department"
-                        data-te-select-filter="true" name="" id="" v-model="selectedSearchDepartment" class="input-ui">
-                        <option :value="department.value" v-for="(department, departmentIndex) in searchDepartmentList"
-                            :key="departmentIndex"> {{ department.name }} </option>
-                    </select>
+            <div class="grid grid-cols-4 pr-0 gap-x-4">
+                
+                <div class="mb-4">
+                    <label for="" class="label-form mb-3">
+                        From
+                    </label>
+                    <input type="date" v-model="fromDate" class="input-ui mb-0">
                 </div>
-                <div class=" !text-sm" data-te-select-wrapper-ref>
-                    <select data-te-select-init data-te-select-placeholder="Select Role"
-                        data-te-select-filter="true" name="" id="" v-model="selectedSearchRole" class="input-ui">
-                        <option :value="role.value" v-for="(role, roleIndex) in searchRoleList"
-                            :key="roleIndex"> {{ role.name }} </option>
-                    </select>
+                <div class="mb-4">
+                    <label for="" class="label-form mb-3">
+                        To
+                    </label>
+                    <input type="date" v-model="toDate" class="input-ui mb-0">
                 </div>
-                <button type="button"
-                    class="add-btn transition duration-150 ease-in-out focus:outline-none focus:ring-0 "
-                    data-te-toggle="modal" data-te-target="#create_modal" @click="clearCreateModal">
-                    Add New
-                </button>
+                <div class="mb-4">
+                    <label for="" class="label-form mb-3">
+                        Batch
+                    </label>
+                    <div class="bg-white mb-0 w-full inline-block h-[34px] dark:bg-white !text-black !text-sm"
+                        data-te-select-wrapper-ref>
+                        <select data-te-select-init data-te-select-placeholder="Select Role"
+                            data-te-select-filter="true" name="" id="" v-model="selectedBatch" class="input-ui !text-black text-sm">
+                            <option :value="batch" v-for="(batch, index) in batchList"
+                                :key="index"> {{ batch.name }} </option>
+                        </select>
+                    </div>
+                </div>
+                <div>
+                    <label for="" class="label-form mb-3">
+                        &nbsp;
+                    </label>
+                    <button type="button"
+                        class="add-btn transition duration-150 ease-in-out focus:outline-none focus:ring-0 " @click="getSalaryList">
+                        Add New
+                    </button>
+                </div>
+                
             </div>
         </div>
         <div class="box-container-table">
@@ -50,58 +59,72 @@
                                     Name
                                 </th>
                                 <th scope="col" class="">
-                                    Role
-                                </th>
-                                <th scope="col" class="">
                                     Department
                                 </th>
                                 <th scope="col" class="">
-                                    Type
+                                    Role
                                 </th>
                                 <th scope="col" class="">
-                                    Amount
+                                    Salary
+                                </th>
+                                <th scope="col" class="">
+                                    Allowance
+                                </th>
+                                <th scope="col" class="">
+                                    Overtime
+                                </th>
+                                <th scope="col" class="">
+                                    Net Salary
+                                </th>
+                                <th scope="col" class="">
+                                    
                                 </th>
                             </tr>
                         </thead>
                         <tbody>
-                            <div class="contents" v-for="(ot, index) in allowanceList" :key="index">
+                            <div class="contents" v-for="(salary, index) in salaryList" :key="index">
                                 <tr class="">
                                     <td class=" font-medium ">
                                         <!-- {{ perPage * (currentPage - 1) + (++index) }} -->
                                         {{ index+1 }}
                                     </td>
                                     <td class="whitespace-nowrap">
-                                        {{ ot.name }}
+                                        {{ salary.staff_name }}
                                     </td>
                                     <td class="whitespace-nowrap">
-                                        {{ ot.role.name }}
+                                        {{ salary.department_name }}
                                     </td>
                                     <td class="whitespace-nowrap">
-                                        {{ ot.role.department.name }}
+                                        {{ salary.role_name }}
                                     </td>
                                     <td class="whitespace-nowrap">
-                                        {{ ot.type }}
+                                        {{ salary.basic_salary }}
                                     </td>
                                     <td class="whitespace-nowrap">
-                                        {{ ot.amount }}
+                                        {{ salary.total_allowance }}
                                     </td>
-                                    <!-- <td class="whitespace-nowrap">
-                                        <button data-te-toggle="modal" data-te-target="#edit_modal" id="edit-btn"
-                                            class="pr-3" @click="editBtnClicked(ot, index)">
+                                    <td class="whitespace-nowrap">
+                                        {{ salary.overtime_pay }}
+                                    </td>
+                                    <td class="whitespace-nowrap">
+                                        {{ salary.net_salary }}
+                                    </td>
+                                    <td class="whitespace-nowrap">
+                                        <button data-te-toggle="modal" data-te-target="#add_allowance_modal" id="edit-btn"
+                                            class="pr-3" @click="btnClickedAddAllowanceAndDeduction(salary, index)">
                                             <i class="fal fa-pen"></i>
                                         </button>
-                                        <button @click="deleteBtnClicked(ot.id)" data-te-toggle="modal"
-                                            data-te-target="#deleteModal" id="delete-btn" class="pr-1">
-                                            <i class="fas fa-trash-alt"></i>
-                                        </button>
-                                    </td> -->
+                                    </td>
                                 </tr>
                             </div>
                         </tbody>
                     </table>
+                    <button data-te-toggle="modal" data-te-target="#add_allowance_modal" id="edit-btn"
+                        class="pr-3 opacity-0 w-0 h-0">
+                    </button>
 
                     <!-- pagination -->
-                    <div class="flex justify-center">
+                    <!-- <div class="flex justify-center">
                         <div v-if="totalData != 0" class=" bg-white  flex justify-center mt-5 py-3">
                             <button class="rounded px-6 py-1 border  hover:bg-slate-200" :disabled="currentPage === 1"
                                 @click="getAllowanceList(currentPage - 1)">«</button>
@@ -114,150 +137,88 @@
                                 :disabled="currentPage === lastPage" @click="getAllowanceList(currentPage + 1)">
                                 »</button>
                         </div>
-                    </div>
+                    </div> -->
+                
+                    <button type="button"
+                        class="add-btn transition duration-150 ease-in-out focus:outline-none focus:ring-0 " @click="btnCreateSalaryCalculate">
+                        Publish
+                    </button>
                 </div>
             </div>
         </div>
 
-        <!--Delete Modal -->
+
+
+        <!-- add allowance modal -->
+        
         <div data-te-modal-init
             class="fixed left-0 top-0 z-[1055] hidden h-full w-full overflow-y-auto overflow-x-hidden outline-none"
-            id="deleteModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            id="add_allowance_modal" tabindex="-1" aria-labelledby="add_allowanceLabel" aria-hidden="true">
             <div data-te-modal-dialog-ref
-                class="pointer-events-none relative flex min-h-[calc(100%-1rem)] w-auto translate-y-[-50px] items-center opacity-0 transition-all duration-300 ease-in-out min-[576px]:mx-auto min-[576px]:mt-7 min-[576px]:min-h-[calc(100%-3.5rem)] min-[576px]:max-w-[500px]">
+                class="pointer-events-none relative w-auto mb-12 translate-y-[-50px] opacity-0 transition-all duration-300 ease-in-out min-[576px]:mx-auto min-[576px]:mt-7 min-[576px]:max-w-[500px]">
                 <div
-                    class="min-[576px]:shadow-[0_0.5rem_1rem_rgba(#000, 0.15)] pointer-events-auto relative flex w-full flex-col rounded-md border-none bg-white bg-clip-padding text-current shadow-lg outline-none ">
-                    <div
-                        class="flex flex-shrink-0 items-center justify-between rounded-t-md border-b-2 border-neutral-100 border-opacity-100 p-4 ">
-                        <!--Modal title-->
-                        <h5 class="text-xl font-medium leading-normal text-neutral-800 " id="exampleModalLabel">
-                            Delete ?
+                    class="min-[576px]:shadow-[0_0.5rem_1rem_rgba(#000, 0.15)] pointer-events-auto relative flex w-full flex-col rounded-md border-none bg-white bg-clip-padding text-current shadow-lg outline-none">
+                    <div class="relative flex justify-between py-2 px-6 border-b">
+                        <h5 class="text-base text-center mt-2 font-semibold leading-normal font-inter"
+                            id="add_allowanceLabel">
+                            Choose Allowance / Deduction
                         </h5>
-                        <!--Close button-->
-                        <button type="button"
-                            class="box-content rounded-none border-none hover:no-underline hover:opacity-75 focus:opacity-100 focus:shadow-none focus:outline-none"
-                            data-te-modal-dismiss aria-label="Close">
+                        <button type="button" class="text-xs focus:shadow-none focus:outline-none" data-te-modal-dismiss
+                            id="close_add_allowance" aria-label="Close">
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
-                                stroke="currentColor" class="h-6 w-6">
+                                stroke="currentColor" class="h-4 w-4">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
                             </svg>
                         </button>
                     </div>
-
-                    <!--Modal body-->
-                    <div class="relative flex-auto p-4" data-te-modal-body-ref>
-                        <p>
-                            Are you sure ?
-                        </p>
+                    <div class="relative px-6 py-4 border-b" data-te-modal-body-ref>
+                        <div class="mb-4">
+                            <label for="" class="label-form mb-3">
+                                Type
+                            </label>
+                            <div class="bg-white mb-0 w-full inline-block h-[34px] dark:bg-white !text-black !text-sm"
+                                data-te-select-wrapper-ref>
+                                <select data-te-select-init data-te-select-placeholder="Select Type" @change="selectedTypeChange()"
+                                    data-te-select-filter="true" name="" id="" v-model="selectedType" class="input-ui !text-black text-sm">
+                                    <option value="allowance"> Allowance </option>
+                                    <option value="deduction"> Deduction </option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="mb-4">
+                            <label for="" class="label-form mb-3">
+                                Name
+                            </label>
+                            <div class="bg-white mb-0 w-full inline-block h-[34px] dark:bg-white !text-black !text-sm"
+                                data-te-select-wrapper-ref>
+                                <select data-te-select-init data-te-select-placeholder="Select Role"
+                                    data-te-select-filter="true" name="" id="" v-model="selectedAllowance" class="input-ui !text-black text-sm">
+                                    <option :value="allowance" v-for="(allowance, index) in allowanceList"
+                                        :key="index"> {{ allowance.name }} </option>
+                                </select>
+                            </div>
+                        </div>
                     </div>
 
-                    <!--Modal footer-->
-                    <div
-                        class="flex flex-shrink-0 flex-wrap items-center justify-end rounded-b-md border-t-2 border-neutral-100 border-opacity-100 p-4 ">
-                        <button type="button"
-                            class="inline-block px-6 pb-2 pt-2.5 text-xs focus:outline-none focus:ring-0 "
-                            data-te-modal-dismiss>
-                            Close
+                    <div class="flex justify-end gap-x-4 px-6 mb-6 pt-4">
+                        <button type="button" class="cancel-btn focus:shadow-none focus:outline-none" data-te-modal-dismiss
+                            aria-label="Close">
+                            Cancel
                         </button>
-                        <button @click="deleteItem()" type="button" data-te-toggle="modal" data-te-target="#deleteModal"
-                            class="ml-1 inline-block rounded bg-red-600 px-6 pb-2 pt-2.5 text-xs  text-white   focus:outline-none focus:ring-0 ">
-                            Delete
+                        <button type="button" @click="btnAddAllowanceOrDeduction()"
+                            class="add-btn focus:outline-none focus:ring-0 ">
+                            Create
                         </button>
                     </div>
                 </div>
             </div>
         </div>
+
+
     </div>
 
 
-    <div data-te-modal-init
-        class="fixed left-0 top-0 z-[1055] hidden h-full w-full overflow-y-auto overflow-x-hidden outline-none"
-        id="create_modal" tabindex="-1" aria-labelledby="create_modalLabel" aria-hidden="true">
-        <div data-te-modal-dialog-ref
-            class="pointer-events-none relative w-auto mb-12 translate-y-[-50px] opacity-0 transition-all duration-300 ease-in-out min-[576px]:mx-auto min-[576px]:mt-7 min-[576px]:max-w-[500px]">
-            <div
-                class="min-[576px]:shadow-[0_0.5rem_1rem_rgba(#000, 0.15)] pointer-events-auto relative flex w-full flex-col rounded-md border-none bg-white bg-clip-padding text-current shadow-lg outline-none">
-                <div class="relative flex justify-between py-2 px-6 border-b">
-                    <h5 class="text-base text-center mt-2 font-semibold leading-normal font-inter"
-                        id="create_modalLabel">
-                        Create Overtime Fees
-                    </h5>
-                    <button type="button" class="text-xs focus:shadow-none focus:outline-none" data-te-modal-dismiss
-                        id="close_create_modal" aria-label="Close">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
-                            stroke="currentColor" class="h-4 w-4">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
-                        </svg>
-                    </button>
-                </div>
-                <div class="relative px-6 py-4 border-b" data-te-modal-body-ref>
-                    <div class="mb-4">
-                        <label for="" class="label-form mb-3">
-                            Department
-                        </label>
-                        <div class="bg-white mb-0 w-full inline-block h-[34px] dark:bg-white !text-black !text-sm"
-                            data-te-select-wrapper-ref>
-                            <select data-te-select-init data-te-select-placeholder="Select Department" @change="selectedDepartmentChange()"
-                                data-te-select-filter="true" name="" id="" v-model="selectedDepartment" class="input-ui !text-black text-sm">
-                                <option :value="department" v-for="(department, index) in departmentList"
-                                    :key="index"> {{ department.name }} </option>
-                            </select>
-                        </div>
-                    </div>
-                    <div class="mb-4">
-                        <label for="" class="label-form mb-3">
-                            Role
-                        </label>
-                        <div class="bg-white mb-0 w-full inline-block h-[34px] dark:bg-white !text-black !text-sm"
-                            data-te-select-wrapper-ref>
-                            <select data-te-select-init data-te-select-placeholder="Select Role"
-                                data-te-select-filter="true" name="" id="" v-model="selectedRole" class="input-ui !text-black text-sm">
-                                <option :value="role" v-for="(role, index) in roleList"
-                                    :key="index"> {{ role.name }} </option>
-                            </select>
-                        </div>
-                    </div>
-                    <div class="mb-4">
-                        <label for="" class="label-form mb-3">
-                            Name
-                        </label>
-                        <input type="text" v-model="name" class="input-ui mb-0">
-                    </div>
-                    <div class="mb-4">
-                        <label for="" class="label-form mb-3">
-                            Type
-                        </label>
-                        <div class="bg-white mb-0 w-full inline-block h-[34px] dark:bg-white !text-black !text-sm"
-                            data-te-select-wrapper-ref>
-                            <select data-te-select-init data-te-select-placeholder="Select Type"
-                                data-te-select-filter="true" name="" id="" v-model="selectedType" class="input-ui !text-black text-sm">
-                                <option value="allowance"> Allowance </option>
-                                <option value="deduction"> Deduction </option>
-                            </select>
-                        </div>
-                    </div>
-                    <div class="mb-4">
-                        <label for="" class="label-form mb-3">
-                            Amount
-                        </label>
-                        <input type="text" v-model="amount" class="input-ui mb-0">
-                    </div>
-
-                </div>
-
-                <div class="flex justify-end gap-x-4 px-6 mb-6 pt-4">
-                    <button type="button" class="cancel-btn focus:shadow-none focus:outline-none" data-te-modal-dismiss
-                        aria-label="Close">
-                        Cancel
-                    </button>
-                    <button type="button" @click="btnCreateAllowance()"
-                        class="add-btn focus:outline-none focus:ring-0 ">
-                        Create
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
+    
 
 
 </template>
@@ -274,130 +235,235 @@ export default {
     },
     data() {
         return {
+            unChangedSalaryList: [],
+            salaryList: [],
+
+            batchList: [],
+
+            fromDate:null,
+            toDate: null,
+            selectedBatch: null,
+            
             allowanceList: [],
+            selectedType: null,
+            selectedAllowance: null,
 
-            searchDepartmentList:[],
-            searchRoleList:[],
-            selectedSearchDepartment: null,
-            selectedSearchRole: null,
-            
-            departmentList:[],
-            roleList:[],
+            salaryDetail: null,
+            salaryIndex: null,
 
-            selectedDepartment:null,
-            selectedRole:null,
-            name:null,
-            selectedType:null,
-            amount: null,
-
-            currentPage: 0,
-            perPage: 0,
-            lastPage: 0,
-            totalData: 0,
-
-            searchInput: null,
-
-            
-
-            url:'/api/hr/salary_allowances',
-            url_search:'',
-            url_department:'',
-            url_role:'',
-            deleteId:null,
+            pay_slip:[],
+            test: [],
         };
     },
 
     methods: {
         ...mapGetters(['getToken']),
 
-        async getAllowanceList(pageNumber) {
-            let url = this.url + this.url_search + this.url_department + this.url_role;
+        async getBatchList() {
+            let url = '/api/hr/salary_batches';
             let response = await getApiData({ url: url, token: this.getToken() });
             if (response.data) {
-                this.allowanceList = response.data.data;
+                this.batchList = response.data.data;
             }
         },
-        async getDepartmentList(){
-            let response = await getApiData({ url: '/api/departments', token: this.getToken() });
-            if (response.data) {
-                this.departmentList = response.data;
-            }
-        },
-        selectedDepartmentChange(){
-            console.log('dep change')
-            this.roleList = this.selectedDepartment.roles;
-            this.selectedRole = null;
-        },
-        btnCreateAllowance(){
-            if(!this.selectedRole){
-                this.alertValidationMessage(`Role `);
+        async getSalaryList(){
+            if(!this.fromDate){
+                this.alertValidationMessage(`From Date `);
                 return 1;
             }
-            else if(!this.name){
-                this.alertValidationMessage(`Name`);
+            else if(!this.toDate){
+                this.alertValidationMessage(`To Date`);
                 return 1;
             }
-            else if(!this.selectedType){
-                this.alertValidationMessage(`Type`);
-                return 1;
-            }
-            else if(!this.amount){
-                this.alertValidationMessage(`Amount`);
+            else if(!this.selectedBatch){
+                this.alertValidationMessage(`Batch`);
                 return 1;
             }
             else{
-                this.createAllowance();
+                let url = '/api/hr/calculate_salary?salary_batch_id=' + this.selectedBatch.id + '&from_date=' + this.fromDate + '&to_date=' + this.toDate;
+                let response = await getApiData({ url: url, token: this.getToken() });
+                if (response.data) {
+                    this.unChangedSalaryList = response.data.data;
+                    this.salaryList = response.data.data;
+                    this.salaryList.forEach(sa => {
+                        sa.total_allowance = sa.allowance;
+                        sa.added_allowance_amount = 0;
+                        sa.added_deduction_amount = 0;
+                        sa.overtime = sa.overtime_pay;
+                        sa.net_salary = sa.netSalary;
+                        sa.added_allowances = [];
+                        sa.added_deductions = [];
+                    });
+                }
             }
+            
         },
-        async createAllowance(){
-            let formData = new FormData();
-            formData.append('role_id',this.selectedRole.id);
-            formData.append('name',this.name);
-            formData.append('type',this.selectedType);
-            formData.append('amount',this.amount);
-            let response = await postApiData({url:`/api/hr/salary_allowances`, form_data:formData, token:this.getToken()})
-            if(response.success){
-                this.getAllowanceList();
-                this.clearCreateModal();
-                document.getElementById('close_create_modal').click();
-            }
-        },
-        clearCreateModal(){
-            this.selectedDepartment = null;
-            this.roleList = [];
-            this.selectedRole = null;
-            this.name = null;
+        btnClickedAddAllowanceAndDeduction(salary,index){
+            this.salaryDetail = salary
+            this.salaryIndex = index;
             this.selectedType = null;
-            this.amount = null
+            this.allowanceList = [];
+            this.selectedAllowance = null;
         },
-        // async searchBtnClicked() {
-        //     this.url_search = '&search=' + this.searchInput
-        //     this.getAllowanceList(1);
-        // },
-        // clearSearchBtnClicked() {
-        //     this.searchInput = null;
-        //     this.url_search = '';
-        //     this.getAllowanceList(1);
-        // },
-
-
-
-        deleteBtnClicked(id) {
-            this.deleteId = id;
-        },
-        async deleteItem() {
-            let response = await deleteApiData({ url: `/api/hr/overtime_fees/` + this.deleteId, token: this.getToken() });
-            if (response.success) {
-                this.getAllowanceList(1);
+        async selectedTypeChange(){
+            let url = '/api/hr/allowance_types?role_id=' + this.salaryDetail.role_id + '&type=' + this.selectedType;
+            let response = await getApiData({ url: url, token: this.getToken() });
+            if (response.data) {
+                this.allowanceList = response.data;
             }
             else {
+                console.log(response.message)
                 this.$notify({
-                    title: `Input validation`,
                     text: response.message,
-                    type: "warn"
+                    type: "error"
                 });
             }
         },
+        btnAddAllowanceOrDeduction(){
+            if(!this.selectedType){
+                this.alertValidationMessage(`Type `);
+                return 1;
+            }
+            else if(!this.selectedAllowance){
+                this.alertValidationMessage(`Allowance Or Deduction`);
+                return 1;
+            }
+            else{
+                if(this.selectedType == 'allowance'){
+                    this.salaryList[this.salaryIndex].total_allowance += this.selectedAllowance.amount
+                    this.salaryList[this.salaryIndex].net_salary += this.selectedAllowance.amount
+                    this.salaryList[this.salaryIndex].added_allowance_amount += this.selectedAllowance.amount
+                    this.salaryList[this.salaryIndex].added_allowances.push({
+                        id: this.selectedAllowance.id,
+                        amount: this.selectedAllowance.amount
+                    })
+                }
+                else{
+                    this.salaryList[this.salaryIndex].total_allowance -= this.selectedAllowance.amount
+                    this.salaryList[this.salaryIndex].net_salary -= this.selectedAllowance.amount
+                    this.salaryList[this.salaryIndex].added_deduction_amount += this.selectedAllowance.amount
+                    this.salaryList[this.salaryIndex].added_deductions.push({
+                        id: this.selectedAllowance.id,
+                        amount: this.selectedAllowance.amount
+                    })
+                }
+                document.getElementById('close_add_allowance').click();
+            }
+        },
+        
+        btnCreateSalaryCalculate(){
+            // if(!this.selectedRole){
+            //     this.alertValidationMessage(`Role `);
+            //     return 1;
+            // }
+            // else if(!this.name){
+            //     this.alertValidationMessage(`Name`);
+            //     return 1;
+            // }
+            // else{
+            //     this.createSalaryCalculate();
+            // }
+            this.createSalaryCalculate();
+
+            // tset = [
+            //         {
+            //             "staff_id": 1,
+            //             "salary_batch_id": 1,
+            //             "salary_id": 1,
+            //             "basic_salary": 45454.55,
+            //             "allowance": 80000,
+            //             "added_allowance_amount":5000,
+            //             "added_deduction_amount":5000,
+            //             "added_allowances": [
+            //                 {
+            //                 "id": 1,
+            //                 "amount": 5000
+            //                 }
+            //             ],
+            //             "added_deductions": [
+            //                 {
+            //                 "id": 3,
+            //                 "amount": 5000
+            //                 }
+            //             ],
+            //             "total_allowance": 80000,
+            //             "overtime": 0,
+            //             "net_salary": 125454.55
+            //         },
+            //         {
+            //             "staff_id": 2,
+            //             "salary_batch_id": 1,
+            //             "salary_id": 2,
+            //             "basic_salary": 38461.54,
+            //             "allowance": 80000,
+            //             "added_allowance_amount":20000,
+            //             "added_allowances": [
+            //                 {
+            //                 "id": 4,
+            //                 "amount": 20000
+            //                 }
+            //             ],
+            //             "total_allowance": 100000,
+            //             "overtime": 0,
+            //             "net_salary": 138461.54
+            //         }
+            //     ]
+
+        },
+        async createSalaryCalculate(){
+            let pay_slip = [];
+            this.salaryList.forEach(item => 
+                pay_slip.push({
+                    staff_id: item.staff_id,
+                    salary_batch_id: item.salary_batch_id,
+                    salary_id: item.salary_id,
+                    basic_salary: item.basic_salary,
+                    allowance: item.allowance,
+                    added_allowance_amount: item.added_allowance_amount,
+                    added_deduction_amount: item.added_deduction_amount,
+                    added_allowances: item.added_allowances,
+                    added_deductions: item.added_deductions,
+                    total_allowance: item.total_allowance,
+                    overtime: item.overtime,
+                    net_salary: item.net_salary,
+                })
+            )
+            this.test = pay_slip
+            let formData = new FormData();
+            formData.append('pay_slips',JSON.stringify(pay_slip));
+            let response = await postApiData({url:`/api/hr/pay_slips`, form_data:formData, token:this.getToken()})
+            if(response.success){
+                // this.getAllowanceList();
+                // this.clearCreateModal();
+                // document.getElementById('close_create_modal').click();
+                window.location.replace('/pay_slip')
+            }
+        },
+        // clearCreateModal(){
+        //     this.selectedDepartment = null;
+        //     this.roleList = [];
+        //     this.selectedRole = null;
+        //     this.name = null;
+        //     this.selectedType = null;
+        //     this.amount = null
+        // },
+
+        // deleteBtnClicked(id) {
+        //     this.deleteId = id;
+        // },
+        // async deleteItem() {
+        //     let response = await deleteApiData({ url: `/api/hr/overtime_fees/` + this.deleteId, token: this.getToken() });
+        //     if (response.success) {
+        //         this.getAllowanceList(1);
+        //     }
+        //     else {
+        //         this.$notify({
+        //             title: `Input validation`,
+        //             text: response.message,
+        //             type: "warn"
+        //         });
+        //     }
+        // },
 
 
 
@@ -415,8 +481,7 @@ export default {
         
     },
     created() {
-        this.getDepartmentList();
-        this.getAllowanceList(1);
+        this.getBatchList();
     }
 }
 </script>

@@ -929,6 +929,12 @@
                             Salary Calculate
                         </a>
                     </li>
+                    <li>
+                        <a href="/pay_slip" class="flex items-center @yield('pay_slip') sidebar-gap-x">
+                            <img class="sidebar-img " src="{{ asset('img/icons8-warning-64.png') }}" alt="">
+                            Pay Slip
+                        </a>
+                    </li>
                     
 
                 </ul>
