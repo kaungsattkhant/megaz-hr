@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Models\Role;
+use App\Models\PaySlipAllowance;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
@@ -24,5 +25,9 @@ class Allowance extends Model
     public function role()
     {
         return $this->belongsTo(Role::class);
+    }
+    public function paySlipAllowances()
+    {
+        return $this->hasMany(PaySlipAllowance::class, 'pay_slip_id');
     }
 }
