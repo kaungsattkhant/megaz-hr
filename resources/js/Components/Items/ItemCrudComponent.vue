@@ -28,8 +28,16 @@
 
             </div>
             <div class="flex justify-end gap-x-4">
+                <label for="excel_import_item_type" class="add-btn h-8 cursor-pointer">
+                    Import Type
+                    <input type="file" placeholder="Excel" id="excel_import_item_type" class="opacity-0 w-0 h-0 hidden"  @change="handleItemTypeFileChange">
+                </label>
+                <label for="excel_import_item_category" class="add-btn h-8 cursor-pointer">
+                    Import Category
+                    <input type="file" placeholder="Excel" id="excel_import_item_category" class="opacity-0 w-0 h-0 hidden"  @change="handleItemCategoryFileChange">
+                </label>
                 <label for="excel_import" class="add-btn h-8 cursor-pointer">
-                    Excel Import
+                    Import Item
                     <input type="file" placeholder="Excel" id="excel_import" class="opacity-0 w-0 h-0 hidden"  @change="handleFileChange">
                 </label>
                 <!-- <button type="button"
@@ -858,14 +866,14 @@ export default {
         async importBtnClicked() {
             let formData = new FormData();
             formData.append('item_import', this.selectedFile);
-            let response = await postApiData({ url: '/api/items/imports', form_data: formData, token: this.getToken() });
+            let response = await postApiData({ url: '/api/import/items', form_data: formData, token: this.getToken() });
             if (response.success) {
                 this.$notify({
                     text: `Excel Imported successfully`,
                     type: "info"
                 });
                 this.selectedFile = null;
-                document.getElementById('close_import_modal').click();
+                this.getItemList(1);
             }
             else {
                 this.$notify({
@@ -874,6 +882,67 @@ export default {
                 });
             }
         },
+
+
+        handleItemTypeFileChange(event) {
+            console.log("Event object:", event);
+            const selectedItemTypeFile = event.target.files[0];
+            this.selectedItemTypeFile = selectedItemTypeFile;
+            if(this.selectedItemTypeFile){
+                this.importItemType();
+            }
+        },
+        async importItemType() {
+            let formData = new FormData();
+            formData.append('item_type_import', this.selectedItemTypeFile);
+            let response = await postApiData({ url: '/api/import/item_types', form_data: formData, token: this.getToken() });
+            if (response.success) {
+                this.$notify({
+                    text: `Excel Imported successfully`,
+                    type: "info"
+                });
+                this.selectedItemTypeFile = null;
+                this.getItemTypeList();
+            }
+            else {
+                this.$notify({
+                    text: `Excel Imported failed`,
+                    type: "error"
+                });
+            }
+        },
+
+
+
+        handleItemCategoryFileChange(event) {
+            console.log("Event object:", event);
+            const selectedItemCategoryFile = event.target.files[0];
+            this.selectedItemCategoryFile = selectedItemCategoryFile;
+            if(this.selectedItemCategoryFile){
+                this.importItemCategory();
+            }
+        },
+        async importItemCategory() {
+            let formData = new FormData();
+            formData.append('category_import', this.selectedItemCategoryFile);
+            let response = await postApiData({ url: '/api/import/categories', form_data: formData, token: this.getToken() });
+            if (response.success) {
+                this.$notify({
+                    text: `Excel Imported successfully`,
+                    type: "info"
+                });
+                this.selectedItemCategoryFile = null;
+                this.getItemCategoryList();
+            }
+            else {
+                this.$notify({
+                    text: `Excel Imported failed`,
+                    type: "error"
+                });
+            }
+        },
+
+
     },
 
     created() {

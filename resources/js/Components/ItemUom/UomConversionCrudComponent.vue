@@ -21,6 +21,10 @@
             </div>
             <div class="flex justify-end flex-col">
                 <div class="flex gap-3">
+                    <label for="excel_import" class="add-btn h-8 cursor-pointer">
+                        Excel Import
+                        <input type="file" placeholder="Excel" id="excel_import" class="opacity-0 w-0 h-0 hidden"  @change="handleFileChange">
+                    </label>
                     <button type="button"
                         class="add-btn transition duration-150 ease-in-out focus:outline-none focus:ring-0 "
                         data-te-toggle="modal" data-te-target="#create_modal">
@@ -210,7 +214,7 @@
                         <label for="" class="label-form mb-3">
                             Base Unit
                         </label>
-                        <select type="text" placeholder="Unit" v-model="baseUnit" class="input-ui">
+                        <select placeholder="Unit" v-model="baseUnit" class="input-ui">
                             <option v-for='(uom, index) in uomList' :key=index :value=uom.id>{{ uom.name }}</option>
                         </select>
 
@@ -219,7 +223,7 @@
                         <label for="" class="label-form mb-3">
                             Conversion Unit
                         </label>
-                        <select type="text" placeholder="Unit" v-model="conversionUnit" class="input-ui">
+                        <select placeholder="Unit" v-model="conversionUnit" class="input-ui">
                             <option v-for='(uom, index) in uomList' :key=index :value=uom.id>{{ uom.name }}</option>
                         </select>
                     </div>
@@ -326,7 +330,7 @@
                         <label for="" class="block text-sm text-black mb-3">
                             Base Unit
                         </label>
-                        <select type="text" placeholder="Unit" v-model="baseUnitedit"
+                        <select  placeholder="Unit" v-model="baseUnitedit"
                             class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
                             <option v-for='(uom, index) in uomList' :key=index :value=uom.id>{{ uom.name }}</option>
                         </select>
@@ -335,7 +339,7 @@
                         <label for="" class="block text-sm text-black mb-3">
                             Conversion Unit
                         </label>
-                        <select type="text" placeholder="Unit" v-model="conversionUnitedit"
+                        <select  placeholder="Unit" v-model="conversionUnitedit"
                             class="text-sm border border-gray-300 input-ui w-full bg-transparent rounded-lg focus:ring-0">
                             <option v-for='(uom, index) in uomList' :key=index :value=uom.id>{{ uom.name }}</option>
                         </select>
@@ -392,6 +396,8 @@ export default {
             perPage: 0,
             lastPage: 0,
             totalData:0,
+
+            selectedFile: null,
         };
     },
 
@@ -526,6 +532,40 @@ export default {
             this.searchInput = null;
             this.getUomConversionList(1);
         },
+
+
+
+
+        handleFileChange(event) {
+            console.log("Event object:", event);
+            const selectedFile = event.target.files[0];
+            this.selectedFile = selectedFile;
+            if(this.selectedFile){
+                this.importBtnClicked();
+            }
+        },
+        async importBtnClicked() {
+            let formData = new FormData();
+            formData.append('uom_import', this.selectedFile);
+            let response = await postApiData({ url: '/api/import/uoms', form_data: formData, token: this.getToken() });
+            if (response.success) {
+                this.$notify({
+                    text: `Excel Imported successfully`,
+                    type: "info"
+                });
+                this.selectedFile = null;
+                this.getUomConversionList(1);
+                this.getUom();
+            }
+            else {
+                this.$notify({
+                    text: `Excel Imported failed`,
+                    type: "error"
+                });
+            }
+        },
+
+
 
     },
 

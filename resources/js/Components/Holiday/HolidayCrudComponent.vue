@@ -271,7 +271,7 @@ export default {
             
             let response = await postApiData({url:`/api/hr/public_holidays`, form_data:formData, token:this.getToken()})
             if(response.success){
-                // this.getHolidayList();
+                this.getHolidayList();
                 document.getElementById("close_create_modal").click();
             }
         },
