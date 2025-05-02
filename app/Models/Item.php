@@ -213,9 +213,6 @@ class Item extends BaseModel
             );
     }
 
-
-
-
     public function balance()
     {
         return $this->hasOne(InventoryLedgerItem::class, 'item_id')

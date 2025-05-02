@@ -15,7 +15,7 @@ class UomSeeder extends Seeder
     public function run(): void
     {
         //
-        $name=[
+        $name = [
             'k',
             'kg',
             'g',
@@ -25,21 +25,22 @@ class UomSeeder extends Seeder
             'pack',
         ];
         foreach ($name as $n) {
-            $uom=Uom::create([
+            $uom = Uom::create([
                 'name' => $n,
-                'created_by'=>1,
+                'created_by' => 1,
             ]);
-            if($uom){
+            if ($uom) {
                 UomConversion::firstOrCreate(
                     [
                         'base_unit_id' => $uom->id,
                         'conversion_unit_id' => $uom->id,
-                    ], [
+                    ],
+                    [
                         'base_unit_id' => $uom->id,
                         'conversion_unit_id' => $uom->id,
-                        'conversion'=>1,
-                        'created_by'=>1,
-                        'is_show'=>0
+                        'conversion' => 1,
+                        'created_by' => 1,
+                        'is_show' => 0
                     ]
                 );
             }

@@ -10,7 +10,8 @@ class Category extends BaseModel
 {
     use HasFactory;
 
-    protected $fillable=[
+    protected $fillable = [
+        'category_code',
         'name',
         'is_active',
     ];
