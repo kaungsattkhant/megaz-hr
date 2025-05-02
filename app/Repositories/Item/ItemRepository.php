@@ -118,10 +118,7 @@ class ItemRepository implements ItemRepositoryInterface
                 if (isset($data['base_uom_id']) && isset($data['uom_id'])) {
                     $baseUomId = $data['base_uom_id'];
                     $uomId = $data['uom_id'];
-                    $uomConversion = UomConversion::where('base_unit_id', $baseUomId)
-                        ->where('conversion_unit_id', $uomId)
-                        ->where('is_active', 1)
-                        ->first();
+                    $uomConversion = $this->itemService->uomConversionRate($baseUomId, $uomId);
                     if (!$uomConversion) {
                         return ResponseMessage('No UOM conversion found for the given units.', 404);
                     }
