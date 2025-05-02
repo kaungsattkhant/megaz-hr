@@ -753,6 +753,20 @@
                                 OKR
                             </a>
                         </li>
+                        <li>
+                        <a href="/okr_duty" class="flex items-center @yield('OKR_duty') sidebar-gap-x">
+                            <!-- <i class="fal fa-braille pr-3"></i> -->
+                            <img class="sidebar-img " src="{{ asset('img/icons8-career-64.png') }}" alt="">
+                            OKR Duty
+                        </a>
+                        <li>
+                        <a href="/okr_dashboard" class="flex items-center @yield('okr_dashboard') sidebar-gap-x">
+                            <!-- <i class="fal fa-braille pr-3"></i> -->
+                            <img class="sidebar-img " src="{{ asset('img/icons8-dashboard-48.png') }}" alt="">
+                            OKR Dashboard
+                        </a>
+                    </li>
+                    </li>
                     @endif
 
                     @if(checkFeaturePermission('ktv-product-tree'))
@@ -783,13 +797,9 @@
 
                     
                     
-                    <li>
-                        <a href="/okr_duty" class="flex items-center @yield('OKR_duty') sidebar-gap-x">
-                            <!-- <i class="fal fa-braille pr-3"></i> -->
-                            <img class="sidebar-img " src="{{ asset('img/icons8-career-64.png') }}" alt="">
-                            OKR Duty
-                        </a>
-                    </li>
+                  
+                    @if(checkFeaturePermission('check-in'))
+
                     <li>
                         <a href="/time_shift" class="flex items-center @yield('time_shift') sidebar-gap-x">
                             <!-- <i class="fal fa-braille pr-3"></i> -->
@@ -805,19 +815,21 @@
                         </a>
                     </li>
                     <li>
-                        <a href="/contact" class="flex items-center @yield('contact') sidebar-gap-x">
-                            <!-- <i class="fal fa-braille pr-3"></i> -->
-                            <img class="sidebar-img " src="{{ asset('img/icons8-contact-50.png') }}" alt="">
-                            Contact
-                        </a>
-                    </li>
-                    <li>
                         <a href="/check_in" class="flex items-center @yield('check_in') sidebar-gap-x">
                             <!-- <i class="fal fa-braille pr-3"></i> -->
                             <img class="sidebar-img " src="{{ asset('img/icons8-check-in-64.png') }}" alt="">
                             Check In
                         </a>
                     </li>
+                    @endif
+                    <li>
+                        <a href="/contact" class="flex items-center @yield('contact') sidebar-gap-x">
+                            <!-- <i class="fal fa-braille pr-3"></i> -->
+                            <img class="sidebar-img " src="{{ asset('img/icons8-contact-50.png') }}" alt="">
+                            Contact
+                        </a>
+                    </li>
+                   
                     <li>
                         <a href="/lead_time" class="flex items-center @yield('lead_time') sidebar-gap-x">
                             <!-- <i class="fal fa-braille pr-3"></i> -->
@@ -825,13 +837,8 @@
                             Lead Time
                         </a>
                     </li>
-                    <li>
-                        <a href="/okr_dashboard" class="flex items-center @yield('okr_dashboard') sidebar-gap-x">
-                            <!-- <i class="fal fa-braille pr-3"></i> -->
-                            <img class="sidebar-img " src="{{ asset('img/icons8-dashboard-48.png') }}" alt="">
-                            OKR Dashboard
-                        </a>
-                    </li>
+                    @if(checkFeaturePermission('check-in'))
+                    
                     <li>
                         <a href="/meeting" class="flex items-center @yield('meeting') sidebar-gap-x">
                             <!-- <i class="fal fa-braille pr-3"></i> -->
@@ -923,6 +930,7 @@
                             Salary Batch
                         </a>
                     </li>
+                    @endif
                     
 
                 </ul>

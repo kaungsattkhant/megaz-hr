@@ -313,6 +313,10 @@ Route::middleware(['departments:objective'])->group(function () {
     Route::view('/OKR', 'OKR.index')->name('OKR');
     Route::view('/OKR/create', 'OKR.create')->name('OKR.create');
     Route::view('/OKR/{id}/edit', 'OKR.edit');
+    Route::view('/okr_duty', 'okr_duty.index')->name('okr_duty');
+    Route::view('/okr_duty/create', 'okr_duty.create')->name('okr_duty.create');
+    Route::view('/okr_duty/{id}/edit', 'okr_duty.edit');
+    Route::view('/okr_dashboard', 'okr_dashboard.index')->name('okr_dashboard');
 });
 Route::view('/menu_forecasting', 'menu_forecastings.index')->name('menu_forecasting');
 Route::view('/menu_forecasting/create', 'menu_forecastings.create')->name('menu_forecasting.create');
@@ -335,55 +339,59 @@ Route::middleware(['departments:arrival-item'])->group(function () {
 });
 Route::middleware(['departments:po-order-invoice'])->group(function () {
     Route::view('/purchase_order_invoices', 'purchase_order_invoices.index')->name('purchase_order_invoices');
+    Route::view('/purchase_order_invoices/{id}/confirm', 'purchase_order_invoices.confirm')->name('purchase_order_invoices.confirm');
 });
 
 
-//test
+Route::view('/purchase_orders/{id}/edit', 'purchase_orders.edit');
 
+//test
+Route::view('/lead_time', 'lead_time.index')->name('lead_time');
 Route::view('/suppliers/{id}/lead_times', 'supplier.supplier_leadtime')->name('supplier.lead_times');
 
 Route::view('/creditor', 'creditor.index')->name('creditor');
 Route::view('/creditor/suppliers/{creditorId}/transactions', 'creditor.history')->name('creditor.history');
 
-Route::view('/okr_duty', 'okr_duty.index')->name('okr_duty');
-Route::view('/okr_duty/create', 'okr_duty.create')->name('okr_duty.create');
-Route::view('/okr_duty/{id}/edit', 'okr_duty.edit');
-Route::view('/time_shift', 'time_shift.index')->name('time_shift');
-Route::view('/gps', 'GPS.index')->name('gps');
-Route::view('/check_in', 'check_in.index')->name('check_in');
-Route::view('/contact', 'contact.index')->name('contact');
-Route::view('/lead_time', 'lead_time.index')->name('lead_time');
-Route::view('/okr_dashboard', 'okr_dashboard.index')->name('okr_dashboard');
+//checkin
+Route::middleware(['departments:check-in'])->group(function () {
 
-Route::view('/purchase_orders/{id}/edit', 'purchase_orders.edit');
-Route::view('/meeting', 'meeting.index')->name('meeting');
-Route::view('/meeting/create', 'meeting.create')->name('meeting.create');
-Route::view('/meeting/{id}/edit', 'meeting.edit');
-Route::view('/training', 'training.index')->name('training');
-Route::view('/training/create', 'training.create')->name('training.create');
-Route::view('/training/{id}/edit', 'training.edit');
-Route::view('/org_news', 'org_news.index')->name('org_news');
-Route::view('/org_news/create', 'org_news.create')->name('org_news.create');
-Route::view('/org_news/{id}/edit', 'org_news.edit');
-Route::view('/warning', 'warning.index')->name('warning');
-Route::view('/warning/create', 'warning.create')->name('warning.create');
-Route::view('/warning/{id}/edit', 'warning.edit');
-Route::view('/purchase_order_invoices/{id}/confirm', 'purchase_order_invoices.confirm')->name('purchase_order_invoices.confirm');
-Route::view('/menu_area', 'menu_area.index')->name('menu_area.index');
-Route::view('/off_day', 'off_day.index')->name('off_day.index');
-Route::view('/leave_allowance', 'leave_allowance.index')->name('leave_allowance.index');
-Route::view('/leave_allowance/create', 'leave_allowance.create')->name('leave_allowance.create');
-Route::view('/leave', 'leave.index')->name('leave.index');
-Route::view('/exit_pass', 'exit_pass.index')->name('exit_pass.index');
-Route::view('/holiday', 'holiday.index')->name('holiday.index');
-Route::view('/overtime_fees', 'overtime_fees.index')->name('overtime_fees.index');
-Route::view('/overtime_confirmation', 'overtime_confirmation.index')->name('overtime_confirmation.index');
-Route::view('/salary_setup', 'salary_setup.index')->name('salary_setup.index');
-Route::view('/salary_setup/create', 'salary_setup.create')->name('salary_setup.create');
-Route::view('/salary_setup/{id}/edit', 'salary_setup.edit');
-Route::view('/salary', 'salary.index')->name('salary.index');
-Route::view('/allowance', 'allowance.index')->name('allowance.index');
+    Route::view('/time_shift', 'time_shift.index')->name('time_shift');
+    Route::view('/gps', 'GPS.index')->name('gps');
+    Route::view('/check_in', 'check_in.index')->name('check_in');
+});
 
-Route::view('/salary_batch', 'salary_batch.index')->name('salary_batch.index');
-Route::view('/salary_batch/create', 'salary_batch.create')->name('salary_batch.create');
-Route::view('/salary_batch/{id}/edit', 'salary_batch.edit');
+//hr
+Route::middleware(['departments:hr'])->group(function () {
+
+    Route::view('/contact', 'contact.index')->name('contact');
+    Route::view('/meeting', 'meeting.index')->name('meeting');
+    Route::view('/meeting/create', 'meeting.create')->name('meeting.create');
+    Route::view('/meeting/{id}/edit', 'meeting.edit');
+    Route::view('/training', 'training.index')->name('training');
+    Route::view('/training/create', 'training.create')->name('training.create');
+    Route::view('/training/{id}/edit', 'training.edit');
+    Route::view('/org_news', 'org_news.index')->name('org_news');
+    Route::view('/org_news/create', 'org_news.create')->name('org_news.create');
+    Route::view('/org_news/{id}/edit', 'org_news.edit');
+    Route::view('/warning', 'warning.index')->name('warning');
+    Route::view('/warning/create', 'warning.create')->name('warning.create');
+    Route::view('/warning/{id}/edit', 'warning.edit');
+    Route::view('/menu_area', 'menu_area.index')->name('menu_area.index');
+    Route::view('/off_day', 'off_day.index')->name('off_day.index');
+    Route::view('/leave_allowance', 'leave_allowance.index')->name('leave_allowance.index');
+    Route::view('/leave_allowance/create', 'leave_allowance.create')->name('leave_allowance.create');
+    Route::view('/leave', 'leave.index')->name('leave.index');
+    Route::view('/exit_pass', 'exit_pass.index')->name('exit_pass.index');
+    Route::view('/holiday', 'holiday.index')->name('holiday.index');
+    Route::view('/overtime_fees', 'overtime_fees.index')->name('overtime_fees.index');
+    Route::view('/overtime_confirmation', 'overtime_confirmation.index')->name('overtime_confirmation.index');
+    Route::view('/salary_setup', 'salary_setup.index')->name('salary_setup.index');
+    Route::view('/salary_setup/create', 'salary_setup.create')->name('salary_setup.create');
+    Route::view('/salary_setup/{id}/edit', 'salary_setup.edit');
+    Route::view('/salary', 'salary.index')->name('salary.index');
+    Route::view('/allowance', 'allowance.index')->name('allowance.index');
+
+    Route::view('/salary_batch', 'salary_batch.index')->name('salary_batch.index');
+    Route::view('/salary_batch/create', 'salary_batch.create')->name('salary_batch.create');
+    Route::view('/salary_batch/{id}/edit', 'salary_batch.edit');
+});
