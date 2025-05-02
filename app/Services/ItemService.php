@@ -22,7 +22,7 @@ class ItemService
   {
     return UomConversion::where('base_unit_id', $baseUomId)
       ->where('conversion_unit_id', $uomId)
-      ->where('is_active', 1)
+      ->where('is_active', 1)->where('is_show', 1)
       ->first();
   }
 }

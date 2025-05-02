@@ -42,15 +42,11 @@ class ItemsImport implements ToModel, WithHeadingRow, WithValidation, SkipsOnErr
 
         $categoryId = Category::where('category_code', $row['category_code'])->value('id');
         $itemTypeId = ItemType::where('item_type_code', $row['item_type_code'])->value('id');
-        $baseUomId = Uom::where('uom_code', $row['base_uom_code'])->value('id') ?? null;
-        $uomId = Uom::where('uom_code', $row['uom_code'])->value('id') ?? null;
+        $baseUomId = Uom::where('uom_code', $row['base_uom_code'])->value('id');
+        $uomId = Uom::where('uom_code', $row['uom_code'])->value('id');
         $minHoldingBaseUomQuantity = $row['min_holding_base_uom_quantity'] ?? 0;
         $minHoldingUomQuantity = $row['min_holding_uom_quantity'] ?? 0;
-        // $uomConversion = $this->itemService->uomConversionRate($baseUomId, $uomId);
-        $uomConversion = UomConversion::where('base_unit_id', $baseUomId)
-            ->where('conversion_unit_id', $uomId)
-            ->where('is_active', 1)
-            ->first();
+        $uomConversion = $this->itemService->uomConversionRate($baseUomId, $uomId);
         if (!$uomConversion) {
             return ResponseMessage('No UOM conversion found for the given units.', 404);
         }
@@ -79,26 +75,26 @@ class ItemsImport implements ToModel, WithHeadingRow, WithValidation, SkipsOnErr
     public function rules(): array
     {
         return [
-            'name' => [
-                'required',
-            ],
-            'code' => [
-                'required',
-                Rule::unique('items', 'code'),
-                function ($attribute, $value, $fail) {
-                    if (in_array($value, $this->importedCodes)) {
-                        $fail("The $attribute '{$value}' is duplicated in the file.");
-                    } else {
-                        $this->importedCodes[] = $value;
-                    }
-                },
-            ],
-            'category_code' => 'required|string|max:255',
-            'item_type_code' => 'required',
-            'base_uom_code' => 'required',
-            'uom_code' => '',
-            'min_holding_base_uom_quantity' => 'required',
-            'min_holding_uom_quantity' => '',
+            // 'name' => [
+            //     'required',
+            // ],
+            // 'code' => [
+            //     'required',
+            //     Rule::unique('items', 'code'),
+            //     function ($attribute, $value, $fail) {
+            //         if (in_array($value, $this->importedCodes)) {
+            //             $fail("The $attribute '{$value}' is duplicated in the file.");
+            //         } else {
+            //             $this->importedCodes[] = $value;
+            //         }
+            //     },
+            // ],
+            // 'category_code' => 'required|string|max:255',
+            // 'item_type_code' => 'required',
+            // 'base_uom_code' => 'required',
+            // 'uom_code' => '',
+            // 'min_holding_base_uom_quantity' => 'required',
+            // 'min_holding_uom_quantity' => '',
         ];
     }
 
