@@ -1,67 +1,70 @@
 <nav id="sidebar_admin" class="side-bar w-fit pt-0 h-[100vh]">
     <div class="relative">
-        <button type="button" id="toggleBtn" class="py-3 px-2 absolute left-full top-8 bg-[#fafafa] text-black rounded-tr-md rounded-br-md border-gray-400 ">
+        <button type="button" id="toggleBtn"
+            class="py-3 px-2 absolute left-full top-8 bg-[#fafafa] text-black rounded-tr-md rounded-br-md border-gray-400 ">
             <i class="fas fa-chevron-double-left ease-linear" style="transition:transform 0.5s ease;"></i>
         </button>
 
-        
+
 
         <!-- <input type="text" id="sidebar-search" placeholder="Search links..." class="mx-2 mt-4 rounded-md"> -->
 
         <div class="relative pb-20 small-scrollbar h-[100vh]" onmouseover="this.style.overflowY='scroll'"
             onmouseout="this.style.overflowY='hidden'">
-            
+
 
             <div class="relative w-[15rem] pt-12">
                 <ul class=" mb-4">
                     @if(checkFeaturePermission('financial-report'))
-                    <li>
-                        <button class="flex items-center pl-9 my-2 text-sm w-full" type="button" data-te-collapse-init
-                            data-te-ripple-init data-te-ripple-color="light" data-te-target="#collapseFinanceReport"
-                            aria-expanded="false" aria-controls="collapseExample">
-                            <i class="fal fa-chart-line  pr-3"></i>
-                            Finance Report <i class="fas fa-angle-down absolute right-2"></i>
-                        </button>
-                        <div class="!visible @yield('cash_flow_collapse')hidden text-center" id="collapseFinanceReport"
-                            data-te-collapse-item>
-                            <ul>
-                                <li>
-                                    <a href="/cash_flow_statement"
-                                        class="flex items-center text-left @yield('cash_flow_statement')">
-                                        <i class="fal fa-tasks  pr-3"></i>
-                                        Cash Flow
-                                    </a>
-                                </li>
-                                <li>
-                                    <a href="/indirect_cashflow_statement"
-                                        class="flex items-center text-left @yield('indirect_cashflow_statement')">
-                                        <i class="fal fa-tasks  pr-3"></i>
-                                        Indirect Cash Flow
-                                    </a>
-                                </li>
+                        <li>
+                            <button class="flex items-center pl-9 my-2 text-sm w-full" type="button" data-te-collapse-init
+                                data-te-ripple-init data-te-ripple-color="light" data-te-target="#collapseFinanceReport"
+                                aria-expanded="false" aria-controls="collapseExample">
+                                <i class="fal fa-chart-line  pr-3"></i>
+                                Finance Report <i class="fas fa-angle-down absolute right-2"></i>
+                            </button>
+                            <div class="!visible @yield('cash_flow_collapse')hidden text-center" id="collapseFinanceReport"
+                                data-te-collapse-item>
+                                <ul>
+                                    <li>
+                                        <a href="/cash_flow_statement"
+                                            class="flex items-center text-left @yield('cash_flow_statement')">
+                                            <i class="fal fa-tasks  pr-3"></i>
+                                            Cash Flow
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a href="/indirect_cashflow_statement"
+                                            class="flex items-center text-left @yield('indirect_cashflow_statement')">
+                                            <i class="fal fa-tasks  pr-3"></i>
+                                            Indirect Cash Flow
+                                        </a>
+                                    </li>
 
-                                <li>
-                                    <a href="/working_capital" class="flex items-center text-left @yield('working_capital')">
-                                        <i class="fal fa-braille pr-3"></i>
-                                        Working Capital
-                                    </a>
-                                </li>
-                                <li>
-                                    <a href="/ap_balances" class="flex items-center text-left @yield('ap_balances')">
-                                        <i class="fal fa-braille pr-3"></i>
-                                        AP Balance
-                                    </a>
-                                </li>
-                                <li>
-                                    <a href="/creditor_balances" class="flex items-center text-left @yield('creditor_balances')">
-                                        <i class="fal fa-braille pr-3"></i>
-                                        Creditor Balance
-                                    </a>
-                                </li>
+                                    <li>
+                                        <a href="/working_capital"
+                                            class="flex items-center text-left @yield('working_capital')">
+                                            <i class="fal fa-braille pr-3"></i>
+                                            Working Capital
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a href="/ap_balances" class="flex items-center text-left @yield('ap_balances')">
+                                            <i class="fal fa-braille pr-3"></i>
+                                            AP Balance
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a href="/creditor_balances"
+                                            class="flex items-center text-left @yield('creditor_balances')">
+                                            <i class="fal fa-braille pr-3"></i>
+                                            Creditor Balance
+                                        </a>
+                                    </li>
 
-                            </ul>
-                        </div>
-                    </li>
+                                </ul>
+                            </div>
+                        </li>
                     @endif
                     @if(checkFeaturePermission('sale-target'))
                         <li>
@@ -140,18 +143,19 @@
                     @endif -->
                     @if (checkFeaturePermission('mrp'))
                         <li>
-                            <a href="{{ route('menu_categories') }}" class="flex items-center @yield('menu_categories') sidebar-gap-x">
+                            <a href="{{ route('menu_categories') }}"
+                                class="flex items-center @yield('menu_categories') sidebar-gap-x">
                                 <!-- <i class="fal fa-clipboard-list  pr-3"></i> -->
                                 <img class=" sidebar-img" src="{{ asset('img/icons8-menu-50 (2).png') }}" alt="">
                                 Menu Categories
                             </a>
                         </li>
                         <!-- <li>
-                            <a href="{{ route('menus') }}" class="flex items-center @yield('menus')">
-                                <i class="fal fa-clipboard-list  pr-3"></i>
-                                Selling Menus
-                            </a>
-                        </li> -->
+                                <a href="{{ route('menus') }}" class="flex items-center @yield('menus')">
+                                    <i class="fal fa-clipboard-list  pr-3"></i>
+                                    Selling Menus
+                                </a>
+                            </li> -->
                         <li>
                             <a href="{{ route('menu_sale_report.index') }}"
                                 class="flex items-center @yield('menu_sale_report') sidebar-gap-x">
@@ -161,7 +165,8 @@
                             </a>
                         </li>
                         <li>
-                            <a href="{{ route('menu_costing.index') }}" class="flex items-center @yield('menu_costing') sidebar-gap-x">
+                            <a href="{{ route('menu_costing.index') }}"
+                                class="flex items-center @yield('menu_costing') sidebar-gap-x">
                                 <img class=" sidebar-img" src="{{ asset('img/icons8-estimate-50.png') }}" alt="">
                                 <!-- <i class="fal fa-clipboard-list  pr-3"></i> -->
                                 Menu Costing
@@ -234,7 +239,8 @@
 
                     @if(checkFeaturePermission('cooking-place'))
                         <li>
-                            <a href="{{ route('cookingPlace') }}" class="flex items-center @yield('cooking_place') sidebar-gap-x">
+                            <a href="{{ route('cookingPlace') }}"
+                                class="flex items-center @yield('cooking_place') sidebar-gap-x">
                                 <!-- <i class="far fa-hat-chef"></i> -->
                                 <img class=" sidebar-img" src="{{ asset('img/icons8-cooking-50.png') }}" alt="">
                                 Cooking Place
@@ -244,7 +250,8 @@
 
                     @if (checkFeaturePermission('department'))
                         <li>
-                            <a href="{{ route('departments') }}" class="flex items-center @yield('departments') sidebar-gap-x">
+                            <a href="{{ route('departments') }}"
+                                class="flex items-center @yield('departments') sidebar-gap-x">
                                 <!-- <i class="fal fa-network-wired  pr-3"></i> -->
                                 <img class=" sidebar-img" src="{{ asset('img/icons8-department-50.png') }}" alt="">
                                 Department
@@ -270,7 +277,8 @@
                         </li>
 
                         <li>
-                            <a href="{{ route('custom_tasks') }}" class="flex items-center @yield('custom_tasks') sidebar-gap-x">
+                            <a href="{{ route('custom_tasks') }}"
+                                class="flex items-center @yield('custom_tasks') sidebar-gap-x">
                                 <!-- <i class="fal fa-tasks  pr-3"></i> -->
                                 <img class=" sidebar-img" src="{{ asset('img/icons8-task-50.png') }}" alt="">
                                 Custom Tasks
@@ -278,7 +286,8 @@
                         </li>
 
                         <li>
-                            <a href="{{ route('task_report') }}" class="flex items-center @yield('tasks_reports') sidebar-gap-x">
+                            <a href="{{ route('task_report') }}"
+                                class="flex items-center @yield('tasks_reports') sidebar-gap-x">
                                 <!-- <i class="fal fa-tasks  pr-3"></i> -->
                                 <img class=" sidebar-img" src="{{ asset('img/icons8-task-50.png') }}" alt="">
                                 Report Tasks
@@ -366,7 +375,8 @@
                             </a>
                         </li>
                         <li>
-                            <a href="{{ route('menu_costing.index') }}" class="flex items-center @yield('menu_costing') sidebar-gap-x">
+                            <a href="{{ route('menu_costing.index') }}"
+                                class="flex items-center @yield('menu_costing') sidebar-gap-x">
                                 <img class=" sidebar-img" src="{{ asset('img/icons8-estimate-50.png') }}" alt="">
                                 <!-- <i class="fal fa-clipboard-list  pr-3"></i> -->
                                 Menu Costing
@@ -412,7 +422,8 @@
                     @endif
                     @if (checkFeaturePermission('inventory'))
                         <li>
-                            <a href="{{ route('inventories') }}" class="flex items-center @yield('inventories') sidebar-gap-x">
+                            <a href="{{ route('inventories') }}"
+                                class="flex items-center @yield('inventories') sidebar-gap-x">
                                 <!-- <i class="fal fa-inventory  pr-3"></i> -->
                                 <img class=" sidebar-img" src="{{ asset('img/icons8-inventory-50.png') }}" alt="">
                                 Inventories
@@ -421,7 +432,8 @@
                     @endif
                     @if (checkFeaturePermission('supplier'))
                         <li>
-                            <a href="{{ route('suppliers.index') }}" class="flex items-center @yield('supplier') sidebar-gap-x">
+                            <a href="{{ route('suppliers.index') }}"
+                                class="flex items-center @yield('supplier') sidebar-gap-x">
                                 <img class=" sidebar-img" src="{{ asset('img/icons8-supplier-48.png') }}" alt="">
                                 <!-- <i class="fal fa-tasks  pr-3"></i> -->
                                 Suppliers
@@ -453,7 +465,8 @@
                             <div class="!visible hidden text-center" id="collapseCashbooks" data-te-collapse-item>
                                 <ul>
                                     <li>
-                                        <a href="{{ route('office_cash') }}" class="flex items-center @yield('office_cash')">
+                                        <a href="{{ route('office_cash') }}"
+                                            class="flex items-center @yield('office_cash')">
                                             <i class="fal fa-tasks  pr-3"></i>
                                             Office Cash Book
                                         </a>
@@ -465,13 +478,15 @@
                                         </a>
                                     </li>
                                     <li>
-                                        <a href="{{ route('service_cash') }}" class="flex items-center @yield('service_cash')">
+                                        <a href="{{ route('service_cash') }}"
+                                            class="flex items-center @yield('service_cash')">
                                             <i class="fal fa-tasks  pr-3"></i>
                                             Service Cash Book
                                         </a>
                                     </li>
                                     <li>
-                                        <a href="{{ route('advance_cash') }}" class="flex items-center @yield('advance_cash')">
+                                        <a href="{{ route('advance_cash') }}"
+                                            class="flex items-center @yield('advance_cash')">
                                             <i class="fal fa-tasks  pr-3"></i>
                                             Advance Cash Book
                                         </a>
@@ -534,23 +549,24 @@
                     @endif
                     @if (checkFeaturePermission('purchase-order'))
                         <li>
-                            <a href="{{ route('purchase_orders') }}" class="flex items-center @yield('purchase_orders') sidebar-gap-x">
+                            <a href="{{ route('purchase_orders') }}"
+                                class="flex items-center @yield('purchase_orders') sidebar-gap-x">
                                 <img class="sidebar-img " src="{{ asset('img/icons8-order-48.png') }}" alt="">
                                 <!-- <i class="fal fa-truck-loading  pr-3"></i> -->
                                 Purchase Orders
                             </a>
                         </li>
                     @endif
-                        @if (checkFeaturePermission('purchase-order-confirmation'))
-                            <li>
-                                <a href="{{ route('purchase_orders.confirm_poitems') }}"
-                                    class="flex items-center @yield('confirm_purchase_order_items') sidebar-gap-x">
-                                    <img class="sidebar-img " src="{{ asset('img/icons8-shopping-cart-48.png') }}" alt="">
-                                    <!-- <i class="fal fa-truck-loading  pr-3"></i> -->
-                                    Confirm Purchase Order Items
-                                </a>
-                            </li>
-                        @endif
+                    @if (checkFeaturePermission('purchase-order-confirmation'))
+                        <li>
+                            <a href="{{ route('purchase_orders.confirm_poitems') }}"
+                                class="flex items-center @yield('confirm_purchase_order_items') sidebar-gap-x">
+                                <img class="sidebar-img " src="{{ asset('img/icons8-shopping-cart-48.png') }}" alt="">
+                                <!-- <i class="fal fa-truck-loading  pr-3"></i> -->
+                                Confirm Purchase Order Items
+                            </a>
+                        </li>
+                    @endif
                     @if (checkFeaturePermission('purchase-order-item-left'))
                         <li>
                             <a href="{{ route('purchase_orders.left_items_index') }}"
@@ -563,33 +579,37 @@
                     @endif
                     @if (checkFeaturePermission('po-order'))
 
-                    <li>
-                        <a href="{{ route('procurement_order_items') }}" class="flex items-center @yield('procurement_order_items') sidebar-gap-x">
-                            <img class="sidebar-img " src="{{ asset('img/icons8-shopping-cart-48.png') }}" alt="">
-                            <!-- <i class="fal fa-truck-loading  pr-3"></i> -->
-                            Procurement Order Items
-                        </a>
-                    </li>
+                        <li>
+                            <a href="{{ route('procurement_order_items') }}"
+                                class="flex items-center @yield('procurement_order_items') sidebar-gap-x">
+                                <img class="sidebar-img " src="{{ asset('img/icons8-shopping-cart-48.png') }}" alt="">
+                                <!-- <i class="fal fa-truck-loading  pr-3"></i> -->
+                                Procurement Order Items
+                            </a>
+                        </li>
                     @endif
                     @if (checkFeaturePermission('arrival-item'))
-                    
-                    <li>
-                        <a href="{{ route('arrival_items') }}" class="flex items-center @yield('arrival_items') sidebar-gap-x">
-                            <img class="sidebar-img " src="{{ asset('img/icons8-add-to-shopping-basket-48.png') }}" alt="">
-                            <!-- <i class="fal fa-truck-loading  pr-3"></i> -->
-                            Arrival Items
-                        </a>
-                    </li>
+
+                        <li>
+                            <a href="{{ route('arrival_items') }}"
+                                class="flex items-center @yield('arrival_items') sidebar-gap-x">
+                                <img class="sidebar-img " src="{{ asset('img/icons8-add-to-shopping-basket-48.png') }}"
+                                    alt="">
+                                <!-- <i class="fal fa-truck-loading  pr-3"></i> -->
+                                Arrival Items
+                            </a>
+                        </li>
                     @endif
                     @if (checkFeaturePermission('po-order-invoice'))
 
-                    <li>
-                        <a href="{{ route('purchase_order_invoices') }}" class="flex items-center @yield('purchase_order_invoices') sidebar-gap-x">
-                            <img class="sidebar-img " src="{{ asset('img/icons8-shopping-cart-48.png') }}" alt="">
-                            <!-- <i class="fal fa-truck-loading  pr-3"></i> -->
-                            Purchase Order Invoices
-                        </a>
-                    </li>
+                        <li>
+                            <a href="{{ route('purchase_order_invoices') }}"
+                                class="flex items-center @yield('purchase_order_invoices') sidebar-gap-x">
+                                <img class="sidebar-img " src="{{ asset('img/icons8-shopping-cart-48.png') }}" alt="">
+                                <!-- <i class="fal fa-truck-loading  pr-3"></i> -->
+                                Purchase Order Invoices
+                            </a>
+                        </li>
                     @endif
                     @if (checkFeaturePermission('fixed-asset'))
                         <li>
@@ -637,14 +657,16 @@
                     @endif
                     @if (checkFeaturePermission('inventory-transfer-list'))
                         <li>
-                            <a href="{{ route('transfers.index') }}" class="flex items-center @yield('inventory_histories') sidebar-gap-x">
+                            <a href="{{ route('transfers.index') }}"
+                                class="flex items-center @yield('inventory_histories') sidebar-gap-x">
                                 <!-- <i class="fal fa-user  pr-3"></i> -->
                                 <img class=" sidebar-img" src="{{ asset('img/icons8-inventory-50.png') }}" alt="">
                                 Inventory Transfer Histories
                             </a>
                         </li>
                         <li>
-                            <a href="{{ route('transfers.receives') }}" class="flex items-center @yield('inventory_receives') sidebar-gap-x">
+                            <a href="{{ route('transfers.receives') }}"
+                                class="flex items-center @yield('inventory_receives') sidebar-gap-x">
                                 <!-- <i class="fal fa-user  pr-3"></i> -->
                                 <img class=" sidebar-img" src="{{ asset('img/icons8-inventory-50.png') }}" alt="">
                                 Inventory Receives List
@@ -688,7 +710,8 @@
 
                     @if (checkFeaturePermission('package'))
                         <li>
-                            <a href="{{ route('packages.index') }}" class="flex items-center @yield('packages') sidebar-gap-x">
+                            <a href="{{ route('packages.index') }}"
+                                class="flex items-center @yield('packages') sidebar-gap-x">
                                 <!-- <i class="fal fa-truck-loading  pr-3"></i> -->
                                 <img class="sidebar-img " src="{{ asset('img/icons8-packages-50.png') }}" alt="">
                                 Packages
@@ -754,19 +777,19 @@
                             </a>
                         </li>
                         <li>
-                        <a href="/okr_duty" class="flex items-center @yield('OKR_duty') sidebar-gap-x">
-                            <!-- <i class="fal fa-braille pr-3"></i> -->
-                            <img class="sidebar-img " src="{{ asset('img/icons8-career-64.png') }}" alt="">
-                            OKR Duty
-                        </a>
+                            <a href="/okr_duty" class="flex items-center @yield('OKR_duty') sidebar-gap-x">
+                                <!-- <i class="fal fa-braille pr-3"></i> -->
+                                <img class="sidebar-img " src="{{ asset('img/icons8-career-64.png') }}" alt="">
+                                OKR Duty
+                            </a>
                         <li>
-                        <a href="/okr_dashboard" class="flex items-center @yield('okr_dashboard') sidebar-gap-x">
-                            <!-- <i class="fal fa-braille pr-3"></i> -->
-                            <img class="sidebar-img " src="{{ asset('img/icons8-dashboard-48.png') }}" alt="">
-                            OKR Dashboard
-                        </a>
-                    </li>
-                    </li>
+                            <a href="/okr_dashboard" class="flex items-center @yield('okr_dashboard') sidebar-gap-x">
+                                <!-- <i class="fal fa-braille pr-3"></i> -->
+                                <img class="sidebar-img " src="{{ asset('img/icons8-dashboard-48.png') }}" alt="">
+                                OKR Dashboard
+                            </a>
+                        </li>
+                        </li>
                     @endif
 
                     @if(checkFeaturePermission('ktv-product-tree'))
@@ -795,32 +818,32 @@
                     </li>
                     <!-- @endif -->
 
-                    
-                    
-                  
+
+
+
                     @if(checkFeaturePermission('check-in'))
 
-                    <li>
-                        <a href="/time_shift" class="flex items-center @yield('time_shift') sidebar-gap-x">
-                            <!-- <i class="fal fa-braille pr-3"></i> -->
-                            <img class="sidebar-img " src="{{ asset('img/icons8-time-shift-50.png') }}" alt="">
-                            Time Shift
-                        </a>
-                    </li>
-                    <li>
-                        <a href="/gps" class="flex items-center @yield('gps') sidebar-gap-x">
-                            <!-- <i class="fal fa-braille pr-3"></i> -->
-                            <img class="sidebar-img " src="{{ asset('img/icons8-gps-48.png') }}" alt="">
-                            GPS
-                        </a>
-                    </li>
-                    <li>
-                        <a href="/check_in" class="flex items-center @yield('check_in') sidebar-gap-x">
-                            <!-- <i class="fal fa-braille pr-3"></i> -->
-                            <img class="sidebar-img " src="{{ asset('img/icons8-check-in-64.png') }}" alt="">
-                            Check In
-                        </a>
-                    </li>
+                        <li>
+                            <a href="/time_shift" class="flex items-center @yield('time_shift') sidebar-gap-x">
+                                <!-- <i class="fal fa-braille pr-3"></i> -->
+                                <img class="sidebar-img " src="{{ asset('img/icons8-time-shift-50.png') }}" alt="">
+                                Time Shift
+                            </a>
+                        </li>
+                        <li>
+                            <a href="/gps" class="flex items-center @yield('gps') sidebar-gap-x">
+                                <!-- <i class="fal fa-braille pr-3"></i> -->
+                                <img class="sidebar-img " src="{{ asset('img/icons8-gps-48.png') }}" alt="">
+                                GPS
+                            </a>
+                        </li>
+                        <li>
+                            <a href="/check_in" class="flex items-center @yield('check_in') sidebar-gap-x">
+                                <!-- <i class="fal fa-braille pr-3"></i> -->
+                                <img class="sidebar-img " src="{{ asset('img/icons8-check-in-64.png') }}" alt="">
+                                Check In
+                            </a>
+                        </li>
                     @endif
                     <li>
                         <a href="/contact" class="flex items-center @yield('contact') sidebar-gap-x">
@@ -829,7 +852,7 @@
                             Contact
                         </a>
                     </li>
-                   
+
                     <li>
                         <a href="/lead_time" class="flex items-center @yield('lead_time') sidebar-gap-x">
                             <!-- <i class="fal fa-braille pr-3"></i> -->
@@ -838,100 +861,113 @@
                         </a>
                     </li>
                     @if(checkFeaturePermission('check-in'))
-                    
-                    <li>
-                        <a href="/meeting" class="flex items-center @yield('meeting') sidebar-gap-x">
-                            <!-- <i class="fal fa-braille pr-3"></i> -->
-                            <img class="sidebar-img " src="{{ asset('img/icons8-meeting-50.png') }}" alt="">
-                            Meeting
-                        </a>
-                    </li>
-                    <li>
-                        <a href="/training" class="flex items-center @yield('training') sidebar-gap-x">
-                            <img class="sidebar-img " src="{{ asset('img/icons8-training-50.png') }}" alt="">
-                            Training
-                        </a>
-                    </li>
-                    <li>
-                        <a href="/org_news" class="flex items-center @yield('org_news') sidebar-gap-x">
-                            <img class="sidebar-img " src="{{ asset('img/icons8-news-50.png') }}" alt="">
-                            OrgNews
-                        </a>
-                    </li>
-                    <li>
-                        <a href="/warning" class="flex items-center @yield('warning') sidebar-gap-x">
-                            <img class="sidebar-img " src="{{ asset('img/icons8-warning-64.png') }}" alt="">
-                            Warning
-                        </a>
-                    </li>
-                    <li>
-                        <a href="/menu_area" class="flex items-center @yield('menu_area') sidebar-gap-x">
-                            <img class="sidebar-img " src="{{ asset('img/icons8-warning-64.png') }}" alt="">
-                            Menu Area
-                        </a>
-                    </li>
-                    <li>
-                        <a href="/off_day" class="flex items-center @yield('off_day') sidebar-gap-x">
-                            <img class="sidebar-img " src="{{ asset('img/icons8-warning-64.png') }}" alt="">
-                            Off Day
-                        </a>
-                    </li>
-                    <li>
-                        <a href="/leave_allowance" class="flex items-center @yield('leave_allowance') sidebar-gap-x">
-                            <img class="sidebar-img " src="{{ asset('img/icons8-warning-64.png') }}" alt="">
-                            Leave Allowance
-                        </a>
-                    </li>
-                    <li>
-                        <a href="/leave" class="flex items-center @yield('leave') sidebar-gap-x">
-                            <img class="sidebar-img " src="{{ asset('img/icons8-warning-64.png') }}" alt="">
-                            Leave
-                        </a>
-                    </li>
-                    <li>
-                        <a href="/exit_pass" class="flex items-center @yield('exit_pass') sidebar-gap-x">
-                            <img class="sidebar-img " src="{{ asset('img/icons8-warning-64.png') }}" alt="">
-                            Exit Pass
-                        </a>
-                    </li>
-                    <li>
-                        <a href="/overtime_fees" class="flex items-center @yield('overtime_fees') sidebar-gap-x">
-                            <img class="sidebar-img " src="{{ asset('img/icons8-warning-64.png') }}" alt="">
-                            Overtime Fees
-                        </a>
-                    </li>
-                    <li>
-                        <a href="/overtime_confirmation" class="flex items-center @yield('overtime_confirmation') sidebar-gap-x">
-                            <img class="sidebar-img " src="{{ asset('img/icons8-warning-64.png') }}" alt="">
-                            Overtime
-                        </a>
-                    </li>
-                    <li>
-                        <a href="/salary_setup" class="flex items-center @yield('salary_setup') sidebar-gap-x">
-                            <img class="sidebar-img " src="{{ asset('img/icons8-warning-64.png') }}" alt="">
-                            Salary Setup
-                        </a>
-                    </li>
-                    <li>
-                        <a href="/salary" class="flex items-center @yield('salary') sidebar-gap-x">
-                            <img class="sidebar-img " src="{{ asset('img/icons8-warning-64.png') }}" alt="">
-                            Salary
-                        </a>
-                    </li>
-                    <li>
-                        <a href="/allowance" class="flex items-center @yield('allowance') sidebar-gap-x">
-                            <img class="sidebar-img " src="{{ asset('img/icons8-warning-64.png') }}" alt="">
-                            Allowance
-                        </a>
-                    </li>
-                    <li>
-                        <a href="/salary_batch" class="flex items-center @yield('salary_batch') sidebar-gap-x">
-                            <img class="sidebar-img " src="{{ asset('img/icons8-warning-64.png') }}" alt="">
-                            Salary Batch
-                        </a>
-                    </li>
+
+                        <li>
+                            <a href="/meeting" class="flex items-center @yield('meeting') sidebar-gap-x">
+                                <!-- <i class="fal fa-braille pr-3"></i> -->
+                                <img class="sidebar-img " src="{{ asset('img/icons8-meeting-50.png') }}" alt="">
+                                Meeting
+                            </a>
+                        </li>
+                        <li>
+                            <a href="/training" class="flex items-center @yield('training') sidebar-gap-x">
+                                <img class="sidebar-img " src="{{ asset('img/icons8-training-50.png') }}" alt="">
+                                Training
+                            </a>
+                        </li>
+                        <li>
+                            <a href="/org_news" class="flex items-center @yield('org_news') sidebar-gap-x">
+                                <img class="sidebar-img " src="{{ asset('img/icons8-news-50.png') }}" alt="">
+                                OrgNews
+                            </a>
+                        </li>
+                        <li>
+                            <a href="/warning" class="flex items-center @yield('warning') sidebar-gap-x">
+                                <img class="sidebar-img " src="{{ asset('img/icons8-warning-64.png') }}" alt="">
+                                Warning
+                            </a>
+                        </li>
+                        <li>
+                            <a href="/menu_area" class="flex items-center @yield('menu_area') sidebar-gap-x">
+                                <img class="sidebar-img " src="{{ asset('img/icons8-warning-64.png') }}" alt="">
+                                Menu Area
+                            </a>
+                        </li>
+                        <li>
+                            <a href="/off_day" class="flex items-center @yield('off_day') sidebar-gap-x">
+                                <img class="sidebar-img " src="{{ asset('img/icons8-warning-64.png') }}" alt="">
+                                Off Day
+                            </a>
+                        </li>
+                        <li>
+                            <a href="/leave_allowance" class="flex items-center @yield('leave_allowance') sidebar-gap-x">
+                                <img class="sidebar-img " src="{{ asset('img/icons8-warning-64.png') }}" alt="">
+                                Leave Allowance
+                            </a>
+                        </li>
+                        <li>
+                            <a href="/leave" class="flex items-center @yield('leave') sidebar-gap-x">
+                                <img class="sidebar-img " src="{{ asset('img/icons8-warning-64.png') }}" alt="">
+                                Leave
+                            </a>
+                        </li>
+                        <li>
+                            <a href="/exit_pass" class="flex items-center @yield('exit_pass') sidebar-gap-x">
+                                <img class="sidebar-img " src="{{ asset('img/icons8-warning-64.png') }}" alt="">
+                                Exit Pass
+                            </a>
+                        </li>
+                        <li>
+                            <a href="/overtime_fees" class="flex items-center @yield('overtime_fees') sidebar-gap-x">
+                                <img class="sidebar-img " src="{{ asset('img/icons8-warning-64.png') }}" alt="">
+                                Overtime Fees
+                            </a>
+                        </li>
+                        <li>
+                            <a href="/overtime_confirmation"
+                                class="flex items-center @yield('overtime_confirmation') sidebar-gap-x">
+                                <img class="sidebar-img " src="{{ asset('img/icons8-warning-64.png') }}" alt="">
+                                Overtime
+                            </a>
+                        </li>
+                        <li>
+                            <a href="/salary_setup" class="flex items-center @yield('salary_setup') sidebar-gap-x">
+                                <img class="sidebar-img " src="{{ asset('img/icons8-warning-64.png') }}" alt="">
+                                Salary Setup
+                            </a>
+                        </li>
+                        <li>
+                            <a href="/salary" class="flex items-center @yield('salary') sidebar-gap-x">
+                                <img class="sidebar-img " src="{{ asset('img/icons8-warning-64.png') }}" alt="">
+                                Salary
+                            </a>
+                        </li>
+                        <li>
+                            <a href="/allowance" class="flex items-center @yield('allowance') sidebar-gap-x">
+                                <img class="sidebar-img " src="{{ asset('img/icons8-warning-64.png') }}" alt="">
+                                Allowance
+                            </a>
+                        </li>
+                        <li>
+                            <a href="/salary_batch" class="flex items-center @yield('salary_batch') sidebar-gap-x">
+                                <img class="sidebar-img " src="{{ asset('img/icons8-warning-64.png') }}" alt="">
+                                Salary Batch
+                            </a>
+                        </li>
                     @endif
-                    
+                    <li>
+                        <a href="/salary_calculate" class="flex items-center @yield('salary_calculate') sidebar-gap-x">
+                            <img class="sidebar-img " src="{{ asset('img/icons8-warning-64.png') }}" alt="">
+                            Salary Calculate
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/pay_slip" class="flex items-center @yield('pay_slip') sidebar-gap-x">
+                            <img class="sidebar-img " src="{{ asset('img/icons8-warning-64.png') }}" alt="">
+                            Pay Slip
+                        </a>
+                    </li>
+
 
                 </ul>
 
