@@ -727,6 +727,12 @@ export default {
                 this.perPage = response.data.per_page;
                 this.totalData = response.data.total;
             }
+            else {
+                this.$notify({
+                    text: response.message,
+                    type: "error"
+                });
+            }
         },
         async createBrand(){
             if(!this.brandName){
