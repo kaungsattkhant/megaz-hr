@@ -31,7 +31,6 @@ class ItemsImport implements ToModel, WithHeadingRow, WithValidation, SkipsOnErr
     private $itemService;
     private $importedCodes = [];
     private $importedNames = [];
-    // private $rows = [];
     public function __construct(ItemService $itemService)
     {
         $this->itemService = $itemService;
