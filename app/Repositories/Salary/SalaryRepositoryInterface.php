@@ -26,6 +26,8 @@ interface SalaryRepositoryInterface
 
   public function createOvertimeFee($data);
 
+  public function deleteOvertimeFee($id);
+
   public function getOvertimeCategories($request);
 
   public function createOvertimeCategories($data);
