@@ -31,7 +31,7 @@
             </div>
             <div class="flex pr-0 gap-x-4">
                 
-                <button  data-te-toggle="modal" data-te-target="#add_exit_modal"
+                <button  data-te-toggle="modal" data-te-target="#add_exit_modal" @click="btnClickedCreateExitModal"
                     class="add-btn  h-8 whitespace-nowrap">
                     Add New
             </button>
@@ -183,7 +183,7 @@
                                 </label>
                                 <div class="bg-white mb-0 w-full inline-block h-[34px] dark:bg-white !text-black !text-sm"
                                     data-te-select-wrapper-ref>
-                                    <select data-te-select-init data-te-select-placeholder="Select Role"
+                                    <select data-te-select-init data-te-select-placeholder="Select Role" @change="selectedRoleChange"
                                         data-te-select-filter="true" name="" id="" v-model="selectedRole" class="input-ui !text-black text-sm">
                                         <option :value="role" v-for="(role, index) in roleList"
                                             :key="index"> {{ role.name }} </option>
@@ -422,17 +422,23 @@ export default {
 
         selectedDepartmentChange(){
             this.roleList = this.selectedDepartment.roles;
-            this.getStaffList();
+            this.selectedRole = null;
+            this.staffList = [];
+            this.selectedStaff = null;
+            // this.getStaffList();
         },
-        // selectedRoleChange(){
-        //     this.getStaffList();
-        // },
-        async getStaffList(){
-            const response = await getApiData({ url: '/api/departments/' + this.selectedDepartment.id + '/staffs', token: this.getToken() });
-            if(response.data){
-                this.staffList = response.data;
+        async selectedRoleChange(){
+            let response = await getApiData({ url: '/api/hr/staff_lists_by_role/' + this.selectedRole.id + '/department/' + this.selectedDepartment.id, token: this.getToken() });
+            if (response.data) {
+                this.staffList = response.data.data;
             }
         },
+        // async getStaffList(){
+        //     const response = await getApiData({ url: '/api/departments/' + this.selectedDepartment.id + '/staffs', token: this.getToken() });
+        //     if(response.data){
+        //         this.staffList = response.data;
+        //     }
+        // },
         // async getStaffList(){
         //     const response = await getApiData({ url: '/api/staff_lists_by_role/' + this.selectedRole.id + '/department/' +this.selectedDepartment.id, token: this.getToken() });
         //     if(response.data){
@@ -464,7 +470,17 @@ export default {
                 this.selectedExitCategory = response.data;
             }
         },
-
+        btnClickedCreateExitModal(){
+            this.selectedDepartment = null;
+            this.roleList = [];
+            this.selectedRole = null;
+            this.staffList = [];
+            this.selectedStaff = null;
+            this.selectedExitCategory = null;
+            this.description = null;
+            this.exitTime = null;
+            this.arrivalTime = null;
+        },
         btnClickedCreateExit(){
             if(!this.selectedStaff){
                 this.alertValidationMessage(`Employee`);
@@ -501,7 +517,7 @@ export default {
             formData.append('detail', this.description);
             formData.append('exit_date_time', this.exitTime);
             formData.append('arrival_date_time', this.arrivalTime);
-            formData.append('status', 'received');
+            formData.append('status', 'confirmed');
 
             // formData.append('confirmed_at', this.currentTime);
             // formData.append('confirmed_by', this.getUser().id);
