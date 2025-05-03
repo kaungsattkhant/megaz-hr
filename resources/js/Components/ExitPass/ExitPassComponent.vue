@@ -401,12 +401,13 @@ export default {
             }
         },
         searchDepartmentChange(){
-            this.url_department = '?department_id='+this.selectedDepartment.id;
-            this.roleList = this.selectedDepartment.roles;
+            this.url_department = '?department_id='+this.searchDepartment.id;
+            this.searchRoleList = this.searchDepartment.roles;
+            this.searchRole = null;
             this.getExitList();
         },
         searchRoleChange(){
-            this.url_role = '&role_id='+this.selectedRole.id;
+            this.url_role = '&role_id='+this.searchRole.id;
             this.getExitList();
         },
         async searchBtnClicked() {
