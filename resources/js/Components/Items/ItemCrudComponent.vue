@@ -734,6 +734,9 @@ export default {
                 });
             }
         },
+
+
+        
         async createBrand(){
             if(!this.brandName){
                 this.alertValiationMessage('Brand Name');
