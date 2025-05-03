@@ -500,12 +500,53 @@ class SalaryRepository implements SalaryRepositoryInterface
 
   public function getSalaryBatch($request)
   {
-    $data = SalaryBatch::with(['salaryBatchStaff.staff'])
-      ->withCount('salaryBatchStaff')
+    // $data = SalaryBatch::with(['salaryBatchStaff.staff'])->withCount('salaryBatchStaff')
+    //   ->orderBy('id', 'desc')
+    //   ->paginate(config('common.list_count'));
+
+    // ResponseData($data);
+
+    $data = SalaryBatch::with(['salaryBatchStaff' => function ($query) use ($request) {
+      $query->whereHas('staff', function ($q) use ($request) {
+        if ($request->role_id) {
+          $q->whereHas('roles', function ($roleQuery) use ($request) {
+            $roleQuery->where('id', $request->role_id);
+          });
+        }
+        if ($request->department_id) {
+          $q->where('department_id', $request->department_id);
+        }
+      })
+        ->with(['staff.roles', 'staff.department']);
+    }])
+      ->whereHas('salaryBatchStaff.staff', function ($q) use ($request) {
+        if ($request->role_id) {
+          $q->whereHas('roles', function ($roleQuery) use ($request) {
+            $roleQuery->where('id', $request->role_id);
+          });
+        }
+        if ($request->department_id) {
+          $q->where('department_id', $request->department_id);
+        }
+      })->when($request->search_input, function ($q) use ($request) {
+        $q->where('name', 'LIKE', '%' . $request->search_input . '%');
+      })
+      ->withCount(['salaryBatchStaff' => function ($query) use ($request) {
+        $query->whereHas('staff', function ($q) use ($request) {
+          if ($request->role_id) {
+            $q->whereHas('roles', function ($roleQuery) use ($request) {
+              $roleQuery->where('id', $request->role_id);
+            });
+          }
+          if ($request->department_id) {
+            $q->where('department_id', $request->department_id);
+          }
+        });
+      }])
       ->orderBy('id', 'desc')
       ->paginate(config('common.list_count'));
 
-    ResponseData($data);
+    return ResponseData($data);
   }
 
   public function getSalaryBatchById($id)
@@ -879,6 +920,18 @@ class SalaryRepository implements SalaryRepositoryInterface
   public function getPaySlips($request)
   {
     return PaySlip::with(['staff.department', 'staff.roles'])
+      ->when($request->role_id || $request->department_id, function ($query) use ($request) {
+        $query->whereHas('staff', function ($q) use ($request) {
+          if ($request->role_id) {
+            $q->whereHas('roles', function ($roleQuery) use ($request) {
+              $roleQuery->where('id', $request->role_id);
+            });
+          }
+          if ($request->department_id) {
+            $q->where('department_id', $request->department_id);
+          }
+        });
+      })
 
       ->orderBy('id', 'desc')
       ->paginate(config('common.list_count'));
