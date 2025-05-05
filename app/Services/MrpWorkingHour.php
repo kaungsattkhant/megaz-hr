@@ -66,7 +66,7 @@ class MrpWorkingHour
         'role_id' => $step->role_id,
         'position' => $step->position,
         'total_working_hour' => $totalMinutes,
-        'hr_cost_cal' => $cost
+        'hr_cost_cal' => round($cost, 3)
       ];
     });
     return $menuSteps;
