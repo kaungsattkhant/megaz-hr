@@ -180,7 +180,7 @@
                 <div class="relative flex justify-between py-2 px-6 border-b">
                     <h5 class="text-base text-center mt-2 font-semibold leading-normal font-inter"
                         id="create_modalLabel">
-                        Create Overtime Fees
+                        Create Allowance
                     </h5>
                     <button type="button" class="text-xs focus:shadow-none focus:outline-none" data-te-modal-dismiss
                         id="close_create_modal" aria-label="Close">
@@ -230,9 +230,10 @@
                         <div class="bg-white mb-0 w-full inline-block h-[34px] dark:bg-white !text-black !text-sm"
                             data-te-select-wrapper-ref>
                             <select data-te-select-init data-te-select-placeholder="Select Type"
-                                data-te-select-filter="true" name="" id="" v-model="selectedType" class="input-ui !text-black text-sm">
-                                <option value="allowance"> Allowance </option>
-                                <option value="deduction"> Deduction </option>
+                                data-te-select-filter="false" name="" id="" v-model="selectedType" class="input-ui !text-black text-sm">
+                                <option :value="type" v-for="type in typeList">{{ type.name }}</option>
+                                <!-- <option value="allowance"> Allowance </option>
+                                <option value="deduction"> Deduction </option> -->
                             </select>
                         </div>
                     </div>
@@ -283,6 +284,10 @@ export default {
             
             departmentList:[],
             roleList:[],
+            typeList:[
+                {value: 'allowance', name: 'Allowance'},
+                {value: 'deduction', name: 'Deduction'},
+            ],
 
             selectedDepartment:null,
             selectedRole:null,
@@ -353,7 +358,7 @@ export default {
             let formData = new FormData();
             formData.append('role_id',this.selectedRole.id);
             formData.append('name',this.name);
-            formData.append('type',this.selectedType);
+            formData.append('type',this.selectedType.value);
             formData.append('amount',this.amount);
             let response = await postApiData({url:`/api/hr/salary_allowances`, form_data:formData, token:this.getToken()})
             if(response.success){
