@@ -441,7 +441,7 @@ export default {
         async getStaffList(){
             let response = await getApiData({ url: '/api/staffs', token: this.getToken() });
             if (response.data) {
-                this.staffList = response.data;
+                this.staffList = response.data.data;
             }
         },
         btnCreateOffDay(){
