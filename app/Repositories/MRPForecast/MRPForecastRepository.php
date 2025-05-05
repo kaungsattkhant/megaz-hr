@@ -3,6 +3,7 @@
 namespace App\Repositories\MRPForecast;
 
 use Exception;
+use Carbon\Carbon;
 use App\Models\Item;
 use App\Models\Menu;
 use App\Models\MrpHr;
@@ -10,6 +11,7 @@ use App\Models\KtvItem;
 use App\Models\MenuStep;
 use App\Models\Inventory;
 use App\Models\ItemPrice;
+use App\Models\DayInOffDay;
 use App\Models\MrpForecast;
 use App\Models\KtvObjective;
 use App\Models\SupplierItem;
@@ -41,31 +43,35 @@ class MRPForecastRepository implements MRPForecastRepositoryInterface
   public function getForcastHrByMenuId($request, $menuId)
   {
     $quantity = $request->quantity;
-    $hrDurations = $this->MrpWorkingHour->getGroupedHrDurations($menuId, $quantity);
+    $date = Carbon::parse($request->date);
+    $hrDurations = $this->MrpWorkingHour->getGroupedHrDurations($menuId, $quantity, $date);
     return  $hrDurations;
   }
 
   public function getForcastHR($data)
   {
     $forecastMenuDatas = json_decode($data['forecast_datas'], true);
-
     $allHrDurations = collect();
     foreach ($forecastMenuDatas as $forecastMenuData) {
-      $hrDurations = $this->MrpWorkingHour->getGroupedHrDurations($forecastMenuData['menu_id'], $forecastMenuData['quantity']);
+      $menuId = $forecastMenuData['menu_id'];
+      $quantity = $forecastMenuData['quantity'];
+      $date = Carbon::parse($forecastMenuData['date']);
+      $hrDurations = $this->MrpWorkingHour->getGroupedHrDurations($menuId,  $quantity, $date);
       $allHrDurations = $allHrDurations->merge($hrDurations);
     }
     $groupedHrDurations = $allHrDurations->groupBy('role_id')->map(function ($roles) {
       $first = $roles->first();
       $totalMinutes = $roles->reduce(function ($carry, $role) {
-        return $carry + $role->total_working_hour;
+        return $carry + $role['total_working_hour'];
       }, 0);
-      // $hours = floor($totalMinutes / 60);
-      // $minutes = $totalMinutes % 60;
-
+      $totalHrCost = $roles->sum(function ($role) {
+        return $role['hr_cost_cal'];
+      });
       return [
-        'role_id' => $first->role_id,
-        'position' => $first->position,
+        'role_id' => $first['role_id'],
+        'position' => $first['position'],
         'total_working_hour' => $totalMinutes,
+        'hr_cost_cal' => $totalHrCost,
       ];
     })->values();
 
@@ -1038,6 +1044,7 @@ class MRPForecastRepository implements MRPForecastRepositoryInterface
     foreach ($forecastKTVDatas as $forecastKTV) {
       $quantity = $forecastKTV['quantity']; //session = quantity 
       $entityId = $forecastKTV['entity_id'];
+      $date = $forecastKTV['date'];
 
       $ktvHrData = KtvObjective::with('objectiveKey.role.department')
         ->whereHas('ktvProductTree', function ($query) use ($entityId) {
