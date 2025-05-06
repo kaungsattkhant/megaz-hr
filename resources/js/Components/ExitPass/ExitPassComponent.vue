@@ -81,7 +81,7 @@
                                         {{ index+1 }}
                                     </td>
                                     <td class="whitespace-nowrap">
-                                        date needed
+                                        {{ exit.created_at.split("T")[0] }}
                                     </td>
                                     <td class="whitespace-nowrap">
                                         {{ exit.staff.name }}
@@ -294,7 +294,7 @@
                             Delete ?
                         </h5>
                         <!--Close button-->
-                        <button type="button"
+                        <button type="button" id="close_delete_modal"
                             class="box-content rounded-none border-none hover:no-underline hover:opacity-75 focus:opacity-100 focus:shadow-none focus:outline-none"
                             data-te-modal-dismiss aria-label="Close">
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
