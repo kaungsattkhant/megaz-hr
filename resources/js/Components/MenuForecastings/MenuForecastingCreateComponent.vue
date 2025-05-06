@@ -601,7 +601,8 @@ export default {
                         mrp_forecastable_id: response.data.id,
                         quantity: response.data.quantity,
                         amount: response.data.total_menu_forecast_amt,
-                        mrp_forecastable_type : mrp_forecastable_type
+                        mrp_forecastable_type : mrp_forecastable_type,
+                        date: this.selectedMonth,
                     })
                 // }
                 // this.menuTableList[index].quantity += response.data.quantity;

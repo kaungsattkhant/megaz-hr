@@ -39,4 +39,22 @@ class TimeShift extends Model
         }
         return 0;
     }
+
+
+    public static function calculateTotalShiftDuration()
+    {
+        $timeShifts = self::whereNotNull('from_time')
+            ->whereNotNull('to_time')->get();
+        $totalMinutes = 0;
+
+        foreach ($timeShifts as $timeShift) {
+            $from = Carbon::parse($timeShift['from_time']);
+            $to = Carbon::parse($timeShift['to_time']);
+            $totalMinutes += $to->diffInMinutes($from);
+        }
+
+        $totalHours = $totalMinutes / 60;
+
+        return round($totalHours, 2);
+    }
 }
