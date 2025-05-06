@@ -27,7 +27,7 @@ class UomRepository implements UomRepositoryInterface
             $data['created_by'] = UserData()->id;
             $data['name'] = $data['name'];
             $data['uom_code'] = $data['uom_code'];
-            $uom = Uom::firstOrCreate(['name' => $data['name']], $data);
+            $uom = Uom::firstOrCreate(['name' => $data['name'], 'uom_code' => $data['uom_code']], $data);
             if ($uom) {
                 UomConversion::firstOrCreate(
                     [
@@ -60,6 +60,7 @@ class UomRepository implements UomRepositoryInterface
             $uom = Uom::find($id);
             if ($uom) {
                 $uom->name = $data['name'];
+                $uom->uom_code = $data['uom_code'];
                 $uom->save();
                 DB::commit();
                 return $uom;
